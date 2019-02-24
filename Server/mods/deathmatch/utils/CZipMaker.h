@@ -13,10 +13,10 @@ class CZipMaker
 {
 public:
     CZipMaker(const SString& strZipPathFilename);
-    ~CZipMaker(void);
+    ~CZipMaker();
 
-    bool IsValid(void);
-    bool Close(void);
+    bool IsValid();
+    bool Close();
     bool InsertFile(const SString& strSrc, const SString& strDest);
     bool InsertDirectoryTree(const SString& strSrc, const SString& strDest);
 

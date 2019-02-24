@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CColTube::CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight, CXMLNode* pNode)
-    : CColShape(pManager, pParent, pNode)
+CColTube::CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight) : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
@@ -29,7 +28,7 @@ bool CColTube::DoHitDetection(const CVector& vecNowPosition)
             vecNowPosition.fZ <= m_vecPosition.fZ + m_fHeight);
 }
 
-bool CColTube::ReadSpecialData(void)
+bool CColTube::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
@@ -41,7 +40,7 @@ bool CColTube::ReadSpecialData(void)
     return true;
 }
 
-CSphere CColTube::GetWorldBoundingSphere(void)
+CSphere CColTube::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

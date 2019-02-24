@@ -18,13 +18,13 @@ CClientColModelManager::CClientColModelManager(class CClientManager* pManager)
     m_bRemoveFromList = true;
 }
 
-CClientColModelManager::~CClientColModelManager(void)
+CClientColModelManager::~CClientColModelManager()
 {
     // Remove all items
     RemoveAll();
 }
 
-void CClientColModelManager::RemoveAll(void)
+void CClientColModelManager::RemoveAll()
 {
     // Make sure they don't remove themselves from the list
     m_bRemoveFromList = false;

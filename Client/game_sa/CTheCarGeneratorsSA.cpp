@@ -18,7 +18,7 @@ CTheCarGeneratorsSA::CTheCarGeneratorsSA()
         CarGenerators[i] = new CCarGeneratorSA((CCarGeneratorSAInterface*)(ARRAY_CarGenerators + i * sizeof(CCarGeneratorSAInterface)));
 }
 
-CTheCarGeneratorsSA::~CTheCarGeneratorsSA(void)
+CTheCarGeneratorsSA::~CTheCarGeneratorsSA()
 {
     for (int i = 0; i < MAX_CAR_GENERATORS; i++)
     {

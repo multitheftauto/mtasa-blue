@@ -72,20 +72,20 @@ class CBaseModelInfo_SA_VTBL
 {
 public:
     DWORD Destructor;
-    DWORD AsAtomicModelInfoPtr;                  // (void)
-    DWORD AsDamageAtomicModelInfoPtr;            // (void)
-    DWORD AsLodAtomicModelInfoPtr;               // (void)
-    DWORD GetModelType;                          // (void)           - Not defined in the base
-    DWORD GetTimeInfo;                           // (void)
-    DWORD Init;                                  // (void)
-    DWORD Shutdown;                              // (void)
-    DWORD DeleteRwObject;                        // (void)           - Not defined in the base
-    DWORD GetRwModelType;                        // (void)           - Not defined in the base
+    DWORD AsAtomicModelInfoPtr;                  // ()
+    DWORD AsDamageAtomicModelInfoPtr;            // ()
+    DWORD AsLodAtomicModelInfoPtr;               // ()
+    DWORD GetModelType;                          // ()           - Not defined in the base
+    DWORD GetTimeInfo;                           // ()
+    DWORD Init;                                  // ()
+    DWORD Shutdown;                              // ()
+    DWORD DeleteRwObject;                        // ()           - Not defined in the base
+    DWORD GetRwModelType;                        // ()           - Not defined in the base
     DWORD CreateInstance_;                       // (RwMatrixTag*)   - Not defined in the base
-    DWORD CreateInstance;                        // (void)           - Not defined in the base
+    DWORD CreateInstance;                        // ()           - Not defined in the base
     DWORD SetAnimFile;                           // (char const*)
-    DWORD ConvertAnimFileIndex;                  // (void)
-    DWORD GetAnimFileIndex;                      // (void)
+    DWORD ConvertAnimFileIndex;                  // ()
+    DWORD GetAnimFileIndex;                      // ()
 };
 
 class CAtomicModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
@@ -281,68 +281,68 @@ protected:
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
 public:
-    CModelInfoSA(void);
+    CModelInfoSA();
     CModelInfoSA(DWORD dwModelID);
 
-    CBaseModelInfoSAInterface* GetInterface(void);
-    CPedModelInfoSAInterface*  GetPedModelInfoInterface(void) { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
+    CBaseModelInfoSAInterface* GetInterface();
+    CPedModelInfoSAInterface*  GetPedModelInfoInterface() { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
 
-    DWORD          GetModel(void) { return m_dwModelID; }
-    eModelInfoType GetModelType(void);
-    uint           GetAnimFileIndex(void);
+    DWORD          GetModel() { return m_dwModelID; }
+    eModelInfoType GetModelType();
+    uint           GetAnimFileIndex();
 
-    bool IsPlayerModel(void);
+    bool IsPlayerModel();
 
-    BOOL IsBoat(void);
-    BOOL IsCar(void);
-    BOOL IsTrain(void);
-    BOOL IsHeli(void);
-    BOOL IsPlane(void);
-    BOOL IsBike(void);
-    BOOL IsFakePlane(void);
-    BOOL IsMonsterTruck(void);
-    BOOL IsQuadBike(void);
-    BOOL IsBmx(void);
-    BOOL IsTrailer(void);
-    BOOL IsVehicle(void);
-    BOOL IsUpgrade(void);
+    BOOL IsBoat();
+    BOOL IsCar();
+    BOOL IsTrain();
+    BOOL IsHeli();
+    BOOL IsPlane();
+    BOOL IsBike();
+    BOOL IsFakePlane();
+    BOOL IsMonsterTruck();
+    BOOL IsQuadBike();
+    BOOL IsBmx();
+    BOOL IsTrailer();
+    BOOL IsVehicle();
+    BOOL IsUpgrade();
 
-    char* GetNameIfVehicle(void);
+    char* GetNameIfVehicle();
 
     VOID           Request(EModelRequestType requestType, const char* szTag);
-    VOID           Remove(void);
+    VOID           Remove();
     BYTE           GetLevelFromPosition(CVector* vecPosition);
-    BOOL           IsLoaded(void);
-    BOOL           DoIsLoaded(void);
-    BYTE           GetFlags(void);
-    CBoundingBox*  GetBoundingBox(void);
-    bool           IsValid(void);
-    float          GetDistanceFromCentreOfMassToBaseOfModel(void);
-    unsigned short GetTextureDictionaryID(void);
+    BOOL           IsLoaded();
+    BOOL           DoIsLoaded();
+    BYTE           GetFlags();
+    CBoundingBox*  GetBoundingBox();
+    bool           IsValid();
+    float          GetDistanceFromCentreOfMassToBaseOfModel();
+    unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
-    float          GetLODDistance(void);
+    float          GetLODDistance();
     void           SetLODDistance(float fDistance);
-    static void    StaticResetLodDistances(void);
-    void           RestreamIPL(void);
-    static void    StaticFlushPendingRestreamIPL(void);
-    static void    StaticSetHooks(void);
+    static void    StaticResetLodDistances();
+    void           RestreamIPL();
+    static void    StaticFlushPendingRestreamIPL();
+    static void    StaticSetHooks();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
-    void        ResetAlphaTransparency(void);
-    static void StaticResetAlphaTransparencies(void);
+    void        ResetAlphaTransparency();
+    static void StaticResetAlphaTransparencies();
 
     void ModelAddRef(EModelRequestType requestType, const char* szTag);
-    int  GetRefCount(void);
+    int  GetRefCount();
     void RemoveRef(bool bRemoveExtraGTARef = false);
-    bool ForceUnload(void);
+    bool ForceUnload();
 
     // CVehicleModelInfo specific
     short        GetAvailableVehicleMod(unsigned short usSlot);
     bool         IsUpgradeAvailable(eVehicleUpgradePosn posn);
     void         SetCustomCarPlateText(const char* szText);
-    unsigned int GetNumRemaps(void);
-    void*        GetVehicleSuspensionData(void);
+    unsigned int GetNumRemaps();
+    void*        GetVehicleSuspensionData();
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
@@ -358,22 +358,22 @@ public:
 
     // Custom collision related functions
     void SetCustomModel(RpClump* pClump);
-    void RestoreOriginalModel(void);
+    void RestoreOriginalModel();
     void SetColModel(CColModel* pColModel);
-    void RestoreColModel(void);
-    void MakeCustomModel(void);
+    void RestoreColModel();
+    void MakeCustomModel();
 
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
-    RwObject* GetRwObject(void) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
+    RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
 
-    SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) { return m_ModelSupportedUpgrades; }
+    SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
     void InitialiseSupportedUpgrades(RpClump* pClump);
-    void ResetSupportedUpgrades(void);
+    void ResetSupportedUpgrades();
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

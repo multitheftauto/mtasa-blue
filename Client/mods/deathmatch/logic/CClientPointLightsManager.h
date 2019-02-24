@@ -22,23 +22,23 @@ class CClientPointLightsManager
 
 public:
     CClientPointLightsManager(CClientManager* pManager);
-    ~CClientPointLightsManager(void);
+    ~CClientPointLightsManager();
 
     CClientPointLights* Create(ElementID ID);
 
     void Delete(CClientPointLights* pLight);
-    void DeleteAll(void);
+    void DeleteAll();
 
-    std::list<CClientPointLights*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CClientPointLights*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CClientPointLights*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientPointLights*>::const_iterator IterEnd() { return m_List.end(); };
 
     static CClientPointLights* Get(ElementID ID);
 
-    unsigned short GetDimension(void) { return m_usDimension; };
+    unsigned short GetDimension() { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
-    void DoPulse(void);
-    void RenderHeliLightHandler(void);
+    void DoPulse();
+    void RenderHeliLightHandler();
 
     static bool IsLightsLimitReached();
 

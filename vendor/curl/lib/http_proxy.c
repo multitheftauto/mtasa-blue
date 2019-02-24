@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -222,7 +222,7 @@ static CURLcode CONNECT(struct connectdata *conn,
 
       host_port = aprintf("%s:%d", hostname, remote_port);
       if(!host_port) {
-        Curl_add_buffer_free(req_buffer);
+        Curl_add_buffer_free(&req_buffer);
         return CURLE_OUT_OF_MEMORY;
       }
 
@@ -247,7 +247,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
                   remote_port);
         if(!hostheader) {
-          Curl_add_buffer_free(req_buffer);
+          Curl_add_buffer_free(&req_buffer);
           return CURLE_OUT_OF_MEMORY;
         }
 
@@ -255,7 +255,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           host = aprintf("Host: %s\r\n", hostheader);
           if(!host) {
             free(hostheader);
-            Curl_add_buffer_free(req_buffer);
+            Curl_add_buffer_free(&req_buffer);
             return CURLE_OUT_OF_MEMORY;
           }
         }
@@ -267,7 +267,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           useragent = conn->allocptr.uagent;
 
         result =
-          Curl_add_bufferf(req_buffer,
+          Curl_add_bufferf(&req_buffer,
                            "CONNECT %s HTTP/%s\r\n"
                            "%s"  /* Host: */
                            "%s"  /* Proxy-Authorization */
@@ -290,13 +290,13 @@ static CURLcode CONNECT(struct connectdata *conn,
 
         if(!result)
           /* CRLF terminate the request */
-          result = Curl_add_bufferf(req_buffer, "\r\n");
+          result = Curl_add_bufferf(&req_buffer, "\r\n");
 
         if(!result) {
           /* Send the connect request to the proxy */
           /* BLOCKING */
           result =
-            Curl_add_buffer_send(req_buffer, conn,
+            Curl_add_buffer_send(&req_buffer, conn,
                                  &data->info.request_size, 0, sockindex);
         }
         req_buffer = NULL;
@@ -304,7 +304,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           failf(data, "Failed sending CONNECT to proxy");
       }
 
-      Curl_add_buffer_free(req_buffer);
+      Curl_add_buffer_free(&req_buffer);
       if(result)
         return result;
 
@@ -643,7 +643,7 @@ static CURLcode CONNECT(struct connectdata *conn,
 
 void Curl_connect_free(struct Curl_easy *data)
 {
-  struct connectdata *conn = data->easy_conn;
+  struct connectdata *conn = data->conn;
   struct http_connect_state *s = conn->connect_state;
   if(s) {
     free(s);

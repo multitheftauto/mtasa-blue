@@ -180,7 +180,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
     }
 
     // Check whether on(Client)DebugMessage is currently being triggered
-    bool notCancelled = false;
+    bool notCancelled = true;
     if (!m_bTriggeringMessageEvent)
     {
         // Make sure the state of on(Client)DebugMessage being triggered can be retrieved later
@@ -344,7 +344,7 @@ void CScriptDebugging::OnLuaMainDestroy(CLuaMain* pLuaMain)
     ListRemove(m_LuaMainStack, pLuaMain);
 }
 
-CLuaMain* CScriptDebugging::GetTopLuaMain(void)
+CLuaMain* CScriptDebugging::GetTopLuaMain()
 {
     if (!m_LuaMainStack.empty())
         return m_LuaMainStack.back();

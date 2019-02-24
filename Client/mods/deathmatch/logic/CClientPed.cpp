@@ -243,7 +243,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     g_pClientGame->InsertPedPointerToSet(this);
 }
 
-CClientPed::~CClientPed(void)
+CClientPed::~CClientPed()
 {
     // A hack to destroy custom animation by playing a default internal animation.
     // When IFP is unloaded by leaving the server, the pointer to its animations might
@@ -402,7 +402,7 @@ float CClientPed::GetStat(unsigned short usStat)
     }
 }
 
-void CClientPed::ResetStats(void)
+void CClientPed::ResetStats()
 {
     // stats
     for (unsigned short us = 0; us <= NUM_PLAYER_STATS; us++)
@@ -737,9 +737,10 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     SetMoveSpeed(CVector());
     SetInterior(ucInterior);
     SetFootBloodEnabled(false);
+    SetIsDead(false);
 }
 
-void CClientPed::ResetInterpolation(void)
+void CClientPed::ResetInterpolation()
 {
     m_ulBeginRotationTime = 0;
     m_ulEndRotationTime = 0;
@@ -749,7 +750,7 @@ void CClientPed::ResetInterpolation(void)
     RemoveTargetPosition();
 }
 
-float CClientPed::GetCameraRotation(void)
+float CClientPed::GetCameraRotation()
 {
     // Local player
     if (m_bIsLocalPlayer)
@@ -1039,7 +1040,7 @@ bool CClientPed::SetModel(unsigned long ulModel, bool bTemp)
     return false;
 }
 
-bool CClientPed::GetCanBeKnockedOffBike(void)
+bool CClientPed::GetCanBeKnockedOffBike()
 {
     if (m_pPlayerPed)
     {
@@ -1077,7 +1078,7 @@ CVector* CClientPed::GetTransformedBonePosition(eBone bone, CVector& vecPosition
     return NULL;
 }
 
-CClientVehicle* CClientPed::GetRealOccupiedVehicle(void)
+CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 {
     if (m_pPlayerPed)
     {
@@ -1435,6 +1436,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                 // Tell vehicle audio we have driver
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
             }
+
+            // Make sure our camera is fixed on the new vehicle
+            if (m_bIsLocalPlayer)
+                m_pManager->GetCamera()->SetTargetEntity(pVehicle);
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1477,6 +1482,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                         // Tell vehicle audio we have driver
                         pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
                     }
+
+                    // Make sure our camera is fixed on the new vehicle
+                    if (m_bIsLocalPlayer)
+                        m_pManager->GetCamera()->SetTargetEntity(pVehicle);
                 }
             }
 
@@ -1511,7 +1520,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     }
 }
 
-void CClientPed::ResetToOutOfVehicleWeapon(void)
+void CClientPed::ResetToOutOfVehicleWeapon()
 {
     if (m_pOutOfVehicleWeaponSlot != WEAPONSLOT_MAX)
     {
@@ -1604,7 +1613,7 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
     return pVehicle;
 }
 
-bool CClientPed::IsVisible(void)
+bool CClientPed::IsVisible()
 {
     if (m_pPlayerPed)
     {
@@ -1622,7 +1631,7 @@ void CClientPed::SetVisible(bool bVisible)
     m_bVisible = bVisible;
 }
 
-bool CClientPed::GetUsesCollision(void)
+bool CClientPed::GetUsesCollision()
 {
     /*
     if ( m_pPlayerPed )
@@ -1645,7 +1654,7 @@ void CClientPed::SetUsesCollision(bool bUsesCollision)
     }
 }
 
-float CClientPed::GetMaxHealth(void)
+float CClientPed::GetMaxHealth()
 {
     // TODO: Verify this formula
 
@@ -1662,7 +1671,7 @@ float CClientPed::GetMaxHealth(void)
     return fMaxHealth;
 }
 
-float CClientPed::GetHealth(void)
+float CClientPed::GetHealth()
 {
     if (m_bHealthLocked)
         return m_fHealth;
@@ -1729,7 +1738,7 @@ void CClientPed::InternalSetHealth(float fHealth)
     }
 }
 
-float CClientPed::GetArmor(void)
+float CClientPed::GetArmor()
 {
     if (m_bArmorLocked)
         return m_fArmor;
@@ -1766,7 +1775,7 @@ void CClientPed::LockArmor(float fArmor)
     m_fArmor = fArmor;
 }
 
-float CClientPed::GetOxygenLevel(void)
+float CClientPed::GetOxygenLevel()
 {
     if (m_pPlayerPed)
     {
@@ -1783,7 +1792,7 @@ void CClientPed::SetOxygenLevel(float fOxygen)
     }
 }
 
-bool CClientPed::IsDying(void)
+bool CClientPed::IsDying()
 {
     if (m_pPlayerPed)
     {
@@ -1800,20 +1809,16 @@ bool CClientPed::IsDying(void)
     return false;
 }
 
-bool CClientPed::IsDead(void)
+bool CClientPed::IsDead()
 {
     if (m_pPlayerPed)
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+
         if (pTask)
-        {
-            if (pTask->GetTaskType() == TASK_SIMPLE_DEAD)
-            {
-                return true;
-            }
-        }
-        return false;
+            return pTask->GetTaskType() == TASK_SIMPLE_DEAD;
     }
+
     return m_bDead;
 }
 
@@ -1949,7 +1954,7 @@ void CClientPed::SetFrozen(bool bFrozen)
     }
 }
 
-bool CClientPed::IsFrozenWaitingForGroundToLoad(void) const
+bool CClientPed::IsFrozenWaitingForGroundToLoad() const
 {
     return m_bFrozenWaitingForGroundToLoad;
 }
@@ -2106,13 +2111,21 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
                     DWORD       ammoInClip = oldWeapon->GetAmmoInClip();
                     DWORD       ammoInTotal = oldWeapon->GetAmmoTotal();
                     eWeaponType weaponType = oldWeapon->GetType();
-                    RemoveWeapon(oldWeapon->GetType());
+
+                    bool isGoggles = currentSlot == WEAPONSLOT_TYPE_PARACHUTE && (weaponType == WEAPONTYPE_NIGHTVISION || weaponType == WEAPONTYPE_INFRARED);
+                    if (!isGoggles)
+                    {
+                        RemoveWeapon(oldWeapon->GetType());
+                    }
 
                     m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
 
-                    CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                    newWeapon->SetAmmoInClip(ammoInClip);
-                    newWeapon->SetAmmoTotal(ammoInTotal);
+                    if (!isGoggles)
+                    {
+                        CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                        newWeapon->SetAmmoInClip(ammoInClip);
+                        newWeapon->SetAmmoTotal(ammoInTotal);
+                    }
 
                     // Don't allow doing gang driveby while unarmed
                     if (IsDoingGangDriveby())
@@ -2142,7 +2155,7 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
     return false;
 }
 
-eWeaponSlot CClientPed::GetCurrentWeaponSlot(void)
+eWeaponSlot CClientPed::GetCurrentWeaponSlot()
 {
     if (m_pPlayerPed)
     {
@@ -2151,7 +2164,7 @@ eWeaponSlot CClientPed::GetCurrentWeaponSlot(void)
     return m_CurrentWeaponSlot;
 }
 
-eWeaponType CClientPed::GetCurrentWeaponType(void)
+eWeaponType CClientPed::GetCurrentWeaponType()
 {
     if (m_pPlayerPed)
     {
@@ -2164,13 +2177,13 @@ eWeaponType CClientPed::GetCurrentWeaponType(void)
     return WEAPONTYPE_UNARMED;
 }
 
-bool CClientPed::IsCurrentWeaponUsingBulletSync(void)
+bool CClientPed::IsCurrentWeaponUsingBulletSync()
 {
     eWeaponType weaponType = GetCurrentWeaponType();
     return g_pClientGame->GetWeaponTypeUsesBulletSync(weaponType);
 }
 
-CWeapon* CClientPed::GetWeapon(void)
+CWeapon* CClientPed::GetWeapon()
 {
     if (m_pPlayerPed)
     {
@@ -2227,7 +2240,7 @@ void CClientPed::RemoveWeapon(eWeaponType weaponType)
     }
 }
 
-void CClientPed::RemoveAllWeapons(void)
+void CClientPed::RemoveAllWeapons()
 {
     if (m_bIsLocalPlayer)
     {
@@ -2297,7 +2310,7 @@ bool CClientPed::HasWeapon(eWeaponType weaponType)
 //
 // Check and attempt to fix weapons for remote players
 //
-void CClientPed::ValidateRemoteWeapons(void)
+void CClientPed::ValidateRemoteWeapons()
 {
     // Must be streamed in remote player
     if (!m_pPlayerPed || IsLocalPlayer() || GetType() != CCLIENTPLAYER)
@@ -2335,7 +2348,7 @@ void CClientPed::ValidateRemoteWeapons(void)
     m_pPlayerPed->SetCurrentWeaponSlot(m_CurrentWeaponSlot);
 }
 
-eMovementState CClientPed::GetMovementState(void)
+eMovementState CClientPed::GetMovementState()
 {
     // Do we have a player, and are we on foot? (streamed in)
     if (m_pPlayerPed && !GetRealOccupiedVehicle())
@@ -2407,7 +2420,7 @@ bool CClientPed::GetMovementState(std::string& strStateName)
     return true;
 }
 
-CTask* CClientPed::GetCurrentPrimaryTask(void)
+CTask* CClientPed::GetCurrentPrimaryTask()
 {
     if (m_pPlayerPed)
     {
@@ -2527,7 +2540,7 @@ bool CClientPed::KillTaskSecondary(int iTaskPriority, bool bGracefully)
     return false;
 }
 
-CVector CClientPed::GetAim(void) const
+CVector CClientPed::GetAim() const
 {
     if (m_shotSyncData)
         return CVector(m_shotSyncData->m_fArmDirectionX, m_shotSyncData->m_fArmDirectionY, 0);
@@ -3272,7 +3285,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     }
 }
 
-float CClientPed::GetCurrentRotation(void)
+float CClientPed::GetCurrentRotation()
 {
     if (m_pPlayerPed)
     {
@@ -3326,7 +3339,7 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float
 #include "../mods/deathmatch/logic/CClientGame.h"
 extern CClientGame* g_pClientGame;
 
-void CClientPed::Interpolate(void)
+void CClientPed::Interpolate()
 {
     // Grab the current time
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -3553,7 +3566,7 @@ void CClientPed::UpdateKeysync(bool bCleanup)
     }
 }
 
-void CClientPed::_CreateModel(void)
+void CClientPed::_CreateModel()
 {
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
@@ -3561,14 +3574,11 @@ void CClientPed::_CreateModel(void)
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(static_cast<ePedModel>(m_ulModel)));
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel)));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         g_pMultiplayer->AddRemoteDataStorage(m_pPlayerPed, m_remoteDataStorage);
 
@@ -3683,10 +3693,10 @@ void CClientPed::_CreateModel(void)
     }
 }
 
-void CClientPed::_CreateLocalModel(void)
+void CClientPed::_CreateLocalModel()
 {
     // Init the local player and grab the pointers
-    g_pGame->InitLocalPlayer();
+    g_pGame->InitLocalPlayer(this);
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->GetPedFromRef((DWORD)1));
 
     if (m_pPlayerPed)
@@ -3695,9 +3705,6 @@ void CClientPed::_CreateLocalModel(void)
 
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
@@ -3786,9 +3793,6 @@ void CClientPed::_DestroyModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
-
     // Remove the ped from the world
     g_pGame->GetPools()->RemovePed(m_pPlayerPed);
     m_pPlayerPed = NULL;
@@ -3831,8 +3835,7 @@ void CClientPed::_DestroyLocalModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
+    g_pGame->GetPools()->InvalidateLocalPlayerClientEntity();
 
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
@@ -3849,7 +3852,7 @@ void CClientPed::_DestroyLocalModel()
     m_pTaskManager = NULL;
 }
 
-void CClientPed::_ChangeModel(void)
+void CClientPed::_ChangeModel()
 {
     // Different model than before?
     if (m_pPlayerPed->GetModelIndex() != m_ulModel)
@@ -3982,7 +3985,7 @@ void CClientPed::_ChangeModel(void)
     }
 }
 
-void CClientPed::ReCreateModel(void)
+void CClientPed::ReCreateModel()
 {
     // We can only recreate if we're not the local player and if we have a player model
     if (!m_bIsLocalPlayer && m_pPlayerPed)
@@ -4104,7 +4107,7 @@ void CClientPed::StreamIn(bool bInstantly)
     }
 }
 
-void CClientPed::StreamOut(void)
+void CClientPed::StreamOut()
 {
     // Make sure we have a player ped and that we're not
     // the local player
@@ -4157,17 +4160,6 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
             // Make sure we can't fall off
             SetCanBeKnockedOffBike(false);
         }
-
-        // Jax: make sure our camera is fixed on the new vehicle
-        if (m_bIsLocalPlayer)
-        {
-            CClientCamera* pCamera = m_pManager->GetCamera();
-            if (!pCamera->IsInFixedMode())
-            {
-                // Jax: very hacky, clean up if possible (some camera-target pointer)
-                *(unsigned long*)(0xB6F3B8) = (unsigned long)pGameVehicle->GetVehicleInterface();
-            }
-        }
     }
 }
 
@@ -4201,7 +4193,7 @@ void CClientPed::InternalRemoveFromVehicle(CVehicle* pGameVehicle)
     }
 }
 
-bool CClientPed::PerformChecks(void)
+bool CClientPed::PerformChecks()
 {
     // Must be streamed in
     if (m_pPlayerPed)
@@ -4231,7 +4223,7 @@ bool CClientPed::PerformChecks(void)
     return true;
 }
 
-void CClientPed::StartRadio(void)
+void CClientPed::StartRadio()
 {
     // We use this to avoid radio lags sometimes. Also make sure
     // it's not already on
@@ -4245,7 +4237,7 @@ void CClientPed::StartRadio(void)
     }
 }
 
-void CClientPed::StopRadio(void)
+void CClientPed::StopRadio()
 {
     // We use this to avoid radio lags sometimes
     if (!m_bDontChangeRadio)
@@ -4285,7 +4277,7 @@ void CClientPed::Duck(bool bDuck)
     m_bDucked = bDuck;
 }
 
-bool CClientPed::IsDucked(void)
+bool CClientPed::IsDucked()
 {
     if (m_pPlayerPed)
     {
@@ -4340,7 +4332,7 @@ void CClientPed::SetChoking(bool bChoking)
     }
 }
 
-bool CClientPed::IsChoking(void)
+bool CClientPed::IsChoking()
 {
     // We have a task manager?
     if (m_pTaskManager)
@@ -4570,7 +4562,7 @@ bool CClientPed::SetHasJetPack(bool bHasJetPack)
     return true;
 }
 
-bool CClientPed::HasJetPack(void)
+bool CClientPed::HasJetPack()
 {
     if (m_pPlayerPed)
     {
@@ -4584,7 +4576,7 @@ bool CClientPed::HasJetPack(void)
     return m_bHasJetPack;
 }
 
-bool CClientPed::IsInWater(void)
+bool CClientPed::IsInWater()
 {
     if (m_pPlayerPed)
     {
@@ -4601,7 +4593,7 @@ bool CClientPed::IsInWater(void)
     return m_bIsInWater;
 }
 
-float CClientPed::GetDistanceFromGround(void)
+float CClientPed::GetDistanceFromGround()
 {
     CVector vecPosition;
     GetPosition(vecPosition);
@@ -4610,7 +4602,7 @@ float CClientPed::GetDistanceFromGround(void)
     return (vecPosition.fZ - fGroundLevel);
 }
 
-bool CClientPed::IsOnGround(void)
+bool CClientPed::IsOnGround()
 {
     CVector vecPosition;
     GetPosition(vecPosition);
@@ -4618,7 +4610,7 @@ bool CClientPed::IsOnGround(void)
     return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel) <= 1.0f);
 }
 
-bool CClientPed::IsClimbing(void)
+bool CClientPed::IsClimbing()
 {
     if (m_pPlayerPed)
     {
@@ -4631,7 +4623,7 @@ bool CClientPed::IsClimbing(void)
     return false;
 }
 
-void CClientPed::NextRadioChannel(void)
+void CClientPed::NextRadioChannel()
 {
     // Is our radio on?
     if (m_bRadioOn)
@@ -4640,7 +4632,7 @@ void CClientPed::NextRadioChannel(void)
     }
 }
 
-void CClientPed::PreviousRadioChannel(void)
+void CClientPed::PreviousRadioChannel()
 {
     // Is our radio on?
     if (m_bRadioOn)
@@ -4837,7 +4829,7 @@ CVector CClientPed::AdjustShotOriginForWalls(const CVector& vecOrigin, const CVe
     return vecResultOrigin;
 }
 
-eFightingStyle CClientPed::GetFightingStyle(void)
+eFightingStyle CClientPed::GetFightingStyle()
 {
     if (m_pPlayerPed)
     {
@@ -4855,7 +4847,7 @@ void CClientPed::SetFightingStyle(eFightingStyle style)
     m_FightingStyle = style;
 }
 
-eMoveAnim CClientPed::GetMoveAnim(void)
+eMoveAnim CClientPed::GetMoveAnim()
 {
     if (m_pPlayerPed)
     {
@@ -4890,7 +4882,7 @@ unsigned int CClientPed::CountProjectiles(eWeaponType weaponType)
     return uiCount;
 }
 
-void CClientPed::RemoveAllProjectiles(void)
+void CClientPed::RemoveAllProjectiles()
 {
     CClientProjectile*                 pProjectile = NULL;
     list<CClientProjectile*>::iterator iter = m_Projectiles.begin();
@@ -4944,7 +4936,7 @@ void CClientPed::DestroySatchelCharges(bool bBlow, bool bDestroy)
     m_bDestroyingSatchels = false;
 }
 
-bool CClientPed::IsEnteringVehicle(void)
+bool CClientPed::IsEnteringVehicle()
 {
     if (m_pPlayerPed)
     {
@@ -4967,7 +4959,7 @@ bool CClientPed::IsEnteringVehicle(void)
     return false;
 }
 
-bool CClientPed::IsLeavingVehicle(void)
+bool CClientPed::IsLeavingVehicle()
 {
     if (m_pPlayerPed)
     {
@@ -4994,7 +4986,7 @@ bool CClientPed::IsLeavingVehicle(void)
     return false;
 }
 
-bool CClientPed::IsGettingIntoVehicle(void)
+bool CClientPed::IsGettingIntoVehicle()
 {
     if (m_pPlayerPed)
     {
@@ -5026,7 +5018,7 @@ bool CClientPed::IsGettingIntoVehicle(void)
     return false;
 }
 
-bool CClientPed::IsGettingOutOfVehicle(void)
+bool CClientPed::IsGettingOutOfVehicle()
 {
     if (m_pPlayerPed)
     {
@@ -5057,7 +5049,7 @@ bool CClientPed::IsGettingOutOfVehicle(void)
     return false;
 }
 
-bool CClientPed::IsGettingJacked(void)
+bool CClientPed::IsGettingJacked()
 {
     if (m_pPlayerPed)
     {
@@ -5080,31 +5072,26 @@ bool CClientPed::IsGettingJacked(void)
     return false;
 }
 
-CClientEntity* CClientPed::GetContactEntity(void)
+CClientEntity* CClientPed::GetContactEntity()
 {
-    CClientEntity* pReturn = NULL;
-    if (m_pPlayerPed)
+    CPools* pPools = g_pGame->GetPools();
+    if (pPools && m_pPlayerPed)
     {
         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
+            CEntitySAInterface* pInterface = pEntity->GetInterface();
+            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
+                return pPools->GetClientEntity((DWORD*)pInterface);
             }
         }
     }
-    return pReturn;
+    return nullptr;
 }
 
-bool CClientPed::HasAkimboPointingUpwards(void)
+bool CClientPed::HasAkimboPointingUpwards()
 {
     if (m_bIsLocalPlayer)
     {
@@ -5137,7 +5124,7 @@ bool CClientPed::HasAkimboPointingUpwards(void)
     return false;
 }
 
-float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel(void)
+float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     if (m_pPlayerPed)
     {
@@ -5303,7 +5290,7 @@ void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulD
     }
 }
 
-void CClientPed::RemoveTargetPosition(void)
+void CClientPed::RemoveTargetPosition()
 {
     m_interp.pos.ulFinishTime = 0;
     if (m_interp.pTargetOriginSource)
@@ -5313,7 +5300,7 @@ void CClientPed::RemoveTargetPosition(void)
     }
 }
 
-void CClientPed::UpdateTargetPosition(void)
+void CClientPed::UpdateTargetPosition()
 {
     if (HasTargetPosition())
     {
@@ -5437,7 +5424,7 @@ void CClientPed::UpdateUnderFloorFix(const CVector& vecTargetPosition, const CVe
     }
 }
 
-CClientEntity* CClientPed::GetTargetedEntity(void)
+CClientEntity* CClientPed::GetTargetedEntity()
 {
     CClientEntity* pReturn = NULL;
     if (m_pPlayerPed)
@@ -5445,26 +5432,14 @@ CClientEntity* CClientPed::GetTargetedEntity(void)
         CEntity* pEntity = m_pPlayerPed->GetTargetedEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
-            {
-                case ENTITY_TYPE_PED:
-                    pReturn = m_pManager->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pEntity), true, false);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;
 }
 
-CClientPed* CClientPed::GetTargetedPed(void)
+CClientPed* CClientPed::GetTargetedPed()
 {
     CClientEntity* pTargetEntity = GetTargetedEntity();
     if (pTargetEntity && IS_PED(pTargetEntity))
@@ -5474,19 +5449,19 @@ CClientPed* CClientPed::GetTargetedPed(void)
     return NULL;
 }
 
-void CClientPed::NotifyCreate(void)
+void CClientPed::NotifyCreate()
 {
     m_pManager->GetPedManager()->OnCreation(this);
     CClientStreamElement::NotifyCreate();
 }
 
-void CClientPed::NotifyDestroy(void)
+void CClientPed::NotifyDestroy()
 {
     m_pManager->GetPedManager()->OnDestruction(this);
     UpdateKeysync(true);
 }
 
-bool CClientPed::IsSunbathing(void)
+bool CClientPed::IsSunbathing()
 {
     if (m_pPlayerPed)
     {
@@ -5567,7 +5542,7 @@ bool CClientPed::UseGun(CVector vecTarget, CClientEntity* pEntity)
     return false;
 }
 
-bool CClientPed::IsAttachToable(void)
+bool CClientPed::IsAttachToable()
 {
     // We're not attachable if we're inside a vehicle (that would get messy)
     if (!GetOccupiedVehicle())
@@ -5577,7 +5552,7 @@ bool CClientPed::IsAttachToable(void)
     return false;
 }
 
-bool CClientPed::IsDoingGangDriveby(void)
+bool CClientPed::IsDoingGangDriveby()
 {
     if (m_pPlayerPed)
     {
@@ -5640,7 +5615,7 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     m_bDoingGangDriveby = bDriveby;
 }
 
-bool CClientPed::IsRunningAnimation(void)
+bool CClientPed::IsRunningAnimation()
 {
     if (m_pPlayerPed)
     {
@@ -5756,7 +5731,7 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
     m_bFreezeLastFrameAnimation = bFreezeLastFrame;
 }
 
-void CClientPed::KillAnimation(void)
+void CClientPed::KillAnimation()
 {
     if (m_pPlayerPed)
     {
@@ -5778,7 +5753,7 @@ void CClientPed::KillAnimation(void)
     SetNextAnimationNormal();
 }
 
-void CClientPed::PostWeaponFire(void)
+void CClientPed::PostWeaponFire()
 {
     m_ulLastTimeFired = CClientTime::GetTime();
 }
@@ -5811,7 +5786,7 @@ bool CClientPed::GetBulletImpactData(CClientEntity** ppEntity, CVector* pvecHitP
         return false;
 }
 
-bool CClientPed::IsUsingGun(void)
+bool CClientPed::IsUsingGun()
 {
     if (m_pPlayerPed)
     {
@@ -5848,7 +5823,7 @@ void CClientPed::SetFootBloodEnabled(bool bHasFootBlood)
     }
 }
 
-bool CClientPed::IsFootBloodEnabled(void)
+bool CClientPed::IsFootBloodEnabled()
 {
     if (m_pPlayerPed)
     {
@@ -5899,7 +5874,7 @@ void CClientPed::SetVoice(const char* szVoiceType, const char* szVoice)
         m_pPlayerPed->SetVoice(szVoiceType, szVoice);
 }
 
-bool CClientPed::IsSpeechEnabled(void)
+bool CClientPed::IsSpeechEnabled()
 {
     if (m_pPlayerPed)
     {
@@ -5920,7 +5895,7 @@ void CClientPed::SetSpeechEnabled(bool bEnabled)
     m_bSpeechEnabled = bEnabled;
 }
 
-bool CClientPed::CanReloadWeapon(void)
+bool CClientPed::CanReloadWeapon()
 {
     unsigned long    ulNow = CClientTime::GetTime();
     CControllerState Current;
@@ -5940,7 +5915,7 @@ bool CClientPed::CanReloadWeapon(void)
     return false;
 }
 
-bool CClientPed::ReloadWeapon(void)
+bool CClientPed::ReloadWeapon()
 {
     if (m_pTaskManager)
     {
@@ -5959,12 +5934,12 @@ bool CClientPed::ReloadWeapon(void)
     return false;
 }
 
-bool CClientPed::IsReloadingWeapon(void)
+bool CClientPed::IsReloadingWeapon()
 {
     return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
 }
 
-bool CClientPed::ShouldBeStealthAiming(void)
+bool CClientPed::ShouldBeStealthAiming()
 {
     if (m_pPlayerPed)
     {
@@ -6058,7 +6033,7 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimation(AnimationId id)
     return nullptr;
 }
 
-std::unique_ptr<CAnimBlendAssociation> CClientPed::GetFirstAnimation(void)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetFirstAnimation()
 {
     if (m_pPlayerPed)
     {
@@ -6116,7 +6091,7 @@ void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
     }
 }
 
-void CClientPed::RestoreAllAnimations(void)
+void CClientPed::RestoreAllAnimations()
 {
     m_mapOfReplacedAnimations.clear();
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
@@ -6153,7 +6128,7 @@ SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterf
     return nullptr;
 }
 
-CSphere CClientPed::GetWorldBoundingSphere(void)
+CSphere CClientPed::GetWorldBoundingSphere()
 {
     CSphere     sphere;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(GetModel());
@@ -6171,7 +6146,7 @@ CSphere CClientPed::GetWorldBoundingSphere(void)
 }
 
 // Currently, this should only be called for the local player
-void CClientPed::HandleWaitingForGroundToLoad(void)
+void CClientPed::HandleWaitingForGroundToLoad()
 {
     // Check if near any MTA objects
     bool    bNearObject = false;

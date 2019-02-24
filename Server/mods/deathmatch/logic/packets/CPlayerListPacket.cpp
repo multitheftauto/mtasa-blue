@@ -73,7 +73,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
 
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
-        BitStream.WriteBit(pPlayer->IsDead());            // Currently unused by the client
+        BitStream.WriteBit(pPlayer->IsDead());
         BitStream.WriteBit(true);                         // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit(bInVehicle);
         BitStream.WriteBit(pPlayer->HasJetPack());

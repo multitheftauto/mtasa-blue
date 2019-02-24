@@ -21,16 +21,16 @@ public:
     ~CProxyDirectInputDevice8();
     /*** IUnknown methods ***/
     virtual HRESULT __stdcall QueryInterface(REFIID riid, LPVOID* ppvObj);
-    virtual ULONG __stdcall AddRef(VOID);
-    virtual ULONG __stdcall Release(VOID);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     /*** IDirectInputDevice8A methods ***/
     virtual HRESULT __stdcall GetCapabilities(LPDIDEVCAPS a);
     virtual HRESULT __stdcall EnumObjects(LPDIENUMDEVICEOBJECTSCALLBACKA a, LPVOID b, DWORD c);
     virtual HRESULT __stdcall GetProperty(REFGUID a, LPDIPROPHEADER b);
     virtual HRESULT __stdcall SetProperty(REFGUID a, LPCDIPROPHEADER b);
-    virtual HRESULT __stdcall Acquire(VOID);
-    virtual HRESULT __stdcall Unacquire(VOID);
+    virtual HRESULT __stdcall Acquire();
+    virtual HRESULT __stdcall Unacquire();
     virtual HRESULT __stdcall GetDeviceState(DWORD a, LPVOID b);
     virtual HRESULT __stdcall GetDeviceData(DWORD a, LPDIDEVICEOBJECTDATA b, LPDWORD c, DWORD d);
     virtual HRESULT __stdcall SetDataFormat(LPCDIDATAFORMAT a);
@@ -47,7 +47,7 @@ public:
     virtual HRESULT __stdcall SendForceFeedbackCommand(DWORD a);
     virtual HRESULT __stdcall EnumCreatedEffectObjects(LPDIENUMCREATEDEFFECTOBJECTSCALLBACK a, LPVOID b, DWORD c);
     virtual HRESULT __stdcall Escape(LPDIEFFESCAPE a);
-    virtual HRESULT __stdcall Poll(VOID);
+    virtual HRESULT __stdcall Poll();
     virtual HRESULT __stdcall SendDeviceData(DWORD a, LPCDIDEVICEOBJECTDATA b, LPDWORD c, DWORD d);
     virtual HRESULT __stdcall EnumEffectsInFile(LPCSTR a, LPDIENUMEFFECTSINFILECALLBACK b, LPVOID c, DWORD d);
     virtual HRESULT __stdcall WriteEffectToFile(LPCSTR a, DWORD b, LPDIFILEEFFECT c, DWORD d);

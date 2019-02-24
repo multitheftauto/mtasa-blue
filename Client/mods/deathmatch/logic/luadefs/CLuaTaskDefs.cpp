@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-void CLuaTaskDefs::LoadFunctions(void)
+void CLuaTaskDefs::LoadFunctions()
 {
     // ChrML: Disabled for dp3
     /*

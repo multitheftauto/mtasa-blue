@@ -11,11 +11,11 @@
 
 #include "StdInc.h"
 
-CTeamManager::CTeamManager(void)
+CTeamManager::CTeamManager()
 {
 }
 
-CTeamManager::~CTeamManager(void)
+CTeamManager::~CTeamManager()
 {
     RemoveAll();
 }
@@ -25,7 +25,7 @@ void CTeamManager::RemoveFromList(CTeam* pTeam)
     m_List.remove(pTeam);
 }
 
-void CTeamManager::RemoveAll(void)
+void CTeamManager::RemoveAll()
 {
     DeletePointersAndClearList(m_List);
 }
@@ -50,34 +50,28 @@ bool CTeamManager::Exists(CTeam* pTeam)
     return ListContains(m_List, pTeam);
 }
 
-CTeam* CTeamManager::Create(CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+CTeam* CTeamManager::Create(CElement* pParent, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    // Create the team
-    CTeam* pTeam = new CTeam(this, pParent, pNode, szName, ucRed, ucGreen, ucBlue);
+    CTeam* const pTeam = new CTeam(this, pParent, szName, ucRed, ucGreen, ucBlue);
 
-    // Invalid Team id?
     if (pTeam->GetID() == INVALID_ELEMENT_ID)
     {
         delete pTeam;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created Team
     return pTeam;
 }
 
 CTeam* CTeamManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the Team
-    CTeam* pTeam = new CTeam(this, pParent, &Node);
+    CTeam* const pTeam = new CTeam(this, pParent);
 
-    // Verify the Team id and load the data from xml
-    if (pTeam->GetID() == INVALID_ELEMENT_ID || !pTeam->LoadFromCustomData(pEvents))
+    if (pTeam->GetID() == INVALID_ELEMENT_ID || !pTeam->LoadFromCustomData(pEvents, Node))
     {
         delete pTeam;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created Team
     return pTeam;
 }

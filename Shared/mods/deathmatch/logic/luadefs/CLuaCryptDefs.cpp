@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include <SharedUtil.Crypto.h>
 
-void CLuaCryptDefs::LoadFunctions(void)
+void CLuaCryptDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"md5", Md5},

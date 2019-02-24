@@ -39,7 +39,7 @@ bool g_bNoCrashHandler = false;
 bool    g_bDaemonized = false;
 WINDOW* m_wndMenu = NULL;
 WINDOW* m_wndInput = NULL;
-bool    IsCursesActive(void)
+bool    IsCursesActive()
 {
     return m_wndInput != NULL;
 }
@@ -48,7 +48,7 @@ bool    IsCursesActive(void)
 #ifdef WIN32
 CServerImpl::CServerImpl(CThreadCommandQueue* pThreadCommandQueue)
 #else
-CServerImpl::CServerImpl(void)
+CServerImpl::CServerImpl()
 #endif
 {
     #ifdef WIN32
@@ -74,23 +74,23 @@ CServerImpl::CServerImpl(void)
     m_pModManager = new CModManagerImpl(this);
 }
 
-CServerImpl::~CServerImpl(void)
+CServerImpl::~CServerImpl()
 {
     // Destroy our stuff
     delete m_pModManager;
 }
 
-CNetServer* CServerImpl::GetNetwork(void)
+CNetServer* CServerImpl::GetNetwork()
 {
     return m_pNetwork;
 }
 
-CModManager* CServerImpl::GetModManager(void)
+CModManager* CServerImpl::GetModManager()
 {
     return m_pModManager;
 }
 
-CXML* CServerImpl::GetXML(void)
+CXML* CServerImpl::GetXML()
 {
     return m_pXML;
 }
@@ -131,7 +131,7 @@ void CServerImpl::Printf(const char* szFormat, ...)
     va_end(ap);
 }
 
-bool CServerImpl::IsRequestingExit(void)
+bool CServerImpl::IsRequestingExit()
 {
 #ifdef WIN32
     m_pThreadCommandQueue->Process(m_bRequestedQuit, NULL);
@@ -435,7 +435,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     return ERROR_NO_ERROR;
 }
 
-void CServerImpl::MainLoop(void)
+void CServerImpl::MainLoop()
 {
 #ifdef WIN32
     timeBeginPeriod(1);            // Change sleep resolution to 1ms
@@ -491,7 +491,7 @@ void CServerImpl::MainLoop(void)
 //
 // Limit the pulses to avoid heavy CPU usage
 //
-void CServerImpl::HandlePulseSleep(void)
+void CServerImpl::HandlePulseSleep()
 {
     // Get settings
     int iSleepBusyMs;
@@ -714,7 +714,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
 #endif
 }
 
-void CServerImpl::HandleInput(void)
+void CServerImpl::HandleInput()
 {
     wint_t iStdIn = 0;
 
@@ -983,7 +983,7 @@ void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
 #endif
 }
 
-bool CServerImpl::ClearInput(void)
+bool CServerImpl::ClearInput()
 {
     if (m_uiInputCount > 0)
     {
@@ -1007,7 +1007,7 @@ bool CServerImpl::ClearInput(void)
     return false;
 }
 
-bool CServerImpl::ResetInput(void)
+bool CServerImpl::ResetInput()
 {
     if (m_uiInputCount > 0)
     {
@@ -1145,7 +1145,7 @@ bool IsKeyPressed(int iKey)
     return false;
 }
 
-void CServerImpl::DestroyWindow(void)
+void CServerImpl::DestroyWindow()
 {
 #ifndef WIN32
     if (!g_bSilent && !g_bNoCurses && m_wndInput)

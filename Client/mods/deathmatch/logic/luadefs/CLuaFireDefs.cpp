@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "CLuaFireDefs.h"
 
-void CLuaFireDefs::LoadFunctions(void)
+void CLuaFireDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createFire", CreateFire},

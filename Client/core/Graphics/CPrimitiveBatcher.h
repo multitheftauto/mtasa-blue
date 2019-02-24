@@ -8,11 +8,12 @@
  *
  *****************************************************************************/
 // Vertex type used by the primitives batcher
-struct sDrawQueuePrimitive
+struct sPrimitive
 {
-    D3DPRIMITIVETYPE              type;
-    std::vector<PrimitiveVertice> vertices;
+    D3DPRIMITIVETYPE               eType;
+    std::vector<PrimitiveVertice>* pVecVertices;
 };
+
 //
 // Batches primitives drawing
 //
@@ -20,22 +21,23 @@ class CPrimitiveBatcher
 {
 public:
     ZERO_ON_NEW
-    CPrimitiveBatcher(bool m_bZTest);
-    ~CPrimitiveBatcher(void);
+    CPrimitiveBatcher();
+    ~CPrimitiveBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
-    void Flush(void);
+    void SetDeviceStates();
+    void Flush();
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iSize, const void* pDataAddr, size_t iVertexStride);
-    void ClearQueue(void);
-    void AddPrimitive(sDrawQueuePrimitive primitive);
+    void ClearQueue();
+    void AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices);
 
 protected:
-    bool                             m_bZTest;
-    IDirect3DDevice9*                m_pDevice;
-    std::vector<sDrawQueuePrimitive> m_primitiveList;
-    float                            m_fViewportSizeX;
-    float                            m_fViewportSizeY;
-    D3DXMATRIX                       m_MatView;
-    D3DXMATRIX                       m_MatProjection;
+    IDirect3DDevice9*       m_pDevice;
+    std::vector<sPrimitive> m_primitiveList;
+    float                   m_fViewportSizeX;
+    float                   m_fViewportSizeY;
+    D3DXMATRIX              m_MatWorld;
+    D3DXMATRIX              m_MatView;
+    D3DXMATRIX              m_MatProjection;
 };

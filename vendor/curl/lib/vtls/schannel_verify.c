@@ -7,7 +7,7 @@
  *
  * Copyright (C) 2012 - 2016, Marc Hoersken, <info@marc-hoersken.de>
  * Copyright (C) 2012, Mark Salisbury, <mark.salisbury@hp.com>
- * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 /*
- * Source file for SChannel-specific certificate verification. This code should
+ * Source file for Schannel-specific certificate verification. This code should
  * only be invoked by code in schannel.c.
  */
 
@@ -87,14 +87,14 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
   LARGE_INTEGER file_size;
   char *ca_file_buffer = NULL;
   char *current_ca_file_ptr = NULL;
-  const TCHAR *ca_file_tstr = NULL;
+  TCHAR *ca_file_tstr = NULL;
   size_t ca_file_bufsize = 0;
   DWORD total_bytes_read = 0;
   bool more_certs = 0;
   int num_certs = 0;
   size_t END_CERT_LEN;
 
-  ca_file_tstr = Curl_convert_UTF8_to_tchar(ca_file);
+  ca_file_tstr = Curl_convert_UTF8_to_tchar((char *)ca_file);
   if(!ca_file_tstr) {
     failf(data,
           "schannel: invalid path name for CA file '%s': %s",
@@ -135,7 +135,7 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
     failf(data,
           "schannel: CA file exceeds max size of %u bytes",
           MAX_CAFILE_SIZE);
-    result = CURLE_OUT_OF_MEMORY;
+    result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
   }
 
@@ -244,7 +244,7 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
             CertFreeCertificateContext(cert_context);
             if(!add_cert_result) {
               failf(data,
-                    "schannel: failed to add certificate from CA file '%s'"
+                    "schannel: failed to add certificate from CA file '%s' "
                     "to certificate store: %s",
                     ca_file, Curl_strerror(conn, GetLastError()));
               result = CURLE_SSL_CACERT_BADFILE;
@@ -319,6 +319,10 @@ static CURLcode verify_host(struct Curl_easy *data,
    * embedded null bytes. This appears to be undocumented behavior.
    */
   cert_hostname_buff = (LPTSTR)malloc(len * sizeof(TCHAR));
+  if(!cert_hostname_buff) {
+    result = CURLE_OUT_OF_MEMORY;
+    goto cleanup;
+  }
   actual_len = CertGetNameString(pCertContextServer,
                                  CERT_NAME_DNS_TYPE,
                                  name_flags,
@@ -402,7 +406,7 @@ cleanup:
   return result;
 }
 
-CURLcode verify_certificate(struct connectdata *conn, int sockindex)
+CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
 {
   SECURITY_STATUS status;
   struct Curl_easy *data = conn->data;

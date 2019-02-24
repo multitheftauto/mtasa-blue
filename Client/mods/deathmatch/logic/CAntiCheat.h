@@ -16,14 +16,14 @@
 class CAntiCheat
 {
 public:
-    CAntiCheat(void);
-    ~CAntiCheat(void);
+    CAntiCheat();
+    ~CAntiCheat();
 
     void AddModule(CAntiCheatModule& Module);
     void RemoveModule(CAntiCheatModule& Module);
-    void ClearModules(void);
+    void ClearModules();
 
-    bool PerformChecks(void);
+    bool PerformChecks();
 
 private:
     std::list<CAntiCheatModule*>           m_Entries;

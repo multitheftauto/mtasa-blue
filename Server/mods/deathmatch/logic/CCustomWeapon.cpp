@@ -10,8 +10,8 @@
 
 #include "StdInc.h"
 
-CCustomWeapon::CCustomWeapon(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
-    : CObject(pParent, pNode, pObjectManager, false)
+CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
+    : CObject(pParent, pObjectManager, false)
 {
     // Init
     m_iType = CElement::WEAPON;
@@ -79,7 +79,7 @@ void CCustomWeapon::SetWeaponTarget(CVector vecTarget)
     m_targetType = TARGET_TYPE_VECTOR;
 }
 
-void CCustomWeapon::ResetWeaponTarget(void)
+void CCustomWeapon::ResetWeaponTarget()
 {
     m_pTarget = NULL;
     m_vecTarget = CVector(0, 0, 0);
@@ -162,12 +162,12 @@ void CCustomWeapon::SetWeaponFireTime(int iFireTime)
     m_iWeaponFireRate = iFireTime;
 }
 
-int CCustomWeapon::GetWeaponFireTime(void)
+int CCustomWeapon::GetWeaponFireTime()
 {
     return m_iWeaponFireRate;
 }
 
-void CCustomWeapon::ResetWeaponFireTime(void)
+void CCustomWeapon::ResetWeaponFireTime()
 {
     m_iWeaponFireRate = GetWeaponFireTime(m_pWeaponStat);
 }

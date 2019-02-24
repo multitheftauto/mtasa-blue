@@ -92,7 +92,7 @@ void CLuaTimerManager::RemoveTimer(CLuaTimer* pLuaTimer)
         delete pLuaTimer;
 }
 
-void CLuaTimerManager::RemoveAllTimers(void)
+void CLuaTimerManager::RemoveAllTimers()
 {
     // Delete all the timers
     CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin();

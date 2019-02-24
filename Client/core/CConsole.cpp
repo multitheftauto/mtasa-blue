@@ -55,7 +55,7 @@ CConsole::CConsole(CGUI* pManager, CGUIElement* pParent)
     m_pConsoleHistory->LoadFromFile();
 }
 
-CConsole::~CConsole(void)
+CConsole::~CConsole()
 {
     // Delete the GUI elements
     DestroyElements();
@@ -104,7 +104,7 @@ void CConsole::Printf(const char* szFormat, ...)
     Echo(szBuffer);
 }
 
-void CConsole::Clear(void)
+void CConsole::Clear()
 {
     // Clear the history buffer.
     // This crashes if there is more than one line in the console
@@ -115,7 +115,7 @@ void CConsole::Clear(void)
     }
 }
 
-bool CConsole::IsEnabled(void)
+bool CConsole::IsEnabled()
 {
     return m_bIsEnabled;
 }
@@ -139,7 +139,7 @@ void CConsole::SetEnabled(bool bEnabled)
     }
 }
 
-bool CConsole::IsVisible(void)
+bool CConsole::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
@@ -168,22 +168,22 @@ void CConsole::SetVisible(bool bVisible)
     }
 }
 
-void CConsole::Show(void)
+void CConsole::Show()
 {
     SetVisible(true);
 }
 
-void CConsole::Hide(void)
+void CConsole::Hide()
 {
     SetVisible(false);
 }
 
-bool CConsole::IsInputActive(void)
+bool CConsole::IsInputActive()
 {
     return IsVisible() && m_pInput->IsActive();
 }
 
-void CConsole::ActivateInput(void)
+void CConsole::ActivateInput()
 {
     m_pInput->Activate();
 }
@@ -281,7 +281,7 @@ bool CConsole::GracefullyMoveEditboxCaret(CGUIElement* pElement)
     return true;
 }
 
-void CConsole::SetNextHistoryText(void)
+void CConsole::SetNextHistoryText()
 {
     // Don't set history back if we aren't focused.
     if (!m_pInput->IsActive())
@@ -325,7 +325,7 @@ void CConsole::SetNextHistoryText(void)
     }
 }
 
-void CConsole::SetPreviousHistoryText(void)
+void CConsole::SetPreviousHistoryText()
 {
     // Don't set history back if we aren't focused.
     if (!m_pInput->IsActive())
@@ -361,12 +361,12 @@ void CConsole::SetPreviousHistoryText(void)
     }
 }
 
-void CConsole::ResetAutoCompleteMatch(void)
+void CConsole::ResetAutoCompleteMatch()
 {
     m_iAutoCompleteIndex = -1;
 }
 
-void CConsole::SetNextAutoCompleteMatch(void)
+void CConsole::SetNextAutoCompleteMatch()
 {
     // Update match list if required
     if (m_iAutoCompleteIndex == -1)
@@ -457,13 +457,13 @@ void CConsole::CreateElements(CGUIElement* pParent)
     m_pInput->SetHeight(m_fInputHeight);
 }
 
-void CConsole::DestroyElements(void)
+void CConsole::DestroyElements()
 {
     if (m_pWindow)
         delete m_pWindow;
 }
 
-CVector2D CConsole::GetPosition(void)
+CVector2D CConsole::GetPosition()
 {
     if (m_pWindow)
     {
@@ -480,7 +480,7 @@ void CConsole::SetPosition(CVector2D& vecPosition)
     }
 }
 
-CVector2D CConsole::GetSize(void)
+CVector2D CConsole::GetSize()
 {
     if (m_pWindow)
     {
@@ -518,7 +518,7 @@ bool CConsole::OnWindowSize(CGUIElement* pElement)
 }
 
 // Send saved console adds to the actual gui window
-void CConsole::FlushPendingAdd(void)
+void CConsole::FlushPendingAdd()
 {
     if (!m_strPendingAdd.empty())
     {

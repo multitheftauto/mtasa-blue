@@ -44,11 +44,11 @@ void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconne
                       const char* szMessage = "");
 void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, unsigned int uiCode);
 
-bool InitializeSockets(void);
-bool CleanupSockets(void);
+bool InitializeSockets();
+bool CleanupSockets();
 
-float  GetRandomFloat(void);
-double GetRandomDouble(void);
+float  GetRandomFloat();
+double GetRandomDouble();
 int    GetRandom(int iLow, int iHigh);
 
 bool IsValidFilePath(const char* szPath);

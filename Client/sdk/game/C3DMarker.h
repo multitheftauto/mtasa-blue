@@ -23,7 +23,7 @@ class CMatrix;
 class C3DMarker
 {
 public:
-    virtual ~C3DMarker(void){};
+    virtual ~C3DMarker(){};
 
     virtual void     GetMatrix(CMatrix* pMatrix) = 0;
     virtual void     SetMatrix(CMatrix* pMatrix) = 0;

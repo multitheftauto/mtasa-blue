@@ -14,12 +14,12 @@ class CAntiCheatModule
 {
 public:
     CAntiCheatModule(class CAntiCheat& AntiCheat);
-    virtual ~CAntiCheatModule(void);
+    virtual ~CAntiCheatModule();
 
     // Implement this function in the anticheat module class. This should
     // return true if the checks were successful, and false if the player
     // is a cheater.
-    virtual bool PerformChecks(void) = 0;
+    virtual bool PerformChecks() = 0;
 
 private:
     class CAntiCheat& m_AntiCheat;

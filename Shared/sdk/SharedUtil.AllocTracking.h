@@ -187,7 +187,7 @@ namespace std
     class CArray : public std::vector<_Ty, Allocator<_Ty> >
     {
     public:
-        CArray(void) : std::vector<_Ty, Allocator<_Ty> >() {}
+        CArray() : std::vector<_Ty, Allocator<_Ty> >() {}
         CArray(int size) : std::vector<_Ty, Allocator<_Ty> >(size) {}
         CArray(int size, int fill) : std::vector<_Ty, Allocator<_Ty> >(size, fill) {}
         template <class _Iter>
@@ -206,7 +206,7 @@ namespace std
     class CMap : public std::map<_Kty, _Ty, _Pr, Allocator<std::pair<const _Kty, _Ty> > >
     {
     public:
-        CMap(void) : std::map<_Kty, _Ty, _Pr, Allocator<std::pair<const _Kty, _Ty> > >() {}
+        CMap() : std::map<_Kty, _Ty, _Pr, Allocator<std::pair<const _Kty, _Ty> > >() {}
         CMap(uint uiInitialSize) : std::map<_Kty, _Ty, _Pr, Allocator<std::pair<const _Kty, _Ty> > >() {}
     };
 
@@ -214,7 +214,7 @@ namespace std
     class CSet : public std::set<_Kty, _Pr, Allocator<_Kty> >
     {
     public:
-        CSet(void) : std::set<_Kty, _Pr, Allocator<_Kty> >() {}
+        CSet() : std::set<_Kty, _Pr, Allocator<_Kty> >() {}
         template <class _Iter>
         CSet(_Iter _First, _Iter _Last) : std::set<_Kty, _Pr, Allocator<_Kty> >(_First, _Last)
         {

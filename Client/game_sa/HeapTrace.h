@@ -13,4 +13,4 @@
 
 void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine);
 void RemoveTrack(void* pAddress);
-void DumpUnfreed(void);
+void DumpUnfreed();
