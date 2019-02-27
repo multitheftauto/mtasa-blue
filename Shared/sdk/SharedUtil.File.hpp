@@ -522,7 +522,7 @@ bool SharedUtil::DelTree(const SString& strPath, const SString& strInsideHere)
     sfos.wFunc = FO_DELETE;
     sfos.pFrom = szBuffer;            // Double NULL terminated
     sfos.pTo = NULL;
-    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_ALLOWUNDO;
+    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
 
     int status = SHFileOperationW(&sfos);
     return status == 0;
