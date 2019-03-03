@@ -73,11 +73,8 @@ bool CClientEffect::SetEffectDensity(float fDensity)
 {
     if (fDensity >= 0)
     {
-        if (fDensity <= m_fMaxDensity)
-        {
-            m_pFxSystem->SetEffectDensity(fDensity);
-            return true;
-        }
+        m_pFxSystem->SetEffectDensity(Clamp(0.0f, fDensity, m_fMaxDensity));
+        return true;
     }
     return false;
 }
