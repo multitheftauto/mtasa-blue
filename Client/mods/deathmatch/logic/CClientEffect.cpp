@@ -71,7 +71,7 @@ float CClientEffect::GetEffectSpeed() const
 
 bool CClientEffect::SetEffectDensity(float fDensity)
 {
-    if (fDensity >= 0)
+    if (fDensity >= 0.0f && fDensity <= 2.0f)
     {
         m_pFxSystem->SetEffectDensity(Clamp(0.0f, fDensity, m_fMaxDensity));
         return true;

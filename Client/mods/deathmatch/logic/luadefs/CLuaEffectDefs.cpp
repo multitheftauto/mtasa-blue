@@ -631,6 +631,8 @@ int CLuaEffectDefs::SetEffectDensity(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, "effect density beyond bounds");
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
