@@ -1460,42 +1460,76 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (Ped.GetModel() == usModel)
+            const unsigned short usCurrentModel = Ped.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
-            if (!CClientPlayerManager::IsValidModel(usModel))
+
+            if (!Ped.SetModel(usModel))
                 return false;
-            Ped.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Ped.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            if (Vehicle.GetModel() == usModel)
+            const unsigned short usCurrentModel = Vehicle.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientVehicleManager::IsValidModel(usModel))
                 return false;
+
             Vehicle.SetModelBlocking(usModel, 255, 255);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
-            if (Object.GetModel() == usModel)
+            const unsigned short usCurrentModel = Object.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Object.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Object.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
-            if (Projectile.GetGameEntity() && Projectile.GetGameEntity()->GetModelIndex() == usModel)
+            const unsigned short usCurrentModel = Projectile.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Projectile.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         default:
@@ -1685,6 +1719,12 @@ bool CStaticFunctionDefinitions::SetPedAnalogControlState(CClientEntity& Entity,
 bool CStaticFunctionDefinitions::IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby)
 {
     bDoingGangDriveby = Ped.IsDoingGangDriveby();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle)
+{
+    ucStyle = Ped.GetFightingStyle();
     return true;
 }
 
@@ -5652,6 +5692,30 @@ void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
     }
 }
 
+bool CStaticFunctionDefinitions::GUIBlur(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Deactivate();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIFocus(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Activate();
+        return true;
+    }
+    return false;
+}
+
 void CStaticFunctionDefinitions::GUICheckBoxSetSelected(CClientEntity& Entity, bool bFlag)
 {
     RUN_CHILDREN(GUICheckBoxSetSelected(**iter, bFlag))
@@ -7586,11 +7650,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
-    if (Sound.IsSoundStream())
-        return false;
-
-    Sound.SetPlayPosition(dPosition);
-    return true;
+    return Sound.SetPlayPosition(dPosition);
 }
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double dPosition)
@@ -7889,8 +7949,7 @@ bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPanEnabled(CClientSound& Sound, bool bEnabled)
 {
-    Sound.SetPanEnabled(bEnabled);
-    return true;
+    return Sound.SetPanEnabled(bEnabled);
 }
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight)
@@ -9683,4 +9742,19 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     }
 
     return nullptr;
+}
+
+bool CStaticFunctionDefinitions::ResetAllSurfaceInfo()
+{
+    g_pGame->GetWorld()->ResetAllSurfaceInfo();
+    return true;
+}
+bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
+    {
+        g_pGame->GetWorld()->ResetSurfaceInfo(sSurfaceID);
+        return true;
+    }
+    return false;
 }

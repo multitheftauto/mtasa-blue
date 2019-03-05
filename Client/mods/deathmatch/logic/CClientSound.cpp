@@ -293,18 +293,20 @@ void CClientSound::PlayStream(const SString& strURL, bool bLoop, bool bThrottle,
 //
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::SetPlayPosition(double dPosition)
+bool CClientSound::SetPlayPosition(double dPosition)
 {
     if (m_pAudio)
     {
         // Use actual audio if active
-        m_pAudio->SetPlayPosition(dPosition);
+        return m_pAudio->SetPlayPosition(dPosition);
     }
-    else
+    else if (m_SimulatedPlayPosition.IsValid())
     {
         // Use simulation if not active
         m_SimulatedPlayPosition.SetPlayPositionNow(dPosition);
+        return true;
     }
+    return false;
 }
 
 double CClientSound::GetPlayPosition()
@@ -522,10 +524,13 @@ float* CClientSound::GetWaveData(int iLength)
 }
 bool CClientSound::SetPanEnabled(bool bPan)
 {
-    if (m_pAudio && m_b3D)
+    if (m_b3D)
     {
-        m_pAudio->SetPanEnabled(bPan);
         m_bPan = bPan;
+        if (m_pAudio)
+        {
+            m_pAudio->SetPanEnabled(bPan);
+        }
         return true;
     }
     return false;

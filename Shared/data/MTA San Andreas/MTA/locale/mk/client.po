@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-11-19 12:36+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2018-12-12 21:38+0000\n"
+"Last-Translator: Mercy <Dimitar.Milosevski@yahoo.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: mk\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
 "Translators: Mercy; Rilind\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542630982.0\n"
+"X-POOTLE-MTIME: 1544650720.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -830,7 +830,7 @@ msgstr "Непроѕирност:"
 #. *
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:418
 msgid "Master volume:"
-msgstr ""
+msgstr "Севкупна Јачина:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
@@ -863,7 +863,7 @@ msgstr "Општо"
 
 #: ..\Client\core\CSettings.cpp:513
 msgid "Radio options"
-msgstr ""
+msgstr "Радио опции"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
@@ -894,14 +894,12 @@ msgid "Automatic Media Scan"
 msgstr "Автоматски медија скенер"
 
 #: ..\Client\core\CSettings.cpp:555
-#, fuzzy
 msgid "Mute options"
-msgstr "Маус опции"
+msgstr "Опции за мутирање"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Мутирај SFX звук кога е минимизирано"
+msgstr "Мутирање на целиот звук кога е минимизирано"
 
 #: ..\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
