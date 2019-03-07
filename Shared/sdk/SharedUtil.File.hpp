@@ -91,8 +91,18 @@ bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFil
 #ifdef WIN32
     if (MoveFileExW(FromUTF8(strFilenameOld), FromUTF8(strFilenameNew), MOVEFILE_COPY_ALLOWED) == 0)
     {
+        int errorCode = GetLastError();
+        if (errorCode == ERROR_ACCESS_DENIED)
+        {
+            // Try alternate rename strategy
+            if (!FileExists(strFilenameNew) && FileCopy(strFilenameOld, strFilenameNew))
+            {
+                FileDelete(strFilenameOld);
+                return true;
+            }
+        }
         if (pOutErrorCode)
-            *pOutErrorCode = GetLastError();
+            *pOutErrorCode = errorCode;
         return false;
     }
     return true;
