@@ -12,6 +12,7 @@
 #include <queue>
 #include <future>
 #include <vector>
+#include <algorithm>
 
 namespace SharedUtil
 {
@@ -85,7 +86,7 @@ namespace SharedUtil
 
         static CThreadPool& getDefaultThreadPool()
         { 
-            static CThreadPool DefaultThreadPool(std::thread::hardware_concurrency());
+            static CThreadPool DefaultThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
             return DefaultThreadPool;
         }
 

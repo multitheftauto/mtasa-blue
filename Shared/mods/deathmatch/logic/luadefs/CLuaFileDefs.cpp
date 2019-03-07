@@ -550,7 +550,8 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         // Make sure the destination folder exists so we can move the file
                         MakeSureDirExists(strDestAbsPath);
 
-                        if (FileRename(strSrcAbsPath, strDestAbsPath))
+                        int errorCode;
+                        if (FileRename(strSrcAbsPath, strDestAbsPath, &errorCode))
                         {
                             // If file renamed/moved return success
                             lua_pushboolean(luaVM, true);
@@ -558,7 +559,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         }
 
                         // Output error
-                        m_pScriptDebugging->LogWarning(luaVM, "fileRename failed; unable to rename file");
+                        m_pScriptDebugging->LogWarning(luaVM, SString("fileRename failed; unable to rename file (Error %d)", errorCode));
                     }
                     else
                     {

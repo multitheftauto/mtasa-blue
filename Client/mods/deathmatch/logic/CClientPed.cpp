@@ -6069,12 +6069,16 @@ void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 {
-    for (auto const& x : m_mapOfReplacedAnimations)
+    for (auto iter = m_mapOfReplacedAnimations.cbegin(); iter != m_mapOfReplacedAnimations.cend(); /* manual increment */)
     {
-        if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
+        if (std::addressof(*IFP.get()) == std::addressof(*iter->second.pIFP.get()))
         {
-            m_mapOfReplacedAnimations.erase(x.first);
-            CIFPEngine::EngineApplyAnimation(*this, x.first);
+            CIFPEngine::EngineApplyAnimation(*this, iter->first);
+            iter = m_mapOfReplacedAnimations.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
 }
