@@ -226,55 +226,13 @@ CServerBrowser::CServerBrowser()
             int         x, y, w, h;
             const char* szName;
         } iconInfoList[] = {
-            {
-                20,
-                iBase + iGap * 0,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\refresh.png",
-            },
-            {
-                25,
-                iBase + iGap * 1 + 5,
-                16,
-                16,
-                "cgui\\images\\serverbrowser\\favorite.png",
-            },
-            {
-                20,
-                iBase + iGap * 2,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\connect.png",
-            },
-            {
-                20,
-                iBase + iGap * 3,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\info.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 0 + 5,
-                29,
-                16,
-                "cgui\\images\\serverbrowser\\search-servers.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 1 + 5,
-                29,
-                16,
-                "cgui\\images\\serverbrowser\\search-players.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 2 + 5,
-                16,
-                16,
-                "cgui\\images\\serverbrowser\\search.png",
-            },
+            {20, iBase + iGap * 0, 26, 26, "cgui\\images\\serverbrowser\\refresh.png"},
+            {25, iBase + iGap * 1 + 5, 16, 16, "cgui\\images\\serverbrowser\\favorite.png"},
+            {20, iBase + iGap * 2, 26, 26, "cgui\\images\\serverbrowser\\connect.png"},
+            {20, iBase + iGap * 3, 26, 26, "cgui\\images\\serverbrowser\\info.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-servers.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-players.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5, 16, 16, "cgui\\images\\serverbrowser\\search.png"},
         };
 
         for (uint i = 0; i < NUMELMS(iconInfoList); i++)
