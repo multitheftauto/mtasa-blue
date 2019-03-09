@@ -684,15 +684,11 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
     }
     else
     {
-        strMessage += "\n\n";
-        strMessage += _("Do you want to see some on-line help about this problem ?");
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(strTitle);
         pQuestionBox->SetMessage(strMessage);
-        pQuestionBox->SetButton(0, _("No"));
-        pQuestionBox->SetButton(1, _("Yes"));
-        pQuestionBox->SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
+        pQuestionBox->SetOnLineHelpOption(strTroubleLink);
         pQuestionBox->Show();
     }
 }
