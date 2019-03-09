@@ -236,9 +236,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
-    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
-    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);

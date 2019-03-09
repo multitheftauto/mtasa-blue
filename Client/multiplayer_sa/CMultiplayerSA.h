@@ -81,8 +81,6 @@ public:
     void                RemoveRemoteDataStorage(CPlayerPed* pPed);
     void                EnableHooks_ClothesMemFix(bool bEnable);
 
-    void InitializeAnimationHooks(bool bIsHostSmotra);
-
     CPed* GetContextSwitchedPed();
 
     CPopulationMP* GetPopulationMP() { return Population; }

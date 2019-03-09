@@ -179,7 +179,6 @@ public:
         FAST_CLOTHES_ON = 2,
     };
 
-    virtual void                InitializeAnimationHooks(bool bIsHostSmotra) = 0;
     virtual CRemoteDataStorage* CreateRemoteDataStorage() = 0;
     virtual void                DestroyRemoteDataStorage(CRemoteDataStorage* pData) = 0;
     virtual void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData) = 0;

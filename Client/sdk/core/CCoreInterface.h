@@ -173,8 +173,6 @@ public:
     virtual SString     GetBlueCopyrightString() = 0;
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
-
-    virtual bool IsHostSmotraServer() = 0;
 };
 
 class CClientTime
