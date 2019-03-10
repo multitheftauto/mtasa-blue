@@ -1200,7 +1200,6 @@ void CRenderItemManager::FlushNonAARenderTarget()
                 float fV2 = 1;
 
                 const SRTVertex vertices[] = {{fX1, fY1, 0, 1, fU1, fV1}, {fX2, fY1, 0, 1, fU2, fV1}, {fX1, fY2, 0, 1, fU1, fV2},
-
                                               {fX2, fY1, 0, 1, fU2, fV1}, {fX2, fY2, 0, 1, fU2, fV2}, {fX1, fY2, 0, 1, fU1, fV2}};
 
                 // Set vertex stream

@@ -420,7 +420,6 @@ void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
 void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimBlendAssocGroupCopyAnimation();
 void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
@@ -735,6 +734,10 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1529,30 +1532,6 @@ void RemoveFxSystemPointer(DWORD* pPointer)
             free(pPointer);
             return;
         }
-    }
-}
-
-void CMultiplayerSA::InitializeAnimationHooks(bool bIsHostSmotra)
-{
-    if (bIsHostSmotra)
-    {
-        BYTE originalCode_CAnimManager_AddAnimation[10] = {0x8B, 0x44, 0x24, 0x0C, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x0};
-        BYTE originalCode_CAnimManager_AddAnimationAndSync[10] = {0x8B, 0x44, 0x24, 0x10, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x00};
-        BYTE originalCode_CAnimManager_BlendAnimation_Hierarchy[5] = {0x8B, 0x54, 0x24, 0x2C, 0x51};
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimation, &originalCode_CAnimManager_AddAnimation, 10);
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimationAndSync, &originalCode_CAnimManager_AddAnimationAndSync, 10);
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, &originalCode_CAnimManager_BlendAnimation_Hierarchy, 5);
-
-        HookInstall(HOOKPOS_CAnimBlendAssocGroupCopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroupCopyAnimation, 6);
-    }
-    else
-    {
-        BYTE originalCode_CAnimBlendAssocGroupCopyAnimation[6] = {0x64, 0xA1, 0x00, 0x00, 0x00, 0x00};
-        MemCpy((LPVOID)HOOKPOS_CAnimBlendAssocGroupCopyAnimation, &originalCode_CAnimBlendAssocGroupCopyAnimation, 6);
-
-        HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-        HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-        HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     }
 }
 

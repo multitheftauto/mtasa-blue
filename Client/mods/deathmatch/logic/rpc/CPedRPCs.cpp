@@ -315,7 +315,7 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
     std::string animName;
     float fSpeed;
 
-    if (bitStream.ReadString(animName))
+    if (bitStream.ReadString<unsigned char>(animName))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed && !animName.empty())

@@ -684,15 +684,11 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
     }
     else
     {
-        strMessage += "\n\n";
-        strMessage += _("Do you want to see some on-line help about this problem ?");
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(strTitle);
         pQuestionBox->SetMessage(strMessage);
-        pQuestionBox->SetButton(0, _("No"));
-        pQuestionBox->SetButton(1, _("Yes"));
-        pQuestionBox->SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
+        pQuestionBox->SetOnLineHelpOption(strTroubleLink);
         pQuestionBox->Show();
     }
 }
@@ -2272,27 +2268,4 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
-}
-
-bool CCore::IsHostSmotraServer()
-{
-    unsigned int uiPort;
-    SString      strHost;
-    CVARS_GET("host", strHost);
-    CVARS_GET("port", uiPort);
-
-    if (uiPort != 22003)
-    {
-        return false;
-    }
-
-    unsigned int arrSmotraHostIps[3] = {HashString("164.132.204.62"), HashString("149.202.223.26"), HashString("151.80.111.167")};
-    for (int i = 0; i < 3; i++)
-    {
-        if (arrSmotraHostIps[i] == HashString(strHost))
-        {
-            return true;
-        }
-    }
-    return false;
 }

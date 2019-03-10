@@ -65,59 +65,6 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGro
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim_Smotra(CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId)
-{
-    // Apply offset
-    int iUseAnimId = iAnimId - pGroup->iIDOffset;
-
-    if (pGroup->pAssociationsArray)
-    {
-        CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
-        if (pAssociation && pAssociation->pAnimHeirarchy == NULL)
-        {
-            // Choose another animId
-            int iNewAnimId = iUseAnimId;
-            for (int i = 0; i < pGroup->iNumAnimations; i++)
-            {
-                pAssociation = pGroup->pAssociationsArray + i;
-                if (pAssociation->pAnimHeirarchy)
-                {
-                    // Find closest valid anim id
-                    if (abs(iUseAnimId - i) < abs(iUseAnimId - iNewAnimId) || iNewAnimId == iUseAnimId)
-                        iNewAnimId = i;
-                }
-            }
-
-            iUseAnimId = iNewAnimId;
-            LogEvent(534, "CopyAnimation", "", SString("Group:%d replaced id:%d with id:%d", pGroup->groupID, iAnimId, iUseAnimId + pGroup->iIDOffset));
-        }
-    }
-
-    // Unapply offset
-    iAnimId = iUseAnimId + pGroup->iIDOffset;
-    return iAnimId;
-}
-
-DWORD RETURN_CAnimBlendAssocGroupCopyAnimation = 0x4CE136;
-void _declspec(naked) HOOK_CAnimBlendAssocGroupCopyAnimation()
-{
-    _asm
-    {
-        pushad
-        push[esp + 32 + 4 * 1]
-        push    ecx
-        call    OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim_Smotra
-        add     esp, 4 * 2
-        mov[esp + 32 + 4 * 1], eax
-        popad
-
-        mov     eax, fs:0
-        jmp     RETURN_CAnimBlendAssocGroupCopyAnimation
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for invalid RpHAnimHierarchy*
 void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHierarchyResult)
 {
