@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-10 04:47+0000\n"
-"PO-Revision-Date: 2019-03-10 04:31+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2019-03-14 21:52+0000\n"
+"Last-Translator: DNL291 <danilo_dnld@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Francisco \"Vampire\"; Cristiano Teixeira; neves768; Davidhm; gustavorn\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Francisco \"Vampire\"; Cristiano Teixeira; neves768; Davidhm; gustavorn; expert975\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1552192317.0\n"
+"X-POOTLE-MTIME: 1552600342.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -583,8 +583,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
-"Você está usando uma compilação de teste! Esta versão não pode ser usada "
-"para se conectar a servidores públicos!"
+"Você está utilizando uma compilação de teste! Esta versão não pode ser usada"
+" para se conectar a servidores públicos!"
 
 #: ..\Client\core\CMainMenu.cpp:1110
 msgid ""
@@ -757,7 +757,7 @@ msgstr "Pilotar com o mouse"
 #. Joypad options
 #: ..\Client\core\CSettings.cpp:215
 msgid "Joypad options"
-msgstr "Opções do Joypad"
+msgstr "Opções do Controle"
 
 #: ..\Client\core\CSettings.cpp:228
 msgid "Standard controls (Mouse + Keyboard)"
@@ -954,7 +954,7 @@ msgstr "Filtragem anisotrópica:"
 
 #: ..\Client\core\CSettings.cpp:599 ..\Client\core\CSettings.cpp:741
 msgid "Anti-aliasing:"
-msgstr "Anti-aliasing:"
+msgstr "Anti-serrilhamento:"
 
 #: ..\Client\core\CSettings.cpp:599 ..\Client\core\CSettings.cpp:755
 msgid "Aspect Ratio:"
@@ -1344,7 +1344,7 @@ msgstr "Texto"
 
 #: ..\Client\core\CSettings.cpp:1997
 msgid "Input Background"
-msgstr "Fundo da entrada do Bate-papo"
+msgstr "Fundo da Entrada"
 
 #: ..\Client\core\CSettings.cpp:1997
 msgid "Input Text"
@@ -2227,7 +2227,7 @@ msgid ""
 "\n"
 "  '%s'\n"
 msgstr ""
-"MTA:SA não conseguiu completar a seguinte tarefa:\n"
+"O MTA:SA não pôde completar a seguinte tarefa:\n"
 "\n"
 "  '%s'\n"
 
@@ -2239,7 +2239,7 @@ msgid ""
 msgstr ""
 "** O travamento foi causado por uma falha no driver de vídeo **\n"
 "\n"
-"** Verifique o driver de sua placa de vídeo **"
+"** Atualize o driver da sua placa de vídeo **"
 
 #: ..\Client\loader\CInstallManager.cpp:485
 msgid "Install updated MTA:SA files"
@@ -2296,7 +2296,7 @@ msgstr ""
 
 #: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Fazendo isso vai aumentar as chances do erro ser consertado."
+msgstr "Fazendo isso aumentará as chances do erro ser corrigido."
 
 #: ..\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
@@ -2535,7 +2535,7 @@ msgid ""
 "\n"
 "Do you want to see some online help?"
 msgstr ""
-"Você está tendo problemas ao rodar o MTA:SA?.\n"
+"Você está tendo problemas ao executar o MTA:SA?.\n"
 "\n"
 "Você deseja obter ajuda online?"
 
@@ -2556,7 +2556,7 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
-"Está tendo problemas ao executar o MTA:SA?.\n"
+"Você está tendo problemas ao executar o MTA:SA?.\n"
 "\n"
 "Tente desabilitando os seguintes produtos para o GTA e o MTA:"
 
@@ -2707,8 +2707,8 @@ msgstr ""
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
-"Há arquivos em seu MTA que são de uma versão distinta da instalada. Se "
-"estiver enfrentando problemas com ele, reinstale-o.\n"
+"Há arquivos incompatíveis com os desta versão. Se estiver enfrentando "
+"problemas reinstale o MTA:SA.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:932
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -3157,56 +3157,57 @@ msgstr "Você foi expulso do jogo"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
+msgstr "Este servidor requer um gta_sa.exe sem modificação"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr ""
+msgstr "Por favor troque o gta_sa.exe"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgstr "Este servidor não aceita D3D9.DLLs modificados"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
+msgstr "Remova o D3D9.DLL da pasta de instalação do GTA e reinicie o MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr ""
+msgstr "Este servidor não aceita máquinas virtuais"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Este servidor requer que a assinatura de driver esteja ativada"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr ""
+msgstr "Por favor reinicie o seu PC"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "Este servidor detectou a falta de componentes do anti-cheat"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "Tente reiniciando o MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "Este servidor requer um gta3.img e gta_int.img sem modificação"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Por favor troque o gta3.img ou gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Este servidor não aceita o Wine"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr ""
+"Certifique-se de que nenhum outro programa esteja modificando o MTA:SA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "

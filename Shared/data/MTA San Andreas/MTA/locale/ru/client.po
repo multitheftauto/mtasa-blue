@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-10 04:47+0000\n"
-"PO-Revision-Date: 2019-03-10 04:34+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2019-03-14 14:56+0000\n"
+"Last-Translator: Easterdie <easterdie@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Alexander Romanov; Stanislav Zverev; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; !; MeowCola; Rocketman; The_Creator; Napoleon  Hill; FranklinRoosevelt; Nikita Obrekht\n"
+"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; !; MeowCola; Rocketman; The_Creator; Napoleon  Hill; FranklinRoosevelt; Nikita Obrekht\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1552192488.0\n"
+"X-POOTLE-MTIME: 1552575372.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -44,7 +44,7 @@ msgstr "Разрешить"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:55
 msgid "Deny"
-msgstr "Запрет"
+msgstr "Запретить"
 
 #: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
@@ -230,7 +230,7 @@ msgstr "КОНСОЛЬ"
 #: ..\Client\core\CCore.cpp:743 ..\Client\loader\CInstallManager.cpp:657
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "Для уставновки MTA:SA не хватает свободного места на диске %s."
+msgstr "Для установки MTA:SA недостаточно места на диске %s."
 
 #: ..\Client\core\CCore.cpp:745 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
@@ -682,7 +682,7 @@ msgstr "Интерфейс"
 
 #: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
-msgstr "Веб-браузер"
+msgstr "Браузер"
 
 #: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
@@ -772,7 +772,7 @@ msgstr "Насыщенность"
 
 #: ..\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Зайдите во вкладку 'Клавиши' для настройки джойстика"
+msgstr "Зайдите во вкладку 'Клавиши' для настройки джойстика."
 
 #: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
@@ -842,7 +842,7 @@ msgstr "Громкость эффектов:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:476
 msgid "MTA volume:"
-msgstr "Громкость MTA (звуки в скриптах):"
+msgstr "Громкость MTA:"
 
 #: ..\Client\core\CSettings.cpp:411 ..\Client\core\CSettings.cpp:495
 msgid "Voice volume:"
@@ -911,11 +911,11 @@ msgstr "Заглушить звуки эффектов, когда игра св
 
 #: ..\Client\core\CSettings.cpp:577
 msgid "Mute MTA sounds when minimized"
-msgstr "Заглушить звуки MTA, когда игра свёрнута"
+msgstr "Глушить звуки MTA "
 
 #: ..\Client\core\CSettings.cpp:582
 msgid "Mute Voice sounds when minimized"
-msgstr "Заглушить голосовой чат, когда игра свёрнута"
+msgstr "Глушить голосовой чат"
 
 #. *
 #. *  Video tab
@@ -926,7 +926,7 @@ msgstr "Разрешение:"
 
 #: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:648
 msgid "FOV:"
-msgstr "Угол обзора:"
+msgstr "FOV:"
 
 #: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:664
 msgid "Draw Distance:"
@@ -1001,7 +1001,7 @@ msgstr "Очень высокое"
 #: ..\Client\core\CSettings.cpp:3002 ..\Client\core\CSettings.cpp:3034
 #: ..\Client\core\CSettings.cpp:3056 ..\Client\core\CSettings.cpp:4020
 msgid "Off"
-msgstr "Отключена"
+msgstr "Отключено"
 
 #: ..\Client\core\CSettings.cpp:750 ..\Client\core\CSettings.cpp:1452
 msgid "1x"
@@ -3110,56 +3110,56 @@ msgstr "Вас кикнули с сервера"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
+msgstr "Этот сервер требует не изменённый gta_sa.exe"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr ""
+msgstr "Пожалуйста, замените gta_sa.exe"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgstr "Этот сервер не разрешает собственные D3D9.DLL"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
+msgstr "Удалите D3D9.DLL из директории GTA и перезапустите MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr ""
+msgstr "Этот сервер не разрешает виртуальные машины"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Этот сервер требует, чтобы подпись драйверов была включена"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr ""
+msgstr "Пожалуйста, перезапустите ваш компьютер"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "Этот сервер обнаружил отсутствующие компоненты анти-чита"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "Попробуйте перезапустить MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "Этот сервер требует не изменённый gta3.img и gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Пожалуйста, замените gta3.img или gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Этот сервер не разрешает Wine"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "Убедитесь, что никакая другая программа не изменяет MTA:SA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
