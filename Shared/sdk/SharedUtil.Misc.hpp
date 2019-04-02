@@ -16,6 +16,7 @@
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
+    #include <Psapi.h>
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -74,6 +75,42 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
 #endif
 
 //
+// Return full path and filename of parent exe
+//
+SString GetParentProcessPathFilename(int pid) 
+{
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if(Process32FirstW(hSnapshot, &pe))
+    {
+    	do
+        {
+    		if (pe.th32ProcessID == pid)
+            {
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
+                if (hProcess)
+                {
+                    WCHAR szModuleName[MAX_PATH * 2] = {0};
+                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+                    CloseHandle(hProcess);
+                    SString strModuleName = ToUTF8(szModuleName);
+                    if (FileExists(strModuleName))
+                    {
+                        CloseHandle(hSnapshot);
+                        if (IsShortPathName(strModuleName))
+                            return GetSystemLongPathName(strModuleName);
+                        return strModuleName;
+                    }
+                }
+    		}
+    	}
+        while(Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return "";
+}
+
+//
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
@@ -82,6 +119,13 @@ SString SharedUtil::GetMTASABaseDir()
     static SString strInstallRoot;
     if (strInstallRoot.empty())
     {
+        if (IsGTAProcess())
+        {
+            // Try to get base dir from parent process
+            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+        }
+        if (strInstallRoot.empty())
+        {
             strInstallRoot = GetRegistryValue("", "Last Run Location");
             if (strInstallRoot.empty())
             {
@@ -90,6 +134,7 @@ SString SharedUtil::GetMTASABaseDir()
                 TerminateProcess(GetCurrentProcess(), 9);
             }
         }
+    }
     return strInstallRoot;
 }
 
