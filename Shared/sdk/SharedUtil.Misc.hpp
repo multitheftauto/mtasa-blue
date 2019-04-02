@@ -64,6 +64,9 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
     // Default to warning icon
     if ((uType & ICON_MASK_VALUE) == 0)
         uType |= ICON_WARNING;
+    // Make topmost work
+    if (uType & MB_TOPMOST)
+        uType |= MB_SYSTEMMODAL;
     WString strText = MbUTF8ToUTF16(lpText);
     WString strCaption = MbUTF8ToUTF16(lpCaption);
     return MessageBoxW(hWnd, strText.c_str(), strCaption.c_str(), uType);
@@ -79,14 +82,14 @@ SString SharedUtil::GetMTASABaseDir()
     static SString strInstallRoot;
     if (strInstallRoot.empty())
     {
-        strInstallRoot = GetRegistryValue("", "Last Run Location");
-        if (strInstallRoot.empty())
-        {
-            MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
-                           MB_OK | MB_ICONERROR | MB_TOPMOST);
-            TerminateProcess(GetCurrentProcess(), 9);
+            strInstallRoot = GetRegistryValue("", "Last Run Location");
+            if (strInstallRoot.empty())
+            {
+                MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
+                               MB_OK | MB_ICONERROR | MB_TOPMOST);
+                TerminateProcess(GetCurrentProcess(), 9);
+            }
         }
-    }
     return strInstallRoot;
 }
 
