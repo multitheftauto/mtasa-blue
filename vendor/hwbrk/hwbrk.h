@@ -4,7 +4,7 @@
 //
 
 #pragma once
-
+#ifdef WIN32
 enum HWBRK_TYPE
 	{
 	HWBRK_TYPE_CODE,
@@ -22,3 +22,4 @@ enum HWBRK_SIZE
 
 HANDLE SetHardwareBreakpoint(HANDLE hThread,HWBRK_TYPE Type,HWBRK_SIZE Size,void* s);
 bool RemoveHardwareBreakpoint(HANDLE hBrk);
+#endif

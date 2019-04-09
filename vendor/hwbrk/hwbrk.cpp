@@ -4,6 +4,7 @@
 //   Hardware Breakpoint Functions
 //
 
+#ifdef WIN32
 #include <windows.h>
 #include "hwbrk.h"
 
@@ -247,3 +248,4 @@ bool RemoveHardwareBreakpoint(HANDLE hBrk)
 	delete h;
 	return true;
 	}
+#endif
