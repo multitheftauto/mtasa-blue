@@ -377,4 +377,5 @@ public:
 
     virtual DWORD GetLastStaticAnimationGroupID() = 0;
     virtual DWORD GetLastStaticAnimationID() = 0;
+    virtual DWORD GetLastAnimArrayAddress() = 0;
 };
