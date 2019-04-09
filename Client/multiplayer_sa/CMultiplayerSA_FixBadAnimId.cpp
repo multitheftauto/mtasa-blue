@@ -18,7 +18,7 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGro
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId)
 {
-    pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId);
+    pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId, *(DWORD*)0xb4ea34);
     CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
 
     DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);

@@ -1031,10 +1031,9 @@ void CCrashDumpWriter::GetCurrentAnimTaskInfo(CBuffer& buffer)
     CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
     if (pMultiplayer)
     {
-        stream.WriteString ( SString (
-            "Last Animation Added: group ID = %u, animation ID = %u\n",
-            pMultiplayer->GetLastStaticAnimationGroupID(), pMultiplayer->GetLastStaticAnimationID()
-        ));
+        stream.WriteString(SString("Last Animation Added: group ID = %u, animation ID = %u, CAnimManager::ms_aAnimAssocGroups = %#.8x\n",
+                                   pMultiplayer->GetLastStaticAnimationGroupID(), pMultiplayer->GetLastStaticAnimationID(),
+                                   pMultiplayer->GetLastAnimArrayAddress()));
     }
 }
 

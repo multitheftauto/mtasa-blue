@@ -17,6 +17,7 @@
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
+#include <hwbrk.h>
 
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
@@ -4709,6 +4710,27 @@ void _declspec(naked) HOOK_CGame_Process_End()
     }
 }
 
+void ProtectAnimGroupArray()
+{
+    static bool bBreakPointSet = false;
+    if (!bBreakPointSet)
+    {
+        void*  pAnimGroupArray = reinterpret_cast<void*>(0xb4ea34);
+        HANDLE mainThread = SharedUtil::GetMainThread();
+        SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, pAnimGroupArray);
+
+        LogEvent(567, "aAnimAssocGroups", "Hardware Breakpoint set on WRITE access",
+                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)pAnimGroupArray), 567);
+        bBreakPointSet = true;
+    }
+}
+
+void __cdecl HandleIdle()
+{
+    ProtectAnimGroupArray();
+    m_pIdleHandler();
+}
+
 DWORD CALL_CGame_Process = 0x53BEE0;
 void _declspec(naked) HOOK_Idle()
 {
@@ -4723,7 +4745,7 @@ void _declspec(naked) HOOK_Idle()
 
     TIMING_CHECKPOINT("+Idle");
     if (m_pIdleHandler)
-        m_pIdleHandler();
+        HandleIdle();
     TIMING_CHECKPOINT("-Idle");
 
     _asm

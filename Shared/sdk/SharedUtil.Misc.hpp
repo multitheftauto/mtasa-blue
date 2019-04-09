@@ -77,15 +77,15 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
 //
 // Return full path and filename of parent exe
 //
-SString GetParentProcessPathFilename(int pid) 
+SString GetParentProcessPathFilename(int pid)
 {
-    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
-    if(Process32FirstW(hSnapshot, &pe))
+    if (Process32FirstW(hSnapshot, &pe))
     {
-    	do
+        do
         {
-    		if (pe.th32ProcessID == pid)
+            if (pe.th32ProcessID == pid)
             {
                 HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
                 if (hProcess)
@@ -102,9 +102,8 @@ SString GetParentProcessPathFilename(int pid)
                         return strModuleName;
                     }
                 }
-    		}
-    	}
-        while(Process32NextW(hSnapshot, &pe));
+            }
+        } while (Process32NextW(hSnapshot, &pe));
     }
     CloseHandle(hSnapshot);
     return "";
@@ -1180,15 +1179,12 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-//
-// Return true if currently executing the main thread.
-// (Linux: Main thread being defined as the thread the function is first called from.)
-//
-bool SharedUtil::IsMainThread()
+void* SharedUtil::GetMainThread()
 {
 #ifdef WIN32
-    static DWORD dwMainThreadID = 0;
-    if (dwMainThreadID == 0)
+    static void* pMainThread = nullptr;
+    DWORD        dwMainThreadID = 0;
+    if (pMainThread == nullptr)
     {
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -1220,10 +1216,34 @@ bool SharedUtil::IsMainThread()
             }
             CloseHandle(hThreadSnap);
         }
+    }
 
-        // Fallback
-        if (dwMainThreadID == 0)
-            dwMainThreadID = GetCurrentThreadId();
+    if (pMainThread)
+    {
+        return pMainThread;
+    }
+
+    if (dwMainThreadID == 0)
+    {
+        pMainThread = GetCurrentThread();
+        return pMainThread;
+    }
+    pMainThread = OpenThread(THREAD_ALL_ACCESS, true, dwMainThreadID);
+    return pMainThread;
+#endif
+}
+
+//
+// Return true if currently executing the main thread.
+// (Linux: Main thread being defined as the thread the function is first called from.)
+//
+bool SharedUtil::IsMainThread()
+{
+#ifdef WIN32
+    static DWORD dwMainThreadID = 0;
+    if (dwMainThreadID == 0)
+    {
+        dwMainThreadID = GetThreadId(GetMainThread());
     }
 
     return dwMainThreadID == GetCurrentThreadId();
