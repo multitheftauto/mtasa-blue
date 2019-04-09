@@ -162,6 +162,8 @@ namespace SharedUtil
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
 
+    void* GetMainThread();
+
     //
     // Return true if currently executing the main thread
     // See implementation for details
@@ -1688,7 +1690,7 @@ namespace SharedUtil
 
         T* operator->() { return pPointer->GetData(); }
 
-        const T* operator->()const { return pPointer->GetData(); }
+        const T* operator->() const { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 
