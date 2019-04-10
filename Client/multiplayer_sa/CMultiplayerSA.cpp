@@ -155,7 +155,6 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
-#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation        0x4CFC50
 #define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
 #define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
@@ -419,7 +418,6 @@ void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CAnimBlendNode_GetCurrentTranslation();
 void HOOK_CAnimBlendAssociation_SetCurrentTime();
 void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
@@ -640,7 +638,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process_End, (DWORD)HOOK_CGame_Process_End, 5);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
-    HookInstall(HOOKPOS_CAnimBlendNode_GetCurrentTranslation, (DWORD)HOOK_CAnimBlendNode_GetCurrentTranslation, 5);
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
     HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
