@@ -11,14 +11,6 @@
 
 #include "StdInc.h"
 
-// These includes have to be fixed!
-#include "..\game_sa\CCameraSA.h"
-#include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CBuildingSA.h"
-#include "..\game_sa\CPedSA.h"
-#include "..\game_sa\common.h"
-#include <hwbrk.h>
-
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
@@ -366,6 +358,7 @@ DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
+HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
 void HOOK_FindPlayerHeading();
@@ -4712,12 +4705,12 @@ void ProtectAnimGroupArray()
     static bool bBreakPointSet = false;
     if (!bBreakPointSet)
     {
-        void*  pAnimGroupArray = reinterpret_cast<void*>(0xb4ea34);
+        DWORD  dwAnimGroupArrayAddress = 0xb4ea34;
         HANDLE mainThread = SharedUtil::GetMainThread();
-        SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, pAnimGroupArray);
+        SetThreadHardwareBreakPoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, dwAnimGroupArrayAddress);
 
         LogEvent(567, "aAnimAssocGroups", "Hardware Breakpoint set on WRITE access",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)pAnimGroupArray), 567);
+                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
         bBreakPointSet = true;
     }
 }

@@ -48,6 +48,7 @@
 #include <net/CNet.h>
 #include <multiplayer/CMultiplayer.h>
 #include <game/CGame.h>
+#include <hwbrk.h>
 
 // Core-level includes
 #include "CrashHandler.h"
