@@ -66,8 +66,8 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
 
 CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
 {
-    DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
-    return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
+    auto pAnimGroupArray = reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(*(DWORD*)0xb4ea34);
+    return &pAnimGroupArray[animGroup];
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
