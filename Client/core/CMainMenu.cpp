@@ -672,7 +672,6 @@ void CMainMenu::Hide()
 void CMainMenu::OnEscapePressedOffLine()
 {
     m_ServerBrowser.SetVisible(false);
-    m_ServerInfo.Hide();
     m_Credits.SetVisible(false);
     m_pNewsBrowser->SetVisible(false);
 }
@@ -698,7 +697,6 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
         SetMenuUnhovered();
         m_QuickConnect.SetVisible(false);
         m_ServerBrowser.SetVisible(false);
-        m_ServerInfo.Hide();
         m_Settings.SetVisible(false);
         m_Credits.SetVisible(false);
         m_pNewsBrowser->SetVisible(false);
