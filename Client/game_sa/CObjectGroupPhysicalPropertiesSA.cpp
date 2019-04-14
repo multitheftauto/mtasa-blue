@@ -14,7 +14,7 @@
 extern CGameSA* pGame;
 
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = (CObjectGroupPhysicalPropertiesSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
-std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesSAInterface*> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
+std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterface(nullptr)
 {}
@@ -56,9 +56,9 @@ void CObjectGroupPhysicalPropertiesSA::ChangeSafeguard()
     // Make copy of original
     if (!MapFind(ms_OriginalGroupProperties, m_ucObjectGroup))
     {
-        auto pOriginalCopy = new CObjectGroupPhysicalPropertiesSAInterface;
-        memcpy(pOriginalCopy, m_pInterface, sizeof(CObjectGroupPhysicalPropertiesSAInterface));
-        MapSet(ms_OriginalGroupProperties, m_ucObjectGroup, pOriginalCopy);
+        auto pOriginalCopy = std::make_unique<CObjectGroupPhysicalPropertiesSAInterface>();
+        memcpy(pOriginalCopy.get(), m_pInterface, sizeof(CObjectGroupPhysicalPropertiesSAInterface));
+        ms_OriginalGroupProperties[m_ucObjectGroup] = std::move(pOriginalCopy);
     }
 }
 
@@ -72,12 +72,11 @@ void CObjectGroupPhysicalPropertiesSA::RestoreDefault()
     if (!ppOriginalCopy)
         return;
 
-    auto pOriginal = *ppOriginalCopy;
-    dassert(pOriginal);
-    if (!pOriginal)
+    dassert(ppOriginalCopy->get());
+    if (!ppOriginalCopy->get())
         return;
-    
-    memcpy(m_pInterface, pOriginal, sizeof(CObjectGroupPhysicalPropertiesSAInterface));
+
+    memcpy(m_pInterface, ppOriginalCopy->get(), sizeof(CObjectGroupPhysicalPropertiesSAInterface));
     m_bModified = false;
 }
 
@@ -86,7 +85,7 @@ void CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues()
     for (auto& entry : ms_OriginalGroupProperties)
     {
         pGame->GetObjectGroupPhysicalProperties(entry.first)->RestoreDefault();
-        delete entry.second;
+        entry.second.reset();
         MapRemove(ms_OriginalGroupProperties, entry.first);
     }
 }

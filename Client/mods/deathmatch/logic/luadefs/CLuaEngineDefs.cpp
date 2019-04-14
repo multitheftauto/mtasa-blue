@@ -1387,7 +1387,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID >= 20000)
+        if (iModelID < 0 || iModelID > 19999)
         {
             argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1430,7 +1430,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iModelID < 0 || iModelID >= 20000)
+        if (iModelID < 0 || iModelID > 19999)
         {
             argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

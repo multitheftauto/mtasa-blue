@@ -1401,7 +1401,7 @@ void CModelInfoSA::RestoreObjectPropertiesGroup()
 
 void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 {
-    for (auto& pair : ms_OriginalObjectPropertiesGroups)
+    for (const auto& pair : ms_OriginalObjectPropertiesGroups)
     {
         pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
     }

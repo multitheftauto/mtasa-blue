@@ -69,23 +69,9 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
 
 CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_FxManager_c__GetSystemByName;
-    const char* pChars = sName;
-    CFxSystemBPSAInterface* pFxSystemBlueprint = nullptr;
-
-    _asm
-    {
-        mov     ecx, dwThis 
-        push    pChars
-        call    dwFunc
-        mov     pFxSystemBlueprint, eax
-    }
-
-    if (!pFxSystemBlueprint)
-        return nullptr;
-
-    return pFxSystemBlueprint;
+    using func_t = CFxSystemBPSAInterface*(__thiscall*)(CFxManagerSAInterface * pInterface, const char* pChars);
+    auto func = reinterpret_cast<func_t>(FUNC_FxManager_c__GetSystemByName);
+    return func(m_pInterface, sName);
 }
 
 bool CFxManagerSA::IsValidFxSystemBlueprintName(SString sName)
