@@ -650,6 +650,15 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #############################################################
 
         #############################################################
+        # Fix missing msvcp60.dll (tags.dll depends on it)
+        SetOutPath "$INSTDIR\MTA"
+        ${IfNot} ${FileExists} $SYSDIR\msvcp60.dll
+            ${LogText} "Did not find $SYSDIR\msvcp60.dll"
+            File "${FILES_ROOT}\mta\msvcp60.dll"
+        ${EndIf}
+        #############################################################
+
+        #############################################################
         # For XP, install Microsoft Internationalized Domain Names (IDN) Mitigation APIs
         SetOutPath "$TEMP"
         ${If} ${AtMostWinXP}

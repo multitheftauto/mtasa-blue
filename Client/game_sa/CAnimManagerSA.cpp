@@ -778,13 +778,16 @@ CAnimBlendAssocGroup* CAnimManagerSA::GetAnimBlendAssocGroup(CAnimBlendAssocGrou
     if (pInterface)
     {
         AssocGroupId groupID = pInterface->groupID;
-        if (!m_pAnimAssocGroups[groupID])
+        if (groupID < TOTAL_ANIM_GROUPS)
         {
-            m_pAnimAssocGroups[groupID] = new CAnimBlendAssocGroupSA(pInterface);
+            if (!m_pAnimAssocGroups[groupID])
+            {
+                m_pAnimAssocGroups[groupID] = new CAnimBlendAssocGroupSA(pInterface);
+            }
+            return m_pAnimAssocGroups[groupID];
         }
-        return m_pAnimAssocGroups[groupID];
     }
-    return NULL;
+    return nullptr;
 }
 
 CAnimBlock* CAnimManagerSA::GetAnimBlock(CAnimBlockSAInterface* pInterface)
@@ -801,7 +804,7 @@ CAnimBlock* CAnimManagerSA::GetAnimBlock(CAnimBlockSAInterface* pInterface)
             return m_pAnimBlocks[ID];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface)
