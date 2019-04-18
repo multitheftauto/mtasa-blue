@@ -420,12 +420,12 @@ public:
 
     bool        IsRunningAnimation();
     void        RunAnimation(AssocGroupId animGroup, AnimationId animID);
-    void        RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true,
+    void        RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true,
                                   bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false,
                                   bool bHoldLastFrame = false);
-    void        KillAnimation();
-    CAnimBlock* GetAnimationBlock() { return m_pAnimationBlock; }
-    const char* GetAnimationName() { return m_strAnimationName; }
+    void                        KillAnimation();
+    std::unique_ptr<CAnimBlock> GetAnimationBlock();
+    const char*                 GetAnimationName();
 
     bool IsUsingGun();
 
@@ -637,7 +637,7 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
-    CAnimBlock*                              m_pAnimationBlock;
+    std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     SString                                  m_strAnimationName;
     bool                                     m_bRequestedAnimation;
     int                                      m_iTimeAnimation;

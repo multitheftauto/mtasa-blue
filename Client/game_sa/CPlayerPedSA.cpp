@@ -285,7 +285,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     // Need to load ?
     if (!IsBlendAssocGroupLoaded(iAnimGroup))
     {
-        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+        std::unique_ptr<CAnimBlock> pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
 
         // Try load
         if (pAnimBlock && !pAnimBlock->IsLoaded())
@@ -304,7 +304,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         return;
 
     // Ensure we add a ref to this block, even if it wasn't loaded by us
-    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+    std::unique_ptr<CAnimBlock> pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
     if (!pAnimBlock)
         return;
     if (!MapContains(ms_DoneAnimBlockRefMap, strBlockName))

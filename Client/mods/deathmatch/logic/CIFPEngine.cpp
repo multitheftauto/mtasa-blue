@@ -45,7 +45,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
         CClientPed& Ped = static_cast<CClientPed&>(*pEntity);
 
         const unsigned int          u32BlockNameHash = HashString(strCustomBlockName.ToLower());
-        CAnimBlock*                 pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
+        std::unique_ptr<CAnimBlock> pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
         std::shared_ptr<CClientIFP> pCustomIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
         if (pInternalBlock && pCustomIFP)
         {
@@ -78,7 +78,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
         }
         else
         {
-            CAnimBlock* pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
+            std::unique_ptr<CAnimBlock> pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
             if (pInternalBlock)
             {
                 if (eRestoreType == eRestoreAnimation::BLOCK)
