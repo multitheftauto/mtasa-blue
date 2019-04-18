@@ -55,7 +55,7 @@ bool CAnimBlendAssocGroupSA::IsCreated()
     {
         mov     ecx, dwThis
         call    dwFunc
-        mov     al, bReturn
+        mov     bReturn, al
     }
     return bReturn;
 }
