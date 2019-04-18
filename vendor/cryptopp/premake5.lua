@@ -12,6 +12,7 @@ project "cryptopp"
 		
 	defines {
 		"_WINSOCK_DEPRECATED_NO_WARNINGS",
+		"CRYPTOPP_DISABLE_CLMUL", -- sse 4.1 required for this
 		"_LIB"
 	}
 	
