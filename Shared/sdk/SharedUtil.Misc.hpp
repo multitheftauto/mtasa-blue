@@ -16,6 +16,7 @@
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
+    #include <Psapi.h>
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -64,11 +65,49 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
     // Default to warning icon
     if ((uType & ICON_MASK_VALUE) == 0)
         uType |= ICON_WARNING;
+    // Make topmost work
+    if (uType & MB_TOPMOST)
+        uType |= MB_SYSTEMMODAL;
     WString strText = MbUTF8ToUTF16(lpText);
     WString strCaption = MbUTF8ToUTF16(lpCaption);
     return MessageBoxW(hWnd, strText.c_str(), strCaption.c_str(), uType);
 }
 #endif
+
+//
+// Return full path and filename of parent exe
+//
+SString GetParentProcessPathFilename(int pid)
+{
+    HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if (Process32FirstW(hSnapshot, &pe))
+    {
+        do
+        {
+            if (pe.th32ProcessID == pid)
+            {
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
+                if (hProcess)
+                {
+                    WCHAR szModuleName[MAX_PATH * 2] = {0};
+                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+                    CloseHandle(hProcess);
+                    SString strModuleName = ToUTF8(szModuleName);
+                    if (FileExists(strModuleName))
+                    {
+                        CloseHandle(hSnapshot);
+                        if (IsShortPathName(strModuleName))
+                            return GetSystemLongPathName(strModuleName);
+                        return strModuleName;
+                    }
+                }
+            }
+        } while (Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return "";
+}
 
 //
 // Get startup directory as saved in the registry by the launcher
@@ -79,12 +118,20 @@ SString SharedUtil::GetMTASABaseDir()
     static SString strInstallRoot;
     if (strInstallRoot.empty())
     {
-        strInstallRoot = GetRegistryValue("", "Last Run Location");
+        if (IsGTAProcess())
+        {
+            // Try to get base dir from parent process
+            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+        }
         if (strInstallRoot.empty())
         {
-            MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
-                           MB_OK | MB_ICONERROR | MB_TOPMOST);
-            TerminateProcess(GetCurrentProcess(), 9);
+            strInstallRoot = GetRegistryValue("", "Last Run Location");
+            if (strInstallRoot.empty())
+            {
+                MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
+                               MB_OK | MB_ICONERROR | MB_TOPMOST);
+                TerminateProcess(GetCurrentProcess(), 9);
+            }
         }
     }
     return strInstallRoot;
@@ -1132,15 +1179,12 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-//
-// Return true if currently executing the main thread.
-// (Linux: Main thread being defined as the thread the function is first called from.)
-//
-bool SharedUtil::IsMainThread()
+void* SharedUtil::GetMainThread()
 {
 #ifdef WIN32
-    static DWORD dwMainThreadID = 0;
-    if (dwMainThreadID == 0)
+    static void* pMainThread = nullptr;
+    DWORD        dwMainThreadID = 0;
+    if (pMainThread == nullptr)
     {
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -1172,10 +1216,34 @@ bool SharedUtil::IsMainThread()
             }
             CloseHandle(hThreadSnap);
         }
+    }
 
-        // Fallback
-        if (dwMainThreadID == 0)
-            dwMainThreadID = GetCurrentThreadId();
+    if (pMainThread)
+    {
+        return pMainThread;
+    }
+
+    if (dwMainThreadID == 0)
+    {
+        pMainThread = GetCurrentThread();
+        return pMainThread;
+    }
+    pMainThread = OpenThread(THREAD_ALL_ACCESS, true, dwMainThreadID);
+    return pMainThread;
+#endif
+}
+
+//
+// Return true if currently executing the main thread.
+// (Linux: Main thread being defined as the thread the function is first called from.)
+//
+bool SharedUtil::IsMainThread()
+{
+#ifdef WIN32
+    static DWORD dwMainThreadID = 0;
+    if (dwMainThreadID == 0)
+    {
+        dwMainThreadID = GetThreadId(GetMainThread());
     }
 
     return dwMainThreadID == GetCurrentThreadId();

@@ -2916,7 +2916,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
                 animId == ANIM_ID_STEALTH_AIM)
             {
                 // Are our knife anims loaded?
-                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
+                std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
                 if (pBlock->IsLoaded())
                 {
                     // Force the animation
@@ -4360,7 +4360,7 @@ void CClientPed::SetWearingGoggles(bool bWearing, bool animationEnabled)
             // Are our goggle anims loaded?
             if (animationEnabled)
             {
-                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
+                std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
                 if (pBlock->IsLoaded())
                 {
                     BlendAnimation(ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f);
@@ -5651,7 +5651,7 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
     }
 }
 
-void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
+void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
                                    bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
@@ -5721,7 +5721,10 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
             */
         }
     }
-    m_pAnimationBlock = pBlock;
+    if (pBlock)
+    {
+        m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
+    }
     m_strAnimationName = szAnimName;
     m_iTimeAnimation = iTime;
     m_iBlendAnimation = iBlend;
@@ -5751,6 +5754,19 @@ void CClientPed::KillAnimation()
     m_strAnimationName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
+}
+
+std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
+{ 
+    if (m_pAnimationBlock)
+    {
+        return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
+    }
+    return nullptr; 
+}
+const char* CClientPed::GetAnimationName()
+{ 
+    return m_strAnimationName; 
 }
 
 void CClientPed::PostWeaponFire()
@@ -6069,12 +6085,16 @@ void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 {
-    for (auto const& x : m_mapOfReplacedAnimations)
+    for (auto iter = m_mapOfReplacedAnimations.cbegin(); iter != m_mapOfReplacedAnimations.cend(); /* manual increment */)
     {
-        if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
+        if (std::addressof(*IFP.get()) == std::addressof(*iter->second.pIFP.get()))
         {
-            m_mapOfReplacedAnimations.erase(x.first);
-            CIFPEngine::EngineApplyAnimation(*this, x.first);
+            CIFPEngine::EngineApplyAnimation(*this, iter->first);
+            iter = m_mapOfReplacedAnimations.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
 }

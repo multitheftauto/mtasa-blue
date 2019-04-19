@@ -236,9 +236,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
-    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
-    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -3904,14 +3901,13 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
-
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;

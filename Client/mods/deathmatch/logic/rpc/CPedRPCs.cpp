@@ -266,7 +266,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                     if (bitStream.Version() >= 0x065)
                         bitStream.Read(iBlend);
 
-                    CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
                     if (pBlock)
                         pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                 }
@@ -315,7 +315,7 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
     std::string animName;
     float fSpeed;
 
-    if (bitStream.ReadString(animName))
+    if (bitStream.ReadString<unsigned char>(animName))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed && !animName.empty())

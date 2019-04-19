@@ -81,8 +81,6 @@ public:
     void                RemoveRemoteDataStorage(CPlayerPed* pPed);
     void                EnableHooks_ClothesMemFix(bool bEnable);
 
-    void InitializeAnimationHooks(bool bIsHostSmotra);
-
     CPed* GetContextSwitchedPed();
 
     CPopulationMP* GetPopulationMP() { return Population; }
@@ -278,9 +276,15 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
-    void  SetLastStaticAnimationPlayed(DWORD dwGroupID, DWORD dwAnimID) { m_dwLastStaticAnimGroupID = dwGroupID; m_dwLastStaticAnimID = dwAnimID; }
+    void SetLastStaticAnimationPlayed(DWORD dwGroupID, DWORD dwAnimID, DWORD dwAnimArrayAddress)
+    {
+        m_dwLastStaticAnimGroupID = dwGroupID;
+        m_dwLastStaticAnimID = dwAnimID;
+        m_dwLastAnimArrayAddress = dwAnimArrayAddress;
+    }
     DWORD GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
     DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+    DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
@@ -304,6 +308,7 @@ private:
     float               m_fMaddDoggPoolLevel;
     DWORD               m_dwLastStaticAnimGroupID;
     DWORD               m_dwLastStaticAnimID;
+    DWORD               m_dwLastAnimArrayAddress;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

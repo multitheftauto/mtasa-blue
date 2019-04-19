@@ -10,7 +10,8 @@ project "Multiplayer SA"
 	filter {}
 		includedirs { 
 			"../sdk",
-			"../../vendor/sparsehash/src/"
+			"../../vendor/sparsehash/src/",
+			"../../vendor/hwbrk"
 		}
 	
 	pchheader "StdInc.h"
@@ -22,6 +23,8 @@ project "Multiplayer SA"
 		["*"] = "premake5.lua"
 	}
 	
+	links { "hwbrk" }
+
 	files {
 		"premake5.lua",
 		"*.h",

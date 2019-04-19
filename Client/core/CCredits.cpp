@@ -60,6 +60,7 @@ CCredits::CCredits()
     m_strCredits +=
         "\n\n"
 
+        "Patrik \"myonlake\" Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
         "Marek \"botder\" Kulik\n"
         "Arran\n"
@@ -107,7 +108,6 @@ CCredits::CCredits()
         "Callum \"Callum\" Dawson\n"
         "Philip \"Fenix\" Farquharson\n"
         "Robin \"robhol\" Holm\n"
-        "Patrik \"myonlake\" Juvonen\n"
         "Gabrielius \"Dezash\" Laurinavicius\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Adam \"50p\" Telega\n"
