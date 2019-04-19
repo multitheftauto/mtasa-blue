@@ -105,7 +105,7 @@ bool CClientSound::Create()
 
     // If we're not allowed to play a stream, stop here
     if (m_bStream)
-        if (!g_pCore->GetCVars()->GetValue("allow_internet_sound_streams", true))
+        if (!g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
             return false;
 
     // Initial state
@@ -635,7 +635,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
     {
         // Check if we're allowed to play streams, otherwise just destroy the stream
         // This way we can start the stream without the need to handle this edge case in scripting
-        if (g_pCore->GetCVars()->GetValue("allow_internet_sound_streams", true))
+        if (g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
         {
             if (!m_pAudio)
             {

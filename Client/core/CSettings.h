@@ -151,7 +151,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxDeviceSelectionDialog;
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
-    CGUICheckBox*  m_pCheckBoxAllowInternetSoundStreams;
+    CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
@@ -376,7 +376,7 @@ protected:
     bool OnFxQualityChanged(CGUIElement* pElement);
     bool OnVolumetricShadowsClick(CGUIElement* pElement);
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
-    bool OnAllowInternetSoundStreamsClick(CGUIElement* pElement);
+    bool OnAllowExternalSoundsClick(CGUIElement* pElement);
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
@@ -442,7 +442,7 @@ private:
     DWORD m_dwFrameCount;
     bool  m_bShownVolumetricShadowsWarning;
     bool  m_bShownAllowScreenUploadMessage;
-    bool  m_bShownAllowInternetSoundStreamsMessage;
+    bool  m_bShownAllowExternalSoundsMessage;
     int   m_iMaxAnisotropic;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;

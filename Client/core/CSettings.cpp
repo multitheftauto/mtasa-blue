@@ -376,10 +376,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxAllowInternetSoundStreams = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow internet sound streams"), true));
-    m_pCheckBoxAllowInternetSoundStreams->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
-    m_pCheckBoxAllowInternetSoundStreams->GetPosition(vecTemp, false);
-    m_pCheckBoxAllowInternetSoundStreams->AutoSize(NULL, 20.0f);
+    m_pCheckBoxAllowExternalSounds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow external sounds"), true));
+    m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1208,7 +1208,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
-    m_pCheckBoxAllowInternetSoundStreams->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowInternetSoundStreamsClick, this));
+    m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
@@ -1496,10 +1496,10 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
 
-    // Allow internet sound streams
-    bool bAllowInternetSoundStreamsEnabled;
-    CVARS_GET("allow_internet_sound_streams", bAllowInternetSoundStreamsEnabled);
-    m_pCheckBoxAllowInternetSoundStreams->SetSelected(bAllowInternetSoundStreamsEnabled);
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3308,9 +3308,9 @@ void CSettings::SaveData()
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
-    // Allow internet sound streams
-    bool bAllowInternetSoundStreamsEnabled = m_pCheckBoxAllowInternetSoundStreams->GetSelected();
-    CVARS_SET("allow_internet_sound_streams", bAllowInternetSoundStreamsEnabled);
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
+    CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4310,19 +4310,19 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
 }
 
 //
-// AllowInternetSoundStreams
+// AllowExternalSounds
 //
-bool CSettings::OnAllowInternetSoundStreamsClick(CGUIElement* pElement)
+bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
 {
-    if (!m_pCheckBoxAllowInternetSoundStreams->GetSelected() && !m_bShownAllowInternetSoundStreamsMessage)
+    if (!m_pCheckBoxAllowExternalSounds->GetSelected() && !m_bShownAllowExternalSoundsMessage)
     {
-        m_bShownAllowInternetSoundStreamsMessage = true;
+        m_bShownAllowExternalSoundsMessage = true;
         SString strMessage;
         strMessage +=
             _("Some scripts may play sounds, such as radio, from the internet."
               "\n\nDisabling this setting may decrease network"
               "\nbandwidth consumption.\n");
-        CCore::GetSingleton().ShowMessageBox(_("INTERNET SOUND STREAMS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+        CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
 }
