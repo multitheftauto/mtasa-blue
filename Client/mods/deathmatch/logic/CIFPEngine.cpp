@@ -56,8 +56,8 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             CAnimBlendHierarchySAInterface* pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy(strCustomAnimName);
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
+                EngineApplyAnimation(Ped, pInternalAnimHierarchy->GetInterface(), pCustomAnimHierarchyInterface);
                 Ped.ReplaceAnimation(pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface);
-                EngineApplyAnimation(Ped, pCustomAnimHierarchyInterface);
                 return true;
             }
         }
@@ -101,16 +101,29 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
     return false;
 }
 
-bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
+bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface, CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
 {
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = Ped.GetClump();
     if (pClump)
     {
-        auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pAnimHierarchyInterface);
-        auto pCurrentAnimAssociation = pAnimationManager->RpAnimBlendClumpGetAssociationHashKey(pClump, pAnimHierarchy->GetNameHashKey());
+        auto pCurrentAnimAssociation = Ped.GetAnimAssociation(pOriginalHierarchyInterface);
         if (pCurrentAnimAssociation)
         {
+            auto pCurrentAnimHierarchy = pCurrentAnimAssociation->GetAnimHierarchy();
+            auto pAssocHierachyInterface = pCurrentAnimHierarchy->GetInterface();
+            if (pAssocHierachyInterface == pAnimHierarchyInterface)
+            {
+                return true;
+            }
+
+            int iGroupID = pCurrentAnimAssociation->GetAnimGroup();
+            int iAnimID = pCurrentAnimAssociation->GetAnimID();
+            if (iGroupID < 0 && iAnimID < 0)
+            {
+                return true;
+            }
+            auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pAnimHierarchyInterface);
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
             pCurrentAnimAssociation->FreeAnimBlendNodeArray();
             pCurrentAnimAssociation->Init(pClump, pAnimHierarchyInterface);

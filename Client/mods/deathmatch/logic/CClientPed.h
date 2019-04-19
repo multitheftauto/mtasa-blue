@@ -500,6 +500,8 @@ public:
     void                RestoreAllAnimations();
     SReplacedAnimation* GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface);
 
+    std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);

@@ -6079,8 +6079,9 @@ void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 
 void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
-    m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
-    CIFPEngine::EngineApplyAnimation(*this, pInternalAnimHierarchy->GetInterface());
+    CAnimBlendHierarchySAInterface* pInterface = pInternalAnimHierarchy->GetInterface();
+    CIFPEngine::EngineApplyAnimation(*this, pInterface, pInterface);
+    m_mapOfReplacedAnimations.erase(pInterface);
 }
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
@@ -6089,7 +6090,8 @@ void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
     {
         if (std::addressof(*IFP.get()) == std::addressof(*iter->second.pIFP.get()))
         {
-            CIFPEngine::EngineApplyAnimation(*this, iter->first);
+            auto pAnimHierarchy = g_pGame->GetAnimManager()->GetAnimBlendHierarchy(iter->first);
+            CIFPEngine::EngineApplyAnimation(*this, iter->first, iter->first);
             iter = m_mapOfReplacedAnimations.erase(iter);
         }
         else
@@ -6106,14 +6108,13 @@ void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
     for (size_t i = 0; i < cAnimations; i++)
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
+        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
         m_mapOfReplacedAnimations.erase(pAnimHierarchyInterface);
-        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface);
     }
 }
 
 void CClientPed::RestoreAllAnimations()
 {
-    m_mapOfReplacedAnimations.clear();
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = GetClump();
     if (pClump)
@@ -6129,12 +6130,14 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    CIFPEngine::EngineApplyAnimation(*this, pAnimStaticAssociation->GetAnimHierachyInterface());
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }
             pAnimAssociation = std::move(pAnimNextAssociation);
         }
     }
+    m_mapOfReplacedAnimations.clear();
 }
 
 SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)
@@ -6146,6 +6149,45 @@ SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterf
         return &it->second;
     }
     return nullptr;
+}
+
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface)
+{
+    RpClump* pClump = GetClump();
+    if (!pClump)
+    {
+        return nullptr;
+    }
+
+    auto pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
+    CAnimBlendHierarchySAInterface* pReplacedInterface = nullptr;
+    if (pReplacedAnimation != nullptr)
+    {
+        pReplacedInterface = pReplacedAnimation->pAnimationHierarchy;
+    }
+
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    auto pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+    while (pAnimAssociation)
+    {
+        auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
+        auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+        if (pAnimHierarchy)
+        {  
+            CAnimBlendHierarchySAInterface* pInterface = pAnimHierarchy->GetInterface();
+            if (pInterface == pOriginalHierarchyInterface)
+            {
+                return pAnimAssociation;
+            }
+            if (pReplacedInterface && pInterface == pReplacedInterface)
+            {
+                return pAnimAssociation;
+            }
+        }
+        pAnimAssociation = std::move(pAnimNextAssociation);
+    }
+    return nullptr;
+
 }
 
 CSphere CClientPed::GetWorldBoundingSphere()
