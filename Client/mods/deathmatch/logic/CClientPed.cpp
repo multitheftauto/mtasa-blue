@@ -717,6 +717,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
         m_fHealth = GetMaxHealth();
         m_pPlayerPed->SetHealth(m_fHealth);
         m_bUsesCollision = true;
+        m_pPlayerPed->SetLanding(false);
     }
     else
     {
@@ -1383,6 +1384,8 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     if (m_pPlayerPed)
     {
+        m_pPlayerPed->SetLanding(false);
+
         // Fall tasks
         KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
         // Swim tasks
@@ -1847,6 +1850,8 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
             // Kill the task
             pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
+
+        m_pPlayerPed->SetLanding(false);
 
         // Make sure to remove the jetpack task before setting death tasks (Issue #7860)
         if (HasJetPack())
@@ -3605,6 +3610,7 @@ void CClientPed::_CreateModel()
         }
 
         // Restore any settings
+        m_pPlayerPed->SetLanding(false);
         m_pPlayerPed->SetMatrix(&m_Matrix);
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
@@ -3718,6 +3724,8 @@ void CClientPed::_CreateLocalModel()
         {
             m_pPlayerPed->SetModelIndex(m_ulModel);
         }
+
+        m_pPlayerPed->SetLanding(false);
 
         // Give him the default fighting style
         m_pPlayerPed->SetFightingStyle(m_FightingStyle, 6);
@@ -4317,6 +4325,8 @@ void CClientPed::SetChoking(bool bChoking)
             // His not choking. Make him choke if that's what we're supposed to do.
             if (bChoking)
             {
+                m_pPlayerPed->SetLanding(false);
+
                 // Remove jetpack now so it doesn't stay on (#9522#c25612)
                 if (HasJetPack())
                     SetHasJetPack(false);
@@ -5192,6 +5202,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
 
             m_pPlayerPed->Respawn(pvecPosition, bCameraCut);
             SetPosition(*pvecPosition);
+
+            m_pPlayerPed->SetLanding(false);
 
             if (bRestoreState)
             {
