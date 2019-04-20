@@ -5672,6 +5672,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
 
         if (pBlock->IsLoaded())
         {
+            // Fix #366: Can only run forward bug
+            m_pPlayerPed->SetLanding(false);
+
             // Remove jetpack now so it doesn't stay on (#9522#c25612)
             if (HasJetPack())
                 SetHasJetPack(false);
