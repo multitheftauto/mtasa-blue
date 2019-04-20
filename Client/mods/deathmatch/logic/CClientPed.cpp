@@ -1930,6 +1930,9 @@ void CClientPed::SetFrozen(bool bFrozen)
         {
             if (m_pTaskManager)
             {
+                // Fix #366: Can only run forward bug
+                m_pPlayerPed->SetLanding(false);
+
                 // Let them have a jetpack (#9522)
                 if (!HasJetPack())
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
