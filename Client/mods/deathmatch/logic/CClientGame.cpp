@@ -276,6 +276,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGamePlayerDestructHandler(CClientGame::StaticGamePlayerDestructHandler);
     g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
@@ -3758,6 +3759,11 @@ void CClientGame::StaticGameModelRemoveHandler(ushort usModelId)
     g_pClientGame->GameModelRemoveHandler(usModelId);
 }
 
+void CClientGame::StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    g_pClientGame->GameRunNamedAnimDestructorHandler(pTask);
+}
+
 void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
 {
     if (pGameEntity)
@@ -4773,7 +4779,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             {
                 return true;
             }
-            CLuaArguments  Arguments;
+            CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
@@ -4917,6 +4923,20 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
     // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+}
+
+void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    auto it = m_mapOfRunNamedAnimTasks.find(pTask);
+    if (it != m_mapOfRunNamedAnimTasks.end())
+    {
+        CClientPed* pPed = it->second;
+        if (pPed && pPed->IsCrouchToBeSetOnAnimEnd())
+        {
+            pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+        }
+        m_mapOfRunNamedAnimTasks.erase(pTask);
+    }
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -6928,6 +6948,11 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed)
+{
+    m_mapOfRunNamedAnimTasks[pTask] = pPed;
 }
 
 void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)

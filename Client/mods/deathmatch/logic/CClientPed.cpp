@@ -90,6 +90,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
+    m_bCrouchToBeSetOnAnimEnd = false;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";
@@ -5094,7 +5095,7 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
@@ -5666,8 +5667,8 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
     }
 }
 
-void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
-                                   bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5725,6 +5726,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
         else
@@ -5775,16 +5777,16 @@ void CClientPed::KillAnimation()
 }
 
 std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
-{ 
+{
     if (m_pAnimationBlock)
     {
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
-    return nullptr; 
+    return nullptr;
 }
 const char* CClientPed::GetAnimationName()
-{ 
-    return m_strAnimationName; 
+{
+    return m_strAnimationName;
 }
 
 void CClientPed::PostWeaponFire()
@@ -6177,7 +6179,7 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
         return nullptr;
     }
 
-    auto pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
+    auto                            pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
     CAnimBlendHierarchySAInterface* pReplacedInterface = nullptr;
     if (pReplacedAnimation != nullptr)
     {
@@ -6185,13 +6187,13 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
     }
 
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+    auto          pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
     while (pAnimAssociation)
     {
         auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
         auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
         if (pAnimHierarchy)
-        {  
+        {
             CAnimBlendHierarchySAInterface* pInterface = pAnimHierarchy->GetInterface();
             if (pInterface == pOriginalHierarchyInterface)
             {
@@ -6205,7 +6207,6 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
         pAnimAssociation = std::move(pAnimNextAssociation);
     }
     return nullptr;
-
 }
 
 CSphere CClientPed::GetWorldBoundingSphere()

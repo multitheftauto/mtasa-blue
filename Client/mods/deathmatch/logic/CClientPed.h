@@ -418,12 +418,12 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
-    bool        IsRunningAnimation();
-    void        RunAnimation(AssocGroupId animGroup, AnimationId animID);
-    void        RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true,
-                                  bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false,
-                                  bool bHoldLastFrame = false);
-    void                        KillAnimation();
+    bool IsRunningAnimation();
+    void RunAnimation(AssocGroupId animGroup, AnimationId animID);
+    void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
+                           bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
+                           bool bOffsetPed = false, bool bHoldLastFrame = false);
+    void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const char*                 GetAnimationName();
 
@@ -541,6 +541,8 @@ public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
+    void SetCrouchToBeSetOnAnimEnd(bool bSetOnEnd) { m_bCrouchToBeSetOnAnimEnd = bSetOnEnd; }
+    bool IsCrouchToBeSetOnAnimEnd() { return m_bCrouchToBeSetOnAnimEnd; }
 
     void NotifyCreate();
     void NotifyDestroy();
@@ -709,4 +711,5 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
+    bool              m_bCrouchToBeSetOnAnimEnd;
 };
