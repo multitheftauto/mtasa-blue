@@ -4931,7 +4931,7 @@ void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAni
     if (it != m_mapOfRunNamedAnimTasks.end())
     {
         CClientPed* pPed = it->second;
-        if (pPed && pPed->IsCrouchToBeSetOnAnimEnd())
+        if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
         {
             pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
         }

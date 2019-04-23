@@ -90,7 +90,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
-    m_bCrouchToBeSetOnAnimEnd = false;
+    m_bTaskToBeRestoredOnAnimEnd = false;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";

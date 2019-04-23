@@ -541,8 +541,8 @@ public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
-    void SetCrouchToBeSetOnAnimEnd(bool bSetOnEnd) { m_bCrouchToBeSetOnAnimEnd = bSetOnEnd; }
-    bool IsCrouchToBeSetOnAnimEnd() { return m_bCrouchToBeSetOnAnimEnd; }
+    void SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
+    bool IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
 
     void NotifyCreate();
     void NotifyDestroy();
@@ -711,5 +711,5 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
-    bool              m_bCrouchToBeSetOnAnimEnd;
+    bool              m_bTaskToBeRestoredOnAnimEnd;
 };

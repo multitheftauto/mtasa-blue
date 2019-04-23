@@ -1990,7 +1990,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     bool           bUpdatePosition = true;
     bool           bInterruptable = true;
     bool           bFreezeLastFrame = true;
-    bool           bCrouchToBeSetOnAnimEnd = false;
+    bool           bTaskToBeRestoredOnAnimEnd = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2007,7 +2007,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadBool(bInterruptable, true);
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
-    argStream.ReadBool(bCrouchToBeSetOnAnimEnd, false);
+    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
 
     if (!argStream.HasErrors())
     {
@@ -2018,10 +2018,10 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
             CClientPed* pPed = static_cast<CClientPed*>(pEntity);
             if (!pPed->IsDucked())
             {
-                bCrouchToBeSetOnAnimEnd = false;
+                bTaskToBeRestoredOnAnimEnd = false;
             }
 
-            pPed->SetCrouchToBeSetOnAnimEnd(bCrouchToBeSetOnAnimEnd);
+            pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
             lua_pushboolean(luaVM, true);
             return 1;
         }

@@ -254,7 +254,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                 std::string animName;
                 int         iTime;
                 int         iBlend = 250;
-                bool        bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bCrouchToBeSetOnAnimEnd;
+                bool        bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
 
                 if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
                     bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
@@ -262,10 +262,10 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                     if (bitStream.Version() >= 0x065)
                     {
                         bitStream.Read(iBlend);
-                        bitStream.ReadBit(bCrouchToBeSetOnAnimEnd);
+                        bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
                         if (!pPed->IsDucked())
                         {
-                            bCrouchToBeSetOnAnimEnd = false;
+                            bTaskToBeRestoredOnAnimEnd = false;
                         }
                     }
 
@@ -273,7 +273,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                     if (pBlock)
                     {
                         pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
-                        pPed->SetCrouchToBeSetOnAnimEnd(bCrouchToBeSetOnAnimEnd);
+                        pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
                     }
                 }
             }

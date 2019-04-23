@@ -415,7 +415,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     int       iBlend = 250;
     bool      bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
     bool      bDummy;
-    bool      bCrouchToBeSetOnAnimEnd;
+    bool      bTaskToBeRestoredOnAnimEnd;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -435,7 +435,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadBool(bInterruptable, true);
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
-    argStream.ReadBool(bCrouchToBeSetOnAnimEnd, false);
+    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
 
     if (!argStream.HasErrors())
     {
@@ -443,7 +443,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
         szBlock = strBlockName.empty() ? NULL : strBlockName.c_str();
         szAnim = strAnimName.empty() ? NULL : strAnimName.c_str();
 
-        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bCrouchToBeSetOnAnimEnd))
+        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
         {
             lua_pushboolean(luaVM, true);
             return 1;
