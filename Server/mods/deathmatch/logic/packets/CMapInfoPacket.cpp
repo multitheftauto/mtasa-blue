@@ -133,8 +133,17 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_WorldWaterLevelInfo.fSeaLevel);
     BitStream.WriteBit(m_WorldWaterLevelInfo.bNonSeaLevelSet);
     if (m_WorldWaterLevelInfo.bNonSeaLevelSet)
+    {
         BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
-
+    }
+    if (BitStream.Version() >= 0x6D)
+    {
+        BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
+        if (m_WorldWaterLevelInfo.bOutsideLevelSet)
+        {
+            BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
+        }
+    }
     BitStream.WriteCompressed(m_usFPSLimit);
 
     // Write the garage states

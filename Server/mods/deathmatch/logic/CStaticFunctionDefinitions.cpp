@@ -9091,13 +9091,15 @@ bool CStaticFunctionDefinitions::SetAllElementWaterLevel(float fLevel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel)
+bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel,  bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel);
+    g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(fLevel);
     BitStream.pBitStream->WriteBit(bIncludeWorldNonSeaLevel);
+    BitStream.pBitStream->WriteBit(bIncludeWorldSeaLevel);
+    BitStream.pBitStream->WriteBit(bIncludeOutsideWorldLevel);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WORLD_WATER_LEVEL, *BitStream.pBitStream));
     return true;
 }

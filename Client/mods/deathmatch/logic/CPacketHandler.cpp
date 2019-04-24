@@ -2205,18 +2205,32 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     float fSeaLevel = 0.0f;
     bool  bHasNonSeaLevel = false;
     float fNonSeaLevel = 0.0f;
+    bool  bHasOutsideLevel = false;
+    float fOutsideLevel = 0.0f;
     bitStream.Read(fSeaLevel);
     bitStream.ReadBit(bHasNonSeaLevel);
     if (bHasNonSeaLevel)
+    {
         bitStream.Read(fNonSeaLevel);
-
+    }
+    if (bitStream.Version() >= 0x6D)
+    {
+        bitStream.ReadBit(bHasOutsideLevel);
+        if (bHasOutsideLevel)
+        {
+            bitStream.Read(fOutsideLevel);
+        }
+    }
     // Reset world water level to GTA default
     g_pClientGame->GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
-        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, NULL, true);
+        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, NULL, true, false, false);
+     // Apply outside world level (before -3000 and after 3000)
+    if (bHasOutsideLevel)
+        g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, NULL, false, false, true);
     // Apply world sea level (to world sea level water only)
-    g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, NULL, false);
+    g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, NULL, false, true, false);
 
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed(usFPSLimit);

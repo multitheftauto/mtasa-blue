@@ -16,8 +16,10 @@
 struct SWorldWaterLevelInfo
 {
     bool  bNonSeaLevelSet;
+    bool  bOutsideLevelSet;
     float fSeaLevel;
     float fNonSeaLevel;
+    float fOutsideLevel;
 };
 
 class CMapInfoPacket : public CPacket
