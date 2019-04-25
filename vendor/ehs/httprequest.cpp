@@ -625,7 +625,7 @@ RequestMethod GetRequestMethodFromString ( const std::string & isRequestMethod  
 std::string & mytolower (std::string & s ///< string to make lowercase
 	) 
 { 
-	std::transform ( s.begin(), s.end(), s.begin(), std::tolower);
+	std::transform ( s.begin(), s.end(), s.begin(), [](char c) { return std::tolower(c); });
 	return s;
 
 }
