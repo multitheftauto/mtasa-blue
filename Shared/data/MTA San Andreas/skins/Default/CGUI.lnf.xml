@@ -2081,7 +2081,7 @@
 	  <Property name="NormalImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
 	  <Property name="HoverImage" value="set:CGUI-Images image:ComboboxButtonHover" />
       <Property name="PushedImage" value="set:CGUI-Images image:ComboboxButtonHover" />
-	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonHover" />
+	  <Property name="DisabledImage" value="set:CGUI-Images image:ComboboxButtonNormal" />
     </Child>
     <StateImagery name="Enabled" />
     <StateImagery name="Disabled" />
