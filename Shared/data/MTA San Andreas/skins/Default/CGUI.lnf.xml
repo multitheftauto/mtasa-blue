@@ -101,18 +101,8 @@
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
-        <StateImagery name="Enabled">
-            <Layer>
-                <Section section="normal" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Disabled">
-            <Layer>
-                <Section section="normal">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
-                </Section>
-            </Layer>
-        </StateImagery>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
     </WidgetLook>
 	
     <WidgetLook name="CGUI/Titlebar">
