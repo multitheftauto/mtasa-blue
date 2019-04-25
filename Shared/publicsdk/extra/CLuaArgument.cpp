@@ -22,7 +22,7 @@
 
 using namespace std;
 
-CLuaArgument::CLuaArgument(void)
+CLuaArgument::CLuaArgument()
 {
     m_szString = NULL;
     m_iType = LUA_TNIL;
@@ -72,7 +72,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, unsigned int uiArgument)
     Read(luaVM, uiArgument);
 }
 
-CLuaArgument::~CLuaArgument(void)
+CLuaArgument::~CLuaArgument()
 {
     // Eventually destroy our string
     if (m_szString)

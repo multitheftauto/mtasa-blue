@@ -58,7 +58,7 @@ void CMultiplayerSA::SetFastClothesLoading(EFastClothesLoading fastClothesLoadin
 // Skip loading the directory data from player.img if it has already been loaded.
 // Speeds up clothes a bit, but is only part of a solution - The actual files from inside player.img are still loaded each time
 //
-bool _cdecl IsPlayerImgDirLoaded(void)
+bool _cdecl IsPlayerImgDirLoaded()
 {
     // When player.img dir is loaded, it looks this this:
     // 0x00BC12C0  00bbcdc8 00000226
@@ -263,7 +263,7 @@ skip:
 // Setup hooks for ClothesSpeedUp
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_ClothesSpeedUp(void)
+void CMultiplayerSA::InitHooks_ClothesSpeedUp()
 {
     EZHookInstall(CStreamingLoadRequestedModels);
     EZHookInstall(LoadingPlayerImgDir);

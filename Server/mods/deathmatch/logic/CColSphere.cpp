@@ -38,7 +38,7 @@ bool CColSphere::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColSphere::GetWorldBoundingSphere(void)
+CSphere CColSphere::GetWorldBoundingSphere()
 {
     return CSphere(m_vecPosition, m_fRadius);
 }

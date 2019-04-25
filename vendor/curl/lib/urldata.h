@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -77,7 +77,7 @@
 /* Default FTP/IMAP etc response timeout in milliseconds.
    Symbian OS panics when given a timeout much greater than 1/2 hour.
 */
-#define RESP_TIMEOUT (1800*1000)
+#define RESP_TIMEOUT (120*1000)
 
 #include "cookie.h"
 #include "psl.h"
@@ -142,14 +142,6 @@ typedef ssize_t (Curl_recv)(struct connectdata *conn, /* connection data */
 #include <libssh2_sftp.h>
 #endif /* HAVE_LIBSSH2_H */
 
-/* The upload buffer size, should not be smaller than CURL_MAX_WRITE_SIZE, as
-   it needs to hold a full buffer as could be sent in a write callback.
-
-   The size was 16KB for many years but was bumped to 64KB because it makes
-   libcurl able to do significantly faster uploads in some circumstances. Even
-   larger buffers can help further, but this is deemed a fair memory/speed
-   compromise. */
-#define UPLOAD_BUFSIZE 65536
 
 /* The "master buffer" is for HTTP pipelining */
 #define MASTERBUF_SIZE 16384
@@ -336,6 +328,12 @@ struct kerberos5data {
 struct ntlmdata {
   curlntlm state;
 #ifdef USE_WINDOWS_SSPI
+/* The sslContext is used for the Schannel bindings. The
+ * api is available on the Windows 7 SDK and later.
+ */
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+  CtxtHandle *sslContext;
+#endif
   CredHandle *credentials;
   CtxtHandle *context;
   SEC_WINNT_AUTH_IDENTITY identity;
@@ -366,6 +364,9 @@ struct negotiatedata {
   gss_buffer_desc output_token;
 #else
 #ifdef USE_WINDOWS_SSPI
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+  CtxtHandle *sslContext;
+#endif
   DWORD status;
   CredHandle *credentials;
   CtxtHandle *context;
@@ -476,7 +477,6 @@ struct hostname {
 #define KEEP_SENDBITS (KEEP_SEND | KEEP_SEND_HOLD | KEEP_SEND_PAUSE)
 
 
-#ifdef CURLRES_ASYNCH
 struct Curl_async {
   char *hostname;
   int port;
@@ -485,7 +485,6 @@ struct Curl_async {
   int status; /* if done is TRUE, this is the status from the callback */
   void *os_specific;  /* 'struct thread_data' for Windows */
 };
-#endif
 
 #define FIRSTSOCKET     0
 #define SECONDARYSOCKET 1
@@ -509,6 +508,28 @@ enum upgrade101 {
   UPGR101_REQUESTED,          /* upgrade requested */
   UPGR101_RECEIVED,           /* response received */
   UPGR101_WORKING             /* talking upgraded protocol */
+};
+
+struct dohresponse {
+  unsigned char *memory;
+  size_t size;
+};
+
+/* one of these for each DoH request */
+struct dnsprobe {
+  CURL *easy;
+  int dnstype;
+  unsigned char dohbuffer[512];
+  size_t dohlen;
+  struct dohresponse serverdoh;
+};
+
+struct dohdata {
+  struct curl_slist *headers;
+  struct dnsprobe probe[2];
+  unsigned int pending; /* still outstanding requests */
+  const char *host;
+  int port;
 };
 
 /*
@@ -606,6 +627,7 @@ struct SingleRequest {
 
   void *protop;       /* Allocated protocol-specific data. Each protocol
                          handler makes sure this points to data it needs. */
+  struct dohdata doh; /* DoH specific data for this request */
 };
 
 /*
@@ -636,7 +658,7 @@ struct Curl_handler {
    */
   CURLcode (*connect_it)(struct connectdata *, bool *done);
 
-  /* See above. Currently only used for FTP. */
+  /* See above. */
   CURLcode (*connecting)(struct connectdata *, bool *done);
   CURLcode (*doing)(struct connectdata *, bool *done);
 
@@ -716,6 +738,7 @@ struct Curl_handler {
 
 #define CONNCHECK_NONE 0                 /* No checks */
 #define CONNCHECK_ISDEAD (1<<0)          /* Check if the connection is dead. */
+#define CONNCHECK_KEEPALIVE (1<<1)       /* Perform any keepalive function. */
 
 #define CONNRESULT_NONE 0                /* No extra information. */
 #define CONNRESULT_DEAD (1<<0)           /* The connection is dead. */
@@ -814,6 +837,7 @@ struct connectdata {
   int socktype;  /* SOCK_STREAM or SOCK_DGRAM */
 
   struct hostname host;
+  char *hostname_resolve; /* host name to resolve to address, allocated */
   char *secondaryhostname; /* secondary socket host name (ftp) */
   struct hostname conn_to_host; /* the host to connect to. valid only if
                                    bits.conn_to_host is set */
@@ -892,6 +916,13 @@ struct connectdata {
 
   long ip_version; /* copied from the Curl_easy at creation time */
 
+  /* Protocols can use a custom keepalive mechanism to keep connections alive.
+     This allows those protocols to track the last time the keepalive mechanism
+     was used on this connection. */
+  struct curltime keepalive;
+
+  long upkeep_interval_ms;      /* Time between calls for connection upkeep. */
+
   /**** curl_get() phase fields */
 
   curl_socket_t sockfd;   /* socket to read from or CURL_SOCKET_BAD */
@@ -952,6 +983,9 @@ struct connectdata {
   void *seek_client;            /* pointer to pass to the seek() above */
 
   /*************** Request - specific items ************/
+#if defined(USE_WINDOWS_SSPI) && defined(SECPKG_ATTR_ENDPOINT_BINDINGS)
+  CtxtHandle *sslContext;
+#endif
 
 #if defined(USE_NTLM)
   struct ntlmdata ntlm;     /* NTLM differs from other authentication schemes
@@ -969,11 +1003,8 @@ struct connectdata {
 #endif
 
   char syserr_buf [256]; /* buffer for Curl_strerror() */
-
-#ifdef CURLRES_ASYNCH
   /* data used for the asynch name resolve callback */
   struct Curl_async async;
-#endif
 
   /* These three are used for chunked-encoding trailer support */
   char *trailer; /* allocated buffer to store trailer in */
@@ -1197,6 +1228,15 @@ typedef enum {
   EXPIRE_LAST /* not an actual timer, used as a marker only */
 } expire_id;
 
+
+typedef enum {
+  TRAILERS_NONE,
+  TRAILERS_INITIALIZED,
+  TRAILERS_SENDING,
+  TRAILERS_DONE
+} trailers_state;
+
+
 /*
  * One instance for each timeout an easy handle can set.
  */
@@ -1204,6 +1244,18 @@ struct time_node {
   struct curl_llist_element list;
   struct curltime time;
   expire_id eid;
+};
+
+/* individual pieces of the URL */
+struct urlpieces {
+  char *scheme;
+  char *hostname;
+  char *port;
+  char *user;
+  char *password;
+  char *options;
+  char *path;
+  char *query;
 };
 
 struct UrlState {
@@ -1225,7 +1277,7 @@ struct UrlState {
   size_t headersize;   /* size of the allocation */
 
   char *buffer; /* download buffer */
-  char *ulbuf; /* alloced upload buffer or NULL */
+  char *ulbuf; /* allocated upload buffer or NULL */
   curl_off_t current_speed;  /* the ProgressShow() function sets this,
                                 bytes / second */
   bool this_is_a_follow; /* this is a followed Location: request */
@@ -1296,9 +1348,6 @@ struct UrlState {
   /* for FTP downloads: how many CRLFs did we converted to LFs? */
   curl_off_t crlf_conversions;
 #endif
-  char *pathbuffer;/* allocated buffer to store the URL's path part in */
-  char *path;      /* path to use, points to somewhere within the pathbuffer
-                      area */
   bool slash_removed; /* set TRUE if the 'path' points to a path where the
                          initial URL slash separator has been taken off */
   bool use_range;
@@ -1332,6 +1381,15 @@ struct UrlState {
 #ifdef CURLDEBUG
   bool conncache_lock;
 #endif
+  CURLU *uh; /* URL handle for the current parsed URL */
+  struct urlpieces up;
+#ifndef CURL_DISABLE_HTTP
+  size_t trailers_bytes_sent;
+  Curl_send_buffer *trailers_buf; /* a buffer containing the compiled trailing
+                                  headers */
+#endif
+  trailers_state trailers_state; /* whether we are sending trailers
+                                       and what stage are we at */
 };
 
 
@@ -1351,6 +1409,7 @@ struct DynamicStatic {
                                     curl_easy_setopt(COOKIEFILE) calls */
   struct curl_slist *resolve; /* set to point to the set.resolve list when
                                  this should be dealt with in pretransfer */
+  bool wildcard_resolve; /* Set to true if any resolve change is a wildcard */
 };
 
 /*
@@ -1442,17 +1501,22 @@ enum dupstring {
   STRING_UNIX_SOCKET_PATH,      /* path to Unix socket, if used */
 #endif
   STRING_TARGET,                /* CURLOPT_REQUEST_TARGET */
+  STRING_DOH,                   /* CURLOPT_DOH_URL */
   /* -- end of zero-terminated strings -- */
 
   STRING_LASTZEROTERMINATED,
 
-  /* -- below this are pointers to binary data that cannot be strdup'ed.
-     Each such pointer must be added manually to Curl_dupset() --- */
+  /* -- below this are pointers to binary data that cannot be strdup'ed. --- */
 
   STRING_COPYPOSTFIELDS,  /* if POST, set the fields' values here */
 
   STRING_LAST /* not used, just an end-of-list marker */
 };
+
+/* callback that gets called when this easy handle is completed within a multi
+   handle.  Only used for internally created transfers, like for example
+   DoH. */
+typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
   FILE *err;         /* the stderr user data goes here */
@@ -1562,8 +1626,8 @@ struct UserDefined {
   curl_proxytype proxytype; /* what kind of proxy that is in use */
   long dns_cache_timeout; /* DNS cache timeout */
   long buffer_size;      /* size of receive buffer to use */
-  long upload_buffer_size; /* size of upload buffer to use,
-                              keep it >= CURL_MAX_WRITE_SIZE */
+  size_t upload_buffer_size; /* size of upload buffer to use,
+                                keep it >= CURL_MAX_WRITE_SIZE */
   void *private_data; /* application-private data */
 
   struct curl_slist *http200aliases; /* linked list of aliases for http200 */
@@ -1689,6 +1753,15 @@ struct UserDefined {
                                                   before resolver start */
   void *resolver_start_client; /* pointer to pass to resolver start callback */
   bool disallow_username_in_url; /* disallow username in url */
+  long upkeep_interval_ms;      /* Time between calls for connection upkeep. */
+  bool doh; /* DNS-over-HTTPS enabled */
+  bool doh_get; /* use GET for DoH requests, instead of POST */
+  bool http09_allowed; /* allow HTTP/0.9 responses */
+  multidone_func fmultidone;
+  struct Curl_easy *dohfor; /* this is a DoH request for that transfer */
+  CURLU *uh; /* URL handle for the current parsed URL */
+  void *trailer_data; /* pointer to pass to trailer data callback */
+  curl_trailer_callback trailer_callback; /* trailing data callback */
 };
 
 struct Names {
@@ -1716,9 +1789,10 @@ struct Curl_easy {
   struct Curl_easy *next;
   struct Curl_easy *prev;
 
-  struct connectdata *easy_conn;     /* the "unit's" connection */
+  struct connectdata *conn;
   struct curl_llist_element connect_queue;
   struct curl_llist_element pipeline_queue;
+  struct curl_llist_element sh_queue; /* list per Curl_sh_entry */
 
   CURLMstate mstate;  /* the handle's state */
   CURLcode result;   /* previous result */
@@ -1730,6 +1804,8 @@ struct Curl_easy {
      the state etc are also kept. This array is mostly used to detect when a
      socket is to be removed from the hash. See singlesocket(). */
   curl_socket_t sockets[MAX_SOCKSPEREASYHANDLE];
+  int actions[MAX_SOCKSPEREASYHANDLE]; /* action for each socket in
+                                          sockets[] */
   int numsocks;
 
   struct Names dns;

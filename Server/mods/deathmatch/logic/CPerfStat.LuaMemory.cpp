@@ -19,7 +19,7 @@ namespace
     class CLuaMainMemory
     {
     public:
-        CLuaMainMemory(void) { memset(this, 0, sizeof(*this)); }
+        CLuaMainMemory() { memset(this, 0, sizeof(*this)); }
 
         int Delta;
         int Current;
@@ -52,12 +52,12 @@ class CPerfStatLuaMemoryImpl : public CPerfStatLuaMemory
 {
 public:
     ZERO_ON_NEW
-    CPerfStatLuaMemoryImpl(void);
-    virtual ~CPerfStatLuaMemoryImpl(void);
+    CPerfStatLuaMemoryImpl();
+    virtual ~CPerfStatLuaMemoryImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatLuaMemory
@@ -96,7 +96,7 @@ CPerfStatLuaMemory* CPerfStatLuaMemory::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLuaMemoryImpl::CPerfStatLuaMemoryImpl(void)
+CPerfStatLuaMemoryImpl::CPerfStatLuaMemoryImpl()
 {
     m_strCategoryName = "Lua memory";
 }
@@ -108,7 +108,7 @@ CPerfStatLuaMemoryImpl::CPerfStatLuaMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatLuaMemoryImpl::~CPerfStatLuaMemoryImpl(void)
+CPerfStatLuaMemoryImpl::~CPerfStatLuaMemoryImpl()
 {
 }
 
@@ -119,7 +119,7 @@ CPerfStatLuaMemoryImpl::~CPerfStatLuaMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatLuaMemoryImpl::GetCategoryName(void)
+const SString& CPerfStatLuaMemoryImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -185,7 +185,7 @@ void CPerfStatLuaMemoryImpl::UpdateLuaMemory(CLuaMain* pLuaMain, int iMemUsed)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatLuaMemoryImpl::DoPulse(void)
+void CPerfStatLuaMemoryImpl::DoPulse()
 {
 }
 

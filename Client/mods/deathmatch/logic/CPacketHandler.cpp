@@ -577,16 +577,40 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
     if (bShowMessageBox)
     {
         // Read and insert extra string if required
-        SString strMessage;
-        if (bitStream.GetNumberOfUnreadBits() > 7)            // We have our string left to read
-        {
-            bitStream.ReadString(strMessage);
-        }
+        SString strMessage, strTroubleLink;
+        bitStream.ReadString(strMessage);
+        bitStream.ReadString(strTroubleLink);
         if (bExpectExtraString)
         {
             strReason = SString(strReason, strMessage.c_str());
         }
 
+        // Localize additional server messages
+        std::vector<const char*> snippetList = {
+            {_td("You were kicked from the game")},
+            {_td("This server requires a non-modifed gta_sa.exe")},
+            {_td("Please replace gta_sa.exe")},
+            {_td("This server does not allow custom D3D9.DLLs")},
+            {_td("Remove D3D9.DLL from your GTA install directory and restart MTA")},
+            {_td("This server does not allow virtual machines")},
+            {_td("This server requires driver signing to be enabled")},
+            {_td("Please restart your PC")},
+            {_td("This server has detected missing anti-cheat components")},
+            {_td("Try restarting MTA")},
+            {_td("This server requires a non-modifed gta3.img and gta_int.img")},
+            {_td("Please replace gta3.img or gta_int.img")},
+            {_td("This server requires a non-modifed gta_sa.exe")},
+            {_td("Please replace gta_sa.exe")},
+            {_td("This server does not allow Wine")},
+            {_td("Ensure no other program is modifying MTA:SA")},
+        };
+        for (auto szSnippet : snippetList)
+        {
+            if (strReason.Contains(szSnippet))
+                strReason = strReason.Replace(szSnippet, g_pLocalization->Translate(szSnippet));
+        }
+
+        // Append duration infomation if required
         if (!strDuration.empty() && strDuration != "0")
         {
             time_t Duration;
@@ -612,7 +636,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
         }
 
         // Display the error
-        g_pCore->ShowMessageBox(_("Disconnected") + strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowErrorMessageBox(_("Disconnected") + strErrorCode, strReason, strTroubleLink);
     }
 
     AddReportLog(7107, SString("Game - Disconnected (%s) (%s)", *strErrorCode, *strReason.Replace("\n", " ")));
@@ -751,7 +775,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         }
 
         // Player flags
-        bool bIsDead = bitStream.ReadBit();               // Unused.
+        bool bIsDead = bitStream.ReadBit();
         bool bIsSpawned = bitStream.ReadBit();            // Indicates extra info in packet. Always true for newer server builds.
         bool bInVehicle = bitStream.ReadBit();
         bool bHasJetPack = bitStream.ReadBit();
@@ -863,7 +887,14 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
             // Store the nick and if he's dead
             pPlayer->SetNick(szNickBuffer);
-            pPlayer->SetDeadOnNetwork(false);
+            pPlayer->SetDeadOnNetwork(bIsDead);
+            pPlayer->SetIsDead(bIsDead);
+
+            if (bIsDead)
+            {
+                pPlayer->LockHealth(0.0f);
+                pPlayer->LockArmor(0.0f);
+            }
 
             if (!strNametagText.empty())
                 pPlayer->SetNametagText(strNametagText);

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -69,7 +69,7 @@ bool Curl_auth_is_ntlm_supported(void)
  *
  * data    [in]     - The session handle.
  * userp   [in]     - The user name in the format User or Domain\User.
- * passdwp [in]     - The user's password.
+ * passwdp [in]     - The user's password.
  * service [in]     - The service type such as http, smtp, pop or imap.
  * host    [in]     - The host name.
  * ntlm    [in/out] - The NTLM data struct being used and modified.
@@ -234,7 +234,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
  *
  * data    [in]     - The session handle.
  * userp   [in]     - The user name in the format User or Domain\User.
- * passdwp [in]     - The user's password.
+ * passwdp [in]     - The user's password.
  * ntlm    [in/out] - The NTLM data struct being used and modified.
  * outptr  [in/out] - The address where a pointer to newly allocated memory
  *                    holding the result will be stored upon completion.
@@ -249,7 +249,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
                                              char **outptr, size_t *outlen)
 {
   CURLcode result = CURLE_OK;
-  SecBuffer type_2_buf;
+  SecBuffer type_2_bufs[2];
   SecBuffer type_3_buf;
   SecBufferDesc type_2_desc;
   SecBufferDesc type_3_desc;
@@ -261,12 +261,39 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   (void) userp;
 
   /* Setup the type-2 "input" security buffer */
-  type_2_desc.ulVersion = SECBUFFER_VERSION;
-  type_2_desc.cBuffers  = 1;
-  type_2_desc.pBuffers  = &type_2_buf;
-  type_2_buf.BufferType = SECBUFFER_TOKEN;
-  type_2_buf.pvBuffer   = ntlm->input_token;
-  type_2_buf.cbBuffer   = curlx_uztoul(ntlm->input_token_len);
+  type_2_desc.ulVersion     = SECBUFFER_VERSION;
+  type_2_desc.cBuffers      = 1;
+  type_2_desc.pBuffers      = &type_2_bufs[0];
+  type_2_bufs[0].BufferType = SECBUFFER_TOKEN;
+  type_2_bufs[0].pvBuffer   = ntlm->input_token;
+  type_2_bufs[0].cbBuffer   = curlx_uztoul(ntlm->input_token_len);
+
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+  /* ssl context comes from schannel.
+  * When extended protection is used in IIS server,
+  * we have to pass a second SecBuffer to the SecBufferDesc
+  * otherwise IIS will not pass the authentication (401 response).
+  * Minimum supported version is Windows 7.
+  * https://docs.microsoft.com/en-us/security-updates
+  * /SecurityAdvisories/2009/973811
+  */
+  if(ntlm->sslContext) {
+    SEC_CHANNEL_BINDINGS channelBindings;
+    SecPkgContext_Bindings pkgBindings;
+    pkgBindings.Bindings = &channelBindings;
+    status = s_pSecFn->QueryContextAttributes(
+      ntlm->sslContext,
+      SECPKG_ATTR_ENDPOINT_BINDINGS,
+      &pkgBindings
+    );
+    if(status == SEC_E_OK) {
+      type_2_desc.cBuffers++;
+      type_2_bufs[1].BufferType = SECBUFFER_CHANNEL_BINDINGS;
+      type_2_bufs[1].cbBuffer = pkgBindings.BindingsLength;
+      type_2_bufs[1].pvBuffer = pkgBindings.Bindings;
+    }
+  }
+#endif
 
   /* Setup the type-3 "output" security buffer */
   type_3_desc.ulVersion = SECBUFFER_VERSION;

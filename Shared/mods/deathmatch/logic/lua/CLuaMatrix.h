@@ -14,12 +14,12 @@
 class CLuaMatrix : public CMatrix
 {
 public:
-    CLuaMatrix(void);
+    CLuaMatrix();
     CLuaMatrix(const CMatrix& matrix);
 
-    ~CLuaMatrix(void);
+    ~CLuaMatrix();
 
-    unsigned int GetScriptID(void) const { return m_uiScriptID; }
+    unsigned int GetScriptID() const { return m_uiScriptID; }
 
     static CLuaMatrix* GetFromScriptID(unsigned int uiScriptID);
 

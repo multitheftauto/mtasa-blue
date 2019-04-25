@@ -13,7 +13,7 @@
 #include "CWeaponRPCs.h"
 #include "net/SyncStructures.h"
 
-void CWeaponRPCs::LoadFunctions(void)
+void CWeaponRPCs::LoadFunctions()
 {
     AddHandler(GIVE_WEAPON, GiveWeapon, "GiveWeapon");
     AddHandler(TAKE_WEAPON, TakeWeapon, "TakeWeapon");

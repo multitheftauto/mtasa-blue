@@ -38,7 +38,7 @@ public:
     virtual void AllQuery(CElementResult& outResult);
 
     // CSpatialDatabaseImpl functions
-    void FlushUpdateQueue(void);
+    void FlushUpdateQueue();
     bool IsValidSphere(const CSphere& sphere);
 
     CElementTree                     m_Tree;
@@ -157,7 +157,7 @@ void CSpatialDatabaseImpl::AllQuery(CElementResult& outResult)
 // Process all entities that have changed since the last call
 //
 ///////////////////////////////////////////////////////////////
-void CSpatialDatabaseImpl::FlushUpdateQueue(void)
+void CSpatialDatabaseImpl::FlushUpdateQueue()
 {
     std::map<CElement*, int> updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear();

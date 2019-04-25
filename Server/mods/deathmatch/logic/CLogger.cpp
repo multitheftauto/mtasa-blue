@@ -180,18 +180,18 @@ void CLogger::SetMinLogLevel(eLogLevel logLevel)
 //
 // Advanced animation to entertain user
 //
-void CLogger::ProgressDotsBegin(void)
+void CLogger::ProgressDotsBegin()
 {
     m_bPrintingDots = true;
 }
 
-void CLogger::ProgressDotsUpdate(void)
+void CLogger::ProgressDotsUpdate()
 {
     if (m_bPrintingDots)
         HandleLogPrint(false, "", ".", true, true, false);
 }
 
-void CLogger::ProgressDotsEnd(void)
+void CLogger::ProgressDotsEnd()
 {
     if (m_bPrintingDots)
     {
@@ -200,7 +200,7 @@ void CLogger::ProgressDotsEnd(void)
     }
 }
 
-void CLogger::BeginConsoleOutputCapture(void)
+void CLogger::BeginConsoleOutputCapture()
 {
     m_CaptureBufferMutex.Lock();
     m_strCaptureBuffer.clear();
@@ -208,7 +208,7 @@ void CLogger::BeginConsoleOutputCapture(void)
     m_CaptureBufferMutex.Unlock();
 }
 
-SString CLogger::EndConsoleOutputCapture(void)
+SString CLogger::EndConsoleOutputCapture()
 {
     m_CaptureBufferMutex.Lock();
     SString strTemp = m_strCaptureBuffer;

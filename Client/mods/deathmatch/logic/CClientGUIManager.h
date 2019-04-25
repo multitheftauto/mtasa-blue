@@ -24,24 +24,24 @@ class CClientGUIManager
     friend class CClientGUIElement;
 
 public:
-    CClientGUIManager(void);
-    ~CClientGUIManager(void);
+    CClientGUIManager();
+    ~CClientGUIManager();
 
-    void DeleteAll(void);
+    void DeleteAll();
 
     bool         Exists(CClientGUIElement* pGUIElement);
     bool         Exists(CGUIElement* pCGUIElement);
-    unsigned int Count(void) { return static_cast<unsigned int>(m_Elements.size()); };
+    unsigned int Count() { return static_cast<unsigned int>(m_Elements.size()); };
 
     CClientGUIElement* Get(CGUIElement* pCGUIElement);
 
-    void DoPulse(void);
+    void DoPulse();
     void QueueGridListUpdate(CClientGUIElement* pGUIElement);
 
 private:
     void Add(CClientGUIElement* pGUIElement);
     void Remove(CClientGUIElement* pGUIElement);
-    void FlushQueuedUpdates(void);
+    void FlushQueuedUpdates();
 
 private:
     bool                            m_bCanRemoveFromList;

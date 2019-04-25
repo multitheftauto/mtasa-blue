@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaColShapeDefs::LoadFunctions(void)
+void CLuaColShapeDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createColCircle", CreateColCircle},

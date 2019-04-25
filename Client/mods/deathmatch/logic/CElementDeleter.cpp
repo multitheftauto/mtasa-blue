@@ -86,7 +86,6 @@ void CElementDeleter::DeleteRecursive(class CClientEntity* pElement)
     }
 }
 
-
 void CElementDeleter::DoDeleteAll()
 {
     // Make sure elements won't call us back and screw with our list (would crash)
@@ -108,7 +107,7 @@ void CElementDeleter::DoDeleteAll()
     // We can now allow unrefernecs again
     m_bAllowUnreference = true;
 }
- 
+
 void CElementDeleter::DoDeleteAllSmartPointers()
 {
     // Delete all the elements

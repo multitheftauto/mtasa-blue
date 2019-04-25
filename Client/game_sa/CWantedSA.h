@@ -82,9 +82,9 @@ private:
     bool                m_bDontDelete;
 
 public:
-    CWantedSA(void);
+    CWantedSA();
     CWantedSA(CWantedSAInterface* wantedInterface);
-    ~CWantedSA(void);
+    ~CWantedSA();
 
     // Internal game_sa accessors
     CWantedSAInterface* GetInterface() { return this->internalInterface; }
@@ -95,6 +95,6 @@ public:
     void SetMaximumWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
-    char GetWantedLevel(void) { return this->internalInterface->m_WantedLevel; };
+    char GetWantedLevel() { return this->internalInterface->m_WantedLevel; };
     void SetWantedLevelNoDrop(DWORD dwWantedLevel);
 };

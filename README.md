@@ -1,6 +1,6 @@
-## Multi Theft Auto: San Andreas [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/master.svg?label=Linux:master)](https://travis-ci.org/multitheftauto/mtasa-blue) [![Build Status](https://img.shields.io/appveyor/ci/multitheftauto/mtasa-blue/master.svg?label=Windows:master)](https://ci.appveyor.com/project/multitheftauto/mtasa-blue)
+## Multi Theft Auto: San Andreas [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/master.svg?label=Linux%3Amaster&logo=travis)](https://travis-ci.org/multitheftauto/mtasa-blue) [![Build Status](https://img.shields.io/appveyor/ci/multitheftauto/mtasa-blue/master.svg?label=Windows%3Amaster&logo=appveyor&logoColor=%23ffffff)](https://ci.appveyor.com/project/multitheftauto/mtasa-blue) [![Build Status](https://img.shields.io/azure-devops/build/multitheftauto/6e1b4536-589e-4de8-abc5-f53ff8539687/1/master.svg?label=Azure%3Amaster&logo=azuredevops)](https://dev.azure.com/multitheftauto/mtasa-blue/_build?definitionId=1)
 
-[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
+[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
 
 ## Introduction
 
@@ -67,4 +67,4 @@ Execute `win-create-projects.bat`.
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2018.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2019.

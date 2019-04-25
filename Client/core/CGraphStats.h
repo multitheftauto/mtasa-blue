@@ -17,12 +17,12 @@
 class CGraphStatsInterface
 {
 public:
-    virtual ~CGraphStatsInterface(void) {}
+    virtual ~CGraphStatsInterface() {}
 
-    virtual void Draw(void) = 0;
+    virtual void Draw() = 0;
     virtual void SetEnabled(bool bEnabled) = 0;
-    virtual bool IsEnabled(void) = 0;
+    virtual bool IsEnabled() = 0;
     virtual void AddTimingPoint(const char* szName) = 0;
 };
 
-CGraphStatsInterface* GetGraphStats(void);
+CGraphStatsInterface* GetGraphStats();

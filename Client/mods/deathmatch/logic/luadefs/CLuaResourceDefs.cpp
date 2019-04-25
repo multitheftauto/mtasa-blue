@@ -12,7 +12,7 @@
 #include "StdInc.h"
 using std::list;
 
-void CLuaResourceDefs::LoadFunctions(void)
+void CLuaResourceDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"call", Call},

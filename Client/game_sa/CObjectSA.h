@@ -130,14 +130,14 @@ private:
 public:
     CObjectSA(CObjectSAInterface* objectInterface);
     CObjectSA(DWORD dwModel, bool bBreakingDisabled);
-    ~CObjectSA(void);
+    ~CObjectSA();
 
-    CObjectSAInterface* GetObjectInterface(void) { return (CObjectSAInterface*)GetInterface(); }
+    CObjectSAInterface* GetObjectInterface() { return (CObjectSAInterface*)GetInterface(); }
 
-    void  Explode(void);
-    void  Break(void);
+    void  Explode();
+    void  Break();
     void  SetHealth(float fHealth);
-    float GetHealth(void);
+    float GetHealth();
     void  SetModelIndex(unsigned long ulModel);
 
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }

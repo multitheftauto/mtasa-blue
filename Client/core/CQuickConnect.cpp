@@ -13,7 +13,7 @@
 
 extern CCore* g_pCore;
 
-CQuickConnect::CQuickConnect(void)
+CQuickConnect::CQuickConnect()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -87,7 +87,7 @@ CQuickConnect::CQuickConnect(void)
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CQuickConnect::OnConnectButtonClick, this));
 }
 
-CQuickConnect::~CQuickConnect(void)
+CQuickConnect::~CQuickConnect()
 {
     delete m_pButtonBack;
     delete m_pButtonConnect;
@@ -121,12 +121,12 @@ void CQuickConnect::SetVisible(bool bVisible)
     }
 }
 
-bool CQuickConnect::IsVisible(void)
+bool CQuickConnect::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
 
-void CQuickConnect::Reset(void)
+void CQuickConnect::Reset()
 {
     m_pEditHost->SetText("");
     m_pEditPort->SetText("");
@@ -262,7 +262,7 @@ bool CQuickConnect::OnHostChanged(CGUIElement* pElement)
     return true;
 }
 
-void CQuickConnect::LoadData(void)
+void CQuickConnect::LoadData()
 {
     std::string  val;
     unsigned int uval;

@@ -14,7 +14,7 @@
 class CLuaPedDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(CreatePed);
@@ -55,6 +55,7 @@ public:
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
+    LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
@@ -79,7 +80,6 @@ public:
     LUA_DECLARE(RemovePedClothes);
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
-    LUA_DECLARE(SetPedSunbathing);
     LUA_DECLARE(SetPedDoingGangDriveby);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);

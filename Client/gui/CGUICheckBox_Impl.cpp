@@ -51,7 +51,7 @@ CGUICheckBox_Impl::CGUICheckBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, cons
     }
 }
 
-CGUICheckBox_Impl::~CGUICheckBox_Impl(void)
+CGUICheckBox_Impl::~CGUICheckBox_Impl()
 {
     DestroyElement();
 }
@@ -61,7 +61,7 @@ void CGUICheckBox_Impl::SetSelected(bool bChecked)
     reinterpret_cast<CEGUI::Checkbox*>(m_pWindow)->setSelected(!bChecked);
 }
 
-bool CGUICheckBox_Impl::GetSelected(void)
+bool CGUICheckBox_Impl::GetSelected()
 {
     return !(reinterpret_cast<CEGUI::Checkbox*>(m_pWindow)->isSelected());
 }
