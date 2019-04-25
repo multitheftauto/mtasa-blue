@@ -1295,6 +1295,17 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
     return false;
 }
 
+void CClientPed::ResetInOutState()
+{
+    m_pInOutVehicle = NULL;
+    m_bIsEnteringVehicle = false;
+    m_bIsLeavingVehicle = false;
+    m_uiInOutSeat = NULL;
+    m_ucLeavingDoor = NULL;
+    SetJacker(NULL);
+    SetJacking(NULL);
+}
+
 bool CClientPed::GracefullyEnterCar(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor)
 {
     // Check if we are already entering a vehicle or are already in a vehicle.
@@ -2874,12 +2885,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
             this->CallEvent("onClientPedExitVehicle", Arguments, true);
 
-            m_pInOutVehicle = NULL;
-            m_bIsLeavingVehicle = false;
-            m_uiInOutSeat = NULL;
-            m_ucLeavingDoor = NULL;
-            SetJacker(NULL);
-            SetJacking(NULL);
+            ResetInOutState();
         }
 
         if (m_bIsEnteringVehicle && !IsEnteringVehicle() && !IsGettingIntoVehicle() && m_pInOutVehicle != NULL)
@@ -2901,13 +2907,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
             this->CallEvent("onClientPedEnterVehicle", Arguments, true);
 
-            m_pInOutVehicle = NULL;
-            m_bIsEnteringVehicle = false;
-            m_uiInOutSeat = NULL;
-            m_ucEnteringDoor = NULL;
-
-            SetJacker(NULL);
-            SetJacking(NULL);
+            ResetInOutState();
         }
     }
 

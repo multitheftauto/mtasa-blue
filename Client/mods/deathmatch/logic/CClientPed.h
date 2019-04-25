@@ -225,6 +225,8 @@ public:
     void GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0);
     void GetOutOfVehicle(unsigned char ucDoor);
 
+    void ResetInOutState();
+
     bool GracefullyEnterCar(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor);
     bool GracefullyExitCar();
 

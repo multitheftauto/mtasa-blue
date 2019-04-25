@@ -2138,6 +2138,23 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
     if (IS_PED(&Entity))
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        
+        // Ped is trying to enter a vehicle, cancel it.
+        if (Ped.IsEnteringVehicle()) 
+        {
+            if (!Ped.GetOccupiedVehicle()) 
+            {
+                if (Ped.IsLocalPlayer())
+                {
+                    m_pClientGame->ResetVehicleInOut();
+                }
+                else
+                {
+                    Ped.ResetInOutState();
+                }
+            }
+        }
+
         if (strBlockName && szAnimName)
         {
             CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
