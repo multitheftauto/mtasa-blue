@@ -3992,10 +3992,25 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
-    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
-    auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
-    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
+
+    if ((DWORD)pAnimAssocGroupInterface < 0x250)
+    {
+        g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
+            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+    }
+  
+    auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
+
+    if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
+    {
+        g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
+            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+    }
+
+    int  iGroupID = pAnimAssocGroup->GetGroupID();
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
