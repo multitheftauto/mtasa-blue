@@ -5819,7 +5819,6 @@ const int CClientPed::GetAnimationBlendTime()
     return m_iBlendAnimation;
 }
 
-
 void CClientPed::PostWeaponFire()
 {
     m_ulLastTimeFired = CClientTime::GetTime();
