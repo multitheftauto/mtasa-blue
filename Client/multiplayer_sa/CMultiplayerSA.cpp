@@ -4700,24 +4700,16 @@ void _declspec(naked) HOOK_CGame_Process_End()
     }
 }
 
-void ProtectAnimGroupArray()
-{
-    static bool bBreakPointSet = false;
-    if (!bBreakPointSet)
-    {
-        DWORD  dwAnimGroupArrayAddress = 0xb4ea34;
-        HANDLE mainThread = SharedUtil::GetMainThread();
-        SetThreadHardwareBreakPoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, dwAnimGroupArrayAddress);
-
-        LogEvent(567, "aAnimAssocGroups", "Hardware Breakpoint set on WRITE access",
-                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
-        bBreakPointSet = true;
-    }
-}
-
 void __cdecl HandleIdle()
 {
-    ProtectAnimGroupArray();
+    static bool bAnimGroupArrayAddressLogged = false;
+    if (!bAnimGroupArrayAddressLogged)
+    {
+        bAnimGroupArrayAddressLogged = true;
+        DWORD  dwAnimGroupArrayAddress = 0xb4ea34;
+        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
+            SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
+    }
     m_pIdleHandler();
 }
 
