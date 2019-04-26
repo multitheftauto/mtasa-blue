@@ -1228,11 +1228,21 @@ int CLuaPedDefs::GetPedAnimation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         SString strBlockName, strAnimName;
-        if (CStaticFunctionDefinitions::GetPedAnimation(*pPed, strBlockName, strAnimName))
+        int iTime, iBlendTime;
+        bool bLoop, bUpdatePosition, bInterruptable, bFreezeOnLastFrame, bRestoreTaskOnAnimEnd;
+        if (CStaticFunctionDefinitions::GetPedAnimation(*pPed, strBlockName, strAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, 
+            bFreezeOnLastFrame, iBlendTime, bRestoreTaskOnAnimEnd))
         {
             lua_pushstring(luaVM, strBlockName);
             lua_pushstring(luaVM, strAnimName);
-            return 2;
+            lua_pushinteger(luaVM, iTime);
+            lua_pushboolean(luaVM, bLoop);
+            lua_pushboolean(luaVM, bUpdatePosition);
+            lua_pushboolean(luaVM, bInterruptable);
+            lua_pushboolean(luaVM, bFreezeOnLastFrame);
+            lua_pushinteger(luaVM, iBlendTime);
+            lua_pushboolean(luaVM, bRestoreTaskOnAnimEnd);
+            return 9;
         }
     }
     else

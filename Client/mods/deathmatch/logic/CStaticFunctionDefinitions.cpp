@@ -1728,7 +1728,8 @@ bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned c
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
+bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName, int& iTime, bool& bLoop, bool& bUpdatePosition, 
+    bool& bInterruptable, bool& bFreezeOnLastFrame, int& iBlendTime, bool& bRestoreTaskOnAnimEnd)
 {
     if (Ped.IsRunningAnimation())
     {
@@ -1742,6 +1743,14 @@ bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBl
             strBlockName = Ped.GetAnimationBlock()->GetName();
             strAnimName = Ped.GetAnimationName();
         }
+        iTime = Ped.GetAnimationTime();
+        bLoop = Ped.IsAnimationLooped();
+        bUpdatePosition = Ped.IsPositionUpdatedByAnimation();
+        bInterruptable = Ped.IsAnimationInterruptable();
+        bFreezeOnLastFrame = Ped.IsAnimationFrozenOnLastFrame();
+        iBlendTime = Ped.GetAnimationBlendTime();
+        bRestoreTaskOnAnimEnd = Ped.IsTaskToBeRestoredOnAnimEnd();
+
         return true;
     }
     return false;

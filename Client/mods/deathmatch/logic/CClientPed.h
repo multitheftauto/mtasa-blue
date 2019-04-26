@@ -426,6 +426,12 @@ public:
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const char*                 GetAnimationName();
+    const int                   GetAnimationTime();
+    const bool                  IsAnimationLooped();
+    const bool                  IsPositionUpdatedByAnimation();
+    const bool                  IsAnimationInterruptable();
+    const bool                  IsAnimationFrozenOnLastFrame();
+    const int                   GetAnimationBlendTime();
 
     bool IsUsingGun();
 

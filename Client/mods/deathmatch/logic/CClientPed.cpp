@@ -5789,6 +5789,37 @@ const char* CClientPed::GetAnimationName()
     return m_strAnimationName;
 }
 
+const int CClientPed::GetAnimationTime()
+{
+    return m_iTimeAnimation;
+}
+
+const bool CClientPed::IsAnimationLooped()
+{
+    return m_bLoopAnimation;
+}
+
+const bool CClientPed::IsPositionUpdatedByAnimation()
+{
+    return m_bUpdatePositionAnimation;
+}
+
+const bool CClientPed::IsAnimationInterruptable()
+{
+    return m_bUpdatePositionAnimation;
+}
+
+const bool CClientPed::IsAnimationFrozenOnLastFrame()
+{
+    return m_bFreezeLastFrameAnimation;
+}
+
+const int CClientPed::GetAnimationBlendTime()
+{
+    return m_iBlendAnimation;
+}
+
+
 void CClientPed::PostWeaponFire()
 {
     m_ulLastTimeFired = CClientTime::GetTime();
