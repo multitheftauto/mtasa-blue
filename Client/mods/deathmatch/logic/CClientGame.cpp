@@ -440,6 +440,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGamePlayerDestructHandler(NULL);
     g_pMultiplayer->SetGameProjectileDestructHandler(NULL);
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
