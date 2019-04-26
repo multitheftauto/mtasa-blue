@@ -2182,17 +2182,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         // Ped is trying to enter a vehicle, cancel it.
         if (Ped.IsEnteringVehicle()) 
         {
-            if (!Ped.GetOccupiedVehicle()) 
-            {
-                if (Ped.IsLocalPlayer())
-                {
-                    m_pClientGame->ResetVehicleInOut();
-                }
-                else
-                {
-                    Ped.ResetInOutState();
-                }
-            }
+            CancelPedEnterVehicle(Ped);
         }
 
         if (strBlockName && szAnimName)
@@ -2578,6 +2568,30 @@ bool CStaticFunctionDefinitions::SetPedEnterVehicle(CClientPed& pPed, CClientVeh
         }
 
         return pPed.GracefullyEnterCar(&pVehicle, uiSeat, uiSeat);
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::CancelPedEnterVehicle(CClientPed& pPed)
+{
+    if (pPed.IsEnteringVehicle())
+    {
+        if (!pPed.GetOccupiedVehicle())
+        {
+            if (pPed.IsLocalPlayer())
+            {
+                m_pClientGame->ResetVehicleInOut();
+            }
+            else
+            {
+                pPed.ResetInOutState();
+            }
+
+            pPed.KillTask(TASK_PRIORITY_PRIMARY, true);
+
+            return true;
+        }
     }
 
     return false;

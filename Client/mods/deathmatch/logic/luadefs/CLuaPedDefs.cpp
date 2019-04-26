@@ -90,7 +90,8 @@ void CLuaPedDefs::LoadFunctions()
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
         {"setPedExitVehicle", SetPedExitVehicle},
-        {"setPedEnterVehicle", SetPedEnterVehicle}
+        {"setPedEnterVehicle", SetPedEnterVehicle},
+        {"cancelPedEnterVehicle", CancelPedEnterVehicle}
     };
 
     // Add functions
@@ -185,6 +186,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
+    lua_classfunction(luaVM, "cancelEnterVehicle", "cancelPedEnterVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -2261,6 +2263,28 @@ int CLuaPedDefs::SetPedEnterVehicle(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetPedEnterVehicle(*pPed, *pVehicle, uiSeat))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::CancelPedEnterVehicle(lua_State* luaVM)
+{
+    CClientPed*     pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::CancelPedEnterVehicle(*pPed))
         {
             lua_pushboolean(luaVM, true);
             return 1;

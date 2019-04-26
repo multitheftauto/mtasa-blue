@@ -1305,6 +1305,7 @@ void CClientPed::ResetInOutState()
     m_bIsLeavingVehicle = false;
     m_uiInOutSeat = NULL;
     m_ucLeavingDoor = NULL;
+    m_bForceGettingIn = false;
     SetJacker(NULL);
     SetJacking(NULL);
 }
@@ -2904,22 +2905,31 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         if (m_bIsEnteringVehicle && !IsEnteringVehicle() && !IsGettingIntoVehicle() && m_pInOutVehicle != NULL)
         {
-            CClientVehicle::SetPedOccupiedVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
-            CClientVehicle::SetPedOccupyingVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
+            // Only update the occupying state if we are actually inside the vehicle.
+            if (GetRealOccupiedVehicle()) {
+                CClientVehicle::SetPedOccupiedVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
+                CClientVehicle::SetPedOccupyingVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
 
-            m_pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
-            m_pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
+                m_pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+                m_pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
 
-            CLuaArguments Arguments;
-            Arguments.PushElement(this);            // ped
-            Arguments.PushNumber(m_uiInOutSeat);    // seat
+                CLuaArguments Arguments;
+                Arguments.PushElement(this);            // ped
+                Arguments.PushNumber(m_uiInOutSeat);    // seat
 
-            if (GetJacking())
+                if (GetJacking())
+                {
+                    Arguments.PushElement(GetJacking());     // ped we have carjacked
+                }
+
+                this->CallEvent("onClientPedEnterVehicle", Arguments, true);
+            } 
+            else 
             {
-                Arguments.PushElement(GetJacking());     // ped we have carjacked
+                // Seems like we somehow abandoned getting into the vehicle.
+                // For safety reasons let's make sure the ped knows this too.
+                KillTask(TASK_PRIORITY_PRIMARY, true);
             }
-
-            this->CallEvent("onClientPedEnterVehicle", Arguments, true);
 
             ResetInOutState();
         }

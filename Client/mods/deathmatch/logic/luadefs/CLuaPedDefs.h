@@ -94,4 +94,5 @@ public:
     LUA_DECLARE(SetPedStat);
     LUA_DECLARE(SetPedExitVehicle);
     LUA_DECLARE(SetPedEnterVehicle);
+    LUA_DECLARE(CancelPedEnterVehicle);
 };

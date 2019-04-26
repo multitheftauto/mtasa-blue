@@ -192,6 +192,7 @@ public:
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
     static bool SetPedExitVehicle(CClientPed& pPed);
     static bool SetPedEnterVehicle(CClientPed& pPed, CClientVehicle& pVehicle, unsigned int uiSeat);
+    static bool CancelPedEnterVehicle(CClientPed& pPed);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
