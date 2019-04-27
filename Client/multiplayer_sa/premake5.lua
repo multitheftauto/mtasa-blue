@@ -4,6 +4,8 @@ project "Multiplayer SA"
 	targetname "multiplayer_sa"
 	targetdir(buildpath("mta"))
 	
+	cppdialect "C++14" -- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
 	
