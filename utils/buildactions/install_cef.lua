@@ -35,7 +35,7 @@ newaction {
 
 		-- Check md5
 		local archive_path = CEF_PATH.."temp.tar.bz2"
-		if os.md5_file(archive_path) == correct_checksum then
+		if os.isfile(archive_path) and os.md5_file(archive_path) == correct_checksum then
 			print("CEF consistency checks succeeded")
 			return
 		end

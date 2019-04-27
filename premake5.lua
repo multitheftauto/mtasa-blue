@@ -27,7 +27,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	cppdialect "C++14"
+	cppdialect "C++17"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"

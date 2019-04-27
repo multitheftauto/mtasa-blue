@@ -4050,7 +4050,7 @@ void                        GetVehicleDriveType()
 }
 
 static CTransmission* pCurTransmission = nullptr;
-static byte*          pCurGear = nullptr;
+static ::byte*          pCurGear = nullptr;
 
 void CheckVehicleMaxGear()
 {
