@@ -16,19 +16,6 @@ matrix:
         ENV_CXX=g++-8 
         ENV_CC=gcc-8
         NIGHTLY_UPLOAD=1
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-8
-          packages:
-            - clang-8
-            - zip
-      env: 
-        ENV_CXX=clang++-8
-        ENV_CC=clang-8
-        NIGHTLY_UPLOAD=0
     
 before_script:
   - wget https://mirror.mtasa.com/bdata/premake5-travis -4 -O ./premake5 &&
