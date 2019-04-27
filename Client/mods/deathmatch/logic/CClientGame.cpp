@@ -236,9 +236,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
-    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
-    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -279,6 +276,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGamePlayerDestructHandler(CClientGame::StaticGamePlayerDestructHandler);
     g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
@@ -442,6 +440,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGamePlayerDestructHandler(NULL);
     g_pMultiplayer->SetGameProjectileDestructHandler(NULL);
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
@@ -3763,6 +3762,11 @@ void CClientGame::StaticGameModelRemoveHandler(ushort usModelId)
     g_pClientGame->GameModelRemoveHandler(usModelId);
 }
 
+void CClientGame::StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    g_pClientGame->GameRunNamedAnimDestructorHandler(pTask);
+}
+
 void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
 {
     if (pGameEntity)
@@ -3906,14 +3910,13 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
-
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
@@ -3992,10 +3995,25 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
-    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
-    auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
-    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
+
+    if ((DWORD)pAnimAssocGroupInterface < 0x250)
+    {
+        g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
+            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+    }
+  
+    auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
+
+    if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
+    {
+        g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
+            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+    }
+
+    int  iGroupID = pAnimAssocGroup->GetGroupID();
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
@@ -4779,7 +4797,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             {
                 return true;
             }
-            CLuaArguments  Arguments;
+            CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
@@ -4923,6 +4941,20 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
     // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+}
+
+void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    auto it = m_mapOfRunNamedAnimTasks.find(pTask);
+    if (it != m_mapOfRunNamedAnimTasks.end())
+    {
+        CClientPed* pPed = it->second;
+        if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
+        {
+            pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+        }
+        m_mapOfRunNamedAnimTasks.erase(pTask);
+    }
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -6934,6 +6966,11 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed)
+{
+    m_mapOfRunNamedAnimTasks[pTask] = pPed;
 }
 
 void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)

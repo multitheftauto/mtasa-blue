@@ -11,13 +11,6 @@
 
 #include "StdInc.h"
 
-// These includes have to be fixed!
-#include "..\game_sa\CCameraSA.h"
-#include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CBuildingSA.h"
-#include "..\game_sa\CPedSA.h"
-#include "..\game_sa\common.h"
-
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
@@ -89,6 +82,9 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
 
+#define HOOKPOS_CGame_Process_End                           0x53C23A
+DWORD RETURN_CGame_Process_End = 0x53C23F;
+
 #define HOOKPOS_Idle                                        0x53E981
 DWORD RETURN_Idle = 0x53E98B;
 
@@ -151,7 +147,6 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
-#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation        0x4CFC50
 #define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
 #define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
@@ -363,6 +358,7 @@ DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
+HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
 void HOOK_FindPlayerHeading();
@@ -409,18 +405,17 @@ void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
+void HOOK_CGame_Process_End();
 void HOOK_Idle();
 void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CAnimBlendNode_GetCurrentTranslation();
 void HOOK_CAnimBlendAssociation_SetCurrentTime();
 void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
 void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimBlendAssocGroupCopyAnimation();
 void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
@@ -633,9 +628,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
+    HookInstall(HOOKPOS_CGame_Process_End, (DWORD)HOOK_CGame_Process_End, 5);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
-    HookInstall(HOOKPOS_CAnimBlendNode_GetCurrentTranslation, (DWORD)HOOK_CAnimBlendNode_GetCurrentTranslation, 5);
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
     HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
@@ -735,6 +730,10 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1529,30 +1528,6 @@ void RemoveFxSystemPointer(DWORD* pPointer)
             free(pPointer);
             return;
         }
-    }
-}
-
-void CMultiplayerSA::InitializeAnimationHooks(bool bIsHostSmotra)
-{
-    if (bIsHostSmotra)
-    {
-        BYTE originalCode_CAnimManager_AddAnimation[10] = {0x8B, 0x44, 0x24, 0x0C, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x0};
-        BYTE originalCode_CAnimManager_AddAnimationAndSync[10] = {0x8B, 0x44, 0x24, 0x10, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x00};
-        BYTE originalCode_CAnimManager_BlendAnimation_Hierarchy[5] = {0x8B, 0x54, 0x24, 0x2C, 0x51};
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimation, &originalCode_CAnimManager_AddAnimation, 10);
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimationAndSync, &originalCode_CAnimManager_AddAnimationAndSync, 10);
-        MemCpy((LPVOID)HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, &originalCode_CAnimManager_BlendAnimation_Hierarchy, 5);
-
-        HookInstall(HOOKPOS_CAnimBlendAssocGroupCopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroupCopyAnimation, 6);
-    }
-    else
-    {
-        BYTE originalCode_CAnimBlendAssocGroupCopyAnimation[6] = {0x64, 0xA1, 0x00, 0x00, 0x00, 0x00};
-        MemCpy((LPVOID)HOOKPOS_CAnimBlendAssocGroupCopyAnimation, &originalCode_CAnimBlendAssocGroupCopyAnimation, 6);
-
-        HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-        HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-        HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     }
 }
 
@@ -4075,7 +4050,7 @@ void                        GetVehicleDriveType()
 }
 
 static CTransmission* pCurTransmission = nullptr;
-static byte*          pCurGear = nullptr;
+static ::byte*          pCurGear = nullptr;
 
 void CheckVehicleMaxGear()
 {
@@ -4681,8 +4656,6 @@ void _declspec(naked) HOOK_CGame_Process()
     }
 
     TIMING_CHECKPOINT("+CWorld_Process");
-    if (m_pPreWorldProcessHandler)
-        m_pPreWorldProcessHandler();
 
     _asm
     {
@@ -4692,14 +4665,52 @@ void _declspec(naked) HOOK_CGame_Process()
         pushad
     }
 
-    if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
-    TIMING_CHECKPOINT("-CWorld_Process");
+    if (m_pPreWorldProcessHandler) m_pPreWorldProcessHandler();
 
     _asm
     {
         popad
         jmp     RETURN_CGame_Process;
     }
+}
+
+DWORD CALL_CWaterLevel_PreRenderWater = 0x6EB710;
+void _declspec(naked) HOOK_CGame_Process_End()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
+
+    TIMING_CHECKPOINT("-CWorld_Process");
+
+    _asm
+    {
+        popad
+        call    CALL_CWaterLevel_PreRenderWater
+        pushad
+    }
+
+    _asm
+    {
+        popad
+        jmp     RETURN_CGame_Process_End;
+    }
+}
+
+void __cdecl HandleIdle()
+{
+    static bool bAnimGroupArrayAddressLogged = false;
+    if (!bAnimGroupArrayAddressLogged)
+    {
+        bAnimGroupArrayAddressLogged = true;
+        DWORD  dwAnimGroupArrayAddress = 0xb4ea34;
+        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
+            SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
+    }
+    m_pIdleHandler();
 }
 
 DWORD CALL_CGame_Process = 0x53BEE0;
@@ -4716,7 +4727,7 @@ void _declspec(naked) HOOK_Idle()
 
     TIMING_CHECKPOINT("+Idle");
     if (m_pIdleHandler)
-        m_pIdleHandler();
+        HandleIdle();
     TIMING_CHECKPOINT("-Idle");
 
     _asm

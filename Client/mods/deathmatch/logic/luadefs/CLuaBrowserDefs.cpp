@@ -120,6 +120,22 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (vecSize.fX < 0)
+        {
+            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
+        }
+        else if (vecSize.fY < 0)
+        {
+            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
+        }
+        else if (vecSize.fX == 0 || vecSize.fY == 0)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
         if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
         {
             lua_pushboolean(luaVM, false);
@@ -882,6 +898,22 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     argStream.ReadBool(bIsTransparent);
     argStream.ReadBool(bIsRelative);
     argStream.ReadUserData(parent, nullptr);
+
+    if (!argStream.HasErrors())
+    {
+        if (size.fX < 0)
+        {
+            argStream.SetCustomError("Browser width is smaller than 0", "Invalid parameter");
+        }
+        else if (size.fY < 0)
+        {
+            argStream.SetCustomError("Browser height is smaller than 0", "Invalid parameter");
+        }
+        else if (size.fX == 0 || size.fY == 0)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+        }
+    }
 
     if (!argStream.HasErrors())
     {

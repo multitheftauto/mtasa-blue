@@ -80,8 +80,10 @@ typedef int socklen_t;
 
     #if defined(__APPLE__)
         #include <ncurses.h>
-    #else
+    #elif __has_include(<ncursesw/curses.h>)
         #include <ncursesw/curses.h>
+    #else 
+        #include <ncurses.h>
     #endif
 
     #define MAX_PATH 255

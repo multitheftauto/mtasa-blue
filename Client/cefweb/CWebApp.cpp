@@ -22,7 +22,7 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
 void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
     // Register custom MTA scheme (has to be called in all proceseses)
-    registrar->AddCustomScheme("mtalocal", false, false, false, false, false, true);
+    registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
 }
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)

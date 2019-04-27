@@ -252,18 +252,17 @@ void CChat::DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffs
     CVector2D chatTopLeft(drawList.renderBounds.fX1, drawList.renderBounds.fY1);
     CVector2D chatBotRight(drawList.renderBounds.fX2, drawList.renderBounds.fY2);
     CVector2D chatSize = chatBotRight - chatTopLeft;
-    CRect2D   chatBounds(0, 0, chatSize.fX, chatSize.fY);
 
-    chatBounds.fX1 += topLeftOffset.fX;
-    chatBounds.fY1 += topLeftOffset.fY;
-    chatBounds.fX2 += topLeftOffset.fX;
-    chatBounds.fY2 += topLeftOffset.fY;
+    float fRight = topLeftOffset.fX + chatSize.fX;
+    float fLineHeight = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
 
     CGraphics::GetSingleton().BeginDrawBatch();
 
     for (const auto& item : drawList.lineItemList)
     {
-        m_Lines[item.uiLine].Draw(item.vecPosition - chatTopLeft + topLeftOffset, item.ucAlpha, drawList.bShadow, drawList.bOutline, chatBounds);
+        CVector2D vecPosition = item.vecPosition - chatTopLeft + topLeftOffset;
+        CRect2D   chatBounds(vecPosition.fX, vecPosition.fY, fRight, vecPosition.fY + fLineHeight);
+        m_Lines[item.uiLine].Draw(vecPosition, item.ucAlpha, drawList.bShadow, drawList.bOutline, chatBounds);
     }
 
     CGraphics::GetSingleton().EndDrawBatch();
@@ -975,14 +974,14 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
         fScaleX *= g_pChat->m_fRcpUsingDxFontScale;
         fScaleY *= g_pChat->m_fRcpUsingDxFontScale;
 
-        if (DrawArea.fY1 < RenderBounds.fY1)
+        if (DrawArea.fY1 <= RenderBounds.fY1)
         {
             // Clip text at the top
             if (DrawArea.fY1 + fLineHeight - RenderBounds.fY1 > 1)
                 g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)RenderBounds.fY1, (int)DrawArea.fX2, (int)DrawArea.fY1 + fLineHeight, ulColor,
                                                    szText, fScaleX, fScaleY, DT_LEFT | DT_BOTTOM | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
         }
-        else if (DrawArea.fY1 + fLineHeight > RenderBounds.fY2)
+        else if (DrawArea.fY1 + fLineHeight >= RenderBounds.fY2)
         {
             // Clip text at the bottom
             if (RenderBounds.fY2 - DrawArea.fY1 > 1)
