@@ -20,7 +20,7 @@ project "Launcher"
 	
 	filter "system:windows"
 		targetname "MTA Server"
-		flags { "StaticRuntime" } 
+		staticruntime "On"
 		files {
 			"launcher.rc",
 			"resource/mtaicon.ico"

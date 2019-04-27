@@ -524,10 +524,13 @@ float* CClientSound::GetWaveData(int iLength)
 }
 bool CClientSound::SetPanEnabled(bool bPan)
 {
-    if (m_pAudio && m_b3D)
+    if (m_b3D)
     {
-        m_pAudio->SetPanEnabled(bPan);
         m_bPan = bPan;
+        if (m_pAudio)
+        {
+            m_pAudio->SetPanEnabled(bPan);
+        }
         return true;
     }
     return false;

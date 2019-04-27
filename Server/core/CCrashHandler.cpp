@@ -18,10 +18,10 @@
 
 // clang-format off
 #ifndef WIN32
-    #ifdef __APPLE__
-        #include <ncurses.h>
-    #else
+    #if __has_include(<ncursesw/curses.h>)
         #include <ncursesw/curses.h>
+    #else 
+        #include <ncurses.h>
     #endif
 
     extern "C" WINDOW* m_wndMenu;

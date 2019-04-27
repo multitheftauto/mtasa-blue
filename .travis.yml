@@ -10,25 +10,12 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
+            - g++-8
             - zip
       env: 
-        ENV_CXX=g++-5 
-        ENV_CC=gcc-5 
+        ENV_CXX=g++-8 
+        ENV_CC=gcc-8
         NIGHTLY_UPLOAD=1
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-6.0
-          packages:
-            - clang-6.0
-            - zip
-      env: 
-        ENV_CXX=clang++-6.0 
-        ENV_CC=clang-6.0 
-        NIGHTLY_UPLOAD=0
     
 before_script:
   - wget https://mirror.mtasa.com/bdata/premake5-travis -4 -O ./premake5 &&

@@ -11,6 +11,8 @@
 # See http://www.cryptopp.com/wiki/iOS_(Command_Line) for more details
 # ====================================================================
 
+# set -eu
+
 #########################################
 #####       Clear old options       #####
 #########################################
@@ -38,72 +40,89 @@ SETENV_VERBOSE=1
 #####         Command line         #####
 ########################################
 
+APPLE_SDK=
+IOS_ARCH=
+BACK_ARCH=
+
 for ARG in "$@"
 do
   CL=$(echo $ARG | tr '[A-Z]' '[a-z]')
 
   # i386 (simulator)
   if [ "$CL" == "i386" ]; then
-    IOS_ARCH=i386
+    BACK_ARCH=i386
+    APPLE_SDK=iPhoneSimulator
   fi
 
   # x86_64 (simulator)
   if [ "$CL" == "x86_64" ]; then
-    IOS_ARCH=x86_64
+    BACK_ARCH=x86_64
+    APPLE_SDK=iPhoneSimulator
   fi
 
   # ARMv5
   if [ "$CL" == "armv5" ]; then
-    IOS_ARCH=armv5
+    BACK_ARCH=armv5
+    APPLE_SDK=iPhoneOS
   fi
 
   # ARMv6
   if [ "$CL" == "armv6" ]; then
-    IOS_ARCH=armv6
+    BACK_ARCH=armv6
+    APPLE_SDK=iPhoneOS
   fi
 
   # ARMv7
   if [ "$CL" == "armv7" ]; then
-    IOS_ARCH=armv7
+    BACK_ARCH=armv7
+    APPLE_SDK=iPhoneOS
   fi
 
   # ARMv7s
   if [ "$CL" == "armv7s" ]; then
-    IOS_ARCH=armv7s
+    BACK_ARCH=armv7s
+    APPLE_SDK=iPhoneOS
   fi
 
   # ARM64
-  if [ "$CL" == "arm64" ]; then
-    IOS_ARCH=arm64
+  if [[ ("$CL" == "arm64" || "$CL" == "armv8" || "$CL" == "aarch64") ]]; then
+    BACK_ARCH=arm64
+    APPLE_SDK=iPhoneOS
   fi
 
   # iPhone
-  if [ "$CL" == "iphone" ] || [ "$CL" == "iphoneos" ]; then
+  if [[ ("$CL" == "iphone" || "$CL" == "iphoneos") ]]; then
+    BACK_ARCH=armv7
     APPLE_SDK=iPhoneOS
   fi
 
   # iPhone Simulator
-  if [ "$CL" == "simulator" ] || [ "$CL" == "iphonesimulator" ]; then
+  if [[ ("$CL" == "simulator" || "$CL" == "iphonesimulator") ]]; then
+    BACK_ARCH=i386
     APPLE_SDK=iPhoneSimulator
   fi
 
   # Watch
-  if [ "$CL" == "watch" ] || [ "$CL" == "watchos" ] || [ "$CL" == "applewatch" ]; then
+  if [[ ("$CL" == "watch" || "$CL" == "watchos" || "$CL" == "applewatch") ]]; then
+    BACK_ARCH=armv7
     APPLE_SDK=WatchOS
   fi
 
   # Watch Simulator
   if [ "$CL" == "watchsimulator" ]; then
+    BACK_ARCH=i386
     APPLE_SDK=WatchSimulator
   fi
 
   # Apple TV
-  if [ "$CL" == "tv" ] || [ "$CL" == "appletv" ] || [ "$CL" == "appletvos" ]; then
+  if [[ ("$CL" == "tv" || "$CL" == "appletv" || "$CL" == "appletvos") ]]; then
+    BACK_ARCH=arm64
     APPLE_SDK=AppleTVOS
   fi
 
   # Apple TV Simulator
-  if [ "$CL" == "tvsimulator" ] || [ "$CL" == "appletvsimulator" ]; then
+  if [[ ("$CL" == "tvsimulator" || "$CL" == "appletvsimulator") ]]; then
+    BACK_ARCH=x86_64
     APPLE_SDK=AppleTVSimulator
   fi
 
@@ -111,28 +130,20 @@ done
 
 # Defaults if not set
 if [ -z "$APPLE_SDK" ]; then
+    BACK_ARCH=armv7
 	APPLE_SDK=iPhoneOS
 fi
 
+# Defaults if not set
 if [ -z "$IOS_ARCH" ]; then
-	if [ "$APPLE_SDK" == "iPhoneOS" ]; then
-		IOS_ARCH=armv7
-	elif [ "$APPLE_SDK" == "iPhoneSimulator" ]; then
-		IOS_ARCH=i386
-	elif [ "$APPLE_SDK" == "AppleTVOS" ]; then
-		IOS_ARCH=arm64
-	elif [ "$APPLE_SDK" == "WatchOS" ]; then
-		IOS_ARCH=armv7
-	fi
-
-	# TODO: fill in missing simulator architectures
+	IOS_ARCH="$BACK_ARCH"
 fi
 
 # Allow a user override? I think we should be doing this. The use case is:
 # move /Applications/Xcode somewhere else for a side-by-side installation.
 # These sorts of tricks are a required procedure on Apple's gear:
 # http://stackoverflow.com/questions/11651773/install-simulator-sdk-4-3-to-xcode-4-4-on-mountain-lion
-if [ -z "$XCODE_DEVELOPER" ]; then
+if [ -z "${XCODE_DEVELOPER-}" ]; then
   XCODE_DEVELOPER=$(xcode-select -print-path 2>/dev/null)
 fi
 
@@ -188,27 +199,48 @@ if [ -z "$XCODE_SDK" ]; then
     [ "$0" = "$BASH_SOURCE" ] && exit 1 || return 1
 fi
 
+# https://github.com/weidai11/cryptopp/issues/635
+if [ "$APPLE_SDK" == "iPhoneSimulator" ]; then
+  IOS_FLAGS="$IOS_FLAGS -DCRYPTOPP_DISABLE_ASM"
+fi
+
 # Simulator fixup. LD fails to link dylib.
 if [ "$APPLE_SDK" == "iPhoneSimulator" ] && [ "$IOS_ARCH" == "i386" ]; then
-  IOS_FLAGS=-miphoneos-version-min=5
+  IOS_FLAGS="$IOS_FLAGS -miphoneos-version-min=5"
 fi
 
 # ARMv7s fixup. Xcode 4/iOS 6
 if [ "$IOS_ARCH" == "armv7s" ]; then
-  IOS_FLAGS=-miphoneos-version-min=6
+  IOS_FLAGS="$IOS_FLAGS -miphoneos-version-min=6"
 fi
 
 # ARM64 fixup. Xcode 5/iOS 7
 if [ "$IOS_ARCH" == "arm64" ]; then
-  IOS_FLAGS=-miphoneos-version-min=7
+  IOS_FLAGS="$IOS_FLAGS -miphoneos-version-min=7"
 fi
 
-# ARM64 Simulator fixup. Under Xcode 6/iOS 8, it uses x86_64 and not i386
-if [ "$IOS_ARCH" == "x86_64" ]; then
-  IOS_FLAGS=-miphoneos-version-min=8
+# Yet another ARM64 fixup.
+if [ "$APPLE_SDK" == "AppleTVOS" ]; then
+  IOS_FLAGS=""
 fi
 
-# Simulator uses i386 or x86_64, Device uses ARMv5, ARMv6, ARMv7, or ARMv7s
+# Disable ASM for simulator. We are failing on Travis due to missing _start.
+# We may need to link against crt1.o for simulator builds. Also see
+# https://stackoverflow.com/q/24841283/608639
+# -watchos_simulator_version_min does not work though it is in LLVM sources.
+if [ "$APPLE_SDK" == "WatchSimulator" ]; then
+  IOS_FLAGS="$IOS_FLAGS -DCRYPTOPP_DISABLE_ASM"
+fi
+
+# Disable ASM for simulator. We are failing on Travis due to missing _start.
+# We may need to link against crt1.o for simulator builds. Also see
+# https://stackoverflow.com/q/24841283/608639
+# -tvos_simulator_version_min does not work though it is in LLVM sources.
+if [ "$APPLE_SDK" == "AppleTVSimulator" ]; then
+  IOS_FLAGS="$IOS_FLAGS -tvos_simulator_version_min -DCRYPTOPP_DISABLE_ASM"
+fi
+
+# Simulator uses i386 or x86_64, Device uses ARMv5, ARMv6, ARMv7, ARMv7s or ARMv8
 #
 # Apple deprecated ARMv5 at iOS 4.0, and ARMv6 at iOS 5.0
 # http://stackoverflow.com/questions/7488657/how-to-build-for-armv6-and-armv7-architectures-with-ios-5
@@ -233,8 +265,8 @@ if [ "$SETENV_VERBOSE" == "1" ]; then
   echo "XCODE_DEVELOPER_TOP: $XCODE_DEVELOPER_TOP"
   echo "IOS_ARCH: $IOS_ARCH"
   echo "IOS_TOOLCHAIN: $IOS_TOOLCHAIN"
-  echo "IOS_FLAGS: $IOS_FLAGS"
-  echo "IOS_SYSROOT: $IOS_SYSROOT"
+  echo "IOS_FLAGS: ${IOS_FLAGS-}"
+  echo "IOS_SYSROOT: ${IOS_SYSROOT-}"
 fi
 
 ########################################
@@ -265,7 +297,7 @@ fi
 FOUND_ALL=1
 
 # Apple's embedded g++ cannot compile integer.cpp
-TOOLS=(clang clang++ ar ranlib libtool ld)
+TOOLS=(clang clang++ libtool ld)
 for tool in ${TOOLS[@]}
 do
 	if [ ! -e "$IOS_TOOLCHAIN/$tool" ] && [ ! -e "$XCODE_TOOLCHAIN/$tool" ]; then
@@ -278,10 +310,22 @@ if [ "$FOUND_ALL" -eq "0" ]; then
 	[ "$0" = "$BASH_SOURCE" ] && exit 1 || return 1
 fi
 
+# Exports added for Autotools. GNUmakefile-cross does not use them.
+# What to do for AR=libtool and ARFLAGS?
+export CPP="$IOS_TOOLCHAIN/cpp"
+export CC="$IOS_TOOLCHAIN/clang"
+export CXX="$IOS_TOOLCHAIN/clang++"
+export LD="$IOS_TOOLCHAIN/ld"
+export AS="$IOS_TOOLCHAIN/as"
+export AR="$IOS_TOOLCHAIN/ar"
+export RANLIB="$IOS_TOOLCHAIN/ranlib"
+export STRIP="$IOS_TOOLCHAIN/strip"
+
 echo
 echo "*******************************************************************************"
-echo "It looks the the environment is set correctly. Your next step is"
-echo "build the library with 'make -f GNUmakefile-cross'"
+echo "It looks the the environment is set correctly. Your next step is build"
+echo "the library with 'make -f GNUmakefile-cross'. You can create a versioned"
+echo "shared object using 'HAS_SOLIB_VERSION=1 make -f GNUmakefile-cross'"
 echo "*******************************************************************************"
 echo
 
