@@ -14,11 +14,11 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS 3
+#define CORE_SETTINGS_HEADER_SPACER " "
+#define CORE_SETTINGS_NO_KEY " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -1095,7 +1095,7 @@ void CSettings::CreateGUI()
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG   // Don't hide when debugging
+#ifndef MTA_DEBUG            // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1753,6 +1753,8 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
+    gameSettings->ResetVehiclesLODDistance();
+    gameSettings->ResetPedsLODDistance();
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -3325,10 +3327,12 @@ void CSettings::SaveData()
     // High detail vehicles (just set cvar, real change occur on next connect)
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
+    gameSettings->ResetVehiclesLODDistance();
 
     // High detail peds (just set cvar, real change occur on next connect)
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
+    gameSettings->ResetPedsLODDistance();
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
