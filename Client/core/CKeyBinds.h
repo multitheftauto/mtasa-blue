@@ -135,6 +135,9 @@ public:
 
     unsigned int Count(eKeyBindType bindType = KEY_BIND_UNDEFINED);
 
+    bool ControlForwardsBackWards(CControllerState& cs);
+    bool ControlLeftAndRight(CControllerState& cs);
+
     void DoPreFramePulse();
     void DoPostFramePulse();
 

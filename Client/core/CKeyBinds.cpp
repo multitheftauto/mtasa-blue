@@ -2053,6 +2053,86 @@ void CKeyBinds::DoPreFramePulse()
     }
 }
 
+bool CKeyBinds::ControlForwardsBackWards(CControllerState& cs)
+{
+    static bool bLastStateForwards = false;
+    static bool bLastStateBackwards = false;
+    static bool bMoveForwards = false;
+
+    bool bCurrentStateForwards = g_bcControls[3].bState;
+    bool bCurrentStateBackwards = g_bcControls[4].bState;
+    if (bCurrentStateForwards && !bCurrentStateBackwards)
+    {
+        bLastStateForwards = true;
+        bLastStateBackwards = false;
+    }
+    else if (!bCurrentStateForwards && bCurrentStateBackwards)
+    {
+        bLastStateForwards = false;
+        bLastStateBackwards = true;
+    }
+
+    bool bBothKeysPressed = false;
+    if (bCurrentStateForwards && bCurrentStateBackwards)
+    {
+        bBothKeysPressed = true;
+        if (!bLastStateForwards && bLastStateBackwards)
+        {
+            bMoveForwards = true;
+        }
+        else if (bLastStateForwards && !bLastStateBackwards)
+        {
+            bMoveForwards = false;
+        }
+
+        bool bForwardsState = bMoveForwards;
+        bool bBackwardsState = !bMoveForwards;
+        cs.LeftStickY = (short)((bForwardsState) ? bForwardsState * -128 : bBackwardsState * 128);
+    }
+
+    return bBothKeysPressed;
+}
+
+bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
+{
+    static bool bLastStateLeft = false;
+    static bool bLastStateRight = false;
+    static bool bMoveLeft = false;
+
+    bool bCurrentStateLeft = g_bcControls[5].bState;
+    bool bCurrentStateRight = g_bcControls[6].bState;
+    if (bCurrentStateLeft && !bCurrentStateRight)
+    {
+        bLastStateLeft = true;
+        bLastStateRight = false;
+    }
+    else if (!bCurrentStateLeft && bCurrentStateRight)
+    {
+        bLastStateLeft = false;
+        bLastStateRight = true;
+    }
+
+    bool bBothKeysPressed = false;
+    if (bCurrentStateLeft && bCurrentStateRight)
+    {
+        bBothKeysPressed = true;
+        if (!bLastStateLeft && bLastStateRight)
+        {
+            bMoveLeft = true;
+        }
+        else if (bLastStateLeft && !bLastStateRight)
+        {
+            bMoveLeft = false;
+        }
+
+        bool bLeftState = bMoveLeft;
+        bool bRightState = !bMoveLeft;
+        cs.LeftStickX = (short)((bLeftState) ? bLeftState * -128 : bRightState * 128);
+    }
+
+    return bBothKeysPressed;
+}
+
 void CKeyBinds::DoPostFramePulse()
 {
     eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
@@ -2112,12 +2192,17 @@ void CKeyBinds::DoPostFramePulse()
             cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;                                         // Fire
             cs.RightShoulder2 = (g_bcControls[1].bState || (bAimingWeapon && g_bcControls[7].bState)) ? 255 : 0;            // Next Weapon / Zoom In
             cs.LeftShoulder2 = (g_bcControls[2].bState || (bAimingWeapon && g_bcControls[8].bState)) ? 255 : 0;             // Previous Weapon / Zoom Out
-            cs.LeftStickY = ((g_bcControls[3].bState && g_bcControls[4].bState) || (!g_bcControls[3].bState && !g_bcControls[4].bState))
-                                ? 0
-                                : (g_bcControls[3].bState) ? -128 : 128;
-            cs.LeftStickX = ((g_bcControls[5].bState && g_bcControls[6].bState) || (!g_bcControls[5].bState && !g_bcControls[6].bState))
-                                ? 0
-                                : (g_bcControls[5].bState) ? -128 : 128;
+
+            if (!ControlForwardsBackWards(cs))
+            {
+                cs.LeftStickY = (!g_bcControls[3].bState && !g_bcControls[4].bState) ? 0 : (g_bcControls[3].bState) ? -128 : 128;
+            }
+
+            if (!ControlLeftAndRight(cs))
+            {
+                cs.LeftStickX = (!g_bcControls[5].bState && !g_bcControls[6].bState) ? 0 : (g_bcControls[5].bState) ? -128 : 128;
+            }
+
             // * Enter Exit
             // * Change View
             cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;            // Jump
