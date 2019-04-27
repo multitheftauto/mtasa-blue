@@ -78,6 +78,7 @@ public:
     LUA_DECLARE(GetVehicleNitroLevel);
     LUA_DECLARE(GetHeliBladeCollisionsEnabled);
     LUA_DECLARE(IsVehicleWindowOpen);
+    LUA_DECLARE_OOP(GetVehicleEntryPoints);
 
     LUA_DECLARE(FixVehicle);
     LUA_DECLARE(BlowVehicle);

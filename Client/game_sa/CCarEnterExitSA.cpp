@@ -183,3 +183,24 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
 
     return bRet;
 }
+
+void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& vecPosition, CVehicle* pVehicle, unsigned int uiDoor)
+{
+    DWORD dwFunc = FUNC_GetPositionToOpenCarDoor;
+
+    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
+
+    if (pVehicleSA)
+    {
+        CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+        _asm
+        {
+            push    uiDoor
+            push    pVehicleInterface
+            push    vecPosition
+            call    dwFunc
+            add     esp, 0x0C
+            mov     vecPosition, ecx
+        }
+    }
+}

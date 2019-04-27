@@ -19,6 +19,7 @@
 #define FUNC_GetNearestCarPassengerDoor         0x650BB0
 #define FUNC_ComputeTargetDoorToExit            0x64F110
 #define FUNC_IsRoomForPedToLeaveCar             0x6504C0
+#define FUNC_GetPositionToOpenCarDoor           0x64E740
 
 class CCarEnterExitSA : public CCarEnterExit
 {
@@ -27,4 +28,5 @@ public:
     bool GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor, bool bUnknown, bool bUnknown2, bool bCheckIfRoomToGetIn);
     int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle);
     bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0);
+    void GetPositionToOpenCarDoor(CVector& vecPosition, CVehicle* pVehicle, unsigned int uiDoor);
 };

@@ -82,6 +82,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleEntryPoints", GetVehicleEntryPoints},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -221,6 +222,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
+    lua_classfunction(luaVM, "getEntryPoints", OOP_GetVehicleEntryPoints);
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -3869,6 +3871,145 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleEntryPoints(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+
+        if (ucMaxPassengers == 255)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
+
+        if (!pGameVehicle)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        lua_newtable(luaVM);
+
+        for (unsigned int i = 8; i <= 11; i++)
+        {
+            CVector vecDoorPosition;
+            g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(vecDoorPosition, pGameVehicle, i);
+
+            unsigned int uiDoor = i;
+
+            switch (uiDoor)
+            {
+            case 10:
+                uiDoor = 0;
+                break;
+            case 8:
+                uiDoor = 1;
+                break;
+            case 11:
+                uiDoor = 2;
+                break;
+            case 9:
+                uiDoor = 3;
+                break;
+            }
+
+            lua_pushnumber(luaVM, uiDoor);
+            lua_createtable(luaVM, 3, 0);
+
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vecDoorPosition.fX);
+            lua_settable(luaVM, -3);
+
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vecDoorPosition.fY);
+            lua_settable(luaVM, -3);
+
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vecDoorPosition.fZ);
+            lua_settable(luaVM, -3);
+
+            lua_settable(luaVM, -3);
+        }
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleEntryPoints(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+
+        if (ucMaxPassengers == 255)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
+
+        if (!pGameVehicle)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        lua_newtable(luaVM);
+
+        for (unsigned int i = 8; i <= 11; i++)
+        {
+            CVector vecDoorPosition;
+            g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(vecDoorPosition, pGameVehicle, i);
+
+            unsigned int uiDoor = i;
+
+            switch (uiDoor)
+            {
+                case 10:
+                    uiDoor = 0;
+                    break;
+                case 8:
+                    uiDoor = 1;
+                    break;
+                case 11:
+                    uiDoor = 2;
+                    break;
+                case 9:
+                    uiDoor = 3;
+                    break;
+            }
+
+            lua_pushnumber(luaVM, uiDoor);
+            lua_pushvector(luaVM, vecDoorPosition);
+            lua_settable(luaVM, -3);
+        }
+
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
