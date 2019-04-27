@@ -2348,6 +2348,14 @@ void CClientGame::ChangeVehicleWeapon(bool bNext)
 
 void CClientGame::ResetVehicleInOut()
 {
+    if (m_pJackingPed != NULL)
+    {
+        if (m_pJackingPed->IsLocalEntity())
+        {
+            m_pJackingPed->ResetInOutState();
+        }
+    }
+
     m_ulLastVehicleInOutTime = 0;
     m_bIsGettingOutOfVehicle = false;
     m_bIsGettingIntoVehicle = false;
@@ -2358,6 +2366,7 @@ void CClientGame::ResetVehicleInOut()
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
     m_pGettingJackedBy = NULL;
+    m_pJackingPed = NULL;
     m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_NONE);
 }
 
@@ -5350,7 +5359,8 @@ bool CClientGame::ProcessEnterVehicle(CClientVehicle* pVehicle, unsigned int uiS
 
         if (pOccupyingPed) {
             m_bIsJackingVehicle = true;
-
+            m_pJackingPed = pOccupyingPed;
+            
             pOccupyingPed->SetJacker(m_pLocalPlayer);
             m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_JACKING);
             pOccupyingPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_JACKED);

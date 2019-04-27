@@ -1306,6 +1306,21 @@ void CClientPed::ResetInOutState()
     m_uiInOutSeat = NULL;
     m_ucLeavingDoor = NULL;
     m_bForceGettingIn = false;
+
+    CClientPed* pJackingPed = GetJacking();
+
+    if (pJackingPed != NULL) 
+    {
+        if (pJackingPed->IsLocalPlayer())
+        {
+            g_pClientGame->ResetVehicleInOut();
+        }
+        else
+        {
+            pJackingPed->ResetInOutState();
+        }
+    }
+
     SetJacker(NULL);
     SetJacking(NULL);
 }
@@ -1439,7 +1454,7 @@ bool CClientPed::GracefullyEnterCar(CClientVehicle* pVehicle, unsigned int uiSea
             pOccupyingPed->SetJacker(this);
         }
     
-        this->SetJacking(pOccupyingPed);
+        SetJacking(pOccupyingPed);
 
         // We haven't yet entered the car. The ped being carjacked is still occopying it.
         // Workaround for early-unpair issue.
@@ -4412,6 +4427,13 @@ void CClientPed::StreamIn(bool bInstantly)
 
 void CClientPed::StreamOut()
 {
+    // Is the ped being streamed out a local ped?
+    if (IsLocalEntity() && !m_bIsLocalPlayer) 
+    {
+        // Yes, let's reset the vehicle in/out state
+        ResetInOutState();
+    }
+
     // Make sure we have a player ped and that we're not
     // the local player
     if (m_pPlayerPed && !m_bIsLocalPlayer)

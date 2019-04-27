@@ -313,22 +313,40 @@ void CNetAPI::DoPulse()
             if (IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
             {
                 // Are in a vehicle?
-                if (pVehicle && !pVehicle->IsLocalEntity())
+                if (pVehicle)
                 {
                     // Send a puresync packet
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
                     if (pBitStream)
                     {
-                        // Write our data
-                        WriteVehiclePuresync(pPlayer, pVehicle, *pBitStream);
+                        // Is the vehicle created on the server?
+                        if (!pVehicle->IsLocalEntity()) 
+                        {
+                            // It is, sync it accordingly
+                            // Write our data
+                            WriteVehiclePuresync(pPlayer, pVehicle, *pBitStream);
 
-                        // Send the packet and destroy it
-                        g_pNet->SendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
+                            // Send the packet and destroy it
+                            g_pNet->SendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                            g_pNet->DeallocateNetBitStream(pBitStream);
+                        }
+                        else 
+                        {
+                            // It was created client-side, we'll sync to the server as if we were on-foot instead
+                            // Write our data
+                            WritePlayerPuresync(pPlayer, *pBitStream);
+
+                            // Send the packet and destroy it
+                            g_pNet->SendPacket(PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                            g_pNet->DeallocateNetBitStream(pBitStream);
+                        }
                     }
 
-                    // Sync its damage model too
-                    static_cast<CDeathmatchVehicle*>(pVehicle)->SyncDamageModel();
+                    if (!pVehicle->IsLocalEntity()) 
+                    {
+                        // Sync its damage model too
+                        static_cast<CDeathmatchVehicle*>(pVehicle)->SyncDamageModel();
+                    }
                 }
                 else
                 {

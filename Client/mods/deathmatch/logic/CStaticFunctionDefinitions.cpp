@@ -2575,6 +2575,12 @@ bool CStaticFunctionDefinitions::SetPedEnterVehicle(CClientPed& pPed, CClientVeh
 
 bool CStaticFunctionDefinitions::CancelPedEnterVehicle(CClientPed& pPed)
 {
+    // This function only works on local peds.
+    if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
+    {
+        return false;
+    }
+
     if (pPed.IsEnteringVehicle())
     {
         if (!pPed.GetOccupiedVehicle())

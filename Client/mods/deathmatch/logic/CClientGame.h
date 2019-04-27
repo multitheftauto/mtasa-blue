@@ -724,6 +724,7 @@ private:
     unsigned long  m_ulLastVehicleInOutTime;
     bool           m_bIsGettingOutOfVehicle;
     bool           m_bIsGettingIntoVehicle;
+    CClientPed*    m_pJackingPed;
     bool           m_bIsJackingVehicle;
     bool           m_bIsGettingJacked;
     ElementID      m_VehicleInOutID;
