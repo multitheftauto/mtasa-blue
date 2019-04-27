@@ -90,7 +90,7 @@ workspace "MTASA"
 	
 	filter "system:windows"
 		toolset "v141"
-		flags { "StaticRuntime" }
+		staticruntime "On"
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
 			path.join(dxdir, "Include")
