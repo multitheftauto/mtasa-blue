@@ -283,6 +283,12 @@ CKeyBinds::CKeyBinds(CCore* pCore)
     m_KeyStrokeHandler = NULL;
     m_CharacterKeyHandler = NULL;
     m_bWaitingToLoadDefaults = false;
+    m_bLastStateForwards = false;
+    m_bLastStateBackwards = false;
+    m_bMoveForwards = false;
+    m_bLastStateLeft = false;
+    m_bLastStateRight = false;
+    m_bMoveLeft = false;
 }
 
 CKeyBinds::~CKeyBinds()
@@ -2055,38 +2061,34 @@ void CKeyBinds::DoPreFramePulse()
 
 bool CKeyBinds::ControlForwardsBackWards(CControllerState& cs)
 {
-    static bool bLastStateForwards = false;
-    static bool bLastStateBackwards = false;
-    static bool bMoveForwards = false;
-
     bool bCurrentStateForwards = g_bcControls[3].bState;
     bool bCurrentStateBackwards = g_bcControls[4].bState;
     if (bCurrentStateForwards && !bCurrentStateBackwards)
     {
-        bLastStateForwards = true;
-        bLastStateBackwards = false;
+        m_bLastStateForwards = true;
+        m_bLastStateBackwards = false;
     }
     else if (!bCurrentStateForwards && bCurrentStateBackwards)
     {
-        bLastStateForwards = false;
-        bLastStateBackwards = true;
+        m_bLastStateForwards = false;
+        m_bLastStateBackwards = true;
     }
 
     bool bBothKeysPressed = false;
     if (bCurrentStateForwards && bCurrentStateBackwards)
     {
         bBothKeysPressed = true;
-        if (!bLastStateForwards && bLastStateBackwards)
+        if (!m_bLastStateForwards && m_bLastStateBackwards)
         {
-            bMoveForwards = true;
+            m_bMoveForwards = true;
         }
-        else if (bLastStateForwards && !bLastStateBackwards)
+        else if (m_bLastStateForwards && !m_bLastStateBackwards)
         {
-            bMoveForwards = false;
+            m_bMoveForwards = false;
         }
 
-        bool bForwardsState = bMoveForwards;
-        bool bBackwardsState = !bMoveForwards;
+        bool bForwardsState = m_bMoveForwards;
+        bool bBackwardsState = !m_bMoveForwards;
         cs.LeftStickY = (short)((bForwardsState) ? bForwardsState * -128 : bBackwardsState * 128);
     }
 
@@ -2095,38 +2097,34 @@ bool CKeyBinds::ControlForwardsBackWards(CControllerState& cs)
 
 bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
 {
-    static bool bLastStateLeft = false;
-    static bool bLastStateRight = false;
-    static bool bMoveLeft = false;
-
     bool bCurrentStateLeft = g_bcControls[5].bState;
     bool bCurrentStateRight = g_bcControls[6].bState;
     if (bCurrentStateLeft && !bCurrentStateRight)
     {
-        bLastStateLeft = true;
-        bLastStateRight = false;
+        m_bLastStateLeft = true;
+        m_bLastStateRight = false;
     }
     else if (!bCurrentStateLeft && bCurrentStateRight)
     {
-        bLastStateLeft = false;
-        bLastStateRight = true;
+        m_bLastStateLeft = false;
+        m_bLastStateRight = true;
     }
 
     bool bBothKeysPressed = false;
     if (bCurrentStateLeft && bCurrentStateRight)
     {
         bBothKeysPressed = true;
-        if (!bLastStateLeft && bLastStateRight)
+        if (!m_bLastStateLeft && m_bLastStateRight)
         {
-            bMoveLeft = true;
+            m_bMoveLeft = true;
         }
-        else if (bLastStateLeft && !bLastStateRight)
+        else if (m_bLastStateLeft && !m_bLastStateRight)
         {
-            bMoveLeft = false;
+            m_bMoveLeft = false;
         }
 
-        bool bLeftState = bMoveLeft;
-        bool bRightState = !bMoveLeft;
+        bool bLeftState = m_bMoveLeft;
+        bool bRightState = !m_bMoveLeft;
         cs.LeftStickX = (short)((bLeftState) ? bLeftState * -128 : bRightState * 128);
     }
 

@@ -166,4 +166,10 @@ private:
     KeyStrokeHandler      m_KeyStrokeHandler;
     CharacterKeyHandler   m_CharacterKeyHandler;
     bool                  m_bWaitingToLoadDefaults;
+    bool                  m_bLastStateForwards;
+    bool                  m_bLastStateBackwards;
+    bool                  m_bMoveForwards;
+    bool                  m_bLastStateLeft;
+    bool                  m_bLastStateRight;
+    bool                  m_bMoveLeft;
 };
