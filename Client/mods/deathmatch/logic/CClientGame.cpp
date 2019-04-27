@@ -2356,6 +2356,8 @@ void CClientGame::ResetVehicleInOut()
         }
     }
 
+    m_pLocalPlayer->ResetInOutState();
+
     m_ulLastVehicleInOutTime = 0;
     m_bIsGettingOutOfVehicle = false;
     m_bIsGettingIntoVehicle = false;
@@ -5351,7 +5353,6 @@ bool CClientGame::ProcessEnterVehicle(CClientVehicle* pVehicle, unsigned int uiS
         m_VehicleInOutID = pVehicle->GetID();
         m_ucVehicleInOutSeat = uiSeat;
 
-        m_VehicleInOutID = pVehicle->GetID();
         m_bIsGettingIntoVehicle = true;
         m_ulLastVehicleInOutTime = CClientTime::GetTime();
     

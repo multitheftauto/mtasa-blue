@@ -149,7 +149,8 @@ public:
     static bool             IsPedHeadless(CClientPed& Ped, bool& bHeadless);
     static bool             IsPedFrozen(CClientPed& Ped, bool& bFrozen);
     static bool             GetPedOccupiedVehicleSeat(CClientPed& Ped, uint& uiSeat);
-    static CClientVehicle*  GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors, uint& uiEntryPoint, CVector& vecClosestDoorPosition);
+    static CClientVehicle*  GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors, unsigned int& uiEntryPoint, CVector& vecClosestDoorPosition);
+    static CClientVehicle*  GetPedEnterVehicleTarget(CClientPed& pPed, unsigned int& uiSeat, unsigned int& uiEntryPoint);
     static bool             IsPedFootBloodEnabled(CClientPed& Ped, bool& bHasFootBlood);
     static bool             GetPedCameraRotation(CClientPed& Ped, float& fRotation);
     static bool             GetPedWeaponMuzzlePosition(CClientPed& Ped, CVector& vecPosition);

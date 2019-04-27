@@ -1099,7 +1099,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 
 CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                      bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
-                                                     float fWithinRange)
+                                                     float fWithinRange, bool bLocalOnly)
 {
     if (bGetPositionFromClosestDoor)
     {
@@ -1134,6 +1134,9 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromCloses
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle();
 
         if (!pGameVehicle && bGetPositionFromClosestDoor)
+            continue;
+
+        if (bLocalOnly && !pTempVehicle->IsLocalEntity())
             continue;
 
         // Should we take the position from the closest door instead of center of vehicle
@@ -1306,6 +1309,7 @@ void CClientPed::ResetInOutState()
     m_uiInOutSeat = NULL;
     m_ucLeavingDoor = NULL;
     m_bForceGettingIn = false;
+    m_pEnteringVehicle = NULL;
 
     CClientPed* pJackingPed = GetJacking();
 
@@ -1565,6 +1569,7 @@ void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, u
 
     // Do it
     _GetIntoVehicle(pVehicle, uiSeat, ucDoor);
+    m_pEnteringVehicle = pVehicle;
     m_uiOccupiedVehicleSeat = uiSeat;
     m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;

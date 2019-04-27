@@ -1812,7 +1812,7 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CClientPed& pPed, uin
 }
 
 CClientVehicle* CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors,
-                                                                 uint& uiEntryPoint, CVector& vecClosestDoorPosition)
+                                                                 unsigned int& uiEntryPoint, CVector& vecClosestDoorPosition)
 {
     // This function should only work on local peds.
     if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
@@ -1826,9 +1826,37 @@ CClientVehicle* CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(CClie
         return false;
     }
 
-    CClientVehicle* pVehicle = pPed.GetClosestVehicleInRange(true, bCheckDriverDoor, bCheckPassengersDoors, false, &uiEntryPoint, &vecClosestDoorPosition, 20.0f);
+    CClientVehicle* pVehicle = pPed.GetClosestVehicleInRange(true, bCheckDriverDoor, bCheckPassengersDoors, false, &uiEntryPoint, &vecClosestDoorPosition, 20.0f, (!pPed.IsLocalPlayer()));
 
     return pVehicle;
+}
+
+CClientVehicle* CStaticFunctionDefinitions::GetPedEnterVehicleTarget(CClientPed& pPed, unsigned int& uiSeat, unsigned int& uiEntryPoint)
+{
+    // This function only works on local peds.
+    if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
+    {
+        return false;
+    }
+
+    if (pPed.IsEnteringVehicle())
+    {
+        if (!pPed.GetOccupiedVehicle())
+        {
+            uiSeat = pPed.GetTargetSeat();
+            uiEntryPoint = pPed.GetTargetDoor();
+            CClientVehicle* pTargetVehicle = pPed.GetTargetVehicle();
+
+            if (!pTargetVehicle->IsLocalEntity() && !pPed.IsLocalPlayer())
+            {
+                return false;
+            }
+
+            return pTargetVehicle;
+        }
+    }
+
+    return false;
 }
 
 const char* CStaticFunctionDefinitions::GetPedSimplestTask(CClientPed& Ped)
@@ -2555,10 +2583,17 @@ bool CStaticFunctionDefinitions::SetPedEnterVehicle(CClientPed& pPed, CClientVeh
         return false;
     }
 
+    unsigned int uiDoor = uiSeat;
+
+    if (uiSeat == 0) {
+        CVector      vecDoorPos;
+        pPed.GetClosestDoor(&pVehicle, true, false, uiDoor, &vecDoorPos);
+    }
+
     if (pPed.IsLocalPlayer())
     {
         m_pClientGame->ResetVehicleInOut();
-        return m_pClientGame->ProcessEnterVehicle(&pVehicle, uiSeat, uiSeat);
+        return m_pClientGame->ProcessEnterVehicle(&pVehicle, uiSeat, uiDoor);
     }
     else
     {
@@ -2567,7 +2602,7 @@ bool CStaticFunctionDefinitions::SetPedEnterVehicle(CClientPed& pPed, CClientVeh
             return false;
         }
 
-        return pPed.GracefullyEnterCar(&pVehicle, uiSeat, uiSeat);
+        return pPed.GracefullyEnterCar(&pVehicle, uiSeat, uiDoor);
     }
 
     return false;

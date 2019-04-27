@@ -218,7 +218,7 @@ public:
 
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestVehicleInRange(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles,
-                                             unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f);
+                                             unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f, bool bLocalOnly = false);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -559,6 +559,10 @@ public:
     void SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
     bool IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
 
+    CClientVehicle* GetTargetVehicle() { return m_pEnteringVehicle; }
+    unsigned char GetTargetDoor() { return m_ucEnteringDoor; }
+    unsigned int GetTargetSeat() { return m_uiOccupiedVehicleSeat; }
+
     void NotifyCreate();
     void NotifyDestroy();
 
@@ -685,6 +689,7 @@ public:
     float                                    m_fLighting;
     unsigned char                            m_ucEnteringDoor;
     unsigned char                            m_ucLeavingDoor;
+    CClientVehicle*                          m_pEnteringVehicle;
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
 
