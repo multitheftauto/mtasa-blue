@@ -263,6 +263,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(CClientGame::StaticAssocGroupCopyAnimationHandler);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(CClientGame::StaticBlendAnimationHierarchyHandler);
+    g_pMultiplayer->SetBlendAnimationHandler(CClientGame::StaticBlendAnimationHandler);
     g_pMultiplayer->SetProcessCollisionHandler(CClientGame::StaticProcessCollisionHandler);
     g_pMultiplayer->SetVehicleCollisionHandler(CClientGame::StaticVehicleCollisionHandler);
     g_pMultiplayer->SetVehicleDamageHandler(CClientGame::StaticVehicleDamageHandler);
@@ -428,6 +429,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(NULL);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(NULL);
+    g_pMultiplayer->SetBlendAnimationHandler(nullptr);
     g_pMultiplayer->SetProcessCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleDamageHandler(NULL);
@@ -3671,6 +3673,11 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
+bool CClientGame::StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    return g_pClientGame->BlendAnimationHandler(pClump, animGroup, animID, fBlendData);
+}
+
 void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
@@ -3997,15 +4004,15 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroupInterface < 0x250)
     {
         g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
-            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
     }
-  
+
     auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
 
     if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
     {
         g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
-            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
     int  iGroupID = pAnimAssocGroup->GetGroupID();
@@ -4082,6 +4089,23 @@ bool CClientGame::BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterfac
         pClientPed->SetNextAnimationNormal();
     }
     return isCustomAnimationToPlay;
+}
+
+bool CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    CClientPed* pClientPed = GetClientPedByClump(*pClump);
+    if (pClientPed != nullptr)
+    {
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        {
+            // check for idle animation
+            if ((animGroup == 54 && animID == 3) || (animGroup == 0 && animID == 3))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)
@@ -4949,7 +4973,11 @@ void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAni
         CClientPed* pPed = it->second;
         if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
         {
-            pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+            if (pPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+            {
+                pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+                pPed->SetTaskToBeRestoredOnAnimEnd(false);
+            }
         }
         m_mapOfRunNamedAnimTasks.erase(pTask);
     }
