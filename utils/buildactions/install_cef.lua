@@ -6,7 +6,7 @@ premake.modules.install_cef = {}
 local CEF_PATH = "vendor/cef3/"
 local CEF_URL = "https://mirror.mtasa.com/bdata/cef-latest_xp.tar.bz2"
 
-local CEF_VERSION = "3.3626.1891.g52be333" -- Change here to update CEF version
+local CEF_VERSION = "73.1.13%2Bg6e3c989%2Bchromium-73.0.3683.75" -- Change here to update CEF version
 
 function make_cef_download_url()
 	return CEF_URL
@@ -34,7 +34,7 @@ newaction {
 
 		-- Check md5
 		local archive_path = CEF_PATH.."temp.tar.bz2"
-		if os.md5_file(archive_path) == correct_checksum then
+		if os.isfile(archive_path) and os.md5_file(archive_path) == correct_checksum then
 			print("CEF consistency checks succeeded")
 			return
 		end

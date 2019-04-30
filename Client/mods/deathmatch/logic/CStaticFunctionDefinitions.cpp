@@ -2160,7 +2160,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+            std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
@@ -2176,8 +2176,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
                     auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {

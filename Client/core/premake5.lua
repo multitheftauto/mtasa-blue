@@ -6,7 +6,7 @@ project "Client Core"
 	
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH\:NO" }
+		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 	
 	filter {}
@@ -17,7 +17,8 @@ project "Client Core"
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
-			"../../vendor/sparsehash/src/"
+			"../../vendor/sparsehash/src/",
+			"../../vendor/hwbrk"
 		}
 
 	libdirs {
@@ -34,6 +35,8 @@ project "Client Core"
 		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
+	
+	links { "hwbrk" }
 	
 	files {
 		"premake5.lua",

@@ -38,11 +38,12 @@
       'type': 'static_library',
       'include_dirs': [
         '<(DEPTH)/testing/include',
-        '<(DEPTH)/testing/gtest',
-        '<(DEPTH)/testing/gtest/include',
+        '<(DEPTH)/testing/googletest/include',
+        '<(DEPTH)/testing/googletest',
+        '<(DEPTH)/testing',
       ],
       'sources': [
-        '<(DEPTH)/testing/gtest/src/gtest-all.cc',
+        '<(DEPTH)/testing/googletest/src/gtest-all.cc',
       ],
       'direct_dependent_settings': {
         'include_dirs': [
@@ -61,18 +62,24 @@
       'type': 'static_library',
       'include_dirs': [
         '<(DEPTH)/testing/include',
-        '<(DEPTH)/testing/',
-        '<(DEPTH)/testing/gtest',
-        '<(DEPTH)/testing/gtest/include',
+        '<(DEPTH)/testing/googletest/include',
+        '<(DEPTH)/testing/googletest',
+        '<(DEPTH)/testing/googlemock/include',
+        '<(DEPTH)/testing/googlemock',
+        '<(DEPTH)/testing',
       ],
       'sources': [
-        '<(DEPTH)/testing/src/gmock-all.cc',
-        '<(DEPTH)/testing/src/gmock_main.cc',
+        '<(DEPTH)/testing/googlemock/src/gmock-all.cc',
+        '<(DEPTH)/testing/googletest/src/gtest_main.cc',
       ],
       'direct_dependent_settings': {
         'include_dirs': [
           '<(DEPTH)/testing/include',
-          '<(DEPTH)/testing/gtest/include',
+          '<(DEPTH)/testing/googletest/include',
+          '<(DEPTH)/testing/googletest',
+          '<(DEPTH)/testing/googlemock/include',
+          '<(DEPTH)/testing/googlemock',
+          '<(DEPTH)/testing',
         ],
         'defines': ['_VARIADIC_MAX=10'],
       },

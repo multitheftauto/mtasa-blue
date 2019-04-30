@@ -761,6 +761,7 @@ void CServerBrowser::SetVisible(bool bVisible)
         // Hide information windows.
         m_pGeneralHelpWindow->SetVisible(false);
         m_pQuickConnectHelpWindow->SetVisible(false);
+        CServerInfo::GetSingletonPtr()->Hide();
     }
 }
 

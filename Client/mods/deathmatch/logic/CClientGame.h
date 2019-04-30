@@ -73,6 +73,7 @@ class CClientGame
 {
     friend class CPacketHandler;
     typedef std::map<CAnimBlendAssociationSAInterface*, std::shared_ptr<CIFPAnimations> > AnimAssociations_type;
+    typedef std::map<class CTaskSimpleRunNamedAnimSAInterface*, CClientPed*>              RunNamedAnimTask_type;
 
 public:
     enum eStatus
@@ -520,6 +521,7 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
+    static void StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -562,6 +564,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
+    void        GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
@@ -615,6 +618,7 @@ public:
 
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
+    void InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed);
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
@@ -834,6 +838,8 @@ private:
     std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
     std::set<CClientPed*>                                m_setOfPedPointers;
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
+    // Key is the task and value is the CClientPed*
+    RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
 };
 
 extern CClientGame* g_pClientGame;

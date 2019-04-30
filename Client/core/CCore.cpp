@@ -2269,3 +2269,8 @@ SString CCore::GetBlueCopyrightString()
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
+
+HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
+{
+    return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
+}
