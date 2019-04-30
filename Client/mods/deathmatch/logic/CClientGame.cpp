@@ -4099,9 +4099,12 @@ bool CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup,
         if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
         {
             // check for idle animation
-            if ((animGroup == 54 && animID == 3) || (animGroup == 0 && animID == 3))
+            if (animID == 3)
             {
-                return false;
+                if ((animGroup == 0) || (animGroup >= 54 && animGroup <= 70) || (animGroup >= 118))
+                {
+                    return false;
+                }
             }
         }
     }
