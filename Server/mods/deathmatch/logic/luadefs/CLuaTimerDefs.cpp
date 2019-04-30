@@ -68,9 +68,7 @@ int CLuaTimerDefs::SetTimer(lua_State* luaVM)
             // Check for the minimum interval
             if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
             {
-                char errorBuffer[64];
-                snprintf(errorBuffer, NUMELMS(errorBuffer), "Interval is below %d", LUA_TIMER_MIN_INTERVAL);
-                argStream.SetCustomError(errorBuffer);
+                argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
             }
             else
             {
