@@ -1235,14 +1235,22 @@ int CLuaPedDefs::GetPedAnimation(lua_State* luaVM)
         {
             lua_pushstring(luaVM, strBlockName);
             lua_pushstring(luaVM, strAnimName);
+            lua_newtable(luaVM);
             lua_pushinteger(luaVM, iTime);
+            lua_setfield(luaVM, -2, "time");
             lua_pushboolean(luaVM, bLoop);
+            lua_setfield(luaVM, -2, "loop");
             lua_pushboolean(luaVM, bUpdatePosition);
+            lua_setfield(luaVM, -2, "updatePosition");
             lua_pushboolean(luaVM, bInterruptable);
+            lua_setfield(luaVM, -2, "interruptable");
             lua_pushboolean(luaVM, bFreezeOnLastFrame);
+            lua_setfield(luaVM, -2, "freezeLastFrame");
             lua_pushinteger(luaVM, iBlendTime);
+            lua_setfield(luaVM, -2, "blendTime");
             lua_pushboolean(luaVM, bRestoreTaskOnAnimEnd);
-            return 9;
+            lua_setfield(luaVM, -2, "restoreTaskOnAnimEnd");
+            return 3;
         }
     }
     else
