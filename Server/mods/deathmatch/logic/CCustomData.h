@@ -31,7 +31,7 @@ public:
 
     SCustomData* Get(const char* szName);
     SCustomData* GetSynced(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    bool         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CLuaArgument* pOldVariable = nullptr);
 
     bool Delete(const char* szName);
 

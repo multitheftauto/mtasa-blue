@@ -140,7 +140,7 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true);
+    bool SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true);
     void DeleteCustomData(const char* szName);
     void SendAllCustomData(CPlayer* pPlayer);
 

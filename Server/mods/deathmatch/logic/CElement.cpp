@@ -690,36 +690,34 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent)
+// Returns false in case we try to set the same value for the custom data and we didn't change the bSync, otherwise true
+bool CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        return false;
     }
 
-    // Grab the old variable
-    CLuaArgument       oldVariable;
-    const SCustomData* pData = m_pCustomData->Get(szName);
-    if (pData)
-    {
-        oldVariable = pData->Variable;
-    }
-
+    // We need the old variable as well
+    CLuaArgument OldVariable;
     // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
-
-    if (bTriggerEvent)
+    if (m_pCustomData->Set(szName, Variable, bSynchronized, &OldVariable))
     {
-        // Trigger the onElementDataChange event on us
-        CLuaArguments Arguments;
-        Arguments.PushString(szName);
-        Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(Variable);
-        CallEvent("onElementDataChange", Arguments, pClient);
+        if (bTriggerEvent)
+        {
+            // Trigger the onElementDataChange event on us
+            CLuaArguments Arguments;
+            Arguments.PushString(szName);
+            Arguments.PushArgument(OldVariable);
+            Arguments.PushArgument(Variable);
+            CallEvent("onElementDataChange", Arguments, pClient);
+        }
+        return true;
     }
+    return false;
 }
 
 void CElement::DeleteCustomData(const char* szName)

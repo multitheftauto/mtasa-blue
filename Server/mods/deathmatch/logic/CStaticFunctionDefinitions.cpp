@@ -876,9 +876,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &bIsSynced);
-    if (!pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize)
+    if (pElement->SetCustomData(szName, Variable, bSynchronize))
     {
         if (bSynchronize)
         {
@@ -891,11 +889,8 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
+                BitStream.pBitStream->GetNumberOfBytesUsed());
         }
-
-        // Set its custom data
-        pElement->SetCustomData(szName, Variable, bSynchronize);
         return true;
     }
     return false;

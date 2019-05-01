@@ -80,7 +80,8 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
     }
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+// Returns false in case we try to set the same value for the custom data and we didn't change the bSync, otherwise true
+bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
     assert(szName);
 
@@ -88,10 +89,18 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
     SCustomData* pData = Get(szName);
     if (pData)
     {
-        // Update existing
-        pData->Variable = Variable;
-        pData->bSynchronized = bSynchronized;
-        UpdateSynced(szName, Variable, bSynchronized);
+        if (pData->bSynchronized != bSynchronized || pData->Variable != Variable)
+        {
+            // Set the old variable(its used by the onElementDataChange event)
+            if (pOldVariable)
+                *pOldVariable = pData->Variable;
+            // Update existing
+            pData->Variable = Variable;
+            pData->bSynchronized = bSynchronized;
+            UpdateSynced(szName, Variable, bSynchronized);
+
+            return true;
+        }
     }
     else
     {
@@ -101,7 +110,10 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
         newData.bSynchronized = bSynchronized;
         m_Data[szName] = newData;
         UpdateSynced(szName, Variable, bSynchronized);
+
+        return true;
     }
+    return false;
 }
 
 bool CCustomData::Delete(const char* szName)
