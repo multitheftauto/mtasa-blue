@@ -679,7 +679,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
                         {
                             // Generate a null-terminating string for our character
-                            wchar_t wUNICODE[2] = {uiCharacter, '\0'};
+                            wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
 
                             // Convert our UTF character into an ANSI string
                             std::string strANSI = UTF16ToMbUTF8(wUNICODE);

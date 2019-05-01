@@ -4,6 +4,8 @@ project "Game SA"
 	targetname "game_sa"
 	targetdir(buildpath("mta"))
 	
+	cppdialect "C++14" -- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
@@ -29,6 +31,9 @@ project "Game SA"
 		"**.hpp",
 		"**.cpp"
 	}
+
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
