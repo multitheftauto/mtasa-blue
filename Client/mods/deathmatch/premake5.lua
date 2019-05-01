@@ -24,7 +24,7 @@ project "Client Deathmatch"
 	
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH\:NO" }
+		linkoptions { "/SAFESEH:NO" }
 	
 	filter {}
 		includedirs {

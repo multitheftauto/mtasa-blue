@@ -4,13 +4,16 @@ project "Multiplayer SA"
 	targetname "multiplayer_sa"
 	targetdir(buildpath("mta"))
 	
+	cppdialect "C++14" -- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
 			"../sdk",
-			"../../vendor/sparsehash/src/"
+			"../../vendor/sparsehash/src/",
+			"../../vendor/hwbrk"
 		}
 	
 	pchheader "StdInc.h"
@@ -22,11 +25,16 @@ project "Multiplayer SA"
 		["*"] = "premake5.lua"
 	}
 	
+	links { "hwbrk" }
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
+	
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

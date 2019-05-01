@@ -1,6 +1,6 @@
 MODULE windows x86_64 72E103A85CB249078B76B2E7C06257B13 dump_syms_regtest64.pdb
-INFO CODE_ID 5357F5C01A000 dump_syms_regtest64.exe
-FILE 1 d:\src\breakpad\src\tools\windows\dump_syms\testdata\dump_syms_regtest64.cc
+INFO CODE_ID 589DFD111A000 dump_syms_regtest64.exe
+FILE 1 c:\cygwin64\wip\breakpad-depot\src\src\tools\windows\dump_syms\testdata\dump_syms_regtest.cc
 FILE 2 f:\dd\vctools\crt\crtw32\misc\amd64\amdsecgs.asm
 FILE 3 f:\dd\ExternalAPIs\Windows\WinBlue\sdk\inc\ksamd64.inc
 FILE 4 f:\dd\ExternalAPIs\Windows\WinBlue\sdk\inc\kxamd64.inc

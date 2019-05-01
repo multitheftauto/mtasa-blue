@@ -135,6 +135,9 @@ public:
 
     unsigned int Count(eKeyBindType bindType = KEY_BIND_UNDEFINED);
 
+    bool ControlForwardsBackWards(CControllerState& cs);
+    bool ControlLeftAndRight(CControllerState& cs);
+
     void DoPreFramePulse();
     void DoPostFramePulse();
 
@@ -163,4 +166,10 @@ private:
     KeyStrokeHandler      m_KeyStrokeHandler;
     CharacterKeyHandler   m_CharacterKeyHandler;
     bool                  m_bWaitingToLoadDefaults;
+    bool                  m_bLastStateForwards;
+    bool                  m_bLastStateBackwards;
+    bool                  m_bMoveForwards;
+    bool                  m_bLastStateLeft;
+    bool                  m_bLastStateRight;
+    bool                  m_bMoveLeft;
 };

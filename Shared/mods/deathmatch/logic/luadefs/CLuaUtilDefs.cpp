@@ -179,7 +179,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = {uiDelimiter, '\0'};
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string
@@ -642,7 +642,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        wchar_t wUNICODE[2] = { static_cast<wchar_t>(uiDelimiter), '\0' };
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string

@@ -577,33 +577,38 @@ void CCore::ApplyConsoleSettings()
 
 void CCore::ApplyGameSettings()
 {
-    bool                      bval;
+    bool                      bVal;
     int                       iVal;
+    float                     fVal;
     CControllerConfigManager* pController = m_pGame->GetControllerConfigManager();
+    CGameSettings*            pGameSettings = m_pGame->GetSettings();
 
-    CVARS_GET("invert_mouse", bval);
-    pController->SetMouseInverted(bval);
-    CVARS_GET("fly_with_mouse", bval);
-    pController->SetFlyWithMouse(bval);
-    CVARS_GET("steer_with_mouse", bval);
-    pController->SetSteerWithMouse(bval);
-    CVARS_GET("classic_controls", bval);
-    pController->SetClassicControls(bval);
-    CVARS_GET("volumetric_shadows", bval);
-    m_pGame->GetSettings()->SetVolumetricShadowsEnabled(bval);
+    CVARS_GET("invert_mouse", bVal);
+    pController->SetMouseInverted(bVal);
+    CVARS_GET("fly_with_mouse", bVal);
+    pController->SetFlyWithMouse(bVal);
+    CVARS_GET("steer_with_mouse", bVal);
+    pController->SetSteerWithMouse(bVal);
+    CVARS_GET("classic_controls", bVal);
+    pController->SetClassicControls(bVal);
+    CVARS_GET("volumetric_shadows", bVal);
+    pGameSettings->SetVolumetricShadowsEnabled(bVal);
     CVARS_GET("aspect_ratio", iVal);
-    m_pGame->GetSettings()->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
-    CVARS_GET("grass", bval);
-    m_pGame->GetSettings()->SetGrassEnabled(bval);
-    CVARS_GET("heat_haze", bval);
-    m_pMultiplayer->SetHeatHazeEnabled(bval);
+    pGameSettings->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
+    CVARS_GET("grass", bVal);
+    pGameSettings->SetGrassEnabled(bVal);
+    CVARS_GET("heat_haze", bVal);
+    m_pMultiplayer->SetHeatHazeEnabled(bVal);
     CVARS_GET("fast_clothes_loading", iVal);
     m_pMultiplayer->SetFastClothesLoading((CMultiplayer::EFastClothesLoading)iVal);
-    CVARS_GET("tyre_smoke_enabled", bval);
-    m_pMultiplayer->SetTyreSmokeEnabled(bval);
-    m_pGame->GetSettings()->UpdateFieldOfViewFromSettings();
-    m_pGame->GetSettings()->ResetVehiclesLODDistance();
+    CVARS_GET("tyre_smoke_enabled", bVal);
+    m_pMultiplayer->SetTyreSmokeEnabled(bVal);
+    pGameSettings->UpdateFieldOfViewFromSettings();
+    pGameSettings->ResetVehiclesLODDistance();
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
+    CVARS_GET("mastervolume", fVal);
+    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
+    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
 }
 
 void CCore::SetConnected(bool bConnected)
@@ -684,15 +689,11 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
     }
     else
     {
-        strMessage += "\n\n";
-        strMessage += _("Do you want to see some on-line help about this problem ?");
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(strTitle);
         pQuestionBox->SetMessage(strMessage);
-        pQuestionBox->SetButton(0, _("No"));
-        pQuestionBox->SetButton(1, _("Yes"));
-        pQuestionBox->SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
+        pQuestionBox->SetOnLineHelpOption(strTroubleLink);
         pQuestionBox->Show();
     }
 }
@@ -2274,25 +2275,7 @@ SString CCore::GetBlueCopyrightString()
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
 
-bool CCore::IsHostSmotraServer()
+HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
 {
-    unsigned int uiPort;
-    SString      strHost;
-    CVARS_GET("host", strHost);
-    CVARS_GET("port", uiPort);
-
-    if (uiPort != 22003)
-    {
-        return false;
-    }
-
-    unsigned int arrSmotraHostIps[3] = {HashString("164.132.204.62"), HashString("149.202.223.26"), HashString("151.80.111.167")};
-    for (int i = 0; i < 3; i++)
-    {
-        if (arrSmotraHostIps[i] == HashString(strHost))
-        {
-            return true;
-        }
-    }
-    return false;
+    return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }

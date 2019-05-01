@@ -236,9 +236,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
-    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
-    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -266,6 +263,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(CClientGame::StaticAssocGroupCopyAnimationHandler);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(CClientGame::StaticBlendAnimationHierarchyHandler);
+    g_pMultiplayer->SetBlendAnimationHandler(CClientGame::StaticBlendAnimationHandler);
     g_pMultiplayer->SetProcessCollisionHandler(CClientGame::StaticProcessCollisionHandler);
     g_pMultiplayer->SetVehicleCollisionHandler(CClientGame::StaticVehicleCollisionHandler);
     g_pMultiplayer->SetVehicleDamageHandler(CClientGame::StaticVehicleDamageHandler);
@@ -279,6 +277,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGamePlayerDestructHandler(CClientGame::StaticGamePlayerDestructHandler);
     g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
@@ -430,6 +429,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(NULL);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(NULL);
+    g_pMultiplayer->SetBlendAnimationHandler(nullptr);
     g_pMultiplayer->SetProcessCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleDamageHandler(NULL);
@@ -442,6 +442,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGamePlayerDestructHandler(NULL);
     g_pMultiplayer->SetGameProjectileDestructHandler(NULL);
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
@@ -2385,7 +2386,7 @@ bool CClientGame::CharacterKeyHandler(WPARAM wChar)
         if (wChar >= 32)
         {
             // Generate a null-terminating string for our character
-            wchar_t wUNICODE[2] = {wChar, '\0'};
+            wchar_t wUNICODE[2] = {static_cast<wchar_t>(wChar), '\0'};
 
             // Convert our UTF character into an ANSI string
             SString strANSI = UTF16ToMbUTF8(wUNICODE);
@@ -3672,6 +3673,11 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
+bool CClientGame::StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    return g_pClientGame->BlendAnimationHandler(pClump, animGroup, animID, fBlendData);
+}
+
 void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
@@ -3759,6 +3765,11 @@ void CClientGame::StaticGameProjectileDestructHandler(CEntitySAInterface* pProje
 void CClientGame::StaticGameModelRemoveHandler(ushort usModelId)
 {
     g_pClientGame->GameModelRemoveHandler(usModelId);
+}
+
+void CClientGame::StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    g_pClientGame->GameRunNamedAnimDestructorHandler(pTask);
 }
 
 void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
@@ -3904,14 +3915,13 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
-
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
@@ -3990,10 +4000,25 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
-    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
-    auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
-    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
+
+    if ((DWORD)pAnimAssocGroupInterface < 0x250)
+    {
+        g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+    }
+
+    auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
+
+    if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
+    {
+        g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+    }
+
+    int  iGroupID = pAnimAssocGroup->GetGroupID();
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
@@ -4064,6 +4089,26 @@ bool CClientGame::BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterfac
         pClientPed->SetNextAnimationNormal();
     }
     return isCustomAnimationToPlay;
+}
+
+bool CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    CClientPed* pClientPed = GetClientPedByClump(*pClump);
+    if (pClientPed != nullptr)
+    {
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        {
+            // check for idle animation
+            if (animID == 3)
+            {
+                if ((animGroup == 0) || (animGroup >= 54 && animGroup <= 70) || (animGroup >= 118))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)
@@ -4777,7 +4822,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             {
                 return true;
             }
-            CLuaArguments  Arguments;
+            CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
@@ -4921,6 +4966,24 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
     // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+}
+
+void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    auto it = m_mapOfRunNamedAnimTasks.find(pTask);
+    if (it != m_mapOfRunNamedAnimTasks.end())
+    {
+        CClientPed* pPed = it->second;
+        if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
+        {
+            if (pPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+            {
+                pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+                pPed->SetTaskToBeRestoredOnAnimEnd(false);
+            }
+        }
+        m_mapOfRunNamedAnimTasks.erase(pTask);
+    }
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -6932,6 +6995,11 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed)
+{
+    m_mapOfRunNamedAnimTasks[pTask] = pPed;
 }
 
 void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)

@@ -6,7 +6,7 @@ project "Client Webbrowser"
 	
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-		linkoptions { "/SAFESEH\:NO" }
+		linkoptions { "/SAFESEH:NO" }
 		buildoptions { "-Zm130" }
 	
 	filter {}
@@ -45,6 +45,9 @@ project "Client Webbrowser"
 		"_WIN32_WINNT=0x502",
 		"PSAPI_VERSION=1"
 	}
+
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

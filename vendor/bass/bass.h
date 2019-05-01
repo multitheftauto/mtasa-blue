@@ -1,6 +1,6 @@
 /*
 	BASS 2.4 C/C++ header file
-	Copyright (c) 1999-2018 Un4seen Developments Ltd.
+	Copyright (c) 1999-2019 Un4seen Developments Ltd.
 
 	See the BASS.CHM file for more detailed documentation
 */
@@ -117,6 +117,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_VERIFY			23
 #define BASS_CONFIG_UPDATETHREADS	24
 #define BASS_CONFIG_DEV_BUFFER		27
+#define BASS_CONFIG_REC_LOOPBACK	28
 #define BASS_CONFIG_VISTA_TRUEPOS	30
 #define BASS_CONFIG_IOS_MIXAUDIO	34
 #define BASS_CONFIG_DEV_DEFAULT		36
@@ -141,13 +142,14 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_AM_DISABLE		58
 #define BASS_CONFIG_NET_PLAYLIST_DEPTH	59
 #define BASS_CONFIG_NET_PREBUF_WAIT	60
-#define BASS_CONFIG_LIBSSL			64
 #define BASS_CONFIG_WASAPI_PERSIST	65
+#define BASS_CONFIG_REC_WASAPI		66
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
 #define BASS_CONFIG_NET_PROXY		17
 #define BASS_CONFIG_IOS_NOTIFY		46
+#define BASS_CONFIG_LIBSSL			64
 
 // BASS_Init flags
 #define BASS_DEVICE_8BITS		1		// 8 bit
@@ -565,6 +567,7 @@ user   : The 'user' parameter value given when calling BASS_StreamCreateURL */
 #define BASS_SYNC_MUSICFX		3
 #define BASS_SYNC_OGG_CHANGE	12
 #define BASS_SYNC_DEV_FAIL		14
+#define BASS_SYNC_DEV_FORMAT	15
 #define BASS_SYNC_MIXTIME		0x40000000	// flag: sync at mixtime, else at playtime
 #define BASS_SYNC_ONETIME		0x80000000	// flag: sync only once, else continuously
 
@@ -646,6 +649,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_DATA_FFT_NOWINDOW	0x20	// FFT flag: no Hanning window
 #define BASS_DATA_FFT_REMOVEDC	0x40	// FFT flag: pre-remove DC bias
 #define BASS_DATA_FFT_COMPLEX	0x80	// FFT flag: return complex data
+#define BASS_DATA_FFT_NYQUIST	0x100	// FFT flag: return extra Nyquist value
 
 // BASS_ChannelGetLevelEx flags
 #define BASS_LEVEL_MONO		1
