@@ -162,7 +162,7 @@ namespace SharedUtil
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
 
-    void* GetMainThread();
+    DWORD GetMainThreadId();
 
     //
     // Return true if currently executing the main thread
