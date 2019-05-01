@@ -1179,12 +1179,11 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-void* SharedUtil::GetMainThread()
+DWORD SharedUtil::GetMainThreadId()
 {
 #ifdef WIN32
-    static void* pMainThread = nullptr;
-    DWORD        dwMainThreadID = 0;
-    if (pMainThread == nullptr)
+    static DWORD dwMainThreadID = 0;
+    if (dwMainThreadID == 0)
     {
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -1216,20 +1215,14 @@ void* SharedUtil::GetMainThread()
             }
             CloseHandle(hThreadSnap);
         }
-    }
 
-    if (pMainThread)
-    {
-        return pMainThread;
+        // Fallback
+        if (dwMainThreadID == 0)
+        {
+            dwMainThreadID = GetCurrentThreadId();
+        }
     }
-
-    if (dwMainThreadID == 0)
-    {
-        pMainThread = GetCurrentThread();
-        return pMainThread;
-    }
-    pMainThread = OpenThread(THREAD_ALL_ACCESS, true, dwMainThreadID);
-    return pMainThread;
+    return dwMainThreadID;
 #endif
 }
 
@@ -1240,13 +1233,7 @@ void* SharedUtil::GetMainThread()
 bool SharedUtil::IsMainThread()
 {
 #ifdef WIN32
-    static DWORD dwMainThreadID = 0;
-    if (dwMainThreadID == 0)
-    {
-        dwMainThreadID = GetThreadId(GetMainThread());
-    }
-
-    return dwMainThreadID == GetCurrentThreadId();
+    return GetMainThreadId() == GetCurrentThreadId();
 #else
     static pthread_t dwMainThread = pthread_self();
     return pthread_equal(pthread_self(), dwMainThread) != 0;

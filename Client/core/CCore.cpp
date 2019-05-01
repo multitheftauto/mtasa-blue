@@ -607,8 +607,8 @@ void CCore::ApplyGameSettings()
     pGameSettings->ResetVehiclesLODDistance();
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
-    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal * 64.0f);
-    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal * 64.0f);
+    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
+    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
 }
 
 void CCore::SetConnected(bool bConnected)
