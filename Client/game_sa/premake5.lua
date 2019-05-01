@@ -4,6 +4,8 @@ project "Game SA"
 	targetname "game_sa"
 	targetdir(buildpath("mta"))
 	
+	cppdialect "C++14" -- HACK(Jusonex): Temp fix for ebp not being set in naked functions
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
