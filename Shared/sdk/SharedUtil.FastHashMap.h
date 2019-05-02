@@ -71,12 +71,9 @@ namespace SharedUtil
     // CFastHashMap helpers
     //
 
-    // Add a value for a key
-    template <class T, class V, class T2, class V2>
-    void MapInsert(CFastHashMap<T, V>& collection, const T2& key, const V2& value)
-    {
-        collection.insert(std::pair<T2, V>(key, value));
-    }
+    // Adding a value to a key(container[key] = value) can be done with container[key] = value, 
+    // and it'll work just fine, no need for a function
+
 
     // Remove key from collection
     template <class T, class V, class T2>
