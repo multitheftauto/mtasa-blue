@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "SharedUtil.FastHashMap.h"
 #include "lua/CLuaArgument.h"
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
@@ -25,14 +26,14 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    SCustomData* Get(SString strName);
+    bool         Set(SString strName, const CLuaArgument& Variable, bool bSynchronized = true, CLuaArgument* pOldVariable = nullptr);
 
-    bool Delete(const char* szName);
+    bool Delete(SString strName);
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    CFastHashMap<SString, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
+    CFastHashMap<SString, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
 
 private:
-    std::map<std::string, SCustomData> m_Data;
+    CFastHashMap<SString, SCustomData> m_Data;
 };

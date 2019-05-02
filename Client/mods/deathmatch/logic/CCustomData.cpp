@@ -14,35 +14,40 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    CFastHashMap<SString, SCustomData>::const_iterator iter = pCustomData->IterBegin();
     for (; iter != pCustomData->IterEnd(); iter++)
     {
-        Set(iter->first.c_str(), iter->second.Variable);
+        Set(iter->first, iter->second.Variable);
     }
 }
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(SString strName)
 {
-    assert(szName);
-
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(strName);
     if (it != m_Data.end())
         return &it->second;
 
     return NULL;
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+bool CCustomData::Set(SString strName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
-    assert(szName);
-
     // Grab the item with the given name
-    SCustomData* pData = Get(szName);
+    SCustomData* pData = MapFind(m_Data, strName);
     if (pData)
-    {
-        // Update existing
-        pData->Variable = Variable;
-        pData->bSynchronized = bSynchronized;
+    {   
+        if (pData->Variable != Variable || pData->bSynchronized != bSynchronized)
+        {
+            // Set old variable if needed
+            if (pOldVariable)
+                *pOldVariable = pData->Variable;
+
+            // Update existing
+            pData->Variable = Variable;
+            pData->bSynchronized = bSynchronized;
+
+            return true;
+        }
     }
     else
     {
@@ -50,14 +55,17 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
         SCustomData newData;
         newData.Variable = Variable;
         newData.bSynchronized = bSynchronized;
-        m_Data[szName] = newData;
+        m_Data[strName] = newData;
+
+        return true;
     }
+    return false;
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(SString strName)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(strName);
     if (it != m_Data.end())
     {
         m_Data.erase(it);

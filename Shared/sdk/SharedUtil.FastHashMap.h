@@ -71,10 +71,6 @@ namespace SharedUtil
     // CFastHashMap helpers
     //
 
-    // Adding a value to a key(container[key] = value) can be done with container[key] = value, 
-    // and it'll work just fine, no need for a function
-
-
     // Remove key from collection
     template <class T, class V, class T2>
     bool MapRemove(CFastHashMap<T, V>& collection, const T2& key)
