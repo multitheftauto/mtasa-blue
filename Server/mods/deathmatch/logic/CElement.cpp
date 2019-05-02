@@ -701,16 +701,16 @@ bool CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, b
     }
 
     // We need the old variable as well
-    CLuaArgument OldVariable;
+    CLuaArgument oldVariable;
     // Set the new data
-    if (m_pCustomData->Set(szName, Variable, bSynchronized, &OldVariable))
+    if (m_pCustomData->Set(szName, Variable, bSynchronized, &oldVariable))
     {
         if (bTriggerEvent)
         {
             // Trigger the onElementDataChange event on us
             CLuaArguments Arguments;
             Arguments.PushString(szName);
-            Arguments.PushArgument(OldVariable);
+            Arguments.PushArgument(oldVariable);
             Arguments.PushArgument(Variable);
             CallEvent("onElementDataChange", Arguments, pClient);
         }
