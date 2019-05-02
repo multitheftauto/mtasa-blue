@@ -40,7 +40,7 @@ struct SReportLine
 {
     SString strText;
     uint    uiId;
-            operator SString&() { return strText; }
+    void    operator+=(const char* szAppend) { strText += szAppend; }
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
