@@ -81,7 +81,7 @@ bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
         {
             // Set the old variable(its used by the onElementDataChange event)
             if (pOldVariable)
-            * pOldVariable = pData->Variable;
+                *pOldVariable = pData->Variable;
             // Update existing
             pData->Variable = Variable;
             pData->bSynchronized = bSynchronized;
