@@ -745,7 +745,7 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
     for (auto iter = m_pCustomData->SyncedIterBegin(); iter != m_pCustomData->SyncedIterEnd(); ++iter)
     {
-        const std::string& strName = iter->first;
+        const SString& strName = iter->first;
         const SCustomData& customData = iter->second;
         if (customData.bSynchronized)
         {

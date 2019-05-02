@@ -53,7 +53,7 @@ SFixedArray<CRPCFunctions::SElementRPCHandler, CRPCFunctions::NUM_RPC_FUNCS> CRP
 
 CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
 {
-    m_bShowRPCs = true;
+    m_bShowRPCs = false;
     m_pManager = pClientGame->GetManager();
     m_pCamera = m_pManager->GetCamera();
     m_pMarkerManager = m_pManager->GetMarkerManager();
@@ -148,6 +148,16 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
             CClientEntity* pSource = CElementIDs::GetElement(ID);
             if (pSource == NULL)
             {
+                /* 
+                 * Hey bro!
+                 * Did you come here because your console is flooded with "FIX ME - SetElementData?"(and it works just fine)
+                 * If so, dont worry, thats fucked up
+                 * Fix it if you want to, I dont know whats the problem with it(it was like that even before this pr(#907))
+                 *
+                 * Note: This shit is called if element data is set on a custom element created with createElement, and not with other ones.
+                 *
+                 * - Pirulax
+                 */
 #ifdef MTA_DEBUG
                 SString strMessage("CRPCFunctions::ProcessPacket - FIXME (%s)", *pElementHandler->strName);
                 OutputDebugLine(SStringX("[RPC] ") + strMessage);
