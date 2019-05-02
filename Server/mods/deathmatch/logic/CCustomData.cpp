@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CCustomData.cpp
- *  PURPOSE:     Custom entity data class
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/CCustomData.cpp
+*  PURPOSE:     Custom entity data class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,39 +13,29 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    CFastHashMap<SString, SCustomData>::const_iterator iter = pCustomData->IterBegin();
     for (; iter != pCustomData->IterEnd(); iter++)
-    {
-        Set(iter->first.c_str(), iter->second.Variable);
-    }
+        Set(iter->first, iter->second.Variable);
 }
 
 SCustomData* CCustomData::Get(const char* szName)
 {
     assert(szName);
 
-    std::map<std::string, SCustomData>::const_iterator it = m_Data.find(szName);
-    if (it != m_Data.end())
-        return (SCustomData*)&it->second;
-
-    return NULL;
+    return MapFind(m_Data, szName);
 }
 
 SCustomData* CCustomData::GetSynced(const char* szName)
 {
     assert(szName);
 
-    std::map<std::string, SCustomData>::const_iterator it = m_SyncedData.find(szName);
-    if (it != m_SyncedData.end())
-        return (SCustomData*)&it->second;
-
-    return NULL;
+    return MapFind(m_SyncedData, szName);
 }
 
 bool CCustomData::DeleteSynced(const char* szName)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator iter = m_SyncedData.find(szName);
+    CFastHashMap<SString, SCustomData>::iterator iter = m_SyncedData.find(szName);
     if (iter != m_SyncedData.end())
     {
         m_SyncedData.erase(iter);
@@ -60,7 +50,7 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
 {
     if (bSynchronized)
     {
-        SCustomData* pDataSynced = GetSynced(szName);
+        SCustomData* pDataSynced = MapFind(m_SyncedData, szName);
         if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
@@ -75,25 +65,23 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
         }
     }
     else
-    {
         DeleteSynced(szName);
-    }
 }
 
-// Returns false in case we try to set the same value for the custom data and we didn't change the bSync, otherwise true
+// Returns false in case we try to set the same value for the custom data and we didn't change bSync, otherwise true
 bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
     assert(szName);
 
     // Grab the item with the given name
-    SCustomData* pData = Get(szName);
+    SCustomData* pData = MapFind(m_Data, szName);
     if (pData)
     {
         if (pData->bSynchronized != bSynchronized || pData->Variable != Variable)
         {
             // Set the old variable(its used by the onElementDataChange event)
             if (pOldVariable)
-                *pOldVariable = pData->Variable;
+            * pOldVariable = pData->Variable;
             // Update existing
             pData->Variable = Variable;
             pData->bSynchronized = bSynchronized;
@@ -119,7 +107,7 @@ bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
 bool CCustomData::Delete(const char* szName)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(szName);
     if (it != m_Data.end())
     {
         DeleteSynced(szName);
@@ -133,31 +121,31 @@ bool CCustomData::Delete(const char* szName)
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
+    CFastHashMap<SString, SCustomData>::const_iterator iter = m_Data.begin();
     for (; iter != m_Data.end(); iter++)
     {
-        CLuaArgument* arg = (CLuaArgument*)&iter->second.Variable;
+        CLuaArgument* arg = (CLuaArgument*)& iter->second.Variable;
 
         switch (arg->GetType())
         {
-            case LUA_TSTRING:
-            {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetString().c_str());
-                break;
-            }
-            case LUA_TNUMBER:
-            {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue((float)arg->GetNumber());
-                break;
-            }
-            case LUA_TBOOLEAN:
-            {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetBoolean());
-                break;
-            }
+        case LUA_TSTRING:
+        {
+            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+            attr->SetValue(arg->GetString().c_str());
+            break;
+        }
+        case LUA_TNUMBER:
+        {
+            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+            attr->SetValue((float)arg->GetNumber());
+            break;
+        }
+        case LUA_TBOOLEAN:
+        {
+            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+            attr->SetValue(arg->GetBoolean());
+            break;
+        }
         }
     }
     return pNode;

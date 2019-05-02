@@ -157,10 +157,9 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             CCustomData* pCustomData = pElement->GetCustomDataPointer();
             assert(pCustomData);
             BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
-            map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
-            for (; iter != pCustomData->SyncedIterEnd(); ++iter)
+            for (auto iter = pCustomData->SyncedIterBegin(); iter != pCustomData->SyncedIterEnd(); ++iter)
             {
-                const char*         szName = iter->first.c_str();
+                const char*         szName = iter->first;
                 const CLuaArgument* pArgument = &iter->second.Variable;
                 bool                bSynchronized = iter->second.bSynchronized;
 

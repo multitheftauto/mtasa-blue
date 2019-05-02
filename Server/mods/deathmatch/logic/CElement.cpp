@@ -521,10 +521,9 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     assert(table);
 
     // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_pCustomData->IterBegin();
-    for (; iter != m_pCustomData->IterEnd(); iter++)
+    for (auto iter = m_pCustomData->IterBegin(); iter != m_pCustomData->IterEnd(); iter++)
     {
-        table->PushString(iter->first.c_str());                // key
+        table->PushString(iter->first);                // key
         table->PushArgument(iter->second.Variable);            // value
     }
 
@@ -744,7 +743,7 @@ void CElement::DeleteCustomData(const char* szName)
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_pCustomData->SyncedIterBegin(); iter != m_pCustomData->SyncedIterEnd(); ++iter)
+    for (auto iter = m_pCustomData->SyncedIterBegin(); iter != m_pCustomData->SyncedIterEnd(); ++iter)
     {
         const std::string& strName = iter->first;
         const SCustomData& customData = iter->second;

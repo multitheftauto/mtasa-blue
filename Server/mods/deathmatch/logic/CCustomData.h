@@ -15,6 +15,7 @@
 #include "lua/CLuaArgument.h"
 #include <map>
 #include <string>
+#include "SharedUtil.FastHashMap.h"
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
@@ -39,16 +40,16 @@ public:
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    CFastHashMap<SString, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
+    CFastHashMap<SString, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
 
-    std::map<std::string, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
-    std::map<std::string, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
+    CFastHashMap<SString, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
+    CFastHashMap<SString, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
 
 private:
     bool DeleteSynced(const char* szName);
     void UpdateSynced(const char* szName, const CLuaArgument& Variable, bool bSynchronized);
 
-    std::map<std::string, SCustomData> m_Data;
-    std::map<std::string, SCustomData> m_SyncedData;
+    CFastHashMap<SString, SCustomData> m_Data;
+    CFastHashMap<SString, SCustomData> m_SyncedData;
 };
