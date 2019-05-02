@@ -26,10 +26,10 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(SString strName);
-    bool         Set(SString strName, const CLuaArgument& Variable, bool bSynchronized = true, CLuaArgument* pOldVariable = nullptr);
+    SCustomData* Get(const char* szName);
+    bool         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CLuaArgument* pOldVariable = nullptr);
 
-    bool Delete(SString strName);
+    bool Delete(const char* szName);
 
     CFastHashMap<SString, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
     CFastHashMap<SString, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }

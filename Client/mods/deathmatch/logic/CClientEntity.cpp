@@ -458,22 +458,22 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-bool CClientEntity::SetCustomData(SString strName, const CLuaArgument& Variable, bool bSynchronized)
+bool CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
-    if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)", *strName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        CLogger::ErrorPrintf("Custom data name too long (%s)", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
         return false;
     }
 
     // Grab the old variable
     CLuaArgument OldVariable;
-    if (m_pCustomData->Set(strName, Variable, bSynchronized, &OldVariable))
+    if (m_pCustomData->Set(szName, Variable, bSynchronized, &OldVariable))
     {
         // Trigger the onClientElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(strName);
+        Arguments.PushString(szName);
         Arguments.PushArgument(OldVariable);
         Arguments.PushArgument(Variable);
         CallEvent("onClientElementDataChange", Arguments, true);

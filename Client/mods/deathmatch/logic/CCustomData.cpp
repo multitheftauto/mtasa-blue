@@ -21,19 +21,19 @@ void CCustomData::Copy(CCustomData* pCustomData)
     }
 }
 
-SCustomData* CCustomData::Get(SString strName)
+SCustomData* CCustomData::Get(const char* szName)
 {
-    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(strName);
+    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(szName);
     if (it != m_Data.end())
         return &it->second;
 
     return NULL;
 }
 
-bool CCustomData::Set(SString strName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
+bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
     // Grab the item with the given name
-    SCustomData* pData = MapFind(m_Data, strName);
+    SCustomData* pData = MapFind(m_Data, szName);
     if (pData)
     {   
         if (pData->Variable != Variable || pData->bSynchronized != bSynchronized)
@@ -55,17 +55,17 @@ bool CCustomData::Set(SString strName, const CLuaArgument& Variable, bool bSynch
         SCustomData newData;
         newData.Variable = Variable;
         newData.bSynchronized = bSynchronized;
-        m_Data[strName] = newData;
+        m_Data[szName] = newData;
 
         return true;
     }
     return false;
 }
 
-bool CCustomData::Delete(SString strName)
+bool CCustomData::Delete(const char* szName)
 {
     // Find the item and delete it
-    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(strName);
+    CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(szName);
     if (it != m_Data.end())
     {
         m_Data.erase(it);

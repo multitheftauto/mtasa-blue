@@ -53,7 +53,7 @@ SFixedArray<CRPCFunctions::SElementRPCHandler, CRPCFunctions::NUM_RPC_FUNCS> CRP
 
 CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
 {
-    m_bShowRPCs = false;
+    m_bShowRPCs = true;
     m_pManager = pClientGame->GetManager();
     m_pCamera = m_pManager->GetCamera();
     m_pMarkerManager = m_pManager->GetMarkerManager();
@@ -142,12 +142,6 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
         SElementRPCHandler* pElementHandler = &m_ElementRPCHandlers[ucFunctionID];
         if (pElementHandler->Callback != NULL)
         {
-            static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
-            if (bEnabled)
-                g_pCore->LogEvent(0, "Element RPC", "", pElementHandler->strName);
-            if (m_bShowRPCs)
-                g_pCore->GetConsole()->Printf("* element-rpc: %s", *pElementHandler->strName);
-
             // Grab the source entity.
             ElementID ID;
             bitStream.Read(ID);
@@ -161,6 +155,12 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
 #endif
                 return;
             }
+
+            static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
+            if (bEnabled)
+                g_pCore->LogEvent(0, "Element RPC", "", pElementHandler->strName);
+            if (m_bShowRPCs)
+                g_pCore->GetConsole()->Printf("* element-rpc: %s | Source entity addr.: %p", *pElementHandler->strName, pSource);
 
             (pElementHandler->Callback)(pSource, bitStream);
         }
