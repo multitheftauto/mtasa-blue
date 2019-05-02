@@ -128,24 +128,24 @@ CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 
         switch (arg->GetType())
         {
-        case LUA_TSTRING:
-        {
-            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
-            attr->SetValue(arg->GetString().c_str());
-            break;
-        }
-        case LUA_TNUMBER:
-        {
-            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
-            attr->SetValue((float)arg->GetNumber());
-            break;
-        }
-        case LUA_TBOOLEAN:
-        {
-            CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
-            attr->SetValue(arg->GetBoolean());
-            break;
-        }
+            case LUA_TSTRING:
+            {
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+                attr->SetValue(arg->GetString().c_str());
+                break;
+            }
+            case LUA_TNUMBER:
+            {
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+                attr->SetValue((float)arg->GetNumber());
+                break;
+            }
+            case LUA_TBOOLEAN:
+            {
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first);
+                attr->SetValue(arg->GetBoolean());
+                break;
+            }
         }
     }
     return pNode;
