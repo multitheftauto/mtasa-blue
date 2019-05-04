@@ -609,6 +609,25 @@ void SharedUtil::SetClipboardText(const SString& strText)
     }
 }
 
+SString SharedUtil::GetClipboardText()
+{
+    SString data;
+
+    if (OpenClipboard(NULL))
+    {
+        // Get the clipboard's data
+        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
+        void*  lockedData = GlobalLock(clipboardData);
+        if (lockedData)
+            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+
+        GlobalUnlock(clipboardData);
+        CloseClipboard();
+    }
+
+    return data;
+}
+
 //
 // Direct players to info about trouble
 //
