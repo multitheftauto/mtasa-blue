@@ -763,11 +763,6 @@ void CCore::HideMainMenu()
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
 }
 
-void CCore::HideQuickConnect()
-{
-    m_pLocalGUI->GetMainMenu()->GetQuickConnectWindow()->SetVisible(false);
-}
-
 void CCore::ShowServerInfo(unsigned int WindowType)
 {
     RemoveMessageBox();
