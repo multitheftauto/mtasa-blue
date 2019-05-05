@@ -1997,12 +1997,11 @@ void CMultiplayerSA::SetCloudsEnabled(bool bDisabled)
     else
         MemPut<BYTE>(0x716380, 0xC3);
 
-    // normal clouds
-    // 0071395A     90             NOP
+    // bottom clouds
     if (bDisabled)
-        MemPut<BYTE>(0x713950, 0x83);
+        MemPut<BYTE>(0x7154B0, 0x83);
     else
-        MemPut<BYTE>(0x713950, 0xC3);
+        MemPut<BYTE>(0x7154B0, 0xC3);
 
     // plane trails (not really clouds, but they're sort of vapour)
 
