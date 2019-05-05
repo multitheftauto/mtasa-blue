@@ -102,6 +102,12 @@
     #define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
 #endif
 
+//
+// Stringize the result of expansion of a macro argument
+//
+#define MTA_STR_EXPAND(token) #token
+#define MTA_STR(token) MTA_STR_EXPAND(token)
+
 #ifdef WIN32
     #define PATH_SEPERATOR "\\"
 #else
