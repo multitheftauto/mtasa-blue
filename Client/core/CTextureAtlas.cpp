@@ -115,7 +115,7 @@ bool CTextureAtlas::CreateAtlas()
             CopyTextureToAtlas(textureInfo);
         }
 
-        D3DXSaveTextureToFile("C:\\Users\\danish\\Desktop\\myLovelyAtlas.dds", D3DXIFF_DDS, m_pAtlasTexture, NULL);
+        D3DXSaveTextureToFile("C:\\Users\\danish\\Desktop\\myLovelyAtlas.png", D3DXIFF_PNG, m_pAtlasTexture, NULL);
     };
 
     const auto result_size = find_best_packing<spaces_type>(
