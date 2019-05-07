@@ -18,7 +18,9 @@ project "Client Core"
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk"
+			"../../vendor/hwbrk",
+			"../../vendor/rectpack2D",
+			"../../vendor/DirectXTex"
 		}
 
 	libdirs {
@@ -36,8 +38,6 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 	
-	links { "hwbrk" }
-	
 	files {
 		"premake5.lua",
 		"../launch/resource/mtaicon.ico",
@@ -49,7 +49,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8", 
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", 
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "hwbrk", "DirectXTex"
 	}
 
 	defines {

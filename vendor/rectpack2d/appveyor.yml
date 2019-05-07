@@ -1,0 +1,38 @@
+version: 1.0.{build}
+branches:
+  only:
+    - master
+
+image: Visual Studio 2017 Preview
+configuration: Release
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: build/rectpack2D.sln      # path to Visual Studio solution or project
+  verbosity: minimal
+install:
+  - git submodule update --init --recursive
+
+test:
+  assemblies:
+    only:
+      - '**\*.rectpack2D.exe'
+      - '**\*.rectpack2D-Debug.exe'
+
+notifications:
+  - provider: Email
+    to:
+      - some@email.com
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+
+
+before_build:
+  - mkdir build
+  - cd build
+  - cmake -G "Visual Studio 15 2017 Win64" ..
+
+test_script:
+  - ps: 'cd ../example'
+  - ps: '& "../build/$env:CONFIGURATION/rectpack2D.exe" --unit-tests-only'
+  - ps: 'if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode ) }'

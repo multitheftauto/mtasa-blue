@@ -1,0 +1,47 @@
+os: linux
+language: cpp
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+     - gdb
+     - apport
+     - gcc-7
+     - g++-7
+     - cmake
+     - ninja-build
+    sources:
+     - ubuntu-toolchain-r-test
+
+matrix:
+  include:
+  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug 
+    compiler: gcc
+  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Release 
+    compiler: gcc
+
+before_install:
+ - ulimit -c
+ - ulimit -a -S
+ - ulimit -a -H
+ - cat /proc/sys/kernel/core_pattern
+ - cat /etc/default/apport
+ - service --status-all || true
+ - initctl list || true
+
+script:
+  - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && ninja --version
+  - export CC=${c_compiler}
+  - export CXX=${cxx_compiler}
+  - cmake/build_example.sh ${config} ${c_compiler} ${cxx_compiler}
+  - ulimit -c unlimited -S
+  - pushd build/current
+  - ninja run -k 0
+  - ls -l
+  - popd
+  - ls -l example
+  - cmake/print_bt_if_core_found.sh example/core
+
+notfications:
+  email: false
