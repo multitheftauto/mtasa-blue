@@ -23,6 +23,7 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
+#include "CTextureAtlasInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -33,6 +34,7 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
+
 enum HWBRK_TYPE;
 enum HWBRK_SIZE;
 
@@ -176,6 +178,8 @@ public:
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
     virtual HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress) = 0;
+
+    virtual std::unique_ptr<CTextureAtlasInterface> CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo) = 0;
 };
 
 class CClientTime

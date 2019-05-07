@@ -21,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
+#include "CTextureAtlas.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -2278,4 +2279,9 @@ SString CCore::GetBlueCopyrightString()
 HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
 {
     return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
+}
+
+std::unique_ptr<CTextureAtlasInterface> CCore::CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
+{
+    return std::make_unique<CTextureAtlas>(vecTexturesInfo);
 }
