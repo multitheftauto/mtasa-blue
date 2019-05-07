@@ -1,9 +1,16 @@
 #include "StdInc.h"
 #include <rectpack2D\src\finders_interface.h>
+#include <DirectXTex\DirectXTex.h>
 #include "CTextureAtlas.h"
 #include <iostream>
 #include <vector>
 #include <algorithm> 
+#include <dxgi.h>
+#include <dxgiformat.h>
+
+#include <wincodec.h>
+
+#include "DirectXTex.h"
 
 using namespace rectpack2D;
 
@@ -131,7 +138,7 @@ bool CTextureAtlas::CreateAtlasTextureResource(float fWidth, float fHeight)
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
     HRESULT hr = pDevice->CreateTexture(fWidth, fHeight, m_dwMaximumMipMapLevel,
-                        D3DUSAGE_DYNAMIC, theFormatForAtlas, D3DPOOL_SYSTEMMEM, &m_pAtlasTexture, NULL);
+                        D3DUSAGE_DYNAMIC, m_kTextureFormat, D3DPOOL_SYSTEMMEM, &m_pAtlasTexture, NULL);
     if (hr != D3D_OK)
     {
         std::printf("CreateAtlasTexture failed with error: %#.8x\n", hr);
@@ -144,13 +151,43 @@ bool CTextureAtlas::CreateAtlasTextureResource(float fWidth, float fHeight)
 
 bool CTextureAtlas::LoadTextureFromFile(CTextureInfo &textureInfo)
 {
+
+    DirectX::ScratchImage scratchImage;
+    HRESULT hr = LoadFromWICFile(FromUTF8(textureInfo.GetFilePath()), DirectX::WIC_FLAGS_ALL_FRAMES, nullptr, scratchImage);
+    if (hr != D3D_OK)
+    {
+        std::printf("LoadFromWICFile fail for '%s' with error: %#.8x\n",
+            textureInfo.GetFilePath().c_str(), hr);
+        return false;
+    }
+
+    DirectX::TexMetadata* pTextureMeta = (DirectX::TexMetadata*)&scratchImage.GetMetadata();
+
+    DirectX::ScratchImage convertedImage;
+    bool bImageConverted = false;
+
+    std::printf("pTextureMeta->format: %#.8x | m_kTextureDxgiFormat: %#.8x", pTextureMeta->format, m_kTextureDxgiFormat);
+
+    if (pTextureMeta->format != m_kTextureDxgiFormat)
+    {
+        hr = Convert(scratchImage.GetImages(), scratchImage.GetImageCount(),
+            scratchImage.GetMetadata(),
+            m_kTextureDxgiFormat, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT,
+            convertedImage);
+        if (FAILED(hr))
+        {
+            std::printf("Convert fail for '%s' with error: %#.8x\n",
+                textureInfo.GetFilePath().c_str(), hr);
+            return false;
+        }
+
+        pTextureMeta = (DirectX::TexMetadata*)&convertedImage.GetMetadata();
+        bImageConverted = true;
+    }
+
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-    UINT const kMipLevels = D3DX_DEFAULT;
-    HRESULT const hr = D3DXCreateTextureFromFileEx(pDevice, textureInfo.GetFilePath(),
-        D3DX_DEFAULT, D3DX_DEFAULT, kMipLevels,
-        0, D3DFMT_UNKNOWN, D3DPOOL_SYSTEMMEM,
-        D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL,
-        &textureInfo.GetTexture());
+    hr = pDevice->CreateTexture(pTextureMeta->width, pTextureMeta->height, pTextureMeta->mipLevels,
+        D3DUSAGE_DYNAMIC, m_kTextureFormat, D3DPOOL_SYSTEMMEM, &textureInfo.GetTexture(), NULL);
     if (hr != D3D_OK)
     {
         std::printf("D3DXCreateTextureFromFileEx fail for '%s' with error: %#.8x\n",
@@ -158,20 +195,49 @@ bool CTextureAtlas::LoadTextureFromFile(CTextureInfo &textureInfo)
         return false;
     }
 
-    D3DSURFACE_DESC desc;
-    textureInfo.GetTexture()->GetLevelDesc(0, &desc);
-
-    //remove this later
-    theFormatForAtlas = desc.Format;
-
-    // Can only pack 2D textures of known types
-    if ((textureInfo.GetTexture()->GetType() != D3DRTYPE_TEXTURE) || (!IsSupportedFormat(desc.Format)))
+    const DirectX::Image* pImages = scratchImage.GetImages();
+    if (bImageConverted)
     {
-        fprintf(stderr, "*** Error: Texture %s has unsupported format.\n", textureInfo.GetFilePath().c_str());
-        textureInfo.GetTexture()->Release();
-        false;
+        pImages = convertedImage.GetImages();
     }
-    std::printf("texture successfully loaded for '%s' | D3DFormat = %u\n", textureInfo.GetFilePath().c_str(), desc.Format);
+
+
+    std::printf("pTextureMeta->mipLevels: %d | scratchImage: image count: %d\n", pTextureMeta->mipLevels, scratchImage.GetImageCount());
+
+    IDirect3DTexture9* pTexture = textureInfo.GetTexture();
+    for (size_t mipLevel = 0; mipLevel < pTextureMeta->mipLevels; ++mipLevel)
+    {
+        long const div = static_cast<long>(pow(2L, mipLevel));
+        long const mipHeight = std::max(1UL, pTextureMeta->height / div);
+        long const mipWidth = std::max(1UL, pTextureMeta->width / div);
+
+        D3DLOCKED_RECT dstLockedRect;
+        hr = pTexture->LockRect(mipLevel, &dstLockedRect, nullptr, 0);
+        if (hr != S_OK)
+        {
+            std::printf("pTexture->LockRect: failed to lock srcLockedRect\n");
+            return false;
+        }
+
+        size_t index = pTextureMeta->ComputeIndex(mipLevel, 0, 0);
+
+        const DirectX::Image& image = pImages[index];
+
+        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
+        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
+        UCHAR *dstPtr = reinterpret_cast<UCHAR*>(dstLockedRect.pBits);
+        UCHAR *srcPtr = reinterpret_cast<UCHAR*>(image.pixels);
+        for (int i = 0; i < mipHeight / kBlockFactor; ++i)
+        {
+            memcpy(dstPtr, srcPtr, kBlockFactor * kBytesPerRow);
+            dstPtr += dstLockedRect.Pitch;
+            srcPtr += image.rowPitch;
+        }
+        hr = pTexture->UnlockRect(mipLevel);
+        assert(hr == S_OK);
+    }
+
+    std::printf("texture successfully loaded for '%s' | D3DFormat = %u\n", textureInfo.GetFilePath().c_str(), m_kTextureFormat);
     return true;
 }
 
@@ -226,8 +292,8 @@ bool CTextureAtlas::CopyTextureToAtlas(CTextureInfo& textureInfo)
         }
         assert(hr == S_OK);
 
-        int const kBytesPerRow = (mipWidth * SizeOfTexel(theFormatForAtlas)) / 8;
-        int const kBlockFactor = (IsDXTnFormat(theFormatForAtlas) ? 4 : 1);
+        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
+        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
         UCHAR *srcPtr = reinterpret_cast<UCHAR*>(srcLockedRect.pBits);
         UCHAR *dstPtr = reinterpret_cast<UCHAR*>(dstLockedRect.pBits);
 
