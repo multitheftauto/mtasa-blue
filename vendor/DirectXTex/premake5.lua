@@ -8,14 +8,14 @@ project "DirectXTex"
 
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.c",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	
 	files {
 		"premake5.lua",
 		"*.h",
-		"*.c"
+		"*.cpp"
 	}
 	
 	filter "architecture:x64"
