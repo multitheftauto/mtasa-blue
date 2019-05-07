@@ -497,7 +497,19 @@ int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
     SString        strCustomAnimName = "";
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+
+    std::vector <CTextureInfo> vecTexturesInfo;
+
+    SString theDirPath = "C:\\Program Files (x86)\\NVIDIA Corporation\\Texture Atlas Tools\\DEMOS\\Direct3D9\\bin\\release\\";
+    vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "grass.png", 256, 256)); //grass.png
+    vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "nvidia_cloth.png", 512, 512)); //nvidia_cloth.png
+    vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "1d_debug.png", 128, 128)); //1d_debug.png
+    vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "shine.png", 64, 64)); //shine.png
+    vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "mtasa.png", 800, 600)); //mtasa.png
+
+    auto pTextureInfo = g_pCore->CreateTextureAtlas(vecTexturesInfo);
+
+   /* argStream.ReadUserData(pEntity);
     argStream.ReadString(strInternalBlockName);
     argStream.ReadString(strInternalAnimName);
     argStream.ReadString(strCustomBlockName);
@@ -513,7 +525,7 @@ int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
+        */
     lua_pushboolean(luaVM, false);
     return 1;
 }
