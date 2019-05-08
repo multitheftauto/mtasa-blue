@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
@@ -3324,12 +3324,12 @@ void CSettings::SaveData()
     CVARS_SET("tyre_smoke_enabled", bTyreSmokeEnabled);
     g_pCore->GetMultiplayer()->SetTyreSmokeEnabled(bTyreSmokeEnabled);
 
-    // High detail vehicles (just set cvar, real change occur on next connect)
+    // High detail vehicles
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
     gameSettings->ResetVehiclesLODDistance();
 
-    // High detail peds (just set cvar, real change occur on next connect)
+    // High detail peds
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance();
