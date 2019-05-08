@@ -149,6 +149,7 @@ namespace SharedUtil
 
     SString GetSystemErrorMessage(uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
     void    SetClipboardText(const SString& strText);
+    SString GetClipboardText();
 
     // Version checks
     bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
@@ -161,6 +162,8 @@ namespace SharedUtil
 
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
+
+    DWORD GetMainThreadId();
 
     //
     // Return true if currently executing the main thread
@@ -235,6 +238,13 @@ namespace SharedUtil
     T Clamp(const T& min, const T& a, const T& max)
     {
         return a < min ? min : a > max ? max : a;
+    }
+
+    // Checks whether a value is between two other values ( min <= a <= max )
+    template <class T>
+    bool Between(const T& min, const T& a, const T& max)
+    {
+        return a >= min && a <= max;
     }
 
     // Lerps between two values depending on the weight
@@ -1681,7 +1691,7 @@ namespace SharedUtil
 
         T* operator->() { return pPointer->GetData(); }
 
-        const T* operator->()const { return pPointer->GetData(); }
+        const T* operator->() const { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 

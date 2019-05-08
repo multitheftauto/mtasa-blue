@@ -27,7 +27,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	cppdialect "C++14"
+	cppdialect "C++17"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -90,7 +90,7 @@ workspace "MTASA"
 	
 	filter "system:windows"
 		toolset "v141"
-		flags { "StaticRuntime" }
+		staticruntime "On"
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
 			path.join(dxdir, "Include")
@@ -131,6 +131,7 @@ workspace "MTASA"
 		include "vendor/portaudio"
 		include "vendor/cef3"
 		include "vendor/jpeg-9b"
+		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
@@ -155,6 +156,7 @@ workspace "MTASA"
 		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
+		include "vendor/hwbrk"
 		include "vendor/json-c"
 		include "vendor/lua"
 		include "vendor/mbedtls"

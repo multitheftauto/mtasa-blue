@@ -104,6 +104,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
 
 CGUI_Impl::~CGUI_Impl()
 {
+    delete CEGUI::System::getSingletonPtr();
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
