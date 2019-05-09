@@ -90,6 +90,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
+    m_bTaskToBeRestoredOnAnimEnd = false;
+    m_eTaskTypeToBeRestoredOnAnimEnd = TASK_SIMPLE_PLAYER_ON_FOOT;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";
@@ -717,6 +719,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
         m_fHealth = GetMaxHealth();
         m_pPlayerPed->SetHealth(m_fHealth);
         m_bUsesCollision = true;
+        m_pPlayerPed->SetLanding(false);
     }
     else
     {
@@ -1383,6 +1386,8 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     if (m_pPlayerPed)
     {
+        m_pPlayerPed->SetLanding(false);
+
         // Fall tasks
         KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
         // Swim tasks
@@ -1848,6 +1853,8 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
             pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
 
+        m_pPlayerPed->SetLanding(false);
+
         // Make sure to remove the jetpack task before setting death tasks (Issue #7860)
         if (HasJetPack())
         {
@@ -1930,6 +1937,9 @@ void CClientPed::SetFrozen(bool bFrozen)
         {
             if (m_pTaskManager)
             {
+                // Fix #366: Can only run forward bug
+                m_pPlayerPed->SetLanding(false);
+
                 // Let them have a jetpack (#9522)
                 if (!HasJetPack())
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
@@ -3602,6 +3612,7 @@ void CClientPed::_CreateModel()
         }
 
         // Restore any settings
+        m_pPlayerPed->SetLanding(false);
         m_pPlayerPed->SetMatrix(&m_Matrix);
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
@@ -3715,6 +3726,8 @@ void CClientPed::_CreateLocalModel()
         {
             m_pPlayerPed->SetModelIndex(m_ulModel);
         }
+
+        m_pPlayerPed->SetLanding(false);
 
         // Give him the default fighting style
         m_pPlayerPed->SetFightingStyle(m_FightingStyle, 6);
@@ -4314,6 +4327,8 @@ void CClientPed::SetChoking(bool bChoking)
             // His not choking. Make him choke if that's what we're supposed to do.
             if (bChoking)
             {
+                m_pPlayerPed->SetLanding(false);
+
                 // Remove jetpack now so it doesn't stay on (#9522#c25612)
                 if (HasJetPack())
                     SetHasJetPack(false);
@@ -5081,7 +5096,7 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
@@ -5189,6 +5204,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
 
             m_pPlayerPed->Respawn(pvecPosition, bCameraCut);
             SetPosition(*pvecPosition);
+
+            m_pPlayerPed->SetLanding(false);
 
             if (bRestoreState)
             {
@@ -5651,8 +5668,8 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
     }
 }
 
-void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
-                                   bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5669,6 +5686,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
 
         if (pBlock->IsLoaded())
         {
+            // Fix #366: Can only run forward bug
+            m_pPlayerPed->SetLanding(false);
+
             // Remove jetpack now so it doesn't stay on (#9522#c25612)
             if (HasJetPack())
                 SetHasJetPack(false);
@@ -5707,6 +5727,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
         else
@@ -5757,16 +5778,16 @@ void CClientPed::KillAnimation()
 }
 
 std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
-{ 
+{
     if (m_pAnimationBlock)
     {
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
-    return nullptr; 
+    return nullptr;
 }
 const char* CClientPed::GetAnimationName()
-{ 
-    return m_strAnimationName; 
+{
+    return m_strAnimationName;
 }
 
 void CClientPed::PostWeaponFire()
@@ -6079,8 +6100,9 @@ void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 
 void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
-    m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
-    CIFPEngine::EngineApplyAnimation(*this, pInternalAnimHierarchy->GetInterface());
+    CAnimBlendHierarchySAInterface* pInterface = pInternalAnimHierarchy->GetInterface();
+    CIFPEngine::EngineApplyAnimation(*this, pInterface, pInterface);
+    m_mapOfReplacedAnimations.erase(pInterface);
 }
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
@@ -6089,7 +6111,8 @@ void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
     {
         if (std::addressof(*IFP.get()) == std::addressof(*iter->second.pIFP.get()))
         {
-            CIFPEngine::EngineApplyAnimation(*this, iter->first);
+            auto pAnimHierarchy = g_pGame->GetAnimManager()->GetAnimBlendHierarchy(iter->first);
+            CIFPEngine::EngineApplyAnimation(*this, iter->first, iter->first);
             iter = m_mapOfReplacedAnimations.erase(iter);
         }
         else
@@ -6106,14 +6129,13 @@ void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
     for (size_t i = 0; i < cAnimations; i++)
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
+        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
         m_mapOfReplacedAnimations.erase(pAnimHierarchyInterface);
-        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface);
     }
 }
 
 void CClientPed::RestoreAllAnimations()
 {
-    m_mapOfReplacedAnimations.clear();
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = GetClump();
     if (pClump)
@@ -6129,12 +6151,14 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    CIFPEngine::EngineApplyAnimation(*this, pAnimStaticAssociation->GetAnimHierachyInterface());
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }
             pAnimAssociation = std::move(pAnimNextAssociation);
         }
     }
+    m_mapOfReplacedAnimations.clear();
 }
 
 SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)
@@ -6144,6 +6168,44 @@ SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterf
     if (it != m_mapOfReplacedAnimations.end())
     {
         return &it->second;
+    }
+    return nullptr;
+}
+
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface)
+{
+    RpClump* pClump = GetClump();
+    if (!pClump)
+    {
+        return nullptr;
+    }
+
+    auto                            pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
+    CAnimBlendHierarchySAInterface* pReplacedInterface = nullptr;
+    if (pReplacedAnimation != nullptr)
+    {
+        pReplacedInterface = pReplacedAnimation->pAnimationHierarchy;
+    }
+
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    auto          pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+    while (pAnimAssociation)
+    {
+        auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
+        auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+        if (pAnimHierarchy)
+        {
+            CAnimBlendHierarchySAInterface* pInterface = pAnimHierarchy->GetInterface();
+            if (pInterface == pOriginalHierarchyInterface)
+            {
+                return pAnimAssociation;
+            }
+            if (pReplacedInterface && pInterface == pReplacedInterface)
+            {
+                return pAnimAssociation;
+            }
+        }
+        pAnimAssociation = std::move(pAnimNextAssociation);
     }
     return nullptr;
 }

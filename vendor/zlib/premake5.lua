@@ -1,10 +1,10 @@
 project "zlib"
-	language "C++"
+	language "C"
 	kind "StaticLib"
 	targetname "zlib"
 	
 	vpaths { 
-		["Headers/*"] = "**.h",
+		["Headers/*"] = "*.h",
 		["Sources/*"] = "*.c",
 		["*"] = "premake5.lua"
 	}

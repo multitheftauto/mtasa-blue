@@ -700,30 +700,6 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssoci
     return nullptr;
 }
 
-std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey)
-{
-    if (!pClump)
-    {
-        return nullptr;
-    }
-
-    auto pAnimAssociation = RpAnimBlendClumpGetFirstAssociation(pClump);
-    while (pAnimAssociation)
-    {
-        auto pAnimNextAssociation = RpAnimBlendGetNextAssociation(pAnimAssociation);
-        auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
-        if (pAnimHierarchy)
-        {
-            if (pAnimHierarchy->GetNameHashKey() == uiAnimNameHashKey)
-            {
-                return pAnimAssociation;
-            }
-        }
-        pAnimAssociation = std::move(pAnimNextAssociation);
-    }
-    return nullptr;
-}
-
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation)
 {
     CAnimBlendAssociationSAInterface* pInterface = nullptr;

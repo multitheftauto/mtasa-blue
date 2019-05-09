@@ -281,24 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
 {
     g_pCore->SetChatVisible(bShow);

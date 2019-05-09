@@ -117,6 +117,7 @@ public:
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
     void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler);
     void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler);
+    void SetBlendAnimationHandler(BlendAnimationHandler* pHandler);
     void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler);
     void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler);
     void SetVehicleDamageHandler(VehicleDamageHandler* pHandler);
@@ -130,6 +131,7 @@ public:
     void SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler);
     void SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler);
     void SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler);
+    void SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler);
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);

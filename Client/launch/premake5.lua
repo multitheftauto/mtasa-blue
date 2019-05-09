@@ -25,7 +25,7 @@ project "Client Launcher"
 	}
 	
 	filter "system:windows"
-		flags { "StaticRuntime" } 
+		staticruntime "On"
 		files {
 			"NEU/GDFImp.gdf.xml",
 			"GDFImp.rc",
@@ -33,8 +33,11 @@ project "Client Launcher"
 			"mtaicon.ico"
 		}
 	
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
+	
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
 		
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
