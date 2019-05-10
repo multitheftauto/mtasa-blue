@@ -16,11 +16,12 @@
 
 class CChatLineSection;
 
-#define CHAT_WIDTH              320                             // Chatbox default width
-#define CHAT_TEXT_COLOR         CColor(235, 221, 178)           // Chatbox default text color
-#define CHAT_MAX_LINES          100                             // Chatbox maximum chat lines
-#define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
-#define CHAT_BUFFER             1024                            // Chatbox buffer size
+#define CHAT_WIDTH 320                                   // Chatbox default width
+#define CHAT_TEXT_COLOR CColor(235, 221, 178)            // Chatbox default text color
+#define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
+#define CHAT_MAX_CHAT_LENGTH 96                          // Chatbox maximum chat message length
+#define CHAT_BUFFER 1024                                 // Chatbox buffer size
+#define CHAT_INPUT_HISTORY_LENGTH 128                    // Chatbox input history length
 
 class CColor
 {
@@ -169,6 +170,13 @@ public:
     bool IsInputVisible() { return m_bVisible && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
+    bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
+
+    void ResetHistoryChanges();
+    void SelectInputHistoryEntry(int iEntry);
+    bool SetNextHistoryText();
+    bool SetPreviousHistoryText();
+
     const char* GetInputPrefix();
     void        SetInputPrefix(const char* szPrefix);
     const char* GetInputText() { return m_strInputText.c_str(); }
@@ -241,6 +249,12 @@ protected:
 
     std::string m_strInputText;
     std::string m_strCommand;
+
+    // Contains a saved copy of initial input text when navigating history entries
+    std::string m_strSavedInputText;
+
+    CEntryHistory* m_pInputHistory = new CEntryHistory(CHAT_INPUT_HISTORY_LENGTH);
+    int            m_iSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;
