@@ -1989,23 +1989,35 @@ void CMultiplayerSA::ResetSunSize()
     MemPut<BYTE>(0x55FA9F, 0x3C);
 }
 
-void CMultiplayerSA::SetCloudsEnabled(bool bDisabled)
+void CMultiplayerSA::SetCloudsEnabled(bool bEnabled)
 {
     // volumetric clouds
-    if (bDisabled)
+    if (bEnabled)
         MemPut<BYTE>(0x716380, 0xA1);
     else
         MemPut<BYTE>(0x716380, 0xC3);
 
     // bottom clouds
-    if (bDisabled)
+    if (bEnabled)
         MemPut<BYTE>(0x7154B0, 0x83);
     else
         MemPut<BYTE>(0x7154B0, 0xC3);
 
+    // skyline clouds
+    if (bEnabled)
+    {
+        MemPut<BYTE>(0x71411A, 0xD9);
+        MemPut<BYTE>(0x71411B, 0x41);
+        MemPut<BYTE>(0x71411C, 0x08);
+    }
+    else
+    {
+        MemSet((void*)0x71411A, 0x90, 3);
+    }
+
     // plane trails (not really clouds, but they're sort of vapour)
 
-    if (bDisabled)
+    if (bEnabled)
     {
         MemPut<BYTE>(0x717180, 0x83);
         MemPut<BYTE>(0x717181, 0xEC);
