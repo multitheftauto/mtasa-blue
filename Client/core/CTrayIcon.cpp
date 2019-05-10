@@ -49,7 +49,7 @@ bool CTrayIcon::CreateTrayIcon()
     wcDummy.lpfnWndProc = ProcessNotificationsWindowMessage;
     wcDummy.cbClsExtra = 0;
     wcDummy.cbWndExtra = 0;
-    wcDummy.hInstance = GetModuleHandle(NULL);
+    wcDummy.hInstance = g_hModule;
     wcDummy.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wcDummy.hCursor = LoadCursor(NULL, IDC_ARROW);
     wcDummy.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
@@ -60,12 +60,12 @@ bool CTrayIcon::CreateTrayIcon()
         return false;
 
     // Create dummy notifications window
-    m_pNID->hWnd = CreateWindowExW(0, TRAY_DUMMY_WINDOW_NAME, L"", 0, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, wcDummy.hInstance, NULL);
+    m_pNID->hWnd = CreateWindowExW(0, TRAY_DUMMY_WINDOW_NAME, L"", 0, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, g_hModule, NULL);
     if (m_pNID->hWnd != NULL)
         SetWindowLongPtrW(m_pNID->hWnd, 0, reinterpret_cast<LONG_PTR>(this));
     else
     {
-        UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, wcDummy.hInstance);
+        UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, g_hModule);
         return false;
     }
 
@@ -95,7 +95,7 @@ void CTrayIcon::DestroyTrayIcon()
     if (IsWindow(m_pNID->hWnd))
         DestroyWindow(m_pNID->hWnd);
 
-    UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, GetModuleHandle(NULL));
+    UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, g_hModule);
 }
 
 bool CTrayIcon::CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound)
