@@ -15,7 +15,10 @@ project "DirectXTex"
 	files {
 		"premake5.lua",
 		"*.h",
-		"*.cpp"
+		"BC.cpp", "BC4BC5.cpp", "BC6HBC7.cpp", "BCDirectCompute.cpp", "DirectXTexCompress.cpp", "DirectXTexCompressGPU.cpp", 
+		"DirectXTexConvert.cpp", "DirectXTexDDS.cpp", "DirectXTexFlipRotate.cpp", "DirectXTexHDR.cpp", "DirectXTexImage.cpp", 
+		"DirectXTexMipmaps.cpp", "DirectXTexMisc.cpp", "DirectXTexNormalMaps.cpp", "DirectXTexPMAlpha.cpp", "DirectXTexResize.cpp", 
+		"DirectXTexTGA.cpp", "DirectXTexUtil.cpp","DirectXTexWIC.cpp"
 	}
 	
 	filter "architecture:x64"
