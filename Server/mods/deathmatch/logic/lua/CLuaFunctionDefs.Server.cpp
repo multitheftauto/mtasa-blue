@@ -747,9 +747,12 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
 
     for (const auto& request : g_pGame->GetRemoteCalls()->GetCalls())
     {
-        lua_pushnumber(luaVM, ++iIndex);
-        lua_pushuserdata(luaVM, request);
-        lua_settable(luaVM, -3);
+        if (!pResource || request->GetVM() == pLuaMain)
+        {
+            lua_pushnumber(luaVM, ++iIndex);
+            lua_pushuserdata(luaVM, request);
+            lua_settable(luaVM, -3);
+        }
     }
 
     return 1;
