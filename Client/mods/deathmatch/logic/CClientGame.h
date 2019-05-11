@@ -484,6 +484,8 @@ private:
     void Event_OnIngame();
     void Event_OnIngameAndConnected();
 
+    void SetupGlobalLuaEvents();
+
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
     static void                              StaticFireHandler(CFire* pFire);
@@ -606,8 +608,6 @@ public:
     void                           SetFileCacheRoot();
     const char*                    GetFileCacheRoot() { return m_strFileCacheRoot; }
 
-    void                        CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
-                                                                std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
     void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
     void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
     std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);
@@ -835,6 +835,8 @@ private:
     SString           m_strFileCacheRoot;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+
+    ksignals::Delegate m_Delegate;
 
     // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
     std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;

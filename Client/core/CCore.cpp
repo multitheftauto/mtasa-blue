@@ -32,54 +32,6 @@ extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
 
-BOOL AC_RestrictAccess()
-{
-    EXPLICIT_ACCESS NewAccess;
-    PACL            pTempDacl;
-    HANDLE          hProcess;
-    DWORD           dwFlags;
-    DWORD           dwErr;
-
-    ///////////////////////////////////////////////
-    // Get the HANDLE to the current process.
-    hProcess = GetCurrentProcess();
-
-    ///////////////////////////////////////////////
-    // Setup which accesses we want to deny.
-    dwFlags = GENERIC_WRITE | PROCESS_ALL_ACCESS | WRITE_DAC | DELETE | WRITE_OWNER | READ_CONTROL;
-
-    ///////////////////////////////////////////////
-    // Build our EXPLICIT_ACCESS structure.
-    BuildExplicitAccessWithName(&NewAccess, "CURRENT_USER", dwFlags, DENY_ACCESS, NO_INHERITANCE);
-
-    ///////////////////////////////////////////////
-    // Create our Discretionary Access Control List.
-    if (ERROR_SUCCESS != (dwErr = SetEntriesInAcl(1, &NewAccess, NULL, &pTempDacl)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetEntriesInAcl(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Set the new DACL to our current process.
-    if (ERROR_SUCCESS != (dwErr = SetSecurityInfo(hProcess, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pTempDacl, NULL)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetSecurityInfo(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Free the DACL (see msdn on SetEntriesInAcl)
-    LocalFree(pTempDacl);
-    CloseHandle(hProcess);
-
-    return TRUE;
-}
-
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
@@ -87,10 +39,6 @@ CCore::CCore()
 {
     // Initialize the global pointer
     g_pCore = this;
-
-    #if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
-    AC_RestrictAccess();
-    #endif
 
     m_pConfigFile = NULL;
 
@@ -762,11 +710,6 @@ HWND CCore::GetHookedWindow()
 void CCore::HideMainMenu()
 {
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
-}
-
-void CCore::HideQuickConnect()
-{
-    m_pLocalGUI->GetMainMenu()->GetQuickConnectWindow()->SetVisible(false);
 }
 
 void CCore::ShowServerInfo(unsigned int WindowType)
