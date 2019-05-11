@@ -498,6 +498,13 @@ int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
 
+   
+    /*CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("C:\\Users\\danish\\Desktop\\gtaTxdDff\\Infernus\\infernus.txd", CBuffer());
+    pRenderWare->WriteTXD("C:\\Users\\danish\\Desktop\\gtaTxdDff\\Infernus\\infernus2.txd", pTxdDictionary);
+    */
+
+    
     std::vector <CTextureInfo> vecTexturesInfo;
 
     SString theDirPath = "C:\\Program Files (x86)\\NVIDIA Corporation\\Texture Atlas Tools\\DEMOS\\Direct3D9\\bin\\release\\";
@@ -508,6 +515,7 @@ int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
     vecTexturesInfo.emplace_back(CTextureInfo(theDirPath + "mtasa.png", 800, 600)); //mtasa.png
 
     auto pTextureInfo = g_pCore->CreateTextureAtlas(vecTexturesInfo);
+    
 
    /* argStream.ReadUserData(pEntity);
     argStream.ReadString(strInternalBlockName);

@@ -44,6 +44,10 @@ public:
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
     RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions);
 
+    bool WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary);
+
+    bool WriteDFF(const SString& strFilename, RpClump* pClump);
+
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
 

@@ -292,6 +292,44 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
     return pClump;
 }
 
+struct RwStreamMemory
+{
+    unsigned int   position;
+    unsigned int   nSize;
+    unsigned char *memBlock;
+};
+
+bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary)
+{
+    RwStream *result; // eax
+    RwStreamMemory *v3; // esi
+
+    result = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
+    v3 = (RwStreamMemory *)result;
+    if (!result)
+    {
+        return false;
+    }
+    RwTexDictionaryStreamWrite(pTxdDictionary, result);
+    result = (RwStream *)RwStreamClose((RwStream*)v3, 0);
+    return true;
+}
+
+bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
+{
+    auto RpClumpStreamWrite = (void (__cdecl*)(RpClump*, RwStream *))0x74AA10;
+
+    RwStream*  v2 = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, strFilename);
+    if (v2)
+    {
+       // v2->field_C.type = 0;
+        RpClumpStreamWrite(pClump, v2);
+        RwStreamClose(v2, 0);
+        return true;
+    }
+    return false;
+}
+
 //
 // Returns list of atomics inside a clump
 //
