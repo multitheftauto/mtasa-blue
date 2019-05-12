@@ -45,7 +45,7 @@ int CVoiceRecorder::BASSCallback(HRECORD handle, const void* buffer, DWORD lengt
     if (pVoiceRecorder->IsEnabled())
         pVoiceRecorder->SendFrame(buffer, length);
 
-    return 0;
+    return 1;
 }
 
 void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
