@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/Common.h
-*  PURPOSE:     Grand Theft Auto: San Andreas game definitions
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/Common.h
+ *  PURPOSE:     Grand Theft Auto: San Andreas game definitions
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __GAME_COMMON
-#define __GAME_COMMON
+#pragma once
 
 #include <windows.h>
 
@@ -30,11 +29,11 @@
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
 #define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
-#define MAX_RWOBJECT_INSTANCES              2500            
+#define MAX_RWOBJECT_INSTANCES              2500
 
 /**
  * Flags used to define weapon characteristics
- */ 
+ */
 // aiming options
 #define WEAPONTYPE_CANAIM           (0x000001)  // can auto target to aim
 #define WEAPONTYPE_CANAIMWITHARM    (0x000002)  // only needs arm to aim
@@ -58,19 +57,19 @@
 #define WEAPONTYPE_LONG_RELOAD_TIME (0x008000)  // force a longer reload time!
 
 // these are area effect/shot options
-#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  // 
-#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
+#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  //
+#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  //
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
-#define WEAPONTYPE_EXPANDS          (0x080000)  // 
+#define WEAPONTYPE_EXPANDS          (0x080000)  //
 
 enum eRadarSprite
-{  
+{
     RADAR_SPRITE_NONE = 0,
     RADAR_SPRITE_BORDER,
     RADAR_SPRITE_CENTRE,
     RADAR_SPRITE_MAP_HERE,
     RADAR_SPRITE_NORTH,
-    
+
     RADAR_SPRITE_AIRYARD,
     RADAR_SPRITE_GUN,
     RADAR_SPRITE_BARBERS,
@@ -132,7 +131,6 @@ enum eRadarSprite
     RADAR_SPRITE_SPRAY
 };
 
-
 enum eWantedLevelSA
 {
     WANTED_CLEAN = 0,
@@ -175,14 +173,14 @@ enum eSystemState
 typedef struct eControlStatesSA
 {
     DWORD dwFrontPad;
-    WORD wKeys1[19];
+    WORD  wKeys1[19];
     DWORD dwFrontPad2;
-    WORD wKeys2[19];
-    WORD wTurnLeftRightAnalog[10];
-    BYTE bytePadding1[138];
-    BYTE byteCrouchAnalog[5];
-    BYTE byteIncrementer;
-    BYTE bytePadding2[15];
+    WORD  wKeys2[19];
+    WORD  wTurnLeftRightAnalog[10];
+    BYTE  bytePadding1[138];
+    BYTE  byteCrouchAnalog[5];
+    BYTE  byteIncrementer;
+    BYTE  bytePadding2[15];
     DWORD dwKeyHeld;
 } eControlStatesSA;
 
@@ -251,7 +249,7 @@ enum eVehicleTypes
     VT_SKIMMER,
     VT_PCJ600,
     VT_FAGGIO,
-    VT_FREEWAY, 
+    VT_FREEWAY,
     VT_RCBARON,
     VT_RCRAIDER,
     VT_GLENDALE,
@@ -274,7 +272,7 @@ enum eVehicleTypes
     VT_CAMPER,
     VT_MARQUIS,
     VT_BAGGAGE,
-    VT_DOZER,   
+    VT_DOZER,
     VT_MAVERICK,
     VT_VCNMAV,
     VT_RANCHER,
@@ -568,7 +566,7 @@ enum eHandlingTypes
     HT_UTIL_TR1,
     HT_ROLLER,
     HT_BIKE,
-    HT_MOPED,
+    HT_PIZZABOY,
     HT_DIRTBIKE,
     HT_FCR900,
     HT_NRG500,
@@ -615,100 +613,108 @@ enum eHandlingTypes
     HT_RCBARON,
     HT_RCGOBLIN,
     HT_RCRAIDER,
+    HT_HOTRINA,
+    HT_HOTRINB,
+    HT_SADLSHIT,
+    HT_GLENSHIT,
+    HT_FAGGIO,
+    HT_FIRELA,
+    HT_RNCHLURE,
+    HT_FREIBOX,
     HT_MAX
 };
 
 enum VehHandlingFlags
 {
-    HF_1GEAR_BOOST              = 0x00000001,
-    HF_2GEAR_BOOST              = 0x00000002,
-    HF_NPC_ANTI_ROLL            = 0x00000004,
-    HF_NPC_NEUTRAL_HANDLING     = 0x00000008,
+    HF_1GEAR_BOOST = 0x00000001,
+    HF_2GEAR_BOOST = 0x00000002,
+    HF_NPC_ANTI_ROLL = 0x00000004,
+    HF_NPC_NEUTRAL_HANDLING = 0x00000008,
 
-    HF_NO_HANDBRAKE             = 0x00000010,
-    HF_STEER_REARWHEELS         = 0x00000020,
+    HF_NO_HANDBRAKE = 0x00000010,
+    HF_STEER_REARWHEELS = 0x00000020,
     HF_HANDBRAKE_REARWHEELSTEER = 0x00000040,
-    HF_ALT_STEERING_OPTION      = 0x00000080,
-    
-    HF_WHEEL_F_NARROW_X2        = 0x00000100,
-    HF_WHEEL_F_NARROW           = 0x00000200,
-    HF_WHEEL_F_WIDE             = 0x00000400,
-    HF_WHEEL_F_WIDE_X2          = 0x00000800,
-    
-    HF_WHEEL_R_NARROW_X2        = 0x00001000,
-    HF_WHEEL_R_NARROW           = 0x00002000,
-    HF_WHEEL_R_WIDE             = 0x00004000,
-    HF_WHEEL_R_WIDE_X2          = 0x00008000,
-    
-    HF_HYDRAULICS_GEOMETRY      = 0x00010000,
-    HF_HYDRAULICS_INSTALLED     = 0x00020000,
+    HF_ALT_STEERING_OPTION = 0x00000080,
+
+    HF_WHEEL_F_NARROW_X2 = 0x00000100,
+    HF_WHEEL_F_NARROW = 0x00000200,
+    HF_WHEEL_F_WIDE = 0x00000400,
+    HF_WHEEL_F_WIDE_X2 = 0x00000800,
+
+    HF_WHEEL_R_NARROW_X2 = 0x00001000,
+    HF_WHEEL_R_NARROW = 0x00002000,
+    HF_WHEEL_R_WIDE = 0x00004000,
+    HF_WHEEL_R_WIDE_X2 = 0x00008000,
+
+    HF_HYDRAULICS_GEOMETRY = 0x00010000,
+    HF_HYDRAULICS_INSTALLED = 0x00020000,
     HF_HYDRAULICS_NOT_AVAILABLE = 0x00040000,
-    HF_NOS_INSTALLED            = 0x00080000,
-    
-    HF_OFFROAD_ABILITIES        = 0x00100000,
-    HF_OFFROAD_ABILITIES_X2     = 0x00200000,
-    HF_HALOGEN_LIGHTS           = 0x00400000,
-    HF_PROCESS_REARWHEEL_1ST    = 0x00800000,
-    
-    HF_USE_TOPSPEED_LIMIT       = 0x01000000,
-    HF_LOW_RIDER                = 0x02000000,
-    HF_STREET_RACER             = 0x04000000,
-    
-    HF_SWINGING_CHASSIS         = 0x10000000,
-    
-    HF_LAST_AVAILABLE_FLAG      = 0x80000000
+    HF_NOS_INSTALLED = 0x00080000,
+
+    HF_OFFROAD_ABILITIES = 0x00100000,
+    HF_OFFROAD_ABILITIES_X2 = 0x00200000,
+    HF_HALOGEN_LIGHTS = 0x00400000,
+    HF_PROCESS_REARWHEEL_1ST = 0x00800000,
+
+    HF_USE_TOPSPEED_LIMIT = 0x01000000,
+    HF_LOW_RIDER = 0x02000000,
+    HF_STREET_RACER = 0x04000000,
+
+    HF_SWINGING_CHASSIS = 0x10000000,
+
+    HF_LAST_AVAILABLE_FLAG = 0x80000000
 };
 
 enum VehModelFlags
 {
-    MF_IS_VAN               = 0x00000001,
-    MF_IS_BUS               = 0x00000002,
-    MF_IS_LOW               = 0x00000004,
-    MF_IS_BIG               = 0x00000008,
+    MF_IS_VAN = 0x00000001,
+    MF_IS_BUS = 0x00000002,
+    MF_IS_LOW = 0x00000004,
+    MF_IS_BIG = 0x00000008,
 
-    MF_REVERSE_BONNET       = 0x00000010,
-    MF_HANGING_BOOT         = 0x00000020,
-    MF_TAILGATE_BOOT        = 0x00000040,
-    MF_NOSWING_BOOT         = 0x00000080,
-    
-    MF_NO_DOORS             = 0x00000100,
-    MF_TANDEM_SEATING       = 0x00000200,
-    MF_SIT_IN_BOAT          = 0x00000400,
-    MF_CONVERTIBLE          = 0x00000800,
-    
-    MF_NO_EXHAUST           = 0x00001000,
-    MF_DOUBLE_EXHAUST       = 0x00002000,
-    MF_NO_1STPERSON_LOOKBEHIND  = 0x00004000,
-    MF_FORCE_DOORS_CHECK    = 0x00008000,
-    
-    MF_AXLE_F_NOTILT        = 0x00010000,
-    MF_AXLE_F_SOLID         = 0x00020000,
-    MF_AXLE_F_MCPHERSON     = 0x00040000,
-    MF_AXLE_F_REVERSETILT   = 0x00080000,
-    
-    MF_AXLE_R_NOTILT        = 0x00100000,
-    MF_AXLE_R_SOLID         = 0x00200000,
-    MF_AXLE_R_MCPHERSON     = 0x00400000,
-    MF_AXLE_R_REVERSETILT   = 0x00800000,
-    
+    MF_REVERSE_BONNET = 0x00000010,
+    MF_HANGING_BOOT = 0x00000020,
+    MF_TAILGATE_BOOT = 0x00000040,
+    MF_NOSWING_BOOT = 0x00000080,
+
+    MF_NO_DOORS = 0x00000100,
+    MF_TANDEM_SEATING = 0x00000200,
+    MF_SIT_IN_BOAT = 0x00000400,
+    MF_CONVERTIBLE = 0x00000800,
+
+    MF_NO_EXHAUST = 0x00001000,
+    MF_DOUBLE_EXHAUST = 0x00002000,
+    MF_NO_1STPERSON_LOOKBEHIND = 0x00004000,
+    MF_FORCE_DOORS_CHECK = 0x00008000,
+
+    MF_AXLE_F_NOTILT = 0x00010000,
+    MF_AXLE_F_SOLID = 0x00020000,
+    MF_AXLE_F_MCPHERSON = 0x00040000,
+    MF_AXLE_F_REVERSETILT = 0x00080000,
+
+    MF_AXLE_R_NOTILT = 0x00100000,
+    MF_AXLE_R_SOLID = 0x00200000,
+    MF_AXLE_R_MCPHERSON = 0x00400000,
+    MF_AXLE_R_REVERSETILT = 0x00800000,
+
     // these are tempory, will be integrated into vehicle type (probably)
-    MF_IS_BIKE              = 0x01000000,
-    MF_IS_HELI              = 0x02000000,
-    MF_IS_PLANE             = 0x04000000,
-    MF_IS_BOAT              = 0x08000000,
-    
-    MF_NO_PANEL_BOUNCING    = 0x10000000,
-    MF_DOUBLE_REAR_WHEELS   = 0x20000000,
+    MF_IS_BIKE = 0x01000000,
+    MF_IS_HELI = 0x02000000,
+    MF_IS_PLANE = 0x04000000,
+    MF_IS_BOAT = 0x08000000,
+
+    MF_NO_PANEL_BOUNCING = 0x10000000,
+    MF_DOUBLE_REAR_WHEELS = 0x20000000,
     // this is a tempory flag to ensure ground clearance until the model gets changed
     MF_FORCE_GRND_CLEARANCE = 0x40000000,
-//  MF_SUICIDE_REAR_DOORS   = 0x80000000,
-    
-    MF_IS_HATCHBACK         = 0x80000000    // has window in boot that is pointing upwards (render order thing)
+    //  MF_SUICIDE_REAR_DOORS   = 0x80000000,
+
+    MF_IS_HATCHBACK = 0x80000000            // has window in boot that is pointing upwards (render order thing)
 };
 
 enum ePedModel
 {
-    GTAVC_PLAYER=0,
+    GTAVC_PLAYER = 0,
     GTAVC_COP_COP,
     GTAVC_COP_SWAT,
     GTAVC_COP_FBI,
@@ -837,14 +843,12 @@ enum ePedModel
     GTAVC_CIVMALE_SPECIAL21
 };
 
-
-
 /**
  * Use to refer to types of weather, most in CWeather
  */
 enum eWeather
 {
-    WEATHER_SUNNY=0,
+    WEATHER_SUNNY = 0,
     WEATHER_CLOUDY,
     WEATHER_RAINY,
     WEATHER_FOGGY,
@@ -860,8 +864,8 @@ enum e3DMarkerType
     MARKER3D_TUBE,
     MARKER3D_ARROW2,
     MARKER3D_TORUS,
-    MARKER3D_CONE, 
-    MARKER3D_CONE_NO_COLLISION, 
+    MARKER3D_CONE,
+    MARKER3D_CONE_NO_COLLISION,
     MARKER3D_NUM
 };
 
@@ -937,20 +941,20 @@ enum eMarkerSprite
 /**
  * Used to decide how the marker is displayed in-game and on the radar
  */
-enum eMarkerDisplay // R*'s eMARKER_DISPLAY
+enum eMarkerDisplay            // R*'s eMARKER_DISPLAY
 {
-    MARKER_DISPLAY_NEITHER=0,   //  BLIPDISPLAY_NEITHER
-    MARKER_DISPLAY_MARKERONLY,  //  BLIPDISPLAY_MARKERONLY
-    MARKER_DISPLAY_BLIPONLY,    //  MARKER_DISPLAY_BLIPONLY
-    MARKER_DISPLAY_BOTH         //  BLIPDISPLAY_BOTH
+    MARKER_DISPLAY_NEITHER = 0,            //  BLIPDISPLAY_NEITHER
+    MARKER_DISPLAY_MARKERONLY,             //  BLIPDISPLAY_MARKERONLY
+    MARKER_DISPLAY_BLIPONLY,               //  MARKER_DISPLAY_BLIPONLY
+    MARKER_DISPLAY_BOTH                    //  BLIPDISPLAY_BOTH
 };
 
 enum eMarkerType
 {
     MARKER_TYPE_UNUSED,
-    MARKER_TYPE_CAR, 
-    MARKER_TYPE_CHAR, 
-    MARKER_TYPE_OBJECT, 
+    MARKER_TYPE_CAR,
+    MARKER_TYPE_CHAR,
+    MARKER_TYPE_OBJECT,
     MARKER_TYPE_COORDS,
     MARKER_TYPE_CONTACT,
     MARKER_TYPE_SEARCHLIGHT,
@@ -960,7 +964,7 @@ enum eMarkerType
 
 enum eMarkerColor
 {
-    MARKER_COLOR_PLUM=0,
+    MARKER_COLOR_PLUM = 0,
     MARKER_COLOR_PALE_GREEN,
     MARKER_COLOR_PALE_BLUE,
     MARKER_COLOR_PALE_GREY,
@@ -975,34 +979,34 @@ enum eMarkerColor
 };
 
 enum ePickupState
-{  
-    PUSTATE_ON, 
-    PUSTATE_OFF 
+{
+    PUSTATE_ON,
+    PUSTATE_OFF
 };
 
 enum ePickupType
-{ 
-    PICKUP_NONE, 
-    PICKUP_IN_SHOP, 
-    PICKUP_ON_STREET, 
-    PICKUP_ONCE, 
-    PICKUP_ONCE_TIMEOUT, 
-    PICKUP_ONCE_TIMEOUT_SLOW, 
-    PICKUP_COLLECTABLE1, 
-    PICKUP_IN_SHOP_OUT_OF_STOCK, 
-    PICKUP_MONEY, 
-    PICKUP_MINE_INACTIVE, 
+{
+    PICKUP_NONE,
+    PICKUP_IN_SHOP,
+    PICKUP_ON_STREET,
+    PICKUP_ONCE,
+    PICKUP_ONCE_TIMEOUT,
+    PICKUP_ONCE_TIMEOUT_SLOW,
+    PICKUP_COLLECTABLE1,
+    PICKUP_IN_SHOP_OUT_OF_STOCK,
+    PICKUP_MONEY,
+    PICKUP_MINE_INACTIVE,
     PICKUP_MINE_ARMED,
-    PICKUP_NAUTICAL_MINE_INACTIVE, 
-    PICKUP_NAUTICAL_MINE_ARMED, 
-    PICKUP_FLOATINGPACKAGE, 
-    PICKUP_FLOATINGPACKAGE_FLOATING, 
-    PICKUP_ON_STREET_SLOW, 
-    PICKUP_ASSET_REVENUE, 
-    PICKUP_PROPERTY_LOCKED, 
-    PICKUP_PROPERTY_FORSALE, 
-    PICKUP_MONEY_DOESNTDISAPPEAR, 
-    PICKUP_SNAPSHOT, 
+    PICKUP_NAUTICAL_MINE_INACTIVE,
+    PICKUP_NAUTICAL_MINE_ARMED,
+    PICKUP_FLOATINGPACKAGE,
+    PICKUP_FLOATINGPACKAGE_FLOATING,
+    PICKUP_ON_STREET_SLOW,
+    PICKUP_ASSET_REVENUE,
+    PICKUP_PROPERTY_LOCKED,
+    PICKUP_PROPERTY_FORSALE,
+    PICKUP_MONEY_DOESNTDISAPPEAR,
+    PICKUP_SNAPSHOT,
     PICKUP_2P,
     PICKUP_ONCE_FOR_MISSION
 };
@@ -1041,9 +1045,9 @@ enum eEventType
     EVENT_ASSAULT_NASTYWEAPON,
     EVENT_ASSAULT_NASTYWEAPON_POLICE,
     // extra eventy - not strictly 'events' but used to notice interesting stuff
-    EVENT_ICECREAM,     /////
-    EVENT_ATM,          //  // queue for these 3
-    EVENT_SHOPSTALL,    /////
+    EVENT_ICECREAM,             /////
+    EVENT_ATM,                  //  // queue for these 3
+    EVENT_SHOPSTALL,            /////
     EVENT_SHOPWINDOW,
     EVENT_LAST_EVENT
 };
@@ -1057,89 +1061,89 @@ enum eEventEntityType
 
 enum eCoronaType
 {
-    CORONATYPE_SHINYSTAR, 
-    CORONATYPE_HEADLIGHT, 
-    CORONATYPE_MOON, 
-    CORONATYPE_REFLECTION, 
+    CORONATYPE_SHINYSTAR,
+    CORONATYPE_HEADLIGHT,
+    CORONATYPE_MOON,
+    CORONATYPE_REFLECTION,
     CORONATYPE_HEADLIGHTLINE,
-    CORONATYPE_HEX, 
-    CORONATYPE_CIRCLE, 
-    CORONATYPE_RING, 
-    CORONATYPE_STREAK, 
-    CORONATYPE_TORUS, 
+    CORONATYPE_HEX,
+    CORONATYPE_CIRCLE,
+    CORONATYPE_RING,
+    CORONATYPE_STREAK,
+    CORONATYPE_TORUS,
     CORONATYPE_NONE
 };
 
-enum eCoronaFlareTypeSA 
+enum eCoronaFlareTypeSA
 {
-    FLARETYPE_NONE, 
-    FLARETYPE_SUN, 
+    FLARETYPE_NONE,
+    FLARETYPE_SUN,
     FLARETYPE_HEADLIGHTS
 };
 
-enum eCoronaLosCheckSA // These should not be changed without changing stuff in ProcessLightsForEntity
+enum eCoronaLosCheckSA            // These should not be changed without changing stuff in ProcessLightsForEntity
 {
-    LOSCHECK_OFF = 0, 
+    LOSCHECK_OFF = 0,
     LOSCHECK_ON
-};  
+};
 
 enum eCoronaSpecialSA
 {
-    SPECIALCORONA_NONE, 
-    SPECIALCORONA_SUNCORE, 
-    SPECIALCORONA_SUNCORONA, 
+    SPECIALCORONA_NONE,
+    SPECIALCORONA_SUNCORE,
+    SPECIALCORONA_SUNCORONA,
     SPECIALCORONA_SUNMOON
 };
 
 enum eCoronaUnkSA
 {
-    CORREFL_NONE, 
+    CORREFL_NONE,
     CORREFL_SIMPLE
 };
 
 enum eCoronaTrailSA
 {
-    TRAIL_OFF, 
+    TRAIL_OFF,
     TRAIL_ON
 };
 
 enum ePedType
 {
-   PEDTYPE_PLAYER1=0,
-   PEDTYPE_PLAYER2,         // 2nd player in single player game (using 2nd pad)
-   PEDTYPE_PLAYER_NETWORK,      // Player controlled over the network (not by this machine)
-   PEDTYPE_PLAYER_UNUSED,      // Not used at the moment
-   PEDTYPE_CIVMALE,
-   PEDTYPE_CIVFEMALE,
-   PEDTYPE_COP,
-   PEDTYPE_GANG1,      //8bits
-   PEDTYPE_GANG2,
-   PEDTYPE_GANG3,
-   PEDTYPE_GANG4,
-   PEDTYPE_GANG5,
-   PEDTYPE_GANG6,
-   PEDTYPE_GANG7,
-   PEDTYPE_GANG8,
-   PEDTYPE_GANG9,      //16bits
-   PEDTYPE_GANG10,
-   PEDTYPE_DEALER,
-   PEDTYPE_MEDIC,
-   PEDTYPE_FIRE,
-   PEDTYPE_CRIMINAL,
-   PEDTYPE_BUM,
-   PEDTYPE_PROSTITUTE,
-   PEDTYPE_SPECIAL,   //24bits
-   PEDTYPE_MISSION1,
-   PEDTYPE_MISSION2,
-   PEDTYPE_MISSION3,
-   PEDTYPE_MISSION4,
-   PEDTYPE_MISSION5,
-   PEDTYPE_MISSION6,
-   PEDTYPE_MISSION7,
-   PEDTYPE_MISSION8,   //32bits
-   // WE'RE USING BIT-FLAGS FOR PED AQUANTANCES
-   // SO 32 IS THE MAX NUMBER OF PED TYPES WE CAN HAVE!!!!
-   PEDTYPE_LAST_PEDTYPE
+    PEDTYPE_PLAYER1 = 0,
+    PEDTYPE_PLAYER2,                   // 2nd player in single player game (using 2nd pad)
+    PEDTYPE_PLAYER_NETWORK,            // Player controlled over the network (not by this machine)
+    PEDTYPE_PLAYER_UNUSED,             // Not used at the moment
+    PEDTYPE_CIVMALE,
+    PEDTYPE_CIVFEMALE,
+    PEDTYPE_COP,
+    PEDTYPE_GANG1,            // 8bits
+    PEDTYPE_GANG2,
+    PEDTYPE_GANG3,
+    PEDTYPE_GANG4,
+    PEDTYPE_GANG5,
+    PEDTYPE_GANG6,
+    PEDTYPE_GANG7,
+    PEDTYPE_GANG8,
+    PEDTYPE_GANG9,            // 16bits
+    PEDTYPE_GANG10,
+    PEDTYPE_DEALER,
+    PEDTYPE_MEDIC,
+    PEDTYPE_FIRE,
+    PEDTYPE_CRIMINAL,
+    PEDTYPE_BUM,
+    PEDTYPE_PROSTITUTE,
+    PEDTYPE_SPECIAL,            // 24bits
+    PEDTYPE_MISSION1,
+    PEDTYPE_MISSION2,
+    PEDTYPE_MISSION3,
+    PEDTYPE_MISSION4,
+    PEDTYPE_MISSION5,
+    PEDTYPE_MISSION6,
+    PEDTYPE_MISSION7,
+    PEDTYPE_MISSION8,            // 32bits
+    // WE'RE USING BIT-FLAGS FOR PED AQUANTANCES
+    // SO 32 IS THE MAX NUMBER OF PED TYPES WE CAN HAVE!!!!
+    PEDTYPE_LAST_PEDTYPE
 };
 
 enum ePedState
@@ -1161,14 +1165,14 @@ enum ePedState
     PED_DUMMY,
     PED_PAUSE,
     PED_ATTACK,
-    PED_FIGHT,      // new close combat fist fight mode
+    PED_FIGHT,            // new close combat fist fight mode
     PED_FACE_PHONE,
     PED_MAKE_PHONECALL,
     PED_CHAT,
     PED_MUG,
     PED_AIMGUN,
     PED_AI_CONTROL,
-    PED_SEEK_CAR, //24
+    PED_SEEK_CAR,            // 24
     PED_SEEK_BOAT_POSITION,
     PED_FOLLOW_ROUTE,
     PED_CPR,
@@ -1180,9 +1184,9 @@ enum ePedState
     PED_SUNBATHE,
     PED_FLASH,
     PED_JOG,
-    PED_ANSWER_MOBILE,  
+    PED_ANSWER_MOBILE,
     PED_HANG_OUT,
-    PED_STATES_NO_AI, // only put states after here that do not require AI, put other ones before this  
+    PED_STATES_NO_AI,            // only put states after here that do not require AI, put other ones before this
     PED_ABSEIL_FROM_HELI,
     PED_SIT,
     PED_JUMP,
@@ -1190,11 +1194,11 @@ enum ePedState
     PED_GETUP,
     PED_STAGGER,
     PED_EVADE_DIVE,
-    PED_STATES_CAN_SHOOT, // only put states before here than ped can be shot during
-    PED_ENTER_TRAIN, 
+    PED_STATES_CAN_SHOOT,            // only put states before here than ped can be shot during
+    PED_ENTER_TRAIN,
     PED_EXIT_TRAIN,
     PED_ARREST_PLAYER,
-    PED_DRIVING, // 50
+    PED_DRIVING,            // 50
     PED_PASSENGER,
     PED_TAXI_PASSENGER,
     PED_OPEN_DOOR,
@@ -1208,22 +1212,22 @@ enum ePedState
     PED_HANDS_UP,
     PED_ARRESTED,
     PED_DEPLOY_STINGER,
-        
+
     PED_NUM_STATES
 };
 
 enum eMoveState
 {
-   PEDMOVE_NONE = 0,
-   PEDMOVE_STILL,
-   PEDMOVE_TURN_L,
-   PEDMOVE_TURN_R,
-   PEDMOVE_WALK,
-//#ifdef GTA_MIAMI            
-   PEDMOVE_JOG,   
-//#endif   
-   PEDMOVE_RUN,
-   PEDMOVE_SPRINT
+    PEDMOVE_NONE = 0,
+    PEDMOVE_STILL,
+    PEDMOVE_TURN_L,
+    PEDMOVE_TURN_R,
+    PEDMOVE_WALK,
+    //#ifdef GTA_MIAMI
+    PEDMOVE_JOG,
+    //#endif
+    PEDMOVE_RUN,
+    PEDMOVE_SPRINT
 };
 /*
 enum eMoveStateVC
@@ -1231,7 +1235,7 @@ enum eMoveStateVC
     PEDMOVE_NONE,
     PEDMOVE_STILL,
     PEDMOVE_WALK,
-    PEDMOVE_JOG,    
+    PEDMOVE_JOG,
     PEDMOVE_RUN,
     PEDMOVE_SPRINT,
     PEDMOVE_THROWN
@@ -1239,7 +1243,7 @@ enum eMoveStateVC
 
 enum eObjective
 {
-    NO_OBJ = 0,                         //0
+    NO_OBJ = 0,            // 0
     WAIT_ON_FOOT,
     WAIT_ON_FOOT_FOR_COP,
     FLEE_ON_FOOT_TILL_SAFE,
@@ -1249,8 +1253,8 @@ enum eObjective
     WAIT_IN_CAR_THEN_GET_OUT,
     KILL_CHAR_ON_FOOT,
     KILL_CHAR_ANY_MEANS,
-    FLEE_CHAR_ON_FOOT_TILL_SAFE,        //10
-    FLEE_CHAR_ON_FOOT_ALWAYS,           
+    FLEE_CHAR_ON_FOOT_TILL_SAFE,            // 10
+    FLEE_CHAR_ON_FOOT_ALWAYS,
     GOTO_CHAR_ON_FOOT,
     GOTO_CHAR_ON_FOOT_WALKING,
     HASSLE_CHAR,
@@ -1259,8 +1263,8 @@ enum eObjective
     ENTER_CAR_AS_PASSENGER,
     ENTER_CAR_AS_DRIVER,
     FOLLOW_CAR_IN_CAR,
-    FIRE_AT_OBJECT_FROM_VEHICLE,        //20
-    DESTROY_OBJECT,                     
+    FIRE_AT_OBJECT_FROM_VEHICLE,            // 20
+    DESTROY_OBJECT,
     DESTROY_CAR,
     GOTO_AREA_ANY_MEANS,
     GOTO_AREA_ON_FOOT,
@@ -1269,8 +1273,8 @@ enum eObjective
     FOLLOW_CAR_ON_FOOT_WITH_OFFSET,
     GUARD_ATTACK,
     SET_LEADER,
-    FOLLOW_ROUTE,                       //30
-    SOLICIT_VEHICLE,                            
+    FOLLOW_ROUTE,            // 30
+    SOLICIT_VEHICLE,
     HAIL_TAXI,
     CATCH_TRAIN,
     BUY_ICE_CREAM,
@@ -1279,26 +1283,26 @@ enum eObjective
     MUG_CHAR,
     LEAVE_CAR_AND_DIE,
     GOTO_SEAT_ON_FOOT,
-    GOTO_ATM_ON_FOOT,                   //40
-    FLEE_CAR,                           
+    GOTO_ATM_ON_FOOT,            // 40
+    FLEE_CAR,
     SUN_BATHE,
     GOTO_BUS_STOP_ON_FOOT,
     GOTO_PIZZA_ON_FOOT,
     GOTO_SHELTER_ON_FOOT,
     AIM_GUN_AT,
     WANDER,
-    WAIT_ON_FOOT_AT_SHELTER,          
-    SPRINT_TO_AREA,                     
-    KILL_CHAR_ON_BOAT,                  //50
+    WAIT_ON_FOOT_AT_SHELTER,
+    SPRINT_TO_AREA,
+    KILL_CHAR_ON_BOAT,            // 50
     SOLICIT_FOOT,
-    WAIT_ON_FOOT_AT_BUS_STOP,            
-    GOTO_ICE_CREAM_VAN_ON_FOOT,       
-    WAIT_ON_FOOT_AT_ICE_CREAM_VAN       //54
+    WAIT_ON_FOOT_AT_BUS_STOP,
+    GOTO_ICE_CREAM_VAN_ON_FOOT,
+    WAIT_ON_FOOT_AT_ICE_CREAM_VAN            // 54
 };
 
 enum eWaitState
 {
-    PEDWAIT_FALSE = 0,              //0
+    PEDWAIT_FALSE = 0,            // 0
     PEDWAIT_TRAFFIC_LIGHTS,
     PEDWAIT_CROSS_ROAD,
     PEDWAIT_CROSS_ROAD_LOOK,
@@ -1308,7 +1312,7 @@ enum eWaitState
     PEDWAIT_FACEOFF_GANG,
     PEDWAIT_DOUBLEBACK,
     PEDWAIT_HITWALL,
-    PEDWAIT_TURN180,                //10
+    PEDWAIT_TURN180,            // 10
     PEDWAIT_SURPRISE,
     PEDWAIT_STUCK,
     PEDWAIT_LOOK_ABOUT,
@@ -1318,7 +1322,7 @@ enum eWaitState
     PEDWAIT_PLAYANIM_HANDSUP,
     PEDWAIT_PLAYANIM_HANDSCOWER,
     PEDWAIT_PLAYANIM_CHAT,
-    PEDWAIT_FINISH_FLEE,            //20
+    PEDWAIT_FINISH_FLEE,            // 20
     PEDWAIT_SIT_DOWN,
     PEDWAIT_SIT_DOWN_RVRS,
     PEDWAIT_SIT_UP,
@@ -1328,12 +1332,12 @@ enum eWaitState
     PEDWAIT_SUN_BATHE_DOWN,
     PEDWAIT_SUN_BATHE_IDLE,
     PEDWAIT_RIOT,
-    PEDWAIT_FAST_FALL,              //30
-    PEDWAIT_BOMBER,                 
+    PEDWAIT_FAST_FALL,            // 30
+    PEDWAIT_BOMBER,
     PEDWAIT_STRIPPER,
     PEDWAIT_GROUND_ATTACK,
     PEDWAIT_LANCESITTING,
-    PEDWAIT_PLAYANIM_HANDSUP_SIMPLE //35
+    PEDWAIT_PLAYANIM_HANDSUP_SIMPLE            // 35
 };
 
 enum eTireState
@@ -1351,16 +1355,31 @@ enum ePedVehicleAction
 
 enum eInVehicleCameraMode
 {
-    IN_VEHICLE_CAMERA_MODE_CLOSE=1,
+    IN_VEHICLE_CAMERA_MODE_CLOSE = 1,
     IN_VEHICLE_CAMERA_MODE_MIDDLE,
     IN_VEHICLE_CAMERA_MODE_FAR,
     IN_VEHICLE_CAMERA_MODE_FIXED,
     IN_VEHICLE_CAMERA_MODE_CINEMATIC
 };
 
-enum {FADING_OUT=0, FADING_IN, NOT_FADING}; 
-enum {CLEAR_SCREEN=0, IN_MIDDLE_OF_FADING, DARK_SCREEN};
-enum {NO_ONE=0, SCRIPT_CAM_CONTROL, OBBE_CAM_CONTROL};
+enum
+{
+    FADING_OUT = 0,
+    FADING_IN,
+    NOT_FADING
+};
+enum
+{
+    CLEAR_SCREEN = 0,
+    IN_MIDDLE_OF_FADING,
+    DARK_SCREEN
+};
+enum
+{
+    NO_ONE = 0,
+    SCRIPT_CAM_CONTROL,
+    OBBE_CAM_CONTROL
+};
 
 enum eHandlingProperty
 {
@@ -1418,11 +1437,11 @@ enum eWeaponProperty
 
     WEAPON_MODEL,
     WEAPON_MODEL2,
-    
+
     WEAPON_SLOT,
 
     WEAPON_FIRE_OFFSET,
-    
+
     WEAPON_SKILL_LEVEL,
     WEAPON_REQ_SKILL_LEVEL,
 
@@ -1435,36 +1454,36 @@ enum eWeaponProperty
     WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME,
 
     WEAPON_ANIM_BREAKOUT_TIME,
-    
+
     WEAPON_SPEED,
     WEAPON_RADIUS,
-    
+
     WEAPON_AIM_OFFSET,
 
     WEAPON_DEFAULT_COMBO,
     WEAPON_COMBOS_AVAILABLE,
 
-    WEAPON_FLAG_AIM_NO_AUTO,                    // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
+    WEAPON_FLAG_AIM_NO_AUTO,            // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
     WEAPON_FLAG_FIRST = WEAPON_FLAG_AIM_NO_AUTO,
-    WEAPON_FLAG_AIM_ARM,                        // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
-    WEAPON_FLAG_AIM_1ST_PERSON,                 // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
-    WEAPON_FLAG_AIM_FREE,                       // 0x000008 - can only use free aiming      (ie country sniper/flame thrower/minigun/fire extinguisher)
-    WEAPON_FLAG_MOVE_AND_AIM,                   // 0x000010 - can move and aim at same time 
-    WEAPON_FLAG_MOVE_AND_SHOOT,                 // 0x000020 - can move and fire at same time 
+    WEAPON_FLAG_AIM_ARM,                   // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_AIM_1ST_PERSON,            // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
+    WEAPON_FLAG_AIM_FREE,                  // 0x000008 - can only use free aiming      (ie country sniper/flame thrower/minigun/fire extinguisher)
+    WEAPON_FLAG_MOVE_AND_AIM,              // 0x000010 - can move and aim at same time
+    WEAPON_FLAG_MOVE_AND_SHOOT,            // 0x000020 - can move and fire at same time
     WEAPON_FLAG_UNKNOWN_0040,
     WEAPON_FLAG_UNKNOWN_0080,
-    WEAPON_FLAG_TYPE_THROW,                     // 0x000100 - is a throwing weapon          (ie satchel)
-    WEAPON_FLAG_TYPE_HEAVY,                     // 0x000200 - heavy weapon - can't jump     (ie flame thrower/rpgs/minigun)
-    WEAPON_FLAG_TYPE_CONSTANT,                  // 0x000400 - fires every frame within loop (ie paint spray) 
-    WEAPON_FLAG_TYPE_DUAL,                      // 0x000800 - can use 2x guns at same time  (ie pistol/shotgun/tec9/uzi)
-    WEAPON_FLAG_ANIM_RELOAD,                    // 0x001000 - weapon has reload anims       (ie everything except shotgun/snipers/flame thrower/rpgs/minigun/satchel)
-    WEAPON_FLAG_ANIM_CROUCH,                    // 0x002000 - weapon has crouching anims    (ie everything except flame thrower/rpgs/minigun/satchel)
-    WEAPON_FLAG_ANIM_RELOAD_LOOP,               // 0x004000 - loop from end of reload to fire loop start
-    WEAPON_FLAG_ANIM_RELOAD_LONG,               // 0x008000 - force a longer reload time!   (ie rpgs/snipers)
-    WEAPON_FLAG_SHOT_SLOWS,                     // 0x010000 - slows down                    (ie flame thrower)
-    WEAPON_FLAG_SHOT_RAND_SPEED,                // 0x020000 - random speed                  (ie flame thrower)
-    WEAPON_FLAG_SHOT_ANIM_ABRUPT,               // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
-    WEAPON_FLAG_SHOT_EXPANDS,                   // 0x080000 - expands
+    WEAPON_FLAG_TYPE_THROW,               // 0x000100 - is a throwing weapon          (ie satchel)
+    WEAPON_FLAG_TYPE_HEAVY,               // 0x000200 - heavy weapon - can't jump     (ie flame thrower/rpgs/minigun)
+    WEAPON_FLAG_TYPE_CONSTANT,            // 0x000400 - fires every frame within loop (ie paint spray)
+    WEAPON_FLAG_TYPE_DUAL,                // 0x000800 - can use 2x guns at same time  (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_ANIM_RELOAD,              // 0x001000 - weapon has reload anims       (ie everything except shotgun/snipers/flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_CROUCH,              // 0x002000 - weapon has crouching anims    (ie everything except flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_RELOAD_LOOP,            // 0x004000 - loop from end of reload to fire loop start
+    WEAPON_FLAG_ANIM_RELOAD_LONG,            // 0x008000 - force a longer reload time!   (ie rpgs/snipers)
+    WEAPON_FLAG_SHOT_SLOWS,                  // 0x010000 - slows down                    (ie flame thrower)
+    WEAPON_FLAG_SHOT_RAND_SPEED,             // 0x020000 - random speed                  (ie flame thrower)
+    WEAPON_FLAG_SHOT_ANIM_ABRUPT,            // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
+    WEAPON_FLAG_SHOT_EXPANDS,                // 0x080000 - expands
     WEAPON_FLAG_LAST = WEAPON_FLAG_SHOT_EXPANDS,
 
     WEAPON_FIRE_ROTATION,
@@ -1499,4 +1518,32 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
-#endif
+enum eVehicleDummies
+{
+    LIGHT_FRONT_MAIN = 0,
+    LIGHT_REAR_MAIN,
+    LIGHT_FRONT_SECONDARY,
+    LIGHT_REAR_SECONDARY,
+    SEAT_FRONT,
+    SEAT_REAR,
+    EXHAUST,
+    ENGINE,
+    GAS_CAP,
+    TRAILER_ATTACH,
+    HAND_REST,
+    EXHAUST_SECONDARY,
+    WING_AIRTRAIL,
+    VEH_GUN,
+};
+
+enum eObjectProperty
+{
+    OBJECT_PROPERTY_ALL,
+    OBJECT_PROPERTY_MASS,
+    OBJECT_PROPERTY_TURNMASS,
+    OBJECT_PROPERTY_AIRRESISTANCE,
+    OBJECT_PROPERTY_ELASTICITY,
+    OBJECT_PROPERTY_CENTEROFMASS,
+    OBJECT_PROPERTY_BUOYANCY,
+    OBJECT_PROPERTY_MAX,
+};

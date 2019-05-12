@@ -1,33 +1,32 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CRegisteredCoronaSA.cpp
-*  PURPOSE:     Registered corona entity
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CRegisteredCoronaSA.cpp
+ *  PURPOSE:     Registered corona entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface * coronaInterface)
+CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {
     DEBUG_TRACE("CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface * coronaInterface)");
     internalInterface = coronaInterface;
 }
 
-CVector * CRegisteredCoronaSA::GetPosition()
+CVector* CRegisteredCoronaSA::GetPosition()
 {
     DEBUG_TRACE("CVector * CRegisteredCoronaSA::GetPosition()");
     return &internalInterface->Coordinates;
 }
 
-VOID CRegisteredCoronaSA::SetPosition(CVector * vector)
+VOID CRegisteredCoronaSA::SetPosition(CVector* vector)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetPosition(CVector * vector)");
-    MemCpyFast (&internalInterface->Coordinates, vector, sizeof(CVector));
+    MemCpyFast(&internalInterface->Coordinates, vector, sizeof(CVector));
 }
 
 FLOAT CRegisteredCoronaSA::GetSize()
@@ -66,7 +65,6 @@ VOID CRegisteredCoronaSA::SetPullTowardsCamera(FLOAT fPullTowardsCamera)
     internalInterface->PullTowardsCam = fPullTowardsCamera;
 }
 
-
 VOID CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)");
@@ -77,7 +75,7 @@ VOID CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)
     internalInterface->FadedIntensity = Alpha;
 }
 
-VOID CRegisteredCoronaSA::SetTexture(RwTexture * texture)
+VOID CRegisteredCoronaSA::SetTexture(RwTexture* texture)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(RwTexture * texture)");
     internalInterface->pTex = texture;
@@ -86,9 +84,9 @@ VOID CRegisteredCoronaSA::SetTexture(RwTexture * texture)
 VOID CRegisteredCoronaSA::SetTexture(eCoronaType texture)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(eCoronaType texture)");
-    CCoronasSA * coronas = ((CCoronasSA *)pGame->GetCoronas());
-    RwTexture * tex =  coronas->GetTexture(texture);
-    if(tex)
+    CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
+    RwTexture*  tex = coronas->GetTexture(texture);
+    if (tex)
         internalInterface->pTex = tex;
 }
 
@@ -119,6 +117,8 @@ VOID CRegisteredCoronaSA::Init(DWORD Identifier)
     DEBUG_TRACE("VOID CRegisteredCoronaSA::Init(DWORD Identifier)");
     internalInterface->Identifier = Identifier;
     this->SetSize(2.5f);
+    internalInterface->bIsAttachedToEntity = false;
+    internalInterface->pEntityAttachedTo = NULL;
     internalInterface->NormalAngle = 0.0f;
     internalInterface->Range = 450.0f;
     internalInterface->PullTowardsCam = 1.5f;
@@ -130,7 +130,7 @@ VOID CRegisteredCoronaSA::Init(DWORD Identifier)
     internalInterface->FlareType = 0;
     internalInterface->ReflectionType = 1;
     internalInterface->JustCreated = 1;
-    internalInterface->RegisteredThisFrame = 1; // won't appear in-game without this
+    internalInterface->RegisteredThisFrame = 1;            // won't appear in-game without this
 }
 
 VOID CRegisteredCoronaSA::Refresh()
@@ -142,5 +142,5 @@ VOID CRegisteredCoronaSA::Refresh()
 VOID CRegisteredCoronaSA::Disable()
 {
     internalInterface->Identifier = 0;
-   // internalInterface->Intensity = 0; // wasn't working before?
+    // internalInterface->Intensity = 0; // wasn't working before?
 }

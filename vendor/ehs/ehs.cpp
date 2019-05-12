@@ -40,12 +40,11 @@ static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
 int EHSServer::CreateFdSet ( )
 {
     MUTEX_LOCK ( m_oMutex );
-	// don't lock mutex, as it is only called from within a locked section
 
-	FD_ZERO( &m_oReadFds );
+	m_oReadFds.Reset();
 
 	// add the accepting FD	
-	FD_SET( m_poNetworkAbstraction->GetFd ( ), &m_oReadFds );
+	m_oReadFds.Add( m_poNetworkAbstraction->GetFd(), POLLIN );
 
 	int nHighestFd = m_poNetworkAbstraction->GetFd ( );
 
@@ -61,7 +60,7 @@ int EHSServer::CreateFdSet ( )
 			
 			EHS_TRACE ( "Adding %d to FD SET\n", nCurrentFd );
 
-			FD_SET ( nCurrentFd, &m_oReadFds );
+			m_oReadFds.Add( nCurrentFd, POLLIN );
 
 			// store the highest FD in the set to return it
 			if ( nCurrentFd > nHighestFd ) {
@@ -889,22 +888,9 @@ void EHSServer::HandleData ( int inTimeoutMilliseconds, ///< milliseconds for ti
 
 			MUTEX_UNLOCK ( m_oMutex );
 
-			// set up the timeout and normalize
-			timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
-			tv.tv_sec = tv.tv_usec / 1000000;
-			tv.tv_usec %= 1000000;
-
-			// create the FD set for select
-			int nHighestFd = CreateFdSet ( );			
-			
-			// call select
-			//fprintf ( stderr, "##### [%d] Calling select\n", inThreadId );
-			int nSocketCount = select ( nHighestFd + 1,
-										&m_oReadFds,
-										NULL,
-										NULL,
-										&tv );
-			//fprintf ( stderr, "##### [%d] Done calling select\n", inThreadId );
+			// create the FD set for poll
+			CreateFdSet();
+			int nSocketCount = poll( m_oReadFds.GetFdArray(), m_oReadFds.GetFdCount(), inTimeoutMilliseconds );
 
 			// handle select error
 #ifdef _WIN32
@@ -971,7 +957,7 @@ void EHSServer::CheckAcceptSocket ( )
 {
 
 	// see if we got data on this socket
-	if ( FD_ISSET ( m_poNetworkAbstraction->GetFd ( ), &m_oReadFds ) ) {
+	if ( m_oReadFds.IsSet( m_poNetworkAbstraction->GetFd(), POLLIN ) ) {
 		
 
         //printf ( "Accept new connection\n");
@@ -1031,7 +1017,7 @@ void EHSServer::CheckClientSockets ( )
 		  i != m_oEHSConnectionList.end ( );
 		  i++ ) {
 
-		if ( FD_ISSET ( (*i)->GetNetworkAbstraction ( )->GetFd ( ), &m_oReadFds ) ) {
+		if ( m_oReadFds.IsSet( (*i)->GetNetworkAbstraction()->GetFd(), POLLIN ) ) {
 
             if ( MUTEX_TRY_LOCK ( (*i)->m_oConnectionMutex ) == false )
                 continue;
@@ -1531,7 +1517,7 @@ ResponseCode EHS::HandleRequest ( HttpRequest * ipoHttpRequest,
 
 	// otherwise, just send back the current time
 	char psTime [ 20 ];
-	sprintf ( psTime, "%d", time ( NULL ) );
+	sprintf ( psTime, "%lld", time ( NULL ) );
 	ipoHttpResponse->SetBody ( psTime, strlen ( psTime ) );
 	return HTTPRESPONSECODE_200_OK;
 

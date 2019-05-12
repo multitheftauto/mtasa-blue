@@ -39,10 +39,8 @@
 #include "common/dwarf_cu_to_module.h"
 
 #include <assert.h>
-#if !defined(__ANDROID__)
-#include <cxxabi.h>
-#endif
 #include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include <algorithm>
@@ -140,7 +138,7 @@ DwarfCUToModule::FileContext::~FileContext() {
 }
 
 void DwarfCUToModule::FileContext::AddSectionToSectionMap(
-    const string& name, const char* contents, uint64 length) {
+    const string& name, const uint8_t *contents, uint64 length) {
   section_map_[name] = std::make_pair(contents, length);
 }
 
@@ -263,7 +261,7 @@ class DwarfCUToModule::GenericDIEHandler: public dwarf2reader::DIEHandler {
   uint64 offset_;
 
   // Place the name in the global set of strings. Even though this looks
-  // like a copy, all the major std::string implementations use reference
+  // like a copy, all the major string implementations use reference
   // counting internally, so the effect is to have all the data structures
   // share copies of strings whenever possible.
   // FIXME: Should this return something like a string_ref to avoid the
@@ -349,20 +347,22 @@ void DwarfCUToModule::GenericDIEHandler::ProcessAttributeString(
     case dwarf2reader::DW_AT_name:
       name_attribute_ = AddStringToPool(data);
       break;
-    case dwarf2reader::DW_AT_MIPS_linkage_name: {
-      char* demangled = NULL;
-      int status = -1;
-#if !defined(__ANDROID__)  // Android NDK doesn't provide abi::__cxa_demangle.
-      demangled = abi::__cxa_demangle(data.c_str(), NULL, NULL, &status);
-#endif
-      if (status != 0) {
-        cu_context_->reporter->DemangleError(data, status);
-        demangled_name_ = "";
-        break;
-      }
-      if (demangled) {
-        demangled_name_ = AddStringToPool(demangled);
-        free(reinterpret_cast<void*>(demangled));
+    case dwarf2reader::DW_AT_MIPS_linkage_name:
+    case dwarf2reader::DW_AT_linkage_name: {
+      string demangled;
+      Language::DemangleResult result =
+          cu_context_->language->DemangleName(data, &demangled);
+      switch (result) {
+        case Language::kDemangleSuccess:
+          demangled_name_ = AddStringToPool(demangled);
+          break;
+
+        case Language::kDemangleFailure:
+          cu_context_->reporter->DemangleError(data);
+          // fallthrough
+        case Language::kDontDemangle:
+          demangled_name_.clear();
+          break;
       }
       break;
     }
@@ -383,17 +383,17 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
     qualified_name = &specification_->qualified_name;
   }
 
-  const string *unqualified_name;
+  const string *unqualified_name = NULL;
   const string *enclosing_name;
   if (!qualified_name) {
-    // Find our unqualified name. If the DIE has its own DW_AT_name
-    // attribute, then use that; otherwise, check our specification.
-    if (name_attribute_.empty() && specification_)
-      unqualified_name = &specification_->unqualified_name;
-    else
+    // Find the unqualified name. If the DIE has its own DW_AT_name
+    // attribute, then use that; otherwise, check the specification.
+    if (!name_attribute_.empty())
       unqualified_name = &name_attribute_;
+    else if (specification_)
+      unqualified_name = &specification_->unqualified_name;
 
-    // Find the name of our enclosing context. If we have a
+    // Find the name of the enclosing context. If this DIE has a
     // specification, it's the specification's enclosing context that
     // counts; otherwise, use this DIE's context.
     if (specification_)
@@ -407,7 +407,7 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
   string return_value;
   if (qualified_name) {
     return_value = *qualified_name;
-  } else {
+  } else if (unqualified_name && enclosing_name) {
     // Combine the enclosing name and unqualified name to produce our
     // own fully-qualified name.
     return_value = cu_context_->language->MakeQualifiedName(*enclosing_name,
@@ -416,7 +416,8 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
 
   // If this DIE was marked as a declaration, record its names in the
   // specification table.
-  if (declaration_) {
+  if ((declaration_ && qualified_name) ||
+      (unqualified_name && enclosing_name)) {
     Specification spec;
     if (qualified_name) {
       spec.qualified_name = *qualified_name;
@@ -674,11 +675,10 @@ void DwarfCUToModule::WarningReporter::UnnamedFunction(uint64 offset) {
           filename_.c_str(), offset);
 }
 
-void DwarfCUToModule::WarningReporter::DemangleError(
-    const string &input, int error) {
+void DwarfCUToModule::WarningReporter::DemangleError(const string &input) {
   CUHeading();
-  fprintf(stderr, "%s: warning: failed to demangle %s with error %d\n",
-          filename_.c_str(), input.c_str(), error);
+  fprintf(stderr, "%s: warning: failed to demangle %s\n",
+          filename_.c_str(), input.c_str());
 }
 
 void DwarfCUToModule::WarningReporter::UnhandledInterCUReference(
@@ -759,6 +759,7 @@ dwarf2reader::DIEHandler *DwarfCUToModule::FindChildHandler(
     case dwarf2reader::DW_TAG_class_type:
     case dwarf2reader::DW_TAG_structure_type:
     case dwarf2reader::DW_TAG_union_type:
+    case dwarf2reader::DW_TAG_module:
       return new NamedScopeHandler(cu_context_.get(), child_context_.get(),
                                    offset);
     default:
@@ -770,6 +771,14 @@ void DwarfCUToModule::SetLanguage(DwarfLanguage language) {
   switch (language) {
     case dwarf2reader::DW_LANG_Java:
       cu_context_->language = Language::Java;
+      break;
+
+    case dwarf2reader::DW_LANG_Swift:
+      cu_context_->language = Language::Swift;
+      break;
+
+    case dwarf2reader::DW_LANG_Rust:
+      cu_context_->language = Language::Rust;
       break;
 
     // DWARF has no generic language code for assembly language; this is
@@ -814,7 +823,7 @@ void DwarfCUToModule::ReadSourceLines(uint64 offset) {
     cu_context_->reporter->MissingSection(".debug_line");
     return;
   }
-  const char *section_start = map_entry->second.first;
+  const uint8_t *section_start = map_entry->second.first;
   uint64 section_length = map_entry->second.second;
   if (offset >= section_length) {
     cu_context_->reporter->BadLineInfoOffset(offset);

@@ -1,4 +1,4 @@
-// fipstest.cpp - written and placed in the public domain by Wei Dai
+// fipstest.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 #include "config.h"
@@ -10,6 +10,7 @@
 #include "cryptlib.h"
 #include "filters.h"
 #include "smartptr.h"
+#include "pkcspad.h"
 #include "misc.h"
 
 // Simply disable CRYPTOPP_WIN32_AVAILABLE for Windows Phone and Windows Store apps
@@ -29,23 +30,24 @@
 #include <windows.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#ifdef _M_IX86
-#define _CRT_DEBUGGER_HOOK _crt_debugger_hook
-#else
-#define _CRT_DEBUGGER_HOOK __crt_debugger_hook
-#endif
-#if _MSC_VER < 1900
+# ifdef _M_IX86
+#  define _CRT_DEBUGGER_HOOK _crt_debugger_hook
+# else
+#  define _CRT_DEBUGGER_HOOK __crt_debugger_hook
+# endif
+# if _MSC_VER < 1900
 extern "C" {_CRTIMP void __cdecl _CRT_DEBUGGER_HOOK(int);}
-#else
+# else
 extern "C" {void __cdecl _CRT_DEBUGGER_HOOK(int); }
+# endif
 #endif
-#endif
-#endif
+#endif  // CRYPTOPP_WIN32_AVAILABLE
 
+#include <sstream>
 #include <iostream>
 
 #if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4100)
+# pragma warning(disable: 4100 4702)
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -54,12 +56,19 @@ extern PowerUpSelfTestStatus g_powerUpSelfTestStatus;
 SecByteBlock g_actualMac;
 unsigned long g_macFileLocation = 0;
 
+// $ grep -iIR baseaddress *.*proj
+// cryptdll.vcxproj:      <BaseAddress>0x42900000</BaseAddress>
+// cryptdll.vcxproj:      <BaseAddress>0x42900000</BaseAddress>
+// cryptdll.vcxproj:      <BaseAddress>0x42900000</BaseAddress>
+// cryptdll.vcxproj:      <BaseAddress>0x42900000</BaseAddress>
+const void* g_BaseAddressOfMAC = reinterpret_cast<void*>(0x42900000);
+
 // use a random dummy string here, to be searched/replaced later with the real MAC
 static const byte s_moduleMac[CryptoPP::HMAC<CryptoPP::SHA1>::DIGESTSIZE] = CRYPTOPP_DUMMY_DLL_MAC;
 CRYPTOPP_COMPILE_ASSERT(sizeof(s_moduleMac) == CryptoPP::SHA1::DIGESTSIZE);
 
 #ifdef CRYPTOPP_WIN32_AVAILABLE
-static HMODULE s_hModule = NULL;
+static HMODULE s_hModule = NULLPTR;
 #endif
 
 const byte * CRYPTOPP_API GetActualMacAndLocation(unsigned int &macSize, unsigned int &fileLocation)
@@ -82,13 +91,11 @@ void KnownAnswerTest(RandomNumberGenerator &rng, const char *output)
 
 template <class CIPHER>
 void X917RNG_KnownAnswerTest(
-	const char *key, 
-	const char *seed, 
+	const char *key,
+	const char *seed,
 	const char *deterministicTimeVector,
-	const char *output,
-	CIPHER *dummy = NULL)
+	const char *output)
 {
-	CRYPTOPP_UNUSED(dummy);
 #ifdef OS_RNG_AVAILABLE
 	std::string decodedKey, decodedSeed, decodedDeterministicTimeVector;
 	StringSource(key, true, new HexDecoder(new StringSink(decodedKey)));
@@ -119,17 +126,15 @@ void KnownAnswerTest(StreamTransformation &encryption, StreamTransformation &dec
 
 template <class CIPHER>
 void SymmetricEncryptionKnownAnswerTest(
-	const char *key, 
-	const char *hexIV, 
-	const char *plaintext, 
+	const char *key,
+	const char *hexIV,
+	const char *plaintext,
 	const char *ecb,
 	const char *cbc,
 	const char *cfb,
 	const char *ofb,
-	const char *ctr,
-	CIPHER *dummy = NULL)
+	const char *ctr)
 {
-	CRYPTOPP_UNUSED(dummy);
 	std::string decodedKey;
 	StringSource(key, true, new HexDecoder(new StringSink(decodedKey)));
 
@@ -162,17 +167,15 @@ void KnownAnswerTest(HashTransformation &hash, const char *message, const char *
 }
 
 template <class HASH>
-void SecureHashKnownAnswerTest(const char *message, const char *digest, HASH *dummy = NULL)
+void SecureHashKnownAnswerTest(const char *message, const char *digest)
 {
-	CRYPTOPP_UNUSED(dummy);
 	HASH hash;
 	KnownAnswerTest(hash, message, digest);
 }
 
 template <class MAC>
-void MAC_KnownAnswerTest(const char *key, const char *message, const char *digest, MAC *dummy = NULL)
+void MAC_KnownAnswerTest(const char *key, const char *message, const char *digest)
 {
-	CRYPTOPP_UNUSED(dummy);
 	std::string decodedKey;
 	StringSource(key, true, new HexDecoder(new StringSink(decodedKey)));
 
@@ -181,12 +184,11 @@ void MAC_KnownAnswerTest(const char *key, const char *message, const char *diges
 }
 
 template <class SCHEME>
-void SignatureKnownAnswerTest(const char *key, const char *message, const char *signature, SCHEME *dummy = NULL)
+void SignatureKnownAnswerTest(const char *key, const char *message, const char *signature)
 {
 	typename SCHEME::Signer signer(StringSource(key, true, new HexDecoder).Ref());
 	typename SCHEME::Verifier verifier(signer);
 
-	CRYPTOPP_UNUSED(dummy);
 	RandomPool rng;
 	EqualityComparisonFilter comparison;
 
@@ -196,7 +198,7 @@ void SignatureKnownAnswerTest(const char *key, const char *message, const char *
 	comparison.ChannelMessageSeriesEnd("0");
 	comparison.ChannelMessageSeriesEnd("1");
 
-	VerifierFilter verifierFilter(verifier, NULL, VerifierFilter::SIGNATURE_AT_BEGIN | VerifierFilter::THROW_EXCEPTION);
+	SignatureVerificationFilter verifierFilter(verifier, NULLPTR, SignatureVerificationFilter::SIGNATURE_AT_BEGIN | SignatureVerificationFilter::THROW_EXCEPTION);
 	StringSource(signature, true, new HexDecoder(new Redirector(verifierFilter, Redirector::DATA_ONLY)));
 	StringSource(message, true, new Redirector(verifierFilter));
 }
@@ -210,22 +212,22 @@ void EncryptionPairwiseConsistencyTest(const PK_Encryptor &encryptor, const PK_D
 		std::string ciphertext, decrypted;
 
 		StringSource(
-			testMessage, 
-			true, 
+			testMessage,
+			true,
 			new PK_EncryptorFilter(
-				rng, 
-				encryptor, 
+				rng,
+				encryptor,
 				new StringSink(ciphertext)));
 
 		if (ciphertext == testMessage)
 			throw 0;
 
 		StringSource(
-			ciphertext, 
-			true, 
+			ciphertext,
+			true,
 			new PK_DecryptorFilter(
-				rng, 
-				decryptor, 
+				rng,
+				decryptor,
 				new StringSink(decrypted)));
 
 		if (decrypted != testMessage)
@@ -244,12 +246,12 @@ void SignaturePairwiseConsistencyTest(const PK_Signer &signer, const PK_Verifier
 		RandomPool rng;
 
 		StringSource(
-			"test message", 
-			true, 
+			"test message",
+			true,
 			new SignerFilter(
-				rng, 
-				signer, 
-				new VerifierFilter(verifier, NULL, VerifierFilter::THROW_EXCEPTION),
+				rng,
+				signer,
+				new SignatureVerificationFilter(verifier, NULLPTR, SignatureVerificationFilter::THROW_EXCEPTION),
 				true));
 	}
 	catch (...)
@@ -259,12 +261,11 @@ void SignaturePairwiseConsistencyTest(const PK_Signer &signer, const PK_Verifier
 }
 
 template <class SCHEME>
-void SignaturePairwiseConsistencyTest(const char *key, SCHEME *dummy = NULL)
+void SignaturePairwiseConsistencyTest(const char *key)
 {
 	typename SCHEME::Signer signer(StringSource(key, true, new HexDecoder).Ref());
 	typename SCHEME::Verifier verifier(signer);
 
-	CRYPTOPP_UNUSED(dummy);
 	SignaturePairwiseConsistencyTest(signer, verifier);
 }
 
@@ -292,14 +293,15 @@ bool IntegrityCheckModule(const char *moduleFilename, const byte *expectedModule
 	std::ifstream moduleStream;
 
 #ifdef CRYPTOPP_WIN32_AVAILABLE
-	HMODULE h = NULL;
+	HMODULE h = NULLPTR;
 	{
-	char moduleFilenameBuf[MAX_PATH] = "";
-	if (moduleFilename == NULL)
+	const size_t FIPS_MODULE_MAX_PATH = 2*MAX_PATH;
+	char moduleFilenameBuf[FIPS_MODULE_MAX_PATH] = "";
+	if (moduleFilename == NULLPTR)
 	{
 #if (_MSC_VER >= 1400 && !defined(_STLPORT_VERSION))	// ifstream doesn't support wide filename on other compilers
-		wchar_t wideModuleFilename[MAX_PATH];
-		if (GetModuleFileNameW(s_hModule, wideModuleFilename, MAX_PATH) > 0)
+		wchar_t wideModuleFilename[FIPS_MODULE_MAX_PATH];
+		if (GetModuleFileNameW(s_hModule, wideModuleFilename, FIPS_MODULE_MAX_PATH) > 0)
 		{
 			moduleStream.open(wideModuleFilename, std::ios::in | std::ios::binary);
 			h = GetModuleHandleW(wideModuleFilename);
@@ -307,25 +309,41 @@ bool IntegrityCheckModule(const char *moduleFilename, const byte *expectedModule
 		else
 #endif
 		{
-			GetModuleFileNameA(s_hModule, moduleFilenameBuf, MAX_PATH);
+			GetModuleFileNameA(s_hModule, moduleFilenameBuf, FIPS_MODULE_MAX_PATH);
 			moduleFilename = moduleFilenameBuf;
 		}
 	}
 #endif
-	if (moduleFilename != NULL)
+	if (moduleFilename != NULLPTR)
 	{
 			moduleStream.open(moduleFilename, std::ios::in | std::ios::binary);
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 			h = GetModuleHandleA(moduleFilename);
-			moduleFilename = NULL;
+			moduleFilename = NULLPTR;
 	}
 #endif
 	}
 
+#ifdef CRYPTOPP_WIN32_AVAILABLE
+	if (h == g_BaseAddressOfMAC)
+	{
+		std::ostringstream oss;
+		oss << "Crypto++ DLL loaded at base address " << std::hex << h << ".\n";
+		OutputDebugStringA(oss.str().c_str());
+	}
+	else
+	{
+		std::ostringstream oss;
+		oss << "Crypto++ DLL integrity check may fail. Expected module base address is ";
+		oss << std::hex << g_BaseAddressOfMAC << ", but module loaded at " << h << ".\n";
+		OutputDebugStringA(oss.str().c_str());
+	}
+#endif
+
 	if (!moduleStream)
 	{
 #ifdef CRYPTOPP_WIN32_AVAILABLE
-		OutputDebugString("Crypto++ DLL integrity check failed. Cannot open file for reading.");
+		OutputDebugStringA("Crypto++ DLL integrity check failed. Cannot open file for reading.");
 #endif
 		return false;
 	}
@@ -383,7 +401,7 @@ bool IntegrityCheckModule(const char *moduleFilename, const byte *expectedModule
 					}
 				}
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && !(defined(_M_ARM) || defined(_M_ARM64))
 				// first byte of _CRT_DEBUGGER_HOOK gets modified in memory by the debugger invisibly, so read it from file
 				if (IsDebuggerPresent())
 				{
@@ -419,7 +437,7 @@ bool IntegrityCheckModule(const char *moduleFilename, const byte *expectedModule
 	// hash from disk instead
 	if (!VerifyBufsEqual(expectedModuleMac, actualMac, macSize))
 	{
-		OutputDebugString("In memory integrity check failed. This may be caused by debug breakpoints or DLL relocation.\n");
+		OutputDebugStringA("Crypto++ DLL in-memory integrity check failed. This may be caused by debug breakpoints or DLL relocation.\n");
 		moduleStream.clear();
 		moduleStream.seekg(0);
 		verifier.Initialize(MakeParameters(Name::OutputBuffer(), ByteArrayParameter(actualMac, (unsigned int)actualMac.size())));
@@ -438,7 +456,7 @@ bool IntegrityCheckModule(const char *moduleFilename, const byte *expectedModule
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 	std::string hexMac;
 	HexEncoder(new StringSink(hexMac)).PutMessageEnd(actualMac, actualMac.size());
-	OutputDebugString((("Crypto++ DLL integrity check failed. Actual MAC is: " + hexMac) + "\n").c_str());
+	OutputDebugStringA((("Crypto++ DLL integrity check failed. Actual MAC is: " + hexMac) + ".\n").c_str());
 #endif
 	return false;
 }
@@ -450,7 +468,7 @@ void DoPowerUpSelfTest(const char *moduleFilename, const byte *expectedModuleMac
 
 	try
 	{
-		if (FIPS_140_2_ComplianceEnabled() || expectedModuleMac != NULL)
+		if (FIPS_140_2_ComplianceEnabled() || expectedModuleMac != NULLPTR)
 		{
 			if (!IntegrityCheckModule(moduleFilename, expectedModuleMac, &g_actualMac, &g_macFileLocation))
 				throw 0;	// throw here so we break in the debugger, this will be caught right away
@@ -492,16 +510,16 @@ void DoPowerUpSelfTest(const char *moduleFilename, const byte *expectedModuleMac
 			"7649abac8119b246cee98e9b12e9197d5086cb9b507219ee95db113a917678b273bed6b8e3c1743b7116e69e222295163ff1caa1681fac09120eca307586e1a7",	// cbc
 			"3b3fd92eb72dad20333449f8e83cfb4ac8a64537a0b3a93fcde3cdad9f1ce58b26751f67a3cbb140b1808cf187a4f4dfc04b05357c5d1c0eeac4c66f9ff7f2e6", // cfb
 			"3b3fd92eb72dad20333449f8e83cfb4a7789508d16918f03f53c52dac54ed8259740051e9c5fecf64344f7a82260edcc304c6528f659c77866a510d9c1d6ae5e", // ofb
-			NULL);
+			NULLPTR);
 
 		SymmetricEncryptionKnownAnswerTest<AES>(
 			"2b7e151628aed2a6abf7158809cf4f3c",
 			"f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
 			"6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710",
-			NULL,
-			NULL,
-			NULL,
-			NULL,
+			NULLPTR,
+			NULLPTR,
+			NULLPTR,
+			NULLPTR,
 			"874d6191b620e3261bef6864990db6ce9806f66b7970fdff8617187bb9fffdff5ae4df3edbd5d35e5b4f09020db03eab1e031dda2fbe03d1792170a0f3009cee"); // ctr
 
 
@@ -530,7 +548,7 @@ void DoPowerUpSelfTest(const char *moduleFilename, const byte *expectedModuleMac
 			"Sample #2",
 			"0922d3405faa3d194f82a45830737d5cc6c75d24");
 
-		const char *keyRSA1 = 
+		const char *keyRSA1 =
 			"30820150020100300d06092a864886f70d01010105000482013a3082013602010002400a66791dc6988168de7ab77419bb7fb0"
 			"c001c62710270075142942e19a8d8c51d053b3e3782a1de5dc5af4ebe99468170114a1dfe67cdc9a9af55d655620bbab0203010001"
 			"02400123c5b61ba36edb1d3679904199a89ea80c09b9122e1400c09adcf7784676d01d23356a7d44d6bd8bd50e94bfc723fa"
@@ -598,7 +616,7 @@ done:
 
 void DoDllPowerUpSelfTest()
 {
-	CryptoPP::DoPowerUpSelfTest(NULL, s_moduleMac);
+	CryptoPP::DoPowerUpSelfTest(NULLPTR, s_moduleMac);
 }
 
 #else
@@ -615,8 +633,8 @@ NAMESPACE_END
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 
 // DllMain needs to be in the global namespace
-BOOL APIENTRY DllMain(HANDLE hModule, 
-                      DWORD  dwReason, 
+BOOL APIENTRY DllMain(HANDLE hModule,
+                      DWORD  dwReason,
                       LPVOID /*lpReserved*/)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)

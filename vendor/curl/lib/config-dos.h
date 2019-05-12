@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -40,8 +40,10 @@
 #define PACKAGE  "curl"
 
 #define HAVE_ARPA_INET_H       1
+#define HAVE_ASSERT_H          1
 #define HAVE_ERRNO_H           1
 #define HAVE_FCNTL_H           1
+#define HAVE_FREEADDRINFO      1
 #define HAVE_GETADDRINFO       1
 #define HAVE_GETNAMEINFO       1
 #define HAVE_GETPROTOBYNAME    1
@@ -51,7 +53,6 @@
 #define HAVE_IOCTL_FIONBIO     1
 #define HAVE_IOCTLSOCKET       1
 #define HAVE_IOCTLSOCKET_FIONBIO   1
-#define HAVE_LIMITS_H          1
 #define HAVE_LOCALE_H          1
 #define HAVE_LONGLONG          1
 #define HAVE_MEMORY_H          1
@@ -69,7 +70,6 @@
 #define HAVE_SETMODE           1
 #define HAVE_SIGNAL            1
 #define HAVE_SOCKET            1
-#define HAVE_SPNEGO            1
 #define HAVE_STRDUP            1
 #define HAVE_STRICMP           1
 #define HAVE_STRTOLL           1
@@ -86,9 +86,11 @@
 
 #define RETSIGTYPE             void
 #define SIZEOF_INT             4
+#define SIZEOF_LONG            4
 #define SIZEOF_LONG_DOUBLE     16
 #define SIZEOF_SHORT           2
 #define SIZEOF_SIZE_T          4
+#define SIZEOF_CURL_OFF_T      4
 #define STDC_HEADERS           1
 #define TIME_WITH_SYS_TIME     1
 
@@ -133,12 +135,11 @@
   #define HAVE_LIBZ              1
 #endif
 
-/* USE_SSLEAY on cmd-line */
-#ifdef USE_SSLEAY
+/* USE_OPENSSL on cmd-line */
+#ifdef USE_OPENSSL
   #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
   #define HAVE_OPENSSL_ENGINE_H  1
   #define OPENSSL_NO_KRB5        1
-  #define USE_OPENSSL            1
 #endif
 
 /* to disable LDAP */
@@ -164,11 +165,6 @@
   #define HAVE_TERMIOS_H  1
   #define HAVE_VARIADIC_MACROS_GCC 1
 
-  /* Because djgpp <= 2.03 doesn't have snprintf() etc. */
-  #if (DJGPP_MINOR < 4)
-    #define _MPRINTF_REPLACE
-  #endif
-
 #elif defined(__WATCOMC__)
   #define HAVE_STRCASECMP 1
 
@@ -185,4 +181,3 @@
 #undef byte
 
 #endif /* HEADER_CURL_CONFIG_DOS_H */
-

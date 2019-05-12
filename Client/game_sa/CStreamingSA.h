@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CStreamingSA.h
-*  PURPOSE:     Header file for data streamer class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CStreamingSA.h
+ *  PURPOSE:     Header file for data streamer class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CStreamingSA_H
-#define __CStreamingSA_H
+#pragma once
 
 #include <game/CStreaming.h>
 #include "Common.h"
@@ -25,10 +23,8 @@
 class CStreamingSA : public CStreaming
 {
 public:
-    void            RequestModel                    ( DWORD dwModelID, DWORD dwFlags );
-    void            LoadAllRequestedModels          ( BOOL bOnlyPriorityModels = 0, const char* szTag = NULL );
-    BOOL            HasModelLoaded                  ( DWORD dwModelID );
-    void            RequestSpecialModel             ( DWORD model, const char * szTexture, DWORD channel );
+    void RequestModel(DWORD dwModelID, DWORD dwFlags);
+    void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
+    BOOL HasModelLoaded(DWORD dwModelID);
+    void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
 };
-
-#endif

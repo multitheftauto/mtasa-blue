@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.cpp
-*  PURPOSE:
-*  DEVELOPERS:  xidiot
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.cpp
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -18,14 +16,14 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::PostConstruct ( CRenderItemManager* pManager )
+void CRenderItem::PostConstruct(CRenderItemManager* pManager, bool bIncludeInMemoryStats)
 {
     m_pManager = pManager;
     m_pDevice = pManager->m_pDevice;
     m_iRefCount = 1;
-    m_pManager->NotifyContructRenderItem ( this );
+    m_bIncludeInMemoryStats = bIncludeInMemoryStats;
+    m_pManager->NotifyContructRenderItem(this);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -34,11 +32,10 @@ void CRenderItem::PostConstruct ( CRenderItemManager* pManager )
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItem::~CRenderItem ( void )
+CRenderItem::~CRenderItem()
 {
-    assert ( m_iRefCount == 0 );
+    assert(m_iRefCount == 0);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -47,12 +44,11 @@ CRenderItem::~CRenderItem ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::PreDestruct ( void )
+void CRenderItem::PreDestruct()
 {
-    assert ( m_iRefCount == 0 );
-    m_pManager->NotifyDestructRenderItem ( this );
+    assert(m_iRefCount == 0);
+    m_pManager->NotifyDestructRenderItem(this);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -61,16 +57,15 @@ void CRenderItem::PreDestruct ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::Release ( void )
+void CRenderItem::Release()
 {
-    assert ( m_iRefCount > 0 );
-    if ( --m_iRefCount > 0 )
+    assert(m_iRefCount > 0);
+    if (--m_iRefCount > 0)
         return;
 
-    PreDestruct ();
+    PreDestruct();
     delete this;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -79,8 +74,8 @@ void CRenderItem::Release ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::AddRef ( void )
+void CRenderItem::AddRef()
 {
-    assert ( m_iRefCount > 0 );
+    assert(m_iRefCount > 0);
     ++m_iRefCount;
 }

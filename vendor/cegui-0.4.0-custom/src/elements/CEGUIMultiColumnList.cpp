@@ -1866,7 +1866,7 @@ void MultiColumnList::populateRenderCache()
 
                 // Leave a gap between columns
                 if ( !item->isSelected() && j < getColumnCount() - 1 )
-                    itemClipper.setWidth( Max ( 0.f, itemClipper.getWidth() - 5 ) );
+                    itemClipper.setWidth( std::max ( 0.f, itemClipper.getWidth() - 5 ) );
 
                 // skip this item if totally clipped
                 if (itemClipper.getWidth() == 0)

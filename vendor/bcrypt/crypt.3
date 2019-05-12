@@ -1,0 +1,575 @@
+.\" Written and revised by Solar Designer <solar at openwall.com> in 2000-2011.
+.\" No copyright is claimed, and this man page is hereby placed in the public
+.\" domain.  In case this attempt to disclaim copyright and place the man page
+.\" in the public domain is deemed null and void, then the man page is
+.\" Copyright (c) 2000-2011 Solar Designer and it is hereby released to the
+.\" general public under the following terms:
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted.
+.\"
+.\" There's ABSOLUTELY NO WARRANTY, express or implied.
+.\"
+.\" This manual page in its current form is intended for use on systems
+.\" based on the GNU C Library with crypt_blowfish patched into libcrypt.
+.\"
+.TH CRYPT 3 "July 7, 2014" "Openwall Project" "Library functions"
+.ad l
+.\" No macros in NAME to keep makewhatis happy.
+.SH NAME
+\fBcrypt\fR, \fBcrypt_r\fR, \fBcrypt_rn\fR, \fBcrypt_ra\fR,
+\fBcrypt_gensalt\fR, \fBcrypt_gensalt_rn\fR, \fBcrypt_gensalt_ra\fR
+\- password hashing
+.SH SYNOPSIS
+.B #define _XOPEN_SOURCE
+.br
+.B #include <unistd.h>
+.sp
+.in +8
+.ti -8
+.BI "char *crypt(const char *" key ", const char *" setting );
+.in -8
+.sp
+.B #define _GNU_SOURCE
+.br
+.B #include <crypt.h>
+.sp
+.in +8
+.ti -8
+.BI "char *crypt_r(const char *" key ", const char *" setting ", struct crypt_data *" data );
+.in -8
+.sp
+.B #define _OW_SOURCE
+.br
+.B #include <crypt.h>
+.sp
+.in +8
+.ti -8
+.BI "char *crypt_rn(const char *" key ", const char *" setting ", void *" data ", int " size );
+.ti -8
+.BI "char *crypt_ra(const char *" key ", const char *" setting ", void **" data ", int *" size );
+.ti -8
+.BI "char *crypt_gensalt(const char *" prefix ", unsigned long " count ", const char *" input ", int " size );
+.ti -8
+.BI "char *crypt_gensalt_rn(const char *" prefix ", unsigned long " count ", const char *" input ", int " size ", char *" output ", int " output_size );
+.ti -8
+.BI "char *crypt_gensalt_ra(const char *" prefix ", unsigned long " count ", const char *" input ", int " size );
+.ad b
+.de crypt
+.BR crypt ,
+.BR crypt_r ,
+.BR crypt_rn ", \\$1"
+.ie "\\$2"" .B crypt_ra
+.el .BR crypt_ra "\\$2"
+..
+.de crypt_gensalt
+.BR crypt_gensalt ,
+.BR crypt_gensalt_rn ", \\$1"
+.ie "\\$2"" .B crypt_gensalt_ra
+.el .BR crypt_gensalt_ra "\\$2"
+..
+.SH DESCRIPTION
+The
+.crypt and
+functions calculate a cryptographic hash function of
+.I key
+with one of a number of supported methods as requested with
+.IR setting ,
+which is also used to pass a salt and possibly other parameters to
+the chosen method.
+The hashing methods are explained below.
+.PP
+Unlike
+.BR crypt ,
+the functions
+.BR crypt_r ,
+.BR crypt_rn " and"
+.B crypt_ra
+are reentrant.
+They place their result and possibly their private data in a
+.I data
+area of
+.I size
+bytes as passed to them by an application and/or in memory they
+allocate dynamically.  Some hashing algorithms may use the data area to
+cache precomputed intermediate values across calls.  Thus, applications
+must properly initialize the data area before its first use.
+.B crypt_r
+requires that only
+.I data->initialized
+be reset to zero;
+.BR crypt_rn " and " crypt_ra
+require that either the entire data area is zeroed or, in the case of
+.BR crypt_ra ,
+.I *data
+is NULL.  When called with a NULL
+.I *data
+or insufficient
+.I *size
+for the requested hashing algorithm,
+.B crypt_ra
+uses
+.BR realloc (3)
+to allocate the required amount of memory dynamically.  Thus,
+.B crypt_ra
+has the additional requirement that
+.IR *data ,
+when non-NULL, must point to an area allocated either with a previous
+call to
+.B crypt_ra
+or with a
+.BR malloc (3)
+family call.
+The memory allocated by
+.B crypt_ra
+should be freed with
+.BR free "(3)."
+.PP
+The
+.crypt_gensalt and
+functions compile a string for use as
+.I setting
+\- with the given
+.I prefix
+(used to choose a hashing method), the iteration
+.I count
+(if supported by the chosen method) and up to
+.I size
+cryptographically random
+.I input
+bytes for use as the actual salt.
+If
+.I count
+is 0, a low default will be picked.
+The random bytes may be obtained from
+.BR /dev/urandom .
+Unlike
+.BR crypt_gensalt ,
+the functions
+.BR crypt_gensalt_rn " and " crypt_gensalt_ra
+are reentrant.
+.B crypt_gensalt_rn
+places its result in the
+.I output
+buffer of
+.I output_size
+bytes.
+.B crypt_gensalt_ra
+allocates memory for its result dynamically.  The memory should be
+freed with
+.BR free "(3)."
+.SH RETURN VALUE
+Upon successful completion, the functions
+.crypt and
+return a pointer to a string containing the setting that was actually used
+and a printable encoding of the hash function value.
+The entire string is directly usable as
+.I setting
+with other calls to
+.crypt and
+and as
+.I prefix
+with calls to
+.crypt_gensalt and .
+.PP
+The behavior of
+.B crypt
+on errors isn't well standardized.  Some implementations simply can't fail
+(unless the process dies, in which case they obviously can't return),
+others return NULL or a fixed string.  Most implementations don't set
+.IR errno ,
+but some do.  SUSv2 specifies only returning NULL and setting
+.I errno
+as a valid behavior, and defines only one possible error
+.RB "(" ENOSYS ,
+"The functionality is not supported on this implementation.")
+Unfortunately, most existing applications aren't prepared to handle
+NULL returns from
+.BR crypt .
+The description below corresponds to this implementation of
+.BR crypt " and " crypt_r
+only, and to
+.BR crypt_rn " and " crypt_ra .
+The behavior may change to match standards, other implementations or
+existing applications.
+.PP
+.BR crypt " and " crypt_r
+may only fail (and return) when passed an invalid or unsupported
+.IR setting ,
+in which case they return a pointer to a magic string that is
+shorter than 13 characters and is guaranteed to differ from
+.IR setting .
+This behavior is safe for older applications which assume that
+.B crypt
+can't fail, when both setting new passwords and authenticating against
+existing password hashes.
+.BR crypt_rn " and " crypt_ra
+return NULL to indicate failure.  All four functions set
+.I errno
+when they fail.
+.PP
+The functions
+.crypt_gensalt and
+return a pointer to the compiled string for
+.IR setting ,
+or NULL on error in which case
+.I errno
+is set.
+.SH ERRORS
+.TP
+.B EINVAL
+.crypt "" :
+.I setting
+is invalid or not supported by this implementation;
+.sp
+.crypt_gensalt "" :
+.I prefix
+is invalid or not supported by this implementation;
+.I count
+is invalid for the requested
+.IR prefix ;
+the input
+.I size
+is insufficient for the smallest valid salt with the requested
+.IR prefix ;
+.I input
+is NULL.
+.TP
+.B ERANGE
+.BR crypt_rn :
+the provided data area
+.I size
+is insufficient for the requested hashing algorithm;
+.sp
+.BR crypt_gensalt_rn :
+.I output_size
+is too small to hold the compiled
+.I setting
+string.
+.TP
+.B ENOMEM
+.B crypt
+(original glibc only):
+failed to allocate memory for the output buffer (which subsequent calls
+would re-use);
+.sp
+.BR crypt_ra :
+.I *data
+is NULL or
+.I *size
+is insufficient for the requested hashing algorithm and
+.BR realloc (3)
+failed;
+.sp
+.BR crypt_gensalt_ra :
+failed to allocate memory for the compiled
+.I setting
+string.
+.TP
+.B ENOSYS
+.B crypt
+(SUSv2):
+the functionality is not supported on this implementation;
+.sp
+.BR crypt ,
+.B crypt_r
+(glibc 2.0 to 2.0.1 only):
+.de no-crypt-add-on
+the crypt add-on is not compiled in and
+.I setting
+requests something other than the MD5-based algorithm.
+..
+.no-crypt-add-on
+.TP
+.B EOPNOTSUPP
+.BR crypt ,
+.B crypt_r
+(glibc 2.0.2 to 2.1.3 only):
+.no-crypt-add-on
+.SH HASHING METHODS
+The implemented hashing methods are intended specifically for processing
+user passwords for storage and authentication;
+they are at best inefficient for most other purposes.
+.PP
+It is important to understand that password hashing is not a replacement
+for strong passwords.
+It is always possible for an attacker with access to password hashes
+to try guessing candidate passwords against the hashes.
+There are, however, certain properties a password hashing method may have
+which make these key search attacks somewhat harder.
+.PP
+All of the hashing methods use salts such that the same
+.I key
+may produce many possible hashes.
+Proper use of salts may defeat a number of attacks, including:
+.TP
+1.
+The ability to try candidate passwords against multiple hashes at the
+price of one.
+.TP
+2.
+The use of pre-hashed lists of candidate passwords.
+.TP
+3.
+The ability to determine whether two users (or two accounts of one user)
+have the same or different passwords without actually having to guess
+one of the passwords.
+.PP
+The key search attacks depend on computing hashes of large numbers of
+candidate passwords.
+Thus, the computational cost of a good password hashing method must be
+high \- but of course not too high to render it impractical.
+.PP
+All hashing methods implemented within the
+.crypt and
+interfaces use multiple iterations of an underlying cryptographic
+primitive specifically in order to increase the cost of trying a
+candidate password.
+Unfortunately, due to hardware improvements, the hashing methods which
+have a fixed cost become increasingly less secure over time.
+.PP
+In addition to salts, modern password hashing methods accept a variable
+iteration
+.IR count .
+This makes it possible to adapt their cost to the hardware improvements
+while still maintaining compatibility.
+.PP
+The following hashing methods are or may be implemented within the
+described interfaces:
+.PP
+.de hash
+.ad l
+.TP
+.I prefix
+.ie "\\$1"" \{\
+"" (empty string);
+.br
+a string matching ^[./0-9A-Za-z]{2} (see
+.BR regex (7))
+.\}
+.el "\\$1"
+.TP
+.B Encoding syntax
+\\$2
+.TP
+.B Maximum password length
+\\$3 (uses \\$4-bit characters)
+.TP
+.B Effective key size
+.ie "\\$5"" limited by the hash size only
+.el up to \\$5 bits
+.TP
+.B Hash size
+\\$6 bits
+.TP
+.B Salt size
+\\$7 bits
+.TP
+.B Iteration count
+\\$8
+.ad b
+..
+.ti -2
+.B Traditional DES-based
+.br
+This method is supported by almost all implementations of
+.BR crypt .
+Unfortunately, it no longer offers adequate security because of its many
+limitations.
+Thus, it should not be used for new passwords unless you absolutely have
+to be able to migrate the password hashes to other systems.
+.hash "" "[./0-9A-Za-z]{13}" 8 7 56 64 12 25
+.PP
+.ti -2
+.B Extended BSDI-style DES-based
+.br
+This method is used on BSDI and is also available on at least NetBSD,
+OpenBSD, and FreeBSD due to the use of David Burren's FreeSec library.
+.hash _ "_[./0-9A-Za-z]{19}" unlimited 7 56 64 24 "1 to 2**24-1 (must be odd)"
+.PP
+.ti -2
+.B FreeBSD-style MD5-based
+.br
+This is Poul-Henning Kamp's MD5-based password hashing method originally
+developed for FreeBSD.
+It is currently supported on many free Unix-like systems, on Solaris 10
+and newer, and it is part of the official glibc.
+Its main disadvantage is the fixed iteration count, which is already
+too low for the currently available hardware.
+.hash "$1$" "\e$1\e$[^$]{1,8}\e$[./0-9A-Za-z]{22}" unlimited 8 "" 128 "6 to 48" 1000
+.PP
+.ti -2
+.BR "OpenBSD-style Blowfish-based" " (" bcrypt )
+.br
+.B bcrypt
+was originally developed by Niels Provos and David Mazieres for OpenBSD
+and is also supported on recent versions of FreeBSD and NetBSD,
+on Solaris 10 and newer, and on several GNU/*/Linux distributions.
+It is, however, not part of the official glibc.
+.PP
+While both
+.B bcrypt
+and the BSDI-style DES-based hashing offer a variable iteration count,
+.B bcrypt
+may scale to even faster hardware, doesn't allow for certain optimizations
+specific to password cracking only, doesn't have the effective key size
+limitation, and uses 8-bit characters in passwords.
+.hash "$2b$" "\e$2[abxy]\e$[0-9]{2}\e$[./A-Za-z0-9]{53}" 72 8 "" 184 128 "2**4 to 2**99 (current implementations are limited to 2**31 iterations)"
+.PP
+With
+.BR bcrypt ,
+the
+.I count
+passed to
+.crypt_gensalt and
+is the base-2 logarithm of the actual iteration count.
+.PP
+.B bcrypt
+hashes used the "$2a$" prefix since 1997.
+However, in 2011 an implementation bug was discovered in crypt_blowfish
+(versions up to 1.0.4 inclusive) affecting handling of password characters with
+the 8th bit set.
+Besides fixing the bug,
+to provide for upgrade strategies for existing systems, two new prefixes were
+introduced: "$2x$", which fully re-introduces the bug, and "$2y$", which
+guarantees correct handling of both 7- and 8-bit characters.
+OpenBSD 5.5 introduced the "$2b$" prefix for behavior that exactly matches
+crypt_blowfish's "$2y$", and current crypt_blowfish supports it as well.
+Unfortunately, the behavior of "$2a$" on password characters with the 8th bit
+set has to be considered system-specific.
+When generating new password hashes, the "$2b$" or "$2y$" prefix should be used.
+(If such hashes ever need to be migrated to a system that does not yet support
+these new prefixes, the prefix in migrated copies of the already-generated
+hashes may be changed to "$2a$".)
+.PP
+.crypt_gensalt and
+support the "$2b$", "$2y$", and "$2a$" prefixes (the latter for legacy programs
+or configurations), but not "$2x$" (which must not be used for new hashes).
+.crypt and
+support all four of these prefixes.
+.SH PORTABILITY NOTES
+Programs using any of these functions on a glibc 2.x system must be
+linked against
+.BR libcrypt .
+However, many Unix-like operating systems and older versions of the
+GNU C Library include the
+.BR crypt " function in " libc .
+.PP
+The
+.BR crypt_r ,
+.BR crypt_rn ,
+.BR crypt_ra ,
+.crypt_gensalt and
+functions are very non-portable.
+.PP
+The set of supported hashing methods is implementation-dependent.
+.SH CONFORMING TO
+The
+.B crypt
+function conforms to SVID, X/OPEN, and is available on BSD 4.3.
+The strings returned by
+.B crypt
+are not required to be portable among conformant systems.
+.PP
+.B crypt_r
+is a GNU extension.
+There's also a
+.B crypt_r
+function on HP-UX and MKS Toolkit, but the prototypes and semantics differ.
+.PP
+.B crypt_gensalt
+is an Openwall extension.
+There's also a
+.B crypt_gensalt
+function on Solaris 10 and newer, but the prototypes and semantics differ.
+.PP
+.BR crypt_rn ,
+.BR crypt_ra ,
+.BR crypt_gensalt_rn ,
+and
+.B crypt_gensalt_ra
+are Openwall extensions.
+.SH HISTORY
+A rotor-based
+.B crypt
+function appeared in Version 6 AT&T UNIX.
+The "traditional"
+.B crypt
+first appeared in Version 7 AT&T UNIX.
+.PP
+The
+.B crypt_r
+function was introduced during glibc 2.0 development.
+.SH BUGS
+The return values of
+.BR crypt " and " crypt_gensalt
+point to static buffers that are overwritten by subsequent calls.
+These functions are not thread-safe.
+.RB ( crypt
+on recent versions of Solaris uses thread-specific data and actually is
+thread-safe.)
+.PP
+The strings returned by certain other implementations of
+.B crypt
+on error may be stored in read-only locations or only initialized once,
+which makes it unsafe to always attempt to zero out the buffer normally
+pointed to by the
+.B crypt
+return value as it would otherwise be preferable for security reasons.
+The problem could be avoided with the use of
+.BR crypt_r ,
+.BR crypt_rn ,
+or
+.B crypt_ra
+where the application has full control over output buffers of these functions
+(and often over some of their private data as well).
+Unfortunately, the functions aren't (yet?) available on platforms where
+.B crypt
+has this undesired property.
+.PP
+Applications using the thread-safe
+.B crypt_r
+need to allocate address space for the large (over 128 KB)
+.I struct crypt_data
+structure.  Each thread needs a separate instance of the structure.  The
+.B crypt_r
+interface makes it impossible to implement a hashing algorithm which
+would need to keep an even larger amount of private data, without breaking
+binary compatibility.
+.B crypt_ra
+allows for dynamically increasing the allocation size as required by the
+hashing algorithm that is actually used.  Unfortunately,
+.B crypt_ra
+is even more non-portable than
+.BR crypt_r .
+.PP
+Multi-threaded applications or library functions which are meant to be
+thread-safe should use
+.BR crypt_gensalt_rn " or " crypt_gensalt_ra
+rather than
+.BR crypt_gensalt .
+.SH SEE ALSO
+.BR login (1),
+.BR passwd (1),
+.BR crypto (3),
+.BR encrypt (3),
+.BR free (3),
+.BR getpass (3),
+.BR getpwent (3),
+.BR malloc (3),
+.BR realloc (3),
+.BR shadow (3),
+.BR passwd (5),
+.BR shadow (5),
+.BR regex (7),
+.BR pam (8)
+.sp
+Niels Provos and David Mazieres.  A Future-Adaptable Password Scheme.
+Proceedings of the 1999 USENIX Annual Technical Conference, June 1999.
+.br
+http://www.usenix.org/events/usenix99/provos.html
+.sp
+Robert Morris and Ken Thompson.  Password Security: A Case History.
+Unix Seventh Edition Manual, Volume 2, April 1978.
+.br
+http://plan9.bell-labs.com/7thEdMan/vol2/password

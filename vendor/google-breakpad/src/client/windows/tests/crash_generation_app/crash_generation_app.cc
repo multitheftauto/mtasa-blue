@@ -73,7 +73,7 @@ BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
-static int kCustomInfoCount = 2;
+static size_t kCustomInfoCount = 2;
 static CustomInfoEntry kCustomInfoEntries[] = {
     CustomInfoEntry(L"prod", L"CrashTestApp"),
     CustomInfoEntry(L"ver", L"1.0"),

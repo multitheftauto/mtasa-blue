@@ -1,206 +1,190 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/lua/CLuaFunctionDefs.Input.cpp
-*  PURPOSE:     Lua function definitions class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*               Chris McArthur <>
-*               Derek Abdine <>
-*               Christian Myhre Lundheim <>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Florian Busse <flobu@gmx.net>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/lua/CLuaFunctionDefs.Input.cpp
+ *  PURPOSE:     Lua function definitions class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using std::list;
 
-int CLuaFunctionDefs::GetCursorPosition ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCursorPosition(lua_State* luaVM)
 {
     CVector2D vecCursor;
-    CVector vecWorld;
-    if ( CStaticFunctionDefinitions::GetCursorPosition ( vecCursor, vecWorld ) )
+    CVector   vecWorld;
+    if (CStaticFunctionDefinitions::GetCursorPosition(vecCursor, vecWorld))
     {
-        lua_pushnumber ( luaVM, ( double ) vecCursor.fX );
-        lua_pushnumber ( luaVM, ( double ) vecCursor.fY );
-        lua_pushnumber ( luaVM, ( double ) vecWorld.fX );
-        lua_pushnumber ( luaVM, ( double ) vecWorld.fY );
-        lua_pushnumber ( luaVM, ( double ) vecWorld.fZ );
+        lua_pushnumber(luaVM, (double)vecCursor.fX);
+        lua_pushnumber(luaVM, (double)vecCursor.fY);
+        lua_pushnumber(luaVM, (double)vecWorld.fX);
+        lua_pushnumber(luaVM, (double)vecWorld.fY);
+        lua_pushnumber(luaVM, (double)vecWorld.fZ);
         return 5;
     }
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::SetCursorPosition ( lua_State* luaVM )
+int CLuaFunctionDefs::SetCursorPosition(lua_State* luaVM)
 {
-    CVector2D vecPosition;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector2D ( vecPosition );
+    CVector2D        vecPosition;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector2D(vecPosition);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        HWND hookedWindow = g_pCore->GetHookedWindow ();
+        HWND hookedWindow = g_pCore->GetHookedWindow();
 
-        tagPOINT windowPos = { 0 };
-        ClientToScreen( hookedWindow, &windowPos );
+        tagPOINT windowPos = {0};
+        ClientToScreen(hookedWindow, &windowPos);
 
-        CVector2D vecResolution = g_pCore->GetGUI ()->GetResolution ();
+        CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
-        if ( vecPosition.fX < 0 )
+        if (vecPosition.fX < 0)
             vecPosition.fX = 0.0f;
-        else if ( vecPosition.fX > vecResolution.fX )
+        else if (vecPosition.fX > vecResolution.fX)
             vecPosition.fX = vecResolution.fX;
-        if ( vecPosition.fY < 0 )
+        if (vecPosition.fY < 0)
             vecPosition.fY = 0.0f;
-        else if ( vecPosition.fY > vecResolution.fY )
+        else if (vecPosition.fY > vecResolution.fY)
             vecPosition.fY = vecResolution.fY;
 
-        g_pCore->CallSetCursorPos ( ( int ) vecPosition.fX + ( int ) windowPos.x, ( int ) vecPosition.fY + ( int ) windowPos.y );
-        lua_pushboolean ( luaVM, true );
+        g_pCore->CallSetCursorPos((int)vecPosition.fX + (int)windowPos.x, (int)vecPosition.fY + (int)windowPos.y);
+        lua_pushboolean(luaVM, true);
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::IsCursorShowing ( lua_State* luaVM )
+int CLuaFunctionDefs::IsCursorShowing(lua_State* luaVM)
 {
     bool bShowing = false;
-    if ( CStaticFunctionDefinitions::IsCursorShowing ( bShowing ) )
+    if (CStaticFunctionDefinitions::IsCursorShowing(bShowing))
     {
-        lua_pushboolean ( luaVM, bShowing );
+        lua_pushboolean(luaVM, bShowing);
         return 1;
     }
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetCursorAlpha ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCursorAlpha(lua_State* luaVM)
 {
-//  float getCursorAlpha ()
+    //  float getCursorAlpha ()
     float fAlpha;
 
-    if ( CStaticFunctionDefinitions::GetCursorAlpha ( fAlpha ) )
+    if (CStaticFunctionDefinitions::GetCursorAlpha(fAlpha))
     {
-        lua_pushnumber ( luaVM, Round( fAlpha * 255.f ) );
+        lua_pushnumber(luaVM, Round(fAlpha * 255.f));
         return 1;
     }
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::SetCursorAlpha ( lua_State* luaVM )
+int CLuaFunctionDefs::SetCursorAlpha(lua_State* luaVM)
 {
-//  bool setCursorAlpha ( float alpha )
+    //  bool setCursorAlpha ( float alpha )
     float fAlpha;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fAlpha );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(fAlpha);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetCursorAlpha ( fAlpha / 255.f ) )
+        if (CStaticFunctionDefinitions::SetCursorAlpha(fAlpha / 255.f))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::ShowCursor ( lua_State* luaVM )
+int CLuaFunctionDefs::ShowCursor(lua_State* luaVM)
 {
-    bool bShow = false, bToggleControls = true;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadBool ( bShow );
-    argStream.ReadBool ( bToggleControls, true );
+    bool             bShow = false, bToggleControls = true;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bShow);
+    argStream.ReadBool(bToggleControls, true);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
         // Get the VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
             // Grab the resource belonging to this VM
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( pResource )
+            CResource* pResource = pLuaMain->GetResource();
+            if (pResource)
             {
                 // Show/hide it inside that resource
-                pResource->ShowCursor ( bShow, bToggleControls );
-                lua_pushboolean ( luaVM, true );
+                pResource->ShowCursor(bShow, bToggleControls);
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Fail
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
+int CLuaFunctionDefs::BindKey(lua_State* luaVM)
 {
-    SString strKey = "", strHitState = "", strCommand = "", strArguments = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
-    argStream.ReadString ( strHitState );
+    SString          strKey = "", strHitState = "", strCommand = "", strArguments = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strHitState);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
-            if ( argStream.NextIsString ( ) )
+            if (argStream.NextIsString())
             {
                 // bindKey ( string key, string keyState, string commandName, [ string arguments ] )
                 SString strResource = pLuaMain->GetResource()->GetName();
-                argStream.ReadString ( strCommand );
-                argStream.ReadString ( strArguments, "" );
-                if ( !argStream.HasErrors ( ) )
+                argStream.ReadString(strCommand);
+                argStream.ReadString(strArguments, "");
+                if (!argStream.HasErrors())
                 {
-                    if ( CStaticFunctionDefinitions::BindKey ( strKey, strHitState, strCommand, strArguments, strResource ) )
+                    if (CStaticFunctionDefinitions::BindKey(strKey, strHitState, strCommand, strArguments, strResource))
                     {
-                        lua_pushboolean ( luaVM, true );
+                        lua_pushboolean(luaVM, true);
                         return 1;
-                    }  
+                    }
                 }
             }
             else
             {
                 // bindKey ( string key, string keyState, function handlerFunction,  [ var arguments, ... ] )
                 CLuaFunctionRef iLuaFunction;
-                CLuaArguments Arguments;
-                argStream.ReadFunction ( iLuaFunction );
-                argStream.ReadLuaArguments ( Arguments );
-                argStream.ReadFunctionComplete ();
-                if ( !argStream.HasErrors ( ) )
+                CLuaArguments   Arguments;
+                argStream.ReadFunction(iLuaFunction);
+                argStream.ReadLuaArguments(Arguments);
+                argStream.ReadFunctionComplete();
+                if (!argStream.HasErrors())
                 {
-                    if ( CStaticFunctionDefinitions::BindKey ( strKey, strHitState, pLuaMain, iLuaFunction, Arguments ) )
+                    if (CStaticFunctionDefinitions::BindKey(strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
                     {
-                        lua_pushboolean ( luaVM, true );
+                        lua_pushboolean(luaVM, true);
                         return 1;
                     }
                 }
@@ -208,37 +192,36 @@ int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
         }
     }
 
-    if ( argStream.HasErrors ( ) )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
+int CLuaFunctionDefs::UnbindKey(lua_State* luaVM)
 {
-    SString strKey = "", strHitState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
+    SString          strKey = "", strHitState = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
-            if ( argStream.NextIsString ( 1 ) ) // Check if has command
+            if (argStream.NextIsString(1))            // Check if has command
             {
                 // bool unbindKey ( string key, string keyState, string command )
                 SString strResource = pLuaMain->GetResource()->GetName();
                 SString strCommand = "";
-                argStream.ReadString ( strHitState );
-                argStream.ReadString ( strCommand );
-                if ( !argStream.HasErrors ( ) )
+                argStream.ReadString(strHitState);
+                argStream.ReadString(strCommand);
+                if (!argStream.HasErrors())
                 {
-                    if ( CStaticFunctionDefinitions::UnbindKey ( strKey, strHitState, strCommand, strResource ) )
+                    if (CStaticFunctionDefinitions::UnbindKey(strKey, strHitState, strCommand, strResource))
                     {
-                        lua_pushboolean ( luaVM, true );
+                        lua_pushboolean(luaVM, true);
                         return 1;
                     }
                 }
@@ -247,15 +230,15 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
             {
                 // bool unbindKey ( string key, [ string keyState, function handler ] )
                 CLuaFunctionRef iLuaFunction;
-                argStream.ReadString ( strHitState, "" );
-                argStream.ReadFunction ( iLuaFunction, LUA_REFNIL );
-                argStream.ReadFunctionComplete ();
-                if ( !argStream.HasErrors ( ) )
+                argStream.ReadString(strHitState, "");
+                argStream.ReadFunction(iLuaFunction, LUA_REFNIL);
+                argStream.ReadFunctionComplete();
+                if (!argStream.HasErrors())
                 {
                     const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
-                    if ( CStaticFunctionDefinitions::UnbindKey ( strKey, pLuaMain, szHitState, iLuaFunction ) )
+                    if (CStaticFunctionDefinitions::UnbindKey(strKey, pLuaMain, szHitState, iLuaFunction))
                     {
-                        lua_pushboolean ( luaVM, true );
+                        lua_pushboolean(luaVM, true);
                         return 1;
                     }
                 }
@@ -263,258 +246,231 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
         }
     }
 
-    if ( argStream.HasErrors ( ) )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetKeyState ( lua_State * luaVM )
+int CLuaFunctionDefs::GetKeyState(lua_State* luaVM)
 {
-    SString strKey = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
+    SString          strKey = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
         bool bState;
-        if ( CStaticFunctionDefinitions::GetKeyState ( strKey, bState ) )
+        if (CStaticFunctionDefinitions::GetKeyState(strKey, bState))
         {
-            lua_pushboolean ( luaVM, bState );
+            lua_pushboolean(luaVM, bState);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetControlState ( lua_State * luaVM )
+int CLuaFunctionDefs::GetAnalogControlState(lua_State* luaVM)
 {
-    SString strControlState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControlState );
+    SString          strControlState = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strControlState);
 
-    if ( !argStream.HasErrors ( ) )
-    {
-        bool bState;
-        if ( CStaticFunctionDefinitions::GetControlState ( strControlState , bState ) )
-        {
-            lua_pushboolean ( luaVM, bState );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
-{
-    SString strControlState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControlState );
-
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
         float fState;
-        if ( CStaticFunctionDefinitions::GetAnalogControlState ( strControlState , fState ) )
+        if (CStaticFunctionDefinitions::GetAnalogControlState(strControlState, fState))
         {
-            lua_pushnumber ( luaVM, fState );
+            lua_pushnumber(luaVM, fState);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
+int CLuaFunctionDefs::SetAnalogControlState(lua_State* luaVM)
 {
-//  bool setAnalogControlState ( string controlName [, float state] )
-    SString strControlState = "";
-    float fState = 0.0f;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControlState );
+    //  bool setAnalogControlState ( string controlName [, float state] )
+    SString          strControlState = "";
+    float            fState = 0.0f;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strControlState);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( argStream.NextIsNumber ( ) )
+        if (argStream.NextIsNumber())
         {
-            argStream.ReadNumber ( fState );
-            if ( CClientPad::SetAnalogControlState ( strControlState , fState ) )
+            argStream.ReadNumber(fState);
+            if (CClientPad::SetAnalogControlState(strControlState, fState))
             {
-                lua_pushboolean ( luaVM, true );
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
-        else if ( argStream.NextIsNone ( ) )
+        else if (argStream.NextIsNone())
         {
-            CClientPad::RemoveSetAnalogControlState ( strControlState );
-            lua_pushboolean ( luaVM, true );
+            CClientPad::RemoveSetAnalogControlState(strControlState);
+            lua_pushboolean(luaVM, true);
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType(luaVM);
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaFunctionDefs::IsControlEnabled ( lua_State * luaVM )
+int CLuaFunctionDefs::IsControlEnabled(lua_State* luaVM)
 {
-    SString strControlState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControlState );
+    SString          strControlState = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strControlState);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
         bool bEnabled;
-        if ( CStaticFunctionDefinitions::IsControlEnabled ( strControlState, bEnabled ) )
+        if (CStaticFunctionDefinitions::IsControlEnabled(strControlState, bEnabled))
         {
-            lua_pushboolean ( luaVM, bEnabled );
+            lua_pushboolean(luaVM, bEnabled);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetBoundKeys ( lua_State * luaVM )
+int CLuaFunctionDefs::GetBoundKeys(lua_State* luaVM)
 {
-    SString strKey = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
+    SString          strKey = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        SBindableGTAControl * pControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( strKey );
+        SBindableGTAControl* pControl = g_pCore->GetKeyBinds()->GetBindableFromControl(strKey);
         // Did we find a control matching the string given?
-        if ( pControl )
+        if (pControl)
         {
-            list < CGTAControlBind * > controlBinds;
-            g_pCore->GetKeyBinds ()->GetBoundControls ( pControl, controlBinds );
-            if ( !controlBinds.empty () )
+            list<CGTAControlBind*> controlBinds;
+            g_pCore->GetKeyBinds()->GetBoundControls(pControl, controlBinds);
+            if (!controlBinds.empty())
             {
-                lua_newtable ( luaVM );
-                list < CGTAControlBind * > ::iterator iter = controlBinds.begin ();
-                for ( ; iter != controlBinds.end () ; iter++ )
+                lua_newtable(luaVM);
+                list<CGTAControlBind*>::iterator iter = controlBinds.begin();
+                for (; iter != controlBinds.end(); iter++)
                 {
-                    lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
-                    lua_pushstring ( luaVM, "down" );
-                    lua_settable ( luaVM, -3 );
+                    lua_pushstring(luaVM, (*iter)->boundKey->szKey);
+                    lua_pushstring(luaVM, "down");
+                    lua_settable(luaVM, -3);
                 }
             }
             else
-                lua_pushboolean ( luaVM, false );
+                lua_pushboolean(luaVM, false);
             return 1;
         }
         // If not, assume its a command
         else
         {
-            list < CCommandBind * > commandBinds;
-            g_pCore->GetKeyBinds ()->GetBoundCommands ( strKey, commandBinds );
-            if ( !commandBinds.empty () )
+            list<CCommandBind*> commandBinds;
+            g_pCore->GetKeyBinds()->GetBoundCommands(strKey, commandBinds);
+            if (!commandBinds.empty())
             {
-                lua_newtable ( luaVM );
-                list < CCommandBind * > ::iterator iter = commandBinds.begin ();
-                for ( ; iter != commandBinds.end () ; iter++ )
+                lua_newtable(luaVM);
+                list<CCommandBind*>::iterator iter = commandBinds.begin();
+                for (; iter != commandBinds.end(); iter++)
                 {
-                    lua_pushstring ( luaVM, (*iter)->boundKey->szKey );
-                    lua_pushstring ( luaVM, (*iter)->bHitState ? "down" : "up" );
-                    lua_settable ( luaVM, -3 );
+                    lua_pushstring(luaVM, (*iter)->boundKey->szKey);
+                    lua_pushstring(luaVM, (*iter)->bHitState ? "down" : "up");
+                    lua_settable(luaVM, -3);
                 }
             }
             else
-                lua_pushboolean ( luaVM, false );
+                lua_pushboolean(luaVM, false);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
+int CLuaFunctionDefs::GetFunctionsBoundToKey(lua_State* luaVM)
 {
-    SString strKey = "", strHitState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
-    argStream.ReadString ( strHitState, "" );
+    SString          strKey = "", strHitState = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strHitState, "");
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
             const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
 
             bool bCheckHitState = false, bHitState = true;
-            if ( szHitState )
+            if (szHitState)
             {
-                if ( stricmp ( szHitState, "down" ) == 0 )
+                if (stricmp(szHitState, "down") == 0)
                     bCheckHitState = true, bHitState = true;
-                else if ( stricmp ( szHitState, "up" ) == 0 )
+                else if (stricmp(szHitState, "up") == 0)
                     bCheckHitState = true, bHitState = false;
             }
 
             // Create a new table
-            lua_newtable ( luaVM );
+            lua_newtable(luaVM);
 
             // Add all the bound functions to it
-            unsigned int uiIndex = 0;
-            list < CScriptKeyBind* > ::const_iterator iter = m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
-            for ( ; iter != m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
+            unsigned int                          uiIndex = 0;
+            list<CScriptKeyBind*>::const_iterator iter = m_pClientGame->GetScriptKeyBinds()->IterBegin();
+            for (; iter != m_pClientGame->GetScriptKeyBinds()->IterEnd(); iter++)
             {
                 CScriptKeyBind* pScriptKeyBind = *iter;
-                if ( !pScriptKeyBind->IsBeingDeleted () )
+                if (!pScriptKeyBind->IsBeingDeleted())
                 {
-                    switch ( pScriptKeyBind->GetType () )
+                    switch (pScriptKeyBind->GetType())
                     {
                         case SCRIPT_KEY_BIND_FUNCTION:
                         {
-                            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
-                            if ( !bCheckHitState || pBind->bHitState == bHitState )
+                            CScriptKeyFunctionBind* pBind = static_cast<CScriptKeyFunctionBind*>(pScriptKeyBind);
+                            if (!bCheckHitState || pBind->bHitState == bHitState)
                             {
-                                if ( strcmp ( strKey, pBind->boundKey->szKey ) == 0 )
+                                if (strcmp(strKey, pBind->boundKey->szKey) == 0)
                                 {
-                                    lua_pushnumber ( luaVM, ++uiIndex );
-                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
-                                    lua_settable ( luaVM, -3 );
+                                    lua_pushnumber(luaVM, ++uiIndex);
+                                    lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
+                                    lua_settable(luaVM, -3);
                                 }
                             }
                             break;
                         }
                         case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
                         {
-                            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
-                            if ( !bCheckHitState || pBind->bHitState == bHitState )
+                            CScriptControlFunctionBind* pBind = static_cast<CScriptControlFunctionBind*>(pScriptKeyBind);
+                            if (!bCheckHitState || pBind->bHitState == bHitState)
                             {
-                                if ( strcmp ( strKey, pBind->boundControl->szControl ) == 0 )
+                                if (strcmp(strKey, pBind->boundControl->szControl) == 0)
                                 {
-                                    lua_pushnumber ( luaVM, ++uiIndex );
-                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
-                                    lua_settable ( luaVM, -3 );
+                                    lua_pushnumber(luaVM, ++uiIndex);
+                                    lua_rawgeti(luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt());
+                                    lua_settable(luaVM, -3);
                                 }
                             }
                             break;
@@ -528,51 +484,50 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
+int CLuaFunctionDefs::GetKeyBoundToFunction(lua_State* luaVM)
 {
-    SString strKey = "", strHitState = "";
-    CScriptArgReader argStream ( luaVM );
+    SString          strKey = "", strHitState = "";
+    CScriptArgReader argStream(luaVM);
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        if ( argStream.NextIsFunction ( ) )
+        if (argStream.NextIsFunction())
         {
-            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
+            CLuaFunctionRef iLuaFunction = luaM_toref(luaVM, 1);
             // get the key
-            list < CScriptKeyBind* > ::const_iterator iter =  m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
-            for ( ; iter !=  m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )
+            list<CScriptKeyBind*>::const_iterator iter = m_pClientGame->GetScriptKeyBinds()->IterBegin();
+            for (; iter != m_pClientGame->GetScriptKeyBinds()->IterEnd(); iter++)
             {
                 CScriptKeyBind* pScriptKeyBind = *iter;
-                if ( !pScriptKeyBind->IsBeingDeleted () )
+                if (!pScriptKeyBind->IsBeingDeleted())
                 {
-                    switch ( pScriptKeyBind->GetType () )
+                    switch (pScriptKeyBind->GetType())
                     {
                         case SCRIPT_KEY_BIND_FUNCTION:
                         {
-                            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( pScriptKeyBind );
+                            CScriptKeyFunctionBind* pBind = static_cast<CScriptKeyFunctionBind*>(pScriptKeyBind);
                             // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
-                            if ( iLuaFunction == pBind->m_iLuaFunction )
+                            if (iLuaFunction == pBind->m_iLuaFunction)
                             {
-                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                lua_pushstring(luaVM, pBind->boundKey->szKey);
                                 return 1;
                             }
                             break;
                         }
                         case SCRIPT_KEY_BIND_CONTROL_FUNCTION:
                         {
-                            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pScriptKeyBind );
+                            CScriptControlFunctionBind* pBind = static_cast<CScriptControlFunctionBind*>(pScriptKeyBind);
                             // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
-                            if ( iLuaFunction == pBind->m_iLuaFunction )
+                            if (iLuaFunction == pBind->m_iLuaFunction)
                             {
-                                lua_pushstring ( luaVM, pBind->boundControl->szControl );
+                                lua_pushstring(luaVM, pBind->boundControl->szControl);
                                 return 1;
                             }
                             break;
@@ -582,62 +537,63 @@ int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
                     }
                 }
             }
-            lua_pushboolean ( luaVM, false );
+            lua_pushboolean(luaVM, false);
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            m_pScriptDebugging->LogBadType(luaVM);
     }
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
 {
-    SString strKey = "", strHitState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strKey );
-    argStream.ReadString ( strHitState, "" );
+    SString          strKey = "", strHitState = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strHitState, "");
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
-        if ( pLuaMain )
+        if (pLuaMain)
         {
             const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
-            bool bCheckHitState = false, bHitState = true;
+            bool        bCheckHitState = false, bHitState = true;
 
-            if ( szHitState )
+            if (szHitState)
             {
-                if ( stricmp ( szHitState, "down" ) == 0 )
+                if (stricmp(szHitState, "down") == 0)
                     bCheckHitState = true, bHitState = true;
-                else if ( stricmp ( szHitState, "up" ) == 0 )
+                else if (stricmp(szHitState, "up") == 0)
                     bCheckHitState = true, bHitState = false;
             }
 
             // Create a new table
-            lua_newtable ( luaVM );
+            lua_newtable(luaVM);
 
             // Add all the bound commands to it
-            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+            list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
 
-            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
+            for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
             {
                 CKeyBind* pKeyBind = *iter;
 
-                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive && pKeyBind->GetType () == KEY_BIND_COMMAND )
+                if (!pKeyBind->IsBeingDeleted() && pKeyBind->bActive && pKeyBind->GetType() == KEY_BIND_COMMAND)
                 {
-                    CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pKeyBind );
+                    CCommandBind* pCommandBind = static_cast<CCommandBind*>(pKeyBind);
 
-                    if ( !bCheckHitState || pCommandBind->bHitState == bHitState )
+                    if (!bCheckHitState || pCommandBind->bHitState == bHitState)
                     {
-                        if ( strcmp ( strKey, pCommandBind->boundKey->szKey ) == 0 )
+                        if (strcmp(strKey, pCommandBind->boundKey->szKey) == 0)
                         {
-                            lua_pushstring ( luaVM, pCommandBind->szCommand );
-                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' ) ? pCommandBind->szArguments : "" );
-                            lua_settable ( luaVM, -3 );
+                            lua_pushstring(luaVM, pCommandBind->szCommand);
+                            lua_pushstring(luaVM, (pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' && pCommandBind->bScriptCreated)
+                                                      ? pCommandBind->szArguments
+                                                      : "");
+                            lua_settable(luaVM, -3);
                         }
                     }
                 }
@@ -647,122 +603,95 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
+int CLuaFunctionDefs::GetKeyBoundToCommand(lua_State* luaVM)
 {
-    SString strCommand = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strCommand );
+    SString          strCommand = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strCommand);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
             // get the key
-            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
-            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
+            list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
+            for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
             {
                 CKeyBind* pKeyBind = *iter;
-                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive )
+                if (!pKeyBind->IsBeingDeleted() && pKeyBind->bActive)
                 {
-                    if ( pKeyBind->GetType () == KEY_BIND_COMMAND )
+                    if (pKeyBind->GetType() == KEY_BIND_COMMAND)
                     {
-                        CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
-                        if ( strcmp ( strCommand, pBind->szCommand ) == 0 )
+                        CCommandBind* pBind = static_cast<CCommandBind*>(pKeyBind);
+                        if (strcmp(strCommand, pBind->szCommand) == 0)
                         {
-                            lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                            lua_pushstring(luaVM, pBind->boundKey->szKey);
                             return 1;
                         }
                     }
                 }
             }
-            lua_pushboolean ( luaVM, false );
+            lua_pushboolean(luaVM, false);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::SetControlState ( lua_State * luaVM )
+int CLuaFunctionDefs::ToggleControl(lua_State* luaVM)
 {
-    SString strControl = "";
-    bool bState = false;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControl );
-    argStream.ReadBool ( bState );
+    SString          strControl = "";
+    bool             bState = false;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strControl);
+    argStream.ReadBool(bState);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetControlState ( strControl, bState ) )
+        if (CStaticFunctionDefinitions::ToggleControl(strControl, bState))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaFunctionDefs::ToggleControl ( lua_State * luaVM )
+int CLuaFunctionDefs::ToggleAllControls(lua_State* luaVM)
 {
-    SString strControl = "";
-    bool bState = false;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControl );
-    argStream.ReadBool ( bState );
+    bool             bEnabled = false;
+    bool             bGTAControls = true, bMTAControls = true;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bEnabled);
+    argStream.ReadBool(bGTAControls, true);
+    argStream.ReadBool(bMTAControls, true);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::ToggleControl ( strControl, bState ) )
+        if (CStaticFunctionDefinitions::ToggleAllControls(bGTAControls, bMTAControls, bEnabled))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::ToggleAllControls ( lua_State* luaVM )
-{
-    bool bEnabled = false;
-    bool bGTAControls = true, bMTAControls = true;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadBool ( bEnabled );
-    argStream.ReadBool ( bGTAControls, true );
-    argStream.ReadBool ( bMTAControls, true );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( CStaticFunctionDefinitions::ToggleAllControls ( bGTAControls, bMTAControls, bEnabled ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }

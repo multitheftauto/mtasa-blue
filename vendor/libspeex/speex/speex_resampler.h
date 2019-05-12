@@ -84,7 +84,7 @@
       
 #else /* OUTSIDE_SPEEX */
 
-#include "speex/speex_types.h"
+#include "speexdsp_types.h"
 
 #endif /* OUTSIDE_SPEEX */
 
@@ -302,12 +302,12 @@ void speex_resampler_set_output_stride(SpeexResamplerState *st,
 void speex_resampler_get_output_stride(SpeexResamplerState *st, 
                                       spx_uint32_t *stride);
 
-/** Get the latency in input samples introduced by the resampler.
+/** Get the latency introduced by the resampler measured in input samples.
  * @param st Resampler state
  */
 int speex_resampler_get_input_latency(SpeexResamplerState *st);
 
-/** Get the latency in output samples introduced by the resampler.
+/** Get the latency introduced by the resampler measured in output samples.
  * @param st Resampler state
  */
 int speex_resampler_get_output_latency(SpeexResamplerState *st);

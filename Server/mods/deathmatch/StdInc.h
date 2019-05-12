@@ -1,10 +1,8 @@
-#pragma once
-
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
+#include <winsock2.h>
 #include <windows.h>
-#include <winsock.h>
 #include <mmsystem.h>
 #endif
 
@@ -20,6 +18,9 @@
 #include <vector>
 #include <ctime>
 #include <sstream>
+#include <mutex>
+#include <unordered_set>
+#include <future>
 
 // Forward declarations
 class CAclRightName;
@@ -29,7 +30,6 @@ struct SAclRequest;
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
-#include "gccHashSupport.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -40,7 +40,6 @@ struct SAclRequest;
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"
-#include "CQuat.h"
 #include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
@@ -50,6 +49,7 @@ struct SAclRequest;
 
 // Packet includes
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CChatClearPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "packets/CCommandPacket.h"
 #include "packets/CConsoleEchoPacket.h"
@@ -124,7 +124,6 @@ struct SAclRequest;
 #include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaDefs.h"
-#include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
@@ -284,7 +283,6 @@ struct SAclRequest;
 #include "CWater.h"
 #include "CWaterManager.h"
 #include "CWeaponNames.h"
-#include "CWhoWas.h"
 #include "CXMLConfig.h"
 #include "CZoneNames.h"
 #include "TaskNames.h"
@@ -308,4 +306,4 @@ struct SAclRequest;
 #include "../../version.h"
 
 extern CNetServer* g_pRealNetServer;
-extern CGame* g_pGame;
+extern CGame*      g_pGame;

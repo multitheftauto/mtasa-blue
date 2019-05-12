@@ -1,15 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CLogger.cpp
-*  PURPOSE:     Logger class
-*  DEVELOPERS:  Jax <>
-*               Oliver Brown <>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CLogger.cpp
+ *  PURPOSE:     Logger class
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
@@ -18,37 +15,36 @@ using namespace std;
 FILE* CLogger::m_pLogFile = NULL;
 
 #define MAX_STRING_LENGTH 2048
-void CLogger::LogPrintf ( const char* szFormat, ... )
+void CLogger::LogPrintf(const char* szFormat, ...)
 {
     // Compose the formatted message
-    char szBuffer [MAX_STRING_LENGTH];
+    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
-    va_start ( marker, szFormat );
-    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
-    va_end ( marker );
+    va_start(marker, szFormat);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    va_end(marker);
 
     // Timestamp and send to the logfile
-    HandleLogPrint ( true, "", szBuffer, false, true );
+    HandleLogPrint(true, "", szBuffer, false, true);
 }
 
-
-void CLogger::LogPrint ( const char* szText )
+void CLogger::LogPrint(const char* szText)
 {
     // Timestamp and send to the logfile
-    HandleLogPrint ( true, "", szText, false, true );
+    HandleLogPrint(true, "", szText, false, true);
 }
 
-void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
+void CLogger::LogPrintfNoStamp(const char* szFormat, ...)
 {
     // Compose the formatted message
-    char szBuffer [MAX_STRING_LENGTH];
+    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
-    va_start ( marker, szFormat );
-    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
-    va_end ( marker );
+    va_start(marker, szFormat);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    va_end(marker);
 
     // Send to the console and logfile
-    HandleLogPrint ( false, "", szBuffer, true, true );
+    HandleLogPrint(false, "", szBuffer, true, true);
 }
 
 #if 0   // Currently unused
@@ -59,17 +55,17 @@ void CLogger::LogPrintNoStamp ( const char* szText )
 }
 #endif
 
-void CLogger::ErrorPrintf ( const char* szFormat, ... )
+void CLogger::ErrorPrintf(const char* szFormat, ...)
 {
     // Compose the formatted message
-    char szBuffer [MAX_STRING_LENGTH];
+    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
-    va_start ( marker, szFormat );
-    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
-    va_end ( marker );
+    va_start(marker, szFormat);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    va_end(marker);
 
     // Timestamp and send to the console and logfile
-    HandleLogPrint ( true, "ERROR: ", szBuffer, true, true );
+    HandleLogPrint(true, "ERROR: ", szBuffer, true, true);
 }
 
 #if 0   // Currently unused
@@ -89,43 +85,31 @@ void CLogger::DebugPrintf ( const char* szFormat, ... )
 }
 #endif
 
-void CLogger::SetLogFile ( const char* szLogFile )
+void CLogger::SetLogFile(const char* szLogFile)
 {
     // Eventually delete our current file
-    if ( m_pLogFile )
+    if (m_pLogFile)
     {
-        fclose ( m_pLogFile );
+        fclose(m_pLogFile);
         m_pLogFile = NULL;
     }
 
     // Eventually open a new file
-    if ( szLogFile && szLogFile[0] )
+    if (szLogFile && szLogFile[0])
     {
-        m_pLogFile = fopen ( szLogFile, "a+" );
+        m_pLogFile = File::Fopen(szLogFile, "a+");
     }
 }
 
-
 // Handle where to send the message
-void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile )
+void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile)
 {
     // Put the timestamp at the beginning of the string
     string strOutputShort;
     string strOutputLong;
-    if ( bTimeStamp )
+    if (bTimeStamp)
     {
-        char szBuffer [MAX_STRING_LENGTH] = { "\0" };
-        time_t timeNow;
-        time ( &timeNow );
-        tm* pCurrentTime = localtime ( &timeNow );
-#if 0
-        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%H:%M:%S] ", pCurrentTime ) )
-            szBuffer[0] = 0;
-        strOutputShort = szBuffer;
-#endif
-        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%Y-%m-%d %H:%M:%S] ", pCurrentTime ) )
-            szBuffer[0] = 0;
-        strOutputLong = szBuffer;
+        strOutputLong = SString("[%s] ", *GetLocalTimeString(true));
     }
 
     // Build the final string
@@ -133,14 +117,14 @@ void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const cha
     strOutputLong = strOutputLong + szPrePend + szMessage;
 
     // Maybe print it in the console
-    if ( bToConsole )
-        g_pCore->GetConsole()->Print ( strOutputShort.c_str () );
+    if (bToConsole)
+        g_pCore->GetConsole()->Print(strOutputShort.c_str());
 
     // Maybe print it to the log file
     // Note: m_pLogFile is never set, so this always does nothing
-    if ( bToLogFile && m_pLogFile )
+    if (bToLogFile && m_pLogFile)
     {
-        fprintf ( m_pLogFile, "%s", strOutputLong.c_str () );
-        fflush ( m_pLogFile );
+        fprintf(m_pLogFile, "%s", strOutputLong.c_str());
+        fflush(m_pLogFile);
     }
 }

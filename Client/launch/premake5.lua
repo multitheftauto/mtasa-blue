@@ -3,12 +3,13 @@ project "Client Launcher"
 	kind "WindowedApp"
 	targetname "Multi Theft Auto"
 	targetdir(buildpath("."))
+	debugdir(buildpath("."))
 	
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
-	flags { "WinMain" }
+	entrypoint "WinMainCRTStartup"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
@@ -24,6 +25,7 @@ project "Client Launcher"
 	}
 	
 	filter "system:windows"
+		staticruntime "On"
 		files {
 			"NEU/GDFImp.gdf.xml",
 			"GDFImp.rc",
@@ -31,8 +33,11 @@ project "Client Launcher"
 			"mtaicon.ico"
 		}
 	
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
+	
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
 		
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,10 +24,10 @@
 
 #include <curl/curl.h>
 #include "urldata.h"
-#include "sslgen.h"
-
-#define _MPRINTF_REPLACE /* use the internal *printf() functions */
-#include <curl/mprintf.h>
+#include "vtls/vtls.h"
+#include "http2.h"
+#include "ssh.h"
+#include "curl_printf.h"
 
 #ifdef USE_ARES
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) && \
@@ -37,8 +37,12 @@
 #  include <ares.h>
 #endif
 
-#ifdef USE_LIBIDN
-#include <stringprep.h>
+#ifdef USE_LIBIDN2
+#include <idn2.h>
+#endif
+
+#ifdef USE_LIBPSL
+#include <libpsl.h>
 #endif
 
 #if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
@@ -61,12 +65,50 @@
 #define CURL_LIBSSH2_VERSION LIBSSH2_VERSION
 #endif
 
+#ifdef HAVE_ZLIB_H
+#include <zlib.h>
+#ifdef __SYMBIAN32__
+/* zlib pollutes the namespace with this definition */
+#undef WIN32
+#endif
+#endif
+
+#ifdef HAVE_BROTLI
+#include <brotli/decode.h>
+#endif
+
+void Curl_version_init(void);
+
+/* For thread safety purposes this function is called by global_init so that
+   the static data in both version functions is initialized. */
+void Curl_version_init(void)
+{
+  curl_version();
+  curl_version_info(CURLVERSION_NOW);
+}
+
+#ifdef HAVE_BROTLI
+static size_t brotli_version(char *buf, size_t bufsz)
+{
+  uint32_t brotli_version = BrotliDecoderVersion();
+  unsigned int major = brotli_version >> 24;
+  unsigned int minor = (brotli_version & 0x00FFFFFF) >> 12;
+  unsigned int patch = brotli_version & 0x00000FFF;
+
+  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+}
+#endif
+
 char *curl_version(void)
 {
+  static bool initialized;
   static char version[200];
   char *ptr = version;
   size_t len;
   size_t left = sizeof(version);
+
+  if(initialized)
+    return version;
 
   strcpy(ptr, LIBCURL_NAME "/" LIBCURL_VERSION);
   len = strlen(ptr);
@@ -84,41 +126,64 @@ char *curl_version(void)
   }
 
 #ifdef HAVE_LIBZ
-  len = snprintf(ptr, left, " zlib/%s", zlibVersion());
+  len = msnprintf(ptr, left, " zlib/%s", zlibVersion());
+  left -= len;
+  ptr += len;
+#endif
+#ifdef HAVE_BROTLI
+  len = msnprintf(ptr, left, "%s", " brotli/");
+  left -= len;
+  ptr += len;
+  len = brotli_version(ptr, left);
   left -= len;
   ptr += len;
 #endif
 #ifdef USE_ARES
   /* this function is only present in c-ares, not in the original ares */
-  len = snprintf(ptr, left, " c-ares/%s", ares_version(NULL));
+  len = msnprintf(ptr, left, " c-ares/%s", ares_version(NULL));
   left -= len;
   ptr += len;
 #endif
-#ifdef USE_LIBIDN
-  if(stringprep_check_version(LIBIDN_REQUIRED_VERSION)) {
-    len = snprintf(ptr, left, " libidn/%s", stringprep_check_version(NULL));
+#ifdef USE_LIBIDN2
+  if(idn2_check_version(IDN2_VERSION)) {
+    len = msnprintf(ptr, left, " libidn2/%s", idn2_check_version(NULL));
     left -= len;
     ptr += len;
   }
 #endif
+#ifdef USE_LIBPSL
+  len = msnprintf(ptr, left, " libpsl/%s", psl_get_version());
+  left -= len;
+  ptr += len;
+#endif
 #ifdef USE_WIN32_IDN
-  len = snprintf(ptr, left, " WinIDN");
+  len = msnprintf(ptr, left, " WinIDN");
   left -= len;
   ptr += len;
 #endif
 #if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
 #ifdef _LIBICONV_VERSION
-  len = snprintf(ptr, left, " iconv/%d.%d",
-                 _LIBICONV_VERSION >> 8, _LIBICONV_VERSION & 255);
+  len = msnprintf(ptr, left, " iconv/%d.%d",
+                  _LIBICONV_VERSION >> 8, _LIBICONV_VERSION & 255);
 #else
   /* version unknown */
-  len = snprintf(ptr, left, " iconv");
+  len = msnprintf(ptr, left, " iconv");
 #endif /* _LIBICONV_VERSION */
   left -= len;
   ptr += len;
 #endif
 #ifdef USE_LIBSSH2
-  len = snprintf(ptr, left, " libssh2/%s", CURL_LIBSSH2_VERSION);
+  len = msnprintf(ptr, left, " libssh2/%s", CURL_LIBSSH2_VERSION);
+  left -= len;
+  ptr += len;
+#endif
+#ifdef USE_LIBSSH
+  len = msnprintf(ptr, left, " libssh/%s", CURL_LIBSSH_VERSION);
+  left -= len;
+  ptr += len;
+#endif
+#ifdef USE_NGHTTP2
+  len = Curl_http2_ver(ptr, left);
   left -= len;
   ptr += len;
 #endif
@@ -132,14 +197,14 @@ char *curl_version(void)
     else
       suff[0] = '\0';
 
-    snprintf(ptr, left, " librtmp/%d.%d%s",
-             RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff,
-             suff);
+    msnprintf(ptr, left, " librtmp/%d.%d%s",
+              RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff,
+              suff);
 /*
   If another lib version is added below this one, this code would
   also have to do:
 
-    len = what snprintf() returned
+    len = what msnprintf() returned
 
     left -= len;
     ptr += len;
@@ -147,6 +212,11 @@ char *curl_version(void)
   }
 #endif
 
+  /* Silent scan-build even if librtmp is not enabled. */
+  (void) left;
+  (void) ptr;
+
+  initialized = true;
   return version;
 }
 
@@ -204,11 +274,17 @@ static const char * const protocols[] = {
 #ifndef CURL_DISABLE_RTSP
   "rtsp",
 #endif
-#ifdef USE_LIBSSH2
+#if defined(USE_LIBSSH) || defined(USE_LIBSSH2)
   "scp",
-#endif
-#ifdef USE_LIBSSH2
   "sftp",
+#endif
+#if !defined(CURL_DISABLE_SMB) && defined(USE_NTLM) && \
+   (CURL_SIZEOF_CURL_OFF_T > 4) && \
+   (!defined(USE_WINDOWS_SSPI) || defined(USE_WIN32_CRYPTO))
+  "smb",
+#  ifdef USE_SSL
+  "smbs",
+#  endif
 #endif
 #ifndef CURL_DISABLE_SMTP
   "smtp",
@@ -235,26 +311,30 @@ static curl_version_info_data version_info = {
 #ifdef ENABLE_IPV6
   | CURL_VERSION_IPV6
 #endif
-#ifdef HAVE_KRB4
-  | CURL_VERSION_KERBEROS4
-#endif
 #ifdef USE_SSL
   | CURL_VERSION_SSL
 #endif
 #ifdef USE_NTLM
   | CURL_VERSION_NTLM
 #endif
-#if defined(USE_NTLM) && defined(NTLM_WB_ENABLED)
+#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM) && \
+  defined(NTLM_WB_ENABLED)
   | CURL_VERSION_NTLM_WB
+#endif
+#ifdef USE_SPNEGO
+  | CURL_VERSION_SPNEGO
+#endif
+#ifdef USE_KERBEROS5
+  | CURL_VERSION_KERBEROS5
+#endif
+#ifdef HAVE_GSSAPI
+  | CURL_VERSION_GSSAPI
 #endif
 #ifdef USE_WINDOWS_SSPI
   | CURL_VERSION_SSPI
 #endif
 #ifdef HAVE_LIBZ
   | CURL_VERSION_LIBZ
-#endif
-#ifdef USE_HTTP_NEGOTIATE
-  | CURL_VERSION_GSSNEGOTIATE
 #endif
 #ifdef DEBUGBUILD
   | CURL_VERSION_DEBUG
@@ -264,9 +344,6 @@ static curl_version_info_data version_info = {
 #endif
 #ifdef CURLRES_ASYNCH
   | CURL_VERSION_ASYNCHDNS
-#endif
-#ifdef HAVE_SPNEGO
-  | CURL_VERSION_SPNEGO
 #endif
 #if (CURL_SIZEOF_CURL_OFF_T > 4) && \
     ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
@@ -278,6 +355,24 @@ static curl_version_info_data version_info = {
 #if defined(USE_TLS_SRP)
   | CURL_VERSION_TLSAUTH_SRP
 #endif
+#if defined(USE_NGHTTP2)
+  | CURL_VERSION_HTTP2
+#endif
+#if defined(USE_UNIX_SOCKETS)
+  | CURL_VERSION_UNIX_SOCKETS
+#endif
+#if defined(USE_LIBPSL)
+  | CURL_VERSION_PSL
+#endif
+#if defined(CURL_WITH_MULTI_SSL)
+  | CURL_VERSION_MULTI_SSL
+#endif
+#if defined(HAVE_BROTLI)
+  | CURL_VERSION_BROTLI
+#endif
+#if defined(USE_ALTSVC)
+  | CURL_VERSION_ALTSVC
+#endif
   ,
   NULL, /* ssl_version */
   0,    /* ssl_version_num, this is kept at zero */
@@ -288,18 +383,33 @@ static curl_version_info_data version_info = {
   NULL, /* libidn version */
   0,    /* iconv version */
   NULL, /* ssh lib version */
+  0,    /* brotli_ver_num */
+  NULL, /* brotli version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
 {
-#ifdef USE_LIBSSH2
+  static bool initialized;
+#if defined(USE_LIBSSH) || defined(USE_LIBSSH2)
   static char ssh_buffer[80];
 #endif
-
 #ifdef USE_SSL
   static char ssl_buffer[80];
+#endif
+#ifdef HAVE_BROTLI
+  static char brotli_buffer[80];
+#endif
+
+  if(initialized)
+    return &version_info;
+
+#ifdef USE_SSL
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
   version_info.ssl_version = ssl_buffer;
+  if(Curl_ssl->supports & SSLSUPP_HTTPS_PROXY)
+    version_info.features |= CURL_VERSION_HTTPS_PROXY;
+  else
+    version_info.features &= ~CURL_VERSION_HTTPS_PROXY;
 #endif
 
 #ifdef HAVE_LIBZ
@@ -313,10 +423,10 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
     version_info.ares_num = aresnum;
   }
 #endif
-#ifdef USE_LIBIDN
+#ifdef USE_LIBIDN2
   /* This returns a version string if we use the given version or later,
      otherwise it returns NULL */
-  version_info.libidn = stringprep_check_version(LIBIDN_REQUIRED_VERSION);
+  version_info.libidn = idn2_check_version(IDN2_VERSION);
   if(version_info.libidn)
     version_info.features |= CURL_VERSION_IDN;
 #elif defined(USE_WIN32_IDN)
@@ -332,12 +442,22 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
 #endif /* _LIBICONV_VERSION */
 #endif
 
-#ifdef USE_LIBSSH2
-  snprintf(ssh_buffer, sizeof(ssh_buffer), "libssh2/%s", LIBSSH2_VERSION);
+#if defined(USE_LIBSSH2)
+  msnprintf(ssh_buffer, sizeof(ssh_buffer), "libssh2/%s", LIBSSH2_VERSION);
   version_info.libssh_version = ssh_buffer;
+#elif defined(USE_LIBSSH)
+  msnprintf(ssh_buffer, sizeof(ssh_buffer), "libssh/%s", CURL_LIBSSH_VERSION);
+  version_info.libssh_version = ssh_buffer;
+#endif
+
+#ifdef HAVE_BROTLI
+  version_info.brotli_ver_num = BrotliDecoderVersion();
+  brotli_version(brotli_buffer, sizeof(brotli_buffer));
+  version_info.brotli_version = brotli_buffer;
 #endif
 
   (void)stamp; /* avoid compiler warnings, we don't use this */
 
+  initialized = true;
   return &version_info;
 }

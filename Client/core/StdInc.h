@@ -13,7 +13,6 @@
 
 #include <sys/stat.h>
 #include <d3d9.h>
-#include <d3dx9.h>
 #include <direct.h>
 #include <stdio.h>
 #include <dbghelp.h>
@@ -34,7 +33,6 @@
 #include <iomanip>
 #include <functional>
 
-
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
 #include "CLocalization.h"
@@ -49,6 +47,7 @@
 #include <net/CNet.h>
 #include <multiplayer/CMultiplayer.h>
 #include <game/CGame.h>
+#include <hwbrk.h>
 
 // Core-level includes
 #include "CrashHandler.h"
@@ -60,14 +59,13 @@
 #include <DXHook/CDirect3DEvents9.h>
 #include <DXHook/CProxyDirectInput8.h>
 #include <DXHook/CProxyDirect3D9.h>
-#include "CPEHookUtils.h"
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
 #include <Graphics/CVideoModeManager.h>
-#include <Serverbrowser/CServerCache.h>
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
 #include "CGraphStats.h"
 #include "CNickGen.h"
-#include <Webbrowser/CWebView.h>
+#include <core/CWebViewInterface.h>
+#include "CTrayIcon.h"

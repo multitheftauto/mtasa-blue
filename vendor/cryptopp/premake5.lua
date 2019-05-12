@@ -12,6 +12,10 @@ project "cryptopp"
 		
 	defines {
 		"_WINSOCK_DEPRECATED_NO_WARNINGS",
+		"CRYPTOPP_DISABLE_CLMUL", 
+		"CRYPTOPP_DISABLE_AESNI",
+		"CRYPTOPP_DISABLE_SSE4", 
+		"CRYPTOPP_DISABLE_SSSE3",
 		"_LIB"
 	}
 	
@@ -40,7 +44,6 @@ project "cryptopp"
 		"cpu.cpp",
 		"crc.cpp",
 		"cryptlib.cpp",
-		"cryptlib_bds.cpp",
 		"default.cpp",
 		"des.cpp",
 		"dessp.cpp",
@@ -84,7 +87,6 @@ project "cryptopp"
 		"mqueue.cpp",
 		"mqv.cpp",
 		"nbtheory.cpp",
-		"network.cpp",
 		"oaep.cpp",
 		"osrng.cpp",
 		"panama.cpp",
@@ -108,6 +110,10 @@ project "cryptopp"
 		"safer.cpp",
 		"salsa.cpp",
 		"seal.cpp",
+		"sha_simd.cpp",
+		"gf2n_simd.cpp",
+		"sse_simd.cpp",
+		"rijndael_simd.cpp",
 		"seed.cpp",
 		"serpent.cpp",
 		"sha.cpp",
@@ -117,7 +123,6 @@ project "cryptopp"
 		"sharkbox.cpp",
 		"simple.cpp",
 		"skipjack.cpp",
-		"socketft.cpp",
 		"sosemanuk.cpp",
 		"square.cpp",
 		"squaretb.cpp",
@@ -126,19 +131,17 @@ project "cryptopp"
 		"tftables.cpp",
 		"tiger.cpp",
 		"tigertab.cpp",
-		"trdlocal.cpp",
 		"ttmac.cpp",
 		"twofish.cpp",
 		"vmac.cpp",
-		"wait.cpp",
 		"wake.cpp",
 		"whrlpool.cpp",
-		"winpipes.cpp",
 		"xtr.cpp",
 		"xtrcrypt.cpp",
 		"zdeflate.cpp",
 		"zinflate.cpp",
-		"zlib.cpp"
+		"zlib.cpp",
+		"keccak_core.cpp"
 	}
 	
 	filter "platforms:x64"
@@ -147,11 +150,9 @@ project "cryptopp"
 			"x64masm.asm"
 		}
 	
-	-- C++11 build fails with GCC4.8/4.9
-	-- See https://github.com/weidai11/cryptopp/issues/206
-	filter "system:not windows"
-		removeflags { "C++14" }
-	
-	disablewarnings { "4005" }
 	filter {"system:windows"}
 		linkoptions { "/ignore:4221" }
+		disablewarnings { "4005" }
+
+	filter {"system:windows", "toolset:*_xp*"}
+		defines { "USE_MS_CRYPTOAPI", "_WIN32_WINNT=0x502", "NTDDI_VERSION=0x05020300" }

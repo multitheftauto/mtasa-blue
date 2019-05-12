@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -25,7 +25,7 @@
 #include "curl_setup.h"
 
 #ifdef CURL_DISABLE_PROXY
-#define Curl_SOCKS4(a,b,c,d,e,f) CURLE_NOT_BUILT_IN
+#define Curl_SOCKS4(a,b,c,d,e) CURLE_NOT_BUILT_IN
 #define Curl_SOCKS5(a,b,c,d,e,f) CURLE_NOT_BUILT_IN
 #else
 /*
@@ -49,8 +49,7 @@ CURLcode Curl_SOCKS4(const char *proxy_name,
                      const char *hostname,
                      int remote_port,
                      int sockindex,
-                     struct connectdata *conn,
-                     bool protocol4a);
+                     struct connectdata *conn);
 
 /*
  * This function logs in to a SOCKS5 proxy and sends the specifics to the
@@ -65,7 +64,7 @@ CURLcode Curl_SOCKS5(const char *proxy_name,
 
 #if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
 /*
- * This function handles the sockss5 gssapie negotiation and initialisation
+ * This function handles the SOCKS5 GSS-API negotiation and initialisation
  */
 CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
                                       struct connectdata *conn);
@@ -74,4 +73,3 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
 #endif /* CURL_DISABLE_PROXY */
 
 #endif  /* HEADER_CURL_SOCKS_H */
-

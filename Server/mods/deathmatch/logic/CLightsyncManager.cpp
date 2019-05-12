@@ -1,68 +1,65 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CLightsyncManager.h
-*  PURPOSE:     Lightweight synchronization manager class
-*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CLightsyncManager.h
+ *  PURPOSE:     Lightweight synchronization manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CLightsyncManager::CLightsyncManager ()
+CLightsyncManager::CLightsyncManager()
 {
 }
 
-CLightsyncManager::~CLightsyncManager ()
+CLightsyncManager::~CLightsyncManager()
 {
 }
 
-void CLightsyncManager::RegisterPlayer ( CPlayer* pPlayer )
+void CLightsyncManager::RegisterPlayer(CPlayer* pPlayer)
 {
-    if ( pPlayer->IsBeingDeleted() )
+    if (pPlayer->IsBeingDeleted())
         return;
 
     SEntry entry;
-    entry.ullTime = GetTickCount64_ ();
+    entry.ullTime = GetTickCount64_();
     entry.pPlayer = pPlayer;
     entry.eType = SYNC_PLAYER;
-    entry.uiContext = 0; // Unused
-    m_Queue.push_back ( entry );
+    entry.uiContext = 0;            // Unused
+    m_Queue.push_back(entry);
 }
 
-CPlayer* CLightsyncManager::FindPlayer ( const char* szArguments )
-{    
-    for ( std::list<SEntry>::iterator iter = m_Queue.begin();
-          iter != m_Queue.end (); )
+CPlayer* CLightsyncManager::FindPlayer(const char* szArguments)
+{
+    for (std::list<SEntry>::iterator iter = m_Queue.begin(); iter != m_Queue.end();)
     {
         SEntry& entry = *iter;
-        if ( strcmp ( entry.pPlayer->GetNick ( ), szArguments ) == 0 )
+        if (strcmp(entry.pPlayer->GetNick(), szArguments) == 0)
         {
             return entry.pPlayer;
         }
 
-         ++iter;
+        ++iter;
     }
     return NULL;
 }
 
-void CLightsyncManager::UnregisterPlayer ( CPlayer* pPlayer )
+void CLightsyncManager::UnregisterPlayer(CPlayer* pPlayer)
 {
-    for ( std::list<SEntry>::iterator iter = m_Queue.begin();
-          iter != m_Queue.end (); )
+    for (std::list<SEntry>::iterator iter = m_Queue.begin(); iter != m_Queue.end();)
     {
         SEntry& entry = *iter;
-        if ( entry.pPlayer == pPlayer )
-            m_Queue.erase ( iter++ );
+        if (entry.pPlayer == pPlayer)
+            m_Queue.erase(iter++);
         else
             ++iter;
     }
 }
 
-void CLightsyncManager::DoPulse ()
+void CLightsyncManager::DoPulse()
 {
     // The point of this method is to get all players that should receive right now the lightweight
     // sync from all the other players. To make this efficient, we are using a queue in what the
@@ -79,7 +76,7 @@ void CLightsyncManager::DoPulse ()
     // are also storing the delta context in what it happened, so we only consider the health unchanged
     // when we find the marker with the same context value.
 
-    if ( g_pBandwidthSettings->bLightSyncEnabled == false )
+    if (g_pBandwidthSettings->bLightSyncEnabled == false)
         return;
 
     // For counting stats
@@ -87,44 +84,44 @@ void CLightsyncManager::DoPulse ()
     long iBitsSent = 0;
 
     // For limiting light sync processing
-    long iLimitCounter = Max < uint > ( 10, g_pGame->GetPlayerManager ()->Count () / 25 );
-    int iLightsyncRate = g_TickRateSettings.iLightSync;
-    long long llTickCountNow = GetTickCount64_ ();
-    while ( m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= llTickCountNow && iLimitCounter > 0 )
+    long      iLimitCounter = std::max<uint>(10, g_pGame->GetPlayerManager()->Count() / 25);
+    int       iLightsyncRate = g_TickRateSettings.iLightSync;
+    long long llTickCountNow = GetTickCount64_();
+    while (m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= llTickCountNow && iLimitCounter > 0)
     {
-        SEntry entry = m_Queue.front ();
-        m_Queue.pop_front ();
+        SEntry entry = m_Queue.front();
+        m_Queue.pop_front();
 
-        CPlayer* pPlayer = entry.pPlayer;
-        CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
+        CPlayer*                       pPlayer = entry.pPlayer;
+        CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData();
 
-        switch ( entry.eType )
+        switch (entry.eType)
         {
             case SYNC_PLAYER:
             {
                 CLightsyncPacket packet;
 
                 // Use this players far list
-                const SViewerMapType& farList = pPlayer->GetFarPlayerList ();
+                const SViewerMapType& farList = pPlayer->GetFarPlayerList();
 
                 // For each far player
-                for ( SViewerMapType ::const_iterator it = farList.begin (); it != farList.end (); ++it )
+                for (SViewerMapType ::const_iterator it = farList.begin(); it != farList.end(); ++it)
                 {
                     CPlayer* pCurrent = it->first;
-                    dassert ( pPlayer != pCurrent );
+                    dassert(pPlayer != pCurrent);
 
                     // Only send if he isn't network troubled.
-                    if ( pCurrent->UhOhNetworkTrouble ( ) == false )
+                    if (pCurrent->UhOhNetworkTrouble() == false)
                     {
-                        CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
-                        packet.AddPlayer ( pCurrent );
+                        CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData();
+                        packet.AddPlayer(pCurrent);
 
                         // Calculate the delta sync
-                        if ( fabs(currentData.health.fLastHealth - pCurrent->GetHealth()) > LIGHTSYNC_HEALTH_THRESHOLD ||
-                             fabs(currentData.health.fLastArmor - pCurrent->GetArmor()) > LIGHTSYNC_HEALTH_THRESHOLD )
+                        if (fabs(currentData.health.fLastHealth - pCurrent->GetHealth()) > LIGHTSYNC_HEALTH_THRESHOLD ||
+                            fabs(currentData.health.fLastArmor - pCurrent->GetArmor()) > LIGHTSYNC_HEALTH_THRESHOLD)
                         {
-                            currentData.health.fLastHealth = pCurrent->GetHealth ();
-                            currentData.health.fLastArmor = pCurrent->GetArmor ();
+                            currentData.health.fLastHealth = pCurrent->GetHealth();
+                            currentData.health.fLastArmor = pCurrent->GetArmor();
                             currentData.health.bSync = true;
                             currentData.health.uiContext++;
 
@@ -134,16 +131,16 @@ void CLightsyncManager::DoPulse ()
                             marker.pPlayer = pCurrent;
                             marker.eType = DELTA_MARKER_HEALTH;
                             marker.uiContext = currentData.health.uiContext;
-                            m_Queue.push_back ( marker );
+                            m_Queue.push_back(marker);
                         }
 
-                        CVehicle* pVehicle = pCurrent->GetOccupiedVehicle ();
-                        if ( pVehicle && pCurrent->GetOccupiedVehicleSeat() == 0 )
+                        CVehicle* pVehicle = pCurrent->GetOccupiedVehicle();
+                        if (pVehicle && pCurrent->GetOccupiedVehicleSeat() == 0)
                         {
-                            if ( currentData.vehicleHealth.lastVehicle != pVehicle ||
-                                 fabs(currentData.vehicleHealth.fLastHealth - pVehicle->GetHealth ()) > LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD )
+                            if (currentData.vehicleHealth.lastVehicle != pVehicle ||
+                                fabs(currentData.vehicleHealth.fLastHealth - pVehicle->GetHealth()) > LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD)
                             {
-                                currentData.vehicleHealth.fLastHealth = pVehicle->GetHealth ();
+                                currentData.vehicleHealth.fLastHealth = pVehicle->GetHealth();
                                 currentData.vehicleHealth.lastVehicle = pVehicle;
                                 currentData.vehicleHealth.bSync = true;
                                 currentData.vehicleHealth.uiContext++;
@@ -154,33 +151,33 @@ void CLightsyncManager::DoPulse ()
                                 marker.pPlayer = pCurrent;
                                 marker.eType = DELTA_MARKER_VEHICLE_HEALTH;
                                 marker.uiContext = currentData.vehicleHealth.uiContext;
-                                m_Queue.push_back ( marker );
+                                m_Queue.push_back(marker);
                             }
                         }
 
-                        if ( packet.Count () == LIGHTSYNC_MAX_PLAYERS )
+                        if (packet.Count() == LIGHTSYNC_MAX_PLAYERS)
                         {
-                            iBitsSent += pPlayer->Send ( packet );
+                            iBitsSent += pPlayer->Send(packet);
                             iPacketsSent++;
-                            packet.Reset ();
+                            packet.Reset();
                         }
                     }
                 }
 
-                if ( packet.Count () > 0 )
+                if (packet.Count() > 0)
                 {
-                    iBitsSent += pPlayer->Send ( packet );
+                    iBitsSent += pPlayer->Send(packet);
                     iPacketsSent++;
                 }
 
-                RegisterPlayer ( pPlayer );
+                RegisterPlayer(pPlayer);
                 iLimitCounter--;
                 break;
             }
 
             case DELTA_MARKER_HEALTH:
             {
-                if ( data.health.uiContext == entry.uiContext )
+                if (data.health.uiContext == entry.uiContext)
                     data.health.bSync = false;
 
                 break;
@@ -188,7 +185,7 @@ void CLightsyncManager::DoPulse ()
 
             case DELTA_MARKER_VEHICLE_HEALTH:
             {
-                if ( data.vehicleHealth.uiContext == entry.uiContext )
+                if (data.vehicleHealth.uiContext == entry.uiContext)
                     data.vehicleHealth.bSync = false;
 
                 break;

@@ -186,7 +186,6 @@ LUA_API void  (lua_pushboolean) (lua_State *L, int b);
 LUA_API void  (lua_pushlightuserdata) (lua_State *L, void *p);
 LUA_API int   (lua_pushthread) (lua_State *L);
 
-
 /*
 ** get functions (Lua -> stack)
 */
@@ -357,6 +356,7 @@ LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count);
 LUA_API lua_Hook lua_gethook (lua_State *L);
 LUA_API int lua_gethookmask (lua_State *L);
 LUA_API int lua_gethookcount (lua_State *L);
+LUA_API void lua_addtotalbytes(lua_State *L, int n);
 
 
 struct lua_Debug {

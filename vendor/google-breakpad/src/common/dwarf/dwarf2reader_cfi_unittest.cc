@@ -31,6 +31,7 @@
 
 // dwarf2reader_cfi_unittest.cc: Unit tests for dwarf2reader::CallFrameInfo
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include <string>
@@ -125,6 +126,8 @@ class MockCallFrameErrorReporter: public CallFrameInfo::Reporter {
   MOCK_METHOD1(EarlyEHTerminator, void(uint64));
   MOCK_METHOD2(CIEPointerOutOfRange, void(uint64, uint64));
   MOCK_METHOD2(BadCIEId, void(uint64, uint64));
+  MOCK_METHOD2(UnexpectedAddressSize, void(uint64, uint8_t));
+  MOCK_METHOD2(UnexpectedSegmentSize, void(uint64, uint8_t));
   MOCK_METHOD2(UnrecognizedVersion, void(uint64, int version));
   MOCK_METHOD2(UnrecognizedAugmentation, void(uint64, const string &));
   MOCK_METHOD2(InvalidPointerEncoding, void(uint64, uint8));
@@ -186,7 +189,7 @@ class CFI: public CFIFixture, public Test { };
 TEST_F(CFI, EmptyRegion) {
   EXPECT_CALL(handler, Entry(_, _, _, _, _, _)).Times(0);
   EXPECT_CALL(handler, End()).Times(0);
-  static const char data[1] = { 42 };
+  static const uint8_t data[] = { 42 };
 
   ByteReader byte_reader(ENDIANNESS_BIG);
   CallFrameInfo parser(data, 0, &byte_reader, &handler, &reporter);
@@ -213,7 +216,8 @@ TEST_F(CFI, IncompleteLength32) {
 
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(8);
-  CallFrameInfo parser(contents.data(), contents.size() - 2,
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size() - 2,
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -238,7 +242,8 @@ TEST_F(CFI, IncompleteLength64) {
 
   ByteReader byte_reader(ENDIANNESS_LITTLE);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size() - 4,
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size() - 4,
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -262,7 +267,8 @@ TEST_F(CFI, IncompleteId32) {
 
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(8);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -288,7 +294,8 @@ TEST_F(CFI, BadId32) {
 
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(8);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -309,7 +316,8 @@ TEST_F(CFI, SingleCIE) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_LITTLE);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
 }
@@ -339,7 +347,8 @@ TEST_F(CFI, OneFDE) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
 }
@@ -382,7 +391,8 @@ TEST_F(CFI, TwoFDEsOneCIE) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
 }
@@ -431,7 +441,8 @@ TEST_F(CFI, TwoFDEsTwoCIEs) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_LITTLE);
   byte_reader.SetAddressSize(8);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
 }
@@ -475,7 +486,8 @@ TEST_F(CFI, BadVersion) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -519,7 +531,8 @@ TEST_F(CFI, BadAugmentation) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_FALSE(parser.Start());
 }
@@ -553,7 +566,8 @@ TEST_F(CFI, CIEVersion1ReturnColumn) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
 }
@@ -587,9 +601,95 @@ TEST_F(CFI, CIEVersion3ReturnColumn) {
   EXPECT_TRUE(section.GetContents(&contents));
   ByteReader byte_reader(ENDIANNESS_BIG);
   byte_reader.SetAddressSize(4);
-  CallFrameInfo parser(contents.data(), contents.size(),
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
                        &byte_reader, &handler, &reporter);
   EXPECT_TRUE(parser.Start());
+}
+
+TEST_F(CFI, CIEVersion4AdditionalFields) {
+  CFISection section(kBigEndian, 4);
+  Label cie;
+  section
+      .Mark(&cie)
+      // CIE version 4 with expected address and segment size.
+      .CIEHeader(0x0ab4758d, 0xc010fdf7, 0x89, 4, "", true, 8, 0)
+      .FinishEntry()
+      // FDE, citing that CIE.
+      .FDEHeader(cie, 0x86763f2b, 0x2a66dc23)
+      .FinishEntry();
+
+  PERHAPS_WRITE_DEBUG_FRAME_FILE("CIEVersion3ReturnColumn", section);
+
+  {
+    InSequence s;
+    EXPECT_CALL(handler, Entry(_, 0x86763f2b, 0x2a66dc23, 4, "", 0x89))
+        .WillOnce(Return(true));
+    EXPECT_CALL(handler, End()).WillOnce(Return(true));
+  }
+
+  string contents;
+  EXPECT_TRUE(section.GetContents(&contents));
+  ByteReader byte_reader(ENDIANNESS_BIG);
+  byte_reader.SetAddressSize(4);
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
+                       &byte_reader, &handler, &reporter);
+  EXPECT_TRUE(parser.Start());
+}
+
+TEST_F(CFI, CIEVersion4AdditionalFieldsUnexpectedAddressSize) {
+  CFISection section(kBigEndian, 4);
+  Label cie;
+
+  section
+      .Mark(&cie)
+      // Unexpected address size.
+      .CIEHeader(0x4be22f75, 0x2492236e, 0x6b6efb87, 4, "", true, 3, 0)
+      .FinishEntry()
+      // FDE, citing that CIE.
+      .FDEHeader(cie, 0x86763f2b, 0x2a66dc23)
+      .FinishEntry();
+
+  PERHAPS_WRITE_DEBUG_FRAME_FILE("AdditionalFieldsUnexpectedAddress", section);
+
+  EXPECT_CALL(reporter, UnexpectedAddressSize(_, 3))
+    .WillOnce(Return());
+
+  string contents;
+  EXPECT_TRUE(section.GetContents(&contents));
+  ByteReader byte_reader(ENDIANNESS_BIG);
+  byte_reader.SetAddressSize(8);
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
+                       &byte_reader, &handler, &reporter);
+  EXPECT_FALSE(parser.Start());
+}
+
+TEST_F(CFI, CIEVersion4AdditionalFieldsUnexpectedSegmentSize) {
+  CFISection section(kBigEndian, 4);
+  Label cie;
+
+  section
+      .Mark(&cie)
+      .CIEHeader(0xf8bc4399, 0x8cf09931, 0xf2f519b2, 4, "", true, 8, 7)
+      .FinishEntry()
+      .FDEHeader(cie, 0x7bf0fda0, 0xcbcd28d8)
+      .FinishEntry();
+
+  PERHAPS_WRITE_DEBUG_FRAME_FILE("AdditionalFieldsUnexpectedSegment", section);
+
+  EXPECT_CALL(reporter, UnexpectedSegmentSize(_, 7))
+    .WillOnce(Return());
+
+  string contents;
+  EXPECT_TRUE(section.GetContents(&contents));
+  ByteReader byte_reader(ENDIANNESS_BIG);
+  byte_reader.SetAddressSize(8);
+  CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                       contents.size(),
+                       &byte_reader, &handler, &reporter);
+  EXPECT_FALSE(parser.Start());
 }
 
 struct CFIInsnFixture: public CFIFixture {
@@ -668,7 +768,8 @@ struct CFIInsnFixture: public CFIFixture {
     }
     ByteReader byte_reader(endianness);
     byte_reader.SetAddressSize(section->AddressSize());
-    CallFrameInfo parser(contents.data(), contents.size(),
+    CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                         contents.size(),
                          &byte_reader, &handler, &reporter);
     if (succeeds)
       EXPECT_TRUE(parser.Start());
@@ -1989,10 +2090,12 @@ struct EHFrameFixture: public CFIInsnFixture {
     }
     ByteReader byte_reader(endianness);
     byte_reader.SetAddressSize(section->AddressSize());
-    byte_reader.SetCFIDataBase(encoded_pointer_bases.cfi, contents.data());
+    byte_reader.SetCFIDataBase(encoded_pointer_bases.cfi,
+                               reinterpret_cast<const uint8_t *>(contents.data()));
     byte_reader.SetTextBase(encoded_pointer_bases.text);
     byte_reader.SetDataBase(encoded_pointer_bases.data);
-    CallFrameInfo parser(contents.data(), contents.size(),
+    CallFrameInfo parser(reinterpret_cast<const uint8_t *>(contents.data()),
+                         contents.size(),
                          &byte_reader, &handler, &reporter, true);
     if (succeeds)
       EXPECT_TRUE(parser.Start());

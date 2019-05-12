@@ -6,8 +6,7 @@ project "Falagard"
 	pchheader "StdInc.h"
 	pchsource "src/StdInc.cpp"
 	
-	defines { "FALAGARDBASE_EXPORTS" }
-	disablewarnings { "4297" }
+	defines { "FALAGARDBASE_EXPORTS", "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
 	
 	includedirs { 
 		"include",
@@ -30,3 +29,6 @@ project "Falagard"
 		flags { "ExcludeFromBuild" } 
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 
+	
+	filter {"system:windows"}
+		disablewarnings { "4297" }

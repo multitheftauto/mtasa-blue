@@ -1,23 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/XML.cpp
-*  PURPOSE:     XML module entry
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/XML.cpp
+ *  PURPOSE:     XML module entry
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 CXMLImpl* pXMLInterface = NULL;
 
-_DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
+MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
 {
     // Initialize and do any file recovery as necessary
-    CXMLFileImpl::InitFileRecovery( szSaveFlagDirectory );
+    CXMLFileImpl::InitFileRecovery(szSaveFlagDirectory);
 
     // this is required during parsing, see resources project fallout/help.xml @r659
     TiXmlBase::SetCondenseWhiteSpace(false);
@@ -26,9 +25,9 @@ _DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
     return pXMLInterface;
 }
 
-_DECLSPEC_EX void ReleaseXMLInterface()
+MTAEXPORT void ReleaseXMLInterface()
 {
-    if ( pXMLInterface )
+    if (pXMLInterface)
     {
         delete pXMLInterface;
         pXMLInterface = NULL;
@@ -42,7 +41,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
     // Kill the interface on detach
     if (dwReason == DLL_PROCESS_DETACH)
     {
-        ReleaseXMLInterface ();
+        ReleaseXMLInterface();
     }
 
     return TRUE;
@@ -50,7 +49,6 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
 #else
 
-void __attribute__ ((destructor)) ReleaseXMLInterface(void);
+void __attribute__((destructor)) ReleaseXMLInterface(void);
 
 #endif
-

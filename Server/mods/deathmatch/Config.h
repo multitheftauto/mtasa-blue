@@ -1,56 +1,64 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/Config.h
-*  PURPOSE:     Header for platform specific functions, types and defines
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/Config.h
+ *  PURPOSE:     Header for platform specific functions, types and defines
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 // Header file for platform specific functions, types and defines
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#pragma once
 
 #include <MTAPlatform.h>
 #include <Common.h>
 
 /*** va_pass() (passing of ... variable length arguments ***/
-template<unsigned char count>
-struct SVaPassNext{
-    SVaPassNext<count-1> big;
-    unsigned long dw;
+template <unsigned char count>
+struct SVaPassNext
+{
+    SVaPassNext<count - 1> big;
+    unsigned long          dw;
 };
-template<> struct SVaPassNext<0>{};
-//SVaPassNext - is generator of structure of any size at compile time.
+template <>
+struct SVaPassNext<0>
+{
+};
+// SVaPassNext - is generator of structure of any size at compile time.
 
-class CVaPassNext{
+class CVaPassNext
+{
 public:
     SVaPassNext<50> svapassnext;
-    CVaPassNext(va_list & args){
-        try{//to avoid access violation
+    CVaPassNext(va_list& args)
+    {
+        try
+        {            // to avoid access violation
             memcpy(&svapassnext, args, sizeof(svapassnext));
-        } catch (...) {}
+        }
+        catch (...)
+        {
+        }
     }
 };
 #define va_pass(valist) CVaPassNext(valist).svapassnext
 /*** va_pass() (passing of ... variable length arguments ***/
 
 // Min and max number of characters in player nicknames (this must match the client's)
-#define MIN_NICK_LENGTH 1
-#define MAX_NICK_LENGTH 22
+#define MIN_PLAYER_NICK_LENGTH 1
+#define MAX_PLAYER_NICK_LENGTH 22
 
 // Min and max number of characters in player nametags (this must match the client's)
-#define MIN_NAMETAG_LENGTH 1
-#define MAX_NAMETAG_LENGTH 22
+#define MIN_PLAYER_NAMETAG_LENGTH 1
+#define MAX_PLAYER_NAMETAG_LENGTH 64
 
 #define MAX_TEAM_NAME_LENGTH 255
 
-// Min and max number of characters in passwords
+// Min number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
-#define MAX_PASSWORD_LENGTH 30
 
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
@@ -98,9 +106,6 @@ public:
 #if MAX_CHAT_LENGTH > 255
     #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
-
-// Defines how long the whowas list can be
-#define MAX_WHOWAS_LENGTH 1024
 
 // Max valid weather id
 #define MAX_VALID_WEATHER 255
@@ -159,5 +164,3 @@ public:
 
 // MTA minclientversion auto update and others
 #define HQCOMMS_URL                 "http://updatesa.multitheftauto.com/sa/server/hqcomms/"
-
-#endif

@@ -1,7 +1,6 @@
 #pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <windows.h>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
@@ -26,6 +25,7 @@
 
 // SDK includes
 #include <core/CLocalizationInterface.h>
+#include <core/CTrayIconInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>
@@ -39,7 +39,6 @@
 #include <CVector.h>
 #include <CVector4D.h>
 #include <CMatrix4.h>
-#include <CQuat.h>
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>
@@ -78,6 +77,7 @@
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
+#include <CClientIFP.h>
 #include <CClientWater.h>
 #include <CClientWeapon.h>
 #include <CClientRenderElement.h>
@@ -94,6 +94,9 @@
 #include <CLogger.h>
 #include <CMapEventManager.h>
 #include <CModelNames.h>
+#include <CIFPEngine.h>
+#include <CFileReader.h>
+#include <CIFPAnimations.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
@@ -115,7 +118,6 @@
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
-#include <luadefs/CLuaFileDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
@@ -148,7 +150,6 @@
 #include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
-#include "logic/CGameEntityXRefManager.h"
 #include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
@@ -156,5 +157,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

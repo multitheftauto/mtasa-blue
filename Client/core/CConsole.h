@@ -1,96 +1,95 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CConsole.h
-*  PURPOSE:     Header file for console class
-*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*               Christian Myhre Lundheim <>
-*               Derek Abdine <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CConsole.h
+ *  PURPOSE:     Header file for console class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CConsole;
 
-#ifndef __CCONSOLE_H
-#define __CCONSOLE_H
+#pragma once
 
 #include <core/CConsoleInterface.h>
 #include "CCore.h"
 #include "CCommands.h"
 #include "CSingleton.h"
-#include "CConsoleHistory.h"
+#include "CEntryHistory.h"
 
 class CConsole : public CConsoleInterface
 {
 public:
-                        CConsole                        ( CGUI* pManager, CGUIElement* pParent = NULL );
-                        ~CConsole                       ( void );
+    CConsole(CGUI* pManager, CGUIElement* pParent = NULL);
+    ~CConsole();
 
-    void                Echo                            ( const char* szText );
-    void                Print                           ( const char* szText );
-    void                Printf                          ( const char* szFormat, ... );
+    void Echo(const char* szText);
+    void Print(const char* szText);
+    void Printf(const char* szFormat, ...);
 
-    void                Clear                           ( void );
+    void Clear();
 
-    bool                IsEnabled                       ( void );
-    void                SetEnabled                      ( bool bEnabled );
+    bool IsEnabled();
+    void SetEnabled(bool bEnabled);
 
-    bool                IsVisible                       ( void );
-    void                SetVisible                      ( bool bVisible );
-    void                Show                            ( void );
-    void                Hide                            ( void );
-    bool                IsInputActive                   ( void );
-    void                ActivateInput                   ( void );
+    bool IsVisible();
+    void SetVisible(bool bVisible);
+    void Show();
+    void Hide();
+    bool IsInputActive();
+    void ActivateInput();
 
-    void                HandleTextAccepted              ( bool bHandled );
-    void                GetCommandInfo                  ( const std::string &strIn, std::string & strCmdOut, std::string & strCmdLineOut );
+    void HandleTextAccepted(bool bHandled);
+    void GetCommandInfo(const std::string& strIn, std::string& strCmdOut, std::string& strCmdLineOut);
 
-    void                SetNextHistoryText              ( void );
-    void                SetPreviousHistoryText          ( void );
-    void                SetNextAutoCompleteMatch        ( void );
-    void                ResetAutoCompleteMatch          ( void );
+    void ResetHistoryChanges();
+    void SelectHistoryEntry(int iEntry);
+    bool SetNextHistoryText();
+    bool SetPreviousHistoryText();
 
-    CVector2D           GetPosition                     ( void );
-    void                SetPosition                     ( CVector2D& vecPosition );
+    void SetNextAutoCompleteMatch();
+    void ResetAutoCompleteMatch();
 
-    CVector2D           GetSize                         ( void );
-    void                SetSize                         ( CVector2D& vecSize );
+    CVector2D GetPosition();
+    void      SetPosition(CVector2D& vecPosition);
+
+    CVector2D GetSize();
+    void      SetSize(CVector2D& vecSize);
 
 protected:
-    bool                OnCloseButtonClick              ( CGUIElement* pElement );
-    bool                Edit_OnTextAccepted             ( CGUIElement* pElement );
-    bool                History_OnTextChanged           ( CGUIElement* pElement );
-    void                FlushPendingAdd                 ( void );
+    bool OnCloseButtonClick(CGUIElement* pElement);
+    bool Edit_OnTextAccepted(CGUIElement* pElement);
+    bool History_OnTextChanged(CGUIElement* pElement);
+    void FlushPendingAdd();
+    void GracefullySetEditboxText(const char* szText);
+    bool GracefullyMoveEditboxCaret(CGUIElement* pElement);
 
 private:
-    void                CreateElements                  ( CGUIElement* pParent = NULL );
-    void                DestroyElements                 ( void );
+    void CreateElements(CGUIElement* pParent = NULL);
+    void DestroyElements();
 
-    bool                OnWindowSize                    ( CGUIElement* pElement );
+    bool OnWindowSize(CGUIElement* pElement);
 
-    CGUI*               m_pManager;
+    CGUI* m_pManager;
 
-    CConsoleHistory*    m_pConsoleHistory;
-    int                 m_iHistoryIndex;
-    std::vector < int > m_AutoCompleteList;
-    int                 m_iAutoCompleteIndex;
+    CEntryHistory*   m_pConsoleHistory;
+    int              m_iHistoryIndex;
+    std::vector<int> m_AutoCompleteList;
+    int              m_iAutoCompleteIndex;
 
-    CGUIWindow*         m_pWindow;
-    CGUIEdit*           m_pInput;
-    CGUIMemo*           m_pHistory;
+    CGUIWindow* m_pWindow;
+    CGUIEdit*   m_pInput;
+    CGUIMemo*   m_pHistory;
 
-    bool                m_bIsEnabled;
+    bool m_bIsEnabled;
 
-    float               m_fWindowSpacer;
-    float               m_fWindowSpacerTop;
-    float               m_fWindowX;
-    float               m_fWindowY;
-    float               m_fInputHeight;
-    SString             m_strPendingAdd;
+    float   m_fWindowSpacer;
+    float   m_fWindowSpacerTop;
+    float   m_fWindowX;
+    float   m_fWindowY;
+    float   m_fInputHeight;
+    SString m_strPendingAdd;
+    SString m_strSavedInputText;
 };
-
-#endif

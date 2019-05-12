@@ -45,8 +45,12 @@ MinidumpDescriptor::MinidumpDescriptor(const MinidumpDescriptor& descriptor)
       directory_(descriptor.directory_),
       c_path_(NULL),
       size_limit_(descriptor.size_limit_),
-      microdump_build_fingerprint_(descriptor.microdump_build_fingerprint_),
-      microdump_product_info_(descriptor.microdump_product_info_) {
+      address_within_principal_mapping_(
+          descriptor.address_within_principal_mapping_),
+      skip_dump_if_principal_mapping_not_referenced_(
+          descriptor.skip_dump_if_principal_mapping_not_referenced_),
+      sanitize_stacks_(descriptor.sanitize_stacks_),
+      microdump_extra_info_(descriptor.microdump_extra_info_) {
   // The copy constructor is not allowed to be called on a MinidumpDescriptor
   // with a valid path_, as getting its c_path_ would require the heap which
   // can cause problems in compromised environments.
@@ -67,8 +71,12 @@ MinidumpDescriptor& MinidumpDescriptor::operator=(
     UpdatePath();
   }
   size_limit_ = descriptor.size_limit_;
-  microdump_build_fingerprint_ = descriptor.microdump_build_fingerprint_;
-  microdump_product_info_ = descriptor.microdump_product_info_;
+  address_within_principal_mapping_ =
+      descriptor.address_within_principal_mapping_;
+  skip_dump_if_principal_mapping_not_referenced_ =
+      descriptor.skip_dump_if_principal_mapping_not_referenced_;
+  sanitize_stacks_ = descriptor.sanitize_stacks_;
+  microdump_extra_info_ = descriptor.microdump_extra_info_;
   return *this;
 }
 
@@ -84,17 +92,6 @@ void MinidumpDescriptor::UpdatePath() {
   path_.clear();
   path_ = directory_ + "/" + guid_str + ".dmp";
   c_path_ = path_.c_str();
-}
-
-void MinidumpDescriptor::SetMicrodumpBuildFingerprint(
-    const char* build_fingerprint) {
-  assert(mode_ == kWriteMicrodumpToConsole);
-  microdump_build_fingerprint_ = build_fingerprint;
-}
-
-void MinidumpDescriptor::SetMicrodumpProductInfo(const char* product_info) {
-  assert(mode_ == kWriteMicrodumpToConsole);
-  microdump_product_info_ = product_info;
 }
 
 }  // namespace google_breakpad

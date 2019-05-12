@@ -5,13 +5,13 @@ project "GUI"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
 			"../sdk",
 			"../../vendor/cegui-0.4.0-custom/include",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 	 
 	pchheader "StdInc.h"
@@ -35,6 +35,9 @@ project "GUI"
 		"*.h",
 		"*.cpp"
 	}
+	
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
