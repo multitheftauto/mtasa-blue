@@ -76,7 +76,7 @@ private:
     bool        m_bEnabled;
     eVoiceState m_VoiceState;
 
-    HSTREAM* m_pAudioStream;
+    HRECORD m_pAudioStream;
 
     void*                 m_pSpeexEncoderState;
     SpeexPreprocessState* m_pSpeexPreprocState;

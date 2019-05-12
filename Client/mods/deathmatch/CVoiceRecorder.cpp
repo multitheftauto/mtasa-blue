@@ -79,7 +79,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     BASS_RecordInit(-1);
 
     // Start recording
-    BASS_RecordStart(SAMPLERATE_WIDEBAND, 1, BASS_SAMPLE_FLOAT, &BASSCallback, this);
+    m_pAudioStream = BASS_RecordStart(SAMPLERATE_WIDEBAND, 1, BASS_SAMPLE_FLOAT, &BASSCallback, this);
 
     // Initialize our outgoing buffer
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
