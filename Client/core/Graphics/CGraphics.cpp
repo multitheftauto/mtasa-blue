@@ -690,6 +690,43 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
     return 0.0f;
 }
 
+float CGraphics::GetDXTextHeight(const char* szText, float fWidth, float fScaleX, float fScaleY, LPD3DXFONT pDXFont, bool bWordBreak, bool bColorCoded)
+{
+    // We're calling this a lot on empty strings
+    // Also prevents undefined behavior when using
+    // strText.back() below
+    if (*szText == '\0')
+        return 0.0f;
+
+    if (!pDXFont)
+        pDXFont = GetFont();
+
+    pDXFont = MaybeGetBigFont(pDXFont, fScaleX, fScaleY);
+
+    if (pDXFont)
+    {
+        RECT    rect = {0, 0, fWidth, 0};
+        WString strText = MbUTF8ToUTF16(szText);
+
+        if (bColorCoded)
+            RemoveColorCodesInPlaceW(strText);
+
+        // Compute the size of the text itself
+        ulong ulFlags = DT_CALCRECT;
+        if (bWordBreak)
+            ulFlags |= DT_WORDBREAK;
+
+        D3DXMATRIX   matrix;
+        D3DXVECTOR2  scaling(fScaleX, fScaleY);
+        D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL);
+        m_pDXSprite->SetTransform(&matrix);
+        pDXFont->DrawTextW(m_pDXSprite, strText.c_str(), strText.length(), &rect, ulFlags, D3DCOLOR_XRGB(0, 0, 0));
+
+        return (float)(rect.bottom - rect.top);
+    }
+    return 0.0f;
+}
+
 ID3DXFont* CGraphics::GetFont(eFontType fontType, float* pfOutScaleUsed, float fRequestedScale, const char* szCustomScaleUser)
 {
     if (pfOutScaleUsed)

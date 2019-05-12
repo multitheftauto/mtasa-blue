@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
+#define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions()
@@ -28,6 +28,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawPrimitive", DxDrawPrimitive},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxGetTextWidth", DxGetTextWidth},
+        {"dxGetTextHeight", DxGetTextHeight},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
         {"dxCreateTexture", DxCreateTexture},
@@ -569,9 +570,9 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveVertice>();
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveVertice>();
+    bool             bPostGUI;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
@@ -599,7 +600,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
             g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
-        }       
+        }
     }
     else
     {
@@ -615,10 +616,10 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
-    CClientMaterial*    pMaterialElement;
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial* pMaterialElement;
+    bool             bPostGUI;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
@@ -637,7 +638,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
                 pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
-                                                               vecTableContent[3], vecTableContent[4]});
+                                                                 vecTableContent[3], vecTableContent[4]});
                 break;
         }
     }
@@ -737,6 +738,58 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 
         // Success
         lua_pushnumber(luaVM, fWidth);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxGetTextHeight(lua_State* luaVM)
+{
+    //  float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
+    //      bool wordBreak=false, bool colorCoded=false] )
+    SString            strText;
+    float              fWidth;
+    float              fScaleX;
+    float              fScaleY;
+    eFontType          fontType;
+    CClientDxFont*     pDxFontElement;
+    bool               bWordBreak;
+    bool               bColorCoded;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strText);
+    argStream.ReadNumber(fWidth, 0);
+    if (argStream.NextIsUserDataOfType<CLuaVector2D>())
+    {
+        CVector2D vecScale;
+        argStream.ReadVector2D(vecScale);
+        fScaleX = vecScale.fX;
+        fScaleY = vecScale.fY;
+    }
+    else
+    {
+        argStream.ReadNumber(fScaleX, 1);
+        if (argStream.NextIsNumber())
+            argStream.ReadNumber(fScaleY);
+        else
+            fScaleY = fScaleX;
+    }
+    MixedReadDxFontString(argStream, fontType, FONT_DEFAULT, pDxFontElement);
+    argStream.ReadBool(bWordBreak, false);
+    argStream.ReadBool(bColorCoded, false);
+
+    if (!argStream.HasErrors())
+    {
+        // Get DX font
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont(fontType, pDxFontElement);
+
+        float fHeight = g_pCore->GetGraphics()->GetDXTextHeight(strText.c_str(), fWidth, fScaleX, fScaleY, pD3DXFont, bWordBreak, bColorCoded);
+        lua_pushnumber(luaVM, fHeight);
         return 1;
     }
     else
@@ -977,10 +1030,8 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
         if (!bIsRawData)
         {
-            bIsRawData = (strFile.find("technique ") != std::string::npos) &&
-                (strFile.find("pass ") != std::string::npos) &&
-                (strFile.find('{') != std::string::npos) &&
-                (strFile.find('}') != std::string::npos);
+            bIsRawData = (strFile.find("technique ") != std::string::npos) && (strFile.find("pass ") != std::string::npos) &&
+                         (strFile.find('{') != std::string::npos) && (strFile.find('}') != std::string::npos);
         }
     }
 
@@ -1006,8 +1057,8 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     }
 
     SString        strStatus;
-    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
-        strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(strPath, strRootPath, bIsRawData, strStatus, fPriority,
+                                                                                                  fMaxDistance, bLayered, false, iEntityTypeMaskResult);
 
     if (pShader)
     {
