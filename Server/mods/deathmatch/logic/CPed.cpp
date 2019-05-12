@@ -112,6 +112,7 @@ CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetHealth(GetHealth());
         pTemp->SetArmor(GetArmor());
         pTemp->SetSyncable(IsSyncable());
+        pTemp->SetSpawned(true);
     }
 
     return pTemp;
