@@ -1923,34 +1923,35 @@ int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
     return 1;
 }
 
+// table getRemoteRequests([resource theResource = nil])
 int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CResource*       pResource = nullptr;
-    SString          sResourceName;
     CLuaMain*        pLuaMain = nullptr;
     int              iIndex = 0;
-    if (argStream.NextIsUserData())
-    {
-        argStream.ReadUserData(pResource);
-    }
-    else if (argStream.NextIsString())
-    {
-        argStream.ReadString(sResourceName);
-        pResource = g_pClientGame->GetResourceManager()->GetResource(sResourceName.c_str());
-    }
+
+    argStream.ReadUserData(pResource, NULL);
+
     // Grab virtual machine
     if (pResource)
         pLuaMain = pResource->GetVM();
+
     lua_newtable(luaVM);
     for (const auto& request : g_pClientGame->GetRemoteCalls()->GetCalls())
     {
-        lua_pushnumber(luaVM, ++iIndex);
-        lua_pushuserdata(luaVM, request);
-        lua_settable(luaVM, -3);
+        if(!pLuaMain || request->GetVM() == pLuaMain)
+        {
+            lua_pushnumber(luaVM, ++iIndex);
+            lua_pushuserdata(luaVM, request);
+            lua_settable(luaVM, -3);
+        }
     }
+
     return 1;
 }
+
+// table getRemoteRequestInfo(element theRequest)
 int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
@@ -1958,26 +1959,26 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
     CRemoteCall*     pRemoteCall = nullptr;
     CResource*       pThisResource = g_pClientGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
 
+
     argStream.ReadUserData(pRemoteCall);
 
     if (!argStream.HasErrors())
     {
         CResource* pResource = pRemoteCall->GetVM()->GetResource();
-
-        if (pResource != pThisResource)
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
+        bool bExtendedInfo = (pResource == pThisResource);
+        
         info.PushString("type");
         info.PushString((pRemoteCall->IsFetch() ? "fetch" : "call"));
+
+        // TODO: remove query_string from url when bExtendedInfo isn't set
         info.PushString("url");
         info.PushString(pRemoteCall->GetURL().c_str());
+
         info.PushString("queue");
         info.PushString(pRemoteCall->GetQueueName().c_str());
+        
         info.PushString("resource");
-
+        
         if (pResource)
             info.PushResource(pResource);
         else
@@ -1986,13 +1987,29 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString("start");
         info.PushNumber(pRemoteCall->GetStartTime());
 
-        info.PushString("postData");
-        info.PushString(pRemoteCall->GetOptions().strPostData.c_str());
+        if (bExtendedInfo)
+        {
+            info.PushString("postData");
+            info.PushString(pRemoteCall->GetOptions().strPostData.c_str());
+
+            // requested headers
+            info.PushString("headers");
+
+            for (auto const& header : pRemoteCall->GetOptions().requestHeaders)
+            {
+                requestedHeaders.PushString(header.first.c_str());
+                requestedHeaders.PushString(header.second.c_str());
+            }
+
+            info.PushTable(&requestedHeaders);
+        }
+
         info.PushString("method");
         info.PushString((pRemoteCall->GetOptions().strRequestMethod.length() >= 1 ? pRemoteCall->GetOptions().strRequestMethod.ToUpper().c_str() : "POST"));
 
         info.PushString("connectionAttempts");
         info.PushNumber(pRemoteCall->GetOptions().uiConnectionAttempts);
+
         info.PushString("connectionTimeout");
         info.PushNumber(pRemoteCall->GetOptions().uiConnectTimeoutMs);
 
@@ -2011,16 +2028,6 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString("currentAttempt");
         info.PushNumber(downloadInfo.uiAttemptNumber);
 
-        // requested headers
-        info.PushString("headers");
-
-        for (auto const& header : pRemoteCall->GetOptions().requestHeaders)
-        {
-            requestedHeaders.PushString(header.first.c_str());
-            requestedHeaders.PushString(header.second.c_str());
-        }
-
-        info.PushTable(&requestedHeaders);
         info.PushAsTable(luaVM);
         return 1;
     }
@@ -2029,6 +2036,7 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
     return 1;
 }
 
+// bool abortRemoteRequest(element theRequest)
 int CLuaFunctionDefs::AbortRemoteRequest(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);

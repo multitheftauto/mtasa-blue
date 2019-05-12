@@ -728,15 +728,10 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
     CLuaMain*        pLuaMain = nullptr;
     int              iIndex = 0;
 
-    if(argStream.NextIsUserData())
-    {
-        argStream.ReadUserData(pResource, NULL);
+    argStream.ReadUserData(pResource, NULL);
 
-        if (pResource)
-        {
-            pLuaMain = pResource->GetVirtualMachine();
-        }
-    }
+    if (pResource)
+        pLuaMain = pResource->GetVirtualMachine();
 
     if(!argStream.HasErrors())
     {
@@ -819,6 +814,8 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
                 requestedHeaders.PushString(header.first.c_str());
                 requestedHeaders.PushString(header.second.c_str());
             }
+
+            info.PushTable(&requestedHeaders);
         }
 
         info.PushString("method");
@@ -845,9 +842,7 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString("currentAttempt");
         info.PushNumber(downloadInfo.uiAttemptNumber);
 
-        info.PushTable(&requestedHeaders);
         info.PushAsTable(luaVM);
-
         return 1;
     }
     
