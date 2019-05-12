@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CVoiceRecorder.h
  *  PURPOSE:     Remote player voice chat playback
@@ -17,7 +17,7 @@
 */
 
 #include <mutex>
-#include <speex/speex.h>
+#include <libopus/include/opus.h>
 #include <CClientPlayer.h>
 #include <../deathmatch/CVoiceRecorder.h>
 #include <bass.h>
@@ -84,8 +84,8 @@ private:
     CVoiceRecorder* m_pVoiceRecorder;
     unsigned int    m_SampleRate;
     HSTREAM         m_pBassPlaybackStream;
-    void*           m_pSpeexDecoderState;
-    int             m_iSpeexIncomingFrameSampleCount;
+    OpusDecoder*    m_pOpusDecoderState;
+    int             m_iOpusIncomingFrameSampleCount;
     float           m_fVolume;
     float           m_fVolumeScale;
 

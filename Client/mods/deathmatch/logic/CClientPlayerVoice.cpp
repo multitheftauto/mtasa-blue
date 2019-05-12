@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CVoiceRecorder.cpp
  *  PURPOSE:     Remote player voice chat playback
@@ -25,12 +25,13 @@ void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user);
 
 CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder)
 {
+    /*
     m_pPlayer = pPlayer;
     m_pVoiceRecorder = pVoiceRecorder;
     m_bVoiceActive = false;
     m_SampleRate = SAMPLERATE_WIDEBAND;
-    m_pSpeexDecoderState = NULL;
-    m_iSpeexIncomingFrameSampleCount = 0;
+    m_pOpusDecoderState = NULL;
+    m_iOpusIncomingFrameSampleCount = 0;
 
     // Get initial voice volume
     m_fVolume = 1.0f;
@@ -47,14 +48,16 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
 #endif
     m_fPlaybackSpeed = 1.0f;
     Init();
+    */
 }
 CClientPlayerVoice::~CClientPlayerVoice()
 {
-    DeInit();
+    //DeInit();
 }
 
 void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, void* user)
 {
+    /*
     if (data == 0)
     {
         CClientPlayerVoice* pVoice = static_cast<CClientPlayerVoice*>(user);
@@ -66,10 +69,12 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
             pVoice->m_bVoiceActive = false;
         }
     }
+    */
 }
 
 void CClientPlayerVoice::Init()
 {
+    /*
     // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
     unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
@@ -81,30 +86,31 @@ void CClientPlayerVoice::Init()
     BASS_ChannelPlay(m_pBassPlaybackStream, false);
     BASS_ChannelSetAttribute(m_pBassPlaybackStream, BASS_ATTRIB_VOL, m_fVolume * m_fVolumeScale);
 
-    // Get the relevant speex mode for the servers sample rate
-    const SpeexMode* speexMode = m_pVoiceRecorder->getSpeexModeFromSampleRate();
-    m_pSpeexDecoderState = speex_decoder_init(speexMode);
-
-    // Initialize our speex decoder
-    speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
-    speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &ucQuality);
+    // Initialize our opus decoder
+    m_iOpusIncomingFrameSampleCount = m_SampleRate;
+    m_pOpusDecoderState = opus_decoder_create(m_SampleRate, 2, nullptr);
+    opus_decoder_ctl(m_pOpusDecoderState, OPUS_SET_COMPLEXITY(&ucQuality));
+    */
 }
 
 void CClientPlayerVoice::DeInit()
 {
+    /*
     BASS_ChannelStop(m_pBassPlaybackStream);
     BASS_StreamFree(m_pBassPlaybackStream);
 
     m_pBassPlaybackStream = NULL;
 
-    speex_decoder_destroy(m_pSpeexDecoderState);
-    m_pSpeexDecoderState = NULL;
+    opus_decoder_destroy(m_pOpusDecoderState);
+    m_pOpusDecoderState = NULL;
 
     m_SampleRate = SAMPLERATE_WIDEBAND;
+    */
 }
 
 void CClientPlayerVoice::DoPulse()
 {
+    /*
     // Dispatch queued events
     ServiceEventQueue();
 
@@ -122,11 +128,12 @@ void CClientPlayerVoice::DoPulse()
         float fScaledVolume = m_fVolume * m_fVolumeScale;
         BASS_ChannelSetAttribute(m_pBassPlaybackStream, BASS_ATTRIB_VOL, fScaledVolume);
     }
+    */
 }
 
 void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
 {
-    m_Mutex.lock();
+    /*m_Mutex.lock();
 
     if (!m_bVoiceActive)
     {
@@ -145,6 +152,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
         m_Mutex.unlock();
     }
 
+    /*
     char      pTempBuffer[2048];
     SpeexBits speexBits;
     speex_bits_init(&speexBits);
@@ -157,10 +165,12 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
     unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
     BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
+    */
 }
 
 void CClientPlayerVoice::ServiceEventQueue()
 {
+    /*
     std::list<SString> eventQueue;
     {
         std::lock_guard<std::mutex> lock(m_Mutex);
@@ -172,6 +182,7 @@ void CClientPlayerVoice::ServiceEventQueue()
         CLuaArguments Arguments;
         m_pPlayer->CallEvent(strEvent, Arguments, true);
     }
+    */
 }
 
 ////////////////////////////////////////////////////////////

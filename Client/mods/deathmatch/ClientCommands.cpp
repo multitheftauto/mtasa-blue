@@ -732,6 +732,7 @@ void COMMAND_ShowSyncData(const char* szCmdLine)
 
 void COMMAND_VoicePushToTalk(const char* szCmdLine)
 {
+    /*
     CVoiceRecorder* const pVoiceRecorder = g_pClientGame->GetVoiceRecorder();
 
     if (pVoiceRecorder->IsEnabled())
@@ -753,6 +754,7 @@ void COMMAND_VoicePushToTalk(const char* szCmdLine)
             g_pCore->GetConsole()->Print("voiceptt: This server does not have voice enabled");
         }
     }
+    */
 }
 
 void COMMAND_ServerInfo(const char* szCmdLine)

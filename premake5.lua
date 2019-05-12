@@ -134,7 +134,7 @@ workspace "MTASA"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
-		include "vendor/libspeex"
+		include "vendor/libopus"
 	end
 	
 	filter {}
