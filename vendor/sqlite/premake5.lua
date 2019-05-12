@@ -1,10 +1,10 @@
 project "sqlite"
-	language "C++"
+	language "C"
 	kind "StaticLib"
 	targetname "sqlite"
 	
 	vpaths { 
-		["Headers/*"] = "**.h",
+		["Headers/*"] = "*.h",
 		["Sources/*"] = "*.c",
 		["*"] = "premake5.lua"
 	}

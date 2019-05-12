@@ -276,7 +276,6 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->MoveToBack();
 
     // Submenus
-    m_QuickConnect.SetVisible(false);
     m_ServerBrowser.SetVisible(false);
     m_ServerInfo.Hide();
     m_Settings.SetVisible(false);
@@ -695,7 +694,6 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     {
         m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered();
-        m_QuickConnect.SetVisible(false);
         m_ServerBrowser.SetVisible(false);
         m_Settings.SetVisible(false);
         m_Credits.SetVisible(false);
