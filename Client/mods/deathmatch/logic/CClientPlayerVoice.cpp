@@ -39,10 +39,12 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
 
     m_fVolume = m_fVolume * m_fVolumeScale;
 
+#ifndef VOICE_DEBUG_LOCAL_PLAYBACK
     if (pPlayer->IsLocalPlayer() == true)
     {
         m_fVolume = 0.0f;
     }
+#endif
     m_fPlaybackSpeed = 1.0f;
     Init();
 }
@@ -110,7 +112,11 @@ void CClientPlayerVoice::DoPulse()
     g_pCore->GetCVars()->Get("voicevolume", fPreviousVolume);
     fPreviousVolume *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
 
-    if (fPreviousVolume != m_fVolumeScale && m_pPlayer->IsLocalPlayer() == false)
+    if (fPreviousVolume != m_fVolumeScale
+#ifndef VOICE_DEBUG_LOCAL_PLAYBACK
+        && m_pPlayer->IsLocalPlayer() == false
+#endif
+    )
     {
         m_fVolumeScale = fPreviousVolume;
         float fScaledVolume = m_fVolume * m_fVolumeScale;
@@ -218,7 +224,11 @@ void CClientPlayerVoice::SetVolume(float fVolume, bool bStore)
 {
     m_fVolume = fVolume;
 
-    if (m_pBassPlaybackStream && m_pPlayer->IsLocalPlayer() == false)
+    if (m_pBassPlaybackStream
+#ifndef VOICE_DEBUG_LOCAL_PLAYBACK
+        && m_pPlayer->IsLocalPlayer() == false
+#endif
+    )
     {
         float fScaledVolume = m_fVolume * m_fVolumeScale;
         BASS_ChannelSetAttribute(m_pBassPlaybackStream, BASS_ATTRIB_VOL, fScaledVolume);
