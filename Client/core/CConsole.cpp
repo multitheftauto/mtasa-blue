@@ -215,8 +215,9 @@ bool CConsole::Edit_OnTextAccepted(CGUIElement* pElement)
     // Get the text object from our input window.
     strInput = m_pInput->GetText();
 
-    // Add the input text to the console history
-    m_pConsoleHistory->Add(strInput.c_str());
+    // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
+    if (!strInput.empty() && (m_pConsoleHistory->Empty() || m_pConsoleHistory->GetLast() != strInput))
+        m_pConsoleHistory->Add(strInput.c_str());
 
     // Clear the input text.
     m_pInput->SetText("");
