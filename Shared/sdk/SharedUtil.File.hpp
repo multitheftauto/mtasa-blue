@@ -86,12 +86,34 @@ bool SharedUtil::FileDelete(const SString& strFilename, bool bForce)
     return File::Delete(strFilename) == 0;
 }
 
-bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFilenameNew)
+bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFilenameNew, int* pOutErrorCode)
 {
 #ifdef WIN32
-    return MoveFile(strFilenameOld, strFilenameNew) != 0;
+    if (MoveFileExW(FromUTF8(strFilenameOld), FromUTF8(strFilenameNew), MOVEFILE_COPY_ALLOWED) == 0)
+    {
+        int errorCode = GetLastError();
+        if (errorCode == ERROR_ACCESS_DENIED)
+        {
+            // Try alternate rename strategy
+            if (!FileExists(strFilenameNew) && FileCopy(strFilenameOld, strFilenameNew))
+            {
+                FileDelete(strFilenameOld);
+                return true;
+            }
+        }
+        if (pOutErrorCode)
+            *pOutErrorCode = errorCode;
+        return false;
+    }
+    return true;
 #else
-    return rename(strFilenameOld, strFilenameNew) == 0;
+    if (rename(strFilenameOld, strFilenameNew) != 0)
+    {
+        if (pOutErrorCode)
+            *pOutErrorCode = errno;
+        return false;
+    }
+    return true;
 #endif
 }
 

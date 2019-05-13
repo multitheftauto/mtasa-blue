@@ -149,6 +149,7 @@ namespace SharedUtil
 
     SString GetSystemErrorMessage(uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
     void    SetClipboardText(const SString& strText);
+    SString GetClipboardText();
 
     // Version checks
     bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
@@ -161,6 +162,8 @@ namespace SharedUtil
 
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
+
+    DWORD GetMainThreadId();
 
     //
     // Return true if currently executing the main thread
@@ -1688,7 +1691,7 @@ namespace SharedUtil
 
         T* operator->() { return pPointer->GetData(); }
 
-        const T* operator->()const { return pPointer->GetData(); }
+        const T* operator->() const { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 

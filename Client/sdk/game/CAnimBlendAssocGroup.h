@@ -17,6 +17,7 @@ class CAnimBlendAssociation;
 class CAnimBlendStaticAssociation;
 struct RpClump;
 class CAnimBlock;
+class CAnimBlendAssocGroupSAInterface;
 
 class CAnimBlendAssocGroup
 {
@@ -31,4 +32,5 @@ public:
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
     virtual bool                              IsLoaded() = 0;
     virtual void                              SetIDOffset(int iOffset) = 0;
+    virtual CAnimBlendAssocGroupSAInterface*  GetInterface() = 0;
 };

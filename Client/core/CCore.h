@@ -135,7 +135,6 @@ public:
     bool IsCursorForcedVisible();
     bool IsCursorControlsToggled() { return m_bCursorToggleControls; }
     void HideMainMenu();
-    void HideQuickConnect();
     void SetCenterCursor(bool bEnabled);
 
     void ShowServerInfo(unsigned int WindowType);
@@ -275,9 +274,7 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-
-    bool IsHostSmotraServer();
-
+    HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 private:
     // Core devices.
     CXML*               m_pXML;
