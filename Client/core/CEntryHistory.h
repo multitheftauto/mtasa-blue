@@ -71,7 +71,7 @@ public:
     }
 
     // Get the last entry in history
-    CEntryHistoryItem& GetLast() { return m_entries.back(); }
+    CEntryHistoryItem& GetLast() { return m_entries.front(); }
 
     // Resets temporary history edits to their original values
     void ResetChanges()
