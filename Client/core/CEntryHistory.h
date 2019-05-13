@@ -31,7 +31,7 @@ public:
     // Contains a clean version of the entry with sensitive info parsed out
     SString clean;
 
-    CEntryHistoryItem(SString entry) { SetContent(entry); }
+    CEntryHistoryItem(const SString& entry) { SetContent(entry); }
 
     // Reset the temporary value with the original value
     void Reset() { temp = entry; }
@@ -58,16 +58,17 @@ public:
     void Clear() { m_entries.clear(); }
 
     // Check whether history contains a line
-    bool Contains(const SString line) const { return std::find(m_entries.begin(), m_entries.end(), line) != m_entries.end(); }
+    bool Contains(const SString& line) const { return std::find(m_entries.begin(), m_entries.end(), line) != m_entries.end(); }
 
     // Return a boolean representing whether the history is empty or not
     bool Empty() const { return m_entries.empty(); }
 
     // Return a specific entry from history
-    CEntryHistoryItem& Get(unsigned int index) {
+    CEntryHistoryItem* Get(unsigned int index) {
         auto& iter = std::next(m_entries.begin(), index);
         if (iter != m_entries.end())
-            return *iter;
+            return &(*iter);
+        return nullptr;
     }
 
     // Get the last entry in history

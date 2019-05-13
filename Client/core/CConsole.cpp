@@ -306,14 +306,14 @@ void CConsole::SelectHistoryEntry(int iEntry)
     if (iPreviousHistoryIndex == -1)
         m_strSavedInputText = strInputText;
     else
-        m_pConsoleHistory->Get(iPreviousHistoryIndex).temp = strInputText;
+        m_pConsoleHistory->Get(iPreviousHistoryIndex)->temp = strInputText;
 
     // If we haven't selected any history entry, use our saved input text
     if (m_iHistoryIndex == -1)
         GracefullySetEditboxText(m_strSavedInputText.c_str());
     else
     {
-        SString& strSelectedInputHistoryEntry = m_pConsoleHistory->Get(m_iHistoryIndex).temp;
+        SString& strSelectedInputHistoryEntry = m_pConsoleHistory->Get(m_iHistoryIndex)->temp;
         GracefullySetEditboxText(strSelectedInputHistoryEntry.c_str());
     }
 }
@@ -364,8 +364,9 @@ void CConsole::SetNextAutoCompleteMatch()
         {
             // Step through the history
             int iIndex = -1;
-            while (const char* szItem = m_pConsoleHistory->Get(++iIndex))
+            while (CEntryHistoryItem* pEntryHistoryItem = m_pConsoleHistory->Get(++iIndex))
             {
+                const char* szItem = *pEntryHistoryItem;
                 if (strlen(szItem) < 3)            // Skip very short lines
                     continue;
 
@@ -374,7 +375,10 @@ void CConsole::SetNextAutoCompleteMatch()
                 {
                     if (m_AutoCompleteList.size())            // Dont add duplicates of the previously added line
                     {
-                        const char* szPrevItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_AutoCompleteList.size() - 1));
+                        CEntryHistoryItem* pPrevEntryHistoryItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_AutoCompleteList.size() - 1));
+                        if (!pPrevEntryHistoryItem)
+                            continue;
+                        const char* szPrevItem = *pPrevEntryHistoryItem;
                         if (strcmp(szItem, szPrevItem) == 0)
                             continue;
                     }
@@ -393,11 +397,12 @@ void CConsole::SetNextAutoCompleteMatch()
     m_iAutoCompleteIndex = (m_iAutoCompleteIndex + 1) % m_AutoCompleteList.size();
 
     // Grab the item and set the input text to it
-    const char* szItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_iAutoCompleteIndex));
+    CEntryHistoryItem* pHistoryEntryItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_iAutoCompleteIndex));
+    if (!pHistoryEntryItem)
+        return;
+    const char* szItem = *pHistoryEntryItem;
     if (szItem)
-    {
         GracefullySetEditboxText(szItem);
-    }
 }
 
 void CConsole::CreateElements(CGUIElement* pParent)

@@ -571,7 +571,7 @@ void CChat::SelectInputHistoryEntry(int iEntry)
     if (iPreviouslySelectedInputHistoryEntry == -1)
         m_strSavedInputText = m_strInputText;
     else
-        m_pInputHistory->Get(iPreviouslySelectedInputHistoryEntry).temp = m_strInputText;
+        m_pInputHistory->Get(iPreviouslySelectedInputHistoryEntry)->temp = m_strInputText;
 
     // Clear input
     ClearInput();
@@ -581,7 +581,7 @@ void CChat::SelectInputHistoryEntry(int iEntry)
         SetInputText(m_strSavedInputText.c_str());
     else
     {
-        SString& strSelectedInputHistoryEntry = m_pInputHistory->Get(m_iSelectedInputHistoryEntry).temp;
+        SString& strSelectedInputHistoryEntry = m_pInputHistory->Get(m_iSelectedInputHistoryEntry)->temp;
         // If the selected entry isn't empty, fill it in
         if (!strSelectedInputHistoryEntry.empty())
             SetInputText(strSelectedInputHistoryEntry.c_str());
