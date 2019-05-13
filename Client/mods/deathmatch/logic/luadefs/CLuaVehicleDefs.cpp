@@ -36,6 +36,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
+        {"areVehicleLightsOn", AreVehicleLightsOn},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
         {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
         {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
@@ -999,6 +1000,25 @@ int CLuaVehicleDefs::GetVehiclePanelState(lua_State* luaVM)
     {
         unsigned char ucState = pVehicle->GetPanelStatus(ucPanel);
         lua_pushnumber(luaVM, ucState);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::AreVehicleLightsOn(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
+        lua_pushboolean(luaVM, bLightsOn);
         return 1;
     }
     else
