@@ -36,7 +36,7 @@ struct CIMGArchiveFile
     EntryHeader*			fileEntry;
     uint64					actualFileOffset;
     uint64					actualFileSize;
-    std::vector<uchar>		fileByteBuffer;
+    CBuffer		            fileByteBuffer;
 };
 
 class CIMGArchive

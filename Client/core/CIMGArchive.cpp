@@ -13,7 +13,7 @@ CIMGArchive::CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOper
     }
     else if (fileOperation == IMG_FILE_WRITE)
     {
-        fopen_s(&CIMGArchiveFile_, &archiveFilePath_[0], "w");
+        //fopen_s(&CIMGArchiveFile_, &archiveFilePath_[0], "w");
     }
 }
 
@@ -55,28 +55,34 @@ DWORD GetTotalBlockSize(DWORD blockSize)
     return blockSize / IMG_BLOCK_SIZE;
 }
 
+#include <iostream>
+#include <fstream>
+#include <sys/stat.h>
+#include <cstring>
+#include <cerrno>
+
 void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
 {
-    if (CIMGArchiveFile_ != NULL)
-    {
+    //if (CIMGArchiveFile_ != NULL)
+    //{/
         DWORD dwTotalEntries = imgEntries.size();
-
         const char * version = "VER2";
-        fwrite(version, 1, 4, CIMGArchiveFile_);
-        fwrite(&dwTotalEntries, 1, 4, CIMGArchiveFile_);
-
-
 
         std::vector <EntryHeader> vecEntryHeaders;
         vecEntryHeaders.reserve(dwTotalEntries);
 
-        std::ofstream outputStream;
+        std::ofstream outputStream(archiveFilePath_, std::ofstream::out | std::ios::binary | std::ios::trunc);
 
-        outputStream.open(archiveFilePath_, std::ofstream::out | std::ios::binary);
+        using std::ofstream;
+        using std::strerror;
+        using std::cerr;
+        
+
+        //outputStream.open(archiveFilePath_, std::ofstream::out | std::ios::binary);
 
         if (outputStream.fail())
         {
-            std::printf("ostream failed to open\n");
+            std::printf("WriteEntries: ostream failed to open: %s\n", strerror(errno));
         }
 
         outputStream.write((char*)version, 4);
@@ -87,7 +93,7 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
         for (int i = 0; i < dwTotalEntries; i++)
         {
             CIMGArchiveFile* pArchiveFile = imgEntries[i];
-            DWORD fileBlockSize = GetTotalBlockSize(pArchiveFile->actualFileSize);
+            DWORD fileBlockSize = pArchiveFile->fileEntry->fSize;
             vecEntryHeaders.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry->fileName);
             currentBlockOffset += fileBlockSize;
         }
@@ -104,11 +110,13 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
             DWORD actualFileSize = vecEntryHeaders[i].fSize * 2048;
 
             outputStream.seekp(actualFileOffset, std::ios::beg);
-            outputStream.write((char*)pArchiveFile->fileByteBuffer.data(), actualFileSize);
+
+            //std::printf("WriteEntries: actualFileSize = %d\n", actualFileSize);
+            outputStream.write((char*)pArchiveFile->fileByteBuffer.GetData(), actualFileSize);
         }
 
-        std::printf("okay done writing\n");
-    }
+        std::printf("WriteEntries: okay done writing\n");
+    //}
 }
 
 
@@ -136,11 +144,12 @@ CIMGArchiveFile* CIMGArchive::GetFileByID(uint id)
             newArchiveFile->fileEntry = &archiveFileEntries_[id];
             newArchiveFile->actualFileOffset = archiveFileEntries_[id].offset * 2048;
             newArchiveFile->actualFileSize = archiveFileEntries_[id].fSize * 2048;
-            newArchiveFile->fileByteBuffer.reserve((size_t)newArchiveFile->actualFileSize);
+            newArchiveFile->fileByteBuffer.SetSize((size_t)newArchiveFile->actualFileSize);
             fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
             // std::printf("archiveFileEntries_.size() = %d | id: %d | fileBYteBuffer Size: %d | actual file size: %d\n",
             //    archiveFileEntries_.size(), id, newArchiveFile->fileByteBuffer.size(), newArchiveFile->actualFileSize);
-            fread(newArchiveFile->fileByteBuffer.data(), 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
+            char * pData = newArchiveFile->fileByteBuffer.GetData();
+            fread(pData, 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
             return newArchiveFile;
         }
         return NULL;
@@ -159,9 +168,9 @@ CIMGArchiveFile* CIMGArchive::GetFileByName(std::string fileName)
                 newArchiveFile->fileEntry = &archiveFileEntries_[i];
                 newArchiveFile->actualFileOffset = archiveFileEntries_[i].offset * 2048;
                 newArchiveFile->actualFileSize = archiveFileEntries_[i].fSize * 2048;
-                newArchiveFile->fileByteBuffer.reserve(newArchiveFile->actualFileSize);
+                newArchiveFile->fileByteBuffer.SetSize(newArchiveFile->actualFileSize);
                 fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
-                fread(newArchiveFile->fileByteBuffer.data(), 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
+                fread(newArchiveFile->fileByteBuffer.GetData(), 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
                 return newArchiveFile;
             }
             return NULL;
