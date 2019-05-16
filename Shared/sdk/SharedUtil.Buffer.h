@@ -45,6 +45,8 @@ namespace SharedUtil
         CBuffer() {}
         CBuffer(const void* pData, uint uiSize) { AddBytes(pData, uiSize, 0); }
 
+        void Swap(CBuffer& vecContainer) { swap(vecContainer); }
+
         void Clear() { clear(); }
 
         bool IsEmpty() const { return empty(); }
@@ -66,6 +68,8 @@ namespace SharedUtil
         }
 
         uint GetSize() const { return (uint)size(); }
+
+        uint GetCapacity() const { return (uint)capacity(); }
 
         // Access
         char* GetData(uint uiOffset = 0) { return size() ? &at(uiOffset) : NULL; }
