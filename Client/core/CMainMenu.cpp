@@ -282,6 +282,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_Credits.SetVisible(false);
     m_pNewsBrowser->SetVisible(false);
     m_pLanguageSelector = new CLanguageSelector(m_pCanvas);
+    std::printf("CMainMenuConstructor\n");
 
     // We're not ingame
     SetIsIngame(false);
@@ -432,6 +433,14 @@ void CMainMenu::Update()
 
     if (m_bIsFullyVisible)
     {
+        static bool bArchiveOpimizerVisible = false;
+        if (!bArchiveOpimizerVisible)
+        {
+            bArchiveOpimizerVisible = true;
+            std::printf("fully visible yes\n");
+            m_ImgArchiveOptimizer.SetVisible(true);
+        }
+
         // Grab our cursor position
         tagPOINT cursor;
         GetCursorPos(&cursor);
@@ -698,7 +707,6 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
         m_Settings.SetVisible(false);
         m_Credits.SetVisible(false);
         m_pNewsBrowser->SetVisible(false);
-
         //        m_bIsInSubWindow = false;
     }
     else

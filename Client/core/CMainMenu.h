@@ -19,6 +19,7 @@ class CMainMenu;
 #include <ServerBrowser/CServerInfo.h>
 #include "CSettings.h"
 #include "CCredits.h"
+#include "CIMGArchiveOptimizer.h"
 #include <Graphics/CGraphics.h>
 class CNewsBrowser;
 class CLanguageSelector;
@@ -115,13 +116,14 @@ private:
     bool                   m_bMouseOverMenu;
 
     // Submenu classes
-    CQuestionBox       m_QuestionBox;
-    CSettings          m_Settings;
-    CNewsBrowser*      m_pNewsBrowser;
-    CCredits           m_Credits;
-    CServerBrowser     m_ServerBrowser;
-    CServerInfo        m_ServerInfo;
-    CLanguageSelector* m_pLanguageSelector;
+    CQuestionBox         m_QuestionBox;
+    CSettings            m_Settings;
+    CNewsBrowser*        m_pNewsBrowser;
+    CCredits             m_Credits;
+    CServerBrowser       m_ServerBrowser;
+    CServerInfo          m_ServerInfo;
+    CLanguageSelector*   m_pLanguageSelector;
+    CIMGArchiveOptimizer m_ImgArchiveOptimizer;
 
     // Properties
     bool m_bIsIngame;
