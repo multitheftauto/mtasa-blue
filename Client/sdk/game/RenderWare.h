@@ -424,3 +424,49 @@ struct RwError
 {
     int err1, err2;
 };
+
+/*****************************************************************************/
+/** RenderWare Plugins (extensions)                                         **/
+/*****************************************************************************/
+
+typedef struct RwPluginRegistry RwPluginRegistry;
+typedef struct RwPluginRegEntry RwPluginRegEntry;
+
+struct RwPluginRegistry
+{
+    unsigned int      sizeOfStruct;
+    unsigned int      origSizeOfStruct;
+    unsigned int      maxSizeOfStruct;
+    unsigned int      staticAlloc;
+    RwPluginRegEntry *firstRegEntry;
+    RwPluginRegEntry *lastRegEntry;
+};
+
+typedef RwStream *(*RwPluginDataChunkWriteCallBack)(RwStream *stream, int binaryLength, const void *object, int offsetInObject, int sizeInObject);
+typedef RwStream *(*RwPluginDataChunkReadCallBack)(RwStream *stream, int binaryLength, void *object, int offsetInObject, int sizeInObject);
+typedef int(*RwPluginDataChunkGetSizeCallBack)(const void *object, int offsetInObject, int sizeInObject);
+typedef bool(*RwPluginDataChunkAlwaysCallBack)(void *object, int offsetInObject, int sizeInObject);
+typedef bool(*RwPluginDataChunkRightsCallBack)(void *object, int offsetInObject, int sizeInObject, int extraData);
+typedef void *(*RwPluginObjectConstructor)(void *object, int offsetInObject, int sizeInObject);
+typedef void *(*RwPluginObjectCopy)(void *dstObject, const void *srcObject, int offsetInObject, int sizeInObject);
+typedef void *(*RwPluginObjectDestructor)(void *object, int offsetInObject, int sizeInObject);
+typedef void *(*RwPluginErrorStrCallBack)(void *);
+
+struct RwPluginRegEntry
+{
+    int             offset;
+    int             size;
+    unsigned int    pluginID;
+    RwPluginDataChunkReadCallBack readCB;
+    RwPluginDataChunkWriteCallBack writeCB;
+    RwPluginDataChunkGetSizeCallBack getSizeCB;
+    RwPluginDataChunkAlwaysCallBack alwaysCB;
+    RwPluginDataChunkRightsCallBack rightsCB;
+    RwPluginObjectConstructor constructCB;
+    RwPluginObjectDestructor destructCB;
+    RwPluginObjectCopy copyCB;
+    RwPluginErrorStrCallBack errStrCB;
+    RwPluginRegEntry *nextRegEntry;
+    RwPluginRegEntry *prevRegEntry;
+    RwPluginRegistry *parentRegistry;
+};

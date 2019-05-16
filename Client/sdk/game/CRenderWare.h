@@ -69,11 +69,13 @@ public:
     virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
-    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData) = 0;
-    virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
+    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture = true) = 0;
+    virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr) = 0;
     virtual CColModel*       ReadCOL(const CBuffer& fileData) = 0;
     virtual bool             WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary) = 0;
     virtual bool             WriteDFF(const SString& strFilename, RpClump* pClump) = 0;
+    virtual bool             WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary) = 0;
+    virtual bool             WriteDFF(void* pData, size_t dataSize, RpClump* pClump) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;

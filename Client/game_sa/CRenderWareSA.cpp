@@ -176,6 +176,224 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     return true;
 }
 
+/*
+0x0253f200: atomic_visibility_distance
+0x0253f201: clump_visibility_distance
+0x0253f202: frame_visibility_distance
+
+0x0253f2f3: pipeline_set
+0x0253f2f4: unused_5
+0x0253f2f5: texdictionary_link
+0x0253f2f6: specular_material
+0x0253f2f7: unused_8
+0x0253f2f8: effect_2d
+0x0253f2f9: extra_vert_colour
+0x0253f2fa: collision_model
+0x0253f2fb: gta_hanim
+0x0253f2fc: reflection_material
+0x0253f2fd: breakable
+0x0253f2fe: frame
+0x0253f2ff: unused_16*/
+std::map<void*, std::set<RwPluginRegEntry *>> mapOfRwPlugins;
+
+bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
+{
+    if (pPluginRegistryEntry->pluginID >= (DWORD)0x0253F2F0)
+    {
+        switch (pPluginRegistryEntry->pluginID)
+        {
+            /*
+            case (DWORD)0x0253F2F3: // pipeline_set
+            {
+                return false;
+            }
+            */
+            /*
+            case (DWORD)0x0253F2F4: // unused_5
+            {
+                return false;
+            }
+            
+            case (DWORD)0x0253F2F5: // texdictionary_link
+            {
+                return false;
+            }
+            case (DWORD)0x0253F2F6: // specular_material
+            {
+                return false;
+            }
+            
+            case (DWORD)0x0253F2F7: // unused_8
+            {
+                return false;
+            }
+            /*
+            case (DWORD)0x0253F2F8: // effect_2d
+            {
+                return false;
+            }
+           */
+            
+            case (DWORD)0x0253F2F9: // extra_vert_colour
+            {
+                return false;
+                /*DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+                */
+            }
+          /*
+            case (DWORD)0x0253F2FA: // collision_model
+            {
+                return false;
+            }
+            case (DWORD)0x0253F2FB: // gta_hanim
+            {
+                return false;
+            }
+            case (DWORD)0x0253F2FC: // reflection_material
+            {
+                return false;
+            }
+            */
+            case (DWORD)0x0253F2FD: // breakable
+            {
+
+                //return false;
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+            
+            /*
+            case (DWORD)0x0253F2FE: // frame
+            {
+                return false;
+            }
+            
+            case (DWORD)0x0253F2FF: // unused_16
+            {
+                return false;
+            }
+            */
+            default:
+            {
+                return true;
+            }
+        }
+    }
+    return true;;
+}
+
+int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* pObject)
+{
+    int iTotalPluginsSize = 0;
+
+    RwPluginRegEntry *pPluginRegistryEntry = pPluginRegistry->firstRegEntry;
+    for (iTotalPluginsSize = 0; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        bool bPluginUsed = IsPluginUsed(pPluginRegistryEntry, pObject);
+        if (!bPluginUsed)
+        {
+            //std::printf("rwPluginRegistryGetSize: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
+        }
+
+        if (pPluginRegistryEntry->getSizeCB && bPluginUsed)
+        {
+            int iRegistryEntrySize = pPluginRegistryEntry->getSizeCB(pObject, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
+            if (iRegistryEntrySize > 0)
+            {
+                iTotalPluginsSize += iRegistryEntrySize + 12;
+            }
+        }
+    }
+
+    return iTotalPluginsSize;
+}
+
+RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1, RwStream *stream, const void* object)
+{
+
+    auto _rwStreamWriteVersionedChunkHeader = (RwStream *(__cdecl*)(RwStream *stream, int type, int size, int version, unsigned __int16 buildNum))0x7ED270;
+
+
+    int iTotalPluginsSize = _rwPluginRegistryGetSize(a1, (void*)object);
+
+    if (!_rwStreamWriteVersionedChunkHeader(stream, 3, iTotalPluginsSize, 0x36003, 0xFFFFu))
+    {
+        return nullptr;
+    }
+
+    if (!a1->firstRegEntry)
+    {
+        return a1;
+    }
+
+    for (auto pPluginRegistryEntry = a1->firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        RwPluginDataChunkGetSizeCallBack GetSize = pPluginRegistryEntry->getSizeCB;
+        if (GetSize)
+        {
+            bool bPluginUsed = IsPluginUsed(pPluginRegistryEntry, (void*)object);
+            if (!bPluginUsed)
+            {
+              std::printf("_rwPluginRegistryWriteDataChunks: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, (void*)object);
+            }
+
+            if (pPluginRegistryEntry->writeCB && bPluginUsed)
+            {
+                int iPluginDataSize = GetSize(object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
+                if (iPluginDataSize > 0)
+                {
+
+                    if (!_rwStreamWriteVersionedChunkHeader(stream, pPluginRegistryEntry->pluginID, iPluginDataSize, 0x36003, 0xFFFFu))
+                    {
+                        return nullptr;
+                    }
+
+                    if (!pPluginRegistryEntry->writeCB(stream, iPluginDataSize, object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size))
+                    {
+                        return nullptr;
+                    }
+                }
+            }
+        }
+    }
+
+    return a1;
+}
+
+RwStream * PipelinePluginWriteCB(RwStream *stream, int length, unsigned char* pObject)
+{
+    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+    int& PipelinePluginOffset = *(int*)0x8D6080;
+
+    RwStreamWrite(stream, (void*)(pObject+ PipelinePluginOffset), length);
+    return stream;
+}
+
+void RegisterPipelinePluginWriteCB()
+{
+    RwPluginRegistry& atomicTKList = *(RwPluginRegistry*)0x8D624C;
+    for (auto pPluginRegistryEntry = atomicTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        // pipeline_set plugin
+        if (pPluginRegistryEntry->pluginID == (DWORD)0x0253F2F3)
+        {
+            pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PipelinePluginWriteCB;
+            break;
+        }
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 //  CRenderWareSA
@@ -185,8 +403,12 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 CRenderWareSA::CRenderWareSA(eGameVersion version)
 {
     InitRwFunctions(version);
-
     InitTextureWatchHooks();
+    HookInstall(0x808B00, (DWORD)_rwPluginRegistryGetSize, 5);
+    HookInstall(0x808B40, (DWORD)_rwPluginRegistryWriteDataChunks, 5);
+
+    RegisterPipelinePluginWriteCB();
+
     m_pMatchChannelManager = new CMatchChannelManager();
     m_iRenderingEntityType = TYPE_MASK_WORLD;
     m_GTAVertexShadersDisabledTimer.SetMaxIncrement(1000, true);
@@ -199,7 +421,7 @@ CRenderWareSA::~CRenderWareSA()
 }
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData)
+RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture)
 {
     // open the stream
     RwStream* streamTexture;
@@ -215,7 +437,9 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
 
     // check for errors
     if (streamTexture == NULL)
+    {
         return NULL;
+    }
 
     // TXD header id: 0x16
     // find our txd chunk (dff loads textures, so correct loading order is: txd, dff)
@@ -231,19 +455,60 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
     // close the stream
     RwStreamClose(streamTexture, NULL);
 
-    ScriptAddedTxd(pTex);
+    if (bScriptAddTexture)
+    {
+        ScriptAddedTxd(pTex);
+    }
 
     return pTex;
 }
 
+bool LoadTheFileToMemory(const SString& strFilePath, CBuffer& theBuffer)
+{
+    std::ifstream   fileStream(FromUTF8(strFilePath), std::ios::binary | std::ios::ate);
+    std::streamsize iFileSize = fileStream.tellg();
+    if (iFileSize == -1) // eIFSTREAM::SIZE_ERROR
+    {
+        return false;
+    }
+
+    fileStream.seekg(0, std::ios::beg);
+    theBuffer.SetSize(iFileSize);
+    if (fileStream.read(theBuffer.GetData(), iFileSize))
+    {
+        return true;
+    }
+    return false;
+}
+
+
+class  CStreamingInfoSAInterface {
+public:
+    short m_nNextIndex; // ms_pArrayBase array index
+    short m_nPrevIndex; // ms_pArrayBase array index
+    short m_nNextIndexOnCd;
+    unsigned char m_nFlags; // see eStreamingFlags
+    unsigned char m_nImgId;
+    unsigned int m_nCdPosn;
+    unsigned int m_nCdSize;
+    unsigned char m_nLoadState; // see eStreamingLoadState
+private:
+    char __pad[3];
+};
+
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict)
 {
-    // Set correct TXD as materials are processed at the same time
-    if (usModelID != 0)
+
+    if (pTexDict)
     {
+        RwTexDictionarySetCurrent(pTexDict);
+    }
+    else if (usModelID != 0)
+    {
+        // Set correct TXD as materials are processed at the same time
         unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
         SetTextureDict(usTxdId);
     }
@@ -265,12 +530,16 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // check for errors
     if (streamModel == NULL)
+    {
+        throw;
         return NULL;
+    }
 
     // DFF header id: 0x10
     // find our dff chunk
     if (RwStreamFindChunk(streamModel, 0x10, NULL, NULL) == false)
     {
+        std::printf("couldn't find DFF chunk for model Id: %u\n", usModelID);
         RwStreamClose(streamModel, NULL);
         return NULL;
     }
@@ -282,14 +551,20 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(streamModel);
 
+    if (!pClump)
+    {
+        throw;
+    }
     // reset collision hack
     if (bLoadEmbeddedCollisions)
         RpPrtStdGlobalDataSetStreamEmbedded(NULL);
 
     // close the stream
     RwStreamClose(streamModel, NULL);
+    
 
     return pClump;
+    
 }
 
 struct RwStreamMemory
@@ -301,33 +576,61 @@ struct RwStreamMemory
 
 bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary)
 {
-    RwStream *result; // eax
-    RwStreamMemory *v3; // esi
-
-    result = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
-    v3 = (RwStreamMemory *)result;
-    if (!result)
+    RwStream * pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
+    if (pStream)
     {
-        return false;
+        RwTexDictionaryStreamWrite(pTxdDictionary, pStream);
+        RwStreamClose(pStream, 0);
+        return true;
     }
-    RwTexDictionaryStreamWrite(pTxdDictionary, result);
-    result = (RwStream *)RwStreamClose((RwStream*)v3, 0);
-    return true;
+    return false;
 }
 
 bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
 {
     auto RpClumpStreamWrite = (void (__cdecl*)(RpClump*, RwStream *))0x74AA10;
 
-    RwStream*  v2 = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, strFilename);
-    if (v2)
+    RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
+    if (pStream)
     {
-       // v2->field_C.type = 0;
-        RpClumpStreamWrite(pClump, v2);
-        RwStreamClose(v2, 0);
+        RpClumpStreamWrite(pClump, pStream);
+        RwStreamClose(pStream, 0);
         return true;
     }
     return false;
+}
+
+
+bool CRenderWareSA::WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary)
+{
+    RwStream theStream;
+    memset(&theStream, 0, sizeof(RwStream));
+
+    theStream.type = STREAM_TYPE_BUFFER;
+    theStream.mode = STREAM_MODE_WRITE;
+    theStream.data.size = dataSize;
+    theStream.data.ptr_file = pData;
+
+    RwTexDictionaryStreamWrite(pTxdDictionary, &theStream);
+    RwStreamClose(&theStream, 0);
+    return true;
+}
+
+bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
+{
+    auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream *))0x74AA10;
+
+    RwStream theStream;
+    memset(&theStream, 0, sizeof(RwStream));
+
+    theStream.type = STREAM_TYPE_BUFFER;
+    theStream.mode = STREAM_MODE_WRITE;
+    theStream.data.size = dataSize;
+    theStream.data.ptr_file = pData;
+
+    RpClumpStreamWrite(pClump, &theStream);
+    RwStreamClose(&theStream, 0);
+    return true;
 }
 
 //

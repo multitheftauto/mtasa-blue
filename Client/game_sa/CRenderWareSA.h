@@ -39,14 +39,18 @@ public:
     bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
+    RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture = true);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions);
+    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr);
 
     bool WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary);
 
     bool WriteDFF(const SString& strFilename, RpClump* pClump);
+
+    bool WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary);
+
+    bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
