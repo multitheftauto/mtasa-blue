@@ -2224,29 +2224,7 @@ HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK
     return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }
 
-#include "CIMGArchive.h"
-
 std::unique_ptr<CTextureAtlasInterface> CCore::CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
 {
-    CIMGArchive* newIMgArchive = new CIMGArchive("C:\\Program Files (x86)\\Rockstar Games\\GTA San Andreas\\models\\gta3.img", IMG_FILE_READ);
-    newIMgArchive->ReadEntries();
-
-    CIMGArchive* newIMgArchiveOut = new CIMGArchive("C:\\Users\\danish\\Desktop\\proxy_test_gta3.img", IMG_FILE_WRITE);
-    std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)
-    {
-        CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
-        if (newFile != NULL)
-        {
-            imgArchiveFiles.push_back(newFile);
-        }
-    }
-
-    newIMgArchiveOut->WriteEntries(imgArchiveFiles);
-
-    //delete newFile;
-    delete newIMgArchive;
-    delete newIMgArchiveOut;
-
     return std::make_unique<CTextureAtlas>(vecTexturesInfo);
 }
