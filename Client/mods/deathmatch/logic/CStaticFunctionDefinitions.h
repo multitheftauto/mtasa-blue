@@ -35,7 +35,7 @@ public:
     static bool WasEventCancelled();
 
     // Misc funcs
-    static bool DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum = CChecksum());
+    static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
 
     // Output funcs
     static bool OutputConsole(const char* szText);

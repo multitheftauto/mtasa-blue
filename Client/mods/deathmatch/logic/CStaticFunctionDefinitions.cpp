@@ -213,7 +213,7 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
     return m_pEvents->WasEventCancelled();
 }
 
-bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum)
+bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
     SString strPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
@@ -221,7 +221,7 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
     // Call SingularFileDownloadManager
     if (g_pClientGame->GetSingularFileDownloadManager())
     {
-        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum);
+        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, pRequestResource, checksum);
         return true;
     }
     return false;
