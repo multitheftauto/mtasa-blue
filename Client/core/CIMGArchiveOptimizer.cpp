@@ -98,13 +98,13 @@ DWORD GetActualFileSize(DWORD blockSize)
 void OptimizeTXDFile(CIMGArchiveFile* newFile)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-    auto RwTexDictionaryStreamGetSize = (int(__cdecl*)(RwTexDictionary *dict))0x804930;
+    auto RwTexDictionaryStreamGetSize = (unsigned int(__cdecl*)(RwTexDictionary *dict))0x804930;
 
     RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD(nullptr, newFile->fileByteBuffer, false);
     if (pTxdDictionary)
     {
        // std::printf("txd loaded\n");
-        int txdSize = RwTexDictionaryStreamGetSize(pTxdDictionary);
+        unsigned int txdSize = RwTexDictionaryStreamGetSize(pTxdDictionary);
 
         //free the memory
         CBuffer().Swap(newFile->fileByteBuffer);
@@ -128,28 +128,38 @@ void OptimizeTXDFile(CIMGArchiveFile* newFile)
 void OptimizeDFFFile(CIMGArchiveFile* newFile)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-    auto RpClumpStreamGetSize = (int(__cdecl*)(RpClump *))0x74A5E0;
+    auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump *))0x74A5E0;
 
-    RpClump* pClump = pRenderWare->ReadDFF("lodseabed033.dff", CBuffer(), 0, false);
-    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, 0, false);
+    
+    RwTexDictionary* pTxdDictionary =  nullptr;
+    /*pTxdDictionary = pRenderWare->ReadTXD("dyno_box.txd", CBuffer(), false);
+    if (pTxdDictionary)
+    {
+        std::printf("txd loaded\n");
+    }*/
+
+   // RpClump* pClump = pRenderWare->ReadDFF("cj_bag_det.dff", CBuffer(), 0, false, pTxdDictionary);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, 0, false);
     if (pClump)
     {
-        int clumpSize = RpClumpStreamGetSize(pClump);
+        unsigned int clumpSize = RpClumpStreamGetSize(pClump);
+
+        //clumpSize += 10000;
 
         //free the memory
         CBuffer().Swap(newFile->fileByteBuffer);
 
         newFile->actualFileSize = GetActualFileSize(clumpSize);
         newFile->fileEntry->fSize = newFile->actualFileSize / 2048;
-        std::printf("dff file: %s  | new dff size: %d | actualFileSize: %d | capacity: %d\n",
+        std::printf("dff file: %s  | new dff size: %u | actualFileSize: %d | capacity: %d\n",
             newFile->fileEntry->fileName, clumpSize, (int)newFile->actualFileSize, newFile->fileByteBuffer.GetCapacity());
 
         newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
         void* pData = newFile->fileByteBuffer.GetData();
-        pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
+       // pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
-       // SString strPathOfGeneratedDff = "dffs\\";
-        // pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
+       SString strPathOfGeneratedDff = "dffs\\";
+        pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
 
         pRenderWare->DestroyDFF(pClump);
     }
@@ -168,7 +178,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 1; i++)
+    for (DWORD i = 0; i < 2500; i++)
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)

@@ -194,12 +194,12 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 0x0253f2fd: breakable
 0x0253f2fe: frame
 0x0253f2ff: unused_16*/
-std::map<void*, std::set<RwPluginRegEntry *>> mapOfRwPlugins;
 
 bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
 {
     if (pPluginRegistryEntry->pluginID >= (DWORD)0x0253F2F0)
-    {
+    {  
+
         switch (pPluginRegistryEntry->pluginID)
         {
             /*
@@ -208,36 +208,54 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
                 return false;
             }
             */
-            /*
+            
             case (DWORD)0x0253F2F4: // unused_5
             {
-                return false;
+                //return false;
+                
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+                
             }
-            
+            /*
             case (DWORD)0x0253F2F5: // texdictionary_link
             {
                 return false;
             }
+            */
+            
             case (DWORD)0x0253F2F6: // specular_material
             {
-                return false;
+                //return false;
+                
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+                
             }
             
+            /*
             case (DWORD)0x0253F2F7: // unused_8
             {
                 return false;
             }
-            /*
+          */
             case (DWORD)0x0253F2F8: // effect_2d
             {
+                // we need to write 2 new functions for effect2D.
+                // One for write callback and other one for Size call back
                 return false;
-            }
-           */
-            
-            case (DWORD)0x0253F2F9: // extra_vert_colour
-            {
-                return false;
-                /*DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+                /*
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
                 if (!*pPluginData)
                 {
@@ -245,24 +263,12 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
                 }
                 return true;
                 */
+                
             }
-          /*
-            case (DWORD)0x0253F2FA: // collision_model
+         
+            
+            case (DWORD)0x0253F2F9: // extra_vert_colour
             {
-                return false;
-            }
-            case (DWORD)0x0253F2FB: // gta_hanim
-            {
-                return false;
-            }
-            case (DWORD)0x0253F2FC: // reflection_material
-            {
-                return false;
-            }
-            */
-            case (DWORD)0x0253F2FD: // breakable
-            {
-
                 //return false;
                 DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
@@ -271,6 +277,47 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
                     return false;
                 }
                 return true;
+                
+            }
+            /*
+            case (DWORD)0x0253F2FA: // collision_model
+            {
+                return false;
+            }
+            */
+            /*
+            case (DWORD)0x0253F2FB: // gta_hanim
+            {
+                return false;
+            }
+            */
+            case (DWORD)0x0253F2FC: // reflection_material
+            {
+                //return false;
+                
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                // CCustomCarEnvMapPipeline::fakeEnvMapPipeMatData = 0xc02d18
+                if (*pPluginData == (DWORD)0xc02d18 || !*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+                
+            }
+          
+            case (DWORD)0x0253F2FD: // breakable
+            {
+               // return false;
+                
+                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+                
             }
             
             /*
@@ -305,7 +352,7 @@ int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* p
         {
             //std::printf("rwPluginRegistryGetSize: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
         }
-
+       
         if (pPluginRegistryEntry->getSizeCB && bPluginUsed)
         {
             int iRegistryEntrySize = pPluginRegistryEntry->getSizeCB(pObject, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
@@ -315,7 +362,6 @@ int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* p
             }
         }
     }
-
     return iTotalPluginsSize;
 }
 
@@ -326,6 +372,11 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
 
 
     int iTotalPluginsSize = _rwPluginRegistryGetSize(a1, (void*)object);
+
+    if (iTotalPluginsSize <= 0)
+    {
+        return a1;
+    }
 
     if (!_rwStreamWriteVersionedChunkHeader(stream, 3, iTotalPluginsSize, 0x36003, 0xFFFFu))
     {
@@ -345,7 +396,7 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
             bool bPluginUsed = IsPluginUsed(pPluginRegistryEntry, (void*)object);
             if (!bPluginUsed)
             {
-              std::printf("_rwPluginRegistryWriteDataChunks: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, (void*)object);
+              //std::printf("_rwPluginRegistryWriteDataChunks: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, (void*)object);
             }
 
             if (pPluginRegistryEntry->writeCB && bPluginUsed)
@@ -354,15 +405,15 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
                 if (iPluginDataSize > 0)
                 {
 
-                    if (!_rwStreamWriteVersionedChunkHeader(stream, pPluginRegistryEntry->pluginID, iPluginDataSize, 0x36003, 0xFFFFu))
-                    {
-                        return nullptr;
-                    }
+                if (!_rwStreamWriteVersionedChunkHeader(stream, pPluginRegistryEntry->pluginID, iPluginDataSize, 0x36003, 0xFFFFu))
+                {
+                    return nullptr;
+                }
 
-                    if (!pPluginRegistryEntry->writeCB(stream, iPluginDataSize, object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size))
-                    {
-                        return nullptr;
-                    }
+                if (!pPluginRegistryEntry->writeCB(stream, iPluginDataSize, object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size))
+                {
+                    return nullptr;
+                }
                 }
             }
         }
@@ -371,16 +422,83 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
     return a1;
 }
 
+
+#pragma pack(push, 1)
+struct GeometryMeshExt
+{
+    unsigned int m_uiPosRule;
+    unsigned short m_usNumVertices;
+    short _pad0;
+    RwV3d *m_pVertexPos;
+    RwTextureCoordinates *m_pTexCoors;
+    RwRGBA *m_pVertexColors;
+    unsigned short m_usNumTriangles;
+    short _pad1;
+    RpTriangle *m_pTriangles;
+    unsigned short *m_pMaterialAssignments;
+    unsigned short m_usNumMaterials;
+    short _pad2;
+    RwTexture **m_pTextures;
+    char *m_pTextureNames;
+    char *m_pMaskNames;
+    RwSurfaceProperties *m_pMaterialProperties;
+};
+#pragma pack(pop)
+
+int BreakableStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
+{
+    int size = 0;
+
+    GeometryMeshExt* pGeometryMeshExt = *(GeometryMeshExt**)(pObject + pluginOffset);
+    if (pGeometryMeshExt)
+    {
+        size += 4;
+        size += 52;
+
+        size += (12 * pGeometryMeshExt->m_usNumVertices);
+        size += (8 * pGeometryMeshExt->m_usNumVertices);
+        size += (4 * pGeometryMeshExt->m_usNumVertices);
+        size += (6 * pGeometryMeshExt->m_usNumTriangles);
+        size += (2 * pGeometryMeshExt->m_usNumTriangles);
+        size += (32 * pGeometryMeshExt->m_usNumMaterials);
+        size += (32 * pGeometryMeshExt->m_usNumMaterials);
+        size += (12 * pGeometryMeshExt->m_usNumMaterials);
+    }
+    return size;
+}
+
 RwStream * PipelinePluginWriteCB(RwStream *stream, int length, unsigned char* pObject)
 {
     auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
     int& PipelinePluginOffset = *(int*)0x8D6080;
 
-    RwStreamWrite(stream, (void*)(pObject+ PipelinePluginOffset), length);
+    RwStreamWrite(stream, (void*)(pObject + PipelinePluginOffset), length);
     return stream;
 }
 
-void RegisterPipelinePluginWriteCB()
+struct ExtraVertColourPlugin
+{
+    RwRGBA* nightColors; // array of RwRGBAs per vertice
+    RwRGBA* dayColors; // array of RwRGBAs per vertice
+    float dnParam;
+};
+
+RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+{
+    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+
+    // GTA SA was dereferencing the pointer `pObject + offsetInObject` and causing the game to crash
+    // on this function
+    ExtraVertColourPlugin* pExtraVertColour = (ExtraVertColourPlugin*)(pObject + offsetInObject);
+    RwStreamWrite(stream, pExtraVertColour, 4);
+    if (pExtraVertColour->nightColors)
+    {
+        RwStreamWrite(stream, pExtraVertColour->nightColors, 4 * ((RpGeometry*)pObject)->vertices_size);
+    }
+    return stream;
+}
+
+void RegisterAtomicPluginsCallBacks()
 {
     RwPluginRegistry& atomicTKList = *(RwPluginRegistry*)0x8D624C;
     for (auto pPluginRegistryEntry = atomicTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
@@ -393,6 +511,27 @@ void RegisterPipelinePluginWriteCB()
         }
     }
 }
+
+void RegisterGeometryPluginsCallBacks()
+{
+    RwPluginRegistry& geometryTKList = *(RwPluginRegistry*)0x8D628C;
+    for (auto pPluginRegistryEntry = geometryTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        // breakable plugin
+        if (pPluginRegistryEntry->pluginID == (DWORD)0x253F2FD)
+        {
+            pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)BreakableStreamGetSizeCB;
+            break;
+        }
+
+        /// ExtraVertColours plugin (night colors)
+        if (pPluginRegistryEntry->pluginID == (DWORD)0x253F2F9)
+        {
+            pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginExtraVertColourStreamWriteCB;
+        }
+    }
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -407,7 +546,13 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
     HookInstall(0x808B00, (DWORD)_rwPluginRegistryGetSize, 5);
     HookInstall(0x808B40, (DWORD)_rwPluginRegistryWriteDataChunks, 5);
 
-    RegisterPipelinePluginWriteCB();
+
+    RegisterAtomicPluginsCallBacks();
+    RegisterGeometryPluginsCallBacks();
+
+    
+    // fix for extra vert WriteCB
+    MemCpy((void*)0x5D6D9C, "\x90\x90", 5);
 
     m_pMatchChannelManager = new CMatchChannelManager();
     m_iRenderingEntityType = TYPE_MASK_WORLD;
@@ -481,21 +626,6 @@ bool LoadTheFileToMemory(const SString& strFilePath, CBuffer& theBuffer)
     return false;
 }
 
-
-class  CStreamingInfoSAInterface {
-public:
-    short m_nNextIndex; // ms_pArrayBase array index
-    short m_nPrevIndex; // ms_pArrayBase array index
-    short m_nNextIndexOnCd;
-    unsigned char m_nFlags; // see eStreamingFlags
-    unsigned char m_nImgId;
-    unsigned int m_nCdPosn;
-    unsigned int m_nCdSize;
-    unsigned char m_nLoadState; // see eStreamingLoadState
-private:
-    char __pad[3];
-};
-
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
@@ -566,13 +696,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
     return pClump;
     
 }
-
-struct RwStreamMemory
-{
-    unsigned int   position;
-    unsigned int   nSize;
-    unsigned char *memBlock;
-};
 
 bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary)
 {
