@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/lua/CLuaMain.cpp
+ *  FILE:        mods/deathmatch/logic/lua/CLuaMain.cpp
  *  PURPOSE:     Lua main
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -365,15 +366,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
     CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
-
     return xmlNode;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)
 {
-    if (m_XMLFiles.empty()) {
+    if (m_XMLFiles.empty())
         return false;
-    }
     m_XMLFiles.remove(pFile);
     delete pFile;
     return true;
@@ -381,19 +380,16 @@ bool CLuaMain::DestroyXML(CXMLFile* pFile)
 
 bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 {
-    if (m_XMLFiles.empty()) {
+    if (m_XMLFiles.empty())
         return false;
-    }
-    list<CXMLFile*>::iterator iter;
-    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++)
+    for (CXMLFile* pFile : m_XMLFiles)
     {
-        CXMLFile* file = (*iter);
-        if (file)
+        if (pFile)
         {
-            if (file->GetRootNode() == pRootNode)
+            if (pFile->GetRootNode() == pRootNode)
             {
-                delete file;
-                m_XMLFiles.erase(iter);
+                m_XMLFiles.remove(pFile);
+                delete pFile;
                 break;
             }
         }
@@ -403,16 +399,10 @@ bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 {
-    for (CXMLFile* file : m_XMLFiles)
-    {
-        if (file)
-        {
-            if (file->GetRootNode() == pRootNode)
-            {
-                return file->Write();
-            }
-        }
-    }
+    for (CXMLFile* pFile : m_XMLFiles)
+        if (pFile)
+            if (pFile->GetRootNode() == pRootNode)
+                return pFile->Write();
     if (m_pResource)
     {
         list<CResourceConfigItem*>::iterator iter = m_pResource->ConfigIterBegin();
@@ -423,9 +413,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
             {
                 CXMLFile* pFile = pConfigItem->GetFile();
                 if (pFile)
-                {
                     return pFile->Write();
-                }
                 return false;
             }
         }
