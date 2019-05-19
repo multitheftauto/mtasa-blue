@@ -1202,9 +1202,9 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
+#ifdef WIN32
 DWORD SharedUtil::GetMainThreadId()
 {
-#ifdef WIN32
     static DWORD dwMainThreadID = 0;
     if (dwMainThreadID == 0)
     {
@@ -1246,8 +1246,8 @@ DWORD SharedUtil::GetMainThreadId()
         }
     }
     return dwMainThreadID;
-#endif
 }
+#endif
 
 //
 // Return true if currently executing the main thread.
@@ -1727,7 +1727,7 @@ namespace SharedUtil
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
-        DWORD cpu;
+        unsigned long cpu;
 
         uint32_t CPUInfo[4];
         __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
