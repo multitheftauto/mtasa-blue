@@ -1753,8 +1753,8 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
-    gameSettings->ResetVehiclesLODDistance();
-    gameSettings->ResetPedsLODDistance();
+    gameSettings->ResetVehiclesLODDistance(false);
+    gameSettings->ResetPedsLODDistance(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -3327,12 +3327,12 @@ void CSettings::SaveData()
     // High detail vehicles
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
-    gameSettings->ResetVehiclesLODDistance();
+    gameSettings->ResetVehiclesLODDistance(false);
 
     // High detail peds
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
-    gameSettings->ResetPedsLODDistance();
+    gameSettings->ResetPedsLODDistance(false);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
