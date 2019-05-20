@@ -37,7 +37,7 @@ project "Dbconmy"
 		links { "rt" }
 
 	filter "system:macosx"
-		includedirs { "/usr/local/opt/mysql/include/mysql/" }
+		includedirs { os.findheader("mysql.h", "/usr/local/opt/mysql/include/mysql") }
 
 	if GLIBC_COMPAT then
 		filter { "system:linux" }
