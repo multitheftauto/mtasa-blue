@@ -16,6 +16,6 @@ project "zip"
 		"*.h",
 		"*.c"
 	}
-	
-	filter "system:linux"
+
+	filter "system:not windows"
 		excludes { "iowin32.h", "iowin32.c" }
