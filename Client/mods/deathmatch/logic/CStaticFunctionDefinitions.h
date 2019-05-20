@@ -42,7 +42,6 @@ public:
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
     static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
-    static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
 

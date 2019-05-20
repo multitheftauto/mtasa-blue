@@ -347,6 +347,9 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
+
+    // Setup builtin Lua events
+    SetupGlobalLuaEvents();
 }
 
 CClientGame::~CClientGame()
@@ -2833,6 +2836,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientGUIBlur", "", NULL, false);
     m_Events.AddEvent("onClientKey", "key, state", NULL, false);
     m_Events.AddEvent("onClientCharacter", "character", NULL, false);
+    m_Events.AddEvent("onClientPaste", "clipboardText", NULL, false);
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
@@ -3600,6 +3604,26 @@ void CClientGame::Event_OnIngameAndConnected()
     m_pNetAPI->RPC(PLAYER_INGAME_NOTICE);
 }
 
+void CClientGame::SetupGlobalLuaEvents()
+{
+    // Setup onClientPaste event
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
+        // Don't trigger if main menu or console is open or the cursor is not visible
+        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+            return;
+
+        // Also don't trigger if remote web browser view is focused
+        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+            return;
+        
+        // Call event now
+        CLuaArguments args;
+        args.PushString(clipboardText);
+        m_pRootEntity->CallEvent("onClientPaste", args, false);
+    });
+}
+
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
 {
     return g_pClientGame->BreakTowLinkHandler(pTowingVehicle);
@@ -3915,13 +3939,14 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
+
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;

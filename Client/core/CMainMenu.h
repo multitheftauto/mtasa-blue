@@ -14,7 +14,6 @@ class CMainMenu;
 #pragma once
 
 #include "CCore.h"
-#include "CQuickConnect.h"
 #include "CQuestionBox.h"
 #include <ServerBrowser/CServerBrowser.h>
 #include <ServerBrowser/CServerInfo.h>
@@ -38,7 +37,6 @@ struct sMenuItem
 
 class CMainMenu
 {
-    friend class CQuickConnect;
     friend class CServerBrowser;
     friend class CSettings;
     friend class CCredits;
@@ -61,7 +59,6 @@ public:
 
     CServerBrowser* GetServerBrowser() { return &m_ServerBrowser; };
     CSettings*      GetSettingsWindow() { return &m_Settings; };
-    CQuickConnect*  GetQuickConnectWindow() { return &m_QuickConnect; };
     CQuestionBox*   GetQuestionWindow() { return &m_QuestionBox; };
     CNewsBrowser*   GetNewsBrowser() { return m_pNewsBrowser; };
 
@@ -119,7 +116,6 @@ private:
 
     // Submenu classes
     CQuestionBox       m_QuestionBox;
-    CQuickConnect      m_QuickConnect;
     CSettings          m_Settings;
     CNewsBrowser*      m_pNewsBrowser;
     CCredits           m_Credits;
