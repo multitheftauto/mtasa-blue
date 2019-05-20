@@ -299,6 +299,28 @@ CMainMenu::CMainMenu(CGUI* pManager)
     if (CXMLNode* pOldNode = pConfig->FindSubNode(CONFIG_NODE_SERVER_INT))
         pConfig->DeleteSubNode(pOldNode);
 
+#ifdef CI_BUILD
+    // Add feature branch alert
+    m_pFeatureBranchAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
+    std::int32_t buffer = 0xFFFF0000;
+    m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1);            // HACK: Load red dot
+
+    m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pFeatureBranchAlertImage->LoadFromTexture(m_pFeatureBranchAlertTexture.get());
+    m_pFeatureBranchAlertImage->SetPosition({0.0f, 0.0f}, false);
+    m_pFeatureBranchAlertImage->SetSize({ScreenSize.fX, 35.0f});
+
+    m_pFeatureBranchAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pFeatureBranchAlertImage.get())));
+    m_pFeatureBranchAlertLabel->SetText(
+        _("You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"));
+    m_pFeatureBranchAlertLabel->SetPosition({0.0f, 0.0f}, false);
+    m_pFeatureBranchAlertLabel->SetSize({ScreenSize.fX, 35.0f});
+    m_pFeatureBranchAlertLabel->SetFont("clear-normal");
+    m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+    m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+#endif
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
     // Add annonying alert
     m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
@@ -309,10 +331,12 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
     m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
 
-    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), "Your operating system is outdated and prone to security vulnerabilities. You should consider updating as soon as possible.")));
+    #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
+    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
     m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
     m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
     m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+#endif
 }
 
 CMainMenu::~CMainMenu()
@@ -616,6 +640,13 @@ void CMainMenu::Update()
         // Start updater after fade up is complete
         if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+        if (WaitForMenu == 275)
+        {
+            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
+        }
+#endif
 
         if (WaitForMenu < 300)
             WaitForMenu++;
