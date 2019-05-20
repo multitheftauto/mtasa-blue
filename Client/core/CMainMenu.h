@@ -168,11 +168,11 @@ private:
     std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
 #endif
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+//#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
     std::unique_ptr<CGUITexture> m_pAlertTexture;
     std::unique_ptr<CGUIStaticImage> m_pAlertImage;
     std::unique_ptr<CGUILabel> m_pAlertLabel;
-#endif
+//#endif
 
     // Fade states
     enum eFadeStates

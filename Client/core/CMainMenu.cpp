@@ -320,7 +320,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 #endif
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+//#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
     // Add annonying alert
     m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
@@ -336,7 +336,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
     m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
     m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
-#endif
+//#endif
 }
 
 CMainMenu::~CMainMenu()
@@ -641,12 +641,12 @@ void CMainMenu::Update()
         if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+//#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
         if (WaitForMenu == 275)
         {
             CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
         }
-#endif
+//#endif
 
         if (WaitForMenu < 300)
             WaitForMenu++;
