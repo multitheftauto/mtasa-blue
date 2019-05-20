@@ -49,6 +49,8 @@ project "Core"
 
 	filter "system:macosx"
 		links { "ncurses", "breakpad", "CoreFoundation.framework" }
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
 
 		-- This makes ncurses `get_wch` work
 		defines { "_XOPEN_SOURCE_EXTENDED=1" }
