@@ -2,23 +2,23 @@ project "cryptopp"
 	language "C++"
 	kind "StaticLib"
 	targetname "cryptopp"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "**.cpp",
 		["Assembly"] = "**.asm",
 		["*"] = "premake5.lua"
 	}
-		
+
 	defines {
 		"_WINSOCK_DEPRECATED_NO_WARNINGS",
-		"CRYPTOPP_DISABLE_CLMUL", 
+		"CRYPTOPP_DISABLE_CLMUL",
 		"CRYPTOPP_DISABLE_AESNI",
-		"CRYPTOPP_DISABLE_SSE4", 
+		"CRYPTOPP_DISABLE_SSE4",
 		"CRYPTOPP_DISABLE_SSSE3",
 		"_LIB"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
@@ -143,13 +143,13 @@ project "cryptopp"
 		"zlib.cpp",
 		"keccak_core.cpp"
 	}
-	
+
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",
 			"x64masm.asm"
 		}
-	
+
 	filter {"system:windows"}
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4005" }
