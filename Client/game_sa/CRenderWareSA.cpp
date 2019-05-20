@@ -16,6 +16,7 @@
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
+#include "C2dEffectSA.h"
 
 extern CGameSA* pGame;
 
@@ -198,143 +199,139 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
 {
     if (pPluginRegistryEntry->pluginID >= (DWORD)0x0253F2F0)
-    {  
+    {
 
         switch (pPluginRegistryEntry->pluginID)
         {
             /*
             case (DWORD)0x0253F2F3: // pipeline_set
             {
-                return false;
+            return false;
             }
             */
-            
-            case (DWORD)0x0253F2F4: // unused_5
-            {
-                //return false;
-                
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
-                if (!*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                
-            }
-            /*
-            case (DWORD)0x0253F2F5: // texdictionary_link
+        case (DWORD)0x0253F2F4: // unused_5
+        {
+            //return false;
+
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+            if (!*pPluginData)
             {
                 return false;
             }
-            */
-            
-            case (DWORD)0x0253F2F6: // specular_material
-            {
-                //return false;
-                
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+            return true;
 
-                if (!*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                
-            }
-            
-            /*
-            case (DWORD)0x0253F2F7: // unused_8
+        }
+        /*
+        case (DWORD)0x0253F2F5: // texdictionary_link
+        {
+        return false;
+        }
+        */
+
+        case (DWORD)0x0253F2F6: // specular_material
+        {
+            //return false;
+
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+            if (!*pPluginData)
             {
                 return false;
             }
-          */
-            case (DWORD)0x0253F2F8: // effect_2d
-            {
-                // we need to write 2 new functions for effect2D.
-                // One for write callback and other one for Size call back
-                return false;
-                /*
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+            return true;
 
-                if (!*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                */
-                
-            }
+        }
+
+        /*
+        case (DWORD)0x0253F2F7: // unused_8
+        {
+        return false;
+        }
+        */
+        case (DWORD)0x0253F2F8: // effect_2d
+        {
          
-            
-            case (DWORD)0x0253F2F9: // extra_vert_colour
-            {
-                //return false;
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
-                if (!*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                
-            }
-            /*
-            case (DWORD)0x0253F2FA: // collision_model
+            if (!*pPluginData)
             {
                 return false;
             }
-            */
-            /*
-            case (DWORD)0x0253F2FB: // gta_hanim
-            {
-                return false;
-            }
-            */
-            case (DWORD)0x0253F2FC: // reflection_material
-            {
-                //return false;
-                
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+            return true;
+           
+        }
 
-                // CCustomCarEnvMapPipeline::fakeEnvMapPipeMatData = 0xc02d18
-                if (*pPluginData == (DWORD)0xc02d18 || !*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                
-            }
-          
-            case (DWORD)0x0253F2FD: // breakable
-            {
-               // return false;
-                
-                DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
-                if (!*pPluginData)
-                {
-                    return false;
-                }
-                return true;
-                
-            }
-            
-            /*
-            case (DWORD)0x0253F2FE: // frame
+        case (DWORD)0x0253F2F9: // extra_vert_colour
+        {
+            //return false;
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+            if (!*pPluginData)
             {
                 return false;
             }
-            
-            case (DWORD)0x0253F2FF: // unused_16
+            return true;
+
+        }
+        /*
+        case (DWORD)0x0253F2FA: // collision_model
+        {
+        return false;
+        }
+        */
+        /*
+        case (DWORD)0x0253F2FB: // gta_hanim
+        {
+        return false;
+        }
+        */
+        case (DWORD)0x0253F2FC: // reflection_material
+        {
+            //return false;
+
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+            // CCustomCarEnvMapPipeline::fakeEnvMapPipeMatData = 0xc02d18
+            if (*pPluginData == (DWORD)0xc02d18 || !*pPluginData)
             {
                 return false;
             }
-            */
-            default:
+            return true;
+
+        }
+
+        case (DWORD)0x0253F2FD: // breakable
+        {
+            // return false;
+
+            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+            if (!*pPluginData)
             {
-                return true;
+                return false;
             }
+            return true;
+
+        }
+
+        /*
+        case (DWORD)0x0253F2FE: // frame
+        {
+        return false;
+        }
+
+        case (DWORD)0x0253F2FF: // unused_16
+        {
+        return false;
+        }
+        */
+        default:
+        {
+            return true;
+        }
         }
     }
     return true;;
@@ -373,10 +370,13 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
 
     int iTotalPluginsSize = _rwPluginRegistryGetSize(a1, (void*)object);
 
+    /*
+    // This check fixes a crash for writing TXD
     if (iTotalPluginsSize <= 0)
     {
         return a1;
     }
+    */
 
     if (!_rwStreamWriteVersionedChunkHeader(stream, 3, iTotalPluginsSize, 0x36003, 0xFFFFu))
     {
@@ -488,7 +488,7 @@ RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int lengt
     auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
 
     // GTA SA was dereferencing the pointer `pObject + offsetInObject` and causing the game to crash
-    // on this function
+    // in the write callback function. Fixed it.
     ExtraVertColourPlugin* pExtraVertColour = (ExtraVertColourPlugin*)(pObject + offsetInObject);
     RwStreamWrite(stream, pExtraVertColour, 4);
     if (pExtraVertColour->nightColors)
@@ -496,6 +496,214 @@ RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int lengt
         RwStreamWrite(stream, pExtraVertColour->nightColors, 4 * ((RpGeometry*)pObject)->vertices_size);
     }
     return stream;
+}
+
+
+struct t2dEffectPlugin
+{
+    unsigned int uiCount;
+    C2dEffectSAInterface arrEffects [];
+};
+
+RwStream *__cdecl Plugin2DEffectStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+{
+    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+
+    t2dEffectPlugin* pEffectPlugin = *(t2dEffectPlugin**)(pObject + offsetInObject);
+    if (!pEffectPlugin)
+    {
+        return stream;
+    }
+
+    RwStreamWrite(stream, &pEffectPlugin->uiCount, 4);
+
+    for (unsigned int i = 0; i < pEffectPlugin->uiCount; i++)
+    {
+        C2dEffectSAInterface& the2dEffect = pEffectPlugin->arrEffects[i];
+
+        //C2dEffectSAInterface* p2dEffect = (C2dEffectSAInterface*)( ((unsigned char*)pEffectPlugin) + 4  + (sizeof(C2dEffectSAInterface)*i));
+        //std::printf("2DEffectWrite: type: %d | type in hex: %#.8x | type addr: %p\n",
+        //    p2dEffect->m_nType, p2dEffect->m_nType, (void*)&p2dEffect->m_nType);
+
+        // Write the position
+        RwStreamWrite(stream, &the2dEffect, 12);
+
+        unsigned char arrTypeAndPadding [4] = {the2dEffect.m_nType, 0, 0, 0};
+        RwStreamWrite(stream, &arrTypeAndPadding, 4);
+
+        switch (the2dEffect.m_nType)
+        {
+        case EFFECT_LIGHT:
+        {
+            // 80 bytes = write look x, y, and z values as well
+            int iSizeOfStruct = 80;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+
+            // write 20 bytes from m_color till m_fShadowSize
+            RwStreamWrite(stream, &the2dEffect.light, 20);
+
+            // write 4 bytes from m_nCoronaFlashType till m_nShadowColorMultiplier
+            RwStreamWrite(stream, &the2dEffect.light.m_nCoronaFlashType, 4);
+
+            unsigned char* pFlags = reinterpret_cast<unsigned char*>(&the2dEffect.light.m_nFlags);
+            RwStreamWrite(stream, pFlags, 1);
+            RwStreamWrite(stream, &the2dEffect.light.m_pCoronaTex->name, 24);
+            RwStreamWrite(stream, &the2dEffect.light.m_pShadowTex->name, 24);
+            RwStreamWrite(stream, &the2dEffect.light.m_nShadowZDistance, 1);
+            pFlags++;
+            RwStreamWrite(stream, pFlags, 1);
+
+            // write look X, Y, and Z directions
+            RwStreamWrite(stream, &the2dEffect.light.offsetX, 3);
+
+            short sPadding = 0;
+            RwStreamWrite(stream, &sPadding, 2);
+            break;
+        }
+        case EFFECT_PARTICLE:
+        {
+            int iSizeOfStruct = 24;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.particle, iSizeOfStruct);
+            break;
+        }
+        case EFFECT_ATTRACTOR:
+        {
+            int iSizeOfStruct = 56;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nAttractorType, 1);
+
+            int iPadding = 0;
+            RwStreamWrite(stream, &iPadding, 3);
+
+            RwStreamWrite(stream, &the2dEffect.pedAttractor, 36);
+            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_szScriptName, 8);
+            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nPedExistingProbability, 1);
+            RwStreamWrite(stream, &iPadding, 3);
+
+            unsigned char arrLast4Bytes[4] = {the2dEffect.pedAttractor.field_36, 0, the2dEffect.pedAttractor.m_nFlags , 0};   
+            RwStreamWrite(stream, &arrLast4Bytes, 4);
+            break;
+        }
+        case EFFECT_ENEX:
+        {
+            int iSizeOfStruct = 44;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.enEx, iSizeOfStruct);
+            break;
+        }
+        case EFFECT_ROADSIGN:
+        {
+            int iSizeOfStruct = 88;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+
+            RwStreamWrite(stream, &the2dEffect.roadsign, 22);
+            RwStreamWrite(stream, the2dEffect.roadsign.m_pText, 64);
+
+            short sPadding = 0;
+            RwStreamWrite(stream, &sPadding, 2);
+            break;
+        }
+        case EFFECT_SLOTMACHINE_WHEEL:
+        {
+            int iSizeOfStruct = 4;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.iSlotMachineIndex, iSizeOfStruct);
+            break;
+        }
+        case EFFECT_COVER_POINT:
+        {
+            int iSizeOfStruct = 12;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.coverPoint, iSizeOfStruct);
+            break;
+        }
+        case EFFECT_ESCALATOR:
+        {
+            int iSizeOfStruct = 40;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            RwStreamWrite(stream, &the2dEffect.escalator, iSizeOfStruct);
+            break;
+        }
+        default:
+        {
+            int iSizeOfStruct = 0;
+            RwStreamWrite(stream, &iSizeOfStruct, 4);
+        }
+        }
+    }
+    
+    return stream;
+}
+
+int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
+{
+    int size = 0;
+
+    t2dEffectPlugin* pEffectPlugin = *(t2dEffectPlugin**)(pObject + pluginOffset);
+    if (pEffectPlugin)
+    {
+
+        // number of effects
+        size += 4;
+
+        for (unsigned int i = 0; i < pEffectPlugin->uiCount; i++)
+        {
+            C2dEffectSAInterface& the2dEffect = pEffectPlugin->arrEffects[i];
+
+            // std::printf("EffectGetSizeCB: effect type: %d\n", the2dEffect.m_nType);
+            
+            // common header size
+            size += 20;
+           
+            switch (the2dEffect.m_nType)
+            {
+                case EFFECT_LIGHT:
+                {
+                    // 80 bytes = write look x, y, and z values as well
+                    size += 80;
+                    break;
+                }
+                case EFFECT_PARTICLE:
+                {
+                    size += 24;
+                    break;
+                }
+                case EFFECT_ATTRACTOR:
+                {
+                    size += 56;
+                    break;
+                }
+                case EFFECT_ENEX:
+                {
+                    size += 44;
+                    break;
+                }
+                case EFFECT_ROADSIGN:
+                {
+                    size += 88;
+                    break;
+                }
+                case EFFECT_SLOTMACHINE_WHEEL:
+                {
+                    size += 4;
+                    break;
+                }
+                case EFFECT_COVER_POINT:
+                {
+                    size += 12;
+                    break;
+                }
+                case EFFECT_ESCALATOR:
+                {
+                    size += 40;
+                    break;
+                }
+            }
+            
+        }
+    }
+    return size;
 }
 
 void RegisterAtomicPluginsCallBacks()
@@ -517,17 +725,29 @@ void RegisterGeometryPluginsCallBacks()
     RwPluginRegistry& geometryTKList = *(RwPluginRegistry*)0x8D628C;
     for (auto pPluginRegistryEntry = geometryTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
     {
-        // breakable plugin
-        if (pPluginRegistryEntry->pluginID == (DWORD)0x253F2FD)
+        switch (pPluginRegistryEntry->pluginID)
         {
-            pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)BreakableStreamGetSizeCB;
-            break;
-        }
+            // breakable plugin
+            case(DWORD)0x253F2FD:
+            {
+                pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)BreakableStreamGetSizeCB;
+                break;
+            }
 
-        /// ExtraVertColours plugin (night colors)
-        if (pPluginRegistryEntry->pluginID == (DWORD)0x253F2F9)
-        {
-            pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginExtraVertColourStreamWriteCB;
+            // 2D effect plugin
+            case (DWORD)0x253F2F8:
+            {
+                pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)Plugin2DEffectStreamWriteCB;
+                pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)Plugin2DEffectStreamGetSizeCB;
+                break;
+            }
+
+            /// ExtraVertColours plugin (night colors)
+            case(DWORD)0x253F2F9:
+            {
+                pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginExtraVertColourStreamWriteCB;
+                break;
+            }
         }
     }
 }
@@ -546,13 +766,8 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
     HookInstall(0x808B00, (DWORD)_rwPluginRegistryGetSize, 5);
     HookInstall(0x808B40, (DWORD)_rwPluginRegistryWriteDataChunks, 5);
 
-
     RegisterAtomicPluginsCallBacks();
     RegisterGeometryPluginsCallBacks();
-
-    
-    // fix for extra vert WriteCB
-    MemCpy((void*)0x5D6D9C, "\x90\x90", 5);
 
     m_pMatchChannelManager = new CMatchChannelManager();
     m_iRenderingEntityType = TYPE_MASK_WORLD;
@@ -606,24 +821,6 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
     }
 
     return pTex;
-}
-
-bool LoadTheFileToMemory(const SString& strFilePath, CBuffer& theBuffer)
-{
-    std::ifstream   fileStream(FromUTF8(strFilePath), std::ios::binary | std::ios::ate);
-    std::streamsize iFileSize = fileStream.tellg();
-    if (iFileSize == -1) // eIFSTREAM::SIZE_ERROR
-    {
-        return false;
-    }
-
-    fileStream.seekg(0, std::ios::beg);
-    theBuffer.SetSize(iFileSize);
-    if (fileStream.read(theBuffer.GetData(), iFileSize))
-    {
-        return true;
-    }
-    return false;
 }
 
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)

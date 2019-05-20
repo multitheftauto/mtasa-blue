@@ -178,7 +178,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 2500; i++)
+    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
@@ -189,7 +189,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
             // check if it's a txd file
             if (strFileExtension == "txd")
             {
-                OptimizeTXDFile(newFile);
+                //OptimizeTXDFile(newFile);
             }
             else if (strFileExtension == "dff")
             {
