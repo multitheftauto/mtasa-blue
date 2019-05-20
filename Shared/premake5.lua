@@ -2,12 +2,12 @@ project "Shared"
 	language "C++"
 	kind "StaticLib"
 	targetname "shared"
-		
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = { "**.h", "**.hpp" },
 		["*"] = "premake5.lua",
 	}
-		
+
 	files {
 		"premake5.lua",
 		"**.h",
@@ -20,4 +20,4 @@ project "Shared"
 		"XML/**",
 	}
 
-	flags { "ExcludeFromBuild" } 
+	flags { "ExcludeFromBuild" }

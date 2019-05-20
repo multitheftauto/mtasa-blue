@@ -4,26 +4,26 @@ project "Client Launcher"
 	targetname "Multi Theft Auto"
 	targetdir(buildpath("."))
 	debugdir(buildpath("."))
-	
+
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
+
 	entrypoint "WinMainCRTStartup"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["Resources/*"] = {"*.rc", "*.ico", "**.xml"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
-	
+
 	filter "system:windows"
 		staticruntime "On"
 		files {
@@ -32,12 +32,12 @@ project "Client Launcher"
 			"launch.rc",
 			"mtaicon.ico"
 		}
-	
+
 	filter {"system:windows", "toolset:*_xp*"}
 		links { "Psapi.lib" }
-	
+
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
-		
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

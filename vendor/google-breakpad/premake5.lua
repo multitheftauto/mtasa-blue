@@ -4,26 +4,26 @@ project "breakpad"
 	targetname "breakpad"
 
 	includedirs { "src", "src/third_party/glog/src" }
-	vpaths { 
+	vpaths {
 		["Headers/*"] = "src/**.h",
 		["Sources/*"] = {"src/**.cc", "src/**.c"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
-		
+
 		"src/**.h",
 		"src/client/*.cc",
 		"src/common/*.cc",
 		"src/common/*.c",
 		"src/processor/*.cc",
-		
+
 		"src/third_party/glog/src/*.cc",
 		"src/third_party/libdisasm/*.c",
 		"src/third_party/protobuf/protobuf/src/**.c"
 	}
-	
+
 	filter "system:linux"
 		files {
 			"src/client/linux/**.cc",
@@ -42,12 +42,11 @@ project "breakpad"
 		"src/common/stabs_reader.cc"
 	}
 
-
 	--[[filter "system:windows"
 		files {
 			"src/client/windows/**.cc",
 			"src/common/windows/**.cc"
 		}]]
-		
+
 	filter "system:not linux"
 		flags { "ExcludeFromBuild" }
