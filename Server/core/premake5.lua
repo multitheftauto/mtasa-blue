@@ -48,8 +48,10 @@ project "Core"
 		linkoptions { "-pthread" }
 
 	filter "system:macosx"
-		-- ncurses? or curses?
-		links { "curses", "breakpad", "CoreFoundation.framework" }
+		links { "ncurses", "breakpad", "CoreFoundation.framework" }
+
+		-- This makes ncurses `get_wch` work
+		defines { "_XOPEN_SOURCE_EXTENDED=1" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
