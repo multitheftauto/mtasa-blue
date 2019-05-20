@@ -15,7 +15,6 @@
 #include <game/CControllerConfigManager.h>
 
 #include <list>
-#include <ksignals/ksignals.h>
 
 class CKeyFunctionBind;
 class CControlFunctionBind;
@@ -244,7 +243,4 @@ public:
     virtual void UnbindCommand(const char* szCmdLine) = 0;
     virtual void PrintBindsCommand(const char* szCmdLine) = 0;
     virtual bool TriggerKeyStrokeHandler(const SString& strKey, bool bActive, bool bIsConsoleInputKey) = 0;
-
-    // Events
-    ksignals::Event<void(const SString&)> OnPaste;
 };

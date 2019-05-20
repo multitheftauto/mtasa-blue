@@ -482,13 +482,6 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         }
     }
 
-    if (bAllowed)
-    {
-        // Check for pasting the clipboard
-        if (bState && strcmp(pKey->szKey, "v") == 0 && (GetKeyState(VK_CONTROL) & 0x8000))
-            OnPaste(SharedUtil::GetClipboardText());
-    }
-
     m_bProcessingKeyStroke = false;
     RemoveDeletedBinds();
     return bFound;
