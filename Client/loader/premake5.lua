@@ -3,11 +3,11 @@ project "Loader"
 	kind "SharedLib"
 	targetname "loader"
 	targetdir(buildpath("mta"))
-	
+
 	filter "system:windows"
 		linkoptions { "/SAFESEH:NO" }
-	
-	includedirs { 
+
+	includedirs {
 		"../sdk",
 		"../../vendor"
 	}
@@ -23,31 +23,31 @@ project "Loader"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",
 		["Resources/*"] = {"*.rc", "**.bmp"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
-	
+
 	filter "system:windows"
 		files {
 			"loader.rc",
 			"resource/splash.bmp"
 		}
-	
+
 	filter {"system:windows", "toolset:*_xp*"}
 		links { "Psapi.lib" }
 
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
-	
+		flags { "ExcludeFromBuild" }
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }
