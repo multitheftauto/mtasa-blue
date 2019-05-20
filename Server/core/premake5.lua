@@ -46,6 +46,10 @@ project "Core"
 		links { "ncursesw", "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-	
+
+	filter "system:macosx"
+		-- ncurses? or curses?
+		links { "curses", "breakpad", "CoreFoundation.framework" }
+
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

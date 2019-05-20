@@ -31,6 +31,19 @@ project "breakpad"
 			"src/common/dwarf/**.cc"
 		}
 
+	filter "system:macosx"
+		files {
+			"src/client/mac/**.cc",
+			"src/client/mac/**.mm",
+			"src/common/mac/**.mm",
+			"src/common/mac/**.cc"
+		}
+
+	-- Is there a better way to allow vendor to `include <BreakpadDefines.h>`
+	-- It should include "src/client/apple/Framework/BreakpadDefines.h".
+	filter "system:macosx"
+		includedirs { "src/client/apple/Framework", "src/common/mac" }
+
 	-- Ignore tests
 	excludes(os.matchfiles("**/*_unittest.cc"))
 	excludes(os.matchfiles("**/*_test.cc"))
@@ -39,6 +52,8 @@ project "breakpad"
 	excludes {
 		"src/client/linux/sender/google_crash_report_sender.cc",
 		"src/common/linux/tests/**.cc",
+		"src/client/mac/tests/**",
+		"src/client/mac/handler/testcases/**",
 		"src/common/stabs_reader.cc"
 	}
 
