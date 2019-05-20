@@ -309,7 +309,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
     m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
 
-    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), "Support for Windows XP & Vista will end in July 2019. Upgrade your OS to continue receiving future MTA updates and play on servers that require you to update.")));
+    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), "Your operating system is outdated and prone to security vulnerabilities. You should consider updating as soon as possible.")));
     m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
     m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
     m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
