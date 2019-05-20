@@ -181,7 +181,7 @@ CCredits::CCredits()
         "Pugwipe\n"
         "The_GTA\n"
         "Phatlooser\n"
-        "Dwayne 'The 'Woovie' Rock' Johnson\n"
+        "Jordan 'Woovie' Banasik\n"
         "max 'Hobo Pie' Power\n"
         "diegofkda\n"
         "Ren712\n"
