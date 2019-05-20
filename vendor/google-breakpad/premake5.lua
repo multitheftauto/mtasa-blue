@@ -24,19 +24,6 @@ project "breakpad"
 		"src/third_party/protobuf/protobuf/src/**.c"
 	}
 
-	-- Ignore tests
-	excludes(os.matchfiles("**/*_unittest.cc"))
-	excludes(os.matchfiles("**/*_test.cc"))
-	excludes(os.matchfiles("**/*_selftest.cc"))
-
-	excludes {
-		"src/client/linux/sender/google_crash_report_sender.cc",
-		"src/common/linux/tests/**.cc",
-		"src/client/mac/tests/**",
-		"src/client/mac/handler/testcases/**",
-		"src/common/stabs_reader.cc"
-	}
-
 	filter "system:linux"
 		files {
 			"src/client/linux/**.cc",
@@ -56,6 +43,20 @@ project "breakpad"
 	-- It should include "src/client/apple/Framework/BreakpadDefines.h".
 	filter "system:macosx"
 		includedirs { "src/client/apple/Framework", "src/common/mac" }
+
+	filter {}
+		-- Ignore tests
+		excludes(os.matchfiles("**/*_unittest.cc"))
+		excludes(os.matchfiles("**/*_test.cc"))
+		excludes(os.matchfiles("**/*_selftest.cc"))
+
+		excludes {
+			"src/client/linux/sender/google_crash_report_sender.cc",
+			"src/common/linux/tests/**.cc",
+			"src/client/mac/tests/**",
+			"src/client/mac/handler/testcases/**",
+			"src/common/stabs_reader.cc"
+		}
 
 	--[[filter "system:windows"
 		files {
