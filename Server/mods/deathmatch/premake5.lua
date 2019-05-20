@@ -61,9 +61,11 @@ project "Deathmatch"
 
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
-		links { "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
+
+	filter "system:linux"
+		links { "rt" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

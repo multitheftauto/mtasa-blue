@@ -35,7 +35,7 @@ project "XML"
 			copy "mta"
 		}
 
-	filter "system:not windows"
+	filter "system:linux"
 		links { "rt" }
 
 	filter "platforms:x64"

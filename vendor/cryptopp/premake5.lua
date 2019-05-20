@@ -144,6 +144,9 @@ project "cryptopp"
 		"keccak_core.cpp"
 	}
 
+	filter "system:macosx"
+		defines {"CRYPTOPP_DISABLE_ASM"}
+
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",
