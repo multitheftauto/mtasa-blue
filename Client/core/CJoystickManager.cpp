@@ -30,10 +30,6 @@ extern IDirectInput8* g_pDirectInput8;
 #define VALID_INDEX_FOR( array, index ) \
             ( index >= 0 && index < NUMELMS(array) )
 
-#define ZERO_ON_NEW \
-    void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
-    void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
-
 SString GUIDToString(const GUID& g)
 {
     return SString("%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", g.Data1, g.Data2, g.Data3, g.Data4[0], g.Data4[1], g.Data4[2], g.Data4[3], g.Data4[4],
