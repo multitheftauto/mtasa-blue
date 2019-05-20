@@ -2976,14 +2976,13 @@ void CSettings::LoadData()
     // Skins
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    uiIndex = 0;
 
     for (size_t i = 0; i < m_pInterfaceSkinSelector->GetItemCount(); i++)
     {
-        std::string strItemText = m_pInterfaceSkinSelector->GetItemText(uiIndex);
+        std::string strItemText = m_pInterfaceSkinSelector->GetItemText(i);
         if (currentSkin == strItemText)
         {
-            m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
+            m_pInterfaceSkinSelector->SetSelectedItemByIndex(i);
             break;
         }
     }
