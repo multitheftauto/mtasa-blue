@@ -1,6 +1,11 @@
+-- Workaround for `kind "None"` only being supported for Visual Studio.
+if _ACTION == "gmake" then
+	return
+end
+
 project "Shared"
 	language "C++"
-	kind "StaticLib"
+	kind "None"
 	targetname "shared"
 
 	vpaths {
