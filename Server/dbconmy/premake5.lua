@@ -45,7 +45,7 @@ project "Dbconmy"
 			linkoptions { "-l:libmysqlclient.a", "-pthread" }
 			links { "z", "dl", "m" }
 	else
-		filter "system:linux or macosx"
+		filter "system:not windows"
 			links { "mysqlclient" }
 		filter {"system:linux", "platforms:x86"}
 			libdirs { "/usr/lib32/mysql" }
