@@ -9,6 +9,7 @@ jobs:
     vmImage: 'macOS-10.14'
   steps:
   - bash: brew install mysql
+    displayName: 'Install MySQL'
   - script: ./linux-build.sh
     displayName: 'Run Build'
 
