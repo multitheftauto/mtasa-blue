@@ -2655,7 +2655,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: unbind <all/key> [<up/down> <command>]";
+    char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);
@@ -2689,24 +2689,31 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
             }
             else
             {
-                bool bState = true;
-                if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0)
+                bool        bState = true;
+                bool        both = true;
+                const char* szState = "both";
+
+                if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0 || strcmp(szCommand, "both") == 0)
                 {
                     bState = (strcmp(szCommand, "down") == 0);
+                    szState = szCommand;
                     szCommand = strtok(NULL, " ");
+
+                    if (strcmp(szState, "both") != 0)
+                        both = false;
                 }
 
                 if (szCommand)
                 {
-                    if (RemoveCommand(szKey, szCommand, true, bState))
-                        pConsole->Printf("* Unbound key '%s' '%s' from command '%s'", szKey, (bState) ? "down" : "up", szCommand);
+                    if (RemoveCommand(szKey, szCommand, !both, bState))
+                        pConsole->Printf("* Unbound key '%s' '%s' from command '%s'", szKey, szState, szCommand);
                     else
-                        pConsole->Printf("* Failed to unbind '%s' '%s' from command '%s'", szKey, (bState) ? "down" : "up", szCommand);
+                        pConsole->Printf("* Failed to unbind '%s' '%s' from command '%s'", szKey, szState, szCommand);
                 }
-                else if (RemoveAllCommands(szKey, true, bState))
-                    pConsole->Printf("* Removed all binds from key '%s' '%s'", szKey, (bState) ? "down" : "up");
+                else if (RemoveAllCommands(szKey, !both, bState))
+                    pConsole->Printf("* Removed all binds from key '%s' '%s'", szKey, szState);
                 else
-                    pConsole->Printf("* Failed to remove binds from key '%s' '%s'", szKey, (bState) ? "down" : "up");
+                    pConsole->Printf("* Failed to remove binds from key '%s' '%s'", szKey, szState);
             }
         }
         else

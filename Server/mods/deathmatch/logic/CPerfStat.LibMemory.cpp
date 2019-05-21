@@ -218,6 +218,8 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
                 #endif
                 #ifdef WIN32
                 info.strName += ".dll";
+                #elif defined(__APPLE__)
+                info.strName += ".dylib";
                 #else
                 info.strName += ".so";
                 #endif

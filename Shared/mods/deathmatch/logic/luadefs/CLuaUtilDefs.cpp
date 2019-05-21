@@ -194,11 +194,6 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         // Create a new table
         lua_newtable(luaVM);
 
-        // Add our first token
-        lua_pushnumber(luaVM, ++uiCount);
-        lua_pushstring(luaVM, szToken);
-        lua_settable(luaVM, -3);
-
         // strtok until we're out of tokens
         while (szToken)
         {
