@@ -12,11 +12,17 @@ enum eIMGFileOperation
     IMG_FILE_WRITE
 };
 
+struct STXDImgArchiveInfo
+{
+    unsigned int uiOffset;
+    unsigned short usSize;
+};
+
 #pragma pack(push, 1)
 struct EntryHeader
 {
     uint					offset;
-    ushort					fSize;
+    ushort					usSize;
     ushort					fSize2;
     char					fileName[24];
 
@@ -24,7 +30,7 @@ struct EntryHeader
     EntryHeader(uint theOffset, ushort theSize, ushort theSize2, char* theFileName)
     {
         offset = theOffset;
-        fSize = theSize;
+        usSize = theSize;
         fSize2 = theSize2;
         strncpy_s(fileName, theFileName, sizeof(EntryHeader::fileName));
     }
@@ -48,7 +54,9 @@ public:
     uint				  GetFileCount();
     CIMGArchiveFile*	  GetFileByID(uint id);
     CIMGArchiveFile*      GetFileByName(std::string fileName);
-    std::vector<EntryHeader> GetArchiveDirEntries();
+    CIMGArchiveFile*     GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo);
+
+    std::vector<EntryHeader>& GetArchiveDirEntries();
     void			      ReadEntries();
     void                  WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries);
 private:

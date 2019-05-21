@@ -1,5 +1,7 @@
 #include "StdInc.h"
 #include "CIMGArchive.h"
+#include "CIDELoader.h"
+
 /*
 GUIEditor.window[1] = guiCreateWindow(499, 255, 366, 177, "Optimize gta3.img", false)
 guiWindowSetSizable(GUIEditor.window[1], false)
@@ -110,7 +112,7 @@ void OptimizeTXDFile(CIMGArchiveFile* newFile)
         CBuffer().Swap(newFile->fileByteBuffer);
 
         newFile->actualFileSize = GetActualFileSize(txdSize);
-        newFile->fileEntry->fSize = newFile->actualFileSize / 2048;
+        newFile->fileEntry->usSize = newFile->actualFileSize / 2048;
         std::printf("txd file: %s  | new txd size: %d | actualFileSize: %d | capacity: %d\n",
             newFile->fileEntry->fileName, txdSize, (int)newFile->actualFileSize, newFile->fileByteBuffer.GetCapacity());
 
@@ -125,21 +127,36 @@ void OptimizeTXDFile(CIMGArchiveFile* newFile)
     }
 }
 
-void OptimizeDFFFile(CIMGArchiveFile* newFile)
+void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoader& ideLoader)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump *))0x74A5E0;
 
-    
-    RwTexDictionary* pTxdDictionary =  nullptr;
-    /*pTxdDictionary = pRenderWare->ReadTXD("dyno_box.txd", CBuffer(), false);
-    if (pTxdDictionary)
+    RwTexDictionary* pTxdDictionary = nullptr;
+
+    const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
+    STXDDescriptor* pTXDDescriptor = ideLoader.GetTXDDescriptorFromDFFName(uiDFFNameHash);
+    if (pTXDDescriptor)
     {
-        std::printf("txd loaded\n");
-    }*/
+        pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
+        if (!pTxdDictionary)
+        {
+           // EntryHeader * pTheTXDEntryHeader = &vecArchiveEntryHeaders[11532];
+            //std::printf("OptimizeDFFFile: pTheTXDEntryHeader = %p\n", pTheTXDEntryHeader);
+            //std::printf("OptimizeDFFFile: pTheTXDEntryHeader->offset = %u\n", pTheTXDEntryHeader->offset);
+
+            STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
+            CIMGArchiveFile* pTXDArchiveFile = pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo);
+            pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
+            pTXDDescriptor->SetTextureDictionary(pTxdDictionary);
+            delete pTXDArchiveFile;
+          
+        }
+
+    }
 
    // RpClump* pClump = pRenderWare->ReadDFF("cj_bag_det.dff", CBuffer(), 0, false, pTxdDictionary);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, 0, false);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, 0, false, pTxdDictionary);
     if (pClump)
     {
         unsigned int clumpSize = RpClumpStreamGetSize(pClump);
@@ -150,7 +167,7 @@ void OptimizeDFFFile(CIMGArchiveFile* newFile)
         CBuffer().Swap(newFile->fileByteBuffer);
 
         newFile->actualFileSize = GetActualFileSize(clumpSize);
-        newFile->fileEntry->fSize = newFile->actualFileSize / 2048;
+        newFile->fileEntry->usSize = newFile->actualFileSize / 2048;
         std::printf("dff file: %s  | new dff size: %u | actualFileSize: %d | capacity: %d\n",
             newFile->fileEntry->fileName, clumpSize, (int)newFile->actualFileSize, newFile->fileByteBuffer.GetCapacity());
 
@@ -162,6 +179,7 @@ void OptimizeDFFFile(CIMGArchiveFile* newFile)
         pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
 
         pRenderWare->DestroyDFF(pClump);
+        pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
     }
     else
     {
@@ -173,12 +191,16 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 {
     std::printf("Generate button pressed\n");
 
+    CIDELoader ideLoader;
+    
     CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
     newIMgArchive->ReadEntries();
 
+    ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
+
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)
+    for (DWORD i = 0; i < 1; i++) // newIMgArchive->GetFileCount()
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
@@ -194,7 +216,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
             else if (strFileExtension == "dff")
             {
                
-                OptimizeDFFFile(newFile);
+                OptimizeDFFFile(newIMgArchive, newFile, ideLoader);
             }
             
             imgArchiveFiles.push_back(newFile);
@@ -206,6 +228,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     //delete newFile;
     delete newIMgArchive;
     delete newIMgArchiveOut;
+
 
     return true;
 }
