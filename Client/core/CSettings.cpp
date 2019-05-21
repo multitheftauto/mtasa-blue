@@ -2739,7 +2739,13 @@ void CSettings::Initialize()
                     }
                     if (pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0')
                     {
-                        strDescription.Format("%s: %s", pCommandBind->szCommand, pCommandBind->szArguments);
+                        // HACK(qaisjp): Show special voiceptt text.
+                        //               Move this to a special Voice tab?
+                        if (strcmp(pCommandBind->szCommand, "voiceptt") == 0)
+                            strDescription = _("Push to Talk");
+                        else
+                            strDescription.Format("%s: %s", pCommandBind->szCommand, pCommandBind->szArguments);
+
                         iMultiplayerRowCount++;
                     }
                     else
