@@ -93,7 +93,7 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
         for (int i = 0; i < dwTotalEntries; i++)
         {
             CIMGArchiveFile* pArchiveFile = imgEntries[i];
-            DWORD fileBlockSize = pArchiveFile->fileEntry->fSize;
+            DWORD fileBlockSize = pArchiveFile->fileEntry->usSize;
             vecEntryHeaders.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry->fileName);
             currentBlockOffset += fileBlockSize;
         }
@@ -107,7 +107,7 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
         {
             CIMGArchiveFile* pArchiveFile = imgEntries[i];
             DWORD actualFileOffset = vecEntryHeaders[i].offset * 2048;
-            DWORD actualFileSize = vecEntryHeaders[i].fSize * 2048;
+            DWORD actualFileSize = vecEntryHeaders[i].usSize * 2048;
 
             outputStream.seekp(actualFileOffset, std::ios::beg);
 
@@ -119,15 +119,14 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
     //}
 }
 
+std::vector<EntryHeader>& CIMGArchive::GetArchiveDirEntries()
+{
+    return archiveFileEntries_;
+}
 
 uint CIMGArchive::GetFileCount()
 {
     return archiveFileEntries_.size();
-}
-
-std::vector<EntryHeader> CIMGArchive::GetArchiveDirEntries()
-{
-    return archiveFileEntries_;
 }
 
 CIMGArchiveFile* CIMGArchive::GetFileByID(uint id)
@@ -143,7 +142,7 @@ CIMGArchiveFile* CIMGArchive::GetFileByID(uint id)
             CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
             newArchiveFile->fileEntry = &archiveFileEntries_[id];
             newArchiveFile->actualFileOffset = archiveFileEntries_[id].offset * 2048;
-            newArchiveFile->actualFileSize = archiveFileEntries_[id].fSize * 2048;
+            newArchiveFile->actualFileSize = archiveFileEntries_[id].usSize * 2048;
             newArchiveFile->fileByteBuffer.SetSize((size_t)newArchiveFile->actualFileSize);
             fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
             // std::printf("archiveFileEntries_.size() = %d | id: %d | fileBYteBuffer Size: %d | actual file size: %d\n",
@@ -167,7 +166,7 @@ CIMGArchiveFile* CIMGArchive::GetFileByName(std::string fileName)
                 CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
                 newArchiveFile->fileEntry = &archiveFileEntries_[i];
                 newArchiveFile->actualFileOffset = archiveFileEntries_[i].offset * 2048;
-                newArchiveFile->actualFileSize = archiveFileEntries_[i].fSize * 2048;
+                newArchiveFile->actualFileSize = archiveFileEntries_[i].usSize * 2048;
                 newArchiveFile->fileByteBuffer.SetSize(newArchiveFile->actualFileSize);
                 fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
                 fread(newArchiveFile->fileByteBuffer.GetData(), 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
@@ -175,6 +174,25 @@ CIMGArchiveFile* CIMGArchive::GetFileByName(std::string fileName)
             }
             return NULL;
         }
+    }
+    return NULL;
+}
+
+CIMGArchiveFile* CIMGArchive::GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo)
+{
+    if (CIMGArchiveFile_ != NULL)
+    {
+        CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
+        newArchiveFile->fileEntry = nullptr;
+        newArchiveFile->actualFileOffset = pTXDImgArchiveInfo->uiOffset * 2048;
+        newArchiveFile->actualFileSize = pTXDImgArchiveInfo->usSize * 2048;
+        newArchiveFile->fileByteBuffer.SetSize((size_t)newArchiveFile->actualFileSize);
+        fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
+        // std::printf("archiveFileEntries_.size() = %d | id: %d | fileBYteBuffer Size: %d | actual file size: %d\n",
+        //    archiveFileEntries_.size(), id, newArchiveFile->fileByteBuffer.size(), newArchiveFile->actualFileSize);
+        char * pData = newArchiveFile->fileByteBuffer.GetData();
+        fread(pData, 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
+        return newArchiveFile;
     }
     return NULL;
 }
