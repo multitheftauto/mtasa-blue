@@ -18,7 +18,7 @@ project "curl"
 		"lib/amigaos.h",
 		"lib/config-amigaos.h",
 		"lib/config-dos.h",
-		"lib/config-mac.h"
+		"lib/config-mac.h",
 		"lib/config-os400.h",
 		"lib/config-riscos.h",
 		"lib/config-symbian.h",
