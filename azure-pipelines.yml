@@ -4,6 +4,14 @@ resources:
     image: sbx320/mtasa-blue-azure:latest
 
 jobs:
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.14'
+  container: ci
+  steps:
+  - script: ./linux-build.sh
+    displayName: 'Run Build'
+
 - job: linux
   pool:
     vmImage: 'Ubuntu 16.04'
@@ -11,7 +19,7 @@ jobs:
   steps:
   - script: ./linux-build.sh
     displayName: 'Run Build'
-    
+
 - job: windows
   pool:
     vmImage: 'VS2017-Win2016'
@@ -34,4 +42,3 @@ jobs:
     inputs:
       solution: '$(solution)'
       configuration: '$(buildConfiguration)'
- 
