@@ -239,8 +239,6 @@ const SDefaultCommandBind g_dcbDefaultCommands[] = {{"g", true, "enter_passenger
                                                     {"num_div", true, "radar_opacity_down", NULL},
                                                     {"num_mul", true, "radar_opacity_up", NULL},
                                                     {"num_1", true, "radar_help", NULL},
-                                                    {"z", true, "voiceptt", "1"},
-                                                    {"z", false, "voiceptt", "0"},
                                                     {"pgup", true, "chatscrollup", "1"},
                                                     {"pgup", false, "chatscrollup", "0"},
                                                     {"pgdn", true, "chatscrolldown", "-1"},
