@@ -7,7 +7,6 @@ jobs:
 - job: macOS
   pool:
     vmImage: 'macOS-10.14'
-  container: ci
   steps:
   - script: ./linux-build.sh
     displayName: 'Run Build'
