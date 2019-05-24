@@ -201,6 +201,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEngineState", "getVehicleEngineState");
     lua_classfunction(luaVM, "getLightState", "getVehicleLightState");
     lua_classfunction(luaVM, "getAdjustableProperty", "getVehicleAdjustableProperty");
+    lua_classfunction(luaVM, "areLightsOn", "areVehicleLightsOn");
     lua_classfunction(luaVM, "getOverrideLights", "getVehicleOverrideLights");
     lua_classfunction(luaVM, "getPanelState", "getVehiclePanelState");
     lua_classfunction(luaVM, "getTurnVelocity", OOP_GetVehicleTurnVelocity);
@@ -299,6 +300,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable");
     lua_classvariable(luaVM, "engineState", "setVehicleEngineState", "getVehicleEngineState");
     lua_classvariable(luaVM, "landingGearDown", "setVehicleLandingGearDown", "getVehicleLandingGearDown");
+    lua_classvariable(luaVM, "lightsOn", NULL, "areVehicleLightsOn");
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "undamageableDoors", "setVehicleDoorsUndamageable", NULL);
     lua_classvariable(luaVM, "taxiLight", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
