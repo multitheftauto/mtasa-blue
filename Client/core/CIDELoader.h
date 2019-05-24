@@ -46,6 +46,7 @@ struct STXDDescriptor
     {
         if (pTextureDictionary)
         {
+            std::printf("unloading texture | size is zero\n");
             CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
             pRenderWare->DestroyTXD(pTextureDictionary);
             pTextureDictionary = nullptr;
@@ -75,7 +76,7 @@ public:
     CIDELoader();
 
     bool LoadFileToString(const SString & fileName, SString& contents);
-    void RemoveStringSpaces(SString& contents);
+    void RemoveStringTabsSpaces(SString& contents);
     void ParseObjsLine(const SString& line);
 
     // we only need to read the objs section

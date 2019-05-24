@@ -29,14 +29,22 @@ bool CIDELoader::LoadFileToString(const SString & fileName, SString& contents)
     return false;
 }
 
-void CIDELoader::RemoveStringSpaces(SString& contents)
+void CIDELoader::RemoveStringTabsSpaces(SString& contents)
 {
     SString::iterator end_pos = std::remove(contents.begin(), contents.end(), ' ');
+    contents.erase(end_pos, contents.end());
+
+    end_pos = std::remove(contents.begin(), contents.end(), '\t');
     contents.erase(end_pos, contents.end());
 }
 
 void CIDELoader::ParseObjsLine(const SString& line)
 {
+    if (line.size() == 0 || line[0] == '#')
+    {
+        return;
+    }
+
     //std::cout << line << std::endl;
     std::vector<SString> vecSplittedStrings;
     line.Split(",", vecSplittedStrings);
@@ -45,8 +53,8 @@ void CIDELoader::ParseObjsLine(const SString& line)
     {
         const SString strDFFName = vecSplittedStrings[1] + ".dff";
         const SString strTXDName = vecSplittedStrings[2] + ".txd";
-        const unsigned int uiDFFNameHash = HashString(strDFFName);
-        const unsigned int uiTXDNameHash = HashString(strTXDName);
+        const unsigned int uiDFFNameHash = HashString(strDFFName.ToLower());
+        const unsigned int uiTXDNameHash = HashString(strTXDName.ToLower());
 
       //  std::printf("dff name: %s | txd name: %s\n", strDFFName.c_str(), strTXDName.c_str());
 
@@ -61,7 +69,7 @@ void CIDELoader::ParseObjsLine(const SString& line)
     }
     else
     {
-        std::printf("\n\n\nError !!!: vecSplittedStrings SIZE IS LESS THAN 3\n\n\n");
+        std::printf("\n\n\nError !!!: vecSplittedStrings SIZE IS LESS THAN 3 | line : %s\n\n\n", line.c_str());
     }
 
 }
@@ -71,14 +79,66 @@ void CIDELoader::ParseContents(SString& contents)
 {
     SString line;
     std::istringstream inStream(contents);
-    if (std::getline(inStream, line))
+    while (std::getline(inStream, line))
     {
-        RemoveStringSpaces(line);
+        RemoveStringTabsSpaces(line);
         if (line == "objs")
         {
             while (std::getline(inStream, line))
             {
-                RemoveStringSpaces(line);
+                RemoveStringTabsSpaces(line);
+                if (line == "end")
+                {
+                    break;
+                }
+
+                ParseObjsLine(line);
+            }
+        }
+        else if (line == "tobj")
+        {
+            while (std::getline(inStream, line))
+            {
+                RemoveStringTabsSpaces(line);
+                if (line == "end")
+                {
+                    break;
+                }
+
+                ParseObjsLine(line);
+            }
+        }
+        else if (line == "peds")
+        {
+            while (std::getline(inStream, line))
+            {
+                RemoveStringTabsSpaces(line);
+                if (line == "end")
+                {
+                    break;
+                }
+
+                ParseObjsLine(line);
+            }
+        }
+        else if (line == "weap")
+        {
+            while (std::getline(inStream, line))
+            {
+                RemoveStringTabsSpaces(line);
+                if (line == "end")
+                {
+                    break;
+                }
+
+                ParseObjsLine(line);
+            }
+        }
+        else if (line == "anim")
+        {
+            while (std::getline(inStream, line))
+            {
+                RemoveStringTabsSpaces(line);
                 if (line == "end")
                 {
                     break;
@@ -88,6 +148,8 @@ void CIDELoader::ParseContents(SString& contents)
             }
         }
     }
+
+  
 }
 
 void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
@@ -97,6 +159,8 @@ void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
     for (auto& entryHeader: vecArchiveEntryHeaders)
     { 
         SString strFileName = entryHeader.fileName;
+        strFileName = strFileName.ToLower();
+
         SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
 
         if (strFileExtension == "txd")
