@@ -149,6 +149,8 @@ public:
     void UpdateDisableGTAVertexShadersTimer();
     void SetGTAVertexShadersEnabled(bool bEnable);
 
+    void SetCurrentDFFBeingGeneratedFileName(SString& strDFFName);
+
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*> m_D3DDataTexInfoMap;
