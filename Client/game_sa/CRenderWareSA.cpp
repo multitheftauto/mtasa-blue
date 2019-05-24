@@ -200,13 +200,13 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
 {
     if (pPluginRegistryEntry->pluginID >= (DWORD)0x0253F2F0)
     {
-
+        //std::printf("IsPluginUsed: pluginId = %#.8x\n", pPluginRegistryEntry->pluginID);
         switch (pPluginRegistryEntry->pluginID)
         {
             /*
             case (DWORD)0x0253F2F3: // pipeline_set
             {
-            return false;
+             return false;
             }
             */
 
@@ -232,7 +232,7 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
 
         case (DWORD)0x0253F2F6: // specular_material
         {
-            //return false;
+           // return false;
 
             DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
@@ -267,6 +267,7 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
         case (DWORD)0x0253F2F9: // extra_vert_colour
         {
             //return false;
+
             DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
             if (!*pPluginData)
@@ -276,12 +277,12 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
             return true;
 
         }
-        /*
+       // /*
         case (DWORD)0x0253F2FA: // collision_model
         {
         return false;
         }
-        */
+       // */
         /*
         case (DWORD)0x0253F2FB: // gta_hanim
         {
@@ -290,7 +291,7 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
         */
         case (DWORD)0x0253F2FC: // reflection_material
         {
-            //return false;
+           // return false;
 
             DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
@@ -305,7 +306,7 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
 
         case (DWORD)0x0253F2FD: // breakable
         {
-            // return false;
+            //return false;
 
             DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
 
@@ -352,11 +353,15 @@ int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* p
        
         if (pPluginRegistryEntry->getSizeCB && bPluginUsed)
         {
+           // std::printf("rwPluginRegistryGetSize: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
+
             int iRegistryEntrySize = pPluginRegistryEntry->getSizeCB(pObject, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
             if (iRegistryEntrySize > 0)
             {
                 iTotalPluginsSize += iRegistryEntrySize + 12;
             }
+
+           // iTotalPluginsSize += 12;
         }
     }
     return iTotalPluginsSize;
@@ -370,13 +375,13 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
 
     int iTotalPluginsSize = _rwPluginRegistryGetSize(a1, (void*)object);
 
-    /*
+    
     // This check fixes a crash for writing TXD
-    if (iTotalPluginsSize <= 0)
+    /*if (iTotalPluginsSize <= 0)
     {
         return a1;
-    }
-    */
+    }*/
+    
 
     if (!_rwStreamWriteVersionedChunkHeader(stream, 3, iTotalPluginsSize, 0x36003, 0xFFFFu))
     {
@@ -401,6 +406,13 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
 
             if (pPluginRegistryEntry->writeCB && bPluginUsed)
             {
+                if (pPluginRegistryEntry->pluginID == (DWORD)0x0253F2F3)
+                {
+                    int i = 0;
+                }
+
+                //std::printf("rwWriteDataChunks: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, object);
+
                 int iPluginDataSize = GetSize(object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
                 if (iPluginDataSize > 0)
                 {
@@ -467,13 +479,18 @@ int BreakableStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     return size;
 }
 
-RwStream * PipelinePluginWriteCB(RwStream *stream, int length, unsigned char* pObject)
+
+RwStream *__cdecl PipelinePluginWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
 {
     auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
-    int& PipelinePluginOffset = *(int*)0x8D6080;
 
-    RwStreamWrite(stream, (void*)(pObject + PipelinePluginOffset), length);
+    RwStreamWrite(stream, (void*)(pObject + offsetInObject), length);
     return stream;
+}
+
+void*__cdecl PipelinePluginDestructCB(void *object, int offsetInObject, int sizeInObject)
+{
+    return object;
 }
 
 struct ExtraVertColourPlugin
@@ -493,11 +510,23 @@ RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int lengt
     RwStreamWrite(stream, pExtraVertColour, 4);
     if (pExtraVertColour->nightColors)
     {
+        RpGeometry* pGeometry = (RpGeometry*)pObject;
         RwStreamWrite(stream, pExtraVertColour->nightColors, 4 * ((RpGeometry*)pObject)->vertices_size);
     }
     return stream;
 }
 
+int PluginExtraVertColourStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
+{
+    int size = 0;
+    RpGeometry* pGeometry = (RpGeometry*)pObject;
+    if (pGeometry)
+    {
+        size += 4;
+        size += 4 * pGeometry->vertices_size;
+    }
+    return size;
+}
 
 struct t2dEffectPlugin
 {
@@ -715,6 +744,7 @@ void RegisterAtomicPluginsCallBacks()
         if (pPluginRegistryEntry->pluginID == (DWORD)0x0253F2F3)
         {
             pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PipelinePluginWriteCB;
+            pPluginRegistryEntry->destructCB = (RwPluginObjectDestructor)PipelinePluginDestructCB;
             break;
         }
     }
@@ -746,12 +776,49 @@ void RegisterGeometryPluginsCallBacks()
             case(DWORD)0x253F2F9:
             {
                 pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginExtraVertColourStreamWriteCB;
+                pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)PluginExtraVertColourStreamGetSizeCB;
                 break;
             }
         }
     }
 }
 
+
+SString g_CurrentDFFBeingGeneratedFileName;
+
+void CRenderWareSA::SetCurrentDFFBeingGeneratedFileName(SString& strDFFName)
+{
+    g_CurrentDFFBeingGeneratedFileName = strDFFName;
+}
+
+void __cdecl On_rwPluginRegistryReadDataChunks(void* pObject, RwPluginRegEntry *pPluginRegistryEntry)
+{
+    // collision plugin
+    if (pPluginRegistryEntry->pluginID == (DWORD)0x0253F2FA)
+    {
+        std::printf("colPlugin: %s\n", g_CurrentDFFBeingGeneratedFileName.c_str());
+    }
+}
+
+DWORD RETURN__rwPluginRegistryReadDataChunks = 0x808A6F;
+void _declspec(naked) HOOK__rwPluginRegistryReadDataChunks()
+{
+    _asm
+    {
+        pushad
+
+        push    eax // pPluginRegistryEntry
+        push    edi // pObject
+        call    On_rwPluginRegistryReadDataChunks
+        add     esp, 8
+
+        popad
+
+        mov     edx, [eax + 4]
+        mov     eax, [eax]
+        jmp     RETURN__rwPluginRegistryReadDataChunks
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -763,6 +830,9 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
 {
     InitRwFunctions(version);
     InitTextureWatchHooks();
+
+    HookInstall(0x808A6A, (DWORD)HOOK__rwPluginRegistryReadDataChunks, 5);
+
     HookInstall(0x808B00, (DWORD)_rwPluginRegistryGetSize, 5);
     HookInstall(0x808B40, (DWORD)_rwPluginRegistryWriteDataChunks, 5);
 
