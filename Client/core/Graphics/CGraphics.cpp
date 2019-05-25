@@ -641,7 +641,7 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
         // DT_CALCRECT may not take space characters at the end of a line
         // into consideration for the rect size.
         // Count the amount of space characters at the end
-        int iAdditionalPixels = GetEndSpacesWidth(pDXFont, strText);
+        int iAdditionalPixels = GetTrailingSpacesWidth(pDXFont, strText);
 
         // Compute the size of the text itself
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
@@ -702,7 +702,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
 
         while (std::getline(ssText, sLineText))
         {
-            iSpacesWidth = GetEndSpacesWidth(pDXFont, sLineText);
+            iSpacesWidth = GetTrailingSpacesWidth(pDXFont, sLineText);
             if (iEndSpacesWidth > iSpacesWidth)
                 iEndSpacesWidth = iSpacesWidth;
         }
@@ -718,7 +718,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
     }
 }
 
-int CGraphics::GetEndSpacesWidth(ID3DXFont* pDXFont, WString& strText)
+int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
 {
     // Count the amount of space characters at the end
     int iSpaceCount = 0;

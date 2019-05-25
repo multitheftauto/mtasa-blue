@@ -196,7 +196,7 @@ private:
     void       DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,
                                       unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
                                       float fRotationCenterY);
-    int        GetEndSpacesWidth(ID3DXFont* pDXFont, WString& strText);
+    int        GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText);
 
     CLocalGUI* m_pGUI;
 
