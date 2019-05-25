@@ -692,26 +692,11 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
         if (bWordBreak)
             ulFormat |= DT_WORDBREAK;
 
-        // DT_CALCRECT may not take space characters at the end of a line
-        // into consideration for the rect size.
-        // Retrieve the longest line's extent
-        std::wistringstream ssText(strText);
-        WString             sLineText;
-        int                 iSpacesWidth = 0;
-        int                 iTrailingSpacesWidth = 0;
-
-        while (std::getline(ssText, sLineText))
-        {
-            iSpacesWidth = GetTrailingSpacesWidth(pDXFont, sLineText);
-            if (iSpacesWidth > iTrailingSpacesWidth)
-                iTrailingSpacesWidth = iSpacesWidth;
-        }
-
         // Calculate the size of the text
         RECT rect = {0, 0, fWidth / fScaleX, 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
-        vecSize.fX = (rect.right - rect.left + iTrailingSpacesWidth) * fScaleX;
+        vecSize.fX = (rect.right - rect.left) * fScaleX;
         vecSize.fY = (rect.bottom - rect.top) * fScaleY;
     }
 }
@@ -737,8 +722,6 @@ int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
         SIZE size;
         GetTextExtentPoint32W(dc, L" ", 1, &size);
         iSpacesWidth = iSpaceCount * size.cx;
-        // Remove trailing spaces from the text
-        //strText = strText.Left(strText.length() - iSpaceCount);
     }
 
     return iSpacesWidth;
