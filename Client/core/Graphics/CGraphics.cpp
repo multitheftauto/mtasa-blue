@@ -702,7 +702,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
 
         while (std::getline(ssText, sLineText))
         {
-            iSpacesWidth = GetEndSpacesWidth(pDXFont, sLineText);
+            iSpacesWidth = GetTrailingSpacesWidth(pDXFont, sLineText);
             if (iEndSpacesWidth > iSpacesWidth)
                 iEndSpacesWidth = iSpacesWidth;
         }
@@ -718,7 +718,7 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
     }
 }
 
-int CGraphics::GetEndSpacesWidth(ID3DXFont* pDXFont, WString& strText)
+int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
 {
     // Count the amount of space characters at the end
     int iSpaceCount = 0;
