@@ -1611,23 +1611,21 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 pVehicle->SetModel(usOldModel);
                 return false;
             }
-            else
+
+            // Check for any passengers above the max seat list
+            unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
+            CLogger::DebugPrintf("Max passengers = %u\n", ucMaxPassengers);
+            unsigned char i = 0;
+            for (; i < MAX_VEHICLE_SEATS; i++)
             {
-                // Check for any passengers above the max seat list
-                unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
-                CLogger::DebugPrintf("Max passengers = %u\n", ucMaxPassengers);
-                unsigned char i = 0;
-                for (; i < MAX_VEHICLE_SEATS; i++)
+                // Got a player in this seat and is it bigger than the supported amount
+                // of seats in this new vehicle
+                CPed* pPed = pVehicle->GetOccupant(i);
+                if (pPed && IS_PLAYER(pPed) && (i > ucMaxPassengers))
                 {
-                    // Got a player in this seat and is it bigger than the supported amount
-                    // of seats in this new vehicle
-                    CPed* pPed = pVehicle->GetOccupant(i);
-                    if (pPed && IS_PLAYER(pPed) && (i > ucMaxPassengers))
-                    {
-                        // Throw him out
-                        // TODO: Maybe relocate him in the future. Find a free seat if available and put him in it.
-                        RemovePedFromVehicle(pPed);
-                    }
+                    // Throw him out
+                    // TODO: Maybe relocate him in the future. Find a free seat if available and put him in it.
+                    RemovePedFromVehicle(pPed);
                 }
             }
 
