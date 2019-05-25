@@ -664,7 +664,7 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
         }
 
         // Compute the size of the text itself
-        pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
         return ((float)(rect.right - rect.left + iAdditionalPixels) * fScale);
     }
@@ -690,11 +690,8 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
     return 0.0f;
 }
 
-float CGraphics::GetDXTextHeight(const char* szText, float fWidth, float fScaleX, float fScaleY, LPD3DXFONT pDXFont, bool bWordBreak, bool bColorCoded)
+float CGraphics::GetDXTextSize(const char* szText, float fWidth, float fScaleX, float fScaleY, LPD3DXFONT pDXFont, bool bWordBreak, bool bColorCoded)
 {
-    // We're calling this a lot on empty strings
-    // Also prevents undefined behavior when using
-    // strText.back() below
     if (*szText == '\0')
         return 0.0f;
 
@@ -710,17 +707,38 @@ float CGraphics::GetDXTextHeight(const char* szText, float fWidth, float fScaleX
 
         if (bColorCoded)
             RemoveColorCodesInPlaceW(strText);
-
-        // Compute the size of the text itself
+        
         ulong ulFlags = DT_CALCRECT;
         if (bWordBreak)
             ulFlags |= DT_WORDBREAK;
 
-        D3DXMATRIX   matrix;
-        D3DXVECTOR2  scaling(fScaleX, fScaleY);
-        D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL);
-        m_pDXSprite->SetTransform(&matrix);
-        pDXFont->DrawTextW(m_pDXSprite, strText.c_str(), strText.length(), &rect, ulFlags, D3DCOLOR_XRGB(0, 0, 0));
+        // DT_CALCRECT may not take space characters at the end of a line
+        // into consideration for the rect size.
+        // Count the amount of space characters at the end
+        int iSpaceCount = 0;
+        for (auto c = strText.rbegin(); c != strText.rend(); ++c)
+        {
+            if (*c == ' ')
+                ++iSpaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that
+        // to get the width of the ignored space characters
+        int iAdditionalPixels = 0;
+        if (iSpaceCount > 0)
+        {
+            HDC  dc = pDXFont->GetDC();
+            SIZE size;
+            GetTextExtentPoint32W(dc, L" ", 1, &size);
+            iAdditionalPixels = iSpaceCount * size.cx;
+            // Remove trailing spaces from the text
+            strText = strText.Left(strText.length() - iSpaceCount);
+        }
+        
+        // Compute the size of the text itself
+        pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, ulFlags, D3DCOLOR_XRGB(0, 0, 0));
 
         return (float)(rect.bottom - rect.top);
     }

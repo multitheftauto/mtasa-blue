@@ -28,7 +28,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawPrimitive", DxDrawPrimitive},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxGetTextWidth", DxGetTextWidth},
-        {"dxGetTextHeight", DxGetTextHeight},
+        {"dxGetTextSize", DxGetTextSize},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
         {"dxCreateTexture", DxCreateTexture},
@@ -748,9 +748,9 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
     return 1;
 }
 
-int CLuaDrawingDefs::DxGetTextHeight(lua_State* luaVM)
+int CLuaDrawingDefs::DxGetTextSize(lua_State* luaVM)
 {
-    //  float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
+    //  float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
     //      bool wordBreak=false, bool colorCoded=false] )
     SString            strText;
     float              fWidth;
@@ -788,7 +788,7 @@ int CLuaDrawingDefs::DxGetTextHeight(lua_State* luaVM)
         // Get DX font
         ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont(fontType, pDxFontElement);
 
-        float fHeight = g_pCore->GetGraphics()->GetDXTextHeight(strText.c_str(), fWidth, fScaleX, fScaleY, pD3DXFont, bWordBreak, bColorCoded);
+        float fHeight = g_pCore->GetGraphics()->GetDXTextSize(strText.c_str(), fWidth, fScaleX, fScaleY, pD3DXFont, bWordBreak, bColorCoded);
         lua_pushnumber(luaVM, fHeight);
         return 1;
     }

@@ -118,7 +118,7 @@ public:
     float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL);
     float GetDXTextExtent(const char* szText, float fScale = 1.0f, ID3DXFont* pDXFont = NULL, bool bColorCoded = false);
     float GetDXTextExtentW(const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL);
-    float GetDXTextHeight(const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, ID3DXFont* pDXFont = NULL, bool bWordBreak = false, bool bColorCoded = false);
+    float GetDXTextSize(const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false);
 
     // Textures
     void DrawTexture(CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f,
