@@ -1585,7 +1585,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(usOldModel);
             pPed->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                     // Get the new model
-            if (!pPed->CallEvent("onElementModelChange", Arguments))
+            bool bContinue = pPed->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pPed->GetModel())
+                 return false;
+
+            if (!bContinue)
             {
                 // Change canceled
                 pPed->SetModel(usOldModel);
@@ -1605,7 +1610,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(usOldModel);
             pVehicle->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                         // Get the new model
-            if (!pVehicle->CallEvent("onElementModelChange", Arguments))
+            bool bContinue = pVehicle->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pVehicle->GetModel())
+                 return false;
+
+            if (!bContinue)
             {
                 // Change canceled
                 pVehicle->SetModel(usOldModel);
@@ -1643,7 +1653,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             Arguments.PushNumber(usOldModel);
             pObject->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                        // Get the new model
-            if (!pObject->CallEvent("onElementModelChange", Arguments))
+            bool bContinue = pObject->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pObject->GetModel())
+                 return false;
+
+            if (!bContinue)
             {
                 // Change canceled
                 pObject->SetModel(usOldModel);
