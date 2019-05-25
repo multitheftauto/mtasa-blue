@@ -1580,11 +1580,17 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CPlayerManager::IsValidPlayerModel(usModel))
                 return false;
+            unsigned short usOldModel = pPed->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pPed->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);
             pPed->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                     // Get the new model
-            pPed->CallEvent("onElementModelChange", Arguments);
+            if (!pPed->CallEvent("onElementModelChange", Arguments))
+            {
+                // Change canceled
+                pPed->SetModel(usOldModel);
+                return false;
+            }
             break;
         }
         case CElement::VEHICLE:
@@ -1594,28 +1600,37 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CVehicleManager::IsValidModel(usModel))
                 return false;
+            unsigned short usOldModel = pVehicle->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pVehicle->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);
             pVehicle->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                         // Get the new model
-            pVehicle->CallEvent("onElementModelChange", Arguments);
-
-            // Check for any passengers above the max seat list
-            unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
-            CLogger::DebugPrintf("Max passengers = %u\n", ucMaxPassengers);
-            unsigned char i = 0;
-            for (; i < MAX_VEHICLE_SEATS; i++)
+            if (!pVehicle->CallEvent("onElementModelChange", Arguments))
             {
-                // Got a player in this seat and is it bigger than the supported amount
-                // of seats in this new vehicle
-                CPed* pPed = pVehicle->GetOccupant(i);
-                if (pPed && IS_PLAYER(pPed) && (i > ucMaxPassengers))
+                // Change canceled
+                pVehicle->SetModel(usOldModel);
+                return false;
+            }
+            else
+            {
+                // Check for any passengers above the max seat list
+                unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
+                CLogger::DebugPrintf("Max passengers = %u\n", ucMaxPassengers);
+                unsigned char i = 0;
+                for (; i < MAX_VEHICLE_SEATS; i++)
                 {
-                    // Throw him out
-                    // TODO: Maybe relocate him in the future. Find a free seat if available and put him in it.
-                    RemovePedFromVehicle(pPed);
+                    // Got a player in this seat and is it bigger than the supported amount
+                    // of seats in this new vehicle
+                    CPed* pPed = pVehicle->GetOccupant(i);
+                    if (pPed && IS_PLAYER(pPed) && (i > ucMaxPassengers))
+                    {
+                        // Throw him out
+                        // TODO: Maybe relocate him in the future. Find a free seat if available and put him in it.
+                        RemovePedFromVehicle(pPed);
+                    }
                 }
             }
+
             break;
         }
         case CElement::OBJECT:
@@ -1625,11 +1640,17 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CObjectManager::IsValidModel(usModel))
                 return false;
+            unsigned short usOldModel = pObject->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pObject->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);                     // Get the old model
             pObject->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                        // Get the new model
-            pObject->CallEvent("onElementModelChange", Arguments);
+            if (!pObject->CallEvent("onElementModelChange", Arguments))
+            {
+                // Change canceled
+                pObject->SetModel(usOldModel);
+                return false;
+            }
             break;
         }
         default:
