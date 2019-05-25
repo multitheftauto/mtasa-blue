@@ -698,22 +698,20 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
         std::wistringstream ssText(strText);
         WString             sLineText;
         int                 iSpacesWidth = 0;
-        int                 iEndSpacesWidth = 0;
+        int                 iTrailingSpacesWidth = 0;
 
         while (std::getline(ssText, sLineText))
         {
             iSpacesWidth = GetTrailingSpacesWidth(pDXFont, sLineText);
-            if (iEndSpacesWidth > iSpacesWidth)
-                iEndSpacesWidth = iSpacesWidth;
+            if (iSpacesWidth > iTrailingSpacesWidth)
+                iTrailingSpacesWidth = iSpacesWidth;
         }
 
-        fWidth += iEndSpacesWidth;
-
         // Calculate the size of the text
-        RECT rect = {0, 0, fWidth * (1 / fScaleX), 0};
+        RECT rect = {0, 0, fWidth / fScaleX, 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
-        vecSize.fX = (rect.right - rect.left) * fScaleX;
+        vecSize.fX = (rect.right - rect.left + iTrailingSpacesWidth) * fScaleX;
         vecSize.fY = (rect.bottom - rect.top) * fScaleY;
     }
 }
