@@ -1640,7 +1640,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             unsigned short usOldModel = pObject->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(usOldModel);                     // Get the old model
+            Arguments.PushNumber(usOldModel);
             pObject->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                        // Get the new model
             if (!pObject->CallEvent("onElementModelChange", Arguments))
