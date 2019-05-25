@@ -29,7 +29,7 @@ public:
     LUA_DECLARE(DxDrawImageSection);
     LUA_DECLARE(DxDrawPrimitive);
     LUA_DECLARE(DxDrawMaterialPrimitive);
-    LUA_DECLARE(DxGetTextSize);
+    LUA_DECLARE_OOP(DxGetTextSize);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);
