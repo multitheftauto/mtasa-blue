@@ -3,19 +3,19 @@ project "CEFLauncher"
 	kind "WindowedApp"
 	targetname "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
-	
+
 	includedirs { "../sdk" }
-	
+
 	links { "CEFLauncher DLL"}
 	entrypoint "WinMainCRTStartup"
 
-	vpaths { 
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 
-		
+
 	files {
 		"premake5.lua",
 		"*.h",
@@ -23,6 +23,6 @@ project "CEFLauncher"
 	}
 
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

@@ -194,18 +194,15 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         // Create a new table
         lua_newtable(luaVM);
 
-        // Add our first token
-        lua_pushnumber(luaVM, ++uiCount);
-        lua_pushstring(luaVM, szToken);
-        lua_settable(luaVM, -3);
-
         // strtok until we're out of tokens
-        while (szToken = strtok(NULL, strDelimiter))
+        while (szToken)
         {
             // Add the token to the table
             lua_pushnumber(luaVM, ++uiCount);
             lua_pushstring(luaVM, szToken);
             lua_settable(luaVM, -3);
+
+            szToken = strtok(NULL, strDelimiter);
         }
 
         // Delete the text
