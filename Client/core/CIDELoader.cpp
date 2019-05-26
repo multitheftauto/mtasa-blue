@@ -51,12 +51,13 @@ void CIDELoader::ParseObjsLine(const SString& line)
 
     if (vecSplittedStrings.size() >= 3)
     {
+        const int modelID = std::stoi(vecSplittedStrings[0]);
         const SString strDFFName = vecSplittedStrings[1] + ".dff";
         const SString strTXDName = vecSplittedStrings[2] + ".txd";
         const unsigned int uiDFFNameHash = HashString(strDFFName.ToLower());
         const unsigned int uiTXDNameHash = HashString(strTXDName.ToLower());
 
-      //  std::printf("dff name: %s | txd name: %s\n", strDFFName.c_str(), strTXDName.c_str());
+        //  std::printf("dff name: %s | txd name: %s\n", strDFFName.c_str(), strTXDName.c_str());
 
         auto it = mapOfTxdDescriptors.find(uiTXDNameHash);
         if (it == mapOfTxdDescriptors.end())
@@ -65,7 +66,13 @@ void CIDELoader::ParseObjsLine(const SString& line)
             it = thePair.first;
         }
 
-        mapOfDffTxdDescriptors[uiDFFNameHash] = &it->second;
+        auto dffDescriptorIterator = mapOfDffDescriptors.find(uiDFFNameHash);
+        if (dffDescriptorIterator == mapOfDffDescriptors.end())
+        {
+            mapOfDffDescriptors.emplace(
+                std::piecewise_construct, std::forward_as_tuple(uiDFFNameHash),
+                std::forward_as_tuple(modelID, &it->second)); 
+         }
     }
     else
     {
@@ -96,6 +103,19 @@ void CIDELoader::ParseContents(SString& contents)
             }
         }
         else if (line == "tobj")
+        {
+            while (std::getline(inStream, line))
+            {
+                RemoveStringTabsSpaces(line);
+                if (line == "end")
+                {
+                    break;
+                }
+
+                ParseObjsLine(line);
+            }
+        }
+        else if (line == "cars")
         {
             while (std::getline(inStream, line))
             {
@@ -196,22 +216,22 @@ void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
         {
             const unsigned int uiDFFNameHash = HashString(strFileName);
 
-            auto it = mapOfDffTxdDescriptors.find(uiDFFNameHash);
-            if (it != mapOfDffTxdDescriptors.end())
+            auto it = mapOfDffDescriptors.find(uiDFFNameHash);
+            if (it != mapOfDffDescriptors.end())
             {
-                it->second->AddDFFNameToSet(uiDFFNameHash);
+                it->second.GetTXDDescriptor()->AddDFFNameToSet(uiDFFNameHash);
             }
         }
         i++;
     }
 }
 
-STXDDescriptor* CIDELoader::GetTXDDescriptorFromDFFName(const unsigned int uiDFFNameHash)
+SDFFDescriptor* CIDELoader::GetDFFDescriptor(const unsigned int uiDFFNameHash)
 {
-    auto it = mapOfDffTxdDescriptors.find(uiDFFNameHash);
-    if (it != mapOfDffTxdDescriptors.end())
+    auto it = mapOfDffDescriptors.find(uiDFFNameHash);
+    if (it != mapOfDffDescriptors.end())
     {
-        return it->second;
+        return &it->second;
     }
     return nullptr;
 }

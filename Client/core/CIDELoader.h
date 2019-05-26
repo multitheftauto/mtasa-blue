@@ -70,6 +70,28 @@ struct STXDDescriptor
     }
 };
 
+struct SDFFDescriptor
+{
+    int             m_nModelID;
+    STXDDescriptor* m_pTxdDescriptor;
+
+    SDFFDescriptor(int modelID, STXDDescriptor* pTxdDescriptor)
+    {
+        m_nModelID = modelID;
+        m_pTxdDescriptor = pTxdDescriptor;
+    }
+
+    int GetModelID()
+    {
+        return m_nModelID;
+    }
+
+    STXDDescriptor* GetTXDDescriptor()
+    {
+        return m_pTxdDescriptor;
+    }
+};
+
 class CIDELoader
 {
 public:
@@ -82,13 +104,13 @@ public:
     // we only need to read the objs section
     void ParseContents(SString& contents);
     void AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive);
-    STXDDescriptor* GetTXDDescriptorFromDFFName(const unsigned int uiDFFNameHash);
+    SDFFDescriptor* GetDFFDescriptor(const unsigned int uiDFFNameHash);
 
 private:
-    // Key: DFF name hash | Value: TXD name hash
-    std::map<unsigned int, STXDDescriptor*> mapOfDffTxdDescriptors;
+    // Key: DFF name hash 
+    std::map<unsigned int, SDFFDescriptor> mapOfDffDescriptors;
 
-    // Key: TXD name hash | Value: STXDReference
+    // Key: TXD name hash
     std::map<unsigned int, STXDDescriptor> mapOfTxdDescriptors;
 
     const std::array <std::string, 59> ideFilePaths =
