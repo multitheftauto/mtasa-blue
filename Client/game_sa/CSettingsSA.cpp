@@ -227,11 +227,11 @@ float CSettingsSA::GetDrawDistance()
 void CSettingsSA::SetDrawDistance(float fDistance)
 {
     _asm
-        {
+    {
         push    fDistance
         call    FUNC_SetDrawDistance
         add     esp, 4
-        }
+    }
     m_pInterface->fDrawDistance = fDistance;
 }
 
@@ -281,11 +281,11 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
         _asm
-            {
+        {
             push    uiAntiAliasing
             call    dwFunc
             add     esp, 4
-            }
+        }
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
 
@@ -951,7 +951,8 @@ DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
 DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
 void _declspec(naked) HOOK_SelectDevice()
 {
-    _asm {
+    _asm
+    {
         pushad
         call    OnMY_SelectDevice
         cmp     eax, 1
