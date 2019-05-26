@@ -46,11 +46,11 @@ public:
 
     bool WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary);
 
-    bool WriteDFF(const SString& strFilename, RpClump* pClump);
+    bool WriteDFF(const SString& strFilename, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false);
 
     bool WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary);
 
-    bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump);
+    bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
@@ -150,6 +150,7 @@ public:
     void SetGTAVertexShadersEnabled(bool bEnable);
 
     void SetCurrentDFFBeingGeneratedFileName(SString& strDFFName);
+    void SetCurrentDFFWriteModelID(int modelID);
 
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;

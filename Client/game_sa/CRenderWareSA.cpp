@@ -277,12 +277,12 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
             return true;
 
         }
-       // /*
+        /*
         case (DWORD)0x0253F2FA: // collision_model
         {
         return false;
         }
-       // */
+        */
         /*
         case (DWORD)0x0253F2FB: // gta_hanim
         {
@@ -735,6 +735,194 @@ int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     return size;
 }
 
+
+
+int g_CurrentDFFWriteModelID = 0;
+
+RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+{
+    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+
+    CBaseModelInfoSAInterface **CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
+    CBaseModelInfoSAInterface*&CCollisionPlugin__ms_currentModel = *(CBaseModelInfoSAInterface**)0x9689E0;
+
+    auto pBaseModelInfoInterface = CModelInfo_ms_modelInfoPtrs[g_CurrentDFFWriteModelID];//CCollisionPlugin__ms_currentModel;
+    auto pColModelInterface = pBaseModelInfoInterface->pColModel;
+    auto pColData = pColModelInterface->pColData;
+
+    ColModelFileHeader colFileHeader = { 0 };
+    memcpy(colFileHeader.version, "COL3", 4);
+    colFileHeader.modelId = g_CurrentDFFWriteModelID;
+
+    RwStreamWrite(stream, &colFileHeader, sizeof(ColModelFileHeader));
+    RwStreamWrite(stream, &pColModelInterface->boundingBox, sizeof(CBoundingBoxSA));
+    RwStreamWrite(stream, &pColData->numColSpheres, 7);
+
+    char padding = 0;
+    RwStreamWrite(stream, &padding, 1);
+
+    unsigned char arrFlags[4] = { pColData->m_nFlags, 0, 0, 0 };
+    RwStreamWrite(stream, &arrFlags, 4);
+
+    unsigned int offsetCollisionSphere = sizeof(CColDataSA); // 0x30
+    offsetCollisionSphere += 68; // this really isn't needed but it's there.
+    unsigned int offsetCollisionBoxes = offsetCollisionSphere + (sizeof(CColSphereSA) * pColData->numColSpheres);
+    unsigned int offsetCollisionLinesOrDisks = offsetCollisionBoxes + (sizeof(CColBoxSA) * pColData->numColBoxes);
+    unsigned int uiCollisionLinesOrDisksSize = sizeof(CColLineSA) * pColData->numLinesOrDisks;
+    if (pColData->Flags.bUsesDisks)
+    {
+        uiCollisionLinesOrDisksSize = sizeof(CColDiskSA) * pColData->numLinesOrDisks;
+    }
+    unsigned int offsetCollisionVertices = offsetCollisionLinesOrDisks + uiCollisionLinesOrDisksSize;
+
+    unsigned short usHighestVertexIndex = 0;
+    if (pColData->pColTriangles)
+    {
+        for (unsigned short i = 0; i < pColData->numColTriangles; i++)
+        {
+            CColTriangleSA& colTriangle = pColData->pColTriangles[i];
+            if (colTriangle.vertexIndex1 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex1;
+            if (colTriangle.vertexIndex2 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex2;
+            if (colTriangle.vertexIndex3 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex3;
+        }
+    }
+
+    unsigned int numVertices = usHighestVertexIndex > 0 ? (usHighestVertexIndex + 1) : 0;
+    unsigned int offsetCollisionTriangles = offsetCollisionVertices + (sizeof(CCompressedVectorSA) * numVertices);
+    unsigned int offsetCollisionTrianglePlanes = offsetCollisionTriangles + 0; // don't write triangle planes
+    unsigned int offsetCollisionShadowVertices = offsetCollisionTrianglePlanes + 0;
+    unsigned int offsetCollisionShadowTriangles = offsetCollisionShadowVertices + sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices;
+
+    unsigned theCollisionOffset = 0;
+
+    theCollisionOffset = pColData->pColSpheres ? offsetCollisionSphere : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset = pColData->pColBoxes ? offsetCollisionBoxes : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset = pColData->m_pSuspensionLines ? uiCollisionLinesOrDisksSize : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset = pColData->m_pVertices ? offsetCollisionVertices : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset = pColData->pColTriangles ? offsetCollisionTriangles : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset =  0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+
+    // shadow data exists for version >= COL3
+    RwStreamWrite(stream, &pColData->m_nNumShadowTriangles, 4);
+
+    theCollisionOffset = pColData->m_pShadowVertices ? offsetCollisionShadowVertices : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    theCollisionOffset = pColData->m_pShadowTriangles ? offsetCollisionShadowTriangles : 0;
+    RwStreamWrite(stream, &theCollisionOffset, 4);
+
+    if (pColData->pColSpheres)
+    {
+        RwStreamWrite(stream, pColData->pColSpheres, sizeof(CColSphereSA) * pColData->numColSpheres);
+    }
+
+    if (pColData->pColBoxes)
+    {
+        RwStreamWrite(stream, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
+    }
+
+    if (pColData->m_pSuspensionLines)
+    {
+        RwStreamWrite(stream, pColData->m_pSuspensionLines, uiCollisionLinesOrDisksSize);
+    }
+
+    if (pColData->m_pVertices)
+    {
+        RwStreamWrite(stream, pColData->m_pVertices, sizeof(CCompressedVectorSA) * numVertices);
+    }
+
+    if (pColData->pColTriangles)
+    {
+        RwStreamWrite(stream, pColData->pColTriangles, sizeof(CColTriangleSA) * pColData->numColTriangles);
+    }
+
+    // Don't write triangle planes
+
+    if (pColData->m_pShadowVertices)
+    {
+        RwStreamWrite(stream, pColData->m_pShadowVertices, sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices);
+    }
+
+    if (pColData->m_pShadowTriangles)
+    {
+        RwStreamWrite(stream, pColData->m_pShadowTriangles, sizeof(CColTriangleSA) * pColData->m_nNumShadowTriangles);
+    }
+
+    return stream;
+}
+
+int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
+{
+    CBaseModelInfoSAInterface **CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
+    CBaseModelInfoSAInterface*&CCollisionPlugin__ms_currentModel = *(CBaseModelInfoSAInterface**)0x9689E0;
+
+    auto pBaseModelInfoInterface = CModelInfo_ms_modelInfoPtrs[g_CurrentDFFWriteModelID];
+    auto pColModelInterface = pBaseModelInfoInterface->pColModel;
+    auto pColData = pColModelInterface->pColData;
+
+    unsigned int uiCollisionLinesOrDisksSize = sizeof(CColLineSA) * pColData->numLinesOrDisks;
+    if (pColData->Flags.bUsesDisks)
+    {
+        uiCollisionLinesOrDisksSize = sizeof(CColDiskSA) * pColData->numLinesOrDisks;
+    }
+
+    unsigned short usHighestVertexIndex = 0;
+    if (pColData->pColTriangles)
+    {
+        for (unsigned short i = 0; i < pColData->numColTriangles; i++)
+        {
+            CColTriangleSA& colTriangle = pColData->pColTriangles[i];
+            if (colTriangle.vertexIndex1 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex1;
+            if (colTriangle.vertexIndex2 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex2;
+            if (colTriangle.vertexIndex3 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex3;
+        }
+    }
+
+    unsigned int numVertices = usHighestVertexIndex > 0 ? (usHighestVertexIndex + 1) : 0;
+
+    int size = 0;
+
+    size += sizeof(ColModelFileHeader);
+    size += 88; // COL3 data
+    size += sizeof(CColSphereSA) * pColData->numColSpheres;
+    size += sizeof(CColBoxSA) * pColData->numColBoxes;
+    size += uiCollisionLinesOrDisksSize;
+    size += sizeof(CCompressedVectorSA) * numVertices;
+    size += sizeof(CColTriangleSA) * pColData->numColTriangles;
+
+    // Ignore triangle planes
+    size += sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices;
+    size += sizeof(CColTriangleSA) * pColData->m_nNumShadowTriangles;
+    return size;
+}
+
+void RegisterClumpPluginsCallBacks()
+{
+    RwPluginRegistry& clumpTKList = *(RwPluginRegistry*)0x8D6264;
+    for (auto pPluginRegistryEntry = clumpTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        // collision plugin
+        if (pPluginRegistryEntry->pluginID == (DWORD)0x0253F2FA)
+        {
+            pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginCollisionStreamWriteCB;
+            pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)PluginCollisionStreamGetSizeCB;
+            break;
+        }
+    }
+}
+
 void RegisterAtomicPluginsCallBacks()
 {
     RwPluginRegistry& atomicTKList = *(RwPluginRegistry*)0x8D624C;
@@ -791,6 +979,11 @@ void CRenderWareSA::SetCurrentDFFBeingGeneratedFileName(SString& strDFFName)
     g_CurrentDFFBeingGeneratedFileName = strDFFName;
 }
 
+void CRenderWareSA::SetCurrentDFFWriteModelID(int modelID)
+{
+    g_CurrentDFFWriteModelID = modelID;
+}
+
 void __cdecl On_rwPluginRegistryReadDataChunks(void* pObject, RwPluginRegEntry *pPluginRegistryEntry)
 {
     // collision plugin
@@ -836,6 +1029,7 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
     HookInstall(0x808B00, (DWORD)_rwPluginRegistryGetSize, 5);
     HookInstall(0x808B40, (DWORD)_rwPluginRegistryWriteDataChunks, 5);
 
+    RegisterClumpPluginsCallBacks();
     RegisterAtomicPluginsCallBacks();
     RegisterGeometryPluginsCallBacks();
 
@@ -976,14 +1170,28 @@ bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDi
     return false;
 }
 
-bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
+bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
     auto RpClumpStreamWrite = (void (__cdecl*)(RpClump*, RwStream *))0x74AA10;
 
     RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
     if (pStream)
     {
+        // get the modelinfo array
+        DWORD* pPool = (DWORD*)ARRAY_ModelInfo;
+
+        g_CurrentDFFWriteModelID = usModelID;
+
+        // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
+        if (bLoadEmbeddedCollisions)
+            RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
+
         RpClumpStreamWrite(pClump, pStream);
+
+        // reset collision hack
+        if (bLoadEmbeddedCollisions)
+            RpPrtStdGlobalDataSetStreamEmbedded(NULL);
+
         RwStreamClose(pStream, 0);
         return true;
     }
@@ -1006,7 +1214,7 @@ bool CRenderWareSA::WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxd
     return true;
 }
 
-bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
+bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision)
 {
     auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream *))0x74AA10;
 

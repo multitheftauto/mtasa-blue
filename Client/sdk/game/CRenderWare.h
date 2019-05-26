@@ -73,9 +73,9 @@ public:
     virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr) = 0;
     virtual CColModel*       ReadCOL(const CBuffer& fileData) = 0;
     virtual bool             WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary) = 0;
-    virtual bool             WriteDFF(const SString& strFilename, RpClump* pClump) = 0;
+    virtual bool             WriteDFF(const SString& strFilename, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false) = 0;
     virtual bool             WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary) = 0;
-    virtual bool             WriteDFF(void* pData, size_t dataSize, RpClump* pClump) = 0;
+    virtual bool             WriteDFF(void* pData, size_t dataSize, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
@@ -106,4 +106,5 @@ public:
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
 
     virtual void     SetCurrentDFFBeingGeneratedFileName(SString& strDFFName) = 0;
+    virtual void     SetCurrentDFFWriteModelID(int modelID) = 0;
 };

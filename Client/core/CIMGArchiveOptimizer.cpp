@@ -353,35 +353,47 @@ void OptimizeTXDFile(CIMGArchiveFile* newFile)
     }
 }
 
-extern SString g_CurrentDFFBeingGeneratedFileName;
+
+bool IsVehicleModel(const int modelID)
+{
+    return modelID >= 400 && modelID <= 611;
+}
+
+//extern SString g_CurrentDFFBeingGeneratedFileName;
+
+
+static RwTexDictionary* g_pVehicleTxdDictionary = nullptr;
 
 void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoader& ideLoader)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump *))0x74A5E0;
 
-    /*
+    ///*
     // REMOVE THIS LATER
-    char theDFFName[] = "tcelawcuntunb.dff";
+    char theDFFName[] = "infernus.dff";
     memcpy(newFile->fileEntry->fileName, theDFFName, strlen(theDFFName) + 1);
     // REMOVE END
-    */
+   // */
 
+    
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
-    auto it = setOfIgnoredDffNameHashes.find(uiDFFNameHash);
+    /*auto it = setOfIgnoredDffNameHashes.find(uiDFFNameHash);
     if (it != setOfIgnoredDffNameHashes.end())
     {
         return; // ignore it
     }
+    */
 
-    STXDDescriptor* pTXDDescriptor = ideLoader.GetTXDDescriptorFromDFFName(uiDFFNameHash);
-    if (!pTXDDescriptor)
+    SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
+    if (!pDFFDescriptor)
     {
         return;
     }
 
     //std::printf("GetTXDDescriptorFromDFFName failed\n");
     //RwTexDictionary* pTxdDictionary = nullptr;
+    STXDDescriptor* pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
     if (!pTxdDictionary)
     {
@@ -393,9 +405,11 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
           
     }
 
+    pRenderWare->SetCurrentDFFWriteModelID(pDFFDescriptor->GetModelID());
 
-    //RpClump* pClump = pRenderWare->ReadDFF(theDFFName, CBuffer(), 0, false, pTxdDictionary);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, 0, false, pTxdDictionary);
+    bool bLoadCollision = IsVehicleModel(pDFFDescriptor->GetModelID());
+    RpClump* pClump = pRenderWare->ReadDFF(theDFFName, CBuffer(), pDFFDescriptor->GetModelID(), bLoadCollision, pTxdDictionary);
+    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, pDFFDescriptor->GetModelID(), bLoadCollision, pTxdDictionary);
     if (pClump)
     {
         unsigned int clumpSize = RpClumpStreamGetSize(pClump);
@@ -413,16 +427,13 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
         void* pData = newFile->fileByteBuffer.GetData();
-        pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
+        //pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
-        //SString strPathOfGeneratedDff = "dffs\\";
-        //pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
+        SString strPathOfGeneratedDff = "dffs\\";
+        pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump, pDFFDescriptor->GetModelID(), bLoadCollision);
 
         pRenderWare->DestroyDFF(pClump);
-        if (pTXDDescriptor)
-        {
-            pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
-        }
+        pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
     }
     else
     {
@@ -448,7 +459,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++) // newIMgArchive->GetFileCount()
+    for (DWORD i = 0; i < 1; i++) // newIMgArchive->GetFileCount()
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
