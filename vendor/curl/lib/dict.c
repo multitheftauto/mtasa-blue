@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -85,6 +85,7 @@ const struct Curl_handler Curl_handler_dict = {
   ZERO_NULL,                            /* perform_getsock */
   ZERO_NULL,                            /* disconnect */
   ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* connection_check */
   PORT_DICT,                            /* defport */
   CURLPROTO_DICT,                       /* protocol */
   PROTOPT_NONE | PROTOPT_NOURLQUERY      /* flags */
@@ -94,17 +95,17 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
 {
   char *newp = NULL;
   char *dictp;
-  char *ptr;
   size_t len;
-  char ch;
-  int olen=0;
 
   CURLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len, FALSE);
   if(!newp || result)
     return NULL;
 
-  dictp = malloc(((size_t)len)*2 + 1); /* add one for terminating zero */
+  dictp = malloc(len*2 + 1); /* add one for terminating zero */
   if(dictp) {
+    char *ptr;
+    char ch;
+    int olen = 0;
     /* According to RFC2229 section 2.2, these letters need to be escaped with
        \[letter] */
     for(ptr = newp;
@@ -116,7 +117,7 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
       }
       dictp[olen++] = ch;
     }
-    dictp[olen]=0;
+    dictp[olen] = 0;
   }
   free(newp);
   return dictp;
@@ -131,12 +132,11 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
   char *strategy = NULL;
   char *nthdef = NULL; /* This is not part of the protocol, but required
                           by RFC 2229 */
-  CURLcode result=CURLE_OK;
-  struct Curl_easy *data=conn->data;
+  CURLcode result = CURLE_OK;
+  struct Curl_easy *data = conn->data;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
-  char *path = data->state.path;
-  curl_off_t *bytecount = &data->req.bytecount;
+  char *path = data->state.up.path;
 
   *done = TRUE; /* unconditionally */
 
@@ -167,7 +167,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
 
     if((word == NULL) || (*word == (char)0)) {
       infof(data, "lookup word is missing\n");
-      word=(char *)"default";
+      word = (char *)"default";
     }
     if((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";
@@ -199,8 +199,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       failf(data, "Failed sending DICT request");
       return result;
     }
-    Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount,
-                        -1, NULL); /* no upload */
+    Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1); /* no upload */
   }
   else if(strncasecompare(path, DICT_DEFINE, sizeof(DICT_DEFINE)-1) ||
           strncasecompare(path, DICT_DEFINE2, sizeof(DICT_DEFINE2)-1) ||
@@ -221,7 +220,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
 
     if((word == NULL) || (*word == (char)0)) {
       infof(data, "lookup word is missing\n");
-      word=(char *)"default";
+      word = (char *)"default";
     }
     if((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";
@@ -246,8 +245,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
       failf(data, "Failed sending DICT request");
       return result;
     }
-    Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount,
-                        -1, NULL); /* no upload */
+    Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
   }
   else {
 
@@ -269,7 +267,7 @@ static CURLcode dict_do(struct connectdata *conn, bool *done)
         return result;
       }
 
-      Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, bytecount, -1, NULL);
+      Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
     }
   }
 

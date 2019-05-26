@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -146,7 +146,6 @@ CURLcode Curl_sasl_parse_url_auth_option(struct SASL *sasl,
                                          const char *value, size_t len)
 {
   CURLcode result = CURLE_OK;
-  unsigned int mechbit;
   size_t mechlen;
 
   if(!len)
@@ -160,7 +159,7 @@ CURLcode Curl_sasl_parse_url_auth_option(struct SASL *sasl,
   if(!strncmp(value, "*", len))
     sasl->prefmech = SASL_AUTH_DEFAULT;
   else {
-    mechbit = Curl_sasl_decode_mech(value, len, &mechlen);
+    unsigned int mechbit = Curl_sasl_decode_mech(value, len, &mechlen);
     if(mechbit && mechlen == len)
       sasl->prefmech |= mechbit;
     else
@@ -265,7 +264,7 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct connectdata *conn,
   const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
     conn->host.name;
   const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
-#if defined(USE_KERBEROS5)
+#if defined(USE_KERBEROS5) || defined(USE_NTLM)
   const char *service = data->set.str[STRING_SERVICE_NAME] ?
     data->set.str[STRING_SERVICE_NAME] :
     sasl->params->service;
@@ -301,8 +300,7 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct connectdata *conn,
         result = Curl_auth_create_gssapi_user_message(data, conn->user,
                                                       conn->passwd,
                                                       service,
-                                                      data->easy_conn->
-                                                            host.name,
+                                                      data->conn->host.name,
                                                       sasl->mutual_auth,
                                                       NULL, &conn->krb5,
                                                       &resp, &len);
@@ -331,8 +329,12 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct connectdata *conn,
       sasl->authused = SASL_MECH_NTLM;
 
       if(force_ir || data->set.sasl_ir)
-        result = Curl_auth_create_ntlm_type1_message(conn->user, conn->passwd,
-                                                     &conn->ntlm, &resp, &len);
+        result = Curl_auth_create_ntlm_type1_message(data,
+                                                     conn->user, conn->passwd,
+                                                     service,
+                                                     hostname,
+                                                     &conn->ntlm, &resp,
+                                                     &len);
       }
     else
 #endif
@@ -360,15 +362,6 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct connectdata *conn,
                                                        conn->oauth_bearer,
                                                        &resp, &len);
     }
-    else if(enabledmechs & SASL_MECH_LOGIN) {
-      mech = SASL_MECH_STRING_LOGIN;
-      state1 = SASL_LOGIN;
-      state2 = SASL_LOGIN_PASSWD;
-      sasl->authused = SASL_MECH_LOGIN;
-
-      if(force_ir || data->set.sasl_ir)
-        result = Curl_auth_create_login_message(data, conn->user, &resp, &len);
-    }
     else if(enabledmechs & SASL_MECH_PLAIN) {
       mech = SASL_MECH_STRING_PLAIN;
       state1 = SASL_PLAIN;
@@ -377,6 +370,15 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct connectdata *conn,
       if(force_ir || data->set.sasl_ir)
         result = Curl_auth_create_plain_message(data, conn->user, conn->passwd,
                                                 &resp, &len);
+    }
+    else if(enabledmechs & SASL_MECH_LOGIN) {
+      mech = SASL_MECH_STRING_LOGIN;
+      state1 = SASL_LOGIN;
+      state2 = SASL_LOGIN_PASSWD;
+      sasl->authused = SASL_MECH_LOGIN;
+
+      if(force_ir || data->set.sasl_ir)
+        result = Curl_auth_create_login_message(data, conn->user, &resp, &len);
     }
   }
 
@@ -415,14 +417,15 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct connectdata *conn,
     conn->host.name;
   const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
 #if !defined(CURL_DISABLE_CRYPTO_AUTH)
-  char *serverdata;
   char *chlg = NULL;
   size_t chlglen = 0;
 #endif
-#if !defined(CURL_DISABLE_CRYPTO_AUTH) || defined(USE_KERBEROS5)
+#if !defined(CURL_DISABLE_CRYPTO_AUTH) || defined(USE_KERBEROS5) || \
+    defined(USE_NTLM)
   const char *service = data->set.str[STRING_SERVICE_NAME] ?
                         data->set.str[STRING_SERVICE_NAME] :
                         sasl->params->service;
+  char *serverdata;
 #endif
   size_t len = 0;
 
@@ -490,7 +493,9 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct connectdata *conn,
 #ifdef USE_NTLM
   case SASL_NTLM:
     /* Create the type-1 message */
-    result = Curl_auth_create_ntlm_type1_message(conn->user, conn->passwd,
+    result = Curl_auth_create_ntlm_type1_message(data,
+                                                 conn->user, conn->passwd,
+                                                 service, hostname,
                                                  &conn->ntlm, &resp, &len);
     newstate = SASL_NTLM_TYPE2MSG;
     break;
@@ -511,7 +516,7 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct connectdata *conn,
     result = Curl_auth_create_gssapi_user_message(data, conn->user,
                                                   conn->passwd,
                                                   service,
-                                                  data->easy_conn->host.name,
+                                                  data->conn->host.name,
                                                   sasl->mutual_auth, NULL,
                                                   &conn->krb5,
                                                   &resp, &len);

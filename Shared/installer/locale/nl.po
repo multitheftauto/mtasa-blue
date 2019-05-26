@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -12,10 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: MCvarial; MittellBuurman; Winky; JaJa; iam2noob4u; Tim Ossenblok; RaceXtreme; HOLLAND; Talidan; Lukkie; ccw; Blokker_1999; Boštjan Kozar\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: MCvarial; MittellBuurman; Winky; JaJa; iam2noob4u; Tim \"tim26\" "
-"Ossenblok; RaceXtreme; HOLLAND; Talidan; Lukkie; ccw; Blokker_1999; Boštjan "
-"\"DrEspy\" Kozar\n"
 "X-POOTLE-MTIME: 1396623596.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -43,11 +41,9 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Deze wizard zal u begeleiden door de installatie of update van $(^Name) "
-"${REVISION_TAG}\n"
+"Deze wizard zal u begeleiden door de installatie of update van $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Het is aanbevolen om alle andere applicaties te sluiten voordat u de "
-"Installatie start.\n"
+"Het is aanbevolen om alle andere applicaties te sluiten voordat u de Installatie start.\n"
 "\n"
 "[Administrator rechten kunnen worden opgevraagd voor Vista en nieuwer]\n"
 "\n"
@@ -74,15 +70,15 @@ msgid ""
 msgstr ""
 "Selecteer het bestand waar Grand Theft Auto: San Andreas zich bevind.$\n"
 "$\n"
-" Je MOET Grand Theft Auto: San Andreas 1.0 geïnstalleerd hebben om MTA:SA te "
-"gebruiken, MTA:SA ondersteund geen andere versies.$\n"
+" Je MOET Grand Theft Auto: San Andreas 1.0 geïnstalleerd hebben om MTA:SA te gebruiken, MTA:SA ondersteund geen andere versies.$\n"
 "$\n"
 " Klik op Installeer om met de installatie te beginnen."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Maak een groep in het Start Menu aan voor de geïnstalleerde applicatie"
+msgstr ""
+"Maak een groep in het Start Menu aan voor de geïnstalleerde applicatie"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
@@ -151,8 +147,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"De MTA:SA 1.0 Map Editor.  Dit kan gebruikt worden om je eigen wereld mee te "
-"bouwen voor gebruik in spelmodi in MTA."
+"De MTA:SA 1.0 Map Editor.  Dit kan gebruikt worden om je eigen wereld mee te"
+" bouwen voor gebruik in spelmodi in MTA."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:209
@@ -176,8 +172,8 @@ msgstr ""
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr ""
-"De client is het programma dat je start om te spelen op een Multi Theft Auto "
-"server"
+"De client is het programma dat je start om te spelen op een Multi Theft Auto"
+" server"
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
@@ -253,9 +249,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Een geldige Windows versie van Grand Theft Auto: San Andreas is niet "
-"gedetecteerd.$\r$\n"
-"Maar de installatie gaat door.$\r$\n"
+"Een geldige Windows versie van Grand Theft Auto: San Andreas is niet gedetecteerd.$\r"
+"$\n"
+"Maar de installatie gaat door.$\r"
+"$\n"
 "Alstublieft opnieuw installeren als er enige problemen zijn later."
 
 #. INST_SEC_CORE_RESOURCES
@@ -294,8 +291,8 @@ msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
 msgstr ""
-"Ben je zeker dat je $(^Name) en alle bijhorende onderdelen volledig wenst te "
-"verwijderen?"
+"Ben je zeker dat je $(^Name) en alle bijhorende onderdelen volledig wenst te"
+" verwijderen?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -421,10 +418,8 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} wordt in de volgende map "
-"geïnstalleerd.$\n"
-"Om dit in een andere map te installeren, klik Bladeren en selecteer een "
-"andere map.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} wordt in de volgende map geïnstalleerd.$\n"
+"Om dit in een andere map te installeren, klik Bladeren en selecteer een andere map.$\n"
 "$\n"
 "Klik op volgende om door te gaan."
 

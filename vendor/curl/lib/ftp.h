@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -81,7 +81,7 @@ typedef enum {
 
 struct ftp_parselist_data; /* defined later in ftplistparser.c */
 
-struct ftp_wc_tmpdata {
+struct ftp_wc {
   struct ftp_parselist_data *parser;
 
   struct {
@@ -102,9 +102,10 @@ typedef enum {
    perhaps the Curl_easy is changed between the times the connection is
    used. */
 struct FTP {
-  curl_off_t *bytecountp;
   char *user;    /* user name string */
   char *passwd;  /* password string */
+  char *path;    /* points to the urlpieces struct field */
+  char *pathalloc; /* if non-NULL a pointer to an allocated path */
 
   /* transfer a file/body or not, done as a typedefed enum just to make
      debuggers display the full symbol and not just the numerical value */
@@ -130,10 +131,12 @@ struct ftp_conn {
                        should be FALSE when it gets to Curl_ftp_quit() */
   bool cwddone;     /* if it has been determined that the proper CWD combo
                        already has been done */
+  int cwdcount;     /* number of CWD commands issued */
   bool cwdfail;     /* set TRUE if a CWD command fails, as then we must prevent
                        caching the current directory */
   bool wait_data_conn; /* this is set TRUE if data connection is waited */
   char *prevpath;   /* conn->path from the previous transfer */
+  curl_ftpfile prevmethod; /* ftp method in previous transfer  */
   char transfertype; /* set by ftp_transfertype for use by Curl_client_write()a
                         and others (A/I or zero) */
   int count1; /* general purpose counter for the state machine */

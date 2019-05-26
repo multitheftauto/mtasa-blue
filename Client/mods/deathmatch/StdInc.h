@@ -77,6 +77,7 @@
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
+#include <CClientIFP.h>
 #include <CClientWater.h>
 #include <CClientWeapon.h>
 #include <CClientRenderElement.h>
@@ -93,6 +94,9 @@
 #include <CLogger.h>
 #include <CMapEventManager.h>
 #include <CModelNames.h>
+#include <CIFPEngine.h>
+#include <CFileReader.h>
+#include <CIFPAnimations.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
@@ -146,7 +150,6 @@
 #include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
-#include "logic/CGameEntityXRefManager.h"
 #include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
@@ -154,5 +157,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

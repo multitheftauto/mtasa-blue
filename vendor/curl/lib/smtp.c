@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -67,6 +67,7 @@
 #include "transfer.h"
 #include "escape.h"
 #include "http.h" /* for HTTP proxy tunnel stuff */
+#include "mime.h"
 #include "socks.h"
 #include "smtp.h"
 #include "strtoofft.h"
@@ -124,6 +125,7 @@ const struct Curl_handler Curl_handler_smtp = {
   ZERO_NULL,                        /* perform_getsock */
   smtp_disconnect,                  /* disconnect */
   ZERO_NULL,                        /* readwrite */
+  ZERO_NULL,                        /* connection_check */
   PORT_SMTP,                        /* defport */
   CURLPROTO_SMTP,                   /* protocol */
   PROTOPT_CLOSEACTION | PROTOPT_NOURLQUERY | /* flags */
@@ -150,63 +152,12 @@ const struct Curl_handler Curl_handler_smtps = {
   ZERO_NULL,                        /* perform_getsock */
   smtp_disconnect,                  /* disconnect */
   ZERO_NULL,                        /* readwrite */
+  ZERO_NULL,                        /* connection_check */
   PORT_SMTPS,                       /* defport */
   CURLPROTO_SMTPS,                  /* protocol */
   PROTOPT_CLOSEACTION | PROTOPT_SSL
   | PROTOPT_NOURLQUERY | PROTOPT_URLOPTIONS /* flags */
 };
-#endif
-
-#ifndef CURL_DISABLE_HTTP
-/*
- * HTTP-proxyed SMTP protocol handler.
- */
-
-static const struct Curl_handler Curl_handler_smtp_proxy = {
-  "SMTP",                               /* scheme */
-  Curl_http_setup_conn,                 /* setup_connection */
-  Curl_http,                            /* do_it */
-  Curl_http_done,                       /* done */
-  ZERO_NULL,                            /* do_more */
-  ZERO_NULL,                            /* connect_it */
-  ZERO_NULL,                            /* connecting */
-  ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
-  ZERO_NULL,                            /* disconnect */
-  ZERO_NULL,                            /* readwrite */
-  PORT_SMTP,                            /* defport */
-  CURLPROTO_HTTP,                       /* protocol */
-  PROTOPT_NONE                          /* flags */
-};
-
-#ifdef USE_SSL
-/*
- * HTTP-proxyed SMTPS protocol handler.
- */
-
-static const struct Curl_handler Curl_handler_smtps_proxy = {
-  "SMTPS",                              /* scheme */
-  Curl_http_setup_conn,                 /* setup_connection */
-  Curl_http,                            /* do_it */
-  Curl_http_done,                       /* done */
-  ZERO_NULL,                            /* do_more */
-  ZERO_NULL,                            /* connect_it */
-  ZERO_NULL,                            /* connecting */
-  ZERO_NULL,                            /* doing */
-  ZERO_NULL,                            /* proto_getsock */
-  ZERO_NULL,                            /* doing_getsock */
-  ZERO_NULL,                            /* domore_getsock */
-  ZERO_NULL,                            /* perform_getsock */
-  ZERO_NULL,                            /* disconnect */
-  ZERO_NULL,                            /* readwrite */
-  PORT_SMTPS,                           /* defport */
-  CURLPROTO_HTTP,                       /* protocol */
-  PROTOPT_NONE                          /* flags */
-};
-#endif
 #endif
 
 /* SASL parameters for the smtp protocol */
@@ -256,8 +207,12 @@ static bool smtp_endofresp(struct connectdata *conn, char *line, size_t len,
      Section 4. Examples of RFC-4954 but some e-mail servers ignore this and
      only send the response code instead as per Section 4.2. */
   if(line[3] == ' ' || len == 5) {
+    char tmpline[6];
+
     result = TRUE;
-    *resp = curlx_sltosi(strtol(line, NULL, 10));
+    memset(tmpline, '\0', sizeof(tmpline));
+    memcpy(tmpline, line, (len == 5 ? 5 : 3));
+    *resp = curlx_sltosi(strtol(tmpline, NULL, 10));
 
     /* Make sure real server never sends internal value */
     if(*resp == 1)
@@ -281,23 +236,30 @@ static bool smtp_endofresp(struct connectdata *conn, char *line, size_t len,
  */
 static void smtp_get_message(char *buffer, char **outptr)
 {
-  size_t len = 0;
+  size_t len = strlen(buffer);
   char *message = NULL;
 
-  /* Find the start of the message */
-  for(message = buffer + 4; *message == ' ' || *message == '\t'; message++)
-    ;
+  if(len > 4) {
+    /* Find the start of the message */
+    len -= 4;
+    for(message = buffer + 4; *message == ' ' || *message == '\t';
+        message++, len--)
+      ;
 
-  /* Find the end of the message */
-  for(len = strlen(message); len--;)
-    if(message[len] != '\r' && message[len] != '\n' && message[len] != ' ' &&
-       message[len] != '\t')
-      break;
+    /* Find the end of the message */
+    for(; len--;)
+      if(message[len] != '\r' && message[len] != '\n' && message[len] != ' ' &&
+         message[len] != '\t')
+        break;
 
-  /* Terminate the message */
-  if(++len) {
-    message[len] = '\0';
+    /* Terminate the message */
+    if(++len) {
+      message[len] = '\0';
+    }
   }
+  else
+    /* junk input => zero length output */
+    message = &buffer[len];
 
   *outptr = message;
 }
@@ -580,8 +542,40 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
     }
   }
 
+  /* Prepare the mime data if some. */
+  if(data->set.mimepost.kind != MIMEKIND_NONE) {
+    /* Use the whole structure as data. */
+    data->set.mimepost.flags &= ~MIME_BODY_ONLY;
+
+    /* Add external headers and mime version. */
+    curl_mime_headers(&data->set.mimepost, data->set.headers, 0);
+    result = Curl_mime_prepare_headers(&data->set.mimepost, NULL,
+                                       NULL, MIMESTRATEGY_MAIL);
+
+    if(!result)
+      if(!Curl_checkheaders(conn, "Mime-Version"))
+        result = Curl_mime_add_header(&data->set.mimepost.curlheaders,
+                                      "Mime-Version: 1.0");
+
+    /* Make sure we will read the entire mime structure. */
+    if(!result)
+      result = Curl_mime_rewind(&data->set.mimepost);
+
+    if(result) {
+      free(from);
+      free(auth);
+      return result;
+    }
+
+    data->state.infilesize = Curl_mime_size(&data->set.mimepost);
+
+    /* Read from mime structure. */
+    data->state.fread_func = (curl_read_callback) Curl_mime_read;
+    data->state.in = (void *) &data->set.mimepost;
+  }
+
   /* Calculate the optional SIZE parameter */
-  if(conn->proto.smtpc.size_supported && conn->data->state.infilesize > 0) {
+  if(conn->proto.smtpc.size_supported && data->state.infilesize > 0) {
     size = aprintf("%" CURL_FORMAT_CURL_OFF_T, data->state.infilesize);
 
     if(!size) {
@@ -714,7 +708,6 @@ static CURLcode smtp_state_ehlo_resp(struct connectdata *conn, int smtpcode,
   struct smtp_conn *smtpc = &conn->proto.smtpc;
   const char *line = data->state.buffer;
   size_t len = strlen(line);
-  size_t wordlen;
 
   (void)instate; /* no use for this yet */
 
@@ -749,6 +742,7 @@ static CURLcode smtp_state_ehlo_resp(struct connectdata *conn, int smtpcode,
       /* Loop through the data line */
       for(;;) {
         size_t llen;
+        size_t wordlen;
         unsigned int mechbit;
 
         while(len &&
@@ -965,7 +959,7 @@ static CURLcode smtp_state_data_resp(struct connectdata *conn, int smtpcode,
     Curl_pgrsSetUploadSize(data, data->state.infilesize);
 
     /* SMTP upload */
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, FIRSTSOCKET, NULL);
+    Curl_setup_transfer(data, -1, -1, FALSE, FIRSTSOCKET);
 
     /* End of DO phase */
     state(conn, SMTP_STOP);
@@ -1090,19 +1084,20 @@ static CURLcode smtp_multi_statemach(struct connectdata *conn, bool *done)
       return result;
   }
 
-  result = Curl_pp_statemach(&smtpc->pp, FALSE);
+  result = Curl_pp_statemach(&smtpc->pp, FALSE, FALSE);
   *done = (smtpc->state == SMTP_STOP) ? TRUE : FALSE;
 
   return result;
 }
 
-static CURLcode smtp_block_statemach(struct connectdata *conn)
+static CURLcode smtp_block_statemach(struct connectdata *conn,
+                                     bool disconnecting)
 {
   CURLcode result = CURLE_OK;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
 
   while(smtpc->state != SMTP_STOP && !result)
-    result = Curl_pp_statemach(&smtpc->pp, TRUE);
+    result = Curl_pp_statemach(&smtpc->pp, TRUE, disconnecting);
 
   return result;
 }
@@ -1205,11 +1200,15 @@ static CURLcode smtp_done(struct connectdata *conn, CURLcode status,
   if(!smtp || !pp->conn)
     return CURLE_OK;
 
+  /* Cleanup our per-request based variables */
+  Curl_safefree(smtp->custom);
+
   if(status) {
     connclose(conn, "SMTP done with bad status"); /* marked for closure */
     result = status;         /* use the already set error code */
   }
-  else if(!data->set.connect_only && data->set.upload && data->set.mail_rcpt) {
+  else if(!data->set.connect_only && data->set.mail_rcpt &&
+          (data->set.upload || data->set.mimepost.kind)) {
     /* Calculate the EOB taking into account any terminating CRLF from the
        previous line of the email or the CRLF of the DATA command when there
        is "no mail data". RFC-5321, sect. 4.1.1.4.
@@ -1246,7 +1245,7 @@ static CURLcode smtp_done(struct connectdata *conn, CURLcode status,
     }
     else {
       /* Successfully sent so adjust the response timeout relative to now */
-      pp->response = Curl_tvnow();
+      pp->response = Curl_now();
 
       free(eob);
     }
@@ -1259,11 +1258,8 @@ static CURLcode smtp_done(struct connectdata *conn, CURLcode status,
        the smtp_multi_statemach function but we have no general support for
        non-blocking DONE operations!
     */
-    result = smtp_block_statemach(conn);
+    result = smtp_block_statemach(conn, FALSE);
   }
-
-  /* Cleanup our per-request based variables */
-  Curl_safefree(smtp->custom);
 
   /* Clear the transfer mode for the next request */
   smtp->transfer = FTPTRANSFER_BODY;
@@ -1298,8 +1294,13 @@ static CURLcode smtp_perform(struct connectdata *conn, bool *connected,
   /* Store the first recipient (or NULL if not specified) */
   smtp->rcpt = data->set.mail_rcpt;
 
+  /* Initial data character is the first character in line: it is implicitly
+     preceded by a virtual CRLF. */
+  smtp->trailing_crlf = TRUE;
+  smtp->eob = 2;
+
   /* Start the first command in the DO phase */
-  if(data->set.upload && data->set.mail_rcpt)
+  if((data->set.upload || data->set.mimepost.kind) && data->set.mail_rcpt)
     /* MAIL transfer */
     result = smtp_perform_mail(conn);
   else
@@ -1364,7 +1365,7 @@ static CURLcode smtp_disconnect(struct connectdata *conn, bool dead_connection)
      point! */
   if(!dead_connection && smtpc->pp.conn && smtpc->pp.conn->bits.protoconnstart)
     if(!smtp_perform_quit(conn))
-      (void)smtp_block_statemach(conn); /* ignore errors on QUIT */
+      (void)smtp_block_statemach(conn, TRUE); /* ignore errors on QUIT */
 
   /* Disconnect from the server */
   Curl_pp_disconnect(&smtpc->pp);
@@ -1387,7 +1388,7 @@ static CURLcode smtp_dophase_done(struct connectdata *conn, bool connected)
 
   if(smtp->transfer != FTPTRANSFER_BODY)
     /* no data to transfer */
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+    Curl_setup_transfer(conn->data, -1, -1, FALSE, -1);
 
   return CURLE_OK;
 }
@@ -1445,42 +1446,15 @@ static CURLcode smtp_regular_transfer(struct connectdata *conn,
 
 static CURLcode smtp_setup_connection(struct connectdata *conn)
 {
-  struct Curl_easy *data = conn->data;
   CURLcode result;
 
   /* Clear the TLS upgraded flag */
   conn->tls_upgraded = FALSE;
 
-  /* Set up the proxy if necessary */
-  if(conn->bits.httpproxy && !data->set.tunnel_thru_httpproxy) {
-    /* Unless we have asked to tunnel SMTP operations through the proxy, we
-       switch and use HTTP operations only */
-#ifndef CURL_DISABLE_HTTP
-    if(conn->handler == &Curl_handler_smtp)
-      conn->handler = &Curl_handler_smtp_proxy;
-    else {
-#ifdef USE_SSL
-      conn->handler = &Curl_handler_smtps_proxy;
-#else
-      failf(data, "SMTPS not supported!");
-      return CURLE_UNSUPPORTED_PROTOCOL;
-#endif
-    }
-    /* set it up as a HTTP connection instead */
-    return conn->handler->setup_connection(conn);
-
-#else
-    failf(data, "SMTP over http proxy requires HTTP support built-in!");
-    return CURLE_UNSUPPORTED_PROTOCOL;
-#endif
-  }
-
   /* Initialise the SMTP layer */
   result = smtp_init(conn);
   if(result)
     return result;
-
-  data->state.path++;   /* don't include the initial slash */
 
   return CURLE_OK;
 }
@@ -1535,7 +1509,7 @@ static CURLcode smtp_parse_url_path(struct connectdata *conn)
   /* The SMTP struct is already initialised in smtp_connect() */
   struct Curl_easy *data = conn->data;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
-  const char *path = data->state.path;
+  const char *path = &data->state.up.path[1]; /* skip leading path */
   char localhost[HOSTNAME_MAX + 1];
 
   /* Calculate the path if necessary */
@@ -1591,13 +1565,14 @@ CURLcode Curl_smtp_escape_eob(struct connectdata *conn, const ssize_t nread)
   if(!scratch || data->set.crlf) {
     oldscratch = scratch;
 
-    scratch = newscratch = malloc(2 * BUFSIZE);
+    scratch = newscratch = malloc(2 * data->set.upload_buffer_size);
     if(!newscratch) {
       failf(data, "Failed to alloc scratch buffer!");
 
       return CURLE_OUT_OF_MEMORY;
     }
   }
+  DEBUGASSERT(data->set.upload_buffer_size >= (size_t)nread);
 
   /* Have we already sent part of the EOB? */
   eob_sent = smtp->eob;

@@ -1,4 +1,4 @@
-// eccrypto.cpp - written and placed in the public domain by Wei Dai
+// eccrypto.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 
@@ -6,7 +6,7 @@
 
 #if CRYPTOPP_MSC_VERSION
 # pragma warning(push)
-# pragma warning(disable: 4127 4189)
+# pragma warning(disable: 4127 4189 4505)
 #endif
 
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
@@ -28,10 +28,15 @@
 #include "ec2n.h"
 #include "misc.h"
 
+// Squash MS LNK4221 and libtool warnings
+#ifndef CRYPTOPP_MANUALLY_INSTANTIATE_TEMPLATES
+extern const char ECCRYPTO_FNAME[] = __FILE__;
+#endif
+
 NAMESPACE_BEGIN(CryptoPP)
 
 #if 0
-#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
+#if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 static void ECDSA_TestInstantiations()
 {
 	ECDSA<EC2N>::Signer t1;
@@ -46,8 +51,8 @@ static void ECDSA_TestInstantiations()
 #endif
 #endif
 
-// VC60 workaround: complains when these functions are put into an anonymous namespace
-static Integer ConvertToInteger(const PolynomialMod2 &x)
+ANONYMOUS_NAMESPACE_BEGIN
+inline Integer ConvertToInteger(const PolynomialMod2 &x)
 {
 	unsigned int l = x.ByteCount();
 	SecByteBlock temp(l);
@@ -55,12 +60,12 @@ static Integer ConvertToInteger(const PolynomialMod2 &x)
 	return Integer(temp, l);
 }
 
-static inline Integer ConvertToInteger(const Integer &x)
+inline Integer ConvertToInteger(const Integer &x)
 {
 	return x;
 }
 
-static bool CheckMOVCondition(const Integer &q, const Integer &r)
+inline bool CheckMOVCondition(const Integer &q, const Integer &r)
 {
 	// see "Updated standards for validating elliptic curves", http://eprint.iacr.org/2007/343
 	Integer t = 1;
@@ -77,6 +82,7 @@ static bool CheckMOVCondition(const Integer &q, const Integer &r)
 	}
 	return true;
 }
+ANONYMOUS_NAMESPACE_END
 
 // ******************************************************************
 
@@ -85,23 +91,27 @@ template <class T> struct EcRecommendedParameters;
 template<> struct EcRecommendedParameters<EC2N>
 {
 	EcRecommendedParameters(const OID &oid, unsigned int t2, unsigned int t3, unsigned int t4, const char *a, const char *b, const char *g, const char *n, unsigned int h)
-		: oid(oid), t0(0), t1(0), t2(t2), t3(t3), t4(t4), a(a), b(b), g(g), n(n), h(h) {}
+		: oid(oid), a(a), b(b), g(g), n(n), h(h), t0(0), t1(0), t2(t2), t3(t3), t4(t4) {}
 	EcRecommendedParameters(const OID &oid, unsigned int t0, unsigned int t1, unsigned int t2, unsigned int t3, unsigned int t4, const char *a, const char *b, const char *g, const char *n, unsigned int h)
-		: oid(oid), t0(t0), t1(t1), t2(t2), t3(t3), t4(t4), a(a), b(b), g(g), n(n), h(h) {}
+		: oid(oid), a(a), b(b), g(g), n(n), h(h), t0(t0), t1(t1), t2(t2), t3(t3), t4(t4) {}
 	EC2N *NewEC() const
 	{
 		StringSource ssA(a, true, new HexDecoder);
 		StringSource ssB(b, true, new HexDecoder);
 		if (t0 == 0)
-			return new EC2N(GF2NT(t2, t3, t4), EC2N::FieldElement(ssA, (size_t)ssA.MaxRetrievable()), EC2N::FieldElement(ssB, (size_t)ssB.MaxRetrievable()));
+		{
+			if (t2 == 233 && t3 == 74 && t4 == 0)
+				return new EC2N(GF2NT233(233, 74, 0), EC2N::FieldElement(ssA, (size_t)ssA.MaxRetrievable()), EC2N::FieldElement(ssB, (size_t)ssB.MaxRetrievable()));
+			else
+				return new EC2N(GF2NT(t2, t3, t4), EC2N::FieldElement(ssA, (size_t)ssA.MaxRetrievable()), EC2N::FieldElement(ssB, (size_t)ssB.MaxRetrievable()));
+		}
 		else
 			return new EC2N(GF2NPP(t0, t1, t2, t3, t4), EC2N::FieldElement(ssA, (size_t)ssA.MaxRetrievable()), EC2N::FieldElement(ssB, (size_t)ssB.MaxRetrievable()));
 	};
 
 	OID oid;
-	unsigned int t0, t1, t2, t3, t4;
 	const char *a, *b, *g, *n;
-	unsigned int h;
+	unsigned int h, t0, t1, t2, t3, t4;
 };
 
 template<> struct EcRecommendedParameters<ECP>
@@ -117,8 +127,7 @@ template<> struct EcRecommendedParameters<ECP>
 	};
 
 	OID oid;
-	const char *p;
-	const char *a, *b, *g, *n;
+	const char *p, *a, *b, *g, *n;
 	unsigned int h;
 };
 
@@ -267,10 +276,27 @@ static void GetRecommendedParameters(const EcRecommendedParameters<EC2N> *&begin
 	end = rec + sizeof(rec)/sizeof(rec[0]);
 }
 
+// See https://www.cryptopp.com/wiki/SM2 for details on sm2p256v1 and sm2encrypt_recommendedParameters
 static void GetRecommendedParameters(const EcRecommendedParameters<ECP> *&begin, const EcRecommendedParameters<ECP> *&end)
 {
 	// this array must be sorted by OID
 	static const EcRecommendedParameters<ECP> rec[] = {
+		EcRecommendedParameters<ECP>(ASN1::sm2p256v1(),
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFF",
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFC",
+			"28E9FA9E 9D9F5E34 4D5A9E4B CF6509A7 F39789F5 15AB8F92 DDBCBD41 4D940E93",
+			"04" "32C4AE2C 1F198119 5F990446 6A39C994 8FE30BBF F2660BE1 715A4589 334C74C7"
+			     "BC3736A2 F4F6779C 59BDCEE3 6B692153 D0A9877C C62A4740 02DF32E5 2139F0A0",
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF 7203DF6B 21C6052B 53BBF409 39D54123",
+			1),
+		EcRecommendedParameters<ECP>(ASN1::sm2encrypt_recommendedParameters(),
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFF",
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFC",
+			"28E9FA9E 9D9F5E34 4D5A9E4B CF6509A7 F39789F5 15AB8F92 DDBCBD41 4D940E93",
+			"04" "32C4AE2C 1F198119 5F990446 6A39C994 8FE30BBF F2660BE1 715A4589 334C74C7"
+			     "BC3736A2 F4F6779C 59BDCEE3 6B692153 D0A9877C C62A4740 02DF32E5 2139F0A0",
+			"FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF 7203DF6B 21C6052B 53BBF409 39D54123",
+			1),
 		EcRecommendedParameters<ECP>(ASN1::secp192r1(),
 			"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF",
 			"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC",
@@ -469,7 +495,7 @@ bool DL_GroupParameters_EC<EC>::GetVoidValue(const char *name, const std::type_i
 {
 	if (strcmp(name, Name::GroupOID()) == 0)
 	{
-		if (m_oid.m_values.empty())
+		if (m_oid.Empty())
 			return false;
 
 		this->ThrowIfTypeMismatch(name, typeid(OID), valueType);
@@ -547,7 +573,7 @@ void DL_GroupParameters_EC<EC>::BERDecode(BufferedTransformation &bt)
 template <class EC>
 void DL_GroupParameters_EC<EC>::DEREncode(BufferedTransformation &bt) const
 {
-	if (m_encodeAsOID && !m_oid.m_values.empty())
+	if (m_encodeAsOID && !m_oid.Empty())
 		m_oid.DEREncode(bt);
 	else
 	{
@@ -579,23 +605,29 @@ template <class EC>
 Integer DL_GroupParameters_EC<EC>::ConvertElementToInteger(const Element &element) const
 {
 	return ConvertToInteger(element.x);
-};
+}
 
 template <class EC>
 bool DL_GroupParameters_EC<EC>::ValidateGroup(RandomNumberGenerator &rng, unsigned int level) const
 {
 	bool pass = GetCurve().ValidateParameters(rng, level);
+	CRYPTOPP_ASSERT(pass);
 
 	Integer q = GetCurve().FieldSize();
 	pass = pass && m_n!=q;
+	CRYPTOPP_ASSERT(pass);
 
 	if (level >= 2)
 	{
 		Integer qSqrt = q.SquareRoot();
 		pass = pass && m_n>4*qSqrt;
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && VerifyPrime(rng, m_n, level-2);
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && (m_k.IsZero() || m_k == (q+2*qSqrt+1)/m_n);
+		CRYPTOPP_ASSERT(pass);
 		pass = pass && CheckMOVCondition(q, m_n);
+		CRYPTOPP_ASSERT(pass);
 	}
 
 	return pass;
@@ -604,17 +636,25 @@ bool DL_GroupParameters_EC<EC>::ValidateGroup(RandomNumberGenerator &rng, unsign
 template <class EC>
 bool DL_GroupParameters_EC<EC>::ValidateElement(unsigned int level, const Element &g, const DL_FixedBasePrecomputation<Element> *gpc) const
 {
-	bool pass = !IsIdentity(g) && GetCurve().VerifyPoint(g);
+	bool pass = !IsIdentity(g);
+	CRYPTOPP_ASSERT(pass);
+	pass = pass && GetCurve().VerifyPoint(g);
+	CRYPTOPP_ASSERT(pass);
+
 	if (level >= 1)
 	{
 		if (gpc)
+		{
 			pass = pass && gpc->Exponentiate(this->GetGroupPrecomputation(), Integer::One()) == g;
+			CRYPTOPP_ASSERT(pass);
+		}
 	}
 	if (level >= 2 && pass)
 	{
 		const Integer &q = GetSubgroupOrder();
 		Element gq = gpc ? gpc->Exponentiate(this->GetGroupPrecomputation(), q) : this->ExponentiateElement(g, q);
 		pass = pass && IsIdentity(gq);
+		CRYPTOPP_ASSERT(pass);
 	}
 	return pass;
 }
@@ -626,13 +666,13 @@ void DL_GroupParameters_EC<EC>::SimultaneousExponentiate(Element *results, const
 }
 
 template <class EC>
-CPP_TYPENAME DL_GroupParameters_EC<EC>::Element DL_GroupParameters_EC<EC>::MultiplyElements(const Element &a, const Element &b) const
+typename DL_GroupParameters_EC<EC>::Element DL_GroupParameters_EC<EC>::MultiplyElements(const Element &a, const Element &b) const
 {
 	return GetCurve().Add(a, b);
 }
 
 template <class EC>
-CPP_TYPENAME DL_GroupParameters_EC<EC>::Element DL_GroupParameters_EC<EC>::CascadeExponentiate(const Element &element1, const Integer &exponent1, const Element &element2, const Integer &exponent2) const
+typename DL_GroupParameters_EC<EC>::Element DL_GroupParameters_EC<EC>::CascadeExponentiate(const Element &element1, const Integer &exponent1, const Element &element2, const Integer &exponent2) const
 {
 	return GetCurve().CascadeMultiply(exponent1, element1, exponent2, element2);
 }
@@ -705,6 +745,77 @@ void DL_PrivateKey_EC<EC>::BERDecodePrivateKey(BufferedTransformation &bt, bool 
 
 template <class EC>
 void DL_PrivateKey_EC<EC>::DEREncodePrivateKey(BufferedTransformation &bt) const
+{
+	DERSequenceEncoder privateKey(bt);
+		DEREncodeUnsigned<word32>(privateKey, 1);	// version
+		// SEC 1 ver 1.0 says privateKey (m_d) has the same length as order of the curve
+		// this will be changed to order of base point in a future version
+		this->GetPrivateExponent().DEREncodeAsOctetString(privateKey, this->GetGroupParameters().GetSubgroupOrder().ByteCount());
+	privateKey.MessageEnd();
+}
+
+// ******************************************************************
+
+template <class EC>
+void DL_PublicKey_ECGDSA<EC>::BERDecodePublicKey(BufferedTransformation &bt, bool parametersPresent, size_t size)
+{
+	CRYPTOPP_UNUSED(parametersPresent);
+
+	typename EC::Point P;
+	if (!this->GetGroupParameters().GetCurve().DecodePoint(P, bt, size))
+		BERDecodeError();
+	this->SetPublicElement(P);
+}
+
+template <class EC>
+void DL_PublicKey_ECGDSA<EC>::DEREncodePublicKey(BufferedTransformation &bt) const
+{
+	this->GetGroupParameters().GetCurve().EncodePoint(bt, this->GetPublicElement(), this->GetGroupParameters().GetPointCompression());
+}
+
+// ******************************************************************
+
+template <class EC>
+void DL_PrivateKey_ECGDSA<EC>::BERDecodePrivateKey(BufferedTransformation &bt, bool parametersPresent, size_t size)
+{
+	CRYPTOPP_UNUSED(size);
+	BERSequenceDecoder seq(bt);
+		word32 version;
+		BERDecodeUnsigned<word32>(seq, version, INTEGER, 1, 1);	// check version
+
+		BERGeneralDecoder dec(seq, OCTET_STRING);
+		if (!dec.IsDefiniteLength())
+			BERDecodeError();
+		Integer x;
+		x.Decode(dec, (size_t)dec.RemainingLength());
+		dec.MessageEnd();
+		if (!parametersPresent && seq.PeekByte() != (CONTEXT_SPECIFIC | CONSTRUCTED | 0))
+			BERDecodeError();
+		if (!seq.EndReached() && seq.PeekByte() == (CONTEXT_SPECIFIC | CONSTRUCTED | 0))
+		{
+			BERGeneralDecoder parameters(seq, CONTEXT_SPECIFIC | CONSTRUCTED | 0);
+			this->AccessGroupParameters().BERDecode(parameters);
+			parameters.MessageEnd();
+		}
+		if (!seq.EndReached())
+		{
+			// skip over the public element
+			SecByteBlock subjectPublicKey;
+			unsigned int unusedBits;
+			BERGeneralDecoder publicKey(seq, CONTEXT_SPECIFIC | CONSTRUCTED | 1);
+			BERDecodeBitString(publicKey, subjectPublicKey, unusedBits);
+			publicKey.MessageEnd();
+			Element Q;
+			if (!(unusedBits == 0 && this->GetGroupParameters().GetCurve().DecodePoint(Q, subjectPublicKey, subjectPublicKey.size())))
+				BERDecodeError();
+		}
+	seq.MessageEnd();
+
+	this->SetPrivateExponent(x);
+}
+
+template <class EC>
+void DL_PrivateKey_ECGDSA<EC>::DEREncodePrivateKey(BufferedTransformation &bt) const
 {
 	DERSequenceEncoder privateKey(bt);
 		DEREncodeUnsigned<word32>(privateKey, 1);	// version

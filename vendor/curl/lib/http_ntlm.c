@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -37,11 +37,14 @@
 #include "sendf.h"
 #include "strcase.h"
 #include "http_ntlm.h"
+#include "curl_ntlm_core.h"
 #include "curl_ntlm_wb.h"
 #include "vauth/vauth.h"
 #include "url.h"
 
-#if defined(USE_NSS)
+/* SSL backend-specific #if branches in this file must be kept in the order
+   documented in curl_ntlm_core. */
+#if defined(NTLM_NEEDS_NSS_INIT)
 #include "vtls/nssg.h"
 #elif defined(USE_WINDOWS_SSPI)
 #include "curl_sspi.h"
@@ -118,9 +121,11 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
      server, which is for a plain host or for a HTTP proxy */
   char **allocuserpwd;
 
-  /* point to the name and password for this */
+  /* point to the username, password, service and host */
   const char *userp;
   const char *passwdp;
+  const char *service = NULL;
+  const char *hostname = NULL;
 
   /* point to the correct struct with this */
   struct ntlmdata *ntlm;
@@ -129,7 +134,7 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
   DEBUGASSERT(conn);
   DEBUGASSERT(conn->data);
 
-#ifdef USE_NSS
+#if defined(NTLM_NEEDS_NSS_INIT)
   if(CURLE_OK != Curl_nss_force_init(conn->data))
     return CURLE_OUT_OF_MEMORY;
 #endif
@@ -138,6 +143,9 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
     allocuserpwd = &conn->allocptr.proxyuserpwd;
     userp = conn->http_proxy.user;
     passwdp = conn->http_proxy.passwd;
+    service = conn->data->set.str[STRING_PROXY_SERVICE_NAME] ?
+              conn->data->set.str[STRING_PROXY_SERVICE_NAME] : "HTTP";
+    hostname = conn->http_proxy.host.name;
     ntlm = &conn->proxyntlm;
     authp = &conn->data->state.authproxy;
   }
@@ -145,6 +153,9 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
     allocuserpwd = &conn->allocptr.userpwd;
     userp = conn->user;
     passwdp = conn->passwd;
+    service = conn->data->set.str[STRING_SERVICE_NAME] ?
+              conn->data->set.str[STRING_SERVICE_NAME] : "HTTP";
+    hostname = conn->host.name;
     ntlm = &conn->ntlm;
     authp = &conn->data->state.authhost;
   }
@@ -164,13 +175,18 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
     if(s_hSecDll == NULL)
       return err;
   }
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+  ntlm->sslContext = conn->sslContext;
+#endif
 #endif
 
   switch(ntlm->state) {
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
     /* Create a type-1 message */
-    result = Curl_auth_create_ntlm_type1_message(userp, passwdp, ntlm, &base64,
+    result = Curl_auth_create_ntlm_type1_message(conn->data, userp, passwdp,
+                                                 service, hostname,
+                                                 ntlm, &base64,
                                                  &len);
     if(result)
       return result;
@@ -215,7 +231,7 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
     /* connection is already authenticated,
      * don't send a header in future requests */
     ntlm->state = NTLMSTATE_LAST;
-    /* fall-through */
+    /* FALLTHROUGH */
   case NTLMSTATE_LAST:
     Curl_safefree(*allocuserpwd);
     authp->done = TRUE;

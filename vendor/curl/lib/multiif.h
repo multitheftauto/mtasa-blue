@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -25,11 +25,17 @@
 /*
  * Prototypes for library-wide functions provided by multi.c
  */
-void Curl_expire(struct Curl_easy *data, time_t milli);
+
+void Curl_updatesocket(struct Curl_easy *data);
+void Curl_expire(struct Curl_easy *data, time_t milli, expire_id);
 void Curl_expire_clear(struct Curl_easy *data);
-void Curl_expire_latest(struct Curl_easy *data, time_t milli);
+void Curl_expire_done(struct Curl_easy *data, expire_id id);
 bool Curl_pipeline_wanted(const struct Curl_multi* multi, int bits);
-void Curl_multi_handlePipeBreak(struct Curl_easy *data);
+void Curl_detach_connnection(struct Curl_easy *data);
+void Curl_attach_connnection(struct Curl_easy *data,
+                             struct connectdata *conn);
+void Curl_set_in_callback(struct Curl_easy *data, bool value);
+bool Curl_is_in_callback(struct Curl_easy *easy);
 
 /* Internal version of curl_multi_init() accepts size parameters for the
    socket and connection hashes */
@@ -54,8 +60,6 @@ struct Curl_multi *Curl_multi_handle(int hashsize, int chashsize);
   */
 void Curl_multi_dump(struct Curl_multi *multi);
 #endif
-
-void Curl_multi_process_pending_handles(struct Curl_multi *multi);
 
 /* Return the value of the CURLMOPT_MAX_HOST_CONNECTIONS option */
 size_t Curl_multi_max_host_connections(struct Curl_multi *multi);
@@ -87,7 +91,7 @@ void Curl_multi_connchanged(struct Curl_multi *multi);
  * socket again and it gets the same file descriptor number.
  */
 
-void Curl_multi_closed(struct connectdata *conn, curl_socket_t s);
+void Curl_multi_closed(struct Curl_easy *data, curl_socket_t s);
 
 /*
  * Add a handle and move it into PERFORM state at once. For pushed streams.
@@ -95,4 +99,12 @@ void Curl_multi_closed(struct connectdata *conn, curl_socket_t s);
 CURLMcode Curl_multi_add_perform(struct Curl_multi *multi,
                                  struct Curl_easy *data,
                                  struct connectdata *conn);
+
+CURLMcode Curl_multi_wait(struct Curl_multi *multi,
+                          struct curl_waitfd extra_fds[],
+                          unsigned int extra_nfds,
+                          int timeout_ms,
+                          int *ret,
+                          bool *gotsocket); /* if any socket was checked */
+
 #endif /* HEADER_CURL_MULTIIF_H */

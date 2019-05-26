@@ -1,20 +1,20 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2013-05-22 14:24+0000\n"
-"Last-Translator: MIKI785 <admin@mshost.cz>\n"
+"PO-Revision-Date: 2018-03-06 15:48+0000\n"
+"Last-Translator: Rataj <rataj@fabulasoft.cz>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Translators: MIKI785; Rataj; pyrodojo; ccw; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: MIKI785; ccw; LilDollaTechZone\n"
-"X-POOTLE-MTIME: 1369232692.0\n"
+"X-POOTLE-MTIME: 1520351306.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Verze MTA:SA, kterou jste stáhl nepodporuje Windows XP nebo Vista. Prosím, "
+"stáhněte si alternativní verzi z www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Tato verze MTA:SA byla vytvořena pro starší verze systému Windows. Prosím, "
+"stáhněte si nejnovější verzi z www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -41,18 +45,18 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Tento průvodce tě provede instalací nebo updatem $(^Name) ${REVISION_TAG}\n"
+"Tento průvodce tě provede instalací nebo aktualizací $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Doporučujeme bys vypl všechny ostatní aplikace před spouštěním instalace.\n"
+"Doporučujeme vypnout všechny ostatní aplikace před spouštěním instalace.\n"
 "\n"
-"[Admin přistup může být vyžadován pro Visty a výše]\n"
+"[Administrátorská oprávnění mohou být vyžadována u systémů Vista a novější]\n"
 "\n"
 "Klikni na Další pro pokračování."
 
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Grand Theft Auto: San Andreas lokace"
+msgstr "Umístění Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:190
@@ -70,35 +74,34 @@ msgid ""
 msgstr ""
 "Prosím zvol tvou Grand Theft Auto: San Andreas složku.$\n"
 "$\n"
-"Musíš mít verzi Grand Theft Auto: San Andreas 1.0 pro použití MTA:SA, jiné "
-"verze nejsou podporováný.$\n"
+"Musíš mít verzi Grand Theft Auto: San Andreas 1.0 pro použití MTA:SA, jiné verze nejsou podporovány.$\n"
 "$\n"
-"Klikni na Instalovat."
+"Klikni na Instalovat pro zahájení instalace."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Vytvořit skupinu ve Start Menu"
+msgstr "Vytvořit skupinu v Nabídce Start pro nainstalované aplikace"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Vytvořit odkaz na ploše pro MTA:SA Client."
+msgstr "Vytvořit zástupce na ploše pro MTA:SA klient."
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Registrovat mtasa:// protokol."
+msgstr "Registrovat protokol mtasa:// pro prohlížeče."
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Přidat do Windows prohlížeče her (Pokavaď ho máš)."
+msgstr "Přidat do Prohlížeče her Windows (je-li k dispozici)."
 
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Nainstalovat nebo aktualizovat DirectX (pokud je potřeba)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -108,7 +111,7 @@ msgstr "Jádrové komponenty potřebné pro chod Multi Theft Auto."
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:200
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "MTA:SA modifikace, umožňující ti hraní online."
+msgstr "MTA:SA modifikace, umožňující ti hrát online."
 
 #. DESC_SectionGroupServer
 #: ../Shared/installer/nightly.nsi:203
@@ -116,13 +119,13 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"Multi Theft Auto Server. Toto ti umožňuje hostovat hry z tvého PC. Je "
-"zapotřebí rychlé internetové spojení."
+"Multi Theft Auto Server. Toto ti umožňuje hostovat hry z tvého počítače. Je "
+"zapotřebí rychlé internetové připojení."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "Multi Theft Auto server. Potřebná součást."
+msgstr "Multi Theft Auto server. Toto je potřebná součást."
 
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:205
@@ -145,7 +148,7 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"MTA:SA 1.0 Map Editor.   Může být použito pro vytvoření tvých vlastních map "
+"MTA:SA 1.0 Map Editor.   Může být použit pro vytvoření tvých vlastních map "
 "pro herní módy v MTA."
 
 #. DESC_Section9
@@ -155,7 +158,7 @@ msgid ""
 " if you have a good understanding of C++!"
 msgstr ""
 "Toto je SDK pro vytváření binárních modulů pro MTA server. Instaluj pouze "
-"pokuď máš dobrou znalost C++!"
+"pokud máš dobrou znalost C++!"
 
 #. DESC_SectionGroupDev
 #: ../Shared/installer/nightly.nsi:211
@@ -163,13 +166,13 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Vyvojářský kód a nástroje které můžou pomoci při vývoji módu pro Multi Theft "
-"Auto"
+"Vývojářský kód a nástroje které můžou pomoci při vývoji módu pro Multi Theft"
+" Auto"
 
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "Client je program který spustíš pro hraní na Multi Theft Auto serveru"
+msgstr "Klient je program který spustíš pro hraní na Multi Theft Auto serveru"
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
@@ -199,17 +202,17 @@ msgstr "Zaregistrovat mtasa:// protokol"
 #. INST_GAMES_EXPLORER
 #: ../Shared/installer/nightly.nsi:427
 msgid "Add to Games Explorer"
-msgstr "Přidat do prohlížeče her"
+msgstr "Přidat do Prohlížeče her"
 
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Nainstalovat DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
 msgid "Game client"
-msgstr "Herní client"
+msgstr "Herní klient"
 
 #. INST_SEC_SERVER
 #: ../Shared/installer/nightly.nsi:463
@@ -229,7 +232,7 @@ msgstr "Herní modul"
 #. INFO_INPLACE_UPGRADE
 #: ../Shared/installer/nightly.nsi:467
 msgid "Performing in-place upgrade..."
-msgstr "Provádím mistní aktualizaci..."
+msgstr "Provádím místní aktualizaci..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: ../Shared/installer/nightly.nsi:468
@@ -245,9 +248,11 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Platná verze hry Grand Theft Auto: San Andreas nebyla nalezena.$\r$\n"
-"Instalace bude i tak pokračovat.$\r$\n"
-"Reinstalujte MTA v případě pozdějších problémů."
+"Platná verze hry Grand Theft Auto: San Andreas nebyla nalezena.$\r"
+"$\n"
+"Instalace bude i přesto pokračovat.$\r"
+"$\n"
+"Přeinstalujte MTA v případě pozdějších problémů."
 
 #. INST_SEC_CORE_RESOURCES
 #: ../Shared/installer/nightly.nsi:472
@@ -262,7 +267,7 @@ msgstr "Volitelné Resources"
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474
 msgid "Editor"
-msgstr "Map Editor"
+msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
 #: ../Shared/installer/nightly.nsi:967
@@ -284,7 +289,8 @@ msgstr "Odinstalace selhala!"
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
-msgstr "Jsi si jist že chceš kompletně smazat $(^Name) a všechny jeho součásti?"
+msgstr ""
+"Jsi si jist že chceš kompletně smazat $(^Name) a všechny jeho součásti?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -295,6 +301,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
+"Odinstalovat před aktualizací?$\r"
+"$\n"
+"Odstranění předchozí instalace není nutné při instalace nové verze MTA:SA$\r"
+"$\n"
+"Spusť nový instalátor pro aktualizaci a zachování nastavení."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -303,9 +314,9 @@ msgid ""
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
 msgstr ""
-"Chceš ponechat tvoje osobní soubory (Jako resources, screenshoty a nastavení "
-"serveru)? Pokuď klikneš na ne, všechny resources, konfigurace a screenshoty "
-"co jsi vytvořil budou ztraceny."
+"Chceš ponechat tvoje osobní soubory (jako skripty, screenshoty a nastavení "
+"serveru)? Pokud klikneš na ne, všechny skripty, nastavení a screenshoty, "
+"které jsi vytvořil budou ztraceny."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
@@ -321,17 +332,18 @@ msgid ""
 "Unable to install the patch file for your version of Grand Theft Auto: San "
 "Andreas"
 msgstr ""
-"Chyba při instalaci patche pro tvojí verzi Grand Theft Auto: San Andreas"
+"Chyba při instalaci aktualizace pro tvoji verzi Grand Theft Auto: San "
+"Andreas"
 
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1181
 msgid "This installer requires admin access, try again"
-msgstr "Tento instalátor vyžaduje admin přístup, zkus to znovu"
+msgstr "Tento instalátor vyžaduje admin. oprávnění, zkus to znovu"
 
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1182
 msgid "This uninstaller requires admin access, try again"
-msgstr "Tento odinstalátor vyžaduje admin přístup, zkus to znovu"
+msgstr "Tento odinstalátor vyžaduje admin. oprávnění, zkus to znovu"
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1183
@@ -364,6 +376,10 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
+"MTA nemůže být nainstalováno do stejného adresáře, jako je GTA:SA.$\n"
+"$\n"
+"Chceš místo toho použít výchozí adresář pro instalaci$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1780
@@ -390,7 +406,7 @@ msgstr ""
 #. INST_CHOOSE_LOC_TOP
 #: ../Shared/installer/nightly.nsi:1905
 msgid "Choose Install Location"
-msgstr "Vyberte umístění instalace"
+msgstr "Vyber umístění instalace"
 
 #. INST_CHOOSE_LOC
 #: ../Shared/installer/nightly.nsi:1906
@@ -409,8 +425,7 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainstalován v následujícím "
-"adresáři.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainstalován v následujícím adresáři.$\n"
 "Pro instalaci do jiného adresáře klikni na Procházet a zvol jiný adresář.$\n"
 "$\n"
 "Klikni na Další pro pokračování."
@@ -460,22 +475,22 @@ msgstr "Typ instalace:   Upgrade"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
-msgstr ""
+msgstr "Online aktualizace"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
-msgstr ""
+msgstr "Zjišťuji informace o aktualizaci"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "Kontroluji informace o aktualizacích instalátoru..."
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "Prosím, ujisti se, že firewall něco neblokuje"
 
 #~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
 #~ msgstr "Chyba při stahovéní Microsoft Visual Studio 2008 SP1 redistributable"
@@ -490,6 +505,8 @@ msgstr ""
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Nebylo možné stáhnout Microsoft Visual Studio 2008 SP1 redistributable.$\r$\n"
-#~ "Instalace bude i tak pokračovat.$\r$\n"
+#~ "Nebylo možné stáhnout Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Instalace bude i tak pokračovat.$\r"
+#~ "$\n"
 #~ "Reinstaluj MTA v případě pozdějších problémů."

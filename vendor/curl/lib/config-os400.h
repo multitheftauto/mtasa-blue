@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -403,8 +403,14 @@
 /* The size of `short', as computed by sizeof. */
 #define SIZEOF_SHORT            2
 
+/* The size of `long', as computed by sizeof. */
+#define SIZEOF_LONG             4
+
 /* The size of `size_t', as computed by sizeof. */
-#define SIZEOF_SIZE_T           8
+#define SIZEOF_SIZE_T           4
+
+/* The size of `curl_off_t', as computed by sizeof. */
+#define SIZEOF_CURL_OFF_T       8
 
 /* Whether long long constants must be suffixed by LL. */
 
@@ -418,6 +424,9 @@
 
 /* Define if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME
+
+/* Define to enable alt-svc support (experimental) */
+#undef USE_ALTSVC
 
 /* Version number of package */
 #undef VERSION

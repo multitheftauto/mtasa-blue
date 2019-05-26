@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -71,8 +71,8 @@ bool Curl_auth_is_spnego_supported(void)
  * Parameters:
  *
  * data        [in]     - The session handle.
- * userp       [in]     - The user name in the format User or Domain\User.
- * passdwp     [in]     - The user's password.
+ * user        [in]     - The user name in the format User or Domain\User.
+ * password    [in]     - The user's password.
  * service     [in]     - The service type such as http, smtp, pop or imap.
  * host        [in]     - The host name.
  * chlg64      [in]     - The optional base64 encoded challenge message.
@@ -92,7 +92,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
   size_t chlglen = 0;
   unsigned char *chlg = NULL;
   PSecPkgInfo SecurityPackage;
-  SecBuffer chlg_buf;
+  SecBuffer chlg_buf[2];
   SecBuffer resp_buf;
   SecBufferDesc chlg_desc;
   SecBufferDesc resp_desc;
@@ -138,7 +138,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
  }
 
   if(!nego->credentials) {
-    /* Do we have credientials to use or are we using single sign-on? */
+    /* Do we have credentials to use or are we using single sign-on? */
     if(user && *user) {
       /* Populate our identity structure */
       result = Curl_create_sspi_identity(user, password, &nego->identity);
@@ -153,11 +153,9 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
       nego->p_identity = NULL;
 
     /* Allocate our credentials handle */
-    nego->credentials = malloc(sizeof(CredHandle));
+    nego->credentials = calloc(1, sizeof(CredHandle));
     if(!nego->credentials)
       return CURLE_OUT_OF_MEMORY;
-
-    memset(nego->credentials, 0, sizeof(CredHandle));
 
     /* Acquire our credentials handle */
     nego->status =
@@ -170,11 +168,9 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
       return CURLE_LOGIN_DENIED;
 
     /* Allocate our new context handle */
-    nego->context = malloc(sizeof(CtxtHandle));
+    nego->context = calloc(1, sizeof(CtxtHandle));
     if(!nego->context)
       return CURLE_OUT_OF_MEMORY;
-
-    memset(nego->context, 0, sizeof(CtxtHandle));
   }
 
   if(chlg64 && *chlg64) {
@@ -193,12 +189,39 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
     }
 
     /* Setup the challenge "input" security buffer */
-    chlg_desc.ulVersion = SECBUFFER_VERSION;
-    chlg_desc.cBuffers  = 1;
-    chlg_desc.pBuffers  = &chlg_buf;
-    chlg_buf.BufferType = SECBUFFER_TOKEN;
-    chlg_buf.pvBuffer   = chlg;
-    chlg_buf.cbBuffer   = curlx_uztoul(chlglen);
+    chlg_desc.ulVersion    = SECBUFFER_VERSION;
+    chlg_desc.cBuffers     = 1;
+    chlg_desc.pBuffers     = &chlg_buf[0];
+    chlg_buf[0].BufferType = SECBUFFER_TOKEN;
+    chlg_buf[0].pvBuffer   = chlg;
+    chlg_buf[0].cbBuffer   = curlx_uztoul(chlglen);
+
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+    /* ssl context comes from Schannel.
+    * When extended protection is used in IIS server,
+    * we have to pass a second SecBuffer to the SecBufferDesc
+    * otherwise IIS will not pass the authentication (401 response).
+    * Minimum supported version is Windows 7.
+    * https://docs.microsoft.com/en-us/security-updates
+    * /SecurityAdvisories/2009/973811
+    */
+    if(nego->sslContext) {
+      SEC_CHANNEL_BINDINGS channelBindings;
+      SecPkgContext_Bindings pkgBindings;
+      pkgBindings.Bindings = &channelBindings;
+      nego->status = s_pSecFn->QueryContextAttributes(
+          nego->sslContext,
+          SECPKG_ATTR_ENDPOINT_BINDINGS,
+          &pkgBindings
+      );
+      if(nego->status == SEC_E_OK) {
+        chlg_desc.cBuffers++;
+        chlg_buf[1].BufferType = SECBUFFER_CHANNEL_BINDINGS;
+        chlg_buf[1].cbBuffer   = pkgBindings.BindingsLength;
+        chlg_buf[1].pvBuffer   = pkgBindings.Bindings;
+      }
+    }
+#endif
   }
 
   /* Setup the response "output" security buffer */
@@ -225,8 +248,9 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
   free(chlg);
 
   if(GSS_ERROR(nego->status)) {
+    char buffer[STRERROR_LEN];
     failf(data, "InitializeSecurityContext failed: %s",
-          Curl_sspi_strerror(data->easy_conn, nego->status));
+          Curl_sspi_strerror(nego->status, buffer, sizeof(buffer)));
     return CURLE_OUT_OF_MEMORY;
   }
 
@@ -319,6 +343,11 @@ void Curl_auth_spnego_cleanup(struct negotiatedata *nego)
   /* Reset any variables */
   nego->status = 0;
   nego->token_max = 0;
+  nego->state = GSS_AUTHNONE;
+  nego->noauthpersist = FALSE;
+  nego->havenoauthpersist = FALSE;
+  nego->havenegdata = FALSE;
+  nego->havemultiplerequests = FALSE;
 }
 
 #endif /* USE_WINDOWS_SSPI && USE_SPNEGO */

@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAEAudioHardwareSA.h
-*  PURPOSE:     Audio hardware header
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAEAudioHardwareSA.h
+ *  PURPOSE:     Audio hardware header
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -21,16 +21,15 @@
 
 class CAEAudioHardwareSAInterface
 {
-
 };
 
 class CAEAudioHardwareSA : public CAEAudioHardware
 {
 public:
-                                        CAEAudioHardwareSA                  ( CAEAudioHardwareSAInterface * pInterface );
-    bool                                IsSoundBankLoaded                   ( short wSoundBankID, short wSoundBankSlotID );
-    void                                LoadSoundBank                       ( short wSoundBankID, short wSoundBankSlotID );
+    CAEAudioHardwareSA(CAEAudioHardwareSAInterface* pInterface);
+    bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID);
+    void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID);
 
 private:
-    CAEAudioHardwareSAInterface *       m_pInterface;
+    CAEAudioHardwareSAInterface* m_pInterface;
 };

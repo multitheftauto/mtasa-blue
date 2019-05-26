@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,9 +22,15 @@
 
 #include "curl_setup.h"
 
-#ifdef HAVE_LIMITS_H
+/***********************************************************************
+ * Only for ares-enabled builds
+ * And only for functions that fulfill the asynch resolver backend API
+ * as defined in asyn.h, nothing else belongs in this file!
+ **********************************************************************/
+
+#ifdef CURLRES_ARES
+
 #include <limits.h>
-#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -47,14 +53,6 @@
 #undef in_addr_t
 #define in_addr_t unsigned long
 #endif
-
-/***********************************************************************
- * Only for ares-enabled builds
- * And only for functions that fulfill the asynch resolver backend API
- * as defined in asyn.h, nothing else belongs in this file!
- **********************************************************************/
-
-#ifdef CURLRES_ARES
 
 #include "urldata.h"
 #include "sendf.h"
@@ -121,6 +119,17 @@ void Curl_resolver_global_cleanup(void)
 #endif
 }
 
+
+static void Curl_ares_sock_state_cb(void *data, ares_socket_t socket_fd,
+                                    int readable, int writable)
+{
+  struct Curl_easy *easy = data;
+  if(!readable && !writable) {
+    DEBUGASSERT(easy);
+    Curl_multi_closed(easy, socket_fd);
+  }
+}
+
 /*
  * Curl_resolver_init()
  *
@@ -128,9 +137,14 @@ void Curl_resolver_global_cleanup(void)
  * URL-state specific environment ('resolver' member of the UrlState
  * structure).  Fills the passed pointer by the initialized ares_channel.
  */
-CURLcode Curl_resolver_init(void **resolver)
+CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
 {
-  int status = ares_init((ares_channel*)resolver);
+  int status;
+  struct ares_options options;
+  int optmask = ARES_OPT_SOCK_STATE_CB;
+  options.sock_state_cb = Curl_ares_sock_state_cb;
+  options.sock_state_cb_data = easy;
+  status = ares_init_options((ares_channel*)resolver, &options, optmask);
   if(status != ARES_SUCCESS) {
     if(status == ARES_ENOMEM)
       return CURLE_OUT_OF_MEMORY;
@@ -161,12 +175,15 @@ void Curl_resolver_cleanup(void *resolver)
  * environment ('resolver' member of the UrlState structure).  Duplicates the
  * 'from' ares channel and passes the resulting channel to the 'to' pointer.
  */
-int Curl_resolver_duphandle(void **to, void *from)
+CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to, void *from)
 {
-  /* Clone the ares channel for the new handle */
-  if(ARES_SUCCESS != ares_dup((ares_channel*)to, (ares_channel)from))
-    return CURLE_FAILED_INIT;
-  return CURLE_OK;
+  (void)from;
+  /*
+   * it would be better to call ares_dup instead, but right now
+   * it is not possible to set 'sock_state_cb_data' outside of
+   * ares_init_options
+   */
+  return Curl_resolver_init(easy, to);
 }
 
 static void destroy_async_data(struct Curl_async *async);
@@ -179,6 +196,17 @@ void Curl_resolver_cancel(struct connectdata *conn)
   if(conn->data && conn->data->state.resolver)
     ares_cancel((ares_channel)conn->data->state.resolver);
   destroy_async_data(&conn->async);
+}
+
+/*
+ * We're equivalent to Curl_resolver_cancel() for the c-ares resolver.  We
+ * never block.
+ */
+void Curl_resolver_kill(struct connectdata *conn)
+{
+  /* We don't need to check the resolver state because we can be called safely
+     at any time and we always do the same thing. */
+  Curl_resolver_cancel(conn);
 }
 
 /*
@@ -232,7 +260,7 @@ int Curl_resolver_getsock(struct connectdata *conn,
   milli = (timeout->tv_sec * 1000) + (timeout->tv_usec/1000);
   if(milli == 0)
     milli += 10;
-  Curl_expire_latest(conn->data, milli);
+  Curl_expire(conn->data, milli, EXPIRE_ASYNC_NAME);
 
   return max;
 }
@@ -260,7 +288,7 @@ static int waitperform(struct connectdata *conn, int timeout_ms)
   bitmask = ares_getsock((ares_channel)data->state.resolver, socks,
                          ARES_GETSOCK_MAXNUM);
 
-  for(i=0; i < ARES_GETSOCK_MAXNUM; i++) {
+  for(i = 0; i < ARES_GETSOCK_MAXNUM; i++) {
     pfd[i].events = 0;
     pfd[i].revents = 0;
     if(ARES_GETSOCK_READABLE(bitmask, i)) {
@@ -289,7 +317,7 @@ static int waitperform(struct connectdata *conn, int timeout_ms)
                     ARES_SOCKET_BAD);
   else {
     /* move through the descriptors and ask for processing on them */
-    for(i=0; i < num; i++)
+    for(i = 0; i < num; i++)
       ares_process_fd((ares_channel)data->state.resolver,
                       pfd[i].revents & (POLLRDNORM|POLLIN)?
                       pfd[i].fd:ARES_SOCKET_BAD,
@@ -314,22 +342,25 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
     conn->async.os_specific;
   CURLcode result = CURLE_OK;
 
-  *dns = NULL;
+  if(dns)
+    *dns = NULL;
 
   waitperform(conn, 0);
 
   if(res && !res->num_pending) {
-    (void)Curl_addrinfo_callback(conn, res->last_status, res->temp_ai);
-    /* temp_ai ownership is moved to the connection, so we need not free-up
-       them */
-    res->temp_ai = NULL;
+    if(dns) {
+      (void)Curl_addrinfo_callback(conn, res->last_status, res->temp_ai);
+      /* temp_ai ownership is moved to the connection, so we need not free-up
+         them */
+      res->temp_ai = NULL;
+    }
     if(!conn->async.dns) {
       failf(data, "Could not resolve: %s (%s)",
             conn->async.hostname, ares_strerror(conn->async.status));
       result = conn->bits.proxy?CURLE_COULDNT_RESOLVE_PROXY:
         CURLE_COULDNT_RESOLVE_HOST;
     }
-    else
+    else if(dns)
       *dns = conn->async.dns;
 
     destroy_async_data(&conn->async);
@@ -341,21 +372,21 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
 /*
  * Curl_resolver_wait_resolv()
  *
- * waits for a resolve to finish. This function should be avoided since using
+ * Waits for a resolve to finish. This function should be avoided since using
  * this risk getting the multi interface to "hang".
  *
  * If 'entry' is non-NULL, make it point to the resolved dns entry
  *
- * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved, and
- * CURLE_OPERATION_TIMEDOUT if a time-out occurred.
+ * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved,
+ * CURLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
  */
 CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
                                    struct Curl_dns_entry **entry)
 {
   CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
-  long timeout;
-  struct timeval now = Curl_tvnow();
+  timediff_t timeout;
+  struct curltime now = Curl_now();
   struct Curl_dns_entry *temp_entry;
 
   if(entry)
@@ -373,7 +404,6 @@ CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
   /* Wait for the name resolve query to complete. */
   while(!result) {
     struct timeval *tvp, tv, store;
-    long timediff;
     int itimeout;
     int timeout_ms;
 
@@ -393,7 +423,7 @@ CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
       timeout_ms = 1000;
 
     waitperform(conn, timeout_ms);
-    result = Curl_resolver_is_resolved(conn, &temp_entry);
+    result = Curl_resolver_is_resolved(conn, entry?&temp_entry:NULL);
 
     if(result || conn->async.done)
       break;
@@ -401,9 +431,14 @@ CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
     if(Curl_pgrsUpdate(conn))
       result = CURLE_ABORTED_BY_CALLBACK;
     else {
-      struct timeval now2 = Curl_tvnow();
-      timediff = Curl_tvdiff(now2, now); /* spent time */
-      timeout -= timediff?timediff:1; /* always deduct at least 1 */
+      struct curltime now2 = Curl_now();
+      timediff_t timediff = Curl_timediff(now2, now); /* spent time */
+      if(timediff <= 0)
+        timeout -= 1; /* always deduct at least 1 */
+      else if(timediff > timeout)
+        timeout = -1;
+      else
+        timeout -= (long)timediff;
       now = now2; /* for next loop */
     }
     if(timeout < 0)
@@ -470,17 +505,19 @@ static void query_completed_cb(void *arg,  /* (struct connectdata *) */
     return;
 
   res = (struct ResolverResults *)conn->async.os_specific;
-  res->num_pending--;
+  if(res) {
+    res->num_pending--;
 
-  if(CURL_ASYNC_SUCCESS == status) {
-    Curl_addrinfo *ai = Curl_he2ai(hostent, conn->async.port);
-    if(ai) {
-      compound_results(res, ai);
+    if(CURL_ASYNC_SUCCESS == status) {
+      Curl_addrinfo *ai = Curl_he2ai(hostent, conn->async.port);
+      if(ai) {
+        compound_results(res, ai);
+      }
     }
+    /* A successful result overwrites any previous error */
+    if(res->last_status != ARES_SUCCESS)
+      res->last_status = status;
   }
-  /* A successful result overwrites any previous error */
-  if(res->last_status != ARES_SUCCESS)
-    res->last_status = status;
 }
 
 /*

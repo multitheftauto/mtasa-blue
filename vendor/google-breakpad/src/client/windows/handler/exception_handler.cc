@@ -41,17 +41,16 @@
 
 namespace google_breakpad {
 
-static const int kWaitForHandlerThreadMs = 60000;
-static const int kExceptionHandlerThreadInitialStackSize = 64 * 1024;
-
-// As documented on MSDN, on failure SuspendThread returns (DWORD) -1
-static const DWORD kFailedToSuspendThread = static_cast<DWORD>(-1);
-
 // This is passed as the context to the MinidumpWriteDump callback.
 typedef struct {
   AppMemoryList::const_iterator iter;
   AppMemoryList::const_iterator end;
 } MinidumpCallbackContext;
+
+// This define is new to Windows 10.
+#ifndef DBG_PRINTEXCEPTION_WIDE_C
+#define DBG_PRINTEXCEPTION_WIDE_C ((DWORD)0x4001000A)
+#endif
 
 vector<ExceptionHandler*>* ExceptionHandler::handler_stack_ = NULL;
 LONG ExceptionHandler::handler_stack_index_ = 0;
@@ -217,6 +216,7 @@ void ExceptionHandler::Initialize(
     // Don't attempt to create the thread if we could not create the semaphores.
     if (handler_finish_semaphore_ != NULL && handler_start_semaphore_ != NULL) {
       DWORD thread_id;
+      const int kExceptionHandlerThreadInitialStackSize = 64 * 1024;
       handler_thread_ = CreateThread(NULL,         // lpThreadAttributes
                                      kExceptionHandlerThreadInitialStackSize,
                                      ExceptionHandlerThreadMain,
@@ -353,6 +353,7 @@ ExceptionHandler::~ExceptionHandler() {
     // inside DllMain.
     is_shutdown_ = true;
     ReleaseSemaphore(handler_start_semaphore_, 1, NULL);
+    const int kWaitForHandlerThreadMs = 60000;
     WaitForSingleObject(handler_thread_, kWaitForHandlerThreadMs);
 #else
     TerminateThread(handler_thread_, 1);
@@ -480,7 +481,9 @@ LONG ExceptionHandler::HandleException(EXCEPTION_POINTERS* exinfo) {
   DWORD code = exinfo->ExceptionRecord->ExceptionCode;
   LONG action;
   bool is_debug_exception = (code == EXCEPTION_BREAKPOINT) ||
-                            (code == EXCEPTION_SINGLE_STEP);
+                            (code == EXCEPTION_SINGLE_STEP) ||
+                            (code == DBG_PRINTEXCEPTION_C) ||
+                            (code == DBG_PRINTEXCEPTION_WIDE_C);
 
   if (code == EXCEPTION_INVALID_HANDLE &&
       current_handler->consume_invalid_handle_exceptions_) {
@@ -764,9 +767,10 @@ bool ExceptionHandler::WriteMinidumpForException(EXCEPTION_POINTERS* exinfo) {
 // static
 bool ExceptionHandler::WriteMinidump(const wstring &dump_path,
                                      MinidumpCallback callback,
-                                     void* callback_context) {
+                                     void* callback_context,
+                                     MINIDUMP_TYPE dump_type) {
   ExceptionHandler handler(dump_path, NULL, callback, callback_context,
-                           HANDLER_NONE);
+                           HANDLER_NONE, dump_type, (HANDLE)NULL, NULL);
   return handler.WriteMinidump();
 }
 
@@ -775,10 +779,13 @@ bool ExceptionHandler::WriteMinidumpForChild(HANDLE child,
                                              DWORD child_blamed_thread,
                                              const wstring& dump_path,
                                              MinidumpCallback callback,
-                                             void* callback_context) {
+                                             void* callback_context,
+                                             MINIDUMP_TYPE dump_type) {
   EXCEPTION_RECORD ex;
   CONTEXT ctx;
   EXCEPTION_POINTERS exinfo = { NULL, NULL };
+  // As documented on MSDN, on failure SuspendThread returns (DWORD) -1
+  const DWORD kFailedToSuspendThread = static_cast<DWORD>(-1);
   DWORD last_suspend_count = kFailedToSuspendThread;
   HANDLE child_thread_handle = OpenThread(THREAD_GET_CONTEXT |
                                           THREAD_QUERY_INFORMATION |
@@ -806,7 +813,7 @@ bool ExceptionHandler::WriteMinidumpForChild(HANDLE child,
   }
 
   ExceptionHandler handler(dump_path, NULL, callback, callback_context,
-                           HANDLER_NONE);
+                           HANDLER_NONE, dump_type, (HANDLE)NULL, NULL);
   bool success = handler.WriteMinidumpWithExceptionForProcess(
       child_blamed_thread,
       exinfo.ExceptionRecord ? &exinfo : NULL,

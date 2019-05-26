@@ -105,14 +105,30 @@ curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void *),
                                  void *arg)
 {
 #ifdef _WIN32_WCE
-  return CreateThread(NULL, 0, func, arg, 0, NULL);
+  typedef HANDLE curl_win_thread_handle_t;
+#elif defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
+  typedef unsigned long curl_win_thread_handle_t;
 #else
-  curl_thread_t t;
-  t = (curl_thread_t)_beginthreadex(NULL, 0, func, arg, 0, NULL);
-  if((t == 0) || (t == (curl_thread_t)-1L))
-    return curl_thread_t_null;
-  return t;
+  typedef uintptr_t curl_win_thread_handle_t;
 #endif
+  curl_thread_t t;
+  curl_win_thread_handle_t thread_handle;
+#ifdef _WIN32_WCE
+  thread_handle = CreateThread(NULL, 0, func, arg, 0, NULL);
+#else
+  thread_handle = _beginthreadex(NULL, 0, func, arg, 0, NULL);
+#endif
+  t = (curl_thread_t)thread_handle;
+  if((t == 0) || (t == LongToHandle(-1L))) {
+#ifdef _WIN32_WCE
+    DWORD gle = GetLastError();
+    errno = ((gle == ERROR_ACCESS_DENIED ||
+              gle == ERROR_NOT_ENOUGH_MEMORY) ?
+             EACCES : EINVAL);
+#endif
+    return curl_thread_t_null;
+  }
+  return t;
 }
 
 void Curl_thread_destroy(curl_thread_t hnd)

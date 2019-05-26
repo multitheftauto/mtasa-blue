@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CCoronasSA.cpp
-*  PURPOSE:     Header file for corona entity manager class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CCoronasSA.cpp
+ *  PURPOSE:     Header file for corona entity manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_CORONAS
-#define __CGAMESA_CORONAS
+#pragma once
 
 #include <game/CCoronas.h>
 #include "CRegisteredCoronaSA.h"
@@ -26,18 +24,17 @@
 class CCoronasSA : public CCoronas
 {
 private:
-    CRegisteredCoronaSA     * Coronas[MAX_CORONAS];
+    CRegisteredCoronaSA* Coronas[MAX_CORONAS];
+
 public:
-                            CCoronasSA();
-                            ~CCoronasSA ();
+    CCoronasSA();
+    ~CCoronasSA();
 
-    CRegisteredCorona       * GetCorona(DWORD ID);
-    CRegisteredCorona       * CreateCorona(DWORD Identifier, CVector * position);
-    CRegisteredCorona       * FindFreeCorona();
-    CRegisteredCorona       * FindCorona(DWORD Identifier);
-    RwTexture               * GetTexture(eCoronaType type);
+    CRegisteredCorona* GetCorona(DWORD ID);
+    CRegisteredCorona* CreateCorona(DWORD Identifier, CVector* position);
+    CRegisteredCorona* FindFreeCorona();
+    CRegisteredCorona* FindCorona(DWORD Identifier);
+    RwTexture*         GetTexture(eCoronaType type);
 
-    void                    DisableSunAndMoon ( bool bDisabled );
+    void DisableSunAndMoon(bool bDisabled);
 };
-
-#endif

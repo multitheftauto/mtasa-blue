@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,8 +40,6 @@ bool Curl_compareheader(const char *headerline,  /* line to check */
                         const char *header,   /* header keyword _with_ colon */
                         const char *content); /* content string to find */
 
-char *Curl_checkheaders(const struct connectdata *conn,
-                        const char *thisheader);
 char *Curl_copy_header_value(const char *header);
 
 char *Curl_checkProxyheaders(const struct connectdata *conn,
@@ -60,12 +58,14 @@ struct Curl_send_buffer {
 typedef struct Curl_send_buffer Curl_send_buffer;
 
 Curl_send_buffer *Curl_add_buffer_init(void);
-void Curl_add_buffer_free(Curl_send_buffer *buff);
-CURLcode Curl_add_bufferf(Curl_send_buffer *in, const char *fmt, ...);
-CURLcode Curl_add_buffer(Curl_send_buffer *in, const void *inptr, size_t size);
-CURLcode Curl_add_buffer_send(Curl_send_buffer *in,
+void Curl_add_buffer_free(Curl_send_buffer **inp);
+CURLcode Curl_add_bufferf(Curl_send_buffer **inp, const char *fmt, ...)
+  WARN_UNUSED_RESULT;
+CURLcode Curl_add_buffer(Curl_send_buffer **inp, const void *inptr,
+                         size_t size) WARN_UNUSED_RESULT;
+CURLcode Curl_add_buffer_send(Curl_send_buffer **inp,
                               struct connectdata *conn,
-                              long *bytes_written,
+                              curl_off_t *bytes_written,
                               size_t included_body_bytes,
                               int socketindex);
 
@@ -74,6 +74,9 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
 CURLcode Curl_add_custom_headers(struct connectdata *conn,
                                  bool is_connect,
                                  Curl_send_buffer *req_buffer);
+CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
+                                    Curl_send_buffer *buffer,
+                                    struct Curl_easy *handle);
 
 /* protocol-specific functions set up to be called by the main engine */
 CURLcode Curl_http(struct connectdata *conn, bool *done);
@@ -106,7 +109,7 @@ CURLcode Curl_http_perhapsrewind(struct connectdata *conn);
 
    This value used to be fairly big (100K), but we must take into account that
    if the server rejects the POST due for authentication reasons, this data
-   will always be uncondtionally sent and thus it may not be larger than can
+   will always be unconditionally sent and thus it may not be larger than can
    always be afforded to send twice.
 
    It must not be greater than 64K to work on VMS.
@@ -115,8 +118,13 @@ CURLcode Curl_http_perhapsrewind(struct connectdata *conn);
 #define MAX_INITIAL_POST_SIZE (64*1024)
 #endif
 
-#ifndef TINY_INITIAL_POST_SIZE
-#define TINY_INITIAL_POST_SIZE 1024
+/* EXPECT_100_THRESHOLD is the request body size limit for when libcurl will
+ * automatically add an "Expect: 100-continue" header in HTTP requests. When
+ * the size is unknown, it will always add it.
+ *
+ */
+#ifndef EXPECT_100_THRESHOLD
+#define EXPECT_100_THRESHOLD 1024
 #endif
 
 #endif /* CURL_DISABLE_HTTP */
@@ -125,17 +133,15 @@ CURLcode Curl_http_perhapsrewind(struct connectdata *conn);
  * HTTP unique setup
  ***************************************************************************/
 struct HTTP {
-  struct FormData *sendit;
+  curl_mimepart *sendit;
   curl_off_t postsize; /* off_t to handle large file sizes */
   const char *postdata;
 
   const char *p_pragma;      /* Pragma: string */
   const char *p_accept;      /* Accept: string */
-  curl_off_t readbytecount;
-  curl_off_t writebytecount;
 
   /* For FORM posting */
-  struct Form form;
+  curl_mimepart form;
 
   struct back {
     curl_read_callback fread_func; /* backup storage for fread pointer */
@@ -151,9 +157,11 @@ struct HTTP {
     HTTPSEND_LAST     /* never use this */
   } sending;
 
-  void *send_buffer; /* used if the request couldn't be sent in one chunk,
-                        points to an allocated send_buffer struct */
-
+#ifndef CURL_DISABLE_HTTP
+  Curl_send_buffer *send_buffer; /* used if the request couldn't be sent in
+                                    one chunk, points to an allocated
+                                    send_buffer struct */
+#endif
 #ifdef USE_NGHTTP2
   /*********** for HTTP/2 we store stream-local data here *************/
   int32_t stream_id; /* stream we are interested in */
@@ -169,8 +177,6 @@ struct HTTP {
   size_t pauselen; /* the number of bytes left in data */
   bool closed; /* TRUE on HTTP2 stream close */
   bool close_handled; /* TRUE if stream closure is handled by libcurl */
-  uint32_t error_code; /* HTTP/2 error code */
-
   char *mem;     /* points to a buffer in memory to store received data */
   size_t len;    /* size of the buffer 'mem' points to */
   size_t memlen; /* size of data copied to mem */
@@ -185,9 +191,6 @@ struct HTTP {
 #endif
 };
 
-typedef int (*sending)(void); /* Curl_send */
-typedef int (*recving)(void); /* Curl_recv */
-
 #ifdef USE_NGHTTP2
 /* h2 settings for this connection */
 struct h2settings {
@@ -196,15 +199,14 @@ struct h2settings {
 };
 #endif
 
-
 struct http_conn {
 #ifdef USE_NGHTTP2
 #define H2_BINSETTINGS_LEN 80
   nghttp2_session *h2;
   uint8_t binsettings[H2_BINSETTINGS_LEN];
   size_t  binlen; /* length of the binsettings data */
-  sending send_underlying; /* underlying send Curl_send callback */
-  recving recv_underlying; /* underlying recv Curl_recv callback */
+  Curl_send *send_underlying; /* underlying send Curl_send callback */
+  Curl_recv *recv_underlying; /* underlying recv Curl_recv callback */
   char *inbuf; /* buffer to receive data from underlying socket */
   size_t inbuflen; /* number of bytes filled in inbuf */
   size_t nread_inbuf; /* number of bytes read from in inbuf */
@@ -223,6 +225,7 @@ struct http_conn {
   /* list of settings that will be sent */
   nghttp2_settings_entry local_settings[3];
   size_t local_settings_num;
+  uint32_t error_code; /* HTTP/2 error code */
 #else
   int unused; /* prevent a compiler warning */
 #endif
@@ -255,4 +258,3 @@ Curl_http_output_auth(struct connectdata *conn,
                                             up the proxy tunnel */
 
 #endif /* HEADER_CURL_HTTP_H */
-

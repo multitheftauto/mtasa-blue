@@ -1,22 +1,20 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2016-10-03 13:58+0000\n"
+"PO-Revision-Date: 2018-12-26 16:51+0000\n"
 "Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; Kamil Schneider; Jurandovsky; pkpawelo; 105NWr; ThePiotrek; FileEX; XJMLN; ccw; Bober; SKmedix; qaisjp; GabVVas; krallxz@gmail.com\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Jacek \"jhxp\" Hałas vel Łagoda; pcpl2; RootKiller; guix; "
-"pkpawelo; Jurandovsky; 105NWr; ThePiotrek; Bober; SKmedix; XJMLN; GabVVas\n"
-"X-POOTLE-MTIME: 1475503129.0\n"
+"X-POOTLE-MTIME: 1545843061.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -24,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Pobrana wersja MTA:SA nie wspiera systemów Windows XP oraz Vista. Pobierz "
+"inną wersję z www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -31,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Ta wersja MTA:SA jest zaprojektowana dla starszych wersji systemu Windows. "
+"Pobierz inną wersję z www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -43,11 +45,9 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Ten instalator pozwoli Ci przejść przez proces instalacji lub aktualizacji "
-"$(^Name) ${REVISION_TAG}\n"
+"Ten instalator pozwoli Ci przejść przez proces instalacji lub aktualizacji $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Zaleca się zamknięcie innych uruchomionych aplikacji na czas działania "
-"Instalatora.\n"
+"Zaleca się zamknięcie innych uruchomionych aplikacji na czas działania Instalatora.\n"
 "\n"
 "[Mogą być wymagane prawa administratora dla systemów Vista i nowszych]\n"
 "\n"
@@ -74,8 +74,7 @@ msgid ""
 msgstr ""
 "Wskaż folder, w którym zainstalowano grę Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"MTA:SA WYMAGA gry GTA:SA w wersji 1.0, aczkolwiek jeśli posiadasz inną "
-"wersję, instalator spróbuje ją przystosować do działania z modyfikacją.$\n"
+"MTA:SA WYMAGA gry GTA:SA w wersji 1.0, aczkolwiek jeśli posiadasz inną wersję, instalator spróbuje ją przystosować do działania z modyfikacją.$\n"
 "$\n"
 "Kliknij przycisk Zainstaluj aby rozpocząć instalację."
 
@@ -105,7 +104,7 @@ msgstr ""
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Zainstaluj lub zaaktualizuj DirectX (jeżeli wymagane)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -213,7 +212,7 @@ msgstr "Dodaj do Eksploratora Gier"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Zainstaluj DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -254,8 +253,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Nie wykryto poprawnie zainstalowanej gry Grand Theft Auto: San Andreas.$\r$\n"
-"Instalator będzie jednak kontynuował pracę.$\r$\n"
+"Nie wykryto poprawnie zainstalowanej gry Grand Theft Auto: San Andreas.$\r"
+"$\n"
+"Instalator będzie jednak kontynuował pracę.$\r"
+"$\n"
 "W razie problemów - zainstaluj moda jeszcze raz."
 
 #. INST_SEC_CORE_RESOURCES
@@ -304,10 +305,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Czy próbujesz odinstalować moda przed jego aktualizacją?$\r$\n"
-"Nie ma potrzeby odinstalowywania MTA:SA przed instalacją nowej wersji$\r$\n"
-"Wystarczy uruchomić instalator nowej wersji moda, żeby dokonać uaktualnienia "
-"i zachować swoje ustawienia."
+"Czy próbujesz odinstalować moda przed jego aktualizacją?$\r"
+"$\n"
+"Nie ma potrzeby odinstalowywania MTA:SA przed instalacją nowej wersji$\r"
+"$\n"
+"Wystarczy uruchomić instalator nowej wersji moda, żeby dokonać uaktualnienia i zachować swoje ustawienia."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -325,7 +327,8 @@ msgstr ""
 msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
-msgstr "Nie można pobrać łatki dla Twojej wersji Grand Theft Auto: San Andreas"
+msgstr ""
+"Nie można pobrać łatki dla Twojej wersji Grand Theft Auto: San Andreas"
 
 #. MSGBOX_PATCH_FAIL2
 #: ../Shared/installer/nightly.nsi:1145
@@ -367,8 +370,7 @@ msgid ""
 msgstr ""
 "We wskazanym folderze zainstalowano już inną wersję główną MTA ($1).$\n"
 "$\n"
-"MTA działa prawidłowo tylko wtedy, gdy różne wersje główne moda znajdują się "
-"w osobnych folderach.$\n"
+"MTA działa prawidłowo tylko wtedy, gdy różne wersje główne moda znajdują się w osobnych folderach.$\n"
 "Czy jesteś pewien, że chcesz nadpisać MTA $1 w folderze $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
@@ -427,10 +429,8 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} zostanie zainstalowane w "
-"następującym folderze.$\n"
-"Aby zainstalować je w innym miejscu, kliknij przycisk Przeglądaj i wybierz "
-"inny folder.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} zostanie zainstalowane w następującym folderze.$\n"
+"Aby zainstalować je w innym miejscu, kliknij przycisk Przeglądaj i wybierz inny folder.$\n"
 "$\n"
 " Kliknij przycisk Dalej aby kontynuować."
 
@@ -516,9 +516,10 @@ msgstr ""
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Nie udało się pobrać pakietu Microsoft Visual Studio 2008 SP1 "
-#~ "redistributable.$\r$\n"
-#~ "Instalator będzie jednak kontynuował pracę.$\r$\n"
+#~ "Nie udało się pobrać pakietu Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Instalator będzie jednak kontynuował pracę.$\r"
+#~ "$\n"
 #~ "W razie problemów - uruchom instalator jeszcze raz."
 
 #~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
@@ -537,5 +538,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Nie udało się pobrać pakietu Microsoft Visual Studio 2013 redistributable.$\r"
 #~ "$\n"
-#~ "Instalator będzie jednak kontynuował pracę.$\r$\n"
+#~ "Instalator będzie jednak kontynuował pracę.$\r"
+#~ "$\n"
 #~ "W razie problemów - uruchom instalator jeszcze raz."

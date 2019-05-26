@@ -17,6 +17,8 @@ import urlparse
 import time
 import sys
 import socket
+import polib
+import re
 from optparse import OptionParser
 
 # urlopen with which returns empty string on error
@@ -83,6 +85,8 @@ parser.add_option("-i", "--index",type="int", dest="langindex", default=-1,
             help="If set, only do one language. Returns 2 if index out of range")
 parser.add_option("-a", "--attempts",type="int", dest="attempts", default=3,
             help="Number of download retry attempts before giving up")
+parser.add_option("-e", "--excludeusers", dest="excludeusers", default="",
+            help="A comma delimited list of Pootle usernames to exclude from the Translators: header")
 
 (options, args) = parser.parse_args()
 
@@ -99,8 +103,9 @@ if options.rmdir:
         shutil.rmtree(options.output)
     print ( "Cleared output directory: '%s'"%(options.output) )
 
-# Let's split our languages string into a Python list
+# Let's split our option strings into Python lists
 langlist = (options.languages).replace(" ","").split(",")
+excludeUserList = (options.excludeusers).replace(" ","").split(",")
 
 # Select one language if required
 if options.langindex > -1:
@@ -137,5 +142,27 @@ for lang in (langlist):
     localFile.close()
     print ( "Read '%s' and written to '%s'"%(url,output) )
 
+    # Tidy translators list
+    po = polib.pofile(output)
+    translatorList = po.metadata["Translators"].split('; ')
+    p = re.compile('(.*) "(.*)" (.*)')
+    newTranslatorList = []
+    for translator in (translatorList):
+        m = p.match(translator)
+        if not m:
+            accountName = translator
+        else:
+            firstName = m.group(1)
+            accountName = m.group(2)
+            secondName = m.group(3)
+            if firstName != secondName:
+                translator = firstName+" "+secondName
+            else:
+                translator = firstName
 
+        # Remove admins from credits
+        if not accountName in excludeUserList:
+            newTranslatorList.append(translator)
 
+    po.metadata["Translators"] = "; ".join(newTranslatorList);
+    po.save(output)

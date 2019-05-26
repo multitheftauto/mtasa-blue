@@ -1,492 +1,486 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.x
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/luadefs/CLuaBanDefs.cpp
-*  PURPOSE:     Lua function definitions class
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.x
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaBanDefs.cpp
+ *  PURPOSE:     Lua function definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-void CLuaBanDefs::LoadFunctions ()
+void CLuaBanDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction ( "addBan", AddBan );
-    CLuaCFunctions::AddFunction ( "removeBan", RemoveBan );
+    std::map<const char*, lua_CFunction> functions{
+        {"addBan", AddBan},
+        {"removeBan", RemoveBan},
 
-    CLuaCFunctions::AddFunction ( "getBans", GetBans );
-    CLuaCFunctions::AddFunction ( "reloadBans", ReloadBanList );
+        {"getBans", GetBans},
+        {"reloadBans", ReloadBanList},
 
-    CLuaCFunctions::AddFunction ( "getBanIP", GetBanIP );
-    CLuaCFunctions::AddFunction ( "getBanSerial", GetBanSerial );
-    CLuaCFunctions::AddFunction ( "getBanUsername", GetBanUsername );
-    CLuaCFunctions::AddFunction ( "getBanNick", GetBanNick );
-    CLuaCFunctions::AddFunction ( "getBanTime", GetBanTime );
-    CLuaCFunctions::AddFunction ( "getUnbanTime", GetUnbanTime );
-    CLuaCFunctions::AddFunction ( "getBanReason", GetBanReason );
-    CLuaCFunctions::AddFunction ( "getBanAdmin", GetBanAdmin );
+        {"getBanIP", GetBanIP},
+        {"getBanSerial", GetBanSerial},
+        {"getBanUsername", GetBanUsername},
+        {"getBanNick", GetBanNick},
+        {"getBanTime", GetBanTime},
+        {"getUnbanTime", GetUnbanTime},
+        {"getBanReason", GetBanReason},
+        {"getBanAdmin", GetBanAdmin},
 
-    CLuaCFunctions::AddFunction ( "setUnbanTime", SetUnbanTime );
-    CLuaCFunctions::AddFunction ( "setBanReason", SetBanReason );
-    CLuaCFunctions::AddFunction ( "setBanAdmin", SetBanAdmin );
-    CLuaCFunctions::AddFunction ( "setBanNick", SetBanNick );
-    CLuaCFunctions::AddFunction ( "isBan", IsBan );
+        {"setUnbanTime", SetUnbanTime},
+        {"setBanReason", SetBanReason},
+        {"setBanAdmin", SetBanAdmin},
+        {"setBanNick", SetBanNick},
+        {"isBan", IsBan},
+    };
 
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
-void CLuaBanDefs::AddClass ( lua_State* luaVM )
+void CLuaBanDefs::AddClass(lua_State* luaVM)
 {
-    lua_newclass ( luaVM );
+    lua_newclass(luaVM);
 
-    lua_classfunction ( luaVM, "create", "addBan" );
-    lua_classfunction ( luaVM, "getList", "getBans" );
-    lua_classfunction ( luaVM, "reload", "reloadBans" );
+    lua_classfunction(luaVM, "create", "addBan");
+    lua_classfunction(luaVM, "getList", "getBans");
+    lua_classfunction(luaVM, "reload", "reloadBans");
 
-    lua_classfunction ( luaVM, "remove", "removeBan" );
-    lua_classfunction ( luaVM, "getAdmin", "getBanAdmin" );
-    lua_classfunction ( luaVM, "getIP", "getBanIP" );
-    lua_classfunction ( luaVM, "getNick", "getBanNick" );
-    lua_classfunction ( luaVM, "getReason", "getBanReason" );
-    lua_classfunction ( luaVM, "getSerial", "getBanSerial" );
-    lua_classfunction ( luaVM, "getTime", "getBanTime" );
-    lua_classfunction ( luaVM, "getUnbanTime", "getUnbanTime" );
+    lua_classfunction(luaVM, "remove", "removeBan");
+    lua_classfunction(luaVM, "getAdmin", "getBanAdmin");
+    lua_classfunction(luaVM, "getIP", "getBanIP");
+    lua_classfunction(luaVM, "getNick", "getBanNick");
+    lua_classfunction(luaVM, "getReason", "getBanReason");
+    lua_classfunction(luaVM, "getSerial", "getBanSerial");
+    lua_classfunction(luaVM, "getTime", "getBanTime");
+    lua_classfunction(luaVM, "getUnbanTime", "getUnbanTime");
 
-    lua_classfunction ( luaVM, "setUnbanTime", "setUnbanTime" );
-    lua_classfunction ( luaVM, "setReason", "setBanReason" );
-    lua_classfunction ( luaVM, "setNick", "setBanNick" );
-    lua_classfunction ( luaVM, "setAdmin", "setBanAdmin" );
+    lua_classfunction(luaVM, "setUnbanTime", "setUnbanTime");
+    lua_classfunction(luaVM, "setReason", "setBanReason");
+    lua_classfunction(luaVM, "setNick", "setBanNick");
+    lua_classfunction(luaVM, "setAdmin", "setBanAdmin");
 
-    lua_classvariable ( luaVM, "admin", "setBanAdmin", "getBanAdmin" );
-    lua_classvariable ( luaVM, "IP", NULL, "getBanIP" );
-    lua_classvariable ( luaVM, "serial", NULL, "getBanSerial" );
-    lua_classvariable ( luaVM, "time", NULL, "getBanTime" );
-    lua_classvariable ( luaVM, "unbanTime", "setUnbanTime", "getUnbanTime" );
-    lua_classvariable ( luaVM, "reason", "setBanReason", "getBanReason" );
-    lua_classvariable ( luaVM, "nick", "setBanNick", "getBanNick" );
+    lua_classvariable(luaVM, "admin", "setBanAdmin", "getBanAdmin");
+    lua_classvariable(luaVM, "IP", NULL, "getBanIP");
+    lua_classvariable(luaVM, "serial", NULL, "getBanSerial");
+    lua_classvariable(luaVM, "time", NULL, "getBanTime");
+    lua_classvariable(luaVM, "unbanTime", "setUnbanTime", "getUnbanTime");
+    lua_classvariable(luaVM, "reason", "setBanReason", "getBanReason");
+    lua_classvariable(luaVM, "nick", "setBanNick", "getBanNick");
 
-    lua_registerclass ( luaVM, "Ban" );
+    lua_registerclass(luaVM, "Ban");
 }
 
-
-int CLuaBanDefs::AddBan ( lua_State* luaVM )
+int CLuaBanDefs::AddBan(lua_State* luaVM)
 {
     //  ban addBan ( [ string IP, string Username, string Serial, player responsibleElement, string reason, int seconds = 0 ] )
-    SString strIP = "";
-    SString strUsername = "";
-    SString strSerial = "";
-    SString strResponsible = "Console";
-    CPlayer * pResponsible = NULL;
-    SString strReason = "";
-    time_t tUnban;
+    SString  strIP = "";
+    SString  strUsername = "";
+    SString  strSerial = "";
+    SString  strResponsible = "Console";
+    CPlayer* pResponsible = NULL;
+    SString  strReason = "";
+    time_t   tUnban;
 
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strIP, "" );
-    argStream.ReadString ( strUsername, "" );
-    argStream.ReadString ( strSerial, "" );
-    if ( argStream.NextIsUserData () )
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strIP, "");
+    argStream.ReadString(strUsername, "");
+    argStream.ReadString(strSerial, "");
+    if (argStream.NextIsUserData())
     {
         CElement* pResponsibleElement;
-        argStream.ReadUserData ( pResponsibleElement );
-        if ( ( pResponsible = dynamic_cast <CPlayer*> ( pResponsibleElement ) ) )
-            strResponsible = pResponsible->GetNick ();
+        argStream.ReadUserData(pResponsibleElement);
+        if ((pResponsible = dynamic_cast<CPlayer*>(pResponsibleElement)))
+            strResponsible = pResponsible->GetNick();
     }
     else
-        argStream.ReadString ( strResponsible, "Console" );
+        argStream.ReadString(strResponsible, "Console");
 
-    argStream.ReadString ( strReason, "" );
+    argStream.ReadString(strReason, "");
 
-    if ( argStream.NextIsString () )
+    if (argStream.NextIsString())
     {
         SString strTime;
-        argStream.ReadString ( strTime );
-        tUnban = atoi ( strTime );
+        argStream.ReadString(strTime);
+        tUnban = atoi(strTime);
     }
+    else if (argStream.NextIsNumber())
+        argStream.ReadNumber(tUnban);
     else
-        if ( argStream.NextIsNumber () )
-            argStream.ReadNumber ( tUnban );
-        else
-            tUnban = 0;
+        tUnban = 0;
 
-    if ( tUnban > 0 )
-        tUnban += time ( NULL );
+    if (tUnban > 0)
+        tUnban += time(NULL);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         CBan* pBan = NULL;
-        if ( ( pBan = CStaticFunctionDefinitions::AddBan ( strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban ) ) )
+        if ((pBan = CStaticFunctionDefinitions::AddBan(strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban)))
         {
-            lua_pushban ( luaVM, pBan );
+            lua_pushban(luaVM, pBan);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::RemoveBan ( lua_State* luaVM )
+int CLuaBanDefs::RemoveBan(lua_State* luaVM)
 {
-    CBan* pBan;
+    CBan*    pBan;
     CPlayer* pResponsible = NULL;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( argStream.NextIsUserData () )
+    if (argStream.NextIsUserData())
     {
         CElement* pResponsibleElement;
-        argStream.ReadUserData ( pResponsibleElement );
-        pResponsible = dynamic_cast <CPlayer*> ( pResponsibleElement );
+        argStream.ReadUserData(pResponsibleElement);
+        pResponsible = dynamic_cast<CPlayer*>(pResponsibleElement);
     }
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::RemoveBan ( pBan, pResponsible ) )
+        if (CStaticFunctionDefinitions::RemoveBan(pBan, pResponsible))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBans ( lua_State* luaVM )
+int CLuaBanDefs::GetBans(lua_State* luaVM)
 {
     // Grab its lua
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        lua_newtable ( luaVM );
+        lua_newtable(luaVM);
 
-        CStaticFunctionDefinitions::GetBans ( luaVM );
+        CStaticFunctionDefinitions::GetBans(luaVM);
 
         return 1;
     }
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::ReloadBanList ( lua_State* luaVM )
+int CLuaBanDefs::ReloadBanList(lua_State* luaVM)
 {
-    bool bSuccess = CStaticFunctionDefinitions::ReloadBanList ();
-    if ( !bSuccess )
-        m_pScriptDebugging->LogError ( luaVM, "%s: Ban List failed to reload, fix any errors and run again", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-    lua_pushboolean ( luaVM, bSuccess );
+    bool bSuccess = CStaticFunctionDefinitions::ReloadBanList();
+    if (!bSuccess)
+        m_pScriptDebugging->LogError(luaVM, "%s: Ban List failed to reload, fix any errors and run again", lua_tostring(luaVM, lua_upvalueindex(1)));
+    lua_pushboolean(luaVM, bSuccess);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBanIP ( lua_State* luaVM )
+int CLuaBanDefs::GetBanIP(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strIP;
-        if ( CStaticFunctionDefinitions::GetBanIP ( pBan, strIP ) )
+        if (CStaticFunctionDefinitions::GetBanIP(pBan, strIP))
         {
-            lua_pushstring ( luaVM, strIP );
+            lua_pushstring(luaVM, strIP);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::GetBanSerial ( lua_State* luaVM )
+int CLuaBanDefs::GetBanSerial(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strSerial;
-        if ( CStaticFunctionDefinitions::GetBanSerial ( pBan, strSerial ) )
+        if (CStaticFunctionDefinitions::GetBanSerial(pBan, strSerial))
         {
-            lua_pushstring ( luaVM, strSerial );
+            lua_pushstring(luaVM, strSerial);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBanUsername ( lua_State* luaVM )
+int CLuaBanDefs::GetBanUsername(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strUser;
-        if ( CStaticFunctionDefinitions::GetBanUsername ( pBan, strUser ) )
+        if (CStaticFunctionDefinitions::GetBanUsername(pBan, strUser))
         {
-            lua_pushstring ( luaVM, strUser );
+            lua_pushstring(luaVM, strUser);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-
-int CLuaBanDefs::GetBanNick ( lua_State* luaVM )
+int CLuaBanDefs::GetBanNick(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strNick;
-        if ( CStaticFunctionDefinitions::GetBanNick ( pBan, strNick ) )
+        if (CStaticFunctionDefinitions::GetBanNick(pBan, strNick))
         {
-            lua_pushstring ( luaVM, strNick );
+            lua_pushstring(luaVM, strNick);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBanTime ( lua_State* luaVM )
+int CLuaBanDefs::GetBanTime(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         time_t tTime;
-        if ( CStaticFunctionDefinitions::GetBanTime ( pBan, tTime ) )
+        if (CStaticFunctionDefinitions::GetBanTime(pBan, tTime))
         {
-            lua_pushnumber ( luaVM, (double) tTime );
+            lua_pushnumber(luaVM, (double)tTime);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::GetUnbanTime ( lua_State* luaVM )
+int CLuaBanDefs::GetUnbanTime(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         time_t tTime;
-        if ( CStaticFunctionDefinitions::GetUnbanTime ( pBan, tTime ) )
+        if (CStaticFunctionDefinitions::GetUnbanTime(pBan, tTime))
         {
-            lua_pushnumber ( luaVM, (double) tTime );
+            lua_pushnumber(luaVM, (double)tTime);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBanReason ( lua_State* luaVM )
+int CLuaBanDefs::GetBanReason(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strReason;
-        if ( CStaticFunctionDefinitions::GetBanReason ( pBan, strReason ) )
+        if (CStaticFunctionDefinitions::GetBanReason(pBan, strReason))
         {
-            lua_pushstring ( luaVM, strReason );
+            lua_pushstring(luaVM, strReason);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaBanDefs::GetBanAdmin ( lua_State* luaVM )
+int CLuaBanDefs::GetBanAdmin(lua_State* luaVM)
 {
     CBan* pBan;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
         SString strAdmin;
-        if ( CStaticFunctionDefinitions::GetBanAdmin ( pBan, strAdmin ) )
+        if (CStaticFunctionDefinitions::GetBanAdmin(pBan, strAdmin))
         {
-            lua_pushstring ( luaVM, strAdmin );
+            lua_pushstring(luaVM, strAdmin);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::SetUnbanTime ( lua_State* luaVM )
+int CLuaBanDefs::SetUnbanTime(lua_State* luaVM)
 {
-    CBan* pBan;
+    CBan*  pBan;
     time_t tUnbanTime;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
-    argStream.ReadNumber ( tUnbanTime );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
+    argStream.ReadNumber(tUnbanTime);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetUnbanTime ( pBan, tUnbanTime ) )
+        if (CStaticFunctionDefinitions::SetUnbanTime(pBan, tUnbanTime))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::SetBanReason ( lua_State* luaVM )
+int CLuaBanDefs::SetBanReason(lua_State* luaVM)
 {
-    CBan* pBan;
+    CBan*   pBan;
     SString strReason;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
-    argStream.ReadString ( strReason );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
+    argStream.ReadString(strReason);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetBanReason ( pBan, strReason ) )
+        if (CStaticFunctionDefinitions::SetBanReason(pBan, strReason))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::SetBanAdmin ( lua_State* luaVM )
+int CLuaBanDefs::SetBanAdmin(lua_State* luaVM)
 {
-    CBan* pBan;
+    CBan*   pBan;
     SString strAdminName;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
-    argStream.ReadString ( strAdminName );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
+    argStream.ReadString(strAdminName);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetBanAdmin ( pBan, strAdminName ) )
+        if (CStaticFunctionDefinitions::SetBanAdmin(pBan, strAdminName))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::SetBanNick ( lua_State* luaVM )
+int CLuaBanDefs::SetBanNick(lua_State* luaVM)
 {
-    CBan* pBan;
+    CBan*   pBan;
     SString strNick;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
-    argStream.ReadString ( strNick );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
+    argStream.ReadString(strNick);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetBanNick ( pBan, strNick ) )
+        if (CStaticFunctionDefinitions::SetBanNick(pBan, strNick))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaBanDefs::IsBan ( lua_State* luaVM )
+int CLuaBanDefs::IsBan(lua_State* luaVM)
 {
-    CBan* pBan;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pBan );
+    CBan*            pBan;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        lua_pushboolean ( luaVM, true );
+        lua_pushboolean(luaVM, true);
         return 1;
     }
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
