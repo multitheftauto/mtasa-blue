@@ -105,7 +105,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     m_handle = mysql_init(NULL);
     if (m_handle)
     {
-        my_bool reconnect = m_bAutomaticReconnect;
+        bool reconnect = m_bAutomaticReconnect;
         mysql_options(m_handle, MYSQL_OPT_RECONNECT, &reconnect);
         if (!strCharset.empty())
             mysql_options(m_handle, MYSQL_SET_CHARSET_NAME, strCharset);

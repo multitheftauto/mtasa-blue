@@ -2,20 +2,20 @@ project "unrar"
 	language "C++"
 	kind "StaticLib"
 	targetname "unrar"
-	
+
 	defines { "RARDLL" }
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.hpp",
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
-		
+
 		"*.hpp",
-		
+
 		"archive.cpp",
 		"arcread.cpp",
 		"cmddata.cpp",
@@ -67,4 +67,3 @@ project "unrar"
 		"threadpool.cpp",
 		"ui.cpp"
 	}
-	
