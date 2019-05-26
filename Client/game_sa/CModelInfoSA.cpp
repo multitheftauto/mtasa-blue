@@ -270,8 +270,8 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-    _asm
-    {
+        _asm
+        {
             push    eax
             push    ebx
             push    ecx
@@ -291,7 +291,7 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ecx
             pop     ebx
             pop     eax
-    }
+        }
     return (char*)dwReturn;
     //  }
     //  return NULL;
@@ -524,7 +524,8 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     FLOAT fReturn = 0;
-    _asm {
+    _asm
+    {
         mov     eax, ModelID
         mov     eax, ARRAY_ModelInfo[eax*4]
         mov     eax, [eax+20]
@@ -648,10 +649,10 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 // Log info
                 OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
-// Assert in debug
-#if MTA_DEBUG
+                // Assert in debug
+                #if MTA_DEBUG
                 assert(pEntity->vtbl->DeleteRwObject == 0x00534030);
-#endif
+                #endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
             }
@@ -661,11 +662,11 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
                     _asm
-                        {
+                    {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
-                        }
+                    }
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -685,11 +686,11 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
                     _asm
-                        {
+                    {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
-                        }
+                    }
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -972,7 +973,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
-            if (pVehicleModel->pVisualInfo != NULL)
+            if (pVehicleModel->pVisualInfo != nullptr)
                 pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
         ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
@@ -1056,13 +1057,13 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         DWORD dwFunc = FUNC_SetColModel;
         DWORD ModelID = m_dwModelID;
         _asm
-            {
+        {
             mov     ecx, ModelID
             mov     ecx, ARRAY_ModelInfo[ecx*4]
             push    1
             push    pColModelInterface
             call    dwFunc
-            }
+        }
 
         // FUNC_SetColModel resets bDoWeOwnTheColModel
         m_pInterface->bDoWeOwnTheColModel = false;
@@ -1071,12 +1072,12 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
         _asm
-            {
+        {
             push    pColModelInterface
             push    ModelID
             call    func
             add     esp, 8
-            }
+        }
 
         // Set some lighting for this collision if not already present
         CColDataSA* pColData = pColModelInterface->pColData;
@@ -1109,13 +1110,13 @@ void CModelInfoSA::RestoreColModel()
             DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
             DWORD ModelID = m_dwModelID;
             _asm
-                {
+            {
                 mov     ecx, ModelID
                 mov     ecx, ARRAY_ModelInfo[ecx*4]
                 push    1
                 push    dwOriginalColModelInterface
                 call    dwFunc
-                }
+            }
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;
@@ -1126,7 +1127,7 @@ void CModelInfoSA::RestoreColModel()
                 call    func
                 add     esp, 8
             }
-#pragma message(__LOC__ "(IJs) Document this function some time.")
+            #pragma message(__LOC__ "(IJs) Document this function some time.")
         }
     }
 
@@ -1227,8 +1228,8 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead 0x072FA68
-#define HOOKSIZE_NodeNameStreamRead 15
+#define HOOKPOS_NodeNameStreamRead                         0x072FA68
+#define HOOKSIZE_NodeNameStreamRead                        15
 DWORD RETURN_NodeNameStreamRead = 0x072FA77;
 void _declspec(naked) HOOK_NodeNameStreamRead()
 {
