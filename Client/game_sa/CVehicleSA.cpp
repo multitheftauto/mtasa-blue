@@ -2248,7 +2248,7 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         else
         {
             // CAutomobile allocates wheels * 32 (0x20)
-            m_pSuspensionLines = new BYTE[pColData->ucNumWheels * 0x20];
+            m_pSuspensionLines = new BYTE[pColData->numLinesOrDisks * 0x20];
         }
     }
 
@@ -2262,20 +2262,20 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
     if (pModelInfo->IsMonsterTruck())
     {
         // Monster trucks are 0x90 bytes not 0x80
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, 0x90);
+        if (pColData->m_pSuspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_pSuspensionLines, 0x90);
     }
     else if (pModelInfo->IsBike())
     {
         // Bikes are 0x80 bytes not 0x40
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, 0x80);
+        if (pColData->m_pSuspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_pSuspensionLines, 0x80);
     }
     else
     {
         // CAutomobile allocates wheels * 32 (0x20)
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20);
+        if (pColData->m_pSuspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_pSuspensionLines, pColData->numLinesOrDisks * 0x20);
     }
 }
 

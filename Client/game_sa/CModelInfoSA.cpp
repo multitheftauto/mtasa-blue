@@ -906,14 +906,14 @@ unsigned int CModelInfoSA::GetNumRemaps()
 
 void* CModelInfoSA::GetVehicleSuspensionData()
 {
-    return GetInterface()->pColModel->pColData->pSuspensionLines;
+    return GetInterface()->pColModel->pColData->m_pSuspensionLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 {
     CColDataSA* pColData = GetInterface()->pColModel->pColData;
-    void*       pOrigSuspensionLines = pColData->pSuspensionLines;
-    pColData->pSuspensionLines = pSuspensionLines;
+    void*       pOrigSuspensionLines = pColData->m_pSuspensionLines;
+    pColData->m_pSuspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
     return pOrigSuspensionLines;
 }
 
