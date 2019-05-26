@@ -29,48 +29,122 @@ typedef struct
 {
     CVector vecCenter;
     float   fRadius;
+} CSphereSA;
+
+typedef struct : CSphereSA
+{
+    unsigned char m_nMaterial;
+    unsigned char m_nFlags;
+    unsigned char m_nLighting;
+    unsigned char m_nLight;
 } CColSphereSA;
 
 typedef struct
 {
     CVector min;
     CVector max;
+} CBoxSA;
+
+typedef struct : CBoxSA
+{
+    unsigned char m_nMaterial;
+    unsigned char m_nFlags;
+    unsigned char m_nLighting;
+    unsigned char m_nLight;
 } CColBoxSA;
 
 typedef struct
 {
-    unsigned short v1;
-    unsigned short v2;
-    unsigned short v3;
+    unsigned short vertexIndex1;
+    unsigned short vertexIndex2;
+    unsigned short vertexIndex3;
     EColSurface    material;
     CColLighting   lighting;
 } CColTriangleSA;
 
+#pragma pack(push, 1)
 typedef struct
 {
-    BYTE pad0[12];
+public:
+    short x, y, z;
+} CCompressedVectorSA;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct
+{
+    CCompressedVectorSA m_normal;
+    unsigned short m_nDistance;
+    unsigned char m_nOrientation;
+    char          padding;
 } CColTrianglePlaneSA;
+#pragma pack(pop)
+
+
+typedef struct
+{
+public:
+    CVector m_vecStart;
+    float m_fStartRadius; // unused
+    CVector m_vecEnd;
+    float m_fEndRadius; // unused
+} CColLineSA;
+
+
+typedef struct
+{
+public:
+    CVector m_vecCenter;
+    float m_fOutsideRadiuss;
+    unsigned char m_nMaterial;
+    unsigned char m_nPiece;
+    unsigned char m_nLighting;
+private:
+    char _pad13;
+public:
+    CVector m_vecRelPoint;
+    float m_fInnerRadius;
+} CColDiskSA;
 
 typedef struct
 {
     char  version[4];
     DWORD size;
-    char  name[0x18];
+    char  name[0x16];
+    unsigned short modelId; // 0-19999
 } ColModelFileHeader;
 
 typedef struct
 {
-    WORD                 numColSpheres;
-    WORD                 numColBoxes;
-    WORD                 numColTriangles;
-    BYTE                 ucNumWheels;
-    BYTE                 pad3;
+    unsigned short       numColSpheres;
+    unsigned short       numColBoxes;
+    unsigned short       numColTriangles;
+    unsigned char        numLinesOrDisks;
+    union
+    {
+        unsigned char m_nFlags;
+        struct {
+            unsigned char   bUsesDisks : 1;
+            unsigned char   bNotEmpty : 1;
+            unsigned char   b03 : 1;
+            unsigned char   bHasFaceGroups : 1;
+            unsigned char   bHasShadow : 1;
+        } Flags;
+    };
     CColSphereSA*        pColSpheres;
     CColBoxSA*           pColBoxes;
-    void*                pSuspensionLines;
-    void*                pUnknown;
+    union
+    {
+        CColLineSA*      m_pSuspensionLines;
+        CColDiskSA*      m_pDisks;
+    };
+    CCompressedVectorSA* m_pVertices;
     CColTriangleSA*      pColTriangles;
     CColTrianglePlaneSA* pColTrianglePlanes;
+    unsigned int         m_nNumShadowTriangles;
+    unsigned int         m_nNumShadowVertices;
+    CCompressedVectorSA  *m_pShadowVertices;
+    CColTriangleSA       *m_pShadowTriangles;
 } CColDataSA;
 
 class CColModelSAInterface
