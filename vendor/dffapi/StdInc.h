@@ -1,0 +1,38 @@
+#include <Windows.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct gtaRwGeometry gtaRwGeometry;
+
+#include "gtaRwTypes.h"
+#include "gtaRwStream.h"
+#include "gtaRwString.h"
+
+#include "gtaRwUnknownExtension.h"
+#include "gtaRwAnimationDictionary.h"
+#include "gtaRwAnisot.h"
+#include "gtaRwSkyMipmap.h"
+#include "gtaRwMaterialTexture.h"
+#include "gtaRwMatFX.h"
+#include "gtaRwPipeline.h"
+#include "gtaRwRights.h"
+#include "gtaRwAtomic.h"
+#include "gtaRwBreakable.h"
+#include "gtaRwEnvMap.h"
+#include "gtaRwError.h"
+#include "gtaRwExtraVertColour.h"
+#include "gtaRwHAnim.h"
+#include "gtaRwNodeName.h"
+#include "gtaRwFrameList.h"
+#include "gtaRwGlobal.h"
+#include "gtaRwNormalMap.h"
+#include "gtaRwSpecMap.h"
+#include "gtaRwUVAnim.h"
+#include "gtaRwMaterial.h"
+#include "gtaRwMaterialList.h"
+#include "gtaRwMemory.h"
+#include "gtaRwTextureD3D.h"
+#include "gtaRwTxd.h"
