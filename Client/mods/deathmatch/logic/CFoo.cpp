@@ -139,6 +139,7 @@ void CFoo::Test(const char* szString)
         pLocal->SetInterior(0);
         pLocal->SetDimension(0);
         g_pClientGame->SetAllDimensions(0);
+        g_pClientGame->SetAllInteriors(0);
 
         // Reset return position so we can't warp back to where we were if local player
         g_pClientGame->GetNetAPI()->ResetReturnPosition();
