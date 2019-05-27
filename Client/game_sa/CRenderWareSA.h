@@ -46,11 +46,11 @@ public:
 
     bool WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary);
 
-    bool WriteDFF(const SString& strFilename, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false);
+    bool WriteDFF(const SString& strFilename, RpClump* pClump);
 
     bool WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary);
 
-    bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision = false);
+    bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
@@ -60,6 +60,9 @@ public:
 
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
+
+    // Copies textures from second argument to first one. Textures of first argument are not removed
+    RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom);
 
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const CBuffer& fileData);

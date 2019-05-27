@@ -90,7 +90,7 @@ auto pTextureInfo = g_pCore->CreateTextureAtlas(vecTexturesInfo);
 */
 
 
-const std::array<SString, 214> arrDffFilesToIgnoreNames = {
+const std::array<SString, 212> arrDffFilesToIgnoreNames = {
     "admiral.dff",
     "alpha.dff",
     "ambulan.dff",
@@ -113,7 +113,6 @@ const std::array<SString, 214> arrDffFilesToIgnoreNames = {
     "blade.dff",
     "blistac.dff",
     "bloodra.dff",
-    "bloodrb.dff",
     "bmx.dff",
     "bobcat.dff",
     "boxburg.dff",
@@ -239,7 +238,6 @@ const std::array<SString, 214> arrDffFilesToIgnoreNames = {
     "rcraider.dff",
     "rctiger.dff",
     "rdtrain.dff",
-    "rdtraint.dff",
     "reefer.dff",
     "regina.dff",
     "remingtn.dff",
@@ -308,11 +306,236 @@ const std::array<SString, 214> arrDffFilesToIgnoreNames = {
 
 std::set <unsigned int> setOfIgnoredDffNameHashes;
 
+
+const std::array<SString, 212> arrTXDFilesToIgnoreNames = {
+    "admiral.txd",
+    "alpha.txd",
+    "ambulan.txd",
+    "androm.txd",
+    "artict1.txd",
+    "artict2.txd",
+    "artict3.txd",
+    "at400.txd",
+    "bagboxa.txd",
+    "bagboxb.txd",
+    "baggage.txd",
+    "bandito.txd",
+    "banshee.txd",
+    "barracks.txd",
+    "beagle.txd",
+    "benson.txd",
+    "bf400.txd",
+    "bfinject.txd",
+    "bike.txd",
+    "blade.txd",
+    "blistac.txd",
+    "bloodra.txd",
+    "bmx.txd",
+    "bobcat.txd",
+    "boxburg.txd",
+    "boxville.txd",
+    "bravura.txd",
+    "broadway.txd",
+    "buccanee.txd",
+    "buffalo.txd",
+    "bullet.txd",
+    "burrito.txd",
+    "bus.txd",
+    "cabbie.txd",
+    "caddy.txd",
+    "cadrona.txd",
+    "camper.txd",
+    "cargobob.txd",
+    "cement.txd",
+    "cheetah.txd",
+    "clover.txd",
+    "club.txd",
+    "coach.txd",
+    "coastg.txd",
+    "combine.txd",
+    "comet.txd",
+    "copbike.txd",
+    "copcarla.txd",
+    "copcarru.txd",
+    "copcarsf.txd",
+    "copcarvg.txd",
+    "cropdust.txd",
+    "dft30.txd",
+    "dinghy.txd",
+    "dodo.txd",
+    "dozer.txd",
+    "dumper.txd",
+    "duneride.txd",
+    "elegant.txd",
+    "elegy.txd",
+    "emperor.txd",
+    "enforcer.txd",
+    "esperant.txd",
+    "euros.txd",
+    "faggio.txd",
+    "farmtr1.txd",
+    "fbiranch.txd",
+    "fbitruck.txd",
+    "fcr900.txd",
+    "feltzer.txd",
+    "firela.txd",
+    "firetruk.txd",
+    "flash.txd",
+    "flatbed.txd",
+    "forklift.txd",
+    "fortune.txd",
+    "freeway.txd",
+    "freibox.txd",
+    "freiflat.txd",
+    "freight.txd",
+    "glendale.txd",
+    "glenshit.txd",
+    "greenwoo.txd",
+    "hermes.txd",
+    "hotdog.txd",
+    "hotknife.txd",
+    "hotrina.txd",
+    "hotrinb.txd",
+    "hotring.txd",
+    "hunter.txd",
+    "huntley.txd",
+    "hustler.txd",
+    "hydra.txd",
+    "infernus.txd",
+    "intruder.txd",
+    "jester.txd",
+    "jetmax.txd",
+    "journey.txd",
+    "kart.txd",
+    "landstal.txd",
+    "launch.txd",
+    "leviathn.txd",
+    "linerun.txd",
+    "majestic.txd",
+    "manana.txd",
+    "marquis.txd",
+    "maverick.txd",
+    "merit.txd",
+    "mesa.txd",
+    "monster.txd",
+    "monstera.txd",
+    "monsterb.txd",
+    "moonbeam.txd",
+    "mower.txd",
+    "mrwhoop.txd",
+    "mtbike.txd",
+    "mule.txd",
+    "nebula.txd",
+    "nevada.txd",
+    "newsvan.txd",
+    "nrg500.txd",
+    "oceanic.txd",
+    "packer.txd",
+    "patriot.txd",
+    "pcj600.txd",
+    "peren.txd",
+    "petro.txd",
+    "petrotr.txd",
+    "phoenix.txd",
+    "picador.txd",
+    "pizzaboy.txd",
+    "polmav.txd",
+    "pony.txd",
+    "predator.txd",
+    "premier.txd",
+    "previon.txd",
+    "primo.txd",
+    "quad.txd",
+    "raindanc.txd",
+    "rancher.txd",
+    "rcbandit.txd",
+    "rcbaron.txd",
+    "rccam.txd",
+    "rcgoblin.txd",
+    "rcraider.txd",
+    "rctiger.txd",
+    "rdtrain.txd",
+    "reefer.txd",
+    "regina.txd",
+    "remingtn.txd",
+    "rhino.txd",
+    "rnchlure.txd",
+    "romero.txd",
+    "rumpo.txd",
+    "rustler.txd",
+    "sabre.txd",
+    "sadler.txd",
+    "sadlshit.txd",
+    "sanchez.txd",
+    "sandking.txd",
+    "savanna.txd",
+    "seaspar.txd",
+    "securica.txd",
+    "sentinel.txd",
+    "shamal.txd",
+    "skimmer.txd",
+    "slamvan.txd",
+    "solair.txd",
+    "sparrow.txd",
+    "speeder.txd",
+    "squalo.txd",
+    "stafford.txd",
+    "stallion.txd",
+    "stratum.txd",
+    "streak.txd",
+    "streakc.txd",
+    "stretch.txd",
+    "stunt.txd",
+    "sultan.txd",
+    "sunrise.txd",
+    "supergt.txd",
+    "swatvan.txd",
+    "sweeper.txd",
+    "tahoma.txd",
+    "tampa.txd",
+    "taxi.txd",
+    "topfun.txd",
+    "tornado.txd",
+    "towtruck.txd",
+    "tractor.txd",
+    "tram.txd",
+    "trash.txd",
+    "tropic.txd",
+    "tug.txd",
+    "tugstair.txd",
+    "turismo.txd",
+    "uranus.txd",
+    "utility.txd",
+    "utiltr1.txd",
+    "vcnmav.txd",
+    "vincent.txd",
+    "virgo.txd",
+    "voodoo.txd",
+    "vortex.txd",
+    "walton.txd",
+    "washing.txd",
+    "wayfarer.txd",
+    "willard.txd",
+    "windsor.txd",
+    "yankee.txd",
+    "yosemite.txd",
+    "zr350.txd" };
+
+std::set <unsigned int> setOfIgnoredTXDNameHashes;
+
 void AddIgnoredDffHashesToSet()
 {
     for (auto& dffName : arrDffFilesToIgnoreNames)
     {
         setOfIgnoredDffNameHashes.insert(HashString(dffName.ToLower()));
+    }
+}
+
+void AddIgnoredTXDHashesToSet()
+{
+    for (auto& txdName : arrTXDFilesToIgnoreNames)
+    {
+        setOfIgnoredTXDNameHashes.insert(HashString(txdName.ToLower()));
     }
 }
 
@@ -342,8 +565,8 @@ void OptimizeTXDFile(CIMGArchiveFile* newFile)
         std::printf("txd file: %s  | new txd size: %d | actualFileSize: %d | capacity: %d\n",
             newFile->fileEntry->fileName, txdSize, (int)newFile->actualFileSize, newFile->fileByteBuffer.GetCapacity());
 
-        newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
-        pRenderWare->WriteTXD(newFile->fileByteBuffer.GetData(), newFile->actualFileSize, pTxdDictionary);
+        //newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
+        //pRenderWare->WriteTXD(newFile->fileByteBuffer.GetData(), newFile->actualFileSize, pTxdDictionary);
 
         pRenderWare->DestroyTXD(pTxdDictionary);
     }
@@ -359,7 +582,7 @@ bool IsVehicleModel(const int modelID)
     return modelID >= 400 && modelID <= 611;
 }
 
-//extern SString g_CurrentDFFBeingGeneratedFileName;
+extern SString g_CurrentDFFBeingGeneratedFileName;
 
 
 static RwTexDictionary* g_pVehicleTxdDictionary = nullptr;
@@ -369,12 +592,12 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump *))0x74A5E0;
 
-    ///*
+    
     // REMOVE THIS LATER
-    char theDFFName[] = "infernus.dff";
+    char theDFFName[] = "banshee.dff";
     memcpy(newFile->fileEntry->fileName, theDFFName, strlen(theDFFName) + 1);
     // REMOVE END
-   // */
+    
 
     
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
@@ -382,8 +605,8 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     if (it != setOfIgnoredDffNameHashes.end())
     {
         return; // ignore it
-    }
-    */
+    }*/
+    
 
     SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
@@ -391,28 +614,49 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         return;
     }
 
-    //std::printf("GetTXDDescriptorFromDFFName failed\n");
-    //RwTexDictionary* pTxdDictionary = nullptr;
+
     STXDDescriptor* pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
     if (!pTxdDictionary)
     {
         STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
+        if (pTXDImgArchiveInfo->usSize == 0)
+        {
+            return;
+        }
         CIMGArchiveFile* pTXDArchiveFile = pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo);
         pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
         pTXDDescriptor->SetTextureDictionary(pTxdDictionary);
         delete pTXDArchiveFile;
-          
     }
 
-    pRenderWare->SetCurrentDFFWriteModelID(pDFFDescriptor->GetModelID());
+    int modelID = pDFFDescriptor->GetModelID();
 
-    bool bLoadCollision = IsVehicleModel(pDFFDescriptor->GetModelID());
-    RpClump* pClump = pRenderWare->ReadDFF(theDFFName, CBuffer(), pDFFDescriptor->GetModelID(), bLoadCollision, pTxdDictionary);
-    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, pDFFDescriptor->GetModelID(), bLoadCollision, pTxdDictionary);
+  /*  if (IsVehicleModel(modelID))
+    {
+        pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
+    }
+    */
+    pRenderWare->SetCurrentDFFWriteModelID(modelID);
+
+    // rEMOVE THIS LATER
+    //bool bLoadCollision = false;
+    //REMOVE END
+
+  
+    bool bLoadCollision = IsVehicleModel(modelID);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, nullptr);
+    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
     if (pClump)
     {
-        unsigned int clumpSize = RpClumpStreamGetSize(pClump);
+        unsigned int clumpSize = 25000; // RpClumpStreamGetSize(pClump);
+
+        // REMOVE THIS AFTER TESTING
+        /*if (bLoadCollision)
+        {
+            return; // ignore after testing, hmm
+        }*/
+        // REMOVE END
 
         // there's still an issue with size of empty extension headers of 12 btytes for clump
         clumpSize += 24;
@@ -427,12 +671,13 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
         void* pData = newFile->fileByteBuffer.GetData();
-        //pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
+       // pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
-        SString strPathOfGeneratedDff = "dffs\\";
-        pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump, pDFFDescriptor->GetModelID(), bLoadCollision);
+        //SString strPathOfGeneratedDff = "dffs\\";
+        //pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump, pDFFDescriptor->GetModelID(), bLoadCollision);
 
         pRenderWare->DestroyDFF(pClump);
+        
         pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
     }
     else
@@ -447,19 +692,24 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
+    g_pVehicleTxdDictionary = pRenderWare->ReadTXD("models\\generic\\vehicle.txd", CBuffer(), false);
+    assert(g_pVehicleTxdDictionary != nullptr);
+
     CIDELoader ideLoader;
     
-    CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
+    //CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
+    
+    CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
     newIMgArchive->ReadEntries();
 
     ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
 
     AddIgnoredDffHashesToSet();
-
+    AddIgnoredTXDHashesToSet();
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 1; i++) // newIMgArchive->GetFileCount()
+    for (DWORD i = 0; i < 1; i++) // newIMgArchive->GetFileCount() crash if total file count is 13 for vehicles img (banshee.dff)
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
@@ -473,7 +723,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
             memcpy(newFile->fileEntry->fileName, pFileName, strlen(pFileName)+1);
 
             SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
-            
+
             // check if it's a txd file
             if (strFileExtension == "txd")
             {
@@ -481,10 +731,10 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
             }
             else if (strFileExtension == "dff")
             {
-               
+
                 OptimizeDFFFile(newIMgArchive, newFile, ideLoader);
             }
-            
+
             imgArchiveFiles.push_back(newFile);
         }
     }

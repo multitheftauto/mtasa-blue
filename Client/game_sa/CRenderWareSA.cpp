@@ -177,6 +177,8 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     return true;
 }
 
+int g_CurrentDFFWriteModelID = 0;
+
 /*
 0x0253f200: atomic_visibility_distance
 0x0253f201: clump_visibility_distance
@@ -277,12 +279,17 @@ bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
             return true;
 
         }
-        /*
+        
         case (DWORD)0x0253F2FA: // collision_model
         {
-        return false;
+            // Is vehicle model?
+            if (g_CurrentDFFWriteModelID >= 400 && g_CurrentDFFWriteModelID <= 611)
+            {
+                return true;
+            }
+            return false;
         }
-        */
+        
         /*
         case (DWORD)0x0253F2FB: // gta_hanim
         {
@@ -737,10 +744,15 @@ int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
 
 
 
-int g_CurrentDFFWriteModelID = 0;
+
 
 RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
 {
+    // rEMOVE THIS LATER
+    return stream; 
+    // REMOVE END
+
+
     auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
 
     CBaseModelInfoSAInterface **CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
@@ -865,9 +877,22 @@ RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, uns
 
 int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
 {
+    //REMOVE START
+    return 100;
+    //REMOVE END
+
     CBaseModelInfoSAInterface **CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
     CBaseModelInfoSAInterface*&CCollisionPlugin__ms_currentModel = *(CBaseModelInfoSAInterface**)0x9689E0;
 
+    CModelInfo* pModelInfo = pGame->GetModelInfo(g_CurrentDFFWriteModelID);
+    if (!pModelInfo->IsLoaded())
+    {
+        pModelInfo->Request(BLOCKING, "Car model");
+        if (!pModelInfo->IsLoaded())
+        {
+            std::printf("ERROR. STILL NOT LOADED. HELP!\n");
+        }
+    }
     auto pBaseModelInfoInterface = CModelInfo_ms_modelInfoPtrs[g_CurrentDFFWriteModelID];
     auto pColModelInterface = pBaseModelInfoInterface->pColModel;
     auto pColData = pColModelInterface->pColData;
@@ -894,10 +919,12 @@ int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
 
     int size = 0;
 
-    size += sizeof(ColModelFileHeader);
+    
+  /*  size += sizeof(ColModelFileHeader);
     size += 88; // COL3 data
     size += sizeof(CColSphereSA) * pColData->numColSpheres;
-    size += sizeof(CColBoxSA) * pColData->numColBoxes;
+    size += sizeof(CColBoxSA) * pColData->numColBoxes; 
+    
     size += uiCollisionLinesOrDisksSize;
     size += sizeof(CCompressedVectorSA) * numVertices;
     size += sizeof(CColTriangleSA) * pColData->numColTriangles;
@@ -905,6 +932,7 @@ int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     // Ignore triangle planes
     size += sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices;
     size += sizeof(CColTriangleSA) * pColData->m_nNumShadowTriangles;
+    */
     return size;
 }
 
@@ -1093,6 +1121,16 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
 RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict)
 {
 
+    CModelInfo* pModelInfo = pGame->GetModelInfo(g_CurrentDFFWriteModelID);
+    if (!pModelInfo->IsLoaded())
+    {
+        pModelInfo->Request(BLOCKING, "Car model");
+        if (!pModelInfo->IsLoaded())
+        {
+            std::printf("ERROR. STILL NOT LOADED. HELP!\n");
+        }
+    }
+
     if (pTexDict)
     {
         RwTexDictionarySetCurrent(pTexDict);
@@ -1137,15 +1175,16 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if (bLoadEmbeddedCollisions)
+    {
+        auto pBaseModelInfoInterface = (CBaseModelInfoSAInterface*)pPool[usModelID];
+        std::printf("modelId: %d | pPool[usModelID]: %p | colmodel: %p\n", usModelID, pPool[usModelID], pBaseModelInfoInterface->pColModel);
+
         RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
+    }
 
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(streamModel);
 
-    if (!pClump)
-    {
-        throw;
-    }
     // reset collision hack
     if (bLoadEmbeddedCollisions)
         RpPrtStdGlobalDataSetStreamEmbedded(NULL);
@@ -1170,28 +1209,14 @@ bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDi
     return false;
 }
 
-bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
 {
     auto RpClumpStreamWrite = (void (__cdecl*)(RpClump*, RwStream *))0x74AA10;
 
     RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
     if (pStream)
     {
-        // get the modelinfo array
-        DWORD* pPool = (DWORD*)ARRAY_ModelInfo;
-
-        g_CurrentDFFWriteModelID = usModelID;
-
-        // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
-        if (bLoadEmbeddedCollisions)
-            RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
-
         RpClumpStreamWrite(pClump, pStream);
-
-        // reset collision hack
-        if (bLoadEmbeddedCollisions)
-            RpPrtStdGlobalDataSetStreamEmbedded(NULL);
-
         RwStreamClose(pStream, 0);
         return true;
     }
@@ -1214,7 +1239,7 @@ bool CRenderWareSA::WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxd
     return true;
 }
 
-bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump, unsigned short usModelID, bool bLoadEmbeddedCollision)
+bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
 {
     auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream *))0x74AA10;
 
@@ -1552,6 +1577,27 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
         RwTextureDestroy(pTex);
     }
 }
+
+RwTexDictionary* CRenderWareSA::CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom)
+{
+    auto CClothesBuilder_CopyTexture = (RwTexture *(__cdecl*)(RwTexture *texture))0x5A5730;
+
+    std::vector<RwTexture*> outTextureList;
+    GetTxdTextures(outTextureList, pTextureDictionaryToCopyFrom);
+
+    for (auto& pTexture : outTextureList)
+    {
+        RwTexture* pCopiedTexture = CClothesBuilder_CopyTexture(pTexture);
+        if (pCopiedTexture)
+        {
+            memcpy(pCopiedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
+            memcpy(pCopiedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
+            RwTexDictionaryAddTexture(pResultTextureDictionary, pCopiedTexture);
+        }
+    }
+    return pResultTextureDictionary;
+}
+
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {

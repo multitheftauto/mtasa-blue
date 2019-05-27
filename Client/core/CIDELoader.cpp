@@ -120,6 +120,7 @@ void CIDELoader::ParseContents(SString& contents)
             while (std::getline(inStream, line))
             {
                 RemoveStringTabsSpaces(line);
+                std::printf("%s\n", line.c_str());
                 if (line == "end")
                 {
                     break;
