@@ -1063,6 +1063,9 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
             // Make sure all other elements are aware of what dimension we are in now.
             // So elements can be removed properly.
             g_pClientGame->SetAllDimensions(usDimension);
+            
+            // Make sure all other elements are aware of what interior we are in now.
+            g_pClientGame->SetAllInteriors(ucInterior);
 
             // Reset return position so we can't warp back to where we were if local player
             g_pClientGame->m_pNetAPI->ResetReturnPosition();
