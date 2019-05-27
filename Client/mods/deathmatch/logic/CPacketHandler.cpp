@@ -2859,7 +2859,10 @@ retry:
 
                         if (bitStream.Version() >= 0x068)
                             if (bitStream.ReadBit())
+                            {
                                 pObject->SetVisibleInAllDimensions(true);
+                                pObject->SetVisibleInAllInteriors(true);
+                            }
 
                         bool bIsMoving;
                         if (bitStream.ReadBit(bIsMoving) && bIsMoving)
