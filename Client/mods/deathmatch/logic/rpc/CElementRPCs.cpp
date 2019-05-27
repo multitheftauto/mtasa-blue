@@ -252,8 +252,34 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
     unsigned char ucInterior, ucSetPosition;
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
     {
-        pSource->SetInterior(ucInterior);
-
+        if (pSource->GetType() == CCLIENTTEAM)
+        {
+          CClientTeam*                         pTeam = static_cast<CClientTeam*>(pSource);
+          list<CClientPlayer*>::const_iterator iter = pTeam->IterBegin();
+          for (; iter != pTeam->IterEnd(); iter++)
+          {
+              CClientPlayer* pPlayer = *iter;
+              if (pPlayer->IsLocalPlayer())
+              {
+                  m_pClientGame->SetAllInteriors(ucInterior);
+              }
+                pPlayer->SetInterior(ucInterior);
+          }
+        }
+        else
+        {
+            if (pSource->GetType() == CCLIENTPLAYER)
+            {
+                CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
+                if (pPlayer->IsLocalPlayer())
+                {
+                    m_pGame->SetAllInteriors(ucInterior);   
+                }
+            }
+            
+            pSource->SetInterior(ucInterior);
+        }
+        
         if (ucSetPosition == 1)
         {
             CVector vecPosition;
