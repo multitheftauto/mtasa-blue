@@ -1257,7 +1257,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
         case CCLIENTTEAM:       
         {
             CClientTeam&                         Team = static_cast<CClientTeam&>(Entity);
-            list<CClientPlayer*>::const_interator iter = Team.IterBegin();
+            list<CClientPlayer*>::const_iterator iter = Team.IterBegin();
             for (; iter != Team.IterEnd(); iter++)
             {
                 (*iter)->SetInterior(ucInterior);   
