@@ -64,4 +64,41 @@ public:
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
+
+protected:
+    // Old style: Only warn on failure. This should
+    // not be used for new functions
+    template <auto T>
+    static inline int ArgumentParserWarn(lua_State* L)
+    {
+        int iReturnValue = CLuaFunctionParser<T>()(L);
+        if (iReturnValue < 0)
+        {
+            m_pScriptDebugging->LogCustom(L, "todo fix error message");
+            lua_pushboolean(L, false);
+            return 1;
+        }
+        return iReturnValue;
+    }
+
+    // New style: hard error on usage mistakes
+    template <auto T>
+    static inline int ArgumentParser(lua_State* L)
+    {
+        try
+        {
+            int iReturnValue = CLuaFunctionParser<T>()(L);
+            if (iReturnValue < 0)
+            {
+                luaL_error(L, "todo fix error message");
+                return 1;
+            }
+            return iReturnValue;
+        }
+        catch (CLuaError& e)
+        {
+            luaL_error(L, e.what());
+            return 0;
+        }
+    }
 };
