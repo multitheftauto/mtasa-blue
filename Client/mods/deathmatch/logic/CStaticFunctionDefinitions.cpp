@@ -1251,11 +1251,59 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
 {
     RUN_CHILDREN(SetElementInterior(**iter, ucInterior, bSetPosition, vecPosition))
 
-    Entity.SetInterior(ucInterior);
-    if (bSetPosition)
-        Entity.SetPosition(vecPosition);
+    switch(Entity.GetType())
+    {
+        // Client side elements
+        case CCLIENTTEAM:       
+        {
+            CClientTeam&                         Team = static_cast<CClientTeam&>(Entity);
+            list<CClientPlayer*>::const_interator iter = Team.IterBegin();
+            for (; iter != Team.IterEnd(); iter++)
+            {
+                (*iter)->SetInterior(ucInterior);   
+            }
+        }
+            
+        case CCLIENTCOLSHAPE:
+        case CCLIENTDUMMY:
+        case CCLIENTVEHICLE:
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        case CCLIENTMARKER:
+        case CCLIENTRADARMARKER:
+        case CCLIENTPED:
+        case CCLIENTPICKUP:
+        case CCLIENTPOINTLIGHTS:
+        case CCLIENTRADARAREA:
+        case CCLIENTWORLDMESH:
+        case CCLIENTSOUND:
+        case CCLIENTWATER:
+        {
+            Entity.SetInterior(ucInterior);
+            
+             if (bSetPosition)
+                Entity.SetPosition(vecPosition);
+            
+            return true;
+        }
+            
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (Ped.IsLocalPlayer())
+            {
+                // Update all of our streamers/managers to the local player's interior
+                m_pClientGame->SetAllInteriors(ucInterior);
+            }
 
-    return true;
+            Ped.SetInterior(ucInterior);
+            if (bSetPosition)
+                Entity.SetPosition(vecPosition);
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsigned short usDimension)
