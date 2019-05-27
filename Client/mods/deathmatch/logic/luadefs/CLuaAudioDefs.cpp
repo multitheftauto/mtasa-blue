@@ -466,7 +466,7 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -482,7 +482,7 @@ int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
     {
         m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
         lua_pushnil(luaVM);
-        return false;
+        return 1;
     }
 
     if (!argStream.HasErrors())
