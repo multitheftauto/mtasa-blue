@@ -91,6 +91,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_pRequester = pManager->GetModelRequestManager();
 
     m_bTaskToBeRestoredOnAnimEnd = false;
+    m_eTaskTypeToBeRestoredOnAnimEnd = TASK_SIMPLE_PLAYER_ON_FOOT;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";

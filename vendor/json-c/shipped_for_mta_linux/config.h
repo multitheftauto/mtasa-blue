@@ -43,7 +43,9 @@
 /* #undef HAVE_DOPRNT */
 
 /* Define to 1 if you have the <endian.h> header file. */
+#ifndef __APPLE__
 #define HAVE_ENDIAN_H 1
+#endif
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1

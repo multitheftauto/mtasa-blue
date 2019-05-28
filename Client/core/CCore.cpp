@@ -31,54 +31,6 @@ extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
 
-BOOL AC_RestrictAccess()
-{
-    EXPLICIT_ACCESS NewAccess;
-    PACL            pTempDacl;
-    HANDLE          hProcess;
-    DWORD           dwFlags;
-    DWORD           dwErr;
-
-    ///////////////////////////////////////////////
-    // Get the HANDLE to the current process.
-    hProcess = GetCurrentProcess();
-
-    ///////////////////////////////////////////////
-    // Setup which accesses we want to deny.
-    dwFlags = GENERIC_WRITE | PROCESS_ALL_ACCESS | WRITE_DAC | DELETE | WRITE_OWNER | READ_CONTROL;
-
-    ///////////////////////////////////////////////
-    // Build our EXPLICIT_ACCESS structure.
-    BuildExplicitAccessWithName(&NewAccess, "CURRENT_USER", dwFlags, DENY_ACCESS, NO_INHERITANCE);
-
-    ///////////////////////////////////////////////
-    // Create our Discretionary Access Control List.
-    if (ERROR_SUCCESS != (dwErr = SetEntriesInAcl(1, &NewAccess, NULL, &pTempDacl)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetEntriesInAcl(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Set the new DACL to our current process.
-    if (ERROR_SUCCESS != (dwErr = SetSecurityInfo(hProcess, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pTempDacl, NULL)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetSecurityInfo(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Free the DACL (see msdn on SetEntriesInAcl)
-    LocalFree(pTempDacl);
-    CloseHandle(hProcess);
-
-    return TRUE;
-}
-
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
@@ -86,10 +38,6 @@ CCore::CCore()
 {
     // Initialize the global pointer
     g_pCore = this;
-
-    #if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
-    AC_RestrictAccess();
-    #endif
 
     m_pConfigFile = NULL;
 
@@ -577,33 +525,39 @@ void CCore::ApplyConsoleSettings()
 
 void CCore::ApplyGameSettings()
 {
-    bool                      bval;
+    bool                      bVal;
     int                       iVal;
+    float                     fVal;
     CControllerConfigManager* pController = m_pGame->GetControllerConfigManager();
+    CGameSettings*            pGameSettings = m_pGame->GetSettings();
 
-    CVARS_GET("invert_mouse", bval);
-    pController->SetMouseInverted(bval);
-    CVARS_GET("fly_with_mouse", bval);
-    pController->SetFlyWithMouse(bval);
-    CVARS_GET("steer_with_mouse", bval);
-    pController->SetSteerWithMouse(bval);
-    CVARS_GET("classic_controls", bval);
-    pController->SetClassicControls(bval);
-    CVARS_GET("volumetric_shadows", bval);
-    m_pGame->GetSettings()->SetVolumetricShadowsEnabled(bval);
+    CVARS_GET("invert_mouse", bVal);
+    pController->SetMouseInverted(bVal);
+    CVARS_GET("fly_with_mouse", bVal);
+    pController->SetFlyWithMouse(bVal);
+    CVARS_GET("steer_with_mouse", bVal);
+    pController->SetSteerWithMouse(bVal);
+    CVARS_GET("classic_controls", bVal);
+    pController->SetClassicControls(bVal);
+    CVARS_GET("volumetric_shadows", bVal);
+    pGameSettings->SetVolumetricShadowsEnabled(bVal);
     CVARS_GET("aspect_ratio", iVal);
-    m_pGame->GetSettings()->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
-    CVARS_GET("grass", bval);
-    m_pGame->GetSettings()->SetGrassEnabled(bval);
-    CVARS_GET("heat_haze", bval);
-    m_pMultiplayer->SetHeatHazeEnabled(bval);
+    pGameSettings->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
+    CVARS_GET("grass", bVal);
+    pGameSettings->SetGrassEnabled(bVal);
+    CVARS_GET("heat_haze", bVal);
+    m_pMultiplayer->SetHeatHazeEnabled(bVal);
     CVARS_GET("fast_clothes_loading", iVal);
     m_pMultiplayer->SetFastClothesLoading((CMultiplayer::EFastClothesLoading)iVal);
-    CVARS_GET("tyre_smoke_enabled", bval);
-    m_pMultiplayer->SetTyreSmokeEnabled(bval);
-    m_pGame->GetSettings()->UpdateFieldOfViewFromSettings();
-    m_pGame->GetSettings()->ResetVehiclesLODDistance();
+    CVARS_GET("tyre_smoke_enabled", bVal);
+    m_pMultiplayer->SetTyreSmokeEnabled(bVal);
+    pGameSettings->UpdateFieldOfViewFromSettings();
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
+    CVARS_GET("mastervolume", fVal);
+    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
+    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
 }
 
 void CCore::SetConnected(bool bConnected)
@@ -756,11 +710,6 @@ HWND CCore::GetHookedWindow()
 void CCore::HideMainMenu()
 {
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
-}
-
-void CCore::HideQuickConnect()
-{
-    m_pLocalGUI->GetMainMenu()->GetQuickConnectWindow()->SetVisible(false);
 }
 
 void CCore::ShowServerInfo(unsigned int WindowType)

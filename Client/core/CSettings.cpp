@@ -668,7 +668,7 @@ void CSettings::CreateGUI()
 
     vecTemp.fX = 11;
     m_pDrawDistanceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Draw Distance:")));
-    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pDrawDistanceLabel->GetPosition(vecTemp, false);
     m_pDrawDistanceLabel->AutoSize();
 
@@ -686,7 +686,7 @@ void CSettings::CreateGUI()
     vecTemp.fX = 11;
 
     m_pBrightnessLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Brightness:")));
-    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pBrightnessLabel->GetPosition(vecTemp, false);
     m_pBrightnessLabel->AutoSize();
 
@@ -704,7 +704,7 @@ void CSettings::CreateGUI()
     vecTemp.fX = 11;
 
     m_pFXQualityLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("FX Quality:")));
-    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pFXQualityLabel->GetPosition(vecTemp, false);
     m_pFXQualityLabel->AutoSize();
 
@@ -718,7 +718,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetReadOnly(true);
 
     m_pAnisotropicLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Anisotropic filtering:")));
-    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pAnisotropicLabel->GetPosition(vecTemp, false);
     m_pAnisotropicLabel->AutoSize();
 
@@ -759,7 +759,7 @@ void CSettings::CreateGUI()
     m_pComboAntiAliasing->SetReadOnly(true);
 
     m_pAspectRatioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Aspect Ratio:")));
-    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pAspectRatioLabel->GetPosition(vecTemp, false);
     m_pAspectRatioLabel->AutoSize();
 
@@ -775,7 +775,7 @@ void CSettings::CreateGUI()
     m_pComboAspectRatio->SetReadOnly(true);
 
     m_pCheckBoxHudMatchAspectRatio = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("HUD Match Aspect Ratio"), true));
-    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
+    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 4.0f));
     m_pCheckBoxHudMatchAspectRatio->AutoSize(NULL, 20.0f);
 
     vecTemp.fX = 11;
@@ -799,6 +799,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
     m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
     m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -1527,6 +1531,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_vehicles", bHighDetailVehicles);
     m_pCheckBoxHighDetailVehicles->SetSelected(bHighDetailVehicles);
 
+    // High detail peds
+    bool bHighDetailPeds;
+    CVARS_GET("high_detail_peds", bHighDetailPeds);
+    m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
+
     PopulateResolutionComboBox();
 
     // Fullscreen style
@@ -1750,11 +1759,14 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("heat_haze", true);
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
+    CVARS_SET("high_detail_peds", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
+    gameSettings->ResetVehiclesLODDistance(false);
+    gameSettings->ResetPedsLODDistance(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -2988,13 +3000,16 @@ void CSettings::LoadData()
     // Skins
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    uiIndex = 0;
-    std::string strItemText = m_pInterfaceSkinSelector->GetItemText(uiIndex);
-    while (strItemText != currentSkin)
+
+    for (size_t i = 0; i < m_pInterfaceSkinSelector->GetItemCount(); i++)
     {
-        strItemText = m_pInterfaceSkinSelector->GetItemText(++uiIndex);
+        std::string strItemText = m_pInterfaceSkinSelector->GetItemText(i);
+        if (currentSkin == strItemText)
+        {
+            m_pInterfaceSkinSelector->SetSelectedItemByIndex(i);
+            break;
+        }
     }
-    m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
     // Process priority
     int iVar;
@@ -3328,9 +3343,15 @@ void CSettings::SaveData()
     CVARS_SET("tyre_smoke_enabled", bTyreSmokeEnabled);
     g_pCore->GetMultiplayer()->SetTyreSmokeEnabled(bTyreSmokeEnabled);
 
-    // High detail vehicles (just set cvar, real change occur on next connect)
+    // High detail vehicles
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
+    gameSettings->ResetVehiclesLODDistance(false);
+
+    // High detail peds
+    bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
+    CVARS_SET("high_detail_peds", bHighDetailPeds);
+    gameSettings->ResetPedsLODDistance(false);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())

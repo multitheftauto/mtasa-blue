@@ -945,6 +945,7 @@ static void GetProjectileTarget(CPools*  pPools)
 {
     if (projectileTargetEntityInterface)
     {
+        projectileTargetEntity = NULL;
         switch (projectileTargetEntityInterface->nType)
         {
             case ENTITY_TYPE_VEHICLE:

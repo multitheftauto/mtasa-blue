@@ -2016,7 +2016,11 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
                                                         bFreezeLastFrame))
         {
             CClientPed* pPed = static_cast<CClientPed*>(pEntity);
-            if (!pPed->IsDucked())
+            if (pPed->IsDucked())
+            {
+                pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
+            }
+            else
             {
                 bTaskToBeRestoredOnAnimEnd = false;
             }

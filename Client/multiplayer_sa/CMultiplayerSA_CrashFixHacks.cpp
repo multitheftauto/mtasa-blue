@@ -1500,7 +1500,6 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         cmp     eax, 0x2710
         jg      altcode
 
-        standardcode :
         push    ebx
         mov     bl, [edx + 4]
         shr     bl, 1

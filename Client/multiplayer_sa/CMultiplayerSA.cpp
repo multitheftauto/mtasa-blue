@@ -82,9 +82,6 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
 
-#define HOOKPOS_CGame_Process_End                           0x53C23A
-DWORD RETURN_CGame_Process_End = 0x53C23F;
-
 #define HOOKPOS_Idle                                        0x53E981
 DWORD RETURN_Idle = 0x53E98B;
 
@@ -154,6 +151,9 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
+
+#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
+DWORD RETURN_CAnimManager_BlendAnimation = 0x4D4617;
 
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
@@ -354,104 +354,105 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+BlendAnimationHandler*      m_pBlendAnimationHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
 HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
-void HOOK_FindPlayerCoors();
-void HOOK_FindPlayerCentreOfWorld();
-void HOOK_FindPlayerHeading();
-void HOOK_CStreaming_Update_Caller();
-void HOOK_CHud_Draw_Caller();
-void HOOK_CRunningScript_Process();
-void HOOK_CExplosion_AddExplosion();
-void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
-void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
-void HOOK_Trailer_BreakTowLink();
-void HOOK_CRadar__DrawRadarGangOverlay();
-void HOOK_CTaskComplexJump__CreateSubTask();
-void HOOK_FxManager_CreateFxSystem();
-void HOOK_FxManager_DestroyFxSystem();
-void HOOK_CCam_ProcessFixed();
-void HOOK_Render3DStuff();
-void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
-void HOOK_CPed_IsPlayer();
-void HOOK_CTrain_ProcessControl_Derail();
-void HOOK_CVehicle_SetupRender();
-void HOOK_CVehicle_ResetAfterRender();
-void HOOK_CObject_Render();
-void HOOK_EndWorldColors();
-void HOOK_CWorld_ProcessVerticalLineSectorList();
-void HOOK_ComputeDamageResponse_StartChoking();
-void HOOK_CollisionStreamRead();
-void HOOK_CVehicle_ApplyBoatWaterResistance();
-void HOOK_CPhysical_ApplyGravity();
-void HOOK_VehicleCamStart();
-void HOOK_VehicleCamTargetZTweak();
-void HOOK_VehicleCamLookDir1();
-void HOOK_VehicleCamLookDir2();
-void HOOK_VehicleCamHistory();
-void HOOK_VehicleCamUp();
-void HOOK_VehicleCamEnd();
-void HOOK_VehicleLookBehind();
-void HOOK_VehicleLookAside();
-void HOOK_OccupiedVehicleBurnCheck();
-void HOOK_UnoccupiedVehicleBurnCheck();
-void HOOK_ApplyCarBlowHop();
-void HOOK_CWorld_SetWorldOnFire();
-void HOOK_CTaskSimplePlayerOnFire_ProcessPed();
-void HOOK_CFire_ProcessFire();
-void HOOK_CExplosion_Update();
-void HOOK_CWeapon_FireAreaEffect();
-void HOOK_CGame_Process();
-void HOOK_CGame_Process_End();
-void HOOK_Idle();
-void HOOK_RenderScene_Plants();
-void HOOK_RenderScene_end();
-void HOOK_CPlantMgr_Render();
-void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CAnimBlendAssociation_SetCurrentTime();
-void HOOK_RpAnimBlendClumpUpdateAnimations();
-void HOOK_CAnimBlendAssoc_destructor();
-void HOOK_CAnimManager_AddAnimation();
-void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimManager_BlendAnimation_Hierarchy();
-void HOOK_CPed_GetWeaponSkill();
-void HOOK_CPed_AddGogglesModel();
-void HOOK_CPhysical_ProcessCollisionSectorList();
-void HOOK_CrashFix_Misc1();
-void HOOK_CrashFix_Misc2();
-void HOOK_CrashFix_Misc3();
-void HOOK_CrashFix_Misc4();
-void HOOK_CrashFix_Misc5();
-void HOOK_CrashFix_Misc6();
-void HOOK_CrashFix_Misc7();
-void HOOK_CrashFix_Misc8();
-void HOOK_CrashFix_Misc9();
-void HOOK_CrashFix_Misc10();
-void HOOK_CrashFix_Misc11();
-void HOOK_CrashFix_Misc12();
-void HOOK_CrashFix_Misc13();
-void HOOK_CrashFix_Misc14();
-void HOOK_FreezeFix_Misc15();
-void HOOK_CrashFix_Misc16();
-void HOOK_CrashFix_Misc17();
-void HOOK_CrashFix_Misc18();
-void HOOK_CrashFix_Misc19();
-void HOOK_CrashFix_Misc20();
-void HOOK_CrashFix_Misc21();
-void HOOK_CrashFix_Misc22();
-void HOOK_CrashFix_Misc23();
-void HOOK_CrashFix_Misc24();
-void HOOK_CheckAnimMatrix();
-void HOOK_VehColCB();
-void HOOK_VehCol();
-void HOOK_Transmission_CalculateDriveAcceleration();
-void HOOK_isVehDriveTypeNotRWD();
-void HOOK_isVehDriveTypeNotFWD();
-void HOOK_PreFxRender();
-void HOOK_PreHUDRender();
+void   HOOK_FindPlayerCoors();
+void   HOOK_FindPlayerCentreOfWorld();
+void   HOOK_FindPlayerHeading();
+void   HOOK_CStreaming_Update_Caller();
+void   HOOK_CHud_Draw_Caller();
+void   HOOK_CRunningScript_Process();
+void   HOOK_CExplosion_AddExplosion();
+void   HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
+void   HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
+void   HOOK_Trailer_BreakTowLink();
+void   HOOK_CRadar__DrawRadarGangOverlay();
+void   HOOK_CTaskComplexJump__CreateSubTask();
+void   HOOK_FxManager_CreateFxSystem();
+void   HOOK_FxManager_DestroyFxSystem();
+void   HOOK_CCam_ProcessFixed();
+void   HOOK_Render3DStuff();
+void   HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
+void   HOOK_CPed_IsPlayer();
+void   HOOK_CTrain_ProcessControl_Derail();
+void   HOOK_CVehicle_SetupRender();
+void   HOOK_CVehicle_ResetAfterRender();
+void   HOOK_CObject_Render();
+void   HOOK_EndWorldColors();
+void   HOOK_CWorld_ProcessVerticalLineSectorList();
+void   HOOK_ComputeDamageResponse_StartChoking();
+void   HOOK_CollisionStreamRead();
+void   HOOK_CVehicle_ApplyBoatWaterResistance();
+void   HOOK_CPhysical_ApplyGravity();
+void   HOOK_VehicleCamStart();
+void   HOOK_VehicleCamTargetZTweak();
+void   HOOK_VehicleCamLookDir1();
+void   HOOK_VehicleCamLookDir2();
+void   HOOK_VehicleCamHistory();
+void   HOOK_VehicleCamUp();
+void   HOOK_VehicleCamEnd();
+void   HOOK_VehicleLookBehind();
+void   HOOK_VehicleLookAside();
+void   HOOK_OccupiedVehicleBurnCheck();
+void   HOOK_UnoccupiedVehicleBurnCheck();
+void   HOOK_ApplyCarBlowHop();
+void   HOOK_CWorld_SetWorldOnFire();
+void   HOOK_CTaskSimplePlayerOnFire_ProcessPed();
+void   HOOK_CFire_ProcessFire();
+void   HOOK_CExplosion_Update();
+void   HOOK_CWeapon_FireAreaEffect();
+void   HOOK_CGame_Process();
+void   HOOK_Idle();
+void   HOOK_RenderScene_Plants();
+void   HOOK_RenderScene_end();
+void   HOOK_CPlantMgr_Render();
+void   HOOK_CEventHandler_ComputeKnockOffBikeResponse();
+void   HOOK_CAnimBlendAssociation_SetCurrentTime();
+void   HOOK_RpAnimBlendClumpUpdateAnimations();
+void   HOOK_CAnimBlendAssoc_destructor();
+void   HOOK_CAnimManager_AddAnimation();
+void   HOOK_CAnimManager_AddAnimationAndSync();
+void   HOOK_CAnimManager_BlendAnimation_Hierarchy();
+void   HOOK_CAnimManager_BlendAnimation();
+void   HOOK_CPed_GetWeaponSkill();
+void   HOOK_CPed_AddGogglesModel();
+void   HOOK_CPhysical_ProcessCollisionSectorList();
+void   HOOK_CrashFix_Misc1();
+void   HOOK_CrashFix_Misc2();
+void   HOOK_CrashFix_Misc3();
+void   HOOK_CrashFix_Misc4();
+void   HOOK_CrashFix_Misc5();
+void   HOOK_CrashFix_Misc6();
+void   HOOK_CrashFix_Misc7();
+void   HOOK_CrashFix_Misc8();
+void   HOOK_CrashFix_Misc9();
+void   HOOK_CrashFix_Misc10();
+void   HOOK_CrashFix_Misc11();
+void   HOOK_CrashFix_Misc12();
+void   HOOK_CrashFix_Misc13();
+void   HOOK_CrashFix_Misc14();
+void   HOOK_FreezeFix_Misc15();
+void   HOOK_CrashFix_Misc16();
+void   HOOK_CrashFix_Misc17();
+void   HOOK_CrashFix_Misc18();
+void   HOOK_CrashFix_Misc19();
+void   HOOK_CrashFix_Misc20();
+void   HOOK_CrashFix_Misc21();
+void   HOOK_CrashFix_Misc22();
+void   HOOK_CrashFix_Misc23();
+void   HOOK_CrashFix_Misc24();
+void   HOOK_CheckAnimMatrix();
+void   HOOK_VehColCB();
+void   HOOK_VehCol();
+void   HOOK_Transmission_CalculateDriveAcceleration();
+void   HOOK_isVehDriveTypeNotRWD();
+void   HOOK_isVehDriveTypeNotFWD();
+void   HOOK_PreFxRender();
+void   HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState();
 void HOOK_CTrafficLights_GetSecondaryLightState();
@@ -628,7 +629,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
-    HookInstall(HOOKPOS_CGame_Process_End, (DWORD)HOOK_CGame_Process_End, 5);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
@@ -734,6 +734,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1983,24 +1984,35 @@ void CMultiplayerSA::ResetSunSize()
     MemPut<BYTE>(0x55FA9F, 0x3C);
 }
 
-void CMultiplayerSA::SetCloudsEnabled(bool bDisabled)
+void CMultiplayerSA::SetCloudsEnabled(bool bEnabled)
 {
     // volumetric clouds
-    if (bDisabled)
+    if (bEnabled)
         MemPut<BYTE>(0x716380, 0xA1);
     else
         MemPut<BYTE>(0x716380, 0xC3);
 
-    // normal clouds
-    // 0071395A     90             NOP
-    if (bDisabled)
-        MemPut<BYTE>(0x713950, 0x83);
+    // bottom clouds
+    if (bEnabled)
+        MemPut<BYTE>(0x7154B0, 0x83);
     else
-        MemPut<BYTE>(0x713950, 0xC3);
+        MemPut<BYTE>(0x7154B0, 0xC3);
+
+    // skyline clouds
+    if (bEnabled)
+    {
+        MemPut<BYTE>(0x71411A, 0xD9);
+        MemPut<BYTE>(0x71411B, 0x41);
+        MemPut<BYTE>(0x71411C, 0x08);
+    }
+    else
+    {
+        MemSet((void*)0x71411A, 0x90, 3);
+    }
 
     // plane trails (not really clouds, but they're sort of vapour)
 
-    if (bDisabled)
+    if (bEnabled)
     {
         MemPut<BYTE>(0x717180, 0x83);
         MemPut<BYTE>(0x717181, 0xEC);
@@ -2215,6 +2227,11 @@ void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
 {
     m_pPreHudRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetBlendAnimationHandler(BlendAnimationHandler* pHandler)
+{
+    m_pBlendAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
@@ -4050,7 +4067,7 @@ void                        GetVehicleDriveType()
 }
 
 static CTransmission* pCurTransmission = nullptr;
-static ::byte*          pCurGear = nullptr;
+static ::byte*        pCurGear = nullptr;
 
 void CheckVehicleMaxGear()
 {
@@ -4656,29 +4673,14 @@ void _declspec(naked) HOOK_CGame_Process()
     }
 
     TIMING_CHECKPOINT("+CWorld_Process");
+    if (m_pPreWorldProcessHandler)
+        m_pPreWorldProcessHandler();
 
     _asm
     {
         popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
-        pushad
-    }
-
-    if (m_pPreWorldProcessHandler) m_pPreWorldProcessHandler();
-
-    _asm
-    {
-        popad
-        jmp     RETURN_CGame_Process;
-    }
-}
-
-DWORD CALL_CWaterLevel_PreRenderWater = 0x6EB710;
-void _declspec(naked) HOOK_CGame_Process_End()
-{
-    _asm
-    {
         pushad
     }
 
@@ -4689,14 +4691,7 @@ void _declspec(naked) HOOK_CGame_Process_End()
     _asm
     {
         popad
-        call    CALL_CWaterLevel_PreRenderWater
-        pushad
-    }
-
-    _asm
-    {
-        popad
-        jmp     RETURN_CGame_Process_End;
+        jmp     RETURN_CGame_Process;
     }
 }
 
@@ -4706,9 +4701,9 @@ void __cdecl HandleIdle()
     if (!bAnimGroupArrayAddressLogged)
     {
         bAnimGroupArrayAddressLogged = true;
-        DWORD  dwAnimGroupArrayAddress = 0xb4ea34;
+        DWORD dwAnimGroupArrayAddress = 0xb4ea34;
         LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
-            SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
+                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
     m_pIdleHandler();
 }
@@ -5396,6 +5391,42 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
             cmp     esi, 16h
             jmp     RETURN_CPed_GetWeaponSkill
         }
+    }
+}
+
+bool _cdecl OnCAnimManagerBlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    if (m_pBlendAnimationHandler)
+    {
+        return m_pBlendAnimationHandler(pClump, animGroup, animID, fBlendData);
+    }
+    return true;
+}
+
+void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
+{
+    _asm
+    {
+        push    ebp
+        mov     ebp, esp
+
+        push    [ebp + 20]
+        push    [ebp + 16]
+        push    [ebp + 12]
+        push    [ebp + 8]
+        call    OnCAnimManagerBlendAnimation
+        add     esp, 4 * 4
+
+        pop     ebp
+        test    al, al
+        jnz     standardcode
+        mov     eax, 0
+        retn
+
+        standardcode:
+        sub     esp, 14h
+        mov     ecx, [esp + 18h]
+        jmp     RETURN_CAnimManager_BlendAnimation
     }
 }
 

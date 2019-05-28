@@ -263,6 +263,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(CClientGame::StaticAssocGroupCopyAnimationHandler);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(CClientGame::StaticBlendAnimationHierarchyHandler);
+    g_pMultiplayer->SetBlendAnimationHandler(CClientGame::StaticBlendAnimationHandler);
     g_pMultiplayer->SetProcessCollisionHandler(CClientGame::StaticProcessCollisionHandler);
     g_pMultiplayer->SetVehicleCollisionHandler(CClientGame::StaticVehicleCollisionHandler);
     g_pMultiplayer->SetVehicleDamageHandler(CClientGame::StaticVehicleDamageHandler);
@@ -346,6 +347,9 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
+
+    // Setup builtin Lua events
+    SetupGlobalLuaEvents();
 }
 
 CClientGame::~CClientGame()
@@ -428,6 +432,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(NULL);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(NULL);
+    g_pMultiplayer->SetBlendAnimationHandler(nullptr);
     g_pMultiplayer->SetProcessCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleDamageHandler(NULL);
@@ -2384,7 +2389,7 @@ bool CClientGame::CharacterKeyHandler(WPARAM wChar)
         if (wChar >= 32)
         {
             // Generate a null-terminating string for our character
-            wchar_t wUNICODE[2] = {wChar, '\0'};
+            wchar_t wUNICODE[2] = {static_cast<wchar_t>(wChar), '\0'};
 
             // Convert our UTF character into an ANSI string
             SString strANSI = UTF16ToMbUTF8(wUNICODE);
@@ -2831,6 +2836,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientGUIBlur", "", NULL, false);
     m_Events.AddEvent("onClientKey", "key, state", NULL, false);
     m_Events.AddEvent("onClientCharacter", "character", NULL, false);
+    m_Events.AddEvent("onClientPaste", "clipboardText", NULL, false);
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
@@ -3600,6 +3606,26 @@ void CClientGame::Event_OnIngameAndConnected()
     m_pNetAPI->RPC(PLAYER_INGAME_NOTICE);
 }
 
+void CClientGame::SetupGlobalLuaEvents()
+{
+    // Setup onClientPaste event
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
+        // Don't trigger if main menu or console is open or the cursor is not visible
+        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+            return;
+
+        // Also don't trigger if remote web browser view is focused
+        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+            return;
+        
+        // Call event now
+        CLuaArguments args;
+        args.PushString(clipboardText);
+        m_pRootEntity->CallEvent("onClientPaste", args, false);
+    });
+}
+
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
 {
     return g_pClientGame->BreakTowLinkHandler(pTowingVehicle);
@@ -3671,6 +3697,11 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
                                                        int* pFlags, RpClump* pClump)
 {
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
+}
+
+bool CClientGame::StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    return g_pClientGame->BlendAnimationHandler(pClump, animGroup, animID, fBlendData);
 }
 
 void CClientGame::StaticPreWorldProcessHandler()
@@ -3910,13 +3941,14 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
+
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
@@ -3999,15 +4031,15 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if ((DWORD)pAnimAssocGroupInterface < 0x250)
     {
         g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
-            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
     }
-  
+
     auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
 
     if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
     {
         g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
-            SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
     int  iGroupID = pAnimAssocGroup->GetGroupID();
@@ -4084,6 +4116,26 @@ bool CClientGame::BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterfac
         pClientPed->SetNextAnimationNormal();
     }
     return isCustomAnimationToPlay;
+}
+
+bool CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
+{
+    CClientPed* pClientPed = GetClientPedByClump(*pClump);
+    if (pClientPed != nullptr)
+    {
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        {
+            // check for idle animation
+            if (animID == 3)
+            {
+                if ((animGroup == 0) || (animGroup >= 54 && animGroup <= 70) || (animGroup >= 118))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)
@@ -4951,7 +5003,11 @@ void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAni
         CClientPed* pPed = it->second;
         if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
         {
-            pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+            if (pPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+            {
+                pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+                pPed->SetTaskToBeRestoredOnAnimEnd(false);
+            }
         }
         m_mapOfRunNamedAnimTasks.erase(pTask);
     }
@@ -5654,10 +5710,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistance();
+    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistance();
+    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();
