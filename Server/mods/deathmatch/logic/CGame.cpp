@@ -3898,6 +3898,7 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     Arguments.PushString(pPlayer->GetSerial().c_str());
     Arguments.PushNumber(pPlayer->GetMTAVersion());
     Arguments.PushString(pPlayer->GetPlayerVersion());
+    Arguments.PushString(pPlayer->GetLocalization());
     if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerConnect", Arguments))
     {
         // event cancelled, disconnect the player
