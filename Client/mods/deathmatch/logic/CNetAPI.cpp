@@ -406,10 +406,7 @@ void CNetAPI::DoPulse()
                 // Display network trouble
                 m_bIsNetworkTrouble = true;
             }
-        }
 
-        if (pPlayer)
-        {
             // Do camera sync even if player is dead
             if (IsCameraSyncNeeded())
             {
