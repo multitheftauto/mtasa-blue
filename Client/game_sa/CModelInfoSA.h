@@ -137,37 +137,40 @@ public:
     unsigned char  ucAlpha : 8;                         // +12
 
     unsigned char  ucNumOf2DEffects : 8;            // +13
-    unsigned short usUnknown : 16;                  // +14     Something with 2d effects
+    unsigned short us2dfxIndex : 16;                  // +14   
 
-    unsigned char ucDynamicIndex : 8;            // +16
-
-    unsigned char dwUnknownFlag9 : 1;            // +17
-    unsigned char dwUnknownFlag10 : 1;
-    unsigned char dwUnknownFlag11 : 1;
-    unsigned char dwUnknownFlag12 : 1;
-    unsigned char dwUnknownFlag13 : 1;
-    unsigned char dwUnknownFlag14 : 1;
-    unsigned char dwUnknownFlag15 : 1;
-    unsigned char dwUnknownFlag16 : 1;
+    unsigned short usObjectInfoIndex : 16;            // +16
 
     // Flags used by CBaseModelInfo
-    unsigned char bHasBeenPreRendered : 1;            // +18
-    unsigned char bAlphaTransparency : 1;
-    unsigned char bIsLod : 1;
-    unsigned char bDontWriteZBuffer : 1;
-    unsigned char bDontCastShadowsOn : 1;
-    unsigned char bDrawAdditive : 1;
-    unsigned char bDrawLast : 1;
-    unsigned char bDoWeOwnTheColModel : 1;
+    union
+    {
+        unsigned short m_nFlags;
+        struct
+        {
+            unsigned char m_nFlagsByte1;
+            unsigned char m_nFlagsBtye2;
+        };
+        struct
+        {
+            unsigned char bHasBeenPreRendered : 1;            // +18
+            unsigned char bAlphaTransparency : 1;
+            unsigned char bIsLod : 1;
+            unsigned char bDontWriteZBuffer : 1;
+            unsigned char bDontCastShadowsOn : 1;
+            unsigned char bDrawAdditive : 1;
+            unsigned char bDrawLast : 1;
+            unsigned char bDoWeOwnTheColModel : 1;
 
-    unsigned char dwUnknownFlag25 : 1;            // +19
-    unsigned char dwUnknownFlag26 : 1;
-    unsigned char dwUnknownFlag27 : 1;
-    unsigned char bSwaysInWind : 1;
-    unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
-    unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
-    unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
-    unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+            unsigned char dwUnknownFlag25 : 1;            // +19
+            unsigned char dwUnknownFlag26 : 1;
+            unsigned char dwUnknownFlag27 : 1;
+            unsigned char bSwaysInWind : 1;
+            unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
+            unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
+            unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
+            unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+        };
+    };
 
     CColModelSAInterface* pColModel;            // +20      CColModel: public CBoundingBox
 
