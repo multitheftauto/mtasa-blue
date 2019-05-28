@@ -633,7 +633,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
             // Append localization
-            if (BitStream.Version() >= 0x06D)
+            if (pBitStream->Version() >= 0x06D)
                 pBitStream->WriteString(g_pCore->GetLocalization()->GetLanguageCode());
 
             // Send the packet as joindata
