@@ -592,28 +592,13 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump *))0x74A5E0;
 
-    
-    // REMOVE THIS LATER
-    char theDFFName[] = "banshee.dff";
-    memcpy(newFile->fileEntry->fileName, theDFFName, strlen(theDFFName) + 1);
-    // REMOVE END
-    
-
-    
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
-    /*auto it = setOfIgnoredDffNameHashes.find(uiDFFNameHash);
-    if (it != setOfIgnoredDffNameHashes.end())
-    {
-        return; // ignore it
-    }*/
-    
 
     SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
     {
         return;
     }
-
 
     STXDDescriptor* pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
@@ -632,31 +617,21 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     int modelID = pDFFDescriptor->GetModelID();
 
-  /*  if (IsVehicleModel(modelID))
+    if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
     }
-    */
+    
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
+    pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
-    // rEMOVE THIS LATER
-    //bool bLoadCollision = false;
-    //REMOVE END
-
-  
     bool bLoadCollision = IsVehicleModel(modelID);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, nullptr);
-    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, nullptr);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+    pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
-        unsigned int clumpSize = 25000; // RpClumpStreamGetSize(pClump);
-
-        // REMOVE THIS AFTER TESTING
-        /*if (bLoadCollision)
-        {
-            return; // ignore after testing, hmm
-        }*/
-        // REMOVE END
+        unsigned int clumpSize =  RpClumpStreamGetSize(pClump);
 
         // there's still an issue with size of empty extension headers of 12 btytes for clump
         clumpSize += 24;
@@ -671,10 +646,15 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
         void* pData = newFile->fileByteBuffer.GetData();
-       // pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
+        pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
         //SString strPathOfGeneratedDff = "dffs\\";
         //pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump, pDFFDescriptor->GetModelID(), bLoadCollision);
+
+        if (bLoadCollision)
+        {
+            pRenderWare->DeleteReadDFFCollisionModel();
+        }
 
         pRenderWare->DestroyDFF(pClump);
         
@@ -697,9 +677,9 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIDELoader ideLoader;
     
-    //CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
+    CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
     
-    CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
+    //CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
     newIMgArchive->ReadEntries();
 
     ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
@@ -709,7 +689,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 1; i++) // newIMgArchive->GetFileCount() crash if total file count is 13 for vehicles img (banshee.dff)
+    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++) // newIMgArchive->GetFileCount() crash if total file count is 13 for vehicles img (banshee.dff)
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)

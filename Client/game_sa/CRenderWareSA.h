@@ -154,6 +154,8 @@ public:
 
     void SetCurrentDFFBeingGeneratedFileName(SString& strDFFName);
     void SetCurrentDFFWriteModelID(int modelID);
+    void SetCurrentReadDFFWithoutReplacingCOL(bool bReadWithoutReplacingCOL);
+    void DeleteReadDFFCollisionModel();
 
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;

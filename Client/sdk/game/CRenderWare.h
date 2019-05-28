@@ -108,4 +108,6 @@ public:
 
     virtual void     SetCurrentDFFBeingGeneratedFileName(SString& strDFFName) = 0;
     virtual void     SetCurrentDFFWriteModelID(int modelID) = 0;
+    virtual void     SetCurrentReadDFFWithoutReplacingCOL(bool bReadWithoutReplacingCOL) = 0;
+    virtual void     DeleteReadDFFCollisionModel() = 0;
 };
