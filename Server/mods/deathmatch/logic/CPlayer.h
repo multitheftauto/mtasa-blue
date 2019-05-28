@@ -96,6 +96,9 @@ public:
     void           SetPlayerVersion(const SString& strPlayerVersion);
     const SString& GetPlayerVersion() { return m_strPlayerVersion; };
 
+    void           SetLocalization(const SString& strLocalization) { m_strLocalization = strLocalization; };
+    const SString& GetLocalization() { return m_strLocalization; };
+    
     bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
     bool IsJoined() { return m_bIsJoined; }
@@ -355,6 +358,8 @@ private:
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
+
+    SString        m_strLocalization;
 
     bool m_bNametagColorOverridden;
 

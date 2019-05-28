@@ -43,6 +43,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerACInfo", GetPlayerACInfo},
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
+        {"getPlayerLocalization", GetPlayerLocalization},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -173,6 +174,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraInterior", "getCameraInterior");
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
+    lua_classfunction(luaVM, "getLocalization", "getPlayerLocalization");
 
     lua_classvariable(luaVM, "account", NULL, "getPlayerAccount");
     lua_classvariable(luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior");
@@ -195,6 +197,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "mapForced", "forcePlayerMap", "isPlayerMapForced");
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
+    lua_classvariable(luaVM, "localization", nullptr, "getPlayerLocalization");
     // lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaPlayerDefs::SetPlayerNametagColor,
     // OOP_GetPlayerNametagColor ); lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue",
     // CLuaPlayerDefs::SetPlayerAnnounceValue, OOP_GetPlayerAnnounceValue ); // .announceValue[key]=value lua_classvariable ( luaVM, "hudComponent",
@@ -231,7 +234,7 @@ int CLuaPlayerDefs::CanPlayerUseFunction(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 {
     //  string getPlayerName ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -260,7 +263,7 @@ int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerIP(lua_State* luaVM)
 {
     //  string getPlayerIP ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -310,7 +313,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 {
     //  account getPlayerAccount ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2137,6 +2140,25 @@ int CLuaPlayerDefs::PreloadMissionAudio(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPlayerDefs::GetPlayerLocalization(lua_State* luaVM)
+{
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushstring(luaVM, pPlayer->GetLocalization().c_str());
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

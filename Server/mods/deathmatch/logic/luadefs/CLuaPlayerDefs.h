@@ -46,6 +46,7 @@ public:
     LUA_DECLARE(GetPlayerAccount);
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
+    LUA_DECLARE(GetPlayerLocalization);
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);

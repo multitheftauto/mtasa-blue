@@ -1704,6 +1704,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 pPlayer->SetSerial(strSerial, 0);
                                 pPlayer->SetSerial(strExtra, 1);
                                 pPlayer->SetPlayerVersion(strPlayerVersion);
+                                pPlayer->SetLocalization(Packet.GetLocalization());
 
                                 // Check if client must update
                                 if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()))
