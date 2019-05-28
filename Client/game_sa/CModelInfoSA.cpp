@@ -595,15 +595,16 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
     // So, to ensure the maximum draw distance with a working alpha fade-in, fLodDistanceUnscaled has to be
     // no more than: 325 - (325-170) * draw_distance_setting
     //
+    if (!bOverrideMaxDistance) {
+        // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
+        float fDrawDistanceSetting = UnlerpClamped(0.925f, CSettingsSA().GetDrawDistance(), 1.8f);
 
-    // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
-    float fDrawDistanceSetting = UnlerpClamped ( 0.925f, CSettingsSA ().GetDrawDistance (), 1.8f );
+        // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
+        float fMaximumValue = Lerp(325.f, fDrawDistanceSetting, 170.f);
 
-    // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
-    float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
-
-    // Ensure fDistance is in range
-    fDistance = std::min ( fDistance, fMaximumValue );
+        // Ensure fDistance is in range
+        fDistance = std::min(fDistance, fMaximumValue);
+    }
 #endif
     if (!bOverrideMaxDistance) {
         // Limit to 325.f as it goes horrible after that
