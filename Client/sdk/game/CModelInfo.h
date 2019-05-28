@@ -125,6 +125,7 @@ public:
     virtual bool           IsValid() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
+    virtual float          GetOriginalLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance) = 0;
     virtual void           RestreamIPL() = 0;
 

@@ -27,6 +27,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreAnimation", EngineRestoreAnimation},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineResetModelLODDistance", EngineResetModelLODDistance},
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
@@ -58,6 +59,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "restoreModel", "engineRestoreModel");
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
+    lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -595,6 +597,31 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     {
         unsigned short usModelID = CModelNames::ResolveModelID(strModel);
         CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+        if (pModelInfo && fDistance > 0.0f)
+        {
+            pModelInfo->SetLODDistance(fDistance);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
+{
+    SString          strModel = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModel);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+        CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+        float          fDistance = pModelInfo->GetOriginalLODDistance();
         if (pModelInfo && fDistance > 0.0f)
         {
             pModelInfo->SetLODDistance(fDistance);
