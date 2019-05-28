@@ -567,12 +567,8 @@ float CModelInfoSA::GetLODDistance()
 float CModelInfoSA::GetOriginalLODDistance()
 {
     // Return default LOD distance value (if doesn't exist, LOD distance hasn't been changed)
-    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID)) {
-        float fDistance = MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
-        // Check that we're not setting the same LOD distance value
-        if (fDistance != this->GetLODDistance())
-            return fDistance;
-    }
+    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID))
+        return MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
 
     return 0.0f;
 }
