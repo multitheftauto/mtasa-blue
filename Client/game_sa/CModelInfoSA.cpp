@@ -566,16 +566,18 @@ float CModelInfoSA::GetLODDistance()
 
 float CModelInfoSA::GetOriginalLODDistance()
 {
-    // Return default value if set (if not set, LOD distance has not changed)
-    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID))
-    {
-        return MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+    // Return default LOD distance value (if doesn't exist, LOD distance hasn't been changed)
+    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID)) {
+        float fDistance = MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+        // Check that we're not setting the same LOD distance value
+        if (fDistance != this->GetLODDistance())
+            return fDistance;
     }
 
     return 0.0f;
 }
 
-void CModelInfoSA::SetLODDistance(float fDistance)
+void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
 {
 #if 0
     // fLodDistanceUnscaled values:
@@ -603,8 +605,11 @@ void CModelInfoSA::SetLODDistance(float fDistance)
     // Ensure fDistance is in range
     fDistance = std::min ( fDistance, fMaximumValue );
 #endif
-    // Limit to 325.f as it goes horrible after that
-    fDistance = std::min(fDistance, 325.f);
+    if (!bOverrideMaxDistance) {
+        // Limit to 325.f as it goes horrible after that
+        fDistance = std::min(fDistance, 325.f);
+    }
+
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
     {

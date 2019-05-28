@@ -126,7 +126,7 @@ public:
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
     virtual float          GetOriginalLODDistance() = 0;
-    virtual void           SetLODDistance(float fDistance) = 0;
+    virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
     virtual void           RestreamIPL() = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;

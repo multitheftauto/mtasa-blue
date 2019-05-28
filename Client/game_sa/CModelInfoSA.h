@@ -322,7 +322,7 @@ public:
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
     float          GetOriginalLODDistance();
-    void           SetLODDistance(float fDistance);
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();

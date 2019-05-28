@@ -614,7 +614,6 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 {
     SString          strModel = "";
-    float            fDistance = 0.0f;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModel);
 
@@ -624,10 +623,13 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
         CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
         if (pModelInfo)
         {
-            fDistance = pModelInfo->GetOriginalLODDistance();
-            pModelInfo->SetLODDistance(fDistance);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            float fDistance = pModelInfo->GetOriginalLODDistance();
+            //Make sure we're dealing with a valid LOD distance
+            if (fDistance > 0.0f) {
+                pModelInfo->SetLODDistance(fDistance, true);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
