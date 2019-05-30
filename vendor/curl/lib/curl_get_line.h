@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_HTTP_NTLM_H
-#define HEADER_CURL_HTTP_NTLM_H
+#ifndef HEADER_CURL_GET_LINE_H
+#define HEADER_CURL_GET_LINE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -22,19 +22,8 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+/* get_line() makes sure to only return complete whole lines that fit in 'len'
+ * bytes and end with a newline. */
+char *Curl_get_line(char *buf, int len, FILE *input);
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM)
-
-/* this is for ntlm header input */
-CURLcode Curl_input_ntlm(struct connectdata *conn, bool proxy,
-                         const char *header);
-
-/* this is for creating ntlm header output */
-CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy);
-
-void Curl_http_auth_cleanup_ntlm(struct connectdata *conn);
-
-#endif /* !CURL_DISABLE_HTTP && USE_NTLM */
-
-#endif /* HEADER_CURL_HTTP_NTLM_H */
+#endif /* HEADER_CURL_GET_LINE_H */
