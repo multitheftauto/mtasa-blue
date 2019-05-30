@@ -12,16 +12,17 @@
 #include <SharedUtil.Template.h>
 #include "lua/LuaBasic.h"
 
-template <auto*>
+template <bool, auto*>
 struct CLuaFunctionParser
 {
 };
 
-template <typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<Func>
+template <bool ErrorOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct CLuaFunctionParser<ErrorOnFailure, Func>
 {
     std::size_t iIndex = 1;
     bool        bFailed = false;
+    std::string strError = "todo fix error message";
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type
     // Pop may also throw a LuaArgumentError to indicate failure
@@ -151,7 +152,6 @@ struct CLuaFunctionParser<Func>
                     // TODO: resolve error
                     return map;
                 }
-                
 
                 std::size_t i = -2;
                 auto        k = PopUnsafe<key_t>(L, i);
@@ -219,5 +219,30 @@ struct CLuaFunctionParser<Func>
         }
     }
 
-    inline auto operator()(lua_State* L) { return Call(L); }
+    inline int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
+    {
+        int iResult = 0; 
+        try
+        {
+            Call(L);
+        }
+        catch (std::invalid_argument& e)
+        {
+            strError = e.what();
+        }
+        if (bFailed)
+        {
+            if constexpr (ErrorOnFailure)
+            {
+                luaL_error(L, strError.c_str());
+            }
+            else
+            {
+                pScriptDebugging->LogCustom(L, strError.c_str());
+                lua_pushboolean(L, false);
+            }
+            return 1;
+        }
+        return iResult;
+    }
 };
