@@ -3,12 +3,12 @@
 /**
     is_Nspecialization
 
-    These structs allow testing whether a type is a specialization of a 
+    These structs allow testing whether a type is a specialization of a
     class template
 
-    Note: Take care of optional parameters. For example std::unordered_map 
+    Note: Take care of optional parameters. For example std::unordered_map
     has 5 template arguments, thus is_5specialization needs to be used, rather
-    than is_2specialization (Key, Value). 
+    than is_2specialization (Key, Value).
 **/
 
 template <typename Test, template <typename> class Ref>
@@ -44,6 +44,19 @@ struct is_5specialization<Ref<Arg1, Arg2, Arg3, Arg4, Arg5>, Ref> : std::true_ty
 {
     using param1_t = Arg1;
     using param2_t = Arg2;
+};
+
+template <typename Test>
+struct is_variant : std::false_type
+{
+};
+
+template <typename Arg1, typename... Args>
+struct is_variant<std::variant<Arg1, Args...>> : std::true_type
+{
+    using param1_t = Arg1;
+    using rest_t = std::variant<Args...>;
+    static constexpr auto count = sizeof...(Args) + 1;
 };
 
 /**

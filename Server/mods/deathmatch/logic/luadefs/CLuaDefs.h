@@ -31,6 +31,7 @@
 #include "../CVehicleManager.h"
 #include "../CRegistry.h"
 #include "../CDatabaseManager.h"
+#include <lua/CLuaFunctionParser.h>
 
 // Used by script handlers to verify elements
 #define SCRIPT_VERIFY_BLIP(blip) (m_pBlipManager->Exists(blip)&&!blip->IsBeingDeleted())
