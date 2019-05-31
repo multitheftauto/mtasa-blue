@@ -11,6 +11,7 @@
 #include <optional>
 #include <variant>
 #include <SharedUtil.Template.h>
+#include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/LuaBasic.h"
 
 template <bool, auto*>
@@ -240,7 +241,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
         {
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
-            void* pValue = PopTrivial<void*>(L, index);
+            void* pValue = lua::PopTrivial<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
             T result = nullptr;
             if (isLightUserData)

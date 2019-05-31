@@ -30,6 +30,16 @@ namespace lua
     // The return value must be the amount of items pushed to the stack, which should
     // be 1 for trivial types (e.g. Push<int>) but may be any number for special cases
     // like tuples
+    
+    int Push(lua_State* L, int val);
+    int Push(lua_State* L, const std::string& val);
+    int Push(lua_State* L, bool val);
+    int Push(lua_State* L, std::nullptr_t);
+    int Push(lua_State* L, float val);
+    int Push(lua_State* L, double val);
+    int Push(lua_State* L, unsigned int val);
+    int Push(lua_State* L, unsigned short val);
+
 
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
@@ -86,12 +96,4 @@ namespace lua
         return 1;
     }
 
-    int Push(lua_State* L, int val);
-    int Push(lua_State* L, const std::string& val);
-    int Push(lua_State* L, bool val);
-    int Push(lua_State* L, nullptr_t);
-    int Push(lua_State* L, float val);
-    int Push(lua_State* L, double val);
-    int Push(lua_State* L, unsigned int val);
-    int Push(lua_State* L, unsigned short val);
 }
