@@ -6,7 +6,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#pragma once 
+#pragma once
 
 #include <optional>
 #include <variant>
@@ -23,8 +23,103 @@ template <bool ErrorOnFailure, typename Ret, typename... Args, auto (*Func)(Args
 struct CLuaFunctionParser<ErrorOnFailure, Func>
 {
     std::size_t iIndex = 1;
-    bool        bFailed = false;
-    std::string strError = "todo fix error message";
+    std::string strError = "";
+    std::string strErrorFoundType = "";
+
+    template <typename T>
+    inline void typeToNameVariant(SString& accumulator)
+    {
+        using param = typename is_variant<T>::param1_t;
+        if (accumulator.length() == 0)
+            accumulator = typeToName<param>();
+        else 
+            accumulator += "/" + typeToName<param>();
+
+        if constexpr (is_variant<T>::count != 1)
+            return typeToNameVariant<is_variant<T>::rest_t>(accumulator);
+    }
+
+    template <typename T>
+    inline SString typeToName()
+    {
+        if constexpr (std::is_same_v<T, std::string>)
+            return "string";
+        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
+                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
+            return "number";
+        else if constexpr (std::is_same_v<T, bool>)
+            return "boolean";
+        else if constexpr (std::is_enum_v<T>)
+            return "enum";
+        else if constexpr (is_specialization<T, std::optional>::value)
+        {
+            using param_t = typename is_specialization<T, std::optional>::param_t;
+            return typeToName<param_t>();
+        }
+        else if constexpr (is_2specialization<T, std::vector>::value)
+            return "table";
+        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+            return "table";
+        else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
+            return "function";
+        else if constexpr (std::is_same_v<T, lua_State*>)
+            return "";            // not reachable
+        else if constexpr (is_variant<T>::value)
+        {
+            SString strTypes;
+            typeToNameVariant<T>(strTypes);    
+            return strTypes;
+        }
+
+        else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
+            return GetClassTypeName((T)0);
+    }
+
+    static SString ResolveParameter(lua_State* L, std::size_t index)
+    {
+        switch (lua_type(L, index))
+        {
+            case LUA_TNUMBER:
+                return SString("number (%d)", lua_tonumber(L, index));
+            case LUA_TSTRING:
+            {
+                std::size_t iLen;
+                const char* szValue = lua_tolstring(L, index, &iLen);
+                std::string strValue(szValue, iLen);
+                if (strValue.length() > 10)
+                {
+                    strValue.resize(10);            // Limit to 10 characters
+                    strValue[9] = '.';
+                    strValue[8] = '.';
+                    strValue[7] = '.';
+                }
+                // Avoid printing binary data
+                if (std::find_if(strValue.begin(), strValue.end(), [](char ch) { return !(std::isprint(ch)); }) != strValue.end())
+                    return "string";
+                else
+                {
+                    return SString("string (\"%s\")", strValue.c_str());
+                }
+            }
+            case LUA_TBOOLEAN:
+                return SString("boolean (%s)", lua_toboolean(L, index) == 1 ? "true" : "false");
+            case LUA_TNIL:
+                return "nil";
+            case LUA_TNONE:
+                return "none";
+            case LUA_TTABLE:
+                return "table";
+            case LUA_TFUNCTION:
+                return "function";
+            case LUA_TTHREAD:
+                return "coroutine";
+            case LUA_TUSERDATA:
+                return GetUserDataClassName(*((void**)lua_touserdata(L, index)), L);
+            case LUA_TLIGHTUSERDATA:
+                return GetUserDataClassName(lua_touserdata(L, index), L);
+        }
+        return "";
+    }
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type
     // Pop may also throw a LuaArgumentError to indicate failure
@@ -33,8 +128,10 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
     {
         if (!TypeMatch<T>(L, index))
         {
-            // TODO: resolve error
-            bFailed = true;
+            SString strReceived = ResolveParameter(L, index);
+            SString strExpected = typeToName<T>();
+            SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+            strError = strMessage;
             return T{};
         }
         return PopUnsafe<T>(L, index);
@@ -80,7 +177,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
 
-        // advanced types
+        // Advanced types
         // Enums are represented as strings to Lua
         if constexpr (std::is_enum_v<T>)
             return iArgument == LUA_TSTRING;
@@ -162,8 +259,10 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
                 return eValue;
             else
             {
-                bFailed = true;
-                // TODO: resolve error
+                SString strReceived = ResolveParameter(L, index);
+                SString strExpected = GetEnumTypeName((T)0);
+                SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+                strError = strMessage;
                 return static_cast<T>(0);
             }
         }
@@ -184,11 +283,11 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
             lua_pushnil(L); /* first key */
             while (lua_next(L, index) != 0)
             {
-                if (!TypeMatch<param>(L, -1) || !TypeMatch<int>(L, -2))
+                if (!TypeMatch<param>(L, -1))
                 {
-                    bFailed = true;
-                    // TODO: resolve error
-                    return vecData;
+                    // skip
+                    lua_pop(L, 1);
+                    continue;
                 }
 
                 std::size_t i = -1;
@@ -208,9 +307,9 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
             {
                 if (!TypeMatch<value_t>(L, -1) || !TypeMatch<key_t>(L, -2))
                 {
-                    bFailed = true;
-                    // TODO: resolve error
-                    return map;
+                    // skip
+                    lua_pop(L, 1);
+                    continue;
                 }
 
                 std::size_t i = -2;
@@ -243,29 +342,24 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopTrivial<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
-            T result = nullptr;
-            if (isLightUserData)
-            {
-                result = UserDataCast<class_t>((class_t*)0, pValue, L);
-            }
-            else
-            {
-                result = UserDataCast<class_t>((class_t*)0, *reinterpret_cast<void**>(pValue), L);
-            }
+            auto result =
+                isLightUserData ? UserDataCast<class_t>((class_t*)0, pValue, L) : UserDataCast<class_t>((class_t*)0, *reinterpret_cast<void**>(pValue), L);
             if (result == nullptr)
             {
-                bFailed = true;
-                // TODO: resolve error
+                SString strReceived = isLightUserData ? GetUserDataClassName(pValue, L) : GetUserDataClassName(*(void**)pValue, L);
+                SString strExpected = GetClassTypeName((T)0);
+                SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+                strError = strMessage;
                 return nullptr;
             }
-            return result;
+            return static_cast<T>(result);
         }
     }
 
     template <typename... Params>
     inline auto Call(lua_State* L, Params&&... ps)
     {
-        if (bFailed)
+        if (strError.length() != 0)
         {
             return -1;
         }
@@ -298,7 +392,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         {
             strError = e.what();
         }
-        if (bFailed)
+        if (strError.length() != 0)
         {
             if constexpr (ErrorOnFailure)
             {

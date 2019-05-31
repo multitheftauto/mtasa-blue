@@ -11,7 +11,6 @@
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
 
-
 void CLuaCryptDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
