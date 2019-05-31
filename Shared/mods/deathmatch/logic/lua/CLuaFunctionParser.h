@@ -38,6 +38,29 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         return PopUnsafe<T>(L, index);
     }
 
+    // Special type matcher for variants. Returns -1 if the type does not match
+    // returns n if the nth type of the variant matches
+    template <typename T>
+    inline int TypeMatchVariant(lua_State* L, std::size_t index)
+    {
+        if constexpr (std::is_same_v<T, std::variant<>>)
+            return -1;
+        else
+        {
+            using first_t = typename is_variant<T>::param1_t;
+            using next_t = typename is_variant<T>::rest_t;
+            if (TypeMatch<first_t>(L, index))
+                return 0;
+            else
+            {
+                int iResult = TypeMatchVariant<next_t>(L, index);
+                if (iResult == -1)
+                    return -1;
+                return 1 + iResult;
+            }
+        }
+    }
+
     // TypeMatch<T> should return true if the value on top of the Lua stack can be popped via
     // PopUnsafe<T>. This must accurately reflect the associated PopUnsafe. Note that TypeMatch
     // should only check for obvious type violations (e.g. false is not a string) but not
@@ -52,6 +75,8 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
                       std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
+        if constexpr (std::is_same_v<T, bool>)
+            return (iArgument == LUA_TBOOLEAN);
 
         // advanced types
         // Enums are represented as strings to Lua
@@ -80,10 +105,43 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         if constexpr (std::is_same_v<T, lua_State*>)
             return true;
 
+        // variants can be used by any of the underlying types
+        // thus recursively use this function
+        if constexpr (is_variant<T>::value)
+            return TypeMatchVariant<T>(L, index) != -1;
+
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+    }
+
+    // Special PopUnsafe for variants
+    template <typename T, std::size_t currIndex = 0>
+    inline T PopUnsafeVariant(lua_State* L, std::size_t& index, int vindex)
+    {
+        // As std::variant<> cannot be constructed, we simply return the first value
+        // in the error case. This is actually unreachable in the regular path,
+        // due to TypeMatch making sure that vindex < is_variant<T>::count
+        if constexpr (is_variant<T>::count == currIndex)
+        {
+            using type_t = typename is_variant<T>::param1_t;
+            return type_t{};
+        }
+        else
+        {
+            // If we have reached the target index, pop the right value
+            // else go to the next type
+            if (vindex == currIndex)
+            {
+                using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
+                return PopUnsafe<type_t>(L, index);
+            }
+            else
+            {
+                return PopUnsafeVariant<T, currIndex + 1>(L, index, vindex);
+            }
+        }
     }
 
     template <typename T>
@@ -91,7 +149,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
     {
         // trivial types are directly popped
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> ||
-                      std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
+                      std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, bool>)
             return lua::PopTrivial<T>(L, index);
         else if constexpr (std::is_enum_v<T>)
         {
@@ -166,8 +224,16 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         {
             return luaM_toref(L, index++);
         }
-        if constexpr (std::is_same_v<T, lua_State*>)
+        else if constexpr (std::is_same_v<T, lua_State*>)
             return L;
+        // variants can be used by any of the underlying types
+        // thus recursively use this function
+        else if constexpr (is_variant<T>::value)
+        {
+            int iMatch = TypeMatchVariant<T>(L, index);
+            return PopUnsafeVariant<T>(L, index, iMatch);
+        }
+
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
@@ -221,10 +287,10 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
 
     inline int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
     {
-        int iResult = 0; 
+        int iResult = 0;
         try
         {
-            Call(L);
+            iResult = Call(L);
         }
         catch (std::invalid_argument& e)
         {

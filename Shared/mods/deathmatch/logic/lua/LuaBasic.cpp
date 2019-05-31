@@ -16,10 +16,31 @@ namespace lua
         lua_pushnumber(L, value);
         return 1;
     }
+    int Push(lua_State* L, unsigned int value)
+    {
+        lua_pushnumber(L, value);
+        return 1;
+    }
+    int Push(lua_State* L, float value)
+    {
+        lua_pushnumber(L, value);
+        return 1;
+    }
+    int Push(lua_State* L, double value)
+    {
+        lua_pushnumber(L, value);
+        return 1;
+    }
 
     int Push(lua_State* L, bool value)
     {
         lua_pushboolean(L, value);
+        return 1;
+    }
+
+    int Push(lua_State* L, nullptr_t)
+    {
+        lua_pushnil(L);
         return 1;
     }
 
@@ -43,6 +64,30 @@ namespace lua
     int PopTrivial<int>(lua_State* L, std::size_t& index)
     {
         return static_cast<int>(lua_tonumber(L, index++));
+    }
+
+    template <>
+    unsigned int PopTrivial<unsigned int>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<unsigned int>(lua_tonumber(L, index++));
+    }
+
+    template <>
+    float PopTrivial<float>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<float>(lua_tonumber(L, index++));
+    }
+
+    template <>
+    double PopTrivial<double>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<double>(lua_tonumber(L, index++));
+    }
+    
+    template <>
+    bool PopTrivial<bool>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<bool>(lua_toboolean(L, index++));
     }
 
     template <>

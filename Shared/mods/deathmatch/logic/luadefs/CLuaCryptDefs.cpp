@@ -35,7 +35,6 @@ void CLuaCryptDefs::LoadFunctions()
     }
 }
 
-
 std::string CLuaCryptDefs::Md5(std::string strMd5)
 {
     MD5        md5bytes;
