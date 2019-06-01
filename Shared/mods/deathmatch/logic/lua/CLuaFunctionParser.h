@@ -12,6 +12,7 @@
 #include <variant>
 #include <SharedUtil.Template.h>
 #include "lua/CLuaFunctionParseHelpers.h"
+#include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 
 template <bool, auto*>
@@ -246,6 +247,8 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
     template <typename T>
     inline T PopUnsafe(lua_State* L, std::size_t& index)
     {
+        // Expect no change in stack size
+        LUA_STACK_EXPECT(0); 
         // trivial types are directly popped
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> ||
                       std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, bool>)
