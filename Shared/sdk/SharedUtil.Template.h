@@ -78,4 +78,69 @@ struct nth_element_impl<0, T, Ts...>
 };
 
 template <std::size_t I, typename... Ts>
-using nth_element = typename nth_element_impl<I, Ts...>::type;
+using nth_element_t = typename nth_element_impl<I, Ts...>::type;
+
+
+// common_variant
+// common_variant builds a single variant from types or variants
+//  bool, bool -> variant<bool>
+//  int, bool -> variant<int, bool>
+//  variant<int, bool>, bool -> variant<int, bool>
+//  variant<int, bool>, float -> variant<int, bool, float>
+//  variant<int, bool>, variant<bool, float> -> variant<int, bool, float>
+//  variant<int, bool>, variant<bool, float, double> -> variant<int, bool, float, double>
+
+// Two different types
+//  int, bool -> variant<int, bool>
+template <typename T, typename U>
+struct common_variant
+{
+    using type = std::variant<T, U>;
+};
+
+// Identical types
+//  int, int -> variant<int>
+template <typename T>
+struct common_variant<T, T>
+{
+    using type = std::variant<T>;
+};
+
+// Type + Variant which starts with the Type
+//  int, variant<int> -> variant<int>
+template <typename T, typename... Ts>
+struct common_variant<T, std::variant<T, Ts...>>
+{
+    using type = std::variant<T, Ts...>;
+};
+
+// Variant + Empty = Variant
+template <typename... Ts>
+struct common_variant<std::variant<Ts...>, std::variant<>>
+{
+    using type = std::variant<Ts...>;
+};
+// Empty + Variant = Variant
+template <typename... Ts>
+struct common_variant<std::variant<>, std::variant<Ts...>>
+{
+    using type = std::variant<Ts...>;
+};
+
+template <typename T, typename... Ts>
+struct common_variant<T, std::variant<Ts...>>
+{
+    using type = std::conditional_t<std::is_convertible_v<T, std::variant<Ts...>>, std::variant<Ts...>, std::variant<T, Ts...>>;
+};
+
+template <typename T, typename... Ts>
+struct common_variant<std::variant<Ts...>, T>
+{
+    using type = typename common_variant<T, std::variant<Ts...>>::type;
+};
+
+template <typename T, typename... Ts, typename... Us>
+struct common_variant<std::variant<T, Ts...>, std::variant<Us...>>
+{
+    using type = typename common_variant<std::variant<Ts...>, typename common_variant<T, std::variant<Us...>>::type>::type;
+};

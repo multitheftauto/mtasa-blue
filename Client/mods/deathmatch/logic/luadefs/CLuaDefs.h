@@ -74,10 +74,23 @@ protected:
         return CLuaFunctionParser<false, T>()(L, m_pScriptDebugging);
     }
 
+    template <auto T, auto U>
+    static inline int ArgumentParserWarn(lua_State* L)
+    {
+        return CLuaFunctionParser<false, CLuaOverloadParser<T, U>::Call>()(L, m_pScriptDebugging);
+    }
+
     // New style: hard error on usage mistakes
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
         return CLuaFunctionParser<true, T>()(L, m_pScriptDebugging);
+    }
+
+    // Overload variant
+    template <auto T, auto U>
+    static inline int ArgumentParser(lua_State* L)
+    {
+        return CLuaFunctionParser<true, CLuaOverloadParser<T, U>::Call>()(L, m_pScriptDebugging);
     }
 };
