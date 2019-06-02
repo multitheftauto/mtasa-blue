@@ -162,11 +162,14 @@ static void hashkey(struct connectdata *conn, char *buf,
                     size_t len) /* something like 128 is fine */
 {
   const char *hostname;
+  long port = conn->remote_port;
 
   if(conn->bits.socksproxy)
     hostname = conn->socks_proxy.host.name;
-  else if(conn->bits.httpproxy)
+  else if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
     hostname = conn->http_proxy.host.name;
+    port = conn->port;
+  }
   else if(conn->bits.conn_to_host)
     hostname = conn->conn_to_host.name;
   else
@@ -175,7 +178,7 @@ static void hashkey(struct connectdata *conn, char *buf,
   DEBUGASSERT(len > 32);
 
   /* put the number first so that the hostname gets cut off if too long */
-  msnprintf(buf, len, "%ld%s", conn->port, hostname);
+  msnprintf(buf, len, "%ld%s", port, hostname);
 }
 
 void Curl_conncache_unlock(struct Curl_easy *data)

@@ -34,10 +34,12 @@
 #ifdef HAVE_NET_IF_H
 #include <net/if.h>
 #endif
+#ifdef HAVE_IPHLPAPI_H
+#include <Iphlpapi.h>
+#endif
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -439,7 +441,7 @@ CURLcode Curl_init_userdefined(struct Curl_easy *data)
 
   set->httpreq = HTTPREQ_GET; /* Default HTTP request */
   set->rtspreq = RTSPREQ_OPTIONS; /* Default RTSP request */
-#ifndef CURL_DISABLE_FILE
+#ifndef CURL_DISABLE_FTP
   set->ftp_use_epsv = TRUE;   /* FTP defaults to EPSV operations */
   set->ftp_use_eprt = TRUE;   /* FTP defaults to EPRT operations */
   set->ftp_use_pret = FALSE;  /* mainly useful for drftpd servers */
@@ -1991,7 +1993,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   }
   else {
     unsigned long port = strtoul(data->state.up.port, NULL, 10);
-    conn->remote_port = curlx_ultous(port);
+    conn->port = conn->remote_port = curlx_ultous(port);
   }
 
   (void)curl_url_get(uh, CURLUPART_QUERY, &data->state.up.query, 0);
@@ -2298,7 +2300,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
                             struct connectdata *conn, char *proxy,
                             curl_proxytype proxytype)
 {
-  char *portptr;
+  char *portptr = NULL;
   long port = -1;
   char *proxyuser = NULL;
   char *proxypasswd = NULL;
