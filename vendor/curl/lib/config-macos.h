@@ -263,9 +263,6 @@
 /* Define to 1 if you have the `getpass_r' function. */
 /* #undef HAVE_GETPASS_R */
 
-/* Define to 1 if you have the getpeername function. */
-#define HAVE_GETPEERNAME 1
-
 /* Define to 1 if you have the `getppid' function. */
 #define HAVE_GETPPID 1
 
@@ -280,9 +277,6 @@
 
 /* Define to 1 if you have the getservbyport_r function. */
 /* #undef HAVE_GETSERVBYPORT_R */
-
-/* Define to 1 if you have the getsockname function. */
-#define HAVE_GETSOCKNAME 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
@@ -328,7 +322,7 @@
 /* #undef HAVE_GSSMIT */
 
 /* Define to 1 if you have the <idn2.h> header file. */
-/* #undef HAVE_IDN2_H */
+#define HAVE_IDN2_H 1
 
 /* Define to 1 if you have the <ifaddrs.h> header file. */
 #define HAVE_IFADDRS_H 1
@@ -407,7 +401,7 @@
 #define HAVE_LIBGEN_H 1
 
 /* Define to 1 if you have the `idn2' library (-lidn2). */
-/* #undef HAVE_LIBIDN2 */
+#define HAVE_LIBIDN2 1
 
 /* Define to 1 if using libressl. */
 /* #undef HAVE_LIBRESSL */
@@ -816,7 +810,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin18.6.0"
+#define OS "x86_64-apple-darwin18.2.0"
 
 /* Name of package */
 #define PACKAGE "curl"
