@@ -96,6 +96,10 @@
 #  include "config-vxworks.h"
 #endif
 
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#  include "config-linux.h"
+#endif
+
 #endif /* HAVE_CONFIG_H */
 
 /* ================================================================ */
@@ -684,10 +688,6 @@ int netware_init(void);
 
 #ifdef CURL_WANTS_CA_BUNDLE_ENV
 #error "No longer supported. Set CURLOPT_CAINFO at runtime instead."
-#endif
-
-#if defined(USE_LIBSSH2) || defined(USE_LIBSSH) || defined(USE_WOLFSSH)
-#define USE_SSH
 #endif
 
 /*

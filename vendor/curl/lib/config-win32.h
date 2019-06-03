@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -154,11 +154,6 @@
 #define HAVE_WS2TCPIP_H 1
 #endif
 
-/* Define if you have the <Iphlpapi.h> header file. */
-#ifndef __SALFORDC__
-#define HAVE_IPHLPAPI_H 1
-#endif
-
 /* ---------------------------------------------------------------- */
 /*                        OTHER HEADER INFO                         */
 /* ---------------------------------------------------------------- */
@@ -189,12 +184,6 @@
 
 /* Define if you have the ftruncate function. */
 #define HAVE_FTRUNCATE 1
-
-/* Define to 1 if you have the `getpeername' function. */
-#define HAVE_GETPEERNAME 1
-
-/* Define to 1 if you have the getsockname function. */
-#define HAVE_GETSOCKNAME 1
 
 /* Define if you have the gethostbyaddr function. */
 #define HAVE_GETHOSTBYADDR 1
@@ -590,9 +579,8 @@ Vista
 #  endif
 #endif
 
-/* Availability of freeaddrinfo, getaddrinfo, getnameinfo and if_nametoindex
-   functions is quite convoluted, compiler dependent and even build target
-   dependent. */
+/* Availability of freeaddrinfo, getaddrinfo and getnameinfo functions is
+   quite convoluted, compiler dependent and even build target dependent. */
 #if defined(HAVE_WS2TCPIP_H)
 #  if defined(__POCC__)
 #    define HAVE_FREEADDRINFO           1
@@ -610,11 +598,6 @@ Vista
 #    define HAVE_GETADDRINFO_THREADSAFE 1
 #    define HAVE_GETNAMEINFO            1
 #  endif
-#endif
-#if defined(HAVE_IPHLPAPI_H)
-  #if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0600)
-    #define HAVE_IF_NAMETOINDEX 1
-  #endif
 #endif
 
 #if defined(__POCC__)

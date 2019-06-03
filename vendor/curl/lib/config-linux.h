@@ -263,9 +263,6 @@
 /* Define to 1 if you have the `getpass_r' function. */
 /* #undef HAVE_GETPASS_R */
 
-/* Define to 1 if you have the getpeername function. */
-#define HAVE_GETPEERNAME 1
-
 /* Define to 1 if you have the `getppid' function. */
 #define HAVE_GETPPID 1
 
@@ -280,9 +277,6 @@
 
 /* Define to 1 if you have the getservbyport_r function. */
 #define HAVE_GETSERVBYPORT_R 1
-
-/* Define to 1 if you have the getsockname function. */
-#define HAVE_GETSOCKNAME 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1

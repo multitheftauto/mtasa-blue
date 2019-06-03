@@ -162,14 +162,11 @@ static void hashkey(struct connectdata *conn, char *buf,
                     size_t len) /* something like 128 is fine */
 {
   const char *hostname;
-  long port = conn->remote_port;
 
   if(conn->bits.socksproxy)
     hostname = conn->socks_proxy.host.name;
-  else if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
+  else if(conn->bits.httpproxy)
     hostname = conn->http_proxy.host.name;
-    port = conn->port;
-  }
   else if(conn->bits.conn_to_host)
     hostname = conn->conn_to_host.name;
   else
@@ -178,7 +175,7 @@ static void hashkey(struct connectdata *conn, char *buf,
   DEBUGASSERT(len > 32);
 
   /* put the number first so that the hostname gets cut off if too long */
-  msnprintf(buf, len, "%ld%s", port, hostname);
+  msnprintf(buf, len, "%ld%s", conn->port, hostname);
 }
 
 void Curl_conncache_unlock(struct Curl_easy *data)
@@ -437,7 +434,6 @@ bool Curl_conncache_return_conn(struct connectdata *conn)
   struct connectdata *conn_candidate = NULL;
 
   conn->data = NULL; /* no owner anymore */
-  conn->lastused = Curl_now(); /* it was used up until now */
   if(maxconnects > 0 &&
      Curl_conncache_size(data) > maxconnects) {
     infof(data, "Connection cache is full, closing the oldest one.\n");
@@ -483,7 +479,7 @@ Curl_conncache_extract_bundle(struct Curl_easy *data,
 
     if(!CONN_INUSE(conn) && !conn->data) {
       /* Set higher score for the age passed since the connection was used */
-      score = Curl_timediff(now, conn->lastused);
+      score = Curl_timediff(now, conn->now);
 
       if(score > highscore) {
         highscore = score;
@@ -541,7 +537,7 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
 
       if(!CONN_INUSE(conn) && !conn->data) {
         /* Set higher score for the age passed since the connection was used */
-        score = Curl_timediff(now, conn->lastused);
+        score = Curl_timediff(now, conn->now);
 
         if(score > highscore) {
           highscore = score;
