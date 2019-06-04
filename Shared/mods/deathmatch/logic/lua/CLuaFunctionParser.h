@@ -34,7 +34,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         using param = typename is_variant<T>::param1_t;
         if (accumulator.length() == 0)
             accumulator = typeToName<param>();
-        else 
+        else
             accumulator += "/" + typeToName<param>();
 
         if constexpr (is_variant<T>::count != 1)
@@ -69,12 +69,13 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         else if constexpr (is_variant<T>::value)
         {
             SString strTypes;
-            typeToNameVariant<T>(strTypes);    
+            typeToNameVariant<T>(strTypes);
             return strTypes;
         }
-
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return GetClassTypeName((T)0);
+        else if constexpr (std::is_same_v<T, dummy_type>)
+            return "";
     }
 
     static SString ResolveParameter(lua_State* L, std::size_t index)
@@ -215,6 +216,11 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         // and can be fetched from a userdata
         if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
+        
+        // dummy type is used as overload extension if one overload has fewer arguments
+        // thus it is only allowed if there are no further args on the Lua side 
+        if constexpr (std::is_same_v<T, dummy_type>)
+            return iArgument == LUA_TNONE;
     }
 
     // Special PopUnsafe for variants
@@ -249,10 +255,13 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
     inline T PopUnsafe(lua_State* L, std::size_t& index)
     {
         // Expect no change in stack size
-        LUA_STACK_EXPECT(0); 
+        LUA_STACK_EXPECT(0);
+        // the dummy type is not read from Lua
+        if constexpr (std::is_same_v<T, dummy_type>)
+            return dummy_type{};
         // trivial types are directly popped
-        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> ||
-                      std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, bool>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> ||
+                           std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, bool>)
             return lua::PopTrivial<T>(L, index);
         else if constexpr (std::is_enum_v<T>)
         {

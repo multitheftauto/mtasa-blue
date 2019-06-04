@@ -144,3 +144,50 @@ struct common_variant<std::variant<T, Ts...>, std::variant<Us...>>
 {
     using type = typename common_variant<std::variant<Ts...>, typename common_variant<T, std::variant<Us...>>::type>::type;
 };
+
+// dummy_type
+// generic dummy type
+struct dummy_type
+{
+};
+
+
+// n_tuple: Constructs a tuple of size N
+//  n_tuple<2>::type == std::tuple<dummy_type, dummy_type>
+template <std::size_t, bool B = false, typename... Args>
+struct n_tuple;
+
+template <std::size_t N, typename... Args>
+struct n_tuple<N, true, Args...>
+{
+    using type = std::tuple<Args...>;
+};
+
+template <std::size_t N, typename... Args>
+struct n_tuple<N, false, Args...>
+{
+    using type = typename n_tuple<N, sizeof...(Args) + 1 >= N, Args..., dummy_type>::type;
+};
+
+// pad_func_with_func
+// pads Func with as many dummy_type arguments as needed to 
+// have the same number of arguments as FuncB has
+template <auto* Func, typename T>
+struct pad_func_with_func_impl
+{
+};
+template <typename... Ts, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct pad_func_with_func_impl<Func, std::tuple<Ts...>>
+{
+    static inline Ret Call(Args... arg, Ts... args) { return Func(arg...); }
+};
+
+template <auto*, auto*>
+struct pad_func_with_func
+{
+};
+template <typename Ret, typename... Args, auto (*Func)(Args...)->Ret, typename RetB, typename... ArgsB, auto (*FuncB)(ArgsB...)->RetB>
+struct pad_func_with_func<Func, FuncB> : pad_func_with_func_impl<Func, typename n_tuple<std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args),
+                                                                                        std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
+{
+};

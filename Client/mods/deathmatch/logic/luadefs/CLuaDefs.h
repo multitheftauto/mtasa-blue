@@ -74,10 +74,14 @@ protected:
         return CLuaFunctionParser<false, T>()(L, m_pScriptDebugging);
     }
 
-    template <auto T, auto U>
+    // Special cases for overloads
+    template <auto T, auto U, auto... Ts>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, CLuaOverloadParser<T, U>::Call>()(L, m_pScriptDebugging);
+        if constexpr (sizeof...(Ts) == 0)
+            return ArgumentParserWarn<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
+        else
+            return ArgumentParserWarn<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
     }
 
     // New style: hard error on usage mistakes
@@ -88,9 +92,12 @@ protected:
     }
 
     // Overload variant
-    template <auto T, auto U>
+    template <auto T, auto U, auto... Ts>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<true, CLuaOverloadParser<T, U>::Call>()(L, m_pScriptDebugging);
+        if constexpr (sizeof...(Ts) == 0)
+            return ArgumentParser<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
+        else
+            return ArgumentParser<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
     }
 };

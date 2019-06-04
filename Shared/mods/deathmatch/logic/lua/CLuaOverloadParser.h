@@ -32,7 +32,7 @@ private:
     template <std::size_t N, typename... Ts, typename... Us>
     static ChosenFunction MakeAllChoice(std::variant<Ts...> var, Us... us)
     {
-        ChosenFunction result = MakeChoice<0>(var);
+        ChosenFunction result = MakeChoice<N>(var);
         if constexpr (sizeof...(Us) == 0)
             return result;
         else
