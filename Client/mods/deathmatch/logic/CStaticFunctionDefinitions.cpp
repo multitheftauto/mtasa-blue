@@ -1260,7 +1260,10 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
             list<CClientPlayer*>::const_iterator iter = Team.IterBegin();
             for (; iter != Team.IterEnd(); iter++)
             {
-                (*iter)->SetInterior(ucInterior);   
+                (*iter)->SetInterior(ucInterior);
+                
+                if (bSetPosition)
+                    (*iter)->SetPosition(vecPosition);
             }
         }
             
@@ -1298,7 +1301,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
 
             Ped.SetInterior(ucInterior);
             if (bSetPosition)
-                Entity.SetPosition(vecPosition);
+                Ped.SetPosition(vecPosition);
             return true;
         }
     }
