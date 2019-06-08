@@ -16,13 +16,7 @@
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 
-template <bool, auto*>
-struct CLuaFunctionParser
-{
-};
-
-template <bool ErrorOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<ErrorOnFailure, Func>
+struct CLuaFunctionParserBase
 {
     std::size_t iIndex = 1;
     std::string strError = "";
@@ -91,7 +85,8 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
                 std::string strValue(szValue, iLen);
                 if (strValue.length() > 10)
                 {
-                    strValue.resize(10);            // Limit to 10 characters
+                    // Limit to 10 characters
+                    strValue.resize(10);
                     strValue[9] = '.';
                     strValue[8] = '.';
                     strValue[7] = '.';
@@ -216,9 +211,9 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         // and can be fetched from a userdata
         if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
-        
+
         // dummy type is used as overload extension if one overload has fewer arguments
-        // thus it is only allowed if there are no further args on the Lua side 
+        // thus it is only allowed if there are no further args on the Lua side
         if constexpr (std::is_same_v<T, dummy_type>)
             return iArgument == LUA_TNONE;
     }
@@ -260,9 +255,20 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // trivial types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> ||
-                           std::is_same_v<T, short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, bool>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, short> || std::is_same_v<T, bool> ||
+                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
             return lua::PopTrivial<T>(L, index);
+        // floats/doubles may not be NaN
+        else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+        {
+            T value = lua::PopTrivial<T>(L, index);
+            if (std::isnan(value))
+            {
+                SString strMessage("Expected number at argument %d, got NaN", index);
+                strError = strMessage;
+            }
+            return value;
+        }
         else if constexpr (std::is_enum_v<T>)
         {
             // Enums are considered strings in Lua
@@ -368,7 +374,16 @@ struct CLuaFunctionParser<ErrorOnFailure, Func>
             return static_cast<T>(result);
         }
     }
+};
 
+template <bool, auto*>
+struct CLuaFunctionParser
+{
+};
+
+template <bool ErrorOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct CLuaFunctionParser<ErrorOnFailure, Func> : CLuaFunctionParserBase
+{
     template <typename... Params>
     inline auto Call(lua_State* L, Params&&... ps)
     {
