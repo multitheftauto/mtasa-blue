@@ -53,13 +53,13 @@ typedef CFastHashMap<CPlayer*, SViewerInfo> SViewerMapType;
 
 struct SScreenShotInfo
 {
-    bool      bInProgress;
-    ushort    usNextPartNumber;
-    ushort    usScreenShotId;
-    long long llTimeStamp;
-    uint      uiTotalBytes;
-    ushort    usTotalParts;
-    ushort    usResourceNetId;
+    bool      bInProgress = false;
+    ushort    usNextPartNumber = 0;
+    ushort    usScreenShotId = 0;
+    long long llTimeStamp = 0;
+    uint      uiTotalBytes = 0;
+    ushort    usTotalParts = 0;
+    ushort    usResourceNetId = 0;
     SString   strTag;
     CBuffer   buffer;
 };
@@ -70,7 +70,6 @@ class CPlayer : public CPed, public CClient
     friend class CScriptDebugging;
 
 public:
-    ZERO_ON_NEW
     CPlayer(class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket);
     ~CPlayer();
 
@@ -266,32 +265,23 @@ public:
     //
     struct SLightweightSyncData
     {
-        SLightweightSyncData()
-        {
-            health.uiContext = 0;
-            health.bSync = false;
-            vehicleHealth.uiContext = 0;
-            vehicleHealth.bSync = false;
-            m_bSyncPosition = false;
-        }
-
         struct
         {
-            float        fLastHealth;
-            float        fLastArmor;
-            bool         bSync;
-            unsigned int uiContext;
+            float        fLastHealth = 0.0f;
+            float        fLastArmor = 0.0f;
+            bool         bSync = false;
+            unsigned int uiContext = 0;
         } health;
 
         struct
         {
-            CVehicle*    lastVehicle;
-            float        fLastHealth;
-            bool         bSync;
-            unsigned int uiContext;
+            CVehicle*    lastVehicle = nullptr;
+            float        fLastHealth = 0.0f;
+            bool         bSync = false;
+            unsigned int uiContext = 0;
         } vehicleHealth;
 
-        bool m_bSyncPosition;
+        bool m_bSyncPosition = false;
     };
     SLightweightSyncData& GetLightweightSyncData() { return m_lightweightSyncData; }
 
@@ -328,10 +318,10 @@ public:
     void           SetQuitReasonForLog(const SString& strReason) { m_strQuitReasonForLog = strReason; }
 
     CFastHashSet<CPlayer*> m_PureSyncSimSendList;
-    bool                   m_bPureSyncSimSendListDirty;
-    class CSimPlayer*      m_pSimPlayer;
+    bool                   m_bPureSyncSimSendListDirty = false;
+    class CSimPlayer*      m_pSimPlayer = nullptr;
     SString                m_strDetectedAC;
-    uint                   m_uiD3d9Size;
+    uint                   m_uiD3d9Size = 0;
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
 
@@ -341,94 +331,94 @@ private:
     void WriteCameraModePacket();
     void WriteCameraPositionPacket();
 
-    class CPlayerManager*   m_pPlayerManager;
-    class CScriptDebugging* m_pScriptDebugging;
+    class CPlayerManager*   m_pPlayerManager = nullptr;
+    class CScriptDebugging* m_pScriptDebugging = nullptr;
 
-    CPlayerTextManager* m_pPlayerTextManager;
+    CPlayerTextManager* m_pPlayerTextManager = nullptr;
 
     SString        m_strNick;
-    bool           m_bDoNotSendEntities;
-    int            m_iGameVersion;
-    unsigned short m_usMTAVersion;
-    unsigned short m_usBitStreamVersion;
+    bool           m_bDoNotSendEntities = false;
+    int            m_iGameVersion = 0;
+    unsigned short m_usMTAVersion = 0;
+    unsigned short m_usBitStreamVersion = 0;
     SString        m_strPlayerVersion;
-    bool           m_bIsMuted;
-    bool           m_bIsLeavingServer;
-    bool           m_bIsJoined;
+    bool           m_bIsMuted = false;
+    bool           m_bIsLeavingServer = false;
+    bool           m_bIsJoined = false;
 
-    bool m_bNametagColorOverridden;
+    bool m_bNametagColorOverridden = false;
 
-    float         m_fCameraRotation;
-    long          m_lMoney;
+    float         m_fCameraRotation = 0.0f;
+    long          m_lMoney = 0;
     CVector       m_vecSniperSource;
     CVector       m_vecTargetting;
-    float         m_fAimDirection;
-    unsigned char m_ucDriveByDirection;
+    float         m_fAimDirection = 0.0f;
+    unsigned char m_ucDriveByDirection = 0;
 
-    bool m_bAkimboArmUp;
+    bool m_bAkimboArmUp = false;
 
     CElapsedTime m_ConnectedTimer;
 
     NetServerPlayerID m_PlayerSocket;
-    uint              m_uiPing;
+    uint              m_uiPing = 0;
 
-    time_t m_tNickChange;
+    time_t m_tNickChange = 0;
 
     std::list<CVehicle*> m_SyncingVehicles;
     std::list<CPed*>     m_SyncingPeds;
     std::list<CObject*>  m_SyncingObjects;
 
-    unsigned int m_uiScriptDebugLevel;
+    unsigned int m_uiScriptDebugLevel = 0;
 
     ElementID     m_PlayerAttackerID;
-    unsigned char m_ucAttackWeapon;
-    unsigned char m_ucAttackBodyPart;
-    long long     m_llSetDamageInfoTime;
+    unsigned char m_ucAttackWeapon = 0;
+    unsigned char m_ucAttackBodyPart = 0;
+    long long     m_llSetDamageInfoTime = 0;
 
-    CTeam* m_pTeam;
-    CPad*  m_pPad;
+    CTeam* m_pTeam = nullptr;
+    CPad*  m_pPad = nullptr;
 
-    bool m_bDebuggerVisible;
+    bool m_bDebuggerVisible = false;
 
-    unsigned int m_uiWantedLevel;
+    unsigned int m_uiWantedLevel = 0;
 
-    bool m_bForcedScoreboard;
-    bool m_bForcedMap;
+    bool m_bForcedScoreboard = false;
+    bool m_bForcedMap = false;
 
-    CPlayerCamera* m_pCamera;
+    CPlayerCamera* m_pCamera = nullptr;
 
-    CKeyBinds* m_pKeyBinds;
+    CKeyBinds* m_pKeyBinds = nullptr;
 
-    bool m_bCursorShowing;
+    bool m_bCursorShowing = false;
 
-    char*         m_szNametagText;
-    unsigned char m_ucNametagR;
-    unsigned char m_ucNametagG;
-    unsigned char m_ucNametagB;
-    bool          m_bNametagShowing;
+    char*         m_szNametagText = nullptr;
+    unsigned char m_ucNametagR = 0;
+    unsigned char m_ucNametagG = 0;
+    unsigned char m_ucNametagB = 0;
+    bool          m_bNametagShowing = false;
 
     std::string m_strSerials[2];
     std::string m_strSerialUser;
     std::string m_strCommunityID;
 
-    unsigned char m_ucBlurLevel;
+    unsigned char m_ucBlurLevel = 0;
 
-    long long m_llNextFarPuresyncTime;
+    long long m_llNextFarPuresyncTime = 0;
 
     // Voice
-    eVoiceState          m_VoiceState;
+    eVoiceState          m_VoiceState = eVoiceState::VOICESTATE_IDLE;
     std::list<CElement*> m_lstBroadcastList;
     std::list<CElement*> m_lstIgnoredList;
 
     // Sync stuff
-    bool         m_bSyncingVelocity;
-    unsigned int m_uiPuresyncPackets;
+    bool         m_bSyncingVelocity = false;
+    unsigned int m_uiPuresyncPackets = 0;
 
     CElapsedTime m_LastReceivedSyncTimer;
 
     std::map<std::string, std::string> m_AnnounceValues;
 
-    uint m_uiWeaponIncorrectCount;
+    uint m_uiWeaponIncorrectCount = 0;
 
     SViewerMapType m_NearPlayerList;
     SViewerMapType m_FarPlayerList;
@@ -437,22 +427,22 @@ private:
 
     CVector m_vecCamPosition;
     CVector m_vecCamFwd;
-    int     m_iLastPuresyncZoneDebug;
+    int     m_iLastPuresyncZoneDebug = 0;
 
-    long long m_llLastPositionHasChanged;
+    long long m_llLastPositionHasChanged = 0;
     SString   m_strIP;
 
     SScreenShotInfo m_ScreenShotInfo;
 
-    CPlayerStatsPacket* m_pPlayerStatsPacket;
-    CVehicle*           m_pJackingVehicle;
+    CPlayerStatsPacket* m_pPlayerStatsPacket = nullptr;
+    CVehicle*           m_pJackingVehicle = nullptr;
 
     // Used to reduce calls when calculating weapon range
-    float       m_fWeaponRangeLast;
-    float       m_fWeaponRangeLastSkill;
-    eWeaponType m_eWeaponRangeLastWeapon;
-    uint        m_uiWeaponRangeLastStatsRevision;
+    float       m_fWeaponRangeLast = 0.0f;
+    float       m_fWeaponRangeLastSkill = 0.0f;
+    eWeaponType m_eWeaponRangeLastWeapon = eWeaponType::WEAPONTYPE_UNARMED;
+    uint        m_uiWeaponRangeLastStatsRevision = 0;
 
-    ushort  m_usPrevDimension;
+    ushort  m_usPrevDimension = 0;
     SString m_strQuitReasonForLog;
 };

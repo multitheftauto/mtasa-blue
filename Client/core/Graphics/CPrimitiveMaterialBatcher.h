@@ -22,7 +22,6 @@ class CPrimitiveMaterialBatcher
     friend CGraphics;
 
 public:
-    ZERO_ON_NEW
     CPrimitiveMaterialBatcher(CGraphics* graphics);
     ~CPrimitiveMaterialBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
@@ -35,12 +34,12 @@ public:
     void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);
 
 protected:
-    IDirect3DDevice9*               m_pDevice;
-    CGraphics*                      m_pGraphics;
+    IDirect3DDevice9*               m_pDevice = nullptr;
+    CGraphics*                      m_pGraphics = nullptr;
     std::vector<sPrimitiveMaterial> m_primitiveList;
-    float                           m_fViewportSizeX;
-    float                           m_fViewportSizeY;
-    D3DXMATRIX                      m_MatWorld;
-    D3DXMATRIX                      m_MatView;
-    D3DXMATRIX                      m_MatProjection;
+    float                           m_fViewportSizeX = 0.0f;
+    float                           m_fViewportSizeY = 0.0f;
+    D3DXMATRIX                      m_MatWorld = {};
+    D3DXMATRIX                      m_MatView = {};
+    D3DXMATRIX                      m_MatProjection = {};
 };

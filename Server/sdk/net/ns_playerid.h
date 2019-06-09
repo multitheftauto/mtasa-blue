@@ -21,11 +21,10 @@ protected:
     ~SNetExtraInfo() {}
 
 public:
-    ZERO_ON_NEW
     SNetExtraInfo() {}
 
-    bool m_bHasPing;
-    uint m_uiPing;
+    bool m_bHasPing = false;
+    uint m_uiPing = 0; 
 };
 
 class NetServerPlayerID

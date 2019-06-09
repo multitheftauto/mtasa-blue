@@ -10,8 +10,6 @@
 class CSimPlayerManager
 {
 public:
-    ZERO_ON_NEW
-
     // Main thread methods
     void AddSimPlayer(CPlayer* pPlayer);
     void RemoveSimPlayer(CPlayer* pPlayer);
@@ -32,7 +30,7 @@ public:
 
 protected:
     // Shared variables
-    bool                                     m_bIsLocked;
+    bool                                     m_bIsLocked = false;
     CCriticalSection                         m_CS;
     std::set<CSimPlayer*>                    m_AllSimPlayerMap;
     std::map<NetServerPlayerID, CSimPlayer*> m_SocketSimMap;

@@ -40,7 +40,6 @@ struct SPDTVertex
 class CTileBatcher
 {
 public:
-    ZERO_ON_NEW
     CTileBatcher();
     ~CTileBatcher();
 
@@ -56,19 +55,19 @@ public:
     void MakeCustomMatrices(const SShaderTransform& t, float fX1, float fY1, float fX2, float fY2, D3DXMATRIX& matOutWorld, D3DXMATRIX& matOutProjection);
 
 protected:
-    IDirect3DDevice9*       m_pDevice;
-    CMaterialItem*          m_pCurrentMaterial;
-    float                   m_fCurrentRotation;
-    float                   m_fCurrentRotCenX;
-    float                   m_fCurrentRotCenY;
+    IDirect3DDevice9*       m_pDevice = nullptr;
+    CMaterialItem*          m_pCurrentMaterial = nullptr;
+    float                   m_fCurrentRotation = 0.0f;
+    float                   m_fCurrentRotCenX = 0.0f;
+    float                   m_fCurrentRotCenY = 0.0f;
     std::vector<WORD>       m_Indices;
     std::vector<SPDTVertex> m_Vertices;
-    D3DXMATRIX              m_MatView;
-    D3DXMATRIX              m_MatProjection;
-    float                   m_fViewportSizeX;
-    float                   m_fViewportSizeY;
-    bool                    m_bUseCustomMatrices;
-    D3DXMATRIX              m_MatCustomWorld;
-    D3DXMATRIX              m_MatCustomProjection;
-    bool                    m_bZBufferDirty;
+    D3DXMATRIX              m_MatView = {};
+    D3DXMATRIX              m_MatProjection = {};
+    float                   m_fViewportSizeX = 0.0f;
+    float                   m_fViewportSizeY = 0.0f;
+    bool                    m_bUseCustomMatrices = false;
+    D3DXMATRIX              m_MatCustomWorld = {};
+    D3DXMATRIX              m_MatCustomProjection = {};
+    bool                    m_bZBufferDirty = false;
 };

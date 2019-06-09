@@ -24,7 +24,6 @@ using namespace std;
 class CDatabaseConnectionMySql : public CDatabaseConnection
 {
 public:
-    ZERO_ON_NEW
     CDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword,
                              const SString& strOptions);
     virtual ~CDatabaseConnectionMySql();
@@ -46,17 +45,17 @@ public:
     void EndAutomaticTransaction();
     int  ConvertToSqliteType(enum_field_types type);
 
-    int            m_iRefCount;
-    CDatabaseType* m_pManager;
-    MYSQL*         m_handle;
-    bool           m_bOpened;
+    int            m_iRefCount = 0;
+    CDatabaseType* m_pManager = nullptr;
+    MYSQL*         m_handle = nullptr;
+    bool           m_bOpened = false;
     SString        m_strLastErrorMessage;
-    uint           m_uiLastErrorCode;
-    int            m_bAutomaticReconnect;
-    int            m_bAutomaticTransactionsEnabled;
-    bool           m_bInAutomaticTransaction;
+    uint           m_uiLastErrorCode = 0;
+    int            m_bAutomaticReconnect = 0;
+    int            m_bAutomaticTransactionsEnabled = 0;
+    bool           m_bInAutomaticTransaction = false;
     CTickCount     m_AutomaticTransactionStartTime;
-    int            m_bMultipleStatements;
+    int            m_bMultipleStatements = 0;
 };
 
 ///////////////////////////////////////////////////////////////

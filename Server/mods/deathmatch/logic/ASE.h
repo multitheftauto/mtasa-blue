@@ -45,7 +45,6 @@ class CASERule;
 class ASE
 {
 public:
-    ZERO_ON_NEW
     ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
     ~ASE();
 
@@ -85,11 +84,11 @@ private:
     const std::string* QueryXfireLightCached();
     std::string        QueryXfireLight();
 
-    long long m_llCurrentTime;
-    uint      m_uiCurrentPlayerCount;
+    long long m_llCurrentTime = 0;
+    uint      m_uiCurrentPlayerCount = 0;
 
-    CMainConfig*    m_pMainConfig;
-    CPlayerManager* m_pPlayerManager;
+    CMainConfig*    m_pMainConfig = nullptr;
+    CPlayerManager* m_pPlayerManager = nullptr;
 
     std::string m_strGameType;
     SString     m_strMapName;
@@ -97,7 +96,7 @@ private:
     std::string m_strPort;
 
     static ASE* _instance;
-    time_t      m_tStartTime;
+    time_t      m_tStartTime = 0;
 
     list<CASERule*> m_Rules;
 

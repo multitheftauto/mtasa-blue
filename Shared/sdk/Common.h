@@ -76,7 +76,7 @@ public:
     const unsigned int& Value() const { return m_value; }
 
 private:
-    unsigned int m_value;
+    unsigned int m_value = 0;
 };
 
 // Event name characteristics

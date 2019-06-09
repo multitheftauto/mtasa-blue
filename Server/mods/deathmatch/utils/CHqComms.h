@@ -23,8 +23,6 @@ enum
 class CHqComms : public CRefCountable
 {
 public:
-    ZERO_ON_NEW
-
     CHqComms()
     {
         m_iPollInterval = TICKS_FROM_MINUTES(60);
@@ -245,9 +243,9 @@ public:
 protected:
     ~CHqComms() {}            // Must use Release()
 
-    int          m_iPollInterval;
-    int          m_iPrevBadFileHashesRev;
-    uint         m_Stage;
+    int          m_iPollInterval = 0;
+    int          m_iPrevBadFileHashesRev = 0;
+    uint         m_Stage = 0;
     CElapsedTime m_CheckTimer;
     SString      m_strURL;
     SString      m_strPrevMessage;

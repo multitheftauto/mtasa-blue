@@ -40,7 +40,6 @@ using EJobStage::EJobStageType;
 class CCompressJobData
 {
 public:
-    ZERO_ON_NEW
     bool SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, uint uiTimeSpentInQueue);
     bool HasCallback();
     void ProcessCallback();
@@ -48,28 +47,28 @@ public:
     CCompressJobData() { DEBUG_CREATE_COUNT("CCompressJobData"); }
     ~CCompressJobData() { DEBUG_DESTROY_COUNT("CCompressJobData"); }
 
-    EJobStageType stage;
+    EJobStageType stage = EJobStageType::NONE;
 
     struct
     {
-        uint    uiSizeX;
-        uint    uiSizeY;
-        uint    uiQuality;
+        uint    uiSizeX = 0;
+        uint    uiSizeY = 0;
+        uint    uiQuality = 0;
         CBuffer buffer;
     } command;
 
     struct
     {
-        EJobResultType status;
+        EJobResultType status = EJobResultType::NONE;
         CBuffer        buffer;
     } result;
 
     struct
     {
-        PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback;
-        uint                    uiTimeSpentInQueue;
-        bool                    bSet;
-        bool                    bDone;
+        PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback = nullptr;
+        uint                    uiTimeSpentInQueue = 0;
+        bool                    bSet = false;
+        bool                    bDone = false;
     } callback;
 };
 

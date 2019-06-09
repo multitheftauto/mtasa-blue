@@ -107,11 +107,11 @@ struct SMatchChannelStats
 
 struct SShaderReplacementStats
 {
-    uint                               uiNumReplacementRequests;
-    uint                               uiNumReplacementMatches;
-    uint                               uiTotalTextures;
-    uint                               uiTotalShaders;
-    uint                               uiTotalEntitesRefed;
+    uint                               uiNumReplacementRequests = 0;
+    uint                               uiNumReplacementMatches = 0;
+    uint                               uiTotalTextures = 0;
+    uint                               uiTotalShaders = 0;
+    uint                               uiTotalEntitesRefed = 0;
     std::map<uint, SMatchChannelStats> channelStatsList;
 };
 

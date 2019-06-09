@@ -14,8 +14,6 @@
 class CAspectRatioConverter
 {
 public:
-    ZERO_ON_NEW
-
     // Call once
     void Init(float ViewportHeight)
     {
@@ -81,13 +79,13 @@ public:
     }
 
 protected:
-    bool  m_bValidRatios;
-    bool  m_bSuspended;
-    float m_fSourceRatioValue;
-    float m_fTargetRatioValue;
-    float m_fToRelMul;
-    float m_fFromRelMul;
-    float m_fTargetBase;
-    float m_fSourceBase;
-    float m_fConvertScale;
+    bool  m_bValidRatios = false;
+    bool  m_bSuspended = false;
+    float m_fSourceRatioValue = 0.0f;
+    float m_fTargetRatioValue = 0.0f;
+    float m_fToRelMul = 0.0f;
+    float m_fFromRelMul = 0.0f;
+    float m_fTargetBase = 0.0f;
+    float m_fSourceBase = 0.0f;
+    float m_fConvertScale = 0.0f;
 };

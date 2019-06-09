@@ -29,14 +29,13 @@ class CLuaMain;
 
 struct CRefInfo
 {
-    unsigned long int ulUseCount;
-    int               iFunction;
+    unsigned long int ulUseCount = 0;
+    int               iFunction = 0;
 };
 
-class CLuaMain            //: public CClient
+class CLuaMain
 {
 public:
-    ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
     ~CLuaMain();
 
@@ -85,19 +84,19 @@ private:
 
     SString m_strScriptName;
 
-    lua_State*        m_luaVM;
-    CLuaTimerManager* m_pLuaTimerManager;
+    lua_State*        m_luaVM = nullptr;
+    CLuaTimerManager* m_pLuaTimerManager = nullptr;
 
-    bool m_bBeingDeleted;            // prevent it being deleted twice
+    bool m_bBeingDeleted = false;            // prevent it being deleted twice
 
     CElapsedTime m_FunctionEnterTimer;
 
-    class CResource* m_pResource;
+    class CResource* m_pResource = nullptr;
 
     std::list<CXMLFile*> m_XMLFiles;
     static SString       ms_strExpectedUndumpHash;
 
-    bool m_bEnableOOP;
+    bool m_bEnableOOP = false;
 
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;

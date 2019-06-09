@@ -101,12 +101,10 @@ class CGameSA : public CGame
     typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 private:
-    CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA ModelInfo[MODELINFO_MAX];
+    CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal] = {nullptr};
+    CModelInfoSA ModelInfo[MODELINFO_MAX] = {};
 
 public:
-    ZERO_ON_NEW
-
     CGameSA();            // constructor
     ~CGameSA();
 
@@ -424,77 +422,77 @@ public:
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
-    PreWeaponFireHandler*   m_pPreWeaponFireHandler;
-    PostWeaponFireHandler*  m_pPostWeaponFireHandler;
-    TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
+    PreWeaponFireHandler*   m_pPreWeaponFireHandler = nullptr;
+    PostWeaponFireHandler*  m_pPostWeaponFireHandler = nullptr;
+    TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler = nullptr;
 
 private:
-    CPools*             m_pPools;
-    CPlayerInfo*        m_pPlayerInfo;
-    CProjectileInfo*    m_pProjectileInfo;
-    CRadar*             m_pRadar;
-    CRestart*           m_pRestart;
-    CClock*             m_pClock;
-    CCoronas*           m_pCoronas;
-    CCheckpoints*       m_pCheckpoints;
-    CEventList*         m_pEventList;
-    CFireManager*       m_pFireManager;
-    CGarages*           m_pGarages;
-    CHud*               m_pHud;
-    CWanted*            m_pWanted;
-    CWeather*           m_pWeather;
-    CWorld*             m_pWorld;
-    CCamera*            m_pCamera;
-    CModelInfo*         m_pModelInfo;
-    CPickups*           m_pPickups;
-    CWeaponInfo*        m_pWeaponInfo;
-    CExplosionManager*  m_pExplosionManager;
-    C3DMarkers*         m_p3DMarkers;
-    CRenderWareSA*      m_pRenderWare;
-    CHandlingManager*   m_pHandlingManager;
-    CAnimManager*       m_pAnimManager;
-    CStreaming*         m_pStreaming;
-    CVisibilityPlugins* m_pVisibilityPlugins;
-    CKeyGen*            m_pKeyGen;
-    CRopes*             m_pRopes;
-    CFx*                m_pFx;
-    CFxManagerSA*       m_pFxManager;
-    CWaterManager*      m_pWaterManager;
-    CWeaponStatManager* m_pWeaponStatsManager;
-    CPointLights*       m_pPointLights;
+    CPools*             m_pPools = nullptr;
+    CPlayerInfo*        m_pPlayerInfo = nullptr;
+    CProjectileInfo*    m_pProjectileInfo = nullptr;
+    CRadar*             m_pRadar = nullptr;
+    CRestart*           m_pRestart = nullptr;
+    CClock*             m_pClock = nullptr;
+    CCoronas*           m_pCoronas = nullptr;
+    CCheckpoints*       m_pCheckpoints = nullptr;
+    CEventList*         m_pEventList = nullptr;
+    CFireManager*       m_pFireManager = nullptr;
+    CGarages*           m_pGarages = nullptr;
+    CHud*               m_pHud = nullptr;
+    CWanted*            m_pWanted = nullptr;
+    CWeather*           m_pWeather = nullptr;
+    CWorld*             m_pWorld = nullptr;
+    CCamera*            m_pCamera = nullptr;
+    CModelInfo*         m_pModelInfo = nullptr;
+    CPickups*           m_pPickups = nullptr;
+    CWeaponInfo*        m_pWeaponInfo = nullptr;
+    CExplosionManager*  m_pExplosionManager = nullptr;
+    C3DMarkers*         m_p3DMarkers = nullptr;
+    CRenderWareSA*      m_pRenderWare = nullptr;
+    CHandlingManager*   m_pHandlingManager = nullptr;
+    CAnimManager*       m_pAnimManager = nullptr;
+    CStreaming*         m_pStreaming = nullptr;
+    CVisibilityPlugins* m_pVisibilityPlugins = nullptr;
+    CKeyGen*            m_pKeyGen = nullptr;
+    CRopes*             m_pRopes = nullptr;
+    CFx*                m_pFx = nullptr;
+    CFxManagerSA*       m_pFxManager = nullptr;
+    CWaterManager*      m_pWaterManager = nullptr;
+    CWeaponStatManager* m_pWeaponStatsManager = nullptr;
+    CPointLights*       m_pPointLights = nullptr;
 
-    CPad*                     m_pPad;
-    CTheCarGenerators*        m_pTheCarGenerators;
-    CAERadioTrackManager*     m_pCAERadioTrackManager;
-    CAudioEngine*             m_pAudioEngine;
-    CAEAudioHardware*         m_pAEAudioHardware;
-    CAESoundManager*          m_pAESoundManager;
-    CAudioContainer*          m_pAudioContainer;
-    CMenuManager*             m_pMenuManager;
-    CText*                    m_pText;
-    CStats*                   m_pStats;
-    CFont*                    m_pFont;
-    CPathFind*                m_pPathFind;
-    CPopulation*              m_pPopulation;
-    CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa
-    CTasks*                   m_pTasks;
-    CGameSettings*            m_pSettings;
-    CCarEnterExit*            m_pCarEnterExit;
-    CControllerConfigManager* m_pControllerConfigManager;
+    CPad*                     m_pPad = nullptr;
+    CTheCarGenerators*        m_pTheCarGenerators = nullptr;
+    CAERadioTrackManager*     m_pCAERadioTrackManager = nullptr;
+    CAudioEngine*             m_pAudioEngine = nullptr;
+    CAEAudioHardware*         m_pAEAudioHardware = nullptr;
+    CAESoundManager*          m_pAESoundManager = nullptr;
+    CAudioContainer*          m_pAudioContainer = nullptr;
+    CMenuManager*             m_pMenuManager = nullptr;
+    CText*                    m_pText = nullptr;
+    CStats*                   m_pStats = nullptr;
+    CFont*                    m_pFont = nullptr;
+    CPathFind*                m_pPathFind = nullptr;
+    CPopulation*              m_pPopulation = nullptr;
+    CTaskManagementSystem*    m_pTaskManagementSystem = nullptr;            // not used outside the game_sa
+    CTasks*                   m_pTasks = nullptr;
+    CGameSettings*            m_pSettings = nullptr;
+    CCarEnterExit*            m_pCarEnterExit = nullptr;
+    CControllerConfigManager* m_pControllerConfigManager = nullptr;
 
-    eGameVersion m_eGameVersion;
-    bool         m_bAsyncScriptEnabled;
-    bool         m_bAsyncScriptForced;
-    bool         m_bASyncLoadingSuspended;
-    int          m_iCheckStatus;
-    bool         m_bUnderworldWarp;
+    eGameVersion m_eGameVersion = eGameVersion::VERSION_ALL;
+    bool         m_bAsyncScriptEnabled = false;
+    bool         m_bAsyncScriptForced = false;
+    bool         m_bASyncLoadingSuspended = false;
+    int          m_iCheckStatus = 0;
+    bool         m_bUnderworldWarp = false;
 
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
     static unsigned long* VAR_IsGameLoaded;
     static bool*          VAR_GamePaused;
     static bool*          VAR_IsForegroundWindow;
-    ;
+    
     static unsigned long* VAR_SystemState;
     static void*          VAR_StartGame;
     static bool*          VAR_IsNastyGame;
@@ -508,6 +506,6 @@ private:
 
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
 
-    CPed*      m_pPedContext;
+    CPed*      m_pPedContext = nullptr;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };

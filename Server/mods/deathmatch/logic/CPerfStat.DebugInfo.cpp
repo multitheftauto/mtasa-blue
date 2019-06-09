@@ -31,8 +31,6 @@ namespace
 class CPerfStatDebugInfoImpl : public CPerfStatDebugInfo
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatDebugInfoImpl();
     virtual ~CPerfStatDebugInfoImpl();
 
@@ -49,7 +47,7 @@ public:
     void RecordStats();
 
     SString    m_strCategoryName;
-    bool       m_bActive;
+    bool       m_bActive = false;
     CTickCount m_LastGetStatsTime;
     SString    m_LastFilter;
 

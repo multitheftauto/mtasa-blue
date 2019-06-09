@@ -27,8 +27,6 @@ public:
 class CSimPlayerPuresyncPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
-
     CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType, float WeaponRange,
                              CControllerState& sharedControllerState);
 
@@ -47,34 +45,34 @@ public:
 
     // Set in constructor
     const ElementID   m_PlayerID;
-    const ushort      m_PlayerLatency;
-    const uchar       m_PlayerSyncTimeContext;
-    const uchar       m_PlayerGotWeaponType;
-    const float       m_WeaponRange;
+    const ushort      m_PlayerLatency = 0;
+    const uchar       m_PlayerSyncTimeContext = 0;
+    const uchar       m_PlayerGotWeaponType = 0;
+    const float       m_WeaponRange = 0.0f;
     CControllerState& m_sharedControllerState;
 
     // Set in Read ()
     struct
     {
-        uchar                ucTimeContext;
-        SPlayerPuresyncFlags flags;
+        uchar                ucTimeContext = 0;
+        SPlayerPuresyncFlags flags = {};
         ElementID            ContactElementID;
         CVector              Position;
-        float                fRotation;
+        float                fRotation = 0.0f;
         CVector              Velocity;
-        float                fHealth;
-        float                fArmor;
-        float                fCameraRotation;
+        float                fHealth = 0.0f;
+        float                fArmor = 0.0f; 
+        float                fCameraRotation = 0.0f;
         CVector              vecCamPosition;
         CVector              vecCamFwd;
 
-        bool   bWeaponCorrect;
-        uchar  ucWeaponSlot;            // Only valid if bWeaponCorrect
-        ushort usAmmoInClip;            // Only valid if bWeaponCorrect
-        ushort usTotalAmmo;             // Only valid if bWeaponCorrect
+        bool   bWeaponCorrect = false;
+        uchar  ucWeaponSlot = 0;            // Only valid if bWeaponCorrect
+        ushort usAmmoInClip = 0;            // Only valid if bWeaponCorrect
+        ushort usTotalAmmo = 0;             // Only valid if bWeaponCorrect
 
-        bool    bIsAimFull;
-        float   fAimDirection;              // Only valid if bWeaponCorrect
+        bool    bIsAimFull = false;
+        float   fAimDirection = 0.0f;              // Only valid if bWeaponCorrect
         CVector vecSniperSource;            // Only valid if bWeaponCorrect and bIsAimFull
         CVector vecTargetting;              // Only valid if bWeaponCorrect and bIsAimFull
     } m_Cache;

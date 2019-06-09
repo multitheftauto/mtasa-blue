@@ -148,7 +148,6 @@ class CResource : public EHS
     using KeyValueMap = CFastHashMap<SString, SString>;
 
 public:
-    ZERO_ON_NEW
     CResource(CResourceManager* pResourceManager, bool bIsZipped, const char* szAbsPath, const char* szResourceName);
     ~CResource();
 

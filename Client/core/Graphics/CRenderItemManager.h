@@ -17,7 +17,6 @@
 class CRenderItemManager : public CRenderItemManagerInterface
 {
 public:
-    ZERO_ON_NEW
     CRenderItemManager();
     ~CRenderItemManager();
 
@@ -85,35 +84,35 @@ public:
 
 protected:
     std::set<CRenderItem*>   m_CreatedItemList;
-    IDirect3DSurface9*       m_pDefaultD3DRenderTarget;
-    IDirect3DSurface9*       m_pDefaultD3DZStencilSurface;
-    uint                     m_uiDefaultViewportSizeX;
-    uint                     m_uiDefaultViewportSizeY;
-    CRenderTargetItem*       m_pBackBufferCopy;
-    bool                     m_bBackBufferCopyMaybeNeedsResize;
-    uint                     m_uiBackBufferCopyRevision;
+    IDirect3DSurface9*       m_pDefaultD3DRenderTarget = nullptr;
+    IDirect3DSurface9*       m_pDefaultD3DZStencilSurface = nullptr;
+    uint                     m_uiDefaultViewportSizeX = 0;
+    uint                     m_uiDefaultViewportSizeY = 0;
+    CRenderTargetItem*       m_pBackBufferCopy = nullptr;
+    bool                     m_bBackBufferCopyMaybeNeedsResize = false;
+    uint                     m_uiBackBufferCopyRevision = 0;
     CFastHashSet<CD3DDUMMY*> m_FrameTextureUsage;
     CFastHashSet<CD3DDUMMY*> m_PrevFrameTextureUsage;
-    class CRenderWare*       m_pRenderWare;
-    CEffectCloner*           m_pEffectCloner;
-    eDxTestMode              m_TestMode;
+    class CRenderWare*       m_pRenderWare = nullptr;
+    CEffectCloner*           m_pEffectCloner = nullptr;
+    eDxTestMode              m_TestMode = eDxTestMode::DX_TEST_MODE_NONE;
     SString                  m_strVideoCardName;
-    int                      m_iVideoCardMemoryKBTotal;
-    int                      m_iVideoCardMemoryKBForMTATotal;
+    int                      m_iVideoCardMemoryKBTotal = 0;
+    int                      m_iVideoCardMemoryKBForMTATotal = 0;
     SString                  m_strVideoCardPSVersion;
-    int                      m_iTextureMemoryKBUsed;
-    int                      m_iRenderTargetMemoryKBUsed;
-    int                      m_iFontMemoryKBUsed;
-    int                      m_iMemoryKBFreeForMTA;
-    bool                     m_bSetRenderTargetEnabledOldVer;
-    bool                     m_bUsingReadableDepthBuffer;
-    ERenderFormat            m_depthBufferFormat;
+    int                      m_iTextureMemoryKBUsed = 0;
+    int                      m_iRenderTargetMemoryKBUsed = 0;
+    int                      m_iFontMemoryKBUsed = 0;
+    int                      m_iMemoryKBFreeForMTA = 0;
+    bool                     m_bSetRenderTargetEnabledOldVer = false;
+    bool                     m_bUsingReadableDepthBuffer = false;
+    ERenderFormat            m_depthBufferFormat = ERenderFormat::RFORMAT_UNKNOWN;
     std::set<CShaderItem*>   m_ShadersUsingDepthBuffer;
     std::set<CShaderItem*>   m_ShadersUsingMultipleRenderTargets;
-    IDirect3DSurface9*       m_pSavedSceneDepthSurface;
-    IDirect3DSurface9*       m_pSavedSceneRenderTargetAA;
-    IDirect3DSurface9*       m_pNonAADepthSurface2;
-    IDirect3DSurface9*       m_pNonAARenderTarget;
-    IDirect3DTexture9*       m_pNonAARenderTargetTexture;
-    bool                     m_bIsSwiftShader;
+    IDirect3DSurface9*       m_pSavedSceneDepthSurface = nullptr;
+    IDirect3DSurface9*       m_pSavedSceneRenderTargetAA = nullptr;
+    IDirect3DSurface9*       m_pNonAADepthSurface2 = nullptr;
+    IDirect3DSurface9*       m_pNonAARenderTarget = nullptr;
+    IDirect3DTexture9*       m_pNonAARenderTargetTexture = nullptr;
+    bool                     m_bIsSwiftShader = false;
 };

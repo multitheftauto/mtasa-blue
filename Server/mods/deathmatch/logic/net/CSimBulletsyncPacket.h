@@ -13,8 +13,6 @@
 class CSimBulletsyncPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
-
     CSimBulletsyncPacket(ElementID PlayerID);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_BULLETSYNC; };
@@ -29,12 +27,12 @@ public:
     // Set in Read ()
     struct
     {
-        eWeaponType weaponType;
+        eWeaponType weaponType = eWeaponType::WEAPONTYPE_UNARMED;
         CVector     vecStart;
         CVector     vecEnd;
-        uchar       ucOrderCounter;
-        float       fDamage;
-        uchar       ucHitZone;
+        uchar       ucOrderCounter = 0;
+        float       fDamage = 0.0f;
+        uchar       ucHitZone = 0;
         ElementID   DamagedPlayerID;
     } m_Cache;
 };

@@ -253,7 +253,6 @@ namespace
 class CMemStats : public CMemStatsInterface
 {
 public:
-    ZERO_ON_NEW
     CMemStats();
     ~CMemStats();
 
@@ -269,13 +268,13 @@ protected:
     void CreateTables();
 
     CElapsedTime        m_UpdateTimer;
-    bool                m_bEnabled;
+    bool                m_bEnabled = false;
     SMemStatsInfo       m_MemStatsNow;
     SMemStatsInfo       m_MemStatsPrev;
     SMemStatsInfo       m_MemStatsDelta;
     SMemStatsInfo       m_MemStatsMax;
     std::list<CDxTable> m_TableList;
-    float               m_fPosY;
+    float               m_fPosY = 0.0f;
 };
 
 ///////////////////////////////////////////////////////////////

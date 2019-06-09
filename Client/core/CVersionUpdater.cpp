@@ -24,8 +24,6 @@
 class CVersionUpdater : public CVersionUpdaterInterface
 {
 public:
-    ZERO_ON_NEW
-
     // CVersionUpdaterInterface interface
     CVersionUpdater();
     virtual ~CVersionUpdater();
@@ -139,7 +137,7 @@ public:
     void         UpdaterYield();
 
     SJobInfo      m_JobInfo;
-    long long     m_llTimeStart;
+    long long     m_llTimeStart = 0;
     CConditionMap m_ConditionMap;
     SString       m_strServerSaysType;
     SString       m_strServerSaysData;
@@ -151,37 +149,37 @@ public:
     SString m_strSidegradePassword;
     SString m_strSidegradePath;
 
-    bool                   m_bCheckedTimeForVersionCheck;
-    bool                   m_bCheckedTimeForNewsUpdate;
-    bool                   m_bCheckedTimeForMasterFetch;
-    bool                   m_bLoadedConfig;
-    bool                   m_bSentCrashDump;
-    bool                   m_bSentReportLog;
+    bool                   m_bCheckedTimeForVersionCheck = false;
+    bool                   m_bCheckedTimeForNewsUpdate = false;
+    bool                   m_bCheckedTimeForMasterFetch = false;
+    bool                   m_bLoadedConfig = false;
+    bool                   m_bSentCrashDump = false;
+    bool                   m_bSentReportLog = false;
     std::map<SString, int> m_DoneOptionalMap;
 
-    long long m_llTimeLastManualCheck;
+    long long m_llTimeLastManualCheck = 0;
     SString   m_strLastManualCheckBuildType;
 
-    CReportWrap* m_pReportWrap;
+    CReportWrap* m_pReportWrap = nullptr;
     SString      m_strLastQueryURL;
-    bool         m_bEnabled;
-    uint         m_uiFrameCounter;
-    int          m_iForceMasterConfigRefreshCount;
+    bool         m_bEnabled = false;
+    uint         m_uiFrameCounter = 0;
+    int          m_iForceMasterConfigRefreshCount = 0;
 
     SUpdaterMasterConfig m_MasterConfig;
     SUpdaterVarConfig    m_VarConfig;
 
-    CThreadHandle* m_pProgramThreadHandle;
+    CThreadHandle* m_pProgramThreadHandle = nullptr;
 
     // Shared variables
     struct
     {
-        bool                m_bTerminateThread;
-        bool                m_bThreadTerminated;
-        EUpdaterProgramType m_CurrentProgram;
+        bool                m_bTerminateThread = false;
+        bool                m_bThreadTerminated = false;
+        EUpdaterProgramType m_CurrentProgram = EUpdaterProgramType::None;
         CComboMutex         m_Mutex;
-        bool                m_bQuitCurrentProgram;
-        bool                m_bExitGame;
+        bool                m_bQuitCurrentProgram = false; 
+        bool                m_bExitGame = false;
     } shared;
 };
 

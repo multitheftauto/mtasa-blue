@@ -23,7 +23,6 @@
 class CCompressorJobQueueImpl : public CCompressorJobQueue
 {
 public:
-    ZERO_ON_NEW
     CCompressorJobQueueImpl();
     virtual ~CCompressorJobQueueImpl();
 
@@ -46,7 +45,7 @@ protected:
     void         ProcessCompress(uint uiSizeX, uint uiSizeY, uint uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer);
 
     // Main thread variables
-    CThreadHandle*              m_pServiceThreadHandle;
+    CThreadHandle*              m_pServiceThreadHandle = nullptr;
     std::set<CCompressJobData*> m_IgnoreResultList;
     std::set<CCompressJobData*> m_FinishedList;            // Result has been used, will be deleted next pulse
 
@@ -56,8 +55,8 @@ protected:
     // Shared variables
     struct
     {
-        bool                         m_bTerminateThread;
-        bool                         m_bThreadTerminated;
+        bool                         m_bTerminateThread = false;
+        bool                         m_bThreadTerminated = false;
         std::list<CCompressJobData*> m_CommandQueue;
         std::list<CCompressJobData*> m_ResultQueue;
         CComboMutex                  m_Mutex;

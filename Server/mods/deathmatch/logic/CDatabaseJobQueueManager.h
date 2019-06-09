@@ -18,7 +18,6 @@
 class CDatabaseJobQueueManager
 {
 public:
-    ZERO_ON_NEW
     ~CDatabaseJobQueueManager();
     void        DoPulse();
     CDbJobData* AddCommand(EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData);
@@ -34,5 +33,5 @@ protected:
     SConnectionHandle  GetNextConnectionHandle();
 
     std::map<SString, CDatabaseJobQueue*> m_QueueNameMap;
-    SConnectionHandle                     m_ConnectionHandleCounter;
+    SConnectionHandle                     m_ConnectionHandleCounter = 0;
 };

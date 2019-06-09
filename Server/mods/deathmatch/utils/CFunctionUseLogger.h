@@ -23,8 +23,6 @@ struct SFuncCallRecord
 class CFunctionUseLogger
 {
 public:
-    ZERO_ON_NEW
-
     CFunctionUseLogger(const SString& strLogFilename);
     ~CFunctionUseLogger();
 

@@ -145,7 +145,6 @@ public:
 class CGame
 {
 public:
-    ZERO_ON_NEW            // To be sure everything is cleared
         enum {
             VEHICLE_REQUEST_IN,
             VEHICLE_NOTIFY_IN,
@@ -502,146 +501,146 @@ private:
     // which the voice server library will call to send out data.
 
     CEvents                 m_Events;
-    CRemoteCalls*           m_pRemoteCalls;
-    CHTTPD*                 m_pHTTPD;
-    CMainConfig*            m_pMainConfig;
-    CBlipManager*           m_pBlipManager;
-    CGroups*                m_pGroups;
-    CColManager*            m_pColManager;
-    CObjectManager*         m_pObjectManager;
-    CPickupManager*         m_pPickupManager;
-    CPlayerManager*         m_pPlayerManager;
-    CRadarAreaManager*      m_pRadarAreaManager;
-    CVehicleManager*        m_pVehicleManager;
-    CPacketTranslator*      m_pPacketTranslator;
-    CMapManager*            m_pMapManager;
+    CRemoteCalls*           m_pRemoteCalls = nullptr;
+    CHTTPD*                 m_pHTTPD = nullptr;
+    CMainConfig*            m_pMainConfig = nullptr;
+    CBlipManager*           m_pBlipManager = nullptr;
+    CGroups*                m_pGroups = nullptr;
+    CColManager*            m_pColManager = nullptr;
+    CObjectManager*         m_pObjectManager = nullptr;
+    CPickupManager*         m_pPickupManager = nullptr;
+    CPlayerManager*         m_pPlayerManager = nullptr;
+    CRadarAreaManager*      m_pRadarAreaManager = nullptr;
+    CVehicleManager*        m_pVehicleManager = nullptr;
+    CPacketTranslator*      m_pPacketTranslator = nullptr;
+    CMapManager*            m_pMapManager = nullptr;
     CElementDeleter         m_ElementDeleter;
     CConnectHistory         m_FloodProtect;
-    CLuaManager*            m_pLuaManager;
-    CScriptDebugging*       m_pScriptDebugging;
-    CConsole*               m_pConsole;
-    CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
-    CPedSync*               m_pPedSync;
+    CLuaManager*            m_pLuaManager = nullptr;
+    CScriptDebugging*       m_pScriptDebugging = nullptr;
+    CConsole*               m_pConsole = nullptr;
+    CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync = nullptr;
+    CPedSync*               m_pPedSync = nullptr;
 #ifdef WITH_OBJECT_SYNC
     CObjectSync* m_pObjectSync;
 #endif
-    CMarkerManager*            m_pMarkerManager;
-    CClock*                    m_pClock;
-    CBanManager*               m_pBanManager;
-    CTeamManager*              m_pTeamManager;
-    CCommandLineParser         m_CommandLineParser;
-    CRegisteredCommands*       m_pRegisteredCommands;
-    CDatabaseManager*          m_pDatabaseManager;
-    CLuaCallbackManager*       m_pLuaCallbackManager;
-    CRegistryManager*          m_pRegistryManager;
-    CRegistry*                 m_pRegistry;
-    CAccountManager*           m_pAccountManager;
-    CLatentTransferManager*    m_pLatentTransferManager;
-    CDebugHookManager*         m_pDebugHookManager;
-    CPedManager*               m_pPedManager;
-    CResourceManager*          m_pResourceManager;
-    CAccessControlListManager* m_pACLManager;
-    CSettings*                 m_pSettings;
-    CZoneNames*                m_pZoneNames;
-    ASE*                       m_pASE;
-    CHandlingManager*          m_pHandlingManager;
-    CRPCFunctions*             m_pRPCFunctions;
-    CLanBroadcast*             m_pLanBroadcast;
-    CWaterManager*             m_pWaterManager;
+    CMarkerManager*            m_pMarkerManager = nullptr;
+    CClock*                    m_pClock = nullptr;
+    CBanManager*               m_pBanManager = nullptr;
+    CTeamManager*              m_pTeamManager = nullptr;
+    CCommandLineParser         m_CommandLineParser = nullptr;
+    CRegisteredCommands*       m_pRegisteredCommands = nullptr;
+    CDatabaseManager*          m_pDatabaseManager = nullptr;
+    CLuaCallbackManager*       m_pLuaCallbackManager = nullptr;
+    CRegistryManager*          m_pRegistryManager = nullptr;
+    CRegistry*                 m_pRegistry = nullptr;
+    CAccountManager*           m_pAccountManager = nullptr;
+    CLatentTransferManager*    m_pLatentTransferManager = nullptr;
+    CDebugHookManager*         m_pDebugHookManager = nullptr;
+    CPedManager*               m_pPedManager = nullptr;
+    CResourceManager*          m_pResourceManager = nullptr;
+    CAccessControlListManager* m_pACLManager = nullptr;
+    CSettings*                 m_pSettings = nullptr;
+    CZoneNames*                m_pZoneNames = nullptr;
+    ASE*                       m_pASE = nullptr;
+    CHandlingManager*          m_pHandlingManager = nullptr;
+    CRPCFunctions*             m_pRPCFunctions = nullptr;
+    CLanBroadcast*             m_pLanBroadcast = nullptr;
+    CWaterManager*             m_pWaterManager = nullptr;
 
-    CWeaponStatManager*      m_pWeaponStatsManager;
-    CBuildingRemovalManager* m_pBuildingRemovalManager;
+    CWeaponStatManager*      m_pWeaponStatsManager = nullptr;
+    CBuildingRemovalManager* m_pBuildingRemovalManager = nullptr;
 
-    CCustomWeaponManager* m_pCustomWeaponManager;
-    CFunctionUseLogger*   m_pFunctionUseLogger;
+    CCustomWeaponManager* m_pCustomWeaponManager = nullptr;
+    CFunctionUseLogger*   m_pFunctionUseLogger = nullptr;
 
-    char* m_szCurrentFileName;
+    char* m_szCurrentFileName = nullptr;
 
     // This client represents the console input
-    CConsoleClient* m_pConsoleClient;
+    CConsoleClient* m_pConsoleClient = nullptr;
 
-    float m_fGravity;
-    float m_fGameSpeed;
-    float m_fJetpackMaxHeight;
-    float m_fAircraftMaxHeight;
-    float m_fAircraftMaxVelocity;
-    float m_fAircraftMaxVelocity_Sq;
-    bool  m_bOcclusionsEnabled;
-    bool  m_bUsingMtaServerConf;
+    float m_fGravity = 0.0f;
+    float m_fGameSpeed = 0.0f;
+    float m_fJetpackMaxHeight = 0.0f;
+    float m_fAircraftMaxHeight = 0.0f;
+    float m_fAircraftMaxVelocity = 0.0f;
+    float m_fAircraftMaxVelocity_Sq = 0.0f;
+    bool  m_bOcclusionsEnabled = false;
+    bool  m_bUsingMtaServerConf = false;
 
-    unsigned char m_ucTrafficLightState;
-    bool          m_bTrafficLightsLocked;
-    long long     m_llLastTrafficUpdate;
+    unsigned char m_ucTrafficLightState = 0;
+    bool          m_bTrafficLightsLocked = false;
+    long long     m_llLastTrafficUpdate = 0;
 
-    unsigned char m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
-    unsigned char m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
-    bool          m_bHasSkyGradient;
+    unsigned char m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
+    unsigned char m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
+    bool          m_bHasSkyGradient = false;
 
     SHeatHazeSettings m_HeatHazeSettings;
-    bool              m_bHasHeatHaze;
+    bool              m_bHasHeatHaze = false;
 
-    bool          m_bOverrideWaterColor;
-    unsigned char m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
+    bool          m_bOverrideWaterColor = false;
+    unsigned char m_ucWaterRed = 0, m_ucWaterGreen = 0, m_ucWaterBlue = 0, m_ucWaterAlpha = 0;
 
-    bool m_bInteriorSoundsEnabled;
+    bool m_bInteriorSoundsEnabled = false;
 
-    bool  m_bOverrideRainLevel;
-    float m_fRainLevel;
+    bool  m_bOverrideRainLevel = false;
+    float m_fRainLevel = 0.0f;
 
-    bool  m_bOverrideSunSize;
-    float m_fSunSize;
+    bool  m_bOverrideSunSize = false;
+    float m_fSunSize = 0.0f;
 
-    bool m_bOverrideMoonSize;
-    int  m_iMoonSize;
+    bool m_bOverrideMoonSize = false;
+    int  m_iMoonSize = 0;
 
-    bool          m_bOverrideSunColor;
-    unsigned char m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
+    bool          m_bOverrideSunColor = false;
+    unsigned char m_ucSunCoreR = 0, m_ucSunCoreG = 0, m_ucSunCoreB = 0, m_ucSunCoronaR = 0, m_ucSunCoronaG = 0, m_ucSunCoronaB = 0;
 
-    bool  m_bOverrideWindVelocity;
-    float m_fWindVelX, m_fWindVelY, m_fWindVelZ;
+    bool  m_bOverrideWindVelocity = false;
+    float m_fWindVelX = 0.0f, m_fWindVelY = 0.0f, m_fWindVelZ = 0.0f;
 
-    bool  m_bOverrideFarClip;
-    float m_fFarClipDistance;
+    bool  m_bOverrideFarClip = false;
+    float m_fFarClipDistance = 0.0f;
 
-    bool  m_bOverrideFogDistance;
-    float m_fFogDistance;
+    bool  m_bOverrideFogDistance = false;
+    float m_fFogDistance = 0.0f;
 
-    SGarageStates m_bGarageStates;
+    SGarageStates m_bGarageStates = {};
 
     // FPS statistics
-    long long                                     m_llLastFPSTime;
-    unsigned short                                m_usFrames;
-    unsigned short                                m_usFPS;
-    int                                           m_iSyncFPS;
+    long long                                     m_llLastFPSTime = 0;
+    unsigned short                                m_usFrames = 0;
+    unsigned short                                m_usFPS = 0;
+    int                                           m_iSyncFPS = 0;
     std::map<std::string, eGlitchType>            m_GlitchNames;
-    SFixedArray<bool, NUM_GLITCHES>               m_Glitches;
-    SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
+    SFixedArray<bool, NUM_GLITCHES>               m_Glitches = {};
+    SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons = {};
 
     // This is ticked to true when the app should end
-    bool m_bIsFinished;
-    bool m_bBeingDeleted;
+    bool m_bIsFinished = false;
+    bool m_bBeingDeleted = false;
 
     // Clouds Enabled
-    bool m_bCloudsEnabled;
+    bool m_bCloudsEnabled = false;
 
-    COpenPortsTester*       m_pOpenPortsTester;
-    CMasterServerAnnouncer* m_pMasterServerAnnouncer;
-    CHqComms*               m_pHqComms;
+    COpenPortsTester*       m_pOpenPortsTester = nullptr; 
+    CMasterServerAnnouncer* m_pMasterServerAnnouncer = nullptr;
+    CHqComms*               m_pHqComms = nullptr;
 
     CLightsyncManager m_lightsyncManager;
 
-    bool m_bServerFullyUp;            // No http operations should be allowed unless this is true
+    bool m_bServerFullyUp = false;            // No http operations should be allowed unless this is true
 
-    bool      m_bLatentSendsEnabled;
-    int       m_iLatentSendsBandwidth;
-    CLuaMain* m_pLatentSendsLuaMain;
-    ushort    m_usLatentSendsResourceNetId;
+    bool      m_bLatentSendsEnabled = false;
+    int       m_iLatentSendsBandwidth = 0;
+    CLuaMain* m_pLatentSendsLuaMain = nullptr;
+    ushort    m_usLatentSendsResourceNetId = 0;
 
     SString m_strPrevMinClientKickRequirement;
     SString m_strPrevMinClientConnectRequirement;
     SString m_strPrevLowestConnectedPlayerVersion;
 
-    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler = nullptr;
 
-    bool m_DevelopmentModeEnabled;
+    bool m_DevelopmentModeEnabled = false;
 };

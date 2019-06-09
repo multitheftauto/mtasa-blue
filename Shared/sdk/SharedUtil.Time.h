@@ -61,7 +61,7 @@ namespace SharedUtil
     //
     class CTickCount
     {
-        long long m_llTicks;
+        long long m_llTicks = 0;
 
     public:
         // Constructors
@@ -140,10 +140,10 @@ namespace SharedUtil
     protected:
         long long DoGetTickCount() { return m_bUseModuleTickCount ? GetModuleTickCount64() : GetTickCount64_(); }
 
-        long long          m_llUpdateTime;
-        unsigned long long m_ullElapsedTime;
-        long long          m_llMaxIncrement;
-        bool               m_bUseModuleTickCount;
+        long long          m_llUpdateTime = 0;
+        unsigned long long m_ullElapsedTime = 0;
+        long long          m_llMaxIncrement = 0;
+        bool               m_bUseModuleTickCount = false;
     };
 
     //
@@ -203,7 +203,7 @@ namespace SharedUtil
         uint            m_uiMaxIncrement;
         uint            m_uiElapsedTime;
         uchar*          m_pucCounterValue;
-        CRefCountable** m_ppIntervalCounter;
+        CRefCountable** m_ppIntervalCounter =  nullptr;
     };
 
     //

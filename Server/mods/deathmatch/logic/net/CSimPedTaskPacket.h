@@ -13,8 +13,6 @@
 class CSimPedTaskPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
-
     CSimPedTaskPacket(ElementID PlayerID);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PED_TASK; };
@@ -29,7 +27,7 @@ public:
     // Set in Read ()
     struct
     {
-        uint uiNumBitsInPacketBody;
-        char DataBuffer[56];
+        uint uiNumBitsInPacketBody = 0;
+        char DataBuffer[56] = {0};
     } m_Cache;
 };

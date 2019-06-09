@@ -11,14 +11,14 @@
 struct CLangListItem
 {
     CLangListItem() : fFocusEffectPos(0), fFocusEffectTarget(0), pContainerPane(nullptr), pFlag(nullptr), pLabel(nullptr) {}
-    float            fFocusEffectPos;
-    float            fFocusEffectTarget;
+    float            fFocusEffectPos = 0.0f;
+    float            fFocusEffectTarget = 0.0f;
     SString          strLocale;
-    CGUIElement*     pContainerPane;
-    CGUIStaticImage* pFlag;
+    CGUIElement*     pContainerPane = nullptr;
+    CGUIStaticImage* pFlag = nullptr;
     CVector2D        vecFlagInitialPos;
     CVector2D        vecFlagInitialSize;
-    CGUILabel*       pLabel;
+    CGUILabel*       pLabel = nullptr;
     CVector2D        vecLabelInitialPos;
     CVector2D        vecLabelInitialSize;
 };
@@ -26,7 +26,6 @@ struct CLangListItem
 class CLanguageSelector
 {
 public:
-    ZERO_ON_NEW
     CLanguageSelector(CGUIElement* pMainMenuCanvas);
     ~CLanguageSelector();
     void DoPulse();
@@ -45,11 +44,11 @@ protected:
     bool           OnListItemClick(CGUIElement* pElement);
     bool           OnListDeactivate(CGUIElement* pElement);
 
-    CGUIScrollPane*            m_pButtonWindow;
-    CGUIWindow*                m_pListWindow;
+    CGUIScrollPane*            m_pButtonWindow = nullptr;
+    CGUIWindow*                m_pListWindow = nullptr;
     CLangListItem              m_ButtonItem;
     std::vector<CLangListItem> m_ListItems;
     CTickCount                 m_LastTickCount;
-    bool                       m_bMouseOverButton;
-    bool                       m_bListWasVisible;
+    bool                       m_bMouseOverButton = false;
+    bool                       m_bListWasVisible = false;
 };

@@ -31,8 +31,6 @@ namespace
 class CPerfStatDebugTableImpl : public CPerfStatDebugTable
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatDebugTableImpl();
     virtual ~CPerfStatDebugTableImpl();
 

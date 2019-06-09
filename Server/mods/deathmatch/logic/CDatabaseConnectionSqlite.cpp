@@ -21,7 +21,6 @@
 class CDatabaseConnectionSqlite : public CDatabaseConnection
 {
 public:
-    ZERO_ON_NEW
     CDatabaseConnectionSqlite(CDatabaseType* pManager, const SString& strPath, const SString& strOptions);
     virtual ~CDatabaseConnectionSqlite();
 
@@ -41,16 +40,16 @@ public:
     void BeginAutomaticTransaction();
     void EndAutomaticTransaction();
 
-    int            m_iRefCount;
-    CDatabaseType* m_pManager;
-    sqlite3*       m_handle;
-    bool           m_bOpened;
+    int            m_iRefCount = 0;
+    CDatabaseType* m_pManager = nullptr;
+    sqlite3*       m_handle = nullptr;
+    bool           m_bOpened = false;
     SString        m_strLastErrorMessage;
-    uint           m_uiLastErrorCode;
-    bool           m_bAutomaticTransactionsEnabled;
-    bool           m_bInAutomaticTransaction;
+    uint           m_uiLastErrorCode = 0;
+    bool           m_bAutomaticTransactionsEnabled = false;
+    bool           m_bInAutomaticTransaction = false;
     CTickCount     m_AutomaticTransactionStartTime;
-    bool           m_bMultipleStatements;
+    bool           m_bMultipleStatements = false;
 };
 
 ///////////////////////////////////////////////////////////////

@@ -17,7 +17,6 @@ struct STrailerInfo
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
     CSimVehiclePuresyncPacket(ElementID PlayerID, ushort usPlayerLatency, uchar ucPlayerSyncTimeContext, bool bPlayerHasOccupiedVehicle,
                               ushort usVehicleGotModel, uchar ucPlayerGotOccupiedVehicleSeat, uchar ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
                               CControllerState& sharedControllerState, uint m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo);
@@ -41,23 +40,23 @@ private:
 
     // Set in constructor
     const ElementID              m_PlayerID;
-    const ushort                 m_usPlayerLatency;
-    const uchar                  m_ucPlayerSyncTimeContext;
-    const bool                   m_bPlayerHasOccupiedVehicle;
-    const ushort                 m_usVehicleGotModel;
-    const uchar                  m_ucPlayerGotOccupiedVehicleSeat;
-    const uchar                  m_ucPlayerGotWeaponType;
-    const float                  m_fPlayerGotWeaponRange;
+    const ushort                 m_usPlayerLatency = 0;
+    const uchar                  m_ucPlayerSyncTimeContext = 0;
+    const bool                   m_bPlayerHasOccupiedVehicle = false;
+    const ushort                 m_usVehicleGotModel = 0;
+    const uchar                  m_ucPlayerGotOccupiedVehicleSeat = 0;
+    const uchar                  m_ucPlayerGotWeaponType = 0;
+    const float                  m_fPlayerGotWeaponRange = 0.0f;
     CControllerState&            m_sharedControllerState;
-    const uint                   m_uiDamageInfoSendPhase;
+    const uint                   m_uiDamageInfoSendPhase = 0;
     const SSimVehicleDamageInfo& m_DamageInfo;
 
     // Set in Read()
     struct
     {
-        uchar ucTimeContext;
+        uchar ucTimeContext = 0;
 
-        int iModelID;
+        int iModelID = 0;
 
         CVector PlrPosition;
         CVector vecCamPosition;
@@ -68,34 +67,34 @@ private:
         CVector BothVelocity;
         CVector VehTurnSpeed;
 
-        float fVehHealth;
+        float fVehHealth = 0.0f;
 
         std::vector<STrailerInfo> TrailerList;
 
-        float                 fPlrHealth;
-        float                 fArmor;
-        SVehiclePuresyncFlags flags;
+        float                 fPlrHealth = 0.0f;
+        float                 fArmor = 0.0f;
+        SVehiclePuresyncFlags flags = {};
 
-        uchar ucWeaponSlot;
+        uchar ucWeaponSlot = 0;
 
-        ushort usAmmoInClip;
-        ushort usTotalAmmo;
+        ushort usAmmoInClip = 0;
+        ushort usTotalAmmo = 0;
 
-        float   fAimDirection;
+        float   fAimDirection = 0.0f;
         CVector vecSniperSource;
         CVector vecTargetting;
 
-        uchar ucDriveByDirection;
+        uchar ucDriveByDirection = 0;
 
-        float  fTurretX;
-        float  fTurretY;
-        ushort usAdjustableProperty;
+        float  fTurretX = 0.0f;
+        float  fTurretY = 0.0f;
+        ushort usAdjustableProperty = 0;
 
-        float fRailPosition;
-        uchar ucRailTrack;
-        bool  bRailDirection;
-        float fRailSpeed;
+        float fRailPosition = 0.0f;
+        uchar ucRailTrack  = 0;
+        bool  bRailDirection = false;
+        float fRailSpeed = 0.0f;
 
-        SFixedArray<float, 4> fDoorOpenRatio;
+        SFixedArray<float, 4> fDoorOpenRatio = {};
     } m_Cache;
 };

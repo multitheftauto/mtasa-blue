@@ -30,7 +30,7 @@ public:
     PVOID GetFunctionPointer(const std::string& FunctionName);
 
 private:
-    HMODULE m_hLoadedModule;
-    bool    m_bStatus;
+    HMODULE m_hLoadedModule = nullptr;
+    bool    m_bStatus = false;
     SString m_strLastError;
 };

@@ -89,34 +89,34 @@ struct SMappingLine
 //
 struct SInputDeviceInfo
 {
-    IDirectInputDevice8A* pDevice;
-    bool                  bDoneEnumAxes;
-    int                   iAxisCount;
-    int                   iDeadZone;
-    int                   iSaturation;
-    GUID                  guidProduct;
-    string                strGuid;
-    string                strProductName;
+    IDirectInputDevice8A* pDevice = nullptr;
+    bool                  bDoneEnumAxes = false;
+    int                   iAxisCount = 0;
+    int                   iDeadZone = 0;
+    int                   iSaturation = 0;
+    GUID                  guidProduct = {};
+    std::string           strGuid;
+    std::string           strProductName;
 
     struct
     {
-        bool  bEnabled;
-        long  lMax;
-        long  lMin;
-        DWORD dwType;
-        float fAutoDeadZoneSample;
+        bool  bEnabled = false;
+        long  lMax = 0;
+        long  lMin = 0;
+        DWORD dwType = 0;
+        float fAutoDeadZoneSample = 0.0f;
     } axis[7];
 };
 
 // Internal state
 struct SJoystickState
 {
-    float rgfAxis[7];     /* axis positions     -1.f to 1.f       */
-    DWORD rgdwPOV[4];     /* POV directions                       */
-    BYTE  rgbButtons[32]; /* 32 buttons                           */
-    BYTE  rgbButtonsWas[32];
-    BYTE  povButtonsWas[4];
-    BYTE  axisButtonsWas[14];            // Axis as buttons
+    float rgfAxis[7] = {}; /* axis positions     -1.f to 1.f       */
+    DWORD rgdwPOV[4] = {}; /* POV directions                       */
+    BYTE  rgbButtons[32] = {}; /* 32 buttons                           */
+    BYTE  rgbButtonsWas[32] = {};
+    BYTE  povButtonsWas[4] = {};
+    BYTE  axisButtonsWas[14] = {};            // Axis as buttons
 };
 
 ///////////////////////////////////////////////////////////////
@@ -127,7 +127,6 @@ struct SJoystickState
 class CJoystickManager : public CJoystickManagerInterface
 {
 public:
-    ZERO_ON_NEW
     CJoystickManager();
     ~CJoystickManager();
 
@@ -174,25 +173,25 @@ private:
     CXMLNode* GetConfigNode(bool bCreateIfRequired);
     bool      LoadFromXML();
 
-    bool             m_bDoneInit;
-    int              m_SettingsRevision;
+    bool             m_bDoneInit = false;
+    int              m_SettingsRevision = 0;
     SInputDeviceInfo m_DevInfo;
     SJoystickState   m_JoystickState;
-    SMappingLine     m_currentMapping[10];
-    bool             m_bUseXInput;
-    bool             m_bXInputDeviceAttached;
-    uint             m_uiXInputReattachDelay;
+    SMappingLine     m_currentMapping[10] = {};
+    bool             m_bUseXInput = false;
+    bool             m_bXInputDeviceAttached = false;
+    uint             m_uiXInputReattachDelay = 0;
     CElapsedTime     m_XInputReattachTimer;
-    bool             m_bAutoDeadZoneEnabled;
-    int              m_iAutoDeadZoneCounter;
+    bool             m_bAutoDeadZoneEnabled = false;
+    int              m_iAutoDeadZoneCounter = 0;
 
     // Used during axis binding
-    bool           m_bCaptureAxis;
-    int            m_iCaptureOutputIndex;
+    bool           m_bCaptureAxis = false;
+    int            m_iCaptureOutputIndex = 0;
     SJoystickState m_PreBindJoystickState;
 
-    DIJOYCONFIG* m_pPreferredJoyCfg;
-    bool         m_bPreferredJoyCfgValid;
+    DIJOYCONFIG* m_pPreferredJoyCfg = nullptr;
+    bool         m_bPreferredJoyCfgValid = false;
 };
 
 ///////////////////////////////////////////////////////////////

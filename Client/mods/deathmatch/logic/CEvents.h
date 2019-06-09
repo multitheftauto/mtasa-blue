@@ -50,6 +50,6 @@ private:
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
     std::vector<int>               m_CancelledList;
-    bool                           m_bEventCancelled;
-    bool                           m_bWasEventCancelled;
+    bool                           m_bEventCancelled = false;
+    bool                           m_bWasEventCancelled = false;
 };

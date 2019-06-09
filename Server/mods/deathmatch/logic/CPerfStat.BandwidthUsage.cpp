@@ -93,8 +93,6 @@ namespace
 class CPerfStatBandwidthUsageImpl : public CPerfStatBandwidthUsage
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatBandwidthUsageImpl();
     virtual ~CPerfStatBandwidthUsageImpl();
 
@@ -110,13 +108,13 @@ public:
     void LoadStats();
     void SaveStats();
 
-    long long                        m_llNextRecordTime;
-    long long                        m_llNextSaveTime;
+    long long                        m_llNextRecordTime = 0;
+    long long                        m_llNextSaveTime = 0;
     SString                          m_strCategoryName;
     SBandwidthStatistics             m_PrevLiveStats;
-    long long                        m_llPrevHttpTotalBytesSent;
+    long long                        m_llPrevHttpTotalBytesSent =  0;
     std::vector<SNetStatHistoryType> m_History;
-    SDbConnectionId                  m_DatabaseConnection;
+    SDbConnectionId                  m_DatabaseConnection = 0;
 };
 
 ///////////////////////////////////////////////////////////////

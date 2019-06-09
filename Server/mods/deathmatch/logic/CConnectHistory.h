@@ -37,10 +37,10 @@ private:
     void      RemoveExpired();
     long long GetModuleTickCount64();
 
-    unsigned long  m_ulSamplePeriod;
-    unsigned long  m_ulMaxConnections;
-    unsigned long  m_ulBanLength;
+    unsigned long  m_ulSamplePeriod = 0;
+    unsigned long  m_ulMaxConnections = 0;
+    unsigned long  m_ulBanLength = 0;
     HistoryItemMap m_HistoryItemMap;
-    long long      m_llTimeLastRemoveExpired;
-    long long      m_llDebugTickCountOffset;
+    long long      m_llTimeLastRemoveExpired = 0;
+    long long      m_llDebugTickCountOffset = 0;
 };

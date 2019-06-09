@@ -46,12 +46,9 @@ class CMultiplayerSA : public CMultiplayer
     friend class COffsetsMP;
 
 private:
-    CRemoteDataSA* RemoteData;
-    CPopulationSA* Population;
-
+    CRemoteDataSA* RemoteData = nullptr;
+    CPopulationSA* Population = nullptr;
 public:
-    ZERO_ON_NEW
-
     CMultiplayerSA();
     void                InitHooks();
     void                InitHooks_CrashFixHacks();
@@ -289,28 +286,28 @@ public:
     DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     CVector      m_vecAkimboTarget;
-    bool         m_bAkimboTargetUp;
+    bool         m_bAkimboTargetUp = false;
     static char* ms_PlayerImgCachePtr;
-    bool         m_bBadDrivebyHitboxesDisabled;
+    bool         m_bBadDrivebyHitboxesDisabled = false;
 
 private:
-    bool                m_bSuspensionEnabled;
+    bool                m_bSuspensionEnabled = false;
     std::vector<char>   m_PlayerImgCache;
-    EFastClothesLoading m_FastClothesLoading;
+    EFastClothesLoading m_FastClothesLoading = EFastClothesLoading::FAST_CLOTHES_OFF;
     CLimitsSA           m_limits;
-    bool                m_bEnabledLODSystem;
-    bool                m_bEnabledAltWaterOrder;
-    bool                m_bEnabledClothesMemFix;
-    float               m_fAircraftMaxHeight;
-    float               m_fAircraftMaxVelocity;
-    float               m_fAircraftMaxVelocity_Sq;
-    bool                m_bHeatHazeEnabled;
-    bool                m_bHeatHazeCustomized;
-    float               m_fNearClipDistance;
-    float               m_fMaddDoggPoolLevel;
-    DWORD               m_dwLastStaticAnimGroupID;
-    DWORD               m_dwLastStaticAnimID;
-    DWORD               m_dwLastAnimArrayAddress;
+    bool                m_bEnabledLODSystem = false;
+    bool                m_bEnabledAltWaterOrder = false;
+    bool                m_bEnabledClothesMemFix = false;
+    float               m_fAircraftMaxHeight = 0.0f;
+    float               m_fAircraftMaxVelocity = 0.0f;
+    float               m_fAircraftMaxVelocity_Sq = 0.0f;
+    bool                m_bHeatHazeEnabled = false;
+    bool                m_bHeatHazeCustomized = false;
+    float               m_fNearClipDistance = 0.0f;
+    float               m_fMaddDoggPoolLevel = 0.0f;
+    DWORD               m_dwLastStaticAnimGroupID = 0;
+    DWORD               m_dwLastStaticAnimID = 0;
+    DWORD               m_dwLastAnimArrayAddress = 0;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

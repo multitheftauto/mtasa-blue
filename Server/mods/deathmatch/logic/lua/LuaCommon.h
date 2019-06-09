@@ -91,6 +91,6 @@ struct SLuaDebugInfo
     }
     SString strFile;
     SString strShortSrc;
-    int     iLine;
-    int     infoType;
+    int     iLine = 0;
+    int     infoType = 0;
 };

@@ -125,15 +125,15 @@ struct SSirenBeaconInfo
 struct SSirenInfo
 {
     // Flags
-    bool m_b360Flag;
-    bool m_bDoLOSCheck;
-    bool m_bUseRandomiser;
-    bool m_bSirenSilent;
+    bool m_b360Flag = false;
+    bool m_bDoLOSCheck = false;
+    bool m_bUseRandomiser = false;
+    bool m_bSirenSilent = false;
     // End of flags
-    bool                             m_bOverrideSirens;
-    unsigned char                    m_ucSirenType;
-    unsigned char                    m_ucSirenCount;
-    SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
+    bool                             m_bOverrideSirens = false;
+    unsigned char                    m_ucSirenType = 0;
+    unsigned char                    m_ucSirenCount = 0;
+    SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo = {};
 };
 
 class CVehicle : public CElement
@@ -141,7 +141,6 @@ class CVehicle : public CElement
     friend class CPlayer;
 
 public:
-    ZERO_ON_NEW
     CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     ~CVehicle();
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
@@ -350,97 +349,97 @@ protected:
     bool ReadSpecialData(const int iLine) override;
 
 private:
-    class CVehicleManager* m_pVehicleManager;
+    class CVehicleManager* m_pVehicleManager = nullptr;
 
-    CPlayer*                              m_pSyncer;
-    SFixedArray<CPed*, MAX_VEHICLE_SEATS> m_pOccupants;
+    CPlayer*                              m_pSyncer = nullptr;
+    SFixedArray<CPed*, MAX_VEHICLE_SEATS> m_pOccupants = {};
 
-    unsigned short m_usModel;
-    eVehicleType   m_eVehicleType;
+    unsigned short m_usModel = 0;
+    eVehicleType   m_eVehicleType = eVehicleType::VEHICLE_NONE;
     CVector        m_vecPosition;
     CVector        m_vecRotationDegrees;
     CVector        m_vecVelocity;
     CVector        m_vecVelocityMeters;
     CVector        m_vecTurnSpeed;
-    float          m_fHealth;
-    float          m_fLastSyncedHealthHealth;
+    float          m_fHealth = 0.0f;
+    float          m_fLastSyncedHealthHealth = 0.0f;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
 
-    unsigned char m_ucMaxPassengersOverride;
+    unsigned char m_ucMaxPassengersOverride = 0;
 
     CVehicleColor m_Color;
 
-    bool m_bIsFrozen;
-    bool m_bUnoccupiedSyncable;
+    bool m_bIsFrozen = false;
+    bool m_bUnoccupiedSyncable = false;
 
-    CVehicleUpgrades* m_pUpgrades;
+    CVehicleUpgrades* m_pUpgrades = nullptr;
 
-    unsigned char m_ucOverrideLights;
+    unsigned char m_ucOverrideLights = 0;
 
-    CVehicle* m_pTowedVehicle;
-    CVehicle* m_pTowedByVehicle;
+    CVehicle* m_pTowedVehicle = nullptr;
+    CVehicle* m_pTowedByVehicle = nullptr;
 
-    char          m_szRegPlate[9];
-    unsigned char m_ucPaintjob;
+    char          m_szRegPlate[9] = {0};
+    unsigned char m_ucPaintjob = 0;
 
-    SFixedArray<float, 6> m_fDoorOpenRatio;
-    bool                  m_bLocked;
-    bool                  m_bDoorsUndamageable;
-    bool                  m_bEngineOn;
-    bool                  m_bGunsEnabled;
-    bool                  m_bFuelTankExplodable;
-    bool                  m_bOnGround;
-    bool                  m_bSmokeTrail;
-    unsigned char         m_ucAlpha;
-    bool                  m_bInWater;
-    CPlayer*              m_pJackingPlayer;
+    SFixedArray<float, 6> m_fDoorOpenRatio = {};
+    bool                  m_bLocked = false;
+    bool                  m_bDoorsUndamageable = false;
+    bool                  m_bEngineOn = false;
+    bool                  m_bGunsEnabled = false;
+    bool                  m_bFuelTankExplodable = false;
+    bool                  m_bOnGround = false;
+    bool                  m_bSmokeTrail = false;
+    unsigned char         m_ucAlpha = 0;
+    bool                  m_bInWater = false;
+    CPlayer*              m_pJackingPlayer = nullptr;
     SColor                m_HeadLightColor;
-    bool                  m_bHeliSearchLightVisible;
+    bool                  m_bHeliSearchLightVisible = false;
 
     // Train specific data
-    bool  m_bDerailed;
-    bool  m_bIsDerailable;
-    bool  m_bTrainDirection;
-    float m_fTrainSpeed;
-    float m_fTrainPosition;
-    uchar m_ucTrackID;
+    bool  m_bDerailed = false;
+    bool  m_bIsDerailable = false;
+    bool  m_bTrainDirection = false;
+    float m_fTrainSpeed = 0.0f;
+    float m_fTrainPosition = 0.0f;
+    uchar m_ucTrackID = 0;
 
     // Used to remember where this vehicle spawns
     CVector       m_vecRespawnPosition;
     CVector       m_vecRespawnRotationDegrees;
-    float         m_fRespawnHealth;
-    bool          m_bRespawnEnabled;
-    unsigned long m_ulBlowRespawnInterval;
-    unsigned long m_ulIdleRespawnInterval;
+    float         m_fRespawnHealth = 0.0f; 
+    bool          m_bRespawnEnabled = false;
+    unsigned long m_ulBlowRespawnInterval = 0;
+    unsigned long m_ulIdleRespawnInterval = 0;
 
     // Vehicle specific data
     float          m_fTurretPositionX;
     float          m_fTurretPositionY;
-    bool           m_bSirenActive;
-    bool           m_bTaxiLightState;
-    bool           m_bLandingGearDown;
-    unsigned short m_usAdjustableProperty;
-    bool           m_bCollisionsEnabled;
+    bool           m_bSirenActive = false;
+    bool           m_bTaxiLightState = false;
+    bool           m_bLandingGearDown = false;
+    unsigned short m_usAdjustableProperty = 0;
+    bool           m_bCollisionsEnabled = false;
 
-    CHandlingEntry* m_pHandlingEntry;
-    bool            m_bHandlingChanged;
+    CHandlingEntry* m_pHandlingEntry = nullptr;
+    bool            m_bHandlingChanged = false;
 
-    unsigned char m_ucVariant;
-    unsigned char m_ucVariant2;
+    unsigned char m_ucVariant = 0;
+    unsigned char m_ucVariant2 = 0;
 
     CTickCount m_LastPushedTime;
     CVector    m_vecStationaryCheckPosition;
-    bool       m_bNeedsDimensionResync;
-    ushort     m_usLastUnoccupiedSyncDimension;
+    bool       m_bNeedsDimensionResync = false;
+    ushort     m_usLastUnoccupiedSyncDimension = 0;
 
 public:            // 'Safe' variables (that have no need for accessors)
-    bool                                   m_bDamageProof;
-    uint                                   m_uiDamageInfoSendPhase;
-    SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;
-    SFixedArray<unsigned char, MAX_WHEELS> m_ucWheelStates;
-    SFixedArray<unsigned char, MAX_PANELS> m_ucPanelStates;
-    SFixedArray<unsigned char, MAX_LIGHTS> m_ucLightStates;
+    bool                                   m_bDamageProof = false;
+    uint                                   m_uiDamageInfoSendPhase = 0;
+    SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates = {};
+    SFixedArray<unsigned char, MAX_WHEELS> m_ucWheelStates = {};
+    SFixedArray<unsigned char, MAX_PANELS> m_ucPanelStates = {};
+    SFixedArray<unsigned char, MAX_LIGHTS> m_ucLightStates = {};
     SSirenInfo                             m_tSirenBeaconInfo;
-    bool                                   m_bOccupantChanged;
+    bool                                   m_bOccupantChanged = false;
 };

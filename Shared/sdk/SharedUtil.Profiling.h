@@ -136,7 +136,7 @@ namespace SharedUtil
         void FrameEnd();
 
         SStatResultCollection m_CollectionCombo;
-        float                 m_fNextMaxClearTime;
+        float                 m_fNextMaxClearTime = 0.0f;
     };
 
 }            // namespace SharedUtil

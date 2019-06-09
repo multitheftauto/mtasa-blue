@@ -10,11 +10,11 @@
 
 struct SMasterServerDefinition
 {
-    bool    bAcceptsPush;
-    bool    bDoReminders;
-    bool    bHideProblems;
-    bool    bHideSuccess;
-    uint    uiReminderIntervalMins;
+    bool    bAcceptsPush = false;
+    bool    bDoReminders = false;
+    bool    bHideProblems = false;
+    bool    bHideSuccess = false;
+    uint    uiReminderIntervalMins = 0;
     SString strDesc;
     SString strURL;
 };
@@ -35,8 +35,6 @@ enum
 class CMasterServer : public CRefCountable
 {
 public:
-    ZERO_ON_NEW
-
     CMasterServer(const SMasterServerDefinition& definition) : m_Definition(definition)
     {
         m_Stage = ANNOUNCE_STAGE_INITIAL;
@@ -180,13 +178,13 @@ public:
     static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
-    bool                          m_bStatusBusy;
-    uint                          m_Stage;
-    uint                          m_uiInitialAnnounceRetryAttempts;
-    uint                          m_uiInitialAnnounceRetryInterval;
-    uint                          m_uiPushInterval;
-    long long                     m_llLastAnnounceTime;
-    long long                     m_llLastPushTime;
+    bool                          m_bStatusBusy = false;
+    uint                          m_Stage = 0;
+    uint                          m_uiInitialAnnounceRetryAttempts = 0;
+    uint                          m_uiInitialAnnounceRetryInterval = 0;
+    uint                          m_uiPushInterval = 0;
+    long long                     m_llLastAnnounceTime = 0;
+    long long                     m_llLastPushTime = 0;
     const SMasterServerDefinition m_Definition;
 };
 
@@ -198,8 +196,6 @@ protected:
 class CMasterServerAnnouncer
 {
 public:
-    ZERO_ON_NEW
-
     ~CMasterServerAnnouncer()
     {
         while (!m_MasterServerList.empty())

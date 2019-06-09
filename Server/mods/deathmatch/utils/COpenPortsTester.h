@@ -11,8 +11,6 @@
 class COpenPortsTester
 {
 public:
-    ZERO_ON_NEW
-
     //
     // Start a new test
     //
@@ -133,5 +131,5 @@ public:
     static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
-    int m_iPortTestStage;
+    int m_iPortTestStage = 0;
 };

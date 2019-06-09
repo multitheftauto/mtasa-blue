@@ -33,7 +33,6 @@ namespace
 class CPerfStatSqliteTimingImpl : public CPerfStatSqliteTiming
 {
 public:
-    ZERO_ON_NEW
     CPerfStatSqliteTimingImpl();
     virtual ~CPerfStatSqliteTimingImpl();
 
@@ -52,11 +51,11 @@ public:
     void GetSqliteTimingStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
 
     SString                       m_strCategoryName;
-    long long                     m_llRecordStatsEndTime;
-    bool                          m_bDisableBatching;
+    long long                     m_llRecordStatsEndTime = 0;
+    bool                          m_bDisableBatching = false;
     std::map<CRegistry*, SString> m_RegistryMap;
     std::list<CTimingInfo>        m_TimingList;
-    lua_State*                    m_currentluaVM;
+    lua_State*                    m_currentluaVM = nulptr;
 };
 
 ///////////////////////////////////////////////////////////////

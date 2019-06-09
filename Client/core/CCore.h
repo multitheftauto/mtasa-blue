@@ -78,7 +78,6 @@ extern SString              g_strJingleBells;
 class CCore : public CCoreInterface, public CSingleton<CCore>
 {
 public:
-    ZERO_ON_NEW
     CCore();
     ~CCore();
 
@@ -277,31 +276,31 @@ public:
     HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 private:
     // Core devices.
-    CXML*               m_pXML;
-    CLocalGUI*          m_pLocalGUI;
-    CGraphics*          m_pGraphics;
-    CCommands*          m_pCommands;
-    CDirect3DData*      m_pDirect3DData;
-    CConnectManager*    m_pConnectManager;
-    CModelCacheManager* m_pModelCacheManager;
+    CXML*               m_pXML = nullptr;
+    CLocalGUI*          m_pLocalGUI = nullptr;
+    CGraphics*          m_pGraphics = nullptr;
+    CCommands*          m_pCommands = nullptr;
+    CDirect3DData*      m_pDirect3DData = nullptr;
+    CConnectManager*    m_pConnectManager = nullptr;
+    CModelCacheManager* m_pModelCacheManager = nullptr;
 
     // Instances (put new classes here!)
-    CXMLFile*          m_pConfigFile;
+    CXMLFile*          m_pConfigFile = nullptr;
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
-    CTrayIcon*         m_pTrayIcon;
+    CTrayIcon*         m_pTrayIcon = nullptr;
 
     // Hook interfaces.
-    CMessageLoopHook*        m_pMessageLoopHook;
-    CDirectInputHookManager* m_pDirectInputHookManager;
-    CDirect3DHookManager*    m_pDirect3DHookManager;
+    CMessageLoopHook*        m_pMessageLoopHook = nullptr;
+    CDirectInputHookManager* m_pDirectInputHookManager = nullptr;
+    CDirect3DHookManager*    m_pDirect3DHookManager = nullptr;
     // CFileSystemHook *           m_pFileSystemHook;
-    CSetCursorPosHook* m_pSetCursorPosHook;
+    CSetCursorPosHook* m_pSetCursorPosHook = nullptr;
 
-    bool m_bLastFocused;
-    int  m_iUnminimizeFrameCounter;
-    bool m_bDidRecreateRenderTargets;
-    bool m_bIsWindowMinimized;
+    bool m_bLastFocused = false;
+    int  m_iUnminimizeFrameCounter = 0;
+    bool m_bDidRecreateRenderTargets = false;
+    bool m_bIsWindowMinimized = false;
 
     // Module loader objects.
     CModuleLoader m_GameModule;
@@ -312,58 +311,58 @@ private:
     CModuleLoader m_WebCoreModule;
 
     // Mod manager
-    CModManager* m_pModManager;
+    CModManager* m_pModManager = nullptr;
 
     // Module interfaces.
-    CGame*        m_pGame;
-    CNet*         m_pNet;
-    CMultiplayer* m_pMultiplayer;
-    CGUI*         m_pGUI;
+    CGame*        m_pGame = nullptr;
+    CNet*         m_pNet = nullptr;
+    CMultiplayer* m_pMultiplayer = nullptr;
+    CGUI*         m_pGUI = nullptr;
 
     // Logger utility interface.
-    CConsoleLogger* m_pConsoleLogger;
+    CConsoleLogger* m_pConsoleLogger = nullptr;
 
-    CLocalization* m_pLocalization;
+    CLocalization* m_pLocalization = nullptr;
 
-    CKeyBinds*     m_pKeyBinds;
-    CMouseControl* m_pMouseControl;
+    CKeyBinds*     m_pKeyBinds = nullptr;
+    CMouseControl* m_pMouseControl = nullptr;
 
-    bool              m_bFirstFrame;
-    bool              m_bIsOfflineMod;
-    bool              m_bCursorToggleControls;
-    pfnProcessMessage m_pfnMessageProcessor;
+    bool              m_bFirstFrame = false;
+    bool              m_bIsOfflineMod = false;
+    bool              m_bCursorToggleControls = false;
+    pfnProcessMessage m_pfnMessageProcessor = nullptr;
 
-    CGUIMessageBox* m_pMessageBox;
+    CGUIMessageBox* m_pMessageBox = nullptr;
 
     // screen res
     DEVMODE m_Current;
 
     SString m_strModInstallRoot;
 
-    bool m_bQuitOnPulse;
-    bool m_bDestroyMessageBox;
+    bool m_bQuitOnPulse = false;
+    bool m_bDestroyMessageBox = false;
 
-    bool                 m_bDoneFrameRateLimit;
-    uint                 m_uiServerFrameRateLimit;
-    uint                 m_uiClientScriptFrameRateLimit;
-    uint                 m_uiFrameRateLimit;
+    bool                 m_bDoneFrameRateLimit = false;
+    uint                 m_uiServerFrameRateLimit = 0;
+    uint                 m_uiClientScriptFrameRateLimit = 0;
+    uint                 m_uiFrameRateLimit = 0;
     CElapsedTimeHD       m_FrameRateTimer;
-    uint                 m_uiQueuedFrameRate;
-    bool                 m_bQueuedFrameRateValid;
-    bool                 m_bWaitToSetNick;
-    uint                 m_uiNewNickWaitFrames;
-    EDiagnosticDebugType m_DiagnosticDebug;
-    float                m_fMinStreamingMemory;
-    float                m_fMaxStreamingMemory;
-    bool                 m_bGettingIdleCallsFromMultiplayer;
-    bool                 m_bWindowsTimerEnabled;
-    bool                 m_bModulesLoaded;
-    int                  m_iDummyProgressValue;
-    HANDLE               m_DummyProgressTimerHandle;
+    uint                 m_uiQueuedFrameRate = 0;
+    bool                 m_bQueuedFrameRateValid = false;
+    bool                 m_bWaitToSetNick = false;
+    uint                 m_uiNewNickWaitFrames = 0;
+    EDiagnosticDebugType m_DiagnosticDebug = EDiagnosticDebugType::NONE;
+    float                m_fMinStreamingMemory = 0.0f;
+    float                m_fMaxStreamingMemory = 0.0f;
+    bool                 m_bGettingIdleCallsFromMultiplayer = false;
+    bool                 m_bWindowsTimerEnabled = false;
+    bool                 m_bModulesLoaded = false;
+    int                  m_iDummyProgressValue = 0;
+    HANDLE               m_DummyProgressTimerHandle = nullptr;
     SString              m_strDummyProgressType;
-    bool                 m_bDummyProgressUpdateAlways;
-    bool                 m_bIsRenderingGrass;
-    bool                 m_bFakeLagCommandEnabled;
+    bool                 m_bDummyProgressUpdateAlways = false;
+    bool                 m_bIsRenderingGrass = false;
+    bool                 m_bFakeLagCommandEnabled = false;
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);

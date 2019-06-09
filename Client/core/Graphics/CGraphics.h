@@ -67,7 +67,6 @@ class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
     friend CPrimitiveMaterialBatcher;
 
 public:
-    ZERO_ON_NEW
     CGraphics(CLocalGUI* pGUI);
     ~CGraphics();
 
@@ -195,33 +194,33 @@ private:
                                       unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
                                       float fRotationCenterY);
 
-    CLocalGUI* m_pGUI;
+    CLocalGUI* m_pGUI = nullptr;
 
-    int            m_iDebugQueueRefs;
-    int            m_iDrawBatchRefCount;
-    EBlendModeType m_ActiveBlendMode;
-    EDrawModeType  m_CurDrawMode;
-    EBlendModeType m_CurBlendMode;
+    int            m_iDebugQueueRefs = 0;
+    int            m_iDrawBatchRefCount = 0;
+    EBlendModeType m_ActiveBlendMode = EBlendModeType::NONE;
+    EDrawModeType  m_CurDrawMode = EDrawModeType::NONE;
+    EBlendModeType m_CurBlendMode = EBlendModeType::NONE;
 
-    LPD3DXSPRITE m_pDXSprite;
+    LPD3DXSPRITE m_pDXSprite = nullptr;
 
-    IDirect3DDevice9* m_pDevice;
+    IDirect3DDevice9* m_pDevice = nullptr;
 
-    CRenderItemManager*        m_pRenderItemManager;
-    CScreenGrabberInterface*   m_pScreenGrabber;
-    CPixelsManagerInterface*   m_pPixelsManager;
-    CTileBatcher*              m_pTileBatcher;
-    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
-    CPrimitiveBatcher*         m_pPrimitiveBatcher;
-    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
-    CAspectRatioConverter*     m_pAspectRatioConverter;
+    CRenderItemManager*        m_pRenderItemManager = nullptr;
+    CScreenGrabberInterface*   m_pScreenGrabber = nullptr;
+    CPixelsManagerInterface*   m_pPixelsManager = nullptr;
+    CTileBatcher*              m_pTileBatcher = nullptr;
+    CLine3DBatcher*            m_pLine3DBatcherPreGUI = nullptr;
+    CLine3DBatcher*            m_pLine3DBatcherPostGUI = nullptr;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI = nullptr;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI = nullptr;
+    CPrimitiveBatcher*         m_pPrimitiveBatcher = nullptr;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher = nullptr;
+    CAspectRatioConverter*     m_pAspectRatioConverter = nullptr;
 
     // Fonts
-    ID3DXFont* m_pDXFonts[NUM_FONTS];
-    ID3DXFont* m_pBigDXFonts[NUM_FONTS];
+    ID3DXFont* m_pDXFonts[NUM_FONTS] = {};
+    ID3DXFont* m_pBigDXFonts[NUM_FONTS] = {};
 
     std::vector<SString> m_FontResourceNames;
 
@@ -338,7 +337,7 @@ private:
     void RemoveQueueRef(IUnknown* pUnknown);
 
     // Drawing types
-    struct ID3DXLine* m_pLineInterface;
+    struct ID3DXLine* m_pLineInterface = nullptr;
 
     enum EMTARenderZone
     {
@@ -347,20 +346,20 @@ private:
         MTA_RZONE_OUTSIDE,            // MTA rendering outside known areas. i.e. During a keypress or GTA callback
     };
 
-    EMTARenderZone                          m_MTARenderZone;
-    int                                     m_iOutsideZoneCount;
-    IDirect3DStateBlock9*                   m_pSavedStateBlock;
+    EMTARenderZone                          m_MTARenderZone = EMTARenderZone::MTA_RZONE_NONE;
+    int                                     m_iOutsideZoneCount = 0;
+    IDirect3DStateBlock9*                   m_pSavedStateBlock = nullptr;
     CElapsedTime                            m_LastRenderedSceneTimer;
-    IDirect3DSurface9*                      m_pSavedFrontBufferData;
-    CRenderTargetItem*                      m_pTempBackBufferData;
-    CTextureItem*                           m_ProgressSpinnerTexture;
-    CTextureItem*                           m_RectangleEdgeTexture;
+    IDirect3DSurface9*                      m_pSavedFrontBufferData = nullptr;
+    CRenderTargetItem*                      m_pTempBackBufferData = nullptr;
+    CTextureItem*                           m_ProgressSpinnerTexture = nullptr;
+    CTextureItem*                           m_RectangleEdgeTexture = nullptr;
     SString                                 m_strProgressMessage;
     CElapsedTime                            m_FirstDrawnProgressTimer;
     CElapsedTime                            m_LastDrawnProgressTimer;
     CElapsedTime                            m_LastLostDeviceTimer;
-    bool                                    m_bProgressVisible;
+    bool                                    m_bProgressVisible = false;
     CElapsedTime                            m_ProgressAnimTimer;
-    uint                                    m_uiProgressAnimFrame;
+    uint                                    m_uiProgressAnimFrame = 0;
     std::map<SString, SCustomScaleFontInfo> m_CustomScaleFontMap;
 };

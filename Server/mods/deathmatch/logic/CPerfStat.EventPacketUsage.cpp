@@ -31,8 +31,6 @@ struct SEventUsage
 class CPerfStatEventPacketUsageImpl : public CPerfStatEventPacketUsage
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatEventPacketUsageImpl();
     virtual ~CPerfStatEventPacketUsageImpl();
 
@@ -49,9 +47,9 @@ public:
     // CPerfStatEventPacketUsageImpl
     void MaybeRecordStats();
 
-    bool                           m_bEnabled;
+    bool                           m_bEnabled = false;
     CElapsedTime                   m_TimeSinceGetStats;
-    long long                      m_llNextRecordTime;
+    long long                      m_llNextRecordTime = 0;
     SString                        m_strCategoryName;
     std::map<SString, SEventUsage> m_EventUsageLiveMap;
     std::vector<SEventUsage>       m_EventUsageSortedList;

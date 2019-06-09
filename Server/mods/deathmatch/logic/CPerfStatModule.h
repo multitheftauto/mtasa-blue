@@ -14,27 +14,25 @@
 //
 struct SStatData
 {
-    ZERO_ON_NEW
-
     struct
     {
-        SFixedArray<long long, ZONE_MAX> llSentPacketsByZone;
-        SFixedArray<long long, ZONE_MAX> llSentBytesByZone;
-        SFixedArray<long long, ZONE_MAX> llSkippedPacketsByZone;
-        SFixedArray<long long, ZONE_MAX> llSkippedBytesByZone;
+        SFixedArray<long long, ZONE_MAX> llSentPacketsByZone = {};
+        SFixedArray<long long, ZONE_MAX> llSentBytesByZone = {};
+        SFixedArray<long long, ZONE_MAX> llSkippedPacketsByZone = {};
+        SFixedArray<long long, ZONE_MAX> llSkippedBytesByZone = {};
     } puresync;
 
     struct
     {
-        long long llSyncPacketsSkipped;
-        long long llSyncBytesSkipped;
-        long long llLightSyncPacketsSent;
-        long long llLightSyncBytesSent;
+        long long llSyncPacketsSkipped = 0;
+        long long llSyncBytesSkipped = 0;
+        long long llLightSyncPacketsSent = 0;
+        long long llLightSyncBytesSent = 0;
     } lightsync;
 
-    bool bFunctionTimingActive;
-    int  iDbJobDataCount;
-    int  iDbConnectionCount;
+    bool bFunctionTimingActive = false;
+    int  iDbJobDataCount = 0;
+    int  iDbConnectionCount = 0;
 };
 
 extern std::unique_ptr<SStatData> g_pStats;

@@ -31,7 +31,6 @@ struct SDebugHookCallInfo
 class CDebugHookManager
 {
 public:
-    ZERO_ON_NEW
     CDebugHookManager();
     ~CDebugHookManager();
     bool AddDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector<SString>& allowedNameList);
@@ -54,7 +53,7 @@ protected:
     bool MustNameBeExplicitlyAllowed(const SString& strName);
     void MaybeMaskArgumentValues(const SString& strFunctionName, CLuaArguments& FunctionArguments);
 
-    uint                                  m_uiPostFunctionOverride;
+    uint                                  m_uiPostFunctionOverride = 0;
     std::vector<SDebugHookCallInfo>       m_PreEventHookList;
     std::vector<SDebugHookCallInfo>       m_PostEventHookList;
     std::vector<SDebugHookCallInfo>       m_PreFunctionHookList;

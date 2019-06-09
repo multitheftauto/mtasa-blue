@@ -53,7 +53,7 @@ public:
 class CQueueInfo
 {
 public:
-    EQueueStatusType status;
+    EQueueStatusType status = EQueueStatusType::STATUS_OK;
     CSizeHistory     m_SizeHistory;
 };
 
@@ -63,7 +63,6 @@ public:
 class CNetBufferWatchDog
 {
 public:
-    ZERO_ON_NEW
     CNetBufferWatchDog(CNetServerBuffer* pNetBuffer, bool bVerboseDebug);
     ~CNetBufferWatchDog();
 
@@ -81,25 +80,25 @@ public:
     void         AllowIncomingSyncPackets();
 
     // Main thread variables
-    CThreadHandle* m_pServiceThreadHandle;
+    CThreadHandle* m_pServiceThreadHandle = nullptr;
 
     // Check thread variables
-    CNetServerBuffer* m_pNetBuffer;
-    uint              m_uiFinishedListHigh;
-    uint              m_uiOutCommandQueueHigh;
-    uint              m_uiOutResultQueueHigh;
-    uint              m_uiInResultQueueHigh;
+    CNetServerBuffer* m_pNetBuffer = nullptr;
+    uint              m_uiFinishedListHigh = 0;
+    uint              m_uiOutCommandQueueHigh = 0;
+    uint              m_uiOutResultQueueHigh = 0;
+    uint              m_uiInResultQueueHigh = 0;
     CQueueInfo        m_FinishedListQueueInfo;
     CQueueInfo        m_OutCommandQueueInfo;
     CQueueInfo        m_OutResultQueueInfo;
     CQueueInfo        m_InResultQueueInfo;
-    uint              m_uiGamePlayerCount;
+    uint              m_uiGamePlayerCount = 0;
 
     // Shared variables
     struct
     {
-        bool        m_bTerminateThread;
-        bool        m_bThreadTerminated;
+        bool        m_bTerminateThread = false;
+        bool        m_bThreadTerminated = false;
         CComboMutex m_Mutex;
     } shared;
 

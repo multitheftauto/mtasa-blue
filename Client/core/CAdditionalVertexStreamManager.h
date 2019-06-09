@@ -72,7 +72,6 @@ public:
 class CAdditionalVertexStreamManager
 {
 public:
-    ZERO_ON_NEW
     CAdditionalVertexStreamManager();
     virtual ~CAdditionalVertexStreamManager();
 
@@ -94,8 +93,8 @@ protected:
     SAdditionalStreamInfo* GetAdditionalStreamInfo(IDirect3DVertexBuffer9* pStreamData1);
     SAdditionalStreamInfo* CreateAdditionalStreamInfo(const SCurrentStateInfo& state);
 
-    IDirect3DDevice9*                      m_pDevice;
-    IDirect3DVertexDeclaration9*           m_pOldVertexDeclaration;
+    IDirect3DDevice9*                      m_pDevice = nullptr;
+    IDirect3DVertexDeclaration9*           m_pOldVertexDeclaration = nullptr;
     std::map<void*, SAdditionalStreamInfo> m_AdditionalStreamInfoMap;
     static CAdditionalVertexStreamManager* ms_Singleton;
 };

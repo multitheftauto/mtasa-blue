@@ -21,7 +21,6 @@
 class CDatabaseTypeSqlite : public CDatabaseType
 {
 public:
-    ZERO_ON_NEW
     CDatabaseTypeSqlite();
     virtual ~CDatabaseTypeSqlite();
 

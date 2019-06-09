@@ -49,5 +49,5 @@ private:
 
     std::list<SCommand*> m_Commands;
     std::list<SCommand*> m_TrashCan;
-    bool                 m_bIteratingList;
+    bool                 m_bIteratingList = false;
 };

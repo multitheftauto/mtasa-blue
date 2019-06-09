@@ -122,7 +122,6 @@ public:
 class CVertexStreamBoundingBoxManager
 {
 public:
-    ZERO_ON_NEW
     CVertexStreamBoundingBoxManager();
     virtual ~CVertexStreamBoundingBoxManager();
 
@@ -142,7 +141,7 @@ protected:
     SStreamBoundsInfo* GetStreamBoundsInfo(IDirect3DVertexBuffer9* pStreamData);
     SStreamBoundsInfo* CreateStreamBoundsInfo(const SCurrentStateInfo2& state);
 
-    IDirect3DDevice9*                       m_pDevice;
+    IDirect3DDevice9*                       m_pDevice = nullptr;
     std::map<void*, SStreamBoundsInfo>      m_StreamBoundsInfoMap;
     static CVertexStreamBoundingBoxManager* ms_Singleton;
 };

@@ -40,15 +40,15 @@ private:
     static DWORD WINAPI Thread_EntryPoint(LPVOID pThis);
     unsigned long       Thread_Run();
 
-    bool   m_bIsReady;
-    HANDLE m_hThread;
-    CDynamicLibrary* volatile m_pLibrary;
+    bool   m_bIsReady = false;
+    HANDLE m_hThread = nullptr;
+    CDynamicLibrary* volatile m_pLibrary = nullptr;
     CCriticalSection m_CriticalSection;
     SString          m_strServerRoot;
     SString          m_strDLLFile;
     SString          m_strConfig;
 
-    int m_iLastError;
+    int m_iLastError = 0;
 
     std::string m_strPassword;
 

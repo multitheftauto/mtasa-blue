@@ -56,8 +56,6 @@ namespace
 class CPerfStatServerInfoImpl : public CPerfStatServerInfo
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatServerInfoImpl();
     virtual ~CPerfStatServerInfoImpl();
 
@@ -71,8 +69,8 @@ public:
     SString GetProcessMemoryUsage();
 
     SString                   m_strCategoryName;
-    time_t                    m_tStartTime;
-    long long                 m_llNextRecordTime;
+    time_t                    m_tStartTime = 0;
+    long long                 m_llNextRecordTime = 0;
     SBandwidthStatistics      m_PrevLiveStats;
     SNetPerformanceStatistics m_NetPerformanceStats;
     SSyncThreadStatistics     m_SyncThreadStats;

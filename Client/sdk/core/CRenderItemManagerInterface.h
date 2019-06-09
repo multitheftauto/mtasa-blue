@@ -83,50 +83,50 @@ enum eDxTestMode
 
 struct SDxStatus
 {
-    eDxTestMode testMode;
+    eDxTestMode testMode = eDxTestMode::DX_TEST_MODE_NONE;
 
     struct
     {
         SString       strName;
-        int           iInstalledMemoryKB;
+        int           iInstalledMemoryKB = 0;
         SString       strPSVersion;
-        int           iMaxAnisotropy;
-        ERenderFormat depthBufferFormat;
-        int           iNumSimultaneousRTs;
+        int           iMaxAnisotropy = 0;
+        ERenderFormat depthBufferFormat = ERenderFormat::RFORMAT_UNKNOWN;
+        int           iNumSimultaneousRTs = 0;
     } videoCard;
 
     struct
     {
-        int iNumShadersUsingReadableDepthBuffer;
+        int iNumShadersUsingReadableDepthBuffer = 0;
     } state;
 
     struct
     {
-        int iFreeForMTA;
-        int iUsedByFonts;
-        int iUsedByTextures;
-        int iUsedByRenderTargets;
+        int iFreeForMTA = 0;
+        int iUsedByFonts = 0;
+        int iUsedByTextures = 0;
+        int iUsedByRenderTargets = 0;
     } videoMemoryKB;
 
     struct
     {
-        bool         bWindowed;
-        int          iFullScreenStyle;
-        int          iFXQuality;
-        int          iDrawDistance;
-        bool         bVolumetricShadows;
-        bool         bAllowScreenUpload;
-        int          iStreamingMemory;
-        bool         b32BitColor;
-        bool         bGrassEffect;
-        bool         bHeatHaze;
-        int          iAnisotropicFiltering;
-        int          iAntiAliasing;
-        eAspectRatio aspectRatio;
-        bool         bHUDMatchAspectRatio;
-        float        fFieldOfView;
-        bool         bHighDetailVehicles;
-        bool         bHighDetailPeds;
+        bool         bWindowed = false;
+        int          iFullScreenStyle = 0;
+        int          iFXQuality = 0;
+        int          iDrawDistance = 0;
+        bool         bVolumetricShadows = false;
+        bool         bAllowScreenUpload = false;
+        int          iStreamingMemory = 0;
+        bool         b32BitColor = false;
+        bool         bGrassEffect = false;
+        bool         bHeatHaze = false;
+        int          iAnisotropicFiltering = 0;
+        int          iAntiAliasing = 0;
+        eAspectRatio aspectRatio = eAspectRatio::ASPECT_RATIO_AUTO;
+        bool         bHUDMatchAspectRatio = false;
+        float        fFieldOfView = 0.0f;
+        bool         bHighDetailVehicles = false;
+        bool         bHighDetailPeds = false;
     } settings;
 };
 

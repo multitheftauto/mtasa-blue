@@ -64,7 +64,6 @@ public:
         bool    IsAuthorized() const { return tAuthDate != 0; }
     };
 
-    ZERO_ON_NEW
     CAccount(class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0,
              const std::string& strIP = "", const std::string& strSerial = "", const SString& strHttpPassAppend = "");
     ~CAccount();
@@ -117,20 +116,20 @@ protected:
 
     CAccountManager* m_pManager;
 
-    EAccountType              m_AccountType;
+    EAccountType              m_AccountType = EAcountType::Guest;
     SString                   m_strName;
     CAccountPassword          m_Password;
     SString                   m_strHttpPassAppend;
     std::string               m_strIP;
     std::string               m_strSerial;
-    int                       m_iUserID;
-    bool                      m_bLoadedSerialUsage;
+    int                       m_iUserID = 0;
+    bool                      m_bLoadedSerialUsage = false;
     std::vector<SSerialUsage> m_SerialUsageList;
 
-    bool m_bChanged;
+    bool m_bChanged = false;
 
-    class CClient* m_pClient;
-    uint           m_uiScriptID;
+    class CClient* m_pClient = nullptr;
+    uint           m_uiScriptID = 0;
 
     std::map<SString, CAccountData> m_Data;
 };

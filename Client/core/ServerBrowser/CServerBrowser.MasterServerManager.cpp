@@ -16,7 +16,6 @@
 class CMasterServerManager : public CMasterServerManagerInterface
 {
 public:
-    ZERO_ON_NEW
     CMasterServerManager();
     ~CMasterServerManager();
 
@@ -29,7 +28,7 @@ public:
 protected:
     CElapsedTime                               m_ElapsedTime;
     std::vector<CRemoteMasterServerInterface*> m_MasterServerList;
-    uint                                       m_iActiveAmount;
+    uint                                       m_iActiveAmount = 0;
 };
 
 ///////////////////////////////////////////////////////////////

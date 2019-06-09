@@ -45,7 +45,6 @@ private:
     };
 
 public:
-    ZERO_ON_NEW
     CResourceManager();
     ~CResourceManager();
 
@@ -121,10 +120,10 @@ public:
 private:
     SString                 m_strResourceDirectory;
     CMappedList<CResource*> m_resources;
-    unsigned int            m_uiResourceLoadedCount;
-    unsigned int            m_uiResourceFailedCount;
-    bool                    m_bResourceListChanged;
-    list<CResource*>        m_resourcesToStartAfterRefresh;
+    unsigned int            m_uiResourceLoadedCount = 0;
+    unsigned int            m_uiResourceFailedCount = 0;
+    bool                    m_bResourceListChanged = false;
+    std::list<CResource*>        m_resourcesToStartAfterRefresh;
 
     // Maps to speed things up
     CFastHashMap<CResource*, lua_State*> m_ResourceLuaStateMap;
@@ -132,12 +131,12 @@ private:
     CFastHashMap<SString, CResource*>    m_NameResourceMap;
     std::map<ushort, CResource*>         m_NetIdResourceMap;
 
-    list<sResourceQueue> m_resourceQueue;
+    std::list<sResourceQueue> m_resourceQueue;
 
     SString                           m_strMinClientRequirement;
     CFastHashMap<CResource*, SString> m_MinClientRequirementMap;
     CFastHashMap<CResource*, bool>    m_SyncMapElementDataOptionMap;
 
-    ushort                     m_usNextNetId;
+    ushort                     m_usNextNetId = 0;
     std::map<SString, SString> m_BlockedFileReasonMap;
 };

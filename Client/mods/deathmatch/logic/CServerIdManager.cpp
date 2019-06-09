@@ -52,8 +52,6 @@ namespace
 class CServerIdManagerImpl : public CServerIdManager
 {
 public:
-    ZERO_ON_NEW
-
     virtual SString GetConnectionPrivateDirectory(bool bPreviousVer);
 
     CServerIdManagerImpl();
@@ -66,8 +64,8 @@ protected:
     static DWORD         StaticThreadProc(LPVOID lpdwThreadParam);
     static void          StaticSaveServerIdMap();
 
-    bool                                  m_bListChanged;
-    bool                                  m_bClearedDefaultDirectory;
+    bool                                  m_bListChanged = false;
+    bool                                  m_bClearedDefaultDirectory = false;
     std::map<CServerIdKey, CServerIdInfo> m_ServerIdMap;
     SString                               m_strServerIdLookupBaseDir;
     SString                               m_strTempErrorDir;

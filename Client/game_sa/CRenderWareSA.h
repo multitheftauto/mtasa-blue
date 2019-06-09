@@ -27,7 +27,6 @@ class CModelTexturesInfo;
 class CRenderWareSA : public CRenderWare
 {
 public:
-    ZERO_ON_NEW
     CRenderWareSA(enum eGameVersion version);
     ~CRenderWareSA();
     void Initialize();
@@ -144,16 +143,16 @@ public:
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*> m_D3DDataTexInfoMap;
-    CClientEntityBase*                  m_pRenderingClientEntity;
-    ushort                              m_usRenderingEntityModelId;
-    int                                 m_iRenderingEntityType;
-    CMatchChannelManager*               m_pMatchChannelManager;
-    int                                 m_uiReplacementRequestCounter;
-    int                                 m_uiReplacementMatchCounter;
-    int                                 m_uiNumReplacementRequests;
-    int                                 m_uiNumReplacementMatches;
+    CClientEntityBase*                  m_pRenderingClientEntity = nullptr;
+    ushort                              m_usRenderingEntityModelId = 0;
+    int                                 m_iRenderingEntityType = 0;
+    CMatchChannelManager*               m_pMatchChannelManager = nullptr;
+    int                                 m_uiReplacementRequestCounter = 0;
+    int                                 m_uiReplacementMatchCounter = 0;
+    int                                 m_uiNumReplacementRequests = 0;
+    int                                 m_uiNumReplacementMatches = 0;
     CElapsedTime                        m_GTAVertexShadersDisabledTimer;
-    bool                                m_bGTAVertexShadersEnabled;
+    bool                                m_bGTAVertexShadersEnabled = false;
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
 };

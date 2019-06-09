@@ -113,33 +113,33 @@ struct NetStatistics
 
 struct SBandwidthStatistics
 {
-    long long       llOutgoingUDPByteCount;
-    long long       llIncomingUDPByteCount;
-    long long       llIncomingUDPByteCountBlocked;
-    long long       llOutgoingUDPPacketCount;
-    long long       llIncomingUDPPacketCount;
-    long long       llIncomingUDPPacketCountBlocked;
-    long long       llOutgoingUDPByteResentCount;
-    long long       llOutgoingUDPMessageResentCount;
+    long long       llOutgoingUDPByteCount = 0; 
+    long long       llIncomingUDPByteCount = 0;
+    long long       llIncomingUDPByteCountBlocked = 0;
+    long long       llOutgoingUDPPacketCount = 0;
+    long long       llIncomingUDPPacketCount = 0;
+    long long       llIncomingUDPPacketCountBlocked = 0;
+    long long       llOutgoingUDPByteResentCount = 0;
+    long long       llOutgoingUDPMessageResentCount = 0;
     SThreadCPUTimes threadCPUTimes;
 };
 
 struct SNetPerformanceStatistics
 {
-    uint  uiUpdateCycleRecvTimeAvgUs;
-    uint  uiUpdateCycleSendTimeAvgUs;
-    uint  uiUpdateCycleRecvTimeMaxUs;
-    uint  uiUpdateCycleSendTimeMaxUs;
-    float fUpdateCycleRecvDatagramsAvg;
-    uint  uiUpdateCycleRecvDatagramsMax;
-    float fUpdateCycleDatagramsAvg;
-    uint  uiUpdateCycleDatagramsMax;
-    uint  uiUpdateCycleDatagramsLimit;
-    float fUpdateCycleMessagesAvg;
-    uint  uiUpdateCycleMessagesMax;
-    uint  uiUpdateCycleMessagesLimit;
-    uint  uiUpdateCycleSendsLimitedTotal;
-    float fUpdateCycleSendsLimitedPercent;
+    uint  uiUpdateCycleRecvTimeAvgUs = 0;
+    uint  uiUpdateCycleSendTimeAvgUs = 0;
+    uint  uiUpdateCycleRecvTimeMaxUs = 0;
+    uint  uiUpdateCycleSendTimeMaxUs = 0;
+    float fUpdateCycleRecvDatagramsAvg = 0.0f;
+    uint  uiUpdateCycleRecvDatagramsMax = 0;
+    float fUpdateCycleDatagramsAvg = 0.0f;
+    uint  uiUpdateCycleDatagramsMax = 0;
+    uint  uiUpdateCycleDatagramsLimit = 0;
+    float fUpdateCycleMessagesAvg = 0.0f;
+    uint  uiUpdateCycleMessagesMax = 0;
+    uint  uiUpdateCycleMessagesLimit = 0;
+    uint  uiUpdateCycleSendsLimitedTotal = 0;
+    float fUpdateCycleSendsLimitedPercent = 0.0f;
 };
 
 struct SSyncThreadStatistics

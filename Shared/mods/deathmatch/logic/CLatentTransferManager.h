@@ -103,7 +103,6 @@ struct SSendStatus
 class CLatentSendQueue
 {
 public:
-    ZERO_ON_NEW
     CLatentSendQueue(NetPlayerID remoteId, ushort usBitStreamVersion);
     ~CLatentSendQueue();
     void        DoPulse(int iTimeMsBetweenCalls);
@@ -119,12 +118,12 @@ protected:
     void PostQueueRemove();
     void UpdateEstimatedDurations();
 
-    const NetPlayerID    m_RemoteId;
-    const ushort         m_usBitStreamVersion;
+    const NetPlayerID    m_RemoteId = 0;
+    const ushort         m_usBitStreamVersion =0;
     std::list<SSendItem> m_TxQueue;
-    uint                 m_uiCurrentRate;
-    uint                 m_uiNextSendId;
-    int                  m_iBytesOwing;
+    uint                 m_uiCurrentRate = 0; 
+    uint                 m_uiNextSendId = 0;
+    int                  m_iBytesOwing = 0;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -137,7 +136,6 @@ protected:
 class CLatentReceiver
 {
 public:
-    ZERO_ON_NEW
     CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion);
     ~CLatentReceiver();
     void OnReceive(NetBitStreamInterface* pBitStream);
@@ -145,8 +143,8 @@ public:
 protected:
     void OnReceiveError(const SString& strMessage);
 
-    const NetPlayerID m_RemoteId;
-    const ushort      m_usBitStreamVersion;
+    const NetPlayerID m_RemoteId = 0;
+    const ushort      m_usBitStreamVersion = 0;
     SReceiveItem      activeRx;
 };
 
@@ -160,7 +158,6 @@ protected:
 class CLatentTransferManager
 {
 public:
-    ZERO_ON_NEW
     CLatentTransferManager();
     ~CLatentTransferManager();
     void DoPulse();
@@ -187,13 +184,13 @@ protected:
     CLatentReceiver*  FindReceiverForRemote(NetPlayerID remoteId);
 
     CTickCount m_LastTimeMs;
-    int        m_iTimeMsBetweenCalls;
-    uint       m_uiNumSends;
+    int        m_iTimeMsBetweenCalls = 0;
+    uint       m_uiNumSends = 0;
 
     // Send variables
     std::vector<CLatentSendQueue*>           m_SendQueueList;
     std::map<NetPlayerID, CLatentSendQueue*> m_SendQueueMap;
-    CBufferRef*                              m_pBatchBufferRef;
+    CBufferRef*                              m_pBatchBufferRef = nullptr;
 
     // Receive variables
     std::map<NetPlayerID, CLatentReceiver*> m_ReceiverMap;

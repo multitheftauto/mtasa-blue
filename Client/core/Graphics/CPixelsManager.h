@@ -33,7 +33,6 @@ public:
 class CPixelsManager : public CPixelsManagerInterface
 {
 public:
-    ZERO_ON_NEW
     CPixelsManager();
     ~CPixelsManager();
 
@@ -70,6 +69,6 @@ public:
     static HRESULT LockVolumeRect(IDirect3DVolume9* pD3DVolume, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags, uint uiSlice);
 
 protected:
-    IDirect3DDevice9*  m_pDevice;
-    IDirect3DSurface9* m_pTempOffscreenSurface;
+    IDirect3DDevice9*  m_pDevice = nullptr;
+    IDirect3DSurface9* m_pTempOffscreenSurface = nullptr;
 };

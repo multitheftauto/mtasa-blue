@@ -23,7 +23,6 @@ struct SNewsItem
 class CNewsBrowser
 {
 public:
-    ZERO_ON_NEW
     CNewsBrowser();
     ~CNewsBrowser();
 
@@ -41,9 +40,9 @@ protected:
     bool        OnOKButtonClick(CGUIElement* pElement);
 
     std::vector<SNewsItem>   m_NewsitemList;
-    CGUIWindow*              m_pWindow;
-    CGUITabPanel*            m_pTabPanel;
-    CGUIButton*              m_pButtonOK;
+    CGUIWindow*              m_pWindow = nullptr; 
+    CGUITabPanel*            m_pTabPanel = nullptr;
+    CGUIButton*              m_pButtonOK = nullptr;
     std::vector<CGUITab*>    m_TabList;
     std::vector<CGUIWindow*> m_TabContentList;
 };

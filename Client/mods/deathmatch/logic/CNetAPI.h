@@ -39,7 +39,6 @@ enum eServerRPCFunctions
 class CNetAPI
 {
 public:
-    ZERO_ON_NEW
     CNetAPI(CClientManager* pManager);
 
     void DoPulse();
@@ -100,14 +99,14 @@ public:
     void RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream = NULL);
 
 private:
-    CClientManager*        m_pManager;
-    CClientPlayerManager*  m_pPlayerManager;
-    CClientVehicleManager* m_pVehicleManager;
-    unsigned long          m_ulLastPuresyncTime;
-    unsigned long          m_ulLastSyncReturnTime;
+    CClientManager*        m_pManager = nullptr;
+    CClientPlayerManager*  m_pPlayerManager = nullptr;
+    CClientVehicleManager* m_pVehicleManager = nullptr;
+    unsigned long          m_ulLastPuresyncTime = 0;
+    unsigned long          m_ulLastSyncReturnTime = 0;
 
-    bool    m_bStoredReturnSync;
-    bool    m_bVehicleLastReturn;
+    bool    m_bStoredReturnSync = false;
+    bool    m_bVehicleLastReturn = false;
     CVector m_vecLastReturnPosition;
     CVector m_vecLastReturnRotation;
 
@@ -115,14 +114,14 @@ private:
 
     CInterpolator<CVector> m_Interpolator;
 
-    bool         m_bIsNetworkTrouble;
-    bool         m_bIncreaseTimeoutTime;
+    bool         m_bIsNetworkTrouble = false;
+    bool         m_bIncreaseTimeoutTime = false;
     CElapsedTime m_IncreaseTimeoutTimeTimer;
 
     CElapsedTime     m_TimeSinceMouseOrAnalogStateSent;
     CControllerState m_LastSentControllerState;
-    float            m_fLastSentCameraRotation;
-    float            m_fLastSentAimY;
-    uchar            m_ucBulletSyncOrderCounter;
-    uchar            m_ucCustomWeaponBulletSyncOrderCounter;
+    float            m_fLastSentCameraRotation = 0.0f;
+    float            m_fLastSentAimY = 0.0f;
+    uchar            m_ucBulletSyncOrderCounter = 0;
+    uchar            m_ucCustomWeaponBulletSyncOrderCounter = 0;
 };

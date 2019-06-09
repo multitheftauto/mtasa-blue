@@ -84,8 +84,6 @@ public:
 class CDbJobData
 {
 public:
-    ZERO_ON_NEW
-
     CDbJobData();
     ~CDbJobData();
     SDbJobId           GetId() { return id; }
@@ -96,36 +94,36 @@ public:
     CDatabaseJobQueue* GetQueue() { return command.pJobQueue; }
     SString            GetCommandStringForLog();
 
-    EJobStageType stage;
-    SDbJobId      id;
+    EJobStageType stage = EJobStageType::NONE;
+    SDbJobId      id = 0;
     SLuaDebugInfo m_LuaDebugInfo;
 
     struct
     {
-        EJobCommandType    type;
-        SConnectionHandle  connectionHandle;
+        EJobCommandType    type = EJobCommandType::NONE;
+        SConnectionHandle  connectionHandle = 0;
         SString            strData;
-        CDatabaseJobQueue* pJobQueue;
+        CDatabaseJobQueue* pJobQueue = nullptr;
     } command;
 
     struct
     {
-        EJobResultType  status;
-        uint            uiErrorCode;
+        EJobResultType  status = EJobResultType::NONE;
+        uint            uiErrorCode = 0;
         SString         strReason;
-        bool            bErrorSuppressed;
+        bool            bErrorSuppressed = false;
         CRegistryResult registryResult;
         CTickCount      timeReady;
-        bool            bLoggedWarning;
-        bool            bIgnoreResult;
+        bool            bLoggedWarning = false;
+        bool            bIgnoreResult = false;
     } result;
 
     struct
     {
-        PFN_DBRESULT pfnDbResult;
-        void*        pContext;
-        bool         bSet;
-        bool         bDone;
+        PFN_DBRESULT pfnDbResult = nullptr;
+        void*        pContext = nullptr;
+        bool         bSet = false;
+        bool         bDone = false;
     } callback;
 };
 

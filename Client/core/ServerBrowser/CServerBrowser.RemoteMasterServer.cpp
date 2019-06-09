@@ -15,7 +15,6 @@
 class CRemoteMasterServer : public CRemoteMasterServerInterface
 {
 public:
-    ZERO_ON_NEW
     CRemoteMasterServer();
     ~CRemoteMasterServer();
 
@@ -38,7 +37,7 @@ protected:
     static void                       StaticDownloadFinished(const SHttpDownloadResult& result);
     void                              DownloadFinished(const SHttpDownloadResult& result);
 
-    long long m_llLastRefreshTime;
+    long long m_llLastRefreshTime = 0;
     SString   m_strStage;
     SString   m_strURL;
     CBuffer   m_Data;

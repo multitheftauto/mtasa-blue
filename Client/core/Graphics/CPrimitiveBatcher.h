@@ -20,7 +20,6 @@ struct sPrimitive
 class CPrimitiveBatcher
 {
 public:
-    ZERO_ON_NEW
     CPrimitiveBatcher();
     ~CPrimitiveBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
@@ -33,11 +32,11 @@ public:
     void AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices);
 
 protected:
-    IDirect3DDevice9*       m_pDevice;
+    IDirect3DDevice9*       m_pDevice = nullptr;
     std::vector<sPrimitive> m_primitiveList;
-    float                   m_fViewportSizeX;
-    float                   m_fViewportSizeY;
-    D3DXMATRIX              m_MatWorld;
-    D3DXMATRIX              m_MatView;
-    D3DXMATRIX              m_MatProjection;
+    float                   m_fViewportSizeX = 0.0f;
+    float                   m_fViewportSizeY = 0.0f;
+    D3DXMATRIX              m_MatWorld = {};
+    D3DXMATRIX              m_MatView = {};
+    D3DXMATRIX              m_MatProjection = {};
 };

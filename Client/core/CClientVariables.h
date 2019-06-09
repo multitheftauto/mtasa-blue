@@ -121,7 +121,7 @@ private:
     CXMLNode* Node(const std::string& strVariable);
     void      LoadDefaults();
 
-    bool      m_bLoaded;
-    CXMLNode* m_pStorage;
-    int       m_iRevision;
+    bool      m_bLoaded = false;
+    CXMLNode* m_pStorage = nullptr;
+    int       m_iRevision = 0;
 };

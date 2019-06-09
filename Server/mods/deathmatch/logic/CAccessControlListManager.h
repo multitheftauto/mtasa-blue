@@ -23,7 +23,6 @@ class CAccessControlListManager;
 class CAccessControlListManager : public CXMLConfig
 {
 public:
-    ZERO_ON_NEW
     CAccessControlListManager();
     virtual ~CAccessControlListManager();
 
@@ -75,17 +74,17 @@ private:
     list<class CAccessControlListGroup*> m_Groups;
     list<class CAccessControlList*>      m_ACLs;
 
-    CAccountManager* m_pAccountManager;
+    CAccountManager* m_pAccountManager = nullptr;
 
-    CXMLFile* m_pXML;
-    CXMLNode* m_pRootNode;
+    CXMLFile* m_pXML = nullptr;
+    CXMLNode* m_pRootNode = nullptr;
 
-    bool                        m_bReadCacheDirty;
-    long long                   m_llLastTimeReadCacheCleared;
+    bool                        m_bReadCacheDirty = 0;
+    long long                   m_llLastTimeReadCacheCleared = 0;
     CFastHashMap<SString, bool> m_ReadCacheMap;
 
-    bool         m_bNeedsSave;
-    bool         m_bAllowSave;
+    bool         m_bNeedsSave = false;
+    bool         m_bAllowSave = false;
     CElapsedTime m_AutoSaveTimer;
-    uint         m_uiGlobalRevision;
+    uint         m_uiGlobalRevision = 0;
 };

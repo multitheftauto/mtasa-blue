@@ -31,7 +31,6 @@ struct SMaterialLine3DItem
 class CMaterialLine3DBatcher
 {
 public:
-    ZERO_ON_NEW
     CMaterialLine3DBatcher(bool bPreGUI);
     ~CMaterialLine3DBatcher();
 
@@ -44,9 +43,9 @@ public:
 protected:
     void DrawBatch(const CVector& vecCameraPos, uint* pBatchIndices, uint uiNumBatchLines, CMaterialItem* pMaterial);
 
-    bool                             m_bPreGUI;
-    IDirect3DDevice9*                m_pDevice;
+    bool                             m_bPreGUI = false;
+    IDirect3DDevice9*                m_pDevice = nullptr;
     std::vector<SMaterialLine3DItem> m_LineList;
     static SMaterialLine3DItem*      ms_pLines;            // Used in sort callback
-    ETextureAddress                  m_CurrentTextureAddress;
+    ETextureAddress                  m_CurrentTextureAddress = (ETextureAddress)0;
 };

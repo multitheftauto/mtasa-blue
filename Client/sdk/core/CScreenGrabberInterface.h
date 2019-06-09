@@ -17,8 +17,6 @@ typedef void (*PFN_SCREENSHOT_CALLBACK)(const CBuffer* pBuffer, uint uiTimeSpent
 class CScreenGrabberInterface
 {
 public:
-    ZERO_ON_NEW
-
     virtual ~CScreenGrabberInterface() {}
 
     // CScreenGrabberInterface

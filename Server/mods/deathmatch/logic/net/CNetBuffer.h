@@ -53,7 +53,6 @@ public:
 class CNetServerBuffer : public CNetServer
 {
 public:
-    ZERO_ON_NEW
     CNetServerBuffer(CSimPlayerManager* pSimPlayerManager);
     virtual ~CNetServerBuffer();
 
@@ -185,30 +184,30 @@ public:
     void GetQueueSizes(uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue, uint& uiGamePlayerCount);
 
     // Main thread variables
-    PPACKETHANDLER m_pfnDMPacketHandler;
-    CThreadHandle* m_pServiceThreadHandle;
+    PPACKETHANDLER m_pfnDMPacketHandler = nullptr;
+    CThreadHandle* m_pServiceThreadHandle = nullptr;
     CElapsedTime   m_TimeThreadFPSLastCalced;
-    float          m_fSmoothThreadFPS;
+    float          m_fSmoothThreadFPS = 0.0f;
     CElapsedTime   m_TimeSinceGetPacketStats;
-    SPacketStat    m_PacketStatList[2][256];
+    SPacketStat    m_PacketStatList[2][256] = {};
 
     // Sync thread variables
-    CNetServer*        m_pRealNetServer;
-    CSimPlayerManager* m_pSimPlayerManager;
+    CNetServer*        m_pRealNetServer = nullptr;
+    CSimPlayerManager* m_pSimPlayerManager = nullptr;
 
     // Shared variables
     struct
     {
-        bool                           m_bTerminateThread;
-        bool                           m_bThreadTerminated;
-        bool                           m_bAutoPulse;
+        bool                           m_bTerminateThread = false;
+        bool                           m_bThreadTerminated = false;
+        bool                           m_bAutoPulse = false;
         std::list<CNetJobData*>        m_OutCommandQueue;
         std::list<CNetJobData*>        m_OutResultQueue;
         std::list<SProcessPacketArgs*> m_InResultQueue;
         std::set<CNetJobData*>         m_FinishedList;            // Result has been used, will be deleted next pulse (shared access with watchdog thread)
         CComboMutex                    m_Mutex;
-        CNetBufferWatchDog*            m_pWatchDog;
-        int                            m_iThreadFrameCount;
-        uint                           m_iuGamePlayerCount;
+        CNetBufferWatchDog*            m_pWatchDog = nullptr;
+        int                            m_iThreadFrameCount = 0;
+        uint                           m_iuGamePlayerCount = 0;
     } shared;
 };

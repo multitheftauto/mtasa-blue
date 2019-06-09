@@ -20,7 +20,6 @@ extern const SFixedArray<unsigned char, 212> g_ucMaxPassengers;
 class CClientVehicleManager
 {
 public:
-    ZERO_ON_NEW
     CClientVehicleManager(CClientManager* pManager);
     ~CClientVehicleManager();
 
@@ -69,8 +68,8 @@ public:
     void OnDestruction(CClientVehicle* pVehicle);
 
 protected:
-    CClientManager*               m_pManager;
-    bool                          m_bCanRemoveFromList;
+    CClientManager*               m_pManager = nullptr;
+    bool                          m_bCanRemoveFromList = false;
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
 };

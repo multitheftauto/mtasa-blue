@@ -33,8 +33,6 @@
 class CClientModelCacheManagerImpl : public CClientModelCacheManager
 {
 public:
-    ZERO_ON_NEW
-
     // CClientModelCacheManager interface
     virtual void DoPulse();
     virtual void OnRestreamModel(ushort usModelId);
@@ -53,13 +51,13 @@ public:
     void AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, ushort usModelId, const CVector& vecStartPos, const CVector& vecEndPos);
 
 protected:
-    int                 m_iFrameCounter;
+    int                 m_iFrameCounter = 0;
     CTickCount          m_TickCountNow;
     CVector             m_vecCameraPos;
     CTickCount          m_LastTimeMs;
-    float               m_fSmoothCameraSpeed;
-    CClientPlayer*      m_pLocalPlayer;
-    float               m_fGameFps;
+    float               m_fSmoothCameraSpeed = 0.0f;
+    CClientPlayer*      m_pLocalPlayer = nullptr;
+    float               m_fGameFps = 0.0f;
     CModelCacheManager* m_pCoreModelCacheManager;
 };
 

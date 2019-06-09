@@ -112,7 +112,6 @@ namespace
 class CPerfStatLuaTimingImpl : public CPerfStatLuaTiming
 {
 public:
-    ZERO_ON_NEW
     CPerfStatLuaTimingImpl();
     virtual ~CPerfStatLuaTimingImpl();
 
@@ -132,8 +131,8 @@ public:
 
     SString                      m_strCategoryName;
     CAllLuaTiming                AllLuaTiming;
-    long long                    m_LastTickCount;
-    unsigned long                m_SecondCounter;
+    long long                    m_LastTickCount = 0;
+    unsigned long                m_SecondCounter = 0;
     CFastHashMap<CLuaMain*, int> m_LuaMainMap;
 };
 

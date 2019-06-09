@@ -10,10 +10,10 @@
 
 struct SModelCacheStats
 {
-    uint uiMaxNumPedModels;
-    uint uiMaxNumVehicleModels;
-    uint uiNumPedModels;
-    uint uiNumVehicleModels;
+    uint uiMaxNumPedModels = 0;
+    uint uiMaxNumVehicleModels = 0;
+    uint uiNumPedModels = 0;
+    uint uiNumVehicleModels = 0;
 };
 
 //
@@ -21,22 +21,20 @@ struct SModelCacheStats
 //
 struct SMemStatsInfo
 {
-    ZERO_ON_NEW
-
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
     CProxyDirect3DDevice9::SFrameStats  frameStats;
     SDxStatus                           dxStatus;
-    int                                 iProcessMemSizeKB;
-    int                                 iProcessTotalVirtualKB;
-    int                                 iStreamingMemoryUsed;
-    int                                 iStreamingMemoryAvailable;
+    int                                 iProcessMemSizeKB = 0;
+    int                                 iProcessTotalVirtualKB = 0;
+    int                                 iStreamingMemoryUsed = 0;
+    int                                 iStreamingMemoryAvailable = 0;
     SRwResourceStats                    rwResourceStats;
     SClothesCacheStats                  clothesCacheStats;
     SShaderReplacementStats             shaderReplacementStats;
     SModelCacheStats                    modelCacheStats;
 
     union {
-        uint uiArray[14];
+        uint uiArray[14] = {};
         struct
         {
             uint uiPlayerModels_0_312;

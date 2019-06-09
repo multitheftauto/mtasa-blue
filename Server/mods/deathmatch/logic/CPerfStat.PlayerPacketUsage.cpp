@@ -102,7 +102,6 @@ namespace
 class CPerfStatPlayerPacketUsageImpl : public CPerfStatPlayerPacketUsage
 {
 public:
-    ZERO_ON_NEW
     CPerfStatPlayerPacketUsageImpl();
     virtual ~CPerfStatPlayerPacketUsageImpl();
 
@@ -118,8 +117,8 @@ public:
 
     SString                  m_strCategoryName;
     CAllPlayerPacketUsage    m_AllPlayerPacketUsage;
-    long long                m_LastTickCount;
-    unsigned long            m_SecondCounter;
+    long long                m_LastTickCount = 0;
+    unsigned long            m_SecondCounter = 0;
     std::map<CLuaMain*, int> m_LuaMainMap;
 };
 

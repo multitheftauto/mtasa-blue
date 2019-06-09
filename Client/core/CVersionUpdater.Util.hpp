@@ -162,7 +162,7 @@ namespace
     ///////////////////////////////////////////////////////////////
     class CValueInt : public CValue
     {
-        int m_iValue;
+        int m_iValue = 0;
 
     public:
         CValueInt(int iValue = 0) : m_iValue(iValue) {}
@@ -789,23 +789,23 @@ namespace
             slim.iFilesize = 0;
         }
         // Input
-        int                  iMaxServersToTry;
-        int                  iTimeoutConnect;
-        int                  iTimeoutTransfer;
-        bool                 bShowDownloadPercent;
+        int                  iMaxServersToTry = 0;
+        int                  iTimeoutConnect = 0;
+        int                  iTimeoutTransfer = 0;
+        bool                 bShowDownloadPercent = false;
         std::vector<SString> serverList;
         std::vector<char>    postContent;
-        bool                 bPostContentBinary;
+        bool                 bPostContentBinary = false;
         SString              strPostFilename;
 
         // Using
-        int             iCurrent;
-        int             iRetryCount;
-        int             iIdleTime;
-        int             iIdleTimeLeft;
-        unsigned int    uiBytesDownloaded;
-        EDownloadStatus downloadStatus;
-        int             iDownloadResultCode;
+        int             iCurrent = 0;
+        int             iRetryCount = 0;
+        int             iIdleTime = 0;
+        int             iIdleTimeLeft = 0;
+        unsigned int    uiBytesDownloaded = 0;
+        EDownloadStatus downloadStatus = EDownloadStatus::None;
+        int             iDownloadResultCode = 0;
         SString         strResumableSaveLocation;
 
         // Result

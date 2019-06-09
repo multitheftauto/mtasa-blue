@@ -54,7 +54,6 @@ namespace
 class CPerfStatLibMemoryImpl : public CPerfStatLibMemory
 {
 public:
-    ZERO_ON_NEW
     CPerfStatLibMemoryImpl();
     virtual ~CPerfStatLibMemoryImpl();
 

@@ -30,11 +30,10 @@ struct SSoundEventInfo
 
 struct SSoundThreadVariables
 {
-    ZERO_ON_NEW
     SString            strURL;
-    long               lFlags;
-    DWORD              pSound;
-    bool               bStreamCreateResult;
+    long               lFlags = 0;
+    DWORD              pSound = 0;
+    bool               bStreamCreateResult = false;
     std::list<double>  onClientSoundFinishedDownloadQueue;
     std::list<float>   onClientBPMQueue;
     std::list<double>  onClientBeatQueue;
@@ -45,7 +44,6 @@ struct SSoundThreadVariables
 class CBassAudio
 {
 public:
-    ZERO_ON_NEW
     CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D);
     CBassAudio(void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D);
     ~CBassAudio();
@@ -103,34 +101,34 @@ protected:
     void Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
 
 public:
-    SSoundThreadVariables* m_pVars;
-    uint                   uiEndSyncCount;
-    bool                   bFreeSync;
+    SSoundThreadVariables* m_pVars = nullptr;
+    uint                   uiEndSyncCount = 0;
+    bool                   bFreeSync = false;
 
 private:
-    const bool    m_bStream;
+    const bool    m_bStream = false;
     const SString m_strPath;
-    const bool    m_b3D;
-    const bool    m_bLoop;
-    const bool    m_bThrottle;
-    void*         m_pBuffer;
-    unsigned int  m_uiBufferLength;
+    const bool    m_b3D = false;
+    const bool    m_bLoop = false;
+    const bool    m_bThrottle = false;
+    void*         m_pBuffer = nullptr;
+    unsigned int  m_uiBufferLength = 0;
 
-    bool  m_bPendingPlay;
-    DWORD m_pSound;
+    bool  m_bPendingPlay = false;
+    DWORD m_pSound = 0;
 
     // Playback state
-    bool    m_bPaused;
-    bool    m_bReversed;
-    bool    m_bPan;
-    float   m_fDefaultFrequency;
-    float   m_fVolume;
-    float   m_fMinDistance;
-    float   m_fMaxDistance;
-    float   m_fPlaybackSpeed;
-    float   m_fPitch;
-    float   m_fTempo;
-    float   m_fSampleRate;
+    bool    m_bPaused = false;
+    bool    m_bReversed = false;
+    bool    m_bPan = false;
+    float   m_fDefaultFrequency = 0.0f;
+    float   m_fVolume = 0.0f;
+    float   m_fMinDistance = 0.0f;
+    float   m_fMaxDistance = 0.0f;
+    float   m_fPlaybackSpeed = 0.0f;
+    float   m_fPitch = 0.0f;
+    float   m_fTempo = 0.0f;
+    float   m_fSampleRate = 0.0f;
     CVector m_vecPosition;
     CVector m_vecVelocity;
 
@@ -143,11 +141,11 @@ private:
     std::map<SString, SString> m_ConvertedTagMap;
 
     std::list<SSoundEventInfo> m_EventQueue;
-    float                      m_fBPM;
+    float                      m_fBPM = 0.0f;
 
-    void* m_uiCallbackId;
-    HSYNC m_hSyncDownload;
-    HSYNC m_hSyncEnd;
-    HSYNC m_hSyncFree;
-    HSYNC m_hSyncMeta;
+    void* m_uiCallbackId = nullptr;
+    HSYNC m_hSyncDownload = 0;
+    HSYNC m_hSyncEnd = 0;
+    HSYNC m_hSyncFree = 0;
+    HSYNC m_hSyncMeta = 0;
 };

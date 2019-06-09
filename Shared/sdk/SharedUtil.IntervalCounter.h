@@ -16,7 +16,6 @@ namespace SharedUtil
     class CIntervalCounter : public CRefCountable
     {
     public:
-        ZERO_ON_NEW
         typedef uchar T;
         CIntervalCounter(uint uiMinIntervalMs, T* pCounter);
 
@@ -30,18 +29,18 @@ namespace SharedUtil
 
     protected:
         // Main thread variables
-        CThreadHandle* m_pServiceThreadHandle;
-        uint           m_uiMinIntervalMs;
+        CThreadHandle* m_pServiceThreadHandle = nullptr;
+        uint           m_uiMinIntervalMs = 0;
 
         // Sync thread variables
-        T m_InternalCounter;
+        T m_InternalCounter = 0;
 
         // Shared variables
         struct
         {
-            T*          m_pCounter;
-            bool        m_bTerminateThread;
-            bool        m_bThreadTerminated;
+            T*          m_pCounter = 0;
+            bool        m_bTerminateThread = false;
+            bool        m_bThreadTerminated = false;
             CComboMutex m_Mutex;
         } shared;
     };

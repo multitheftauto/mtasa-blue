@@ -21,7 +21,6 @@
 class CPerfStatServerTimingImpl : public CPerfStatServerTiming
 {
 public:
-    ZERO_ON_NEW
     CPerfStatServerTimingImpl();
     virtual ~CPerfStatServerTimingImpl();
 
@@ -36,10 +35,10 @@ public:
     void SetActive(bool bActive);
 
     SString      m_strCategoryName;
-    long long    m_LastTickCount;
+    long long    m_LastTickCount = 0;
     CStatResults m_StatResults;
     CElapsedTime m_TimeSinceLastViewed;
-    bool         m_bIsActive;
+    bool         m_bIsActive = false;
 };
 
 ///////////////////////////////////////////////////////////////

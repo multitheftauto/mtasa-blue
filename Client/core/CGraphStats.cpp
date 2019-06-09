@@ -32,7 +32,6 @@ namespace
 class CGraphStats : public CGraphStatsInterface
 {
 public:
-    ZERO_ON_NEW
     CGraphStats();
     ~CGraphStats();
 
@@ -43,9 +42,9 @@ public:
     virtual void AddTimingPoint(const char* szName);
 
 protected:
-    bool                              m_bEnabled;
+    bool                              m_bEnabled = false;
     std::map<SString, SGraphStatLine> m_LineList;
-    TIMEUS                            m_StartTime;
+    TIMEUS                            m_StartTime = 0;
 };
 
 ///////////////////////////////////////////////////////////////

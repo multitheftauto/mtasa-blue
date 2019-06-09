@@ -23,18 +23,18 @@
 
 struct SRwResourceStats
 {
-    uint uiTextures;
-    uint uiRasters;
-    uint uiGeometries;
+    uint uiTextures = 0;
+    uint uiRasters = 0;
+    uint uiGeometries = 0;
 };
 
 struct SClothesCacheStats
 {
-    uint uiCacheHit;
-    uint uiCacheMiss;
-    uint uiNumTotal;
-    uint uiNumUnused;
-    uint uiNumRemoved;
+    uint uiCacheHit = 0;
+    uint uiCacheMiss = 0;
+    uint uiNumTotal = 0;
+    uint uiNumUnused = 0;
+    uint uiNumRemoved = 0;
 };
 
 enum EVehicleWeaponType : int

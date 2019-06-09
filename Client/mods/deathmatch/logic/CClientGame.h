@@ -55,18 +55,18 @@ class CResourceFileDownloadManager;
 
 struct SVehExtrapolateSettings
 {
-    int  iBaseMs;
-    int  iScalePercent;
-    int  iMaxMs;
-    bool bEnabled;
+    int  iBaseMs = 0;
+    int  iScalePercent = 0;
+    int  iMaxMs = 0;
+    bool bEnabled = false;
 };
 
 struct SMiscGameSettings
 {
-    bool bUseAltPulseOrder;
-    bool bAllowFastSprintFix;
-    bool bAllowBadDrivebyHitboxFix;
-    bool bAllowShotgunDamageFix;
+    bool bUseAltPulseOrder = false;
+    bool bAllowFastSprintFix = false;
+    bool bAllowBadDrivebyHitboxFix = false;
+    bool bAllowShotgunDamageFix = false;
 };
 
 class CClientGame
@@ -222,7 +222,6 @@ public:
     };
 
 public:
-    ZERO_ON_NEW
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
@@ -626,158 +625,157 @@ public:
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
 private:
-    eStatus       m_Status;
-    eServerType   m_ServerType;
-    unsigned long m_ulTimeStart;
-    unsigned long m_ulVerifyTimeStart;
-    unsigned long m_ulLastClickTick;
+    eStatus       m_Status = eStatus::STATUS_CONNECTING;
+    eServerType   m_ServerType = eServerType::SERVER_TYPE_NORMAL;
+    unsigned long m_ulTimeStart = 0;
+    unsigned long m_ulVerifyTimeStart = 0;
+    unsigned long m_ulLastClickTick = 0;
     CVector2D     m_vecLastCursorPosition;
-    bool          m_bWaitingForLocalConnect;
-    bool          m_bErrorStartingLocal;
-    int           m_iLocalConnectAttempts;
+    bool          m_bWaitingForLocalConnect = false;
+    bool          m_bErrorStartingLocal = false;
+    int           m_iLocalConnectAttempts = 0;
 
-    bool m_bIsPlayingBack;
-    bool m_bFirstPlaybackFrame;
+    bool m_bIsPlayingBack = false;
+    bool m_bFirstPlaybackFrame = false;
 
-    CClientManager*            m_pManager;
-    CClientCamera*             m_pCamera;
-    CClientGUIManager*         m_pGUIManager;
-    CClientMarkerManager*      m_pMarkerManager;
-    CClientObjectManager*      m_pObjectManager;
-    CClientPickupManager*      m_pPickupManager;
-    CClientPlayerManager*      m_pPlayerManager;
-    CClientDisplayManager*     m_pDisplayManager;
-    CClientVehicleManager*     m_pVehicleManager;
-    CClientRadarAreaManager*   m_pRadarAreaManager;
-    CClientRadarMarkerManager* m_pRadarMarkerManager;
-    CClientPathManager*        m_pPathManager;
-    CClientTeamManager*        m_pTeamManager;
-    CClientPedManager*         m_pPedManager;
-    CClientPointLightsManager* m_pPointLightsManager;
-    CClientProjectileManager*  m_pProjectileManager;
-    CRPCFunctions*             m_pRPCFunctions;
-    CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync;
-    CPedSync*                  m_pPedSync;
+    CClientManager*            m_pManager = nullptr;
+    CClientCamera*             m_pCamera = nullptr;
+    CClientGUIManager*         m_pGUIManager = nullptr;
+    CClientMarkerManager*      m_pMarkerManager = nullptr;
+    CClientObjectManager*      m_pObjectManager = nullptr;
+    CClientPickupManager*      m_pPickupManager = nullptr;
+    CClientPlayerManager*      m_pPlayerManager = nullptr;
+    CClientDisplayManager*     m_pDisplayManager = nullptr;
+    CClientVehicleManager*     m_pVehicleManager = nullptr;
+    CClientRadarAreaManager*   m_pRadarAreaManager = nullptr;
+    CClientRadarMarkerManager* m_pRadarMarkerManager = nullptr;
+    CClientPathManager*        m_pPathManager = nullptr;
+    CClientTeamManager*        m_pTeamManager = nullptr;
+    CClientPedManager*         m_pPedManager = nullptr;
+    CClientPointLightsManager* m_pPointLightsManager = nullptr;
+    CClientProjectileManager*  m_pProjectileManager = nullptr;
+    CRPCFunctions*             m_pRPCFunctions = nullptr;
+    CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync = nullptr;
+    CPedSync*                  m_pPedSync = nullptr;
 #ifdef WITH_OBJECT_SYNC
     CObjectSync* m_pObjectSync;
 #endif
-    CMovingObjectsManager* m_pMovingObjectsManager;
-    CNametags*             m_pNametags;
-    CNetAPI*               m_pNetAPI;
-    CNetworkStats*         m_pNetworkStats;
-    CSyncDebug*            m_pSyncDebug;
-    // CScreenshot*                          m_pScreenshot;
-    CRadarMap*                    m_pRadarMap;
-    CTransferBox*                 m_pTransferBox;
-    CResourceManager*             m_pResourceManager;
-    CScriptKeyBinds*              m_pScriptKeyBinds;
+    CMovingObjectsManager* m_pMovingObjectsManager = nullptr;
+    CNametags*             m_pNametags = nullptr;
+    CNetAPI*               m_pNetAPI = nullptr;
+    CNetworkStats*         m_pNetworkStats = nullptr;
+    CSyncDebug*            m_pSyncDebug = nullptr;
+    CRadarMap*                    m_pRadarMap = nullptr;
+    CTransferBox*                 m_pTransferBox = nullptr;
+    CResourceManager*             m_pResourceManager = nullptr;
+    CScriptKeyBinds*              m_pScriptKeyBinds = nullptr;
     CElementDeleter               m_ElementDeleter;
     CObjectRespawner              m_ObjectRespawner;
-    CZoneNames*                   m_pZoneNames;
-    CPacketHandler*               m_pPacketHandler;
-    CLocalServer*                 m_pLocalServer;
-    CLatentTransferManager*       m_pLatentTransferManager;
-    bool                          m_bInitiallyFadedOut;
-    bool                          m_bHudAreaNameDisabled;
-    CSingularFileDownloadManager* m_pSingularFileDownloadManager;
-    CClientModelCacheManager*     m_pModelCacheManager;
-    CDebugHookManager*            m_pDebugHookManager;
-    CRemoteCalls*                 m_pRemoteCalls;
-    CResourceFileDownloadManager* m_pResourceFileDownloadManager;
+    CZoneNames*                   m_pZoneNames = nullptr;
+    CPacketHandler*               m_pPacketHandler = nullptr;
+    CLocalServer*                 m_pLocalServer = nullptr;
+    CLatentTransferManager*       m_pLatentTransferManager = nullptr;
+    bool                          m_bInitiallyFadedOut = false;
+    bool                          m_bHudAreaNameDisabled = false;
+    CSingularFileDownloadManager* m_pSingularFileDownloadManager = nullptr;
+    CClientModelCacheManager*     m_pModelCacheManager = nullptr;
+    CDebugHookManager*            m_pDebugHookManager = nullptr;
+    CRemoteCalls*                 m_pRemoteCalls = nullptr;
+    CResourceFileDownloadManager* m_pResourceFileDownloadManager = nullptr;
 
     // Revised facilities
     CServer m_Server;
 
-    CVoiceRecorder* m_pVoiceRecorder;
+    CVoiceRecorder* m_pVoiceRecorder = nullptr;
 
-    CClientPlayer* m_pLocalPlayer;
+    CClientPlayer* m_pLocalPlayer = nullptr;
     ElementID      m_LocalID;
     SString        m_strLocalNick;
 
-    CClientEntity*      m_pRootEntity;
-    CLuaManager*        m_pLuaManager;
-    CScriptDebugging*   m_pScriptDebugging;
+    CClientEntity*      m_pRootEntity = nullptr;
+    CLuaManager*        m_pLuaManager = nullptr;
+    CScriptDebugging*   m_pScriptDebugging = nullptr;
     CRegisteredCommands m_RegisteredCommands;
 
     // Map statuses
     SString m_strCurrentMapName;
     SString m_strModRoot;
 
-    CBlendedWeather* m_pBlendedWeather;
-    bool             m_bShowNametags;
-    bool             m_bShowRadar;
+    CBlendedWeather* m_pBlendedWeather = nullptr;
+    bool             m_bShowNametags = false;
+    bool             m_bShowRadar = false;
 
     // Status booleans
-    bool m_bGameLoaded;
-    bool m_bTriggeredIngameAndConnected;
-    bool m_bGracefulDisconnect;
+    bool m_bGameLoaded = false;
+    bool m_bTriggeredIngameAndConnected = false;
+    bool m_bGracefulDisconnect = false;
 
     // Network update vars
-    unsigned long  m_ulLastVehicleInOutTime;
-    bool           m_bIsGettingOutOfVehicle;
-    bool           m_bIsGettingIntoVehicle;
-    bool           m_bIsJackingVehicle;
-    bool           m_bIsGettingJacked;
+    unsigned long  m_ulLastVehicleInOutTime = 0;
+    bool           m_bIsGettingOutOfVehicle = false;
+    bool           m_bIsGettingIntoVehicle = false;
+    bool           m_bIsJackingVehicle = false;
+    bool           m_bIsGettingJacked = false;
     ElementID      m_VehicleInOutID;
-    unsigned char  m_ucVehicleInOutSeat;
-    bool           m_bNoNewVehicleTask;
+    unsigned char  m_ucVehicleInOutSeat = 0;
+    bool           m_bNoNewVehicleTask = false;
     ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
+    CClientPlayer* m_pGettingJackedBy = nullptr;
 
-    CEntity*       m_pTargetedGameEntity;
-    CClientEntity* m_pTargetedEntity;
-    bool           m_bTargetSent;
+    CEntity*       m_pTargetedGameEntity = nullptr;
+    CClientEntity* m_pTargetedEntity = nullptr;
+    bool           m_bTargetSent = false;
     ElementID      m_TargetedPlayerID;
 
-    CClientEntity* m_pDamageEntity;
+    CClientEntity* m_pDamageEntity = nullptr;
     ElementID      m_DamagerID;
-    unsigned char  m_ucDamageWeapon;
-    unsigned char  m_ucDamageBodyPiece;
-    unsigned long  m_ulDamageTime;
-    bool           m_bDamageSent;
+    unsigned char  m_ucDamageWeapon = 0;
+    unsigned char  m_ucDamageBodyPiece = 0;
+    unsigned long  m_ulDamageTime = 0;
+    bool           m_bDamageSent = false; 
 
-    eWeaponSlot                            m_lastWeaponSlot;
-    SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
+    eWeaponSlot                            m_lastWeaponSlot = eWeaponSlot::WEAPONSLOT_TYPE_UNARMED;
+    SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip = {};
 
-    bool m_bCursorEventsEnabled;
-    bool m_bLocalPlay;
+    bool m_bCursorEventsEnabled = false;
+    bool m_bLocalPlay = false;
 
-    bool m_bShowNetstat;
-    bool m_bShowFPS;
+    bool m_bShowNetstat = false;
+    bool m_bShowFPS = false;
 
-    bool m_bTransferringSingularFiles;
+    bool m_bTransferringSingularFiles = false;
 
-    float m_fGameSpeed;
-    long  m_lMoney;
-    DWORD m_dwWanted;
+    float m_fGameSpeed = 0.0f;
+    long  m_lMoney = 0;
+    DWORD m_dwWanted = 0;
 
-    SFixedArray<bool, NUM_GLITCHES> m_Glitches;
+    SFixedArray<bool, NUM_GLITCHES> m_Glitches = {};
 
     // Clouds Enabled
-    bool m_bCloudsEnabled;
+    bool m_bCloudsEnabled = false;
     // Birds Enabled
-    bool m_bBirdsEnabled;
+    bool m_bBirdsEnabled = false;
 
-    unsigned long m_ulMinuteDuration;
+    unsigned long m_ulMinuteDuration = 0;
 
-    CClientGUIElement* m_pClickedGUIElement;
+    CClientGUIElement* m_pClickedGUIElement = nullptr;
 
     SString m_strHTTPDownloadURL;
 
-    bool          m_bReceivingBigPacket;
-    unsigned long m_ulBigPacketSize;
-    unsigned long m_ulBigPacketBytesReceivedBase;
-    CTransferBox* m_pBigPacketTransferBox;
+    bool          m_bReceivingBigPacket = false;
+    unsigned long m_ulBigPacketSize = 0;
+    unsigned long m_ulBigPacketBytesReceivedBase = 0;
+    CTransferBox* m_pBigPacketTransferBox = nullptr;
 
     CElapsedTimeHD m_TimeSliceTimer;
-    uint           m_uiFrameCount;
+    uint           m_uiFrameCount = 0;
 
-    long long m_llLastTransgressionTime;
+    long long m_llLastTransgressionTime = 0;
     SString   m_strLastDiagnosticStatus;
 
-    bool m_bBeingDeleted;            // To enable speedy disconnect
+    bool m_bBeingDeleted = false;            // To enable speedy disconnect
 
-    bool m_bWasMinimized;
+    bool m_bWasMinimized = false;
 
     // Cache for speeding up collision processing
 public:
@@ -785,28 +783,28 @@ public:
 
 private:
     std::map<CEntitySAInterface*, CClientEntity*> m_CachedCollisionMap;
-    bool                                          m_BuiltCollisionMapThisFrame;
+    bool                                          m_BuiltCollisionMapThisFrame = false;
 
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
-    bool m_bShowSyncingInfo;
+    bool m_bShowSyncingInfo = false;
     #endif
 
     #ifdef MTA_DEBUG
-    CClientPlayer*            m_pShowPlayerTasks;
-    CClientPlayer*            m_pShowPlayer;
+    CClientPlayer*            m_pShowPlayerTasks = nullptr;
+    CClientPlayer*            m_pShowPlayer = nullptr;
     std::list<CClientPlayer*> m_Mimics;
-    bool                      m_bMimicLag;
-    unsigned long             m_ulLastMimicLag;
+    bool                      m_bMimicLag = false;
+    unsigned long             m_ulLastMimicLag = 0;
     CVector                   m_vecLastMimicPos;
     CVector                   m_vecLastMimicMove;
     CVector                   m_vecLastMimicTurn;
     CVector                   m_vecLastMimicRot;
-    bool                      m_bDoPaintballs;
-    bool                      m_bShowInterpolation;
+    bool                      m_bDoPaintballs = 0;
+    bool                      m_bShowInterpolation = 0;
     #endif
-    bool m_bDevelopmentMode;
-    bool m_bShowCollision;
-    bool m_bShowSound;
+    bool m_bDevelopmentMode = 0;
+    bool m_bShowCollision = 0;
+    bool m_bShowSound = 0;
 
     // Debug class. Empty in release.
 public:
@@ -815,7 +813,7 @@ public:
 private:
     CEvents                                     m_Events;
     std::list<SScreenShotArgs>                  m_ScreenShotArgList;
-    ushort                                      m_usNextScreenShotId;
+    ushort                                      m_usNextScreenShotId = 0;
     std::list<SDelayedPacketInfo>               m_DelayedSendList;
     std::multimap<CClientVehicle*, CClientPed*> m_HeliCollisionsMap;
     CElapsedTime                                m_LastClearTime;
@@ -825,16 +823,16 @@ private:
 
     SVehExtrapolateSettings m_VehExtrapolateSettings;
     SMiscGameSettings       m_MiscGameSettings;
-    uint                    m_uiAltPulseOrderCounter;
+    uint                    m_uiAltPulseOrderCounter = 0;
     SString                 m_strACInfo;
     std::map<uint, uint>    m_SentMessageIds;
 
-    bool              m_bLastKeyWasEscapeCancelled;
+    bool              m_bLastKeyWasEscapeCancelled = false;
     std::set<SString> m_AllowKeyUpMap;
-    uint              m_uiPrecisionCallDepth;
+    uint              m_uiPrecisionCallDepth = 0;
     SString           m_strFileCacheRoot;
 
-    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler = nullptr;
 
     ksignals::Delegate m_Delegate;
 

@@ -54,7 +54,6 @@ namespace
 class CServerCache : public CServerCacheInterface
 {
 public:
-    ZERO_ON_NEW
     virtual void SaveServerCache(bool bWaitUntilFinished);
     virtual void GetServerCachedInfo(CServerListItem* pItem);
     virtual void SetServerCachedInfo(const CServerListItem* pItem);
@@ -69,7 +68,7 @@ protected:
     static DWORD StaticThreadProc(LPVOID lpdwThreadParam);
     static void  StaticSaveServerCache();
 
-    bool                              m_bListChanged;
+    bool                              m_bListChanged = false;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;
 };
 

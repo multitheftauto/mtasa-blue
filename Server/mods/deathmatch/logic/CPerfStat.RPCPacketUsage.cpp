@@ -242,8 +242,6 @@ struct SRPCPacketStat
 class CPerfStatRPCPacketUsageImpl : public CPerfStatRPCPacketUsage
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatRPCPacketUsageImpl();
     virtual ~CPerfStatRPCPacketUsageImpl();
 
@@ -259,18 +257,18 @@ public:
     // CPerfStatRPCPacketUsageImpl
     void MaybeRecordStats();
 
-    int                         m_iStatsCleared;
+    int                         m_iStatsCleared = 0;
     CElapsedTime                m_TimeSinceGetStats;
-    long long                   m_llNextRecordTime;
+    long long                   m_llNextRecordTime = 0;
     SString                     m_strCategoryName;
-    SRPCPacketStat              m_PrevPacketStatsIn[256];
-    SRPCPacketStat              m_PacketStatsIn[256];
-    SRPCPacketStat              m_PacketStatsLiveIn[256];
-    SFixedArray<long long, 256> m_ShownPacketStatsIn;
-    SRPCPacketStat              m_PrevPacketStatsOut[256];
-    SRPCPacketStat              m_PacketStatsOut[256];
-    SRPCPacketStat              m_PacketStatsLiveOut[256];
-    SFixedArray<long long, 256> m_ShownPacketStatsOut;
+    SRPCPacketStat              m_PrevPacketStatsIn[256] = {};
+    SRPCPacketStat              m_PacketStatsIn[256] = {};
+    SRPCPacketStat              m_PacketStatsLiveIn[256] = {};
+    SFixedArray<long long, 256> m_ShownPacketStatsIn = {};
+    SRPCPacketStat              m_PrevPacketStatsOut[256] = {};
+    SRPCPacketStat              m_PacketStatsOut[256] = {};
+    SRPCPacketStat              m_PacketStatsLiveOut[256] = {};
+    SFixedArray<long long, 256> m_ShownPacketStatsOut = {};
 };
 
 ///////////////////////////////////////////////////////////////

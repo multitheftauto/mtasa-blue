@@ -25,7 +25,6 @@ typedef CFastList<CDbJobData*> CJobQueueType;
 class CDatabaseJobQueueImpl : public CDatabaseJobQueue
 {
 public:
-    ZERO_ON_NEW
     CDatabaseJobQueueImpl();
     virtual ~CDatabaseJobQueueImpl();
 
@@ -59,25 +58,25 @@ protected:
     void                 LogString(const SString& strText);
 
     // Main thread variables
-    CThreadHandle*                  m_pServiceThreadHandle;
+    CThreadHandle*                  m_pServiceThreadHandle = nullptr;
     std::map<SDbJobId, CDbJobData*> m_ActiveJobHandles;
     std::set<CDbJobData*>           m_FinishedList;            // Result has been used, will be deleted next pulse
-    uint                            m_uiJobCountWarnThresh;
-    uint                            m_uiJobCount10sMin;
+    uint                            m_uiJobCountWarnThresh = 0;
+    uint                            m_uiJobCount10sMin = 0;
     CElapsedTime                    m_JobCountElpasedTime;
     std::set<SConnectionHandle>     m_PendingFlushMap;
 
     // Other thread variables
     std::map<SString, CDatabaseType*> m_DatabaseTypeMap;
-    uint                              m_uiConnectionCountWarnThresh;
-    EJobLogLevelType                  m_LogLevel;
+    uint                              m_uiConnectionCountWarnThresh = 0;
+    EJobLogLevelType                  m_LogLevel = EJobLogLevelType::NONE;
     SString                           m_strLogFilename;
 
     // Shared variables
     struct
     {
-        bool                                              m_bTerminateThread;
-        bool                                              m_bThreadTerminated;
+        bool                                              m_bTerminateThread = false;
+        bool                                              m_bThreadTerminated = false;
         CJobQueueType                                     m_CommandQueue;
         CJobQueueType                                     m_ResultQueue;
         CComboMutex                                       m_Mutex;

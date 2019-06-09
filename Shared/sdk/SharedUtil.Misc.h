@@ -173,13 +173,13 @@ namespace SharedUtil
     // CPU stats
     struct SThreadCPUTimes
     {
-        uint  uiProcessorNumber;
-        float fUserPercent;
-        float fKernelPercent;
-        float fTotalCPUPercent;
-        float fUserPercentAvg;
-        float fKernelPercentAvg;
-        float fTotalCPUPercentAvg;
+        uint  uiProcessorNumber = 0;
+        float fUserPercent = 0.0f;
+        float fKernelPercent = 0.0f;
+        float fTotalCPUPercent = 0.0f;
+        float fUserPercentAvg = 0.0f;
+        float fKernelPercentAvg = 0.0f;
+        float fTotalCPUPercentAvg = 0.0f;
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
@@ -459,7 +459,7 @@ namespace SharedUtil
             unsigned long ulARGB;
         };
 
-        SColor() {}
+        SColor() { ulARGB = 0; }
         SColor(unsigned long ulValue) { ulARGB = ulValue; }
 
         operator unsigned long() const { return ulARGB; }
@@ -544,7 +544,7 @@ namespace SharedUtil
         void Unlock();
 
     private:
-        void* m_pCriticalSection;
+        void* m_pCriticalSection = nullptr;
     };
 
     //
@@ -1541,8 +1541,8 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////
     class CRefCountable
     {
-        int                     m_iRefCount;
-        CCriticalSection*       m_pCS;            // Use a pointer incase the static variable exists more than once
+        int                     m_iRefCount = 0;
+        CCriticalSection*       m_pCS = nullptr;            // Use a pointer incase the static variable exists more than once
         static CCriticalSection ms_CS;
 
     protected:

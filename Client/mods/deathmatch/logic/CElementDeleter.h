@@ -31,6 +31,6 @@ private:
     void DoDeleteAllSmartPointers();
 
     CMappedList<class CClientEntity*> m_List;
-    bool                              m_bAllowUnreference;
+    bool                              m_bAllowUnreference = false;
     CMappedList<class CClientEntity*> m_ListRawSmartPointer;
 };

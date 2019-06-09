@@ -28,7 +28,6 @@ struct SScreenShotQueueItem
 class CScreenGrabber : public CScreenGrabberInterface
 {
 public:
-    ZERO_ON_NEW
     CScreenGrabber();
     ~CScreenGrabber();
 
@@ -46,10 +45,10 @@ public:
     void ProcessScreenShotQueue();
 
 protected:
-    IDirect3DDevice9*               m_pDevice;
-    CCompressorJobQueue*            m_pCompressorJobQueue;
-    CCompressJobData*               m_pCompressJobData;
-    CRenderTargetItem*              m_pScreenShotTemp;
+    IDirect3DDevice9*               m_pDevice = nullptr;
+    CCompressorJobQueue*            m_pCompressorJobQueue = nullptr;
+    CCompressJobData*               m_pCompressJobData = nullptr; 
+    CRenderTargetItem*              m_pScreenShotTemp = nullptr;
     std::list<SScreenShotQueueItem> m_ScreenShotQueue;
 };
 

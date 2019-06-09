@@ -21,8 +21,6 @@
 class CPerfStatBandwidthReductionImpl : public CPerfStatBandwidthReduction
 {
 public:
-    ZERO_ON_NEW
-
     CPerfStatBandwidthReductionImpl();
     virtual ~CPerfStatBandwidthReductionImpl();
 
@@ -34,7 +32,7 @@ public:
     // CPerfStatBandwidthReductionImpl
     void RecordStats();
 
-    long long  m_llNextRecordTime;
+    long long  m_llNextRecordTime = 0;
     SString    m_strCategoryName;
     CTickCount m_PrevTickCount;
     CTickCount m_DeltaTickCount;

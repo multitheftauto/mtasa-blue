@@ -24,7 +24,6 @@
 class CDatabaseTypeMySql : public CDatabaseType
 {
 public:
-    ZERO_ON_NEW
     CDatabaseTypeMySql();
     virtual ~CDatabaseTypeMySql();
 
@@ -40,7 +39,7 @@ public:
     void                 UpdateStats();
 
     CDynamicLibrary                         m_DbconmyLib;
-    NewDatabaseConnectionMySql_t*           m_pfnNewDatabaseConnection;
+    NewDatabaseConnectionMySql_t*           m_pfnNewDatabaseConnection = nullptr;
     std::map<SString, CDatabaseConnection*> m_SharedConnectionMap;
     std::set<CDatabaseConnection*>          m_AllConnectionMap;
     SString                                 m_strStatsKeyHead;

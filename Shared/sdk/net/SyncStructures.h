@@ -965,8 +965,8 @@ struct SVehicleTurretSync : public ISyncStructure
 
     struct
     {
-        float fTurretX;
-        float fTurretY;
+        float fTurretX = 0.0f;
+        float fTurretY = 0.0f;
     } data;
 };
 

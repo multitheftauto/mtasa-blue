@@ -85,7 +85,6 @@ namespace
 class CPerfStatFunctionTimingImpl : public CPerfStatFunctionTiming
 {
 public:
-    ZERO_ON_NEW
     CPerfStatFunctionTimingImpl();
     virtual ~CPerfStatFunctionTimingImpl();
 
@@ -102,7 +101,7 @@ public:
 
     SString       m_strCategoryName;
     CElapsedTime  m_TimeSinceLastViewed;
-    bool          m_bIsActive;
+    bool          m_bIsActive = false;
     CValueHistory m_PeakUsRequiredHistory;
 
     CElapsedTime                           m_TimeSinceUpdate;

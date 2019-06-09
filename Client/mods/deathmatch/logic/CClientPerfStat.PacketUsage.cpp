@@ -21,8 +21,6 @@
 class CClientPerfStatPacketUsageImpl : public CClientPerfStatPacketUsage
 {
 public:
-    ZERO_ON_NEW
-
     CClientPerfStatPacketUsageImpl();
     virtual ~CClientPerfStatPacketUsageImpl();
 
@@ -34,13 +32,13 @@ public:
     // CClientPerfStatModuleImpl
     void MaybeRecordStats();
 
-    int                         m_iStatsCleared;
+    int                         m_iStatsCleared = 0;
     CElapsedTime                m_TimeSinceGetStats;
-    long long                   m_llNextRecordTime;
+    long long                   m_llNextRecordTime = 0;
     SString                     m_strCategoryName;
-    SPacketStat                 m_PrevPacketStats[2][256];
-    SPacketStat                 m_PacketStats[2][256];
-    SFixedArray<long long, 256> m_ShownPacketStats;
+    SPacketStat                 m_PrevPacketStats[2][256] = {}; 
+    SPacketStat                 m_PacketStats[2][256] = {};
+    SFixedArray<long long, 256> m_ShownPacketStats = {};
 };
 
 ///////////////////////////////////////////////////////////////

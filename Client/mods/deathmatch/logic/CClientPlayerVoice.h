@@ -25,7 +25,6 @@
 class CClientPlayerVoice
 {
 public:
-    ZERO_ON_NEW
     CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder);
     ~CClientPlayerVoice();
     void DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten);
@@ -80,27 +79,27 @@ private:
     void ServiceEventQueue();
     void ApplyFxEffects();
 
-    CClientPlayer*  m_pPlayer;
-    CVoiceRecorder* m_pVoiceRecorder;
-    unsigned int    m_SampleRate;
-    HSTREAM         m_pBassPlaybackStream;
-    void*           m_pSpeexDecoderState;
-    int             m_iSpeexIncomingFrameSampleCount;
-    float           m_fVolume;
-    float           m_fVolumeScale;
+    CClientPlayer*  m_pPlayer = nullptr;
+    CVoiceRecorder* m_pVoiceRecorder = nullptr;
+    unsigned int    m_SampleRate = 0;
+    HSTREAM         m_pBassPlaybackStream = 0;
+    void*           m_pSpeexDecoderState = nullptr;
+    int             m_iSpeexIncomingFrameSampleCount = 0;
+    float           m_fVolume = 0.0f;
+    float           m_fVolumeScale = 0.0f;
 
     // Playback altering stuff
-    float m_fPitch;
-    float m_fTempo;
-    float m_fSampleRate;
-    bool  m_bPan;
-    float m_fPan;
+    float m_fPitch = 0.0f;
+    float m_fTempo = 0.0f;
+    float m_fSampleRate = 0.0f;
+    bool  m_bPan = false;
+    float m_fPan = 0.0f;
 
     // Playback state
-    bool  m_bPaused;
-    float m_fPlaybackSpeed;
-    float m_fDefaultFrequency;
+    bool  m_bPaused = false;
+    float m_fPlaybackSpeed = 0.0f;
+    float m_fDefaultFrequency = 0.0f;
 
-    SFixedArray<int, 9> m_EnabledEffects;
-    SFixedArray<HFX, 9> m_FxEffects;
+    SFixedArray<int, 9> m_EnabledEffects = {};
+    SFixedArray<HFX, 9> m_FxEffects = {};
 };

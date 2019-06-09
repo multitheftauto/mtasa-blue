@@ -31,8 +31,8 @@ public:
 
 private:
     #ifdef WIN32
-    HMODULE m_hModule;
+    HMODULE m_hModule = nullptr;
     #else
-    void* m_hModule;
+    void* m_hModule = nullptr;
     #endif
 };

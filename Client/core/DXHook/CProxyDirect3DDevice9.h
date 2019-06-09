@@ -469,13 +469,13 @@ public:
 
     struct SResourceMemory
     {
-        int iCurrentCount;
-        int iCurrentBytes;
-        int iCreatedCount;
-        int iCreatedBytes;
-        int iDestroyedCount;
-        int iDestroyedBytes;
-        int iLockedCount;
+        int iCurrentCount = 0;
+        int iCurrentBytes = 0;
+        int iCreatedCount = 0;
+        int iCreatedBytes = 0;
+        int iDestroyedCount = 0;
+        int iDestroyedBytes = 0;
+        int iLockedCount = 0;
     };
 
     struct SMemoryState
@@ -511,8 +511,8 @@ public:
 
     struct SFrameStats
     {
-        int iNumShadersFullSetup;
-        int iNumShadersReuseSetup;
+        int iNumShadersFullSetup = 0;
+        int iNumShadersReuseSetup = 0;
     };
 
     struct SD3DDeviceState

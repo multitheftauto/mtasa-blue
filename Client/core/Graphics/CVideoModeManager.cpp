@@ -20,7 +20,6 @@
 class CVideoModeManager : public CVideoModeManagerInterface
 {
 public:
-    ZERO_ON_NEW
     CVideoModeManager();
     ~CVideoModeManager();
 
@@ -54,27 +53,27 @@ private:
 
     void UpdateMonitor();
 
-    unsigned long  m_ulForceBackBufferWidth;
-    unsigned long  m_ulForceBackBufferHeight;
-    unsigned long  m_ulForceBackBufferColorDepth;
-    unsigned long  m_ulFullScreenRefreshRate;
-    HWND           m_hDeviceWindow;
-    CGameSettings* m_pGameSettings;
-    unsigned long  m_ulMonitorCount;
+    unsigned long  m_ulForceBackBufferWidth = 0;
+    unsigned long  m_ulForceBackBufferHeight = 0;
+    unsigned long  m_ulForceBackBufferColorDepth = 0;
+    unsigned long  m_ulFullScreenRefreshRate = 0;
+    HWND           m_hDeviceWindow = nullptr;
+    CGameSettings* m_pGameSettings = nullptr;
+    unsigned long  m_ulMonitorCount = 0;
 
-    int      m_iCurrentVideoMode;            // VideoMode this run
-    int      m_iCurrentAdapter;
-    bool     m_bCurrentWindowed;
-    bool     m_bCurrentFullScreenMinimize;
-    int      m_iCurrentFullscreenStyle;
-    int      m_iNextVideoMode;            // VideoMode next run
-    int      m_iNextAdapter;
-    bool     m_bNextWindowed;
-    int      m_iNextFullscreenStyle;
-    HMONITOR m_hCurrentMonitor;
+    int      m_iCurrentVideoMode = 0;            // VideoMode this run
+    int      m_iCurrentAdapter = 0;
+    bool     m_bCurrentWindowed = false;
+    bool     m_bCurrentFullScreenMinimize = false;
+    int      m_iCurrentFullscreenStyle = 0;
+    int      m_iNextVideoMode = 0;            // VideoMode next run
+    int      m_iNextAdapter = 0;
+    bool     m_bNextWindowed = false;
+    int      m_iNextFullscreenStyle = 0;
+    HMONITOR m_hCurrentMonitor = nullptr;
 
-    bool m_bPendingGainFocus;
-    bool m_bOriginalDesktopResMatches;
+    bool m_bPendingGainFocus = false;
+    bool m_bOriginalDesktopResMatches = false;
 };
 
 ///////////////////////////////////////////////////////////////

@@ -19,7 +19,6 @@ class CClientSoundManager;
 class CClientSoundManager
 {
 public:
-    ZERO_ON_NEW
     CClientSoundManager(CClientManager* pClientManager);
     ~CClientSoundManager();
 
@@ -59,9 +58,9 @@ public:
     void ProcessStopQueues(bool bFlush = false);
 
 private:
-    CClientManager* m_pClientManager;
+    CClientManager* m_pClientManager = nullptr;
 
-    unsigned short m_usDimension;
+    unsigned short m_usDimension = 0;
 
     std::list<CClientSound*> m_Sounds;
     std::set<CClientSound*>  m_DistanceStreamedInMap;
@@ -69,9 +68,9 @@ private:
     std::map<std::string, int> m_FxEffectNames;
     SString                    m_strUserAgent;
 
-    bool m_bMinimizeMuted;
+    bool m_bMinimizeMuted = false;
 
-    bool m_aValidatedSFX[9];
+    bool m_aValidatedSFX[9] = {false}; 
 
     std::vector<DWORD>                  m_ChannelStopQueue;
     std::map<CBassAudio*, CElapsedTime> m_AudioStopQueue;

@@ -17,7 +17,6 @@ class CObject;
 class CClientObjectManager
 {
 public:
-    ZERO_ON_NEW
     CClientObjectManager(class CClientManager* pManager);
     ~CClientObjectManager();
 
@@ -51,17 +50,17 @@ public:
 protected:
     void UpdateLimitInfo();
 
-    int  m_iEntryInfoNodeEntries;
-    int  m_iPointerNodeSingleLinkEntries;
-    int  m_iPointerNodeDoubleLinkEntries;
-    uint m_uiMaxStreamedInCount;
-    uint m_uiMaxLowLodStreamedInCount;
-    uint m_uiStreamedInCount;
-    uint m_uiLowLodStreamedInCount;
-    bool m_bDoneLimitWarning;
+    int  m_iEntryInfoNodeEntries = 0;
+    int  m_iPointerNodeSingleLinkEntries = 0;
+    int  m_iPointerNodeDoubleLinkEntries = 0;
+    uint m_uiMaxStreamedInCount = 0;
+    uint m_uiMaxLowLodStreamedInCount = 0;
+    uint m_uiStreamedInCount = 0;
+    uint m_uiLowLodStreamedInCount = 0;
+    bool m_bDoneLimitWarning = false;
 
-    CClientManager*              m_pManager;
-    bool                         m_bCanRemoveFromList;
+    CClientManager*              m_pManager = nullptr;
+    bool                         m_bCanRemoveFromList = false;
     CMappedArray<CClientObject*> m_Objects;
     CMappedArray<CClientObject*> m_StreamedIn;
 };

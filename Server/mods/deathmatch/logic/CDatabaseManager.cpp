@@ -25,7 +25,6 @@ SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl);
 class CDatabaseManagerImpl : public CDatabaseManager
 {
 public:
-    ZERO_ON_NEW
     CDatabaseManagerImpl();
     virtual ~CDatabaseManagerImpl();
 
@@ -67,10 +66,10 @@ public:
         m_bLastErrorSuppressed = bSuppressed;
     }
 
-    CDatabaseJobQueueManager*            m_JobQueue;
+    CDatabaseJobQueueManager*            m_JobQueue = nullptr;
     std::map<SConnectionHandle, SString> m_ConnectionTypeMap;
     SString                              m_strLastErrorMessage;
-    bool                                 m_bLastErrorSuppressed;
+    bool                                 m_bLastErrorSuppressed = false;
 };
 
 ///////////////////////////////////////////////////////////////

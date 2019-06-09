@@ -13,8 +13,6 @@
 class CSimKeysyncPacket : public CSimPacket
 {
 public:
-    ZERO_ON_NEW
-
     CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupiedVehicle, ushort usVehicleGotModel, uchar ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
                       bool bVehicleHasHydraulics, bool bVehicleIsPlaneOrHeli, CControllerState& sharedControllerState);
 
@@ -26,31 +24,31 @@ public:
 
     // Set in constructor
     const ElementID   m_PlayerID;
-    const bool        m_bPlayerHasOccupiedVehicle;
-    const ushort      m_usVehicleGotModel;
-    const uchar       m_ucPlayerGotWeaponType;
-    const float       m_fPlayerGotWeaponRange;
-    const bool        m_bVehicleHasHydraulics;
-    const bool        m_bVehicleIsPlaneOrHeli;
+    const bool        m_bPlayerHasOccupiedVehicle = false;
+    const ushort      m_usVehicleGotModel = 0;
+    const uchar       m_ucPlayerGotWeaponType = 0;
+    const float       m_fPlayerGotWeaponRange = 0.0f;
+    const bool        m_bVehicleHasHydraulics = false;
+    const bool        m_bVehicleIsPlaneOrHeli = false;
     CControllerState& m_sharedControllerState;
 
     // Set in Read ()
     struct
     {
-        float fPlayerRotation;
-        float fCameraRotation;
+        float fPlayerRotation = 0.0f;
+        float fCameraRotation = 0.0f;
 
-        SKeysyncFlags flags;
+        SKeysyncFlags flags = {};
 
-        bool   bWeaponCorrect;
-        uchar  ucWeaponSlot;            // Only valid if bWeaponCorrect
-        ushort usAmmoInClip;            // Only valid if bWeaponCorrect
+        bool   bWeaponCorrect = false;
+        uchar  ucWeaponSlot = 0;            // Only valid if bWeaponCorrect
+        ushort usAmmoInClip = 0;            // Only valid if bWeaponCorrect
 
-        float   fAimDirection;            // Only valid if bWeaponCorrect
+        float   fAimDirection = 0.0f;      // Only valid if bWeaponCorrect
         CVector vecSniperSource;
         CVector vecTargetting;
 
-        uchar ucDriveByDirection;
+        uchar ucDriveByDirection = 0;
 
         SVehicleTurretSync turretSync;
     } m_Cache;

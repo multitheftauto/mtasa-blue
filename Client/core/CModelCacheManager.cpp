@@ -33,8 +33,6 @@ namespace
 class CModelCacheManagerImpl : public CModelCacheManager
 {
 public:
-    ZERO_ON_NEW
-
     // CModelCacheManager interface
     virtual void DoPulse();
     virtual void GetStats(SModelCacheStats& outStats);
@@ -57,12 +55,12 @@ public:
     void SubModelRefCount(ushort usModelId);
 
 protected:
-    CGame*                            m_pGame;
-    int                               m_iFrameCounter;
+    CGame*                            m_pGame = nullptr;
+    int                               m_iFrameCounter = 0;
     CTickCount                        m_TickCountNow;
-    bool                              m_bDonePreLoad;
-    uint                              m_uiMaxCachedPedModels;
-    uint                              m_uiMaxCachedVehicleModels;
+    bool                              m_bDonePreLoad = false;
+    uint                              m_uiMaxCachedPedModels = 0;
+    uint                              m_uiMaxCachedVehicleModels = 0;
     std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap;
     std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap;
     std::set<ushort>                  m_PermoLoadedModels;

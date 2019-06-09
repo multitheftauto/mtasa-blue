@@ -37,7 +37,6 @@ struct SLine3DItem
 class CLine3DBatcher
 {
 public:
-    ZERO_ON_NEW
     CLine3DBatcher(bool bZTest);
     ~CLine3DBatcher();
 
@@ -47,7 +46,7 @@ public:
     void AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor);
 
 protected:
-    bool                     m_bZTest;
-    IDirect3DDevice9*        m_pDevice;
+    bool                     m_bZTest = false;
+    IDirect3DDevice9*        m_pDevice = nullptr;
     std::vector<SLine3DItem> m_LineList;
 };

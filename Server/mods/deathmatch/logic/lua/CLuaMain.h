@@ -40,7 +40,6 @@ struct CRefInfo
 class CLuaMain            //: public CClient
 {
 public:
-    ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
              CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
 
@@ -120,32 +119,32 @@ private:
 
     SString m_strScriptName;
 
-    lua_State*        m_luaVM;
-    CLuaTimerManager* m_pLuaTimerManager;
+    lua_State*        m_luaVM = nullptr;
+    CLuaTimerManager* m_pLuaTimerManager = nullptr;
 
-    class CResource*     m_pResource;
-    class CResourceFile* m_pResourceFile;
-    CBlipManager*        m_pBlipManager;
-    CObjectManager*      m_pObjectManager;
-    CPlayerManager*      m_pPlayerManager;
-    CRadarAreaManager*   m_pRadarAreaManager;
-    CVehicleManager*     m_pVehicleManager;
-    CMapManager*         m_pMapManager;
+    class CResource*     m_pResource = nullptr;
+    class CResourceFile* m_pResourceFile = nullptr;
+    CBlipManager*        m_pBlipManager = nullptr;
+    CObjectManager*      m_pObjectManager = nullptr;
+    CPlayerManager*      m_pPlayerManager = nullptr;
+    CRadarAreaManager*   m_pRadarAreaManager = nullptr;
+    CVehicleManager*     m_pVehicleManager = nullptr;
+    CMapManager*         m_pMapManager = nullptr;
 
-    list<CXMLFile*>     m_XMLFiles;
-    list<CTextDisplay*> m_Displays;
-    list<CTextItem*>    m_TextItems;
+    std::list<CXMLFile*>     m_XMLFiles;
+    std::list<CTextDisplay*> m_Displays;
+    std::list<CTextItem*>    m_TextItems;
 
-    bool m_bEnableOOP;
+    bool m_bEnableOOP = false;
 
-    bool m_bBeingDeleted;            // prevent it being deleted twice
+    bool m_bBeingDeleted = false;            // prevent it being deleted twice
 
     CElapsedTime         m_FunctionEnterTimer;
     CElapsedTimeApprox   m_WarningTimer;
-    uint                 m_uiPCallDepth;
+    uint                 m_uiPCallDepth = 0;
     std::vector<SString> m_OpenFilenameList;
-    uint                 m_uiOpenFileCountWarnThresh;
-    uint                 m_uiOpenXMLFileCountWarnThresh;
+    uint                 m_uiOpenFileCountWarnThresh = 0;
+    uint                 m_uiOpenXMLFileCountWarnThresh = 0;
     static SString       ms_strExpectedUndumpHash;
 
 public:
