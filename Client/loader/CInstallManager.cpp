@@ -884,6 +884,13 @@ SString CInstallManager::_ProcessAppCompatChecks()
     removeList.push_back(L"DISABLEDWM");
     removeList.push_back(L"HIGHDPIAWARE");
 
+    // Fix for GitHub issue #983 "crash on join server"
+#ifdef DEBUG
+    removeList.push_back(L"IgnoreFreeLibrary<client_d.dll>");
+#else
+    removeList.push_back(L"IgnoreFreeLibrary<client.dll>");
+#endif
+
     // Remove potential performance hit
     removeList.push_back(L"FaultTolerantHeap");
 
