@@ -116,7 +116,7 @@ protected:
 
     CAccountManager* m_pManager;
 
-    EAccountType              m_AccountType = EAcountType::Guest;
+    EAccountType              m_AccountType = EAccountType::Guest;
     SString                   m_strName;
     CAccountPassword          m_Password;
     SString                   m_strHttpPassAppend;
