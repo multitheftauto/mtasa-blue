@@ -30,6 +30,10 @@
     #endif
 #endif
 
+#ifdef __APPLE__
+    #include "cpuid.h"
+#endif
+
 CCriticalSection     CRefCountable::ms_CS;
 std::map<uint, uint> ms_ReportAmountMap;
 SString              ms_strProductRegistryPath;
@@ -1198,9 +1202,9 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
+#ifdef WIN32
 DWORD SharedUtil::GetMainThreadId()
 {
-#ifdef WIN32
     static DWORD dwMainThreadID = 0;
     if (dwMainThreadID == 0)
     {
@@ -1242,8 +1246,8 @@ DWORD SharedUtil::GetMainThreadId()
         }
     }
     return dwMainThreadID;
-#endif
 }
+#endif
 
 //
 // Return true if currently executing the main thread.
@@ -1758,6 +1762,23 @@ namespace SharedUtil
             return pfn();
 
         return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__)
+        // Hacked from https://stackoverflow.com/a/40398183/1517394
+        unsigned long cpu;
+
+        uint32_t CPUInfo[4];
+        __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+
+        /* CPUInfo[1] is EBX, bits 24-31 are APIC ID */
+        if ((CPUInfo[3] & (1 << 9)) == 0)
+            cpu = -1; /* no APIC on chip */
+        else
+            cpu = (unsigned)CPUInfo[1] >> 24;
+
+        if (cpu < 0)
+            cpu = 0;
+
+        return cpu;
 #else
         // This should work on Linux
         return sched_getcpu();

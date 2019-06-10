@@ -34,7 +34,7 @@ extern "C" bool g_bNoTopBar;
     #define MTA_LIB_EXTENSION   ".so"
 #elif defined(__APPLE__)
     #define MTA_OS_STRING       "macOS"
-    #define MTA_LIB_EXTENSION   ".so"
+    #define MTA_LIB_EXTENSION   ".dylib"
 #else
     #error "Unsupported operating system"
 #endif
@@ -82,7 +82,7 @@ typedef int socklen_t;
         #include <ncurses.h>
     #elif __has_include(<ncursesw/curses.h>)
         #include <ncursesw/curses.h>
-    #else 
+    #else
         #include <ncurses.h>
     #endif
 

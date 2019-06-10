@@ -299,7 +299,7 @@ void CNetAPI::DoPulse()
 
         // Grab the local player
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
-        if (pPlayer && !pPlayer->IsDeadOnNetwork())
+        if (pPlayer)
         {
             unsigned long ulCurrentTime = CClientTime::GetTime();
 
@@ -406,10 +406,7 @@ void CNetAPI::DoPulse()
                 // Display network trouble
                 m_bIsNetworkTrouble = true;
             }
-        }
 
-        if (pPlayer)
-        {
             // Do camera sync even if player is dead
             if (IsCameraSyncNeeded())
             {

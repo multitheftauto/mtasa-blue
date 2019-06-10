@@ -650,28 +650,74 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 {
-    // bool                  - show the "X has joined the game" messages?
+    // string          (X)   - AC info
+    // string          (X)   - SD info
+    // bool            (1)   - whether these are new players that have just joined
+    //                       x ProtocolError(8)
+    //
     // [ following repeats <number of players joined> times ]
-    // unsigned char  (1)    - assigned player id
-    // unsigned char  (1)    - player nick length
-    // unsigned char  (X)    - player nick (X = player nick length)
-    // unsigned char  (1)    - nametag text length
-    // unsigned char  (X)    - nametag text (X = nametag text length)
-    // unsigned char  (3)    - nametag color
-    // unsigned char  (1)    - nametag showing
-    // bool                  - is he dead?
-    // bool                  - spawned? (following data only if this is TRUE)
-    // unsigned char  (1)    - model id
-    // ElementID      (2)    - team id
-    // bool                  - in a vehicle?
-    // ElementID      (2)    - vehicle id (if vehicle)
-    // unsigned char  (1)    - vehicle seat (if vehicle)
-    // CVector        (12)   - position (if player)
-    // float          (4)    - rotation (if player)
-    // bool                  - has a jetpack?
-    // unsigned short (2)    - dimension
-    // unsigned char  (1)    - fighting style
-    // Dear God, please fix issue #7376
+    //
+    // unsigned char   (1)   - assigned player id
+    //                       x ProtocolError(8)
+    // unsigned char   (1)   - time sync context
+    // unsigned char   (1)   - player nick length
+    //                       x ProtocolError(9)
+    // unsigned char   (X)   - player nick (X = player nick length)
+    //
+    // if bitStream version >= 0x34
+    // | unsigned short(2)  - bitStream version
+    // | unsigned int  (1)  - build number
+    //
+    // bool            (1)   - is he dead?
+    // bool            (1)   - spawned? (*)
+    // bool            (1)   - in a vehicle? (**)
+    // bool            (1)   - has a jetpack?
+    // bool            (1)   - nametag showing
+    // bool            (1)   - nametag color overridden (***)
+    // bool            (1)   - headless?
+    // bool            (1)   - frozen?
+    // unsigned char   (1)   - nametag text length
+    // unsigned char   (X)   - nametag text (X = nametag text length)
+    //
+    // if (***) nametag color overridden TRUE
+    // | unsigned char (3)   - nametag color (RGB)
+    //
+    // if bitStream version > 0x4B
+    // | unsigned char (1)   - movement anim (default = MOVE_DEFAULT)
+    //
+    // --------------------------------------
+    // (*) ALL following data only if SPAWNED
+    //     Always true for new server builds
+    // --------------------------------------
+    //
+    // unsigned char   (1)   - model id
+    //                       x ProtocolError(10)
+    // bool            (1)   - has team
+    // if has team
+    // | ElementID     (2)   - team id
+    // |                      x ProtocolError(10)
+    //
+    // if (**) inside vehicle
+    // | ElementID     (2)    - vehicle id
+    // | unsigned char (4)    - vehicle seat
+    // |                      x ProtocolError(11)
+    // else (on foot)
+    // | CVector       (12)   - position
+    // | float         (4)    - rotation
+
+    // unsigned short  (2)    - dimension
+    // unsigned char   (1)    - fighting style
+    // unsigned char   (1)    - alpha
+    // unsigned char   (1)    - interior
+    //
+    // ---------------------------------
+    // 16 reads of the following (0..15)
+    // ---------------------------------
+    // bool            (1)    - if player has this weapon id
+    // if player has this weapon
+    // | unsigned char   (6)  - weapon type of this id
+    //
+    // Thank the old gods and the new that issue #7376 is fixed
 
     // The game must be loaded or the game will crash
     if (g_pClientGame->m_Status != CClientGame::STATUS_JOINED)
@@ -695,38 +741,9 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
     if (!bJustJoined)
     {
-        SString strAllowedFiles = "Undisclosed";
-        SString strDisabledAC = "Undisclosed";
-        SString strEnabledSD = "Undisclosed";
-        if (!strACInfo.empty())
-        {
-            SString strVerifyFiles = strACInfo.SplitLeft(",");
-            strDisabledAC = strACInfo.SplitRight(",");
-            strEnabledSD = strSDInfo;
-            strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
-            strEnabledSD = strEnabledSD == "" ? "None" : strEnabledSD;
-
-            int iVerifyFiles = atoi(strVerifyFiles);
-            if (iVerifyFiles == -1)
-                strAllowedFiles = "None";
-            else if (iVerifyFiles == 0)
-                strAllowedFiles = "All";
-            else
-            {
-                strAllowedFiles = "";
-                for (uint i = 0; i < 31; i++)
-                {
-                    if ((iVerifyFiles & (1 << i)) == 0)
-                    {
-                        if (!strAllowedFiles.empty())
-                            strAllowedFiles += ",";
-                        strAllowedFiles += SString("%d", i + 1);
-                    }
-                }
-            }
-        }
-        g_pClientGame->m_strACInfo = SString("[Allowed client files: %s] [Disabled AC: %s] [Enabled SD: %s]", *strAllowedFiles, *strDisabledAC, *strEnabledSD);
-        g_pCore->GetConsole()->Print(SString("Server AC info: %s", *g_pClientGame->m_strACInfo));
+        SString strInfo = CAntiCheat::GetInfo(strACInfo, strSDInfo);
+        g_pCore->GetConsole()->Print(SString("Server AC info: %s", *strInfo));
+        g_pClientGame->m_strACInfo = strInfo;
     }
 
     // While there are bytes left, parse player list items
@@ -876,101 +893,100 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
         // Create the player
         CClientPlayer* pPlayer = new CClientPlayer(g_pClientGame->m_pManager, PlayerID);
-        if (pPlayer)
-        {
-            // Set version info
-            pPlayer->SetRemoteVersionInfo(usBitStreamVersion, uiBuildNumber);
-
-            // Set its parent the root entity
-            pPlayer->SetSyncTimeContext(ucTimeContext);
-            pPlayer->SetParent(g_pClientGame->m_pRootEntity);
-
-            // Store the nick and if he's dead
-            pPlayer->SetNick(szNickBuffer);
-            pPlayer->SetDeadOnNetwork(bIsDead);
-            pPlayer->SetIsDead(bIsDead);
-
-            if (bIsDead)
-            {
-                pPlayer->LockHealth(0.0f);
-                pPlayer->LockArmor(0.0f);
-            }
-
-            if (!strNametagText.empty())
-                pPlayer->SetNametagText(strNametagText);
-
-            // Set the nametag override color if it's overridden
-            if (bHasNametagColorOverridden)
-            {
-                pPlayer->SetNametagOverrideColor(ucNametagR, ucNametagG, ucNametagB);
-            }
-
-            pPlayer->SetNametagShowing(bNametagShowing);
-
-            CClientTeam* pTeam = NULL;
-            if (TeamID != INVALID_ELEMENT_ID)
-                pTeam = g_pClientGame->m_pTeamManager->GetTeam(TeamID);
-
-            if (pTeam)
-                pPlayer->SetTeam(pTeam, true);
-
-            // If the player has spawned
-            if (bIsSpawned)            // Always true for newer server builds.
-            {
-                // Give him the correct skin
-                pPlayer->SetModel(usPlayerModelID);
-
-                // Not in a vehicle?
-                if (ID == INVALID_ELEMENT_ID)
-                {
-                    pPlayer->SetPosition(position.data.vecPosition);
-                    pPlayer->SetCurrentRotation(rotation.data.fRotation);
-                    pPlayer->SetCameraRotation(rotation.data.fRotation);
-                    pPlayer->ResetInterpolation();
-                    pPlayer->SetHasJetPack(bHasJetPack);
-                }
-                else            // In a vehicle
-                {
-                    // Grab the vehicle and warp him into it
-                    CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get(ID);
-                    if (pVehicle)
-                    {
-                        pPlayer->WarpIntoVehicle(pVehicle, ucVehicleSeat);
-                    }
-                }
-                pPlayer->SetHeadless(bIsHeadless);
-                pPlayer->SetFrozen(bIsFrozen);
-                pPlayer->SetDimension(usDimension);
-                pPlayer->SetFightingStyle((eFightingStyle)ucFightingStyle);
-                pPlayer->SetAlpha(alpha.data.ucAlpha);
-                pPlayer->SetInterior(ucInterior);
-
-                // Read the weapon slots
-                for (unsigned int i = 0; i < 16; ++i)
-                {
-                    if (bitStream.ReadBit() == true)
-                    {
-                        SWeaponTypeSync weaponType;
-                        bitStream.Read(&weaponType);
-                        pPlayer->GiveWeapon(static_cast<eWeaponType>(weaponType.data.ucWeaponType), 1);
-                    }
-                }
-            }
-
-            // Set move anim even if not spawned
-            pPlayer->SetMoveAnim((eMoveAnim)ucMoveAnim);
-
-            // Print the join message in the chat
-            if (bJustJoined)
-            {
-                // Call the onClientPlayerJoin event
-                CLuaArguments Arguments;
-                pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
-            }
-        }
-        else
+        if (!pPlayer)
         {
             RaiseFatalError(5);
+            return;
+        }
+
+        // Set version info
+        pPlayer->SetRemoteVersionInfo(usBitStreamVersion, uiBuildNumber);
+
+        // Set its parent the root entity
+        pPlayer->SetSyncTimeContext(ucTimeContext);
+        pPlayer->SetParent(g_pClientGame->m_pRootEntity);
+
+        // Store the nick and if he's dead
+        pPlayer->SetNick(szNickBuffer);
+        pPlayer->SetDeadOnNetwork(bIsDead);
+        pPlayer->SetIsDead(bIsDead);
+
+        if (bIsDead)
+        {
+            pPlayer->LockHealth(0.0f);
+            pPlayer->LockArmor(0.0f);
+        }
+
+        if (!strNametagText.empty())
+            pPlayer->SetNametagText(strNametagText);
+
+        // Set the nametag override color if it's overridden
+        if (bHasNametagColorOverridden)
+        {
+            pPlayer->SetNametagOverrideColor(ucNametagR, ucNametagG, ucNametagB);
+        }
+
+        pPlayer->SetNametagShowing(bNametagShowing);
+
+        CClientTeam* pTeam = NULL;
+        if (TeamID != INVALID_ELEMENT_ID)
+            pTeam = g_pClientGame->m_pTeamManager->GetTeam(TeamID);
+
+        if (pTeam)
+            pPlayer->SetTeam(pTeam, true);
+
+        // If the player has spawned
+        if (bIsSpawned)            // Always true for newer server builds.
+        {
+            // Give him the correct skin
+            pPlayer->SetModel(usPlayerModelID);
+
+            // Not in a vehicle?
+            if (ID == INVALID_ELEMENT_ID)
+            {
+                pPlayer->SetPosition(position.data.vecPosition);
+                pPlayer->SetCurrentRotation(rotation.data.fRotation);
+                pPlayer->SetCameraRotation(rotation.data.fRotation);
+                pPlayer->ResetInterpolation();
+                pPlayer->SetHasJetPack(bHasJetPack);
+            }
+            else            // In a vehicle
+            {
+                // Grab the vehicle and warp him into it
+                CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get(ID);
+                if (pVehicle)
+                {
+                    pPlayer->WarpIntoVehicle(pVehicle, ucVehicleSeat);
+                }
+            }
+            pPlayer->SetHeadless(bIsHeadless);
+            pPlayer->SetFrozen(bIsFrozen);
+            pPlayer->SetDimension(usDimension);
+            pPlayer->SetFightingStyle((eFightingStyle)ucFightingStyle);
+            pPlayer->SetAlpha(alpha.data.ucAlpha);
+            pPlayer->SetInterior(ucInterior);
+
+            // Read the weapon slots
+            for (unsigned int i = 0; i < 16; ++i)
+            {
+                if (bitStream.ReadBit() == true)
+                {
+                    SWeaponTypeSync weaponType;
+                    bitStream.Read(&weaponType);
+                    pPlayer->GiveWeapon(static_cast<eWeaponType>(weaponType.data.ucWeaponType), 1);
+                }
+            }
+        }
+
+        // Set move anim even if not spawned
+        pPlayer->SetMoveAnim((eMoveAnim)ucMoveAnim);
+
+        // Print the join message in the chat
+        if (bJustJoined)
+        {
+            // Call the onClientPlayerJoin event
+            CLuaArguments Arguments;
+            pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
 }

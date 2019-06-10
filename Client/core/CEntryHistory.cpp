@@ -87,11 +87,12 @@ void CEntryHistory::CleanLine(SString& line)
 //
 void CEntryHistory::LoadFromFile(SString filename)
 {
-    m_outFilename = CalcMTASAPath(filename);
+    SString filepath = CalcMTASAPath(filename);
+    m_outFilename = filepath;
 
     // Load the history lines
     char          buffer[256];
-    std::ifstream infile(FromUTF8(filename));
+    std::ifstream infile(FromUTF8(filepath));
     while (infile.getline(buffer, 256))
         if (buffer[0] && !Contains(buffer))
             m_entries.push_back(CEntryHistoryItem(buffer));
