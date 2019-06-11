@@ -108,7 +108,7 @@ protected:
         // Combine functions
         using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
 
-        return ArgumentParserWarn<Ret, Overload::Call, Functions...>(L);
+        return ArgumentParserWarn<ReturnOnError, Overload::Call, Functions...>(L);
     }
 
     // New style: hard error on usage mistakes
