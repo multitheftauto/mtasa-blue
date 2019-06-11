@@ -52,7 +52,7 @@ namespace lua
 
 
     template <>
-    std::string PopTrivial<std::string>(lua_State* L, std::size_t& index)
+    std::string PopPrimitive<std::string>(lua_State* L, std::size_t& index)
     {
         uint        uiLength = lua_strlen(L, index);
         std::string outValue;
@@ -61,37 +61,37 @@ namespace lua
     }
 
     template <>
-    int PopTrivial<int>(lua_State* L, std::size_t& index)
+    int PopPrimitive<int>(lua_State* L, std::size_t& index)
     {
         return static_cast<int>(lua_tonumber(L, index++));
     }
 
     template <>
-    unsigned int PopTrivial<unsigned int>(lua_State* L, std::size_t& index)
+    unsigned int PopPrimitive<unsigned int>(lua_State* L, std::size_t& index)
     {
         return static_cast<unsigned int>(lua_tonumber(L, index++));
     }
 
     template <>
-    float PopTrivial<float>(lua_State* L, std::size_t& index)
+    float PopPrimitive<float>(lua_State* L, std::size_t& index)
     {
         return static_cast<float>(lua_tonumber(L, index++));
     }
 
     template <>
-    double PopTrivial<double>(lua_State* L, std::size_t& index)
+    double PopPrimitive<double>(lua_State* L, std::size_t& index)
     {
         return static_cast<double>(lua_tonumber(L, index++));
     }
     
     template <>
-    bool PopTrivial<bool>(lua_State* L, std::size_t& index)
+    bool PopPrimitive<bool>(lua_State* L, std::size_t& index)
     {
         return static_cast<bool>(lua_toboolean(L, index++));
     }
 
     template <>
-    void* PopTrivial<void*>(lua_State* L, std::size_t& index)
+    void* PopPrimitive<void*>(lua_State* L, std::size_t& index)
     {
         return lua_touserdata(L, index++);
     }

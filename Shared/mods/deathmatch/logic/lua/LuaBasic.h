@@ -13,8 +13,7 @@
 /*
     Basic Lua operations:
         int Push(L, T value)
-        T PopTrivial(L, std::size_t stackIndex)
-        bool TypeMatch(L, std::size_t stackIndex)
+        T PopPrimitive(L, std::size_t stackIndex)
 */
 
 
@@ -23,13 +22,13 @@ namespace lua
     // PopTrival should read a simple value of type T from the stack without extra type checks
     // If whatever is at that point in the stack is not convertible to T, the behavior is undefined
     template <typename T>
-    inline T PopTrivial(lua_State* L, std::size_t& index);
+    inline T PopPrimitive(lua_State* L, std::size_t& index);
 
 
     // Push should push a value of type T to the Lua Stack
-    // The return value must be the amount of items pushed to the stack, which should
-    // be 1 for trivial types (e.g. Push<int>) but may be any number for special cases
-    // like tuples
+    // The return value must be the net amount of items pushed to the stack, which should
+    // be 1 for most types (e.g. Push<int>) but may be any number for special cases
+    // like tuples, in order to allow returning multiple values from a function
     
     int Push(lua_State* L, int val);
     int Push(lua_State* L, const std::string& val);
@@ -67,6 +66,8 @@ namespace lua
             Push(L, v);
             lua_settable(L, -3);
         }
+
+        // Only the table remains on the stack
         return 1;
     }
 
@@ -80,15 +81,19 @@ namespace lua
             Push(L, v);
             lua_settable(L, -3);
         }
+
+        // Only the table remains on the stack
         return 1;
     }
 
+    // Overload for enum types only
     template <typename T>
     typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)
     {
         return Push(L, EnumToString(val));
     }
 
+    // Overload for pointers to classes. We boldly assume that these are script entities
     template <typename T>
     typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
     {

@@ -63,10 +63,10 @@ std::string CLuaCryptDefs::TeaEncode(std::string str, std::string key)
 
 std::string CLuaCryptDefs::TeaDecode(std::string str, std::string key)
 {
-    SString fixme = str;
     SString result = SharedUtil::Base64decode(str);
-    SharedUtil::TeaDecode(result, key, &fixme);
-    return fixme;
+    SString strOutResult;
+    SharedUtil::TeaDecode(result, key, &strOutResult);
+    return strOutResult;
 }
 
 std::string CLuaCryptDefs::Base64encode(std::string str)
