@@ -88,22 +88,27 @@ protected:
 
 protected:
     // Old style: Only warn on failure. This should
-    // not be used for new functions. First template argument 
-    // Is a value used as result on invalid argument
-    template <auto Ret, auto T>
+    // not be used for new functions. ReturnOnError
+    // must be a value to use as result on invalid argument
+    template <auto ReturnOnError, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, Ret, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<false, ReturnOnError, T>()(L, m_pScriptDebugging);
     }
 
-    // Special cases for overloads
-    template <auto Ret, auto T, auto U, auto... Ts>
+    // Special case for overloads
+    // This combines multiple functions into one (via CLuaOverloadParser)
+    template <auto ReturnOnError, auto FunctionA, auto FunctionB, auto... Functions>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        if constexpr (sizeof...(Ts) == 0)
-            return ArgumentParserWarn<Ret, CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
-        else
-            return ArgumentParserWarn<Ret, CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
+        // Pad functions to have the same number of parameters by
+        // filling both up to the larger number of parameters with dummy_type arguments
+        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
+        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        // Combine functions
+        using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
+
+        return ArgumentParserWarn<Ret, Overload::Call, Functions...>(L);
     }
 
     // New style: hard error on usage mistakes
@@ -113,13 +118,18 @@ protected:
         return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
     }
 
-    // Overload variant
-    template <auto T, auto U, auto... Ts>
+    // Special case for overloads
+    // This combines multiple functions into one (via CLuaOverloadParser)
+    template <auto FunctionA, auto FunctionB, auto... Functions>
     static inline int ArgumentParser(lua_State* L)
     {
-        if constexpr (sizeof...(Ts) == 0)
-            return ArgumentParser<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
-        else
-            return ArgumentParser<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
+        // Pad functions to have the same number of parameters by
+        // filling both up to the larger number of parameters with dummy_type arguments
+        using PaddedFunctionA = pad_func_with_func<FunctionA, FunctionB>;
+        using PaddedFunctionB = pad_func_with_func<FunctionB, FunctionA>;
+        // Combine functions
+        using Overload = CLuaOverloadParser<PaddedFunctionA::Call, PaddedFunctionB::Call>;
+
+        return ArgumentParser<Overload::Call, Functions...>(L);
     }
 };
