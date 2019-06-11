@@ -63,7 +63,6 @@ class CGame;
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
-class CBanManager;
 class CBlipManager;
 class CClock;
 class CColManager;
