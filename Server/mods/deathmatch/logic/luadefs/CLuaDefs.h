@@ -88,28 +88,29 @@ protected:
 
 protected:
     // Old style: Only warn on failure. This should
-    // not be used for new functions
-    template <auto T>
+    // not be used for new functions. First template argument 
+    // Is a value used as result on invalid argument
+    template <auto Ret, auto T>
     static inline int ArgumentParserWarn(lua_State* L)
     {
-        return CLuaFunctionParser<false, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<false, Ret, T>()(L, m_pScriptDebugging);
     }
 
     // Special cases for overloads
-    template <auto T, auto U, auto... Ts>
+    template <auto Ret, auto T, auto U, auto... Ts>
     static inline int ArgumentParserWarn(lua_State* L)
     {
         if constexpr (sizeof...(Ts) == 0)
-            return ArgumentParserWarn<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
+            return ArgumentParserWarn<Ret, CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call>(L);
         else
-            return ArgumentParserWarn<CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
+            return ArgumentParserWarn<Ret, CLuaOverloadParser<pad_func_with_func<T, U>::Call, pad_func_with_func<U, T>::Call>::Call, Ts...>(L);
     }
 
     // New style: hard error on usage mistakes
     template <auto T>
     static inline int ArgumentParser(lua_State* L)
     {
-        return CLuaFunctionParser<true, T>()(L, m_pScriptDebugging);
+        return CLuaFunctionParser<true, nullptr, T>()(L, m_pScriptDebugging);
     }
 
     // Overload variant

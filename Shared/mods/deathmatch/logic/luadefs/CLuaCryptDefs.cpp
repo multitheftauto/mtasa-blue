@@ -14,13 +14,13 @@
 void CLuaCryptDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
-        {"md5", ArgumentParserWarn<Md5>},
-        {"sha256", ArgumentParserWarn<Sha256>},
-        {"hash", ArgumentParserWarn<Hash>},
-        {"teaEncode", ArgumentParserWarn<TeaEncode>},
-        {"teaDecode", ArgumentParserWarn<TeaDecode>},
-        {"base64Encode", ArgumentParserWarn<Base64encode>},
-        {"base64Decode", ArgumentParserWarn<Base64decode>},
+        {"md5", ArgumentParserWarn<false, Md5>},
+        {"sha256", ArgumentParserWarn<false, Sha256>},
+        {"hash", ArgumentParserWarn<false, Hash>},
+        {"teaEncode", ArgumentParserWarn<false, TeaEncode>},
+        {"teaDecode", ArgumentParserWarn<false, TeaDecode>},
+        {"base64Encode", ArgumentParserWarn<false, Base64encode>},
+        {"base64Decode", ArgumentParserWarn<false, Base64decode>},
         {"passwordHash", PasswordHash},
         {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},

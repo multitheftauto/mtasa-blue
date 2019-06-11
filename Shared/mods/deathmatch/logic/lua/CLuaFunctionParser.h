@@ -376,13 +376,13 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <bool, auto*>
+template <bool, auto, auto*>
 struct CLuaFunctionParser
 {
 };
 
-template <bool ErrorOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<ErrorOnFailure, Func> : CLuaFunctionParserBase
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
+struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
 {
     template <typename... Params>
     inline auto Call(lua_State* L, Params&&... ps)
@@ -429,7 +429,7 @@ struct CLuaFunctionParser<ErrorOnFailure, Func> : CLuaFunctionParserBase
             else
             {
                 pScriptDebugging->LogCustom(L, strError.c_str());
-                lua_pushboolean(L, false);
+                lua::Push(L, ReturnOnFailure);
             }
             return 1;
         }
