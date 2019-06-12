@@ -76,10 +76,15 @@ public:
     virtual bool             WriteDFF(const SString& strFilename, RpClump* pClump) = 0;
     virtual bool             WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary) = 0;
     virtual bool             WriteDFF(void* pData, size_t dataSize, RpClump* pClump) = 0;
+    virtual RwTexDictionary* CreateTextureDictionary(std::vector<RwTexture*>& vecTextures) = 0;
+    virtual void             GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
     virtual RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom) = 0;
+    virtual _rwD3D9RasterExt* GetRasterExt(RwRaster* raster) = 0;
+    virtual D3DFORMAT        GetRasterD3DFormat(RwRaster* raster) = 0;
+    virtual bool             IsRasterCompressed(RwRaster* raster) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
     virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
@@ -93,6 +98,7 @@ public:
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
     virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
+    virtual void             GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD) = 0;
     virtual const char*      GetTextureName(CD3DDUMMY* pD3DData) = 0;
 
     virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;

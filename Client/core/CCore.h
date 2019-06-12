@@ -276,7 +276,7 @@ public:
     SString     GetBlueCopyrightString();
     HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 
-    std::unique_ptr<CTextureAtlasInterface> CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo);
+    //std::unique_ptr<CTextureAtlasInterface> CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo);
 private:
     // Core devices.
     CXML*               m_pXML;

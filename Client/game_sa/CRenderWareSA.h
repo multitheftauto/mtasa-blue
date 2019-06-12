@@ -52,6 +52,8 @@ public:
 
     bool WriteDFF(void* pData, size_t dataSize, RpClump* pClump);
 
+    RwTexDictionary* CreateTextureDictionary(std::vector<RwTexture*>& vecTextures);
+
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
 
@@ -63,6 +65,12 @@ public:
 
     // Copies textures from second argument to first one. Textures of first argument are not removed
     RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom);
+
+    _rwD3D9RasterExt* GetRasterExt(RwRaster* raster);
+
+    D3DFORMAT GetRasterD3DFormat(RwRaster* raster);
+
+    bool      IsRasterCompressed(RwRaster* raster);
 
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const CBuffer& fileData);
@@ -106,7 +114,7 @@ public:
     void               PulseWorldTextureWatch();
     void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId);
-    static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
+    void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
     void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
@@ -143,8 +151,8 @@ public:
     STexInfo* CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      DestroyTexInfo(STexInfo* pTexInfo);
 
-    static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
-    static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
+    void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
+    bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
     void OnTextureStreamIn(STexInfo* pTexInfo);
     void OnTextureStreamOut(STexInfo* pTexInfo);
@@ -156,6 +164,8 @@ public:
     void SetCurrentDFFWriteModelID(int modelID);
     void SetCurrentReadDFFWithoutReplacingCOL(bool bReadWithoutReplacingCOL);
     void DeleteReadDFFCollisionModel();
+
+    static RwInt32& _RwD3D9RasterExtOffset;    /* Raster extension offset */
 
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;

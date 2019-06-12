@@ -13,11 +13,21 @@
 
 #pragma once
 
+#include <d3d9.h>
+
+
 /*****************************************************************************/
 /** RenderWare rendering types                                              **/
 /*****************************************************************************/
 
+
 // RenderWare definitions
+#if (!defined(RWFORCEENUMSIZEINT))
+#define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
+#endif /* (!defined(RWFORCEENUMSIZEINT)) */
+
+#define RASTEREXTFROMRASTER(raster) \
+((_rwD3D9RasterExt *)(((RwUInt8 *)(raster)) + CRenderWareSA::_RwD3D9RasterExtOffset))
 #define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
 #define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23
@@ -56,6 +66,51 @@ typedef RwCamera* (*RwCameraPreCallback)(RwCamera* camera);
 typedef RwCamera* (*RwCameraPostCallback)(RwCamera* camera);
 typedef RpAtomic* (*RpAtomicCallback)(RpAtomic* atomic);
 typedef RpClump* (*RpClumpCallback)(RpClump* clump, void* data);
+
+
+typedef struct _rwD3D9Palette _rwD3D9Palette;
+struct _rwD3D9Palette
+{
+    PALETTEENTRY    entries[256];
+    RwInt32     globalindex;
+};
+
+typedef LPDIRECT3DSURFACE9 LPSURFACE;
+typedef LPDIRECT3DTEXTURE9 LPTEXTURE;
+
+typedef struct _rwD3D9RasterExt _rwD3D9RasterExt;
+struct _rwD3D9RasterExt
+{
+    LPTEXTURE               texture;
+    _rwD3D9Palette          *palette;
+    RwUInt8                 alpha;              // This texture has alpha 
+    RwUInt8                 cube : 4;           // This texture is a cube texture 
+    RwUInt8                 face : 4;           // The active face of a cube texture 
+    RwUInt8                 automipmapgen : 4;  // This texture uses automipmap generation 
+    RwUInt8                 compressed : 4;     // This texture is compressed 
+    RwUInt8                 lockedMipLevel;
+    LPSURFACE               lockedSurface;
+    D3DLOCKED_RECT          lockedRect;
+    D3DFORMAT               d3dFormat;          // D3D format 
+    LPDIRECT3DSWAPCHAIN9    swapChain;
+    HWND                    window;
+};
+
+typedef struct _rwD3D9RasterConvData _rwD3D9RasterConvData;
+struct _rwD3D9RasterConvData
+{
+    D3DFORMAT   format;
+    RwUInt8     depth;
+    RwUInt8     alpha;
+};
+
+typedef struct _rwD3D9FormatInfo _rwD3D9FormatInfo;
+struct _rwD3D9FormatInfo
+{
+    RwUInt8 alpha;
+    RwUInt8 depth;
+    RwUInt16 rwFormat;
+};
 
 // RenderWare primitive types
 struct RwV2d
@@ -151,6 +206,146 @@ enum RpLightFlags
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
 };
 
+/**
+* \ingroup rwraster
+* \ref RwRasterLockMode represents the options available for locking
+* a raster so that it may be modified (see API function \ref RwRasterLock). An
+* application may wish to write to the raster, read from the raster or
+* simultaneously write and read a raster (rwRASTERLOCKWRITE | rwRASTERLOCKREAD).
+*/
+enum RwRasterLockMode
+{
+    rwRASTERLOCKWRITE = 0x01,   /**<Lock for writing */
+    rwRASTERLOCKREAD = 0x02,    /**<Lock for reading */
+    rwRASTERLOCKNOFETCH = 0x04, /**<When used in combination with
+                                *  rwRASTERLOCKWRITE, asks the driver not to
+                                *  fetch the pixel data. This is only useful
+                                *  if it is known that ALL the raster data is
+                                *  going to be overwritten before the raster
+                                *  is unlocked, i.e. from an
+                                *  \ref RwRasterSetFromImage call. This flag
+                                *  is not supported by all drivers. */
+    rwRASTERLOCKRAW = 0x08,    /**<When used in combination with
+                               rwRASTERLOCKWRITE or rwRASTERLOCKREAD
+                               allows access to the raw platform specific
+                               pixel format */
+    rwRASTERLOCKMODEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
+};
+
+/**
+* \ingroup rwraster
+*  RwRasterType
+*  This type represents the options available for creating a new
+* raster (se API function \ref RwRasterCreate)*/
+enum RwRasterType
+{
+    rwRASTERTYPENORMAL = 0x00,          /**<Normal */
+    rwRASTERTYPEZBUFFER = 0x01,         /**<Z Buffer */
+    rwRASTERTYPECAMERA = 0x02,          /**<Camera */
+    rwRASTERTYPETEXTURE = 0x04,         /**<Texture */
+    rwRASTERTYPECAMERATEXTURE = 0x05,   /**<Camera texture */
+    rwRASTERTYPEMASK = 0x07,            /**<Mask for finding type */
+
+    rwRASTERPALETTEVOLATILE = 0x40,        /**<If set, hints that the palette will change often */
+    rwRASTERDONTALLOCATE = 0x80,        /**<If set the raster is not allocated */
+    rwRASTERTYPEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
+};
+typedef enum RwRasterType RwRasterType;
+
+/**
+* \ingroup rwraster
+* \ref RwRasterFormat is a set of values and flags which may be combined to
+* specify a raster format. The format chosen for a particular raster depends
+* on the hardware device and the raster type specified at creation time
+* (see API function \ref RwRasterCreate). The format may be retrieved using
+* API function \ref RwRasterGetFormat.
+*
+* The raster format is a packed set of bits which contains the following
+* four pieces of information (these may be combined with bitwise OR):
+*
+* <ol>
+* <li> The pixel color format corresponding to one of the following values:
+*      <ul>
+*      <li> rwRASTERFORMAT1555
+*      <li> rwRASTERFORMAT565
+*      <li> rwRASTERFORMAT4444
+*      <li> rwRASTERFORMATLUM8
+*      <li> rwRASTERFORMAT8888
+*      <li> rwRASTERFORMAT888
+*      <li> rwRASTERFORMAT16
+*      <li> rwRASTERFORMAT24
+*      <li> rwRASTERFORMAT32
+*      <li> rwRASTERFORMAT555
+*      </ul>
+*      This value may be masked out of the raster format using
+*      rwRASTERFORMATPIXELFORMATMASK.
+* <li> The palette depth if the raster is palettized:
+*      <ul>
+*      <li> rwRASTERFORMATPAL4
+*      <li> rwRASTERFORMATPAL8
+*      </ul>
+*      In these cases, the color format refers to that of the palette.
+* <li> Flag rwRASTERFORMATMIPMAP. Set if the raster contains mipmap levels.
+* <li> Flag rwRASTERFORMATAUTOMIPMAP. Set if the mipmap levels were generated
+*      automatically by RenderWare.
+* </ol>
+*/
+enum RwRasterFormat
+{
+    rwRASTERFORMATDEFAULT = 0x0000, /* Whatever the hardware likes best */
+
+    rwRASTERFORMAT1555 = 0x0100,    /**<16 bits - 1 bit alpha, 5 bits red, green and blue */
+    rwRASTERFORMAT565 = 0x0200,     /**<16 bits - 5 bits red and blue, 6 bits green */
+    rwRASTERFORMAT4444 = 0x0300,    /**<16 bits - 4 bits per component */
+    rwRASTERFORMATLUM8 = 0x0400,    /**<Gray scale */
+    rwRASTERFORMAT8888 = 0x0500,    /**<32 bits - 8 bits per component */
+    rwRASTERFORMAT888 = 0x0600,     /**<24 bits - 8 bits per component */
+    rwRASTERFORMAT16 = 0x0700,      /**<16 bits - undefined: useful for things like Z buffers */
+    rwRASTERFORMAT24 = 0x0800,      /**<24 bits - undefined: useful for things like Z buffers */
+    rwRASTERFORMAT32 = 0x0900,      /**<32 bits - undefined: useful for things like Z buffers */
+    rwRASTERFORMAT555 = 0x0a00,     /**<16 bits - 5 bits red, green and blue */
+
+    rwRASTERFORMATAUTOMIPMAP = 0x1000, /**<RenderWare generated the mip levels */
+
+    rwRASTERFORMATPAL8 = 0x2000,    /**<8 bit palettised */
+    rwRASTERFORMATPAL4 = 0x4000,    /**<4 bit palettised */
+
+    rwRASTERFORMATMIPMAP = 0x8000,  /**<Mip mapping on */
+
+    rwRASTERFORMATPIXELFORMATMASK = 0x0f00, /**<The pixel color format
+                                            *  (excluding palettised bits) */
+    rwRASTERFORMATMASK = 0xff00     /**<The whole format */,
+    rwRASTERFORMATFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
+};
+typedef enum RwRasterFormat RwRasterFormat;
+
+/**
+* \ingroup rpgeometry
+* RpGeometryLockMode
+* Geometry lock flags
+*/
+enum RpGeometryLockMode
+{
+    rpGEOMETRYLOCKPOLYGONS = 0x01, /**<Lock the polygons (triangle list) */
+    rpGEOMETRYLOCKVERTICES = 0x02, /**<Lock the vertex positional data */
+    rpGEOMETRYLOCKNORMALS = 0x04, /**<Lock the vertex normal data */
+    rpGEOMETRYLOCKPRELIGHT = 0x08, /**<Lock the pre-light values */
+    rpGEOMETRYLOCKTEXCOORDS = 0x10, /**<Lock the texture coordinates set 1*/
+    rpGEOMETRYLOCKTEXCOORDS1 = 0x10, /**<Lock the texture coordinates set 1*/
+    rpGEOMETRYLOCKTEXCOORDS2 = 0x20, /**<Lock the texture coordinates set 2*/
+    rpGEOMETRYLOCKTEXCOORDS3 = 0x40, /**<Lock the texture coordinates set 3*/
+    rpGEOMETRYLOCKTEXCOORDS4 = 0x80, /**<Lock the texture coordinates set 4*/
+    rpGEOMETRYLOCKTEXCOORDS5 = 0x0100, /**<Lock the texture coordinates set 5*/
+    rpGEOMETRYLOCKTEXCOORDS6 = 0x0200, /**<Lock the texture coordinates set 6*/
+    rpGEOMETRYLOCKTEXCOORDS7 = 0x0400, /**<Lock the texture coordinates set 7*/
+    rpGEOMETRYLOCKTEXCOORDS8 = 0x0800, /**<Lock the texture coordinates set 8*/
+    rpGEOMETRYLOCKTEXCOORDSALL = 0x0ff0, /**<Lock all texture coordinate sets*/
+    rpGEOMETRYLOCKALL = 0x0fff, /**<Combination of all the above */
+
+    rpGEOMETRYLOCKMODEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
+};
+typedef enum RpGeometryLockMode RpGeometryLockMode;
+
 // RenderWare/plugin base types
 struct RwObject
 {
@@ -230,20 +425,24 @@ struct RwRGBA
 
 struct RwRaster
 {
-    RwRaster*      parent;                          // 0
-    unsigned char* pixels;                          // 4
-    unsigned char* palette;                         // 8
-    int            width, height, depth;            // 12, 16 / 0x10, 20
-    int            numLevels;                       // 24 / 0x18
-    short          u, v;
-    unsigned char  type;
-    unsigned char  flags;
-    unsigned char  privateFlags;
-    unsigned char  format;
-    unsigned char* origPixels;
-    int            origWidth, origHeight, origDepth;
-    void*          renderResource;            // RwD3D9Raster continues from here
+    RwRaster           *parent;               /* Top level raster if a sub raster */
+    RwUInt8            *cpPixels;             /* Pixel pointer when locked */
+    RwUInt8            *palette;              /* Raster palette */
+    RwInt32             width, height, depth; /* Dimensions of raster */
+    RwInt32             stride;               /* Lines bytes of raster */
+    RwInt16             nOffsetX, nOffsetY;   /* Sub raster offset */
+    RwUInt8             cType;                /* Type of raster */
+    RwUInt8             cFlags;               /* Raster flags */
+    RwUInt8             privateFlags;         /* Raster private flags */
+    RwUInt8             cFormat;              /* Raster format */
+
+    RwUInt8            *originalPixels;
+    RwInt32             originalWidth;
+    RwInt32             originalHeight;
+    RwInt32             originalStride;
+    void*               renderResource;     // RwD3D9Raster continues from here
 };
+
 struct RwColorFloat
 {
     float r, g, b, a;
@@ -360,8 +559,8 @@ struct RpMaterials
 };
 struct RpTriangle
 {
-    unsigned short v1, v2, v3;
-    unsigned short materialId;
+    unsigned short vertIndex[3];
+    unsigned short matIndex;
 };
 struct RpGeometry
 {

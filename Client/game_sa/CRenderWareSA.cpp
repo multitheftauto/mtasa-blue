@@ -20,6 +20,8 @@
 
 extern CGameSA* pGame;
 
+RwInt32& CRenderWareSA::_RwD3D9RasterExtOffset = *reinterpret_cast<int*>(0xB4E9E0);
+
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
 struct SReplaceParts
 {
@@ -1235,6 +1237,18 @@ bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
     return true;
 }
 
+RwTexDictionary* CRenderWareSA::CreateTextureDictionary(std::vector<RwTexture*>& vecTextures)
+{
+    auto RwTexDictionaryCreate = (RwTexDictionary *(__cdecl*)())0x7F3600;
+
+    RwTexDictionary* pTextureDictionary = RwTexDictionaryCreate();
+    for (auto& pTexture : vecTextures)
+    {
+        RwTexDictionaryAddTexture(pTextureDictionary, pTexture);
+    }
+    return pTextureDictionary;
+}
+
 //
 // Returns list of atomics inside a clump
 //
@@ -1577,6 +1591,22 @@ RwTexDictionary* CRenderWareSA::CopyTexturesFromDictionary(RwTexDictionary* pRes
     return pResultTextureDictionary;
 }
 
+_rwD3D9RasterExt* CRenderWareSA::GetRasterExt(RwRaster* raster)
+{
+    return RASTEREXTFROMRASTER(raster->parent);
+}
+
+D3DFORMAT CRenderWareSA::GetRasterD3DFormat(RwRaster* raster)
+{
+    _rwD3D9RasterExt* rasterExt = RASTEREXTFROMRASTER(raster->parent);
+    return rasterExt->d3dFormat;
+}
+
+bool CRenderWareSA::IsRasterCompressed(RwRaster* raster)
+{
+    _rwD3D9RasterExt* rasterExt = RASTEREXTFROMRASTER(raster->parent);
+    return rasterExt->compressed;
+}
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {

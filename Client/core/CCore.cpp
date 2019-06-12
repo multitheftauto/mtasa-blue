@@ -2224,7 +2224,7 @@ HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK
     return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }
 
-std::unique_ptr<CTextureAtlasInterface> CCore::CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
+/*std::unique_ptr<CTextureAtlasInterface> CCore::CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
 {
     return std::make_unique<CTextureAtlas>(vecTexturesInfo);
-}
+}*/

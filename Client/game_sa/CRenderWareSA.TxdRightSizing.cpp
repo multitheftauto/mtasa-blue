@@ -142,7 +142,7 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     D3DFORMAT d3dFormat = pD3DRaster->format;
     bool      bHasAlpha = pD3DRaster->alpha != 0;
     bool      bIsCubeTexture = (pD3DRaster->cubeTextureFlags & 0x01) != 0;
-    bool      bHasMipMaps = (pRaster->numLevels > 1);
+    bool      bHasMipMaps = (pRaster->stride > 1);
     bool      bIsCompressed = (pD3DRaster->textureFlags & 0x10) != 0;
 
     // Check we can do this
@@ -196,14 +196,14 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     header.TextureFormat.vAddressing = (pTexture->flags & 0xf000) >> 12;
     memcpy(header.TextureFormat.name, pTexture->name, 32);
     memcpy(header.TextureFormat.maskName, pTexture->mask, 32);
-    header.RasterFormat.rasterFormat = (pRaster->format & 0x0f)
+    header.RasterFormat.rasterFormat = (pRaster->cFormat & 0x0f)
                                        << 8;            // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
     header.RasterFormat.width = uiReqWidth;
     header.RasterFormat.height = uiReqHeight;
     header.RasterFormat.depth = pRaster->depth;
     header.RasterFormat.numLevels = 1;
-    header.RasterFormat.rasterType = pRaster->type;            // dxt1 = 4 / dxt3 = 4
+    header.RasterFormat.rasterType = pRaster->cType;            // dxt1 = 4 / dxt3 = 4
     header.RasterFormat.alpha = bHasAlpha;
     header.RasterFormat.cubeTexture = bIsCubeTexture;
     header.RasterFormat.autoMipMaps = false;

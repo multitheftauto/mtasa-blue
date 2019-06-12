@@ -46,7 +46,7 @@ struct STXDDescriptor
     {
         if (pTextureDictionary)
         {
-            std::printf("unloading texture | size is zero\n");
+            //std::printf("unloading texture | size is zero\n");
             CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
             pRenderWare->DestroyTXD(pTextureDictionary);
             pTextureDictionary = nullptr;

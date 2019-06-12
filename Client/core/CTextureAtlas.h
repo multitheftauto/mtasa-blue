@@ -1,30 +1,36 @@
 #pragma once
-#include <dxgiformat.h>
 
-class CTextureAtlas : public CTextureAtlasInterface
+class CTextureAtlas
 {
 public:
     CTextureAtlas();
-    CTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo);
-    void Initialize();
-    bool CreateAtlas();
-    bool CreateAtlasTextureResource(float fWidth, float fHeight);
-    bool LoadTextureFromFile(CTextureInfo &textureInfo);
+
+    bool RemoveTextureInfoTillSuccess(std::vector <RwTexture*>& vecTexturesRemoved);
+    void AddTextureInfo(RwTexture* pTexture, const float theWidth, const float theHeight);
+    bool CreateAtlasTextureResource(const float fWidth, const float fHeight);
     bool CopyTextureToAtlas(CTextureInfo& textureInfo);
+
+    eTextureAtlasErrorCodes CreateAtlas();
+    void        GetRasterRect(RwRaster* raster, RECT& rect);
+    bool       IsTextureFormatDifferentFromAtlas(CTextureInfo& textureInfo);
+    RwTexture* CreateTextureWithAtlasFormat(CTextureInfo &textureInfo);
+
     bool IsSupportedFormat(D3DFORMAT format);
-    int SizeOfTexel(D3DFORMAT format);
+    int  SizeOfTexel(D3DFORMAT format);
     bool IsDXTnFormat(D3DFORMAT format);
 
-    IDirect3DTexture9* GetAtlasTexture() { return m_pAtlasTexture; }
+    size_t GetTextureInfoCount() { return m_vecTexturesInfo.size(); }
+    CTextureInfo& GetTextureInfo(size_t index) { return m_vecTexturesInfo[index]; }
+    CTextureInfo* GetTextureInfoByName(unsigned int uiTextureNameHash);
+
+    RwTexture * GetAtlasTexture() { return m_pAtlasTexture; }
     const CVector2D& GetSize() { return vecAtlasSize; }
     float GetWidth() { return vecAtlasSize.fX; }
     float GetHeight() { return vecAtlasSize.fY; }
 
 private:
-    std::vector <CTextureInfo>* m_pVecTexturesInfo;
-    IDirect3DTexture9* m_pAtlasTexture;
-    DWORD m_dwMaximumMipMapLevel;
-    CVector2D vecAtlasSize;
     const D3DFORMAT m_kTextureFormat = D3DFMT_A8R8G8B8;
-    const DXGI_FORMAT m_kTextureDxgiFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    std::vector <CTextureInfo> m_vecTexturesInfo;
+    RwTexture* m_pAtlasTexture;
+    CVector2D vecAtlasSize;
 };

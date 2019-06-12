@@ -12,39 +12,162 @@
 
 #include "DirectXTex.h"
 
+#include "..\..\Client\sdk\core\CTextureAtlasInterface.h"
+
 using namespace rectpack2D;
 
-/*
-vecTexturesInfo.emplace_back(STextureInfo(256, 256)); //grass.png
-vecTexturesInfo.emplace_back(STextureInfo(512, 512)); //nvidia_cloth.png
-vecTexturesInfo.emplace_back(STextureInfo(128, 128)); //1d_debug.png
-vecTexturesInfo.emplace_back(STextureInfo(64, 64)); //shine.png
-vecTexturesInfo.emplace_back(STextureInfo(256, 265)); //braynzar.jpg
-*/
+auto RwTextureCreate = (RwTexture*(__cdecl*)(RwRaster* raster))0x007F37C0;
+auto RwRasterLock = (RwUInt8 *(__cdecl*)(RwRaster *raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+auto RwRasterUnlock = (RwRaster *(__cdecl*)(RwRaster *raster))0x7FAEC0;
+auto RwD3D9RasterCreate = (RwRaster *(__cdecl*)(RwUInt32 width,RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+auto WriteRaster = (bool(__cdecl*)(RwRaster *raster, char *filename))0x5A4150;
 
 extern CCore* g_pCore;
 
-D3DFORMAT theFormatForAtlas;
 
 CTextureAtlas::CTextureAtlas()
 {
-    Initialize();
 }
 
-CTextureAtlas::CTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
+CTextureInfo* CTextureAtlas::GetTextureInfoByName(unsigned int uiTextureNameHash)
 {
-    Initialize();
-    m_pVecTexturesInfo = &vecTexturesInfo;
-    CreateAtlas();
+    for (auto& textureInfo : m_vecTexturesInfo)
+    {
+        if (uiTextureNameHash == textureInfo.GetNameHash())
+        {
+            return &textureInfo;
+        }
+    }
+    return nullptr;
 }
 
-void CTextureAtlas::Initialize()
+bool CTextureAtlas::RemoveTextureInfoTillSuccess(std::vector <RwTexture*>& vecTexturesRemoved)
 {
-    m_pVecTexturesInfo = nullptr;
-    m_dwMaximumMipMapLevel = 1;
+    for (auto it = m_vecTexturesInfo.begin(); it != m_vecTexturesInfo.end();)
+    {
+        RwTexture* pTexture = it->GetTexture();
+        vecTexturesRemoved.push_back(pTexture);
+
+        eTextureAtlasErrorCodes textureReturn = CreateAtlas();
+        if (textureReturn == TEX_ATLAS_SUCCESS)
+        {
+            break;
+        }
+        else if (textureReturn != TEX_ATLAS_CANT_FIT_INTO_ATLAS)
+        {
+            return false;
+        }
+
+        it = m_vecTexturesInfo.erase(it);
+    }
+    return true;
 }
 
-bool CTextureAtlas::CreateAtlas()
+void CTextureAtlas::AddTextureInfo(RwTexture* pTexture, const float theWidth, const float theHeight)
+{
+    m_vecTexturesInfo.emplace_back(pTexture, theWidth, theHeight, this);
+}
+
+bool CTextureAtlas::CreateAtlasTextureResource(const float fWidth, const float fHeight)
+{
+
+    RwRaster* raster = RwD3D9RasterCreate(fWidth, fHeight, m_kTextureFormat,
+        rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
+    if (!raster)
+    {
+        std::printf("CreateAtlasTextureResource: RwD3D9RasterCreate Failed\n");
+        return false;
+    }
+
+    m_pAtlasTexture = RwTextureCreate(raster);
+    if (!m_pAtlasTexture)
+    {
+        std::printf("CreateAtlasTextureResource: RwTextureCreate Failed\n");
+        return false;
+    }
+    vecAtlasSize = CVector2D(fWidth, fHeight);
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////
+// GTA SA doesn't use mipmaps, but it is supported.
+// An option should be given to the client to allow generating mipmaps.
+// The downside is that mipmaps will take extra memory.
+///////////////////////////////////////////////////////////////////////////
+bool CTextureAtlas::CopyTextureToAtlas(CTextureInfo& textureInfo)
+{
+    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
+
+    RwTexture* pTexture = textureInfo.GetTexture();
+    RECT& texturePositionInAtlas = textureInfo.GetRegion();
+
+    RwRaster* sourceRaster = textureInfo.GetTexture()->raster;
+    RwRaster* destinationRaster = m_pAtlasTexture->raster;
+
+    _rwD3D9RasterExt* destinationRasterExt = pRenderware->GetRasterExt(destinationRaster);
+
+    RECT            dstRect;
+    D3DLOCKED_RECT  dstLockedRect;
+
+    const size_t totalMipMapLevels = 1;
+    for (long mipLevel = 0; mipLevel < totalMipMapLevels; ++mipLevel)
+    {
+        long const div = static_cast<long>(pow(2L, mipLevel));
+        DWORD textureWidth = texturePositionInAtlas.right - texturePositionInAtlas.left;
+        DWORD textureHeight = texturePositionInAtlas.bottom - texturePositionInAtlas.top;
+        std::printf("CopyTextureToAtlas: textureWidth: %d | textureHeight: %d\n", (int)textureWidth, (int)textureHeight);
+        long const mipWidth = std::max(1UL, textureWidth / div);
+        long const mipHeight = std::max(1UL, textureHeight / div);
+
+        dstRect.left = std::max(0L, texturePositionInAtlas.left / div);
+        dstRect.top = std::max(0L, texturePositionInAtlas.top / div);
+        dstRect.right = dstRect.left + mipWidth;
+        dstRect.bottom = dstRect.top + mipHeight;
+
+        UCHAR *srcPtr = RwRasterLock(sourceRaster, mipLevel, rwRASTERLOCKREAD);
+        if (!srcPtr)
+        {
+            std::printf("RwRasterLock: failed to lock sourceRaster\n");
+            return false;
+        }
+
+        HRESULT hr = destinationRasterExt->texture->LockRect(mipLevel, &dstLockedRect, &dstRect, 0);
+        if (hr != S_OK)
+        {
+            std::printf("atlas texture LockRect: failed to lock dstLockedRect error: %#.8x\n", hr);
+            return false;
+        }
+
+        UCHAR *dstPtr = (UCHAR *)dstLockedRect.pBits; 
+
+        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
+        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
+
+        for (int i = 0; i < mipHeight / kBlockFactor; ++i)
+        {
+            memcpy(dstPtr, srcPtr, kBlockFactor * kBytesPerRow);
+            srcPtr += sourceRaster->stride;
+            dstPtr += dstLockedRect.Pitch;
+        }
+
+        if (!RwRasterUnlock(sourceRaster))
+        {
+            std::printf("RwRasterUnlock: failed to unlock sourceRaster\n");
+            return false;
+        }
+
+        hr = destinationRasterExt->texture->UnlockRect(mipLevel);
+        if (hr != S_OK)
+        {
+            std::printf("atlas texture UnlockRect: failed to unlock error: %#.8x\n", hr);
+            return false;
+        }
+    }
+    WriteRaster(m_pAtlasTexture->raster, "C:\\Users\\danish\\Desktop\\atlasTXD\\textureAtlas.png");
+    return true;
+}
+
+eTextureAtlasErrorCodes CTextureAtlas::CreateAtlas()
 {
     constexpr bool allow_flip = false; // true;
     const auto runtime_flipping_mode = flipping_option::DISABLED; // ENABLED;
@@ -60,7 +183,10 @@ bool CTextureAtlas::CreateAtlas()
         return callback_result::CONTINUE_PACKING;
     };
 
-    auto report_unsuccessful = [](rect_type&) {
+    bool bFailedToPack = false;
+    auto report_unsuccessful = [&](rect_type&) {
+        bFailedToPack = true;
+        std::printf("report_unsuccessful called\n");
         return callback_result::ABORT_PACKING;
     };
 
@@ -79,26 +205,24 @@ bool CTextureAtlas::CreateAtlas()
 
     std::vector<rect_type> rectangles;
 
-    for (auto& textureInfo : *m_pVecTexturesInfo) {
+    for (size_t i = 0; i< GetTextureInfoCount(); i++)
+    {
+        CTextureInfo& textureInfo = GetTextureInfo(i);
         rectangles.emplace_back(rect_xywh(0, 0, textureInfo.GetWidth(), textureInfo.GetHeight()));
-        LoadTextureFromFile(textureInfo);
-
-        DWORD dwMipMapLevel = textureInfo.GetTexture()->GetLevelCount();
-        if (dwMipMapLevel > m_dwMaximumMipMapLevel)
-        {
-            m_dwMaximumMipMapLevel = dwMipMapLevel;
-        }
     }
 
     auto report_result = [&](const rect_wh& result_size) {
         std::cout << "Resultant bin: " << result_size.w << " " << result_size.h << std::endl;
 
-        CreateAtlasTextureResource(result_size.w, result_size.h);
+        if (!CreateAtlasTextureResource(result_size.w, result_size.h))
+        {
+            return TEX_ATLAS_TEXTURE_RESOURCE_CREATE_FAILED;
+        }
 
         for (DWORD i = 0; i < rectangles.size(); i++) 
         {
             rect_type& textureRectangle = rectangles[i];
-            CTextureInfo& textureInfo = m_pVecTexturesInfo->at(i);
+            CTextureInfo& textureInfo = GetTextureInfo(i);
             float width = textureRectangle.w;
             float height = textureRectangle.h;
 
@@ -108,14 +232,31 @@ bool CTextureAtlas::CreateAtlas()
             height = r.w;
             }*/
 
-            std::cout << textureRectangle.x << " " << textureRectangle.y << " " << width << " " << height << std::endl;
+            char*textureName = textureInfo.GetTexture()->name;
+            std::cout << textureName << " | " << 
+                textureRectangle.x << " " << textureRectangle.y << " " << width << " " << height << std::endl;
 
             textureInfo.GetRegion() = { static_cast<LONG>(textureRectangle.x),static_cast<LONG>(textureRectangle.y),
                                             static_cast<LONG>(width + textureRectangle.x), static_cast<LONG>(height + textureRectangle.y) };
-            CopyTextureToAtlas(textureInfo);
+
+            if (IsTextureFormatDifferentFromAtlas(textureInfo))
+            {
+                RwTexture* pTexture = CreateTextureWithAtlasFormat(textureInfo);
+                if (!pTexture)
+                {
+                    return TEX_ATLAS_DX_ERROR;
+                }
+
+                textureInfo.SetTexture(pTexture);
+            }
+
+            if (!CopyTextureToAtlas(textureInfo))
+            {
+                return TEX_ATLAS_COPY_TO_ATLAS_FAILED;
+            }
         }
 
-        D3DXSaveTextureToFile("C:\\Users\\danish\\Desktop\\myLovelyAtlas.png", D3DXIFF_PNG, m_pAtlasTexture, NULL);
+        //D3DXSaveTextureToFile("C:\\Users\\danish\\Desktop\\myLovelyAtlas.png", D3DXIFF_PNG, m_pAtlasTexture, NULL);
     };
 
     const auto result_size = find_best_packing<spaces_type>(
@@ -129,187 +270,105 @@ bool CTextureAtlas::CreateAtlas()
         )
         );
 
+    if (bFailedToPack)
+    {
+        return TEX_ATLAS_CANT_FIT_INTO_ATLAS;
+    }
+
     report_result(result_size);
-    return true;
+    return TEX_ATLAS_SUCCESS;
 }
 
-
-bool CTextureAtlas::CreateAtlasTextureResource(float fWidth, float fHeight)
+void CTextureAtlas::GetRasterRect(RwRaster* raster, RECT& rect)
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-    HRESULT hr = pDevice->CreateTexture(fWidth, fHeight, m_dwMaximumMipMapLevel,
-                        D3DUSAGE_DYNAMIC, m_kTextureFormat, D3DPOOL_SYSTEMMEM, &m_pAtlasTexture, NULL);
-    if (hr != D3D_OK)
-    {
-        std::printf("CreateAtlasTexture failed with error: %#.8x\n", hr);
-        return false;
-    }
-
-    vecAtlasSize = CVector2D(fWidth, fHeight);
-    return true;
+    rect.left = raster->nOffsetX;
+    rect.top = raster->nOffsetY;
+    rect.right = raster->nOffsetX + raster->width;
+    rect.bottom = raster->nOffsetY + raster->height;
 }
 
-bool CTextureAtlas::LoadTextureFromFile(CTextureInfo &textureInfo)
+bool CTextureAtlas::IsTextureFormatDifferentFromAtlas(CTextureInfo &textureInfo)
 {
+    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
 
-    DirectX::ScratchImage scratchImage;
-    HRESULT hr = LoadFromWICFile(FromUTF8(textureInfo.GetFilePath()), DirectX::WIC_FLAGS_ALL_FRAMES, nullptr, scratchImage);
-    if (hr != D3D_OK)
-    {
-        std::printf("LoadFromWICFile fail for '%s' with error: %#.8x\n",
-            textureInfo.GetFilePath().c_str(), hr);
-        return false;
-    }
-
-    DirectX::TexMetadata* pTextureMeta = (DirectX::TexMetadata*)&scratchImage.GetMetadata();
-
-    DirectX::ScratchImage convertedImage;
-    bool bImageConverted = false;
-
-    std::printf("pTextureMeta->format: %#.8x | m_kTextureDxgiFormat: %#.8x", pTextureMeta->format, m_kTextureDxgiFormat);
-
-    if (pTextureMeta->format != m_kTextureDxgiFormat)
-    {
-        hr = Convert(scratchImage.GetImages(), scratchImage.GetImageCount(),
-            scratchImage.GetMetadata(),
-            m_kTextureDxgiFormat, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT,
-            convertedImage);
-        if (FAILED(hr))
-        {
-            std::printf("Convert fail for '%s' with error: %#.8x\n",
-                textureInfo.GetFilePath().c_str(), hr);
-            return false;
-        }
-
-        pTextureMeta = (DirectX::TexMetadata*)&convertedImage.GetMetadata();
-        bImageConverted = true;
-    }
-
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-    hr = pDevice->CreateTexture(pTextureMeta->width, pTextureMeta->height, pTextureMeta->mipLevels,
-        D3DUSAGE_DYNAMIC, m_kTextureFormat, D3DPOOL_SYSTEMMEM, &textureInfo.GetTexture(), NULL);
-    if (hr != D3D_OK)
-    {
-        std::printf("D3DXCreateTextureFromFileEx fail for '%s' with error: %#.8x\n",
-            textureInfo.GetFilePath().c_str(), hr);
-        return false;
-    }
-
-    const DirectX::Image* pImages = scratchImage.GetImages();
-    if (bImageConverted)
-    {
-        pImages = convertedImage.GetImages();
-    }
-
-
-    std::printf("pTextureMeta->mipLevels: %d | scratchImage: image count: %d\n", pTextureMeta->mipLevels, scratchImage.GetImageCount());
-
-    IDirect3DTexture9* pTexture = textureInfo.GetTexture();
-    for (size_t mipLevel = 0; mipLevel < pTextureMeta->mipLevels; ++mipLevel)
-    {
-        long const div = static_cast<long>(pow(2L, mipLevel));
-        long const mipHeight = std::max(1UL, pTextureMeta->height / div);
-        long const mipWidth = std::max(1UL, pTextureMeta->width / div);
-
-        D3DLOCKED_RECT dstLockedRect;
-        hr = pTexture->LockRect(mipLevel, &dstLockedRect, nullptr, 0);
-        if (hr != S_OK)
-        {
-            std::printf("pTexture->LockRect: failed to lock srcLockedRect\n");
-            return false;
-        }
-
-        size_t index = pTextureMeta->ComputeIndex(mipLevel, 0, 0);
-
-        const DirectX::Image& image = pImages[index];
-
-        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
-        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
-        UCHAR *dstPtr = reinterpret_cast<UCHAR*>(dstLockedRect.pBits);
-        UCHAR *srcPtr = reinterpret_cast<UCHAR*>(image.pixels);
-        for (int i = 0; i < mipHeight / kBlockFactor; ++i)
-        {
-            memcpy(dstPtr, srcPtr, kBlockFactor * kBytesPerRow);
-            dstPtr += dstLockedRect.Pitch;
-            srcPtr += image.rowPitch;
-        }
-        hr = pTexture->UnlockRect(mipLevel);
-        assert(hr == S_OK);
-    }
-
-    std::printf("texture successfully loaded for '%s' | D3DFormat = %u\n", textureInfo.GetFilePath().c_str(), m_kTextureFormat);
-    return true;
+    RwTexture* pTexture = textureInfo.GetTexture();
+    RwRaster* raster = pTexture->raster;
+    _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(raster);
+    return rasterExt->d3dFormat != m_kTextureFormat;
 }
 
-bool CTextureAtlas::CopyTextureToAtlas(CTextureInfo& textureInfo)
+///////////////////////////////////////////////////////////////////////////
+// GTA SA doesn't use mipmaps, but it is supported.
+// An option should be given to the client to allow generating mipmaps.
+// The downside is that mipmaps will take extra memory.
+///////////////////////////////////////////////////////////////////////////
+RwTexture* CTextureAtlas::CreateTextureWithAtlasFormat(CTextureInfo &textureInfo)
 {
-    IDirect3DTexture9* pTexture = textureInfo.GetTexture();
-    RECT& texturePositionInAtlas = textureInfo.GetRegion();
-    HRESULT         hr;
-    RECT            srcRect, dstRect;
-    D3DLOCKED_RECT  srcLockedRect, dstLockedRect;
+    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
 
-    srcRect.left = srcRect.top = 0;
+    RwTexture* pTexture = textureInfo.GetTexture();
+    RwRaster* raster = pTexture->raster;
 
-    // If -nomipmap was set then mpAtlas only has one mip-map and kNumMipMaps is 1.
-    // If it wasn't then mpAtlas has more mip-maps then the texture and kNumMipMaps
-    // is the same as there are mip-maps in pTexture.
-    int const kNumMipMaps = std::min(m_pAtlasTexture->GetLevelCount(), pTexture->GetLevelCount());
-    for (long mipLevel = 0; mipLevel < kNumMipMaps; ++mipLevel)
+    HRESULT hr = NULL;
+ 
+    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, m_kTextureFormat,
+        rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
+    if (!convertedRaster)
     {
-        long const div = static_cast<long>(pow(2L, mipLevel));
-        DWORD textureWidth = texturePositionInAtlas.right - texturePositionInAtlas.left;
-        DWORD textureHeight = texturePositionInAtlas.bottom - texturePositionInAtlas.top;
-        std::printf("textureWidth: %d | textureHeight: %d\n", (int)textureWidth, (int)textureHeight);
-        long const mipWidth = std::max(1UL, textureWidth / div);
-        long const mipHeight = std::max(1UL, textureHeight / div);
-
-        srcRect.right = mipWidth;
-        srcRect.bottom = mipHeight;
-
-        dstRect.left = std::max(0L, texturePositionInAtlas.left / div);
-        dstRect.top = std::max(0L, texturePositionInAtlas.top / div);
-        dstRect.right = dstRect.left + mipWidth;
-        dstRect.bottom = dstRect.top + mipHeight;
-
-        // These calls to LockRect fail (generate errors:
-        // Direct3D9: (ERROR) :Rects for DXT surfaces must be on 4x4 boundaries) 
-        // in the 2003 Summer SDK Debug Runtime.  They work just fine 
-        // (and as expected) when using the retail run-time: 
-        // please make sure to use the retail run-time when running this!
-        hr = pTexture->LockRect(mipLevel, &srcLockedRect, &srcRect, D3DLOCK_READONLY);
-        if (hr != S_OK)
-        {
-            std::printf("pTexture->LockRect: failed to lock srcLockedRect\n");
-            return false;
-        }
-        assert(hr == S_OK);
-        hr = m_pAtlasTexture->LockRect(mipLevel, &dstLockedRect, &dstRect, 0);
-        if (hr != S_OK)
-        {
-            std::printf("m_pAtlasTexture->LockRect: failed to lock dstLockedRect\n");
-            return false;
-        }
-        assert(hr == S_OK);
-
-        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
-        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
-        UCHAR *srcPtr = reinterpret_cast<UCHAR*>(srcLockedRect.pBits);
-        UCHAR *dstPtr = reinterpret_cast<UCHAR*>(dstLockedRect.pBits);
-
-        for (int i = 0; i < mipHeight / kBlockFactor; ++i)
-        {
-            memcpy(dstPtr, srcPtr, kBlockFactor * kBytesPerRow);
-            srcPtr += srcLockedRect.Pitch;
-            dstPtr += dstLockedRect.Pitch;
-        }
-
-        hr = pTexture->UnlockRect(mipLevel);
-        assert(hr == S_OK);
-        hr = m_pAtlasTexture->UnlockRect(mipLevel);
-        assert(hr == S_OK);
+        std::printf("RwD3D9RasterCreate: Failed\n");
+        return nullptr;
     }
-    return true;
+
+    _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(raster);
+    _rwD3D9RasterExt* convertedRasterExt = pRenderware->GetRasterExt(convertedRaster);
+
+    RECT sourceRect, destinationRect;
+    GetRasterRect(raster, sourceRect);
+    GetRasterRect(convertedRaster, destinationRect);
+
+    IDirect3DSurface9 * sourceSurface;
+    hr = rasterExt->texture->GetSurfaceLevel(0, &sourceSurface);
+    if (hr != D3D_OK)
+    {
+        std::printf("Get surface level for sourceSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    IDirect3DSurface9 * destinationSurface;
+    hr = convertedRasterExt->texture->GetSurfaceLevel(0, &destinationSurface);
+    if (hr != D3D_OK)
+    {
+        std::printf("Get surface level for destinationSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    hr = D3DXLoadSurfaceFromSurface(
+        destinationSurface, NULL, &destinationRect,
+        sourceSurface, NULL, &sourceRect,
+        D3DX_DEFAULT, 0); 
+    if (FAILED(hr))
+    {
+        std::printf("D3DXLoadSurfaceFromSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    RwTexture* pConvertedTexture = RwTextureCreate(convertedRaster);
+    memcpy (pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
+    memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
+
+    std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", m_kTextureFormat, rasterExt->d3dFormat);
+
+    SString theDirPath = "C:\\Users\\danish\\Desktop\\atlasTXD\\";
+    theDirPath += pTexture->name;
+    theDirPath += ".png";
+
+    //"C:\\Users\\danish\\Desktop\\ConvertedRaster.png"
+    if (!WriteRaster(convertedRaster, (char*)theDirPath.c_str()))
+    {
+        std::printf("WriteRaster failed\n");
+    }
+
+    return pConvertedTexture;
 }
 
 //-----------------------------------------------------------------------------
