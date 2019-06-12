@@ -64,7 +64,7 @@ private:
                 if constexpr (!std::is_convertible_v<ft, nth_element_t<N, Args...>>)
                     return ChosenFunction::FUNCB;            // if it cannot match A, B it is
                 if constexpr (!std::is_convertible_v<ft, nth_element_t<N, Args2...>>)
-                    return ChosenFunction::FUNCA;            // if it cannot match A, B it is
+                    return ChosenFunction::FUNCA;            // if it cannot match B, A it is
                 return ChosenFunction::COMMON;               // Both match
             },
             var);
