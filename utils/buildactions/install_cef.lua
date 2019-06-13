@@ -7,7 +7,7 @@ local CEF_PATH = "vendor/cef3/"
 local CEF_URL_PREFIX = "https://mirror.mtasa.com/bdata/cef/"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
-local CEF_VERSION = "73.1.13+g6e3c989+chromium-73.0.3683.75" -- Change here to update CEF version
+local CEF_VERSION = "75.0.6+g90ecd35+chromium-75.0.3770.80" -- Change here to update CEF version
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
