@@ -84,8 +84,10 @@ namespace SharedUtil
             {
                 if (m_tasks.empty())
                     break;
+                // Run each task but skip execution of the actual 
+                // function (-> just delete the task)
                 auto task = std::move(m_tasks.front());
-                task(false);
+                task(true);
             } while (true);
         }
 
