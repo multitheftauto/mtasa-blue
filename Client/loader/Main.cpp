@@ -78,7 +78,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
 
     // Stuff
     HandleCustomStartMessage();
-    #if !defined(MTA_DEBUG)
+    #ifndef MTA_DEBUG
         ForbodenProgramsMessage();
     #endif
     CycleEventLog();
