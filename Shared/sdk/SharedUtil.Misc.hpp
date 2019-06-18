@@ -1394,8 +1394,15 @@ std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 }
 
 // Convert a UTF-16 std::wstring into a multibyte UTF-8 string
-std::string SharedUtil::UTF16ToMbUTF8(const WString& input)
+std::string SharedUtil::UTF16ToMbUTF8(const std::wstring& input)
 {
+    return utf8_wcstombs(input);
+}
+
+std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
+{
+    if (input == nullptr)
+        return "";
     return utf8_wcstombs(input);
 }
 
