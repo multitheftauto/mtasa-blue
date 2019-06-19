@@ -244,8 +244,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
 
 bool CFxSA::IsShadowsLimitReached()
 {
-    short shadows;
-    memcpy(&shadows, (void*)0xC403DC, 2);
+    short shadows = *(short*)0xC403DC;
     return shadows >= 48;
 }
 
