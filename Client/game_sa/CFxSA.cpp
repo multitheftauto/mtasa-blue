@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 
+using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
+                                                char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
+auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
+
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     CVector* pvecPosition = &vecPosition;
@@ -236,4 +240,44 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
         push    pvecPosition
         call    dwFunc
     }
+}
+
+bool CFxSA::IsShadowsLimitReached()
+{
+    short shadows;
+    memcpy(&shadows, (void*)0xC403DC, 2);
+    return shadows >= 48;
+}
+
+bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& vecOffset1, CVector2D& vecOffset2, SColor color, float fZDistance,
+                      bool bDrawOnWater, bool bDrawOnBuildings)
+{
+    if (IsShadowsLimitReached())
+        return false;
+
+    RwTexture* pTexture = nullptr;
+    char       type = 1;
+    if (shadowType == SHADOW_NONE)
+    {
+        pTexture = EmptyTexture;
+    }
+    else
+    {
+        void* textureAddress;
+        memcpy(&textureAddress, (void*)(SHADOW_BASE_TEXTURE_OFFSET + shadowType * 4), 4);
+        pTexture = reinterpret_cast<RwTexture*>((void*)textureAddress);
+
+        switch (shadowType)
+        {
+            case SHADOW_HEADLIGHT1:
+            case SHADOW_HEADLIGHT2:
+            case SHADOW_EXPLOSION:
+                type = 2;
+        }
+    }
+
+    StoreShadowToBeRendered(type, pTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
+                            fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
+
+    return true;
 }

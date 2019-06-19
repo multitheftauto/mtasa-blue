@@ -1547,3 +1547,21 @@ enum eObjectProperty
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
 };
+
+enum eShadowType
+{
+    // use only color instead of texture
+    SHADOW_NONE = -1,
+    SHADOW_CAR,
+    SHADOW_PED,
+    SHADOW_HELI,
+    SHADOW_BIKE,
+    SHADOW_RCBARON,
+    SHADOW_EXPLOSION,
+    SHADOW_HEADLIGHT1,
+    SHADOW_HEADLIGHT2,
+    SHADOW_BLOOD,
+    SHADOW_HEADMAN,
+    SHADOW_WINCRACK,
+    SHADOW_LAMP,
+};

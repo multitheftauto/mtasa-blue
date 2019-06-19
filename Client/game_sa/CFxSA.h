@@ -33,6 +33,7 @@
 #define FUNC_CFx_TriggerWaterSplash        0x4a1070
 #define FUNC_CFx_TriggerBulletSplash       0x4a10e0
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
+#define SHADOW_BASE_TEXTURE_OFFSET         0xC403E0
 
 class CFxSAInterface
 {
@@ -53,6 +54,8 @@ public:
     void AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int);
     void AddDebris(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount);
     void AddGlass(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount);
+    bool AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& vecOffset1, CVector2D& vecOffset2, SColor color, float fZDistance,
+                   bool bDrawOnWater, bool bDrawOnBuildings);
     void TriggerWaterHydrant(CVector& vecPosition);
     void TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecDirection, bool bIncludeSparks);
     void TriggerTankFire(CVector& vecPosition, CVector& vecDirection);
@@ -60,6 +63,8 @@ public:
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
 
+    bool IsShadowsLimitReached();
 private:
     CFxSAInterface* m_pInterface;
+    RwTexture*      EmptyTexture = new RwTexture();
 };
