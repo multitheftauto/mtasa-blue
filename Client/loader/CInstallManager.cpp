@@ -954,10 +954,10 @@ SString CInstallManager::_ProcessAppCompatChecks()
     WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
     if (!strUrlValue.empty())
     {
-        WriteDebugEvent(SString("GameUX ServiceLocation was %s", *ToUTF8(strUrlValue)));
-        if (strUrlValue.ContainsI(L"metaservices.microsoft.com"))
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
         {
-            strUrlValue = L"https://www.microsoft.com";
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
             if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
                 bTryAdmin = true;
         }
