@@ -948,6 +948,21 @@ SString CInstallManager::_ProcessAppCompatChecks()
                 bTryAdmin = true;
     }
 
+    // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
+    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+    WString strUrlItem = L"Games";
+    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+    if (!strUrlValue.empty())
+    {
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
+        {
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
+            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                bTryAdmin = true;
+        }
+    }
+
     // Handle admin requirement
     if (bTryAdmin)
     {
