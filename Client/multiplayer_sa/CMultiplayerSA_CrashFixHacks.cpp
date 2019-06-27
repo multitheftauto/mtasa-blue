@@ -1536,12 +1536,13 @@ void __cdecl OnMY_CAnimManager_CreateAnimAssocGroups_Protect(CAnimBlendAssocGrou
     {
         if (pGroupInterface->groupID == groupID)
         {
-            void*  pIdOffsetMember = reinterpret_cast<void*>(&pGroupInterface->iIDOffset);
             HANDLE mainThread = OpenThread(THREAD_ALL_ACCESS, TRUE, SharedUtil::GetMainThreadId());
-
             assert(mainThread != NULL);
 
+            void*  pIdOffsetMember = reinterpret_cast<void*>(&pGroupInterface->iIDOffset);
             SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, pIdOffsetMember);
+
+            CloseHandle(mainThread);
 
             LogEvent(511, "Breakpoint", "Hardware Breakpoint set on WRITE access",
                      SString("groupID: %u | pGroupInterface: %#.8x, pIdOffsetMember = %#.8x | iIDOffset: %d", groupID, pGroupInterface, pIdOffsetMember,
