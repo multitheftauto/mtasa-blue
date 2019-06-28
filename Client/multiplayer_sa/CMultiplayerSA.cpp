@@ -82,9 +82,6 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
 
-#define HOOKPOS_CGame_Process_End                           0x53C23A
-DWORD RETURN_CGame_Process_End = 0x53C23F;
-
 #define HOOKPOS_Idle                                        0x53E981
 DWORD RETURN_Idle = 0x53E98B;
 
@@ -409,7 +406,6 @@ void   HOOK_CFire_ProcessFire();
 void   HOOK_CExplosion_Update();
 void   HOOK_CWeapon_FireAreaEffect();
 void   HOOK_CGame_Process();
-void   HOOK_CGame_Process_End();
 void   HOOK_Idle();
 void   HOOK_RenderScene_Plants();
 void   HOOK_RenderScene_end();
@@ -633,7 +629,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
-    HookInstall(HOOKPOS_CGame_Process_End, (DWORD)HOOK_CGame_Process_End, 5);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
@@ -1989,24 +1984,35 @@ void CMultiplayerSA::ResetSunSize()
     MemPut<BYTE>(0x55FA9F, 0x3C);
 }
 
-void CMultiplayerSA::SetCloudsEnabled(bool bDisabled)
+void CMultiplayerSA::SetCloudsEnabled(bool bEnabled)
 {
     // volumetric clouds
-    if (bDisabled)
+    if (bEnabled)
         MemPut<BYTE>(0x716380, 0xA1);
     else
         MemPut<BYTE>(0x716380, 0xC3);
 
-    // normal clouds
-    // 0071395A     90             NOP
-    if (bDisabled)
-        MemPut<BYTE>(0x713950, 0x83);
+    // bottom clouds
+    if (bEnabled)
+        MemPut<BYTE>(0x7154B0, 0x83);
     else
-        MemPut<BYTE>(0x713950, 0xC3);
+        MemPut<BYTE>(0x7154B0, 0xC3);
+
+    // skyline clouds
+    if (bEnabled)
+    {
+        MemPut<BYTE>(0x71411A, 0xD9);
+        MemPut<BYTE>(0x71411B, 0x41);
+        MemPut<BYTE>(0x71411C, 0x08);
+    }
+    else
+    {
+        MemSet((void*)0x71411A, 0x90, 3);
+    }
 
     // plane trails (not really clouds, but they're sort of vapour)
 
-    if (bDisabled)
+    if (bEnabled)
     {
         MemPut<BYTE>(0x717180, 0x83);
         MemPut<BYTE>(0x717181, 0xEC);
@@ -4667,29 +4673,14 @@ void _declspec(naked) HOOK_CGame_Process()
     }
 
     TIMING_CHECKPOINT("+CWorld_Process");
+    if (m_pPreWorldProcessHandler)
+        m_pPreWorldProcessHandler();
 
     _asm
     {
         popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
-        pushad
-    }
-
-    if (m_pPreWorldProcessHandler) m_pPreWorldProcessHandler();
-
-    _asm
-    {
-        popad
-        jmp     RETURN_CGame_Process;
-    }
-}
-
-DWORD CALL_CWaterLevel_PreRenderWater = 0x6EB710;
-void _declspec(naked) HOOK_CGame_Process_End()
-{
-    _asm
-    {
         pushad
     }
 
@@ -4700,14 +4691,7 @@ void _declspec(naked) HOOK_CGame_Process_End()
     _asm
     {
         popad
-        call    CALL_CWaterLevel_PreRenderWater
-        pushad
-    }
-
-    _asm
-    {
-        popad
-        jmp     RETURN_CGame_Process_End;
+        jmp     RETURN_CGame_Process;
     }
 }
 

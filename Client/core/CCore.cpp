@@ -553,7 +553,8 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
