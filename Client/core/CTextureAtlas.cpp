@@ -1,16 +1,11 @@
 #include "StdInc.h"
 #include <rectpack2D\src\finders_interface.h>
-#include <DirectXTex\DirectXTex.h>
 #include "CTextureAtlas.h"
 #include <iostream>
 #include <vector>
 #include <algorithm> 
-#include <dxgi.h>
-#include <dxgiformat.h>
 
 #include <wincodec.h>
-
-#include "DirectXTex.h"
 
 #include "..\..\Client\sdk\core\CTextureAtlasInterface.h"
 
