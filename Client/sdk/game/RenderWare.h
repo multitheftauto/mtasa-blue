@@ -32,10 +32,13 @@
 #define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
+#define RWD3D9_MAX_TEXTURE_STAGES  8
+#define RWD3D9_MAX_VERTEX_STREAMS  2
 
 typedef float  RwReal;
 typedef long RwFixed;
 typedef int  RwInt32;
+typedef RwInt32 RwBool;
 typedef unsigned int RwUInt32;
 typedef short RwInt16;
 typedef unsigned short RwUInt16;
@@ -110,6 +113,68 @@ struct _rwD3D9FormatInfo
     RwUInt8 alpha;
     RwUInt8 depth;
     RwUInt16 rwFormat;
+};
+
+typedef struct RxD3D9VertexStream RxD3D9VertexStream;
+/**
+* \ingroup worldextensionsd3d9
+* \struct RxD3D9VertexStream
+* This structure contains D3D9 resource specific components.
+*/
+struct RxD3D9VertexStream
+{
+    void *vertexBuffer;     /**< Vertex buffer */
+    RwUInt32 offset;        /**< Offset in bytes since the beginning
+                            of the Vertex buffer */
+    RwUInt32 stride;        /**< Size of the components in bytes */
+    RwUInt16 geometryFlags; /**< Geometry locked flags */
+    RwUInt8 managed;        /**< Created by the Vertex Buffer Manager */
+    RwUInt8 dynamicLock;    /**< Using RwD3D9DynamicVertexBufferLock */
+};
+
+typedef struct RxD3D9ResEntryHeader RxD3D9ResEntryHeader;
+/**
+* \ingroup worldextensionsd3d9
+* \struct RxD3D9ResEntryHeader
+* This structure contains D3D9 resource specific components.
+*/
+struct RxD3D9ResEntryHeader
+{
+    RwUInt32    serialNumber;   /**< The mesh headers serial number */
+
+    RwUInt32    numMeshes;      /**< The number of meshes */
+
+    void        *indexBuffer;   /**< Index buffer */
+
+    RwUInt32    primType;       /**< Primitive type */
+
+    RxD3D9VertexStream vertexStream[RWD3D9_MAX_VERTEX_STREAMS];   /**< Vertex streams */
+
+    RwBool      useOffsets;      /**< Use vertex buffer offsets when setting the streams */
+
+    void        *vertexDeclaration;   /**< Vertex declaration */
+
+    RwUInt32    totalNumIndex;  /**< Total number of indices. Needed for
+                                reinstancing, not for rendering */
+
+    RwUInt32    totalNumVertex; /**< Total number of vertices. Needed for
+                                reinstancing, not for rendering */
+
+};
+/* Doubly linked list. End marked as start (its a ring) */
+
+typedef struct RwLLLink  RwLLLink;                     /*** RwLLLink ***/
+                                                       /**
+                                                       * \ingroup fundtypesdatatypes
+                                                       * \struct RwLLLink
+                                                       * RwLLLink is an internal two way linked list pointer.  It contains
+                                                       * links to the previous and next RwLLLink's.  It is usually used in a
+                                                       * ring list fashion.
+                                                       */
+struct RwLLLink
+{
+    RwLLLink *next;
+    RwLLLink *prev;
 };
 
 // RenderWare primitive types
@@ -489,6 +554,67 @@ struct RwGeometry
     unsigned char  unknown1[14];
     unsigned short refs;
 };
+
+struct RwResEntry;
+
+/**
+* \ingroup rwresources
+* \ref RwResEntryDestroyNotify type represents the function
+* called from \ref RwResourcesFreeResEntry (and indirectly from
+* \ref RwResourcesEmptyArena) immediately before the memory used by the
+* specified resources entry is released.
+*
+* \param  resEntry   Pointer to the instanced data.
+*/
+typedef void(*RwResEntryDestroyNotify) (RwResEntry * resEntry);
+
+struct RwResEntry
+{
+    RwLLLink            link;   /* Node in the list of resource elements */
+    RwInt32             size;   /* Size of this node */
+    void               *owner;  /* Owner of this node */
+    RwResEntry        **ownerRef; /* Pointer to pointer to this (enables de-alloc) */
+    RwResEntryDestroyNotify destroyNotify; /* This is called right before destruction */
+};
+
+/**
+* \ingroup rpmorphtarget
+* \struct RpMorphTarget
+* Morph target -- vertex positions and normals.
+* This should be considered an opaque type.
+* Use RpMorphTarget API functions to access.
+*/
+typedef struct RpMorphTarget RpMorphTarget;
+
+struct RpMorphTarget
+{
+    RpGeometry *parentGeom;
+    RwSphere   boundingSphere;
+    RwV3d      *verts;
+    RwV3d      *normals;
+};
+
+/**
+* \ingroup rpmesh
+* \struct RpMeshHeader
+* Header for all meshes that constitute a single RpGeometry or RpWorldSector
+*/
+struct RpMeshHeader
+{
+    RwUInt32            flags;    /**< \see RpMeshHeaderFlags */
+    RwUInt16            numMeshes; /**< Number of meshes in object */
+    RwUInt16            serialNum; /**< Determine if mesh has changed
+                                   * since last instance */
+    RwUInt32            totalIndicesInMesh; /**< Total triangle index
+                                            * count in all meshes
+                                            */
+    RwUInt32            firstMeshOffset; /**< Offset in bytes from end this
+                                         * structure RpMeshHeader
+                                         * to the first mesh
+                                         */
+};
+
+
 struct RpInterpolation
 {
     unsigned int unknown1;
@@ -578,10 +704,12 @@ struct RpGeometry
     RpTriangle*           triangles;
     RwColor*              colors;
     RwTextureCoordinates* texcoords[RW_MAX_TEXTURE_COORDS];
-    void*                 unknown2;
-    void*                 info;
-    void*                 unknown3;
+    RpMeshHeader        *  mesh;         /* The mesh - groups polys of the same material */
+    RwResEntry          *  repEntry;     /* Information for an instance */
+    RpMorphTarget       *  morphTarget;  /* The Morph Target */
 };
+
+
 
 /*****************************************************************************/
 /** RenderWare I/O                                                          **/

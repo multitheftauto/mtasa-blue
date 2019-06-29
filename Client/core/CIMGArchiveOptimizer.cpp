@@ -587,229 +587,48 @@ extern SString g_CurrentDFFBeingGeneratedFileName;
 
 static RwTexDictionary* g_pVehicleTxdDictionary = nullptr;
 
-bool SetupGeometryMaterialTextures(RpGeometry* pGeometry, std::vector <CTextureAtlas>& vecTextureAtlases, std::vector <CTextureInfo*>& vecTextureInfoPointers)
+// Normalize pIn vector into pOut
+bool VectorNormalize(RwV3d *pIn, RwV3d *pOut)
 {
-    for (int i = 0; i < pGeometry->materials.entries; i++)
+    float len = (float)(std::sqrt(pIn->x*pIn->x + pIn->y*pIn->y + pIn->z*pIn->z));
+    if (len)
     {
-        bool bMaterialTextureInfoFound = false;
-
-        RpMaterial* pMaterial = pGeometry->materials.materials[i];
-        if (!pMaterial->texture)
-        {
-            vecTextureInfoPointers[i] = 0x0;
-            continue;
-        }
-        unsigned int uiMaterialTextureNameHash = HashString(pMaterial->texture->name);
-        for (auto& textureAtlas : vecTextureAtlases)
-        {
-            CTextureInfo* pTextureInfo = textureAtlas.GetTextureInfoByName(uiMaterialTextureNameHash);
-            if (pTextureInfo)
-            {
-                bMaterialTextureInfoFound = true;
-                std::printf("Setting up material: '%s' | id = %d\n", pMaterial->texture->name, i);
-
-                // UNCOMMENT THIS LATER
-               // memcpy(pMaterial->texture->name, textureAtlas.GetAtlasTexture()->name, RW_TEXTURE_NAME_LENGTH);
-                // UNCOMMENT END
-
-                vecTextureInfoPointers[i] = pTextureInfo;
-            }
-        }
-
-        if (!bMaterialTextureInfoFound)
-        {
-            return false;
-        }
+        pOut->x = pIn->x / len;
+        pOut->y = pIn->y / len;
+        pOut->z = pIn->z / len;
+        return true;
     }
-    return true;
+    return false;
 }
 
-float math_scale_values(float originalValue, float  minOriginalRange, float maxOriginalRange, float minNewRange, float maxNewRange)
+bool ReMapGeometryUVs(FILE* file, int firstIndex, int meshID, RpGeometry* pGeometry, std::vector <CTextureAtlas>& vecTextureAtlases)
 {
-    //   MATH_SCALE_VALUES
-    //   Converts a value from one range into another
-    //       (maxNewRange - minNewRange)(originalValue - minOriginalRange)
-    //    y = ----------------------------------------------------------- + minNewRange      
-    //               (maxOriginalRange - minOriginalRange)
-    return minNewRange + (((maxNewRange - minNewRange) * (originalValue - minOriginalRange)) / (maxOriginalRange - minOriginalRange));
-}
-
-void math_get_UV_min_max_range(RpTriangle&pTriangle, RwTextureCoordinates* pTextureCoordinateArray, 
-    float& MinUOriginalRange, float& MaxUOriginalRange, float& MinVOriginalRange, float& MaxVOriginalRange)
-{
-    bool bMinURangeSet = false;
-    bool bMaxURangeSet = false;
-
-    bool bMinVRangeSet = false;
-    bool bMaxVRangeSet = false;
-
-    for (int j = 0; j < 3; j++)
-    {
-
-        unsigned short vertIndex = pTriangle.vertIndex[j];
-
-        RwTextureCoordinates& pTextureCoordinates = pTextureCoordinateArray[vertIndex];
-        //theVertex->u = (theVertex->u / atlasWidth * textureWidth) + (1 / atlasWidth * textureStartInAtlasOffsetW);
-        //theVertex->v = (theVertex->v / atlasHeight * textureHeight) + (1 / atlasHeight * textureStartInAtlasOffsetH);
-
-        //pTextureCoordinates.u = (pTextureCoordinates.u / vecAtlasSize.fX * textureWidth) + (1 / vecAtlasSize.fX * texturePositionInAtlas.left);
-        //pTextureCoordinates.v = (pTextureCoordinates.v / vecAtlasSize.fY * textureHeight) + (1 / vecAtlasSize.fY * texturePositionInAtlas.top);
-
-        if (!bMinURangeSet)
-        {
-            bMinURangeSet = true;
-            MinUOriginalRange = pTextureCoordinates.u;
-        }
-
-        if (!bMaxURangeSet)
-        {
-            bMaxURangeSet = true;
-            MaxUOriginalRange = pTextureCoordinates.u;
-        }
-
-        if (!bMinVRangeSet)
-        {
-            bMinVRangeSet = true;
-            MinVOriginalRange = pTextureCoordinates.v;
-        }
-
-        if (!bMaxVRangeSet)
-        {
-            bMaxVRangeSet = true;
-            MaxVOriginalRange = pTextureCoordinates.v;
-        }
-
-        if (pTextureCoordinates.u < MinUOriginalRange)
-        {
-            MinUOriginalRange = pTextureCoordinates.u;
-        }
-
-        if (pTextureCoordinates.u > MaxUOriginalRange)
-        {
-            MaxUOriginalRange = pTextureCoordinates.u;
-        }
-
-
-        if (pTextureCoordinates.v < MinVOriginalRange)
-        {
-            MinVOriginalRange = pTextureCoordinates.v;
-        }
-
-        if (pTextureCoordinates.v > MaxVOriginalRange)
-        {
-            MaxVOriginalRange = pTextureCoordinates.v;
-        }
-    }
-}
-
-void PrintGeometryUVCoordinates(RpGeometry* pGeometry, RwTextureCoordinates*pTextureCoordinateArray)
-{
-    for (int i = 0; i < pGeometry->vertices_size; i++)
-    {
-        RwTextureCoordinates& pTextureCoordinates = pTextureCoordinateArray[i];
-        std::printf("i = %d | u,v : %f, %f\n", i, pTextureCoordinates.u, pTextureCoordinates.v);
-    }
-}
-
-bool ReMapGeometryUVs(RpGeometry* pGeometry, std::vector <CTextureAtlas>& vecTextureAtlases)
-{
-    std::vector <CTextureInfo*> vecTextureInfoPointers;
-    vecTextureInfoPointers.resize(pGeometry->materials.entries);
-
-    if (!SetupGeometryMaterialTextures(pGeometry, vecTextureAtlases, vecTextureInfoPointers))
-    {
-        return false;
-    }
-
+    RwV3d* pVertices = pGeometry->morphTarget->verts;
+    //RwV3d* pNormals = pGeometry->morphTarget->normals;
     RwTextureCoordinates* pTextureCoordinateArray = pGeometry->texcoords[0];
-
-
-    float minU = 0.0f, maxU = 0.4f;
-    float minV = 0.75f, maxV = 0.875f;
-
-    D3DXVECTOR2 uvCoodinates []= {
-    { maxU, maxV },
-    { maxU, minV },
-    { minU, minV },
-    { minU, maxV },
-    };
-
-    //PrintGeometryUVCoordinates(pGeometry, pTextureCoordinateArray);
-
-    /*
+    RwV3d normal;
     for (int i = 0; i < pGeometry->vertices_size; i++)
     {
-        RwTextureCoordinates& pTextureCoordinates = pTextureCoordinateArray[i];
-        //std::printf("i = %d | u,v : %f, %f\n", i,  pTextureCoordinates.u, pTextureCoordinates.v);
+        VectorNormalize(&pVertices[i], &normal);
+        fprintf(file, "v %g %g %g\n", pVertices[i].x, pVertices[i].z,  pVertices[i].y);
+        fprintf(file, "vn %g %g %g\n", normal.x, normal.z, normal.y);
+        fprintf(file, "vt %g %g\n", pTextureCoordinateArray[i].u, pTextureCoordinateArray[i].v);
+    }
+    fprintf(file, "o mesh%03u\n", meshID);
+    //fprintf(file, "usemtl repack_atlas\n");
+    fprintf(file, "s off\n");
 
-        pTextureCoordinates.u = uvCoodinates[i].x;
-        pTextureCoordinates.v = uvCoodinates[i].y;
-    };
-    */
-
-    ///*
-
-    std::set <unsigned short> setOfUVRemappedVertices;
-
-    for (int i = 0; i < pGeometry->triangles_size; i++)
+    RpTriangle* triangles = pGeometry->triangles;
+    for (uint32_t f = 0; f < pGeometry->triangles_size; f++)
     {
-        RpTriangle& pTriangle = (pGeometry->triangles)[i];
-        unsigned short matIndex = pTriangle.matIndex;
-        CTextureInfo* pTextureInfo = vecTextureInfoPointers[matIndex];
-        if (!pTextureInfo)
+        RpTriangle& triangle = triangles[f];
+        fprintf(file, "f ");
+        for (uint32_t j = 0; j < 3; j++) 
         {
-            continue;
-        }
-        RECT& texturePositionInAtlas = pTextureInfo->GetRegion();
-
-        CTextureAtlas* pTextureAtlas = pTextureInfo->GetAtlas();
-        const CVector2D& vecAtlasSize = pTextureAtlas->GetSize();
-
-        DWORD textureWidth = texturePositionInAtlas.right - texturePositionInAtlas.left;
-        DWORD textureHeight = texturePositionInAtlas.bottom - texturePositionInAtlas.top;
-
-        float MinUOriginalRange = 0 , MaxUOriginalRange = 0;
-        float MinVOriginalRange = 0, MaxVOriginalRange = 0;
-
-       // /*
-        math_get_UV_min_max_range(pTriangle, pTextureCoordinateArray,
-            MinUOriginalRange, MaxUOriginalRange, MinVOriginalRange, MaxVOriginalRange);
-           // */
-
-        for (int j = 0; j < 3; j++)
-        {
-  
-           unsigned short vertIndex = pTriangle.vertIndex[j];
-
-           if (!MapContains(setOfUVRemappedVertices, vertIndex))
-           {
-               RwTextureCoordinates& pTextureCoordinates = pTextureCoordinateArray[vertIndex];
-               //theVertex->u = (theVertex->u / atlasWidth * textureWidth) + (1 / atlasWidth * textureStartInAtlasOffsetW);
-               //theVertex->v = (theVertex->v / atlasHeight * textureHeight) + (1 / atlasHeight * textureStartInAtlasOffsetH);
-
-               ///*
-               pTextureCoordinates.u = math_scale_values(pTextureCoordinates.u,
-                   MinUOriginalRange, MaxUOriginalRange, 0.0f, 1.0f);
-
-               pTextureCoordinates.v = math_scale_values(pTextureCoordinates.v,
-                   MinVOriginalRange, MaxVOriginalRange, 0.0f, 1.0f);
-               // */
-
-               //std::printf("u,v (range fix): %f, %f\n", pTextureCoordinates.u, pTextureCoordinates.v);
-
-               //pTextureCoordinates.u = (pTextureCoordinates.u / vecAtlasSize.fX * textureWidth) + (1 / vecAtlasSize.fX * texturePositionInAtlas.left);
-               //pTextureCoordinates.v = (pTextureCoordinates.v / vecAtlasSize.fY * textureHeight) + (1 / vecAtlasSize.fY * texturePositionInAtlas.top);
-
-               //std::printf("u,v (remap): %f, %f\n", pTextureCoordinates.u, pTextureCoordinates.v);
-
-               MapInsert(setOfUVRemappedVertices, vertIndex);
-           }
+            const uint32_t index = firstIndex + triangle.vertIndex[j] + 1; // 1-indexed
+            fprintf(file, "%d/%d/%d%c", index, index, index, j == 2 ? '\n' : ' ');
         }
     }
-
-   // PrintGeometryUVCoordinates(pGeometry, pTextureCoordinateArray);
-
-   // */
     return true;
 }
 
@@ -823,17 +642,34 @@ bool ReMapClumpUVs(RpClump* pClump, std::vector <CTextureAtlas>& vecTextureAtlas
     std::vector<RpAtomic*> outAtomicList;
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 
+    const char* modelFilePath = "C:\\Users\\danish\\Desktop\\clump_output.obj";
+    FILE* file;
+    if (fopen_s(&file, modelFilePath, "w") != 0)
+    {
+        printf("ReMapClumpUVs: Failed to open file\n");
+        return false;
+    }
+
+    int firstIndex = 0;
+    int meshID = 0;
     for (auto& pAtomic: outAtomicList)
     { 
         RpGeometryLock(pAtomic->geometry, rpGEOMETRYLOCKALL);
 
-        if (!ReMapGeometryUVs(pAtomic->geometry, vecTextureAtlases))
+        if (!ReMapGeometryUVs(file, firstIndex, meshID, pAtomic->geometry, vecTextureAtlases))
         {
             RpGeometryUnlock(pAtomic->geometry);
             return false;
         }
 
+        meshID++;
+        firstIndex += pAtomic->geometry->vertices_size;
         RpGeometryUnlock(pAtomic->geometry);
+    }
+
+    if (file)
+    {
+        fclose(file);
     }
     return true;
 }
@@ -949,7 +785,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     else
     {
         // WE NEED To CHANGE THIS LOGIC LATER TO ALLOW OPTIMIZING OF VEHICLE MODELS AND TXD FILES
-        SString txdName = "cj_airprt";
+       /* SString txdName = "cj_airprt";
         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(vecTextureAtlases, pTxdDictionary, txdName);
         if (!pAtlasTxdDictionary)
         {
@@ -957,7 +793,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
             return;
         }
 
-        pRenderWare->WriteTXD("dffs\\myatlas.txd", pAtlasTxdDictionary);
+        pRenderWare->WriteTXD("dffs\\myatlas.txd", pAtlasTxdDictionary);*/
     }
     
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
