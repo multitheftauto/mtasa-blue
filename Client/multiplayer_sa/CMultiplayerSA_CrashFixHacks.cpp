@@ -1525,32 +1525,40 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 //
 // CAnimManager_CreateAnimAssocGroups
 //
-// Protect `iIDOffset` member of specific anim groups (CAnimBlendAssocGroupSAInterface)
+// Protect `pAssociationsArray` member of specific anim groups (CAnimBlendAssocGroupSAInterface)
 // from corruption by placing a WRITE operation breakpoint on its address.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl OnMY_CAnimManager_CreateAnimAssocGroups_Protect(CAnimBlendAssocGroupSAInterface* pGroupInterface)
 {
-    std::array<unsigned int, 3> arrGroupsToProtect = {ANIM_GROUP_BBBAT_1, ANIM_GROUP_MUSCULAR, ANIM_GROUP_SWORD_1};
-    for (auto groupID : arrGroupsToProtect)
+    static std::set<unsigned int> setOfGroupBreakpointsAdded;
+
+    void* ppAssociationsArray = reinterpret_cast<void*>(&pGroupInterface->pAssociationsArray);
+    for (auto groupID : CMultiplayerSA::arrGroupsToProtect)
     {
-        if (pGroupInterface->groupID == groupID)
+        if (pGroupInterface->groupID == groupID && !MapContains(setOfGroupBreakpointsAdded, groupID))
         {
             HANDLE mainThread = OpenThread(THREAD_ALL_ACCESS, TRUE, SharedUtil::GetMainThreadId());
             assert(mainThread != NULL);
 
-            void*  pIdOffsetMember = reinterpret_cast<void*>(&pGroupInterface->iIDOffset);
-            SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, pIdOffsetMember);
+            SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, ppAssociationsArray);
 
             CloseHandle(mainThread);
 
+            setOfGroupBreakpointsAdded.insert(groupID);
+
             LogEvent(511, "Breakpoint", "Hardware Breakpoint set on WRITE access",
-                     SString("groupID: %u | pGroupInterface: %#.8x, pIdOffsetMember = %#.8x | iIDOffset: %d", groupID, pGroupInterface, pIdOffsetMember,
-                             pGroupInterface->iIDOffset),
+                     SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", groupID, pGroupInterface,
+                             ppAssociationsArray, pGroupInterface->pAssociationsArray),
                      511);
-            break;
+            return;
         }
     }
+
+    LogEvent(512, "GroupLoaded", "Anim group loaded",
+             SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", pGroupInterface->groupID, pGroupInterface,
+                     ppAssociationsArray, pGroupInterface->pAssociationsArray),
+             512);
 }
 
 // Hook info

@@ -50,6 +50,8 @@ unsigned long CMultiplayerSA::ADDR_GotFocus;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
+std::array<unsigned int, 3> CMultiplayerSA::arrGroupsToProtect = {{ANIM_GROUP_BBBAT_1, ANIM_GROUP_MUSCULAR, ANIM_GROUP_SWORD_1}};
+
 #define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
 
