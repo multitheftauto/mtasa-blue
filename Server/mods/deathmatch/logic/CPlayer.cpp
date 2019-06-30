@@ -1098,7 +1098,7 @@ float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
     return m_fWeaponRangeLast;
 }
 
-void CPlayer::SetPlayerVersion(const SString& strPlayerVersion)
+void CPlayer::SetPlayerVersion(const CMtaVersion& strPlayerVersion)
 {
     m_strPlayerVersion = strPlayerVersion;
 }

@@ -768,10 +768,8 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinClientReq() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 if (szReason)
                     argStream.SetVersionWarning(szVersionReq, "client", szReason);
-                #endif
                 return false;
             }
         }

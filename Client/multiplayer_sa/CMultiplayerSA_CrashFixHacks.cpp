@@ -13,7 +13,6 @@
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
-#include "../game_sa/CAnimBlendAssocGroupSA.h"
 
 void CPlayerPed__ProcessControl_Abort();
 
@@ -1464,10 +1463,10 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     // Crash will occur at offset 0xCFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
-    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
-    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    CAnimBlendSequenceSAInterface* pAnimSequence = pInterface->pAnimSequence;
+    CAnimBlendHierarchySAInterface* pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
 
-    bool                           bSequenceExistsInHierarchy = false;
+    bool bSequenceExistsInHierarchy = false;
     CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
     for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
     {
@@ -1480,12 +1479,13 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     }
 
     LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
-             SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
+        SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
                 pAnimSeq = %p | BoneID = %d | BoneHash = %u | \
                 pAnimHier = %p | HierHash = %u | SequenceExistsInHierarchy: %s",
-                     pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID, pAnimSequence, pAnimSequence->m_boneId,
-                     pAnimSequence->m_hash, pAnimHierarchy, pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"),
-             588);
+            pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID,
+            pAnimSequence, pAnimSequence->m_boneId, pAnimSequence->m_hash, pAnimHierarchy,
+            pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"), 588);
+
 }
 
 // Hook info
@@ -1518,59 +1518,6 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         pop     ebp
         add     esp, 18h
         retn    8
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CAnimManager_CreateAnimAssocGroups
-//
-// Protect `iIDOffset` member of specific anim groups (CAnimBlendAssocGroupSAInterface)
-// from corruption by placing a WRITE operation breakpoint on its address.
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl OnMY_CAnimManager_CreateAnimAssocGroups_Protect(CAnimBlendAssocGroupSAInterface* pGroupInterface)
-{
-    std::array<unsigned int, 3> arrGroupsToProtect = {ANIM_GROUP_BBBAT_1, ANIM_GROUP_MUSCULAR, ANIM_GROUP_SWORD_1};
-    for (auto groupID : arrGroupsToProtect)
-    {
-        if (pGroupInterface->groupID == groupID)
-        {
-            HANDLE mainThread = OpenThread(THREAD_ALL_ACCESS, TRUE, SharedUtil::GetMainThreadId());
-            assert(mainThread != NULL);
-
-            void*  pIdOffsetMember = reinterpret_cast<void*>(&pGroupInterface->iIDOffset);
-            SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, pIdOffsetMember);
-
-            CloseHandle(mainThread);
-
-            LogEvent(511, "Breakpoint", "Hardware Breakpoint set on WRITE access",
-                     SString("groupID: %u | pGroupInterface: %#.8x, pIdOffsetMember = %#.8x | iIDOffset: %d", groupID, pGroupInterface, pIdOffsetMember,
-                             pGroupInterface->iIDOffset),
-                     511);
-            break;
-        }
-    }
-}
-
-// Hook info
-#define HOOKPOS_CAnimManager_CreateAnimAssocGroups_Protect                0x4D3DAD
-#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups_Protect               6
-DWORD RETURN_CAnimManager_CreateAnimAssocGroups_Protect = 0x4D3DB3;
-void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups_Protect()
-{
-    _asm
-    {
-        pushad
-        add     eax, esi
-        push    eax
-        call    OnMY_CAnimManager_CreateAnimAssocGroups_Protect
-        add     esp, 0x4
-        popad
-
-        mov     ecx, [esi + eax + 8]
-        xor     edi, edi
-        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Protect
     }
 }
 
@@ -1619,7 +1566,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CVolumetricShadowMgr_Update);
     EZHookInstallChecked(CAnimManager_CreateAnimAssocGroups);
     EZHookInstall(CAnimBlendNode_GetCurrentTranslation);
-    EZHookInstall(CAnimManager_CreateAnimAssocGroups_Protect);
     EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);
