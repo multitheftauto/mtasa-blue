@@ -660,7 +660,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     }
 
     // Check this server can run this resource
-    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
+    CMtaVersion strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
     if (m_strMinServerReqFromMetaXml > strServerVersion)
     {
         strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);

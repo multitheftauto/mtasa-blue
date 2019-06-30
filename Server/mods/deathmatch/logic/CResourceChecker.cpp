@@ -444,9 +444,9 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         return false;
     }
 
-    SString strMinServerHostVer = scriptInfo.szMinServerHostVer;
-    SString strMinServerRunVer = scriptInfo.szMinServerRunVer;
-    SString strMinClientRunVer = scriptInfo.szMinClientRunVer;
+    CMtaVersion strMinServerHostVer = scriptInfo.szMinServerHostVer;
+    CMtaVersion strMinServerRunVer = scriptInfo.szMinServerRunVer;
+    CMtaVersion strMinClientRunVer = scriptInfo.szMinClientRunVer;
 
     // Check server host requirements
     if (strMinServerHostVer > m_strReqServerVersion)
@@ -664,7 +664,8 @@ long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLen
 ///////////////////////////////////////////////////////////////
 bool CResourceChecker::UpgradeLuaFunctionName(const string& strFunctionName, bool bClientScript, string& strOutUpgraded)
 {
-    string           strHow, strVersion;
+    string           strHow;
+    CMtaVersion      strVersion;
     ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo(strFunctionName, bClientScript, strHow, strVersion);
 
     if (what == ECheckerWhat::REPLACED)
@@ -686,7 +687,8 @@ bool CResourceChecker::UpgradeLuaFunctionName(const string& strFunctionName, boo
 void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript,
                                                     unsigned long ulLineNumber)
 {
-    string           strHow, strVersion;
+    string           strHow;
+    CMtaVersion      strVersion;
     ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo(strFunctionName, bClientScript, strHow, strVersion);
 
     if (what == ECheckerWhat::NONE)
@@ -720,7 +722,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
 //
 //
 ///////////////////////////////////////////////////////////////
-ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, string& strOutVersion)
+ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, CMtaVersion& strOutVersion)
 {
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
     static CHashMap<SString, SDeprecatedItem*> serverUpgradeInfoMap;
@@ -745,7 +747,7 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
     if (!strOutVersion.empty())
     {
         // Function behaviour depends on min_mta_version setting
-        const SString& strMinReqFromMetaXml = bClientScript ? m_strMinClientReqFromMetaXml : m_strMinServerReqFromMetaXml;
+        const CMtaVersion& strMinReqFromMetaXml = bClientScript ? m_strMinClientReqFromMetaXml : m_strMinServerReqFromMetaXml;
         if (strMinReqFromMetaXml < strOutVersion)
             return ECheckerWhat::MODIFIED;
         return ECheckerWhat::NONE;
@@ -766,32 +768,32 @@ void CResourceChecker::CheckVersionRequirements(const string& strIdentifierName,
     //    if ( MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE )
     //        return;
 
-    static CHashMap<SString, SString> clientFunctionMap;
-    static CHashMap<SString, SString> serverFunctionMap;
+    static CHashMap<SString, CMtaVersion> clientFunctionMap;
+    static CHashMap<SString, CMtaVersion> serverFunctionMap;
 
     // Check if lookup maps need initializing
     if (clientFunctionMap.empty())
     {
         for (uint i = 0; i < NUMELMS(clientFunctionInitList); i++)
-            MapSet(clientFunctionMap, clientFunctionInitList[i].functionName, clientFunctionInitList[i].minMtaVersion);
+            MapSet(clientFunctionMap, clientFunctionInitList[i].functionName, CMtaVersion(clientFunctionInitList[i].minMtaVersion));
 
         for (uint i = 0; i < NUMELMS(serverFunctionInitList); i++)
-            MapSet(serverFunctionMap, serverFunctionInitList[i].functionName, serverFunctionInitList[i].minMtaVersion);
+            MapSet(serverFunctionMap, serverFunctionInitList[i].functionName, CMtaVersion(serverFunctionInitList[i].minMtaVersion));
     }
 
     // Select client or server check
-    const CHashMap<SString, SString>& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
-    SString&                          strReqMtaVersion = bClientScript ? m_strReqClientVersion : m_strReqServerVersion;
-    SString&                          strReqMtaReason = bClientScript ? m_strReqClientReason : m_strReqServerReason;
+    const CHashMap<SString, CMtaVersion>& functionMap = bClientScript ? clientFunctionMap : serverFunctionMap;
+    CMtaVersion&                          strReqMtaVersion = bClientScript ? m_strReqClientVersion : m_strReqServerVersion;
+    SString&                              strReqMtaReason = bClientScript ? m_strReqClientReason : m_strReqServerReason;
 
-    const SString* pResult = MapFind(functionMap, strIdentifierName);
+    const CMtaVersion* pResult = MapFind(functionMap, strIdentifierName);
     if (pResult)
     {
         // This identifier has a version requirement
-        const SString& strResult = *pResult;
+        const CMtaVersion& strResult = *pResult;
 
         // Is the new requirement relevant for this MTA generation
-        if (strResult > CStaticFunctionDefinitions::GetVersionSortable().Left(3))
+        if (strResult.GetGeneration() >= CStaticFunctionDefinitions::GetVersionSortable().GetGeneration())
         {
             // Is the new requirement higher than the current?
             if (strResult > strReqMtaVersion)
@@ -1125,7 +1127,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 // Also calculates version requirements these days
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, SString& strOutReqClientVersion, SString& strOutReqServerVersion,
+void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion, CMtaVersion& strOutReqServerVersion,
                                           SString& strOutReqClientReason, SString& strOutReqServerReason)
 {
     m_bUpgradeScripts = false;
