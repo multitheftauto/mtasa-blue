@@ -691,7 +691,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     {
         uint uiNumIncompatiblePlayers = 0;
         for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
+            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion() && !(*iter)->ShouldIgnoreMinClientVersionChecks())
                 uiNumIncompatiblePlayers++;
 
         if (uiNumIncompatiblePlayers > 0)

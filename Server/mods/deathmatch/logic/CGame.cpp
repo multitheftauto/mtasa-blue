@@ -1705,10 +1705,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 pPlayer->SetSerial(strExtra, 1);
                                 pPlayer->SetPlayerVersion(strPlayerVersion);
 
-                                // Only do min client version checks if not a custom build or server has a build number
-                                #if (MTASA_VERSION_TYPE > VERSION_TYPE_CUSTOM) || (MTASA_VERSION_BUILD > 0)
                                 // Check if client must update
-                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()))
+                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick,
@@ -1721,7 +1719,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 }
 
                                 // Check if client should optionally update
-                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()))
+                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
@@ -1732,7 +1730,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                     DisconnectPlayer(this, *pPlayer, "");
                                     return;
                                 }
-                                #endif
 
                                 // Check the serial for validity
                                 if (CBan* pBan = m_pBanManager->GetBanFromSerial(pPlayer->GetSerial().c_str()))
