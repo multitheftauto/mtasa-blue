@@ -137,7 +137,6 @@ workspace "MTASA"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/hwbrk"
-		include "vendor/DirectXTex"
 	end
 
 	filter {}
