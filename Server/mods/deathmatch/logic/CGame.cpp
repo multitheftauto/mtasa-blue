@@ -1705,6 +1705,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 pPlayer->SetSerial(strExtra, 1);
                                 pPlayer->SetPlayerVersion(strPlayerVersion);
 
+                                // Only do min client version checks if not a custom build or server has a build number
+                                #if (MTASA_VERSION_TYPE > VERSION_TYPE_CUSTOM) || (MTASA_VERSION_BUILD > 0)
                                 // Check if client must update
                                 if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()))
                                 {
@@ -1730,6 +1732,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                     DisconnectPlayer(this, *pPlayer, "");
                                     return;
                                 }
+                                #endif
 
                                 // Check the serial for validity
                                 if (CBan* pBan = m_pBanManager->GetBanFromSerial(pPlayer->GetSerial().c_str()))
