@@ -660,7 +660,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     }
 
     // Check this server can run this resource
-    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
+    CMtaVersion strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
     if (m_strMinServerReqFromMetaXml > strServerVersion)
     {
         strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);
@@ -691,7 +691,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     {
         uint uiNumIncompatiblePlayers = 0;
         for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
+            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion() && !(*iter)->ShouldIgnoreMinClientVersionChecks())
                 uiNumIncompatiblePlayers++;
 
         if (uiNumIncompatiblePlayers > 0)

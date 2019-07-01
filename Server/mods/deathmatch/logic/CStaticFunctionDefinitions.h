@@ -123,7 +123,7 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -730,5 +730,5 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 };
