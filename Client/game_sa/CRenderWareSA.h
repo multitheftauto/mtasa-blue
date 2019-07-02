@@ -72,6 +72,8 @@ public:
 
     bool      IsRasterCompressed(RwRaster* raster);
 
+    RwTexture* RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat);
+
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const CBuffer& fileData);
 

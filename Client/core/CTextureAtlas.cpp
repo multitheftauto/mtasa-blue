@@ -3,501 +3,275 @@
 #include "CTextureAtlas.h"
 #include <iostream>
 #include <vector>
-#include <algorithm> 
-
-#include <wincodec.h>
+#include <algorithm>
+#include <xatlas.h>
+#include "xatlas_repack.h"
 
 #include "..\..\Client\sdk\core\CTextureAtlasInterface.h"
 
 using namespace rectpack2D;
 
-auto RwTextureCreate = (RwTexture*(__cdecl*)(RwRaster* raster))0x007F37C0;
-auto RwRasterLock = (RwUInt8 *(__cdecl*)(RwRaster *raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
-auto RwRasterUnlock = (RwRaster *(__cdecl*)(RwRaster *raster))0x7FAEC0;
-auto RwD3D9RasterCreate = (RwRaster *(__cdecl*)(RwUInt32 width,RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
-auto WriteRaster = (bool(__cdecl*)(RwRaster *raster, char *filename))0x5A4150;
+auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
+auto RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+auto RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+auto RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+auto WriteRaster = (bool(__cdecl*)(RwRaster* raster, char* filename))0x5A4150;
 
 extern CCore* g_pCore;
 
-
-CTextureAtlas::CTextureAtlas()
+void DilateAtlasTextures(
+    xatlas::Atlas* atlas, xatlas::PackOptions& packOptions,
+    uint8_t* atlasTexture, AtlasLookupTexel* atlasLookup, 
+    unsigned int atlasTextureSize, unsigned int atlasLookupSize,
+    std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures
+)
 {
-}
-
-CTextureInfo* CTextureAtlas::GetTextureInfoByName(unsigned int uiTextureNameHash)
-{
-    for (auto& textureInfo : m_vecTexturesInfo)
+#define DEBUG_DILATE 0
+    // Run a dilate filter on the atlas texture to fill in padding around charts so bilinear filtering doesn't sample empty texels.
+    // Sample from the source texture(s).
+    printf("Dilating atlas texture\n");
+    std::vector<uint8_t> tempAtlasTexture;
+    tempAtlasTexture.resize(atlasTextureSize);
+    std::vector<AtlasLookupTexel> tempAtlasLookup;
+    tempAtlasLookup.resize(atlasLookupSize);
+    const int sampleXOffsets[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    const int sampleYOffsets[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    for (uint32_t i = 0; i < packOptions.padding; i++)
     {
-        if (uiTextureNameHash == textureInfo.GetNameHash())
+        memcpy(tempAtlasTexture.data(), atlasTexture, atlasTextureSize * sizeof(uint8_t));
+        memcpy(tempAtlasLookup.data(), atlasLookup, atlasLookupSize * sizeof(AtlasLookupTexel));
+        for (uint32_t y = 0; y < atlas->height; y++)
         {
-            return &textureInfo;
+            for (uint32_t x = 0; x < atlas->width; x++)
+            {
+                const uint32_t atlasDataOffset = x * 4 + y * (atlas->width * 4);
+                if (tempAtlasTexture[atlasDataOffset + 3] != 0)
+                    continue;            // Alpha != 0, already data here.
+                // Try to sample directly from the source texture.
+                // Need to find source texel position by checking surrounding texels in the atlas.
+                bool foundSample = false;
+                for (uint32_t si = 0; si < 8; si++)
+                {
+                    const int sx = (int)x + sampleXOffsets[si];
+                    const int sy = (int)y + sampleYOffsets[si];
+                    if (sx < 0 || sy < 0 || sx >= (int)atlas->width || sy >= (int)atlas->height)
+                        continue;            // Sample position is outside of atlas texture.
+                    const AtlasLookupTexel& lookup = tempAtlasLookup[sx + sy * (int)atlas->width];
+                    if (lookup.materialIndex == UINT16_MAX || textures[lookup.materialIndex] == UINT32_MAX)
+                        continue;            // No source data here.
+                    // This atlas texel has a corresponding position for the source texel.
+                    // Subtract the sample offset to get the source position.
+                    CDXTexture* sourceTexture = &texturesCache[textures[lookup.materialIndex]];
+                    const int   ssx = (int)lookup.x - sampleXOffsets[si];
+                    const int   ssy = (int)lookup.y - sampleYOffsets[si] * -1;            // need to flip y?
+                    if (ssx < 0 || ssy < 0 || ssx >= (int)sourceTexture->GetWidth() || ssy >= (int)sourceTexture->GetHeight())
+                        continue;            // Sample position is outside of source texture.
+                    // Valid sample.
+                    // const uint8_t* rgbaSource =
+                    //    &sourceTexture->data[ssx * sourceTexture->numComponents + ssy * (sourceTexture->width * sourceTexture->numComponents)];
+                    const PixelColor* argbSource = (const PixelColor*)sourceTexture->GetPixel(ssx, ssy);
+                    uint8_t*          rgbaDest = &atlasTexture[atlasDataOffset];
+#if DEBUG_DILATE
+                    rgbaDest[0] = 0;
+                    rgbaDest[1] = 255;
+                    rgbaDest[2] = 0;
+                    rgbaDest[3] = 255;
+#else
+
+                    rgbaDest[0] = argbSource->r;
+                    rgbaDest[1] = argbSource->g;
+                    rgbaDest[2] = argbSource->b;
+                    rgbaDest[3] = 255;
+#endif
+                    atlasLookup[x + y * (int)atlas->width].x = (uint16_t)ssx;
+                    atlasLookup[x + y * (int)atlas->width].y = (uint16_t)ssy;
+                    atlasLookup[x + y * (int)atlas->width].materialIndex = lookup.materialIndex;
+                    foundSample = true;
+                    break;
+                }
+                if (foundSample)
+                    continue;
+                // Sample up to 8 surrounding texels in the source texture, average their color and assign it to this texel.
+                float rgbSum[3] = {0.0f, 0.0f, 0.0f}, n = 0;
+                for (uint32_t si = 0; si < 8; si++)
+                {
+                    const int sx = (int)x + sampleXOffsets[si];
+                    const int sy = (int)y + sampleYOffsets[si];
+                    if (sx < 0 || sy < 0 || sx >= (int)atlas->width || sy >= (int)atlas->height)
+                        continue;            // Sample position is outside of atlas texture.
+                    const AtlasLookupTexel& lookup = tempAtlasLookup[sx + sy * (int)atlas->width];
+                    if (lookup.materialIndex == UINT16_MAX || textures[lookup.materialIndex] == UINT32_MAX)
+                        continue;            // No source data here.
+                    CDXTexture* sourceTexture = &texturesCache[textures[lookup.materialIndex]];
+                    const int   ssx = (int)lookup.x + sampleXOffsets[si];
+                    const int   ssy = (int)lookup.y + sampleYOffsets[si];
+                    if (ssx < 0 || ssy < 0 || ssx >= (int)sourceTexture->GetWidth() || ssy >= (int)sourceTexture->GetHeight())
+                        continue;            // Sample position is outside of source texture.
+                    // Valid sample.
+                    const PixelColor* rgba = (const PixelColor*)sourceTexture->GetPixel(ssx, ssy);
+                    // const uint8_t* rgba =
+                    //    &sourceTexture->data[ssx * sourceTexture->numComponents + ssy * (sourceTexture->width * sourceTexture->numComponents)];
+                    rgbSum[0] += (float)rgba->r;
+                    rgbSum[1] += (float)rgba->g;
+                    rgbSum[2] += (float)rgba->b;
+                    //rgbSum[3] += (float)rgba->a;
+                    n++;
+                }
+                if (n != 0)
+                {
+                    const float invn = 1.0f / (float)n;
+                    uint8_t*    rgba = &atlasTexture[atlasDataOffset];
+#if DEBUG_DILATE
+                    rgba[0] = 255;
+                    rgba[1] = 0;
+                    rgba[2] = 255;
+                    rgba[3] = 255;
+#else
+                    rgba[0] = uint8_t(rgbSum[0] * invn);
+                    rgba[1] = uint8_t(rgbSum[1] * invn);
+                    rgba[2] = uint8_t(rgbSum[2] * invn);
+                    rgba[3] = 255;
+#endif
+                    continue;
+                }
+                // Sample up to 8 surrounding texels in the atlas texture, average their color and assign it to this texel.
+                rgbSum[0] = rgbSum[1] = rgbSum[2]  = 0.0f;
+                n = 0;
+                for (uint32_t si = 0; si < 8; si++)
+                {
+                    const int sx = (int)x + sampleXOffsets[si];
+                    const int sy = (int)y + sampleYOffsets[si];
+                    if (sx < 0 || sy < 0 || sx >= (int)atlas->width || sy >= (int)atlas->height)
+                        continue;            // Sample position is outside of atlas texture.
+                    const uint8_t* rgba = &tempAtlasTexture[sx * 4 + sy * (atlas->width * 4)];
+                    if (rgba[3] == 0)
+                        continue;
+                    rgbSum[0] += (float)rgba[0];
+                    rgbSum[1] += (float)rgba[1];
+                    rgbSum[2] += (float)rgba[2];
+                    //rgbSum[3] += (float)rgba[3];
+                    n++;
+                }
+                if (n != 0)
+                {
+                    const float invn = 1.0f / (float)n;
+                    uint8_t*    rgba = &atlasTexture[atlasDataOffset];
+#if DEBUG_DILATE
+                    rgba[0] = 0;
+                    rgba[1] = 255;
+                    rgba[2] = 255;
+                    rgba[3] = 255;
+#else
+                    rgba[0] = uint8_t(rgbSum[0] * invn);
+                    rgba[1] = uint8_t(rgbSum[1] * invn);
+                    rgba[2] = uint8_t(rgbSum[2] * invn);
+                    rgba[3] = 255;
+#endif
+                }
+            }
         }
     }
-    return nullptr;
 }
 
-bool CTextureAtlas::RemoveTextureInfoTillSuccess(std::vector <RwTexture*>& vecTexturesRemoved)
-{
-    for (auto it = m_vecTexturesInfo.begin(); it != m_vecTexturesInfo.end();)
-    {
-        RwTexture* pTexture = it->GetTexture();
-        vecTexturesRemoved.push_back(pTexture);
-
-        eTextureAtlasErrorCodes textureReturn = CreateAtlas();
-        if (textureReturn == TEX_ATLAS_SUCCESS)
-        {
-            break;
-        }
-        else if (textureReturn != TEX_ATLAS_CANT_FIT_INTO_ATLAS)
-        {
-            return false;
-        }
-
-        it = m_vecTexturesInfo.erase(it);
-    }
-    return true;
-}
-
-void CTextureAtlas::AddTextureInfo(RwTexture* pTexture, const float theWidth, const float theHeight)
-{
-    m_vecTexturesInfo.emplace_back(pTexture, theWidth, theHeight, this);
-}
-
-bool CTextureAtlas::CreateAtlasTextureResource(const float fWidth, const float fHeight)
+CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial,
+                             std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures, std::vector<Vector2>& uvs)
 {
 
-    RwRaster* raster = RwD3D9RasterCreate(fWidth, fHeight, m_kTextureFormat,
-        rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
-    if (!raster)
+    unsigned int atlasTextureSize = atlas->width * atlas->height * 4;
+    unsigned int atlasLookupSize = atlas->width * atlas->height;
+
+    // Create a texture for the atlas.
+    std::vector<uint8_t> atlasTexture;
+    atlasTexture.resize(atlas->atlasCount * atlasTextureSize);
+    memset(atlasTexture.data(), 0, atlasTexture.size() * sizeof(uint8_t));
+
+    // Need to lookup source position and material for dilation.
+    std::vector<AtlasLookupTexel> atlasLookup;
+    atlasLookup.resize(atlas->atlasCount * atlasLookupSize);
+    for (size_t i = 0; i < atlasLookup.size(); i++)
     {
-        std::printf("CreateAtlasTextureResource: RwD3D9RasterCreate Failed\n");
-        return false;
+        atlasLookup[i].materialIndex = UINT16_MAX;
     }
 
-    m_pAtlasTexture = RwTextureCreate(raster);
-    if (!m_pAtlasTexture)
+    // Rasterize chart triangles.
+    for (uint32_t i = 0; i < atlas->meshCount; i++)
     {
-        std::printf("CreateAtlasTextureResource: RwTextureCreate Failed\n");
-        return false;
-    }
-    vecAtlasSize = CVector2D(fWidth, fHeight);
-    return true;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// GTA SA doesn't use mipmaps, but it is supported.
-// An option should be given to the client to allow generating mipmaps.
-// The downside is that mipmaps will take extra memory.
-///////////////////////////////////////////////////////////////////////////
-bool CTextureAtlas::CopyTextureToAtlas(CTextureInfo& textureInfo)
-{
-    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
-
-    RwTexture* pTexture = textureInfo.GetTexture();
-    RECT& texturePositionInAtlas = textureInfo.GetRegion();
-
-    RwRaster* sourceRaster = textureInfo.GetTexture()->raster;
-    RwRaster* destinationRaster = m_pAtlasTexture->raster;
-
-    _rwD3D9RasterExt* destinationRasterExt = pRenderware->GetRasterExt(destinationRaster);
-
-    RECT            dstRect;
-    D3DLOCKED_RECT  dstLockedRect;
-
-    const size_t totalMipMapLevels = 1;
-    for (long mipLevel = 0; mipLevel < totalMipMapLevels; ++mipLevel)
-    {
-        long const div = static_cast<long>(pow(2L, mipLevel));
-        DWORD textureWidth = texturePositionInAtlas.right - texturePositionInAtlas.left;
-        DWORD textureHeight = texturePositionInAtlas.bottom - texturePositionInAtlas.top;
-        std::printf("CopyTextureToAtlas: textureWidth: %d | textureHeight: %d\n", (int)textureWidth, (int)textureHeight);
-        long const mipWidth = std::max(1UL, textureWidth / div);
-        long const mipHeight = std::max(1UL, textureHeight / div);
-
-        dstRect.left = std::max(0L, texturePositionInAtlas.left / div);
-        dstRect.top = std::max(0L, texturePositionInAtlas.top / div);
-        dstRect.right = dstRect.left + mipWidth;
-        dstRect.bottom = dstRect.top + mipHeight;
-
-        UCHAR *srcPtr = RwRasterLock(sourceRaster, mipLevel, rwRASTERLOCKREAD);
-        if (!srcPtr)
+        const xatlas::Mesh& mesh = atlas->meshes[i];
+        for (uint32_t j = 0; j < mesh.chartCount; j++)
         {
-            std::printf("RwRasterLock: failed to lock sourceRaster\n");
-            return false;
-        }
+            const xatlas::Chart& chart = mesh.chartArray[j];
+            SetAtlasTexelArgs    args;
+            args.materialIndex = vertexToMaterial[chart.indexArray[0]];
+            if (args.materialIndex == UINT16_MAX || textures[args.materialIndex] == UINT32_MAX)
+                args.sourceTexture = nullptr;
+            else
+                args.sourceTexture = &texturesCache[textures[args.materialIndex]];
 
-        HRESULT hr = destinationRasterExt->texture->LockRect(mipLevel, &dstLockedRect, &dstRect, 0);
-        if (hr != S_OK)
-        {
-            std::printf("atlas texture LockRect: failed to lock dstLockedRect error: %#.8x\n", hr);
-            return false;
-        }
+            for (uint32_t k = 0; k < chart.indexCount / 3; k++)
+            {
+                Vector2 v[3];
+                int32_t atlasIndex = -1;
+                for (uint32_t l = 0; l < 3; l++)
+                {
+                    const uint32_t        index = chart.indexArray[k * 3 + l];
+                    const xatlas::Vertex& vertex = mesh.vertexArray[index];
+                    v[l] = Vector2(vertex.uv[0], vertex.uv[1]);
+                    args.sourceUv[l] = uvs[vertex.xref];            // modelVertices[vertex.xref].uv;
+                    args.sourceUv[l].y = 1.0f - args.sourceUv[l].y;
 
-        UCHAR *dstPtr = (UCHAR *)dstLockedRect.pBits; 
+                    atlasIndex = vertex.atlasIndex;
+                }
 
-        int const kBytesPerRow = (mipWidth * SizeOfTexel(m_kTextureFormat)) / 8;
-        int const kBlockFactor = (IsDXTnFormat(m_kTextureFormat) ? 4 : 1);
-
-        for (int i = 0; i < mipHeight / kBlockFactor; ++i)
-        {
-            memcpy(dstPtr, srcPtr, kBlockFactor * kBytesPerRow);
-            srcPtr += sourceRaster->stride;
-            dstPtr += dstLockedRect.Pitch;
-        }
-
-        if (!RwRasterUnlock(sourceRaster))
-        {
-            std::printf("RwRasterUnlock: failed to unlock sourceRaster\n");
-            return false;
-        }
-
-        hr = destinationRasterExt->texture->UnlockRect(mipLevel);
-        if (hr != S_OK)
-        {
-            std::printf("atlas texture UnlockRect: failed to unlock error: %#.8x\n", hr);
-            return false;
+                if (atlasIndex < 0)
+                {
+                    atlasIndex = 0;
+                }
+                Triangle tri(v[0], v[1], v[2], Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1));
+                args.atlasData = ((uint8_t*)atlasTexture.data()) + (atlasTextureSize * atlasIndex);
+                args.atlasWidth = atlas->width;
+                args.atlasLookup = ((AtlasLookupTexel*)atlasLookup.data()) + (atlasLookupSize * atlasIndex);
+                tri.drawAA(setAtlasTexel, &args);
+            }
         }
     }
-    WriteRaster(m_pAtlasTexture->raster, "C:\\Users\\danish\\Desktop\\atlasTXD\\textureAtlas.png");
-    return true;
+    if (packOptions.padding > 0)
+    {
+        for (uint32_t atlasIndex = 0; atlasIndex < atlas->atlasCount; atlasIndex++)
+        {
+            uint8_t* theAtlasTexture = ((uint8_t*)atlasTexture.data()) + (atlasTextureSize * atlasIndex);
+            AtlasLookupTexel* theAtlasLookup = ((AtlasLookupTexel*)atlasLookup.data()) + (atlasLookupSize * atlasIndex);
+
+            DilateAtlasTextures(atlas, packOptions, theAtlasTexture, theAtlasLookup, 
+                atlasTextureSize, atlasLookupSize, texturesCache, textures);
+
+            CDXTexture dxTexture;
+            atlasDXTextures.push_back(dxTexture);
+            CDXTexture& theTexture = atlasDXTextures[atlasDXTextures.size() - 1];
+
+            if (theTexture.CreateTextureLocked(atlas->width, atlas->height, 0))
+            {
+                for (int y = 0; y < atlas->height; y++)
+                {
+                    for (int x = 0; x < atlas->width; x++)
+                    {
+                        const uint32_t atlasDataOffset = x * 4 + y * (atlas->width * 4);
+                        const uint8_t* thePixel = &theAtlasTexture[atlasDataOffset];
+                        theTexture.setPixel(x, y, thePixel[0], thePixel[1], thePixel[2], thePixel[3]);
+                    }
+                }
+
+                char buffer[100];
+                sprintf(buffer, "myAtlas%d", atlasIndex);
+                std::string atlasName = buffer;
+                theTexture.SaveTextureToFile(atlasName);
+            }
+        }
+     
+    }
+    //   stbi_write_tga(atlasFilename, atlas->width, atlas->height, 4, atlasTexture.data());
 }
 
 eTextureAtlasErrorCodes CTextureAtlas::CreateAtlas()
 {
-    constexpr bool allow_flip = false; // true;
-    const auto runtime_flipping_mode = flipping_option::DISABLED; // ENABLED;
-    using spaces_type = rectpack2D::empty_spaces<allow_flip, default_empty_spaces>;
-
-    /*
-    rect_xywh or rect_xywhf (see src/rect_structs.h),
-    depending on the value of allow_flip.
-    */
-
-    using rect_type = output_rect_t<spaces_type>;
-    auto report_successful = [](rect_type&) {
-        return callback_result::CONTINUE_PACKING;
-    };
-
-    bool bFailedToPack = false;
-    auto report_unsuccessful = [&](rect_type&) {
-        bFailedToPack = true;
-        std::printf("report_unsuccessful called\n");
-        return callback_result::ABORT_PACKING;
-    };
-
-    /*
-    Initial size for the bin, from which the search begins.
-    The result can only be smaller - if it cannot, the algorithm will gracefully fail.
-    */
-    const auto maxAtlasSize = 16384;
-    const auto discard_step = 1;
-
-    /*
-    Create some arbitrary rectangles.
-    Every subsequent call to the packer library will only read the widths and heights that we now specify,
-    and always overwrite the x and y coordinates with calculated results.
-    */
-
-    std::vector<rect_type> rectangles;
-
-    for (size_t i = 0; i< GetTextureInfoCount(); i++)
-    {
-        CTextureInfo& textureInfo = GetTextureInfo(i);
-        rectangles.emplace_back(rect_xywh(0, 0, textureInfo.GetWidth(), textureInfo.GetHeight()));
-    }
-
-    auto report_result = [&](const rect_wh& result_size) {
-        std::cout << "Resultant bin: " << result_size.w << " " << result_size.h << std::endl;
-
-        if (!CreateAtlasTextureResource(result_size.w, result_size.h))
-        {
-            return TEX_ATLAS_TEXTURE_RESOURCE_CREATE_FAILED;
-        }
-
-        for (DWORD i = 0; i < rectangles.size(); i++) 
-        {
-            rect_type& textureRectangle = rectangles[i];
-            CTextureInfo& textureInfo = GetTextureInfo(i);
-            float width = textureRectangle.w;
-            float height = textureRectangle.h;
-
-            /*if (r.flipped)
-            {
-            width = r.h;
-            height = r.w;
-            }*/
-
-            char*textureName = textureInfo.GetTexture()->name;
-            std::cout << textureName << " | " << 
-                textureRectangle.x << " " << textureRectangle.y << " " << width << " " << height << std::endl;
-
-            textureInfo.GetRegion() = { static_cast<LONG>(textureRectangle.x),static_cast<LONG>(textureRectangle.y),
-                                            static_cast<LONG>(width + textureRectangle.x), static_cast<LONG>(height + textureRectangle.y) };
-
-            if (IsTextureFormatDifferentFromAtlas(textureInfo))
-            {
-                RwTexture* pTexture = CreateTextureWithAtlasFormat(textureInfo);
-                if (!pTexture)
-                {
-                    return TEX_ATLAS_DX_ERROR;
-                }
-
-                textureInfo.SetTexture(pTexture);
-            }
-
-            if (!CopyTextureToAtlas(textureInfo))
-            {
-                return TEX_ATLAS_COPY_TO_ATLAS_FAILED;
-            }
-        }
-
-        //D3DXSaveTextureToFile("C:\\Users\\danish\\Desktop\\myLovelyAtlas.png", D3DXIFF_PNG, m_pAtlasTexture, NULL);
-    };
-
-    const auto result_size = find_best_packing<spaces_type>(
-        rectangles,
-        make_finder_input(
-            maxAtlasSize,
-            discard_step,
-            report_successful,
-            report_unsuccessful,
-            runtime_flipping_mode
-        )
-        );
-
-    if (bFailedToPack)
-    {
-        return TEX_ATLAS_CANT_FIT_INTO_ATLAS;
-    }
-
-    report_result(result_size);
     return TEX_ATLAS_SUCCESS;
-}
-
-void CTextureAtlas::GetRasterRect(RwRaster* raster, RECT& rect)
-{
-    rect.left = raster->nOffsetX;
-    rect.top = raster->nOffsetY;
-    rect.right = raster->nOffsetX + raster->width;
-    rect.bottom = raster->nOffsetY + raster->height;
-}
-
-bool CTextureAtlas::IsTextureFormatDifferentFromAtlas(CTextureInfo &textureInfo)
-{
-    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
-
-    RwTexture* pTexture = textureInfo.GetTexture();
-    RwRaster* raster = pTexture->raster;
-    _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(raster);
-    return rasterExt->d3dFormat != m_kTextureFormat;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// GTA SA doesn't use mipmaps, but it is supported.
-// An option should be given to the client to allow generating mipmaps.
-// The downside is that mipmaps will take extra memory.
-///////////////////////////////////////////////////////////////////////////
-RwTexture* CTextureAtlas::CreateTextureWithAtlasFormat(CTextureInfo &textureInfo)
-{
-    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
-
-    RwTexture* pTexture = textureInfo.GetTexture();
-    RwRaster* raster = pTexture->raster;
-
-    HRESULT hr = NULL;
- 
-    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, m_kTextureFormat,
-        rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
-    if (!convertedRaster)
-    {
-        std::printf("RwD3D9RasterCreate: Failed\n");
-        return nullptr;
-    }
-
-    _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(raster);
-    _rwD3D9RasterExt* convertedRasterExt = pRenderware->GetRasterExt(convertedRaster);
-
-    RECT sourceRect, destinationRect;
-    GetRasterRect(raster, sourceRect);
-    GetRasterRect(convertedRaster, destinationRect);
-
-    IDirect3DSurface9 * sourceSurface;
-    hr = rasterExt->texture->GetSurfaceLevel(0, &sourceSurface);
-    if (hr != D3D_OK)
-    {
-        std::printf("Get surface level for sourceSurface failed with error: %#.8x\n", hr);
-        return nullptr;
-    }
-
-    IDirect3DSurface9 * destinationSurface;
-    hr = convertedRasterExt->texture->GetSurfaceLevel(0, &destinationSurface);
-    if (hr != D3D_OK)
-    {
-        std::printf("Get surface level for destinationSurface failed with error: %#.8x\n", hr);
-        return nullptr;
-    }
-
-    hr = D3DXLoadSurfaceFromSurface(
-        destinationSurface, NULL, &destinationRect,
-        sourceSurface, NULL, &sourceRect,
-        D3DX_DEFAULT, 0); 
-    if (FAILED(hr))
-    {
-        std::printf("D3DXLoadSurfaceFromSurface failed with error: %#.8x\n", hr);
-        return nullptr;
-    }
-
-    RwTexture* pConvertedTexture = RwTextureCreate(convertedRaster);
-    memcpy (pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
-    memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
-
-    std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", m_kTextureFormat, rasterExt->d3dFormat);
-
-    SString theDirPath = "C:\\Users\\danish\\Desktop\\atlasTXD\\";
-    theDirPath += pTexture->name;
-    theDirPath += ".png";
-
-    //"C:\\Users\\danish\\Desktop\\ConvertedRaster.png"
-    if (!WriteRaster(convertedRaster, (char*)theDirPath.c_str()))
-    {
-        std::printf("WriteRaster failed\n");
-    }
-
-    return pConvertedTexture;
-}
-
-//-----------------------------------------------------------------------------
-// Name: IsSupportedFormat()
-// Desc: return true if the format is supported 
-//       The list of supported formats are essentially all formats that we 
-//       currently know how to deal with, ie they have a known size.  
-//       It is a fail-safe mechansim to not have to deal w/ unknown 4CC codes.
-//-----------------------------------------------------------------------------~
-bool CTextureAtlas::IsSupportedFormat(D3DFORMAT format)
-{
-    switch (format)
-    {
-    case D3DFMT_R8G8B8:
-    case D3DFMT_A8R8G8B8:
-    case D3DFMT_X8R8G8B8:
-    case D3DFMT_R5G6B5:
-    case D3DFMT_X1R5G5B5:
-    case D3DFMT_A1R5G5B5:
-    case D3DFMT_A4R4G4B4:
-    case D3DFMT_R3G3B2:
-    case D3DFMT_A8:
-    case D3DFMT_A8R3G3B2:
-    case D3DFMT_X4R4G4B4:
-    case D3DFMT_A2B10G10R10:
-    case D3DFMT_A8B8G8R8:
-    case D3DFMT_X8B8G8R8:
-    case D3DFMT_G16R16:
-    case D3DFMT_A2R10G10B10:
-    case D3DFMT_A16B16G16R16:
-    case D3DFMT_A8P8:
-    case D3DFMT_P8:
-    case D3DFMT_L8:
-    case D3DFMT_L16:
-    case D3DFMT_A8L8:
-    case D3DFMT_A4L4:
-    case D3DFMT_V8U8:
-    case D3DFMT_Q8W8V8U8:
-    case D3DFMT_V16U16:
-    case D3DFMT_Q16W16V16U16:
-    case D3DFMT_CxV8U8:
-    case D3DFMT_L6V5U5:
-    case D3DFMT_X8L8V8U8:
-    case D3DFMT_A2W10V10U10:
-    case D3DFMT_G8R8_G8B8:
-    case D3DFMT_R8G8_B8G8:
-    case D3DFMT_DXT1:
-    case D3DFMT_DXT2:
-    case D3DFMT_DXT3:
-    case D3DFMT_DXT4:
-    case D3DFMT_DXT5:
-    case D3DFMT_R16F:
-    case D3DFMT_G16R16F:
-    case D3DFMT_A16B16G16R16F:
-    case D3DFMT_R32F:
-    case D3DFMT_G32R32F:
-    case D3DFMT_A32B32G32R32F:
-        break;
-    default:
-        return false;
-    }
-    return true;
-}
-
-int CTextureAtlas::SizeOfTexel(D3DFORMAT format)
-{
-    switch (format)
-    {
-    case D3DFMT_R8G8B8:			return 3 * 8;
-    case D3DFMT_A8R8G8B8:		return 4 * 8;
-    case D3DFMT_X8R8G8B8:		return 4 * 8;
-    case D3DFMT_R5G6B5:			return 2 * 8;
-    case D3DFMT_X1R5G5B5:		return 2 * 8;
-    case D3DFMT_A1R5G5B5:		return 2 * 8;
-    case D3DFMT_A4R4G4B4:		return 2 * 8;
-    case D3DFMT_R3G3B2:			return 8;
-    case D3DFMT_A8:				return 8;
-    case D3DFMT_A8R3G3B2:		return 2 * 8;
-    case D3DFMT_X4R4G4B4:		return 2 * 8;
-    case D3DFMT_A2B10G10R10:	return 4 * 8;
-    case D3DFMT_A8B8G8R8:		return 4 * 8;
-    case D3DFMT_X8B8G8R8:		return 4 * 8;
-    case D3DFMT_G16R16:			return 4 * 8;
-    case D3DFMT_A2R10G10B10:	return 4 * 8;
-    case D3DFMT_A16B16G16R16:	return 8 * 8;
-    case D3DFMT_A8P8:			return 8;
-    case D3DFMT_P8:				return 8;
-    case D3DFMT_L8:				return 8;
-    case D3DFMT_L16:			return 2 * 8;
-    case D3DFMT_A8L8:			return 2 * 8;
-    case D3DFMT_A4L4:			return 8;
-    case D3DFMT_V8U8:			return 2 * 8;
-    case D3DFMT_Q8W8V8U8:		return 4 * 8;
-    case D3DFMT_V16U16:			return 4 * 8;
-    case D3DFMT_Q16W16V16U16:	return 8 * 8;
-    case D3DFMT_CxV8U8:			return 2 * 8;
-    case D3DFMT_L6V5U5:			return 2 * 8;
-    case D3DFMT_X8L8V8U8:		return 4 * 8;
-    case D3DFMT_A2W10V10U10:	return 4 * 8;
-    case D3DFMT_G8R8_G8B8:		return 2 * 8;
-    case D3DFMT_R8G8_B8G8:		return 2 * 8;
-    case D3DFMT_DXT1:			return 4;
-    case D3DFMT_DXT2:			return 8;
-    case D3DFMT_DXT3:			return 8;
-    case D3DFMT_DXT4:			return 8;
-    case D3DFMT_DXT5:			return 8;
-    case D3DFMT_UYVY:			return 2 * 8;
-    case D3DFMT_YUY2:			return 2 * 8;
-    case D3DFMT_R16F:			return 2 * 8;
-    case D3DFMT_G16R16F:		return 4 * 8;
-    case D3DFMT_A16B16G16R16F:	return 8 * 8;
-    case D3DFMT_R32F:			return 4 * 8;
-    case D3DFMT_G32R32F:		return 8 * 8;
-    case D3DFMT_A32B32G32R32F:	return 16 * 8;
-    default:
-        return 0;
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Name: IsDXTnFormat()
-// Desc: Returns true if the given format is a DXT format, false otherwise
-//-----------------------------------------------------------------------------
-bool CTextureAtlas::IsDXTnFormat(D3DFORMAT format)
-{
-    switch (format)
-    {
-    case D3DFMT_DXT1:
-    case D3DFMT_DXT2:
-    case D3DFMT_DXT3:
-    case D3DFMT_DXT4:
-    case D3DFMT_DXT5:
-        return true;
-    default:
-        return false;
-    }
 }

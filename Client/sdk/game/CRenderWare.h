@@ -85,6 +85,7 @@ public:
     virtual _rwD3D9RasterExt* GetRasterExt(RwRaster* raster) = 0;
     virtual D3DFORMAT        GetRasterD3DFormat(RwRaster* raster) = 0;
     virtual bool             IsRasterCompressed(RwRaster* raster) = 0;
+    virtual RwTexture*       RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
     virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;

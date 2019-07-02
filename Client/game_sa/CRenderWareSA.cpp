@@ -17,6 +17,7 @@
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "C2dEffectSA.h"
+#include <D3dx9tex.h>
 
 extern CGameSA* pGame;
 
@@ -1606,6 +1607,71 @@ bool CRenderWareSA::IsRasterCompressed(RwRaster* raster)
 {
     _rwD3D9RasterExt* rasterExt = RASTEREXTFROMRASTER(raster->parent);
     return rasterExt->compressed;
+}
+
+void GetRasterRect(RwRaster* raster, RECT& rect)
+{
+    rect.left = raster->nOffsetX;
+    rect.top = raster->nOffsetY;
+    rect.right = raster->nOffsetX + raster->width;
+    rect.bottom = raster->nOffsetY + raster->height;
+}
+
+RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat)
+{
+    auto         RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
+    auto         RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+    auto         RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+    auto         RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+
+    RwRaster*  raster = pTexture->raster;
+
+    HRESULT hr = NULL;
+
+    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, textureFormat, rwRASTERTYPETEXTURE | (textureFormat & 0x9000));
+    if (!convertedRaster)
+    {
+        std::printf("RwD3D9RasterCreate: Failed\n");
+        return nullptr;
+    }
+
+    _rwD3D9RasterExt* rasterExt = GetRasterExt(raster);
+    _rwD3D9RasterExt* convertedRasterExt = GetRasterExt(convertedRaster);
+
+    RECT sourceRect, destinationRect;
+    GetRasterRect(raster, sourceRect);
+    GetRasterRect(convertedRaster, destinationRect);
+
+    IDirect3DSurface9* sourceSurface;
+    hr = rasterExt->texture->GetSurfaceLevel(0, &sourceSurface);
+    if (hr != D3D_OK)
+    {
+        std::printf("Get surface level for sourceSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    IDirect3DSurface9* destinationSurface;
+    hr = convertedRasterExt->texture->GetSurfaceLevel(0, &destinationSurface);
+    if (hr != D3D_OK)
+    {
+        std::printf("Get surface level for destinationSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    hr = D3DXLoadSurfaceFromSurface(destinationSurface, NULL, &destinationRect, sourceSurface, NULL, &sourceRect, D3DX_DEFAULT, 0);
+    if (FAILED(hr))
+    {
+        std::printf("D3DXLoadSurfaceFromSurface failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    RwTexture* pConvertedTexture = RwTextureCreate(convertedRaster);
+    memcpy(pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
+    memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
+
+    std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", textureFormat, rasterExt->d3dFormat);
+
+    return pConvertedTexture;
 }
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)

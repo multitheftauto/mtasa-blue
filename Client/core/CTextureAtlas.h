@@ -1,8 +1,13 @@
 #pragma once
+#include <xatlas.h>
+#include "CDXTexture.h"
+#include "xatlas_repack.h"
 
 class CTextureAtlas
 {
 public:
+    CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial, std::vector<CDXTexture>& texturesCache,
+                  std::vector<uint32_t>& textures, std::vector<Vector2>& uvs);
     CTextureAtlas();
 
     bool RemoveTextureInfoTillSuccess(std::vector <RwTexture*>& vecTexturesRemoved);
@@ -19,18 +24,9 @@ public:
     int  SizeOfTexel(D3DFORMAT format);
     bool IsDXTnFormat(D3DFORMAT format);
 
-    size_t GetTextureInfoCount() { return m_vecTexturesInfo.size(); }
-    CTextureInfo& GetTextureInfo(size_t index) { return m_vecTexturesInfo[index]; }
-    CTextureInfo* GetTextureInfoByName(unsigned int uiTextureNameHash);
 
-    RwTexture * GetAtlasTexture() { return m_pAtlasTexture; }
-    const CVector2D& GetSize() { return vecAtlasSize; }
-    float GetWidth() { return vecAtlasSize.fX; }
-    float GetHeight() { return vecAtlasSize.fY; }
+    std::vector<CDXTexture> atlasDXTextures;
 
 private:
-    const D3DFORMAT m_kTextureFormat = D3DFMT_A8R8G8B8;
-    std::vector <CTextureInfo> m_vecTexturesInfo;
-    RwTexture* m_pAtlasTexture;
-    CVector2D vecAtlasSize;
+    
 };
