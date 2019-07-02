@@ -89,7 +89,7 @@ workspace "MTASA"
 		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
 
 	filter "system:windows"
-		toolset "v141"
+		toolset "v142"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32" }
 		includedirs {
@@ -137,6 +137,7 @@ workspace "MTASA"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/hwbrk"
+		include "vendor/xatlas"
 	end
 
 	filter {}

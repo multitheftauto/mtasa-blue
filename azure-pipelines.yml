@@ -23,7 +23,7 @@ jobs:
 
 - job: windows
   pool:
-    vmImage: 'VS2017-Win2016'
+    vmImage: 'windows-2019'
   variables:
     solution: 'Build/MTASA.sln'
     buildConfiguration: 'Release'
@@ -34,11 +34,11 @@ jobs:
     displayName: 'Extract DirectX'
   - script: utils\premake5 install_cef
     displayName: 'Install CEF'
-  - script: utils\premake5 vs2017
+  - script: utils\premake5 vs2019
     env:
       DXSDK_DIR: './utils/DXFiles/'
       CI: 'true'
-    displayName: 'Create Visual Studio 2017 Solution'
+    displayName: 'Create Visual Studio 2019 Solution'
   - task: VSBuild@1
     inputs:
       solution: '$(solution)'
