@@ -42,7 +42,6 @@ public:
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
     static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
-    static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
 
@@ -142,6 +141,7 @@ public:
     static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
+    static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
     static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
     static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
     static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
@@ -456,6 +456,8 @@ public:
     static void GUISetAlpha(CClientEntity& Element, float fAlpha);
     static bool GUIBringToFront(CClientEntity& Element);
     static void GUIMoveToBack(CClientEntity& Element);
+    static bool GUIBlur(CClientEntity& Element);
+    static bool GUIFocus(CClientEntity& Element);
 
     static void GUICheckBoxSetSelected(CClientEntity& Element, bool bFlag);
     static void GUIRadioButtonSetSelected(CClientEntity& Element, bool bFlag);
@@ -628,6 +630,9 @@ public:
     static bool SetMoonSize(int iSize);
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
+
+    static bool ResetAllSurfaceInfo();
+    static bool ResetSurfaceInfo(short sSurfaceID);
 
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);

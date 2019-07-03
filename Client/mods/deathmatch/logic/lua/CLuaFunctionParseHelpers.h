@@ -52,6 +52,12 @@ DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM(eSurfaceProperties);
+DECLARE_ENUM(eSurfaceAudio);
+DECLARE_ENUM(eSurfaceBulletEffect);
+DECLARE_ENUM(eSurfaceWheelEffect);
+DECLARE_ENUM(eSurfaceSkidMarkType);
+DECLARE_ENUM(eSurfaceAdhesionGroup);
 
 enum eDXHorizontalAlign
 {
@@ -257,6 +263,14 @@ inline SString GetClassTypeName(CClientMaterial*)
 {
     return "material";
 }
+inline SString GetClassTypeName(CClientRenderTarget*)
+{
+    return "render-target-texture";
+}
+inline SString GetClassTypeName(CClientScreenSource*)
+{
+    return "screen-source-texture";
+}
 inline SString GetClassTypeName(CClientTexture*)
 {
     return "texture";
@@ -382,6 +396,30 @@ inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
+}
+inline SString GetClassTypeName(eSurfaceProperties*)
+{
+    return "surface-property-type";
+}
+inline SString GetClassTypeName(eSurfaceAudio*)
+{
+    return "surface-audio-type";
+}
+inline SString GetClassTypeName(eSurfaceBulletEffect*)
+{
+    return "surface-bullet-effect";
+}
+inline SString GetClassTypeName(eSurfaceWheelEffect*)
+{
+    return "surface-wheel-effect";
+}
+inline SString GetClassTypeName(eSurfaceSkidMarkType*)
+{
+    return "surface-skidmark-type";
+}
+inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
+{
+    return "surface-adhesion-group";
 }
 
 //

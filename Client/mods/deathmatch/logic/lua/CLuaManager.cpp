@@ -229,7 +229,6 @@ void CLuaManager::LoadCFunctions()
         {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
-        // {"getClipboard", CLuaFunctionDefs::GetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
 

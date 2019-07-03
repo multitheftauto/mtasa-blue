@@ -402,8 +402,6 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     if (!pLoadedResource->IsLoaded())
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName);
-        UnloadAndDelete(pLoadedResource);
-        pLoadedResource = nullptr;
     }
     else
     {
@@ -1197,7 +1195,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
 // If resource has a client version requirement, add it to the list
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::ApplyMinClientRequirement(CResource* pResource, const SString& strMinClientRequirement)
+void CResourceManager::ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement)
 {
     if (!strMinClientRequirement.empty())
     {
@@ -1233,7 +1231,7 @@ void CResourceManager::ReevaluateMinClientRequirement()
 {
     // Calc highest requirement
     m_strMinClientRequirement = "";
-    for (CFastHashMap<CResource*, SString>::iterator iter = m_MinClientRequirementMap.begin(); iter != m_MinClientRequirementMap.end(); ++iter)
+    for (auto iter = m_MinClientRequirementMap.begin(); iter != m_MinClientRequirementMap.end(); ++iter)
         if (iter->second > m_strMinClientRequirement)
             m_strMinClientRequirement = iter->second;
 

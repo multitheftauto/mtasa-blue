@@ -15,6 +15,7 @@
 #include <game/CAnimBlendAssociation.h>
 #include <game/CAnimBlendHierarchy.h>
 #include <game/CAnimBlock.h>
+#include <game/CAnimBlendAssocGroup.h>
 
 #include "Common.h"
 #include <list>
@@ -93,16 +94,16 @@ public:
     int GetNumAnimAssocDefinitions();
 
     std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID);
-    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, CAnimBlock* pBlock);
-    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, CAnimBlock* pBlock);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, std::unique_ptr<CAnimBlock>& pBlock);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, std::unique_ptr<CAnimBlock>& pBlock);
 
-    CAnimBlock* GetAnimationBlock(int ID);
-    CAnimBlock* GetAnimationBlock(const char* szName);
-    int         GetAnimationBlockIndex(const char* szName);
-    int         RegisterAnimBlock(const char* szName);
+    std::unique_ptr<CAnimBlock> GetAnimationBlock(int ID);
+    std::unique_ptr<CAnimBlock> GetAnimationBlock(const char* szName);
+    int                         GetAnimationBlockIndex(const char* szName);
+    int                         RegisterAnimBlock(const char* szName);
 
-    CAnimBlendAssocGroup* GetAnimBlendAssoc(AssocGroupId groupID);
-    AssocGroupId          GetFirstAssocGroup(const char* szName);
+    std::unique_ptr<CAnimBlendAssocGroup> GetAnimBlendAssoc(AssocGroupId groupID);
+    AssocGroupId                          GetFirstAssocGroup(const char* szName);
 
     const char* GetAnimGroupName(AssocGroupId groupID);
     const char* GetAnimBlockName(AssocGroupId groupID);
@@ -143,15 +144,14 @@ public:
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
-    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation);
     int                                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
     void                                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
 
     // MTA members
     std::unique_ptr<CAnimBlendAssociation> GetAnimBlendAssociation(CAnimBlendAssociationSAInterface* pInterface);
-    CAnimBlendAssocGroup*                  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface);
-    CAnimBlock*                            GetAnimBlock(CAnimBlockSAInterface* pInterface);
+    std::unique_ptr<CAnimBlendAssocGroup>  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface);
+    std::unique_ptr<CAnimBlock>            GetAnimBlock(CAnimBlockSAInterface* pInterface);
     std::unique_ptr<CAnimBlendHierarchy>   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
 
     StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface);

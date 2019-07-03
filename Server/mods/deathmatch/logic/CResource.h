@@ -191,6 +191,7 @@ public:
     bool IsClientFilesOn() const noexcept { return m_bClientFiles; }
 
     bool             GenerateChecksums();
+    std::future<SString> GenerateChecksumForFile(CResourceFile* pResourceFile);
     const CChecksum& GetLastMetaChecksum() { return m_metaChecksum; }
     bool             HasResourceChanged();
     void             ApplyUpgradeModifications();
@@ -230,7 +231,8 @@ public:
     }
     bool IsStarting() const noexcept { return m_eState == EResourceState::Starting; }
     bool IsStopping() const noexcept { return m_eState == EResourceState::Stopping; }
-    bool HasStarted() const noexcept { return m_eState == EResourceState::Running; }
+
+    bool IsClientSynced() const noexcept { return m_bClientSync; }
 
     const SString& GetName() const noexcept { return m_strResourceName; }
 
@@ -308,8 +310,8 @@ public:
     bool HandleAclRequestChangeCommand(const SString& strRightName, bool bAccess, const SString& strWho);
     bool HandleAclRequestChange(const CAclRightName& strRightName, bool bAccess, const SString& strWho);
 
-    const SString& GetMinServerReqFromMetaXml() const noexcept { return m_strMinServerReqFromMetaXml; }
-    const SString& GetMinClientReqFromMetaXml() const noexcept { return m_strMinClientReqFromMetaXml; }
+    const CMtaVersion& GetMinServerReqFromMetaXml() const noexcept { return m_strMinServerReqFromMetaXml; }
+    const CMtaVersion& GetMinClientReqFromMetaXml() const noexcept { return m_strMinClientReqFromMetaXml; }
 
     bool IsOOPEnabledInMetaXml() const noexcept { return m_bOOPEnabledInMetaXml; }
 
@@ -358,12 +360,14 @@ private:
 
 private:
     EResourceState m_eState = EResourceState::None;
+    bool           m_bClientSync = false;
 
     unsigned short m_usNetID = -1;
     uint           m_uiScriptID = -1;
 
     CResourceManager* m_pResourceManager;
 
+    
     SString     m_strResourceName;
     SString     m_strAbsPath;                      // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
     std::string m_strResourceZip;                  // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
@@ -396,6 +400,7 @@ private:
     std::string m_strCircularInclude;
     SString     m_strFailureReason;
     unzFile     m_zipfile = nullptr;
+    CChecksum   m_zipHash;
 
     bool m_bResourceIsZip;
     bool m_bClientConfigs = true;
@@ -420,10 +425,10 @@ private:
     CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
     CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
-    SString m_strMinClientReqFromMetaXml;            // Min MTA client version as declared in meta.xml
-    SString m_strMinServerReqFromMetaXml;            // Min MTA server version as declared in meta.xml
-    SString m_strMinClientReqFromSource;             // Min MTA client version as calculated by scanning the script source
-    SString m_strMinServerReqFromSource;             // Min MTA server version as calculated by scanning the script source
+    CMtaVersion m_strMinClientReqFromMetaXml;            // Min MTA client version as declared in meta.xml
+    CMtaVersion m_strMinServerReqFromMetaXml;            // Min MTA server version as declared in meta.xml
+    CMtaVersion m_strMinClientReqFromSource;             // Min MTA client version as calculated by scanning the script source
+    CMtaVersion m_strMinServerReqFromSource;             // Min MTA server version as calculated by scanning the script source
     SString m_strMinClientReason;
     SString m_strMinServerReason;
 

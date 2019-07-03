@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -117,6 +117,35 @@ CURLcode Curl_get_upload_buffer(struct Curl_easy *data)
   return CURLE_OK;
 }
 
+#ifndef CURL_DISABLE_HTTP
+/*
+ * This function will be called to loop through the trailers buffer
+ * until no more data is available for sending.
+ */
+static size_t Curl_trailers_read(char *buffer, size_t size, size_t nitems,
+                                 void *raw)
+{
+  struct Curl_easy *data = (struct Curl_easy *)raw;
+  Curl_send_buffer *trailers_buf = data->state.trailers_buf;
+  size_t bytes_left = trailers_buf->size_used-data->state.trailers_bytes_sent;
+  size_t to_copy = (size*nitems < bytes_left) ? size*nitems : bytes_left;
+  if(to_copy) {
+    memcpy(buffer,
+           &trailers_buf->buffer[data->state.trailers_bytes_sent],
+           to_copy);
+    data->state.trailers_bytes_sent += to_copy;
+  }
+  return to_copy;
+}
+
+static size_t Curl_trailers_left(void *raw)
+{
+  struct Curl_easy *data = (struct Curl_easy *)raw;
+  Curl_send_buffer *trailers_buf = data->state.trailers_buf;
+  return trailers_buf->size_used - data->state.trailers_bytes_sent;
+}
+#endif
+
 /*
  * This function will call the read callback to fill our buffer with data
  * to upload.
@@ -127,6 +156,17 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
   struct Curl_easy *data = conn->data;
   size_t buffersize = bytes;
   size_t nread;
+
+#ifndef CURL_DISABLE_HTTP
+  struct curl_slist *trailers = NULL;
+  CURLcode c;
+  int trailers_ret_code;
+#endif
+
+  curl_read_callback readfunc = NULL;
+  void *extra_data = NULL;
+  bool added_crlf = FALSE;
+
 #ifdef CURL_DOES_CONVERSIONS
   bool sending_http_headers = FALSE;
 
@@ -140,15 +180,71 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
   }
 #endif
 
-  if(data->req.upload_chunky) {
+#ifndef CURL_DISABLE_HTTP
+  if(data->state.trailers_state == TRAILERS_INITIALIZED) {
+    /* at this point we already verified that the callback exists
+       so we compile and store the trailers buffer, then proceed */
+    infof(data,
+          "Moving trailers state machine from initialized to sending.\n");
+    data->state.trailers_state = TRAILERS_SENDING;
+    data->state.trailers_buf = Curl_add_buffer_init();
+    if(!data->state.trailers_buf) {
+      failf(data, "Unable to allocate trailing headers buffer !");
+      return CURLE_OUT_OF_MEMORY;
+    }
+    data->state.trailers_bytes_sent = 0;
+    Curl_set_in_callback(data, true);
+    trailers_ret_code = data->set.trailer_callback(&trailers,
+                                                   data->set.trailer_data);
+    Curl_set_in_callback(data, false);
+    if(trailers_ret_code == CURL_TRAILERFUNC_OK) {
+      c = Curl_http_compile_trailers(trailers, data->state.trailers_buf, data);
+    }
+    else {
+      failf(data, "operation aborted by trailing headers callback");
+      *nreadp = 0;
+      c = CURLE_ABORTED_BY_CALLBACK;
+    }
+    if(c != CURLE_OK) {
+      Curl_add_buffer_free(&data->state.trailers_buf);
+      curl_slist_free_all(trailers);
+      return c;
+    }
+    infof(data, "Successfully compiled trailers.\r\n");
+    curl_slist_free_all(trailers);
+  }
+#endif
+
+  /* if we are transmitting trailing data, we don't need to write
+     a chunk size so we skip this */
+  if(data->req.upload_chunky &&
+     data->state.trailers_state == TRAILERS_NONE) {
     /* if chunked Transfer-Encoding */
     buffersize -= (8 + 2 + 2);   /* 32bit hex + CRLF + CRLF */
     data->req.upload_fromhere += (8 + 2); /* 32bit hex + CRLF */
   }
 
+#ifndef CURL_DISABLE_HTTP
+  if(data->state.trailers_state == TRAILERS_SENDING) {
+    /* if we're here then that means that we already sent the last empty chunk
+       but we didn't send a final CR LF, so we sent 0 CR LF. We then start
+       pulling trailing data until we ²have no more at which point we
+       simply return to the previous point in the state machine as if
+       nothing happened.
+       */
+    readfunc = Curl_trailers_read;
+    extra_data = (void *)data;
+  }
+  else
+#endif
+  {
+    readfunc = data->state.fread_func;
+    extra_data = data->state.in;
+  }
+
   Curl_set_in_callback(data, true);
-  nread = data->state.fread_func(data->req.upload_fromhere, 1,
-                                 buffersize, data->state.in);
+  nread = readfunc(data->req.upload_fromhere, 1,
+                   buffersize, extra_data);
   Curl_set_in_callback(data, false);
 
   if(nread == CURL_READFUNC_ABORT) {
@@ -200,10 +296,10 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
        here, knowing they'll become CRLFs later on.
      */
 
-    char hexbuffer[11];
+    char hexbuffer[11] = "";
+    int hexlen = 0;
     const char *endofline_native;
     const char *endofline_network;
-    int hexlen;
 
     if(
 #ifdef CURL_DO_LINEEND_CONV
@@ -218,20 +314,36 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
       endofline_native  = "\r\n";
       endofline_network = "\x0d\x0a";
     }
-    hexlen = msnprintf(hexbuffer, sizeof(hexbuffer),
-                       "%x%s", nread, endofline_native);
 
-    /* move buffer pointer */
-    data->req.upload_fromhere -= hexlen;
-    nread += hexlen;
+    /* if we're not handling trailing data, proceed as usual */
+    if(data->state.trailers_state != TRAILERS_SENDING) {
+      hexlen = msnprintf(hexbuffer, sizeof(hexbuffer),
+                         "%zx%s", nread, endofline_native);
 
-    /* copy the prefix to the buffer, leaving out the NUL */
-    memcpy(data->req.upload_fromhere, hexbuffer, hexlen);
+      /* move buffer pointer */
+      data->req.upload_fromhere -= hexlen;
+      nread += hexlen;
 
-    /* always append ASCII CRLF to the data */
-    memcpy(data->req.upload_fromhere + nread,
-           endofline_network,
-           strlen(endofline_network));
+      /* copy the prefix to the buffer, leaving out the NUL */
+      memcpy(data->req.upload_fromhere, hexbuffer, hexlen);
+
+      /* always append ASCII CRLF to the data unless
+         we have a valid trailer callback */
+#ifndef CURL_DISABLE_HTTP
+      if((nread-hexlen) == 0 &&
+          data->set.trailer_callback != NULL &&
+          data->state.trailers_state == TRAILERS_NONE) {
+        data->state.trailers_state = TRAILERS_INITIALIZED;
+      }
+      else
+#endif
+      {
+        memcpy(data->req.upload_fromhere + nread,
+               endofline_network,
+               strlen(endofline_network));
+        added_crlf = TRUE;
+      }
+    }
 
 #ifdef CURL_DOES_CONVERSIONS
     {
@@ -242,22 +354,40 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
         length = nread;
       else
         /* just translate the protocol portion */
-        length = strlen(hexbuffer);
-      result = Curl_convert_to_network(data, data->req.upload_fromhere,
-                                       length);
-      /* Curl_convert_to_network calls failf if unsuccessful */
-      if(result)
-        return result;
+        length = hexlen;
+      if(length) {
+        result = Curl_convert_to_network(data, data->req.upload_fromhere,
+                                         length);
+        /* Curl_convert_to_network calls failf if unsuccessful */
+        if(result)
+          return result;
+      }
     }
 #endif /* CURL_DOES_CONVERSIONS */
 
-    if((nread - hexlen) == 0) {
-      /* mark this as done once this chunk is transferred */
+#ifndef CURL_DISABLE_HTTP
+    if(data->state.trailers_state == TRAILERS_SENDING &&
+       !Curl_trailers_left(data)) {
+      Curl_add_buffer_free(&data->state.trailers_buf);
+      data->state.trailers_state = TRAILERS_DONE;
+      data->set.trailer_data = NULL;
+      data->set.trailer_callback = NULL;
+      /* mark the transfer as done */
       data->req.upload_done = TRUE;
-      infof(data, "Signaling end of chunked upload via terminating chunk.\n");
+      infof(data, "Signaling end of chunked upload after trailers.\n");
     }
+    else
+#endif
+      if((nread - hexlen) == 0 &&
+         data->state.trailers_state != TRAILERS_INITIALIZED) {
+        /* mark this as done once this chunk is transferred */
+        data->req.upload_done = TRUE;
+        infof(data,
+              "Signaling end of chunked upload via terminating chunk.\n");
+      }
 
-    nread += strlen(endofline_native); /* for the added end of line */
+    if(added_crlf)
+      nread += strlen(endofline_network); /* for the added end of line */
   }
 #ifdef CURL_DOES_CONVERSIONS
   else if((data->set.prefer_ascii) && (!sending_http_headers)) {
@@ -925,7 +1055,6 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
   *didwhat |= KEEP_SEND;
 
   do {
-
     /* only read more data if there's no upload data already
        present in the upload buffer */
     if(0 == k->upload_present) {
@@ -950,7 +1079,6 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
           k->keepon &= ~KEEP_SEND;         /* disable writing */
           k->start100 = Curl_now();       /* timeout count starts now */
           *didwhat &= ~KEEP_SEND;  /* we didn't write anything actually */
-
           /* set a timeout for the multi interface */
           Curl_expire(data, data->set.expect_100_timeout, EXPIRE_100_TIMEOUT);
           break;
@@ -1070,6 +1198,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
                  (size_t)bytes_written);
 
     k->writebytecount += bytes_written;
+    Curl_pgrsSetUploadCounter(data, k->writebytecount);
 
     if((!k->upload_chunky || k->forbidchunk) &&
        (k->writebytecount == data->state.infilesize)) {
@@ -1103,7 +1232,6 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       }
     }
 
-    Curl_pgrsSetUploadCounter(data, k->writebytecount);
 
   } WHILE_FALSE; /* just to break out from! */
 
@@ -1181,11 +1309,7 @@ CURLcode Curl_readwrite(struct connectdata *conn,
 
   k->now = Curl_now();
   if(didwhat) {
-    /* Update read/write counters */
-    if(k->bytecountp)
-      *k->bytecountp = k->bytecount; /* read count */
-    if(k->writebytecountp)
-      *k->writebytecountp = k->writebytecount; /* write count */
+    ;
   }
   else {
     /* no read no write, this is a timeout? */
@@ -1224,15 +1348,15 @@ CURLcode Curl_readwrite(struct connectdata *conn,
   if(k->keepon) {
     if(0 > Curl_timeleft(data, &k->now, FALSE)) {
       if(k->size != -1) {
-        failf(data, "Operation timed out after %ld milliseconds with %"
-              CURL_FORMAT_CURL_OFF_T " out of %"
+        failf(data, "Operation timed out after %" CURL_FORMAT_TIMEDIFF_T
+              " milliseconds with %" CURL_FORMAT_CURL_OFF_T " out of %"
               CURL_FORMAT_CURL_OFF_T " bytes received",
               Curl_timediff(k->now, data->progress.t_startsingle),
               k->bytecount, k->size);
       }
       else {
-        failf(data, "Operation timed out after %ld milliseconds with %"
-              CURL_FORMAT_CURL_OFF_T " bytes received",
+        failf(data, "Operation timed out after %" CURL_FORMAT_TIMEDIFF_T
+              " milliseconds with %" CURL_FORMAT_CURL_OFF_T " bytes received",
               Curl_timediff(k->now, data->progress.t_startsingle),
               k->bytecount);
       }
@@ -1400,11 +1524,14 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
 
   if(data->set.httpreq == HTTPREQ_PUT)
     data->state.infilesize = data->set.filesize;
-  else {
+  else if((data->set.httpreq != HTTPREQ_GET) &&
+          (data->set.httpreq != HTTPREQ_HEAD)) {
     data->state.infilesize = data->set.postfieldsize;
     if(data->set.postfields && (data->state.infilesize == -1))
       data->state.infilesize = (curl_off_t)strlen(data->set.postfields);
   }
+  else
+    data->state.infilesize = 0;
 
   /* If there is a list of cookie files to read, do it now! */
   if(data->change.cookielist)
@@ -1431,12 +1558,6 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
     Curl_initinfo(data); /* reset session-specific information "variables" */
     Curl_pgrsResetTransferSizes(data);
     Curl_pgrsStartNow(data);
-
-    if(data->set.timeout)
-      Curl_expire(data, data->set.timeout, EXPIRE_TIMEOUT);
-
-    if(data->set.connecttimeout)
-      Curl_expire(data, data->set.connecttimeout, EXPIRE_CONNECTTIMEOUT);
 
     /* In case the handle is re-used and an authentication method was picked
        in the session we need to make sure we only use the one(s) we now
@@ -1732,8 +1853,7 @@ CURLcode Curl_retry_request(struct connectdata *conn,
 
 
     if(conn->handler->protocol&PROTO_FAMILY_HTTP) {
-      struct HTTP *http = data->req.protop;
-      if(http->writebytecount) {
+      if(data->req.writebytecount) {
         CURLcode result = Curl_readrewind(conn);
         if(result) {
           Curl_safefree(*url);
@@ -1751,24 +1871,17 @@ CURLcode Curl_retry_request(struct connectdata *conn,
  */
 void
 Curl_setup_transfer(
-  struct connectdata *conn, /* connection data */
+  struct Curl_easy *data,   /* transfer */
   int sockindex,            /* socket index to read from or -1 */
   curl_off_t size,          /* -1 if unknown at this point */
   bool getheader,           /* TRUE if header parsing is wanted */
-  curl_off_t *bytecountp,   /* return number of bytes read or NULL */
-  int writesockindex,       /* socket index to write to, it may very well be
+  int writesockindex        /* socket index to write to, it may very well be
                                the same we read from. -1 disables */
-  curl_off_t *writecountp   /* return number of bytes written or NULL */
   )
 {
-  struct Curl_easy *data;
-  struct SingleRequest *k;
-
+  struct SingleRequest *k = &data->req;
+  struct connectdata *conn = data->conn;
   DEBUGASSERT(conn != NULL);
-
-  data = conn->data;
-  k = &data->req;
-
   DEBUGASSERT((sockindex <= 1) && (sockindex >= -1));
 
   if(conn->bits.multiplex || conn->httpversion == 20) {
@@ -1787,8 +1900,6 @@ Curl_setup_transfer(
   k->getheader = getheader;
 
   k->size = size;
-  k->bytecountp = bytecountp;
-  k->writebytecountp = writecountp;
 
   /* The code sequence below is placed in this function just because all
      necessary input is not always known in do_complete() as this function may

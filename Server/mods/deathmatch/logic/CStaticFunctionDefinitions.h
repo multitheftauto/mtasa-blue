@@ -123,7 +123,7 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -197,10 +197,10 @@ public:
     static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0);
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
-    static bool SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame);
-    static bool SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress);
-    static bool SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed);
+    static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
+    static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
+    static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
@@ -730,5 +730,5 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 };
