@@ -357,6 +357,7 @@ private:
 
     ResponseCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
     ResponseCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount);
+    bool         IsHttpAccessAllowed(CAccount* pAccount);
 
 private:
     EResourceState m_eState = EResourceState::None;
