@@ -32,7 +32,7 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
         if (BitStream.Version() >= 0x06D)
         {
             // Write the message type
-            BitStream.Write(m_iMessageType);
+            BitStream.Write(m_ucMessageType);
         }
 
         // Write the string

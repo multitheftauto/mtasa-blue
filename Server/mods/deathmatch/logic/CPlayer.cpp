@@ -288,7 +288,7 @@ uint CPlayer::Send(const CPacket& Packet)
 
 void CPlayer::SendEcho(const char* szEcho)
 {
-    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE, 4));
+    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE, MESSAGE_TYPE_HARDCODED));
 }
 
 void CPlayer::SendConsole(const char* szEcho)

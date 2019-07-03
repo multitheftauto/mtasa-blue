@@ -1328,14 +1328,25 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     unsigned char ucGreen;
     unsigned char ucBlue;
     bool          bColorCoded;
-    int           iMessageType;
 
     CClientEntity* pClient = nullptr;
 
     if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded))
     {
         // Read the client's ID
-        int iNumberOfBytesUsed;
+        int           iNumberOfBytesUsed;
+        unsigned char ucMessageType;
+
+        /*
+             enum eMessageType
+            {
+                MESSAGE_TYPE_NORMAL,
+                MESSAGE_TYPE_ACTION,
+                MESSAGE_TYPE_TEAM,
+                MESSAGE_TYPE_PRIVATE,
+                MESSAGE_TYPE_HARDCODED
+            };               
+        */
 
         if (bitStream.Version() >= 0x06B)
         {
@@ -1352,7 +1363,8 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
         if (bitStream.Version() >= 0x06D)
         {
             // Get the message type and push the argument
-            bitStream.Read(iMessageType);
+            bitStream.Read(ucMessageType);
+            iNumberOfBytesUsed -= 1;
         }
 
         // Valid length?
@@ -1382,11 +1394,10 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
 
                 if (bitStream.Version() >= 0x06D)
                 {
-                    Arguments.PushNumber(iMessageType);
+                    Arguments.PushNumber(ucMessageType);
                 }
-                
-                bool bCancelled = !pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity);
-                if (!bCancelled)
+
+                if (pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity))
                 {
                     // Echo it
                     g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, bColorCoded);

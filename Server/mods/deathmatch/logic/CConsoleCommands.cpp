@@ -488,7 +488,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                                 list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
                                 for (; iter != pTeam->PlayersEnd(); iter++)
                                 {
-                                    (*iter)->Send(CChatEchoPacket(strEcho, ucRed, ucGreen, ucBlue, true, 2));
+                                    (*iter)->Send(CChatEchoPacket(strEcho, ucRed, ucGreen, ucBlue, true, MESSAGE_TYPE_TEAM));
                                 }
                                 // Call onChatMessage if players chat message was delivered
                                 CLuaArguments Arguments2;
@@ -588,7 +588,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         if (bContinue)
                                         {
                                             // Send it to the player
-                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, 3));
+                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, MESSAGE_TYPE_TEAM));
 
                                             // Send a reponse to the player who sent it
                                             pEchoClient->SendEcho(SString("-> %s: %s", pPlayer->GetNick(), szMessage));
@@ -601,7 +601,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("CONSOLEMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, 3));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, MESSAGE_TYPE_TEAM));
                                     }
                                     case CClient::CLIENT_SCRIPT:
                                     {
@@ -609,7 +609,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("SCRIPTMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, 3));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, MESSAGE_TYPE_TEAM));
                                         break;
                                     }
                                     default:
@@ -688,7 +688,7 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                             CLogger::LogPrintf("CHAT: %s\n", strEcho.c_str());
 
                             // Broadcast the message to all clients
-                            pConsole->GetPlayerManager()->BroadcastOnlyJoined(CChatEchoPacket(strEcho, CHATCOLOR_ME, 1));
+                            pConsole->GetPlayerManager()->BroadcastOnlyJoined(CChatEchoPacket(strEcho, CHATCOLOR_ME, MESSAGE_TYPE_ACTION));
 
                             // Call onChatMessage if players chat message was delivered
                             CPlayer*      pPlayer = static_cast<CPlayer*>(pClient);
