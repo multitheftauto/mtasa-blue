@@ -25,13 +25,14 @@
 class CChatEchoPacket : public CPacket
 {
 public:
-    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false)
+    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false, int iMessageType = 0)
     {
         m_strMessage = strMessage;
         m_ucRed = ucRed;
         m_ucGreen = ucGreen;
         m_ucBlue = ucBlue;
         m_bColorCoded = bColorCoded;
+        m_iMessageType = iMessageType;
     };
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
@@ -47,4 +48,5 @@ private:
     unsigned char m_ucBlue;
     SString       m_strMessage;
     bool          m_bColorCoded;
+    int           m_iMessageType;
 };

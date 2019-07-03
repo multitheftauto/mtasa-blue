@@ -9798,7 +9798,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
+        pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded, 0));
         return true;
     }
 

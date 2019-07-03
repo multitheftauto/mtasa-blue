@@ -1327,11 +1327,12 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    bool          ucColorCoded;
+    bool          bColorCoded;
+    int           iMessageType;
 
     CClientEntity* pClient = nullptr;
 
-    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(ucColorCoded))
+    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded) && bitStream.Read(iMessageType))
     {
         // Read the client's ID
         int iNumberOfBytesUsed;
@@ -1372,11 +1373,12 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 Arguments.PushNumber(ucRed);
                 Arguments.PushNumber(ucGreen);
                 Arguments.PushNumber(ucBlue);
+                Arguments.PushNumber(iMessageType);
                 bool bCancelled = !pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity);
                 if (!bCancelled)
                 {
                     // Echo it
-                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, ucColorCoded);
+                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, bColorCoded);
                 }
             }
             delete[] szMessage;
