@@ -31,6 +31,9 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         // Write the string
         BitStream.Write(m_strMessage.c_str(), sizeMessage);
+
+        // Write the message type
+        BitStream.Write(m_iMessageType);
         return true;
     }
 

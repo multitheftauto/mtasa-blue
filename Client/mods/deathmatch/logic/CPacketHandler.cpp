@@ -1332,7 +1332,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
 
     CClientEntity* pClient = nullptr;
 
-    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded) && bitStream.Read(iMessageType))
+    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded))
     {
         // Read the client's ID
         int iNumberOfBytesUsed;
@@ -1366,6 +1366,9 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 // Determine the event source entity
                 CClientEntity* pRootEntity = g_pClientGame->GetRootEntity();
                 CClientEntity* pEntity = pClient ? pClient : pRootEntity;
+
+                // Get the message type
+                bitStream.Read(iMessageType);
 
                 // Call an event
                 CLuaArguments Arguments;
