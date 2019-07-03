@@ -1349,6 +1349,12 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
         }
 
+        if (bitStream.Version() >= 0x06D)
+        {
+            // Get the message type and push the argument
+            bitStream.Read(iMessageType);
+        }
+
         // Valid length?
         if (iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH)
         {
@@ -1367,16 +1373,18 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 CClientEntity* pRootEntity = g_pClientGame->GetRootEntity();
                 CClientEntity* pEntity = pClient ? pClient : pRootEntity;
 
-                // Get the message type
-                bitStream.Read(iMessageType);
-
                 // Call an event
                 CLuaArguments Arguments;
                 Arguments.PushString(szMessage);
                 Arguments.PushNumber(ucRed);
                 Arguments.PushNumber(ucGreen);
                 Arguments.PushNumber(ucBlue);
-                Arguments.PushNumber(iMessageType);
+
+                if (bitStream.Version() >= 0x06D)
+                {
+                    Arguments.PushNumber(iMessageType);
+                }
+                
                 bool bCancelled = !pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity);
                 if (!bCancelled)
                 {

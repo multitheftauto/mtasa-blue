@@ -29,11 +29,15 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     size_t sizeMessage = m_strMessage.length();
     if (sizeMessage >= MIN_CHATECHO_LENGTH)
     {
+        if (BitStream.Version() >= 0x06D)
+        {
+            // Write the message type
+            BitStream.Write(m_iMessageType);
+        }
+
         // Write the string
         BitStream.Write(m_strMessage.c_str(), sizeMessage);
 
-        // Write the message type
-        BitStream.Write(m_iMessageType);
         return true;
     }
 
