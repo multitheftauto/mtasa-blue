@@ -58,6 +58,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM(eSoundEffectType);
 
 enum eDXHorizontalAlign
 {
@@ -420,6 +421,10 @@ inline SString GetClassTypeName(eSurfaceSkidMarkType*)
 inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
+}
+inline SString GetClassTypeName(eSoundEffectType*)
+{
+    return "sound-effect-type";
 }
 
 //

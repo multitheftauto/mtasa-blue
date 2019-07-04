@@ -1364,10 +1364,10 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientPlayer* pPlayer;
-    CClientSound*  pSound;
-    SString        strEffectName;
-    SString        strEffectParameterName;
+    CClientPlayer*   pPlayer;
+    CClientSound*    pSound;
+    eSoundEffectType eEffectType;
+    SString          strEffectParameterName;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientSound>())
@@ -1384,22 +1384,21 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         lua_pushboolean(luaVM, false);
         return false;
     }
-    argStream.ReadString(strEffectName);
+    argStream.ReadEnumString(eEffectType);
     argStream.ReadString(strEffectParameterName);
 
     if (!argStream.HasErrors())
     {
         if (pSound)
         {
-            int iFxEffect = m_pManager->GetSoundManager()->GetFxEffectFromName(strEffectName);
-            if (iFxEffect >= 0 && pSound->IsFxEffectEnabled(iFxEffect))
+            if (pSound->IsFxEffectEnabled(eEffectType))
             {
-                switch (iFxEffect)
+                switch (eEffectType)
                 {
                     case BASS_FX_DX8_CHORUS:
                     {
                         BASS_DX8_CHORUS params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "wetDryMix")
                         {
                             float fWetDryMix;
@@ -1468,7 +1467,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1478,7 +1477,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_COMPRESSOR:
                     {
                         BASS_DX8_COMPRESSOR params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "gain")
                         {
                             float fGain;
@@ -1538,7 +1537,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1548,7 +1547,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_DISTORTION:
                     {
                         BASS_DX8_DISTORTION params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "gain")
                         {
                             float fGain;
@@ -1599,7 +1598,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1610,7 +1609,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_ECHO:
                     {
                         BASS_DX8_ECHO params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "wetDryMix")
                         {
                             float fWetDryMix;
@@ -1661,7 +1660,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1671,7 +1670,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_FLANGER:
                     {
                         BASS_DX8_FLANGER params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "wetDryMix")
                         {
                             float fWetDryMix;
@@ -1740,7 +1739,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1750,7 +1749,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_GARGLE:
                     {
                         BASS_DX8_GARGLE params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "rateHz")
                         {
                             uint uiRateHz;
@@ -1774,7 +1773,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1784,7 +1783,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_I3DL2REVERB:
                     {
                         BASS_DX8_I3DL2REVERB params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "room")
                         {
                             int iRoom;
@@ -1898,7 +1897,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1908,7 +1907,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_PARAMEQ:
                     {
                         BASS_DX8_PARAMEQ params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "center")
                         {
                             float fCenter;
@@ -1941,7 +1940,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -1951,7 +1950,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                     case BASS_FX_DX8_REVERB:
                     {
                         BASS_DX8_REVERB params;
-                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &params);
+                        CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &params);
                         if (strEffectParameterName == "inGain")
                         {
                             float fInGain;
@@ -1993,7 +1992,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                             lua_pushboolean(luaVM, false);
                             return 1;
                         }
-                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, strEffectName, &params))
+                        if (CStaticFunctionDefinitions::SetSoundEffectParameters(*pSound, eEffectType, &params))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
@@ -2018,9 +2017,9 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
-    CClientPlayer* pPlayer;
-    CClientSound*  pSound;
-    SString        strEffectName;
+    CClientPlayer*   pPlayer;
+    CClientSound*    pSound;
+    eSoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientSound>())
@@ -2037,19 +2036,18 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
         lua_pushboolean(luaVM, false);
         return false;
     }
-    argStream.ReadString(strEffectName);
+    argStream.ReadEnumString(eEffectType);
 
     if (!argStream.HasErrors())
     {
         if (pSound)
         {
-            int iFxEffect = m_pManager->GetSoundManager()->GetFxEffectFromName(strEffectName);
-            switch (iFxEffect)
+            switch (eEffectType)
             {
                 case BASS_FX_DX8_CHORUS:
                 {
                     BASS_DX8_CHORUS fxChorusParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxChorusParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxChorusParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2080,7 +2078,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_COMPRESSOR:
                 {
                     BASS_DX8_COMPRESSOR fxCompressorParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxCompressorParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxCompressorParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2108,7 +2106,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_DISTORTION:
                 {
                     BASS_DX8_DISTORTION fxDistortionParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxDistortionParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxDistortionParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2133,7 +2131,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_ECHO:
                 {
                     BASS_DX8_ECHO fxEchoParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxEchoParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxEchoParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2158,7 +2156,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_FLANGER:
                 {
                     BASS_DX8_FLANGER fxFlangerParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxFlangerParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxFlangerParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2189,7 +2187,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_GARGLE:
                 {
                     BASS_DX8_GARGLE fxGargleParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxGargleParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxGargleParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2205,7 +2203,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_I3DL2REVERB:
                 {
                     BASS_DX8_I3DL2REVERB fxI3DL2ReverbParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxI3DL2ReverbParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxI3DL2ReverbParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2251,7 +2249,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_PARAMEQ:
                 {
                     BASS_DX8_PARAMEQ fxParameqParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxParameqParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxParameqParams))
                     {
                         lua_newtable(luaVM);
 
@@ -2270,7 +2268,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 case BASS_FX_DX8_REVERB:
                 {
                     BASS_DX8_REVERB fxReverbParams;
-                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, strEffectName, &fxReverbParams))
+                    if (CStaticFunctionDefinitions::GetSoundEffectParameters(*pSound, eEffectType, &fxReverbParams))
                     {
                         lua_newtable(luaVM);
 

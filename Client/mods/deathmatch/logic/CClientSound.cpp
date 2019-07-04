@@ -693,7 +693,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
-            // Call onClientSoundStream LUA event
+            // Call onClientSoundStream Lua event
             CLuaArguments Arguments;
             Arguments.PushBoolean(eventInfo.bBool);
             Arguments.PushNumber(eventInfo.dNumber);

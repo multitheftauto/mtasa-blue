@@ -744,8 +744,8 @@ public:
     static bool          GetSoundMaxDistance(CClientSound& Sound, float& fDistance);
     static bool          GetSoundMetaTags(CClientSound& Sound, const SString& strFormat, SString& strMetaTags);
     static bool          SetSoundEffectEnabled(CClientSound& Sound, const SString& strEffectName, bool bEnable);
-    static bool          SetSoundEffectParameters(CClientSound& Sound, const SString& strEffectName, void* params);
-    static bool          GetSoundEffectParameters(CClientSound& Sound, const SString& strEffectName, void* params);
+    static bool          SetSoundEffectParameters(CClientSound& Sound, eSoundEffectType eEffectType, void* params);
+    static bool          GetSoundEffectParameters(CClientSound& Sound, eSoundEffectType eEffectType, void* params);
     static bool          SetSoundPan(CClientSound& Sound, float fPan);
     static bool          GetSoundPan(CClientSound& Sound, float& fPan);
 
@@ -764,8 +764,8 @@ public:
     static bool   GetSoundLevelData(CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight);
     static bool   GetSoundSpeed(CClientPlayer& Player, float& fSpeed);
     static bool   SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
-    static bool   SetSoundEffectParameters(CClientPlayer& Sound, const SString& strEffectName, void* params);
-    static bool   GetSoundEffectParameters(CClientPlayer& Sound, const SString& strEffectName, void* params);
+    static bool   SetSoundEffectParameters(CClientPlayer& Sound, eSoundEffectType eEffectType, void* params);
+    static bool   GetSoundEffectParameters(CClientPlayer& Sound, eSoundEffectType eEffectType, void* params);
     static bool   SetSoundPan(CClientPlayer& Player, float fPan);
     static bool   GetSoundPan(CClientPlayer& Player, float& fPan);
 

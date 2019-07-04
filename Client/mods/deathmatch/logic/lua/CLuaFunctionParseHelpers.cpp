@@ -597,6 +597,18 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
+IMPLEMENT_ENUM_BEGIN(eSoundEffectType)
+ADD_ENUM(BASS_FX_DX8_CHORUS, "chorus")
+ADD_ENUM(BASS_FX_DX8_COMPRESSOR, "compressor")
+ADD_ENUM(BASS_FX_DX8_DISTORTION, "distortion")
+ADD_ENUM(BASS_FX_DX8_ECHO, "echo")
+ADD_ENUM(BASS_FX_DX8_FLANGER, "flanger")
+ADD_ENUM(BASS_FX_DX8_GARGLE, "gargle")
+ADD_ENUM(BASS_FX_DX8_I3DL2REVERB, "i3dl2reverb")
+ADD_ENUM(BASS_FX_DX8_PARAMEQ, "parameq")
+ADD_ENUM(BASS_FX_DX8_REVERB, "reverb")
+IMPLEMENT_ENUM_END("sound-effect-type")
+
 //
 // Get best guess at name of userdata type
 //

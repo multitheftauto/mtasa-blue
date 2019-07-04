@@ -1547,3 +1547,5 @@ enum eObjectProperty
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
 };
+
+enum eSoundEffectType;
