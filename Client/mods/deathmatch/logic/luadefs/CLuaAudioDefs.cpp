@@ -2241,7 +2241,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                         lua_setfield(luaVM, -2, "density");
 
                         lua_pushnumber(luaVM, fxI3DL2ReverbParams.flHFReference);
-                        lua_setfield(luaVM, -2, "HFReferenct");
+                        lua_setfield(luaVM, -2, "HFReference");
                         return 1;
                     }
                     break;
