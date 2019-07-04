@@ -1387,7 +1387,6 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        bool bEffectEnabled = false;
         if (pSound)
         {
             if (pSound->IsFxEffectEnabled(eEffectType))
