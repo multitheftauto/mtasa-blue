@@ -59,6 +59,15 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM(eSoundEffectType);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Distortion);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Echo);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Flanger);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
+DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
+DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
+DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 
 enum eDXHorizontalAlign
 {
@@ -424,8 +433,45 @@ inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 }
 inline SString GetClassTypeName(eSoundEffectType*)
 {
-    return "sound-effect-type";
+    return "soundeffect-type";
 }
+inline SString GetClassTypeName(eSoundEffectParams::Chorus*)
+{
+    return "soundeffect-params-chorus";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Compressor*)
+{
+    return "soundeffect-params-compressor";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Distortion*)
+{
+    return "soundeffect-params-distortion";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Echo*)
+{
+    return "soundeffect-params-echo";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Flanger*)
+{
+    return "soundeffect-params-flanger";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Gargle*)
+{
+    return "soundeffect-params-gargle";
+}
+inline SString GetClassTypeName(eSoundEffectParams::I3DL2Reverb*)
+{
+    return "soundeffect-params-i3dl2reverb";
+}
+inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
+{
+    return "soundeffect-params-parameq";
+}
+inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
+{
+    return "soundeffect-params-reverb";
+}
+
 
 //
 // CResource from userdata

@@ -8047,7 +8047,6 @@ bool CStaticFunctionDefinitions::SetSoundEffectParameters(CClientPlayer& Player,
     CClientPlayerVoice* pVoice = Player.GetVoice();
     if (pVoice)
     {
-
         if (pVoice->IsFxEffectEnabled(eEffectType))
             if (pVoice->SetFxEffectParameters(eEffectType, params))
                 return true;
