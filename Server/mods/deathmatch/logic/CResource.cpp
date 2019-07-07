@@ -660,7 +660,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     }
 
     // Check this server can run this resource
-    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
+    CMtaVersion strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
     if (m_strMinServerReqFromMetaXml > strServerVersion)
     {
         strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);
@@ -691,7 +691,7 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     {
         uint uiNumIncompatiblePlayers = 0;
         for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
+            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion() && !(*iter)->ShouldIgnoreMinClientVersionChecks())
                 uiNumIncompatiblePlayers++;
 
         if (uiNumIncompatiblePlayers > 0)
@@ -2324,28 +2324,7 @@ void Unescape(std::string& str)
 
 ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
 {
-    // Check for http general and if we have access to this resource
-    // if we're trying to return a http file. Otherwize it's the MTA
-    // client trying to download files.
-    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-    // Old way part 1
-    // Check for "resource.blah" being specifically denied
-    bool bResourceBlah = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName.c_str(),
-                                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
-
-    // Old way part 2
-    // Check for "general.http" being specifically denied
-    bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-    // New way
-    // Check for "resource.blah.http" being specifically allowed
-    bool bResourceBlahHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                            SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-    // If denied with both 'new way' and 'old way' then stop here
-    if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
+    if (!IsHttpAccessAllowed(pAccount))
     {
         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
     }
@@ -2430,7 +2409,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         SString strResourceFuncName("%s.function.%s", m_strResourceName.c_str(), strFuncName.c_str());
 
         // @@@@@ Deal with this the new way
-        if (!pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
                                             CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
         {
             return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
@@ -2642,37 +2621,13 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 // We need to be active if downloading a HTML file
                 if (m_eState == EResourceState::Running)
                 {
-                    // Check for http general and if we have access to this resource
-                    // if we're trying to return a http file. Otherwise it's the MTA
-                    // client trying to download files.
-                    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-                    // Old way part 1
-                    // Check for "resource.blah" being specifically denied
-                    bool bResourceBlah = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                                        m_strResourceName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
-                    // Old way part 2
-                    // Check for "general.http" being specifically denied
-                    bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-                    // New way
-                    // Check for "resource.blah.http" being specifically allowed
-                    bool bResourceBlahHttp =
-                        pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                       SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-                    // If denied with both 'new way' and 'old way' then stop here
-                    if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
+                    if (!IsHttpAccessAllowed(pAccount))
                     {
                         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
                     }
 
-                    assert(bResourceBlahHttp || (bResourceBlah && bGeneralHttp));
-
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
-
-                    if (pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                    if (g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                        strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
@@ -2698,24 +2653,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
         else            // handle the default page
         {
-            // Check for http general and if we have access to this resource
-            // if we're trying to return a http file. Otherwize it's the MTA
-            // client trying to download files.
-            CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-            // Old way
-            // Check for "general.http" being specifically denied
-            bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                               CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-            // New way
-            // Check for "resource.blah.http" being specifically allowed
-            bool bResourceBlahHttp =
-                pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                               SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-            // If denied with both 'new way' and 'old way' then stop here
-            if (!bResourceBlahHttp && !bGeneralHttp)
+            if (!IsHttpAccessAllowed(pAccount))
             {
                 return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
             }
@@ -2748,6 +2686,51 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
     SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
+}
+
+// Return true if http access allowed for the supplied account
+bool CResource::IsHttpAccessAllowed(CAccount* pAccount)
+{
+    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
+
+    // New way
+    // Check for "resource.<name>.http" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName + ".http",
+                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+    {
+        return true;
+    }
+
+    // Old way phase 1
+    // Check for "general.http" being explicitly denied
+    if (!pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
+                                        CAccessControlListRight::RIGHT_TYPE_GENERAL, true))
+    {
+        return false;
+    }
+    // Check for "resource.<name>" being explicitly denied
+    if (!pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName,
+                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
+    {
+        return false;
+    }
+
+    // Old way phase 2
+    // Check for "general.http" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    {
+        return true;
+    }
+    // Check for "resource.<name>" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName,
+                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+    {
+        return true;
+    }
+
+    // If nothing explicitly set, then default to denied
+    return false;
 }
 
 bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller)

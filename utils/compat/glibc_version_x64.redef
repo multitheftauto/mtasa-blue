@@ -6,3 +6,4 @@
 # 
 memcmp memcmp@GLIBC_2.2.5
 memcpy memcpy@GLIBC_2.2.5
+powf powf@GLIBC_2.2.5

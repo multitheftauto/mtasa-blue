@@ -3939,13 +3939,14 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
-    m_pManager->GetMarkerManager()->DoPulse();
-    m_pManager->GetPointLightsManager()->DoPulse();
-    m_pManager->GetObjectManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
 {
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
+
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
@@ -5707,10 +5708,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistance();
+    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistance();
+    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();

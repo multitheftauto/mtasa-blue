@@ -216,11 +216,12 @@ namespace SharedUtil
     // string stuff
     //
 
-    std::wstring MbUTF8ToUTF16(const std::string& s);
+    std::wstring MbUTF8ToUTF16(const SString& s);
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
+    std::string UTF16ToMbUTF8(const wchar_t* ws);
 
-    std::wstring ANSIToUTF16(const std::string& s);
+    std::wstring ANSIToUTF16(const SString& s);
 
     int GetUTF8Confidence(const unsigned char* input, int len);
 
@@ -1264,14 +1265,14 @@ namespace SharedUtil
     };
 
     #define DECLARE_ENUM2(T, U) \
-        CEnumInfo<U>*          GetEnumInfo     ( const T& ); \
-        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
-        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
-        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
-        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
+        CEnumInfo<U>*          GetEnumInfo     ( const T* ); \
+        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( (T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( (T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( (T*)0 )->GetTypeName (); }\
+        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( (T*)0 )->ValueValid  ( (eDummy)value ); }\
 
     #define IMPLEMENT_ENUM_BEGIN2(T, U) \
-        CEnumInfo<U>* GetEnumInfo( const T& ) \
+        CEnumInfo<U>* GetEnumInfo( const T* ) \
         { \
             using CEnumInfo = CEnumInfo<U>; \
             static const CEnumInfo::SEnumItem items[] = {
