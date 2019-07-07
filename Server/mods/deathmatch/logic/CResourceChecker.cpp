@@ -626,7 +626,7 @@ long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLen
             continue;
 
         // Look for identifier
-        bool bIsFirstIdent = (isalpha(c) || c == '_' || c == '$');
+        bool bIsFirstIdent = (isalpha(c) || c == '_' || c == '$' || c == '.' || c == ':');
         bool bIsMidIdent = (isdigit(c) || bIsFirstIdent);
         bool bIsNonIdent = !bIsMidIdent;
 
