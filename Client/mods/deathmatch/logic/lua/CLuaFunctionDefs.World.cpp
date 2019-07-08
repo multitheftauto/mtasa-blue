@@ -1951,16 +1951,17 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
     return 1;
 }
 
-// table getRemoteRequestInfo(element theRequest)
+// table getRemoteRequestInfo(element theRequest[, number postDataLength = 0])
 int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CLuaArguments    info, requestedHeaders;
     CRemoteCall*     pRemoteCall = nullptr;
     CResource*       pThisResource = g_pClientGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
-
+    int              iPostDataLength = 0;
 
     argStream.ReadUserData(pRemoteCall);
+    argStream.ReadNumber(iPostDataLength, 0);
 
     if (!argStream.HasErrors())
     {
@@ -1994,8 +1995,13 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 
         if (bExtendedInfo)
         {
+            SString sPostData = pRemoteCall->GetOptions().strPostData.c_str();
+
+            if (iPostDataLength > 0)
+                sPostData = sPostData.SubStr(0, iPostDataLength);
+
             info.PushString("postData");
-            info.PushString(pRemoteCall->GetOptions().strPostData.c_str());
+            info.PushString(sPostData);
 
             // requested headers
             info.PushString("headers");
