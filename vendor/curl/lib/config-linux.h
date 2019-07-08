@@ -49,6 +49,9 @@
 /* to disable --libcurl C code generation option */
 /* #undef CURL_DISABLE_LIBCURL_OPTION */
 
+/* if the OpenSSL configuration won't be loaded automatically */
+/* #undef CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG */
+
 /* to disable POP3 */
 /* #undef CURL_DISABLE_POP3 */
 
@@ -173,9 +176,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
-/* Define to 1 if you have the `ENGINE_cleanup' function. */
-/* #undef HAVE_ENGINE_CLEANUP */
-
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
@@ -190,9 +190,6 @@
 
 /* Define to 1 if you have a working fcntl O_NONBLOCK function. */
 #define HAVE_FCNTL_O_NONBLOCK 1
-
-/* Define to 1 if you have the fdopen function. */
-#define HAVE_FDOPEN 1
 
 /* Define to 1 if you have the `fnmatch' function. */
 #define HAVE_FNMATCH 1
@@ -500,6 +497,9 @@
 /* Define to 1 if you have the <openssl/ssl.h> header file. */
 /* #undef HAVE_OPENSSL_SSL_H */
 
+/* Define to 1 if you have the `OpenSSL_version' function. */
+/* #undef HAVE_OPENSSL_VERSION */
+
 /* Define to 1 if you have the <openssl/x509.h> header file. */
 /* #undef HAVE_OPENSSL_X509_H */
 
@@ -523,6 +523,9 @@
 
 /* Define to 1 if you have a working POSIX-style strerror_r function. */
 #define HAVE_POSIX_STRERROR_R 1
+
+/* Define to 1 if you have the <proto/bsdsocket.h> header file. */
+/* #undef HAVE_PROTO_BSDSOCKET_H */
 
 /* if you have <pthread.h> */
 #define HAVE_PTHREAD_H 1
@@ -613,9 +616,6 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -763,9 +763,6 @@
 
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
-
-/* Define to 1 if you have the `wolfSSL_CTX_UseSupportedCurve' function. */
-/* #undef HAVE_WOLFSSL_CTX_USESUPPORTEDCURVE */
 
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
@@ -923,17 +920,17 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
+/* to enable alt-svc */
+/* #undef USE_ALTSVC */
+
+/* if AmiSSL is in use */
+/* #undef USE_AMISSL */
+
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
 
-/* if axTLS is enabled */
-/* #undef USE_AXTLS */
-
 /* if CyaSSL/WolfSSL is enabled */
 /* #undef USE_CYASSL */
-
-/* to enable Apple OS native SSL/TLS support */
-/* #undef USE_DARWINSSL */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
@@ -959,6 +956,9 @@
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
 
+/* if MesaLink is enabled */
+/* #undef USE_MESALINK */
+
 /* Define to enable metalink support */
 /* #undef USE_METALINK */
 
@@ -979,6 +979,9 @@
 
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
+
+/* enable Secure Transport */
+/* #undef USE_SECTRANSP */
 
 /* if you want POSIX threaded DNS lookup */
 #define USE_THREADS_POSIX 1

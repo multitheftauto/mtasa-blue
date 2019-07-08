@@ -148,7 +148,7 @@ CWebView* CWebCore::FindWebView(CefRefPtr<CefBrowser> browser)
     return nullptr;
 }
 
-void CWebCore::AddEventToEventQueue(std::function<void(void)> event, CWebView* pWebView, const SString& name)
+void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebView, const SString& name)
 {
 #ifndef MTA_DEBUG
     UNREFERENCED_PARAMETER(name);
@@ -280,7 +280,7 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
         // Hardcoded whitelist
         static SString whitelist[] = {
             "google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com",           "player.vimeo.com", "code.jquery.com", "mtasa.com",
-            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com", "localhost",        "127.0.0.1"};
+            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com"};
 
         // Hardcoded blacklist
         static SString blacklist[] = {"nobrain.dk"};

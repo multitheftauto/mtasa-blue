@@ -207,9 +207,9 @@ namespace
             m_uiNumRows++;
         }
 
-        uint GetPixelWidth(void) const { return m_uiTotalWidth; }
+        uint GetPixelWidth() const { return m_uiTotalWidth; }
 
-        uint GetPixelHeight(void) const { return m_uiNumRows * 15; }
+        uint GetPixelHeight() const { return m_uiNumRows * 15; }
 
         // Draw the table with D3D
         void Draw(float fX, float fY, DWORD dwBackColor, uint uiBorderLeft, uint uiBorderRight, uint uiBorderUp, uint uiBorderDown)
@@ -254,19 +254,19 @@ class CMemStats : public CMemStatsInterface
 {
 public:
     ZERO_ON_NEW
-    CMemStats(void);
-    ~CMemStats(void);
+    CMemStats();
+    ~CMemStats();
 
     // CMemStatsInterface methods
-    virtual void Draw(void);
+    virtual void Draw();
     virtual void SetEnabled(bool bEnabled);
-    virtual bool IsEnabled(void);
+    virtual bool IsEnabled();
     virtual void SampleState(SMemStatsInfo& memStatsInfo);
 
 protected:
-    void UpdateFrameStats(void);
-    void UpdateIntervalStats(void);
-    void CreateTables(void);
+    void UpdateFrameStats();
+    void UpdateIntervalStats();
+    void CreateTables();
 
     CElapsedTime        m_UpdateTimer;
     bool                m_bEnabled;
@@ -285,7 +285,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 CMemStats* g_pMemStats = NULL;
 
-CMemStatsInterface* GetMemStats(void)
+CMemStatsInterface* GetMemStats()
 {
     if (!g_pMemStats)
         g_pMemStats = new CMemStats();
@@ -297,11 +297,11 @@ CMemStatsInterface* GetMemStats(void)
 // CVideoModeManager implementation
 //
 ///////////////////////////////////////////////////////////////
-CMemStats::CMemStats(void)
+CMemStats::CMemStats()
 {
 }
 
-CMemStats::~CMemStats(void)
+CMemStats::~CMemStats()
 {
 }
 
@@ -334,7 +334,7 @@ void CMemStats::SetEnabled(bool bEnabled)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMemStats::IsEnabled(void)
+bool CMemStats::IsEnabled()
 {
     return m_bEnabled;
 }
@@ -346,7 +346,7 @@ bool CMemStats::IsEnabled(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::Draw(void)
+void CMemStats::Draw()
 {
     if (!m_bEnabled)
         return;
@@ -404,7 +404,7 @@ void CMemStats::Draw(void)
 // Update values that are measured each frame
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::UpdateFrameStats(void)
+void CMemStats::UpdateFrameStats()
 {
     m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
 
@@ -524,7 +524,7 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
 // Update stats which are sampled at regular intervals
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::UpdateIntervalStats(void)
+void CMemStats::UpdateIntervalStats()
 {
     MemStatsInfoClear(m_MemStatsNow);
     MemStatsInfoClear(m_MemStatsDelta);
@@ -655,7 +655,7 @@ void CMemStats::UpdateIntervalStats(void)
 // Create formatted tables for drawing with
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::CreateTables(void)
+void CMemStats::CreateTables()
 {
     m_TableList.clear();
 

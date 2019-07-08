@@ -22,16 +22,16 @@ class CClientEffectManager
 public:
     CClientEffect* Create(const SString& strEffectName, const CVector& vecPosition, ElementID ID, bool bSoundEnable);
     void           SAEffectDestroyed(void* pFxSAInterface);
-    void           DeleteAll(void);
+    void           DeleteAll();
 
-    unsigned int          Count(void) { return m_Effects.size(); };
+    unsigned int          Count() { return m_Effects.size(); };
     static CClientEffect* Get(ElementID ID);
     void                  AddToList(CClientEffect* pEffect) { m_Effects.push_back(pEffect); }
     void                  RemoveFromList(CClientEffect* pEffect);
 
 private:
     CClientEffectManager(class CClientManager* pManager);
-    ~CClientEffectManager(void);
+    ~CClientEffectManager();
     CClientEffect* Get(void* pFxSA);
 
     class CClientManager*     m_pManager;

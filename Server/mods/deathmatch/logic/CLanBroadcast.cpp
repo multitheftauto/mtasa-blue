@@ -46,12 +46,12 @@ CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
     m_strServerMessage = ss.str();
 }
 
-CLanBroadcast::~CLanBroadcast(void)
+CLanBroadcast::~CLanBroadcast()
 {
     closesocket(m_Socket);
 }
 
-void CLanBroadcast::DoPulse(void)
+void CLanBroadcast::DoPulse()
 {
     sockaddr_in SockAddr;
 #ifndef WIN32

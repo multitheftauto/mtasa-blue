@@ -62,7 +62,7 @@ CClientWeapon::CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType
     m_iWeaponFireRate = GetWeaponFireTime(m_pWeaponStat);
 }
 
-CClientWeapon::~CClientWeapon(void)
+CClientWeapon::~CClientWeapon()
 {
     m_pManager->GetWeaponManager()->RemoveFromList(this);
 
@@ -75,7 +75,7 @@ CClientWeapon::~CClientWeapon(void)
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pTarget, &m_pOwner, NULL);
 }
 
-void CClientWeapon::DoPulse(void)
+void CClientWeapon::DoPulse()
 {
     /*if ( m_bHasTargetDirection )
     {
@@ -180,7 +180,7 @@ void CClientWeapon::DoPulse(void)
     }
 }
 
-void CClientWeapon::Create(void)
+void CClientWeapon::Create()
 {
     CClientObject::Create();
     if (m_weaponConfig.bDisableWeaponModel)
@@ -195,7 +195,7 @@ void CClientWeapon::Create(void)
     }
 }
 
-void CClientWeapon::Destroy(void)
+void CClientWeapon::Destroy()
 {
     CClientObject::Destroy();
 
@@ -406,8 +406,11 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
 
             return;
         }
+
+        CPools* pPools = g_pGame->GetPools();
+
         // Execute our weapon fire event
-        CClientEntity* pClientEntity = m_pManager->FindEntitySafe(pColEntity);
+        CClientEntity* pClientEntity = pColEntity ? pPools->GetClientEntity((DWORD*)pColEntity->GetInterface()) : nullptr;
         CLuaArguments  Arguments;
         if (pClientEntity)
             Arguments.PushElement(pClientEntity);            // entity that got hit
@@ -552,7 +555,7 @@ void CClientWeapon::SetWeaponTarget(CVector vecTarget)
     m_targetType = TARGET_TYPE_VECTOR;
 }
 
-void CClientWeapon::ResetWeaponTarget(void)
+void CClientWeapon::ResetWeaponTarget()
 {
     m_pTarget = NULL;
     m_vecTarget = CVector(0, 0, 0);
@@ -691,27 +694,27 @@ void CClientWeapon::SetWeaponFireTime(int iFireTime)
     m_iWeaponFireRate = iFireTime;
 }
 
-int CClientWeapon::GetWeaponFireTime(void)
+int CClientWeapon::GetWeaponFireTime()
 {
     return m_iWeaponFireRate;
 }
 
-void CClientWeapon::ResetWeaponFireTime(void)
+void CClientWeapon::ResetWeaponFireTime()
 {
     m_iWeaponFireRate = GetWeaponFireTime(m_pWeaponStat);
 }
 
-eTargetType CClientWeapon::GetWeaponTargetType(void)
+eTargetType CClientWeapon::GetWeaponTargetType()
 {
     return m_targetType;
 }
 
-CVector CClientWeapon::GetWeaponVectorTarget(void)
+CVector CClientWeapon::GetWeaponVectorTarget()
 {
     return m_vecTarget;
 }
 
-CClientEntity* CClientWeapon::GetWeaponEntityTarget(void)
+CClientEntity* CClientWeapon::GetWeaponEntityTarget()
 {
     return m_pTarget;
 }

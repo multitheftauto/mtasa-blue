@@ -71,7 +71,7 @@ enum CGUIHorizontalAlign
 class CGUIColor
 {
 public:
-    CGUIColor(void)
+    CGUIColor()
     {
         R = 0;
         G = 0;

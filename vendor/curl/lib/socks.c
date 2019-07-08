@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -54,7 +54,7 @@ int Curl_blockread_all(struct connectdata *conn, /* connection data */
                        ssize_t buffersize,       /* max amount to read */
                        ssize_t *n)               /* amount bytes read */
 {
-  ssize_t nread;
+  ssize_t nread = 0;
   ssize_t allread = 0;
   int result;
   *n = 0;
@@ -98,7 +98,7 @@ int Curl_blockread_all(struct connectdata *conn, /* connection data */
 * destination server.
 *
 * Reference :
-*   http://socks.permeo.com/protocol/socks4.protocol
+*   https://www.openssh.com/txt/socks4.protocol
 *
 * Note :
 *   Set protocol4a=true for  "SOCKS 4A (Simple Extension to SOCKS 4 Protocol)"
@@ -789,4 +789,3 @@ CURLcode Curl_SOCKS5(const char *proxy_user,
 }
 
 #endif /* CURL_DISABLE_PROXY */
-

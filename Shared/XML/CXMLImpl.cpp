@@ -17,13 +17,13 @@
 #endif
 #include "SharedUtil.hpp"
 
-CXMLImpl::CXMLImpl(void)
+CXMLImpl::CXMLImpl()
 {
     // Init array stuff
     CXMLArray::Initialize();
 }
 
-CXMLImpl::~CXMLImpl(void)
+CXMLImpl::~CXMLImpl()
 {
 }
 
@@ -44,7 +44,7 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
     delete pFile;
 }
 
-CXMLNode* CXMLImpl::CreateDummyNode(void)
+CXMLNode* CXMLImpl::CreateDummyNode()
 {
     CXMLNode* xmlNode = new CXMLNodeImpl(NULL, NULL, *new TiXmlElement("dummy_storage"));
     if (xmlNode->IsValid())

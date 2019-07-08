@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
@@ -14,17 +14,17 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS 3
+#define CORE_SETTINGS_HEADER_SPACER " "
+#define CORE_SETTINGS_NO_KEY " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
 extern SBindableKey        g_bkKeys[];
 
-CSettings::CSettings(void)
+CSettings::CSettings()
 {
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
@@ -44,12 +44,12 @@ CSettings::CSettings(void)
     }
 }
 
-CSettings::~CSettings(void)
+CSettings::~CSettings()
 {
     DestroyGUI();
 }
 
-void CSettings::CreateGUI(void)
+void CSettings::CreateGUI()
 {
     if (m_pWindow)
         DestroyGUI();
@@ -137,7 +137,7 @@ void CSettings::CreateGUI(void)
     m_pBindsList = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(pTabBinds, false));
     m_pBindsList->SetPosition(CVector2D(10, 15));
     m_pBindsList->SetSize(CVector2D(620, 357));
-    m_pBindsList->SetSorting(false);
+    m_pBindsList->SetSortingEnabled(false);
     m_pBindsList->SetSelectionMode(SelectionModes::CellSingle);
     m_pBindsList->SetDoubleClickHandler(GUI_CALLBACK(&CSettings::OnBindsListClick, this));
 
@@ -662,7 +662,7 @@ void CSettings::CreateGUI(void)
 
     vecTemp.fX = 11;
     m_pDrawDistanceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Draw Distance:")));
-    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pDrawDistanceLabel->GetPosition(vecTemp, false);
     m_pDrawDistanceLabel->AutoSize();
 
@@ -680,7 +680,7 @@ void CSettings::CreateGUI(void)
     vecTemp.fX = 11;
 
     m_pBrightnessLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Brightness:")));
-    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pBrightnessLabel->GetPosition(vecTemp, false);
     m_pBrightnessLabel->AutoSize();
 
@@ -698,7 +698,7 @@ void CSettings::CreateGUI(void)
     vecTemp.fX = 11;
 
     m_pFXQualityLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("FX Quality:")));
-    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pFXQualityLabel->GetPosition(vecTemp, false);
     m_pFXQualityLabel->AutoSize();
 
@@ -712,7 +712,7 @@ void CSettings::CreateGUI(void)
     m_pComboFxQuality->SetReadOnly(true);
 
     m_pAnisotropicLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Anisotropic filtering:")));
-    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pAnisotropicLabel->GetPosition(vecTemp, false);
     m_pAnisotropicLabel->AutoSize();
 
@@ -753,7 +753,7 @@ void CSettings::CreateGUI(void)
     m_pComboAntiAliasing->SetReadOnly(true);
 
     m_pAspectRatioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Aspect Ratio:")));
-    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pAspectRatioLabel->GetPosition(vecTemp, false);
     m_pAspectRatioLabel->AutoSize();
 
@@ -769,7 +769,7 @@ void CSettings::CreateGUI(void)
     m_pComboAspectRatio->SetReadOnly(true);
 
     m_pCheckBoxHudMatchAspectRatio = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("HUD Match Aspect Ratio"), true));
-    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
+    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 4.0f));
     m_pCheckBoxHudMatchAspectRatio->AutoSize(NULL, 20.0f);
 
     vecTemp.fX = 11;
@@ -793,6 +793,10 @@ void CSettings::CreateGUI(void)
     m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
     m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
     m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -1091,7 +1095,7 @@ void CSettings::CreateGUI(void)
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG   // Don't hide when debugging
+#ifndef MTA_DEBUG            // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1285,7 +1289,7 @@ void CSettings::CreateGUI(void)
     LoadSkins();
 }
 
-void CSettings::DestroyGUI(void)
+void CSettings::DestroyGUI()
 {
     // Destroy
     delete m_pButtonCancel;
@@ -1305,7 +1309,7 @@ void RestartCallBack(void* ptr, unsigned int uiButton)
     }
 }
 
-void CSettings::ShowRestartQuestion(void)
+void CSettings::ShowRestartQuestion()
 {
     SString strMessage = _("Some settings will be changed when you next start MTA");
     strMessage += _("\n\nDo you want to restart now?");
@@ -1329,7 +1333,7 @@ void DisconnectCallback(void* ptr, unsigned int uiButton)
     }
 }
 
-void CSettings::ShowDisconnectQuestion(void)
+void CSettings::ShowDisconnectQuestion()
 {
     SString strMessage = _("Some settings will be changed when you disconnect the current server");
     strMessage += _("\n\nDo you want to disconnect now?");
@@ -1354,7 +1358,7 @@ bool CSettings::OnMouseDoubleClick(CGUIMouseEventArgs Args)
     return false;
 }
 
-void CSettings::Update(void)
+void CSettings::Update()
 {
     // Once each 30 frames
     if (m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL)
@@ -1409,7 +1413,7 @@ void CSettings::UpdateAudioTab()
     m_pComboUsertrackMode->SetSelectedItemByIndex(gameSettings->GetUsertrackMode());
 }
 
-void CSettings::UpdateVideoTab(void)
+void CSettings::UpdateVideoTab()
 {
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
@@ -1515,6 +1519,11 @@ void CSettings::UpdateVideoTab(void)
     CVARS_GET("high_detail_vehicles", bHighDetailVehicles);
     m_pCheckBoxHighDetailVehicles->SetSelected(bHighDetailVehicles);
 
+    // High detail peds
+    bool bHighDetailPeds;
+    CVARS_GET("high_detail_peds", bHighDetailPeds);
+    m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
+
     PopulateResolutionComboBox();
 
     // Fullscreen style
@@ -1545,7 +1554,7 @@ void CSettings::UpdateVideoTab(void)
 //
 // PopulateResolutionComboBox
 //
-void CSettings::PopulateResolutionComboBox(void)
+void CSettings::PopulateResolutionComboBox()
 {
     bool bNextWindowed;
     bool bNextFSMinimize;
@@ -1602,7 +1611,7 @@ void CSettings::PopulateResolutionComboBox(void)
 //
 // Disable/enable the full screen mode options
 //
-void CSettings::UpdateFullScreenComboBoxEnabled(void)
+void CSettings::UpdateFullScreenComboBoxEnabled()
 {
     if (m_pCheckBoxWindowed->GetSelected())
     {
@@ -1621,7 +1630,7 @@ void CSettings::UpdateFullScreenComboBoxEnabled(void)
 //
 // Saves the Joypad settings
 //
-void CSettings::ProcessJoypad(void)
+void CSettings::ProcessJoypad()
 {
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
@@ -1738,11 +1747,14 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("heat_haze", true);
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
+    CVARS_SET("high_detail_peds", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
+    gameSettings->ResetVehiclesLODDistance(false);
+    gameSettings->ResetPedsLODDistance(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -1892,7 +1904,7 @@ bool CSettings::OnBindsDefaultClick(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::CreateInterfaceTabGUI(void)
+void CSettings::CreateInterfaceTabGUI()
 {
     if (!m_pTabInterface)
     {
@@ -2292,7 +2304,7 @@ void CSettings::UpdateChatColorPreview(eChatColorType eType)
 }
 
 // Saves the keybinds
-void CSettings::ProcessKeyBinds(void)
+void CSettings::ProcessKeyBinds()
 {
     CKeyBindsInterface* pKeyBinds = CCore::GetSingleton().GetKeyBinds();
 
@@ -2581,7 +2593,7 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return false;
 }
 
-void CSettings::Initialize(void)
+void CSettings::Initialize()
 {
     // Add binds and sections
     bool bPrimaryKey = true;
@@ -2800,7 +2812,7 @@ void CSettings::SetVisible(bool bVisible)
     m_pWindow->SetZOrderingEnabled(!bVisible);            // Message boxes dont appear on top otherwise
 }
 
-bool CSettings::IsVisible(void)
+bool CSettings::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
@@ -2870,7 +2882,7 @@ bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::LoadData(void)
+void CSettings::LoadData()
 {
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
@@ -2976,13 +2988,16 @@ void CSettings::LoadData(void)
     // Skins
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    uiIndex = 0;
-    std::string strItemText = m_pInterfaceSkinSelector->GetItemText(uiIndex);
-    while (strItemText != currentSkin)
+
+    for (size_t i = 0; i < m_pInterfaceSkinSelector->GetItemCount(); i++)
     {
-        strItemText = m_pInterfaceSkinSelector->GetItemText(++uiIndex);
+        std::string strItemText = m_pInterfaceSkinSelector->GetItemText(i);
+        if (currentSkin == strItemText)
+        {
+            m_pInterfaceSkinSelector->SetSelectedItemByIndex(i);
+            break;
+        }
     }
-    m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
     // Process priority
     int iVar;
@@ -3141,7 +3156,7 @@ void CSettings::LoadData(void)
     ReloadBrowserLists();
 }
 
-void CSettings::ReloadBrowserLists(void)
+void CSettings::ReloadBrowserLists()
 {
     m_pGridBrowserBlacklist->Clear();
     m_pGridBrowserWhitelist->Clear();
@@ -3172,7 +3187,7 @@ bool CSettings::OnTabChanged(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::SaveData(void)
+void CSettings::SaveData()
 {
     std::string    strVar;
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
@@ -3312,9 +3327,15 @@ void CSettings::SaveData(void)
     CVARS_SET("tyre_smoke_enabled", bTyreSmokeEnabled);
     g_pCore->GetMultiplayer()->SetTyreSmokeEnabled(bTyreSmokeEnabled);
 
-    // High detail vehicles (just set cvar, real change occur on next connect)
+    // High detail vehicles
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
+    gameSettings->ResetVehiclesLODDistance(false);
+
+    // High detail peds
+    bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
+    CVARS_SET("high_detail_peds", bHighDetailPeds);
+    gameSettings->ResetPedsLODDistance(false);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -3526,7 +3547,7 @@ void CSettings::RemoveKeyBindSection(char* szSectionName)
     }
 }
 
-void CSettings::RemoveAllKeyBindSections(void)
+void CSettings::RemoveAllKeyBindSections()
 {
     list<SKeyBindSection*>::const_iterator iter = m_pKeyBindSections.begin();
     for (; iter != m_pKeyBindSections.end(); iter++)
@@ -4433,7 +4454,7 @@ void NewNicknameCallback(void* ptr, unsigned int uiButton, std::string strNick)
         CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 }
 
-void CSettings::RequestNewNickname(void)
+void CSettings::RequestNewNickname()
 {
     std::string strNick;
     CVARS_GET("nick", strNick);
@@ -4530,7 +4551,7 @@ void CSettings::TabSkip(bool bBackwards)
     }
 }
 
-bool CSettings::IsActive(void)
+bool CSettings::IsActive()
 {
     return m_pWindow->IsActive();
 }

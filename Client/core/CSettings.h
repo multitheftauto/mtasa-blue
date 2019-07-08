@@ -78,45 +78,45 @@ class CSettings
     friend class CCore;
 
 public:
-    CSettings(void);
-    ~CSettings(void);
+    CSettings();
+    ~CSettings();
 
-    void CreateGUI(void);
-    void DestroyGUI(void);
+    void CreateGUI();
+    void DestroyGUI();
 
     bool ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void Update(void);
-    void Initialize(void);
+    void Update();
+    void Initialize();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
     void SetIsModLoaded(bool bLoaded);
 
-    void LoadData(void);
+    void LoadData();
 
-    bool IsCapturingKey(void) { return m_bCaptureKey; }
+    bool IsCapturingKey() { return m_bCaptureKey; }
     void UpdateCaptureAxis();
     void UpdateJoypadTab();
 
     void UpdateAudioTab();
 
-    void UpdateVideoTab(void);
-    void PopulateResolutionComboBox(void);
-    void UpdateFullScreenComboBoxEnabled(void);
+    void UpdateVideoTab();
+    void PopulateResolutionComboBox();
+    void UpdateFullScreenComboBoxEnabled();
 
     void AddKeyBindSection(char* szSectionName);
     void RemoveKeyBindSection(char* szSectionName);
-    void RemoveAllKeyBindSections(void);
+    void RemoveAllKeyBindSections();
 
-    void RequestNewNickname(void);
-    void ShowRestartQuestion(void);
-    void ShowDisconnectQuestion(void);
+    void RequestNewNickname();
+    void ShowRestartQuestion();
+    void ShowDisconnectQuestion();
 
     void TabSkip(bool bBackwards);
 
-    bool IsActive(void);
+    bool IsActive();
 
     void SetSelectedIndex(unsigned int uiIndex);
 
@@ -156,6 +156,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxHeatHaze;
     CGUICheckBox*  m_pCheckBoxTyreSmokeParticles;
     CGUICheckBox*  m_pCheckBoxHighDetailVehicles;
+    CGUICheckBox*  m_pCheckBoxHighDetailPeds;
     CGUILabel*     m_pFieldOfViewLabel;
     CGUIScrollBar* m_pFieldOfView;
     CGUILabel*     m_pFieldOfViewValueLabel;
@@ -381,20 +382,20 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
-    void ReloadBrowserLists(void);
+    void ReloadBrowserLists();
 
 private:
-    void CreateInterfaceTabGUI(void);
+    void CreateInterfaceTabGUI();
     void UpdateChatColorPreview(eChatColorType eType);
 
-    void ProcessKeyBinds(void);
-    void ProcessJoypad(void);
+    void ProcessKeyBinds();
+    void ProcessJoypad();
 
-    void SaveData(void);
+    void SaveData();
 
-    void LoadSkins(void);
+    void LoadSkins();
 
-    void   LoadChatPresets(void);
+    void   LoadChatPresets();
     void   CreateChatColorTab(eChatColorType eType, const char* szName, CGUITabPanel* pParent);
     void   LoadChatColorFromCVar(eChatColorType eType, const char* szCVar);
     void   LoadChatColorFromString(eChatColorType eType, const std::string& strColor);

@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2014 - 2016, Steve Holme, <steve_holme@hotmail.com>.
- * Copyright (C) 2015 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2015 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -75,7 +75,7 @@ bool Curl_auth_is_digest_supported(void)
  * data    [in]     - The session handle.
  * chlg64  [in]     - The base64 encoded challenge message.
  * userp   [in]     - The user name in the format User or Domain\User.
- * passdwp [in]     - The user's password.
+ * passwdp [in]     - The user's password.
  * service [in]     - The service type such as http, smtp, pop or imap.
  * outptr  [in/out] - The address where a pointer to newly allocated memory
  *                    holding the result will be stored upon completion.
@@ -146,7 +146,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   }
 
   /* Generate our SPN */
-  spn = Curl_auth_build_spn(service, data->easy_conn->host.name, NULL);
+  spn = Curl_auth_build_spn(service, data->conn->host.name, NULL);
   if(!spn) {
     free(output_token);
     free(input_token);
@@ -391,7 +391,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
  *
  * data    [in]     - The session handle.
  * userp   [in]     - The user name in the format User or Domain\User.
- * passdwp [in]     - The user's password.
+ * passwdp [in]     - The user's password.
  * request [in]     - The HTTP request.
  * uripath [in]     - The path of the HTTP uri.
  * digest  [in/out] - The digest data struct being used and modified.

@@ -124,7 +124,7 @@ void _declspec(naked) HOOK_Rtl_fclose()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Files(void)
+void CMultiplayerSA::InitHooks_Files()
 {
     EZHookInstall(Rtl_fopen);
     EZHookInstall(Rtl_fclose);

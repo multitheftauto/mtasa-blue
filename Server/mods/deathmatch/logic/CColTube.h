@@ -18,18 +18,18 @@ class CColTube : public CColShape
 public:
     CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_TUBE; }
+    eColShapeType GetShapeType() { return COLSHAPE_TUBE; }
     bool          DoHitDetection(const CVector& vecNowPosition);
 
-    float GetRadius(void) { return m_fRadius; };
+    float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius)
     {
         m_fRadius = fRadius;
         SizeChanged();
     };
-    float GetHeight(void) { return m_fHeight; };
+    float GetHeight() { return m_fHeight; };
     void  SetHeight(float fHeight)
     {
         m_fHeight = fHeight;

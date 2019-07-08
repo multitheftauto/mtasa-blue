@@ -214,12 +214,12 @@ void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
     }
 }
 
-float GetRandomFloat(void)
+float GetRandomFloat()
 {
     return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f);
 }
 
-double GetRandomDouble(void)
+double GetRandomDouble()
 {
     return static_cast<double>(rand()) / (static_cast<double>(RAND_MAX) + 1.0);
 }

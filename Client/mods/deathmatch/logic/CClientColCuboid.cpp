@@ -30,7 +30,7 @@ bool CClientColCuboid::DoHitDetection(const CVector& vecNowPosition, float fRadi
             vecNowPosition.fZ <= m_vecPosition.fZ + m_vecSize.fZ);
 }
 
-CSphere CClientColCuboid::GetWorldBoundingSphere(void)
+CSphere CClientColCuboid::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition = m_vecPosition + m_vecSize * 0.5f;

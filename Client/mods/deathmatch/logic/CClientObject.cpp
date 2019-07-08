@@ -55,7 +55,7 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
         m_pManager->OnLowLODElementCreated();
 }
 
-CClientObject::~CClientObject(void)
+CClientObject::~CClientObject()
 {
     // Unrequest whatever we've requested or we'll crash in unlucky situations
     m_pModelRequester->Cancel(this, false);
@@ -73,7 +73,7 @@ CClientObject::~CClientObject(void)
         m_pManager->OnLowLODElementDestroyed();
 }
 
-void CClientObject::Unlink(void)
+void CClientObject::Unlink()
 {
     m_pObjectManager->RemoveFromLists(this);
     g_pClientGame->GetObjectRespawner()->Unreference(this);
@@ -224,7 +224,7 @@ void CClientObject::ModelRequestCallback(CModelInfo* pModelInfo)
     Create();
 }
 
-float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel(void)
+float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     if (m_pObject)
     {
@@ -243,7 +243,7 @@ void CClientObject::SetVisible(bool bVisible)
 }
 
 // Call this when m_bIsVisible, m_IsHiddenLowLod or m_pObject is changed
-void CClientObject::UpdateVisibility(void)
+void CClientObject::UpdateVisibility()
 {
     if (m_pObject)
     {
@@ -272,7 +272,7 @@ void CClientObject::SetModel(unsigned short usModel)
     }
 }
 
-bool CClientObject::IsLowLod(void)
+bool CClientObject::IsLowLod()
 {
     return m_bIsLowLod;
 }
@@ -314,14 +314,14 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
     }
 }
 
-CClientObject* CClientObject::GetLowLodObject(void)
+CClientObject* CClientObject::GetLowLodObject()
 {
     if (m_bIsLowLod)
         return NULL;
     return m_pLowLodObject;
 }
 
-void CClientObject::Render(void)
+void CClientObject::Render()
 {
     if (m_pObject)
     {
@@ -399,7 +399,7 @@ void CClientObject::SetCollisionEnabled(bool bCollisionEnabled)
     m_bUsesCollision = bCollisionEnabled;
 }
 
-float CClientObject::GetHealth(void)
+float CClientObject::GetHealth()
 {
     if (m_pObject)
     {
@@ -450,7 +450,7 @@ void CClientObject::StreamIn(bool bInstantly)
     }
 }
 
-void CClientObject::StreamOut(void)
+void CClientObject::StreamOut()
 {
     // Save the health
     if (m_pObject)
@@ -470,7 +470,7 @@ void CClientObject::StreamOut(void)
 }
 
 // Don't call this function directly by lua functions
-void CClientObject::ReCreate(void)
+void CClientObject::ReCreate()
 {
     m_fHealth = 1000.0f;
 
@@ -480,7 +480,7 @@ void CClientObject::ReCreate(void)
     Create();
 }
 
-void CClientObject::Create(void)
+void CClientObject::Create()
 {
     // Not already created an object?
     if (!m_pObject)
@@ -496,7 +496,7 @@ void CClientObject::Create(void)
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(!CClientObjectManager::IsBreakableModel(m_usModel));
 
             // Create the object
-            m_pObject = g_pGame->GetPools()->AddObject(m_usModel, m_bIsLowLod, m_bBreakingDisabled);
+            m_pObject = g_pGame->GetPools()->AddObject(this, m_usModel, m_bIsLowLod, m_bBreakingDisabled);
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(false);
@@ -505,9 +505,6 @@ void CClientObject::Create(void)
             {
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer(this);
-
-                // Add XRef
-                g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pObject);
 
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
@@ -540,7 +537,7 @@ void CClientObject::Create(void)
                     m_pObject->SetBuoyancyConstant(m_fBuoyancyConstant);
                 if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
                     m_pObject->SetCenterOfMass(m_vecCenterOfMass);
-                
+
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
 
@@ -565,16 +562,13 @@ void CClientObject::Create(void)
     }
 }
 
-void CClientObject::Destroy(void)
+void CClientObject::Destroy()
 {
     // If the object exists
     if (m_pObject)
     {
         // Invalidate
         m_pManager->InvalidateEntity(this);
-
-        // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pObject);
 
         // Destroy the object
         g_pGame->GetPools()->RemoveObject(m_pObject);
@@ -587,18 +581,18 @@ void CClientObject::Destroy(void)
     }
 }
 
-void CClientObject::NotifyCreate(void)
+void CClientObject::NotifyCreate()
 {
     m_pObjectManager->OnCreation(this);
     CClientStreamElement::NotifyCreate();
 }
 
-void CClientObject::NotifyDestroy(void)
+void CClientObject::NotifyDestroy()
 {
     m_pObjectManager->OnDestruction(this);
 }
 
-void CClientObject::StreamedInPulse(void)
+void CClientObject::StreamedInPulse()
 {
     // Some things to do if low LOD object
     if (m_bIsLowLod)
@@ -690,7 +684,7 @@ void CClientObject::SetTurnSpeed(const CVector& vecTurnSpeed)
     m_vecTurnSpeed = vecTurnSpeed;
 }
 
-CSphere CClientObject::GetWorldBoundingSphere(void)
+CSphere CClientObject::GetWorldBoundingSphere()
 {
     CSphere     sphere;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(GetModel());
@@ -729,7 +723,7 @@ bool CClientObject::SetBreakable(bool bBreakable)
     return false;
 }
 
-bool CClientObject::Break(void)
+bool CClientObject::Break()
 {
     // Are we breakable?
     if (m_pObject && CClientObjectManager::IsBreakableModel(m_usModel) && !m_bBreakingDisabled)
@@ -740,7 +734,7 @@ bool CClientObject::Break(void)
     return false;
 }
 
-float CClientObject::GetMass(void)
+float CClientObject::GetMass()
 {
     if (m_pObject)
         return m_pObject->GetMass();
@@ -756,7 +750,7 @@ void CClientObject::SetMass(float fMass)
     m_fMass = fMass;
 }
 
-float CClientObject::GetTurnMass(void)
+float CClientObject::GetTurnMass()
 {
     if (m_pObject)
         return m_pObject->GetTurnMass();
@@ -772,7 +766,7 @@ void CClientObject::SetTurnMass(float fTurnMass)
     m_fTurnMass = fTurnMass;
 }
 
-float CClientObject::GetAirResistance(void)
+float CClientObject::GetAirResistance()
 {
     if (m_pObject)
         return m_pObject->GetAirResistance();
@@ -788,7 +782,7 @@ void CClientObject::SetAirResistance(float fAirResistance)
     m_fAirResistance = fAirResistance;
 }
 
-float CClientObject::GetElasticity(void)
+float CClientObject::GetElasticity()
 {
     if (m_pObject)
         return m_pObject->GetElasticity();
@@ -804,7 +798,7 @@ void CClientObject::SetElasticity(float fElasticity)
     m_fElasticity = fElasticity;
 }
 
-float CClientObject::GetBuoyancyConstant(void)
+float CClientObject::GetBuoyancyConstant()
 {
     if (m_pObject)
         return m_pObject->GetBuoyancyConstant();

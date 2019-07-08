@@ -52,7 +52,7 @@ CLanguageSelector::CLanguageSelector(CGUIElement* pMainMenuCanvas)
 // Delete GUI items
 //
 ///////////////////////////////////////////////////////////////
-CLanguageSelector::~CLanguageSelector(void)
+CLanguageSelector::~CLanguageSelector()
 {
     SAFE_DELETE(m_pButtonWindow);
     SAFE_DELETE(m_pListWindow);
@@ -200,7 +200,7 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
 // Update visibilty & animations
 //
 ///////////////////////////////////////////////////////////////
-void CLanguageSelector::DoPulse(void)
+void CLanguageSelector::DoPulse()
 {
     if (CLocalGUI::GetSingleton().GetMainMenu()->GetIsIngame())
     {

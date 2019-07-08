@@ -20,6 +20,7 @@
 #include <sstream>
 #include <mutex>
 #include <unordered_set>
+#include <future>
 
 // Forward declarations
 class CAclRightName;

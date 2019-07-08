@@ -34,7 +34,7 @@ namespace SharedUtil
     class CFastHashSet : public google::dense_hash_set<K>
     {
     public:
-        CFastHashSet(void)
+        CFastHashSet()
         {
             this->set_empty_key(GetEmptyMapKey((K*)NULL));
             this->set_deleted_key(GetDeletedMapKey((K*)NULL));

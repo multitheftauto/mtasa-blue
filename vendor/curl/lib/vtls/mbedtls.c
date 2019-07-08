@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2010 - 2011, Hoi-Ho Chan, <hoiho.chan@gmail.com>
- * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -205,14 +205,11 @@ set_ssl_version_min_max(struct connectdata *conn, int sockindex)
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
       ssl_version = CURL_SSLVERSION_TLSv1_0;
-      ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
   }
 
   switch(ssl_version_max) {
     case CURL_SSLVERSION_MAX_NONE:
-      ssl_version_max = ssl_version << 16;
-      break;
     case CURL_SSLVERSION_MAX_DEFAULT:
       ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
@@ -376,7 +373,7 @@ mbed_connect_step1(struct connectdata *conn,
     }
   }
 
-  infof(data, "mbedTLS: Connecting to %s:%d\n", hostname, port);
+  infof(data, "mbedTLS: Connecting to %s:%ld\n", hostname, port);
 
   mbedtls_ssl_config_init(&BACKEND->config);
 
@@ -577,19 +574,21 @@ mbed_connect_step2(struct connectdata *conn,
 
   ret = mbedtls_ssl_get_verify_result(&BACKEND->ssl);
 
+  if(!SSL_CONN_CONFIG(verifyhost))
+    /* Ignore hostname errors if verifyhost is disabled */
+    ret &= ~MBEDTLS_X509_BADCERT_CN_MISMATCH;
+
   if(ret && SSL_CONN_CONFIG(verifypeer)) {
     if(ret & MBEDTLS_X509_BADCERT_EXPIRED)
       failf(data, "Cert verify failed: BADCERT_EXPIRED");
 
-    if(ret & MBEDTLS_X509_BADCERT_REVOKED) {
+    else if(ret & MBEDTLS_X509_BADCERT_REVOKED)
       failf(data, "Cert verify failed: BADCERT_REVOKED");
-      return CURLE_SSL_CACERT;
-    }
 
-    if(ret & MBEDTLS_X509_BADCERT_CN_MISMATCH)
+    else if(ret & MBEDTLS_X509_BADCERT_CN_MISMATCH)
       failf(data, "Cert verify failed: BADCERT_CN_MISMATCH");
 
-    if(ret & MBEDTLS_X509_BADCERT_NOT_TRUSTED)
+    else if(ret & MBEDTLS_X509_BADCERT_NOT_TRUSTED)
       failf(data, "Cert verify failed: BADCERT_NOT_TRUSTED");
 
     return CURLE_PEER_FAILED_VERIFICATION;
@@ -717,6 +716,8 @@ mbed_connect_step3(struct connectdata *conn,
 
     ret = mbedtls_ssl_get_session(&BACKEND->ssl, our_ssl_sessionid);
     if(ret) {
+      if(ret != MBEDTLS_ERR_SSL_ALLOC_FAILED)
+        mbedtls_ssl_session_free(our_ssl_sessionid);
       free(our_ssl_sessionid);
       failf(data, "mbedtls_ssl_get_session returned -0x%x", -ret);
       return CURLE_SSL_CONNECT_ERROR;
@@ -730,6 +731,7 @@ mbed_connect_step3(struct connectdata *conn,
     retcode = Curl_ssl_addsessionid(conn, our_ssl_sessionid, 0, sockindex);
     Curl_ssl_sessionid_unlock(conn);
     if(retcode) {
+      mbedtls_ssl_session_free(our_ssl_sessionid);
       free(our_ssl_sessionid);
       failf(data, "failed to store ssl session");
       return retcode;
@@ -814,9 +816,14 @@ static void Curl_mbedtls_session_free(void *ptr)
 
 static size_t Curl_mbedtls_version(char *buffer, size_t size)
 {
+#ifdef MBEDTLS_VERSION_C
+  /* if mbedtls_version_get_number() is available it is better */
   unsigned int version = mbedtls_version_get_number();
-  return snprintf(buffer, size, "mbedTLS/%u.%u.%u", version>>24,
-                  (version>>16)&0xff, (version>>8)&0xff);
+  return msnprintf(buffer, size, "mbedTLS/%u.%u.%u", version>>24,
+                   (version>>16)&0xff, (version>>8)&0xff);
+#else
+  return msnprintf(buffer, size, "mbedTLS/%s", MBEDTLS_VERSION_STRING);
+#endif
 }
 
 static CURLcode Curl_mbedtls_random(struct Curl_easy *data,

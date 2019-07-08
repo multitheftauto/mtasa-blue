@@ -21,19 +21,19 @@ class CLocalization : public CLocalizationInterface
 {
 public:
     CLocalization(const SString& strLocale = "", const SString& strLocalePath = "");
-    ~CLocalization(void);
+    ~CLocalization();
 
     SString Translate(const SString& strMessage);
     SString TranslateWithContext(const SString& strContext, const SString& strMessage);
     SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum);
     SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum);
 
-    SString              GetTranslators(void);
-    std::vector<SString> GetAvailableLocales(void);
-    bool                 IsLocalized(void);
-    SString              GetLanguageDirectory(void);
-    SString              GetLanguageCode(void);
-    SString              GetLanguageName(void);
+    SString              GetTranslators();
+    std::vector<SString> GetAvailableLocales();
+    bool                 IsLocalized();
+    SString              GetLanguageDirectory();
+    SString              GetLanguageCode();
+    SString              GetLanguageName();
     SString              ValidateLocale(SString strLocale);
     void                 SetCurrentLanguage(SString strLocale = "");
     CLanguage*           GetLanguage(SString strLocale = "");

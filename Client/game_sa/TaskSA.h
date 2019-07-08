@@ -70,30 +70,30 @@ private:
     bool              m_bBeingDestroyed;
 
 public:
-    CTaskSA(void);
-    ~CTaskSA(void);
+    CTaskSA();
+    ~CTaskSA();
 
-    CTask*      Clone(void);
+    CTask*      Clone();
     void        SetParent(CTask* pParent);
-    CTask*      GetParent(void) { return Parent; }
-    CTask*      GetSubTask(void);
-    bool        IsSimpleTask(void);
-    int         GetTaskType(void);
+    CTask*      GetParent() { return Parent; }
+    CTask*      GetSubTask();
+    bool        IsSimpleTask();
+    int         GetTaskType();
     void        StopTimer(const CEvent* pEvent);
     bool        MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent);
-    const char* GetTaskName(void);
+    const char* GetTaskName();
 
     // our function(s)
     void              SetInterface(CTaskSAInterface* pInterface) { TaskInterface = pInterface; };
-    CTaskSAInterface* GetInterface(void) { return this->TaskInterface; }
-    bool              IsValid(void) { return this->GetInterface() != NULL; }
+    CTaskSAInterface* GetInterface() { return this->TaskInterface; }
+    bool              IsValid() { return this->GetInterface() != NULL; }
 
     void CreateTaskInterface(size_t nSize);
 
     void SetAsPedTask(CPed* pPed, const int iTaskPriority, const bool bForceNewTask = false);
     void SetAsSecondaryPedTask(CPed* pPed, const int iType);
-    void Destroy(void);
-    void DestroyJustThis(void);
+    void Destroy();
+    void DestroyJustThis();
 };
 
 union UCTask {
@@ -146,7 +146,7 @@ static T* ValidNewTask(T* pTask)
 }
 
 template <class T>
-static T* NewTask(void)
+static T* NewTask()
 {
     return ValidNewTask(new T());
 }

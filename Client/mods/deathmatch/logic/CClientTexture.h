@@ -14,10 +14,10 @@ class CClientTexture : public CClientMaterial
 public:
     CClientTexture(CClientManager* pManager, ElementID ID, CTextureItem* pTextureItem);
 
-    eClientEntityType GetType(void) const { return CCLIENTTEXTURE; }
+    eClientEntityType GetType() const { return CCLIENTTEXTURE; }
 
     // CClientTexture methods
-    CTextureItem* GetTextureItem(void) { return (CTextureItem*)m_pRenderItem; }
+    CTextureItem* GetTextureItem() { return (CTextureItem*)m_pRenderItem; }
 };
 
 class CClientRenderTarget : public CClientTexture
@@ -29,10 +29,10 @@ public:
     {
     }
 
-    eClientEntityType GetType(void) const { return CCLIENTRENDERTARGET; }
+    eClientEntityType GetType() const { return CCLIENTRENDERTARGET; }
 
     // CClientRenderTarget methods
-    CRenderTargetItem* GetRenderTargetItem(void) { return (CRenderTargetItem*)m_pRenderItem; }
+    CRenderTargetItem* GetRenderTargetItem() { return (CRenderTargetItem*)m_pRenderItem; }
 };
 
 class CClientScreenSource : public CClientTexture
@@ -44,8 +44,8 @@ public:
     {
     }
 
-    eClientEntityType GetType(void) const { return CCLIENTSCREENSOURCE; }
+    eClientEntityType GetType() const { return CCLIENTSCREENSOURCE; }
 
     // CClientScreenSource methods
-    CScreenSourceItem* GetScreenSourceItem(void) { return (CScreenSourceItem*)m_pRenderItem; }
+    CScreenSourceItem* GetScreenSourceItem() { return (CScreenSourceItem*)m_pRenderItem; }
 };

@@ -24,18 +24,10 @@ class CServerImpl;
 #include <xml/CXML.h>
 #include "CThreadCommandQueue.h"
 
-#ifndef WIN32
-    #ifdef __APPLE__
-        #include <ncurses.h>
-    #else
-        #include <ncursesw/curses.h>
-    #endif
-#endif
-
 #define SERVER_RESET_RETURN 500
 
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
-typedef CNetServer* (*InitNetServerInterface)(void);
+typedef CNetServer* (*InitNetServerInterface)();
 
 #ifdef WIN32
 typedef void(FClientFeedback)(const char* szText);
@@ -48,25 +40,25 @@ public:
     #ifdef WIN32
     CServerImpl(CThreadCommandQueue* pThreadCommandQueue);
     #else
-    CServerImpl(void);
+    CServerImpl();
     #endif
 
-    ~CServerImpl(void);
+    ~CServerImpl();
 
-    CNetServer*  GetNetwork(void);
-    CModManager* GetModManager(void);
-    CXML*        GetXML(void);
+    CNetServer*  GetNetwork();
+    CModManager* GetModManager();
+    CXML*        GetXML();
 
-    const char* GetServerModPath(void) { return m_strServerModPath; };
+    const char* GetServerModPath() { return m_strServerModPath; };
     SString     GetAbsolutePath(const char* szRelative);
 
     void Printf(const char* szText, ...);
-    bool IsRequestingExit(void);
+    bool IsRequestingExit();
 
     // Clears input buffer
-    bool ClearInput(void);
+    bool ClearInput();
     // Prints current input buffer on a new line, clears the input buffer and resets history selection
-    bool ResetInput(void);
+    bool ResetInput();
 
     int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
@@ -76,17 +68,17 @@ public:
 #endif
 
 private:
-    void MainLoop(void);
+    void MainLoop();
 
     bool ParseArguments(int iArgumentCount, char* szArguments[]);
 
     void ShowInfoTag(char* szTag);
-    void HandleInput(void);
+    void HandleInput();
     void SelectCommandHistoryEntry(uint uiEntry);
-    void HandlePulseSleep(void);
+    void HandlePulseSleep();
     void ApplyFrameRateLimit(uint uiUseRate);
 
-    void DestroyWindow(void);
+    void DestroyWindow();
 
     CDynamicLibrary  m_NetworkLibrary;
     CDynamicLibrary  m_XMLLibrary;

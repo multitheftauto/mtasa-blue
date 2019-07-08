@@ -30,12 +30,12 @@ HRESULT CProxyDirectInput8::QueryInterface(REFIID riid, LPVOID* ppvObj)
     return m_pDevice->QueryInterface(riid, ppvObj);
 }
 
-ULONG CProxyDirectInput8::AddRef(VOID)
+ULONG CProxyDirectInput8::AddRef()
 {
     return m_pDevice->AddRef();
 }
 
-ULONG CProxyDirectInput8::Release(VOID)
+ULONG CProxyDirectInput8::Release()
 {
     // Call original function
     ULONG ulRefCount = m_pDevice->Release();

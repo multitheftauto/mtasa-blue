@@ -12,7 +12,6 @@
 #ifdef MTA_CLIENT
 
 #define _WIN32_DCOM
-using namespace std;
 #include <comdef.h>
 #include <Wbemidl.h>
 
@@ -234,10 +233,10 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
         // Fill each cell
         for (unsigned int i = 0; i < vecKeys.size(); i++)
         {
-            string strKey = vecKeys[i];
-            string strValue;
+            std::string strKey = vecKeys[i];
+            std::string strValue;
 
-            wstring wstrKey(strKey.begin(), strKey.end());
+            std::wstring wstrKey(strKey.begin(), strKey.end());
             hr = pclsObj->Get(wstrKey.c_str(), 0, &vtProp, 0, 0);
 
             if (hr == WBEM_S_NO_ERROR)
@@ -275,7 +274,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 //
 //
 /////////////////////////////////////////////////////////////////////
-SString SharedUtil::GetWMIOSVersion(void)
+SString SharedUtil::GetWMIOSVersion()
 {
     SQueryWMIResult result;
 
@@ -295,7 +294,7 @@ SString SharedUtil::GetWMIOSVersion(void)
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMITotalPhysicalMemory(void)
+long long SharedUtil::GetWMITotalPhysicalMemory()
 {
     // This won't change after the first call
     static long long llResult = 0;
@@ -549,7 +548,7 @@ bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* p
 // Return true if is Windows 64 bit OS
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::Is64BitOS(void)
+bool SharedUtil::Is64BitOS()
 {
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;

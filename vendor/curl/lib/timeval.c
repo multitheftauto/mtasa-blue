@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -24,25 +24,34 @@
 
 #if defined(WIN32) && !defined(MSDOS)
 
+/* set in win32_init() */
+extern LARGE_INTEGER Curl_freq;
+extern bool Curl_isVistaOrGreater;
+
 struct curltime Curl_now(void)
 {
-  /*
-  ** GetTickCount() is available on _all_ Windows versions from W95 up
-  ** to nowadays. Returns milliseconds elapsed since last system boot,
-  ** increases monotonically and wraps once 49.7 days have elapsed.
-  */
   struct curltime now;
-#if !defined(_WIN32_WINNT) || !defined(_WIN32_WINNT_VISTA) || \
-    (_WIN32_WINNT < _WIN32_WINNT_VISTA)
-  DWORD milliseconds = GetTickCount();
-  now.tv_sec = milliseconds / 1000;
-  now.tv_usec = (milliseconds % 1000) * 1000;
-#else
-  ULONGLONG milliseconds = GetTickCount64();
-  now.tv_sec = (time_t) (milliseconds / 1000);
-  now.tv_usec = (unsigned int) (milliseconds % 1000) * 1000;
+  if(Curl_isVistaOrGreater) { /* QPC timer might have issues pre-Vista */
+    LARGE_INTEGER count;
+    QueryPerformanceCounter(&count);
+    now.tv_sec = (time_t)(count.QuadPart / Curl_freq.QuadPart);
+    now.tv_usec = (int)((count.QuadPart % Curl_freq.QuadPart) * 1000000 /
+                        Curl_freq.QuadPart);
+  }
+  else {
+    /* Disable /analyze warning that GetTickCount64 is preferred  */
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:28159)
+#endif
+    DWORD milliseconds = GetTickCount();
+#if defined(_MSC_VER)
+#pragma warning(pop)
 #endif
 
+    now.tv_sec = milliseconds / 1000;
+    now.tv_usec = (milliseconds % 1000) * 1000;
+  }
   return now;
 }
 
@@ -60,7 +69,23 @@ struct curltime Curl_now(void)
   struct timeval now;
   struct curltime cnow;
   struct timespec tsnow;
-  if(0 == clock_gettime(CLOCK_MONOTONIC, &tsnow)) {
+
+  /*
+  ** clock_gettime() may be defined by Apple's SDK as weak symbol thus
+  ** code compiles but fails during run-time if clock_gettime() is
+  ** called on unsupported OS version.
+  */
+#if defined(__APPLE__) && (HAVE_BUILTIN_AVAILABLE == 1)
+  bool have_clock_gettime = FALSE;
+  if(__builtin_available(macOS 10.12, iOS 10, tvOS 10, watchOS 3, *))
+    have_clock_gettime = TRUE;
+#endif
+
+  if(
+#if defined(__APPLE__) && (HAVE_BUILTIN_AVAILABLE == 1)
+    have_clock_gettime &&
+#endif
+    (0 == clock_gettime(CLOCK_MONOTONIC, &tsnow))) {
     cnow.tv_sec = tsnow.tv_sec;
     cnow.tv_usec = (unsigned int)(tsnow.tv_nsec / 1000);
   }
@@ -163,7 +188,7 @@ struct curltime Curl_now(void)
  */
 timediff_t Curl_timediff(struct curltime newer, struct curltime older)
 {
-  timediff_t diff = newer.tv_sec-older.tv_sec;
+  timediff_t diff = (timediff_t)newer.tv_sec-older.tv_sec;
   if(diff >= (TIME_MAX/1000))
     return TIME_MAX;
   else if(diff <= (TIME_MIN/1000))
@@ -177,7 +202,7 @@ timediff_t Curl_timediff(struct curltime newer, struct curltime older)
  */
 timediff_t Curl_timediff_us(struct curltime newer, struct curltime older)
 {
-  timediff_t diff = newer.tv_sec-older.tv_sec;
+  timediff_t diff = (timediff_t)newer.tv_sec-older.tv_sec;
   if(diff >= (TIME_MAX/1000000))
     return TIME_MAX;
   else if(diff <= (TIME_MIN/1000000))

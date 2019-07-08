@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -58,12 +58,14 @@ struct Curl_send_buffer {
 typedef struct Curl_send_buffer Curl_send_buffer;
 
 Curl_send_buffer *Curl_add_buffer_init(void);
-void Curl_add_buffer_free(Curl_send_buffer *buff);
-CURLcode Curl_add_bufferf(Curl_send_buffer *in, const char *fmt, ...);
-CURLcode Curl_add_buffer(Curl_send_buffer *in, const void *inptr, size_t size);
-CURLcode Curl_add_buffer_send(Curl_send_buffer *in,
+void Curl_add_buffer_free(Curl_send_buffer **inp);
+CURLcode Curl_add_bufferf(Curl_send_buffer **inp, const char *fmt, ...)
+  WARN_UNUSED_RESULT;
+CURLcode Curl_add_buffer(Curl_send_buffer **inp, const void *inptr,
+                         size_t size) WARN_UNUSED_RESULT;
+CURLcode Curl_add_buffer_send(Curl_send_buffer **inp,
                               struct connectdata *conn,
-                              long *bytes_written,
+                              curl_off_t *bytes_written,
                               size_t included_body_bytes,
                               int socketindex);
 
@@ -72,6 +74,9 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
 CURLcode Curl_add_custom_headers(struct connectdata *conn,
                                  bool is_connect,
                                  Curl_send_buffer *req_buffer);
+CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
+                                    Curl_send_buffer *buffer,
+                                    struct Curl_easy *handle);
 
 /* protocol-specific functions set up to be called by the main engine */
 CURLcode Curl_http(struct connectdata *conn, bool *done);
@@ -134,8 +139,6 @@ struct HTTP {
 
   const char *p_pragma;      /* Pragma: string */
   const char *p_accept;      /* Accept: string */
-  curl_off_t readbytecount;
-  curl_off_t writebytecount;
 
   /* For FORM posting */
   curl_mimepart form;
@@ -154,9 +157,11 @@ struct HTTP {
     HTTPSEND_LAST     /* never use this */
   } sending;
 
-  void *send_buffer; /* used if the request couldn't be sent in one chunk,
-                        points to an allocated send_buffer struct */
-
+#ifndef CURL_DISABLE_HTTP
+  Curl_send_buffer *send_buffer; /* used if the request couldn't be sent in
+                                    one chunk, points to an allocated
+                                    send_buffer struct */
+#endif
 #ifdef USE_NGHTTP2
   /*********** for HTTP/2 we store stream-local data here *************/
   int32_t stream_id; /* stream we are interested in */
@@ -253,4 +258,3 @@ Curl_http_output_auth(struct connectdata *conn,
                                             up the proxy tunnel */
 
 #endif /* HEADER_CURL_HTTP_H */
-

@@ -12,7 +12,7 @@
 
 #define mask(n) (~((0xFFFFFFFF << 1) << ((n) - 1)))
 
-void CLuaBitDefs::LoadFunctions(void)
+void CLuaBitDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"bitAnd", bitAnd},

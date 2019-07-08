@@ -3,9 +3,9 @@ project "curl"
 	language "C"
 	kind "StaticLib"
 	targetname "curl"
-	
+
 	includedirs { "include", "lib", "../mbedtls/include", "../zlib" }
-	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H" }
+	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H" }
 	warnings "off"
 
 	files {
@@ -39,7 +39,7 @@ project "curl"
 	filter { "system:not windows", "system:not macosx" }
 		defines { "USE_MBEDTLS" }
 
-	filter { "system:linux or bsd" }
+	filter { "system:linux or bsd or macosx" }
 		defines { "CURL_HIDDEN_SYMBOLS" }
 
 		-- find the location of the ca bundle

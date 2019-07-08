@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -237,7 +237,18 @@ void Curl_infof(struct Curl_easy *data, const char *fmt, ...)
     size_t len;
     char print_buffer[2048 + 1];
     va_start(ap, fmt);
-    vsnprintf(print_buffer, sizeof(print_buffer), fmt, ap);
+    len = mvsnprintf(print_buffer, sizeof(print_buffer), fmt, ap);
+    /*
+     * Indicate truncation of the input by replacing the last 3 characters
+     * with "...", and transfer the newline over in case the format had one.
+     */
+    if(len >= sizeof(print_buffer)) {
+      len = strlen(fmt);
+      if(fmt[--len] == '\n')
+        msnprintf(print_buffer + (sizeof(print_buffer) - 5), 5, "...\n");
+      else
+        msnprintf(print_buffer + (sizeof(print_buffer) - 4), 4, "...");
+    }
     va_end(ap);
     len = strlen(print_buffer);
     Curl_debug(data, CURLINFO_TEXT, print_buffer, len);
@@ -255,7 +266,7 @@ void Curl_failf(struct Curl_easy *data, const char *fmt, ...)
     size_t len;
     char error[CURL_ERROR_SIZE + 2];
     va_start(ap, fmt);
-    vsnprintf(error, CURL_ERROR_SIZE, fmt, ap);
+    mvsnprintf(error, CURL_ERROR_SIZE, fmt, ap);
     len = strlen(error);
 
     if(data->set.errorbuffer && !data->state.errorbuf) {
@@ -400,8 +411,9 @@ ssize_t Curl_send_plain(struct connectdata *conn, int num,
       *code = CURLE_AGAIN;
     }
     else {
+      char buffer[STRERROR_LEN];
       failf(conn->data, "Send failure: %s",
-            Curl_strerror(conn, err));
+            Curl_strerror(err, buffer, sizeof(buffer)));
       conn->data->state.os_errno = err;
       *code = CURLE_SEND_ERROR;
     }
@@ -465,8 +477,9 @@ ssize_t Curl_recv_plain(struct connectdata *conn, int num, char *buf,
       *code = CURLE_AGAIN;
     }
     else {
+      char buffer[STRERROR_LEN];
       failf(conn->data, "Recv failure: %s",
-            Curl_strerror(conn, err));
+            Curl_strerror(err, buffer, sizeof(buffer)));
       conn->data->state.os_errno = err;
       *code = CURLE_RECV_ERROR;
     }

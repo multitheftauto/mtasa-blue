@@ -346,7 +346,7 @@ SString SString::TrimEnd(const char* szOld) const
 //
 // Change to all lower case characters.
 //
-SString SString::ToLower(void) const
+SString SString::ToLower() const
 {
     SString strResult = *this;
     std::transform(strResult.begin(), strResult.end(), strResult.begin(), SharedUtil::tolower<uchar>);
@@ -356,7 +356,7 @@ SString SString::ToLower(void) const
 //
 // Change to all upper case characters.
 //
-SString SString::ToUpper(void) const
+SString SString::ToUpper() const
 {
     SString strResult = *this;
     std::transform(strResult.begin(), strResult.end(), strResult.begin(), SharedUtil::toupper<uchar>);
@@ -366,7 +366,7 @@ SString SString::ToUpper(void) const
 //
 // Change '0x0a' or '0x0d' or '0x0d 0x0a' to '\n'.
 //
-SString SString::ConformLineEndings(void) const
+SString SString::ConformLineEndings() const
 {
     assert('\n' == '\x0A');
     if (std::count(begin(), end(), '\n'))

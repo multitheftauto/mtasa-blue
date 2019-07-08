@@ -190,18 +190,20 @@ public:
 
     CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
     void                              InitEmptyAssociations(RpClump* pClump);
-    bool                              IsCreated(void);
-    int                               GetNumAnimations(void);
-    CAnimBlock*                       GetAnimBlock(void);
+    bool                              IsCreated();
+    int                               GetNumAnimations();
+    CAnimBlock*                       GetAnimBlock();
     CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
-    AssocGroupId                      GetGroupID(void) { return m_pInterface->groupID; };
+    AssocGroupId                      GetGroupID();
     void                              CreateAssociations(const char* szBlockName);
 
-    bool IsLoaded(void);
+    bool IsLoaded();
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
 
+    CAnimBlendAssocGroupSAInterface*  GetInterface() { return m_pInterface; }
+
 protected:
-    void SetupAnimBlock(void);
+    void SetupAnimBlock();
 
     CAnimBlendAssocGroupSAInterface* m_pInterface;
     CAnimBlockSA*                    m_pAnimBlock;

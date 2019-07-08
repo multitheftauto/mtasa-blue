@@ -51,7 +51,6 @@ public:
     LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
-    LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
     LUA_DECLARE(ClearChatBox);
 
@@ -201,6 +200,7 @@ public:
     LUA_DECLARE(AddCommandHandler);
     LUA_DECLARE(RemoveCommandHandler);
     LUA_DECLARE(ExecuteCommandHandler);
+    LUA_DECLARE(GetCommandHandlers);
 
     // Utility
     LUA_DECLARE(GetNetworkUsageData);
