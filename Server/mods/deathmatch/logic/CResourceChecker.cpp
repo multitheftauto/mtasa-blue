@@ -23,8 +23,8 @@ extern CNetServer* g_pRealNetServer;
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string& strResourceZip)
 {
-    m_strMinClientReqFromMetaXml = pResource->GetMinClientReqFromMetaXml();
-    m_strMinServerReqFromMetaXml = pResource->GetMinServerReqFromMetaXml();
+    m_strMinClientFromMetaXml = pResource->GetMinClientFromMetaXml();
+    m_strMinServerFromMetaXml = pResource->GetMinServerFromMetaXml();
     m_strReqClientVersion = "";
     m_strReqServerVersion = "";
     m_strReqClientReason = "";
@@ -321,15 +321,15 @@ void CResourceChecker::CheckMetaSourceForIssues(CXMLNode* pRootNode, const strin
                                                 bool* pbOutHasChanged)
 {
     // Check min_mta_version is correct
-    if (m_strReqClientVersion > m_strMinClientReqFromMetaXml || m_strReqServerVersion > m_strMinServerReqFromMetaXml)
+    if (m_strReqClientVersion > m_strMinClientFromMetaXml || m_strReqServerVersion > m_strMinServerFromMetaXml)
     {
         // It's not right. What to do?
         if (checkerMode == ECheckerMode::WARNINGS)
         {
             SString strTemp = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-            if (m_strReqClientVersion > m_strMinClientReqFromMetaXml)
+            if (m_strReqClientVersion > m_strMinClientFromMetaXml)
                 strTemp += SString("client %s because of '%s')", *m_strReqClientVersion, *m_strReqClientReason);
-            else if (m_strReqServerVersion > m_strMinServerReqFromMetaXml)
+            else if (m_strReqServerVersion > m_strMinServerFromMetaXml)
                 strTemp += SString("server %s because of '%s')", *m_strReqServerVersion, *m_strReqServerReason);
 
             CLogger::LogPrint(SString("WARNING: %s %s\n", strResourceName.c_str(), *strTemp));
@@ -339,7 +339,7 @@ void CResourceChecker::CheckMetaSourceForIssues(CXMLNode* pRootNode, const strin
             // Create min_mta_version node if required
             CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode("min_mta_version", 0);
             if (!pNodeMinMtaVersion)
-                pNodeMinMtaVersion = pRootNode->CreateSubNode("min_mta_version");
+                pNodeMinMtaVersion = pRootNode->CreateSubNode("min_mta_version", pRootNode->FindSubNode("info"));
 
             CXMLAttributes& attributes = pNodeMinMtaVersion->GetAttributes();
             attributes.Delete("server");
@@ -626,7 +626,7 @@ long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLen
             continue;
 
         // Look for identifier
-        bool bIsFirstIdent = (isalpha(c) || c == '_' || c == '$');
+        bool bIsFirstIdent = (isalpha(c) || c == '_' || c == '$' || c == '.' || c == ':');
         bool bIsMidIdent = (isdigit(c) || bIsFirstIdent);
         bool bIsNonIdent = !bIsMidIdent;
 
@@ -747,8 +747,8 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
     if (!strOutVersion.empty())
     {
         // Function behaviour depends on min_mta_version setting
-        const CMtaVersion& strMinReqFromMetaXml = bClientScript ? m_strMinClientReqFromMetaXml : m_strMinServerReqFromMetaXml;
-        if (strMinReqFromMetaXml < strOutVersion)
+        const CMtaVersion& strMinFromMetaXml = bClientScript ? m_strMinClientFromMetaXml : m_strMinServerFromMetaXml;
+        if (strMinFromMetaXml < strOutVersion)
             return ECheckerWhat::MODIFIED;
         return ECheckerWhat::NONE;
     }
@@ -765,9 +765,6 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& s
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckVersionRequirements(const string& strIdentifierName, bool bClientScript)
 {
-    //    if ( MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE )
-    //        return;
-
     static CHashMap<SString, CMtaVersion> clientFunctionMap;
     static CHashMap<SString, CMtaVersion> serverFunctionMap;
 

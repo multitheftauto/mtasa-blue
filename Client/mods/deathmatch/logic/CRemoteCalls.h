@@ -29,6 +29,7 @@ private:
     CLuaArguments       m_FetchArguments;
     SHttpRequestOptions m_options;
     EDownloadModeType   m_downloadMode = EDownloadModeType::NONE;
+    SDownloadStatus     m_lastDownloadStatus;
 
 public:
     CRemoteCall(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
@@ -43,7 +44,7 @@ public:
     void        MakeCall();
     static void DownloadFinishedCallback(const SHttpDownloadResult& result);
     bool        CancelDownload(void);
-    bool        GetDownloadStatus(SDownloadStatus& outDownloadStatus);
+    const       SDownloadStatus& GetDownloadStatus();
 
     CLuaMain*           GetVM() { return m_VM; };
     signed int          GetStartTime() { return m_iStartTime; };
