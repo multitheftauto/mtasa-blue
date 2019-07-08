@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <ctime>
 
 using std::list;
 
@@ -236,12 +235,7 @@ CRemoteCall::~CRemoteCall()
 
 void CRemoteCall::MakeCall()
 {
-    time_t timer;
-    
-    time(&timer);
-    localtime(&timer);
-    
-    m_iStartTime = timer;
+    m_iStartTime = GetTickCount64_();
 
     // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
     SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <ctime>
 
 extern CGame* g_pGame;
 
@@ -237,12 +236,7 @@ CRemoteCall::~CRemoteCall()
 
 void CRemoteCall::MakeCall()
 {
-    time_t timer;
-
-    time(&timer);
-    localtime(&timer);
-
-    m_iStartTime = timer;
+    m_iStartTime = GetTickCount64_();
 
     m_downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
     CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(m_downloadMode);

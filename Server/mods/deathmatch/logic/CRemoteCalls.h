@@ -23,7 +23,7 @@ private:
     bool                m_bIsFetch;
     class CLuaMain*     m_VM;
     CLuaFunctionRef     m_iFunction;
-    signed int          m_iStartTime;
+    long long           m_iStartTime;
     SString             m_strURL;
     SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
@@ -49,7 +49,7 @@ public:
     const       SDownloadStatus& GetDownloadStatus();
     
     CLuaMain*           GetVM() { return m_VM; };
-    signed int          GetStartTime() { return m_iStartTime; };
+    long long           GetStartTime() { return m_iStartTime; };
     SString             GetURL() { return m_strURL; };
     SString             GetQueueName() { return m_strQueueName; };
     CLuaArguments&      GetFetchArguments() { return m_FetchArguments; };
