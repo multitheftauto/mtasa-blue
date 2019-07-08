@@ -340,6 +340,5 @@ const SDownloadStatus& CRemoteCall::GetDownloadStatus()
             m_lastDownloadStatus = newDownloadStatus;
         }
     }
-    outDownloadStatus = {0};
-    return false;
+    return m_lastDownloadStatus;
 }

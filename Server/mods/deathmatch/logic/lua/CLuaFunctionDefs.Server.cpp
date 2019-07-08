@@ -828,16 +828,13 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushNumber(pRemoteCall->GetOptions().uiConnectTimeoutMs);
 
         // download info
-        SDownloadStatus downloadInfo;
+        SDownloadStatus downloadInfo = pRemoteCall->GetDownloadStatus();
 
-        if (pRemoteCall->GetDownloadStatus(downloadInfo))
-        {
-            info.PushString("bytesReceived");
-            info.PushNumber(downloadInfo.uiBytesReceived);
+        info.PushString("bytesReceived");
+        info.PushNumber(downloadInfo.uiBytesReceived);
 
-            info.PushString("bytesTotal");
-            info.PushNumber(downloadInfo.uiContentLength);
-        }
+        info.PushString("bytesTotal");
+        info.PushNumber(downloadInfo.uiContentLength);
 
         info.PushString("currentAttempt");
         info.PushNumber(downloadInfo.uiAttemptNumber);
