@@ -1970,9 +1970,14 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString("type");
         info.PushString((pRemoteCall->IsFetch() ? "fetch" : "call"));
 
-        // TODO: remove query_string from url when bExtendedInfo isn't set
+        // remove query_string from url when bExtendedInfo isn't set
+        SString sURL = pRemoteCall->GetURL();
+
+        if (!bExtendedInfo)
+            sURL = sURL.ReplaceI("%3F", "?").Replace("#", "?").SplitLeft("?");
+
         info.PushString("url");
-        info.PushString(pRemoteCall->GetURL().c_str());
+        info.PushString(sURL);
 
         info.PushString("queue");
         info.PushString(pRemoteCall->GetQueueName().c_str());
