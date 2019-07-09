@@ -15,8 +15,6 @@ void CLuaUtilDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-        {"deref", Dereference},
-        {"ref", Reference},
         {"getTickCount", GetTickCount_},
         {"getRealTime", GetCTime},
         {"split", Split},
@@ -59,38 +57,6 @@ int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
 {
     m_pScriptDebugging->LogError(luaVM, "Unsafe function was called.");
 
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUtilDefs::Dereference(lua_State* luaVM)
-{
-    int              iPointer = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iPointer);
-
-    if (!argStream.HasErrors())
-    {
-        lua_getref(luaVM, iPointer);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUtilDefs::Reference(lua_State* luaVM)
-{
-    CScriptArgReader argStream(luaVM);
-
-    if (!argStream.NextIsNil() && !argStream.NextIsNone())
-    {
-        int iPointer = lua_ref(luaVM, 1);
-        lua_pushnumber(luaVM, iPointer);
-        return 1;
-    }
     lua_pushboolean(luaVM, false);
     return 1;
 }
