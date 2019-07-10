@@ -54,6 +54,8 @@ public:
 
     RwTexDictionary* CreateTextureDictionary(std::vector<RwTexture*>& vecTextures);
 
+    void CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* pSourceGeometry);
+
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
 

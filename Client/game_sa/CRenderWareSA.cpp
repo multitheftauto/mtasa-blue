@@ -180,8 +180,8 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
     return true;
 }
 
-static bool g_CurrentReadDFFWithoutReplacingCOL = false;
-static int g_CurrentDFFWriteModelID = 0;
+static bool                  g_CurrentReadDFFWithoutReplacingCOL = false;
+static int                   g_CurrentDFFWriteModelID = 0;
 static CColModelSAInterface* g_CurrentReadDFFCOLModel = nullptr;
 
 /*
@@ -203,169 +203,162 @@ static CColModelSAInterface* g_CurrentReadDFFCOLModel = nullptr;
 0x0253f2fe: frame
 0x0253f2ff: unused_16*/
 
-bool IsPluginUsed(RwPluginRegEntry *pPluginRegistryEntry, void* pObject)
+bool IsPluginUsed(RwPluginRegEntry* pPluginRegistryEntry, void* pObject)
 {
     if (pPluginRegistryEntry->pluginID >= (DWORD)0x0253F2F0)
     {
-        //std::printf("IsPluginUsed: pluginId = %#.8x\n", pPluginRegistryEntry->pluginID);
+        // std::printf("IsPluginUsed: pluginId = %#.8x\n", pPluginRegistryEntry->pluginID);
         switch (pPluginRegistryEntry->pluginID)
         {
-            /*
-            case (DWORD)0x0253F2F3: // pipeline_set
+                /*
+                case (DWORD)0x0253F2F3: // pipeline_set
+                {
+                 return false;
+                }
+                */
+
+            case (DWORD)0x0253F2F4:            // unused_5
             {
-             return false;
+                // return false;
+
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+                /*
+                case (DWORD)0x0253F2F5: // texdictionary_link
+                {
+                return false;
+                }
+                */
+
+            case (DWORD)0x0253F2F6:            // specular_material
+            {
+                // return false;
+
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            /*
+            case (DWORD)0x0253F2F7: // unused_8
+            {
+            return false;
             }
             */
-
-        case (DWORD)0x0253F2F4: // unused_5
-        {
-            //return false;
-
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            if (!*pPluginData)
+            case (DWORD)0x0253F2F8:            // effect_2d
             {
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            case (DWORD)0x0253F2F9:            // extra_vert_colour
+            {
+                // return false;
+
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            case (DWORD)0x0253F2FA:            // collision_model
+            {
+                // Is vehicle model?
+                if (g_CurrentDFFWriteModelID >= 400 && g_CurrentDFFWriteModelID <= 611)
+                {
+                    return true;
+                }
                 return false;
             }
-            return true;
 
-        }
-        /*
-        case (DWORD)0x0253F2F5: // texdictionary_link
-        {
-        return false;
-        }
-        */
-
-        case (DWORD)0x0253F2F6: // specular_material
-        {
-           // return false;
-
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            if (!*pPluginData)
+            /*
+            case (DWORD)0x0253F2FB: // gta_hanim
             {
-                return false;
+            return false;
             }
-            return true;
-
-        }
-
-        /*
-        case (DWORD)0x0253F2F7: // unused_8
-        {
-        return false;
-        }
-        */
-        case (DWORD)0x0253F2F8: // effect_2d
-        {
-         
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            if (!*pPluginData)
+            */
+            case (DWORD)0x0253F2FC:            // reflection_material
             {
-                return false;
+                // return false;
+
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                // CCustomCarEnvMapPipeline::fakeEnvMapPipeMatData = 0xc02d18
+                if (*pPluginData == (DWORD)0xc02d18 || !*pPluginData)
+                {
+                    return false;
+                }
+                return true;
             }
-            return true;
-           
-        }
 
-
-        case (DWORD)0x0253F2F9: // extra_vert_colour
-        {
-            //return false;
-
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            if (!*pPluginData)
+            case (DWORD)0x0253F2FD:            // breakable
             {
-                return false;
-            }
-            return true;
+                // return false;
 
-        }
-        
-        case (DWORD)0x0253F2FA: // collision_model
-        {
-            // Is vehicle model?
-            if (g_CurrentDFFWriteModelID >= 400 && g_CurrentDFFWriteModelID <= 611)
+                DWORD* pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
+
+                if (!*pPluginData)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            /*
+            case (DWORD)0x0253F2FE: // frame
+            {
+            return false;
+            }
+
+            case (DWORD)0x0253F2FF: // unused_16
+            {
+            return false;
+            }
+            */
+            default:
             {
                 return true;
             }
-            return false;
-        }
-        
-        /*
-        case (DWORD)0x0253F2FB: // gta_hanim
-        {
-        return false;
-        }
-        */
-        case (DWORD)0x0253F2FC: // reflection_material
-        {
-           // return false;
-
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            // CCustomCarEnvMapPipeline::fakeEnvMapPipeMatData = 0xc02d18
-            if (*pPluginData == (DWORD)0xc02d18 || !*pPluginData)
-            {
-                return false;
-            }
-            return true;
-
-        }
-
-        case (DWORD)0x0253F2FD: // breakable
-        {
-            //return false;
-
-            DWORD * pPluginData = (DWORD*)(pPluginRegistryEntry->offset + ((unsigned char*)pObject));
-
-            if (!*pPluginData)
-            {
-                return false;
-            }
-            return true;
-
-        }
-
-        /*
-        case (DWORD)0x0253F2FE: // frame
-        {
-        return false;
-        }
-
-        case (DWORD)0x0253F2FF: // unused_16
-        {
-        return false;
-        }
-        */
-        default:
-        {
-            return true;
-        }
         }
     }
-    return true;;
+    return true;
+    ;
 }
 
-int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* pObject)
+int __cdecl _rwPluginRegistryGetSize(RwPluginRegistry* pPluginRegistry, void* pObject)
 {
     int iTotalPluginsSize = 0;
 
-    RwPluginRegEntry *pPluginRegistryEntry = pPluginRegistry->firstRegEntry;
+    RwPluginRegEntry* pPluginRegistryEntry = pPluginRegistry->firstRegEntry;
     for (iTotalPluginsSize = 0; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
     {
         bool bPluginUsed = IsPluginUsed(pPluginRegistryEntry, pObject);
         if (!bPluginUsed)
         {
-            //std::printf("rwPluginRegistryGetSize: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
+            // std::printf("rwPluginRegistryGetSize: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
         }
-       
+
         if (pPluginRegistryEntry->getSizeCB && bPluginUsed)
         {
-           // std::printf("rwPluginRegistryGetSize: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
+            // std::printf("rwPluginRegistryGetSize: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, pObject);
 
             int iRegistryEntrySize = pPluginRegistryEntry->getSizeCB(pObject, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
             if (iRegistryEntrySize > 0)
@@ -373,27 +366,23 @@ int  __cdecl _rwPluginRegistryGetSize(RwPluginRegistry *pPluginRegistry, void* p
                 iTotalPluginsSize += iRegistryEntrySize + 12;
             }
 
-           // iTotalPluginsSize += 12;
+            // iTotalPluginsSize += 12;
         }
     }
     return iTotalPluginsSize;
 }
 
-RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1, RwStream *stream, const void* object)
+RwPluginRegistry* __cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry* a1, RwStream* stream, const void* object)
 {
-
-    auto _rwStreamWriteVersionedChunkHeader = (RwStream *(__cdecl*)(RwStream *stream, int type, int size, int version, unsigned __int16 buildNum))0x7ED270;
-
+    auto _rwStreamWriteVersionedChunkHeader = (RwStream * (__cdecl*)(RwStream * stream, int type, int size, int version, unsigned __int16 buildNum))0x7ED270;
 
     int iTotalPluginsSize = _rwPluginRegistryGetSize(a1, (void*)object);
 
-    
     // This check fixes a crash for writing TXD
     /*if (iTotalPluginsSize <= 0)
     {
         return a1;
     }*/
-    
 
     if (!_rwStreamWriteVersionedChunkHeader(stream, 3, iTotalPluginsSize, 0x36003, 0xFFFFu))
     {
@@ -413,7 +402,8 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
             bool bPluginUsed = IsPluginUsed(pPluginRegistryEntry, (void*)object);
             if (!bPluginUsed)
             {
-              //std::printf("_rwPluginRegistryWriteDataChunks: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, (void*)object);
+                // std::printf("_rwPluginRegistryWriteDataChunks: skipping for pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID,
+                // (void*)object);
             }
 
             if (pPluginRegistryEntry->writeCB && bPluginUsed)
@@ -423,21 +413,20 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
                     int i = 0;
                 }
 
-                //std::printf("rwWriteDataChunks: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, object);
+                // std::printf("rwWriteDataChunks: pluginID: '%#.8x' | pObject = %p\n", pPluginRegistryEntry->pluginID, object);
 
                 int iPluginDataSize = GetSize(object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
                 if (iPluginDataSize > 0)
                 {
+                    if (!_rwStreamWriteVersionedChunkHeader(stream, pPluginRegistryEntry->pluginID, iPluginDataSize, 0x36003, 0xFFFFu))
+                    {
+                        return nullptr;
+                    }
 
-                if (!_rwStreamWriteVersionedChunkHeader(stream, pPluginRegistryEntry->pluginID, iPluginDataSize, 0x36003, 0xFFFFu))
-                {
-                    return nullptr;
-                }
-
-                if (!pPluginRegistryEntry->writeCB(stream, iPluginDataSize, object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size))
-                {
-                    return nullptr;
-                }
+                    if (!pPluginRegistryEntry->writeCB(stream, iPluginDataSize, object, pPluginRegistryEntry->offset, pPluginRegistryEntry->size))
+                    {
+                        return nullptr;
+                    }
                 }
             }
         }
@@ -446,26 +435,25 @@ RwPluginRegistry *__cdecl _rwPluginRegistryWriteDataChunks(RwPluginRegistry *a1,
     return a1;
 }
 
-
 #pragma pack(push, 1)
 struct GeometryMeshExt
 {
-    unsigned int m_uiPosRule;
-    unsigned short m_usNumVertices;
-    short _pad0;
-    RwV3d *m_pVertexPos;
-    RwTextureCoordinates *m_pTexCoors;
-    RwRGBA *m_pVertexColors;
-    unsigned short m_usNumTriangles;
-    short _pad1;
-    RpTriangle *m_pTriangles;
-    unsigned short *m_pMaterialAssignments;
-    unsigned short m_usNumMaterials;
-    short _pad2;
-    RwTexture **m_pTextures;
-    char *m_pTextureNames;
-    char *m_pMaskNames;
-    RwSurfaceProperties *m_pMaterialProperties;
+    unsigned int          m_uiPosRule;
+    unsigned short        m_usNumVertices;
+    short                 _pad0;
+    RwV3d*                m_pVertexPos;
+    RwTextureCoordinates* m_pTexCoors;
+    RwRGBA*               m_pVertexColors;
+    unsigned short        m_usNumTriangles;
+    short                 _pad1;
+    RpTriangle*           m_pTriangles;
+    unsigned short*       m_pMaterialAssignments;
+    unsigned short        m_usNumMaterials;
+    short                 _pad2;
+    RwTexture**           m_pTextures;
+    char*                 m_pTextureNames;
+    char*                 m_pMaskNames;
+    RwSurfaceProperties*  m_pMaterialProperties;
 };
 #pragma pack(pop)
 
@@ -491,30 +479,29 @@ int BreakableStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     return size;
 }
 
-
-RwStream *__cdecl PipelinePluginWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+RwStream* __cdecl PipelinePluginWriteCB(RwStream* stream, int length, unsigned char* pObject, int offsetInObject)
 {
-    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+    auto RwStreamWrite = (RwStream * (__cdecl*)(RwStream * stream, void* buffer, int length))0x7ECB30;
 
     RwStreamWrite(stream, (void*)(pObject + offsetInObject), length);
     return stream;
 }
 
-void*__cdecl PipelinePluginDestructCB(void *object, int offsetInObject, int sizeInObject)
+void* __cdecl PipelinePluginDestructCB(void* object, int offsetInObject, int sizeInObject)
 {
     return object;
 }
 
 struct ExtraVertColourPlugin
 {
-    RwRGBA* nightColors; // array of RwRGBAs per vertice
-    RwRGBA* dayColors; // array of RwRGBAs per vertice
-    float dnParam;
+    RwRGBA* nightColors;            // array of RwRGBAs per vertice
+    RwRGBA* dayColors;              // array of RwRGBAs per vertice
+    float   dnParam;
 };
 
-RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+RwStream* __cdecl PluginExtraVertColourStreamWriteCB(RwStream* stream, int length, unsigned char* pObject, int offsetInObject)
 {
-    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+    auto RwStreamWrite = (RwStream * (__cdecl*)(RwStream * stream, void* buffer, int length))0x7ECB30;
 
     // GTA SA was dereferencing the pointer `pObject + offsetInObject` and causing the game to crash
     // in the write callback function. Fixed it.
@@ -530,7 +517,7 @@ RwStream *__cdecl PluginExtraVertColourStreamWriteCB(RwStream *stream, int lengt
 
 int PluginExtraVertColourStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
 {
-    int size = 0;
+    int         size = 0;
     RpGeometry* pGeometry = (RpGeometry*)pObject;
     if (pGeometry)
     {
@@ -542,13 +529,13 @@ int PluginExtraVertColourStreamGetSizeCB(unsigned char* pObject, int pluginOffse
 
 struct t2dEffectPlugin
 {
-    unsigned int uiCount;
-    C2dEffectSAInterface arrEffects [];
+    unsigned int         uiCount;
+    C2dEffectSAInterface arrEffects[];
 };
 
-RwStream *__cdecl Plugin2DEffectStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+RwStream* __cdecl Plugin2DEffectStreamWriteCB(RwStream* stream, int length, unsigned char* pObject, int offsetInObject)
 {
-    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+    auto RwStreamWrite = (RwStream * (__cdecl*)(RwStream * stream, void* buffer, int length))0x7ECB30;
 
     t2dEffectPlugin* pEffectPlugin = *(t2dEffectPlugin**)(pObject + offsetInObject);
     if (!pEffectPlugin)
@@ -562,118 +549,118 @@ RwStream *__cdecl Plugin2DEffectStreamWriteCB(RwStream *stream, int length, unsi
     {
         C2dEffectSAInterface& the2dEffect = pEffectPlugin->arrEffects[i];
 
-        //C2dEffectSAInterface* p2dEffect = (C2dEffectSAInterface*)( ((unsigned char*)pEffectPlugin) + 4  + (sizeof(C2dEffectSAInterface)*i));
-        //std::printf("2DEffectWrite: type: %d | type in hex: %#.8x | type addr: %p\n",
+        // C2dEffectSAInterface* p2dEffect = (C2dEffectSAInterface*)( ((unsigned char*)pEffectPlugin) + 4  + (sizeof(C2dEffectSAInterface)*i));
+        // std::printf("2DEffectWrite: type: %d | type in hex: %#.8x | type addr: %p\n",
         //    p2dEffect->m_nType, p2dEffect->m_nType, (void*)&p2dEffect->m_nType);
 
         // Write the position
         RwStreamWrite(stream, &the2dEffect, 12);
 
-        unsigned char arrTypeAndPadding [4] = {the2dEffect.m_nType, 0, 0, 0};
+        unsigned char arrTypeAndPadding[4] = {the2dEffect.m_nType, 0, 0, 0};
         RwStreamWrite(stream, &arrTypeAndPadding, 4);
 
         switch (the2dEffect.m_nType)
         {
-        case EFFECT_LIGHT:
-        {
-            // 80 bytes = write look x, y, and z values as well
-            int iSizeOfStruct = 80;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
+            case EFFECT_LIGHT:
+            {
+                // 80 bytes = write look x, y, and z values as well
+                int iSizeOfStruct = 80;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
 
-            // write 20 bytes from m_color till m_fShadowSize
-            RwStreamWrite(stream, &the2dEffect.light, 20);
+                // write 20 bytes from m_color till m_fShadowSize
+                RwStreamWrite(stream, &the2dEffect.light, 20);
 
-            // write 4 bytes from m_nCoronaFlashType till m_nShadowColorMultiplier
-            RwStreamWrite(stream, &the2dEffect.light.m_nCoronaFlashType, 4);
+                // write 4 bytes from m_nCoronaFlashType till m_nShadowColorMultiplier
+                RwStreamWrite(stream, &the2dEffect.light.m_nCoronaFlashType, 4);
 
-            unsigned char* pFlags = reinterpret_cast<unsigned char*>(&the2dEffect.light.m_nFlags);
-            RwStreamWrite(stream, pFlags, 1);
-            RwStreamWrite(stream, &the2dEffect.light.m_pCoronaTex->name, 24);
-            RwStreamWrite(stream, &the2dEffect.light.m_pShadowTex->name, 24);
-            RwStreamWrite(stream, &the2dEffect.light.m_nShadowZDistance, 1);
-            pFlags++;
-            RwStreamWrite(stream, pFlags, 1);
+                unsigned char* pFlags = reinterpret_cast<unsigned char*>(&the2dEffect.light.m_nFlags);
+                RwStreamWrite(stream, pFlags, 1);
+                RwStreamWrite(stream, &the2dEffect.light.m_pCoronaTex->name, 24);
+                RwStreamWrite(stream, &the2dEffect.light.m_pShadowTex->name, 24);
+                RwStreamWrite(stream, &the2dEffect.light.m_nShadowZDistance, 1);
+                pFlags++;
+                RwStreamWrite(stream, pFlags, 1);
 
-            // write look X, Y, and Z directions
-            RwStreamWrite(stream, &the2dEffect.light.offsetX, 3);
+                // write look X, Y, and Z directions
+                RwStreamWrite(stream, &the2dEffect.light.offsetX, 3);
 
-            short sPadding = 0;
-            RwStreamWrite(stream, &sPadding, 2);
-            break;
-        }
-        case EFFECT_PARTICLE:
-        {
-            int iSizeOfStruct = 24;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.particle, iSizeOfStruct);
-            break;
-        }
-        case EFFECT_ATTRACTOR:
-        {
-            int iSizeOfStruct = 56;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nAttractorType, 1);
+                short sPadding = 0;
+                RwStreamWrite(stream, &sPadding, 2);
+                break;
+            }
+            case EFFECT_PARTICLE:
+            {
+                int iSizeOfStruct = 24;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.particle, iSizeOfStruct);
+                break;
+            }
+            case EFFECT_ATTRACTOR:
+            {
+                int iSizeOfStruct = 56;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nAttractorType, 1);
 
-            int iPadding = 0;
-            RwStreamWrite(stream, &iPadding, 3);
+                int iPadding = 0;
+                RwStreamWrite(stream, &iPadding, 3);
 
-            RwStreamWrite(stream, &the2dEffect.pedAttractor, 36);
-            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_szScriptName, 8);
-            RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nPedExistingProbability, 1);
-            RwStreamWrite(stream, &iPadding, 3);
+                RwStreamWrite(stream, &the2dEffect.pedAttractor, 36);
+                RwStreamWrite(stream, &the2dEffect.pedAttractor.m_szScriptName, 8);
+                RwStreamWrite(stream, &the2dEffect.pedAttractor.m_nPedExistingProbability, 1);
+                RwStreamWrite(stream, &iPadding, 3);
 
-            unsigned char arrLast4Bytes[4] = {the2dEffect.pedAttractor.field_36, 0, the2dEffect.pedAttractor.m_nFlags , 0};   
-            RwStreamWrite(stream, &arrLast4Bytes, 4);
-            break;
-        }
-        case EFFECT_ENEX:
-        {
-            int iSizeOfStruct = 44;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.enEx, iSizeOfStruct);
-            break;
-        }
-        case EFFECT_ROADSIGN:
-        {
-            int iSizeOfStruct = 88;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
+                unsigned char arrLast4Bytes[4] = {the2dEffect.pedAttractor.field_36, 0, the2dEffect.pedAttractor.m_nFlags, 0};
+                RwStreamWrite(stream, &arrLast4Bytes, 4);
+                break;
+            }
+            case EFFECT_ENEX:
+            {
+                int iSizeOfStruct = 44;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.enEx, iSizeOfStruct);
+                break;
+            }
+            case EFFECT_ROADSIGN:
+            {
+                int iSizeOfStruct = 88;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
 
-            RwStreamWrite(stream, &the2dEffect.roadsign, 22);
-            RwStreamWrite(stream, the2dEffect.roadsign.m_pText, 64);
+                RwStreamWrite(stream, &the2dEffect.roadsign, 22);
+                RwStreamWrite(stream, the2dEffect.roadsign.m_pText, 64);
 
-            short sPadding = 0;
-            RwStreamWrite(stream, &sPadding, 2);
-            break;
-        }
-        case EFFECT_SLOTMACHINE_WHEEL:
-        {
-            int iSizeOfStruct = 4;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.iSlotMachineIndex, iSizeOfStruct);
-            break;
-        }
-        case EFFECT_COVER_POINT:
-        {
-            int iSizeOfStruct = 12;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.coverPoint, iSizeOfStruct);
-            break;
-        }
-        case EFFECT_ESCALATOR:
-        {
-            int iSizeOfStruct = 40;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-            RwStreamWrite(stream, &the2dEffect.escalator, iSizeOfStruct);
-            break;
-        }
-        default:
-        {
-            int iSizeOfStruct = 0;
-            RwStreamWrite(stream, &iSizeOfStruct, 4);
-        }
+                short sPadding = 0;
+                RwStreamWrite(stream, &sPadding, 2);
+                break;
+            }
+            case EFFECT_SLOTMACHINE_WHEEL:
+            {
+                int iSizeOfStruct = 4;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.iSlotMachineIndex, iSizeOfStruct);
+                break;
+            }
+            case EFFECT_COVER_POINT:
+            {
+                int iSizeOfStruct = 12;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.coverPoint, iSizeOfStruct);
+                break;
+            }
+            case EFFECT_ESCALATOR:
+            {
+                int iSizeOfStruct = 40;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+                RwStreamWrite(stream, &the2dEffect.escalator, iSizeOfStruct);
+                break;
+            }
+            default:
+            {
+                int iSizeOfStruct = 0;
+                RwStreamWrite(stream, &iSizeOfStruct, 4);
+            }
         }
     }
-    
+
     return stream;
 }
 
@@ -684,7 +671,6 @@ int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     t2dEffectPlugin* pEffectPlugin = *(t2dEffectPlugin**)(pObject + pluginOffset);
     if (pEffectPlugin)
     {
-
         // number of effects
         size += 4;
 
@@ -693,10 +679,10 @@ int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
             C2dEffectSAInterface& the2dEffect = pEffectPlugin->arrEffects[i];
 
             // std::printf("EffectGetSizeCB: effect type: %d\n", the2dEffect.m_nType);
-            
+
             // common header size
             size += 20;
-           
+
             switch (the2dEffect.m_nType)
             {
                 case EFFECT_LIGHT:
@@ -741,24 +727,21 @@ int Plugin2DEffectStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
                     break;
                 }
             }
-            
         }
     }
     return size;
 }
 
-
-
 int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset);
 
-RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, unsigned char * pObject, int offsetInObject)
+RwStream* __cdecl PluginCollisionStreamWriteCB(RwStream* stream, int length, unsigned char* pObject, int offsetInObject)
 {
-    auto RwStreamWrite = (RwStream *(__cdecl*)(RwStream *stream, void *buffer, int length))0x7ECB30;
+    auto RwStreamWrite = (RwStream * (__cdecl*)(RwStream * stream, void* buffer, int length))0x7ECB30;
 
     auto pColModelInterface = g_CurrentReadDFFCOLModel;
     auto pColData = pColModelInterface->pColData;
 
-    ColModelFileHeader colFileHeader = { 0 };
+    ColModelFileHeader colFileHeader = {0};
     memcpy(colFileHeader.version, "COL3", 4);
     colFileHeader.size = PluginCollisionStreamGetSizeCB(pObject, offsetInObject) - 8;
     colFileHeader.modelId = g_CurrentDFFWriteModelID;
@@ -770,11 +753,11 @@ RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, uns
     char padding = 0;
     RwStreamWrite(stream, &padding, 1);
 
-    unsigned char arrFlags[4] = { pColData->m_nFlags, 0, 0, 0 };
+    unsigned char arrFlags[4] = {pColData->m_nFlags, 0, 0, 0};
     RwStreamWrite(stream, &arrFlags, 4);
 
-    unsigned int offsetCollisionSphere = sizeof(CColDataSA); // 0x30
-    offsetCollisionSphere += 68; // this really isn't needed but it's there.
+    unsigned int offsetCollisionSphere = sizeof(CColDataSA);            // 0x30
+    offsetCollisionSphere += 68;                                        // this really isn't needed but it's there.
     unsigned int offsetCollisionBoxes = offsetCollisionSphere + (sizeof(CColSphereSA) * pColData->numColSpheres);
     unsigned int offsetCollisionLinesOrDisks = offsetCollisionBoxes + (sizeof(CColBoxSA) * pColData->numColBoxes);
     unsigned int uiCollisionLinesOrDisksSize = sizeof(CColLineSA) * pColData->numLinesOrDisks;
@@ -790,16 +773,19 @@ RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, uns
         for (unsigned short i = 0; i < pColData->numColTriangles; i++)
         {
             CColTriangleSA& colTriangle = pColData->pColTriangles[i];
-            if (colTriangle.vertexIndex1 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex1;
-            if (colTriangle.vertexIndex2 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex2;
-            if (colTriangle.vertexIndex3 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex3;
+            if (colTriangle.vertexIndex1 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex1;
+            if (colTriangle.vertexIndex2 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex2;
+            if (colTriangle.vertexIndex3 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex3;
         }
     }
 
     unsigned int numVertices = usHighestVertexIndex > 0 ? (usHighestVertexIndex + 1) : 0;
     unsigned int offsetCollisionTriangles = offsetCollisionVertices + (sizeof(CCompressedVectorSA) * numVertices);
-    unsigned int offsetCollisionTrianglePlanes = offsetCollisionTriangles + sizeof(CColTriangleSA) * pColData->numColTriangles; 
-    unsigned int offsetCollisionShadowVertices = offsetCollisionTrianglePlanes + 0; // don't write triangle planes
+    unsigned int offsetCollisionTrianglePlanes = offsetCollisionTriangles + sizeof(CColTriangleSA) * pColData->numColTriangles;
+    unsigned int offsetCollisionShadowVertices = offsetCollisionTrianglePlanes + 0;            // don't write triangle planes
     unsigned int offsetCollisionShadowTriangles = offsetCollisionShadowVertices + sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices;
 
     unsigned theCollisionOffset = 0;
@@ -819,9 +805,8 @@ RwStream *__cdecl PluginCollisionStreamWriteCB(RwStream *stream, int length, uns
     theCollisionOffset = pColData->pColTriangles ? offsetCollisionTriangles : 0;
     RwStreamWrite(stream, &theCollisionOffset, 4);
 
-    theCollisionOffset =  0;
+    theCollisionOffset = 0;
     RwStreamWrite(stream, &theCollisionOffset, 4);
-
 
     // shadow data exists for version >= COL3
     RwStreamWrite(stream, &pColData->m_nNumShadowTriangles, 4);
@@ -889,9 +874,12 @@ int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
         for (unsigned short i = 0; i < pColData->numColTriangles; i++)
         {
             CColTriangleSA& colTriangle = pColData->pColTriangles[i];
-            if (colTriangle.vertexIndex1 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex1;
-            if (colTriangle.vertexIndex2 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex2;
-            if (colTriangle.vertexIndex3 > usHighestVertexIndex) usHighestVertexIndex = colTriangle.vertexIndex3;
+            if (colTriangle.vertexIndex1 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex1;
+            if (colTriangle.vertexIndex2 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex2;
+            if (colTriangle.vertexIndex3 > usHighestVertexIndex)
+                usHighestVertexIndex = colTriangle.vertexIndex3;
         }
     }
 
@@ -899,12 +887,11 @@ int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
 
     int size = 0;
 
-    
     size += sizeof(ColModelFileHeader);
-    size += 88; // COL3 data
+    size += 88;            // COL3 data
     size += sizeof(CColSphereSA) * pColData->numColSpheres;
-    size += sizeof(CColBoxSA) * pColData->numColBoxes; 
-    
+    size += sizeof(CColBoxSA) * pColData->numColBoxes;
+
     size += uiCollisionLinesOrDisksSize;
     size += sizeof(CCompressedVectorSA) * numVertices;
     size += sizeof(CColTriangleSA) * pColData->numColTriangles;
@@ -912,7 +899,7 @@ int PluginCollisionStreamGetSizeCB(unsigned char* pObject, int pluginOffset)
     // Ignore triangle planes
     size += sizeof(CCompressedVectorSA) * pColData->m_nNumShadowVertices;
     size += sizeof(CColTriangleSA) * pColData->m_nNumShadowTriangles;
-    
+
     return size;
 }
 
@@ -954,7 +941,7 @@ void RegisterGeometryPluginsCallBacks()
         switch (pPluginRegistryEntry->pluginID)
         {
             // breakable plugin
-            case(DWORD)0x253F2FD:
+            case (DWORD)0x253F2FD:
             {
                 pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)BreakableStreamGetSizeCB;
                 break;
@@ -969,7 +956,7 @@ void RegisterGeometryPluginsCallBacks()
             }
 
             /// ExtraVertColours plugin (night colors)
-            case(DWORD)0x253F2F9:
+            case (DWORD)0x253F2F9:
             {
                 pPluginRegistryEntry->writeCB = (RwPluginDataChunkWriteCallBack)PluginExtraVertColourStreamWriteCB;
                 pPluginRegistryEntry->getSizeCB = (RwPluginDataChunkGetSizeCallBack)PluginExtraVertColourStreamGetSizeCB;
@@ -978,7 +965,6 @@ void RegisterGeometryPluginsCallBacks()
         }
     }
 }
-
 
 SString g_CurrentDFFBeingGeneratedFileName;
 
@@ -1009,8 +995,8 @@ void CRenderWareSA::DeleteReadDFFCollisionModel()
 
 void __cdecl OnCCollisionPlugin__read(CColModelSAInterface* pColModel)
 {
-    auto CBaseModelInfo_SetColModel = (void(__thiscall*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool))0x4C4BC0;
-    CBaseModelInfoSAInterface*&CCollisionPlugin__ms_currentModel = *(CBaseModelInfoSAInterface**)0x9689E0;
+    auto                        CBaseModelInfo_SetColModel = (void(__thiscall*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool))0x4C4BC0;
+    CBaseModelInfoSAInterface*& CCollisionPlugin__ms_currentModel = *(CBaseModelInfoSAInterface**)0x9689E0;
 
     if (g_CurrentReadDFFWithoutReplacingCOL)
     {
@@ -1115,7 +1101,8 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions,
+                                RwTexDictionary* pTexDict)
 {
     if (pTexDict)
     {
@@ -1173,15 +1160,13 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // close the stream
     RwStreamClose(streamModel, NULL);
-    
 
     return pClump;
-    
 }
 
 bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary)
 {
-    RwStream * pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
+    RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
     if (pStream)
     {
         RwTexDictionaryStreamWrite(pTxdDictionary, pStream);
@@ -1193,7 +1178,7 @@ bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDi
 
 bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
 {
-    auto RpClumpStreamWrite = (void (__cdecl*)(RpClump*, RwStream *))0x74AA10;
+    auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream*))0x74AA10;
 
     RwStream* pStream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, *strFilename);
     if (pStream)
@@ -1204,7 +1189,6 @@ bool CRenderWareSA::WriteDFF(const SString& strFilename, RpClump* pClump)
     }
     return false;
 }
-
 
 bool CRenderWareSA::WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary)
 {
@@ -1223,7 +1207,7 @@ bool CRenderWareSA::WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxd
 
 bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
 {
-    auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream *))0x74AA10;
+    auto RpClumpStreamWrite = (void(__cdecl*)(RpClump*, RwStream*))0x74AA10;
 
     RwStream theStream;
     memset(&theStream, 0, sizeof(RwStream));
@@ -1240,7 +1224,7 @@ bool CRenderWareSA::WriteDFF(void* pData, size_t dataSize, RpClump* pClump)
 
 RwTexDictionary* CRenderWareSA::CreateTextureDictionary(std::vector<RwTexture*>& vecTextures)
 {
-    auto RwTexDictionaryCreate = (RwTexDictionary *(__cdecl*)())0x7F3600;
+    auto RwTexDictionaryCreate = (RwTexDictionary * (__cdecl*)())0x7F3600;
 
     RwTexDictionary* pTextureDictionary = RwTexDictionaryCreate();
     for (auto& pTexture : vecTextures)
@@ -1248,6 +1232,355 @@ RwTexDictionary* CRenderWareSA::CreateTextureDictionary(std::vector<RwTexture*>&
         RwTexDictionaryAddTexture(pTextureDictionary, pTexture);
     }
     return pTextureDictionary;
+}
+
+void* RwEngineInstance_memoryAlloc_Skin()
+{
+    typedef void*(__cdecl * hmemoryAlloc)(void*, unsigned int);
+
+    struct tRwGlobals
+    {
+        signed char  padding[324];
+        hmemoryAlloc memoryAlloc;
+    };
+
+    void*&       rpSkinGlobals = *reinterpret_cast<void**>(0xC978B8);
+    tRwGlobals*& RwEngineInstance = *reinterpret_cast<tRwGlobals**>(0xC97B24);
+    return RwEngineInstance->memoryAlloc(rpSkinGlobals, 0x30116);
+}
+
+void* RwEngineInstance_memoryFuncs_rwmalloc(unsigned int size)
+{
+    typedef void*(__cdecl * hmemoryFuncs_rwmalloc)(unsigned int, unsigned int);
+
+    struct tRwGlobals
+    {
+        char                  pad308[308];
+        hmemoryFuncs_rwmalloc memoryFuncs_rwmalloc;
+    };
+
+    tRwGlobals*& RwEngineInstance = *reinterpret_cast<tRwGlobals**>(0xC97B24);
+    return RwEngineInstance->memoryFuncs_rwmalloc(size, 0x30116);
+}
+
+// RwMatrixWeights
+struct RwMatrixWeights
+{
+    float w0;
+    float w1;
+    float w2;
+    float w3;
+};
+
+#pragma pack(push, 1)
+struct RpSkin
+{
+    unsigned int     numBones;
+    unsigned int     numBoneIds;
+    unsigned char*   boneIds;
+    RwMatrix*        skinToBoneMatrices;
+    unsigned int     maxNumWeightsForVertex;
+    unsigned int*    vertexBoneIndices;
+    RwMatrixWeights* vertexBoneWeights;
+    char             field_1C[8];
+    // Split data start
+    unsigned int    boneLimit;
+    unsigned int    numMeshes;
+    unsigned int    numRLE;
+    unsigned char*  meshBoneRemapIndices;
+    unsigned short* meshBoneRLECount;
+    unsigned short* meshBoneRLE;
+    // split data end
+    void* pAllocatedMemory;            // does not include split data. Another block of memory is
+                                       // allocated for split data and stored in meshBoneRemapIndices
+};
+#pragma pack(pop)
+
+void CRenderWareSA::CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* pSourceGeometry)
+{
+    RwTexture* CloneRwTexture(RwTexture * pTextureToCopyFrom);
+    auto       breakable_operator_new = (void*(__cdecl*)(int a1))0x82119A;
+    auto       CMemoryMgr_Malloc = (void*(__cdecl*)(int size))0x72F420;
+    auto       _rpMeshHeaderCreate = (void*(__cdecl*)(int size))0x758920;
+
+    RwPluginRegistry& geometryTKList = *(RwPluginRegistry*)0x8D628C;
+    for (auto pPluginRegistryEntry = geometryTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
+    {
+        DWORD* pDest = (DWORD*)(((uint8_t*)pDestGeometry) + pPluginRegistryEntry->offset);
+        DWORD* pSource = (DWORD*)(((uint8_t*)pSourceGeometry) + pPluginRegistryEntry->offset);
+
+        if (pPluginRegistryEntry->pluginID < 0x0253F2F0)
+        {
+            switch (pPluginRegistryEntry->pluginID)
+            {
+                // SkinPLG
+                case 0x116:
+                {
+                    if (!*pSource)
+                    {
+                        break;
+                    }
+
+                    *pDest = (DWORD)RwEngineInstance_memoryAlloc_Skin();
+
+                    RpSkin* pDestSkin = (RpSkin*)*pDest;
+                    RpSkin* pSourceSkin = (RpSkin*)*pSource;
+                    *pDestSkin = *pSourceSkin;
+
+                    unsigned int skinDataSize = (pSourceSkin->numBones << 6) + 20 * pSourceGeometry->vertices_size + pSourceSkin->numBoneIds + 15;
+                    uint8_t*     pDestMemory = (uint8_t*)RwEngineInstance_memoryFuncs_rwmalloc(skinDataSize);
+                    memset(pDestMemory, 0, skinDataSize);
+
+                    unsigned int sizeOfBoneIds = pSourceSkin->numBoneIds + 15;
+                    unsigned int sizeOfSkinToBoneMatrices = sizeof(RwMatrix) * pSourceSkin->numBones;
+                    unsigned int sizeOfVertexBoneIndices = sizeof(unsigned int) * pSourceGeometry->vertices_size;
+                    unsigned int sizeOfVertexBoneWeights = sizeof(RwMatrixWeights) * pSourceGeometry->vertices_size;
+
+                    pDestSkin->pAllocatedMemory = pDestMemory;
+                    pDestSkin->boneIds = pDestMemory;
+                    memcpy(pDestSkin->boneIds, pSourceSkin->boneIds, sizeOfBoneIds);
+                    pDestMemory += sizeOfBoneIds;
+
+                    pDestSkin->skinToBoneMatrices = (RwMatrix*)pDestMemory;
+                    memcpy(pDestSkin->skinToBoneMatrices, pSourceSkin->skinToBoneMatrices, sizeOfSkinToBoneMatrices);
+                    pDestMemory += sizeOfSkinToBoneMatrices;
+
+                    pDestSkin->vertexBoneIndices = (unsigned int*)pDestMemory;
+                    memcpy(pDestSkin->vertexBoneIndices, pSourceSkin->vertexBoneIndices, sizeOfVertexBoneIndices);
+                    pDestMemory += sizeOfVertexBoneIndices;
+
+                    pDestSkin->vertexBoneWeights = (RwMatrixWeights*)pDestMemory;
+                    memcpy(pDestSkin->vertexBoneWeights, pSourceSkin->vertexBoneWeights, sizeOfVertexBoneWeights);
+
+                    if (pSourceSkin->maxNumWeightsForVertex && pSourceSkin->meshBoneRemapIndices)
+                    {
+                        skinDataSize = pSourceSkin->numBones + 2 * (pSourceSkin->numMeshes + pSourceSkin->numRLE);
+                        pDestMemory = (uint8_t*)RwEngineInstance_memoryFuncs_rwmalloc(skinDataSize);
+
+                        unsigned int sizeOfMeshBoneRLECount = sizeof(unsigned short) * pSourceSkin->numMeshes;
+                        unsigned int sizeOfMeshBoneRLE = sizeof(unsigned short) * pSourceSkin->numRLE;
+
+                        pDestSkin->meshBoneRemapIndices = pDestMemory;
+
+                        memcpy(pDestSkin->meshBoneRemapIndices, pSourceSkin->meshBoneRemapIndices, pSourceSkin->numBones);
+                        pDestMemory += pSourceSkin->numBones;
+
+                        pDestSkin->meshBoneRLECount = (unsigned short*)pDestMemory;
+                        memcpy(pDestSkin->meshBoneRLECount, pSourceSkin->meshBoneRLECount, sizeOfMeshBoneRLECount);
+                        pDestMemory += sizeOfMeshBoneRLECount;
+
+                        pDestSkin->meshBoneRLE = (unsigned short*)pDestMemory;
+                        memcpy(pDestSkin->meshBoneRLE, pSourceSkin->meshBoneRLE, sizeOfMeshBoneRLE);
+                    }
+
+                    break;
+                }
+
+                // BinMeshPLG
+                case 0x50E:
+                {
+                    unsigned int size = (sizeof(RpMeshHeader) + ((sizeof(RpMesh) + 4) * pSourceGeometry->mesh->numMeshes));
+                    unsigned int sizeOfIndicesInBytes = sizeof(RxVertexIndex) * pSourceGeometry->mesh->totalIndicesInMesh;
+                    size += sizeOfIndicesInBytes;
+
+                    pDestGeometry->mesh = (RpMeshHeader*)_rpMeshHeaderCreate(size);
+                    memcpy(pDestGeometry->mesh, pSourceGeometry->mesh, sizeof(RpMeshHeader));
+
+                    RpMesh*        pSourceMesh = (RpMesh*)(pSourceGeometry->mesh + 1);
+                    RpMesh*        pDestMesh = (RpMesh*)(pDestGeometry->mesh + 1);
+                    RxVertexIndex* meshIndices = (RxVertexIndex*)(pDestMesh + pSourceGeometry->mesh->numMeshes);
+
+                    unsigned int numMeshes = pSourceGeometry->mesh->numMeshes;
+                    while (numMeshes--)
+                    {
+                        pDestMesh->numIndices = pSourceMesh->numIndices;
+                        pDestMesh->indices = meshIndices;
+                        memcpy(pDestMesh->indices, pSourceMesh->indices, sizeof(RxVertexIndex) * pSourceMesh->numIndices);
+
+                        pDestMesh->material = nullptr;
+                        if (pSourceMesh->material)
+                        {
+                            for (int i = 0; i < pSourceGeometry->materials.entries; i++)
+                            {
+                                if (pSourceGeometry->materials.materials[i] == pSourceMesh->material)
+                                {
+                                    pDestMesh->material = pDestGeometry->materials.materials[i];
+                                    break;
+                                }
+                            }
+                        }
+
+                        meshIndices += pSourceMesh->numIndices;
+                        pDestMesh++;
+                        pSourceMesh++;
+                    }
+                    break;
+                }
+            }
+            continue;
+        }
+
+        if (!IsPluginUsed(pPluginRegistryEntry, pSourceGeometry) || !pPluginRegistryEntry->getSizeCB)
+        {
+            continue;
+        }
+
+        switch (pPluginRegistryEntry->pluginID)
+        {
+            // 2D effect plugin
+            case 0x0253F2F8:
+            {
+                t2dEffectPlugin* pSourceEffectPlugin = *(t2dEffectPlugin**)(pSource);
+                *pDest = (DWORD)CMemoryMgr_Malloc((pSourceEffectPlugin->uiCount << 6) + 4);
+
+                t2dEffectPlugin* pDestEffectPlugin = *(t2dEffectPlugin**)(pDest);
+
+                pDestEffectPlugin->uiCount = pSourceEffectPlugin->uiCount;
+
+                for (unsigned int i = 0; i < pSourceEffectPlugin->uiCount; i++)
+                {
+                    C2dEffectSAInterface& theSource2DEffect = pSourceEffectPlugin->arrEffects[i];
+                    C2dEffectSAInterface& theDest2DEffect = pDestEffectPlugin->arrEffects[i];
+                    // pDestEffectPlugin->arrEffects[i] = theSource2DEffect;
+
+                    theDest2DEffect.m_vecPosn = theSource2DEffect.m_vecPosn;
+                    theDest2DEffect.m_nType = theSource2DEffect.m_nType;
+                    unsigned char effectType = theSource2DEffect.m_nType;
+
+                    switch (effectType)
+                    {
+                        case EFFECT_LIGHT:
+                        {
+                            theDest2DEffect.light = theSource2DEffect.light;
+                            if (theSource2DEffect.light.m_pCoronaTex)
+                            {
+                                theDest2DEffect.light.m_pCoronaTex = CloneRwTexture(theSource2DEffect.light.m_pCoronaTex);
+                            }
+
+                            if (theSource2DEffect.light.m_pShadowTex)
+                            {
+                                theDest2DEffect.light.m_pShadowTex = CloneRwTexture(theSource2DEffect.light.m_pShadowTex);
+                            }
+                            break;
+                        }
+                        case EFFECT_PARTICLE:
+                        {
+                            theDest2DEffect.particle = theSource2DEffect.particle;
+                            break;
+                        }
+                        case EFFECT_ATTRACTOR:
+                        {
+                            theDest2DEffect.pedAttractor = theSource2DEffect.pedAttractor;
+                            break;
+                        }
+                        case EFFECT_ENEX:
+                        {
+                            theDest2DEffect.enEx = theSource2DEffect.enEx;
+                            break;
+                        }
+                        case EFFECT_ROADSIGN:
+                        {
+                            theDest2DEffect.roadsign = theSource2DEffect.roadsign;
+
+                            char* pText = (char*)CMemoryMgr_Malloc(64);
+                            char* pSourceText = theSource2DEffect.roadsign.m_pText;
+                            memcpy(pText, pSourceText, 64);
+                            theDest2DEffect.roadsign.m_pText = pText;
+
+                            break;
+                        }
+                        case EFFECT_SLOTMACHINE_WHEEL:
+                        {
+                            theDest2DEffect.iSlotMachineIndex = theSource2DEffect.iSlotMachineIndex;
+                            break;
+                        }
+                        case EFFECT_COVER_POINT:
+                        {
+                            theDest2DEffect.coverPoint = theSource2DEffect.coverPoint;
+                            break;
+                        }
+                        case EFFECT_ESCALATOR:
+                        {
+                            theDest2DEffect.escalator = theSource2DEffect.escalator;
+                            break;
+                        }
+                        default:
+                        {
+                            printf("unknown 2D effect\n");
+                        }
+                    }
+                }
+                break;
+            }
+
+            // ExtraVertColours plugin (night colors)
+            case 0x253F2F9:
+            {
+                ExtraVertColourPlugin* pSourceExtraVertColour = (ExtraVertColourPlugin*)(pSource);
+                ExtraVertColourPlugin* pDestExtraVertColour = (ExtraVertColourPlugin*)(pDest);
+
+                pDestExtraVertColour->nightColors = (RwRGBA*)CMemoryMgr_Malloc(4 * pSourceGeometry->vertices_size);
+                pDestExtraVertColour->dayColors = (RwRGBA*)CMemoryMgr_Malloc(4 * pSourceGeometry->vertices_size);
+                memcpy(pDestExtraVertColour->nightColors, pSourceExtraVertColour->nightColors, 4 * pSourceGeometry->vertices_size);
+                break;
+            }
+
+            // breakable plugin
+            case 0x0253F2FD:
+            {
+                int iRegistryEntrySize = pPluginRegistryEntry->getSizeCB(pSourceGeometry, pPluginRegistryEntry->offset, pPluginRegistryEntry->size);
+                *pDest = (DWORD)breakable_operator_new(iRegistryEntrySize - 4);
+                GeometryMeshExt* pDestGeometryMeshExt = *(GeometryMeshExt**)pDest;
+                GeometryMeshExt* pSourceGeometryMeshExt = *(GeometryMeshExt**)pSource;
+                *pDestGeometryMeshExt = *pSourceGeometryMeshExt;
+
+                unsigned int sizeOfVertices = sizeof(RwV3d) * pSourceGeometryMeshExt->m_usNumVertices;
+                unsigned int sizeOfTexCoords = sizeof(RwTextureCoordinates) * pSourceGeometryMeshExt->m_usNumVertices;
+                unsigned int sizeOfVertexColors = sizeof(RwRGBA) * pSourceGeometryMeshExt->m_usNumVertices;
+                unsigned int sizeOfTriangles = sizeof(RpBreakableTriangle) * pSourceGeometryMeshExt->m_usNumTriangles;
+                unsigned int sizeOfMaterialAssignments = sizeof(unsigned short) * pSourceGeometryMeshExt->m_usNumTriangles;
+                unsigned int sizeOfTextureNames = 32 * pSourceGeometryMeshExt->m_usNumMaterials;
+                unsigned int sizeOfMaskNames = 32 * pSourceGeometryMeshExt->m_usNumMaterials;
+                unsigned int sizeOfMaterialProperties = sizeof(RwSurfaceProperties) * pSourceGeometryMeshExt->m_usNumMaterials;
+
+                uint8_t* pDestMemory = (uint8_t*)*pDest;
+                pDestMemory += sizeof(GeometryMeshExt);
+
+                pDestGeometryMeshExt->m_pVertexPos = (RwV3d*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pVertexPos, pSourceGeometryMeshExt->m_pVertexPos, sizeOfVertices);
+                pDestMemory += sizeOfVertices;
+
+                pDestGeometryMeshExt->m_pTexCoors = (RwTextureCoordinates*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pTexCoors, pSourceGeometryMeshExt->m_pTexCoors, sizeOfTexCoords);
+                pDestMemory += sizeOfTexCoords;
+
+                pDestGeometryMeshExt->m_pVertexColors = (RwRGBA*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pVertexColors, pSourceGeometryMeshExt->m_pVertexColors, sizeOfVertexColors);
+                pDestMemory += sizeOfVertexColors;
+
+                pDestGeometryMeshExt->m_pTriangles = (RpTriangle*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pTriangles, pSourceGeometryMeshExt->m_pTriangles, sizeOfTriangles);
+                pDestMemory += sizeOfTriangles;
+
+                pDestGeometryMeshExt->m_pMaterialAssignments = (unsigned short*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pMaterialAssignments, pSourceGeometryMeshExt->m_pMaterialAssignments, sizeOfMaterialAssignments);
+                pDestMemory += sizeOfMaterialAssignments;
+
+                pDestGeometryMeshExt->m_pTextureNames = (char*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pTextureNames, pSourceGeometryMeshExt->m_pTextureNames, sizeOfTextureNames);
+                pDestMemory += sizeOfTextureNames;
+
+                pDestGeometryMeshExt->m_pMaskNames = (char*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pMaskNames, pSourceGeometryMeshExt->m_pMaskNames, sizeOfMaskNames);
+                pDestMemory += sizeOfMaskNames;
+
+                pDestGeometryMeshExt->m_pMaterialProperties = (RwSurfaceProperties*)pDestMemory;
+                memcpy(pDestGeometryMeshExt->m_pMaterialProperties, pSourceGeometryMeshExt->m_pMaterialProperties, sizeOfMaterialProperties);
+
+                break;
+            }
+        }
+    }
 }
 
 //
@@ -1335,12 +1668,12 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
                     DWORD                               dwDeleteFunc = FUNC_CVehicleStructure_delete;
                     CVehicleModelVisualInfoSAInterface* info = pVehicleModelInfoInterface->pVisualInfo;
                     _asm
-                    {
+                        {
                         mov     eax, info
                         push    eax
                         call    dwDeleteFunc
                         add     esp, 4
-                    }
+                        }
                     pVehicleModelInfoInterface->pVisualInfo = nullptr;
                 }
             }
@@ -1348,11 +1681,11 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             _asm
-            {
+                {
                 mov     ecx, pModelInfoInterface
                 push    pNewClone
                 call    dwFunc
-            }
+                }
 
             // Destroy old clump container
             RpClumpDestroy(pOldClump);
@@ -1572,20 +1905,30 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
+RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom)
+{
+    auto       CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
+    RwTexture* pCopiedTexture = CClothesBuilder_CopyTexture(pTextureToCopyFrom);
+    if (pCopiedTexture)
+    {
+        memcpy(pCopiedTexture->name, pTextureToCopyFrom->name, RW_TEXTURE_NAME_LENGTH);
+        memcpy(pCopiedTexture->mask, pTextureToCopyFrom->mask, RW_TEXTURE_NAME_LENGTH);
+    }
+    return pCopiedTexture;
+}
+
 RwTexDictionary* CRenderWareSA::CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom)
 {
-    auto CClothesBuilder_CopyTexture = (RwTexture *(__cdecl*)(RwTexture *texture))0x5A5730;
+    auto CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
 
     std::vector<RwTexture*> outTextureList;
     GetTxdTextures(outTextureList, pTextureDictionaryToCopyFrom);
 
     for (auto& pTexture : outTextureList)
     {
-        RwTexture* pCopiedTexture = CClothesBuilder_CopyTexture(pTexture);
+        RwTexture* pCopiedTexture = CloneRwTexture(pTexture);
         if (pCopiedTexture)
         {
-            memcpy(pCopiedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
-            memcpy(pCopiedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
             RwTexDictionaryAddTexture(pResultTextureDictionary, pCopiedTexture);
         }
     }
@@ -1619,12 +1962,12 @@ void GetRasterRect(RwRaster* raster, RECT& rect)
 
 RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat)
 {
-    auto         RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
-    auto         RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
-    auto         RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
-    auto         RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+    auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
+    auto RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+    auto RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+    auto RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
 
-    RwRaster*  raster = pTexture->raster;
+    RwRaster* raster = pTexture->raster;
 
     HRESULT hr = NULL;
 

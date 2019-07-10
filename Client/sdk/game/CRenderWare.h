@@ -77,6 +77,7 @@ public:
     virtual bool             WriteTXD(void* pData, size_t dataSize, RwTexDictionary* pTxdDictionary) = 0;
     virtual bool             WriteDFF(void* pData, size_t dataSize, RpClump* pClump) = 0;
     virtual RwTexDictionary* CreateTextureDictionary(std::vector<RwTexture*>& vecTextures) = 0;
+    virtual void             CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* pSourceGeometry) = 0;
     virtual void             GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;

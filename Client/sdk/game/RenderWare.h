@@ -44,7 +44,7 @@ typedef short RwInt16;
 typedef unsigned short RwUInt16;
 typedef unsigned char RwUInt8;
 typedef signed char RwInt8;
-
+typedef RwUInt16                    RxVertexIndex;
 typedef struct RwV2d                RwV2d;
 typedef struct RwV3d                RwV3d;
 typedef struct RwPlane              RwPlane;
@@ -683,6 +683,14 @@ struct RpMaterials
     int          entries;
     int          unknown;
 };
+
+#pragma pack(push, 1)
+struct RpBreakableTriangle
+{
+    unsigned short vertIndex[3];
+};
+#pragma pack(pop)
+
 struct RpTriangle
 {
     unsigned short vertIndex[3];
@@ -709,8 +717,26 @@ struct RpGeometry
     RpMorphTarget       *  morphTarget;  /* The Morph Target */
 };
 
+typedef struct RpMesh RpMesh;
 
-
+/**
+ * \ingroup rpmesh
+ * \struct RpMesh
+ * This type represents a single polygon mesh.
+ * A mesh is defined as a collection of triangles derived from an RpGeometry
+ * or RpWorldSector which have a common material.
+ *
+ * See API functions \see RpGeometryForAllMeshes and
+ * \see RpWorldSectorForAllMeshes and
+ * the corresponding function callback types:
+ */
+struct RpMesh
+{
+    RxVertexIndex* indices;    /**< vertex indices defining the mesh */
+    RwUInt32       numIndices; /**< number of vertices in mesh */
+    RpMaterial*    material;   /**< pointer to material used to
+                                *   render the mesh. */
+};
 /*****************************************************************************/
 /** RenderWare I/O                                                          **/
 /*****************************************************************************/

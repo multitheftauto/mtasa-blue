@@ -207,79 +207,6 @@ bool VectorNormalize(RwV3d* pIn, RwV3d* pOut)
     return false;
 }
 
-bool ReMapGeometryUVs(FILE* file, int firstIndex, int meshID, RpGeometry* pGeometry, std::vector<CTextureAtlas>& vecTextureAtlases)
-{
-    RwV3d* pVertices = pGeometry->morphTarget->verts;
-    // RwV3d* pNormals = pGeometry->morphTarget->normals;
-    RwTextureCoordinates* pTextureCoordinateArray = pGeometry->texcoords[0];
-    RwV3d                 normal;
-    for (int i = 0; i < pGeometry->vertices_size; i++)
-    {
-        VectorNormalize(&pVertices[i], &normal);
-        fprintf(file, "v %g %g %g\n", pVertices[i].x, pVertices[i].z, pVertices[i].y);
-        fprintf(file, "vn %g %g %g\n", normal.x, normal.z, normal.y);
-        fprintf(file, "vt %g %g\n", pTextureCoordinateArray[i].u, pTextureCoordinateArray[i].v);
-    }
-    fprintf(file, "o mesh%03u\n", meshID);
-    // fprintf(file, "usemtl repack_atlas\n");
-    fprintf(file, "s off\n");
-
-    RpTriangle* triangles = pGeometry->triangles;
-    for (int i = 0; i < pGeometry->triangles_size; i++)
-    {
-        RpTriangle& triangle = triangles[i];
-        fprintf(file, "f ");
-        for (uint32_t j = 0; j < 3; j++)
-        {
-            const uint32_t index = firstIndex + triangle.vertIndex[j] + 1;            // 1-indexed
-            fprintf(file, "%d/%d/%d%c", index, index, index, j == 2 ? '\n' : ' ');
-        }
-    }
-    return true;
-}
-
-bool ReMapClumpUVs(RpClump* pClump, std::vector<CTextureAtlas>& vecTextureAtlases)
-{
-    auto RpGeometryLock = (RpGeometry * (__cdecl*)(RpGeometry * geometry, RwInt32 lockMode))0x74C7D0;
-    auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
-
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-
-    std::vector<RpAtomic*> outAtomicList;
-    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
-
-    const char* modelFilePath = "C:\\Users\\danish\\Desktop\\clump_output.obj";
-    FILE*       file;
-    if (fopen_s(&file, modelFilePath, "w") != 0)
-    {
-        printf("ReMapClumpUVs: Failed to open file\n");
-        return false;
-    }
-
-    int firstIndex = 0;
-    int meshID = 0;
-    for (auto& pAtomic : outAtomicList)
-    {
-        RpGeometryLock(pAtomic->geometry, rpGEOMETRYLOCKALL);
-
-        if (!ReMapGeometryUVs(file, firstIndex, meshID, pAtomic->geometry, vecTextureAtlases))
-        {
-            RpGeometryUnlock(pAtomic->geometry);
-            return false;
-        }
-
-        meshID++;
-        firstIndex += pAtomic->geometry->vertices_size;
-        RpGeometryUnlock(pAtomic->geometry);
-    }
-
-    if (file)
-    {
-        fclose(file);
-    }
-    return true;
-}
-
 void GetTextures(RpClump* pClump, std::vector<uint32_t>& textures, std::vector<CDXTexture>& texturesCache)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
@@ -516,7 +443,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
 
     CTextureAtlas& textureAtlas = CTextureAtlas(atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs);
 
-    std::string              textureAtlasFileExtension = ".png";
+    std::string textureAtlasFileExtension = ".png";
 
     std::vector<std::string> atlasNames;
     atlasNames.resize(textureAtlas.atlasDXTextures.size());
@@ -526,7 +453,6 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         sprintf(buffer, "myAtlas%d", i);
         atlasNames[i] = buffer;
     }
-
 
     const char* modelFilePath = "C:\\Users\\danish\\Desktop\\clump_output.obj";
     printf("Writing '%s'...\n", modelFilePath);
@@ -570,7 +496,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
                     const xatlas::Vertex& v = mesh.vertexArray[vertexIndex];
                     atlasIndex = v.atlasIndex;            // The same for every vertex in the triangle.
                 }
- 
+
                 if (atlasIndex >= 0 && atlasIndex != previousAtlasIndex)
                 {
                     previousAtlasIndex = atlasIndex;
@@ -616,21 +542,104 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     }
 }
 
+RpGeometry* CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format)
+{
+    auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
+    auto RpGeometryCreate = (RpGeometry * (__cdecl*)(int numVerts, int numTriangles, int format))0x74CA90;
+    auto _rpMaterialListCopy = (RpMaterials * (__cdecl*)(RpMaterials * matListOut, const RpMaterials* matListIn))0x74E1F0;
+
+    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
+
+    RpGeometry* pGeometry = RpGeometryCreate(numVerts, numTriangles, format);
+
+    if (!pGeometry)
+    {
+        printf(" failed to create geometry\n");
+        return nullptr;
+    }
+
+    RpGeometryUnlock(pGeometry);
+
+    if (pOriginalGeometry->triangles)
+    {
+        memcpy(pGeometry->triangles, pOriginalGeometry->triangles, sizeof(RpTriangle) * numTriangles);
+    }
+
+    // morphing is not used in GTA SA, so we are assuming that there is only 1 morph target
+    if (pOriginalGeometry->morphTarget->verts)
+    {
+        memcpy(pGeometry->morphTarget->verts, pOriginalGeometry->morphTarget->verts, sizeof(RwV3d) * numVerts);
+    }
+
+    if (pOriginalGeometry->morphTarget->normals)
+    {
+        memcpy(pGeometry->morphTarget->normals, pOriginalGeometry->morphTarget->normals, sizeof(RwV3d) * numVerts);
+    }
+
+    if (pOriginalGeometry->colors)
+    {
+        memcpy(pGeometry->colors, pOriginalGeometry->colors, sizeof(RwColor) * numVerts);
+    }
+
+    for (int i = 0; i < pOriginalGeometry->texcoords_size; i++)
+    {
+        RwTextureCoordinates* pOrignialTextureCoordinateArray = pOriginalGeometry->texcoords[i];
+        RwTextureCoordinates* pTextureCoordinateArray = pGeometry->texcoords[i];
+        for (int vertexIndex = 0; vertexIndex < numVerts; vertexIndex++)
+        {
+            pTextureCoordinateArray[vertexIndex] = pOrignialTextureCoordinateArray[vertexIndex];
+        }
+    }
+
+    _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
+
+    pRenderWare->CopyGeometryPlugins(pGeometry, pOriginalGeometry);
+
+    return pGeometry;
+}
+
+bool ReMapClumpUVs(RpClump* pClump)
+{
+    auto RpGeometryDestroy = (void(__cdecl*)(RpGeometry * geometry))0x74CCC0;
+    auto RpAtomicSetGeometry = (RpAtomic * (__cdecl*)(RpAtomic * atomic, RpGeometry * geometry, RwUInt32 flags))0x749D40;
+    // RpAtomic           * RpAtomicSetGeometry(RpAtomic * atomic, RpGeometry * geometry, RwUInt32 flags)
+    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
+
+    std::vector<RpAtomic*> outAtomicList;
+    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
+
+    for (auto& pAtomic : outAtomicList)
+    {
+        RpGeometry* pGeometry = pAtomic->geometry;
+
+        RpGeometry* pNewGeometry = CreateAtlasRpGeometry(pGeometry, pGeometry->vertices_size, pGeometry->triangles_size, pGeometry->flags);
+
+        RpAtomicSetGeometry(pAtomic, pNewGeometry, 0);
+        // RpGeometryDestroy(pGeometry);
+
+        // pAtomic->geometry = pGeometry;
+    }
+
+    return true;
+}
+
 void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoader& ideLoader)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
 
+    /*
     // REMOVE LATER
     const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
     // REMOVE END
+    */
 
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
+    //RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
 
-    /*SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
+    SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
     {
         std::printf("couldn't find dff descriptor for '%s'\n", newFile->fileEntry->fileName);
@@ -651,14 +660,12 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         pTXDDescriptor->SetTextureDictionary(pTxdDictionary);
         delete pTXDArchiveFile;
     }
-    */
+    
 
     std::vector<CTextureAtlas> vecTextureAtlases;
 
-    /*
-    int modelID = pDFFDescriptor->GetModelID();
-    */
-    int modelID = 0;            // pDFFDescriptor->GetModelID();
+
+    int modelID =  pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
@@ -671,26 +678,26 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
     bool     bLoadCollision = IsVehicleModel(modelID);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    // RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
         // WE NEED To CHANGE THIS LOGIC LATER TO ALLOW OPTIMIZING OF VEHICLE MODELS AND TXD FILES
-        SString          txdName = "cj_airprt";
-        RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases, pTxdDictionary, txdName);
-        if (!pAtlasTxdDictionary)
-        {
-            std::printf("failed to CREATE TXD atlas for TXD '%s' :(\n", txdName.c_str());
-            return;
-        }
+        /* SString          txdName = "cj_airprt";
+         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases, pTxdDictionary, txdName);
+         if (!pAtlasTxdDictionary)
+         {
+             std::printf("failed to CREATE TXD atlas for TXD '%s' :(\n", txdName.c_str());
+             return;
+         }*/
 
-        /*if (!ReMapClumpUVs(pClump, vecTextureAtlases))
+        if (!ReMapClumpUVs(pClump))
         {
             std::printf("FAILED to remap UVs in clump geometries for DFF '%s'\n", newFile->fileEntry->fileName);
             return;
-        }*/
-
+        }
+        
         unsigned int clumpSize = RpClumpStreamGetSize(pClump);
 
         // there's still an issue with size of empty extension headers of 12 btytes for clump
@@ -706,10 +713,10 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         newFile->fileByteBuffer.SetSize(newFile->actualFileSize);
         void* pData = newFile->fileByteBuffer.GetData();
-        // pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
+        pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
-        SString strPathOfGeneratedDff = "dffs\\";
-        pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
+        //SString strPathOfGeneratedDff = "dffs\\";
+        //pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
 
         if (bLoadCollision)
         {
@@ -718,7 +725,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         pRenderWare->DestroyDFF(pClump);
 
-        // pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
+        pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
     }
     else
     {
@@ -755,7 +762,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive*                  newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 1; i++)            // newIMgArchive->GetFileCount() crash if total file count is 13 for vehicles img (banshee.dff)
+    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)    
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
