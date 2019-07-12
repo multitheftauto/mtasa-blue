@@ -59,8 +59,8 @@ void DilateAtlasTextures(
                     const AtlasLookupTexel& lookup = tempAtlasLookup[sx + sy * (int)atlas->width];
                     if (lookup.materialIndex == UINT16_MAX || textures[lookup.materialIndex] == UINT32_MAX)
                         continue;            // No source data here.
-                    // This atlas texel has a corresponding position for the source texel.
-                    // Subtract the sample offset to get the source position.
+                                             // This atlas texel has a corresponding position for the source texel.
+                                             // Subtract the sample offset to get the source position.
                     CDXTexture* sourceTexture = &texturesCache[textures[lookup.materialIndex]];
                     const int   ssx = (int)lookup.x - sampleXOffsets[si];
                     const int   ssy = (int)lookup.y - sampleYOffsets[si] * -1;            // need to flip y?
@@ -81,7 +81,7 @@ void DilateAtlasTextures(
                     rgbaDest[0] = argbSource->r;
                     rgbaDest[1] = argbSource->g;
                     rgbaDest[2] = argbSource->b;
-                    rgbaDest[3] = 255;
+                    rgbaDest[3] = argbSource->a;
 #endif
                     atlasLookup[x + y * (int)atlas->width].x = (uint16_t)ssx;
                     atlasLookup[x + y * (int)atlas->width].y = (uint16_t)ssy;
@@ -92,7 +92,7 @@ void DilateAtlasTextures(
                 if (foundSample)
                     continue;
                 // Sample up to 8 surrounding texels in the source texture, average their color and assign it to this texel.
-                float rgbSum[3] = {0.0f, 0.0f, 0.0f}, n = 0;
+                float rgbSum[4] = {0.0f, 0.0f, 0.0f, 0.0f}, n = 0;
                 for (uint32_t si = 0; si < 8; si++)
                 {
                     const int sx = (int)x + sampleXOffsets[si];
@@ -102,9 +102,9 @@ void DilateAtlasTextures(
                     const AtlasLookupTexel& lookup = tempAtlasLookup[sx + sy * (int)atlas->width];
                     if (lookup.materialIndex == UINT16_MAX || textures[lookup.materialIndex] == UINT32_MAX)
                         continue;            // No source data here.
-                    CDXTexture* sourceTexture = &texturesCache[textures[lookup.materialIndex]];
-                    const int   ssx = (int)lookup.x + sampleXOffsets[si];
-                    const int   ssy = (int)lookup.y + sampleYOffsets[si];
+                    CDXTexture*        sourceTexture = &texturesCache[textures[lookup.materialIndex]];
+                    const int          ssx = (int)lookup.x + sampleXOffsets[si];
+                    const int          ssy = (int)lookup.y + sampleYOffsets[si];
                     if (ssx < 0 || ssy < 0 || ssx >= (int)sourceTexture->GetWidth() || ssy >= (int)sourceTexture->GetHeight())
                         continue;            // Sample position is outside of source texture.
                     // Valid sample.
@@ -114,7 +114,7 @@ void DilateAtlasTextures(
                     rgbSum[0] += (float)rgba->r;
                     rgbSum[1] += (float)rgba->g;
                     rgbSum[2] += (float)rgba->b;
-                    //rgbSum[3] += (float)rgba->a;
+                    rgbSum[3] += (float)rgba->a;
                     n++;
                 }
                 if (n != 0)
@@ -130,12 +130,12 @@ void DilateAtlasTextures(
                     rgba[0] = uint8_t(rgbSum[0] * invn);
                     rgba[1] = uint8_t(rgbSum[1] * invn);
                     rgba[2] = uint8_t(rgbSum[2] * invn);
-                    rgba[3] = 255;
+                    rgba[3] = uint8_t(rgbSum[3] * invn);
 #endif
                     continue;
                 }
                 // Sample up to 8 surrounding texels in the atlas texture, average their color and assign it to this texel.
-                rgbSum[0] = rgbSum[1] = rgbSum[2]  = 0.0f;
+                rgbSum[0] = rgbSum[1] = rgbSum[2] = rgbSum[3] = 0.0f;
                 n = 0;
                 for (uint32_t si = 0; si < 8; si++)
                 {
@@ -149,7 +149,7 @@ void DilateAtlasTextures(
                     rgbSum[0] += (float)rgba[0];
                     rgbSum[1] += (float)rgba[1];
                     rgbSum[2] += (float)rgba[2];
-                    //rgbSum[3] += (float)rgba[3];
+                    rgbSum[3] += (float)rgba[3];
                     n++;
                 }
                 if (n != 0)
@@ -165,7 +165,7 @@ void DilateAtlasTextures(
                     rgba[0] = uint8_t(rgbSum[0] * invn);
                     rgba[1] = uint8_t(rgbSum[1] * invn);
                     rgba[2] = uint8_t(rgbSum[2] * invn);
-                    rgba[3] = 255;
+                    rgba[3] = uint8_t(rgbSum[3] * invn);
 #endif
                 }
             }
@@ -216,7 +216,7 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
                     const uint32_t        index = chart.indexArray[k * 3 + l];
                     const xatlas::Vertex& vertex = mesh.vertexArray[index];
                     v[l] = Vector2(vertex.uv[0], vertex.uv[1]);
-                    args.sourceUv[l] = uvs[vertex.xref];            // modelVertices[vertex.xref].uv;
+                    args.sourceUv[l] = uvs[vertex.xref];
                     args.sourceUv[l].y = 1.0f - args.sourceUv[l].y;
 
                     atlasIndex = vertex.atlasIndex;
@@ -232,6 +232,9 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
                 args.atlasLookup = ((AtlasLookupTexel*)atlasLookup.data()) + (atlasLookupSize * atlasIndex);
                 tri.drawAA(setAtlasTexel, &args);
             }
+
+
+
         }
     }
     if (packOptions.padding > 0)
@@ -268,7 +271,6 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
         }
      
     }
-    //   stbi_write_tga(atlasFilename, atlas->width, atlas->height, 4, atlasTexture.data());
 }
 
 eTextureAtlasErrorCodes CTextureAtlas::CreateAtlas()
