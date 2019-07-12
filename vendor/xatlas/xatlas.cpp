@@ -32,11 +32,6 @@ Fast-BVH
 https://github.com/brandonpelfrey/Fast-BVH
 MIT License
 Copyright (c) 2012 Brandon Pelfrey
-
-px_sched
-https://github.com/pplux/px
-MIT License
-Copyright (c) 2017-2018 Jose L. Hidalgo (PpluX)
 */
 #include <algorithm>
 #include <atomic>
@@ -103,11 +98,11 @@ Copyright (c) 2017-2018 Jose L. Hidalgo (PpluX)
 
 #define XA_UNUSED(a) ((void)(a))
 
-#define XA_CHECK_MESH_FACE_OVERLAP 0
 #define XA_GROW_CHARTS_COPLANAR 1
 #define XA_MERGE_CHARTS 1
 #define XA_MERGE_CHARTS_MIN_NORMAL_DEVIATION 0.5f
 #define XA_RECOMPUTE_CHARTS 1
+#define XA_CLOSE_HOLES_CHECK_EDGE_INTERSECTION 0
 
 #define XA_DEBUG_HEAP 0
 #define XA_DEBUG_SINGLE_CHART 0
@@ -308,24 +303,26 @@ static void *Realloc(void *ptr, size_t size, int /*tag*/, const char * /*file*/,
 
 struct ProfileData
 {
-	clock_t addMeshConcurrent;
-	std::atomic<clock_t> addMesh;
+	std::atomic<clock_t> addMeshReal;
+	std::atomic<clock_t> addMeshThread;
 	std::atomic<clock_t> addMeshCreateColocals;
 	std::atomic<clock_t> addMeshCreateFaceGroups;
 	std::atomic<clock_t> addMeshCreateBoundaries;
-	std::atomic<clock_t> addMeshCreateChartGroups;
-	clock_t computeChartsConcurrent;
-	std::atomic<clock_t> computeCharts;
+	std::atomic<clock_t> addMeshCreateChartGroupsReal;
+	std::atomic<clock_t> addMeshCreateChartGroupsThread;
+	std::atomic<clock_t> computeChartsReal;
+	std::atomic<clock_t> computeChartsThread;
 	std::atomic<clock_t> atlasBuilder;
 	std::atomic<clock_t> atlasBuilderInit;
 	std::atomic<clock_t> atlasBuilderCreateInitialCharts;
 	std::atomic<clock_t> atlasBuilderGrowCharts;
 	std::atomic<clock_t> atlasBuilderMergeCharts;
-	std::atomic<clock_t> createChartMeshes;
+	std::atomic<clock_t> createChartMeshesReal;
+	std::atomic<clock_t> createChartMeshesThread;
 	std::atomic<clock_t> fixChartMeshTJunctions;
 	std::atomic<clock_t> closeChartMeshHoles;
-	clock_t parameterizeChartsConcurrent;
-	std::atomic<clock_t> parameterizeCharts;
+	std::atomic<clock_t> parameterizeChartsReal;
+	std::atomic<clock_t> parameterizeChartsThread;
 	std::atomic<clock_t> parameterizeChartsOrthogonal;
 	std::atomic<clock_t> parameterizeChartsLSCM;
 	std::atomic<clock_t> parameterizeChartsEvaluateQuality;
@@ -868,6 +865,35 @@ static bool pointInTriangle(const Vector3 &p, const Vector3 &a, const Vector3 &b
 {
 	return sameSide(p, a, b, c) && sameSide(p, b, a, c) && sameSide(p, c, a, b);
 }
+
+#if XA_CLOSE_HOLES_CHECK_EDGE_INTERSECTION
+// https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+static bool rayIntersectsTriangle(const Vector3 &rayOrigin, const Vector3 &rayDir, const Vector3 *tri, float *t)
+{
+	*t = 0.0f;
+	const Vector3 &edge1 = tri[1] - tri[0];
+	const Vector3 &edge2 = tri[2] - tri[0];
+	const Vector3 h = cross(rayDir, edge2);
+	const float a = dot(edge1, h);
+	if (a > -kEpsilon && a < kEpsilon)
+		return false; // This ray is parallel to this triangle.
+	const float f = 1.0f / a;
+	const Vector3 s = rayOrigin - tri[0];
+	const float u = f * dot(s, h);
+	if (u < 0.0f || u > 1.0f)
+		return false;
+	const Vector3 q = cross(s, edge1);
+	const float v = f * dot(rayDir, q);
+	if (v < 0.0f || u + v > 1.0f)
+		return false;
+	// At this stage we can compute t to find out where the intersection point is on the line.
+	*t = f * dot(edge2, q);
+	if (*t > kEpsilon && *t < 1.0f - kEpsilon)
+		return true;
+	// This means that there is a line intersection but not a ray intersection.
+	return false;
+}
+#endif
 
 // From Fast-BVH
 struct AABB
@@ -2171,669 +2197,6 @@ private:
 	Vector2 m_majorAxis, m_minorAxis, m_minCorner, m_maxCorner;
 };
 
-namespace task {
-
-#define SCHED_CACHE_LINE_SIZE 64
-
-struct IndexQueue
-{
-	~IndexQueue()
-	{
-		XA_DEBUG_ASSERT(m_list == nullptr);
-	}
-
-	void reset()
-	{
-		if (m_list) {
-			XA_FREE(m_list);
-			m_list = nullptr;
-		}
-		m_size = 0;
-		m_inUse = 0;
-	}
-
-	void init(uint16_t max)
-	{
-		lock();
-		reset();
-		m_size = max;
-		m_inUse = 0;
-		m_list = static_cast<uint32_t*>(XA_ALLOC_ARRAY(MemTag::Default, uint32_t, m_size));
-		unlock();
-	}
-
-	void push(uint32_t p)
-	{
-		lock();
-		XA_DEBUG_ASSERT(m_inUse < m_size);
-		uint16_t pos = (m_current + m_inUse)%m_size;
-		m_list[pos] = p;
-		m_inUse++;
-		unlock();
-	}
-
-	uint16_t in_use()
-	{
-		lock();
-		uint16_t result = m_inUse;
-		unlock();
-		return result;
-	}
-
-	bool pop(uint32_t *res)
-	{
-		lock();
-		bool result = false;
-		if (m_inUse) {
-			if (res)
-				*res = m_list[m_current];
-			m_current = (m_current+1)%m_size;
-			m_inUse--;
-			result = true;
-		}
-		unlock();
-		return result;
-	}
-
-private:
-	void unlock() { m_lock.clear(std::memory_order_release); }
-
-	void lock()
-	{
-		while(m_lock.test_and_set(std::memory_order_acquire))
-			std::this_thread::yield();
-	}
-
-	uint32_t *m_list = nullptr;
-	std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
-	volatile uint16_t m_size = 0;
-	volatile uint16_t m_inUse = 0;
-	volatile uint16_t m_current = 0;
-};
-
-template<class T>
-struct ObjectPool
-{
-	const uint32_t kPosMask = 0x000FFFFF; // 20 bits
-	const uint32_t kRefMask = kPosMask;   // 20 bits
-	const uint32_t kVerMask = 0xFFF00000; // 12 bits
-	const uint32_t kVerDisp = 20;
-
-	~ObjectPool()
-	{
-		reset();
-	}
-
-	void init(uint32_t count)
-	{
-		reset();
-		m_data = XA_ALLOC_ARRAY(MemTag::Default, D, count);
-		for (uint32_t i = 0; i < count; ++i)
-			m_data[i].state = 0xFFFu << kVerDisp;
-		m_count = count;
-		m_next = 0;
-	}
-
-	void reset()
-	{
-		m_count = 0;
-		m_next = 0;
-		if (m_data) {
-			XA_FREE(m_data);
-			m_data = nullptr;
-		}
-	}
-
-	// only access objects you've previously referenced
-	T &get(uint32_t hnd)
-	{
-		const uint32_t pos = hnd & kPosMask;
-		XA_DEBUG_ASSERT(pos < m_count);
-		return m_data[pos].element;
-	}
-
-	// returns the handler of an object in the pool that can be used
-	// it also increments in one the number of references (no need to call ref)
-	uint32_t acquireAndRef()
-	{
-		uint32_t tries = 0;
-		for(;;) {
-			uint32_t pos = (m_next.fetch_add(1) % m_count);
-			D &d = m_data[pos];
-			const uint32_t version = (d.state.load() & kVerMask) >> kVerDisp;
-			// note: avoid 0 as version
-			uint32_t newver = (version + 1) & 0xFFF;
-			if (newver == 0)
-				newver = 1;
-			// instead of using 1 as initial ref, we use 2, when we see 1
-			// in the future we know the object must be freed, but it wont
-			// be actually freed until it reaches 0
-			uint32_t newvalue = (newver << kVerDisp) + 2;
-			uint32_t expected = version << kVerDisp;
-			if (d.state.compare_exchange_strong(expected, newvalue)) {
-				newElement(pos); //< initialize
-				return (newver << kVerDisp) | (pos & kPosMask);
-			}
-			tries++;
-			//XA_DEBUG_ASSERT(tries < m_count*m_count);
-		}
-	}
-
-	void unref(uint32_t hnd) const
-	{
-		const uint32_t pos = hnd & kPosMask;
-#if XA_DEBUG
-		const uint32_t ver = (hnd & kVerMask);
-#endif
-		D &d = m_data[pos];
-		for(;;) {
-			uint32_t prev = d.state.load();
-			uint32_t next = prev - 1;
-			XA_DEBUG_ASSERT((prev & kVerMask) == ver);
-			XA_DEBUG_ASSERT((prev & kRefMask) > 1);
-			if (d.state.compare_exchange_strong(prev, next)) {
-				if ((next & kRefMask) == 1) {
-					deleteElement(pos);
-					d.state = 0;
-				}
-				return;
-			}
-		}
-	}
-
-	// decrements the counter, if the object is no longer valid (last ref)
-	// the given function will be executed with the element
-	template<class F>
-	void unref(uint32_t hnd, F f) const
-	{
-		const uint32_t pos = hnd & kPosMask;
-#if XA_DEBUG
-		const uint32_t ver = (hnd & kVerMask);
-#endif
-		D& d = m_data[pos];
-		for(;;) {
-			uint32_t prev = d.state.load();
-			uint32_t next = prev - 1;
-			XA_DEBUG_ASSERT((prev & kVerMask) == ver);
-			XA_DEBUG_ASSERT((prev & kRefMask) > 1);
-			if (d.state.compare_exchange_strong(prev, next)) {
-				if ((next & kRefMask) == 1) {
-					f(d.element);
-					deleteElement(pos);
-					d.state = 0;
-				}
-				return;
-			}
-		}
-	}
-
-	// returns true if the given position was a valid object
-	bool ref(uint32_t hnd) const
-	{
-		if (!hnd)
-			return false;
-		const uint32_t pos = hnd & kPosMask;
-		const uint32_t ver = (hnd & kVerMask);
-		D &d = m_data[pos];
-		for (;;) {
-			uint32_t prev = d.state.load();
-			const uint32_t next_c = ((prev & kRefMask) + 1);
-			if ((prev & kVerMask) != ver || next_c <= 2)
-				return false;
-			XA_DEBUG_ASSERT(next_c  == (next_c & kRefMask));
-			uint32_t next = (prev & kVerMask) | next_c ;
-			if (d.state.compare_exchange_strong(prev, next))
-				return true;
-		}
-	}
-
-	uint32_t refCount(uint32_t hnd) const
-	{
-		if (!hnd)
-			return 0;
-		const uint32_t pos = hnd & kPosMask;
-		const uint32_t ver = (hnd & kVerMask);
-		D &d = m_data[pos];
-		const uint32_t current = d.state.load();
-		if ((current & kVerMask) != ver)
-			return 0;
-		return (current & kRefMask);
-	}
-
-private:
-	void newElement(uint32_t pos) const
-	{
-		new (&m_data[pos].element) T;
-	}
-
-	void deleteElement(uint32_t pos) const
-	{
-		m_data[pos].element.~T();
-	}
-
-	struct D
-	{
-		mutable std::atomic<uint32_t> state = {0};
-		uint32_t version = 0;
-		T element;
-		// Avoid false sharing between threads
-		static const size_t PADDING_ADJUSTMENT = (SCHED_CACHE_LINE_SIZE - ((sizeof(state)+sizeof(version)+sizeof(element))%SCHED_CACHE_LINE_SIZE)) % SCHED_CACHE_LINE_SIZE;
-		char padding[PADDING_ADJUSTMENT];
-	};
-
-	D *m_data = nullptr;
-	std::atomic<uint32_t> m_next;
-	size_t m_count = 0;
-};
-
-struct Job
-{
-	void (*func)(void *userData);
-	void *userData;
-};
-
-struct Sync
-{
-	uint32_t hnd = 0;
-};
-
-struct SchedulerParams
-{
-	uint16_t num_threads = 16;        // num OS threads created 
-	uint16_t max_running_threads = 0; // 0 --> will be set to max hardware concurrency
-	uint16_t max_number_tasks = 1024; // max number of simultaneous tasks
-	uint16_t thread_num_tries_on_idle = 16;   // number of tries before suspend the thread
-	uint32_t thread_sleep_on_idle_in_microseconds = 5; // time spent waiting between tries
-};
-
-#if XA_MULTITHREADED
-class Scheduler
-{
-public:
-	Scheduler(const SchedulerParams &_params = SchedulerParams()) : m_activeThreads(0)
-	{
-		stop();
-		m_running = true;
-		m_params = _params;
-		if (m_params.max_running_threads == 0)
-			m_params.max_running_threads = static_cast<uint16_t>(std::thread::hardware_concurrency());
-		// create tasks
-		m_tasks.init(m_params.max_number_tasks);
-		m_counters.init(m_params.max_number_tasks);
-		m_readyTasks.init(m_params.max_number_tasks);
-		XA_DEBUG_ASSERT(m_workers == nullptr);
-		m_workers = static_cast<Worker*>(XA_ALLOC_ARRAY(MemTag::Default, Worker, m_params.num_threads));
-		for(uint16_t i = 0; i < m_params.num_threads; ++i) {
-			new (&m_workers[i]) Worker();
-			m_workers[i].thread_index = i;
-		}
-		XA_DEBUG_ASSERT(m_activeThreads.load() == 0);
-		for(uint16_t i = 0; i < m_params.num_threads; ++i) {
-			m_workers[i].thread = std::thread(WorkerThreadMain, this, &m_workers[i]);
-		}
-	}
-
-	~Scheduler()
-	{
-		stop();
-	}
-
-	void stop()
-	{
-		if (m_running) {
-			m_running = false;
-			for(uint16_t i = 0; i < m_params.num_threads; ++i) {
-				wakeUpThreads(m_params.num_threads);
-			}
-			for(uint16_t i = 0; i < m_params.num_threads; ++i) {
-				m_workers[i].thread.join();
-				m_workers[i].~Worker();
-			}
-			XA_FREE(m_workers);
-			m_workers = nullptr;
-			m_tasks.reset();
-			m_counters.reset();
-			m_readyTasks.reset();
-			XA_DEBUG_ASSERT(m_activeThreads.load() == 0);
-		}
-	}
-
-	void run(const Job &job, Sync *sync_obj = nullptr)
-	{
-		XA_DEBUG_ASSERT(m_running);
-		uint32_t t_ref = createTask(job, sync_obj);
-		m_readyTasks.push(t_ref);
-		wakeUpOneThread();
-	}
-
-	void waitFor(Sync s) //< suspend current thread 
-	{
-		if (m_counters.ref(s.hnd)) {
-			Counter &counter = m_counters.get(s.hnd);
-			XA_DEBUG_ASSERT(counter.wait_ptr == nullptr);
-			WaitFor wf;
-			counter.wait_ptr = &wf;
-			unrefCounter(s.hnd);
-			CurrentThreadSleeps(); 
-			wf.wait();
-			CurrentThreadWakesUp(); 
-		}
-	}
-
-	// Call this method before a mutex/lock/etc... to notify the scheduler
-	static void CurrentThreadSleeps()
-	{
-		CurrentThreadBeforeLockResource(nullptr);
-	}
-
-	// call this again to notify the thread is again running
-	static void CurrentThreadWakesUp()
-	{
-		CurrentThreadAfterLockResource();
-	}
-
-	// Call this method before locking a resource, this will be used by the
-	// scheduler to wakeup another thread as a worker.
-	static void CurrentThreadBeforeLockResource(const void *resource_ptr, const char *name = nullptr)
-	{
-		// if the lock might work, wake up one thread to replace this one
-		TLS *d = tls();
-		if (d->scheduler && d->scheduler->m_running.load()) {
-			d->scheduler->m_activeThreads.fetch_sub(1);
-			d->scheduler->wakeUpOneThread();
-		}
-		d->next_lock = {resource_ptr, name};
-	}
-
-	// Call this method after calling CurrentThreadBeforeLockResource, this will be
-	// used to notify the scheduler that this thread can continue working.
-	// If success is true, the lock was successful, false if the thread was not
-	// blocked but also didn't adquired the lock (try_lock)
-	static void CurrentThreadAfterLockResource()
-	{
-		// mark this thread as active (so eventually one thread will step down)
-		TLS *d = tls();
-		if (d->scheduler && d->scheduler->m_running.load())
-			d->scheduler->m_activeThreads.fetch_add(1);
-		d->next_lock = { nullptr, nullptr }; // reset
-	}
-
-private:
-	struct TLS
-	{
-		Scheduler *scheduler = nullptr;
-
-		struct Resource
-		{
-			const void *ptr;
-			const char *name;
-		};
-
-		Resource next_lock = { nullptr, nullptr };
-	};
-
-	static TLS *tls()
-	{
-		static thread_local TLS tls;
-		return &tls;
-	}
-	
-	void wakeUpOneThread()
-	{
-		for(;;) {
-			uint32_t active = m_activeThreads.load();
-			if ((active >= m_params.max_running_threads) || wakeUpThreads(1))
-				return;
-		}
-	}
-
-	SchedulerParams m_params;
-	std::atomic<uint32_t> m_activeThreads;
-	std::atomic<uint32_t> m_running = {0};
-
-	struct Task
-	{
-		Job job;
-		uint32_t counter_id = 0;
-		std::atomic<uint32_t> next_sibling_task = {0};
-	};
-
-	struct WaitFor
-	{
-		explicit WaitFor() : owner(std::this_thread::get_id()), ready(false) {}
-
-		void wait()
-		{
-			XA_DEBUG_ASSERT(std::this_thread::get_id() == owner);
-			std::unique_lock<std::mutex> lk(mutex);
-			if (!ready)
-				condition_variable.wait(lk);
-		}
-
-		void signal()
-		{
-			if (owner != std::this_thread::get_id()) {
-				std::lock_guard<std::mutex> lk(mutex);
-				ready = true;
-				condition_variable.notify_all();
-			} else {
-				ready = true;
-			}
-		}
-		private:
-		std::thread::id const owner;
-		std::mutex mutex;
-		std::condition_variable condition_variable;
-		bool ready;
-	};
-
-	struct Worker
-	{
-		std::thread thread;
-		// setted by the thread when is sleep
-		std::atomic<WaitFor*> wake_up = {nullptr};
-		TLS *thread_tls = nullptr;
-		uint16_t thread_index = 0xFFFF;
-	};
-
-	struct Counter
-	{
-		std::atomic<uint32_t> task_id;
-		std::atomic<uint32_t> user_count;
-		WaitFor *wait_ptr = nullptr;
-	};
-
-	uint16_t wakeUpThreads(uint16_t max_num_threads)
-	{
-		uint16_t total_woken_up = 0;
-		for(uint32_t i = 0; (i < m_params.num_threads) && (total_woken_up < max_num_threads); ++i) {
-			WaitFor *wake_up = m_workers[i].wake_up.exchange(nullptr);
-			if (wake_up) {
-				wake_up->signal();
-				total_woken_up++;
-				// Add one to the total active threads, for later substracting it, this
-				// will take the thread as awake before the thread actually is again working
-				m_activeThreads.fetch_add(1);
-			}
-		}
-		m_activeThreads.fetch_sub(total_woken_up);
-		return total_woken_up;
-	}
-
-	uint32_t createTask(const Job &job, Sync *sync_obj)
-	{
-		uint32_t ref = m_tasks.acquireAndRef();
-		Task *task = &m_tasks.get(ref);
-		task->job = job;
-		task->counter_id = 0;
-		task->next_sibling_task = 0;
-		if (sync_obj) {
-			bool new_counter = !m_counters.ref(sync_obj->hnd);
-			if (new_counter)
-				sync_obj->hnd = createCounter();
-			task->counter_id = sync_obj->hnd;
-		}
-		return ref;
-	}
-	
-	uint32_t createCounter()
-	{
-		uint32_t hnd = m_counters.acquireAndRef();
-		Counter *c = &m_counters.get(hnd);
-		c->task_id = 0;
-		c->user_count = 0;
-		c->wait_ptr = nullptr;
-		return hnd;
-	}
-
-	void unrefCounter(uint32_t hnd)
-	{
-		if (m_counters.ref(hnd)) {
-			m_counters.unref(hnd);
-			Scheduler *schd = this;
-			m_counters.unref(hnd, [schd](Counter &c) {
-				// wake up all tasks 
-				uint32_t tid = c.task_id;
-				while (schd->m_tasks.ref(tid)) {
-					Task &task = schd->m_tasks.get(tid);
-					uint32_t next_tid = task.next_sibling_task; 
-					task.next_sibling_task = 0;
-					schd->m_readyTasks.push(tid);
-					schd->wakeUpOneThread();
-					schd->m_tasks.unref(tid);
-					tid = next_tid;
-				}
-				if (c.wait_ptr)
-					c.wait_ptr->signal();
-			});
-		}
-	}
-
-	Worker *m_workers = nullptr;
-	ObjectPool<Task> m_tasks;
-	ObjectPool<Counter> m_counters;
-	IndexQueue m_readyTasks;
-
-	static void WorkerThreadMain(Scheduler *schd, Scheduler::Worker *worker_data)
-	{
-		const uint16_t id = worker_data->thread_index;
-		TLS *local_storage = tls();
-		local_storage->scheduler = schd;
-		worker_data->thread_tls = local_storage;
-		auto const ttl_wait = schd->m_params.thread_sleep_on_idle_in_microseconds;
-		auto const ttl_value = schd->m_params.thread_num_tries_on_idle ? schd->m_params.thread_num_tries_on_idle : 1;
-		schd->m_activeThreads.fetch_add(1);
-		for(;;) {
-			{ // wait for new activity
-				auto current_num = schd->m_activeThreads.fetch_sub(1);
-				if (!schd->m_running)
-					return;
-				if (schd->m_readyTasks.in_use() == 0 ||
-					current_num > schd->m_params.max_running_threads) {
-					WaitFor wf;
-					schd->m_workers[id].wake_up = &wf;
-					wf.wait();
-					if (!schd->m_running)
-						return;
-				}
-				schd->m_activeThreads.fetch_add(1);
-				schd->m_workers[id].wake_up = nullptr;
-			}
-			auto ttl = ttl_value;
-			{ // do some work
-				uint32_t task_ref;
-				while (ttl && schd->m_running ) {
-					if (!schd->m_readyTasks.pop(&task_ref)) {
-						ttl--;
-						if (ttl_wait) std::this_thread::sleep_for(std::chrono::microseconds(ttl_wait));
-							continue;
-					}
-					ttl = ttl_value;
-					Task *t = &schd->m_tasks.get(task_ref);
-					t->job.func(t->job.userData);
-					uint32_t counter = t->counter_id;
-					schd->m_tasks.unref(task_ref);
-					schd->unrefCounter(counter);
-				}
-			}
-		}
-		worker_data->thread_tls = nullptr;
-		local_storage->scheduler = nullptr;
-	}
-};
-#else
-class Scheduler
-{
-public:
-	Scheduler() {}
-	~Scheduler() {}
-	void init(const SchedulerParams &params = SchedulerParams()) { XA_UNUSED(params); }
-	void stop() {}
-
-	void run(const Job &job, Sync *)
-	{
-		Job j(job);
-		j.func(j.userData);
-	}
-
-	void waitFor(Sync) {}
-	void wakeUpOneThread() {}
-};
-#endif
-
-struct Progress
-{
-	Progress(ProgressCategory::Enum category, ProgressFunc func, void *userData, uint32_t maxValue) : value(0), cancel(false), m_category(category), m_func(func), m_userData(userData), m_maxValue(maxValue), m_progress(0)
-	{
-		if (m_func) {
-			if (!m_func(category, 0, userData))
-				cancel = true;
-		}
-	}
-
-	~Progress()
-	{
-		if (m_func) {
-			if (!m_func(m_category, 100, m_userData))
-				cancel = true;
-		}
-	}
-
-	void update()
-	{
-		if (!m_func)
-			return;
-		m_mutex.lock();
-		const uint32_t newProgress = uint32_t(ceilf(value.load() / (float)m_maxValue * 100.0f));
-		if (newProgress != m_progress && newProgress < 100) {
-			m_progress = newProgress;
-			if (!m_func(m_category, m_progress, m_userData))
-				cancel = true;
-		}
-		m_mutex.unlock();
-	}
-
-	void setMaxValue(uint32_t maxValue)
-	{
-		m_mutex.lock();
-		m_maxValue = maxValue;
-		m_mutex.unlock();
-	}
-
-	std::atomic<uint32_t> value;
-	std::atomic<bool> cancel;
-
-private:
-	ProgressCategory::Enum m_category;
-	ProgressFunc m_func;
-	void *m_userData;
-	uint32_t m_maxValue;
-	uint32_t m_progress;
-	std::mutex m_mutex;
-};
-
-} // namespace task
-
 static uint32_t meshEdgeFace(uint32_t edge) { return edge / 3; }
 static uint32_t meshEdgeIndex0(uint32_t edge) { return edge; }
 
@@ -3006,69 +2369,10 @@ public:
 		return false;
 	}
 
-#if XA_CHECK_MESH_FACE_OVERLAP
-	bool faceOverlapsGroupFace(const Array<AABB> &edgeAabbs, const BVH &edgeBvh, uint32_t group, uint32_t face) const
-	{
-		Array<uint32_t> hitEdges;
-		hitEdges.reserve(8);
-		for (FaceEdgeIterator it(this, face); !it.isDone(); it.advance()) {
-			hitEdges.clear();
-			edgeBvh.query(edgeAabbs[it.edge()], hitEdges);
-			for (uint32_t e = 0; e < hitEdges.size(); e++) {
-				const Edge &otherEdge = m_edges[hitEdges[e]];
-				if (otherEdge.face == face || m_faceGroups[otherEdge.face] != group)
-					continue;
-				const Vector3 &otherPosition0 = m_positions[m_indices[otherEdge.index0]];
-				const Vector3 &otherPosition1 = m_positions[m_indices[otherEdge.index1]];
-				if (equal(it.position0(), otherPosition0) || equal(it.position0(), otherPosition1) || equal(it.position1(), otherPosition0) || equal(it.position1(), otherPosition1))
-					continue;
-				Vector3 points[4];
-				points[0] = it.position0();
-				points[1] = it.position1();
-				points[2] = otherPosition0;
-				points[3] = otherPosition1;
-				int planarDimension = -1;
-				for (uint32_t i = 0; i < 3; i++) {
-					if (equal((&points[0].x)[i], (&points[1].x)[i]) && equal((&points[1].x)[i], (&points[2].x)[i]) && equal((&points[2].x)[i], (&points[3].x)[i])) {
-						planarDimension = i;
-						break;
-					}
-				}
-				if (planarDimension == -1)
-					continue; // Points don't lie on the same plane.
-				Vector2 points2[4];
-				for (uint32_t i = 0; i < 4; i++) {
-					uint32_t k = 0;
-					for (uint32_t j = 0; j < 2; j++) {
-						if (k == (uint32_t)planarDimension)
-							k++;
-						(&points2[i].x)[j] = (&points[i].x)[k];
-						k++;
-					}
-				}
-				if (linesIntersect(points2[0], points2[1], points2[2], points2[3]))
-					return true;
-			}
-		}
-		return false;
-	}
-#endif
-
 	void createFaceGroups()
 	{
 		uint32_t group = 0;
 		Array<uint32_t> growFaces;
-#if XA_CHECK_MESH_FACE_OVERLAP
-		const uint32_t edgeCount = m_edges.size();
-		Array<AABB> edgeAabbs;
-		edgeAabbs.resize(edgeCount);
-		for (uint32_t i = 0; i < edgeCount; i++) {
-			edgeAabbs[i].expandToInclude(m_positions[m_indices[m_edges[i].index0]]);
-			edgeAabbs[i].expandToInclude(m_positions[m_indices[m_edges[i].index1]]);
-			edgeAabbs[i].expand(m_epsilon);
-		}
-		BVH edgeBvh(edgeAabbs);
-#endif
 		for (;;) {
 			// Find an unassigned face.
 			uint32_t face = UINT32_MAX;
@@ -3110,10 +2414,6 @@ public:
 							continue; // Don't want duplicate edges in a group.
 						if (faceMirrorsGroupFace(group, oppositeFace))
 							continue; // Don't want two-sided faces in a group.
-#if XA_CHECK_MESH_FACE_OVERLAP
-						if (faceOverlapsGroupFace(edgeAabbs, edgeBvh, group, oppositeEdge.face))
-							continue; // Don't want overlapping geometry.
-#endif
 						const uint32_t oppositeVertex0 = m_indices[meshEdgeIndex0(oppositeEdge)];
 						const uint32_t oppositeVertex1 = m_indices[meshEdgeIndex1(oppositeEdge)];
 						if (bestConnectedFace == UINT32_MAX || (oppositeVertex0 == edgeIt.vertex1() && oppositeVertex1 == edgeIt.vertex0()))
@@ -3774,8 +3074,12 @@ public:
 	};
 };
 
-static void meshCloseHole(Mesh *mesh, const Array<uint32_t> &holeVertices, bool *duplicatedEdge, bool *failed)
+static bool meshCloseHole(Mesh *mesh, const Array<uint32_t> &holeVertices, const Vector3 &normal)
 {
+#if XA_CLOSE_HOLES_CHECK_EDGE_INTERSECTION
+	const uint32_t faceCount = mesh->faceCount();
+#endif
+	const bool compareNormal = equal(normal, Vector3(0.0f), FLT_EPSILON);
 	uint32_t frontCount = holeVertices.size();
 	Array<uint32_t> frontVertices;
 	Array<Vector3> frontPoints;
@@ -3787,16 +3091,9 @@ static void meshCloseHole(Mesh *mesh, const Array<uint32_t> &holeVertices, bool 
 		frontPoints[i] = mesh->position(frontVertices[i]);
 	}
 	while (frontCount >= 3) {
-		if (frontCount == 3) {
-			if (mesh->addFace(frontVertices[0], frontVertices[1], frontVertices[2]) == Mesh::AddFaceResult::DuplicateEdge) {
-				if (duplicatedEdge)
-					*duplicatedEdge = true;
-			}
-			break;
-		}
 		frontAngles.resize(frontCount);
-		float smallestAngle = kPi2;
-		uint32_t smallestAngleIndex = UINT32_MAX;
+		float smallestAngle = kPi2, smallestAngleIgnoringNormal = kPi2;
+		uint32_t smallestAngleIndex = UINT32_MAX, smallestAngleIndexIgnoringNormal = UINT32_MAX;
 		for (uint32_t i = 0; i < frontCount; i++) {
 			const uint32_t i1 = i == 0 ? frontCount - 1 : i - 1;
 			const uint32_t i2 = i;
@@ -3851,33 +3148,61 @@ static void meshCloseHole(Mesh *mesh, const Array<uint32_t> &holeVertices, bool 
 			}
 			if (intersection)
 				continue;
-			smallestAngle = frontAngles[i];
-			smallestAngleIndex = i;
+#if XA_CLOSE_HOLES_CHECK_EDGE_INTERSECTION
+			// Don't add the triangle if the new edge (i3, i1), intersects any other triangle that isn't part of the filled hole.
+			intersection = false;
+			const Vector3 newEdgeVector = frontPoints[i1] - frontPoints[i3];
+			for (uint32_t f = 0; f < faceCount; f++) {
+				Vector3 tri[3];
+				for (uint32_t j = 0; j < 3; j++)
+					tri[j] = mesh->position(mesh->vertexAt(f * 3 + j));
+				float t;
+				if (rayIntersectsTriangle(frontPoints[i3], newEdgeVector, tri, &t)) {
+					intersection = true;
+					break;
+				}
+			}
+			if (intersection)
+				continue;
+#endif
+			// Skip backwards facing triangles.
+			if (compareNormal) {
+				if (frontAngles[i] < smallestAngleIgnoringNormal) {
+					smallestAngleIgnoringNormal = frontAngles[i];
+					smallestAngleIndexIgnoringNormal = i;
+				}
+				const Vector3 e0 = frontPoints[i3] - frontPoints[i1];
+				const Vector3 e1 = frontPoints[i2] - frontPoints[i1];
+				const Vector3 triNormal = normalizeSafe(cross(e0, e1), Vector3(0.0f), mesh->epsilon());
+				if (dot(normal, triNormal) <= 0.0f)
+					continue;
+			}
+			smallestAngle = smallestAngleIgnoringNormal = frontAngles[i];
+			smallestAngleIndex = smallestAngleIndexIgnoringNormal = i;
 		}
+		// Closing holes failed if we don't have a smallest angle.
+		// Fallback to ignoring the backwards facing normal test if possible.
 		if (smallestAngleIndex == UINT32_MAX || smallestAngle <= 0.0f || smallestAngle >= kPi) {
-			if (failed)
-				*failed = true;
-			return;
+			if (smallestAngleIgnoringNormal == UINT32_MAX || smallestAngleIgnoringNormal <= 0.0f || smallestAngleIgnoringNormal >= kPi)
+				return false;
+			else
+				smallestAngleIndex = smallestAngleIndexIgnoringNormal;
 		}
 		const uint32_t i1 = smallestAngleIndex == 0 ? frontCount - 1 : smallestAngleIndex - 1;
 		const uint32_t i2 = smallestAngleIndex;
 		const uint32_t i3 = (smallestAngleIndex + 1) % frontCount;
-		if (mesh->addFace(frontVertices[i1], frontVertices[i2], frontVertices[i3]) == Mesh::AddFaceResult::DuplicateEdge) {
-			if (duplicatedEdge)
-				*duplicatedEdge = true;
-		}
+		const Mesh::AddFaceResult::Enum result = mesh->addFace(frontVertices[i1], frontVertices[i2], frontVertices[i3]);
+		XA_DEBUG_ASSERT(result == Mesh::AddFaceResult::OK); // Shouldn't happen due to the findEdge calls above.
+		XA_UNUSED(result);
 		frontVertices.removeAt(i2);
 		frontPoints.removeAt(i2);
 		frontCount = frontVertices.size();
 	}
+	return true;
 }
 
-static void meshCloseHoles(Mesh *mesh, const Array<uint32_t> &boundaryLoops, bool *duplicatedEdge, bool *failed, Array<uint32_t> &holeFaceCounts)
+static bool meshCloseHoles(Mesh *mesh, const Array<uint32_t> &boundaryLoops, const Vector3 &normal, Array<uint32_t> &holeFaceCounts)
 {
-	if (duplicatedEdge)
-		*duplicatedEdge = false;
-	if (failed)
-		*failed = false;
 	holeFaceCounts.clear();
 	// Compute lengths.
 	const uint32_t boundaryCount = boundaryLoops.size();
@@ -3907,6 +3232,7 @@ static void meshCloseHoles(Mesh *mesh, const Array<uint32_t> &boundaryLoops, boo
 	// Close holes.
 	Array<uint32_t> holeVertices;
 	Array<Vector3> holePoints;
+	bool result = true;
 	for (uint32_t i = 0; i < boundaryCount; i++) {
 		if (diskBoundary == i)
 			continue; // Skip disk boundary.
@@ -3921,9 +3247,11 @@ static void meshCloseHoles(Mesh *mesh, const Array<uint32_t> &boundaryLoops, boo
 			e++;
 		}
 		const uint32_t oldFaceCount = mesh->faceCount();
-		meshCloseHole(mesh, holeVertices, duplicatedEdge, failed);
+		if (!meshCloseHole(mesh, holeVertices, normal))
+			result = false; // Return false if any hole failed to close, but keep trying to close other holes.
 		holeFaceCounts.push_back(mesh->faceCount() - oldFaceCount);
 	}
+	return result;
 }
 
 static bool meshIsPlanar(const Mesh &mesh)
@@ -4030,7 +3358,10 @@ static Mesh *meshFixTJunctions(const Mesh &inputMesh, bool *duplicatedEdge, bool
 						indexArray.push_back(splitEdge.vertex);
 				}
 			}
-			meshCloseHole(mesh, indexArray, duplicatedEdge, failed);
+			if (!meshCloseHole(mesh, indexArray, Vector3(0.0f))) {
+				if (failed)
+					*failed = true;
+			}
 		} else {
 			// No t-junctions in this face. Copy from input mesh.
 			if (mesh->addFace(&inputMesh.indices()[f * 3]) == Mesh::AddFaceResult::DuplicateEdge) {
@@ -4065,30 +3396,6 @@ class MeshTopology
 {
 public:
 	MeshTopology(const Mesh *mesh)
-	{
-		buildTopologyInfo(mesh);
-	}
-
-	/// Determine if the mesh is connected.
-	bool isConnected() const
-	{
-		return m_connectedCount == 1;
-	}
-
-	/// Determine if the mesh is closed. (Each edge is shared by two faces)
-	bool isClosed() const
-	{
-		return m_boundaryCount == 0;
-	}
-
-	/// Return true if the mesh has the topology of a disk.
-	bool isDisk() const
-	{
-		return isConnected() && m_boundaryCount == 1/* && m_eulerNumber == 1*/;
-	}
-
-private:
-	void buildTopologyInfo(const Mesh *mesh)
 	{
 		const uint32_t vertexCount = mesh->colocalVertexCount();
 		const uint32_t faceCount = mesh->faceCount();
@@ -4139,6 +3446,24 @@ private:
 			m_genus = (2 - m_eulerNumber) / 2;
 	}
 
+	/// Determine if the mesh is connected.
+	bool isConnected() const
+	{
+		return m_connectedCount == 1;
+	}
+
+	/// Determine if the mesh is closed. (Each edge is shared by two faces)
+	bool isClosed() const
+	{
+		return m_boundaryCount == 0;
+	}
+
+	/// Return true if the mesh has the topology of a disk.
+	bool isDisk() const
+	{
+		return isConnected() && m_boundaryCount == 1/* && m_eulerNumber == 1*/;
+	}
+
 private:
 	///< Number of boundary loops.
 	int m_boundaryCount;
@@ -4153,9 +3478,282 @@ private:
 	int m_genus;
 };
 
+struct Progress
+{
+	Progress(ProgressCategory::Enum category, ProgressFunc func, void *userData, uint32_t maxValue) : value(0), cancel(false), m_category(category), m_func(func), m_userData(userData), m_maxValue(maxValue), m_progress(0)
+	{
+		if (m_func) {
+			if (!m_func(category, 0, userData))
+				cancel = true;
+		}
+	}
+
+	~Progress()
+	{
+		if (m_func) {
+			if (!m_func(m_category, 100, m_userData))
+				cancel = true;
+		}
+	}
+
+	void update()
+	{
+		if (!m_func)
+			return;
+		m_mutex.lock();
+		const uint32_t newProgress = uint32_t(ceilf(value.load() / (float)m_maxValue * 100.0f));
+		if (newProgress != m_progress && newProgress < 100) {
+			m_progress = newProgress;
+			if (!m_func(m_category, m_progress, m_userData))
+				cancel = true;
+		}
+		m_mutex.unlock();
+	}
+
+	void setMaxValue(uint32_t maxValue)
+	{
+		m_mutex.lock();
+		m_maxValue = maxValue;
+		m_mutex.unlock();
+	}
+
+	std::atomic<uint32_t> value;
+	std::atomic<bool> cancel;
+
+private:
+	ProgressCategory::Enum m_category;
+	ProgressFunc m_func;
+	void *m_userData;
+	uint32_t m_maxValue;
+	uint32_t m_progress;
+	std::mutex m_mutex;
+};
+
+struct TaskGroupHandle
+{
+	uint32_t value = UINT32_MAX;
+};
+
+struct Task
+{
+	void (*func)(void *userData);
+	void *userData;
+};
+
+#if XA_MULTITHREADED
+class TaskScheduler
+{
+public:
+	TaskScheduler() : m_shutdown(false)
+	{
+		m_workers.resize(std::thread::hardware_concurrency() <= 1 ? 1 : std::thread::hardware_concurrency() - 1);
+		for (uint32_t i = 0; i < m_workers.size(); i++) {
+			m_workers[i].wakeup = false;
+			m_workers[i].thread = XA_NEW(MemTag::Default, std::thread, workerThread, this, &m_workers[i]);
+		}
+	}
+
+	~TaskScheduler()
+	{
+		m_shutdown = true;
+		for (uint32_t i = 0; i < m_workers.size(); i++) {
+			Worker &worker = m_workers[i];
+			XA_DEBUG_ASSERT(worker.thread);
+			worker.wakeup = true;
+			worker.cv.notify_one();
+			if (worker.thread->joinable())
+				worker.thread->join();
+			worker.thread->~thread();
+			XA_FREE(worker.thread);
+		}
+		for (uint32_t i = 0; i < m_groups.size(); i++)
+			destroyGroup(i);
+	}
+
+	TaskGroupHandle createTaskGroup(uint32_t reserveSize = 0)
+	{
+		TaskGroup *group = XA_NEW(MemTag::Default, TaskGroup);
+		group->queue.reserve(reserveSize);
+		group->ref = 0;
+		std::lock_guard<std::mutex> lock(m_groupsMutex);
+		m_groups.push_back(group);
+		TaskGroupHandle handle;
+		handle.value = m_groups.size() - 1;
+		return handle;
+	}
+
+	void run(TaskGroupHandle handle, Task task)
+	{
+		XA_DEBUG_ASSERT(handle.value != UINT32_MAX);
+		TaskGroup *group = m_groups[handle.value];
+		{
+			std::lock_guard<std::mutex> lock(group->queueMutex);
+			group->queue.push_back(task);
+		}
+		group->ref++;
+		// Wake up a worker to run this task.
+		for (uint32_t i = 0; i < m_workers.size(); i++) {
+			m_workers[i].wakeup = true;
+			m_workers[i].cv.notify_one();
+		}
+	}
+
+	void wait(TaskGroupHandle *handle)
+	{
+		if (handle->value == UINT32_MAX) {
+			XA_DEBUG_ASSERT(false);
+			return;
+		}
+		// Run tasks from the group queue until empty.
+		TaskGroup *group = m_groups[handle->value];
+		for (;;) {
+			Task *task = nullptr;
+			{
+				std::lock_guard<std::mutex> lock(group->queueMutex);
+				if (group->queueHead < group->queue.size())
+					task = &group->queue[group->queueHead++];
+			}
+			if (!task)
+				break;
+			task->func(task->userData);
+			group->ref--;
+		}
+		// Even though the task queue is empty, workers can still be running tasks.
+		while (group->ref > 0)
+			std::this_thread::yield();
+		std::lock_guard<std::mutex> lock(m_groupsMutex);
+		destroyGroup(handle->value);
+		handle->value = UINT32_MAX;
+	}
+
+private:
+	struct TaskGroup
+	{
+		Array<Task> queue; // Items are never removed. queueHead is incremented to pop items.
+		uint32_t queueHead = 0;
+		std::mutex queueMutex;
+		std::atomic<uint32_t> ref; // Increment when a task is enqueued, decrement when a task finishes.
+	};
+
+	struct Worker
+	{
+		std::thread *thread = nullptr;
+		std::mutex mutex;
+		std::condition_variable cv;
+		std::atomic<bool> wakeup;
+	};
+
+	Array<TaskGroup *> m_groups;
+	std::mutex m_groupsMutex;
+	Array<Worker> m_workers;
+	std::atomic<bool> m_shutdown;
+
+	void destroyGroup(uint32_t index)
+	{
+		TaskGroup *group = m_groups[index];
+		m_groups[index] = nullptr;
+		if (group) {
+			group->~TaskGroup();
+			XA_FREE(group);
+		}
+	}
+
+	static void workerThread(TaskScheduler *scheduler, Worker *worker)
+	{
+		std::unique_lock<std::mutex> lock(worker->mutex);
+		for (;;) {
+			worker->cv.wait(lock, [=]{ return worker->wakeup.load(); });
+			worker->wakeup = false;
+			for (;;) {
+				if (scheduler->m_shutdown)
+					return;
+				// Look for a task in any of the groups and run it.
+				TaskGroup *group = nullptr;
+				Task *task = nullptr;
+				{
+					std::lock_guard<std::mutex> groupsLock(scheduler->m_groupsMutex);
+					for (uint32_t i = 0; i < scheduler->m_groups.size(); i++) {
+						group = scheduler->m_groups[i];
+						if (!group)
+							continue;
+						std::lock_guard<std::mutex> queueLock(group->queueMutex);
+						if (group->queueHead < group->queue.size()) {
+							task = &group->queue[group->queueHead++];
+							break;
+						}
+					}
+				}
+				if (!task)
+					break;
+				task->func(task->userData);
+				group->ref--;
+			}
+		}
+	}
+};
+#else
+class TaskScheduler
+{
+public:
+	~TaskScheduler()
+	{
+		for (uint32_t i = 0; i < m_groups.size(); i++)
+			destroyGroup({ i });
+	}
+
+	TaskGroupHandle createTaskGroup(uint32_t reserveSize = 0)
+	{
+		TaskGroup *group = XA_NEW(MemTag::Default, TaskGroup);
+		group->queue.reserve(reserveSize);
+		m_groups.push_back(group);
+		TaskGroupHandle handle;
+		handle.value = m_groups.size() - 1;
+		return handle;
+	}
+
+	void run(TaskGroupHandle handle, Task task)
+	{
+		m_groups[handle.value]->queue.push_back(task);
+	}
+
+	void wait(TaskGroupHandle *handle)
+	{
+		if (handle->value == UINT32_MAX) {
+			XA_DEBUG_ASSERT(false);
+			return;
+		}
+		TaskGroup *group = m_groups[handle->value];
+		for (uint32_t i = 0; i < group->queue.size(); i++)
+			group->queue[i].func(group->queue[i].userData);
+		group->queue.clear();
+		destroyGroup(*handle);
+		handle->value = UINT32_MAX;
+	}
+
+private:
+	void destroyGroup(TaskGroupHandle handle)
+	{
+		TaskGroup *group = m_groups[handle.value];
+		if (group) {
+			group->~TaskGroup();
+			XA_FREE(group);
+			m_groups[handle.value] = nullptr;
+		}
+	}
+
+	struct TaskGroup
+	{
+		Array<Task> queue;
+	};
+
+	Array<TaskGroup *> m_groups;
+};
+#endif
+
 struct UvMeshChart
 {
 	Array<uint32_t> indices;
+	uint32_t material;
 };
 
 struct UvMesh
@@ -6105,7 +5703,6 @@ struct ChartWarningFlags
 {
 	enum Enum
 	{
-		CloseHolesDuplicatedEdge = 1<<0,
 		CloseHolesFailed = 1<<1,
 		FixTJunctionsDuplicatedEdge = 1<<2,
 		FixTJunctionsFailed = 1<<3,
@@ -6210,18 +5807,16 @@ public:
 				// - Use minimal spanning trees or seamster.
 				Array<uint32_t> holeFaceCounts;
 				XA_PROFILE_START(closeChartMeshHoles)
-				meshCloseHoles(m_unifiedMesh, boundaryLoops, &duplicatedEdge, &failed, holeFaceCounts);
+				failed = !meshCloseHoles(m_unifiedMesh, boundaryLoops, basis.normal, holeFaceCounts);
 				XA_PROFILE_END(closeChartMeshHoles)
 				m_unifiedMesh->createBoundaries();
 				m_unifiedMesh->linkBoundaries();
-				if (duplicatedEdge)
-					m_warningFlags |= ChartWarningFlags::CloseHolesDuplicatedEdge;
 				meshGetBoundaryLoops(*m_unifiedMesh, boundaryLoops);
 				if (failed || boundaryLoops.size() > 1)
 					m_warningFlags |= ChartWarningFlags::CloseHolesFailed;
 				m_closedHolesCount = holeFaceCounts.size();
 #if XA_DEBUG_EXPORT_OBJ_CLOSE_HOLES_ERROR
-				if (m_warningFlags & (ChartWarningFlags::CloseHolesDuplicatedEdge | ChartWarningFlags::CloseHolesFailed)) {
+				if (m_warningFlags & ChartWarningFlags::CloseHolesFailed) {
 					char filename[256];
 					XA_SPRINTF(filename, sizeof(filename), "debug_mesh_%03u_chartgroup_%03u_chart_%03u_close_holes_error.obj", meshId, chartGroupId, chartId);
 					FILE *file;
@@ -6364,6 +5959,58 @@ private:
 #endif
 };
 
+struct CreateChartTaskArgs
+{
+	const Mesh *mesh;
+	const Array<uint32_t> *faceArray;
+	const Basis *basis;
+	uint32_t meshId;
+	uint32_t chartGroupId;
+	uint32_t chartId;
+	Chart **chart;
+};
+
+static void runCreateChartTask(void *userData)
+{
+	XA_PROFILE_START(createChartMeshesThread)
+	auto args = (CreateChartTaskArgs *)userData;
+	*(args->chart) = XA_NEW(MemTag::Default, Chart, args->mesh, *(args->faceArray), *(args->basis), args->meshId, args->chartGroupId, args->chartId);
+	XA_PROFILE_END(createChartMeshesThread)
+}
+
+struct ParameterizeChartTaskArgs
+{
+	Chart *chart;
+	ParameterizeFunc func;
+};
+
+static void runParameterizeChartTask(void *userData)
+{
+	auto args = (ParameterizeChartTaskArgs *)userData;
+	Mesh *mesh = args->chart->unifiedMesh();
+	XA_PROFILE_START(parameterizeChartsOrthogonal)
+#if 1
+	computeOrthogonalProjectionMap(mesh);
+#else
+	for (uint32_t i = 0; i < vertexCount; i++)
+		mesh->texcoord(i) = Vector2(dot(args->chart->basis().tangent, mesh->position(i)), dot(args->chart->basis().bitangent, mesh->position(i)));
+#endif
+	XA_PROFILE_END(parameterizeChartsOrthogonal)
+	args->chart->evaluateOrthoParameterizationQuality();
+	if (!args->chart->isOrtho() && !args->chart->isPlanar()) {
+		XA_PROFILE_START(parameterizeChartsLSCM)
+		if (args->func)
+			args->func(&mesh->position(0).x, &mesh->texcoord(0).x, mesh->vertexCount(), mesh->indices(), mesh->indexCount());
+		else if (args->chart->isDisk())
+			computeLeastSquaresConformalMap(mesh);
+		XA_PROFILE_END(parameterizeChartsLSCM)
+		args->chart->evaluateParameterizationQuality();
+	}
+	// @@ Check that parameterization quality is above a certain threshold.
+	// Transfer parameterization from unified mesh to chart mesh.
+	args->chart->transferParameterization();
+}
+
 // Set of charts corresponding to mesh faces in the same face group.
 class ChartGroup
 {
@@ -6504,7 +6151,7 @@ public:
 		  - emphasize roundness metrics to prevent those cases.
 	  - If interior self-overlaps: preserve boundary parameterization and use mean-value map.
 	*/
-	void computeCharts(const ChartOptions &options)
+	void computeCharts(TaskScheduler *taskScheduler, const ChartOptions &options)
 	{
 		m_chartOptions = options;
 		// This function may be called multiple times, so destroy existing charts.
@@ -6525,13 +6172,30 @@ public:
 		AtlasBuilder builder(m_mesh, nullptr, options);
 		runAtlasBuilder(builder, options);
 		XA_PROFILE_END(atlasBuilder)
-		XA_PROFILE_START(createChartMeshes)
 		const uint32_t chartCount = builder.chartCount();
+		m_chartArray.resize(chartCount);
+		Array<CreateChartTaskArgs> taskArgs;
+		taskArgs.resize(chartCount);
 		for (uint32_t i = 0; i < chartCount; i++) {
-			Chart *chart = XA_NEW(MemTag::Default, Chart, m_mesh, builder.chartFaces(i), builder.chartBasis(i), m_sourceId, m_id, i);
-			m_chartArray.push_back(chart);
+			CreateChartTaskArgs &args = taskArgs[i];
+			args.mesh = m_mesh;
+			args.faceArray = &builder.chartFaces(i);
+			args.basis = &builder.chartBasis(i);
+			args.meshId = m_sourceId;
+			args.chartGroupId = m_id;
+			args.chartId = i;
+			args.chart = &m_chartArray[i];
 		}
-		XA_PROFILE_END(createChartMeshes)
+		XA_PROFILE_START(createChartMeshesReal)
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartCount);
+		for (uint32_t i = 0; i < chartCount; i++) {
+			Task task;
+			task.userData = &taskArgs[i];
+			task.func = runCreateChartTask;
+			taskScheduler->run(taskGroup, task);
+		}
+		taskScheduler->wait(&taskGroup);
+		XA_PROFILE_END(createChartMeshesReal)
 #endif
 #if XA_DEBUG_EXPORT_OBJ_CHARTS
 		char filename[256];
@@ -6554,18 +6218,33 @@ public:
 #endif
 	}
 
-	void parameterizeCharts(ParameterizeFunc func)
+	void parameterizeCharts(TaskScheduler *taskScheduler, ParameterizeFunc func)
 	{
-#if XA_RECOMPUTE_CHARTS
-		Array<Chart *> invalidCharts;
 		const uint32_t chartCount = m_chartArray.size();
+		Array<ParameterizeChartTaskArgs> taskArgs;
+		taskArgs.resize(chartCount);
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartCount);
+		for (uint32_t i = 0; i < chartCount; i++) {
+			ParameterizeChartTaskArgs &args = taskArgs[i];
+			args.chart = m_chartArray[i];
+			args.func = func;
+			Task task;
+			task.userData = &args;
+			task.func = runParameterizeChartTask;
+			taskScheduler->run(taskGroup, task);
+		}
+		taskScheduler->wait(&taskGroup);
+#if XA_RECOMPUTE_CHARTS
+		// Find charts with invalid parameterizations.
+		Array<Chart *> invalidCharts;
 		for (uint32_t i = 0; i < chartCount; i++) {
 			Chart *chart = m_chartArray[i];
-			parameterizeChart(chart, func);
 			const ParameterizationQuality &quality = chart->paramQuality();
 			if (quality.boundaryIntersection || quality.flippedTriangleCount > 0)
 				invalidCharts.push_back(chart);
 		}
+		if (invalidCharts.isEmpty())
+			return;
 		// Recompute charts with invalid parameterizations.
 		Array<uint32_t> meshFaces;
 		for (uint32_t i = 0; i < invalidCharts.size(); i++) {
@@ -6608,8 +6287,18 @@ public:
 #endif
 		}
 		// Parameterize the new charts.
-		for (uint32_t i = chartCount; i < m_chartArray.size(); i++)
-			parameterizeChart(m_chartArray[i], func);
+		taskGroup = taskScheduler->createTaskGroup(m_chartArray.size() - chartCount);
+		taskArgs.resize(m_chartArray.size() - chartCount);
+		for (uint32_t i = chartCount; i < m_chartArray.size(); i++) {
+			ParameterizeChartTaskArgs &args = taskArgs[i - chartCount];
+			args.chart = m_chartArray[i];
+			args.func = func;
+			Task task;
+			task.userData = &args;
+			task.func = runParameterizeChartTask;
+			taskScheduler->run(taskGroup, task);
+		}
+		taskScheduler->wait(&taskGroup);
 		// Remove and delete the invalid charts.
 		for (uint32_t i = 0; i < invalidCharts.size(); i++) {
 			Chart *chart = invalidCharts[i];
@@ -6617,12 +6306,6 @@ public:
 			chart->~Chart();
 			XA_FREE(chart);
 			m_paramDeletedChartsCount++;
-		}
-#else
-		const uint32_t chartCount = m_chartArray.size();
-		for (uint32_t i = 0; i < chartCount; i++) {
-			Chart *chart = m_chartArray[i];
-			parameterizeChart(chart, func);
 		}
 #endif
 	}
@@ -6666,32 +6349,6 @@ private:
 		XA_DEBUG_ASSERT(builder.facesLeft() == 0);
 	}
 
-	void parameterizeChart(Chart *chart, ParameterizeFunc func)
-	{
-		Mesh *mesh = chart->unifiedMesh();
-		XA_PROFILE_START(parameterizeChartsOrthogonal)
-#if 1
-		computeOrthogonalProjectionMap(mesh);
-#else
-		for (uint32_t i = 0; i < vertexCount; i++)
-			mesh->texcoord(i) = Vector2(dot(chart->basis().tangent, mesh->position(i)), dot(chart->basis().bitangent, mesh->position(i)));
-#endif
-		XA_PROFILE_END(parameterizeChartsOrthogonal)
-		chart->evaluateOrthoParameterizationQuality();
-		if (!chart->isOrtho() && !chart->isPlanar()) {
-			XA_PROFILE_START(parameterizeChartsLSCM)
-			if (func)
-				func(&mesh->position(0).x, &mesh->texcoord(0).x, mesh->vertexCount(), mesh->indices(), mesh->indexCount());
-			else if (chart->isDisk())
-				computeLeastSquaresConformalMap(mesh);
-			XA_PROFILE_END(parameterizeChartsLSCM)
-			chart->evaluateParameterizationQuality();
-		}
-		// @@ Check that parameterization quality is above a certain threshold.
-		// Transfer parameterization from unified mesh to chart mesh.
-		chart->transferParameterization();
-	}
-
 	void removeChart(const Chart *chart)
 	{
 		for (uint32_t i = 0; i < m_chartArray.size(); i++) {
@@ -6713,40 +6370,58 @@ private:
 	uint32_t m_paramDeletedChartsCount; // Number of charts with invalid parameterizations that were deleted, after charts were recomputed.
 };
 
-struct ComputeChartsJobArgs
+struct CreateChartGroupTaskArgs
 {
+	uint32_t faceGroup;
+	uint32_t groupId;
+	const Mesh *mesh;
+	ChartGroup **chartGroup;
+};
+
+static void runCreateChartGroupTask(void *userData)
+{
+	XA_PROFILE_START(addMeshCreateChartGroupsThread)
+	auto args = (CreateChartGroupTaskArgs *)userData;
+	*(args->chartGroup) = XA_NEW(MemTag::Default, ChartGroup, args->groupId, args->mesh, args->faceGroup);
+	XA_PROFILE_END(addMeshCreateChartGroupsThread)
+}
+
+struct ComputeChartsTaskArgs
+{
+	TaskScheduler *taskScheduler;
 	ChartGroup *chartGroup;
 	const ChartOptions *options;
-	task::Progress *progress;
+	Progress *progress;
 };
 
 static void runComputeChartsJob(void *userData)
 {
-	ComputeChartsJobArgs *args = (ComputeChartsJobArgs *)userData;
+	auto args = (ComputeChartsTaskArgs *)userData;
 	if (args->progress->cancel)
 		return;
-	XA_PROFILE_START(computeCharts)
-	args->chartGroup->computeCharts(*args->options);
-	XA_PROFILE_END(computeCharts)
+	XA_PROFILE_START(computeChartsThread)
+	args->chartGroup->computeCharts(args->taskScheduler, *args->options);
+	XA_PROFILE_END(computeChartsThread)
 	args->progress->value++;
 	args->progress->update();
 }
 
-struct ParameterizeChartsJobArgs
+struct ParameterizeChartsTaskArgs
 {
+	TaskScheduler *taskScheduler;
 	ChartGroup *chartGroup;
 	ParameterizeFunc func;
-	task::Progress *progress;
+	Progress *progress;
 };
 
 static void runParameterizeChartsJob(void *userData)
 {
-	ParameterizeChartsJobArgs *args = (ParameterizeChartsJobArgs *)userData;
+	auto args = (ParameterizeChartsTaskArgs *)userData;
 	if (args->progress->cancel)
 		return;
-	XA_PROFILE_START(parameterizeCharts)
-	args->chartGroup->parameterizeCharts(args->func);
-	XA_PROFILE_END(parameterizeCharts)
+	XA_PROFILE_START(parameterizeChartsThread)
+	args->chartGroup->parameterizeCharts(args->taskScheduler, args->func);
+	XA_PROFILE_END(parameterizeChartsThread)
 	args->progress->value++;
 	args->progress->update();
 }
@@ -6811,7 +6486,7 @@ public:
 	}
 
 	// This function is thread safe.
-	void addMesh(const Mesh *mesh)
+	void addMesh(TaskScheduler *taskScheduler, const Mesh *mesh)
 	{
 		// Get list of face groups.
 		const uint32_t faceCount = mesh->faceCount();
@@ -6829,10 +6504,27 @@ public:
 				faceGroups.push_back(group);
 		}
 		// Create one chart group per face group.
+		// Chart group creation is slow since it copies a chunk of the source mesh, so use tasks.
 		Array<ChartGroup *> chartGroups;
 		chartGroups.resize(faceGroups.size());
-		for (uint32_t g = 0; g < faceGroups.size(); g++)
-			chartGroups[g] = XA_NEW(MemTag::Default, ChartGroup, g, mesh, faceGroups[g]);
+		Array<CreateChartGroupTaskArgs> taskArgs;
+		taskArgs.resize(chartGroups.size());
+		for (uint32_t g = 0; g < chartGroups.size(); g++) {
+			CreateChartGroupTaskArgs &args = taskArgs[g];
+			args.chartGroup = &chartGroups[g];
+			args.faceGroup = faceGroups[g];
+			args.groupId = g;
+			args.mesh = mesh;
+		}
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartGroups.size());
+		for (uint32_t g = 0; g < chartGroups.size(); g++) {
+			Task task;
+			task.userData = &taskArgs[g];
+			task.func = runCreateChartGroupTask;
+			taskScheduler->run(taskGroup, task);
+		}
+		taskScheduler->wait(&taskGroup);
+		// Thread-safe append.
 		m_addMeshMutex.lock();
 		for (uint32_t g = 0; g < chartGroups.size(); g++) {
 			m_chartGroups.push_back(chartGroups[g]);
@@ -6841,69 +6533,71 @@ public:
 		m_addMeshMutex.unlock();
 	}
 
-	bool computeCharts(task::Scheduler *taskScheduler, const ChartOptions &options, ProgressFunc progressFunc, void *progressUserData)
+	bool computeCharts(TaskScheduler *taskScheduler, const ChartOptions &options, ProgressFunc progressFunc, void *progressUserData)
 	{
 		m_chartsComputed = false;
 		m_chartsParameterized = false;
-		uint32_t jobCount = 0;
+		uint32_t taskCount = 0;
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap())
-				jobCount++;
+				taskCount++;
 		}
-		task::Progress progress(ProgressCategory::ComputeCharts, progressFunc, progressUserData, jobCount);
-		Array<ComputeChartsJobArgs> jobArgs;
-		jobArgs.reserve(jobCount);
+		Progress progress(ProgressCategory::ComputeCharts, progressFunc, progressUserData, taskCount);
+		Array<ComputeChartsTaskArgs> taskArgs;
+		taskArgs.reserve(taskCount);
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap()) {
-				ComputeChartsJobArgs args;
+				ComputeChartsTaskArgs args;
+				args.taskScheduler = taskScheduler;
 				args.chartGroup = m_chartGroups[i];
 				args.options = &options;
 				args.progress = &progress;
-				jobArgs.push_back(args);
+				taskArgs.push_back(args);
 			}
 		}
-		task::Sync sync;
-		for (uint32_t i = 0; i < jobCount; i++) {
-			task::Job job;
-			job.userData = &jobArgs[i];
-			job.func = runComputeChartsJob;
-			taskScheduler->run(job, &sync);
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(taskCount);
+		for (uint32_t i = 0; i < taskCount; i++) {
+			Task task;
+			task.userData = &taskArgs[i];
+			task.func = runComputeChartsJob;
+			taskScheduler->run(taskGroup, task);
 		}
-		taskScheduler->waitFor(sync);
+		taskScheduler->wait(&taskGroup);
 		if (progress.cancel)
 			return false;
 		m_chartsComputed = true;
 		return true;
 	}
 
-	bool parameterizeCharts(task::Scheduler *taskScheduler, ParameterizeFunc func, ProgressFunc progressFunc, void *progressUserData)
+	bool parameterizeCharts(TaskScheduler *taskScheduler, ParameterizeFunc func, ProgressFunc progressFunc, void *progressUserData)
 	{
 		m_chartsParameterized = false;
-		uint32_t jobCount = 0;
+		uint32_t taskCount = 0;
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap())
-				jobCount++;
+				taskCount++;
 		}
-		task::Progress progress(ProgressCategory::ParameterizeCharts, progressFunc, progressUserData, jobCount);
-		Array<ParameterizeChartsJobArgs> jobArgs;
-		jobArgs.reserve(jobCount);
+		Progress progress(ProgressCategory::ParameterizeCharts, progressFunc, progressUserData, taskCount);
+		Array<ParameterizeChartsTaskArgs> taskArgs;
+		taskArgs.reserve(taskCount);
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap()) {
-				ParameterizeChartsJobArgs args;
+				ParameterizeChartsTaskArgs args;
+				args.taskScheduler = taskScheduler;
 				args.chartGroup = m_chartGroups[i];
 				args.func = func;
 				args.progress = &progress;
-				jobArgs.push_back(args);
+				taskArgs.push_back(args);
 			}
 		}
-		task::Sync sync;
-		for (uint32_t i = 0; i < jobCount; i++) {
-			task::Job job;
-			job.userData = &jobArgs[i];
-			job.func = runParameterizeChartsJob;
-			taskScheduler->run(job, &sync);
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(taskCount);
+		for (uint32_t i = 0; i < taskCount; i++) {
+			Task task;
+			task.userData = &taskArgs[i];
+			task.func = runParameterizeChartsJob;
+			taskScheduler->run(taskGroup, task);
 		}
-		taskScheduler->waitFor(sync);
+		taskScheduler->wait(&taskGroup);
 		if (progress.cancel)
 			return false;
 		// Save original texcoords so PackCharts can be called multiple times (packing overwrites the texcoords).
@@ -6965,94 +6659,124 @@ struct TgaHeader
 };
 #pragma pack(pop)
 
-class DebugAtlasImage
+static void WriteTga(const char *filename, const uint8_t *data, uint32_t width, uint32_t height)
+{
+	XA_DEBUG_ASSERT(sizeof(TgaHeader) == TgaHeader::Size);
+	FILE *f;
+	XA_FOPEN(f, filename, "wb");
+	if (!f)
+		return;
+	TgaHeader tga;
+	tga.id_length = 0;
+	tga.colormap_type = 0;
+	tga.image_type = TGA_TYPE_RGB;
+	tga.colormap_index = 0;
+	tga.colormap_length = 0;
+	tga.colormap_size = 0;
+	tga.x_origin = 0;
+	tga.y_origin = 0;
+	tga.width = (uint16_t)width;
+	tga.height = (uint16_t)height;
+	tga.pixel_size = 24;
+	tga.flags = TGA_ORIGIN_UPPER;
+	fwrite(&tga, sizeof(TgaHeader), 1, f);
+	fwrite(data, sizeof(uint8_t), width * height * 3, f);
+	fclose(f);
+}
+#endif
+
+class AtlasImage
 {
 public:
-	DebugAtlasImage(uint32_t width, uint32_t height) : m_width(width), m_height(height)
+	AtlasImage(uint32_t width, uint32_t height) : m_width(width), m_height(height)
 	{
-		m_data.resize(m_width * m_height * 3);
-		memset(m_data.data(), 0, m_data.size());
+		m_data.resize(m_width * m_height);
+		memset(m_data.data(), 0, sizeof(uint32_t) * m_data.size());
 	}
 
 	void resize(uint32_t width, uint32_t height)
 	{
-		Array<uint8_t> data;
-		data.resize(width * height * 3);
-		memset(data.data(), 0, data.size());
+		Array<uint32_t> data;
+		data.resize(width * height);
+		memset(data.data(), 0, sizeof(uint32_t) * data.size());
 		for (uint32_t y = 0; y < min(m_height, height); y++)
-			memcpy(&data[y * width * 3], &m_data[y * m_width * 3], min(m_width, width) * 3);
+			memcpy(&data[y * width], &m_data[y * m_width], min(m_width, width) * sizeof(uint32_t));
 		m_width = width;
 		m_height = height;
 		swap(m_data, data);
 	}
 
-	void addChart(uint32_t chartIndex, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int atlas_w, int atlas_h, int offset_x, int offset_y, int r)
+	void addChart(uint32_t chartIndex, const BitImage *image, bool imageHasPadding, int atlas_w, int atlas_h, int offset_x, int offset_y)
 	{
-		uint8_t color[3];
-		const int mix = 192;
-		srand((unsigned int)chartIndex);
-		color[0] = uint8_t((rand() % 255 + mix) * 0.5f);
-		color[1] = uint8_t((rand() % 255 + mix) * 0.5f);
-		color[2] = uint8_t((rand() % 255 + mix) * 0.5f);
-		const BitImage *image = r == 0 ? chartBitImage : chartBitImageRotated;
 		const int w = image->width();
 		const int h = image->height();
 		for (int y = 0; y < h; y++) {
-			int yy = y + offset_y;
-			if (yy >= 0) {
-				for (int x = 0; x < w; x++) {
-					int xx = x + offset_x;
-					if (xx >= 0) {
-						if (image->bitAt(x, y)) {
-							if (xx < atlas_w && yy < atlas_h) {
-								for (int i = 0; i < 3; i++)
-									m_data[(xx + yy * m_width) * 3 + i] = color[i];
-							}
-						}
-					}
+			const int yy = y + offset_y;
+			if (yy < 0)
+				continue;
+			for (int x = 0; x < w; x++) {
+				const int xx = x + offset_x;
+				if (xx >= 0 && xx < atlas_w && yy < atlas_h && image->bitAt(x, y)) {
+					const uint32_t dataOffset = xx + yy * m_width;
+					if (m_data[dataOffset] != 0)
+						continue;
+					uint32_t value = chartIndex | kImageHasChartIndexBit;
+					if (imageHasPadding)
+						value |= kImageIsPaddingBit;
+					m_data[dataOffset] = value;
 				}
 			}
 		}
 	}
 
+	void copyTo(uint32_t *dest, uint32_t destWidth, uint32_t destHeight) const
+	{
+		for (uint32_t y = 0; y < destHeight; y++)
+			memcpy(&dest[y * destWidth], &m_data[y * m_width], destWidth * sizeof(uint32_t));
+	}
+
+#if XA_DEBUG_EXPORT_ATLAS_IMAGES
 	void writeTga(const char *filename, uint32_t width, uint32_t height) const
 	{
-		XA_DEBUG_ASSERT(sizeof(TgaHeader) == TgaHeader::Size);
-		FILE *f;
-		XA_FOPEN(f, filename, "wb");
-		if (!f)
-			return;
-		TgaHeader tga;
-		tga.id_length = 0;
-		tga.colormap_type = 0;
-		tga.image_type = TGA_TYPE_RGB;
-		tga.colormap_index = 0;
-		tga.colormap_length = 0;
-		tga.colormap_size = 0;
-		tga.x_origin = 0;
-		tga.y_origin = 0;
-		tga.width = (uint16_t)width;
-		tga.height = (uint16_t)height;
-		tga.pixel_size = 24;
-		tga.flags = TGA_ORIGIN_UPPER;
-		fwrite(&tga, sizeof(TgaHeader), 1, f);
+		Array<uint8_t> image;
+		image.resize(width * height * 3);
 		for (uint32_t y = 0; y < height; y++) {
+			if (y >= m_height)
+				continue;
 			for (uint32_t x = 0; x < width; x++) {
-				fwrite(&m_data[(x + y * m_width) * 3], 3, 1, f);
+				if (x >= m_width)
+					continue;
+				const uint32_t data = m_data[x + y * m_width];
+				if (!(data & kImageHasChartIndexBit))
+					continue;
+				const uint32_t chartIndex = data & kImageChartIndexMask;
+				uint8_t *color = &image[(x + y * width) * 3];
+				if (data & kImageIsPaddingBit) {
+					color[0] = 255;
+					color[1] = 0;
+					color[2] = 255;
+				} else {
+					const int mix = 192;
+					srand((unsigned int)chartIndex);
+					color[0] = uint8_t((rand() % 255 + mix) * 0.5f);
+					color[1] = uint8_t((rand() % 255 + mix) * 0.5f);
+					color[2] = uint8_t((rand() % 255 + mix) * 0.5f);
+				}
 			}
 		}
-		fclose(f);
+		WriteTga(filename, image.data(), width, height);
 	}
+#endif
 
 private:
 	uint32_t m_width, m_height;
-	Array<uint8_t> m_data;
+	Array<uint32_t> m_data;
 };
-#endif
 
 struct Chart
 {
 	int32_t atlasIndex;
+	uint32_t material;
 	uint32_t indexCount;
 	const uint32_t *indices;
 	float parametricArea;
@@ -7088,6 +6812,7 @@ struct Atlas
 	float getTexelsPerUnit() const { return m_texelsPerUnit; }
 	const Chart *getChart(uint32_t index) const { return m_charts[index]; }
 	uint32_t getChartCount() const { return m_charts.size(); }
+	const Array<AtlasImage *> &getImages() const { return m_atlasImages; }
 	float getUtilization(uint32_t atlas) const { return m_utilization[atlas]; }
 
 	void addChart(param::Chart *paramChart)
@@ -7095,6 +6820,7 @@ struct Atlas
 		Mesh *mesh = paramChart->mesh();
 		Chart *chart = XA_NEW(MemTag::Default, Chart);
 		chart->atlasIndex = -1;
+		chart->material = 0;
 		chart->indexCount = mesh->indexCount();
 		chart->indices = mesh->indices();
 		chart->parametricArea = paramChart->computeParametricArea();
@@ -7133,6 +6859,7 @@ struct Atlas
 			UvMeshChart *uvChart = mesh->mesh->charts[c];
 			Chart *chart = XA_NEW(MemTag::Default, Chart);
 			chart->atlasIndex = -1;
+			chart->material = uvChart->material;
 			chart->indexCount = uvChart->indices.size();
 			chart->indices = uvChart->indices.data();
 			chart->vertices = mesh->texcoords.data();
@@ -7212,7 +6939,6 @@ struct Atlas
 				// Estimate resolution based on the mesh surface area and given texel scale.
 				const float texelCount = max(1.0f, meshArea * square(m_texelsPerUnit) / 0.75f); // Assume 75% utilization.
 				resolution = max(1u, nextPowerOfTwo(uint32_t(sqrtf(texelCount))));
-				XA_PRINT("   Estimating resolution as %d\n", resolution);
 			}
 			if (m_texelsPerUnit <= 0) {
 				// Estimate a suitable texelsPerUnit to fit the given resolution.
@@ -7315,16 +7041,17 @@ struct Atlas
 		m_radix = RadixSort();
 		m_radix.sort(chartOrderArray);
 		const uint32_t *ranks = m_radix.ranks();
-#if XA_DEBUG_EXPORT_ATLAS_IMAGES
-		Array<DebugAtlasImage *> debugAtlasImages;
-		Array<DebugAtlasImage *> debugAtlasImagesNoPadding;
-#endif
 		// Divide chart perimeter range into buckets.
 		const float chartPerimeterBucketSize = (maxChartPerimeter - minChartPerimeter) / 16.0f;
 		uint32_t currentChartBucket = 0;
 		Array<Vector2i> chartStartPositions; // per atlas
 		chartStartPositions.push_back(Vector2i(0, 0));
 		// Pack sorted charts.
+#if XA_DEBUG_EXPORT_ATLAS_IMAGES
+		const bool createImage = true;
+#else
+		const bool createImage = options.createImage;
+#endif
 		BitImage chartBitImage, chartBitImageRotated;
 		int atlasWidth = 0, atlasHeight = 0;
 		const bool resizableAtlas = !(options.resolution > 0 && options.texelsPerUnit > 0.0f);
@@ -7362,9 +7089,7 @@ struct Atlas
 				raster::drawTriangle(Vector2((float)chartBitImage.width(), (float)chartBitImage.height()), vertices, drawTriangleCallback, &args);
 			}
 			// Expand chart by padding pixels. (dilation)
-#if XA_DEBUG_EXPORT_ATLAS_IMAGES
 			BitImage chartBitImageNoPadding(chartBitImage), chartBitImageNoPaddingRotated(chartBitImageRotated);
-#endif
 			if (options.padding > 0) {
 				XA_PROFILE_START(packChartsDilate)
 				chartBitImage.dilate(options.padding);
@@ -7396,12 +7121,8 @@ struct Atlas
 					bi->resize(resolution, resolution, true);
 					m_bitImages.push_back(bi);
 					firstChartInBitImage = true;
-#if XA_DEBUG_EXPORT_ATLAS_IMAGES
-					DebugAtlasImage *di = XA_NEW(MemTag::Default, DebugAtlasImage, resolution, resolution);
-					debugAtlasImages.push_back(di);
-					di = XA_NEW(MemTag::Default, DebugAtlasImage, resolution, resolution);
-					debugAtlasImagesNoPadding.push_back(di);
-#endif
+					if (createImage)
+						m_atlasImages.push_back(XA_NEW(MemTag::Default, AtlasImage, resolution, resolution));
 					// Start positions are per-atlas, so create a new one of those too.
 					chartStartPositions.push_back(Vector2i(0, 0));
 				}
@@ -7440,10 +7161,8 @@ struct Atlas
 				// Resize bitImage if necessary.
 				if (uint32_t(atlasWidth) > m_bitImages[0]->width() || uint32_t(atlasHeight) > m_bitImages[0]->height()) {
 					m_bitImages[0]->resize(nextPowerOfTwo(uint32_t(atlasWidth)), nextPowerOfTwo(uint32_t(atlasHeight)), false);
-#if XA_DEBUG_EXPORT_ATLAS_IMAGES
-					debugAtlasImages[0]->resize(m_bitImages[0]->width(), m_bitImages[0]->height());
-					debugAtlasImagesNoPadding[0]->resize(m_bitImages[0]->width(), m_bitImages[0]->height());
-#endif
+					if (createImage)
+						m_atlasImages[0]->resize(m_bitImages[0]->width(), m_bitImages[0]->height());
 				}
 			} else {
 				atlasWidth = min((int)options.resolution, atlasWidth);
@@ -7452,10 +7171,10 @@ struct Atlas
 			XA_PROFILE_START(packChartsBlit)
 			addChart(m_bitImages[currentAtlas], &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, best_x, best_y, best_r);
 			XA_PROFILE_END(packChartsBlit)
-#if XA_DEBUG_EXPORT_ATLAS_IMAGES
-			debugAtlasImages[currentAtlas]->addChart(i, &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, best_x, best_y, best_r);
-			debugAtlasImagesNoPadding[currentAtlas]->addChart(i, &chartBitImageNoPadding, &chartBitImageNoPaddingRotated, atlasWidth, atlasHeight, best_x, best_y, best_r);
-#endif
+			if (createImage) {
+				m_atlasImages[currentAtlas]->addChart(c, best_r == 0 ? &chartBitImageNoPadding : &chartBitImageNoPaddingRotated, false, atlasWidth, atlasHeight, best_x, best_y);
+				m_atlasImages[currentAtlas]->addChart(c, best_r == 0 ? &chartBitImage : &chartBitImageRotated, true, atlasWidth, atlasHeight, best_x, best_y);
+			}
 			chart->atlasIndex = (int32_t)currentAtlas;
 			// Translate and rotate chart texture coordinates.
 			for (uint32_t v = 0; v < chart->uniqueVertexCount(); v++) {
@@ -7502,16 +7221,10 @@ struct Atlas
 			}
 		}
 #if XA_DEBUG_EXPORT_ATLAS_IMAGES
-		for (uint32_t i = 0; i < debugAtlasImages.size(); i++) {
+		for (uint32_t i = 0; i < m_atlasImages.size(); i++) {
 			char filename[256];
-			XA_SPRINTF(filename, sizeof(filename), "debug_atlas%02u.tga", i);
-			debugAtlasImages[i]->writeTga(filename, m_width, m_height);
-			debugAtlasImages[i]->~DebugAtlasImage();
-			XA_FREE(debugAtlasImages[i]);
-			XA_SPRINTF(filename, sizeof(filename), "debug_atlas_no_padding_%02u.tga", i);
-			debugAtlasImagesNoPadding[i]->writeTga(filename, m_width, m_height);
-			debugAtlasImagesNoPadding[i]->~DebugAtlasImage();
-			XA_FREE(debugAtlasImagesNoPadding[i]);
+			XA_SPRINTF(filename, sizeof(filename), "debug_atlas_image%02u.tga", i);
+			m_atlasImages[i]->writeTga(filename, m_width, m_height);
 		}
 #endif
 		if (progressFunc && progress != 100) {
@@ -7681,6 +7394,7 @@ private:
 		return true;
 	}
 
+	Array<AtlasImage *> m_atlasImages;
 	Array<float> m_utilization;
 	Array<BitImage *> m_bitImages;
 	BoundingBox2D m_boundingBox;
@@ -7699,12 +7413,12 @@ struct Context
 {
 	Atlas atlas;
 	uint32_t meshCount = 0;
-	internal::task::Progress *addMeshProgress = nullptr;
-	internal::task::Sync addMeshSync;
+	internal::Progress *addMeshProgress = nullptr;
+	internal::TaskGroupHandle addMeshTaskGroup;
 	internal::param::Atlas paramAtlas;
 	ProgressFunc progressFunc = nullptr;
 	void *progressUserData = nullptr;
-	internal::task::Scheduler *taskScheduler;
+	internal::TaskScheduler *taskScheduler;
 	internal::Array<internal::UvMesh *> uvMeshes;
 	internal::Array<internal::UvMeshInstance *> uvMeshInstances;
 };
@@ -7713,7 +7427,7 @@ Atlas *Create()
 {
 	Context *ctx = XA_NEW(internal::MemTag::Default, Context);
 	memset(&ctx->atlas, 0, sizeof(Atlas));
-	ctx->taskScheduler = XA_NEW(internal::MemTag::Default, internal::task::Scheduler);
+	ctx->taskScheduler = XA_NEW(internal::MemTag::Default, internal::TaskScheduler);
 	return &ctx->atlas;
 }
 
@@ -7745,12 +7459,14 @@ void Destroy(Atlas *atlas)
 	Context *ctx = (Context *)atlas;
 	if (atlas->utilization)
 		XA_FREE(atlas->utilization);
+	if (atlas->image)
+		XA_FREE(atlas->image);
 	DestroyOutputMeshes(ctx);
 	if (ctx->addMeshProgress) {
 		ctx->addMeshProgress->cancel = true;
 		AddMeshJoin(atlas); // frees addMeshProgress
 	}
-	ctx->taskScheduler->~Scheduler();
+	ctx->taskScheduler->~TaskScheduler();
 	XA_FREE(ctx->taskScheduler);
 	for (uint32_t i = 0; i < ctx->uvMeshes.size(); i++) {
 		internal::UvMesh *mesh = ctx->uvMeshes[i];
@@ -7773,18 +7489,18 @@ void Destroy(Atlas *atlas)
 #endif
 }
 
-struct AddMeshJobArgs
+struct AddMeshTaskArgs
 {
 	Context *ctx;
 	internal::Mesh *mesh;
 };
 
-static void runAddMeshJob(void *userData)
+static void runAddMeshTask(void *userData)
 {
-	XA_PROFILE_START(addMesh)
-	auto args = (AddMeshJobArgs *)userData; // Responsible for freeing this.
+	XA_PROFILE_START(addMeshThread)
+	auto args = (AddMeshTaskArgs *)userData; // Responsible for freeing this.
 	internal::Mesh *mesh = args->mesh;
-	internal::task::Progress *progress = args->ctx->addMeshProgress;
+	internal::Progress *progress = args->ctx->addMeshProgress;
 	if (progress->cancel)
 		goto cleanup;
 	XA_PROFILE_START(addMeshCreateColocals)
@@ -7833,9 +7549,9 @@ static void runAddMeshJob(void *userData)
 		fclose(file);
 	}
 #endif
-	XA_PROFILE_START(addMeshCreateChartGroups)
-	args->ctx->paramAtlas.addMesh(mesh); // addMesh is thread safe
-	XA_PROFILE_END(addMeshCreateChartGroups)
+	XA_PROFILE_START(addMeshCreateChartGroupsReal)
+	args->ctx->paramAtlas.addMesh(args->ctx->taskScheduler, mesh); // addMesh is thread safe
+	XA_PROFILE_END(addMeshCreateChartGroupsReal)
 	if (progress->cancel)
 		goto cleanup;
 	progress->value++;
@@ -7843,9 +7559,9 @@ static void runAddMeshJob(void *userData)
 cleanup:
 	mesh->~Mesh();
 	XA_FREE(mesh);
-	args->~AddMeshJobArgs();
+	args->~AddMeshTaskArgs();
 	XA_FREE(args);
-	XA_PROFILE_END(addMesh)
+	XA_PROFILE_END(addMeshThread)
 }
 
 static internal::Vector3 DecodePosition(const MeshDecl &meshDecl, uint32_t index)
@@ -7891,9 +7607,9 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 	}
 	// Don't know how many times AddMesh will be called, so progress needs to adjusted each time.
 	if (!ctx->addMeshProgress) {
-		ctx->addMeshProgress = XA_NEW(internal::MemTag::Default, internal::task::Progress, ProgressCategory::AddMesh, ctx->progressFunc, ctx->progressUserData, 1);
+		ctx->addMeshProgress = XA_NEW(internal::MemTag::Default, internal::Progress, ProgressCategory::AddMesh, ctx->progressFunc, ctx->progressUserData, 1);
 #if XA_PROFILE
-		internal::s_profile.addMeshConcurrent = clock();
+		internal::s_profile.addMeshReal = clock();
 #endif
 	}
 	else {
@@ -7902,7 +7618,6 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 	bool decoded = (meshDecl.indexCount <= 0);
 	uint32_t indexCount = decoded ? meshDecl.vertexCount : meshDecl.indexCount;
 	XA_PRINT("Adding mesh %d: %u vertices, %u triangles\n", ctx->meshCount, meshDecl.vertexCount, indexCount / 3);
-	XA_PROFILE_START(addMesh)
 	// Expecting triangle faces.
 	if ((indexCount % 3) != 0)
 		return AddMeshError::InvalidIndexCount;
@@ -7971,15 +7686,16 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 			ignore = true;
 		mesh->addFace(tri[0], tri[1], tri[2], ignore);
 	}
-	AddMeshJobArgs *jobArgs = XA_NEW(internal::MemTag::Default, AddMeshJobArgs); // The job frees this.
-	jobArgs->ctx = ctx;
-	jobArgs->mesh = mesh;
-	internal::task::Job job;
-	job.userData = jobArgs;
-	job.func = runAddMeshJob;
-	ctx->taskScheduler->run(job, &ctx->addMeshSync);
+	if (ctx->addMeshTaskGroup.value == UINT32_MAX)
+		ctx->addMeshTaskGroup = ctx->taskScheduler->createTaskGroup();
+	AddMeshTaskArgs *taskArgs = XA_NEW(internal::MemTag::Default, AddMeshTaskArgs); // The task frees this.
+	taskArgs->ctx = ctx;
+	taskArgs->mesh = mesh;
+	internal::Task task;
+	task.userData = taskArgs;
+	task.func = runAddMeshTask;
+	ctx->taskScheduler->run(ctx->addMeshTaskGroup, task);
 	ctx->meshCount++;
-	XA_PROFILE_END(addMesh)
 	return AddMeshError::Success;
 }
 
@@ -7993,21 +7709,22 @@ void AddMeshJoin(Atlas *atlas)
 	Context *ctx = (Context *)atlas;
 	if (!ctx->addMeshProgress)
 		return;
-	ctx->taskScheduler->waitFor(ctx->addMeshSync);
+	ctx->taskScheduler->wait(&ctx->addMeshTaskGroup);
 	ctx->addMeshProgress->~Progress();
 	XA_FREE(ctx->addMeshProgress);
 	ctx->addMeshProgress = nullptr;
 #if XA_PROFILE
 	XA_PRINT("Added %u meshes\n", ctx->meshCount);
-	internal::s_profile.addMeshConcurrent = clock() - internal::s_profile.addMeshConcurrent;
+	internal::s_profile.addMeshReal = clock() - internal::s_profile.addMeshReal;
 #endif
-	XA_PROFILE_PRINT("   Total (concurrent): ", addMeshConcurrent)
-		XA_PROFILE_PRINT("   Total: ", addMesh)
-		XA_PROFILE_PRINT("      Create colocals: ", addMeshCreateColocals)
-		XA_PROFILE_PRINT("      Create face groups: ", addMeshCreateFaceGroups)
-		XA_PROFILE_PRINT("      Create boundaries: ", addMeshCreateBoundaries)
-		XA_PROFILE_PRINT("      Create chart groups: ", addMeshCreateChartGroups)
-		XA_PRINT_MEM_USAGE
+	XA_PROFILE_PRINT("   Total (real): ", addMeshReal)
+	XA_PROFILE_PRINT("   Total (thread): ", addMeshThread)
+	XA_PROFILE_PRINT("      Create colocals: ", addMeshCreateColocals)
+	XA_PROFILE_PRINT("      Create face groups: ", addMeshCreateFaceGroups)
+	XA_PROFILE_PRINT("      Create boundaries: ", addMeshCreateBoundaries)
+	XA_PROFILE_PRINT("      Create chart groups (real): ", addMeshCreateChartGroupsReal)
+	XA_PROFILE_PRINT("      Create chart groups (thread): ", addMeshCreateChartGroupsThread)
+	XA_PRINT_MEM_USAGE
 }
 
 struct EdgeKey
@@ -8029,23 +7746,6 @@ struct EdgeKey
 	uint32_t v0;
 	uint32_t v1;
 };
-
-static void GrowUvMeshChart(const internal::UvMeshInstance *mesh, const internal::HashMap<internal::Vector2, uint32_t> &vertexToFaceMap, internal::UvMeshChart *chart, uint32_t face, internal::BitArray &faceAssigned)
-{
-	if (faceAssigned.bitAt(face))
-		return;
-	faceAssigned.setBitAt(face);
-	for (uint32_t i = 0; i < 3; i++)
-		chart->indices.push_back(mesh->mesh->indices[face * 3 + i]);
-	for (uint32_t i = 0; i < 3; i++) {
-		const internal::Vector2 &texcoord = mesh->texcoords[mesh->mesh->indices[face * 3 + i]];
-		uint32_t mapFaceIndex = vertexToFaceMap.get(texcoord);
-		while (mapFaceIndex != UINT32_MAX) {
-			GrowUvMeshChart(mesh, vertexToFaceMap, chart, vertexToFaceMap.value(mapFaceIndex), faceAssigned);
-			mapFaceIndex = vertexToFaceMap.getNext(mapFaceIndex);
-		}
-	}
-}
 
 AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 {
@@ -8103,13 +7803,47 @@ AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 			vertexToFaceMap.add(meshInstance->texcoords[mesh->indices[i]], i / 3);
 		internal::BitArray faceAssigned(faceCount);
 		faceAssigned.clearAll();
+		internal::Array<uint32_t> chartFaces;
 		for (uint32_t f = 0; f < faceCount; f++) {
 			if (faceAssigned.bitAt(f))
 				continue;
+			// Found an unassigned face, create a new chart.
 			internal::UvMeshChart *chart = XA_NEW(internal::MemTag::Default, internal::UvMeshChart);
-			GrowUvMeshChart(meshInstance, vertexToFaceMap, chart, f, faceAssigned);
-			for (uint32_t i = 0; i < chart->indices.size(); i++)
-				mesh->vertexToChartMap[chart->indices[i]] = mesh->charts.size();
+			chart->material = decl.faceMaterialData ? decl.faceMaterialData[f] : 0;
+			// Walk incident faces and assign them to the chart.
+			faceAssigned.setBitAt(f);
+			chartFaces.clear();
+			chartFaces.push_back(f);
+			for (;;) {
+				bool newFaceAssigned = false;
+				const uint32_t faceCount2 = chartFaces.size();
+				for (uint32_t f2 = 0; f2 < faceCount2; f2++) {
+					const uint32_t face = chartFaces[f2];
+					for (uint32_t i = 0; i < 3; i++) {
+						const internal::Vector2 &texcoord = meshInstance->texcoords[meshInstance->mesh->indices[face * 3 + i]];
+						uint32_t mapFaceIndex = vertexToFaceMap.get(texcoord);
+						while (mapFaceIndex != UINT32_MAX) {
+							const uint32_t face2 = vertexToFaceMap.value(mapFaceIndex);
+							// Materials must match.
+							if (!faceAssigned.bitAt(face2) && (!decl.faceMaterialData || decl.faceMaterialData[face] == decl.faceMaterialData[face2])) {
+								faceAssigned.setBitAt(face2);
+								chartFaces.push_back(face2);
+								newFaceAssigned = true;
+							}
+							mapFaceIndex = vertexToFaceMap.getNext(mapFaceIndex);
+						}
+					}
+				}
+				if (!newFaceAssigned)
+					break;
+			}
+			for (uint32_t i = 0; i < chartFaces.size(); i++) {
+				for (uint32_t j = 0; j < 3; j++) {
+					const uint32_t vertex = meshInstance->mesh->indices[chartFaces[i] * 3 + j];
+					chart->indices.push_back(vertex);
+					mesh->vertexToChartMap[vertex] = mesh->charts.size();
+				}
+			}
 			mesh->charts.push_back(chart);
 		}
 		ctx->uvMeshes.push_back(mesh);
@@ -8139,12 +7873,12 @@ void ComputeCharts(Atlas *atlas, ChartOptions chartOptions)
 	}
 	XA_PRINT("Computing charts\n");
 	uint32_t chartCount = 0, chartsWithHolesCount = 0, holesCount = 0, chartsWithTJunctionsCount = 0, tJunctionsCount = 0;
-	XA_PROFILE_START(computeChartsConcurrent)
+	XA_PROFILE_START(computeChartsReal)
 	if (!ctx->paramAtlas.computeCharts(ctx->taskScheduler, chartOptions, ctx->progressFunc, ctx->progressUserData)) {
 		XA_PRINT("   Cancelled by user\n");
 		return;
 	}
-	XA_PROFILE_END(computeChartsConcurrent)
+	XA_PROFILE_END(computeChartsReal)
 	// Count charts and print warnings.
 	for (uint32_t i = 0; i < ctx->meshCount; i++) {
 		for (uint32_t j = 0; j < ctx->paramAtlas.chartGroupCount(i); j++) {
@@ -8153,8 +7887,6 @@ void ComputeCharts(Atlas *atlas, ChartOptions chartOptions)
 				continue;
 			for (uint32_t k = 0; k < chartGroup->chartCount(); k++) {
 				const internal::param::Chart *chart = chartGroup->chartAt(k);
-				if (chart->warningFlags() & internal::param::ChartWarningFlags::CloseHolesDuplicatedEdge)
-					XA_PRINT_WARNING("   Chart %u (mesh %u, group %u, id %u): closing holes created non-manifold geometry\n", chartCount, i, j, k);
 				if (chart->warningFlags() & internal::param::ChartWarningFlags::CloseHolesFailed)
 					XA_PRINT_WARNING("   Chart %u (mesh %u, group %u, id %u): failed to close holes\n", chartCount, i, j, k);
 				if (chart->warningFlags() & internal::param::ChartWarningFlags::FixTJunctionsDuplicatedEdge)
@@ -8180,15 +7912,16 @@ void ComputeCharts(Atlas *atlas, ChartOptions chartOptions)
 	if (tJunctionsCount > 0)
 		XA_PRINT("   Fixed %u t-junctions in %u charts\n", tJunctionsCount, chartsWithTJunctionsCount);
 	XA_PRINT("   %u charts\n", chartCount);
-	XA_PROFILE_PRINT("   Total (concurrent): ", computeChartsConcurrent)
-	XA_PROFILE_PRINT("   Total: ", computeCharts)
+	XA_PROFILE_PRINT("   Total (real): ", computeChartsReal)
+	XA_PROFILE_PRINT("   Total (thread): ", computeChartsThread)
 	XA_PROFILE_PRINT("      Atlas builder: ", atlasBuilder)
 	XA_PROFILE_PRINT("         Init: ", atlasBuilderInit)
 	XA_PROFILE_PRINT("         Create initial charts: ", atlasBuilderCreateInitialCharts)
 	XA_PROFILE_PRINT("         Grow charts: ", atlasBuilderGrowCharts)
 	XA_PROFILE_PRINT("         Merge charts: ", atlasBuilderMergeCharts)
-	XA_PROFILE_PRINT("      Create chart meshes: ", createChartMeshes)
-	XA_PROFILE_PRINT("         Fix t-junctions: ", fixChartMeshTJunctions);
+	XA_PROFILE_PRINT("      Create chart meshes (real): ", createChartMeshesReal)
+	XA_PROFILE_PRINT("      Create chart meshes (thread): ", createChartMeshesThread)
+	XA_PROFILE_PRINT("         Fix t-junctions: ", fixChartMeshTJunctions)
 	XA_PROFILE_PRINT("         Close holes: ", closeChartMeshHoles)
 	XA_PRINT_MEM_USAGE
 }
@@ -8216,14 +7949,18 @@ void ParameterizeCharts(Atlas *atlas, ParameterizeFunc func)
 		XA_FREE(atlas->utilization);
 		atlas->utilization = nullptr;
 	}
+	if (atlas->image) {
+		XA_FREE(atlas->image);
+		atlas->image = nullptr;
+	}
 	DestroyOutputMeshes(ctx);
 	XA_PRINT("Parameterizing charts\n");
-	XA_PROFILE_START(parameterizeChartsConcurrent)
+	XA_PROFILE_START(parameterizeChartsReal)
 	if (!ctx->paramAtlas.parameterizeCharts(ctx->taskScheduler, func, ctx->progressFunc, ctx->progressUserData)) {
 		XA_PRINT("   Cancelled by user\n");
 			return;
 	}
-	XA_PROFILE_END(parameterizeChartsConcurrent)
+	XA_PROFILE_END(parameterizeChartsReal)
 	uint32_t chartCount = 0, orthoChartsCount = 0, planarChartsCount = 0, chartsAddedCount = 0, chartsDeletedCount = 0;
 	for (uint32_t i = 0; i < ctx->meshCount; i++) {
 		for (uint32_t j = 0; j < ctx->paramAtlas.chartGroupCount(i); j++) {
@@ -8304,8 +8041,8 @@ void ParameterizeCharts(Atlas *atlas, ParameterizeFunc func)
 	}
 	if (invalidParamCount > 0)
 		XA_PRINT_WARNING("   %u charts with invalid parameterizations\n", invalidParamCount);
-	XA_PROFILE_PRINT("   Total (concurrent): ", parameterizeChartsConcurrent)
-	XA_PROFILE_PRINT("   Total: ", parameterizeCharts)
+	XA_PROFILE_PRINT("   Total (real): ", parameterizeChartsReal)
+	XA_PROFILE_PRINT("   Total (thread): ", parameterizeChartsThread)
 	XA_PROFILE_PRINT("      Orthogonal: ", parameterizeChartsOrthogonal)
 	XA_PROFILE_PRINT("      LSCM: ", parameterizeChartsLSCM)
 	XA_PROFILE_PRINT("      Evaluate quality: ", parameterizeChartsEvaluateQuality)
@@ -8344,6 +8081,10 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 		XA_FREE(atlas->utilization);
 		atlas->utilization = nullptr;
 	}
+	if (atlas->image) {
+		XA_FREE(atlas->image);
+		atlas->image = nullptr;
+	}
 	atlas->meshCount = 0;
 	// Pack charts.
 	internal::pack::Atlas packAtlas;
@@ -8370,6 +8111,11 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 		atlas->utilization = XA_ALLOC_ARRAY(internal::MemTag::Default, float, atlas->atlasCount);
 		for (uint32_t i = 0; i < atlas->atlasCount; i++)
 			atlas->utilization[i] = packAtlas.getUtilization(i);
+	}
+	if (packOptions.createImage) {
+		atlas->image = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, atlas->atlasCount * atlas->width * atlas->height);
+		for (uint32_t i = 0; i < atlas->atlasCount; i++)
+			packAtlas.getImages()[i]->copyTo(&atlas->image[atlas->width * atlas->height * i], atlas->width, atlas->height);
 	}
 	XA_PROFILE_PRINT("   Total: ", packCharts)
 	XA_PROFILE_PRINT("      Rasterize: ", packChartsRasterize)
@@ -8476,6 +8222,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 							for (uint32_t j = 0; j < 3; j++)
 								outputChart->indexArray[3 * f + j] = firstVertex + mesh->vertexAt(f * 3 + j);
 						}
+						outputChart->material = 0;
 						meshChartIndex++;
 						chartIndex++;
 						firstVertex += chart->mesh()->vertexCount();
@@ -8521,7 +8268,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 				} else {
 					const internal::pack::Chart *chart = packAtlas.getChart(chartIndex + meshChartIndex);
 					vertex.atlasIndex = chart->atlasIndex;
-					vertex.chartIndex = (int32_t)meshChartIndex;
+					vertex.chartIndex = (int32_t)chartIndex + meshChartIndex;
 				}
 			}
 			// Indices.
@@ -8534,6 +8281,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 				outputChart->atlasIndex = (uint32_t)chart->atlasIndex;
 				outputChart->indexCount = chart->indexCount;
 				outputChart->indexArray = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, outputChart->indexCount);
+				outputChart->material = chart->material;
 				memcpy(outputChart->indexArray, chart->indices, chart->indexCount * sizeof(uint32_t));
 				chartIndex++;
 			}

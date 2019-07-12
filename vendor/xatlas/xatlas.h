@@ -50,6 +50,7 @@ struct Chart
 	uint32_t flags;
 	uint32_t *indexArray;
 	uint32_t indexCount;
+	uint32_t material;
 };
 
 // Output vertex.
@@ -72,6 +73,10 @@ struct Mesh
 	uint32_t vertexCount;
 };
 
+static const uint32_t kImageChartIndexMask = 0x3FFFFFFF;
+static const uint32_t kImageHasChartIndexBit = 0x40000000;
+static const uint32_t kImageIsPaddingBit = 0x80000000;
+
 // Empty on creation. Populated after charts are packed.
 struct Atlas
 {
@@ -83,6 +88,7 @@ struct Atlas
 	Mesh *meshes; // The output meshes, corresponding to each AddMesh call.
 	float *utilization; // Normalized atlas texel utilization array. E.g. a value of 0.8 means 20% empty space. atlasCount in length.
 	float texelsPerUnit; // Equal to PackOptions texelsPerUnit if texelsPerUnit > 0, otherwise an estimated value to match PackOptions resolution.
+	uint32_t *image;
 };
 
 // Create an empty atlas.
@@ -148,6 +154,7 @@ struct UvMeshDecl
 	const void *indexData = nullptr; // optional
 	int32_t indexOffset = 0; // optional. Add this offset to all indices.
 	IndexFormat::Enum indexFormat = IndexFormat::UInt16;
+	const uint32_t *faceMaterialData = nullptr; // Optional. Faces with different materials won't be assigned to the same chart. Must be indexCount / 3 in length.
 	bool rotateCharts = true;
 };
 
@@ -183,6 +190,9 @@ struct PackOptions
 {
 	// Slower, but gives the best result. If false, use random chart placement.
 	bool bruteForce = false;
+
+	// Create Atlas::image
+	bool createImage = false;
 
 	// Unit to texel scale. e.g. a 1x1 quad with texelsPerUnit of 32 will take up approximately 32x32 texels in the atlas.
 	// If 0, an estimated value will be calculated to approximately match the given resolution.
