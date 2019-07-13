@@ -605,7 +605,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
                 destColors[v] = sourceColors[sourceVertexIndex];
             }
 
-            pDestTextureCoordinateArray[v] = {vertex.uv[0] / atlas->width, 1.0f - vertex.uv[1] / atlas->height};
+            pDestTextureCoordinateArray[v] = {vertex.uv[0] / atlas->width, vertex.uv[1] / atlas->height};
         }
 
         size_t triangleIndex = 0;
