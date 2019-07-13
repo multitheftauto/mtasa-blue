@@ -6,7 +6,8 @@
 class CTextureAtlas
 {
 public:
-    CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial, std::vector<CDXTexture>& texturesCache,
+    CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial,
+                  std::vector<CDXTexture>& texturesCache,
                   std::vector<uint32_t>& textures, std::vector<Vector2>& uvs);
     CTextureAtlas();
 

@@ -216,8 +216,9 @@ void GetTextures(RpClump* pClump, std::vector<uint32_t>& textures, std::vector<C
 
     std::set<unsigned int> setOfTextureNameHashes;
 
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         for (int i = 0; i < pGeometry->materials.entries; i++)
         {
@@ -261,8 +262,9 @@ void GetVerticesToMaterial(RpClump* pClump, std::vector<uint16_t>** vertexToMate
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 
     size_t totalVertices = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         totalVertices += static_cast<size_t>(pGeometry->vertices_size);
     }
@@ -271,8 +273,9 @@ void GetVerticesToMaterial(RpClump* pClump, std::vector<uint16_t>** vertexToMate
 
     size_t FirstVertexIndex = 0;
     size_t FirstMaterialIndex = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         for (int i = 0; i < pGeometry->triangles_size; i++)
         {
@@ -282,7 +285,7 @@ void GetVerticesToMaterial(RpClump* pClump, std::vector<uint16_t>** vertexToMate
                 int vertexIndex = triangle.vertIndex[j];
 
                 unsigned short materialIndex = triangle.matIndex + FirstMaterialIndex;
-                (*vertexToMaterial)->at(vertexIndex + FirstVertexIndex) = materialIndex;          
+                (*vertexToMaterial)->at(vertexIndex + FirstVertexIndex) = materialIndex;
             }
         }
 
@@ -300,8 +303,9 @@ void GetVerticesPositionsAndUVs(RpClump* pClump, std::vector<Vector3>& vertices,
 
     size_t totalVertices = 0;
     size_t FirstVertexIndex = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*             pAtomic = outAtomicList[geometryIndex];
         RwTextureCoordinates* pTextureCoordinateArray = pAtomic->geometry->texcoords[0];
         RwV3d*                pVertices = pAtomic->geometry->morphTarget->verts;
         for (int i = 0; i < pAtomic->geometry->vertices_size; i++)
@@ -327,8 +331,9 @@ void GetVertexIndices(RpClump* pClump, std::vector<uint32_t>** vertexIndices)
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 
     size_t totalIndices = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
 
         totalIndices += (pGeometry->triangles_size * 3);
@@ -338,8 +343,9 @@ void GetVertexIndices(RpClump* pClump, std::vector<uint32_t>** vertexIndices)
 
     size_t FirstIndex = 0;
     size_t FirstVertexIndex = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         int         triangleIndex = 0;
         uint32_t    totalGeometryIndices = pGeometry->triangles_size * 3;
@@ -349,7 +355,7 @@ void GetVertexIndices(RpClump* pClump, std::vector<uint32_t>** vertexIndices)
             for (int j = 0; j < 3; j++)
             {
                 uint32_t vertexIndex = triangle.vertIndex[j] + FirstVertexIndex;
-                (*vertexIndices)->at(FirstIndex + f + j) = vertexIndex;  
+                (*vertexIndices)->at(FirstIndex + f + j) = vertexIndex;
             }
         }
 
@@ -366,8 +372,9 @@ void GetFaceMaterials(RpClump* pClump, std::vector<uint32_t>** faceMaterials)
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 
     size_t totalTriangles = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         totalTriangles += pGeometry->triangles_size;
     }
@@ -376,8 +383,9 @@ void GetFaceMaterials(RpClump* pClump, std::vector<uint32_t>** faceMaterials)
 
     size_t FirstIndex = 0;
     size_t FirstMaterialIndex = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         int         triangleIndex = 0;
         for (uint32_t triangleIndex = 0; triangleIndex < pGeometry->triangles_size; triangleIndex++)
@@ -430,12 +438,12 @@ void CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeom
     for (size_t i = 0; i < atlasTextures.size(); i++)
     {
         RpMaterial* pMaterial = RpMaterialCreate();
+        pMaterial->color = {0, 0, 255, 255};
         pMaterial->texture = atlasTextures[i];
         pMaterial->refs++;
         pNewGeometry->materials.materials[i] = pMaterial;
         printf("[INSERT] CreateGeometryMaterials: index: %u | name: %s\n", i, pMaterial->texture->name);
     }
-
 }
 
 bool GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex)
@@ -512,9 +520,9 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     size_t FirstIndex = 0;
     size_t FirstVertexIndex = 0;
     size_t FirstFaceIndex = 0;
-    for (uint32_t i = 0; i < outAtomicList.size(); i++)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
-        RpAtomic*   pAtomic = outAtomicList[i];
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         uint32_t    totalGeometryIndices = pGeometry->triangles_size * 3;
 
@@ -532,7 +540,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         if (error != xatlas::AddMeshError::Success)
         {
             xatlas::Destroy(atlas);
-            printf("Error adding mesh %d: %s\n", i, xatlas::StringForEnum(error));
+            printf("Error adding mesh %d: %s\n", (int)geometryIndex, xatlas::StringForEnum(error));
             return nullptr;
         }
 
@@ -547,7 +555,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     xatlas::PackCharts(atlas, packOptions);
     printf("Copying texture data into atlas\n");
 
-    CTextureAtlas& textureAtlas = CTextureAtlas(atlas, packOptions, *vertexToMaterial, texturesCache, textures, *uvs);
+    CTextureAtlas& textureAtlas = CTextureAtlas(pClump, atlas, packOptions, *vertexToMaterial, texturesCache, textures, *uvs);
 
     // texturesCache.swap(std::vector<CDXTexture>());
     // textures.swap(std::vector<uint32_t>());
@@ -567,13 +575,13 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
 
     RwTexDictionary* pAtlasTexDictionary = pRenderWare->CreateTextureDictionary(atlasTextures);
 
-    unsigned int meshIndex = 0;
     FirstVertexIndex = 0;
     unsigned int FirstMaterialIndex = 0;
-    for (auto& pAtomic : outAtomicList)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
+        RpAtomic*           pAtomic = outAtomicList[geometryIndex];
         RpGeometry*         pGeometry = pAtomic->geometry;
-        const xatlas::Mesh& mesh = atlas->meshes[meshIndex];
+        const xatlas::Mesh& mesh = atlas->meshes[geometryIndex];
 
         RpGeometry* pNewGeometry = CreateAtlasRpGeometry(pGeometry, mesh.vertexCount, pGeometry->triangles_size, pGeometry->flags);
 
@@ -591,28 +599,27 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         for (uint32_t v = 0; v < mesh.vertexCount; v++)
         {
             const xatlas::Vertex& vertex = mesh.vertexArray[v];
-            size_t                sourceVertexIndex = vertex.xref + FirstVertexIndex;
+            size_t                sourceVertexIndex = vertex.xref;            // + FirstVertexIndex;
 
-            // const Vector3&        pos = vertices->at(vertex.xref);
-            destVertices[v] = sourceVertices[sourceVertexIndex];
+            destVertices[sourceVertexIndex] = sourceVertices[sourceVertexIndex];
 
             if (sourceNormals)
             {
-                destNormals[v] = sourceNormals[sourceVertexIndex];
+                destNormals[sourceVertexIndex] = sourceNormals[sourceVertexIndex];
             }
             if (sourceColors)
             {
-                destColors[v] = sourceColors[sourceVertexIndex];
+                destColors[sourceVertexIndex] = sourceColors[sourceVertexIndex];
             }
 
-            pDestTextureCoordinateArray[v] = {vertex.uv[0] / atlas->width, vertex.uv[1] / atlas->height};
+            pDestTextureCoordinateArray[sourceVertexIndex] = {vertex.uv[0] / atlas->width, vertex.uv[1] / atlas->height};
         }
 
         size_t triangleIndex = 0;
         for (uint32_t f = 0; f < mesh.indexCount; f += 3, triangleIndex++)
         {
-            uint16_t materialIndex = UINT16_MAX;
-            unsigned int vertexXref = UINT32_MAX;
+            uint16_t       materialIndex = UINT16_MAX;
+            unsigned int   vertexXref = UINT32_MAX;
             unsigned short theVertexToMaterial = UINT16_MAX;
 
             int32_t atlasIndex = -1;
@@ -624,7 +631,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
                 atlasIndex = v.atlasIndex;            // The same for every vertex in the triangle.
                 materialIndex = vertexToMaterial->at(vertexXref) - FirstMaterialIndex;
                 theVertexToMaterial = vertexToMaterial->at(vertexXref);
-                break;
+                pNewGeometry->triangles[triangleIndex].vertIndex[j] = vertexIndex;
             }
 
             RpMaterial* pMaterial = pGeometry->materials.materials[materialIndex];
@@ -651,7 +658,6 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
             }
         }
 
-        meshIndex++;
         FirstVertexIndex += pGeometry->vertices_size;
         FirstMaterialIndex += pGeometry->materials.entries;
 
@@ -771,67 +777,11 @@ RpGeometry* CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, i
         memcpy(pGeometry->triangles, pOriginalGeometry->triangles, sizeof(RpTriangle) * numTriangles);
     }
 
-    /*
-    // morphing is not used in GTA SA, so we are assuming that there is only 1 morph target
-    if (pOriginalGeometry->morphTarget->verts)
-    {
-        memcpy(pGeometry->morphTarget->verts, pOriginalGeometry->morphTarget->verts, sizeof(RwV3d) * numVerts);
-    }
-
-    if (pOriginalGeometry->morphTarget->normals)
-    {
-        memcpy(pGeometry->morphTarget->normals, pOriginalGeometry->morphTarget->normals, sizeof(RwV3d) * numVerts);
-    }
-
-
-    if (pOriginalGeometry->colors)
-    {
-        memcpy(pGeometry->colors, pOriginalGeometry->colors, sizeof(RwColor) * numVerts);
-    }
-   
-
-
-
-    for (int i = 0; i < pOriginalGeometry->texcoords_size; i++)
-    {
-        RwTextureCoordinates* pOrignialTextureCoordinateArray = pOriginalGeometry->texcoords[i];
-        RwTextureCoordinates* pTextureCoordinateArray = pGeometry->texcoords[i];
-        for (int vertexIndex = 0; vertexIndex < numVerts; vertexIndex++)
-        {
-            pTextureCoordinateArray[vertexIndex] = pOrignialTextureCoordinateArray[vertexIndex];
-        }
-    }
-    */
     _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
 
     pRenderWare->CopyGeometryPlugins(pGeometry, pOriginalGeometry);
 
     return pGeometry;
-}
-
-bool ReMapClumpUVs(RpClump* pClump)
-{
-    auto RpGeometryDestroy = (void(__cdecl*)(RpGeometry * geometry))0x74CCC0;
-    auto RpAtomicSetGeometry = (RpAtomic * (__cdecl*)(RpAtomic * atomic, RpGeometry * geometry, RwUInt32 flags))0x749D40;
-    // RpAtomic           * RpAtomicSetGeometry(RpAtomic * atomic, RpGeometry * geometry, RwUInt32 flags)
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-
-    std::vector<RpAtomic*> outAtomicList;
-    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
-
-    for (auto& pAtomic : outAtomicList)
-    {
-        RpGeometry* pGeometry = pAtomic->geometry;
-
-        RpGeometry* pNewGeometry = CreateAtlasRpGeometry(pGeometry, pGeometry->vertices_size, pGeometry->triangles_size, pGeometry->flags);
-
-        RpAtomicSetGeometry(pAtomic, pNewGeometry, 0);
-        // RpGeometryDestroy(pGeometry);
-
-        // pAtomic->geometry = pGeometry;
-    }
-
-    return true;
 }
 
 void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoader& ideLoader)
@@ -841,14 +791,15 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     ///*
     // REMOVE LATER
-    const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
+    int         modelID = 411;
+    const char* pStrDFFName = "infernus.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
     // REMOVE END
     //*/
 
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
 
     /*
     SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
@@ -876,13 +827,10 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     std::vector<CTextureAtlas> vecTextureAtlases;
 
-    int modelID = 0;            // pDFFDescriptor->GetModelID();
+    // int modelID = 0;            // pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
-    }
-    else
-    {
     }
 
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
@@ -905,8 +853,6 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
         pRenderWare->WriteTXD(strPathOfGeneratedDff + "myatlas.txd", pAtlasTxdDictionary);
 
-        printf("about to call RpClumpStreamGetSize\n");
-        
         unsigned int clumpSize = RpClumpStreamGetSize(pClump);
 
         // there's still an issue with size of empty extension headers of 12 btytes for clump
@@ -924,13 +870,13 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         void* pData = newFile->fileByteBuffer.GetData();
         // pRenderWare->WriteDFF(pData, newFile->actualFileSize, pClump);
 
-        pRenderWare->WriteDFF(strPathOfGeneratedDff + newFile->fileEntry->fileName, pClump);
+        pRenderWare->WriteDFF(strPathOfGeneratedDff + "mydff.dff", pClump);
 
         if (bLoadCollision)
         {
             pRenderWare->DeleteReadDFFCollisionModel();
         }
-        
+
         pRenderWare->DestroyDFF(pClump);
         pRenderWare->DestroyTXD(pAtlasTxdDictionary);
         // pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
@@ -956,54 +902,54 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     /*SString txdName = "vehicle";
     CreateTXDAtlas(g_pVehicleTxdDictionary, txdName);*/
 
-        CIDELoader ideLoader;
+    CIDELoader ideLoader;
 
-        CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
+    CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
 
-        // CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
-        newIMgArchive->ReadEntries();
+    // CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
+    newIMgArchive->ReadEntries();
 
-        ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
+    ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
 
-        AddIgnoredDffHashesToSet();
-        AddIgnoredTXDHashesToSet();
+    AddIgnoredDffHashesToSet();
+    AddIgnoredTXDHashesToSet();
 
-        CIMGArchive*                  newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
-        std::vector<CIMGArchiveFile*> imgArchiveFiles;
-        for (DWORD i = 0; i < 1; i++)            // newIMgArchive->GetFileCount()
+    CIMGArchive*                  newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
+    std::vector<CIMGArchiveFile*> imgArchiveFiles;
+    for (DWORD i = 0; i < 1; i++)            // newIMgArchive->GetFileCount()
+    {
+        CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
+        if (newFile != NULL)
         {
-            CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
-            if (newFile != NULL)
+            SString strFileName = newFile->fileEntry->fileName;
+            strFileName = strFileName.ToLower();
+
+            pRenderWare->SetCurrentDFFBeingGeneratedFileName(strFileName);
+
+            const char* pFileName = strFileName.c_str();
+            memcpy(newFile->fileEntry->fileName, pFileName, strlen(pFileName) + 1);
+
+            SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
+
+            // check if it's a txd file
+            if (strFileExtension == "txd")
             {
-                SString strFileName = newFile->fileEntry->fileName;
-                strFileName = strFileName.ToLower();
-
-                pRenderWare->SetCurrentDFFBeingGeneratedFileName(strFileName);
-
-                const char* pFileName = strFileName.c_str();
-                memcpy(newFile->fileEntry->fileName, pFileName, strlen(pFileName) + 1);
-
-                SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
-
-                // check if it's a txd file
-                if (strFileExtension == "txd")
-                {
-                    // OptimizeTXDFile(newFile);
-                }
-                else if (strFileExtension == "dff")
-                {
-                    OptimizeDFFFile(newIMgArchive, newFile, ideLoader);
-                }
-
-                imgArchiveFiles.push_back(newFile);
+                // OptimizeTXDFile(newFile);
             }
+            else if (strFileExtension == "dff")
+            {
+                OptimizeDFFFile(newIMgArchive, newFile, ideLoader);
+            }
+
+            imgArchiveFiles.push_back(newFile);
         }
-
-        newIMgArchiveOut->WriteEntries(imgArchiveFiles);
-
-        // delete newFile;
-        delete newIMgArchive;
-        delete newIMgArchiveOut;
-
-        return true;
     }
+
+    newIMgArchiveOut->WriteEntries(imgArchiveFiles);
+
+    // delete newFile;
+    delete newIMgArchive;
+    delete newIMgArchiveOut;
+
+    return true;
+}

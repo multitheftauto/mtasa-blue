@@ -19,12 +19,8 @@ auto WriteRaster = (bool(__cdecl*)(RwRaster* raster, char* filename))0x5A4150;
 
 extern CCore* g_pCore;
 
-void DilateAtlasTextures(
-    xatlas::Atlas* atlas, xatlas::PackOptions& packOptions,
-    uint8_t* atlasTexture, AtlasLookupTexel* atlasLookup, 
-    unsigned int atlasTextureSize, unsigned int atlasLookupSize,
-    std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures
-)
+void DilateAtlasTextures(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, uint8_t* atlasTexture, AtlasLookupTexel* atlasLookup,
+                         unsigned int atlasTextureSize, unsigned int atlasLookupSize, std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures)
 {
 #define DEBUG_DILATE 0
     // Run a dilate filter on the atlas texture to fill in padding around charts so bilinear filtering doesn't sample empty texels.
@@ -102,9 +98,9 @@ void DilateAtlasTextures(
                     const AtlasLookupTexel& lookup = tempAtlasLookup[sx + sy * (int)atlas->width];
                     if (lookup.materialIndex == UINT16_MAX || textures[lookup.materialIndex] == UINT32_MAX)
                         continue;            // No source data here.
-                    CDXTexture*        sourceTexture = &texturesCache[textures[lookup.materialIndex]];
-                    const int          ssx = (int)lookup.x + sampleXOffsets[si];
-                    const int          ssy = (int)lookup.y + sampleYOffsets[si];
+                    CDXTexture* sourceTexture = &texturesCache[textures[lookup.materialIndex]];
+                    const int   ssx = (int)lookup.x + sampleXOffsets[si];
+                    const int   ssy = (int)lookup.y + sampleYOffsets[si];
                     if (ssx < 0 || ssy < 0 || ssx >= (int)sourceTexture->GetWidth() || ssy >= (int)sourceTexture->GetHeight())
                         continue;            // Sample position is outside of source texture.
                     // Valid sample.
@@ -173,10 +169,9 @@ void DilateAtlasTextures(
     }
 }
 
-CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial,
+CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial,
                              std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures, std::vector<Vector2>& uvs)
 {
-
     unsigned int atlasTextureSize = atlas->width * atlas->height * 4;
     unsigned int atlasLookupSize = atlas->width * atlas->height;
 
@@ -193,10 +188,17 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
         atlasLookup[i].materialIndex = UINT16_MAX;
     }
 
+    CRenderWare*           pRenderWare = g_pCore->GetGame()->GetRenderWare();
+    std::vector<RpAtomic*> outAtomicList;
+    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
+
+    size_t FirstVertexIndex = 0;
     // Rasterize chart triangles.
-    for (uint32_t i = 0; i < atlas->meshCount; i++)
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
-        const xatlas::Mesh& mesh = atlas->meshes[i];
+        RpAtomic*           pAtomic = outAtomicList[geometryIndex];
+        RpGeometry*         pGeometry = pAtomic->geometry;
+        const xatlas::Mesh& mesh = atlas->meshes[geometryIndex];
         for (uint32_t j = 0; j < mesh.chartCount; j++)
         {
             const xatlas::Chart& chart = mesh.chartArray[j];
@@ -215,8 +217,9 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
                 {
                     const uint32_t        index = chart.indexArray[k * 3 + l];
                     const xatlas::Vertex& vertex = mesh.vertexArray[index];
+                    size_t                sourceVertexIndex = vertex.xref + FirstVertexIndex;
                     v[l] = Vector2(vertex.uv[0], vertex.uv[1]);
-                    args.sourceUv[l] = uvs[vertex.xref];
+                    args.sourceUv[l] = uvs[sourceVertexIndex];
                     args.sourceUv[l].y = 1.0f - args.sourceUv[l].y;
 
                     atlasIndex = vertex.atlasIndex;
@@ -232,20 +235,18 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
                 args.atlasLookup = ((AtlasLookupTexel*)atlasLookup.data()) + (atlasLookupSize * atlasIndex);
                 tri.drawAA(setAtlasTexel, &args);
             }
-
-
-
         }
+
+        FirstVertexIndex += pGeometry->vertices_size;
     }
     if (packOptions.padding > 0)
     {
         for (uint32_t atlasIndex = 0; atlasIndex < atlas->atlasCount; atlasIndex++)
         {
-            uint8_t* theAtlasTexture = ((uint8_t*)atlasTexture.data()) + (atlasTextureSize * atlasIndex);
+            uint8_t*          theAtlasTexture = ((uint8_t*)atlasTexture.data()) + (atlasTextureSize * atlasIndex);
             AtlasLookupTexel* theAtlasLookup = ((AtlasLookupTexel*)atlasLookup.data()) + (atlasLookupSize * atlasIndex);
 
-            DilateAtlasTextures(atlas, packOptions, theAtlasTexture, theAtlasLookup, 
-                atlasTextureSize, atlasLookupSize, texturesCache, textures);
+            DilateAtlasTextures(atlas, packOptions, theAtlasTexture, theAtlasLookup, atlasTextureSize, atlasLookupSize, texturesCache, textures);
 
             CDXTexture dxTexture;
             atlasDXTextures.push_back(dxTexture);
@@ -269,7 +270,6 @@ CTextureAtlas::CTextureAtlas(xatlas::Atlas* atlas, xatlas::PackOptions& packOpti
                 theTexture.SaveTextureToFile(atlasName);
             }
         }
-     
     }
 }
 
