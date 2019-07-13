@@ -15,6 +15,7 @@ struct PixelColor
 class CDXTexture
 {
 public:
+    RpMaterial*        m_pMaterial;
     const D3DFORMAT    m_kTextureFormat = D3DFMT_A8R8G8B8;
     RwTexture*         m_pTexture;
     IDirect3DTexture9* dxTexture;
@@ -27,7 +28,7 @@ public:
     bool               bNewRwTextureCreated;
 
     CDXTexture();
-    CDXTexture(RwTexture* pTexture);
+    CDXTexture(RpMaterial* pMaterial);
     ~CDXTexture();
 
     void         Initialize();
@@ -35,6 +36,8 @@ public:
     unsigned int GetWidth() { return imageWidth; }
     unsigned int GetHeight() { return imageHeight; }
 
+    RpMaterial* GetMaterial() { return m_pMaterial; }
+    RwTexture* GetRwTexture() { return m_pTexture; }
     void* GetPixel(int x, int y);
 
     bool LockTexture(DWORD Flags);

@@ -8,13 +8,14 @@ CDXTexture::CDXTexture()
     Initialize();
 }
 
-CDXTexture::CDXTexture(RwTexture* pTexture)
+CDXTexture::CDXTexture(RpMaterial* pMaterial)
 {
     Initialize();
 
+    m_pMaterial = pMaterial;
     CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
 
-    m_pTexture = pTexture;
+    m_pTexture = m_pMaterial->texture;
     _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
     if (rasterExt->d3dFormat != m_kTextureFormat)
     {
@@ -33,6 +34,7 @@ CDXTexture::~CDXTexture()
     if (bNewRwTextureCreated)
     {
         // TODO: delete m_pTexture using an Rw function
+        // otherwise memory leak
     }
 }
 
@@ -49,6 +51,7 @@ void CDXTexture::SaveTextureToFile(std::string& name)
 
 void CDXTexture::Initialize()
 {
+    m_pMaterial = nullptr;
     dxTexture = nullptr;
     bNewRwTextureCreated = false;
     bTextureLocked = false;
@@ -97,17 +100,33 @@ void CDXTexture::UnlockTexture()
 
 bool CDXTexture::CreateTextureLocked(unsigned int width, unsigned int height, DWORD lockFlags)
 {
+    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
+
+    auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
+    auto RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+    auto RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+    auto RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+
     imageWidth = width;
     imageHeight = height;
-    IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
-    HRESULT           hr = pDevice->CreateTexture(imageWidth, imageHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &dxTexture, NULL);
-    if (FAILED(hr))
+
+    RwRaster* raster = RwD3D9RasterCreate(width, height, m_kTextureFormat, rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
+    if (!raster)
     {
-        printf("pD3DDevice->CreateTexture fail\n");
+        std::printf("CreateAtlasTextureResource: RwD3D9RasterCreate Failed\n");
+        return false;
+    }
+
+    m_pTexture = RwTextureCreate(raster);
+    if (!m_pTexture)
+    {
+        std::printf("CreateAtlasTextureResource: RwTextureCreate Failed\n");
         return false;
     }
     else
     {
+        _rwD3D9RasterExt* destinationRasterExt = pRenderware->GetRasterExt(raster);
+        dxTexture = destinationRasterExt->texture;
         printf("texture loaded with width, height = %u, %u\n", imageWidth, imageHeight);
         if (!LockTexture(lockFlags))
         {
