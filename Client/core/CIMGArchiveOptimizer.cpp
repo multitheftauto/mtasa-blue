@@ -270,6 +270,7 @@ void GetVerticesToMaterial(RpClump* pClump, std::vector<uint16_t>** vertexToMate
     *vertexToMaterial = new std::vector<uint16_t>(totalVertices);
 
     size_t FirstVertexIndex = 0;
+    size_t FirstMaterialIndex = 0;
     for (auto& pAtomic : outAtomicList)
     {
         RpGeometry* pGeometry = pAtomic->geometry;
@@ -280,16 +281,13 @@ void GetVerticesToMaterial(RpClump* pClump, std::vector<uint16_t>** vertexToMate
             {
                 int vertexIndex = triangle.vertIndex[j];
 
-                unsigned short materialIndex = triangle.matIndex;
-                /*if (!pGeometry->materials.materials[triangle.matIndex]->texture)
-                {
-                    materialIndex = UINT16_MAX;
-                }*/
-                (*vertexToMaterial)->at(vertexIndex + FirstVertexIndex) = materialIndex;            // should be previousGeoMaterials + materialIndex;
+                unsigned short materialIndex = triangle.matIndex + FirstMaterialIndex;
+                (*vertexToMaterial)->at(vertexIndex + FirstVertexIndex) = materialIndex;          
             }
         }
 
         FirstVertexIndex += pGeometry->vertices_size;
+        FirstMaterialIndex += pGeometry->materials.entries;
     }
 }
 
@@ -339,6 +337,7 @@ void GetVertexIndices(RpClump* pClump, std::vector<uint32_t>** vertexIndices)
     *vertexIndices = new std::vector<uint32_t>(totalIndices);
 
     size_t FirstIndex = 0;
+    size_t FirstVertexIndex = 0;
     for (auto& pAtomic : outAtomicList)
     {
         RpGeometry* pGeometry = pAtomic->geometry;
@@ -349,13 +348,13 @@ void GetVertexIndices(RpClump* pClump, std::vector<uint32_t>** vertexIndices)
             RpTriangle& triangle = pGeometry->triangles[triangleIndex];
             for (int j = 0; j < 3; j++)
             {
-                uint32_t vertexIndex = triangle.vertIndex[j];
-
-                (*vertexIndices)->at(FirstIndex + f + j) = vertexIndex;            /// should be FirstIndex + vertexIndex
+                uint32_t vertexIndex = triangle.vertIndex[j] + FirstVertexIndex;
+                (*vertexIndices)->at(FirstIndex + f + j) = vertexIndex;  
             }
         }
 
         FirstIndex += totalGeometryIndices;
+        FirstVertexIndex += pGeometry->vertices_size;
     }
 }
 
@@ -376,6 +375,7 @@ void GetFaceMaterials(RpClump* pClump, std::vector<uint32_t>** faceMaterials)
     *faceMaterials = new std::vector<uint32_t>(totalTriangles);
 
     size_t FirstIndex = 0;
+    size_t FirstMaterialIndex = 0;
     for (auto& pAtomic : outAtomicList)
     {
         RpGeometry* pGeometry = pAtomic->geometry;
@@ -384,38 +384,12 @@ void GetFaceMaterials(RpClump* pClump, std::vector<uint32_t>** faceMaterials)
         {
             RpTriangle& triangle = pGeometry->triangles[triangleIndex];
 
-            (*faceMaterials)->at(FirstIndex + triangleIndex) = triangle.matIndex;
+            unsigned int materialIndex = triangle.matIndex + FirstMaterialIndex;
+            (*faceMaterials)->at(FirstIndex + triangleIndex) = materialIndex;
         }
 
         FirstIndex += pGeometry->triangles_size;
-    }
-}
-
-void GetVerticesToRpGeometryIndex(RpClump* pClump, std::vector<uint32_t>& vertexToRpGeometryIndex)
-{
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-
-    std::vector<RpAtomic*> outAtomicList;
-    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
-
-    size_t FirstIndex = 0;
-    for (auto& pAtomic : outAtomicList)
-    {
-        RpGeometry* pGeometry = pAtomic->geometry;
-        int         triangleIndex = 0;
-        uint32_t    totalGeometryIndices = pGeometry->triangles_size * 3;
-        for (uint32_t f = 0; f < totalGeometryIndices; f += 3, triangleIndex++)
-        {
-            RpTriangle& triangle = pGeometry->triangles[triangleIndex];
-            for (int j = 0; j < 3; j++)
-            {
-                uint32_t vertexIndex = triangle.vertIndex[j];
-
-                vertexToRpGeometryIndex[FirstIndex + f + j] = vertexIndex;
-            }
-        }
-
-        FirstIndex += totalGeometryIndices;
+        FirstMaterialIndex += pGeometry->materials.entries;
     }
 }
 
@@ -545,8 +519,8 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         uint32_t    totalGeometryIndices = pGeometry->triangles_size * 3;
 
         xatlas::UvMeshDecl meshDecl;
-        meshDecl.vertexCount = (uint32_t)denormalizedUVs->size();
-        meshDecl.vertexUvData = denormalizedUVs->data();
+        meshDecl.vertexCount = (uint32_t)pGeometry->vertices_size;
+        meshDecl.vertexUvData = &denormalizedUVs->at(FirstVertexIndex);
         meshDecl.vertexStride = sizeof(Vector2);
         meshDecl.indexCount = totalGeometryIndices;
         meshDecl.indexData = &vertexIndices->at(FirstIndex);
@@ -617,7 +591,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         for (uint32_t v = 0; v < mesh.vertexCount; v++)
         {
             const xatlas::Vertex& vertex = mesh.vertexArray[v];
-            size_t                sourceVertexIndex = vertex.xref - FirstVertexIndex;
+            size_t                sourceVertexIndex = vertex.xref + FirstVertexIndex;
 
             // const Vector3&        pos = vertices->at(vertex.xref);
             destVertices[v] = sourceVertices[sourceVertexIndex];
@@ -638,14 +612,19 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         for (uint32_t f = 0; f < mesh.indexCount; f += 3, triangleIndex++)
         {
             uint16_t materialIndex = UINT16_MAX;
+            unsigned int vertexXref = UINT32_MAX;
+            unsigned short theVertexToMaterial = UINT16_MAX;
 
             int32_t atlasIndex = -1;
             for (uint32_t j = 0; j < 3; j++)
             {
                 uint32_t              vertexIndex = mesh.indexArray[f + j];
                 const xatlas::Vertex& v = mesh.vertexArray[vertexIndex];
+                vertexXref = v.xref + FirstVertexIndex;
                 atlasIndex = v.atlasIndex;            // The same for every vertex in the triangle.
-                materialIndex = vertexToMaterial->at(v.xref) - FirstMaterialIndex;
+                materialIndex = vertexToMaterial->at(vertexXref) - FirstMaterialIndex;
+                theVertexToMaterial = vertexToMaterial->at(vertexXref);
+                break;
             }
 
             RpMaterial* pMaterial = pGeometry->materials.materials[materialIndex];
@@ -917,12 +896,10 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     {
         SString strPathOfGeneratedDff = "dffs\\";
 
-        // WE NEED To CHANGE THIS LOGIC LATER TO ALLOW OPTIMIZING OF VEHICLE MODELS AND TXD FILES
-        SString          txdName = "cj_airprt";
         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases);
         if (!pAtlasTxdDictionary)
         {
-            std::printf("failed to CREATE TXD atlas for TXD '%s' :(\n", txdName.c_str());
+            std::printf("failed to CREATE TXD atlas :(\n");
             return;
         }
 
