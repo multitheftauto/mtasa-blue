@@ -758,7 +758,7 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
     return 1;
 }
 
-// table getRemoteRequestInfo(element theRequest[, number postDataLength = 0])
+// table getRemoteRequestInfo(element theRequest[, number postDataLength = 0[, bool includeHeaders = false]])
 int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
@@ -766,9 +766,11 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
     CRemoteCall*     pRemoteCall = nullptr;
     CResource*       pThisResource = m_pResourceManager->GetResourceFromLuaState(luaVM);
     int              iPostDataLength = 0;
+    bool             bIncludeHeaders = false;
 
     argStream.ReadUserData(pRemoteCall);
     argStream.ReadNumber(iPostDataLength, 0);
+    argStream.ReadBool(bIncludeHeaders, false);
 
     if (!argStream.HasErrors())
     {
@@ -796,7 +798,7 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString(sURL);
 
         info.PushString("queue");
-        info.PushString(pRemoteCall->GetQueueName().c_str());
+        info.PushString(pRemoteCall->GetQueueName());
 
         info.PushString("resource");
 
@@ -810,24 +812,30 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 
         if (bExtendedInfo)
         {
-            SString sPostData = pRemoteCall->GetOptions().strPostData.c_str();
-
-            if (iPostDataLength > 0)
-                sPostData = sPostData.SubStr(0, iPostDataLength);
-
-            info.PushString("postData");
-            info.PushString(sPostData);
-
-            // requested headers
-            info.PushString("headers");
-
-            for (auto const& header : pRemoteCall->GetOptions().requestHeaders)
+            if (iPostDataLength == -1 || iPostDataLength > 0)
             {
-                requestedHeaders.PushString(header.first.c_str());
-                requestedHeaders.PushString(header.second.c_str());
+                SString sPostData = pRemoteCall->GetOptions().strPostData;
+
+                if (iPostDataLength > 0)
+                    sPostData = sPostData.SubStr(0, iPostDataLength);
+
+                info.PushString("postData");
+                info.PushString(sPostData);
             }
 
-            info.PushTable(&requestedHeaders);
+            // requested headers
+            if (bIncludeHeaders)
+            {
+                info.PushString("headers");
+
+                for (auto const& header : pRemoteCall->GetOptions().requestHeaders)
+                {
+                    requestedHeaders.PushString(header.first);
+                    requestedHeaders.PushString(header.second);
+                }
+
+                info.PushTable(&requestedHeaders);
+            }
         }
 
         info.PushString("method");
