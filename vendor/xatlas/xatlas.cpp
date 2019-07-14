@@ -57,7 +57,7 @@ Copyright (c) 2012 Brandon Pelfrey
 #endif
 
 #ifndef XA_PROFILE
-#define XA_PROFILE 0
+#define XA_PROFILE 1
 #endif
 #if XA_PROFILE
 #include <time.h>
@@ -299,18 +299,18 @@ static void *Realloc(void *ptr, size_t size, int /*tag*/, const char * /*file*/,
 #if XA_PROFILE
 #define XA_PROFILE_START(var) const clock_t var##Start = clock();
 #define XA_PROFILE_END(var) internal::s_profile.var += clock() - var##Start;
-#define XA_PROFILE_PRINT(label, var) XA_PRINT("%s%.2f seconds (%g ms)\n", label, internal::clockToSeconds(internal::s_profile.var), internal::clockToMs(internal::s_profile.var));
+#define XA_PROFILE_PRINT_AND_RESET(label, var) XA_PRINT("%s%.2f seconds (%g ms)\n", label, internal::clockToSeconds(internal::s_profile.var), internal::clockToMs(internal::s_profile.var)); internal::s_profile.var = 0;
 
 struct ProfileData
 {
-	std::atomic<clock_t> addMeshReal;
+	clock_t addMeshReal;
 	std::atomic<clock_t> addMeshThread;
 	std::atomic<clock_t> addMeshCreateColocals;
 	std::atomic<clock_t> addMeshCreateFaceGroups;
 	std::atomic<clock_t> addMeshCreateBoundaries;
 	std::atomic<clock_t> addMeshCreateChartGroupsReal;
 	std::atomic<clock_t> addMeshCreateChartGroupsThread;
-	std::atomic<clock_t> computeChartsReal;
+	clock_t computeChartsReal;
 	std::atomic<clock_t> computeChartsThread;
 	std::atomic<clock_t> atlasBuilder;
 	std::atomic<clock_t> atlasBuilderInit;
@@ -321,7 +321,7 @@ struct ProfileData
 	std::atomic<clock_t> createChartMeshesThread;
 	std::atomic<clock_t> fixChartMeshTJunctions;
 	std::atomic<clock_t> closeChartMeshHoles;
-	std::atomic<clock_t> parameterizeChartsReal;
+	clock_t parameterizeChartsReal;
 	std::atomic<clock_t> parameterizeChartsThread;
 	std::atomic<clock_t> parameterizeChartsOrthogonal;
 	std::atomic<clock_t> parameterizeChartsLSCM;
@@ -330,6 +330,7 @@ struct ProfileData
 	clock_t packChartsRasterize;
 	clock_t packChartsDilate;
 	clock_t packChartsFindLocation;
+	std::atomic<clock_t> packChartsFindLocationThread;
 	clock_t packChartsBlit;
 };
 
@@ -347,7 +348,7 @@ static double clockToSeconds(clock_t c)
 #else
 #define XA_PROFILE_START(var)
 #define XA_PROFILE_END(var)
-#define XA_PROFILE_PRINT(label, var)
+#define XA_PROFILE_PRINT_AND_RESET(label, var)
 #endif
 
 static constexpr float kPi = 3.14159265358979323846f;
@@ -642,6 +643,7 @@ static bool linesIntersect(const Vector2 &a1, const Vector2 &a2, const Vector2 &
 
 struct Vector2i
 {
+	Vector2i() {}
 	Vector2i(int32_t x, int32_t y) : x(x), y(y) {}
 
 	int32_t x, y;
@@ -6537,14 +6539,15 @@ public:
 	{
 		m_chartsComputed = false;
 		m_chartsParameterized = false;
-		uint32_t taskCount = 0;
+		// Ignore vertex maps.
+		uint32_t chartGroupCount = 0;
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap())
-				taskCount++;
+				chartGroupCount++;
 		}
-		Progress progress(ProgressCategory::ComputeCharts, progressFunc, progressUserData, taskCount);
+		Progress progress(ProgressCategory::ComputeCharts, progressFunc, progressUserData, chartGroupCount);
 		Array<ComputeChartsTaskArgs> taskArgs;
-		taskArgs.reserve(taskCount);
+		taskArgs.reserve(chartGroupCount);
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap()) {
 				ComputeChartsTaskArgs args;
@@ -6555,10 +6558,18 @@ public:
 				taskArgs.push_back(args);
 			}
 		}
-		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(taskCount);
-		for (uint32_t i = 0; i < taskCount; i++) {
+		// Sort chart groups by mesh indexCount.
+		m_chartGroupsRadix = RadixSort();
+		Array<float> chartGroupSortData;
+		chartGroupSortData.resize(chartGroupCount);
+		for (uint32_t i = 0; i < chartGroupCount; i++)
+			chartGroupSortData[i] = (float)taskArgs[i].chartGroup->mesh()->indexCount();
+		m_chartGroupsRadix.sort(chartGroupSortData);
+		// Larger chart group meshes are added first to reduce the chance of thread starvation.
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartGroupCount);
+		for (uint32_t i = 0; i < chartGroupCount; i++) {
 			Task task;
-			task.userData = &taskArgs[i];
+			task.userData = &taskArgs[m_chartGroupsRadix.ranks()[chartGroupCount - i - 1]];
 			task.func = runComputeChartsJob;
 			taskScheduler->run(taskGroup, task);
 		}
@@ -6572,14 +6583,15 @@ public:
 	bool parameterizeCharts(TaskScheduler *taskScheduler, ParameterizeFunc func, ProgressFunc progressFunc, void *progressUserData)
 	{
 		m_chartsParameterized = false;
-		uint32_t taskCount = 0;
+		// Ignore vertex maps.
+		uint32_t chartGroupCount = 0;
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap())
-				taskCount++;
+				chartGroupCount++;
 		}
-		Progress progress(ProgressCategory::ParameterizeCharts, progressFunc, progressUserData, taskCount);
+		Progress progress(ProgressCategory::ParameterizeCharts, progressFunc, progressUserData, chartGroupCount);
 		Array<ParameterizeChartsTaskArgs> taskArgs;
-		taskArgs.reserve(taskCount);
+		taskArgs.reserve(chartGroupCount);
 		for (uint32_t i = 0; i < m_chartGroups.size(); i++) {
 			if (!m_chartGroups[i]->isVertexMap()) {
 				ParameterizeChartsTaskArgs args;
@@ -6590,10 +6602,11 @@ public:
 				taskArgs.push_back(args);
 			}
 		}
-		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(taskCount);
-		for (uint32_t i = 0; i < taskCount; i++) {
+		// Larger chart group meshes are added first to reduce the chance of thread starvation.
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartGroupCount);
+		for (uint32_t i = 0; i < chartGroupCount; i++) {
 			Task task;
-			task.userData = &taskArgs[i];
+			task.userData = &taskArgs[m_chartGroupsRadix.ranks()[chartGroupCount - i - 1]];
 			task.func = runParameterizeChartsJob;
 			taskScheduler->run(taskGroup, task);
 		}
@@ -6628,6 +6641,7 @@ private:
 	bool m_chartsComputed;
 	bool m_chartsParameterized;
 	Array<ChartGroup *> m_chartGroups;
+	RadixSort m_chartGroupsRadix; // By mesh indexCount.
 	Array<uint32_t> m_chartGroupSourceMeshes;
 	Array<Array<Vector2> > m_originalChartTexcoords;
 };
@@ -6792,6 +6806,71 @@ struct Chart
 	uint32_t uniqueVertexCount() const { return uniqueVertices.isEmpty() ? vertexCount : uniqueVertices.size(); }
 };
 
+struct FindChartLocationBruteForceTaskArgs
+{
+	std::atomic<bool> *finished; // One of the tasks found a location that doesn't expand the atlas.
+	Vector2i startPosition;
+	const BitImage *atlasBitImage;
+	const BitImage *chartBitImage;
+	const BitImage *chartBitImageRotated;
+	int w, h;
+	bool blockAligned, resizableAtlas, allowRotate;
+	// out
+	bool best_insideAtlas;
+	int best_metric, best_x, best_y, best_w, best_h, best_r;
+};
+
+static void runFindChartLocationBruteForceTask(void *userData)
+{
+	XA_PROFILE_START(packChartsFindLocationThread)
+	auto args = (FindChartLocationBruteForceTaskArgs *)userData;
+	args->best_metric = INT_MAX;
+	if (args->finished->load())
+		return;
+	// Try two different orientations.
+	for (int r = 0; r < 2; r++) {
+		int cw = args->chartBitImage->width();
+		int ch = args->chartBitImage->height();
+		if (r == 1) {
+			if (args->allowRotate)
+				swap(cw, ch);
+			else
+				break;
+		}
+		const int y = args->startPosition.y;
+		const int stepSize = args->blockAligned ? 4 : 1;
+		for (int x = args->startPosition.x; x <= args->w + stepSize; x += stepSize) { // + 1 not really necessary here.
+			if (!args->resizableAtlas && (x > (int)args->atlasBitImage->width() - cw || y > (int)args->atlasBitImage->height() - ch))
+				continue;
+			if (args->finished->load())
+				break;
+			// Early out if metric not better.
+			const int area = max(args->w, x + cw) * max(args->h, y + ch);
+			const int extents = max(max(args->w, x + cw), max(args->h, y + ch));
+			const int metric = extents * extents + area;
+			if (metric > args->best_metric)
+				continue;
+			// If metric is the same, pick the one closest to the origin.
+			if (metric == args->best_metric && max(x, y) >= max(args->best_x, args->best_y))
+				continue;
+			if (!args->atlasBitImage->canBlit(r == 1 ? *(args->chartBitImageRotated) : *(args->chartBitImage), x, y))
+				continue;
+			args->best_metric = metric;
+			args->best_insideAtlas = area == args->w * args->h;
+			args->best_x = x;
+			args->best_y = y;
+			args->best_w = cw;
+			args->best_h = ch;
+			args->best_r = r;
+			if (args->best_insideAtlas) {
+				args->finished->store(true);
+				break;
+			}
+		}
+	}
+	XA_PROFILE_END(packChartsFindLocationThread)
+}
+
 struct Atlas
 {
 	~Atlas()
@@ -6912,7 +6991,7 @@ struct Atlas
 	}
 
 	// Pack charts in the smallest possible rectangle.
-	bool packCharts(const PackOptions &options, ProgressFunc progressFunc, void *progressUserData)
+	bool packCharts(TaskScheduler *taskScheduler, const PackOptions &options, ProgressFunc progressFunc, void *progressUserData)
 	{
 		if (progressFunc) {
 			if (!progressFunc(ProgressCategory::PackCharts, 0, progressUserData))
@@ -7127,7 +7206,7 @@ struct Atlas
 					chartStartPositions.push_back(Vector2i(0, 0));
 				}
 				XA_PROFILE_START(packChartsFindLocation)
-				const bool foundLocation = findChartLocation(chartStartPositions[currentAtlas], options.bruteForce, m_bitImages[currentAtlas], &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, &best_x, &best_y, &best_cw, &best_ch, &best_r, options.blockAlign, resizableAtlas, chart->allowRotate);
+				const bool foundLocation = findChartLocation(taskScheduler, chartStartPositions[currentAtlas], options.bruteForce, m_bitImages[currentAtlas], &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, &best_x, &best_y, &best_cw, &best_ch, &best_r, options.blockAlign, resizableAtlas, chart->allowRotate);
 				XA_PROFILE_END(packChartsFindLocation)
 				if (firstChartInBitImage && !foundLocation) {
 					// Chart doesn't fit in an empty, newly allocated bitImage. texelsPerUnit must be too large for the resolution.
@@ -7239,65 +7318,66 @@ private:
 	// is occupied at this point. At the end we have many small charts and a large atlas with sparse holes. Finding those holes randomly is slow. A better approach would be to
 	// start stacking large charts as if they were tetris pieces. Once charts get small try to place them randomly. It may be interesting to try a intermediate strategy, first try
 	// along one axis and then try exhaustively along that axis.
-	bool findChartLocation(const Vector2i &startPosition, bool bruteForce, const BitImage *atlasBitImage, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int w, int h, int *best_x, int *best_y, int *best_w, int *best_h, int *best_r, bool blockAligned, bool resizableAtlas, bool allowRotate)
+	bool findChartLocation(TaskScheduler *taskScheduler, const Vector2i &startPosition, bool bruteForce, const BitImage *atlasBitImage, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int w, int h, int *best_x, int *best_y, int *best_w, int *best_h, int *best_r, bool blockAligned, bool resizableAtlas, bool allowRotate)
 	{
 		const int attempts = 4096;
 		if (bruteForce || attempts >= w * h)
-			return findChartLocation_bruteForce(startPosition, atlasBitImage, chartBitImage, chartBitImageRotated, w, h, best_x, best_y, best_w, best_h, best_r, blockAligned, resizableAtlas, allowRotate);
+			return findChartLocation_bruteForce(taskScheduler, startPosition, atlasBitImage, chartBitImage, chartBitImageRotated, w, h, best_x, best_y, best_w, best_h, best_r, blockAligned, resizableAtlas, allowRotate);
 		return findChartLocation_random(atlasBitImage, chartBitImage, chartBitImageRotated, w, h, best_x, best_y, best_w, best_h, best_r, attempts, blockAligned, resizableAtlas, allowRotate);
 	}
 
-	bool findChartLocation_bruteForce(const Vector2i &startPosition, const BitImage *atlasBitImage, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int w, int h, int *best_x, int *best_y, int *best_w, int *best_h, int *best_r, bool blockAligned, bool resizableAtlas, bool allowRotate)
+	bool findChartLocation_bruteForce(TaskScheduler *taskScheduler, const Vector2i &startPosition, const BitImage *atlasBitImage, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int w, int h, int *best_x, int *best_y, int *best_w, int *best_h, int *best_r, bool blockAligned, bool resizableAtlas, bool allowRotate)
 	{
-		bool result = false;
-		const int BLOCK_SIZE = 4;
-		int best_metric = INT_MAX;
-		int step_size = blockAligned ? BLOCK_SIZE : 1;
-		// Try two different orientations.
-		for (int r = 0; r < 2; r++) {
-			int cw = chartBitImage->width();
-			int ch = chartBitImage->height();
-			if (r == 1) {
-				if (allowRotate)
-					swap(cw, ch);
-				else
-					break;
-			}
-			for (int y = startPosition.y; y <= h + step_size; y += step_size) { // + 1 to extend atlas in case atlas full.
-				for (int x = (y == startPosition.y ? startPosition.x : 0); x <= w + step_size; x += step_size) { // + 1 not really necessary here.
-					if (!resizableAtlas && (x > (int)atlasBitImage->width() - cw || y > (int)atlasBitImage->height() - ch))
-						continue;
-					// Early out.
-					int area = max(w, x + cw) * max(h, y + ch);
-					//int perimeter = max(w, x+cw) + max(h, y+ch);
-					int extents = max(max(w, x + cw), max(h, y + ch));
-					int metric = extents * extents + area;
-					if (metric > best_metric) {
-						continue;
-					}
-					if (metric == best_metric && max(x, y) >= max(*best_x, *best_y)) {
-						// If metric is the same, pick the one closest to the origin.
-						continue;
-					}
-					if (atlasBitImage->canBlit(r == 1 ? *chartBitImageRotated : *chartBitImage, x, y)) {
-						result = true;
-						best_metric = metric;
-						*best_x = x;
-						*best_y = y;
-						*best_w = cw;
-						*best_h = ch;
-						*best_r = r;
-						if (area == w * h) {
-							// Chart is completely inside, do not look at any other location.
-							goto done;
-						}
-					}
-				}
-			}
+		const int stepSize = blockAligned ? 4 : 1;
+		uint32_t taskCount = 0;
+		for (int y = startPosition.y; y <= h + stepSize; y += stepSize)
+			taskCount++;
+		Array<FindChartLocationBruteForceTaskArgs> taskArgs;
+		taskArgs.resize(taskCount);
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(taskCount);
+		std::atomic<bool> finished(false); // One of the tasks found a location that doesn't expand the atlas.
+		uint32_t i = 0;
+		for (int y = startPosition.y; y <= h + stepSize; y += stepSize) {
+			FindChartLocationBruteForceTaskArgs &args = taskArgs[i];
+			args.finished = &finished;
+			args.startPosition = Vector2i(y == startPosition.y ? startPosition.x : 0, y);
+			args.atlasBitImage = atlasBitImage;
+			args.chartBitImage = chartBitImage;
+			args.chartBitImageRotated = chartBitImageRotated;
+			args.w = w;
+			args.h = h;
+			args.blockAligned = blockAligned;
+			args.resizableAtlas = resizableAtlas;
+			args.allowRotate = allowRotate;
+			Task task;
+			task.userData = &taskArgs[i];
+			task.func = runFindChartLocationBruteForceTask;
+			taskScheduler->run(taskGroup, task);
+			i++;
 		}
-	done:
-		XA_DEBUG_ASSERT (best_metric != INT_MAX);
-		return result;
+		taskScheduler->wait(&taskGroup);
+		// Find the task result with the best metric.
+		int best_metric = INT_MAX;
+		bool best_insideAtlas = false;
+		for (i = 0; i < taskCount; i++) {
+			FindChartLocationBruteForceTaskArgs &args = taskArgs[i];
+			if (args.best_metric > best_metric)
+				continue;
+			// A location that doesn't expand the atlas is always preferred.
+			if (!args.best_insideAtlas && best_insideAtlas)
+				continue;
+			// If metric is the same, pick the one closest to the origin.
+			if (args.best_insideAtlas == best_insideAtlas && args.best_metric == best_metric && max(args.best_x, args.best_y) >= max(*best_x, *best_y))
+				continue;
+			best_metric = args.best_metric;
+			best_insideAtlas = args.best_insideAtlas;
+			*best_x = args.best_x;
+			*best_y = args.best_y;
+			*best_w = args.best_w;
+			*best_h = args.best_h;
+			*best_r = args.best_r;
+		}
+		return best_metric != INT_MAX;
 	}
 
 	bool findChartLocation_random(const BitImage *atlasBitImage, const BitImage *chartBitImage, const BitImage *chartBitImageRotated, int w, int h, int *best_x, int *best_y, int *best_w, int *best_h, int *best_r, int minTrialCount, bool blockAligned, bool resizableAtlas, bool allowRotate)
@@ -7503,19 +7583,25 @@ static void runAddMeshTask(void *userData)
 	internal::Progress *progress = args->ctx->addMeshProgress;
 	if (progress->cancel)
 		goto cleanup;
-	XA_PROFILE_START(addMeshCreateColocals)
-	mesh->createColocals();
-	XA_PROFILE_END(addMeshCreateColocals)
+	{
+		XA_PROFILE_START(addMeshCreateColocals)
+		mesh->createColocals();
+		XA_PROFILE_END(addMeshCreateColocals)
+	}
 	if (progress->cancel)
 		goto cleanup;
-	XA_PROFILE_START(addMeshCreateFaceGroups)
-	mesh->createFaceGroups();
-	XA_PROFILE_END(addMeshCreateFaceGroups)
+	{
+		XA_PROFILE_START(addMeshCreateFaceGroups)
+		mesh->createFaceGroups();
+		XA_PROFILE_END(addMeshCreateFaceGroups)
+	}
 	if (progress->cancel)
 		goto cleanup;
-	XA_PROFILE_START(addMeshCreateBoundaries)
-	mesh->createBoundaries();
-	XA_PROFILE_END(addMeshCreateBoundaries)
+	{
+		XA_PROFILE_START(addMeshCreateBoundaries)
+		mesh->createBoundaries();
+		XA_PROFILE_END(addMeshCreateBoundaries)
+	}
 	if (progress->cancel)
 		goto cleanup;
 #if XA_DEBUG_EXPORT_OBJ_SOURCE_MESHES
@@ -7549,9 +7635,11 @@ static void runAddMeshTask(void *userData)
 		fclose(file);
 	}
 #endif
-	XA_PROFILE_START(addMeshCreateChartGroupsReal)
-	args->ctx->paramAtlas.addMesh(args->ctx->taskScheduler, mesh); // addMesh is thread safe
-	XA_PROFILE_END(addMeshCreateChartGroupsReal)
+	{
+		XA_PROFILE_START(addMeshCreateChartGroupsReal)
+		args->ctx->paramAtlas.addMesh(args->ctx->taskScheduler, mesh); // addMesh is thread safe
+		XA_PROFILE_END(addMeshCreateChartGroupsReal)
+	}
 	if (progress->cancel)
 		goto cleanup;
 	progress->value++;
@@ -7605,12 +7693,13 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 		XA_PRINT_WARNING("AddMesh: Meshes and UV meshes cannot be added to the same atlas.\n");
 		return AddMeshError::Error;
 	}
+#if XA_PROFILE
+	if (ctx->meshCount == 0)
+		internal::s_profile.addMeshReal = clock();
+#endif
 	// Don't know how many times AddMesh will be called, so progress needs to adjusted each time.
 	if (!ctx->addMeshProgress) {
 		ctx->addMeshProgress = XA_NEW(internal::MemTag::Default, internal::Progress, ProgressCategory::AddMesh, ctx->progressFunc, ctx->progressUserData, 1);
-#if XA_PROFILE
-		internal::s_profile.addMeshReal = clock();
-#endif
 	}
 	else {
 		ctx->addMeshProgress->setMaxValue(internal::max(ctx->meshCount + 1, meshCountHint));
@@ -7717,13 +7806,13 @@ void AddMeshJoin(Atlas *atlas)
 	XA_PRINT("Added %u meshes\n", ctx->meshCount);
 	internal::s_profile.addMeshReal = clock() - internal::s_profile.addMeshReal;
 #endif
-	XA_PROFILE_PRINT("   Total (real): ", addMeshReal)
-	XA_PROFILE_PRINT("   Total (thread): ", addMeshThread)
-	XA_PROFILE_PRINT("      Create colocals: ", addMeshCreateColocals)
-	XA_PROFILE_PRINT("      Create face groups: ", addMeshCreateFaceGroups)
-	XA_PROFILE_PRINT("      Create boundaries: ", addMeshCreateBoundaries)
-	XA_PROFILE_PRINT("      Create chart groups (real): ", addMeshCreateChartGroupsReal)
-	XA_PROFILE_PRINT("      Create chart groups (thread): ", addMeshCreateChartGroupsThread)
+	XA_PROFILE_PRINT_AND_RESET("   Total (real): ", addMeshReal)
+	XA_PROFILE_PRINT_AND_RESET("   Total (thread): ", addMeshThread)
+	XA_PROFILE_PRINT_AND_RESET("      Create colocals: ", addMeshCreateColocals)
+	XA_PROFILE_PRINT_AND_RESET("      Create face groups: ", addMeshCreateFaceGroups)
+	XA_PROFILE_PRINT_AND_RESET("      Create boundaries: ", addMeshCreateBoundaries)
+	XA_PROFILE_PRINT_AND_RESET("      Create chart groups (real): ", addMeshCreateChartGroupsReal)
+	XA_PROFILE_PRINT_AND_RESET("      Create chart groups (thread): ", addMeshCreateChartGroupsThread)
 	XA_PRINT_MEM_USAGE
 }
 
@@ -7912,17 +8001,17 @@ void ComputeCharts(Atlas *atlas, ChartOptions chartOptions)
 	if (tJunctionsCount > 0)
 		XA_PRINT("   Fixed %u t-junctions in %u charts\n", tJunctionsCount, chartsWithTJunctionsCount);
 	XA_PRINT("   %u charts\n", chartCount);
-	XA_PROFILE_PRINT("   Total (real): ", computeChartsReal)
-	XA_PROFILE_PRINT("   Total (thread): ", computeChartsThread)
-	XA_PROFILE_PRINT("      Atlas builder: ", atlasBuilder)
-	XA_PROFILE_PRINT("         Init: ", atlasBuilderInit)
-	XA_PROFILE_PRINT("         Create initial charts: ", atlasBuilderCreateInitialCharts)
-	XA_PROFILE_PRINT("         Grow charts: ", atlasBuilderGrowCharts)
-	XA_PROFILE_PRINT("         Merge charts: ", atlasBuilderMergeCharts)
-	XA_PROFILE_PRINT("      Create chart meshes (real): ", createChartMeshesReal)
-	XA_PROFILE_PRINT("      Create chart meshes (thread): ", createChartMeshesThread)
-	XA_PROFILE_PRINT("         Fix t-junctions: ", fixChartMeshTJunctions)
-	XA_PROFILE_PRINT("         Close holes: ", closeChartMeshHoles)
+	XA_PROFILE_PRINT_AND_RESET("   Total (real): ", computeChartsReal)
+	XA_PROFILE_PRINT_AND_RESET("   Total (thread): ", computeChartsThread)
+	XA_PROFILE_PRINT_AND_RESET("      Atlas builder: ", atlasBuilder)
+	XA_PROFILE_PRINT_AND_RESET("         Init: ", atlasBuilderInit)
+	XA_PROFILE_PRINT_AND_RESET("         Create initial charts: ", atlasBuilderCreateInitialCharts)
+	XA_PROFILE_PRINT_AND_RESET("         Grow charts: ", atlasBuilderGrowCharts)
+	XA_PROFILE_PRINT_AND_RESET("         Merge charts: ", atlasBuilderMergeCharts)
+	XA_PROFILE_PRINT_AND_RESET("      Create chart meshes (real): ", createChartMeshesReal)
+	XA_PROFILE_PRINT_AND_RESET("      Create chart meshes (thread): ", createChartMeshesThread)
+	XA_PROFILE_PRINT_AND_RESET("         Fix t-junctions: ", fixChartMeshTJunctions)
+	XA_PROFILE_PRINT_AND_RESET("         Close holes: ", closeChartMeshHoles)
 	XA_PRINT_MEM_USAGE
 }
 
@@ -8041,11 +8130,11 @@ void ParameterizeCharts(Atlas *atlas, ParameterizeFunc func)
 	}
 	if (invalidParamCount > 0)
 		XA_PRINT_WARNING("   %u charts with invalid parameterizations\n", invalidParamCount);
-	XA_PROFILE_PRINT("   Total (real): ", parameterizeChartsReal)
-	XA_PROFILE_PRINT("   Total (thread): ", parameterizeChartsThread)
-	XA_PROFILE_PRINT("      Orthogonal: ", parameterizeChartsOrthogonal)
-	XA_PROFILE_PRINT("      LSCM: ", parameterizeChartsLSCM)
-	XA_PROFILE_PRINT("      Evaluate quality: ", parameterizeChartsEvaluateQuality)
+	XA_PROFILE_PRINT_AND_RESET("   Total (real): ", parameterizeChartsReal)
+	XA_PROFILE_PRINT_AND_RESET("   Total (thread): ", parameterizeChartsThread)
+	XA_PROFILE_PRINT_AND_RESET("      Orthogonal: ", parameterizeChartsOrthogonal)
+	XA_PROFILE_PRINT_AND_RESET("      LSCM: ", parameterizeChartsLSCM)
+	XA_PROFILE_PRINT_AND_RESET("      Evaluate quality: ", parameterizeChartsEvaluateQuality)
 	XA_PRINT_MEM_USAGE
 }
 
@@ -8098,7 +8187,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 			packAtlas.addChart(ctx->paramAtlas.chartAt(i));
 	}
 	XA_PROFILE_START(packCharts)
-	if (!packAtlas.packCharts(packOptions, ctx->progressFunc, ctx->progressUserData))
+	if (!packAtlas.packCharts(ctx->taskScheduler, packOptions, ctx->progressFunc, ctx->progressUserData))
 		return;
 	XA_PROFILE_END(packCharts)
 	// Populate atlas object with pack results.
@@ -8117,19 +8206,13 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 		for (uint32_t i = 0; i < atlas->atlasCount; i++)
 			packAtlas.getImages()[i]->copyTo(&atlas->image[atlas->width * atlas->height * i], atlas->width, atlas->height);
 	}
-	XA_PROFILE_PRINT("   Total: ", packCharts)
-	XA_PROFILE_PRINT("      Rasterize: ", packChartsRasterize)
-	XA_PROFILE_PRINT("      Dilate (padding): ", packChartsDilate)
-	XA_PROFILE_PRINT("      Find location: ", packChartsFindLocation)
-	XA_PROFILE_PRINT("      Blit: ", packChartsBlit)
+	XA_PROFILE_PRINT_AND_RESET("   Total: ", packCharts)
+	XA_PROFILE_PRINT_AND_RESET("      Rasterize: ", packChartsRasterize)
+	XA_PROFILE_PRINT_AND_RESET("      Dilate (padding): ", packChartsDilate)
+	XA_PROFILE_PRINT_AND_RESET("      Find location (real): ", packChartsFindLocation)
+	XA_PROFILE_PRINT_AND_RESET("      Find location (thread): ", packChartsFindLocationThread)
+	XA_PROFILE_PRINT_AND_RESET("      Blit: ", packChartsBlit)
 	XA_PRINT_MEM_USAGE
-#if XA_PROFILE
-	internal::s_profile.packCharts = 0;
-	internal::s_profile.packChartsRasterize = 0;
-	internal::s_profile.packChartsDilate = 0;
-	internal::s_profile.packChartsFindLocation = 0;
-	internal::s_profile.packChartsBlit = 0;
-#endif
 	XA_PRINT("Building output meshes\n");
 	int progress = 0;
 	if (ctx->progressFunc) {
