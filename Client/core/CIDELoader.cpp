@@ -174,7 +174,6 @@ void CIDELoader::ParseContents(SString& contents)
 
 void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
 {
-    int i = 0;
     auto vecArchiveEntryHeaders = pIMgArchive->GetArchiveDirEntries();
     for (auto& entryHeader: vecArchiveEntryHeaders)
     { 
@@ -191,38 +190,8 @@ void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
             if (itTxd != mapOfTxdDescriptors.end())
             {
                 itTxd->second.SetTXDImgArchiveInfo(entryHeader.offset, entryHeader.usSize);
-
-                /*
-                // REMOVE THIS AFTER TESTing
-                if (strFileName == "slamvan.txd")
-                {
-
-                    //bbb_lr_slv1.dff
-                    STXDDescriptor* pTXDDescriptor = GetTXDDescriptorFromDFFName(0xa2743d30);
-                    if (pTXDDescriptor)
-                    {
-                        EntryHeader * pTXDEntryHeader = pTXDDescriptor->GetTXDEntryHeaderOfIMGArchive();
-                        unsigned int actualFileOffset = pTXDEntryHeader->offset * 2048;
-
-                        std::printf("AddTXDDFFInfoToMaps: pTXDEntryHeader = %p | EntryHeaderIndex: %d\n", pTXDEntryHeader, i);
-                        std::printf("AddTXDDFFInfoToMaps: pTXDEntryHeader->offset = %u\n", pTXDEntryHeader->offset);
-                    }
-                }
-                // REMOVE END
-                */
             }
         }
-        else if (strFileExtension == "dff")
-        {
-            const unsigned int uiDFFNameHash = HashString(strFileName);
-
-            auto it = mapOfDffDescriptors.find(uiDFFNameHash);
-            if (it != mapOfDffDescriptors.end())
-            {
-                it->second.GetTXDDescriptor()->AddDFFNameToSet(uiDFFNameHash);
-            }
-        }
-        i++;
     }
 }
 

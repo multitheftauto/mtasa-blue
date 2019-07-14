@@ -663,94 +663,6 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
 
         RpAtomicSetGeometry(pAtomic, pNewGeometry, 0);
     }
-    /*
-    const char* modelFilePath = "C:\\Users\\danish\\Desktop\\clump_output.obj";
-    printf("Writing '%s'...\n", modelFilePath);
-
-    FILE* file;
-    if (fopen_s(&file, modelFilePath, "w") != 0)
-    {
-        printf("ReMapClumpUVs: Failed to open file\n");
-        return nullptr;
-    }
-    if (file)
-    {
-        fprintf(file, "mtllib clump_output.mtl\n");
-        uint32_t firstVertex = 0;
-        for (uint32_t i = 0; i < atlas->meshCount; i++)
-        {
-            const xatlas::Mesh& mesh = atlas->meshes[i];
-            RwV3d               normal;
-            for (uint32_t v = 0; v < mesh.vertexCount; v++)
-            {
-                const xatlas::Vertex& vertex = mesh.vertexArray[v];
-                const Vector3&        pos = vertices->at(vertex.xref);
-
-                VectorNormalize((RwV3d*)&pos, &normal);
-
-                // ModelVertex& sourceVertex = modelVertices[vertex.xref];
-                fprintf(file, "v %g %g %g\n", pos.x, pos.z, pos.y);
-                fprintf(file, "vn %g %g %g\n", normal.x, normal.z, normal.y);
-                fprintf(file, "vt %g %g\n", vertex.uv[0] / atlas->width, 1.0f - vertex.uv[1] / atlas->height);
-            }
-            fprintf(file, "o mesh%03u\n", i);
-            fprintf(file, "s off\n");
-
-            int32_t previousAtlasIndex = -1;
-            for (uint32_t f = 0; f < mesh.indexCount; f += 3)
-            {
-                int32_t atlasIndex = -1;
-                for (uint32_t j = 0; j < 3; j++)
-                {
-                    uint32_t              vertexIndex = mesh.indexArray[f + j];
-                    const xatlas::Vertex& v = mesh.vertexArray[vertexIndex];
-                    atlasIndex = v.atlasIndex;            // The same for every vertex in the triangle.
-                }
-
-                if (atlasIndex >= 0 && atlasIndex != previousAtlasIndex)
-                {
-                    previousAtlasIndex = atlasIndex;
-                    fprintf(file, "usemtl %d\n", atlasIndex);
-                }
-
-                fprintf(file, "f ");
-                for (uint32_t j = 0; j < 3; j++)
-                {
-                    const uint32_t index = firstVertex + mesh.indexArray[f + j] + 1;            // 1-indexed
-                    fprintf(file, "%d/%d/%d%c", index, index, index, j == 2 ? '\n' : ' ');
-                }
-            }
-            firstVertex += mesh.vertexCount;
-        }
-        fclose(file);
-    }
-    // Write the model.
-    const char* materialFilename = "C:\\Users\\danish\\Desktop\\clump_output.mtl";
-    printf("Writing '%s'...\n", materialFilename);
-    if (fopen_s(&file, materialFilename, "w") != 0)
-    {
-        printf("ReMapClumpUVs: Failed to open file\n");
-        return nullptr;
-    }
-    if (file)
-    {
-        for (size_t i = 0; i < atlasNames.size(); i++)
-        {
-            const std::string& textureName = atlasNames[i];
-
-            fprintf(file, "newmtl %d\n", i);
-            fprintf(file, "Ka  0.6 0.6 0.6\n");
-            fprintf(file, "Kd  0.6 0.6 0.6\n");
-            fprintf(file, "Ks  0.0 0.0 0.0\n");
-            fprintf(file, "d  1.0\n");
-            fprintf(file, "Ns  0.0\n");
-            fprintf(file, "illum 2\n");
-            fprintf(file, "map_Kd %s\n", (atlasNames[i] + textureAtlasFileExtension).c_str());
-        }
-
-        fclose(file);
-    }
-    */
     return pAtlasTexDictionary;
 }
 
@@ -789,19 +701,18 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
 
-    ///*
+    /*
     // REMOVE LATER
     int         modelID = 411;
     const char* pStrDFFName = "infernus.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
+
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
     // REMOVE END
-    //*/
+    */
 
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
-
-    /*
     SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
     {
@@ -809,7 +720,10 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         return;
     }
 
-    STXDDescriptor* pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
+    // RwTexDictionary* pTxdDictionary = nullptr;
+
+    // /*
+    STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
     if (!pTxdDictionary)
     {
@@ -820,28 +734,29 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         }
         CIMGArchiveFile* pTXDArchiveFile = pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo);
         pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
-        pTXDDescriptor->SetTextureDictionary(pTxdDictionary);
         delete pTXDArchiveFile;
     }
-    */
+    //*/
 
     std::vector<CTextureAtlas> vecTextureAtlases;
 
-    // int modelID = 0;            // pDFFDescriptor->GetModelID();
+    int modelID = pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
     }
 
+
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
-    bool     bLoadCollision = IsVehicleModel(modelID);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    // RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+    bool bLoadCollision = IsVehicleModel(modelID);
+    // RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
+        /*
         SString strPathOfGeneratedDff = "dffs\\";
 
         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases);
@@ -876,15 +791,16 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         {
             pRenderWare->DeleteReadDFFCollisionModel();
         }
-
+        */
         pRenderWare->DestroyDFF(pClump);
-        pRenderWare->DestroyTXD(pAtlasTxdDictionary);
-        // pTXDDescriptor->RemoveDFFNameFromSet(uiDFFNameHash);
+        // pRenderWare->DestroyTXD(pAtlasTxdDictionary);
     }
     else
     {
         std::printf("failed to read %s\n", newFile->fileEntry->fileName);
     }
+
+    pRenderWare->DestroyTXD(pTxdDictionary);
 }
 
 bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
@@ -905,8 +821,6 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     CIDELoader ideLoader;
 
     CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
-
-    // CIMGArchive* newIMgArchive = new CIMGArchive("models\\vehiclesonly_gta3.img", IMG_FILE_READ);
     newIMgArchive->ReadEntries();
 
     ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
@@ -916,7 +830,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive*                  newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < 1; i++)            // newIMgArchive->GetFileCount()
+    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)            // newIMgArchive->GetFileCount()
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)
@@ -946,6 +860,11 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     }
 
     newIMgArchiveOut->WriteEntries(imgArchiveFiles);
+
+    for (auto& pArchiveFile : imgArchiveFiles)
+    {
+        delete pArchiveFile;
+    }
 
     // delete newFile;
     delete newIMgArchive;
