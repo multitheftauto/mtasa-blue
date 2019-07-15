@@ -438,7 +438,7 @@ void CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeom
     for (size_t i = 0; i < atlasTextures.size(); i++)
     {
         RpMaterial* pMaterial = RpMaterialCreate();
-        //pMaterial->color = {0, 0, 255, 255}; // turns textures into blue during rendering
+        // pMaterial->color = {0, 0, 255, 255}; // turns textures into blue during rendering
         pMaterial->texture = atlasTextures[i];
         pMaterial->refs++;
         pNewGeometry->materials.materials[i] = pMaterial;
@@ -455,6 +455,40 @@ bool GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* mate
             *materialIndex = i;
             return true;
         }
+    }
+    return false;
+}
+
+uint32_t GetBestAtlasMaxResolution(xatlas::Atlas* atlas, float texelsPerUnit)
+{
+    xatlas::PackOptions packOptions;
+    packOptions.padding = 1;
+    packOptions.texelsPerUnit = texelsPerUnit;
+    xatlas::PackCharts(atlas, packOptions);
+
+    uint32_t maxResolution = std::max(atlas->width, atlas->height);
+    if (maxResolution % 2 != 0)
+    {
+        return maxResolution + 1;
+    }
+    return maxResolution;
+}
+
+bool IsResolutionTooBig(unsigned int bestAtlasResolution)
+{
+    // Implying we are using DXT1 format for compressing textures.
+    // Example: assuming bestAtlasResolution is 2590
+    // 5180x5180 with DXT1 = 12.7mb in TXD file
+    // 5180 / 2 = 2590 (half of 5180) | so,  2590 / 204 = 12.7
+    // 12.7 / (5180 / 2590) = 6.35mb (half of 12.7mb)
+
+    const unsigned int sizePermittedInMBs = 5;
+    unsigned int       atlasSizeInMBs = std::ceil(12.7 / (5180 / bestAtlasResolution));
+
+    printf("atlasSizeInMBs: %u\n", atlasSizeInMBs);
+    if (atlasSizeInMBs > sizePermittedInMBs)
+    {
+        return true;
     }
     return false;
 }
@@ -548,12 +582,27 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
         FirstVertexIndex += pGeometry->vertices_size;
         FirstFaceIndex += pGeometry->triangles_size;
     }
+
+    float    texelsPerUnit = 1.0f;
+    uint32_t bestAtlasResolution = GetBestAtlasMaxResolution(atlas, texelsPerUnit);
+
+    if (IsResolutionTooBig(bestAtlasResolution))
+    {
+    }
+    unsigned int        atlasFindingAttempts = 1;
+
     xatlas::PackOptions packOptions;
-    packOptions.padding = 1;
-    packOptions.texelsPerUnit = 0.5f;
-    packOptions.blockAlign = true;
-    packOptions.resolution = 5298;
-    xatlas::PackCharts(atlas, packOptions);
+    do
+    {
+        printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
+        packOptions.padding = 1;
+        packOptions.texelsPerUnit = texelsPerUnit;
+        packOptions.resolution = bestAtlasResolution;
+        xatlas::PackCharts(atlas, packOptions);
+        bestAtlasResolution += 34;
+        atlasFindingAttempts++;
+    } while (atlas->atlasCount > 1);
+    
     printf("Copying texture data into atlas\n");
 
     CTextureAtlas& textureAtlas = CTextureAtlas(pClump, atlas, packOptions, *vertexToMaterial, texturesCache, textures, *uvs);
@@ -570,7 +619,7 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     {
         CDXTexture& atlasTexture = textureAtlas.atlasDXTextures[i];
         printf("compressing atlas texture to DXT1: index = %u\n", i);
-        atlasTexture.Compress(D3DFMT_DXT1);
+        assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
         sprintf(buffer, "myAtlas%d", i);
         RwTexture* pTexture = atlasTexture.GetRwTexture();
         memcpy(pTexture->name, buffer, strlen(buffer) + 1);
@@ -713,7 +762,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
     // REMOVE END
-   // */
+    // */
 
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
 
@@ -726,21 +775,21 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     // RwTexDictionary* pTxdDictionary = nullptr;
 
-     /*
-    STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
-    RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
-    if (!pTxdDictionary)
-    {
-        STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
-        if (pTXDImgArchiveInfo->usSize == 0)
-        {
-            return;
-        }
-        CIMGArchiveFile* pTXDArchiveFile = pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo);
-        pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
-        delete pTXDArchiveFile;
-    }
-    */
+    /*
+   STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
+   RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
+   if (!pTxdDictionary)
+   {
+       STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
+       if (pTXDImgArchiveInfo->usSize == 0)
+       {
+           return;
+       }
+       CIMGArchiveFile* pTXDArchiveFile = pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo);
+       pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
+       delete pTXDArchiveFile;
+   }
+   */
 
     std::vector<CTextureAtlas> vecTextureAtlases;
 
@@ -755,13 +804,12 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
-    bool bLoadCollision = IsVehicleModel(modelID);
-     RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+    bool     bLoadCollision = IsVehicleModel(modelID);
+    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
+    // RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
-
         SString strPathOfGeneratedDff = "dffs\\";
 
         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases);
@@ -796,7 +844,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         {
             pRenderWare->DeleteReadDFFCollisionModel();
         }
- 
+
         pRenderWare->DestroyDFF(pClump);
         pRenderWare->DestroyTXD(pAtlasTxdDictionary);
     }
