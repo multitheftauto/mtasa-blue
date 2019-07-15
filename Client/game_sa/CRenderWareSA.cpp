@@ -2001,7 +2001,7 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
         return nullptr;
     }
 
-    hr = D3DXLoadSurfaceFromSurface(destinationSurface, NULL, &destinationRect, sourceSurface, NULL, &sourceRect, D3DX_DEFAULT, 0);
+    hr = g_pCore->GetGraphics()->LoadSurfaceFromSurface(destinationSurface, NULL, &destinationRect, sourceSurface, NULL, &sourceRect, D3DX_DEFAULT, 0);
     if (FAILED(hr))
     {
         std::printf("D3DXLoadSurfaceFromSurface failed with error: %#.8x\n", hr);

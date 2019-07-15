@@ -2262,3 +2262,11 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
 
     return true;
 }
+
+HRESULT CGraphics::LoadSurfaceFromSurface(LPDIRECT3DSURFACE9 pDestSurface, CONST PALETTEENTRY* pDestPalette, CONST RECT* pDestRect,
+                                          LPDIRECT3DSURFACE9 pSrcSurface,
+                               CONST PALETTEENTRY* pSrcPalette, CONST RECT* pSrcRect, DWORD Filter, D3DCOLOR ColorKey)
+
+{
+    return D3DXLoadSurfaceFromSurface(pDestSurface, pDestPalette, pDestRect, pSrcSurface, pSrcPalette, pSrcRect, Filter, ColorKey);
+}

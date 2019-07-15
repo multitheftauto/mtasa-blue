@@ -172,7 +172,9 @@ public:
                            CBuffer& outBuffer);
     bool CopyDataToSurface(IDirect3DSurface9* pSurface, const uchar* pPixelsData, uint uiDataPitch);
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
-
+    HRESULT LoadSurfaceFromSurface(LPDIRECT3DSURFACE9 pDestSurface, CONST PALETTEENTRY* pDestPalette, CONST RECT* pDestRect,
+                                                          LPDIRECT3DSURFACE9 pSrcSurface, CONST PALETTEENTRY* pSrcPalette, CONST RECT* pSrcRect, DWORD Filter,
+                                                          D3DCOLOR ColorKey);
     // To draw queued up drawings
     void DrawPreGUIQueue();
     void DrawPostGUIQueue();
