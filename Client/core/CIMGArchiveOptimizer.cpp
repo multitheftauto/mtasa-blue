@@ -438,7 +438,7 @@ void CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeom
     for (size_t i = 0; i < atlasTextures.size(); i++)
     {
         RpMaterial* pMaterial = RpMaterialCreate();
-        pMaterial->color = {0, 0, 255, 255};
+        //pMaterial->color = {0, 0, 255, 255}; // turns textures into blue during rendering
         pMaterial->texture = atlasTextures[i];
         pMaterial->refs++;
         pNewGeometry->materials.materials[i] = pMaterial;
@@ -550,8 +550,9 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     }
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
-    packOptions.texelsPerUnit = 1.0f;
-    // packOptions.resolution = 4000;
+    packOptions.texelsPerUnit = 0.5f;
+    packOptions.blockAlign = true;
+    packOptions.resolution = 5298;
     xatlas::PackCharts(atlas, packOptions);
     printf("Copying texture data into atlas\n");
 
@@ -567,8 +568,11 @@ RwTexDictionary* CreateTXDAtlas(RpClump* pClump, std::vector<CTextureAtlas>& vec
     char buffer[100];
     for (size_t i = 0; i < textureAtlas.atlasDXTextures.size(); i++)
     {
+        CDXTexture& atlasTexture = textureAtlas.atlasDXTextures[i];
+        printf("compressing atlas texture to DXT1: index = %u\n", i);
+        atlasTexture.Compress(D3DFMT_DXT1);
         sprintf(buffer, "myAtlas%d", i);
-        RwTexture* pTexture = textureAtlas.atlasDXTextures[i].GetRwTexture();
+        RwTexture* pTexture = atlasTexture.GetRwTexture();
         memcpy(pTexture->name, buffer, strlen(buffer) + 1);
         atlasTextures[i] = pTexture;
     }
@@ -701,15 +705,15 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
 
-    /*
+    ///*
     // REMOVE LATER
-    int         modelID = 411;
-    const char* pStrDFFName = "infernus.dff";            //"infernus.dff";
+    int         modelID = 0;
+    const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
     // REMOVE END
-    */
+   // */
 
     const unsigned int uiDFFNameHash = HashString(newFile->fileEntry->fileName);
 
@@ -722,7 +726,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     // RwTexDictionary* pTxdDictionary = nullptr;
 
-    // /*
+     /*
     STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
     if (!pTxdDictionary)
@@ -736,27 +740,28 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         pTxdDictionary = pRenderWare->ReadTXD(nullptr, pTXDArchiveFile->fileByteBuffer, false);
         delete pTXDArchiveFile;
     }
-    //*/
+    */
 
     std::vector<CTextureAtlas> vecTextureAtlases;
 
+    /*
     int modelID = pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
     }
-
+    */
 
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
     bool bLoadCollision = IsVehicleModel(modelID);
-    // RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
+     RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
+    //RpClump* pClump = pRenderWare->ReadDFF(newFile->fileEntry->fileName, newFile->fileByteBuffer, modelID, bLoadCollision, pTxdDictionary);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
-        /*
+
         SString strPathOfGeneratedDff = "dffs\\";
 
         RwTexDictionary* pAtlasTxdDictionary = CreateTXDAtlas(pClump, vecTextureAtlases);
@@ -791,9 +796,9 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
         {
             pRenderWare->DeleteReadDFFCollisionModel();
         }
-        */
+ 
         pRenderWare->DestroyDFF(pClump);
-        // pRenderWare->DestroyTXD(pAtlasTxdDictionary);
+        pRenderWare->DestroyTXD(pAtlasTxdDictionary);
     }
     else
     {
@@ -830,7 +835,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     CIMGArchive*                  newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
     std::vector<CIMGArchiveFile*> imgArchiveFiles;
-    for (DWORD i = 0; i < newIMgArchive->GetFileCount(); i++)            // newIMgArchive->GetFileCount()
+    for (DWORD i = 0; i < 1; i++)            // newIMgArchive->GetFileCount()
     {
         CIMGArchiveFile* newFile = newIMgArchive->GetFileByID(i);
         if (newFile != NULL)

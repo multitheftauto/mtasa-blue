@@ -38,6 +38,23 @@ CDXTexture::~CDXTexture()
     }
 }
 
+bool CDXTexture::Compress(D3DFORMAT format)
+{
+    CRenderWare*      pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
+    _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
+    if (rasterExt->d3dFormat != format)
+    {
+        RwTexture* pNewTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, format);
+        if (!pNewTexture)
+        {
+            return false;
+        }
+        pRenderware->DestroyTexture(m_pTexture);
+        m_pTexture = pNewTexture;
+    }
+    return true;
+}
+
 void CDXTexture::SaveTextureToFile(std::string& name)
 {
     UnlockTexture();

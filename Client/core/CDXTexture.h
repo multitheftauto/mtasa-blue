@@ -32,6 +32,7 @@ public:
     ~CDXTexture();
 
     void         Initialize();
+    bool         Compress(D3DFORMAT format);
     void SaveTextureToFile(std::string& name);
     unsigned int GetWidth() { return imageWidth; }
     unsigned int GetHeight() { return imageHeight; }
