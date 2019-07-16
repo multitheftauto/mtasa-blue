@@ -326,9 +326,10 @@ void C3DModelOptimizer::GetUsedTexturesCount()
     {
         RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
-        for (int i = 0; i < pGeometry->materials.entries; i++)
+        for (int i = 0; i < pGeometry->triangles_size; i++)
         {
-            RpMaterial* pMaterial = pGeometry->materials.materials[i];
+            unsigned short materialIndex = pGeometry->triangles[i].matIndex;
+            RpMaterial*    pMaterial = pGeometry->materials.materials[materialIndex];
             if (pMaterial->texture)
             {
                 auto it = mapOfUsedTextures.find(pMaterial->texture);
