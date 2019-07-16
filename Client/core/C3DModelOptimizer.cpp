@@ -223,7 +223,7 @@ uint32_t C3DModelOptimizer::GetBestAtlasMaxResolution(xatlas::Atlas* atlas, floa
     uint32_t maxResolution = std::max(atlas->width, atlas->height);
     while (maxResolution % 4 != 0)
     {
-        return maxResolution + 1;
+        maxResolution++;
     }
     return maxResolution;
 }

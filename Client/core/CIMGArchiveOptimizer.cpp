@@ -124,11 +124,11 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     ///*
     // REMOVE LATER
-    int         modelID = 411;
-    const char* pStrDFFName = "infernus.dff";            //"infernus.dff";
+    int         modelID = 0;
+    const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
     // REMOVE END
     // */
 
