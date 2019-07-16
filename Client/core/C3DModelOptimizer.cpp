@@ -265,26 +265,24 @@ uint32_t C3DModelOptimizer::GetBestAtlasMaxResolution(xatlas::Atlas* atlas, floa
     xatlas::PackCharts(atlas, packOptions);
 
     uint32_t maxResolution = std::max(atlas->width, atlas->height);
-    if (maxResolution % 2 != 0)
+    while (maxResolution % 4 != 0)
     {
         return maxResolution + 1;
     }
     return maxResolution;
 }
 
-bool C3DModelOptimizer::IsResolutionTooBig(unsigned int bestAtlasResolution)
+bool C3DModelOptimizer::IsAtlasResolutionTooBig(unsigned int bestAtlasResolution)
 {
     // Implying we are using DXT1 format for compressing textures.
-    // Example: assuming bestAtlasResolution is 2590
-    // 5180x5180 with DXT1 = 12.7mb in TXD file
-    // 5180 / 2 = 2590 (half of 5180) | so,  2590 / 204 = 12.7
-    // 12.7 / (5180 / 2590) = 6.35mb (half of 12.7mb)
 
-    const unsigned int sizePermittedInMBs = 5;
-    unsigned int       atlasSizeInMBs = std::ceil(12.7 / (5180 / bestAtlasResolution));
-
-    printf("atlasSizeInMBs: %u\n", atlasSizeInMBs);
-    if (atlasSizeInMBs > sizePermittedInMBs)
+    unsigned int       blockSizeInBytes = 8;
+    unsigned int       thePitch = std::max((unsigned int)1, (unsigned int)((bestAtlasResolution + 3) / 4)) * blockSizeInBytes;
+    float              atlasSizeInBytes = (bestAtlasResolution/4) * thePitch;
+    float              atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
+    const float        sizePermittedInMBs = 5.0f;
+    printf("atlasSizeInMBs: %f\n", atlasSizeInMbs);
+    if (atlasSizeInMbs > sizePermittedInMBs)
     {
         return true;
     }
@@ -407,10 +405,10 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         return false;
     }
 
-    float    texelsPerUnit = 0.5f;
+    float    texelsPerUnit = 1.0f;
     uint32_t bestAtlasResolution = GetBestAtlasMaxResolution(atlas, texelsPerUnit);
 
-    if (IsResolutionTooBig(bestAtlasResolution))
+    if (IsAtlasResolutionTooBig(bestAtlasResolution))
     {
     }
     unsigned int atlasFindingAttempts = 1;
@@ -424,13 +422,13 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         {
             return false;
         }
-
+        
         printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
         packOptions.padding = 1;
         packOptions.texelsPerUnit = texelsPerUnit;
         packOptions.resolution = bestAtlasResolution;
         xatlas::PackCharts(atlas, packOptions);
-        bestAtlasResolution += 34;
+        bestAtlasResolution += 32;
         atlasFindingAttempts++;
     } while (atlas->atlasCount > 1);
 

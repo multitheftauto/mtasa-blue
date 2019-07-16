@@ -23,7 +23,7 @@ public:
     void             CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeometry, unsigned int atlasCount);
     bool             GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex);
     uint32_t         GetBestAtlasMaxResolution(xatlas::Atlas* atlas, float texelsPerUnit);
-    bool             IsResolutionTooBig(unsigned int bestAtlasResolution);
+    bool             IsAtlasResolutionTooBig(unsigned int bestAtlasResolution);
 
     RpGeometry*      CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format);
     bool             AddMeshesToXatlas(xatlas::Atlas* atlas);
