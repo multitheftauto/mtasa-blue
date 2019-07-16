@@ -178,7 +178,7 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
     {
         SString strPathOfGeneratedDff = "dffs\\";
 
-        C3DModelOptimizer modelOptimizer(pClump);
+        C3DModelOptimizer modelOptimizer(pClump, pTxdDictionary);
         RwTexDictionary*  pAtlasTxdDictionary = modelOptimizer.GetAtlasTexDictionary();
         if (!pAtlasTxdDictionary)
         {

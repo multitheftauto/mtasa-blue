@@ -82,6 +82,8 @@ public:
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
+    virtual RwTexture*       CloneRwTexture(RwTexture* pTextureToCopyFrom) = 0;
+    virtual void             AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture) = 0;
     virtual RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom) = 0;
     virtual _rwD3D9RasterExt* GetRasterExt(RwRaster* raster) = 0;
     virtual D3DFORMAT        GetRasterD3DFormat(RwRaster* raster) = 0;

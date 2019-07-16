@@ -10,7 +10,7 @@ struct RpClump;
 class C3DModelOptimizer
 {
 public:
-    C3DModelOptimizer(RpClump* pTheClump);
+    C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary);
     ~C3DModelOptimizer() {}
 
     RwTexDictionary* GetAtlasTexDictionary() { return m_pAtlasTexDictionary; }
@@ -20,7 +20,6 @@ public:
     void             GetVerticesPositionsAndUVs();
     void             GetVertexIndices();
     void             GetFaceMaterials();
-    void             CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeometry, unsigned int atlasCount);
     bool             GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex);
     uint32_t         GetBestAtlasMaxResolution(xatlas::Atlas* atlas, float texelsPerUnit);
     bool             IsAtlasResolutionTooBig(unsigned int bestAtlasResolution);
@@ -48,8 +47,12 @@ private:
     std::vector<uint32_t>   faceMaterials;
     std::vector<RwTexture*> atlasTextures;
 
+    // Key: original texture of clump  | Value: toal number of triangles using this texture.
     std::map<RwTexture*, unsigned int> mapOfUsedTextures;
-    RwTexture*                         m_pMostUsedTextureToIgnore;
+    // Key: original texture of clump | Value: clone of the same texture and its raster 
+    //                                |        except that it will be added to atlas TXD.
+    std::map<RwTexture*, RwTexture*>   m_mapOfMostUsedTexturesToIgnore;
 
+    RwTexDictionary*        m_pTexDictionary;
     RwTexDictionary*        m_pAtlasTexDictionary;
 };

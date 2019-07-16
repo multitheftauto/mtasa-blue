@@ -65,6 +65,10 @@ public:
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
 
+    RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom);
+
+    void       AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture);
+
     // Copies textures from second argument to first one. Textures of first argument are not removed
     RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom);
 

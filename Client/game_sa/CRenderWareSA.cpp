@@ -1303,6 +1303,7 @@ void CRenderWareSA::CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* p
     auto       CMemoryMgr_Malloc = (void*(__cdecl*)(int size))0x72F420;
     auto       _rpMeshHeaderCreate = (void*(__cdecl*)(int size))0x758920;
 
+    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     RwPluginRegistry& geometryTKList = *(RwPluginRegistry*)0x8D628C;
     for (auto pPluginRegistryEntry = geometryTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
     {
@@ -1454,12 +1455,12 @@ void CRenderWareSA::CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* p
                             theDest2DEffect.light = theSource2DEffect.light;
                             if (theSource2DEffect.light.m_pCoronaTex)
                             {
-                                theDest2DEffect.light.m_pCoronaTex = CloneRwTexture(theSource2DEffect.light.m_pCoronaTex);
+                                theDest2DEffect.light.m_pCoronaTex = pRenderWare->CloneRwTexture(theSource2DEffect.light.m_pCoronaTex);
                             }
 
                             if (theSource2DEffect.light.m_pShadowTex)
                             {
-                                theDest2DEffect.light.m_pShadowTex = CloneRwTexture(theSource2DEffect.light.m_pShadowTex);
+                                theDest2DEffect.light.m_pShadowTex = pRenderWare->CloneRwTexture(theSource2DEffect.light.m_pShadowTex);
                             }
                             break;
                         }
@@ -1905,7 +1906,7 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
-RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom)
+RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 {
     auto       CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
     RwTexture* pCopiedTexture = CClothesBuilder_CopyTexture(pTextureToCopyFrom);
@@ -1915,6 +1916,14 @@ RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom)
         memcpy(pCopiedTexture->mask, pTextureToCopyFrom->mask, RW_TEXTURE_NAME_LENGTH);
     }
     return pCopiedTexture;
+}
+
+void CRenderWareSA::AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture)
+{
+    if (pTexture)
+    {
+        RwTexDictionaryAddTexture(pTextureDictionary, pTexture);
+    }
 }
 
 RwTexDictionary* CRenderWareSA::CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom)

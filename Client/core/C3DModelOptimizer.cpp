@@ -7,9 +7,9 @@
 #include "xatlas_repack.h"
 #include "C3DModelOptimizer.h"
 
-C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump)
+C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary)
 {
-    m_pMostUsedTextureToIgnore = nullptr;
+    m_pTexDictionary = pTxdDictionary;
     m_pAtlasTexDictionary = nullptr;
     pClump = pTheClump;
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
@@ -46,6 +46,14 @@ void C3DModelOptimizer::GetTextures()
             if (!pMaterial->texture)
             {
                 printf("GetTextures: No texture\n");
+                textures.emplace_back(UINT32_MAX);
+                continue;
+            }
+
+            auto itTextureToIgnore = m_mapOfMostUsedTexturesToIgnore.find(pMaterial->texture);
+            if (itTextureToIgnore != m_mapOfMostUsedTexturesToIgnore.end())
+            {
+                printf("GetTextures: Ignoring a texture\n");
                 textures.emplace_back(UINT32_MAX);
                 continue;
             }
@@ -249,7 +257,7 @@ RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeomet
 {
     auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
     auto RpGeometryCreate = (RpGeometry * (__cdecl*)(int numVerts, int numTriangles, int format))0x74CA90;
-    //auto _rpMaterialListCopy = (RpMaterials * (__cdecl*)(RpMaterials * matListOut, const RpMaterials* matListIn))0x74E1F0;
+    // auto _rpMaterialListCopy = (RpMaterials * (__cdecl*)(RpMaterials * matListOut, const RpMaterials* matListIn))0x74E1F0;
     auto RpMaterialCreate = (RpMaterial * (__cdecl*)())0x74D990;
     auto _rpMaterialListAlloc = (RpMaterial * *(__cdecl*)(RwUInt32 count))0x74E1C0;
 
@@ -283,7 +291,7 @@ RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeomet
         pGeometry->materials.materials[i] = pMaterial;
     }
 
-   // _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
+    // _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
 
     pRenderWare->CopyGeometryPlugins(pGeometry, pOriginalGeometry);
 
@@ -314,25 +322,26 @@ void C3DModelOptimizer::GetUsedTexturesCount()
             }
         }
     }
+
+    for (auto& it : mapOfUsedTextures)
+    {
+        printf("\ntex: %s | usage count: %u\n\n", it.first->name, it.second);
+    }
 }
 
 void C3DModelOptimizer::GetMostUsedTextureToIgnore()
 {
-    assert(mapOfUsedTextures.size() != 0);
-    unsigned int textureUsageCount = 0;
-    for (auto& it : mapOfUsedTextures)
-    {
-        if (!m_pMostUsedTextureToIgnore)
-        {
-            m_pMostUsedTextureToIgnore = it.first;
-            textureUsageCount = it.second;
-            continue;
-        }
+    const unsigned int      textureToIgnoreNameHash = HashString("ceiling_256");
+    std::vector<RwTexture*> outTextureList;
+    pRenderWare->GetTxdTextures(outTextureList, m_pTexDictionary);
 
-        if (it.second > textureUsageCount)
+    for (auto& pTexture : outTextureList)
+    {
+        if (HashString(pTexture->name) == textureToIgnoreNameHash)
         {
-            m_pMostUsedTextureToIgnore = it.first;
-            textureUsageCount = it.second;
+            m_mapOfMostUsedTexturesToIgnore[pTexture] = pRenderWare->CloneRwTexture(pTexture);
+            printf("\n[DEBUG] m_pMostUsedTextureToIgnore: %s\n\n", pTexture->name);
+            break;
         }
     }
 }
@@ -383,6 +392,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
     GetUsedTexturesCount();
+    GetMostUsedTextureToIgnore();
     GetTextures();
 
     // Map vertices to materials so rasterization knows which texture to sample.
@@ -429,7 +439,6 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     if (IsAtlasResolutionTooBig(bestAtlasResolution))
     {
-        GetMostUsedTextureToIgnore();
     }
     unsigned int atlasFindingAttempts = 1;
 
@@ -473,6 +482,11 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     RwTexDictionary* pAtlasTexDictionary = pRenderWare->CreateTextureDictionary(atlasTextures);
 
+    for (auto& it : m_mapOfMostUsedTexturesToIgnore)
+    {
+        pRenderWare->AddTextureToDictionary(pAtlasTexDictionary, it.second);
+    }
+
     unsigned int FirstVertexIndex = 0;
     unsigned int FirstMaterialIndex = 0;
     for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
@@ -491,6 +505,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         RwV3d*   sourceVertices = pGeometry->morphTarget->verts;
         RwV3d*   sourceNormals = pGeometry->morphTarget->normals;
         RwColor* sourceColors = pGeometry->colors;
+        RwTextureCoordinates* pSourceTextureCoordinateArray = pGeometry->texcoords[0];
 
         for (uint32_t v = 0; v < mesh.vertexCount; v++)
         {
@@ -508,14 +523,23 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
                 destColors[sourceVertexIndex] = sourceColors[sourceVertexIndex];
             }
 
+            unsigned int vertexXref = vertex.xref + FirstVertexIndex;
+            uint16_t     materialIndex = vertexToMaterial[vertexXref] - FirstMaterialIndex;
+            RpMaterial*  pMaterial = pGeometry->materials.materials[materialIndex];
+            if (MapContains(m_mapOfMostUsedTexturesToIgnore, pMaterial->texture) || (!pMaterial->texture))
+            {
+                pDestTextureCoordinateArray[sourceVertexIndex] = pSourceTextureCoordinateArray[sourceVertexIndex];
+                continue;
+            }
+
             pDestTextureCoordinateArray[sourceVertexIndex] = {vertex.uv[0] / atlas->width, vertex.uv[1] / atlas->height};
         }
 
         size_t triangleIndex = 0;
         for (uint32_t f = 0; f < mesh.indexCount; f += 3, triangleIndex++)
         {
-            uint16_t       materialIndex = UINT16_MAX;
-            unsigned int   vertexXref = UINT32_MAX;
+            uint16_t     materialIndex = UINT16_MAX;
+            unsigned int vertexXref = UINT32_MAX;
 
             int32_t atlasIndex = -1;
             for (uint32_t j = 0; j < 3; j++)
@@ -532,7 +556,13 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
             RpMaterial* pSourceMaterial = pGeometry->materials.materials[materialIndex];
             RpMaterial* pDestinationMaterial = pNewGeometry->materials.materials[materialIndex];
-            if (pSourceMaterial->texture)
+
+            auto it = m_mapOfMostUsedTexturesToIgnore.find(pSourceMaterial->texture);
+            if (it != m_mapOfMostUsedTexturesToIgnore.end())
+            {
+                pDestinationMaterial->texture = it->second;
+            }
+            else if (pSourceMaterial->texture)
             {
                 if (atlasIndex < 0)
                 {
