@@ -200,51 +200,6 @@ void C3DModelOptimizer::GetFaceMaterials()
     }
 }
 
-void C3DModelOptimizer::CreateGeometryMaterials(RpGeometry* pOriginalGeometry, RpGeometry* pNewGeometry, unsigned int atlasCount)
-{
-    auto RpMaterialCreate = (RpMaterial * (__cdecl*)())0x74D990;
-    auto _rpMaterialListAlloc = (RpMaterial * *(__cdecl*)(RwUInt32 count))0x74E1C0;
-
-    unsigned int totalMaterialWithoutTextures = 0;
-    for (int i = 0; i < pOriginalGeometry->materials.entries; i++)
-    {
-        if (!pOriginalGeometry->materials.materials[i]->texture)
-        {
-            totalMaterialWithoutTextures++;
-        }
-    }
-
-    size_t totalNewGeometryMaterials = totalMaterialWithoutTextures + atlasCount;
-    pNewGeometry->materials.entries = totalNewGeometryMaterials;
-    pNewGeometry->materials.unknown = totalNewGeometryMaterials;
-    pNewGeometry->materials.materials = _rpMaterialListAlloc(totalNewGeometryMaterials);
-
-    printf("done calling rpMaterialListAlloc with count: %u\n", totalNewGeometryMaterials);
-
-    unsigned int materialWithoutTextureIndex = atlasCount;
-    for (int i = 0; i < pOriginalGeometry->materials.entries; i++)
-    {
-        if (!pOriginalGeometry->materials.materials[i]->texture)
-        {
-            RpMaterial* pMaterial = pOriginalGeometry->materials.materials[i];
-            pMaterial->refs++;
-            pNewGeometry->materials.materials[materialWithoutTextureIndex] = pMaterial;
-            printf("[INSERT] CreateGeometryMaterials: index: %u\n", materialWithoutTextureIndex);
-            materialWithoutTextureIndex++;
-        }
-    }
-
-    for (size_t i = 0; i < atlasTextures.size(); i++)
-    {
-        RpMaterial* pMaterial = RpMaterialCreate();
-        // pMaterial->color = {0, 0, 255, 255}; // turns textures into blue during rendering
-        pMaterial->texture = atlasTextures[i];
-        pMaterial->refs++;
-        pNewGeometry->materials.materials[i] = pMaterial;
-        printf("[INSERT] CreateGeometryMaterials: index: %u | name: %s\n", i, pMaterial->texture->name);
-    }
-}
-
 bool C3DModelOptimizer::GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex)
 {
     for (int i = 0; i < pGeometry->materials.entries; i++)
@@ -282,7 +237,7 @@ bool C3DModelOptimizer::IsAtlasResolutionTooBig(unsigned int bestAtlasResolution
     float        atlasSizeInBytes = (bestAtlasResolution / 4) * thePitch;
     float        atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
     const float  sizePermittedInMBs = 5.0f;
-    printf("atlasSizeInMBs: %f\n", atlasSizeInMbs);
+    printf("\n[DEBUG] atlasSizeInMBs: %f\n\n", atlasSizeInMbs);
     if (atlasSizeInMbs > sizePermittedInMBs)
     {
         return true;
@@ -294,7 +249,9 @@ RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeomet
 {
     auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
     auto RpGeometryCreate = (RpGeometry * (__cdecl*)(int numVerts, int numTriangles, int format))0x74CA90;
-    auto _rpMaterialListCopy = (RpMaterials * (__cdecl*)(RpMaterials * matListOut, const RpMaterials* matListIn))0x74E1F0;
+    //auto _rpMaterialListCopy = (RpMaterials * (__cdecl*)(RpMaterials * matListOut, const RpMaterials* matListIn))0x74E1F0;
+    auto RpMaterialCreate = (RpMaterial * (__cdecl*)())0x74D990;
+    auto _rpMaterialListAlloc = (RpMaterial * *(__cdecl*)(RwUInt32 count))0x74E1C0;
 
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
@@ -313,7 +270,20 @@ RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeomet
         memcpy(pGeometry->triangles, pOriginalGeometry->triangles, sizeof(RpTriangle) * numTriangles);
     }
 
-    _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
+    pGeometry->materials.entries = pOriginalGeometry->materials.entries;
+    pGeometry->materials.unknown = pOriginalGeometry->materials.entries;
+    pGeometry->materials.materials = _rpMaterialListAlloc(pOriginalGeometry->materials.entries);
+
+    for (int i = 0; i < pOriginalGeometry->materials.entries; i++)
+    {
+        RpMaterial* pMaterial = RpMaterialCreate();
+        *pMaterial = *pOriginalGeometry->materials.materials[i];
+        pMaterial->texture = NULL;
+        pMaterial->refs = 2;
+        pGeometry->materials.materials[i] = pMaterial;
+    }
+
+   // _rpMaterialListCopy(&pGeometry->materials, &pOriginalGeometry->materials);
 
     pRenderWare->CopyGeometryPlugins(pGeometry, pOriginalGeometry);
 
@@ -513,8 +483,6 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
         RpGeometry* pNewGeometry = CreateAtlasRpGeometry(pGeometry, mesh.vertexCount, pGeometry->triangles_size, pGeometry->flags);
 
-        CreateGeometryMaterials(pGeometry, pNewGeometry, atlas->atlasCount);
-
         RwV3d*                destVertices = pNewGeometry->morphTarget->verts;
         RwV3d*                destNormals = pNewGeometry->morphTarget->normals;
         RwColor*              destColors = pNewGeometry->colors;
@@ -548,7 +516,6 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         {
             uint16_t       materialIndex = UINT16_MAX;
             unsigned int   vertexXref = UINT32_MAX;
-            unsigned short theVertexToMaterial = UINT16_MAX;
 
             int32_t atlasIndex = -1;
             for (uint32_t j = 0; j < 3; j++)
@@ -558,23 +525,14 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
                 vertexXref = v.xref + FirstVertexIndex;
                 atlasIndex = v.atlasIndex;            // The same for every vertex in the triangle.
                 materialIndex = vertexToMaterial[vertexXref] - FirstMaterialIndex;
-                theVertexToMaterial = vertexToMaterial[vertexXref];
                 pNewGeometry->triangles[triangleIndex].vertIndex[j] = vertexIndex;
             }
 
-            RpMaterial* pMaterial = pGeometry->materials.materials[materialIndex];
-            if (!pMaterial->texture)
-            {
-                size_t materialIndex = 0;
-                if (!GetMaterialIndex(pNewGeometry, pMaterial, &materialIndex))
-                {
-                    printf("failed to look for materialIndex: %u (in new geometry)\n", materialIndex);
-                    printf("GetMaterialIndex failed\n");
-                    return nullptr;
-                }
-                pNewGeometry->triangles[triangleIndex].matIndex = materialIndex;
-            }
-            else
+            pNewGeometry->triangles[triangleIndex].matIndex = materialIndex;
+
+            RpMaterial* pSourceMaterial = pGeometry->materials.materials[materialIndex];
+            RpMaterial* pDestinationMaterial = pNewGeometry->materials.materials[materialIndex];
+            if (pSourceMaterial->texture)
             {
                 if (atlasIndex < 0)
                 {
@@ -582,7 +540,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
                     return nullptr;
                 }
 
-                pNewGeometry->triangles[triangleIndex].matIndex = atlasIndex;
+                pDestinationMaterial->texture = atlasTextures[atlasIndex];
             }
         }
 

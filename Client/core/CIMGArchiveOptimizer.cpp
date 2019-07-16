@@ -124,11 +124,11 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
 
     ///*
     // REMOVE LATER
-    int         modelID = 0;
-    const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
+    int         modelID = 411;
+    const char* pStrDFFName = "infernus.dff";            //"infernus.dff";
     memcpy(newFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("infernus.txd", CBuffer(), false);
     // REMOVE END
     // */
 
@@ -159,13 +159,13 @@ void OptimizeDFFFile(CIMGArchive* pIMgArchive, CIMGArchiveFile* newFile, CIDELoa
    }
    */
 
-    /*
-    int modelID = pDFFDescriptor->GetModelID();
+   // /*
+   // int modelID = pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
     }
-    */
+   // */
 
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
@@ -234,9 +234,6 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         g_pVehicleTxdDictionary = pRenderWare->ReadTXD("models\\generic\\vehicle.txd", CBuffer(), false);
         assert(g_pVehicleTxdDictionary != nullptr);
     }
-
-    /*SString txdName = "vehicle";
-    CreateTXDAtlas(g_pVehicleTxdDictionary, txdName);*/
 
     CIDELoader ideLoader;
 
