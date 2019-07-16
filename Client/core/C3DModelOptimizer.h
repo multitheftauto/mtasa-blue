@@ -26,6 +26,10 @@ public:
     bool             IsAtlasResolutionTooBig(unsigned int bestAtlasResolution);
 
     RpGeometry*      CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format);
+
+    void             GetUsedTexturesCount();
+    void             GetMostUsedTextureToIgnore();
+
     bool             AddMeshesToXatlas(xatlas::Atlas* atlas);
     RwTexDictionary* CreateTXDAtlas();
 
@@ -43,5 +47,9 @@ private:
     std::vector<uint32_t>   vertexIndices;
     std::vector<uint32_t>   faceMaterials;
     std::vector<RwTexture*> atlasTextures;
+
+    std::map<RwTexture*, unsigned int> mapOfUsedTextures;
+    RwTexture*                         m_pMostUsedTextureToIgnore;
+
     RwTexDictionary*        m_pAtlasTexDictionary;
 };

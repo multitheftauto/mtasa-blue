@@ -9,6 +9,7 @@
 
 C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump)
 {
+    m_pMostUsedTextureToIgnore = nullptr;
     m_pAtlasTexDictionary = nullptr;
     pClump = pTheClump;
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
@@ -276,11 +277,11 @@ bool C3DModelOptimizer::IsAtlasResolutionTooBig(unsigned int bestAtlasResolution
 {
     // Implying we are using DXT1 format for compressing textures.
 
-    unsigned int       blockSizeInBytes = 8;
-    unsigned int       thePitch = std::max((unsigned int)1, (unsigned int)((bestAtlasResolution + 3) / 4)) * blockSizeInBytes;
-    float              atlasSizeInBytes = (bestAtlasResolution/4) * thePitch;
-    float              atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
-    const float        sizePermittedInMBs = 5.0f;
+    unsigned int blockSizeInBytes = 8;
+    unsigned int thePitch = std::max((unsigned int)1, (unsigned int)((bestAtlasResolution + 3) / 4)) * blockSizeInBytes;
+    float        atlasSizeInBytes = (bestAtlasResolution / 4) * thePitch;
+    float        atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
+    const float  sizePermittedInMBs = 5.0f;
     printf("atlasSizeInMBs: %f\n", atlasSizeInMbs);
     if (atlasSizeInMbs > sizePermittedInMBs)
     {
@@ -317,6 +318,52 @@ RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeomet
     pRenderWare->CopyGeometryPlugins(pGeometry, pOriginalGeometry);
 
     return pGeometry;
+}
+
+void C3DModelOptimizer::GetUsedTexturesCount()
+{
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
+    {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
+        RpGeometry* pGeometry = pAtomic->geometry;
+        for (int i = 0; i < pGeometry->materials.entries; i++)
+        {
+            RpMaterial* pMaterial = pGeometry->materials.materials[i];
+            if (pMaterial->texture)
+            {
+                auto it = mapOfUsedTextures.find(pMaterial->texture);
+                if (it != mapOfUsedTextures.end())
+                {
+                    it->second++;
+                }
+                else
+                {
+                    mapOfUsedTextures[pMaterial->texture] = 1;
+                }
+            }
+        }
+    }
+}
+
+void C3DModelOptimizer::GetMostUsedTextureToIgnore()
+{
+    assert(mapOfUsedTextures.size() != 0);
+    unsigned int textureUsageCount = 0;
+    for (auto& it : mapOfUsedTextures)
+    {
+        if (!m_pMostUsedTextureToIgnore)
+        {
+            m_pMostUsedTextureToIgnore = it.first;
+            textureUsageCount = it.second;
+            continue;
+        }
+
+        if (it.second > textureUsageCount)
+        {
+            m_pMostUsedTextureToIgnore = it.first;
+            textureUsageCount = it.second;
+        }
+    }
 }
 
 bool C3DModelOptimizer::AddMeshesToXatlas(xatlas::Atlas* atlas)
@@ -364,6 +411,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
+    GetUsedTexturesCount();
     GetTextures();
 
     // Map vertices to materials so rasterization knows which texture to sample.
@@ -410,6 +458,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     if (IsAtlasResolutionTooBig(bestAtlasResolution))
     {
+        GetMostUsedTextureToIgnore();
     }
     unsigned int atlasFindingAttempts = 1;
 
@@ -422,7 +471,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         {
             return false;
         }
-        
+
         printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
         packOptions.padding = 1;
         packOptions.texelsPerUnit = texelsPerUnit;
