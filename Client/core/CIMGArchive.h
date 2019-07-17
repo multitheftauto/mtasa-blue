@@ -18,6 +18,12 @@ struct STXDImgArchiveInfo
     unsigned short usSize;
 };
 
+struct SIMGFileHeader
+{
+    char version[4];
+    uint entryCount;
+};
+
 #pragma pack(push, 1)
 struct EntryHeader
 {
@@ -61,7 +67,7 @@ public:
     void                  WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries);
 private:
 
-    FILE * CIMGArchiveFile_;
+    std::ifstream            fileStream;
     std::string			  archiveFilePath_;
     std::vector<EntryHeader> archiveFileEntries_;
 };
