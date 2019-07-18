@@ -211,7 +211,7 @@ void C3DModelOptimizer::GetFaceMaterials()
         RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
         int         triangleIndex = 0;
-        for (uint32_t triangleIndex = 0; triangleIndex < pGeometry->triangles_size; triangleIndex++)
+        for (int triangleIndex = 0; triangleIndex < pGeometry->triangles_size; triangleIndex++)
         {
             RpTriangle& triangle = pGeometry->triangles[triangleIndex];
 
