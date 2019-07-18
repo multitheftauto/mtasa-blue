@@ -4,7 +4,7 @@
 CIMGArchive::CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation)
 {
     archiveFilePath_ = archiveFilePath;
-
+    totalImgFilesRead = 0;
     if (fileOperation == IMG_FILE_READ)
     {
         fileStream.open(FromUTF8(archiveFilePath_), std::ios::binary | std::ios::ate);
@@ -75,8 +75,8 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
     for (int i = 0; i < dwTotalEntries; i++)
     {
         CIMGArchiveFile* pArchiveFile = imgEntries[i];
-        DWORD            fileBlockSize = pArchiveFile->fileEntry->usSize;
-        vecEntryHeaders.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry->fileName);
+        DWORD            fileBlockSize = pArchiveFile->fileEntry.usSize;
+        vecEntryHeaders.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry.fileName);
         currentBlockOffset += fileBlockSize;
     }
 
@@ -108,68 +108,118 @@ uint CIMGArchive::GetFileCount()
     return archiveFileEntries_.size();
 }
 
-CIMGArchiveFile* CIMGArchive::GetFileByID(uint id)
+std::vector<CIMGArchiveFile>& CIMGArchive::GetNextImgFiles(unsigned int imgReadWriteOperationSizeInBytes)
+{
+    // Free the container memory
+    std::vector<CIMGArchiveFile>().swap(imgArchiveFiles);
+    std::vector<char>().swap(m_vecImgArchiveFilesBuffer);
+
+    fileStream.seekg(archiveFileEntries_[totalImgFilesRead].offset * 2048, std::ios::beg);
+
+    unsigned int bytesToRead = 0;
+    unsigned int filesToRead = 0;
+    size_t       entryHeaderIndex = totalImgFilesRead;
+    while (true)
+    {
+        EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
+        unsigned int actualFileSize = entryHeader.usSize * 2048;
+        bytesToRead += actualFileSize;
+
+        if (bytesToRead > imgReadWriteOperationSizeInBytes)
+        {
+            bytesToRead -= actualFileSize;
+            break;
+        }
+
+        filesToRead++;
+        entryHeaderIndex++;
+    }
+
+    m_vecImgArchiveFilesBuffer.resize(bytesToRead);
+    imgArchiveFiles.resize(filesToRead);
+
+    fileStream.read(m_vecImgArchiveFilesBuffer.data(), bytesToRead);
+
+    unsigned char* pFilesData = (unsigned char*)m_vecImgArchiveFilesBuffer.data();
+    for (unsigned int i = 0; i < filesToRead; i++)
+    {
+        size_t entryHeaderIndex = totalImgFilesRead + i;
+        EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
+        unsigned int actualFileSize = entryHeader.usSize * 2048;
+
+        CIMGArchiveFile& archiveFile = imgArchiveFiles[i];
+        archiveFile.fileEntry = entryHeader;
+        archiveFile.actualFileOffset = entryHeader.offset * 2048;
+        archiveFile.actualFileSize = actualFileSize;
+        archiveFile.pFileData = pFilesData;
+
+        pFilesData += actualFileSize;
+    }
+
+    totalImgFilesRead += filesToRead;
+
+    return imgArchiveFiles;
+}
+
+
+bool CIMGArchive::GetFileByID(uint id, CIMGArchiveFile& archiveFile)
 {
     if (archiveFileEntries_.size() <= id || id < 0)
     {
-        return NULL;
+        return false;
     }
     else
     {
         if (!fileStream.fail())
         {
-            CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
-            newArchiveFile->fileEntry = &archiveFileEntries_[id];
-            newArchiveFile->actualFileOffset = archiveFileEntries_[id].offset * 2048;
-            newArchiveFile->actualFileSize = archiveFileEntries_[id].usSize * 2048;
-            newArchiveFile->fileByteBuffer.SetSize((size_t)newArchiveFile->actualFileSize);
-            fileStream.seekg(newArchiveFile->actualFileOffset, std::ios::beg);
-            char* pData = newArchiveFile->fileByteBuffer.GetData();
-            fileStream.read(pData,newArchiveFile->actualFileSize);
-            return newArchiveFile;
+            archiveFile.fileEntry = archiveFileEntries_[id];
+            archiveFile.actualFileOffset = archiveFileEntries_[id].offset * 2048;
+            archiveFile.actualFileSize = archiveFileEntries_[id].usSize * 2048;
+            archiveFile.fileByteBuffer.SetSize((size_t)archiveFile.actualFileSize);
+            fileStream.seekg(archiveFile.actualFileOffset, std::ios::beg);
+            char* pData = archiveFile.fileByteBuffer.GetData();
+            fileStream.read(pData, archiveFile.actualFileSize);
+            return true;
         }
-        return NULL;
+        return false;
     }
 }
 
-/*
-CIMGArchiveFile* CIMGArchive::GetFileByName(std::string fileName)
+
+bool CIMGArchive::GetFileByName(std::string fileName, CIMGArchiveFile& archiveFile)
 {
     for (int i = 0; i < archiveFileEntries_.size(); i++)
     {
         if ((std::string)archiveFileEntries_[i].fileName == fileName)
         {
-            if (CIMGArchiveFile_ != NULL)
+            if (!fileStream.fail())
             {
-                CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
-                newArchiveFile->fileEntry = &archiveFileEntries_[i];
-                newArchiveFile->actualFileOffset = archiveFileEntries_[i].offset * 2048;
-                newArchiveFile->actualFileSize = archiveFileEntries_[i].usSize * 2048;
-                newArchiveFile->fileByteBuffer.SetSize(newArchiveFile->actualFileSize);
-                fseek(CIMGArchiveFile_, newArchiveFile->actualFileOffset, SEEK_SET);
-                fread(newArchiveFile->fileByteBuffer.GetData(), 1, newArchiveFile->actualFileSize, CIMGArchiveFile_);
-                return newArchiveFile;
+                archiveFile.fileEntry = archiveFileEntries_[i];
+                archiveFile.actualFileOffset = archiveFileEntries_[i].offset * 2048;
+                archiveFile.actualFileSize = archiveFileEntries_[i].usSize * 2048;
+                archiveFile.fileByteBuffer.SetSize((size_t)archiveFile.actualFileSize);
+                fileStream.seekg(archiveFile.actualFileOffset, std::ios::beg);
+                char* pData = archiveFile.fileByteBuffer.GetData();
+                fileStream.read(pData, archiveFile.actualFileSize);
+                return true;
             }
-            return NULL;
+            return false;
         }
     }
-    return NULL;
+    return false;
 }
-*/
 
-CIMGArchiveFile* CIMGArchive::GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo)
+bool CIMGArchive::GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo, CIMGArchiveFile& archiveFile)
 {
     if (!fileStream.fail())
     {
-        CIMGArchiveFile* newArchiveFile = new CIMGArchiveFile;
-        newArchiveFile->fileEntry = nullptr;
-        newArchiveFile->actualFileOffset = pTXDImgArchiveInfo->uiOffset * 2048;
-        newArchiveFile->actualFileSize = pTXDImgArchiveInfo->usSize * 2048;
-        newArchiveFile->fileByteBuffer.SetSize((size_t)newArchiveFile->actualFileSize);
-        fileStream.seekg(newArchiveFile->actualFileOffset, std::ios::beg);
-        char* pData = newArchiveFile->fileByteBuffer.GetData();
-        fileStream.read(pData, newArchiveFile->actualFileSize);
-        return newArchiveFile;
+        archiveFile.actualFileOffset = pTXDImgArchiveInfo->uiOffset * 2048;
+        archiveFile.actualFileSize = pTXDImgArchiveInfo->usSize * 2048;
+        archiveFile.fileByteBuffer.SetSize((size_t)archiveFile.actualFileSize);
+        fileStream.seekg(archiveFile.actualFileOffset, std::ios::beg);
+        char* pData = archiveFile.fileByteBuffer.GetData();
+        fileStream.read(pData, archiveFile.actualFileSize);
+        return true;
     }
-    return NULL;
+    return false;
 }

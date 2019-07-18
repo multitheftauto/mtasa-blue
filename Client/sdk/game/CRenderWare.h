@@ -69,7 +69,10 @@ public:
     virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
+    virtual RwTexDictionary* ReadTXD(const SString& strFilename, RwBuffer& buffer, bool bScriptAddTexture = true) = 0;
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture = true) = 0;
+    virtual RpClump*         ReadDFF(const SString& strFilename, RwBuffer& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions,
+                                      RwTexDictionary* pTexDict = nullptr) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr) = 0;
     virtual CColModel*       ReadCOL(const CBuffer& fileData) = 0;
     virtual bool             WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary) = 0;

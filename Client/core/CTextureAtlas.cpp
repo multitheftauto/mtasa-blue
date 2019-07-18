@@ -267,7 +267,8 @@ CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::Pack
                 char buffer[100];
                 sprintf(buffer, "myAtlas%d", atlasIndex);
                 std::string atlasName = buffer;
-                theTexture.SaveTextureToFile(atlasName);
+                theTexture.UnlockTexture();
+                //theTexture.SaveTextureToFile(atlasName);
             }
         }
     }

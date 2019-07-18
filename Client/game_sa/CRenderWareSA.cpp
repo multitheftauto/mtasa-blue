@@ -1055,16 +1055,12 @@ CRenderWareSA::~CRenderWareSA()
     SAFE_DELETE(m_pMatchChannelManager);
 }
 
-// Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture)
+RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, RwBuffer& buffer, bool bScriptAddTexture)
 {
     // open the stream
     RwStream* streamTexture;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    if (buffer.size > 0)
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
         streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
     }
     else
@@ -1098,11 +1094,24 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
     return pTex;
 }
 
+// Reads and parses a TXD file specified by a path (szTXD)
+RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture)
+{
+    RwBuffer buffer;
+    if (!fileData.IsEmpty())
+    {
+        buffer.ptr = (void*)fileData.GetData();
+        buffer.size = fileData.GetSize();
+        return ReadTXD(strFilename, buffer, bScriptAddTexture);
+    }
+    buffer = {nullptr, 0};
+    return ReadTXD(strFilename, buffer, bScriptAddTexture);
+}
+
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions,
-                                RwTexDictionary* pTexDict)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, RwBuffer& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict)
 {
     if (pTexDict)
     {
@@ -1117,11 +1126,8 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // open the stream
     RwStream* streamModel;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    if (buffer.size > 0)
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
         streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
     }
     else
@@ -1162,6 +1168,20 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
     RwStreamClose(streamModel, NULL);
 
     return pClump;
+}
+
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions,
+                                RwTexDictionary* pTexDict)
+{
+    RwBuffer buffer;
+    if (!fileData.IsEmpty())
+    {
+        buffer.ptr = (void*)fileData.GetData();
+        buffer.size = fileData.GetSize();
+        return ReadDFF(strFilename, buffer, usModelID, bLoadEmbeddedCollisions, pTexDict);
+    }
+    buffer = {nullptr, 0};
+    return ReadDFF(strFilename, buffer, usModelID, bLoadEmbeddedCollisions, pTexDict);
 }
 
 bool CRenderWareSA::WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary)
@@ -1303,7 +1323,7 @@ void CRenderWareSA::CopyGeometryPlugins(RpGeometry* pDestGeometry, RpGeometry* p
     auto       CMemoryMgr_Malloc = (void*(__cdecl*)(int size))0x72F420;
     auto       _rpMeshHeaderCreate = (void*(__cdecl*)(int size))0x758920;
 
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
+    CRenderWare*      pRenderWare = g_pCore->GetGame()->GetRenderWare();
     RwPluginRegistry& geometryTKList = *(RwPluginRegistry*)0x8D628C;
     for (auto pPluginRegistryEntry = geometryTKList.firstRegEntry; pPluginRegistryEntry; pPluginRegistryEntry = pPluginRegistryEntry->nextRegEntry)
     {

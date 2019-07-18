@@ -38,8 +38,12 @@ public:
     void ClothesRemoveReplacementTxd(char* pFileData);
     bool HasClothesReplacementChanged();
 
+    RwTexDictionary* ReadTXD(const SString& strFilename, RwBuffer& buffer, bool bScriptAddTexture = true);
+
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData, bool bScriptAddTexture = true);
+
+    RpClump* ReadDFF(const SString& strFilename, RwBuffer& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
     RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr);
