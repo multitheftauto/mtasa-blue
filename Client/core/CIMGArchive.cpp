@@ -72,7 +72,7 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
 
     // write the entry headers
     uint64_t currentBlockOffset = GetTotalBlockSize(8 + dwTotalEntries * sizeof(EntryHeader));
-    for (int i = 0; i < dwTotalEntries; i++)
+    for (size_t i = 0; i < dwTotalEntries; i++)
     {
         CIMGArchiveFile* pArchiveFile = imgEntries[i];
         DWORD            fileBlockSize = pArchiveFile->fileEntry.usSize;
@@ -188,7 +188,7 @@ bool CIMGArchive::GetFileByID(uint id, CIMGArchiveFile& archiveFile)
 
 bool CIMGArchive::GetFileByName(std::string fileName, CIMGArchiveFile& archiveFile)
 {
-    for (int i = 0; i < archiveFileEntries_.size(); i++)
+    for (size_t i = 0; i < archiveFileEntries_.size(); i++)
     {
         if ((std::string)archiveFileEntries_[i].fileName == fileName)
         {
