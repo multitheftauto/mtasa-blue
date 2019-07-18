@@ -92,7 +92,7 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
         outputStream.seekp(actualFileOffset, std::ios::beg);
 
         // std::printf("WriteEntries: actualFileSize = %d\n", actualFileSize);
-        outputStream.write((char*)pArchiveFile->fileByteBuffer.GetData(), actualFileSize);
+        outputStream.write((char*)pArchiveFile->GetData(), actualFileSize);
     }
 
     std::printf("WriteEntries: okay done writing\n");

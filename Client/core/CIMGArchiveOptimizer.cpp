@@ -121,8 +121,8 @@ bool IsVehiclMODModel(const int modelID)
 
 static RwTexDictionary* g_pVehicleTxdDictionary = nullptr;
 
-bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<CIMGArchiveFile>& imgArchiveCustomFiles,
-                     std::vector<CIMGArchiveFile*>& imgArchiveFilesOutput, CIMGArchiveFile* pDFFArchiveFile, CIDELoader& ideLoader)
+bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<CIMGArchiveFile>& imgArchiveCustomFiles
+    , CIMGArchiveFile* pDFFArchiveFile, CIDELoader& ideLoader)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
@@ -199,8 +199,9 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
     {
-        SString strPathOfGeneratedDff = "dffs\\";
-
+        SString          strPathOfGeneratedDff = "dffs\\";
+        RwTexDictionary* pAtlasTxdDictionary = nullptr;
+        /*
         C3DModelOptimizer modelOptimizer(pClump, pTxdDictionary);
         RwTexDictionary*  pAtlasTxdDictionary = modelOptimizer.GetAtlasTexDictionary();
         if (!pAtlasTxdDictionary)
@@ -215,6 +216,7 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<
             pRenderWare->DestroyTXD(pTxdDictionary);
             return bOptimizedDFFFile;
         }
+        */
 
         unsigned int clumpSize = RpClumpStreamGetSize(pClump);
 
@@ -222,8 +224,7 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<
         clumpSize += 24;
 
         CIMGArchiveFile& dffArchiveFile = imgArchiveCustomFiles.emplace_back();
-        memcpy(&dffArchiveFile.fileEntry, &pDFFArchiveFile->fileEntry, sizeof(EntryHeader));
-        // dffArchiveFile.fileEntry = pDFFArchiveFile->fileEntry;
+        dffArchiveFile.fileEntry = pDFFArchiveFile->fileEntry;
         dffArchiveFile.actualFileSize = GetActualFileSize(clumpSize);
         dffArchiveFile.fileEntry.usSize = dffArchiveFile.actualFileSize / 2048;
         dffArchiveFile.fileByteBuffer.SetSize(dffArchiveFile.actualFileSize);
@@ -233,7 +234,6 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<
         // Remove this line later
         // pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
 
-        imgArchiveFilesOutput.push_back(&dffArchiveFile);
         /*
         if (pAtlasTxdDictionary)
         {
@@ -261,8 +261,6 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, std::vector<
 
             // Remove this line later
             //pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
-
-            imgArchiveFilesOutput.push_back(&txdArchiveFile);
         }
         */
         if (bLoadCollision)
@@ -342,19 +340,42 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
         if (strFileExtension == "dff")
         {
-            if (!OptimizeDFFFile(totalModelsAddedForOutput, newIMgArchive, imgArchiveCustomFiles, imgArchiveFilesOutput, &archiveFile, ideLoader))
+            if (OptimizeDFFFile(totalModelsAddedForOutput, newIMgArchive, imgArchiveCustomFiles, &archiveFile, ideLoader))
             {
-                imgArchiveFilesOutput.push_back(&archiveFile);
+                // REMOVE THIS LATER
+                // break;
+                // REMOVE NED
             }
         }
-        else
-        {
-            imgArchiveFilesOutput.push_back(&archiveFile);
-        }
-
         totalModelsAddedForOutput++;
     }
 
+    for (auto& customArchiveFile : imgArchiveCustomFiles)
+    {
+        imgArchiveFilesOutput.emplace_back(&customArchiveFile);
+    }
+
+    for (auto& archiveFile : imgArchiveFiles)
+    {
+        bool         bFileWithNameExists = false;
+        unsigned int archiveFileNameHash = HashString(archiveFile.fileEntry.fileName);
+        for (auto& archiveFileOutput : imgArchiveFilesOutput)
+        {
+            if (archiveFileNameHash == HashString(archiveFileOutput->fileEntry.fileName))
+            {
+                printf("[Add File Output FAIL] File exists with properties: %s | size: %u\n", archiveFileOutput->fileEntry.fileName,
+                       archiveFileOutput->actualFileSize);
+                bFileWithNameExists = true;
+                break;
+            }
+        }
+
+        if (!bFileWithNameExists)
+        {
+            printf("[Add File Output OK] File doesn't exists: %s | size: %u\n", archiveFile.fileEntry.fileName, archiveFile.actualFileSize);
+            imgArchiveFilesOutput.push_back(&archiveFile);
+        }
+    }
     newIMgArchiveOut->WriteEntries(imgArchiveFilesOutput);
 
     // delete newFile;

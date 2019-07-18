@@ -45,7 +45,7 @@ struct EntryHeader
         offset = theOffset;
         usSize = theSize;
         fSize2 = theSize2;
-        strncpy_s(fileName, theFileName, sizeof(EntryHeader::fileName));
+        strncpy_s(fileName, theFileName, std::min(sizeof(EntryHeader::fileName) , strlen(theFileName) + 1));
     }
 };
 #pragma pack(pop)
@@ -55,7 +55,7 @@ struct CIMGArchiveFile
     EntryHeader    fileEntry;
     uint64         actualFileOffset;
     uint64         actualFileSize;
-    unsigned char* pFileData;        // points to a location in m_vecImgArchiveFilesBuffer if size is zero,
+    unsigned char* pFileData;        // points to a location in m_vecImgArchiveFilesBuffer if fileByteBuffer size is zero,
                                      // otherwise this is nullptr
     CBuffer        fileByteBuffer;   // If the size is zero, then pFileData is used
 
