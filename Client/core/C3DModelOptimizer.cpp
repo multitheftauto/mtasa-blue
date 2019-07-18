@@ -14,7 +14,23 @@ C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDi
     pClump = pTheClump;
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
-    CreateTXDAtlas();
+
+    // remove atomics with no texcoords for its geometry
+    for (auto it = outAtomicList.begin(); it != outAtomicList.end();)
+    {
+        if (!(*it)->geometry->texcoords[0])            //! pAtomic->geometry->texcoords[0])
+        {
+            it = outAtomicList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    if (!outAtomicList.empty())
+    {
+        CreateTXDAtlas();
+    }
 }
 
 // Normalize pIn vector into pOut
@@ -502,9 +518,9 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         RwColor*              destColors = pNewGeometry->colors;
         RwTextureCoordinates* pDestTextureCoordinateArray = pNewGeometry->texcoords[0];
 
-        RwV3d*   sourceVertices = pGeometry->morphTarget->verts;
-        RwV3d*   sourceNormals = pGeometry->morphTarget->normals;
-        RwColor* sourceColors = pGeometry->colors;
+        RwV3d*                sourceVertices = pGeometry->morphTarget->verts;
+        RwV3d*                sourceNormals = pGeometry->morphTarget->normals;
+        RwColor*              sourceColors = pGeometry->colors;
         RwTextureCoordinates* pSourceTextureCoordinateArray = pGeometry->texcoords[0];
 
         for (uint32_t v = 0; v < mesh.vertexCount; v++)
