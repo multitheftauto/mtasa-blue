@@ -2037,6 +2037,9 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
         return nullptr;
     }
 
+    sourceSurface->Release();
+    destinationSurface->Release();
+
     RwTexture* pConvertedTexture = RwTextureCreate(convertedRaster);
     memcpy(pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
     memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
