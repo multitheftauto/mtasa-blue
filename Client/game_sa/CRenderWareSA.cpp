@@ -1926,6 +1926,20 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
+void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
+{
+    if (!pTexture)
+    {
+        return;
+    }
+
+    while (pTexture->refs > 1)
+    {
+        RwTextureDestroy(pTexture);
+    }
+    RwTextureDestroy(pTexture);
+}
+
 RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 {
     auto       CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
@@ -1989,7 +2003,7 @@ void GetRasterRect(RwRaster* raster, RECT& rect)
     rect.bottom = raster->nOffsetY + raster->height;
 }
 
-RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat)
+RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat)
 {
     auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
     auto RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
@@ -2000,7 +2014,7 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
 
     HRESULT hr = NULL;
 
-    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, textureFormat, rwRASTERTYPETEXTURE | (textureFormat & 0x9000));
+    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, textureFormat, rwRASTERTYPETEXTURE | (rasterFormat & 0x9000));
     if (!convertedRaster)
     {
         std::printf("RwD3D9RasterCreate: Failed\n");
@@ -2083,11 +2097,21 @@ bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwText
 // No idea what will happen if there is a custom txd replacement
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
+void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures, RwTexDictionary* pTxd)
 {
-    RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
-    if (!pTxd)
-        return;
+    bool bExistsInTxdPool = true;
+    if (pTxd)
+    {
+        bExistsInTxdPool = false;
+    }
+    else
+    {
+        pTxd = CTxdStore_GetTxd(usTxdId);
+        if (!pTxd)
+        {
+            return;
+        }
+    }
 
     // We can abandon the textures instead of destroy. It might be safer, but will cause a memory leak
     if (bDestroyTextures)
@@ -2104,15 +2128,22 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
         }
     }
 
-    // Need to have at least one ref for RemoveRef to work correctly
-    if (CTxdStore_GetNumRefs(usTxdId) == 0)
+    if (bExistsInTxdPool)
     {
-        CTxdStore_AddRef(usTxdId);
-    }
+        // Need to have at least one ref for RemoveRef to work correctly
+        if (CTxdStore_GetNumRefs(usTxdId) == 0)
+        {
+            CTxdStore_AddRef(usTxdId);
+        }
 
-    while (CTxdStore_GetNumRefs(usTxdId) > 0)
+        while (CTxdStore_GetNumRefs(usTxdId) > 0)
+        {
+            CTxdStore_RemoveRef(usTxdId);
+        }
+    }
+    else
     {
-        CTxdStore_RemoveRef(usTxdId);
+        DestroyTXD(pTxd);
     }
 }
 

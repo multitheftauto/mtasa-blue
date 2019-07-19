@@ -46,7 +46,8 @@ public:
     RpClump* ReadDFF(const SString& strFilename, RwBuffer& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions, RwTexDictionary* pTexDict = nullptr);
+    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions,
+                     RwTexDictionary* pTexDict = nullptr);
 
     bool WriteTXD(const SString& strFilename, RwTexDictionary* pTxdDictionary);
 
@@ -68,10 +69,11 @@ public:
 
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
+    void DestroyTextureForcefully(RwTexture* pTexture);
 
     RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom);
 
-    void       AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture);
+    void AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture);
 
     // Copies textures from second argument to first one. Textures of first argument are not removed
     RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom);
@@ -80,9 +82,9 @@ public:
 
     D3DFORMAT GetRasterD3DFormat(RwRaster* raster);
 
-    bool      IsRasterCompressed(RwRaster* raster);
+    bool IsRasterCompressed(RwRaster* raster);
 
-    RwTexture* RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat);
+    RwTexture* RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat);
 
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const CBuffer& fileData);
@@ -136,7 +138,7 @@ public:
     void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
     void               RemoveShaderRefs(CSHADERDUMMY* pShaderItem);
     bool               RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit);
-    void               TxdForceUnload(ushort usTxdId, bool bDestroyTextures);
+    void               TxdForceUnload(ushort usTxdId, bool bDestroyTextures, RwTexDictionary* pTxd = nullptr);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
@@ -177,7 +179,7 @@ public:
     void SetCurrentReadDFFWithoutReplacingCOL(bool bReadWithoutReplacingCOL);
     void DeleteReadDFFCollisionModel();
 
-    static RwInt32& _RwD3D9RasterExtOffset;    /* Raster extension offset */
+    static RwInt32& _RwD3D9RasterExtOffset; /* Raster extension offset */
 
     // Watched world textures
     std::multimap<ushort, STexInfo*>    m_TexInfoMap;

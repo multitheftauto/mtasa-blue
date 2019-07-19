@@ -85,13 +85,14 @@ public:
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
+    virtual void             DestroyTextureForcefully(RwTexture* pTexture) = 0;
     virtual RwTexture*       CloneRwTexture(RwTexture* pTextureToCopyFrom) = 0;
     virtual void             AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture) = 0;
     virtual RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom) = 0;
     virtual _rwD3D9RasterExt* GetRasterExt(RwRaster* raster) = 0;
     virtual D3DFORMAT        GetRasterD3DFormat(RwRaster* raster) = 0;
     virtual bool             IsRasterCompressed(RwRaster* raster) = 0;
-    virtual RwTexture*       RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat) = 0;
+    virtual RwTexture*       RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
     virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
@@ -117,7 +118,7 @@ public:
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
-    virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+    virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures, RwTexDictionary* pTxd = nullptr) = 0;
 
     virtual void     SetCurrentDFFBeingGeneratedFileName(SString& strDFFName) = 0;
     virtual void     SetCurrentDFFWriteModelID(int modelID) = 0;

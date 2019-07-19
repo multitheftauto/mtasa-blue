@@ -51,6 +51,16 @@ void C3DModelOptimizer::GetTextures()
 {
     std::set<unsigned int> setOfTextureNameHashes;
 
+    size_t totalPossibleTextures = 0;
+    for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
+    {
+        RpAtomic*   pAtomic = outAtomicList[geometryIndex];
+        RpGeometry* pGeometry = pAtomic->geometry;
+        totalPossibleTextures += pGeometry->materials.entries;
+    }
+
+    texturesCache.reserve(totalPossibleTextures);
+
     for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
     {
         RpAtomic*   pAtomic = outAtomicList[geometryIndex];
@@ -79,7 +89,7 @@ void C3DModelOptimizer::GetTextures()
             if (it == setOfTextureNameHashes.end())
             {
                 textures.emplace_back(texturesCache.size());
-                CDXTexture& dxTexture = texturesCache.emplace_back(pMaterial);
+                CDXTexture& dxTexture = texturesCache.emplace_back(pMaterial->texture, RW_TEXTURE_DELETE_ON_UNLOAD);
                 dxTexture.LockTexture(D3DLOCK_READONLY);
 
                 setOfTextureNameHashes.insert(textureNameHash);
@@ -237,13 +247,8 @@ bool C3DModelOptimizer::GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMat
     return false;
 }
 
-uint32_t C3DModelOptimizer::GetBestAtlasMaxResolution(xatlas::Atlas* atlas, float texelsPerUnit)
+uint32_t C3DModelOptimizer::GetBestAtlasMaxResolution(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions)
 {
-    xatlas::PackOptions packOptions;
-    packOptions.padding = 1;
-    packOptions.texelsPerUnit = texelsPerUnit;
-    xatlas::PackCharts(atlas, packOptions);
-
     uint32_t maxResolution = std::max(atlas->width, atlas->height);
     while (maxResolution % 4 != 0)
     {
@@ -362,6 +367,14 @@ void C3DModelOptimizer::GetMostUsedTextureToIgnore()
     }
 }
 
+void C3DModelOptimizer::DestroyMostUsedTexturesToIgnoreClones()
+{
+    for (auto& it : m_mapOfMostUsedTexturesToIgnore)
+    {
+        pRenderWare->DestroyTextureForcefully(it.second);
+    }
+}
+
 bool C3DModelOptimizer::AddMeshesToXatlas(xatlas::Atlas* atlas)
 {
     size_t FirstIndex = 0;
@@ -386,7 +399,6 @@ bool C3DModelOptimizer::AddMeshesToXatlas(xatlas::Atlas* atlas)
         xatlas::AddMeshError::Enum error = xatlas::AddUvMesh(atlas, meshDecl);
         if (error != xatlas::AddMeshError::Success)
         {
-            xatlas::Destroy(atlas);
             printf("Error adding mesh %d: %s\n", (int)geometryIndex, xatlas::StringForEnum(error));
             return false;
         }
@@ -447,36 +459,45 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     if (!AddMeshesToXatlas(atlas))
     {
+        xatlas::Destroy(atlas);
+        DestroyMostUsedTexturesToIgnoreClones();
         return false;
     }
 
-    float    texelsPerUnit = 1.0f;
-    uint32_t bestAtlasResolution = GetBestAtlasMaxResolution(atlas, texelsPerUnit);
+    const float texelsPerUnit = 1.0f;
+    xatlas::PackOptions packOptions;
+    packOptions.padding = 1;
+    packOptions.texelsPerUnit = texelsPerUnit;
+    xatlas::PackCharts(atlas, packOptions);
+    uint32_t bestAtlasResolution = GetBestAtlasMaxResolution(atlas, packOptions);
 
     if (IsAtlasResolutionTooBig(bestAtlasResolution))
     {
     }
-    unsigned int atlasFindingAttempts = 1;
 
-    xatlas::PackOptions packOptions;
-    do
+    ///*
+    if (atlas->atlasCount <= 1)
     {
-        xatlas::Destroy(atlas);
-        atlas = xatlas::Create();
-        if (!AddMeshesToXatlas(atlas))
+        unsigned int atlasFindingAttempts = 1;
+        do
         {
-            return false;
-        }
+            xatlas::Destroy(atlas);
+            atlas = xatlas::Create();
+            if (!AddMeshesToXatlas(atlas))
+            {
+                xatlas::Destroy(atlas);
+                DestroyMostUsedTexturesToIgnoreClones();
+                return false;
+            }
 
-        printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
-        packOptions.padding = 1;
-        packOptions.texelsPerUnit = texelsPerUnit;
-        packOptions.resolution = bestAtlasResolution;
-        xatlas::PackCharts(atlas, packOptions);
-        bestAtlasResolution += 32;
-        atlasFindingAttempts++;
-    } while (atlas->atlasCount > 1);
-
+            printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
+            packOptions.resolution = bestAtlasResolution;
+            xatlas::PackCharts(atlas, packOptions);
+            bestAtlasResolution += 32;
+            atlasFindingAttempts++;
+        } while (atlas->atlasCount > 1);
+    }
+    //*/
     printf("Copying texture data into atlas\n");
 
     CTextureAtlas& textureAtlas = CTextureAtlas(pClump, atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs);
@@ -580,9 +601,12 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
             }
             else if (pSourceMaterial->texture)
             {
+                assert(atlasIndex >= 0);
                 if (atlasIndex < 0)
                 {
                     printf("invalid atlasIndex for triangle: %u\n", triangleIndex);
+                    xatlas::Destroy(atlas);
+                    DestroyMostUsedTexturesToIgnoreClones();
                     return nullptr;
                 }
 
@@ -596,6 +620,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         RpAtomicSetGeometry(pAtomic, pNewGeometry, 0);
     }
 
+    xatlas::Destroy(atlas);
     m_pAtlasTexDictionary = pAtlasTexDictionary;
     return pAtlasTexDictionary;
 }

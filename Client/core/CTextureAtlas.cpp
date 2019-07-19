@@ -241,6 +241,7 @@ CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::Pack
     }
     if (packOptions.padding > 0)
     {
+        atlasDXTextures.reserve(atlas->atlasCount);
         for (uint32_t atlasIndex = 0; atlasIndex < atlas->atlasCount; atlasIndex++)
         {
             uint8_t*          theAtlasTexture = ((uint8_t*)atlasTexture.data()) + (atlasTextureSize * atlasIndex);
@@ -248,9 +249,7 @@ CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::Pack
 
             DilateAtlasTextures(atlas, packOptions, theAtlasTexture, theAtlasLookup, atlasTextureSize, atlasLookupSize, texturesCache, textures);
 
-            CDXTexture dxTexture;
-            atlasDXTextures.push_back(dxTexture);
-            CDXTexture& theTexture = atlasDXTextures[atlasDXTextures.size() - 1];
+            CDXTexture& theTexture = atlasDXTextures.emplace_back();
 
             if (theTexture.CreateTextureLocked(atlas->width, atlas->height, 0))
             {

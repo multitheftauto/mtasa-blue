@@ -21,13 +21,14 @@ public:
     void             GetVertexIndices();
     void             GetFaceMaterials();
     bool             GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex);
-    uint32_t         GetBestAtlasMaxResolution(xatlas::Atlas* atlas, float texelsPerUnit);
+    uint32_t         GetBestAtlasMaxResolution(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions);
     bool             IsAtlasResolutionTooBig(unsigned int bestAtlasResolution);
 
     RpGeometry*      CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format);
 
     void             GetUsedTexturesCount();
     void             GetMostUsedTextureToIgnore();
+    void             DestroyMostUsedTexturesToIgnoreClones();
 
     bool             AddMeshesToXatlas(xatlas::Atlas* atlas);
     RwTexDictionary* CreateTXDAtlas();

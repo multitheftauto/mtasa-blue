@@ -12,34 +12,43 @@ struct PixelColor
     unsigned char a, r, g, b;
 };
 
+enum eCustomRWTextureDelete
+{
+    RW_TEXTURE_DELETE_ON_UNLOAD = 0,
+    RW_TEXTURE_DONT_DELETE
+};
+
 class CDXTexture
 {
 public:
-    RpMaterial*        m_pMaterial;
-    const D3DFORMAT    m_kTextureFormat = D3DFMT_A8R8G8B8;
-    RwTexture*         m_pTexture;
-    IDirect3DTexture9* dxTexture;
-    unsigned int       imageWidth, imageHeight;
-    unsigned char*     pixels;
-    int                m_pixelSizeInBytes;
-    int                m_pixelPitch;
-    D3DLOCKED_RECT     textureLockedRect;
-    bool               bTextureLocked;
-    bool               bNewRwTextureCreated;
+    RpMaterial*            m_pMaterial;
+    const D3DFORMAT        m_kTextureFormat = D3DFMT_A8R8G8B8;
+    RwTexture*             m_pTexture;
+    IDirect3DTexture9*     dxTexture;
+    unsigned int           imageWidth, imageHeight;
+    unsigned char*         pixels;
+    int                    m_pixelSizeInBytes;
+    int                    m_pixelPitch;
+    D3DLOCKED_RECT         textureLockedRect;
+    bool                   bTextureLocked;
+    bool                   bNewRwTextureCreated;
+    eCustomRWTextureDelete m_deleteSetting;
+    CRenderWare*           pRenderware;
 
     CDXTexture();
-    CDXTexture(RpMaterial* pMaterial);
+    CDXTexture(eCustomRWTextureDelete deleteSetting);
+    CDXTexture(RwTexture* pTexture, eCustomRWTextureDelete deleteSetting);
     ~CDXTexture();
 
     void         Initialize();
     bool         Compress(D3DFORMAT format);
-    void SaveTextureToFile(std::string& name);
+    void         SaveTextureToFile(std::string& name);
     unsigned int GetWidth() { return imageWidth; }
     unsigned int GetHeight() { return imageHeight; }
 
     RpMaterial* GetMaterial() { return m_pMaterial; }
-    RwTexture* GetRwTexture() { return m_pTexture; }
-    void* GetPixel(int x, int y);
+    RwTexture*  GetRwTexture() { return m_pTexture; }
+    void*       GetPixel(int x, int y);
 
     bool LockTexture(DWORD Flags);
     void UnlockTexture();

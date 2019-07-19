@@ -8,19 +8,25 @@ CDXTexture::CDXTexture()
     Initialize();
 }
 
-CDXTexture::CDXTexture(RpMaterial* pMaterial)
+CDXTexture::CDXTexture(eCustomRWTextureDelete deleteSetting)
 {
     Initialize();
+    m_deleteSetting = deleteSetting;
+}
 
-    m_pMaterial = pMaterial;
-    CRenderWare* pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
+CDXTexture::CDXTexture(RwTexture* pTexture, eCustomRWTextureDelete deleteSetting)
+{
+    Initialize();
+    m_deleteSetting = deleteSetting;
 
-    m_pTexture = m_pMaterial->texture;
+    m_pTexture = pTexture;
     _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
+    printf("[Constructor] CDXTexture::CDXTexture: %s\n", m_pTexture->name);
     if (rasterExt->d3dFormat != m_kTextureFormat)
     {
-        m_pTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, m_kTextureFormat);
+        m_pTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, m_kTextureFormat, rwRASTERFORMAT8888);
         rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
+        bNewRwTextureCreated = m_pTexture ? true : false;
     }
     dxTexture = rasterExt->texture;
     imageWidth = m_pTexture->raster->width;
@@ -33,23 +39,29 @@ CDXTexture::~CDXTexture()
 
     if (bNewRwTextureCreated)
     {
-        // TODO: delete m_pTexture using an Rw function
-        // otherwise memory leak
+        if (m_deleteSetting == RW_TEXTURE_DELETE_ON_UNLOAD)
+        {
+            printf("[Destructor] ~CDXTexture called | m_pTexture: %s\n", m_pTexture->name);
+            pRenderware->DestroyTextureForcefully(m_pTexture);
+            m_pTexture = nullptr;
+        }
     }
 }
 
 bool CDXTexture::Compress(D3DFORMAT format)
 {
-    CRenderWare*      pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
     _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
     if (rasterExt->d3dFormat != format)
     {
-        RwTexture* pNewTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, format);
+        RwTexture* pNewTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, format, rwRASTERFORMAT1555);
         if (!pNewTexture)
         {
             return false;
         }
-        pRenderware->DestroyTexture(m_pTexture);
+        if (bNewRwTextureCreated)
+        {
+            pRenderware->DestroyTextureForcefully(m_pTexture);
+        }
         m_pTexture = pNewTexture;
     }
     return true;
@@ -68,7 +80,7 @@ void CDXTexture::SaveTextureToFile(std::string& name)
 
 void CDXTexture::Initialize()
 {
-    m_pMaterial = nullptr;
+    m_deleteSetting = RW_TEXTURE_DONT_DELETE;
     dxTexture = nullptr;
     bNewRwTextureCreated = false;
     bTextureLocked = false;
@@ -77,6 +89,7 @@ void CDXTexture::Initialize()
     imageHeight = 0;
     m_pixelSizeInBytes = 4;
     memset(&textureLockedRect, 0, sizeof(D3DLOCKED_RECT));
+    pRenderware = CCore::GetSingleton().GetGame()->GetRenderWare();
 }
 
 void* CDXTexture::GetPixel(int x, int y)
@@ -142,6 +155,7 @@ bool CDXTexture::CreateTextureLocked(unsigned int width, unsigned int height, DW
     }
     else
     {
+        bNewRwTextureCreated = true;
         _rwD3D9RasterExt* destinationRasterExt = pRenderware->GetRasterExt(raster);
         dxTexture = destinationRasterExt->texture;
         printf("texture loaded with width, height = %u, %u\n", imageWidth, imageHeight);
