@@ -6,6 +6,25 @@
 
                                   Changelog
 
+Version 7.65.3 (19 Jul 2019)
+
+Daniel Stenberg (19 Jul 2019)
+- RELEASE-NOTES: 7.65.3
+
+- THANKS: 7.65.3 status
+
+- progress: make the progress meter appear again
+  
+  Fix regression caused by 21080e1
+  
+  Reported-by: Chih-Hsuan Yen
+  Fixes #4122
+  Closes #4124
+
+- version: bump to 7.65.3
+
+- RELEASE-NOTES: Contributors or now 1990
+
 Version 7.65.2 (17 Jul 2019)
 
 Daniel Stenberg (17 Jul 2019)
@@ -7994,44 +8013,3 @@ Daniel Stenberg (18 Sep 2018)
 - examples/http2-pushinmemory: receive HTTP/2 pushed files in memory
   
   Closes #3004
-
-Daniel Gustafsson (18 Sep 2018)
-- darwinssl: Fix realloc memleak
-  
-  The reallocation was using the input pointer for the return value, which
-  leads to a memory leak on reallication failure. Fix by instead use the
-  safe internal API call Curl_saferealloc().
-  
-  Closes #3005
-  Reviewed-by: Daniel Stenberg <daniel@haxx.se>
-  Reviewed-by: Nick Zitzmann <nickzman@gmail.com>
-
-- [Kruzya brought this change]
-
-  examples: Fix memory leaks from realloc errors
-  
-  Make sure to not overwrite the reallocated pointer in realloc() calls
-  to avoid a memleak on memory errors.
-
-- memory: add missing curl_printf header
-  
-  ftp_send_command() was using vsnprintf() without including the libcurl
-  *rintf() replacement header. Fix by including curl_printf.h and also
-  add curl_memory.h while at it since memdebug.h depends on it.
-  
-  Closes #2999
-  Reviewed-by: Daniel Stenberg <daniel@haxx.se>
-
-Daniel Stenberg (16 Sep 2018)
-- [Si brought this change]
-
-  curl: update --tlsv* descriptions in --help output
-  
-  Closes #2994
-
-- http: made Curl_add_buffer functions take a pointer-pointer
-  
-  ... so that they can clear the original pointer on failure, which makes
-  the error-paths and their cleanups easier.
-  
-  Closes #2992
