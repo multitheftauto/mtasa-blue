@@ -57,7 +57,7 @@ Copyright (c) 2012 Brandon Pelfrey
 #endif
 
 #ifndef XA_PROFILE
-#define XA_PROFILE 1
+#define XA_PROFILE 0
 #endif
 #if XA_PROFILE
 #include <time.h>
@@ -304,6 +304,7 @@ static void *Realloc(void *ptr, size_t size, int /*tag*/, const char * /*file*/,
 struct ProfileData
 {
 	clock_t addMeshReal;
+	clock_t addMeshCopyData;
 	std::atomic<clock_t> addMeshThread;
 	std::atomic<clock_t> addMeshCreateColocals;
 	std::atomic<clock_t> addMeshCreateFaceGroups;
@@ -327,11 +328,15 @@ struct ProfileData
 	std::atomic<clock_t> parameterizeChartsLSCM;
 	std::atomic<clock_t> parameterizeChartsEvaluateQuality;
 	clock_t packCharts;
+	clock_t packChartsAddCharts;
+	std::atomic<clock_t> packChartsAddChartsThread;
+	std::atomic<clock_t> packChartsAddChartsRestoreTexcoords;
 	clock_t packChartsRasterize;
 	clock_t packChartsDilate;
 	clock_t packChartsFindLocation;
 	std::atomic<clock_t> packChartsFindLocationThread;
 	clock_t packChartsBlit;
+	clock_t buildOutputMeshes;
 };
 
 static ProfileData s_profile;
@@ -3531,6 +3536,15 @@ private:
 	std::mutex m_mutex;
 };
 
+struct Spinlock
+{
+	void lock() { while(m_lock.test_and_set(std::memory_order_acquire)) {} }
+	void unlock() { m_lock.clear(std::memory_order_release); }
+
+private:
+	std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
+};
+
 struct TaskGroupHandle
 {
 	uint32_t value = UINT32_MAX;
@@ -3548,6 +3562,14 @@ class TaskScheduler
 public:
 	TaskScheduler() : m_shutdown(false)
 	{
+		// Max with current task scheduler usage is 1 per thread + 1 deep nesting, but allow for some slop.
+		m_maxGroups = std::thread::hardware_concurrency() * 4;
+		m_groups = XA_ALLOC_ARRAY(MemTag::Default, TaskGroup, m_maxGroups);
+		for (uint32_t i = 0; i < m_maxGroups; i++) {
+			new (&m_groups[i]) TaskGroup();
+			m_groups[i].free = true;
+			m_groups[i].ref = 0;
+		}
 		m_workers.resize(std::thread::hardware_concurrency() <= 1 ? 1 : std::thread::hardware_concurrency() - 1);
 		for (uint32_t i = 0; i < m_workers.size(); i++) {
 			m_workers[i].wakeup = false;
@@ -3568,31 +3590,42 @@ public:
 			worker.thread->~thread();
 			XA_FREE(worker.thread);
 		}
-		for (uint32_t i = 0; i < m_groups.size(); i++)
-			destroyGroup(i);
+		for (uint32_t i = 0; i < m_maxGroups; i++)
+			m_groups[i].~TaskGroup();
+		XA_FREE(m_groups);
 	}
 
 	TaskGroupHandle createTaskGroup(uint32_t reserveSize = 0)
 	{
-		TaskGroup *group = XA_NEW(MemTag::Default, TaskGroup);
-		group->queue.reserve(reserveSize);
-		group->ref = 0;
-		std::lock_guard<std::mutex> lock(m_groupsMutex);
-		m_groups.push_back(group);
+		// Claim the first free group.
+		for (uint32_t i = 0; i < m_maxGroups; i++) {
+			TaskGroup &group = m_groups[i];
+			bool expected = true;
+			if (!group.free.compare_exchange_strong(expected, false))
+				continue;
+			group.queueLock.lock();
+			group.queueHead = 0;
+			group.queue.clear();
+			group.queue.reserve(reserveSize);
+			group.queueLock.unlock();
+			TaskGroupHandle handle;
+			handle.value = i;
+			return handle;
+		}
+		XA_DEBUG_ASSERT(false);
 		TaskGroupHandle handle;
-		handle.value = m_groups.size() - 1;
+		handle.value = UINT32_MAX;
 		return handle;
 	}
 
 	void run(TaskGroupHandle handle, Task task)
 	{
 		XA_DEBUG_ASSERT(handle.value != UINT32_MAX);
-		TaskGroup *group = m_groups[handle.value];
-		{
-			std::lock_guard<std::mutex> lock(group->queueMutex);
-			group->queue.push_back(task);
-		}
-		group->ref++;
+		TaskGroup &group = m_groups[handle.value];
+		group.queueLock.lock();
+		group.queue.push_back(task);
+		group.queueLock.unlock();
+		group.ref++;
 		// Wake up a worker to run this task.
 		for (uint32_t i = 0; i < m_workers.size(); i++) {
 			m_workers[i].wakeup = true;
@@ -3607,33 +3640,32 @@ public:
 			return;
 		}
 		// Run tasks from the group queue until empty.
-		TaskGroup *group = m_groups[handle->value];
+		TaskGroup &group = m_groups[handle->value];
 		for (;;) {
 			Task *task = nullptr;
-			{
-				std::lock_guard<std::mutex> lock(group->queueMutex);
-				if (group->queueHead < group->queue.size())
-					task = &group->queue[group->queueHead++];
-			}
+			group.queueLock.lock();
+			if (group.queueHead < group.queue.size())
+				task = &group.queue[group.queueHead++];
+			group.queueLock.unlock();
 			if (!task)
 				break;
 			task->func(task->userData);
-			group->ref--;
+			group.ref--;
 		}
 		// Even though the task queue is empty, workers can still be running tasks.
-		while (group->ref > 0)
+		while (group.ref > 0)
 			std::this_thread::yield();
-		std::lock_guard<std::mutex> lock(m_groupsMutex);
-		destroyGroup(handle->value);
+		group.free = true;
 		handle->value = UINT32_MAX;
 	}
 
 private:
 	struct TaskGroup
 	{
+		std::atomic<bool> free;
 		Array<Task> queue; // Items are never removed. queueHead is incremented to pop items.
 		uint32_t queueHead = 0;
-		std::mutex queueMutex;
+		Spinlock queueLock;
 		std::atomic<uint32_t> ref; // Increment when a task is enqueued, decrement when a task finishes.
 	};
 
@@ -3645,20 +3677,10 @@ private:
 		std::atomic<bool> wakeup;
 	};
 
-	Array<TaskGroup *> m_groups;
-	std::mutex m_groupsMutex;
+	TaskGroup *m_groups;
+	uint32_t m_maxGroups;
 	Array<Worker> m_workers;
 	std::atomic<bool> m_shutdown;
-
-	void destroyGroup(uint32_t index)
-	{
-		TaskGroup *group = m_groups[index];
-		m_groups[index] = nullptr;
-		if (group) {
-			group->~TaskGroup();
-			XA_FREE(group);
-		}
-	}
 
 	static void workerThread(TaskScheduler *scheduler, Worker *worker)
 	{
@@ -3672,18 +3694,17 @@ private:
 				// Look for a task in any of the groups and run it.
 				TaskGroup *group = nullptr;
 				Task *task = nullptr;
-				{
-					std::lock_guard<std::mutex> groupsLock(scheduler->m_groupsMutex);
-					for (uint32_t i = 0; i < scheduler->m_groups.size(); i++) {
-						group = scheduler->m_groups[i];
-						if (!group)
-							continue;
-						std::lock_guard<std::mutex> queueLock(group->queueMutex);
-						if (group->queueHead < group->queue.size()) {
-							task = &group->queue[group->queueHead++];
-							break;
-						}
+				for (uint32_t i = 0; i < scheduler->m_maxGroups; i++) {
+					group = &scheduler->m_groups[i];
+					if (group->free || group->ref == 0)
+						continue;
+					group->queueLock.lock();
+					if (group->queueHead < group->queue.size()) {
+						task = &group->queue[group->queueHead++];
+						group->queueLock.unlock();
+						break;
 					}
+					group->queueLock.unlock();
 				}
 				if (!task)
 					break;
@@ -3754,6 +3775,7 @@ private:
 
 struct UvMeshChart
 {
+	Array<uint32_t> faces;
 	Array<uint32_t> indices;
 	uint32_t material;
 };
@@ -5562,11 +5584,10 @@ struct ParameterizationQuality
 	bool boundaryIntersection = false;
 };
 
-static ParameterizationQuality calculateParameterizationQuality(const Mesh *mesh, Array<uint32_t> *flippedFaces)
+static ParameterizationQuality calculateParameterizationQuality(const Mesh *mesh, uint32_t faceCount, Array<uint32_t> *flippedFaces)
 {
 	XA_DEBUG_ASSERT(mesh != nullptr);
 	ParameterizationQuality quality;
-	const uint32_t faceCount = mesh->faceCount();
 	uint32_t firstBoundaryEdge = UINT32_MAX;
 	for (uint32_t e = 0; e < mesh->edgeCount(); e++) {
 		if (mesh->isBoundaryEdge(e)) {
@@ -5729,7 +5750,7 @@ public:
 		Array<uint32_t> unifiedMeshIndices;
 		unifiedMeshIndices.resize(originalMesh->vertexCount(), (uint32_t)~0);
 		// Add vertices.
-		const uint32_t faceCount = faceArray.size();
+		const uint32_t faceCount = m_initialFaceCount = faceArray.size();
 		for (uint32_t f = 0; f < faceCount; f++) {
 			for (uint32_t i = 0; i < 3; i++) {
 				const uint32_t vertex = originalMesh->vertexAt(faceArray[f] * 3 + i);
@@ -5891,7 +5912,7 @@ public:
 	void evaluateOrthoParameterizationQuality()
 	{
 		XA_PROFILE_START(parameterizeChartsEvaluateQuality)
-		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, nullptr);
+		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, m_initialFaceCount, nullptr);
 		XA_PROFILE_END(parameterizeChartsEvaluateQuality)
 		// Use orthogonal parameterization if quality is acceptable.
 		if (!m_paramQuality.boundaryIntersection && m_paramQuality.geometricArea > 0.0f && m_paramQuality.stretchMetric <= 1.1f && m_paramQuality.maxStretchMetric <= 1.25f)
@@ -5902,9 +5923,9 @@ public:
 	{
 		XA_PROFILE_START(parameterizeChartsEvaluateQuality)
 #if XA_DEBUG_EXPORT_OBJ_INVALID_PARAMETERIZATION
-		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, &m_paramFlippedFaces);
+		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, m_initialFaceCount, &m_paramFlippedFaces);
 #else
-		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, nullptr);
+		m_paramQuality = calculateParameterizationQuality(m_unifiedMesh, m_initialFaceCount, nullptr);
 #endif
 		XA_PROFILE_END(parameterizeChartsEvaluateQuality)
 	}
@@ -5945,6 +5966,7 @@ private:
 	Mesh *m_unifiedMesh;
 	bool m_isDisk, m_isOrtho, m_isPlanar;
 	uint32_t m_warningFlags;
+	uint32_t m_initialFaceCount; // Before fixing T-junctions and/or closing holes.
 	uint32_t m_closedHolesCount, m_fixedTJunctionsCount;
 
 	// List of faces of the original mesh that belong to this chart.
@@ -6444,6 +6466,8 @@ public:
 
 	bool chartsComputed() const { return m_chartsComputed; }
 	bool chartsParameterized() const { return m_chartsParameterized; }
+	uint32_t chartGroupCount() const { return m_chartGroups.size(); }
+	const ChartGroup *chartGroupAt(uint32_t index) const { return m_chartGroups[index]; }
 
 	uint32_t chartGroupCount(uint32_t mesh) const
 	{
@@ -6463,26 +6487,6 @@ public:
 			if (group == 0)
 				return m_chartGroups[c];
 			group--;
-		}
-		return nullptr;
-	}
-
-	uint32_t chartCount() const
-	{
-		uint32_t count = 0;
-		for (uint32_t i = 0; i < m_chartGroups.size(); i++)
-			count += m_chartGroups[i]->chartCount();
-		return count;
-	}
-
-	Chart *chartAt(uint32_t i)
-	{
-		for (uint32_t c = 0; c < m_chartGroups.size(); c++) {
-			uint32_t count = m_chartGroups[c]->chartCount();
-			if (i < count) {
-				return m_chartGroups[c]->chartAt(i);
-			}
-			i -= count;
 		}
 		return nullptr;
 	}
@@ -6613,27 +6617,8 @@ public:
 		taskScheduler->wait(&taskGroup);
 		if (progress.cancel)
 			return false;
-		// Save original texcoords so PackCharts can be called multiple times (packing overwrites the texcoords).
-		const uint32_t nCharts = chartCount();
-		m_originalChartTexcoords.resize(nCharts);
-		for (uint32_t i = 0; i < nCharts; i++) {
-			const Mesh *mesh = chartAt(i)->mesh();
-			m_originalChartTexcoords[i].resize(mesh->vertexCount());
-			for (uint32_t j = 0; j < mesh->vertexCount(); j++)
-				m_originalChartTexcoords[i][j] = mesh->texcoord(j);
-		}
 		m_chartsParameterized = true;
 		return true;
-	}
-
-	void restoreOriginalChartTexcoords()
-	{
-		const uint32_t nCharts = chartCount();
-		for (uint32_t i = 0; i < nCharts; i++) {
-			Mesh *mesh = chartAt(i)->mesh();
-			for (uint32_t j = 0; j < mesh->vertexCount(); j++)
-				mesh->texcoord(j) = m_originalChartTexcoords[i][j];
-		}
 	}
 
 private:
@@ -6643,7 +6628,6 @@ private:
 	Array<ChartGroup *> m_chartGroups;
 	RadixSort m_chartGroupsRadix; // By mesh indexCount.
 	Array<uint32_t> m_chartGroupSourceMeshes;
-	Array<Array<Vector2> > m_originalChartTexcoords;
 };
 
 } // namespace param
@@ -6801,10 +6785,60 @@ struct Chart
 	bool allowRotate;
 	// bounding box
 	Vector2 majorAxis, minorAxis, minCorner, maxCorner;
+	// UvMeshChart only
+	Array<uint32_t> faces;
 
 	Vector2 &uniqueVertexAt(uint32_t v) { return uniqueVertices.isEmpty() ? vertices[v] : vertices[uniqueVertices[v]]; }
 	uint32_t uniqueVertexCount() const { return uniqueVertices.isEmpty() ? vertexCount : uniqueVertices.size(); }
 };
+
+struct AddChartTaskArgs
+{
+	param::Chart *paramChart;
+	Chart *chart; // out
+};
+
+static void runAddChartTask(void *userData)
+{
+	XA_PROFILE_START(packChartsAddChartsThread)
+	auto args = (AddChartTaskArgs *)userData;
+	param::Chart *paramChart = args->paramChart;
+	XA_PROFILE_START(packChartsAddChartsRestoreTexcoords)
+	paramChart->transferParameterization();
+	XA_PROFILE_END(packChartsAddChartsRestoreTexcoords)
+	Mesh *mesh = paramChart->mesh();
+	Chart *chart = args->chart = XA_NEW(MemTag::Default, Chart);
+	chart->atlasIndex = -1;
+	chart->material = 0;
+	chart->indexCount = mesh->indexCount();
+	chart->indices = mesh->indices();
+	chart->parametricArea = paramChart->computeParametricArea();
+	if (chart->parametricArea < kAreaEpsilon) {
+		// When the parametric area is too small we use a rough approximation to prevent divisions by very small numbers.
+		const Vector2 bounds = paramChart->computeParametricBounds();
+		chart->parametricArea = bounds.x * bounds.y;
+	}
+	chart->surfaceArea = paramChart->computeSurfaceArea();
+	chart->vertices = mesh->texcoords();
+	chart->vertexCount = mesh->vertexCount();
+	chart->allowRotate = true;
+	// Compute list of boundary vertices.
+	Array<Vector2> boundary;
+	boundary.reserve(16);
+	for (uint32_t v = 0; v < chart->vertexCount; v++) {
+		if (mesh->isBoundaryVertex(v))
+			boundary.push_back(mesh->texcoord(v));
+	}
+	XA_DEBUG_ASSERT(boundary.size() > 0);
+	// Compute bounding box of chart.
+	static thread_local BoundingBox2D boundingBox;
+	boundingBox.compute(boundary.data(), boundary.size(), mesh->texcoords(), mesh->vertexCount());
+	chart->majorAxis = boundingBox.majorAxis();
+	chart->minorAxis = boundingBox.minorAxis();
+	chart->minCorner = boundingBox.minCorner();
+	chart->maxCorner = boundingBox.maxCorner();
+	XA_PROFILE_END(packChartsAddChartsThread)
+}
 
 struct FindChartLocationBruteForceTaskArgs
 {
@@ -6894,39 +6928,44 @@ struct Atlas
 	const Array<AtlasImage *> &getImages() const { return m_atlasImages; }
 	float getUtilization(uint32_t atlas) const { return m_utilization[atlas]; }
 
-	void addChart(param::Chart *paramChart)
+	void addCharts(TaskScheduler *taskScheduler, param::Atlas *paramAtlas)
 	{
-		Mesh *mesh = paramChart->mesh();
-		Chart *chart = XA_NEW(MemTag::Default, Chart);
-		chart->atlasIndex = -1;
-		chart->material = 0;
-		chart->indexCount = mesh->indexCount();
-		chart->indices = mesh->indices();
-		chart->parametricArea = paramChart->computeParametricArea();
-		if (chart->parametricArea < kAreaEpsilon) {
-			// When the parametric area is too small we use a rough approximation to prevent divisions by very small numbers.
-			const Vector2 bounds = paramChart->computeParametricBounds();
-			chart->parametricArea = bounds.x * bounds.y;
+		// Count charts.
+		uint32_t chartCount = 0;
+		const uint32_t chartGroupsCount = paramAtlas->chartGroupCount();
+		for (uint32_t i = 0; i < chartGroupsCount; i++) {
+			const param::ChartGroup *chartGroup = paramAtlas->chartGroupAt(i);
+			if (chartGroup->isVertexMap())
+				continue;
+			chartCount += chartGroup->chartCount();
 		}
-		chart->surfaceArea = paramChart->computeSurfaceArea();
-		chart->vertices = mesh->texcoords();
-		chart->vertexCount = mesh->vertexCount();
-		chart->allowRotate = true;
-		// Compute list of boundary vertices.
-		Array<Vector2> boundary;
-		boundary.reserve(16);
-		for (uint32_t v = 0; v < chart->vertexCount; v++) {
-			if (mesh->isBoundaryVertex(v))
-				boundary.push_back(mesh->texcoord(v));
+		if (chartCount == 0)
+			return;
+		// Run one task per chart.
+		Array<AddChartTaskArgs> taskArgs;
+		taskArgs.resize(chartCount);
+		TaskGroupHandle taskGroup = taskScheduler->createTaskGroup(chartCount);
+		uint32_t chartIndex = 0;
+		for (uint32_t i = 0; i < chartGroupsCount; i++) {
+			const param::ChartGroup *chartGroup = paramAtlas->chartGroupAt(i);
+			if (chartGroup->isVertexMap())
+				continue;
+			const uint32_t count = chartGroup->chartCount();
+			for (uint32_t j = 0; j < count; j++) {
+				AddChartTaskArgs &args = taskArgs[chartIndex];
+				args.paramChart = chartGroup->chartAt(j);
+				Task task;
+				task.userData = &taskArgs[chartIndex];
+				task.func = runAddChartTask;
+				taskScheduler->run(taskGroup, task);
+				chartIndex++;
+			}
 		}
-		XA_DEBUG_ASSERT(boundary.size() > 0);
-		// Compute bounding box of chart.
-		m_boundingBox.compute(boundary.data(), boundary.size(), mesh->texcoords(), mesh->vertexCount());
-		chart->majorAxis = m_boundingBox.majorAxis();
-		chart->minorAxis = m_boundingBox.minorAxis();
-		chart->minCorner = m_boundingBox.minCorner();
-		chart->maxCorner = m_boundingBox.maxCorner();
-		m_charts.push_back(chart);
+		taskScheduler->wait(&taskGroup);
+		// Get task output.
+		m_charts.resize(chartCount);
+		for (uint32_t i = 0; i < chartCount; i++)
+			m_charts[i] = taskArgs[i].chart;
 	}
 
 	void addUvMeshCharts(UvMeshInstance *mesh)
@@ -6934,6 +6973,7 @@ struct Atlas
 		BitArray vertexUsed(mesh->texcoords.size());
 		Array<Vector2> boundary;
 		boundary.reserve(16);
+		BoundingBox2D boundingBox;
 		for (uint32_t c = 0; c < mesh->mesh->charts.size(); c++) {
 			UvMeshChart *uvChart = mesh->mesh->charts[c];
 			Chart *chart = XA_NEW(MemTag::Default, Chart);
@@ -6944,6 +6984,8 @@ struct Atlas
 			chart->vertices = mesh->texcoords.data();
 			chart->vertexCount = mesh->texcoords.size();
 			chart->allowRotate = mesh->rotateCharts;
+			chart->faces.resize(uvChart->faces.size());
+			memcpy(chart->faces.data(), uvChart->faces.data(), sizeof(uint32_t) * uvChart->faces.size());
 			// Find unique vertices.
 			vertexUsed.clearAll();
 			for (uint32_t i = 0; i < chart->indexCount; i++) {
@@ -6981,30 +7023,30 @@ struct Atlas
 				boundary.push_back(chart->uniqueVertexAt(v));
 			XA_DEBUG_ASSERT(boundary.size() > 0);
 			// Compute bounding box of chart.
-			m_boundingBox.compute(boundary.data(), boundary.size(), boundary.data(), boundary.size());
-			chart->majorAxis = m_boundingBox.majorAxis();
-			chart->minorAxis = m_boundingBox.minorAxis();
-			chart->minCorner = m_boundingBox.minCorner();
-			chart->maxCorner = m_boundingBox.maxCorner();
+			boundingBox.compute(boundary.data(), boundary.size(), boundary.data(), boundary.size());
+			chart->majorAxis = boundingBox.majorAxis();
+			chart->minorAxis = boundingBox.minorAxis();
+			chart->minCorner = boundingBox.minCorner();
+			chart->maxCorner = boundingBox.maxCorner();
 			m_charts.push_back(chart);
 		}
 	}
 
 	// Pack charts in the smallest possible rectangle.
-	bool packCharts(TaskScheduler *taskScheduler, const PackOptions &options, ProgressFunc progressFunc, void *progressUserData)
+    PackChartsError::Enum packCharts(TaskScheduler *taskScheduler, const PackOptions &options, ProgressFunc progressFunc, void *progressUserData)
 	{
 		if (progressFunc) {
 			if (!progressFunc(ProgressCategory::PackCharts, 0, progressUserData))
-				return false;
+				return PackChartsError::Error;
 		}
 		const uint32_t chartCount = m_charts.size();
 		XA_PRINT("Packing %u charts\n", chartCount);
 		if (chartCount == 0) {
 			if (progressFunc) {
 				if (!progressFunc(ProgressCategory::PackCharts, 100, progressUserData))
-					return false;
+					return PackChartsError::Error;
 			}
-			return true;
+			return PackChartsError::Success;
 		}
 		uint32_t resolution = options.resolution;
 		m_texelsPerUnit = options.texelsPerUnit;
@@ -7135,93 +7177,102 @@ struct Atlas
 		int atlasWidth = 0, atlasHeight = 0;
 		const bool resizableAtlas = !(options.resolution > 0 && options.texelsPerUnit > 0.0f);
 		int progress = 0;
-		for (uint32_t i = 0; i < chartCount; i++) {
-			uint32_t c = ranks[chartCount - i - 1]; // largest chart first
-			Chart *chart = m_charts[c];
-			// @@ Add special cases for dot and line charts. @@ Lightmap rasterizer also needs to handle these special cases.
-			// @@ We could also have a special case for chart quads. If the quad surface <= 4 texels, align vertices with texel centers and do not add padding. May be very useful for foliage.
-			// @@ In general we could reduce the padding of all charts by one texel by using a rasterizer that takes into account the 2-texel footprint of the tent bilinear filter. For example,
-			// if we have a chart that is less than 1 texel wide currently we add one texel to the left and one texel to the right creating a 3-texel-wide bitImage. However, if we know that the
-			// chart is only 1 texel wide we could align it so that it only touches the footprint of two texels:
-			//      |   |      <- Touches texels 0, 1 and 2.
-			//    |   |        <- Only touches texels 0 and 1.
-			// \   \ / \ /   /
-			//  \   X   X   /
-			//   \ / \ / \ /
-			//    V   V   V
-			//    0   1   2
-			XA_PROFILE_START(packChartsRasterize)
-			// Leave room for padding.
-			chartBitImage.resize(ftoi_ceil(chartExtents[c].x) + 1 + options.padding * 2, ftoi_ceil(chartExtents[c].y) + 1 + options.padding * 2, true);
-			if (chart->allowRotate)
-				chartBitImageRotated.resize(chartBitImage.height(), chartBitImage.width(), true);
-			// Rasterize chart faces.
-			const uint32_t faceCount = chart->indexCount / 3;
-			for (uint32_t f = 0; f < faceCount; f++) {
-				// Offset vertices by padding.
-				Vector2 vertices[3];
-				for (uint32_t v = 0; v < 3; v++)
-					vertices[v] = chart->vertices[chart->indices[f * 3 + v]] + Vector2(0.5f) + Vector2(float(options.padding));
-				DrawTriangleCallbackArgs args;
-				args.chartBitImage = &chartBitImage;
-				args.chartBitImageRotated = chart->allowRotate ? &chartBitImageRotated : nullptr;
-				raster::drawTriangle(Vector2((float)chartBitImage.width(), (float)chartBitImage.height()), vertices, drawTriangleCallback, &args);
-			}
-			// Expand chart by padding pixels. (dilation)
-			BitImage chartBitImageNoPadding(chartBitImage), chartBitImageNoPaddingRotated(chartBitImageRotated);
-			if (options.padding > 0) {
-				XA_PROFILE_START(packChartsDilate)
-				chartBitImage.dilate(options.padding);
-				if (chart->allowRotate)
-					chartBitImageRotated.dilate(options.padding);
-				XA_PROFILE_END(packChartsDilate)
-			}
-			XA_PROFILE_END(packChartsRasterize)
-			// Update brute force bucketing.
-			if (options.bruteForce) {
-				if (chartOrderArray[c] > minChartPerimeter && chartOrderArray[c] <= maxChartPerimeter - (chartPerimeterBucketSize * (currentChartBucket + 1))) {
-					// Moved to a smaller bucket, reset start location.
-					for (uint32_t j = 0; j < chartStartPositions.size(); j++)
-						chartStartPositions[j] = Vector2i(0, 0);
-					currentChartBucket++;
-				}
-			}
-			// Find a location to place the chart in the atlas.
-			uint32_t currentAtlas = 0;
-			int best_x = 0, best_y = 0;
-			int best_cw = 0, best_ch = 0;
-			int best_r = 0;
-			for (;;)
-			{
-				bool firstChartInBitImage = false;
-				if (currentAtlas + 1 > m_bitImages.size()) {
-					// Chart doesn't fit in the current bitImage, create a new one.
-					BitImage *bi = XA_NEW(MemTag::Default, BitImage);
-					bi->resize(resolution, resolution, true);
-					m_bitImages.push_back(bi);
-					firstChartInBitImage = true;
-					if (createImage)
-						m_atlasImages.push_back(XA_NEW(MemTag::Default, AtlasImage, resolution, resolution));
-					// Start positions are per-atlas, so create a new one of those too.
-					chartStartPositions.push_back(Vector2i(0, 0));
-				}
-				XA_PROFILE_START(packChartsFindLocation)
-				const bool foundLocation = findChartLocation(taskScheduler, chartStartPositions[currentAtlas], options.bruteForce, m_bitImages[currentAtlas], &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, &best_x, &best_y, &best_cw, &best_ch, &best_r, options.blockAlign, resizableAtlas, chart->allowRotate);
-				XA_PROFILE_END(packChartsFindLocation)
-				if (firstChartInBitImage && !foundLocation) {
-					// Chart doesn't fit in an empty, newly allocated bitImage. texelsPerUnit must be too large for the resolution.
-					XA_ASSERT(true && "chart doesn't fit");
-					break;
-				}
-				if (resizableAtlas) {
-					XA_DEBUG_ASSERT(foundLocation);
-					break;
-				}
-				if (foundLocation)
-					break;
-				// Chart doesn't fit in the current bitImage, try the next one.
-				currentAtlas++;
-			}
+        for (uint32_t i = 0; i < chartCount; i++) {
+            uint32_t c = ranks[chartCount - i - 1]; // largest chart first
+            Chart* chart = m_charts[c];
+            // @@ Add special cases for dot and line charts. @@ Lightmap rasterizer also needs to handle these special cases.
+            // @@ We could also have a special case for chart quads. If the quad surface <= 4 texels, align vertices with texel centers and do not add padding. May be very useful for foliage.
+            // @@ In general we could reduce the padding of all charts by one texel by using a rasterizer that takes into account the 2-texel footprint of the tent bilinear filter. For example,
+            // if we have a chart that is less than 1 texel wide currently we add one texel to the left and one texel to the right creating a 3-texel-wide bitImage. However, if we know that the
+            // chart is only 1 texel wide we could align it so that it only touches the footprint of two texels:
+            //      |   |      <- Touches texels 0, 1 and 2.
+            //    |   |        <- Only touches texels 0 and 1.
+            // \   \ / \ /   /
+            //  \   X   X   /
+            //   \ / \ / \ /
+            //    V   V   V
+            //    0   1   2
+            XA_PROFILE_START(packChartsRasterize)
+                // Leave room for padding.
+                chartBitImage.resize(ftoi_ceil(chartExtents[c].x) + 1 + options.padding * 2, ftoi_ceil(chartExtents[c].y) + 1 + options.padding * 2, true);
+            if (chart->allowRotate)
+                chartBitImageRotated.resize(chartBitImage.height(), chartBitImage.width(), true);
+            // Rasterize chart faces.
+            const uint32_t faceCount = chart->indexCount / 3;
+            for (uint32_t f = 0; f < faceCount; f++) {
+                // Offset vertices by padding.
+                Vector2 vertices[3];
+                for (uint32_t v = 0; v < 3; v++)
+                    vertices[v] = chart->vertices[chart->indices[f * 3 + v]] + Vector2(0.5f) + Vector2(float(options.padding));
+                DrawTriangleCallbackArgs args;
+                args.chartBitImage = &chartBitImage;
+                args.chartBitImageRotated = chart->allowRotate ? &chartBitImageRotated : nullptr;
+                raster::drawTriangle(Vector2((float)chartBitImage.width(), (float)chartBitImage.height()), vertices, drawTriangleCallback, &args);
+            }
+            // Expand chart by padding pixels. (dilation)
+            BitImage chartBitImageNoPadding(chartBitImage), chartBitImageNoPaddingRotated(chartBitImageRotated);
+            if (options.padding > 0) {
+                XA_PROFILE_START(packChartsDilate)
+                    chartBitImage.dilate(options.padding);
+                if (chart->allowRotate)
+                    chartBitImageRotated.dilate(options.padding);
+                XA_PROFILE_END(packChartsDilate)
+            }
+            XA_PROFILE_END(packChartsRasterize)
+                // Update brute force bucketing.
+                if (options.bruteForce) {
+                    if (chartOrderArray[c] > minChartPerimeter && chartOrderArray[c] <= maxChartPerimeter - (chartPerimeterBucketSize * (currentChartBucket + 1))) {
+                        // Moved to a smaller bucket, reset start location.
+                        for (uint32_t j = 0; j < chartStartPositions.size(); j++)
+                            chartStartPositions[j] = Vector2i(0, 0);
+                        currentChartBucket++;
+                    }
+                }
+            // Find a location to place the chart in the atlas.
+            uint32_t currentAtlas = 0;
+            int best_x = 0, best_y = 0;
+            int best_cw = 0, best_ch = 0;
+            int best_r = 0;
+            bool failed = false;
+            for (;;)
+            {
+                bool firstChartInBitImage = false;
+                if (currentAtlas + 1 > m_bitImages.size()) {
+                    // Chart doesn't fit in the current bitImage, create a new one.
+                    BitImage* bi = XA_NEW(MemTag::Default, BitImage);
+                    bi->resize(resolution, resolution, true);
+                    m_bitImages.push_back(bi);
+                    firstChartInBitImage = true;
+                    if (createImage)
+                        m_atlasImages.push_back(XA_NEW(MemTag::Default, AtlasImage, resolution, resolution));
+                    // Start positions are per-atlas, so create a new one of those too.
+                    chartStartPositions.push_back(Vector2i(0, 0));
+                }
+                XA_PROFILE_START(packChartsFindLocation)
+                    const bool foundLocation = findChartLocation(taskScheduler, chartStartPositions[currentAtlas], options.bruteForce, m_bitImages[currentAtlas], &chartBitImage, &chartBitImageRotated, atlasWidth, atlasHeight, &best_x, &best_y, &best_cw, &best_ch, &best_r, options.blockAlign, resizableAtlas, chart->allowRotate);
+                XA_PROFILE_END(packChartsFindLocation)
+                    if (firstChartInBitImage && !foundLocation) {
+                        // Chart doesn't fit in an empty, newly allocated bitImage. texelsPerUnit must be too large for the resolution.
+                        failed = true;
+                        break;
+                    }
+                if (resizableAtlas) {
+                    XA_DEBUG_ASSERT(foundLocation);
+                    break;
+                }
+                if (foundLocation)
+                    break;
+                // Chart doesn't fit in the current bitImage, try the next one.
+                currentAtlas++;
+            }
+            if (failed)
+            {
+                printf("ERROR XATLAS! chart doesn't fit!\n");
+                return PackChartsError::ChartDoesntFit;
+            }
+			XA_ASSERT(!failed && "chart doesn't fit");
+			if (failed)
+				continue;
 			// Update brute force start location.
 			if (options.bruteForce) {
 				// Reset start location if the chart expanded the atlas.
@@ -7273,7 +7324,7 @@ struct Atlas
 				if (newProgress != progress) {
 					progress = newProgress;
 					if (!progressFunc(ProgressCategory::PackCharts, progress, progressUserData))
-						return false;
+						return PackChartsError::Error;
 				}
 			}
 		}
@@ -7286,12 +7337,16 @@ struct Atlas
 		XA_PRINT("   %dx%d resolution\n", m_width, m_height);
 		m_utilization.resize(m_bitImages.size());
 		for (uint32_t i = 0; i < m_utilization.size(); i++) {
-			uint32_t count = 0;
-			for (uint32_t y = 0; y < m_height; y++) {
-				for (uint32_t x = 0; x < m_width; x++)
-					count += m_bitImages[i]->bitAt(x, y);
+			if (m_width == 0 || m_height == 0)
+				m_utilization[i] = 0.0f;
+			else {
+				uint32_t count = 0;
+				for (uint32_t y = 0; y < m_height; y++) {
+					for (uint32_t x = 0; x < m_width; x++)
+						count += m_bitImages[i]->bitAt(x, y);
+				}
+				m_utilization[i] = float(count) / (m_width * m_height);
 			}
-			m_utilization[i] = float(count) / (m_width * m_height);
 			if (m_utilization.size() > 1) {
 				XA_PRINT("   %u: %f%% utilization\n", i, m_utilization[i] * 100.0f);
 			}
@@ -7308,9 +7363,9 @@ struct Atlas
 #endif
 		if (progressFunc && progress != 100) {
 			if (!progressFunc(ProgressCategory::PackCharts, 100, progressUserData))
-				return false;
+				return PackChartsError::Error;
 		}
-		return true;
+		return PackChartsError::Success;
 	}
 
 private:
@@ -7477,7 +7532,6 @@ private:
 	Array<AtlasImage *> m_atlasImages;
 	Array<float> m_utilization;
 	Array<BitImage *> m_bitImages;
-	BoundingBox2D m_boundingBox;
 	Array<Chart *> m_charts;
 	RadixSort m_radix;
 	uint32_t m_width = 0;
@@ -7518,8 +7572,8 @@ static void DestroyOutputMeshes(Context *ctx)
 	for (int i = 0; i < (int)ctx->atlas.meshCount; i++) {
 		Mesh &mesh = ctx->atlas.meshes[i];
 		for (uint32_t j = 0; j < mesh.chartCount; j++) {
-			if (mesh.chartArray[j].indexArray)
-				XA_FREE(mesh.chartArray[j].indexArray);
+			if (mesh.chartArray[j].faceArray)
+				XA_FREE(mesh.chartArray[j].faceArray);
 		}
 		if (mesh.chartArray)
 			XA_FREE(mesh.chartArray);
@@ -7704,13 +7758,14 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 	else {
 		ctx->addMeshProgress->setMaxValue(internal::max(ctx->meshCount + 1, meshCountHint));
 	}
-	bool decoded = (meshDecl.indexCount <= 0);
-	uint32_t indexCount = decoded ? meshDecl.vertexCount : meshDecl.indexCount;
+	XA_PROFILE_START(addMeshCopyData)
+	const bool hasIndices = meshDecl.indexCount > 0;
+	const uint32_t indexCount = hasIndices ? meshDecl.indexCount : meshDecl.vertexCount;
 	XA_PRINT("Adding mesh %d: %u vertices, %u triangles\n", ctx->meshCount, meshDecl.vertexCount, indexCount / 3);
 	// Expecting triangle faces.
 	if ((indexCount % 3) != 0)
 		return AddMeshError::InvalidIndexCount;
-	if (!decoded) {
+	if (hasIndices) {
 		// Check if any index is out of range.
 		for (uint32_t i = 0; i < indexCount; i++) {
 			const uint32_t index = DecodeIndex(meshDecl.indexFormat, meshDecl.indexData, meshDecl.indexOffset, i);
@@ -7734,7 +7789,7 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 	for (uint32_t i = 0; i < indexCount / 3; i++) {
 		uint32_t tri[3];
 		for (int j = 0; j < 3; j++)
-			tri[j] = decoded ? i * 3 + j : DecodeIndex(meshDecl.indexFormat, meshDecl.indexData, meshDecl.indexOffset, i * 3 + j);
+			tri[j] = hasIndices ? DecodeIndex(meshDecl.indexFormat, meshDecl.indexData, meshDecl.indexOffset, i * 3 + j) : i * 3 + j;
 		bool ignore = false;
 		// Check for degenerate or zero length edges.
 		for (int j = 0; j < 3; j++) {
@@ -7775,6 +7830,7 @@ AddMeshError::Enum AddMesh(Atlas *atlas, const MeshDecl &meshDecl, uint32_t mesh
 			ignore = true;
 		mesh->addFace(tri[0], tri[1], tri[2], ignore);
 	}
+	XA_PROFILE_END(addMeshCopyData)
 	if (ctx->addMeshTaskGroup.value == UINT32_MAX)
 		ctx->addMeshTaskGroup = ctx->taskScheduler->createTaskGroup();
 	AddMeshTaskArgs *taskArgs = XA_NEW(internal::MemTag::Default, AddMeshTaskArgs); // The task frees this.
@@ -7807,6 +7863,7 @@ void AddMeshJoin(Atlas *atlas)
 	internal::s_profile.addMeshReal = clock() - internal::s_profile.addMeshReal;
 #endif
 	XA_PROFILE_PRINT_AND_RESET("   Total (real): ", addMeshReal)
+	XA_PROFILE_PRINT_AND_RESET("      Copy data: ", addMeshCopyData)
 	XA_PROFILE_PRINT_AND_RESET("   Total (thread): ", addMeshThread)
 	XA_PROFILE_PRINT_AND_RESET("      Create colocals: ", addMeshCreateColocals)
 	XA_PROFILE_PRINT_AND_RESET("      Create face groups: ", addMeshCreateFaceGroups)
@@ -7892,7 +7949,6 @@ AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 			vertexToFaceMap.add(meshInstance->texcoords[mesh->indices[i]], i / 3);
 		internal::BitArray faceAssigned(faceCount);
 		faceAssigned.clearAll();
-		internal::Array<uint32_t> chartFaces;
 		for (uint32_t f = 0; f < faceCount; f++) {
 			if (faceAssigned.bitAt(f))
 				continue;
@@ -7901,13 +7957,12 @@ AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 			chart->material = decl.faceMaterialData ? decl.faceMaterialData[f] : 0;
 			// Walk incident faces and assign them to the chart.
 			faceAssigned.setBitAt(f);
-			chartFaces.clear();
-			chartFaces.push_back(f);
+			chart->faces.push_back(f);
 			for (;;) {
 				bool newFaceAssigned = false;
-				const uint32_t faceCount2 = chartFaces.size();
+				const uint32_t faceCount2 = chart->faces.size();
 				for (uint32_t f2 = 0; f2 < faceCount2; f2++) {
-					const uint32_t face = chartFaces[f2];
+					const uint32_t face = chart->faces[f2];
 					for (uint32_t i = 0; i < 3; i++) {
 						const internal::Vector2 &texcoord = meshInstance->texcoords[meshInstance->mesh->indices[face * 3 + i]];
 						uint32_t mapFaceIndex = vertexToFaceMap.get(texcoord);
@@ -7916,7 +7971,7 @@ AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 							// Materials must match.
 							if (!faceAssigned.bitAt(face2) && (!decl.faceMaterialData || decl.faceMaterialData[face] == decl.faceMaterialData[face2])) {
 								faceAssigned.setBitAt(face2);
-								chartFaces.push_back(face2);
+								chart->faces.push_back(face2);
 								newFaceAssigned = true;
 							}
 							mapFaceIndex = vertexToFaceMap.getNext(mapFaceIndex);
@@ -7926,9 +7981,9 @@ AddMeshError::Enum AddUvMesh(Atlas *atlas, const UvMeshDecl &decl)
 				if (!newFaceAssigned)
 					break;
 			}
-			for (uint32_t i = 0; i < chartFaces.size(); i++) {
+			for (uint32_t i = 0; i < chart->faces.size(); i++) {
 				for (uint32_t j = 0; j < 3; j++) {
-					const uint32_t vertex = meshInstance->mesh->indices[chartFaces[i] * 3 + j];
+					const uint32_t vertex = meshInstance->mesh->indices[chart->faces[i] * 3 + j];
 					chart->indices.push_back(vertex);
 					mesh->vertexToChartMap[vertex] = mesh->charts.size();
 				}
@@ -8071,7 +8126,7 @@ void ParameterizeCharts(Atlas *atlas, ParameterizeFunc func)
 	XA_PRINT("   %u planar charts, %u ortho charts, %u other\n", planarChartsCount, orthoChartsCount, chartCount - (planarChartsCount + orthoChartsCount));
 	if (chartsDeletedCount > 0) {
 		XA_PRINT("   %u charts deleted due to invalid parameterizations, %u new charts added\n", chartsDeletedCount, chartsAddedCount);
-		XA_PRINT("   %u charts\n", ctx->paramAtlas.chartCount());
+		XA_PRINT("   %u charts\n", chartCount);
 	}
 	uint32_t chartIndex = 0, invalidParamCount = 0;
 	for (uint32_t i = 0; i < ctx->meshCount; i++) {
@@ -8138,57 +8193,60 @@ void ParameterizeCharts(Atlas *atlas, ParameterizeFunc func)
 	XA_PRINT_MEM_USAGE
 }
 
-void PackCharts(Atlas *atlas, PackOptions packOptions)
+PackChartsError::Enum PackCharts(Atlas* atlas, PackOptions packOptions)
 {
-	// Validate arguments and context state.
-	if (!atlas) {
-		XA_PRINT_WARNING("PackCharts: atlas is null.\n");
-		return;
-	}
-	Context *ctx = (Context *)atlas;
-	if (ctx->meshCount == 0 && ctx->uvMeshInstances.isEmpty()) {
-		XA_PRINT_WARNING("PackCharts: No meshes. Call AddMesh or AddUvMesh first.\n");
-		return;
-	}
-	if (ctx->uvMeshInstances.isEmpty()) {
-		if (!ctx->paramAtlas.chartsComputed()) {
-			XA_PRINT_WARNING("PackCharts: ComputeCharts must be called first.\n");
-			return;
-		}
-		if (!ctx->paramAtlas.chartsParameterized()) {
-			XA_PRINT_WARNING("PackCharts: ParameterizeCharts must be called first.\n");
-			return;
-		}
-	}
-	if (packOptions.texelsPerUnit < 0.0f) {
-		XA_PRINT_WARNING("PackCharts: PackOptions::texelsPerUnit is negative.\n");
-		packOptions.texelsPerUnit = 0.0f;
-	}
-	// Cleanup atlas.
-	DestroyOutputMeshes(ctx);
-	if (atlas->utilization) {
-		XA_FREE(atlas->utilization);
-		atlas->utilization = nullptr;
-	}
-	if (atlas->image) {
-		XA_FREE(atlas->image);
-		atlas->image = nullptr;
-	}
-	atlas->meshCount = 0;
-	// Pack charts.
-	internal::pack::Atlas packAtlas;
-	if (!ctx->uvMeshInstances.isEmpty()) {
-		for (uint32_t i = 0; i < ctx->uvMeshInstances.size(); i++)
-			packAtlas.addUvMeshCharts(ctx->uvMeshInstances[i]);
-	}
-	else if (ctx->paramAtlas.chartCount() > 0) {
-		ctx->paramAtlas.restoreOriginalChartTexcoords();
-		for (uint32_t i = 0; i < ctx->paramAtlas.chartCount(); i++)
-			packAtlas.addChart(ctx->paramAtlas.chartAt(i));
-	}
-	XA_PROFILE_START(packCharts)
-	if (!packAtlas.packCharts(ctx->taskScheduler, packOptions, ctx->progressFunc, ctx->progressUserData))
-		return;
+    // Validate arguments and context state.
+    if (!atlas) {
+        XA_PRINT_WARNING("PackCharts: atlas is null.\n");
+        return PackChartsError::Error;
+    }
+    Context* ctx = (Context*)atlas;
+    if (ctx->meshCount == 0 && ctx->uvMeshInstances.isEmpty()) {
+        XA_PRINT_WARNING("PackCharts: No meshes. Call AddMesh or AddUvMesh first.\n");
+        return PackChartsError::Error;
+    }
+    if (ctx->uvMeshInstances.isEmpty()) {
+        if (!ctx->paramAtlas.chartsComputed()) {
+            XA_PRINT_WARNING("PackCharts: ComputeCharts must be called first.\n");
+            return PackChartsError::Error;
+        }
+        if (!ctx->paramAtlas.chartsParameterized()) {
+            XA_PRINT_WARNING("PackCharts: ParameterizeCharts must be called first.\n");
+            return PackChartsError::Error;
+        }
+    }
+    if (packOptions.texelsPerUnit < 0.0f) {
+        XA_PRINT_WARNING("PackCharts: PackOptions::texelsPerUnit is negative.\n");
+        packOptions.texelsPerUnit = 0.0f;
+    }
+    // Cleanup atlas.
+    DestroyOutputMeshes(ctx);
+    if (atlas->utilization) {
+        XA_FREE(atlas->utilization);
+        atlas->utilization = nullptr;
+    }
+    if (atlas->image) {
+        XA_FREE(atlas->image);
+        atlas->image = nullptr;
+    }
+    atlas->meshCount = 0;
+    // Pack charts.
+    XA_PROFILE_START(packChartsAddCharts)
+        internal::pack::Atlas packAtlas;
+    if (!ctx->uvMeshInstances.isEmpty()) {
+        for (uint32_t i = 0; i < ctx->uvMeshInstances.size(); i++)
+            packAtlas.addUvMeshCharts(ctx->uvMeshInstances[i]);
+    }
+    else
+        packAtlas.addCharts(ctx->taskScheduler, &ctx->paramAtlas);
+    XA_PROFILE_END(packChartsAddCharts)
+        XA_PROFILE_START(packCharts)
+        PackChartsError::Enum packChartsResult = packAtlas.packCharts(ctx->taskScheduler, packOptions, ctx->progressFunc, ctx->progressUserData);
+    if (packChartsResult != PackChartsError::Success || packChartsResult == PackChartsError::ChartDoesntFit)
+    {
+        return packChartsResult;
+    }
+
 	XA_PROFILE_END(packCharts)
 	// Populate atlas object with pack results.
 	atlas->atlasCount = packAtlas.getNumAtlases();
@@ -8207,6 +8265,9 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 			packAtlas.getImages()[i]->copyTo(&atlas->image[atlas->width * atlas->height * i], atlas->width, atlas->height);
 	}
 	XA_PROFILE_PRINT_AND_RESET("   Total: ", packCharts)
+	XA_PROFILE_PRINT_AND_RESET("      Add charts (real): ", packChartsAddCharts)
+	XA_PROFILE_PRINT_AND_RESET("      Add charts (thread): ", packChartsAddChartsThread)
+	XA_PROFILE_PRINT_AND_RESET("         Restore texcoords: ", packChartsAddChartsRestoreTexcoords)
 	XA_PROFILE_PRINT_AND_RESET("      Rasterize: ", packChartsRasterize)
 	XA_PROFILE_PRINT_AND_RESET("      Dilate (padding): ", packChartsDilate)
 	XA_PROFILE_PRINT_AND_RESET("      Find location (real): ", packChartsFindLocation)
@@ -8214,10 +8275,11 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 	XA_PROFILE_PRINT_AND_RESET("      Blit: ", packChartsBlit)
 	XA_PRINT_MEM_USAGE
 	XA_PRINT("Building output meshes\n");
+	XA_PROFILE_START(buildOutputMeshes)
 	int progress = 0;
 	if (ctx->progressFunc) {
 		if (!ctx->progressFunc(ProgressCategory::BuildOutputMeshes, 0, ctx->progressUserData))
-			return;
+			return PackChartsError::Error;
 	}
 	if (ctx->uvMeshInstances.isEmpty())
 		atlas->meshCount = ctx->meshCount;
@@ -8249,8 +8311,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 			outputMesh.chartArray = XA_ALLOC_ARRAY(internal::MemTag::Default, Chart, outputMesh.chartCount);
 			XA_PRINT("   mesh %u: %u vertices, %u triangles, %u charts\n", i, outputMesh.vertexCount, outputMesh.indexCount / 3, outputMesh.chartCount);
 			// Copy mesh data.
-			uint32_t firstVertex = 0;
-			uint32_t meshChartIndex = 0;
+			uint32_t firstVertex = 0, meshChartIndex = 0;
 			for (uint32_t cg = 0; cg < ctx->paramAtlas.chartGroupCount(i); cg++) {
 				const internal::param::ChartGroup *chartGroup = ctx->paramAtlas.chartGroupAt(i, cg);
 				if (chartGroup->isVertexMap()) {
@@ -8299,16 +8360,14 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 						outputChart->flags = 0;
 						if (chart->paramQuality().boundaryIntersection || chart->paramQuality().flippedTriangleCount > 0)
 							outputChart->flags |= ChartFlags::Invalid;
-						outputChart->indexCount = mesh->faceCount() * 3;
-						outputChart->indexArray = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, outputChart->indexCount);
-						for (uint32_t f = 0; f < mesh->faceCount(); f++) {
-							for (uint32_t j = 0; j < 3; j++)
-								outputChart->indexArray[3 * f + j] = firstVertex + mesh->vertexAt(f * 3 + j);
-						}
+						outputChart->faceCount = mesh->faceCount();
+						outputChart->faceArray = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, outputChart->faceCount);
+						for (uint32_t f = 0; f < outputChart->faceCount; f++)
+							outputChart->faceArray[f] = chartGroup->mapFaceToSourceFace(chart->mapFaceToSourceFace(f));
 						outputChart->material = 0;
 						meshChartIndex++;
 						chartIndex++;
-						firstVertex += chart->mesh()->vertexCount();
+						firstVertex += mesh->vertexCount();
 					}
 				}
 			}
@@ -8319,7 +8378,7 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 				if (newProgress != progress) {
 					progress = newProgress;
 					if (!ctx->progressFunc(ProgressCategory::BuildOutputMeshes, progress, ctx->progressUserData))
-						return;
+                        return PackChartsError::Error;
 				}
 			}
 		}
@@ -8362,10 +8421,11 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 				const internal::pack::Chart *chart = packAtlas.getChart(chartIndex);
 				XA_DEBUG_ASSERT(chart->atlasIndex >= 0);
 				outputChart->atlasIndex = (uint32_t)chart->atlasIndex;
-				outputChart->indexCount = chart->indexCount;
-				outputChart->indexArray = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, outputChart->indexCount);
+				outputChart->faceCount = chart->faces.size();
+				outputChart->faceArray = XA_ALLOC_ARRAY(internal::MemTag::Default, uint32_t, outputChart->faceCount);
 				outputChart->material = chart->material;
-				memcpy(outputChart->indexArray, chart->indices, chart->indexCount * sizeof(uint32_t));
+				for (uint32_t f = 0; f < outputChart->faceCount; f++)
+					outputChart->faceArray[f] = chart->faces[f];
 				chartIndex++;
 			}
 			if (ctx->progressFunc) {
@@ -8373,14 +8433,21 @@ void PackCharts(Atlas *atlas, PackOptions packOptions)
 				if (newProgress != progress) {
 					progress = newProgress;
 					if (!ctx->progressFunc(ProgressCategory::BuildOutputMeshes, progress, ctx->progressUserData))
-						return;
+                        return PackChartsError::Error;
 				}
 			}
 		}
 	}
-	if (ctx->progressFunc && progress != 100)
-		ctx->progressFunc(ProgressCategory::BuildOutputMeshes, 100, ctx->progressUserData);
-	XA_PRINT_MEM_USAGE
+    if (ctx->progressFunc && progress != 100)
+    {
+        ctx->progressFunc(ProgressCategory::BuildOutputMeshes, 100, ctx->progressUserData);
+    }
+
+    XA_PROFILE_END(buildOutputMeshes)
+    XA_PROFILE_PRINT_AND_RESET("   Total: ", buildOutputMeshes)
+    XA_PRINT_MEM_USAGE
+
+    return PackChartsError::Success;
 }
 
 void Generate(Atlas *atlas, ChartOptions chartOptions, ParameterizeFunc paramFunc, PackOptions packOptions)
