@@ -130,7 +130,7 @@ public:
     std::vector<CIMGArchiveFile> imgArchiveCustomFiles;
 };
 
-bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* ptempClass, CIMGArchiveFile* pDFFArchiveFile, CIDELoader& ideLoader)
+bool OptimizeDFFFile(size_t modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* ptempClass, CIMGArchiveFile* pDFFArchiveFile, CIDELoader& ideLoader)
 {
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
     auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
@@ -141,15 +141,14 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
     /*
     // REMOVE LATER
     int         modelID = 0;
-    const char* pStrDFFName = "cj_bag_reclaim.dff";            //"infernus.dff";
-    memcpy(pDFFArchiveFile->fileEntry->fileName, pStrDFFName, strlen(pStrDFFName) + 1);
+    const char* pStrDFFName = "des_cluckinlod.dff";            //"infernus.dff";
+    memcpy(pDFFArchiveFile->fileEntry.fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("cj_airprt.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("lod_countryn.txd", CBuffer(), false);
     // REMOVE END
-     */
+    */
 
     const unsigned int uiDFFNameHash = HashString(pDFFArchiveFile->fileEntry.fileName);
-
     SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
     {
@@ -189,7 +188,6 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
 
     // /*
     int modelID = pDFFDescriptor->GetModelID();
-
     if (IsVehicleModel(modelID))
     {
         pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
@@ -199,11 +197,11 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
     pRenderWare->SetCurrentDFFWriteModelID(modelID);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
-    bool bLoadCollision = IsVehicleModel(modelID);
-    // RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry->fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    printf("\nabout to read: %s | size: %u | modelIndexInImg: %d\n\n", pDFFArchiveFile->fileEntry.fileName, pDFFArchiveFile->actualFileSize, modelIndexInImg);
+    printf("\nabout to read: %s | size: %u | modelIndexInImg: %u\n\n", (char*)pDFFArchiveFile->fileEntry.fileName,pDFFArchiveFile->actualFileSize, modelIndexInImg);
 
+        bool     bLoadCollision = IsVehicleModel(modelID);
     RwBuffer buffer = {pDFFArchiveFile->GetData(), pDFFArchiveFile->actualFileSize};
+    //RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
     RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, buffer, modelID, bLoadCollision, pTxdDictionary);
     pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
     if (pClump)
@@ -243,10 +241,10 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
         dffArchiveFile.fileEntry.usSize = dffArchiveFile.actualFileSize / 2048;
         dffArchiveFile.fileByteBuffer.SetSize(dffArchiveFile.actualFileSize);
         void* pDFFData = dffArchiveFile.fileByteBuffer.GetData();
-        pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
+        //pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
 
         // Remove this line later
-        // pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
+         pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
 
         ///*
         if (pAtlasTxdDictionary)
@@ -273,7 +271,7 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
             void* pTXDData = txdArchiveFile.fileByteBuffer.GetData();
             //pRenderWare->WriteTXD(pTXDData, txdArchiveFile.actualFileSize, pAtlasTxdDictionary);
             // Remove this line later
-            // pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
+            pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
         }
         //*/
         if (bLoadCollision)
@@ -297,7 +295,7 @@ bool OptimizeDFFFile(int modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* 
 }
 
 // 5 mb
-const unsigned int imgReadWriteOperationSizeInBytes = 5 * 1024 * 1024;
+const unsigned int imgReadWriteOperationSizeInBytes = 50 * 1024 * 1024;
 
 bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 {
@@ -344,18 +342,12 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     totalPossibleCustomOutputFiles *= 2;            // each DFF will have its own TXD, so multiply the amount by 2
     pMyTempClass->imgArchiveCustomFiles.reserve(totalPossibleCustomOutputFiles);
 
-        // REMOVE THIS LATER
-        int totalModelsToOutputInImg = 250;
-    int     totalModelsAddedForOutput = 0;
-    // REMOVE END
-
-    for (auto& archiveFile : imgArchiveFiles)
+    size_t modelIndexInIMG = 527;
+    //for (auto& archiveFile : imgArchiveFiles)
+    //for (modelIndexInIMG = 0; modelIndexInIMG < imgArchiveFiles.size(); modelIndexInIMG++)
+    while (modelIndexInIMG < std::min((size_t)528, imgArchiveFiles.size()))            // std::min((size_t)1400, imgArchiveFiles.size())
     {
-        if (totalModelsAddedForOutput >= totalModelsToOutputInImg)
-        {
-            break;
-        }
-
+        CIMGArchiveFile& archiveFile = imgArchiveFiles[modelIndexInIMG];
         SString strFileName = archiveFile.fileEntry.fileName;
         strFileName = strFileName.ToLower();
 
@@ -368,16 +360,19 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
         if (strFileExtension == "dff")
         {
-            if (OptimizeDFFFile(totalModelsAddedForOutput, newIMgArchive, pMyTempClass, &archiveFile, ideLoader))
+            if (OptimizeDFFFile(modelIndexInIMG, newIMgArchive, pMyTempClass, &archiveFile, ideLoader))
             {
-                // REMOVE THIS LATER
-                // break;
-                // REMOVE NED
             }
         }
-        totalModelsAddedForOutput++;
+
+        modelIndexInIMG++;
+
+        // REMOVE LATER
+        //break;
+        // REMOVE END
     }
 
+    printf("\n[ABOUT TO WRITE] modelIndexInIMG: %u\n\n", modelIndexInIMG);
     for (auto& customArchiveFile : pMyTempClass->imgArchiveCustomFiles)
     {
         imgArchiveFilesOutput.emplace_back(&customArchiveFile);

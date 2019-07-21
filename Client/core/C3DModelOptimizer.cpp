@@ -15,10 +15,156 @@ C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDi
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 
+    // REMOVE THIS LINE LATER
+    // OutputClumpAsOBJ();
+    ///*
+    RemoveAtomicsWithNoUVDataFromList();
+
+    if (!outAtomicList.empty())
+    {
+        GetUsedTexturesCount();
+        if (setOfUsedTextures.size() >= minimumModelUsedTexturesRequired)
+        {
+            CreateTXDAtlas();
+        }
+    }
+    // */
+}
+
+bool C3DModelOptimizer::OutputClumpAsOBJ()
+{
+    auto RpGeometryLock = (RpGeometry * (__cdecl*)(RpGeometry * geometry, RwInt32 lockMode))0x74C7D0;
+    auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
+
+    const char* modelFilePath = "C:\\Users\\danish\\Desktop\\clump_output.obj";
+    FILE*       file;
+    if (fopen_s(&file, modelFilePath, "w") != 0)
+    {
+        printf("ReMapClumpUVs: Failed to open file\n");
+        return false;
+    }
+
+    GetTextures();
+
+    int    firstIndex = 0;
+    int    meshID = 0;
+    size_t FirstMaterialIndex = 0;
+
+    uint32_t materialIndex = UINT32_MAX;
+    uint32_t previousMaterialIndex = UINT32_MAX;
+
+    fprintf(file, "mtllib clump_output.mtl\n");
+
+    for (auto& pAtomic : outAtomicList)
+    {
+        RpGeometry*           pGeometry = pAtomic->geometry;
+        RwV3d*                pVertices = pGeometry->morphTarget->verts;
+        RwTextureCoordinates* pTextureCoordinateArray = pGeometry->texcoords[0];
+        RwV3d                 normal;
+
+        printf("geometry vertices: %d | triangles: %d\n", pGeometry->vertices_size, pGeometry->triangles_size);
+
+        for (int i = 0; i < pGeometry->vertices_size; i++)
+        {
+            VectorNormalize(&pVertices[i], &normal);
+            fprintf(file, "v %g %g %g\n", pVertices[i].x, pVertices[i].y, pVertices[i].z);
+            fprintf(file, "vn %g %g %g\n", normal.x, normal.y, normal.z);
+            // fprintf(file, "v %g %g %g\n", pVertices[i].x, pVertices[i].z, pVertices[i].y);
+            // fprintf(file, "vn %g %g %g\n", normal.x, normal.z, normal.y);
+            fprintf(file, "vt %g %g\n", pTextureCoordinateArray[i].u, 1.0f - pTextureCoordinateArray[i].v);
+        }
+        fprintf(file, "o mesh%03u\n", meshID);
+        // fprintf(file, "usemtl repack_atlas\n");
+        fprintf(file, "s off\n");
+
+        RpTriangle* triangles = pGeometry->triangles;
+        for (int i = 0; i < pGeometry->triangles_size; i++)
+        {
+            RpTriangle& triangle = triangles[i];
+
+            materialIndex = textures[FirstMaterialIndex + triangle.matIndex];
+            if (materialIndex == UINT32_MAX)
+            {
+                materialIndex = 0;
+            }
+            else
+            {
+                materialIndex += 1;
+            }
+
+            if (materialIndex != previousMaterialIndex)
+            {
+                previousMaterialIndex = materialIndex;
+                fprintf(file, "usemtl %d\n", materialIndex);
+            }
+
+            fprintf(file, "f ");
+            for (uint32_t j = 0; j < 3; j++)
+            {
+                const uint32_t index = firstIndex + triangle.vertIndex[j] + 1;            // 1-indexed
+                fprintf(file, "%d/%d/%d%c", index, index, index, j == 2 ? '\n' : ' ');
+            }
+        }
+
+        meshID++;
+        firstIndex += pAtomic->geometry->vertices_size;
+        FirstMaterialIndex += pGeometry->materials.entries;
+    }
+
+    if (file)
+    {
+        fclose(file);
+    }
+
+    // Write the model.
+    const char* materialFilename = "C:\\Users\\danish\\Desktop\\clump_output.mtl";
+    printf("Writing '%s'...\n", materialFilename);
+    if (fopen_s(&file, materialFilename, "w") != 0)
+    {
+        printf("ReMapClumpUVs: Failed to open file\n");
+        return nullptr;
+    }
+    if (file)
+    {
+        int i = 0;
+        fprintf(file, "newmtl %d\n", i);
+        fprintf(file, "Ka  0.6 0.6 0.6\n");
+        fprintf(file, "Kd  0.6 0.6 0.6\n");
+        fprintf(file, "Ks  0.0 0.0 0.0\n");
+        fprintf(file, "d  1.0\n");
+        fprintf(file, "Ns  0.0\n");
+        fprintf(file, "illum 2\n");
+
+        i = 1;
+        for (auto& dxTexture : texturesCache)
+        {
+            const std::string textureName = dxTexture.GetOriginalRwTexture()->name;
+
+            fprintf(file, "newmtl %d\n", i);
+            fprintf(file, "Ka  0.6 0.6 0.6\n");
+            fprintf(file, "Kd  0.6 0.6 0.6\n");
+            fprintf(file, "Ks  0.0 0.0 0.0\n");
+            fprintf(file, "d  1.0\n");
+            fprintf(file, "Ns  0.0\n");
+            fprintf(file, "illum 2\n");
+            fprintf(file, "map_Kd %s\n", (textureName + ".png").c_str());
+
+            i++;
+        }
+    }
+
+    if (file)
+    {
+        fclose(file);
+    }
+    return true;
+}
+void C3DModelOptimizer::RemoveAtomicsWithNoUVDataFromList()
+{
     // remove atomics with no texcoords for its geometry
     for (auto it = outAtomicList.begin(); it != outAtomicList.end();)
     {
-        if (!(*it)->geometry->texcoords[0])            //! pAtomic->geometry->texcoords[0])
+        if (!(*it)->geometry->texcoords[0])
         {
             it = outAtomicList.erase(it);
         }
@@ -26,10 +172,6 @@ C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDi
         {
             ++it;
         }
-    }
-    if (!outAtomicList.empty())
-    {
-        CreateTXDAtlas();
     }
 }
 
@@ -266,7 +408,7 @@ bool C3DModelOptimizer::IsAtlasResolutionTooBig(unsigned int bestAtlasResolution
     float        atlasSizeInBytes = (bestAtlasResolution / 4) * thePitch;
     float        atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
     const float  sizePermittedInMBs = 5.0f;
-    printf("\n[DEBUG] atlasSizeInMBs: %f\n\n", atlasSizeInMbs);
+    printf("\n[DEBUG] atlasSizeInMBs: %f | bestAtlasResolution: %u\n\n", atlasSizeInMbs, bestAtlasResolution);
     if (atlasSizeInMbs > sizePermittedInMBs)
     {
         return true;
@@ -325,29 +467,20 @@ void C3DModelOptimizer::GetUsedTexturesCount()
     {
         RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
-        for (int i = 0; i < pGeometry->triangles_size; i++)
+        for (unsigned short materialIndex = 0; materialIndex < pGeometry->materials.entries; materialIndex++)
         {
-            unsigned short materialIndex = pGeometry->triangles[i].matIndex;
-            RpMaterial*    pMaterial = pGeometry->materials.materials[materialIndex];
+            RpMaterial* pMaterial = pGeometry->materials.materials[materialIndex];
             if (pMaterial->texture)
             {
-                auto it = mapOfUsedTextures.find(pMaterial->texture);
-                if (it != mapOfUsedTextures.end())
+                if (!MapContains(setOfUsedTextures, pMaterial->texture))
                 {
-                    it->second++;
-                }
-                else
-                {
-                    mapOfUsedTextures[pMaterial->texture] = 1;
+                    setOfUsedTextures.insert(pMaterial->texture);
                 }
             }
         }
     }
 
-    for (auto& it : mapOfUsedTextures)
-    {
-        printf("\ntex: %s | usage count: %u\n\n", it.first->name, it.second);
-    }
+    printf("\ntotal Textures used: %u\n\n", setOfUsedTextures.size());
 }
 
 void C3DModelOptimizer::GetMostUsedTextureToIgnore()
@@ -373,6 +506,7 @@ void C3DModelOptimizer::DestroyMostUsedTexturesToIgnoreClones()
     {
         pRenderWare->DestroyTextureForcefully(it.second);
     }
+    m_mapOfMostUsedTexturesToIgnore.clear();
 }
 
 bool C3DModelOptimizer::AddMeshesToXatlas(xatlas::Atlas* atlas)
@@ -419,7 +553,6 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
-    GetUsedTexturesCount();
     GetMostUsedTextureToIgnore();
     GetTextures();
 
@@ -464,18 +597,20 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         return false;
     }
 
-    const float texelsPerUnit = 1.0f;
+    const float         texelsPerUnit = 1.0f;
     xatlas::PackOptions packOptions;
+
     packOptions.padding = 1;
     packOptions.texelsPerUnit = texelsPerUnit;
     xatlas::PackCharts(atlas, packOptions);
+
     uint32_t bestAtlasResolution = GetBestAtlasMaxResolution(atlas, packOptions);
 
     if (IsAtlasResolutionTooBig(bestAtlasResolution))
     {
     }
 
-    ///*
+    
     if (atlas->atlasCount <= 1)
     {
         unsigned int atlasFindingAttempts = 1;
@@ -497,7 +632,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
             atlasFindingAttempts++;
         } while (atlas->atlasCount > 1);
     }
-    //*/
+    
     printf("Copying texture data into atlas\n");
 
     CTextureAtlas& textureAtlas = CTextureAtlas(pClump, atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs);
@@ -509,8 +644,8 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     for (size_t i = 0; i < textureAtlas.atlasDXTextures.size(); i++)
     {
         CDXTexture& atlasTexture = textureAtlas.atlasDXTextures[i];
-        printf("compressing atlas texture to DXT1: index = %u\n", i);
-        assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
+        // printf("compressing atlas texture to DXT1: index = %u\n", i);
+        // assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
         sprintf(buffer, "myAtlas%d", i);
         RwTexture* pTexture = atlasTexture.GetRwTexture();
         memcpy(pTexture->name, buffer, strlen(buffer) + 1);

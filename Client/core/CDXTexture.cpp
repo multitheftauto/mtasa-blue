@@ -18,10 +18,10 @@ CDXTexture::CDXTexture(RwTexture* pTexture, eCustomRWTextureDelete deleteSetting
 {
     Initialize();
     m_deleteSetting = deleteSetting;
-
+    m_OriginalTexture = pTexture;
     m_pTexture = pTexture;
     _rwD3D9RasterExt* rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
-    printf("[Constructor] CDXTexture::CDXTexture: %s\n", m_pTexture->name);
+    //printf("[Constructor] CDXTexture::CDXTexture: %s\n", m_pTexture->name);
     if (rasterExt->d3dFormat != m_kTextureFormat)
     {
         m_pTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, m_kTextureFormat, rwRASTERFORMAT8888);
@@ -41,7 +41,7 @@ CDXTexture::~CDXTexture()
     {
         if (m_deleteSetting == RW_TEXTURE_DELETE_ON_UNLOAD)
         {
-            printf("[Destructor] ~CDXTexture called | m_pTexture: %s\n", m_pTexture->name);
+            //printf("[Destructor] ~CDXTexture called | m_pTexture: %s\n", m_pTexture->name);
             pRenderware->DestroyTextureForcefully(m_pTexture);
             m_pTexture = nullptr;
         }
@@ -80,6 +80,7 @@ void CDXTexture::SaveTextureToFile(std::string& name)
 
 void CDXTexture::Initialize()
 {
+    m_OriginalTexture = nullptr;
     m_deleteSetting = RW_TEXTURE_DONT_DELETE;
     dxTexture = nullptr;
     bNewRwTextureCreated = false;

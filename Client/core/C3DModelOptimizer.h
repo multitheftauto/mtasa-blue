@@ -14,6 +14,8 @@ public:
     ~C3DModelOptimizer() {}
 
     RwTexDictionary* GetAtlasTexDictionary() { return m_pAtlasTexDictionary; }
+    bool             OutputClumpAsOBJ();
+    void             RemoveAtomicsWithNoUVDataFromList();
     bool             VectorNormalize(RwV3d* pIn, RwV3d* pOut);
     void             GetTextures();
     void             GetVerticesToMaterial();
@@ -48,12 +50,15 @@ private:
     std::vector<uint32_t>   faceMaterials;
     std::vector<RwTexture*> atlasTextures;
 
-    // Key: original texture of clump  | Value: toal number of triangles using this texture.
-    std::map<RwTexture*, unsigned int> mapOfUsedTextures;
+    // Key: original texture of clump
+    std::set<RwTexture*> setOfUsedTextures;
     // Key: original texture of clump | Value: clone of the same texture and its raster 
     //                                |        except that it will be added to atlas TXD.
     std::map<RwTexture*, RwTexture*>   m_mapOfMostUsedTexturesToIgnore;
 
     RwTexDictionary*        m_pTexDictionary;
     RwTexDictionary*        m_pAtlasTexDictionary;
+
+    // We'll only optimize DFF models which have lots of used textures
+    const unsigned int      minimumModelUsedTexturesRequired = 2;
 };
