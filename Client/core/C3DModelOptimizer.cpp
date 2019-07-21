@@ -394,7 +394,7 @@ uint32_t C3DModelOptimizer::GetBestAtlasMaxResolution(xatlas::Atlas* atlas, xatl
     uint32_t maxResolution = std::max(atlas->width, atlas->height);
     while (maxResolution % 4 != 0)
     {
-        maxResolution++;
+        maxResolution += 3;
     }
     return maxResolution;
 }
@@ -599,7 +599,6 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     const float         texelsPerUnit = 1.0f;
     xatlas::PackOptions packOptions;
-
     packOptions.padding = 1;
     packOptions.texelsPerUnit = texelsPerUnit;
     xatlas::PackCharts(atlas, packOptions);
@@ -610,29 +609,33 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     {
     }
 
-    
-    if (atlas->atlasCount <= 1)
+    unsigned int atlasFindingAttempts = 0;
+    bool         bChartDoesntFit = false;
+    do
     {
-        unsigned int atlasFindingAttempts = 1;
-        do
+        atlasFindingAttempts++;
+        bChartDoesntFit = false;
+
+        xatlas::Destroy(atlas);
+        atlas = xatlas::Create();
+        if (!AddMeshesToXatlas(atlas))
         {
             xatlas::Destroy(atlas);
-            atlas = xatlas::Create();
-            if (!AddMeshesToXatlas(atlas))
-            {
-                xatlas::Destroy(atlas);
-                DestroyMostUsedTexturesToIgnoreClones();
-                return false;
-            }
+            DestroyMostUsedTexturesToIgnoreClones();
+            return false;
+        }
 
-            printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
-            packOptions.resolution = bestAtlasResolution;
-            xatlas::PackCharts(atlas, packOptions);
-            bestAtlasResolution += 32;
-            atlasFindingAttempts++;
-        } while (atlas->atlasCount > 1);
-    }
-    
+        printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
+        packOptions.resolution = bestAtlasResolution;
+        if (xatlas::PackCharts(atlas, packOptions) == xatlas::PackChartsError::ChartDoesntFit)
+        {
+            bChartDoesntFit = true;
+        }
+
+        bestAtlasResolution += 32;
+    } while (atlas->atlasCount > 1 || bChartDoesntFit);
+
+
     printf("Copying texture data into atlas\n");
 
     CTextureAtlas& textureAtlas = CTextureAtlas(pClump, atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs);
@@ -644,8 +647,8 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     for (size_t i = 0; i < textureAtlas.atlasDXTextures.size(); i++)
     {
         CDXTexture& atlasTexture = textureAtlas.atlasDXTextures[i];
-        // printf("compressing atlas texture to DXT1: index = %u\n", i);
-        // assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
+        printf("compressing atlas texture to DXT1: index = %u\n", i);
+        assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
         sprintf(buffer, "myAtlas%d", i);
         RwTexture* pTexture = atlasTexture.GetRwTexture();
         memcpy(pTexture->name, buffer, strlen(buffer) + 1);

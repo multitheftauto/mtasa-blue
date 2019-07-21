@@ -244,7 +244,7 @@ bool OptimizeDFFFile(size_t modelIndexInImg, CIMGArchive* pIMgArchive, CTempClas
         //pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
 
         // Remove this line later
-         pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
+         //pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
 
         ///*
         if (pAtlasTxdDictionary)
@@ -271,7 +271,7 @@ bool OptimizeDFFFile(size_t modelIndexInImg, CIMGArchive* pIMgArchive, CTempClas
             void* pTXDData = txdArchiveFile.fileByteBuffer.GetData();
             //pRenderWare->WriteTXD(pTXDData, txdArchiveFile.actualFileSize, pAtlasTxdDictionary);
             // Remove this line later
-            pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
+            //pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
         }
         //*/
         if (bLoadCollision)
@@ -342,10 +342,9 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     totalPossibleCustomOutputFiles *= 2;            // each DFF will have its own TXD, so multiply the amount by 2
     pMyTempClass->imgArchiveCustomFiles.reserve(totalPossibleCustomOutputFiles);
 
-    size_t modelIndexInIMG = 527;
-    //for (auto& archiveFile : imgArchiveFiles)
+    size_t modelIndexInIMG = 0;            // 527 model ID for sb_seabed02.dff ?
     //for (modelIndexInIMG = 0; modelIndexInIMG < imgArchiveFiles.size(); modelIndexInIMG++)
-    while (modelIndexInIMG < std::min((size_t)528, imgArchiveFiles.size()))            // std::min((size_t)1400, imgArchiveFiles.size())
+    while (modelIndexInIMG < imgArchiveFiles.size())            // std::min((size_t)1400, imgArchiveFiles.size())
     {
         CIMGArchiveFile& archiveFile = imgArchiveFiles[modelIndexInIMG];
         SString strFileName = archiveFile.fileEntry.fileName;
