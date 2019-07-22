@@ -13,11 +13,11 @@
 #include <strsafe.h>
 #include "resource.h"
 
+#define TRAY_DUMMY_WINDOW_NAME  L"NotificationsDummy"
 #define TRAY_BALLOON_TITLE      L"Notification from MTA:SA server"
 #define TRAY_ICON_TOOLTIP_TEXT  L"Multi Theft Auto: San Andreas"
 #define TRAY_BALLOON_INTERVAL   30000L // ms
 
-extern CCore*    g_pCore;
 extern HINSTANCE g_hModule;
 
 CTrayIcon::CTrayIcon() : m_bTrayIconExists{false}, m_pNID{new NOTIFYICONDATAW{0}}, m_llLastBalloonTime{0L}
@@ -42,12 +42,38 @@ bool CTrayIcon::CreateTrayIcon()
     if (m_bTrayIconExists)
         return true;
 
+    // Register window class for dummy notifications window
+    WNDCLASSEXW wcDummy;
+    wcDummy.cbSize = sizeof(WNDCLASSEXW);
+    wcDummy.style = 0;
+    wcDummy.lpfnWndProc = ProcessNotificationsWindowMessage;
+    wcDummy.cbClsExtra = 0;
+    wcDummy.cbWndExtra = 0;
+    wcDummy.hInstance = g_hModule;
+    wcDummy.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wcDummy.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcDummy.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcDummy.lpszMenuName = NULL;
+    wcDummy.lpszClassName = TRAY_DUMMY_WINDOW_NAME;
+    wcDummy.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    if (!RegisterClassExW(&wcDummy))
+        return false;
+
+    // Create dummy notifications window
+    m_pNID->hWnd = CreateWindowExW(0, TRAY_DUMMY_WINDOW_NAME, L"", 0, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL, g_hModule, NULL);
+    if (m_pNID->hWnd != NULL)
+        SetWindowLongPtrW(m_pNID->hWnd, 0, reinterpret_cast<LONG_PTR>(this));
+    else
+    {
+        UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, g_hModule);
+        return false;
+    }
+
     // The handle to the core.dll is neccessary here,
     // because Windows will search for the ICON in the executable and not in the DLL
     // Note: Changing the size will not show a higher quality icon in the balloon
     auto hIcon = LoadImage(g_hModule, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_SHARED | LR_LOADTRANSPARENT);
 
-    m_pNID->hWnd = g_pCore->GetHookedWindow();
     m_pNID->uFlags = NIF_ICON | NIF_TIP;
     m_pNID->hIcon = (hIcon != NULL) ? ((HICON)hIcon) : LoadIcon(NULL, IDI_APPLICATION);
     m_bTrayIconExists = Shell_NotifyIconW(NIM_ADD, m_pNID) == TRUE;
@@ -64,6 +90,12 @@ void CTrayIcon::DestroyTrayIcon()
     m_pNID->dwInfoFlags = 0;
     Shell_NotifyIconW(NIM_DELETE, m_pNID);
     m_bTrayIconExists = false;
+
+    // Destroy the dummy window
+    if (IsWindow(m_pNID->hWnd))
+        DestroyWindow(m_pNID->hWnd);
+
+    UnregisterClassW(TRAY_DUMMY_WINDOW_NAME, g_hModule);
 }
 
 bool CTrayIcon::CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound)
@@ -103,4 +135,24 @@ bool CTrayIcon::CreateTrayBallon(SString strText, eTrayIconType trayIconType, bo
         m_pNID->dwInfoFlags |= NIIF_NOSOUND;
 
     return Shell_NotifyIconW(NIM_MODIFY, m_pNID) == TRUE;
+}
+
+LRESULT CALLBACK CTrayIcon::ProcessNotificationsWindowMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        case WM_DESTROY:
+        case WM_NCDESTROY:
+        {
+            // Destroy the tray icon if dummy window was destroyed
+            // In case of unexpected window crash
+            CTrayIcon* pThis = reinterpret_cast<CTrayIcon*>(GetWindowLongPtrW(hwnd, 0));
+            if (pThis != NULL)
+                pThis->DestroyTrayIcon();
+            break;
+        }
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
 }
