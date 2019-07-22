@@ -1715,6 +1715,7 @@ bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBl
 {
     if (Ped.IsRunningAnimation())
     {
+        const SAnimation* SAnimData = Ped.GetAnimationData();
         if (Ped.IsCustomAnimationPlaying())
         {
             strBlockName = Ped.GetNextAnimationCustomBlockName();
@@ -1723,14 +1724,14 @@ bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBl
         else
         {
             strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = Ped.GetAnimationName();
+            strAnimName = SAnimData->strName;
         }
-        iTime = Ped.GetAnimationTime();
-        bLoop = Ped.IsAnimationLooped();
-        bUpdatePosition = Ped.IsPositionUpdatedByAnimation();
-        bInterruptable = Ped.IsAnimationInterruptable();
-        bFreezeOnLastFrame = Ped.IsAnimationFrozenOnLastFrame();
-        iBlendTime = Ped.GetAnimationBlendTime();
+        iTime = SAnimData->iTime;
+        bLoop = SAnimData->bLoop;
+        bUpdatePosition = SAnimData->bUpdatePosition;
+        bInterruptable = SAnimData->bInterruptable;
+        bFreezeOnLastFrame = SAnimData->bFreezeLastFrame;
+        iBlendTime = SAnimData->iBlend;
         bRestoreTaskOnAnimEnd = Ped.IsTaskToBeRestoredOnAnimEnd();
 
         return true;

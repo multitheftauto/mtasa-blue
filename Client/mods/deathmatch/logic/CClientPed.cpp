@@ -159,14 +159,17 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
-    m_iTimeAnimation = -1;
-    m_iBlendAnimation = 250;
-    m_bLoopAnimation = false;
-    m_bUpdatePositionAnimation = false;
-    m_bInterruptableAnimation = false;
-    m_bFreezeLastFrameAnimation = true;
+    m_SAnimation = new SAnimation;
+    m_SAnimation->iTime = -1;
+    m_SAnimation->iBlend = 250;
+    m_SAnimation->bLoop = false;
+    m_SAnimation->bUpdatePosition = false;
+    m_SAnimation->bInterruptable = false;
+    m_SAnimation->bFreezeLastFrame = true;
+
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -2832,10 +2835,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_SAnimation->strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_SAnimation->iTime, m_SAnimation->iBlend, m_SAnimation->bLoop, m_SAnimation->bUpdatePosition,
+                    m_SAnimation->bInterruptable, m_SAnimation->bFreezeLastFrame);
             }
         }
 
@@ -3672,17 +3675,17 @@ void CClientPed::_CreateModel()
         }
 
         // Are we still playing a looped animation?
-        if (m_bLoopAnimation && m_pAnimationBlock)
+        if (m_SAnimation->bLoop && m_pAnimationBlock)
         {
             if (m_bisCurrentAnimationCustom)
             {
                 m_bisNextAnimationCustom = true;
             }
             // Copy our anim name incase it gets deleted
-            SString strAnimName = m_strAnimationName;
+            SString strAnimName = m_SAnimation->strName;
             // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                              m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_SAnimation->iTime, m_SAnimation->iBlend, m_SAnimation->bLoop, m_SAnimation->bUpdatePosition,
+                m_SAnimation->bInterruptable, m_SAnimation->bFreezeLastFrame);
         }
 
         // Set the voice that corresponds to our model
@@ -3964,7 +3967,7 @@ void CClientPed::_ChangeModel()
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if (m_bLoopAnimation && m_pAnimationBlock)
+            if (m_SAnimation->bLoop && m_pAnimationBlock)
             {
                 if (m_bisCurrentAnimationCustom)
                 {
@@ -3972,10 +3975,10 @@ void CClientPed::_ChangeModel()
                 }
 
                 // Copy our anim name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_SAnimation->strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_SAnimation->iTime, m_SAnimation->iBlend, m_SAnimation->bLoop, m_SAnimation->bUpdatePosition,
+                    m_SAnimation->bInterruptable, m_SAnimation->bFreezeLastFrame);
             }
 
             // Set the voice that corresponds to the new model
@@ -5643,7 +5646,7 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_bLoopAnimation && m_pAnimationBlock);
+    return (m_SAnimation->bLoop && m_pAnimationBlock);
 }
 
 void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
@@ -5746,13 +5749,13 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
-    m_strAnimationName = szAnimName;
-    m_iTimeAnimation = iTime;
-    m_iBlendAnimation = iBlend;
-    m_bLoopAnimation = bLoop;
-    m_bUpdatePositionAnimation = bUpdatePosition;
-    m_bInterruptableAnimation = bInterruptable;
-    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
+    m_SAnimation->strName = szAnimName;
+    m_SAnimation->iTime = iTime;
+    m_SAnimation->iBlend = iBlend;
+    m_SAnimation->bLoop = bLoop;
+    m_SAnimation->bUpdatePosition = bUpdatePosition;
+    m_SAnimation->bInterruptable = bInterruptable;
+    m_SAnimation->bFreezeLastFrame = bFreezeLastFrame;
 }
 
 void CClientPed::KillAnimation()
@@ -5772,7 +5775,7 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_strAnimationName = "";
+    m_SAnimation->strName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -5785,39 +5788,10 @@ std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
     }
     return nullptr;
 }
-const char* CClientPed::GetAnimationName()
-{
-    return m_strAnimationName;
-}
 
-const int CClientPed::GetAnimationTime()
+const SAnimation* CClientPed::GetAnimationData()
 {
-    return m_iTimeAnimation;
-}
-
-const bool CClientPed::IsAnimationLooped()
-{
-    return m_bLoopAnimation;
-}
-
-const bool CClientPed::IsPositionUpdatedByAnimation()
-{
-    return m_bUpdatePositionAnimation;
-}
-
-const bool CClientPed::IsAnimationInterruptable()
-{
-    return m_bUpdatePositionAnimation;
-}
-
-const bool CClientPed::IsAnimationFrozenOnLastFrame()
-{
-    return m_bFreezeLastFrameAnimation;
-}
-
-const int CClientPed::GetAnimationBlendTime()
-{
-    return m_iBlendAnimation;
+    return m_SAnimation;
 }
 
 void CClientPed::PostWeaponFire()

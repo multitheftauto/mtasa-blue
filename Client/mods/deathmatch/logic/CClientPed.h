@@ -119,6 +119,17 @@ struct SReplacedAnimation
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
 };
 
+struct SAnimation
+{
+    char*   strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -425,13 +436,7 @@ public:
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
-    const char*                 GetAnimationName();
-    const int                   GetAnimationTime();
-    const bool                  IsAnimationLooped();
-    const bool                  IsPositionUpdatedByAnimation();
-    const bool                  IsAnimationInterruptable();
-    const bool                  IsAnimationFrozenOnLastFrame();
-    const int                   GetAnimationBlendTime();
+    const SAnimation*           GetAnimationData();
 
     bool IsUsingGun();
 
@@ -477,11 +482,11 @@ public:
 
     void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP() { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_bLoopAnimation) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
+    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_SAnimation->bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
     void SetCustomAnimationUntriggerable()
     {
         m_bRequestedAnimation = false;
-        m_bLoopAnimation = false;
+        m_SAnimation->bLoop = false;
     }
     bool            IsNextAnimationCustom() { return m_bisNextAnimationCustom; }
     void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
@@ -651,14 +656,8 @@ public:
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
-    SString                                  m_strAnimationName;
     bool                                     m_bRequestedAnimation;
-    int                                      m_iTimeAnimation;
-    int                                      m_iBlendAnimation;
-    bool                                     m_bLoopAnimation;
-    bool                                     m_bUpdatePositionAnimation;
-    bool                                     m_bInterruptableAnimation;
-    bool                                     m_bFreezeLastFrameAnimation;
+    SAnimation*                              m_SAnimation;
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;
