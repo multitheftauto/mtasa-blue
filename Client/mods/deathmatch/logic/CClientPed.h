@@ -121,7 +121,7 @@ struct SReplacedAnimation
 
 struct SAnimation
 {
-    char*   strName;
+    SString strName;
     int     iTime;
     bool    bLoop;
     bool    bUpdatePosition;
