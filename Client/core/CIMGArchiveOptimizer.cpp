@@ -16,6 +16,8 @@ GUIEditor.button[1] = guiCreateButton(112, 108, 125, 47, "GENERATE", false, GUIE
 CIMGArchiveOptimizer::CIMGArchiveOptimizer()
 {
     CreateGUI();
+    m_pVehicleTxdDictionary = nullptr;
+    m_pRenderWare = g_pCore->GetGame()->GetRenderWare();
 }
 
 void CIMGArchiveOptimizer::CreateGUI()
@@ -119,25 +121,105 @@ bool IsVehiclMODModel(const int modelID)
     return modelID >= 1000 && modelID <= 1193;
 }
 
-static RwTexDictionary* g_pVehicleTxdDictionary = nullptr;
-
-// Seriously, this should be refactored later, lol
-class CTempClass
+SDFFDescriptor* CIMGArchiveOptimizer::GetDFFDescriptor(CIMGArchiveFile* pDFFArchiveFile)
 {
-public:
-    CTempClass() {}
+    const unsigned int uiDFFNameHash = HashString(pDFFArchiveFile->fileEntry.fileName);
+    SDFFDescriptor*    pDFFDescriptor = m_IdeLoader.GetDFFDescriptor(uiDFFNameHash);
+    if (!pDFFDescriptor)
+    {
+        std::printf("couldn't find dff descriptor for '%s'\n", pDFFArchiveFile->fileEntry.fileName);
+        return nullptr;
+    }
 
-    std::vector<CIMGArchiveFile> imgArchiveCustomFiles;
-};
+    // Do we really need to optimize vehicle mods? I think no.
+    if (IsVehiclMODModel(pDFFDescriptor->GetModelID()))
+    {
+        return nullptr;
+    }
 
-bool OptimizeDFFFile(size_t modelIndexInImg, CIMGArchive* pIMgArchive, CTempClass* ptempClass, CIMGArchiveFile* pDFFArchiveFile, CIDELoader& ideLoader)
+    return pDFFDescriptor;
+}
+
+RwTexDictionary* CIMGArchiveOptimizer::ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor)
 {
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-    auto         RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
-    auto         RwTexDictionaryStreamGetSize = (unsigned int(__cdecl*)(RwTexDictionary * dict))0x804930;
+    STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
+    RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
+    if (!pTxdDictionary)
+    {
+        STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
+        if (pTXDImgArchiveInfo->usSize == 0)
+        {
+            return false;
+        }
+        CIMGArchiveFile* txdArchiveFile = new CIMGArchiveFile();
+        if (m_gt3IMgArchive.GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo, *txdArchiveFile))
+        {
+            pTxdDictionary = m_pRenderWare->ReadTXD(nullptr, txdArchiveFile->fileByteBuffer, false);
+        }
+        else
+        {
+            printf("Failed to read TXD for dff\n");
+        }
+        delete txdArchiveFile;
+    }
 
-    bool bOptimizedDFFFile = false;
+    return pTxdDictionary;
+}
 
+void CIMGArchiveOptimizer::WriteDFF(RpClump* pClump, CIMGArchiveFile* pDFFArchiveFile)
+{
+    auto RpClumpStreamGetSize = (unsigned int(__cdecl*)(RpClump*))0x74A5E0;
+
+    SString strPathOfGeneratedDff = "dffs\\";
+
+    unsigned int clumpSize = RpClumpStreamGetSize(pClump);
+
+    // there's still an issue with size of empty extension headers of 12 bytes for clump
+    clumpSize += 24;
+
+    CIMGArchiveFile& dffArchiveFile = m_ImgArchiveCustomFiles.emplace_back();
+    dffArchiveFile.fileEntry = pDFFArchiveFile->fileEntry;
+    dffArchiveFile.actualFileSize = GetActualFileSize(clumpSize);
+    dffArchiveFile.fileEntry.usSize = dffArchiveFile.actualFileSize / 2048;
+    dffArchiveFile.fileByteBuffer.SetSize(dffArchiveFile.actualFileSize);
+    void* pDFFData = dffArchiveFile.fileByteBuffer.GetData();
+    // m_pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
+
+    // Remove this line later
+    // m_pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
+}
+
+void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, CIMGArchiveFile* pDFFArchiveFile)
+{
+    auto RwTexDictionaryStreamGetSize = (unsigned int(__cdecl*)(RwTexDictionary * dict))0x804930;
+
+    SString strPathOfGeneratedDff = "dffs\\";
+
+    std::string fileName = pDFFArchiveFile->fileEntry.fileName;
+    size_t      lastindex = fileName.find_last_of(".");
+    std::string fileNameWithoutExtension = fileName.substr(0, lastindex);
+    std::string strTXDFileName = fileNameWithoutExtension + ".txd";
+    const char* pTXDName = strTXDFileName.c_str();
+
+    unsigned int txdSize = RwTexDictionaryStreamGetSize(pTxdDictionary);
+
+    // there's still an issue with size of empty extension headers of 12 bytes for TXD
+    txdSize += 24;
+
+    CIMGArchiveFile& txdArchiveFile = m_ImgArchiveCustomFiles.emplace_back();
+    memcpy(txdArchiveFile.fileEntry.fileName, pTXDName, strlen(pTXDName) + 1);
+
+    txdArchiveFile.actualFileSize = GetActualFileSize(txdSize);
+    txdArchiveFile.fileEntry.usSize = txdArchiveFile.actualFileSize / 2048;
+    txdArchiveFile.fileByteBuffer.SetSize(txdArchiveFile.actualFileSize);
+    void* pTXDData = txdArchiveFile.fileByteBuffer.GetData();
+    // m_pRenderWare->WriteTXD(pTXDData, txdArchiveFile.actualFileSize, pTxdDictionary);
+    // Remove this line later
+    // m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
+}
+
+void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
+{
     /*
     // REMOVE LATER
     int         modelID = 0;
@@ -148,245 +230,120 @@ bool OptimizeDFFFile(size_t modelIndexInImg, CIMGArchive* pIMgArchive, CTempClas
     // REMOVE END
     */
 
-    const unsigned int uiDFFNameHash = HashString(pDFFArchiveFile->fileEntry.fileName);
-    SDFFDescriptor* pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
-    if (!pDFFDescriptor)
-    {
-        std::printf("couldn't find dff descriptor for '%s'\n", pDFFArchiveFile->fileEntry.fileName);
-        return bOptimizedDFFFile;
-    }
-
-    ///*
-    STXDDescriptor* pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
-
-    // Do we really need to optimize vehicle mods? I think no.
-    if (IsVehiclMODModel(pDFFDescriptor->GetModelID()))
-    {
-        return false;
-    }
-
-    RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
+    SDFFDescriptor*  pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    RwTexDictionary* pTxdDictionary = pDFFDescriptor ? ReadTextureDictionary(pDFFDescriptor) : nullptr;
     if (!pTxdDictionary)
     {
-        STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
-        if (pTXDImgArchiveInfo->usSize == 0)
-        {
-            return bOptimizedDFFFile;
-        }
-        CIMGArchiveFile* txdArchiveFile = new CIMGArchiveFile();
-        if (pIMgArchive->GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo, *txdArchiveFile))
-        {
-            pTxdDictionary = pRenderWare->ReadTXD(nullptr, txdArchiveFile->fileByteBuffer, false);
-        }
-        else
-        {
-            printf("Failed to read TXD for dff '%s'\n", pDFFArchiveFile->fileEntry.fileName);
-        }
-        delete txdArchiveFile;
+        return;
     }
-    //*/
 
     // /*
     int modelID = pDFFDescriptor->GetModelID();
     if (IsVehicleModel(modelID))
     {
-        pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, g_pVehicleTxdDictionary);
+        m_pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, m_pVehicleTxdDictionary);
     }
     // */
 
-    pRenderWare->SetCurrentDFFWriteModelID(modelID);
-    pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
+    m_pRenderWare->SetCurrentDFFWriteModelID(modelID);
+    m_pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
-    printf("\nabout to read: %s | size: %u | modelIndexInImg: %u\n\n", (char*)pDFFArchiveFile->fileEntry.fileName,pDFFArchiveFile->actualFileSize, modelIndexInImg);
+    printf("\nabout to read: %s | size: %u \n\n", (char*)pDFFArchiveFile->fileEntry.fileName, pDFFArchiveFile->actualFileSize);
 
-        bool     bLoadCollision = IsVehicleModel(modelID);
+    bool bLoadCollision = IsVehicleModel(modelID);
+    // RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
     RwBuffer buffer = {pDFFArchiveFile->GetData(), pDFFArchiveFile->actualFileSize};
-    //RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
-    RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, buffer, modelID, bLoadCollision, pTxdDictionary);
-    pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
+    RpClump* pClump = m_pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, buffer, modelID, bLoadCollision, pTxdDictionary);
+
+    m_pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(false);
+
     if (pClump)
     {
-        SString strPathOfGeneratedDff = "dffs\\";
-        // RwTexDictionary* pAtlasTxdDictionary = nullptr;
-
         C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, pTxdDictionary);
-        RwTexDictionary*   pAtlasTxdDictionary = modelOptimizer->GetAtlasTexDictionary();
-        if (!pAtlasTxdDictionary)
+        if (modelOptimizer->Optimize())
         {
-            delete modelOptimizer;
-            modelOptimizer = nullptr;
-            std::printf("failed to CREATE TXD atlas :(\n");
-            if (bLoadCollision)
-            {
-                pRenderWare->DeleteReadDFFCollisionModel();
-            }
+            RwTexDictionary* pAtlasTxdDictionary = modelOptimizer->CreateTXDAtlas();
+            assert(pAtlasTxdDictionary != nullptr);
 
-            pRenderWare->DestroyDFF(pClump);
-            pRenderWare->TxdForceUnload(0, true, pTxdDictionary);
-            return bOptimizedDFFFile;
+            //WriteDFF(pClump, pDFFArchiveFile);
+            //WriteTXD(pAtlasTxdDictionary, pDFFArchiveFile);
         }
-
         delete modelOptimizer;
         modelOptimizer = nullptr;
-        //*/
-
-        unsigned int clumpSize = RpClumpStreamGetSize(pClump);
-
-        // there's still an issue with size of empty extension headers of 12 bytes for clump
-        clumpSize += 24;
-
-        CIMGArchiveFile& dffArchiveFile = ptempClass->imgArchiveCustomFiles.emplace_back();
-        dffArchiveFile.fileEntry = pDFFArchiveFile->fileEntry;
-        dffArchiveFile.actualFileSize = GetActualFileSize(clumpSize);
-        dffArchiveFile.fileEntry.usSize = dffArchiveFile.actualFileSize / 2048;
-        dffArchiveFile.fileByteBuffer.SetSize(dffArchiveFile.actualFileSize);
-        void* pDFFData = dffArchiveFile.fileByteBuffer.GetData();
-        //pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
-
-        // Remove this line later
-         //pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
-
-        ///*
-        if (pAtlasTxdDictionary)
-        {
-            std::string fileName = pDFFArchiveFile->fileEntry.fileName;
-            size_t      lastindex = fileName.find_last_of(".");
-            std::string fileNameWithoutExtension = fileName.substr(0, lastindex);
-            std::string strTXDFileName = fileNameWithoutExtension + ".txd";
-            const char* pTXDName = strTXDFileName.c_str();
-
-            printf("txd name: %s\n", strTXDFileName.c_str());
-
-            unsigned int txdSize = RwTexDictionaryStreamGetSize(pAtlasTxdDictionary);
-
-            // there's still an issue with size of empty extension headers of 12 bytes for TXD
-            txdSize += 24;
-
-            CIMGArchiveFile& txdArchiveFile = ptempClass->imgArchiveCustomFiles.emplace_back();
-            memcpy(txdArchiveFile.fileEntry.fileName, pTXDName, strlen(pTXDName) + 1);
-
-            txdArchiveFile.actualFileSize = GetActualFileSize(txdSize);
-            txdArchiveFile.fileEntry.usSize = txdArchiveFile.actualFileSize / 2048;
-            txdArchiveFile.fileByteBuffer.SetSize(txdArchiveFile.actualFileSize);
-            void* pTXDData = txdArchiveFile.fileByteBuffer.GetData();
-            //pRenderWare->WriteTXD(pTXDData, txdArchiveFile.actualFileSize, pAtlasTxdDictionary);
-            // Remove this line later
-            //pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pAtlasTxdDictionary);
-        }
-        //*/
-        if (bLoadCollision)
-        {
-            pRenderWare->DeleteReadDFFCollisionModel();
-        }
-
-        pRenderWare->DestroyDFF(pClump);
-        pRenderWare->TxdForceUnload(0, true, pAtlasTxdDictionary);
-
-        bOptimizedDFFFile = true;
     }
     else
     {
-        std::printf("failed to read %s | modelIndexInImg: %d\n", pDFFArchiveFile->fileEntry.fileName, modelIndexInImg);
+        std::printf("failed to read %s\n", pDFFArchiveFile->fileEntry.fileName);
     }
 
-    pRenderWare->TxdForceUnload(0, true, pTxdDictionary);
+    if (pClump && bLoadCollision)
+    {
+        m_pRenderWare->DeleteReadDFFCollisionModel();
+    }
 
-    return bOptimizedDFFFile;
+    m_pRenderWare->DestroyDFF(pClump);
+    m_pRenderWare->TxdForceUnload(0, true, pTxdDictionary);
 }
 
-// 5 mb
-const unsigned int imgReadWriteOperationSizeInBytes = 50 * 1024 * 1024;
+static unsigned int gTotalModelsToOptimize = 0;
 
-bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
+void CIMGArchiveOptimizer::OptimizeIMGArchiveFiles(std::vector<CIMGArchiveFile>* imgArchiveFiles)
 {
-    std::printf("Generate button pressed\n");
-
-    CRenderWare* pRenderWare = g_pCore->GetGame()->GetRenderWare();
-
-    if (!g_pVehicleTxdDictionary)
+    size_t modelIndexInIMG = 0;
+    while (modelIndexInIMG < imgArchiveFiles->size())            // std::min((size_t)1400, imgArchiveFiles.size())
     {
-        g_pVehicleTxdDictionary = pRenderWare->ReadTXD("models\\generic\\vehicle.txd", CBuffer(), false);
-        assert(g_pVehicleTxdDictionary != nullptr);
+        CIMGArchiveFile& archiveFile = imgArchiveFiles->at(modelIndexInIMG);
+        SString          strFileName = archiveFile.fileEntry.fileName;
+        strFileName = strFileName.ToLower();
+
+        m_pRenderWare->SetCurrentDFFBeingGeneratedFileName(strFileName);
+
+        const char* pFileName = strFileName.c_str();
+        memcpy(archiveFile.fileEntry.fileName, pFileName, strlen(pFileName) + 1);
+
+        SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
+        if (strFileExtension == "dff")
+        {
+            OptimizeDFFFile(&archiveFile);
+        }
+
+        modelIndexInIMG++;
+
+        gTotalModelsToOptimize++;
     }
+}
 
-    std::string outputFolder = "OptimizedFiles";
-    if (CreateDirectory(outputFolder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
-    {
-    }
-
-    CIDELoader ideLoader;
-
-    CIMGArchive* newIMgArchive = new CIMGArchive("models\\gta3.img", IMG_FILE_READ);
-    newIMgArchive->ReadEntries();
-
-    ideLoader.AddTXDDFFInfoToMaps(newIMgArchive);
-
-    CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
-
-    std::vector<CIMGArchiveFile>& imgArchiveFiles = newIMgArchive->GetNextImgFiles(imgReadWriteOperationSizeInBytes);
-    CTempClass*                   pMyTempClass = new CTempClass();
-    std::vector<CIMGArchiveFile*> imgArchiveFilesOutput;
-
+unsigned int CIMGArchiveOptimizer::GetTotalPossibleCustomOutputFiles(std::vector<CIMGArchiveFile>* imgArchiveFiles)
+{
     unsigned int totalPossibleCustomOutputFiles = 0;
-    for (auto& archiveFile : imgArchiveFiles)            // newIMgArchive->GetFileCount()
+    for (size_t archiveFileIndex = 0; archiveFileIndex < imgArchiveFiles->size(); archiveFileIndex++)
     {
+        CIMGArchiveFile&   archiveFile = imgArchiveFiles->at(archiveFileIndex);
         const unsigned int uiDFFNameHash = HashString(archiveFile.fileEntry.fileName);
-        SDFFDescriptor*    pDFFDescriptor = ideLoader.GetDFFDescriptor(uiDFFNameHash);
+        SDFFDescriptor*    pDFFDescriptor = m_IdeLoader.GetDFFDescriptor(uiDFFNameHash);
         if (!pDFFDescriptor)
         {
             continue;
         }
         totalPossibleCustomOutputFiles++;
     }
+    return totalPossibleCustomOutputFiles;
+}
 
-    totalPossibleCustomOutputFiles *= 2;            // each DFF will have its own TXD, so multiply the amount by 2
-    pMyTempClass->imgArchiveCustomFiles.reserve(totalPossibleCustomOutputFiles);
-
-    size_t modelIndexInIMG = 0;            // 527 model ID for sb_seabed02.dff ?
-    //for (modelIndexInIMG = 0; modelIndexInIMG < imgArchiveFiles.size(); modelIndexInIMG++)
-    while (modelIndexInIMG < imgArchiveFiles.size())            // std::min((size_t)1400, imgArchiveFiles.size())
+void CIMGArchiveOptimizer::InsertImgArchiveFilesToOutputContainer(std::vector<CIMGArchiveFile>*  imgArchiveFiles,
+                                                                  std::vector<CIMGArchiveFile*>& imgArchiveFilesOutput)
+{
+    for (size_t archiveFileIndex = 0; archiveFileIndex < imgArchiveFiles->size(); archiveFileIndex++)
     {
-        CIMGArchiveFile& archiveFile = imgArchiveFiles[modelIndexInIMG];
-        SString strFileName = archiveFile.fileEntry.fileName;
-        strFileName = strFileName.ToLower();
-
-        pRenderWare->SetCurrentDFFBeingGeneratedFileName(strFileName);
-
-        const char* pFileName = strFileName.c_str();
-        memcpy(archiveFile.fileEntry.fileName, pFileName, strlen(pFileName) + 1);
-
-        SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
-
-        if (strFileExtension == "dff")
-        {
-            if (OptimizeDFFFile(modelIndexInIMG, newIMgArchive, pMyTempClass, &archiveFile, ideLoader))
-            {
-            }
-        }
-
-        modelIndexInIMG++;
-
-        // REMOVE LATER
-        //break;
-        // REMOVE END
-    }
-
-    printf("\n[ABOUT TO WRITE] modelIndexInIMG: %u\n\n", modelIndexInIMG);
-    for (auto& customArchiveFile : pMyTempClass->imgArchiveCustomFiles)
-    {
-        imgArchiveFilesOutput.emplace_back(&customArchiveFile);
-    }
-
-    for (auto& archiveFile : imgArchiveFiles)
-    {
-        bool         bFileWithNameExists = false;
-        unsigned int archiveFileNameHash = HashString(archiveFile.fileEntry.fileName);
+        CIMGArchiveFile& archiveFile = imgArchiveFiles->at(archiveFileIndex);
+        bool             bFileWithNameExists = false;
+        unsigned int     archiveFileNameHash = HashString(archiveFile.fileEntry.fileName);
         for (auto& archiveFileOutput : imgArchiveFilesOutput)
         {
             if (archiveFileNameHash == HashString(archiveFileOutput->fileEntry.fileName))
             {
-                printf("[Add File Output FAIL] File exists with properties: %s | size: %u\n", archiveFileOutput->fileEntry.fileName,
-                       archiveFileOutput->actualFileSize);
+                // printf("[Add File Output FAIL] File exists with properties: %s | size: %u\n", archiveFileOutput->fileEntry.fileName,
+                //       archiveFileOutput->actualFileSize);
                 bFileWithNameExists = true;
                 break;
             }
@@ -394,17 +351,81 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
         if (!bFileWithNameExists)
         {
-            printf("[Add File Output OK] File doesn't exists: %s | size: %u\n", archiveFile.fileEntry.fileName, archiveFile.actualFileSize);
+            // printf("[Add File Output OK] File doesn't exists: %s | size: %u\n", archiveFile.fileEntry.fileName, archiveFile.actualFileSize);
             imgArchiveFilesOutput.push_back(&archiveFile);
         }
     }
-    newIMgArchiveOut->WriteEntries(imgArchiveFilesOutput);
+}
 
-    delete pMyTempClass;
+bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
+{
+    std::printf("Generate button pressed\n");
 
-    // delete newFile;
-    delete newIMgArchive;
+    if (!m_pVehicleTxdDictionary)
+    {
+        m_pVehicleTxdDictionary = m_pRenderWare->ReadTXD("models\\generic\\vehicle.txd", CBuffer(), false);
+        assert(m_pVehicleTxdDictionary != nullptr);
+    }
+
+    std::string outputFolder = "OptimizedFiles";
+    if (CreateDirectory(outputFolder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+    {
+    }
+
+    m_IdeLoader.LoadIDEFiles();
+
+    if (!m_gt3IMgArchive.LoadIMGFile("models\\gta3.img", IMG_FILE_READ))
+    {
+        std::printf("loading gta3.img failed\n");
+        return true;
+    }
+
+    m_gt3IMgArchive.ReadEntries();
+
+    m_IdeLoader.AddTXDDFFInfoToMaps(&m_gt3IMgArchive);
+
+    CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
+
+    std::vector<CIMGArchiveFile>* imgArchiveFiles = m_gt3IMgArchive.GetNextImgFiles(imgReadWriteOperationSizeInBytes);
+
+    while (imgArchiveFiles)
+    {
+        std::vector<CIMGArchiveFile*>          imgArchiveFilesOutput;
+
+        unsigned int totalPossibleCustomOutputFiles = GetTotalPossibleCustomOutputFiles(imgArchiveFiles);
+
+        // each DFF will have its own TXD, so multiply the amount by 2
+        totalPossibleCustomOutputFiles *= 2;
+
+        // free memory for m_ImgArchiveCustomFiles here?
+
+        m_ImgArchiveCustomFiles.reserve(totalPossibleCustomOutputFiles);
+        dffOptimizationInfos.reserve(totalPossibleCustomOutputFiles);
+
+        OptimizeIMGArchiveFiles(imgArchiveFiles);
+
+        /*
+        for (auto& customArchiveFile : m_ImgArchiveCustomFiles)
+        {
+            imgArchiveFilesOutput.emplace_back(&customArchiveFile);
+        }
+
+        InsertImgArchiveFilesToOutputContainer(imgArchiveFiles, imgArchiveFilesOutput);
+        newIMgArchiveOut->WriteEntries(imgArchiveFilesOutput);
+        */
+
+        std::vector<CDFFModelOptimizationInfo>().swap(dffOptimizationInfos);
+        imgArchiveFiles = m_gt3IMgArchive.GetNextImgFiles(imgReadWriteOperationSizeInBytes);
+    }
+
+    printf("\n\ngTotalModelsToOptimize: %u\n\n", gTotalModelsToOptimize);
     delete newIMgArchiveOut;
 
+    // Free memory
+    m_IdeLoader.FreeMemory();
+    m_gt3IMgArchive.FreeArchiveDirEntries();
+    std::vector<CDFFModelOptimizationInfo>().swap(dffOptimizationInfos);
+
+    m_pRenderWare->TxdForceUnload(0, true, m_pVehicleTxdDictionary);
     return true;
 }

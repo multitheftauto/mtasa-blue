@@ -8,12 +8,7 @@ struct STXDDescriptor
     RwTexDictionary*       pTextureDictionary;
     CRenderWare*           pRenderWare;
 
-    STXDDescriptor(int placeholder)
-    {
-        m_TxdImgArchiveInfo = {0};
-        pTextureDictionary = nullptr;
-        pRenderWare = g_pCore->GetGame()->GetRenderWare();
-    }
+    STXDDescriptor(int placeholder);
 
     ~STXDDescriptor() { }
 
@@ -46,6 +41,8 @@ class CIDELoader
 public:
     CIDELoader();
 
+    void FreeMemory();
+    void LoadIDEFiles();
     bool LoadFileToString(const SString& fileName, SString& contents);
     void RemoveStringTabsSpaces(SString& contents);
     void ParseObjsLine(const SString& line);

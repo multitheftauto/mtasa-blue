@@ -1,7 +1,24 @@
 #include "StdInc.h"
 #include "CIDELoader.h"
 
+STXDDescriptor::STXDDescriptor(int placeholder)
+{
+    m_TxdImgArchiveInfo = {0};
+    pTextureDictionary = nullptr;
+    pRenderWare = g_pCore->GetGame()->GetRenderWare();
+}
+
 CIDELoader::CIDELoader()
+{
+}
+
+void CIDELoader::FreeMemory()
+{
+    std::map<unsigned int, SDFFDescriptor>().swap(mapOfDffDescriptors);
+    std::map<unsigned int, STXDDescriptor>().swap(mapOfTxdDescriptors);
+}
+
+void CIDELoader::LoadIDEFiles()
 {
     for (auto& fileName : ideFilePaths)
     {
@@ -17,13 +34,12 @@ CIDELoader::CIDELoader()
     }
 }
 
-bool CIDELoader::LoadFileToString(const SString & fileName, SString& contents)
+bool CIDELoader::LoadFileToString(const SString& fileName, SString& contents)
 {
     std::ifstream in(fileName);
     if (in)
     {
-        contents.assign((std::istreambuf_iterator<char>(in)),
-            (std::istreambuf_iterator<char>()));
+        contents.assign((std::istreambuf_iterator<char>(in)), (std::istreambuf_iterator<char>()));
         return true;
     }
     return false;
@@ -45,15 +61,15 @@ void CIDELoader::ParseObjsLine(const SString& line)
         return;
     }
 
-    //std::cout << line << std::endl;
+    // std::cout << line << std::endl;
     std::vector<SString> vecSplittedStrings;
     line.Split(",", vecSplittedStrings);
 
     if (vecSplittedStrings.size() >= 3)
     {
-        const int modelID = std::stoi(vecSplittedStrings[0]);
-        const SString strDFFName = vecSplittedStrings[1] + ".dff";
-        const SString strTXDName = vecSplittedStrings[2] + ".txd";
+        const int          modelID = std::stoi(vecSplittedStrings[0]);
+        const SString      strDFFName = vecSplittedStrings[1] + ".dff";
+        const SString      strTXDName = vecSplittedStrings[2] + ".txd";
         const unsigned int uiDFFNameHash = HashString(strDFFName.ToLower());
         const unsigned int uiTXDNameHash = HashString(strTXDName.ToLower());
 
@@ -69,22 +85,19 @@ void CIDELoader::ParseObjsLine(const SString& line)
         auto dffDescriptorIterator = mapOfDffDescriptors.find(uiDFFNameHash);
         if (dffDescriptorIterator == mapOfDffDescriptors.end())
         {
-            mapOfDffDescriptors.emplace(
-                std::piecewise_construct, std::forward_as_tuple(uiDFFNameHash),
-                std::forward_as_tuple(modelID, &it->second)); 
-         }
+            mapOfDffDescriptors.emplace(std::piecewise_construct, std::forward_as_tuple(uiDFFNameHash), std::forward_as_tuple(modelID, &it->second));
+        }
     }
     else
     {
         std::printf("\n\n\nError !!!: vecSplittedStrings SIZE IS LESS THAN 3 | line : %s\n\n\n", line.c_str());
     }
-
 }
 
 // we only need to read the objs section
 void CIDELoader::ParseContents(SString& contents)
 {
-    SString line;
+    SString            line;
     std::istringstream inStream(contents);
     while (std::getline(inStream, line))
     {
@@ -168,15 +181,13 @@ void CIDELoader::ParseContents(SString& contents)
             }
         }
     }
-
-  
 }
 
 void CIDELoader::AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive)
 {
     auto vecArchiveEntryHeaders = pIMgArchive->GetArchiveDirEntries();
-    for (auto& entryHeader: vecArchiveEntryHeaders)
-    { 
+    for (auto& entryHeader : vecArchiveEntryHeaders)
+    {
         SString strFileName = entryHeader.fileName;
         strFileName = strFileName.ToLower();
 
