@@ -3,20 +3,26 @@
 
 CIMGArchive::CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation)
 {
-    archiveFilePath_ = archiveFilePath;
-    totalImgFilesRead = 0;
-    if (fileOperation == IMG_FILE_READ)
-    {
-        fileStream.open(FromUTF8(archiveFilePath_), std::ios::binary | std::ios::ate);
-    }
-    else if (fileOperation == IMG_FILE_WRITE)
-    {
-    }
+    LoadIMGFile(archiveFilePath, fileOperation);
 }
 
 CIMGArchive::~CIMGArchive()
 {
     archiveFileEntries_.clear();
+}
+
+bool CIMGArchive::LoadIMGFile(const SString& filePath, eIMGFileOperation fileOperation)
+{
+    archiveFilePath_ = filePath;
+    totalImgFilesRead = 0;
+    if (fileOperation == IMG_FILE_READ)
+    {
+        fileStream.open(FromUTF8(archiveFilePath_), std::ios::binary | std::ios::ate);
+        return fileStream.fail() == false;
+    }
+    else if (fileOperation == IMG_FILE_WRITE)
+    {
+    }
 }
 
 void CIMGArchive::ReadEntries()
@@ -98,6 +104,11 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
     std::printf("WriteEntries: okay done writing\n");
 }
 
+void CIMGArchive::FreeArchiveDirEntries()
+{
+    std::vector<EntryHeader>().swap(archiveFileEntries_);
+}
+
 std::vector<EntryHeader>& CIMGArchive::GetArchiveDirEntries()
 {
     return archiveFileEntries_;
@@ -108,8 +119,13 @@ uint CIMGArchive::GetFileCount()
     return archiveFileEntries_.size();
 }
 
-std::vector<CIMGArchiveFile>& CIMGArchive::GetNextImgFiles(unsigned int imgReadWriteOperationSizeInBytes)
+std::vector<CIMGArchiveFile>* CIMGArchive::GetNextImgFiles(unsigned int imgReadWriteOperationSizeInBytes)
 {
+    if (totalImgFilesRead >= archiveFileEntries_.size())
+    {
+        return nullptr;
+    }
+
     // Free the container memory
     std::vector<CIMGArchiveFile>().swap(imgArchiveFiles);
     std::vector<char>().swap(m_vecImgArchiveFilesBuffer);
@@ -118,21 +134,28 @@ std::vector<CIMGArchiveFile>& CIMGArchive::GetNextImgFiles(unsigned int imgReadW
 
     unsigned int bytesToRead = 0;
     unsigned int filesToRead = 0;
-    size_t       entryHeaderIndex = totalImgFilesRead;
+    size_t       entryHeaderIndex = totalImgFilesRead; // 9
     while (true)
     {
         EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
         unsigned int actualFileSize = entryHeader.usSize * 2048;
         bytesToRead += actualFileSize;
+        filesToRead++;                                    
+        entryHeaderIndex++;                              
 
         if (bytesToRead > imgReadWriteOperationSizeInBytes)
         {
             bytesToRead -= actualFileSize;
+            filesToRead--;
+            entryHeaderIndex--;
             break;
         }
 
-        filesToRead++;
-        entryHeaderIndex++;
+        if (entryHeaderIndex >= archiveFileEntries_.size())
+        {
+            entryHeaderIndex--;
+            break;
+        }
     }
 
     m_vecImgArchiveFilesBuffer.resize(bytesToRead);
@@ -143,7 +166,7 @@ std::vector<CIMGArchiveFile>& CIMGArchive::GetNextImgFiles(unsigned int imgReadW
     unsigned char* pFilesData = (unsigned char*)m_vecImgArchiveFilesBuffer.data();
     for (unsigned int i = 0; i < filesToRead; i++)
     {
-        size_t entryHeaderIndex = totalImgFilesRead + i;
+        size_t       entryHeaderIndex = totalImgFilesRead + i;
         EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
         unsigned int actualFileSize = entryHeader.usSize * 2048;
 
@@ -158,9 +181,8 @@ std::vector<CIMGArchiveFile>& CIMGArchive::GetNextImgFiles(unsigned int imgReadW
 
     totalImgFilesRead += filesToRead;
 
-    return imgArchiveFiles;
+    return &imgArchiveFiles;
 }
-
 
 bool CIMGArchive::GetFileByID(uint id, CIMGArchiveFile& archiveFile)
 {
@@ -184,7 +206,6 @@ bool CIMGArchive::GetFileByID(uint id, CIMGArchiveFile& archiveFile)
         return false;
     }
 }
-
 
 bool CIMGArchive::GetFileByName(std::string fileName, CIMGArchiveFile& archiveFile)
 {

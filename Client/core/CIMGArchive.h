@@ -1,5 +1,6 @@
-#ifndef CIMGArchive_H
-#define CIMGArchive_H
+#pragma once 
+
+#include <fstream>
 
 typedef unsigned char      uchar;
 typedef unsigned int       uint;
@@ -32,8 +33,8 @@ struct EntryHeader
     ushort fSize2;
     char   fileName[24];
 
-    EntryHeader() 
-    { 
+    EntryHeader()
+    {
         offset = 0;
         usSize = 0;
         fSize2 = 0;
@@ -45,7 +46,7 @@ struct EntryHeader
         offset = theOffset;
         usSize = theSize;
         fSize2 = theSize2;
-        strncpy_s(fileName, theFileName, std::min(sizeof(EntryHeader::fileName) , strlen(theFileName) + 1));
+        strncpy_s(fileName, theFileName, std::min(sizeof(EntryHeader::fileName), strlen(theFileName) + 1));
     }
 };
 #pragma pack(pop)
@@ -55,9 +56,9 @@ struct CIMGArchiveFile
     EntryHeader    fileEntry;
     uint64         actualFileOffset;
     uint64         actualFileSize;
-    unsigned char* pFileData;        // points to a location in m_vecImgArchiveFilesBuffer if fileByteBuffer size is zero,
-                                     // otherwise this is nullptr
-    CBuffer        fileByteBuffer;   // If the size is zero, then pFileData is used
+    unsigned char* pFileData;            // points to a location in m_vecImgArchiveFilesBuffer if fileByteBuffer size is zero,
+                                         // otherwise this is nullptr
+    CBuffer fileByteBuffer;              // If the size is zero, then pFileData is used
 
     CIMGArchiveFile()
     {
@@ -79,15 +80,18 @@ struct CIMGArchiveFile
 class CIMGArchive
 {
 public:
+    CIMGArchive() {}
     CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation);
     ~CIMGArchive();
 
-    std::vector<CIMGArchiveFile>& GetNextImgFiles(unsigned int imgReadWriteOperationSize);
+    bool                          LoadIMGFile(const SString& filePath, eIMGFileOperation fileOperation);
+    std::vector<CIMGArchiveFile>* GetNextImgFiles(unsigned int imgReadWriteOperationSize);
     uint                          GetFileCount();
     bool                          GetFileByID(uint id, CIMGArchiveFile& archiveFile);
     bool                          GetFileByName(std::string fileName, CIMGArchiveFile& archiveFile);
     bool                          GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo, CIMGArchiveFile& archiveFile);
 
+    void                      FreeArchiveDirEntries();
     std::vector<EntryHeader>& GetArchiveDirEntries();
     void                      ReadEntries();
     void                      WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries);
@@ -98,6 +102,6 @@ private:
     unsigned int                 totalImgFilesRead;
     std::vector<CIMGArchiveFile> imgArchiveFiles;
     std::vector<char>            m_vecImgArchiveFilesBuffer;
+    std::vector<CIMGArchiveFile*> m_outputArchiveFiles;
     std::vector<EntryHeader>     archiveFileEntries_;
 };
-#endif            // CIMGArchive_H
