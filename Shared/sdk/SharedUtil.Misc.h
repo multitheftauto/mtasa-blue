@@ -48,6 +48,11 @@ namespace SharedUtil
     #endif
 
     //
+    // Return full path and filename of parent exe
+    //
+    SString GetParentProcessPathFilename(int pid);
+
+    //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
