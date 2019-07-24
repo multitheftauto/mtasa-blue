@@ -124,11 +124,18 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Initialize discord manager
+    m_pDiscordManager = new CDiscordManager();
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Delete discord manager
+    delete m_pDiscordManager;
+    m_pDiscordManager = nullptr;
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -564,6 +571,9 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (bConnected) m_pDiscordManager->RegisterPlay(true);
+    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -778,6 +788,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1955,6 +1966,24 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
+}
+
+//
+// ResetDiscordRichPresence
+//
+void CCore::ResetDiscordRichPresence()
+{
+    if (m_pDiscordManager)
+    {
+        // Set default parameters
+        SDiscordActivity activity;
+        activity.m_details = "Awaiting joining a server";
+        m_pDiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+            if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+            else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+        });
+        m_pDiscordManager->RegisterPlay(false);
+    }
 }
 
 //

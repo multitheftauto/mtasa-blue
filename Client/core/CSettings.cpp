@@ -376,6 +376,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
+    m_pDiscordCheck = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Enable Discord Rich Presence"), true));
+    m_pDiscordCheck->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pDiscordCheck->GetPosition(vecTemp, false);
+    m_pDiscordCheck->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1493,6 +1498,11 @@ void CSettings::UpdateVideoTab()
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Enable Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    m_pDiscordCheck->SetSelected(discordRichPresence);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3311,6 +3321,15 @@ void CSettings::SaveData()
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
+
+    // Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    if (discordRichPresence != m_pDiscordCheck->GetSelected())
+    {
+        CVARS_SET("discord_rich_presence", m_pDiscordCheck->GetSelected());
+        g_pCore->GetDiscordManager()->Disconnect();
+    }
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();

@@ -44,6 +44,7 @@
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
+#include "CServerInfo.h"
 
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
@@ -226,7 +227,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -276,6 +277,7 @@ public:
     CSyncDebug*                   GetSyncDebug() { return m_pSyncDebug; };
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
+    CServerInfo*                  GetServerInfo() { return m_pServerInfo; }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
@@ -434,6 +436,8 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
+
+    void TriggerDiscordJoin(SString strSecret);
 
 private:
     // CGUI Callbacks
@@ -698,6 +702,7 @@ private:
     CLuaManager*        m_pLuaManager;
     CScriptDebugging*   m_pScriptDebugging;
     CRegisteredCommands m_RegisteredCommands;
+    CServerInfo*        m_pServerInfo;
 
     // Map statuses
     SString m_strCurrentMapName;

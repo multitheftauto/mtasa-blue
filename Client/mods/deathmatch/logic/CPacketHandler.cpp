@@ -205,6 +205,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_PedTask(bitStream);
             return true;
 
+        case PACKET_ID_SERVER_INFO_SYNC:
+            Packet_ServerInfoSync(bitStream);
+            return true;
+
         default:
             break;
     }
@@ -452,6 +456,9 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
     g_pCore->UpdateRecentlyPlayed();
+
+    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() < 0x06D)
+        g_pCore->GetDiscordManager()->SetState(SString("%i Players", ucNumberOfPlayers), [](EDiscordRes) {});
 }
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
@@ -987,6 +994,11 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             // Call the onClientPlayerJoin event
             CLuaArguments Arguments;
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
+
+            if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
+                g_pCore->GetDiscordManager()->SetState(SString("%i/%i Players", g_pClientGame->GetPlayerManager()->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers()), [](EDiscordRes) {});
+            else
+                g_pCore->GetDiscordManager()->SetState(SString("%i Players", g_pClientGame->GetPlayerManager()->Count()), [](EDiscordRes) {});
         }
     }
 }
@@ -5206,6 +5218,24 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
         default:
             break;
     };
+}
+
+void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
+{
+    uint8 flags;
+    
+    if (!bitStream.Read(flags))
+        return;
+
+    // Read in order of flags
+    if (flags & SERVER_INFO_FLAG_MAX_PLAYERS)
+    {
+        uint maxPlayersCount;
+        if (!bitStream.Read(maxPlayersCount))
+            return;
+
+        g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
 }
 
 //

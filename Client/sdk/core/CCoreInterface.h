@@ -23,6 +23,7 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
+#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -62,21 +63,21 @@ public:
     //       correct MTA version before trying to use any other interface funcs.
     virtual eCoreVersion GetVersion() = 0;
 
-    virtual CConsoleInterface*      GetConsole() = 0;
-    virtual CCommandsInterface*     GetCommands() = 0;
-    virtual CGame*                  GetGame() = 0;
-    virtual CGraphicsInterface*     GetGraphics() = 0;
-    virtual CGUI*                   GetGUI() = 0;
-    virtual CModManagerInterface*   GetModManager() = 0;
-    virtual CMultiplayer*           GetMultiplayer() = 0;
-    virtual CNet*                   GetNetwork() = 0;
-    virtual CXML*                   GetXML() = 0;
-    virtual CKeyBindsInterface*     GetKeyBinds() = 0;
-    virtual CXMLNode*               GetConfig() = 0;
-    virtual CCVarsInterface*        GetCVars() = 0;
-    virtual CLocalizationInterface* GetLocalization() = 0;
-    virtual CWebCoreInterface*      GetWebCore() = 0;
-    virtual CTrayIconInterface*     GetTrayIcon() = 0;
+    virtual CConsoleInterface*        GetConsole() = 0;
+    virtual CCommandsInterface*       GetCommands() = 0;
+    virtual CGame*                    GetGame() = 0;
+    virtual CGraphicsInterface*       GetGraphics() = 0;
+    virtual CGUI*                     GetGUI() = 0;
+    virtual CModManagerInterface*     GetModManager() = 0;
+    virtual CMultiplayer*             GetMultiplayer() = 0;
+    virtual CNet*                     GetNetwork() = 0;
+    virtual CXML*                     GetXML() = 0;
+    virtual CKeyBindsInterface*       GetKeyBinds() = 0;
+    virtual CXMLNode*                 GetConfig() = 0;
+    virtual CCVarsInterface*          GetCVars() = 0;
+    virtual CLocalizationInterface*   GetLocalization() = 0;
+    virtual CWebCoreInterface*        GetWebCore() = 0;
+    virtual CTrayIconInterface*       GetTrayIcon() = 0;
 
     // Temporary functions for r1
     virtual void DebugEcho(const char* szText) = 0;
@@ -176,6 +177,8 @@ public:
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
     virtual HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress) = 0;
+
+    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
 };
 
 class CClientTime

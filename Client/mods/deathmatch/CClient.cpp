@@ -151,6 +151,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
             // Split it up
             char* szNick = strtok(szTemp, " ");
             char* szPass = strtok(NULL, " ");
+            char* szSecret = strtok(NULL, " ");
 
             // Are we supposed to launch the server and play locally?
             if (stricmp(szArguments, "local") == 0)
@@ -184,7 +185,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
                     // Start the game
-                    g_pClientGame->StartGame(szNick, szPass);
+                    g_pClientGame->StartGame(szNick, szPass, CClientGame::SERVER_TYPE_NORMAL, szSecret);
                 }
                 else
                 {
@@ -305,4 +306,9 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
             vPlayerNames.push_back(strPlayerName);
         }
     }
+}
+
+void CClient::TriggerDiscordJoin(SString strSecret)
+{
+    g_pClientGame->TriggerDiscordJoin(strSecret);
 }

@@ -151,6 +151,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxDeviceSelectionDialog;
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
+    CGUICheckBox*  m_pDiscordCheck = nullptr;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;

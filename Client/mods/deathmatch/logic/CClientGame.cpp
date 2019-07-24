@@ -303,6 +303,9 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Start async task scheduler
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
 
+    // Server info construction
+    m_pServerInfo = new CServerInfo();
+
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
     g_pMultiplayer->DisableEnterExitVehicleKey(true);
 
@@ -488,6 +491,8 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
     SAFE_DELETE(m_pResourceFileDownloadManager);
+    
+    SAFE_DELETE(m_pServerInfo);
 
     SAFE_DELETE(m_pRootEntity);
 
@@ -560,7 +565,7 @@ void CClientGame::StartPlayback()
     }
 }
 
-bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type)
+bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type, const char* szSecret)
 {
     m_ServerType = Type;
     // int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
@@ -631,6 +636,13 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             // Append community information (Removed)
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
+
+            if (g_pNet->GetServerBitStreamVersion() >= 0x06D)
+            {
+                SString joinSecret;
+                if (szSecret) joinSecret = szSecret;
+                pBitStream->WriteString<uchar>(joinSecret);
+            }
 
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -6932,6 +6944,17 @@ void CClientGame::RestreamModel(unsigned short usModel)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+}
+
+void CClientGame::TriggerDiscordJoin(SString strSecret)
+{
+    if (g_pNet->GetServerBitStreamVersion() < 0x06D)
+        return;
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    pBitStream->WriteString<uchar>(strSecret);
+    g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
+    g_pNet->DeallocateNetBitStream(pBitStream);
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
