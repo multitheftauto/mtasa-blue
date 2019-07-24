@@ -33,6 +33,6 @@ private:
 
     RwTexDictionary* m_pVehicleTxdDictionary;
 
-    // 50 mb
-    const unsigned int imgReadWriteOperationSizeInBytes = 20 * 1024 * 1024;
+    // n megabytes * 1024 * 1024
+    const unsigned int imgReadWriteOperationSizeInBytes = 7 * 1024 * 1024;
 };

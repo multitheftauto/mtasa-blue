@@ -84,6 +84,7 @@ public:
     CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation);
     ~CIMGArchive();
 
+    void                          closeFile() { fileStream.close(); }
     bool                          LoadIMGFile(const SString& filePath, eIMGFileOperation fileOperation);
     std::vector<CIMGArchiveFile>* GetNextImgFiles(unsigned int imgReadWriteOperationSize);
     uint                          GetFileCount();

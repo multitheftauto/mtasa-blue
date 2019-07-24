@@ -267,6 +267,7 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
 
             //WriteDFF(pClump, pDFFArchiveFile);
             //WriteTXD(pAtlasTxdDictionary, pDFFArchiveFile);
+            m_pRenderWare->TxdForceUnload(0, true, pAtlasTxdDictionary);
         }
         delete modelOptimizer;
         modelOptimizer = nullptr;
@@ -414,8 +415,13 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         newIMgArchiveOut->WriteEntries(imgArchiveFilesOutput);
         */
 
+        std::vector<CIMGArchiveFile>().swap(m_ImgArchiveCustomFiles);
         std::vector<CDFFModelOptimizationInfo>().swap(dffOptimizationInfos);
         imgArchiveFiles = m_gt3IMgArchive.GetNextImgFiles(imgReadWriteOperationSizeInBytes);
+
+        // REMOVE THIS LATER
+        break;
+        // REMOVE END
     }
 
     printf("\n\ngTotalModelsToOptimize: %u\n\n", gTotalModelsToOptimize);
@@ -426,6 +432,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     m_gt3IMgArchive.FreeArchiveDirEntries();
     std::vector<CDFFModelOptimizationInfo>().swap(dffOptimizationInfos);
 
+    m_gt3IMgArchive.closeFile();
     m_pRenderWare->TxdForceUnload(0, true, m_pVehicleTxdDictionary);
     return true;
 }
