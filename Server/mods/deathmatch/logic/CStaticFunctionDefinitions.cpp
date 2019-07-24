@@ -3273,6 +3273,34 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax)
+{
+    assert(pElement);
+
+    if (uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64)
+        return false;
+
+    RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        if (pPlayer->GetBitStreamVersion() < 0x06D)
+            return false;
+
+        CBitStream bitStream;
+        bitStream.pBitStream->WriteString<uchar>(strKey);
+        bitStream.pBitStream->WriteString<uchar>(strPartyId);
+        bitStream.pBitStream->Write(uiPartySize);
+        bitStream.pBitStream->Write(uiPartyMax);
+        pPlayer->Send(CLuaPacket(SET_DISCORD_JOIN_PARAMETERS, *bitStream.pBitStream));
+
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword)
 {
     if (IS_PLAYER(pElement))
@@ -9784,6 +9812,7 @@ bool CStaticFunctionDefinitions::SetMaxPlayers(unsigned int uiMax)
         return false;
     m_pMainConfig->SetSoftMaxPlayers(uiMax);
     g_pNetServer->SetMaximumIncomingConnections(uiMax);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CServerInfoSyncPacket(SERVER_INFO_FLAG_MAX_PLAYERS));
     return true;
 }
 
