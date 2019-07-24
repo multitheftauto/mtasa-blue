@@ -149,7 +149,7 @@ RwTexDictionary* CIMGArchiveOptimizer::ReadTextureDictionary(SDFFDescriptor* pDF
         STXDImgArchiveInfo* pTXDImgArchiveInfo = pTXDDescriptor->GetTXDImgArchiveInfo();
         if (pTXDImgArchiveInfo->usSize == 0)
         {
-            return false;
+            return nullptr;
         }
         CIMGArchiveFile* txdArchiveFile = new CIMGArchiveFile();
         if (m_gt3IMgArchive.GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo, *txdArchiveFile))
