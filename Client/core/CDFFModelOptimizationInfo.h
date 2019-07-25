@@ -35,6 +35,18 @@ struct SOptimizedDFF
 
     SOptimizedTexture& GetOptimizedTexture(size_t index) { return optimizedTextures[index]; }
 
+    SOptimizedTexture* GetOptimizedTextureByName(unsigned int textureNameHash)
+    {
+        for (auto& optimizedTexture : optimizedTextures)
+        {
+            if (textureNameHash == optimizedTexture.m_textureNameHash)
+            {
+                return &optimizedTexture;
+            }
+        }
+        return nullptr;
+    }
+
 private:
     unsigned int                   m_dffNameHash;
     unsigned int                   m_txdNameHash;
@@ -78,6 +90,17 @@ public:
     void FreeMemory() { std::vector<SOptimizedDFF>().swap(optimizedDFFs); }
 
     SOptimizedDFF& InsertDFF(const char* dffName);
+    SOptimizedDFF* GetOptimizedDFF(unsigned int dffNameHash)
+    {
+        for (auto& optimizedDFF : optimizedDFFs)
+        {
+            if (optimizedDFF.GetDFFNameHash() == dffNameHash)
+            {
+                return &optimizedDFF;
+            }
+        }
+        return nullptr;
+    }
 
 private:
     std::vector<char>          tempData;

@@ -40,6 +40,7 @@ public:
     bool             AddMeshesToXatlas();
     bool             GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF);
     void             GetDenormalizedUVs();
+    void             SetupAtlasDataForOptimizationInfo();
     void             SetupAtlasData();
     void             ReplaceGeometriesInClump();
     void             GetAtlasTextures(CTextureAtlas& textureAtlas);
