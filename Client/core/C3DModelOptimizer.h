@@ -38,7 +38,7 @@ public:
     void DestroyMostUsedTexturesToIgnoreClones();
 
     bool             AddMeshesToXatlas();
-    bool             GetModelOptimizationInfo();
+    bool             GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF);
     void             GetDenormalizedUVs();
     void             SetupAtlasData();
     void             ReplaceGeometriesInClump();

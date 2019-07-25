@@ -81,7 +81,7 @@ class CIMGArchive
 {
 public:
     CIMGArchive() {}
-    CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation);
+    CIMGArchive(const SString& archiveFilePath, eIMGFileOperation fileOperation);
     ~CIMGArchive();
 
     void                          closeFile() { fileStream.close(); }

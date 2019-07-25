@@ -52,6 +52,8 @@ public:
     void            AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive);
     SDFFDescriptor* GetDFFDescriptor(const unsigned int uiDFFNameHash);
 
+    unsigned int    GetMaximumOptimizableModelsCount() { return mapOfDffDescriptors.size(); }
+
 private:
     // Key: DFF name hash
     std::map<unsigned int, SDFFDescriptor> mapOfDffDescriptors;

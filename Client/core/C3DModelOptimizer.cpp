@@ -586,37 +586,34 @@ bool C3DModelOptimizer::AddMeshesToXatlas()
     return true;
 }
 
-bool C3DModelOptimizer::GetModelOptimizationInfo()
+bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
 {
-    if (m_pDFFOptimizationInfo)
+    unsigned int        resolution = std::max(m_Atlas->width, m_Atlas->height);
+    unsigned int        atlasSizeInBytes = GetDXT1TextureSizeInBytes(resolution);
+    const float         texelsPerUnit = 1.0f;
+    xatlas::PackOptions packOptions;
+    packOptions.padding = 1;
+    packOptions.texelsPerUnit = texelsPerUnit;
+
+    for (auto& pTexture : setOfUsedTextures)
     {
-        unsigned int        resolution = std::max(m_Atlas->width, m_Atlas->height);
-        unsigned int        atlasSizeInBytes = GetDXT1TextureSizeInBytes(resolution);
-        const float         texelsPerUnit = 1.0f;
-        xatlas::PackOptions packOptions;
-        packOptions.padding = 1;
-        packOptions.texelsPerUnit = texelsPerUnit;
-
-        for (auto& pTexture : setOfUsedTextures)
-        {
-            DestroyMostUsedTexturesToIgnoreClones();
-
-            xatlas::Destroy(m_Atlas);
-            m_Atlas = xatlas::Create();
-            if (!AddMeshesToXatlas())
-            {
-                return false;
-            }
-
-            m_mapOfMostUsedTexturesToIgnore[pTexture] = nullptr;
-
-            xatlas::PackCharts(m_Atlas, packOptions);
-
-            float atlasSizeWithoutOneTextureInBytes = GetDXT1TextureSizeInBytes(std::max(m_Atlas->width, m_Atlas->height));
-            //m_pDFFOptimizationInfo->Addtexture(HashString(pTexture->name), atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes);
-        }
         DestroyMostUsedTexturesToIgnoreClones();
+
+        xatlas::Destroy(m_Atlas);
+        m_Atlas = xatlas::Create();
+        if (!AddMeshesToXatlas())
+        {
+            return false;
+        }
+
+        m_mapOfMostUsedTexturesToIgnore[pTexture] = nullptr;
+
+        xatlas::PackCharts(m_Atlas, packOptions);
+
+        float atlasSizeWithoutOneTextureInBytes = GetDXT1TextureSizeInBytes(std::max(m_Atlas->width, m_Atlas->height));
+        optimizedDFF.Addtexture(HashString(pTexture->name), atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes);
     }
+    DestroyMostUsedTexturesToIgnoreClones();
     return true;
 }
 

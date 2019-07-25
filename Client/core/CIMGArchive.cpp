@@ -1,7 +1,7 @@
 #include "StdInc.h"
 #include "CIMGArchive.h"
 
-CIMGArchive::CIMGArchive(std::string archiveFilePath, eIMGFileOperation fileOperation)
+CIMGArchive::CIMGArchive(const SString& archiveFilePath, eIMGFileOperation fileOperation)
 {
     LoadIMGFile(archiveFilePath, fileOperation);
 }
