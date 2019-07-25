@@ -588,8 +588,6 @@ bool C3DModelOptimizer::AddMeshesToXatlas()
 
 bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
 {
-    SetupAtlasData();
-
     unsigned int        resolution = std::max(m_Atlas->width, m_Atlas->height);
     unsigned int        atlasSizeInBytes = GetDXT1TextureSizeInBytes(resolution);
     const float         texelsPerUnit = 1.0f;
