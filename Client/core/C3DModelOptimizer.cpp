@@ -588,6 +588,8 @@ bool C3DModelOptimizer::AddMeshesToXatlas()
 
 bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
 {
+    SetupAtlasData();
+
     unsigned int        resolution = std::max(m_Atlas->width, m_Atlas->height);
     unsigned int        atlasSizeInBytes = GetDXT1TextureSizeInBytes(resolution);
     const float         texelsPerUnit = 1.0f;
@@ -599,14 +601,15 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
     {
         DestroyMostUsedTexturesToIgnoreClones();
 
+        m_mapOfMostUsedTexturesToIgnore[pTexture] = nullptr;
+        SetupAtlasDataForOptimizationInfo();
+
         xatlas::Destroy(m_Atlas);
         m_Atlas = xatlas::Create();
         if (!AddMeshesToXatlas())
         {
             return false;
         }
-
-        m_mapOfMostUsedTexturesToIgnore[pTexture] = nullptr;
 
         xatlas::PackCharts(m_Atlas, packOptions);
 
@@ -634,6 +637,20 @@ void C3DModelOptimizer::GetDenormalizedUVs()
             denormalizedUVs[i].y *= (float)dxTexture->GetHeight();
         }
     }
+}
+
+void C3DModelOptimizer::SetupAtlasDataForOptimizationInfo()
+{
+    texturesCache.clear();
+    textures.clear();
+    denormalizedUVs.clear();
+    std::vector<CDXTexture>().swap(texturesCache);
+    std::vector<uint32_t>().swap(textures);
+    std::vector<Vector2>().swap(denormalizedUVs);
+
+    GetTextures();
+    denormalizedUVs = uvs;
+    GetDenormalizedUVs();
 }
 
 void C3DModelOptimizer::SetupAtlasData()
