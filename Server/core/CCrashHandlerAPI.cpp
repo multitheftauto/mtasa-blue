@@ -25,6 +25,7 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CCrashHandlerAPI.h"
+#ifdef WIN32
 #include "detours/include/detours.h"
 
 /*//////////////////////////////////////////////////////////////////////
@@ -169,3 +170,5 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     }
     return (lRet);
 }
+
+#endif  // #ifdef WIN32
