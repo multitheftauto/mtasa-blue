@@ -13,6 +13,12 @@ guiLabelSetHorizontalAlign(GUIEditor.label[1], "left", true)
 GUIEditor.button[1] = guiCreateButton(112, 108, 125, 47, "GENERATE", false, GUIEditor.window[1])
 */
 
+std::array<unsigned int, 7> arrModelsToIgnore = {
+    // vehicle models
+    518,
+    // other models
+    13048, 3411, 3412, 10810, 7981, 4666};
+
 CIMGArchiveOptimizer::CIMGArchiveOptimizer()
 {
     CreateGUI();
@@ -186,7 +192,7 @@ void CIMGArchiveOptimizer::WriteDFF(RpClump* pClump, CIMGArchiveFile* pDFFArchiv
     // m_pRenderWare->WriteDFF(pDFFData, dffArchiveFile.actualFileSize, pClump);
 
     // Remove this line later
-    // m_pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
+    m_pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile.fileEntry.fileName, pClump);
 }
 
 void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, CIMGArchiveFile* pDFFArchiveFile)
@@ -215,7 +221,7 @@ void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, CIMGArchive
     void* pTXDData = txdArchiveFile.fileByteBuffer.GetData();
     // m_pRenderWare->WriteTXD(pTXDData, txdArchiveFile.actualFileSize, pTxdDictionary);
     // Remove this line later
-    // m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
+    m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
 }
 
 void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
@@ -223,14 +229,21 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     /*
     // REMOVE LATER
     int         modelID = 0;
-    const char* pStrDFFName = "des_cluckinlod.dff";            //"infernus.dff";
+    const char* pStrDFFName = "freeway6_lan2.dff";            //"infernus.dff";
     memcpy(pDFFArchiveFile->fileEntry.fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = pRenderWare->ReadTXD("lod_countryn.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = m_pRenderWare->ReadTXD("lan2freeway.txd", CBuffer(), false);
     // REMOVE END
     */
 
-    SDFFDescriptor*  pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    SDFFDescriptor* pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    ///*
+    auto it = pDFFDescriptor ? std::find(arrModelsToIgnore.begin(), arrModelsToIgnore.end(), pDFFDescriptor->GetModelID()) : arrModelsToIgnore.end();
+    if (pDFFDescriptor && it == arrModelsToIgnore.end())
+    {
+        return;
+    }
+    // */
     RwTexDictionary* pTxdDictionary = pDFFDescriptor ? ReadTextureDictionary(pDFFDescriptor) : nullptr;
     if (!pTxdDictionary)
     {
@@ -251,7 +264,7 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     printf("\nabout to read: %s | size: %u \n\n", (char*)pDFFArchiveFile->fileEntry.fileName, pDFFArchiveFile->actualFileSize);
 
     bool bLoadCollision = IsVehicleModel(modelID);
-    // RpClump* pClump = pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
+    // RpClump* pClump = m_pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, CBuffer(), modelID, bLoadCollision, pTxdDictionary);
     RwBuffer buffer = {pDFFArchiveFile->GetData(), pDFFArchiveFile->actualFileSize};
     RpClump* pClump = m_pRenderWare->ReadDFF(pDFFArchiveFile->fileEntry.fileName, buffer, modelID, bLoadCollision, pTxdDictionary);
 
@@ -259,11 +272,19 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
 
     if (pClump)
     {
-        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, pTxdDictionary);
+        // This should be set to false when generating atlases
+        bool               bDontLoadTextures = true;
+        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, pTxdDictionary, bDontLoadTextures);
+        // modelOptimizer->OutputClumpAsOBJ();
         if (modelOptimizer->Optimize())
         {
+            ///*
+            // SOptimizedDFF* pOptimizedDFF = m_dffOptimizationInfo.GetOptimizedDFF(pDFFArchiveFile->fileEntry.fileName);
+            // assert(pOptimizedDFF != nullptr);
+            // modelOptimizer->SetOptimizationInfo(pOptimizedDFF);
             // RwTexDictionary* pAtlasTxdDictionary = modelOptimizer->CreateTXDAtlas();
             // assert(pAtlasTxdDictionary != nullptr);
+            //*/
 
             SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
             assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
@@ -310,6 +331,7 @@ void CIMGArchiveOptimizer::OptimizeIMGArchiveFiles(std::vector<CIMGArchiveFile>*
         if (strFileExtension == "dff")
         {
             OptimizeDFFFile(&archiveFile);
+            // break;
         }
 
         modelIndexInIMG++;
@@ -372,16 +394,47 @@ void CIMGArchiveOptimizer::FlushDFFOptimizationDataToFile(const char* filePath)
 
 void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
 {
-    int totalFiles = 1;
+    SString outputFolder = "OptimizedFiles";
+
+    m_dffOptimizationInfo.AllocateSpace(m_IdeLoader.GetMaximumOptimizableModelsCount());
+    int totalFiles = 46;
     for (int dffModelInfosIndex = 0; dffModelInfosIndex < totalFiles; dffModelInfosIndex++)
     {
-        char    fileNameBuffer[100];
-        SString outputFolder = "OptimizedFiles";
+        char fileNameBuffer[100];
         sprintf(fileNameBuffer, "atlasesInfo%d.gmoi", dffModelInfosIndex);
+        printf("reading %s\n", fileNameBuffer);
         assert(m_dffOptimizationInfo.CreateTheFile(outputFolder + "\\" + fileNameBuffer, OPTIMIZE_FILE_READ) != false);
         if (!m_dffOptimizationInfo.ReadOptimizedDFFs())
         {
             printf("ReadOptimizedDFFs failed\n");
+        }
+        m_dffOptimizationInfo.CloseFile();
+    }
+
+    CDFFModelOptimizationInfo theDffOptimizationInfo;
+    theDffOptimizationInfo.AllocateSpace(20);
+    assert(theDffOptimizationInfo.CreateTheFile(outputFolder + "\\atlasesInfoRemaining.gmoi", OPTIMIZE_FILE_READ) != false);
+    if (!theDffOptimizationInfo.ReadOptimizedDFFs())
+    {
+        printf("ReadOptimizedDFFs failed\n");
+    }
+    theDffOptimizationInfo.CloseFile();
+
+    for (unsigned int i = 0; i < theDffOptimizationInfo.GetOptimizedDFFCount(); i++)
+    {
+        SOptimizedDFF& optimizedDFF = theDffOptimizationInfo.GetOptimizedDFF(i);
+        if (m_dffOptimizationInfo.GetOptimizedDFFByHash(optimizedDFF.GetDFFNameHash()))
+        {
+            printf("skipping a remaining DFF optimization info with texture count: %u\n", optimizedDFF.GetTotalOptimizedTextures());
+            continue;
+        }
+
+        SOptimizedDFF& theNewOptimizedDFF = m_dffOptimizationInfo.InsertDFF(optimizedDFF.GetDFFNameHash(), optimizedDFF.GetTXDNameHash());
+
+        for (unsigned int textureIndex = 0; textureIndex < theNewOptimizedDFF.GetTotalOptimizedTextures(); textureIndex++)
+        {
+            SOptimizedTexture& optimizedTexture = theNewOptimizedDFF.GetOptimizedTexture(textureIndex);
+            theNewOptimizedDFF.Addtexture(optimizedTexture.m_textureNameHash, optimizedTexture.m_textureSizeWithinUnwrappedImageInBytes);
         }
     }
 }
@@ -413,22 +466,26 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 
     m_IdeLoader.AddTXDDFFInfoToMaps(&m_gt3IMgArchive);
 
-    // m_IdeLoader.GetMaximumOptimizableModelsCount()
+    ReadDFFOptimizationInfoFiles();
+
+    FlushDFFOptimizationDataToFile(outputFolder + "\\complete.gmoi");
+    return true;
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
+
+    int dffModelInfosIndex = 0;
 
     std::vector<CIMGArchiveFile>* imgArchiveFiles = m_gt3IMgArchive.GetNextImgFiles(imgReadWriteOperationSizeInBytes);
 
     char fileNameBuffer[100];
-    int  dffModelInfosIndex = 0;
     while (imgArchiveFiles)
     {
         std::vector<CIMGArchiveFile*> imgArchiveFilesOutput;
 
         unsigned int totalPossibleCustomOutputFiles = GetTotalPossibleCustomOutputFiles(imgArchiveFiles);
 
-        m_dffOptimizationInfo.FreeMemory();
-        m_dffOptimizationInfo.AllocateSpace(totalPossibleCustomOutputFiles);
+        // m_dffOptimizationInfo.FreeMemory();
+        // m_dffOptimizationInfo.AllocateSpace(totalPossibleCustomOutputFiles);
 
         // each DFF will have its own TXD, so multiply the amount by 2
         totalPossibleCustomOutputFiles *= 2;
@@ -448,14 +505,14 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         newIMgArchiveOut->WriteEntries(imgArchiveFilesOutput);
         */
 
-        sprintf(fileNameBuffer, "atlasesInfo%d.gmoi", dffModelInfosIndex);
-        FlushDFFOptimizationDataToFile(outputFolder + "\\" + fileNameBuffer);
+        // sprintf(fileNameBuffer, "atlasesInfo%d.gmoi", dffModelInfosIndex);
+        // FlushDFFOptimizationDataToFile(outputFolder + "\\" + fileNameBuffer);
 
         imgArchiveFiles = m_gt3IMgArchive.GetNextImgFiles(imgReadWriteOperationSizeInBytes);
         dffModelInfosIndex++;
 
         // REMOVE THIS LATER
-        break;
+        // break;p
         // REMOVE END
     }
 

@@ -6,12 +6,13 @@
 #include "xatlas_repack.h"
 #include "C3DModelOptimizer.h"
 
-C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary)
+C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary, bool bDontLoadTextures)
 {
     m_pTexDictionary = pTxdDictionary;
     pClump = pTheClump;
+    m_bDontLoadTextures = bDontLoadTextures;
     m_Atlas = nullptr;
-    m_pDFFOptimizationInfo = nullptr;
+    m_pOptimizedDFF = nullptr;
     m_pAtlasTexDictionary = nullptr;
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
@@ -265,8 +266,16 @@ void C3DModelOptimizer::GetTextures()
             if (it == setOfTextureNameHashes.end())
             {
                 textures.emplace_back(texturesCache.size());
-                CDXTexture& dxTexture = texturesCache.emplace_back(pMaterial->texture, RW_TEXTURE_DELETE_ON_UNLOAD);
-                dxTexture.LockTexture(D3DLOCK_READONLY);
+                if (m_bDontLoadTextures)
+                {
+                    RwRaster*   raster = pMaterial->texture->raster;
+                    CDXTexture& dxTexture = texturesCache.emplace_back(raster->width, raster->height);
+                }
+                else
+                {
+                    CDXTexture& dxTexture = texturesCache.emplace_back(pMaterial->texture, RW_TEXTURE_DELETE_ON_UNLOAD);
+                    dxTexture.LockTexture(D3DLOCK_READONLY);
+                }
 
                 setOfTextureNameHashes.insert(textureNameHash);
 
@@ -525,7 +534,7 @@ void C3DModelOptimizer::GetUsedTexturesCount()
 
 void C3DModelOptimizer::GetMostUsedTextureToIgnore()
 {
-    /*
+   
     const unsigned int      textureToIgnoreNameHash = HashString("ceiling_256");
     std::vector<RwTexture*> outTextureList;
     pRenderWare->GetTxdTextures(outTextureList, m_pTexDictionary);
@@ -539,7 +548,7 @@ void C3DModelOptimizer::GetMostUsedTextureToIgnore()
             break;
         }
     }
-    */
+
 }
 
 void C3DModelOptimizer::DestroyMostUsedTexturesToIgnoreClones()
@@ -588,12 +597,19 @@ bool C3DModelOptimizer::AddMeshesToXatlas()
 
 bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
 {
-    unsigned int        resolution = std::max(m_Atlas->width, m_Atlas->height);
+    unsigned int resolution = std::max(m_Atlas->width, m_Atlas->height);
+    while (resolution % 4 != 0)
+    {
+        resolution++;
+    }
     unsigned int        atlasSizeInBytes = GetDXT1TextureSizeInBytes(resolution);
     const float         texelsPerUnit = 1.0f;
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
     packOptions.texelsPerUnit = texelsPerUnit;
+
+    float theAtlasSize = (atlasSizeInBytes/ 1024.0f) / 1024.0f;
+    //printf("atlas Size: %f mb | atlasSizeInBytes: %u\n", theAtlasSize, atlasSizeInBytes);
 
     for (auto& pTexture : setOfUsedTextures)
     {
@@ -611,8 +627,18 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
 
         xatlas::PackCharts(m_Atlas, packOptions);
 
-        float atlasSizeWithoutOneTextureInBytes = GetDXT1TextureSizeInBytes(std::max(m_Atlas->width, m_Atlas->height));
-        optimizedDFF.Addtexture(HashString(pTexture->name), atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes);
+        unsigned int theResolution = std::max(m_Atlas->width, m_Atlas->height);
+        while (theResolution % 4 != 0)
+        {
+            theResolution++;
+        }
+        unsigned int atlasSizeWithoutOneTextureInBytes = GetDXT1TextureSizeInBytes(theResolution);
+        unsigned int textureSizeWithinAtlasInBytes = atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes;
+        optimizedDFF.Addtexture(HashString(pTexture->name), textureSizeWithinAtlasInBytes);
+
+        //float theTextureSizeWithinAtlasInMBs = ((atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes) / 1024.0f) / 1024.0f;
+        //std::printf("texture '%s' size in atlas: %f mb | textureSize In Atlas: %u\n", pTexture->name, theTextureSizeWithinAtlasInMBs,
+        //            textureSizeWithinAtlasInBytes);
     }
     DestroyMostUsedTexturesToIgnoreClones();
     return true;
@@ -795,12 +821,9 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     }
 
     unsigned int atlasFindingAttempts = 0;
-    bool         bChartDoesntFit = false;
     do
     {
         atlasFindingAttempts++;
-        bChartDoesntFit = false;
-
         xatlas::Destroy(m_Atlas);
         m_Atlas = xatlas::Create();
         if (!AddMeshesToXatlas())
@@ -810,13 +833,9 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
         printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
         packOptions.resolution = bestAtlasResolution;
-        if (xatlas::PackCharts(m_Atlas, packOptions) == xatlas::PackChartsError::ChartDoesntFit)
-        {
-            bChartDoesntFit = true;
-        }
-
+        xatlas::PackCharts(m_Atlas, packOptions);
         bestAtlasResolution += 32;
-    } while (m_Atlas->atlasCount > 1 || bChartDoesntFit);
+    } while (m_Atlas->atlasCount > 1);
 
     printf("Copying texture data into atlas\n");
 

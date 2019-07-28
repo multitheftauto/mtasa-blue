@@ -6,6 +6,11 @@ CDFFModelOptimizationInfo::~CDFFModelOptimizationInfo()
     CloseFile();
 }
 
+SOptimizedDFF& CDFFModelOptimizationInfo::InsertDFF(unsigned int dffNameHash, unsigned int txdNameHash)
+{
+    return optimizedDFFs.emplace_back(dffNameHash, txdNameHash);
+};
+
 SOptimizedDFF& CDFFModelOptimizationInfo::InsertDFF(const char* dffName)
 {
     unsigned int dffNameHash = HashString(dffName);
@@ -21,6 +26,7 @@ SOptimizedDFF& CDFFModelOptimizationInfo::InsertDFF(const char* dffName)
 
 bool CDFFModelOptimizationInfo::CreateTheFile(const SString& filePath, eDFFModelOptimizationOperation fileOperation)
 {
+    m_fileOperation = fileOperation;
     if (fileOperation == OPTIMIZE_FILE_READ)
     {
         inputFileStream.open(FromUTF8(filePath), std::ios::binary | std::ios::ate);
@@ -55,6 +61,7 @@ void CDFFModelOptimizationInfo::WriteHeader()
     outputFileStream.write((char*)&header, sizeof(SOptimizationInfoHeader));
 }
 
+// Make sure to call AllocateSpace before calling this function
 bool CDFFModelOptimizationInfo::ReadOptimizedDFFs()
 {
     std::streamsize iFileSize = inputFileStream.tellg();
@@ -67,7 +74,7 @@ bool CDFFModelOptimizationInfo::ReadOptimizedDFFs()
     tempData.resize(static_cast<size_t>(iFileSize));
     inputFileStream.read(tempData.data(), iFileSize);
 
-    char*                    pInputData = tempData.data();
+    char*                   pInputData = tempData.data();
     SOptimizationInfoHeader header = *(SOptimizationInfoHeader*)pInputData;
     pInputData += sizeof(SOptimizationInfoHeader);
     if (strncmp(header.version, pHeaderVersion, 4) != 0)
@@ -77,7 +84,6 @@ bool CDFFModelOptimizationInfo::ReadOptimizedDFFs()
     }
 
     printf("ReadOptimizedDFFs: yes GMOI | totalEntries: %u\n", header.totalEntries);
-    AllocateSpace(header.totalEntries);
 
     for (unsigned int i = 0; i < header.totalEntries; i++)
     {
@@ -85,7 +91,7 @@ bool CDFFModelOptimizationInfo::ReadOptimizedDFFs()
         pInputData += sizeof(SOptimizationInfoEntry);
         SOptimizedDFF& optimizedDFF = optimizedDFFs.emplace_back(optimizationInfoEntry.dffNameHash, optimizationInfoEntry.txdNameHash);
 
-        printf("texture entires: %u\n", optimizationInfoEntry.totalOptimizedTextures);
+        //printf("texture entires: %u\n", optimizationInfoEntry.totalOptimizedTextures);
 
         for (unsigned int textureIndex = 0; textureIndex < optimizationInfoEntry.totalOptimizedTextures; textureIndex++)
         {
@@ -129,5 +135,12 @@ void CDFFModelOptimizationInfo::WriteOptimizedDFFs()
 
 void CDFFModelOptimizationInfo::CloseFile()
 {
-    outputFileStream.close();
+    if (m_fileOperation == OPTIMIZE_FILE_READ)
+    {
+        inputFileStream.close();
+    }
+    else if (m_fileOperation == OPTIMIZE_FILE_WRITE)
+    {
+        outputFileStream.close();
+    }
 }

@@ -36,6 +36,7 @@ public:
     CRenderWare*           pRenderware;
 
     CDXTexture();
+    CDXTexture(unsigned int textureWidth, unsigned int textureHeight);
     CDXTexture(eCustomRWTextureDelete deleteSetting);
     CDXTexture(RwTexture* pTexture, eCustomRWTextureDelete deleteSetting);
     ~CDXTexture();

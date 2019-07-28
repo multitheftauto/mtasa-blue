@@ -8,6 +8,13 @@ CDXTexture::CDXTexture()
     Initialize();
 }
 
+CDXTexture::CDXTexture(unsigned int textureWidth, unsigned int textureHeight)
+{
+    Initialize();
+    imageWidth = textureWidth;
+    imageHeight = textureHeight;
+}
+
 CDXTexture::CDXTexture(eCustomRWTextureDelete deleteSetting)
 {
     Initialize();

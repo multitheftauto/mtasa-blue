@@ -7,15 +7,13 @@
 
 struct RpClump;
 
-class CDFFModelOptimizationInfo;
-
 class C3DModelOptimizer
 {
 public:
-    C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary);
+    C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary, bool bDontLoadTextures = false);
     ~C3DModelOptimizer();
 
-    void             SetOptimizationInfo(CDFFModelOptimizationInfo* pDFFOptimizationInfo) { m_pDFFOptimizationInfo = pDFFOptimizationInfo; }
+    void             SetOptimizationInfo(SOptimizedDFF* pOptimizedDFF) { m_pOptimizedDFF = pOptimizedDFF; }
     RwTexDictionary* GetAtlasTexDictionary() { return m_pAtlasTexDictionary; }
     bool             Optimize();
     bool             CreateAtlas();
@@ -47,8 +45,9 @@ public:
     RwTexDictionary* CreateTXDAtlas();
 
 private:
+    bool                       m_bDontLoadTextures;
     xatlas::Atlas*             m_Atlas;
-    CDFFModelOptimizationInfo* m_pDFFOptimizationInfo;
+    SOptimizedDFF*             m_pOptimizedDFF;
 
     RpClump*               pClump;
     CRenderWare*           pRenderWare;

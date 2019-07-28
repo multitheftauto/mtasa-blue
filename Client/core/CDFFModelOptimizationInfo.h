@@ -84,13 +84,21 @@ public:
     unsigned int GetOutputFileSize();
     void         WriteHeader();
     void         WriteOptimizedDFFs();
-    bool         ReadOptimizedDFFs();
+    // Make sure to call AllocateSpace before calling this function
+    bool ReadOptimizedDFFs();
 
     void AllocateSpace(size_t space) { optimizedDFFs.reserve(space); }
     void FreeMemory() { std::vector<SOptimizedDFF>().swap(optimizedDFFs); }
 
+    SOptimizedDFF& InsertDFF(unsigned int dffNameHash, unsigned int txdNameHash);
     SOptimizedDFF& InsertDFF(const char* dffName);
-    SOptimizedDFF* GetOptimizedDFF(unsigned int dffNameHash)
+    SOptimizedDFF* GetOptimizedDFF(const char* pDFFName)
+    {
+        unsigned int dffNameHash = HashString(pDFFName);
+        return GetOptimizedDFFByHash(dffNameHash);
+    }
+
+    SOptimizedDFF* GetOptimizedDFFByHash(unsigned int dffNameHash)
     {
         for (auto& optimizedDFF : optimizedDFFs)
         {
@@ -102,10 +110,14 @@ public:
         return nullptr;
     }
 
+    SOptimizedDFF& GetOptimizedDFF(size_t index) { return optimizedDFFs[index]; }
+    unsigned int   GetOptimizedDFFCount() { return optimizedDFFs.size(); }
+
 private:
-    std::vector<char>          tempData;
-    std::vector<SOptimizedDFF> optimizedDFFs;
-    std::ifstream              inputFileStream;
-    std::ofstream              outputFileStream;
-    const char*                pHeaderVersion = "GMOI";
+    eDFFModelOptimizationOperation m_fileOperation;
+    std::vector<char>              tempData;
+    std::vector<SOptimizedDFF>     optimizedDFFs;
+    std::ifstream                  inputFileStream;
+    std::ofstream                  outputFileStream;
+    const char*                    pHeaderVersion = "GMOI";
 };
