@@ -204,8 +204,8 @@ struct PackOptions
 	// If not 0, and texelsPerUnit is 0, texelsPerUnit is estimated to approximately match the resolution.
 	uint32_t resolution = 0;
 
-	// Charts larger than this will be scaled down.
-	uint32_t maxChartSize = 1024;
+	// Charts larger than this will be scaled down. 0 means no limit.
+	uint32_t maxChartSize = 0;
 
 	// Align charts to 4x4 blocks. Also improves packing speed, since there are fewer possible chart locations to consider.
 	bool blockAlign = false;
@@ -214,18 +214,8 @@ struct PackOptions
 	uint32_t padding = 0;
 };
 
-struct PackChartsError
-{
-    enum Enum
-    {
-        Success,                     // No error.
-        Error,                       // Unspecified error.
-        ChartDoesntFit,              // size of a chart is bigger than resolution supplied
-    };
-};
-
 // Call after ParameterizeCharts. Can be called multiple times to re-pack charts with different options.
-PackChartsError::Enum PackCharts(Atlas *atlas, PackOptions packOptions = PackOptions());
+void PackCharts(Atlas *atlas, PackOptions packOptions = PackOptions());
 
 // Equivalent to calling ComputeCharts, ParameterizeCharts and PackCharts in sequence. Can be called multiple times to regenerate with different options.
 void Generate(Atlas *atlas, ChartOptions chartOptions = ChartOptions(), ParameterizeFunc paramFunc = nullptr, PackOptions packOptions = PackOptions());
