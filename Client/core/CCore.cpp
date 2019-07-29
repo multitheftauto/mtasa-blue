@@ -1690,6 +1690,8 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Apply client config setting
     uint uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    if (uiClientConfigRate > 0)
+        uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
