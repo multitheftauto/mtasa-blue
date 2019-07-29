@@ -673,6 +673,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -680,13 +683,12 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        RECT rect = {};
+        pDXFont->DrawTextW(nullptr, wszText, wcslen(wszText), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
-
-        return ((float)size.cx * fScale);
+        return static_cast<float>(rect.right - rect.left) * fScale;
     }
+
     return 0.0f;
 }
 
