@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CServerInfo.h"
 
 CServerInfo::CServerInfo() : m_MaxPlayersCount(0)
 {

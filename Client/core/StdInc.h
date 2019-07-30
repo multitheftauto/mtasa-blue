@@ -70,4 +70,3 @@
 #include "CNickGen.h"
 #include <core/CWebViewInterface.h>
 #include "CTrayIcon.h"
-#include "CDiscordManager.h"

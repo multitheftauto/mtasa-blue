@@ -43,27 +43,27 @@ public:
     void RegisterPlay(bool connect);
     void Disconnect();
 
-    discord::Activity GetStoredActivity() const { return m_storedActivity; } // For retrieving stored information in rich presence
+    discord::Activity GetStoredActivity() const { return m_StoredActivity; } // For retrieving stored information in rich presence
 
-    bool NeedsSuicide() const { return m_bSuicide; }
-    void SetDead() { m_bSuicide = false; }
+    bool NeedsSuicide() const { return m_Suicide; }
+    void SetDead() { m_Suicide = false; }
     void DisconnectNotification();
 
 private:
 
     void Restore();
 
-    discord::Core*    m_discordCore;
-    discord::Activity m_storedActivity;
+    discord::Core*    m_DiscordCore;
+    discord::Activity m_StoredActivity;
 
-    bool m_waitingForServerName;
+    bool m_WaitingForServerName;
 
-    volatile bool m_bSuicide; // Thread kill command
+    volatile bool m_Suicide; // Thread kill command
 
-    std::mutex                 m_threadSafety;
-    SharedUtil::CThreadHandle* m_pThread;
+    std::mutex                 m_ThreadSafety;
+    SharedUtil::CThreadHandle* m_Thread;
 
-    CElapsedTime   m_timeForReconnection;
-    CQueryReceiver queryReceiver;
+    CElapsedTime   m_TimeForReconnection;
+    CQueryReceiver m_QueryReceiver;
 
 };

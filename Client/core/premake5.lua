@@ -19,12 +19,12 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/hwbrk",
-            "../../vendor/discordgsdk/cpp"
+			"../../vendor/discordgsdk/cpp"
 		}
 
 	libdirs {
 		"../../vendor/detours/lib",
-        "../../vendor/discordgsdk/lib",
+		"../../vendor/discordgsdk/lib",
 	}
 
 

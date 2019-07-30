@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "net/SyncStructures.h"
+#include "CServerInfo.h"
 
 using std::list;
 

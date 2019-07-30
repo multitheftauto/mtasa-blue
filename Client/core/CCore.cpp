@@ -21,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -34,7 +35,7 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-CCore::CCore()
+CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -124,18 +125,11 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
-
-    // Initialize discord manager
-    m_pDiscordManager = new CDiscordManager();
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
-
-    // Delete discord manager
-    delete m_pDiscordManager;
-    m_pDiscordManager = nullptr;
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -572,7 +566,7 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    if (bConnected) m_pDiscordManager->RegisterPlay(true);
+    if (bConnected) m_DiscordManager->RegisterPlay(true);
     else ResetDiscordRichPresence();
 }
 
@@ -1973,17 +1967,14 @@ uint CCore::GetMaxStreamingMemory()
 //
 void CCore::ResetDiscordRichPresence()
 {
-    if (m_pDiscordManager)
-    {
-        // Set default parameters
-        SDiscordActivity activity;
-        activity.m_details = "Awaiting joining a server";
-        m_pDiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
-            if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
-            else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
-        });
-        m_pDiscordManager->RegisterPlay(false);
-    }
+    // Set default parameters
+    SDiscordActivity activity;
+    activity.m_details = "Awaiting joining a server";
+    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+        if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+    });
+    m_DiscordManager->RegisterPlay(false);
 }
 
 //

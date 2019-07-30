@@ -15,6 +15,7 @@
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
 #include <windowsx.h>
+#include "CServerInfo.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -51,7 +52,7 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
-CClientGame::CClientGame(bool bLocalPlay)
+CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
@@ -303,9 +304,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Start async task scheduler
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
 
-    // Server info construction
-    m_pServerInfo = new CServerInfo();
-
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
     g_pMultiplayer->DisableEnterExitVehicleKey(true);
 
@@ -491,8 +489,6 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pLuaManager);
     SAFE_DELETE(m_pLatentTransferManager);
     SAFE_DELETE(m_pResourceFileDownloadManager);
-    
-    SAFE_DELETE(m_pServerInfo);
 
     SAFE_DELETE(m_pRootEntity);
 

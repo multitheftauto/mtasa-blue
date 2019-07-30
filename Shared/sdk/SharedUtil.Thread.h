@@ -8,10 +8,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #include <sys/timeb.h>
 #include <pthread.h>
-
-#pragma once
 
 #ifdef WIN32
 #ifndef _WINSOCKAPI_

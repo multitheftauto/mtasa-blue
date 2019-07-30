@@ -11,25 +11,26 @@
 #include "StdInc.h"
 #include "SharedUtil.Thread.h"
 #include <chrono>
+#include "CDiscordManager.h"
 
-CDiscordManager::CDiscordManager() : m_discordCore(nullptr), m_bSuicide(false), m_waitingForServerName(false), m_storedActivity{}
+CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}
 {
     Reconnect(true); // Try to interact with discord on construction
-    m_pThread = new CThreadHandle(CDiscordManager::DiscordThread, this);
+    m_Thread = new CThreadHandle(CDiscordManager::DiscordThread, this);
 
-    m_storedActivity.GetAssets().SetLargeImage("multi-theft-auto"); // Always thing
-    m_storedActivity.GetAssets().SetLargeText("Playing MTA:SA");
+    m_StoredActivity.GetAssets().SetLargeImage("multi-theft-auto"); // Always thing
+    m_StoredActivity.GetAssets().SetLargeText("Playing MTA:SA");
 }
 
 CDiscordManager::~CDiscordManager()
 {
-    m_bSuicide = true;
+    m_Suicide = true;
     int iTries = 0;
-    while (iTries++ < 400 && m_bSuicide) // Wait maximum of 2 sec on this
+    while (iTries++ < 400 && m_Suicide) // Wait maximum of 2 sec on this
         Sleep(5);
-    if (m_bSuicide) m_pThread->Cancel(); // Kill it anyway
-    delete m_pThread;
-    SAFE_DELETE(m_discordCore);
+    if (m_Suicide) m_Thread->Cancel(); // Kill it anyway
+    delete m_Thread;
+    SAFE_DELETE(m_DiscordCore);
 }
 
 // Establish connection with discord
@@ -39,19 +40,21 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
     CVARS_GET("discord_rich_presence", discordRichPresence);
     if (!discordRichPresence) return; // Disabled
 
-    m_threadSafety.lock();
-    discord::Result res = discord::Core::Create(DISCORD_CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &m_discordCore);
-    m_threadSafety.unlock();
+    discord::Result res;
+    {
+        std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+        res = discord::Core::Create(DISCORD_CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &m_DiscordCore);
+    }
 
-    if (!m_discordCore && bOnInitialization) // Output error only when trying to connect on initialization
+    if (!m_DiscordCore && bOnInitialization) // Output error only when trying to connect on initialization
         WriteErrorEvent(SString("[DISCORD]: Failed to instantiate core, error code: %i", static_cast<int>(res)));
     else
     {
-        m_discordCore->SetLogHook(discord::LogLevel::Info, DiscordLogCallback);
-        WriteDebugEvent(SString("[DISCORD]: Instantiated at %08X", m_discordCore));
+        m_DiscordCore->SetLogHook(discord::LogLevel::Info, DiscordLogCallback);
+        WriteDebugEvent(SString("[DISCORD]: Instantiated at %08X", m_DiscordCore));
 
-        m_discordCore->ActivityManager().RegisterCommand(SString("%s /from_discord", *GetParentProcessPathFilename(GetCurrentProcessId())));
-        m_discordCore->ActivityManager().OnActivityJoin.Connect(OnActivityJoin);
+        m_DiscordCore->ActivityManager().RegisterCommand(SString("%s /from_discord", *GetParentProcessPathFilename(GetCurrentProcessId())));
+        m_DiscordCore->ActivityManager().OnActivityJoin.Connect(OnActivityJoin);
 
         if (!bOnInitialization) // Player could be in a server or in menu by now
         {
@@ -74,9 +77,9 @@ void CDiscordManager::OnActivityJoin(const char* joinSecret)
         return;
 
     // Parse it
-    SString ipport, secret;
+    SString ipport;
+    SString secret = SStringX(joinSecret).SplitRight("-", &ipport);
     ushort  port;
-    secret = SStringX(joinSecret).SplitRight("-", &ipport);
 
     if (!ipport.length() || !secret.length())
         return;
@@ -119,18 +122,12 @@ void CDiscordManager::OnActivityJoin(const char* joinSecret)
     {
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Connect(ipport, port, nick, "", false, secret))
-        {
             CCore::GetSingleton().GetConsole()->Printf(_("Discord Join: Connecting to %s:%u..."), *ipport, port);
-        }
         else
-        {
             CCore::GetSingleton().GetConsole()->Printf(_("Discord Join: could not connect to %s:%u!"), *ipport, port);
-        }
     }
     else
-    {
         CCore::GetSingleton().GetConsole()->Print(_("Discord Join: Failed to unload current mod"));
-    }
 }
 
 void* CDiscordManager::DiscordThread(void* arg)
@@ -155,38 +152,38 @@ void* CDiscordManager::DiscordThread(void* arg)
 // Called from separate thread so the unnecessary load won't affect the main thread, establishing connection with discord is sometimes time-consuming, especially when it's not running
 void CDiscordManager::DoPulse()
 {
-    if (m_discordCore)
+    if (m_DiscordCore)
     {
-        std::lock_guard<std::mutex> guardian(m_threadSafety);
+        std::lock_guard<std::mutex> guardian(m_ThreadSafety);
 
-        if (m_waitingForServerName) // Query request sent
+        if (m_WaitingForServerName) // Query request sent
         {
-            auto info = queryReceiver.GetServerResponse();
+            auto info = m_QueryReceiver.GetServerResponse();
             if (!info.containingInfo)
             {
-                if (queryReceiver.GetElapsedTimeSinceLastQuery() > 2000) // Resend query request every 2s if no response came
+                if (m_QueryReceiver.GetElapsedTimeSinceLastQuery() > 2000) // Resend query request every 2s if no response came
                 {
                     SString      ipaddr;
                     unsigned int port;
                     CVARS_GET("host", ipaddr);
                     CVARS_GET("port", port);
-                    queryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
+                    m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
                 }
             }
             else
             {
-                m_storedActivity.SetDetails(info.serverName);
+                m_StoredActivity.SetDetails(info.serverName);
                 UpdateActivity([](EDiscordRes) {});
-                m_waitingForServerName = false;
+                m_WaitingForServerName = false;
             }
         }
 
-        discord::Result res = m_discordCore->RunCallbacks();
+        discord::Result res = m_DiscordCore->RunCallbacks();
         if (res == discord::Result::NotRunning) // Discord is now closed, needs to be reinstated in the next 15s
         {
-            delete m_discordCore;
-            m_discordCore = nullptr;
-            m_timeForReconnection.Reset();
+            delete m_DiscordCore;
+            m_DiscordCore = nullptr;
+            m_TimeForReconnection.Reset();
             WriteDebugEvent("[DISCORD]: Lost the connection.");
         }
     }
@@ -194,70 +191,70 @@ void CDiscordManager::DoPulse()
     {
         // Discord is not initialized, maybe it's not installed or not yet running
         // So every 15sec we will check if the player got discord running
-        if (m_timeForReconnection.Get() >= 15000)
+        if (m_TimeForReconnection.Get() >= 15000)
         {
             Reconnect();
-            m_timeForReconnection.Reset();
+            m_TimeForReconnection.Reset();
         }
     }
 }
 
 void CDiscordManager::UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
 
-    m_storedActivity.GetTimestamps().SetStart(activity.m_startTimestamp);
-    m_storedActivity.GetTimestamps().SetEnd(activity.m_endTimestamp);
-    m_storedActivity.SetName(activity.m_name);
-    m_storedActivity.SetState(activity.m_state);
-    m_storedActivity.SetDetails(activity.m_details);
-    m_storedActivity.SetType(static_cast<discord::ActivityType>(activity.m_activityType));
+    m_StoredActivity.GetTimestamps().SetStart(activity.m_startTimestamp);
+    m_StoredActivity.GetTimestamps().SetEnd(activity.m_endTimestamp);
+    m_StoredActivity.SetName(activity.m_name);
+    m_StoredActivity.SetState(activity.m_state);
+    m_StoredActivity.SetDetails(activity.m_details);
+    m_StoredActivity.SetType(static_cast<discord::ActivityType>(activity.m_activityType));
 
     UpdateActivity(callback);
 }
 
 void CDiscordManager::UpdateActivity(std::function<void(EDiscordRes)> callback)
 {
-    if (!m_discordCore) return;
+    if (!m_DiscordCore) return;
 
-    m_discordCore->ActivityManager().UpdateActivity(m_storedActivity, [=](discord::Result res) {
+    m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res) {
         callback(static_cast<EDiscordRes>(res));
     });
 }
 
 void CDiscordManager::SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.SetType(static_cast<discord::ActivityType>(type));
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.SetType(static_cast<discord::ActivityType>(type));
     UpdateActivity(callback);
 }
 
 void CDiscordManager::SetName(char const* name, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.SetName(name);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.SetName(name);
     UpdateActivity(callback);
 }
 
 void CDiscordManager::SetState(char const* state, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.SetState(state);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.SetState(state);
     UpdateActivity(callback);
 }
 
 void CDiscordManager::SetDetails(char const* details, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.SetDetails(details);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.SetDetails(details);
     UpdateActivity(callback);
 }
 
 void CDiscordManager::SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback)
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.GetTimestamps().SetStart(start);
-    m_storedActivity.GetTimestamps().SetEnd(end);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.GetTimestamps().SetStart(start);
+    m_StoredActivity.GetTimestamps().SetEnd(end);
     UpdateActivity(callback);
 }
 
@@ -271,11 +268,11 @@ void CDiscordManager::SetJoinParameters(const char* joinSecret, const char* part
     CVARS_GET("port", port);
     SString strRealJoinSecret("%s:%i-%s", *ipaddr, port, joinSecret);
 
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.GetSecrets().SetJoin(strRealJoinSecret);
-    m_storedActivity.GetParty().SetId(partyId);
-    m_storedActivity.GetParty().GetSize().SetCurrentSize(partySize);
-    m_storedActivity.GetParty().GetSize().SetMaxSize(partyMax);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.GetSecrets().SetJoin(strRealJoinSecret);
+    m_StoredActivity.GetParty().SetId(partyId);
+    m_StoredActivity.GetParty().GetSize().SetCurrentSize(partySize);
+    m_StoredActivity.GetParty().GetSize().SetMaxSize(partyMax);
     UpdateActivity(callback);
 }
 
@@ -283,8 +280,8 @@ void CDiscordManager::SetSpectateSecret(const char* spectateSecret, std::functio
 {
     if (!spectateSecret) return;
 
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_storedActivity.GetSecrets().SetSpectate(spectateSecret);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.GetSecrets().SetSpectate(spectateSecret);
     UpdateActivity(callback);
 }
 
@@ -298,25 +295,25 @@ void CDiscordManager::RegisterPlay(bool connect)
         CVARS_GET("host", ipaddr);
         CVARS_GET("port", port);
 
-        std::lock_guard<std::mutex> guardian(m_threadSafety);
-        m_storedActivity.SetDetails("Retrieving server name...");
-        m_storedActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
-        m_storedActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
-        m_storedActivity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+        std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+        m_StoredActivity.SetDetails("Retrieving server name...");
+        m_StoredActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
+        m_StoredActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
+        m_StoredActivity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
         UpdateActivity([=](EDiscordRes res) {
             if (res != DiscordRes_Ok) WriteErrorEvent("[DISCORD]: Unable to register play rich presence.");
             else
             {
-                queryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
+                m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
 
-                m_waitingForServerName = true;
+                m_WaitingForServerName = true;
             }
         });
     }
     else
     {
-        m_storedActivity.GetAssets().SetSmallText("");
-        m_storedActivity.GetAssets().SetSmallImage("");
+        m_StoredActivity.GetAssets().SetSmallText("");
+        m_StoredActivity.GetAssets().SetSmallImage("");
         UpdateActivity([=](EDiscordRes res) {});
     }
 }
@@ -327,19 +324,19 @@ void CDiscordManager::Restore()
     unsigned int port;
     CVARS_GET("host", ipaddr);
     CVARS_GET("port", port);
-    queryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
-    m_waitingForServerName = true;
+    m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
+    m_WaitingForServerName = true;
 }
 
 void CDiscordManager::Disconnect()
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    SAFE_DELETE(m_discordCore);
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    SAFE_DELETE(m_DiscordCore);
 }
 
 void CDiscordManager::DisconnectNotification()
 {
-    std::lock_guard<std::mutex> guardian(m_threadSafety);
-    m_waitingForServerName = false; // No longer wait
-    queryReceiver.InvalidateSocket();
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_WaitingForServerName = false; // No longer wait
+    m_QueryReceiver.InvalidateSocket();
 }

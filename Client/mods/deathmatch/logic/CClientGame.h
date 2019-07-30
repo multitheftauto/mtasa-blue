@@ -44,7 +44,6 @@
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
-#include "CServerInfo.h"
 
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
@@ -53,6 +52,7 @@
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
+class CServerInfo;
 
 struct SVehExtrapolateSettings
 {
@@ -277,7 +277,7 @@ public:
     CSyncDebug*                   GetSyncDebug() { return m_pSyncDebug; };
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
-    CServerInfo*                  GetServerInfo() { return m_pServerInfo; }
+    CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
@@ -702,7 +702,8 @@ private:
     CLuaManager*        m_pLuaManager;
     CScriptDebugging*   m_pScriptDebugging;
     CRegisteredCommands m_RegisteredCommands;
-    CServerInfo*        m_pServerInfo;
+
+    std::unique_ptr<CServerInfo> m_ServerInfo;
 
     // Map statuses
     SString m_strCurrentMapName;
