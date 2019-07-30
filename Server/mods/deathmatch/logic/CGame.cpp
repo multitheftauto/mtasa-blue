@@ -3669,7 +3669,7 @@ void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
             // Handle special info
             std::vector<SString> parts;
             Packet.m_strMessage.Split(",", parts);
-            if (parts.size() > 2)
+            if (parts.size() > 3)
             {
                 pPlayer->m_strDetectedAC = parts[0].Replace("|", ",");
                 pPlayer->m_uiD3d9Size = atoi(parts[1]);
