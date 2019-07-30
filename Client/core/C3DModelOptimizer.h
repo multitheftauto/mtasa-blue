@@ -10,10 +10,10 @@ struct RpClump;
 class C3DModelOptimizer
 {
 public:
-    C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary, bool bDontLoadTextures = false);
+    C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, bool bDontLoadTextures = false);
     ~C3DModelOptimizer();
 
-    void             SetOptimizationInfo(SOptimizedDFF* pOptimizedDFF) { m_pOptimizedDFF = pOptimizedDFF; }
+    void             SetOptimizationInfo(SOptimizedDFF* pOptimizedDFF);
     RwTexDictionary* GetAtlasTexDictionary() { return m_pAtlasTexDictionary; }
     bool             Optimize();
     bool             CreateAtlas();
@@ -32,6 +32,8 @@ public:
     RpGeometry* CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format);
 
     void GetUsedTexturesCount();
+    SOptimizedTexture* RemoveHighestSizeOptimizedTextureFromContainer();
+    void               IgnoreTexture(unsigned int textureNameHash);
     void GetMostUsedTextureToIgnore();
     void DestroyMostUsedTexturesToIgnoreClones();
 
@@ -67,8 +69,9 @@ private:
     // Key: original texture of clump | Value: clone of the same texture and its raster
     //                                |        except that it will be added to atlas TXD.
     std::map<RwTexture*, RwTexture*> m_mapOfMostUsedTexturesToIgnore;
+    std::vector<SOptimizedTexture*>  vecOptimizedTextures;
 
-    RwTexDictionary* m_pTexDictionary;
+    unsigned int     m_defaultTXDSizeInBytes;
     RwTexDictionary* m_pAtlasTexDictionary;
 
     // We'll only optimize DFF models which have lots of used textures

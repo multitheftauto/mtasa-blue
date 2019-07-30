@@ -1942,7 +1942,33 @@ void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
 
 RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 {
-    auto       CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
+    auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
+    auto   RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+    auto   RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+    auto   RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+    auto   CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
+
+    printf("CRenderWareSA::CloneRwTexture: %s | pTextureToCopyFrom: %p\n", pTextureToCopyFrom->name, pTextureToCopyFrom);
+    /*
+    // This code will crash for DXT3 compression. Same thing will happen when we call CClothesBuilder_CopyTexture
+
+    RwRaster* raster = pTextureToCopyFrom->raster;
+    _rwD3D9RasterExt* rasterExt = GetRasterExt(raster);
+    RwRaster* newRaster = RwD3D9RasterCreate(raster->width, raster->height, rasterExt->d3dFormat, rwRASTERTYPETEXTURE | (raster->cFormat & 0x9000));
+
+    RwUInt8* sourcePixels = RwRasterLock(raster, 0, 2);
+    RwUInt8* destinationPixels = RwRasterLock(newRaster, 0, 1);
+    
+    std::printf("destinationPixels: %p | sourcePixels: %p | newRaster: %p\n", destinationPixels, sourcePixels, newRaster);
+
+    memcpy(destinationPixels, sourcePixels, raster->height * raster->stride);
+    RwRasterUnlock(raster);
+    RwRasterUnlock(newRaster);
+    RwTexture* pCopiedTexture = RwTextureCreate(newRaster);
+    *(unsigned char*)(&pCopiedTexture->flags) = 2;
+    */
+
+    // Crash on DXT3 compression. TODO...
     RwTexture* pCopiedTexture = CClothesBuilder_CopyTexture(pTextureToCopyFrom);
     if (pCopiedTexture)
     {
@@ -2058,7 +2084,7 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
     memcpy(pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
     memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
 
-    std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", textureFormat, rasterExt->d3dFormat);
+    //std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", textureFormat, rasterExt->d3dFormat);
 
     return pConvertedTexture;
 }

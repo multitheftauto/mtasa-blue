@@ -10,7 +10,7 @@ public:
     void SetVisible(bool bVisible);
 
     SDFFDescriptor* GetDFFDescriptor(CIMGArchiveFile* pDFFArchiveFile);
-    RwTexDictionary* ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor);
+    RwTexDictionary* ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor, unsigned int& defaultTXDSizeInBytes);
     void         WriteDFF(RpClump* pClump, CIMGArchiveFile* pDFFArchiveFile);
     void         WriteTXD(RwTexDictionary* pTxdDictionary, CIMGArchiveFile* pDFFArchiveFile);
     void         OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile);

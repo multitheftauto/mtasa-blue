@@ -6,9 +6,9 @@
 #include "xatlas_repack.h"
 #include "C3DModelOptimizer.h"
 
-C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, RwTexDictionary* pTxdDictionary, bool bDontLoadTextures)
+C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, bool bDontLoadTextures)
 {
-    m_pTexDictionary = pTxdDictionary;
+    m_defaultTXDSizeInBytes = defaultTXDSizeInBytes;
     pClump = pTheClump;
     m_bDontLoadTextures = bDontLoadTextures;
     m_Atlas = nullptr;
@@ -25,6 +25,17 @@ C3DModelOptimizer::~C3DModelOptimizer()
         xatlas::Destroy(m_Atlas);
         m_Atlas = nullptr;
         DestroyMostUsedTexturesToIgnoreClones();
+    }
+}
+
+void C3DModelOptimizer::SetOptimizationInfo(SOptimizedDFF* pOptimizedDFF)
+{
+    m_pOptimizedDFF = pOptimizedDFF;
+    vecOptimizedTextures.reserve(m_pOptimizedDFF->GetTotalOptimizedTextures());
+    for (unsigned int textureIndex = 0; textureIndex < m_pOptimizedDFF->GetTotalOptimizedTextures(); textureIndex++)
+    {
+        SOptimizedTexture& optimizedTexture = m_pOptimizedDFF->GetOptimizedTexture(textureIndex);
+        vecOptimizedTextures.emplace_back(&optimizedTexture);
     }
 }
 
@@ -248,7 +259,7 @@ void C3DModelOptimizer::GetTextures()
 
             if (!pMaterial->texture)
             {
-                printf("GetTextures: No texture\n");
+                // printf("GetTextures: No texture\n");
                 textures.emplace_back(UINT32_MAX);
                 continue;
             }
@@ -256,7 +267,7 @@ void C3DModelOptimizer::GetTextures()
             auto itTextureToIgnore = m_mapOfMostUsedTexturesToIgnore.find(pMaterial->texture);
             if (itTextureToIgnore != m_mapOfMostUsedTexturesToIgnore.end())
             {
-                printf("GetTextures: Ignoring a texture\n");
+                // printf("GetTextures: Ignoring a texture\n");
                 textures.emplace_back(UINT32_MAX);
                 continue;
             }
@@ -279,14 +290,14 @@ void C3DModelOptimizer::GetTextures()
 
                 setOfTextureNameHashes.insert(textureNameHash);
 
-                printf("GetTextures: added texture to cache: %s\n", pMaterial->texture->name);
+                // printf("GetTextures: added texture to cache: %s\n", pMaterial->texture->name);
             }
             else
             {
                 unsigned int index = std::distance(setOfTextureNameHashes.begin(), it);
                 textures.emplace_back(textures[index]);
 
-                printf("GetTextures: Added index to `textures` as tex exists: %s\n", pMaterial->texture->name);
+                // printf("GetTextures: Added index to `textures` as tex exists: %s\n", pMaterial->texture->name);
             }
         }
     }
@@ -516,46 +527,183 @@ void C3DModelOptimizer::GetUsedTexturesCount()
     {
         RpAtomic*   pAtomic = outAtomicList[geometryIndex];
         RpGeometry* pGeometry = pAtomic->geometry;
-        for (unsigned short materialIndex = 0; materialIndex < pGeometry->materials.entries; materialIndex++)
+        if (pGeometry->materials.entries <= 0)
         {
+            continue;
+        }
+        for (int i = 0; i < pGeometry->triangles_size; i++)
+        {
+            unsigned short materialIndex = pGeometry->triangles[i].matIndex;
+            if (materialIndex > pGeometry->materials.entries)
+            {
+                continue;
+            }
             RpMaterial* pMaterial = pGeometry->materials.materials[materialIndex];
             if (pMaterial->texture)
             {
                 if (!MapContains(setOfUsedTextures, pMaterial->texture))
                 {
+                    printf("[INSERT] setOfUsedTextures: %s\n", pMaterial->texture->name);
                     setOfUsedTextures.insert(pMaterial->texture);
                 }
             }
         }
     }
-
     printf("\ntotal Textures used: %u\n\n", setOfUsedTextures.size());
+}
+
+SOptimizedTexture* C3DModelOptimizer::RemoveHighestSizeOptimizedTextureFromContainer()
+{
+    size_t             optimizedTextureWithHighestSizeIndex = 0;
+    SOptimizedTexture* optimizedTextureWithHighestSize = vecOptimizedTextures[0];
+    for (size_t textureIndex = 0; textureIndex < vecOptimizedTextures.size(); textureIndex++)
+    {
+        SOptimizedTexture* optimizedTexture = vecOptimizedTextures[textureIndex];
+        unsigned int       textureSizeInBytes = optimizedTexture->m_textureSizeWithinAtlasInBytes;
+        if (textureSizeInBytes > optimizedTextureWithHighestSize->m_textureSizeWithinAtlasInBytes)
+        {
+            optimizedTextureWithHighestSize = optimizedTexture;
+            optimizedTextureWithHighestSizeIndex = textureIndex;
+        }
+    }
+    vecOptimizedTextures.erase(vecOptimizedTextures.begin() + optimizedTextureWithHighestSizeIndex);
+    return optimizedTextureWithHighestSize;
+}
+
+void C3DModelOptimizer::IgnoreTexture(unsigned int textureNameHash)
+{
+    bool bTextureFound = false;
+    for (RwTexture* pTexture : setOfUsedTextures)
+    {
+        if (HashString(pTexture->name) == textureNameHash)
+        {
+            printf("\n[DEBUG] IgnoreTexture: %s\n\n", pTexture->name);
+            pTexture->refs++;
+            m_mapOfMostUsedTexturesToIgnore[pTexture] = pTexture;
+            bTextureFound = true;
+            break;
+        }
+    }
+    assert(bTextureFound != false);
 }
 
 void C3DModelOptimizer::GetMostUsedTextureToIgnore()
 {
-   
-    const unsigned int      textureToIgnoreNameHash = HashString("ceiling_256");
-    std::vector<RwTexture*> outTextureList;
-    pRenderWare->GetTxdTextures(outTextureList, m_pTexDictionary);
-
-    for (auto& pTexture : outTextureList)
+    // /*
+    unsigned int atlasSizeInBytes = 0;
+    float        atlasSizeInMBs = 0.0f;
+    float        defaultTXDSizeInMbs = 0.0f;
+    float        atlasSizeInPercentange = 0.0f;
+    unsigned int texturesToIgnore = 0; 
+    unsigned int totalAtlasSizeReducedInBytes = 0;
+    if (m_pOptimizedDFF)
     {
-        if (HashString(pTexture->name) == textureToIgnoreNameHash)
+        defaultTXDSizeInMbs = (m_defaultTXDSizeInBytes / 1024.0f) / 1024.0f;
+        for (unsigned int textureIndex = 0; textureIndex < m_pOptimizedDFF->GetTotalOptimizedTextures(); textureIndex++)
         {
-            m_mapOfMostUsedTexturesToIgnore[pTexture] = pRenderWare->CloneRwTexture(pTexture);
-            printf("\n[DEBUG] m_pMostUsedTextureToIgnore: %s\n\n", pTexture->name);
-            break;
+            SOptimizedTexture& optimizedTexture = m_pOptimizedDFF->GetOptimizedTexture(textureIndex);
+            const unsigned int maxSizeLimitInBytes = 1000 * 1024 * 1024;            // 1000 MB
+            if (optimizedTexture.m_textureSizeWithinAtlasInBytes > maxSizeLimitInBytes)
+            {
+                optimizedTexture.m_textureSizeWithinAtlasInBytes = 0;
+            }
+            atlasSizeInBytes += optimizedTexture.m_textureSizeWithinAtlasInBytes;
+        }
+
+        for (unsigned int textureIndex = 0; textureIndex < m_pOptimizedDFF->GetTotalOptimizedTextures(); textureIndex++)
+        {
+            SOptimizedTexture& optimizedTexture = m_pOptimizedDFF->GetOptimizedTexture(textureIndex);
+            if (optimizedTexture.m_textureSizeWithinAtlasInBytes > atlasSizeInBytes)
+            {
+                optimizedTexture.m_textureSizeWithinAtlasInBytes = 0;
+            }
+        }
+
+        atlasSizeInMBs = (atlasSizeInBytes / 1024.0f) / 1024.0f;
+        atlasSizeInPercentange = (atlasSizeInMBs * 100.0f) / defaultTXDSizeInMbs;
+
+        if (defaultTXDSizeInMbs >= atlasSizeInMBs)
+        {
+            return;
+        }
+
+        const unsigned int maxTexturesToIgnore = 5;
+        SOptimizedTexture* optimizedTextureWithHighestSize = RemoveHighestSizeOptimizedTextureFromContainer();
+        float              removedTextureSizeWithinAtlas = ((optimizedTextureWithHighestSize->m_textureSizeWithinAtlasInBytes) / 1024.0f) / 1024.0f;
+        while (removedTextureSizeWithinAtlas >= 1.0f && vecOptimizedTextures.size() > 0)
+        {
+            if (setOfUsedTextures.size() <= 2)
+            {
+                printf("WARNING! setOfUsedTextures is %u and requires ignoring textures! atlasSizeInMBs: %f\n", setOfUsedTextures.size(), atlasSizeInMBs);
+                break;
+            }
+
+            totalAtlasSizeReducedInBytes += optimizedTextureWithHighestSize->m_textureSizeWithinAtlasInBytes;
+            IgnoreTexture(optimizedTextureWithHighestSize->m_textureNameHash);
+
+            optimizedTextureWithHighestSize = RemoveHighestSizeOptimizedTextureFromContainer();
+            removedTextureSizeWithinAtlas = ((optimizedTextureWithHighestSize->m_textureSizeWithinAtlasInBytes) / 1024.0f) / 1024.0f;
+            texturesToIgnore++;
+            if (texturesToIgnore >= maxTexturesToIgnore || texturesToIgnore == (setOfUsedTextures.size() - 1))
+            {
+                break;
+            }
         }
     }
+    //*/
 
+    float atlasSizeReducedInMBs = ((totalAtlasSizeReducedInBytes) / 1024.0f) / 1024.0f;
+    printf("\nAtlas Size Reduced: %f MBs | Textures Ignored: %u | texturesToIgnore variable: %u\n\n", 
+        atlasSizeReducedInMBs, m_mapOfMostUsedTexturesToIgnore.size(), texturesToIgnore);
+    if (m_pOptimizedDFF)
+    {
+        /*
+        unsigned int atlasSizeInBytes = 0;
+        float        atlasSizeInMBs = 0.0f;
+        float        defaultTXDSizeInMbs = (m_defaultTXDSizeInBytes / 1024.0f) / 1024.0f;
+        for (unsigned int textureIndex = 0; textureIndex < m_pOptimizedDFF->GetTotalOptimizedTextures(); textureIndex++)
+        {
+            SOptimizedTexture& optimizedTexture = m_pOptimizedDFF->GetOptimizedTexture(textureIndex);
+            const unsigned int maxSizeLimitInBytes = 1000 * 1024 * 1024;            // 1000 MB
+            if (optimizedTexture.m_textureSizeWithinAtlasInBytes > maxSizeLimitInBytes)
+            {
+                optimizedTexture.m_textureSizeWithinAtlasInBytes = 0;
+            }
+            atlasSizeInBytes += optimizedTexture.m_textureSizeWithinAtlasInBytes;
+            vecOptimizedTextures.emplace_back(&optimizedTexture);
+        }
+
+        atlasSizeInMBs = (atlasSizeInBytes / 1024.0f) / 1024.0f;
+        float atlasSizeInPercentange = (atlasSizeInMBs * 100.0f) / defaultTXDSizeInMbs;
+        */
+        printf("atlasSizeInMBs: %f | defaultTXDSizeInMbs: %f | atlasSizeInPercentange: %f\n", atlasSizeInMBs, defaultTXDSizeInMbs, atlasSizeInPercentange);
+
+        // printf("\atlasSizeInBytes: %u | defaultTXDSizeInBytes: %u | atlasSizeInPercentange: %f\n",
+        //     atlasSizeInBytes, m_defaultTXDSizeInBytes, atlasSizeInPercentange);
+
+        for (unsigned int textureIndex = 0; textureIndex < m_pOptimizedDFF->GetTotalOptimizedTextures(); textureIndex++)
+        {
+            SOptimizedTexture& optimizedTexture = m_pOptimizedDFF->GetOptimizedTexture(textureIndex);
+            for (auto& pTexture : setOfUsedTextures)
+            {
+                if (HashString(pTexture->name) == optimizedTexture.m_textureNameHash && optimizedTexture.m_textureSizeWithinAtlasInBytes > 0)
+                {
+                    float sizeInAtlas = (optimizedTexture.m_textureSizeWithinAtlasInBytes / 1024.0f) / 1024.0f;
+                    printf("\n[DEBUG] texture: %s | SizeInAtlas: %f MBs, %u bytes\n\n", pTexture->name, sizeInAtlas,
+                           optimizedTexture.m_textureSizeWithinAtlasInBytes);
+                    // printf("\n[DEBUG] texture: %s | SizeInAtlas: %u bytes\n\n", pTexture->name, optimizedTexture.m_textureSizeWithinAtlasInBytes);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void C3DModelOptimizer::DestroyMostUsedTexturesToIgnoreClones()
 {
     for (auto& it : m_mapOfMostUsedTexturesToIgnore)
     {
-        pRenderWare->DestroyTextureForcefully(it.second);
+        pRenderWare->DestroyTexture(it.second);
     }
     m_mapOfMostUsedTexturesToIgnore.clear();
 }
@@ -608,8 +756,8 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
     packOptions.padding = 1;
     packOptions.texelsPerUnit = texelsPerUnit;
 
-    float theAtlasSize = (atlasSizeInBytes/ 1024.0f) / 1024.0f;
-    //printf("atlas Size: %f mb | atlasSizeInBytes: %u\n", theAtlasSize, atlasSizeInBytes);
+    float theAtlasSize = (atlasSizeInBytes / 1024.0f) / 1024.0f;
+    printf("atlas Size: %f mb | atlasSizeInBytes: %u\n", theAtlasSize, atlasSizeInBytes);
 
     for (auto& pTexture : setOfUsedTextures)
     {
@@ -636,10 +784,11 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
         unsigned int textureSizeWithinAtlasInBytes = atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes;
         optimizedDFF.Addtexture(HashString(pTexture->name), textureSizeWithinAtlasInBytes);
 
-        //float theTextureSizeWithinAtlasInMBs = ((atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes) / 1024.0f) / 1024.0f;
-        //std::printf("texture '%s' size in atlas: %f mb | textureSize In Atlas: %u\n", pTexture->name, theTextureSizeWithinAtlasInMBs,
-        //            textureSizeWithinAtlasInBytes);
+        float theTextureSizeWithinAtlasInMBs = ((atlasSizeInBytes - atlasSizeWithoutOneTextureInBytes) / 1024.0f) / 1024.0f;
+        std::printf("texture '%s' size in atlas: %f mb | textureSize In Atlas: %u\n", pTexture->name, theTextureSizeWithinAtlasInMBs,
+                    textureSizeWithinAtlasInBytes);
     }
+    printf("total Optimized Textures: %u\n", optimizedDFF.GetTotalOptimizedTextures());
     DestroyMostUsedTexturesToIgnoreClones();
     return true;
 }

@@ -7,12 +7,12 @@
 struct SOptimizedTexture
 {
     unsigned int m_textureNameHash;
-    unsigned int m_textureSizeWithinUnwrappedImageInBytes;
+    unsigned int m_textureSizeWithinAtlasInBytes;
 
     SOptimizedTexture(unsigned int textureNameHash, unsigned int textureSizeWithinUnwrappedImageInBytes)
     {
         m_textureNameHash = textureNameHash;
-        m_textureSizeWithinUnwrappedImageInBytes = textureSizeWithinUnwrappedImageInBytes;
+        m_textureSizeWithinAtlasInBytes = textureSizeWithinUnwrappedImageInBytes;
     }
 };
 

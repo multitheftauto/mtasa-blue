@@ -13,12 +13,6 @@ guiLabelSetHorizontalAlign(GUIEditor.label[1], "left", true)
 GUIEditor.button[1] = guiCreateButton(112, 108, 125, 47, "GENERATE", false, GUIEditor.window[1])
 */
 
-std::array<unsigned int, 7> arrModelsToIgnore = {
-    // vehicle models
-    518,
-    // other models
-    13048, 3411, 3412, 10810, 7981, 4666};
-
 CIMGArchiveOptimizer::CIMGArchiveOptimizer()
 {
     CreateGUI();
@@ -146,7 +140,7 @@ SDFFDescriptor* CIMGArchiveOptimizer::GetDFFDescriptor(CIMGArchiveFile* pDFFArch
     return pDFFDescriptor;
 }
 
-RwTexDictionary* CIMGArchiveOptimizer::ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor)
+RwTexDictionary* CIMGArchiveOptimizer::ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor, unsigned int& defaultTXDSizeInBytes)
 {
     STXDDescriptor*  pTXDDescriptor = pDFFDescriptor->GetTXDDescriptor();
     RwTexDictionary* pTxdDictionary = pTXDDescriptor->GetTextureDictionary();
@@ -160,7 +154,12 @@ RwTexDictionary* CIMGArchiveOptimizer::ReadTextureDictionary(SDFFDescriptor* pDF
         CIMGArchiveFile* txdArchiveFile = new CIMGArchiveFile();
         if (m_gt3IMgArchive.GetFileByTXDImgArchiveInfo(pTXDImgArchiveInfo, *txdArchiveFile))
         {
+            defaultTXDSizeInBytes = txdArchiveFile->fileByteBuffer.GetSize();
             pTxdDictionary = m_pRenderWare->ReadTXD(nullptr, txdArchiveFile->fileByteBuffer, false);
+            if (IsVehicleModel(pDFFDescriptor->GetModelID()))
+            {
+                m_pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, m_pVehicleTxdDictionary);
+            }
         }
         else
         {
@@ -228,36 +227,36 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
 {
     /*
     // REMOVE LATER
-    int         modelID = 0;
-    const char* pStrDFFName = "freeway6_lan2.dff";            //"infernus.dff";
+    //int         modelID = 0;
+    const char* pStrDFFName = "a51_jetroom.dff";            //"infernus.dff";
     memcpy(pDFFArchiveFile->fileEntry.fileName, pStrDFFName, strlen(pStrDFFName) + 1);
 
-    RwTexDictionary* pTxdDictionary = m_pRenderWare->ReadTXD("lan2freeway.txd", CBuffer(), false);
+    RwTexDictionary* pTxdDictionary = m_pRenderWare->ReadTXD("a51.txd", CBuffer(), false);
     // REMOVE END
     */
 
-    SDFFDescriptor* pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
-    ///*
-    auto it = pDFFDescriptor ? std::find(arrModelsToIgnore.begin(), arrModelsToIgnore.end(), pDFFDescriptor->GetModelID()) : arrModelsToIgnore.end();
-    if (pDFFDescriptor && it == arrModelsToIgnore.end())
+    SOptimizedDFF* pOptimizedDFF = m_dffOptimizationInfo.GetOptimizedDFF(pDFFArchiveFile->fileEntry.fileName);
+    if (!pOptimizedDFF)
     {
         return;
     }
-    // */
-    RwTexDictionary* pTxdDictionary = pDFFDescriptor ? ReadTextureDictionary(pDFFDescriptor) : nullptr;
+
+    SDFFDescriptor*  pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    /*
+    int             modelID = 0;
+    if (pDFFDescriptor && (modelID = pDFFDescriptor->GetModelID()), (modelID != 16682))
+    {
+        return;
+    }*/
+
+    unsigned int     defaultTXDSizeInBytes = 0;
+    RwTexDictionary* pTxdDictionary = pDFFDescriptor ? ReadTextureDictionary(pDFFDescriptor, defaultTXDSizeInBytes) : nullptr;
     if (!pTxdDictionary)
     {
         return;
     }
 
-    // /*
     int modelID = pDFFDescriptor->GetModelID();
-    if (IsVehicleModel(modelID))
-    {
-        m_pRenderWare->CopyTexturesFromDictionary(pTxdDictionary, m_pVehicleTxdDictionary);
-    }
-    // */
-
     m_pRenderWare->SetCurrentDFFWriteModelID(modelID);
     m_pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
@@ -273,21 +272,19 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     if (pClump)
     {
         // This should be set to false when generating atlases
-        bool               bDontLoadTextures = true;
-        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, pTxdDictionary, bDontLoadTextures);
+        bool               bDontLoadTextures = false;
+        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, defaultTXDSizeInBytes, bDontLoadTextures);
+        modelOptimizer->SetOptimizationInfo(pOptimizedDFF);
         // modelOptimizer->OutputClumpAsOBJ();
         if (modelOptimizer->Optimize())
         {
             ///*
-            // SOptimizedDFF* pOptimizedDFF = m_dffOptimizationInfo.GetOptimizedDFF(pDFFArchiveFile->fileEntry.fileName);
-            // assert(pOptimizedDFF != nullptr);
-            // modelOptimizer->SetOptimizationInfo(pOptimizedDFF);
             // RwTexDictionary* pAtlasTxdDictionary = modelOptimizer->CreateTXDAtlas();
             // assert(pAtlasTxdDictionary != nullptr);
             //*/
 
-            SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
-            assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
+            //SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
+            //assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
 
             // WriteDFF(pClump, pDFFArchiveFile);
             // WriteTXD(pAtlasTxdDictionary, pDFFArchiveFile);
@@ -397,6 +394,13 @@ void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
     SString outputFolder = "OptimizedFiles";
 
     m_dffOptimizationInfo.AllocateSpace(m_IdeLoader.GetMaximumOptimizableModelsCount());
+    assert(m_dffOptimizationInfo.CreateTheFile(outputFolder + "\\completeWithoutVehicleModsModels.gmoi", OPTIMIZE_FILE_READ) != false);
+    if (!m_dffOptimizationInfo.ReadOptimizedDFFs())
+    {
+        printf("ReadOptimizedDFFs failed\n");
+    }
+    m_dffOptimizationInfo.CloseFile();
+    /*
     int totalFiles = 46;
     for (int dffModelInfosIndex = 0; dffModelInfosIndex < totalFiles; dffModelInfosIndex++)
     {
@@ -434,9 +438,10 @@ void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
         for (unsigned int textureIndex = 0; textureIndex < theNewOptimizedDFF.GetTotalOptimizedTextures(); textureIndex++)
         {
             SOptimizedTexture& optimizedTexture = theNewOptimizedDFF.GetOptimizedTexture(textureIndex);
-            theNewOptimizedDFF.Addtexture(optimizedTexture.m_textureNameHash, optimizedTexture.m_textureSizeWithinUnwrappedImageInBytes);
+            theNewOptimizedDFF.Addtexture(optimizedTexture.m_textureNameHash, optimizedTexture.m_textureSizeWithinAtlasInBytes);
         }
     }
+    */
 }
 
 bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
@@ -467,9 +472,6 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     m_IdeLoader.AddTXDDFFInfoToMaps(&m_gt3IMgArchive);
 
     ReadDFFOptimizationInfoFiles();
-
-    FlushDFFOptimizationDataToFile(outputFolder + "\\complete.gmoi");
-    return true;
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
 
@@ -512,7 +514,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         dffModelInfosIndex++;
 
         // REMOVE THIS LATER
-        // break;p
+        // break;
         // REMOVE END
     }
 

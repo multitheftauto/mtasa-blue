@@ -96,7 +96,7 @@ bool CDFFModelOptimizationInfo::ReadOptimizedDFFs()
         for (unsigned int textureIndex = 0; textureIndex < optimizationInfoEntry.totalOptimizedTextures; textureIndex++)
         {
             SOptimizedTexture* pOptimizedTexture = (SOptimizedTexture*)pInputData;
-            optimizedDFF.Addtexture(pOptimizedTexture->m_textureNameHash, pOptimizedTexture->m_textureSizeWithinUnwrappedImageInBytes);
+            optimizedDFF.Addtexture(pOptimizedTexture->m_textureNameHash, pOptimizedTexture->m_textureSizeWithinAtlasInBytes);
             pInputData += sizeof(SOptimizedTexture);
         }
     }
