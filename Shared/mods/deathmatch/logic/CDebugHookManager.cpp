@@ -27,11 +27,25 @@
 CDebugHookManager::CDebugHookManager()
 {
 #ifndef MTA_CLIENT
-    m_MaskArgumentsMap["dbConnect"] = {1, 2, 3};               // type, 1=HOST, 2=USERNAME, 3=PASSWORD, options
-    m_MaskArgumentsMap["logIn"] = {2};                         // player, account, 2=PASSWORD
-    m_MaskArgumentsMap["addAccount"] = {1};                    // name, 1=PASSWORD
-    m_MaskArgumentsMap["getAccount"] = {1};                    // name, 1=PASSWORD
-    m_MaskArgumentsMap["setAccountPassword"] = {1};            // account, 1=PASSWORD
+    m_MaskArgumentsMap = {
+                        {"logIn", {{EArgType::Password, 2}}},                           // player, account, 2=PASSWORD
+                        {"addAccount", {{EArgType::Password, 1}}},                      // name, 1=PASSWORD
+                        {"getAccount", {{EArgType::Password, 1}}},                      // name, 1=PASSWORD
+                        {"setAccountPassword", {{EArgType::Password, 1}}},              // account, 1=PASSWORD
+                        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
+                        {"callRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},   // 0=URL, ...
+                        {"dbConnect", {{EArgType::MaxArgs, 0}}},
+                        {"dbExec", {{EArgType::MaxArgs, 0}}},
+                        {"dbFree", {{EArgType::MaxArgs, 0}}},
+                        {"dbPoll", {{EArgType::MaxArgs, 0}}},
+                        {"dbPrepareString", {{EArgType::MaxArgs, 0}}},
+                        {"dbQuery", {{EArgType::MaxArgs, 0}}},
+                        {"executeSQLQuery", {{EArgType::MaxArgs, 0}}},
+                        };
+#else
+    m_MaskArgumentsMap = {
+                        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
+                        };
 #endif
 }
 
@@ -540,14 +554,32 @@ bool CDebugHookManager::MustNameBeExplicitlyAllowed(const SString& strName)
 ///////////////////////////////////////////////////////////////
 void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, CLuaArguments& FunctionArguments)
 {
-    auto* pArgIndexList = MapFind(m_MaskArgumentsMap, strFunctionName);
-    if (pArgIndexList)
+    auto* pMaskArgumentList = MapFind(m_MaskArgumentsMap, strFunctionName);
+    if (pMaskArgumentList)
     {
-        for (uint uiIndex : *pArgIndexList)
+        for (const auto& maskArgument : *pMaskArgumentList)
         {
-            CLuaArgument* pArgument = FunctionArguments[uiIndex];
-            if (pArgument)
-                pArgument->ReadString("***");
+            if (maskArgument.argType == EArgType::Password)
+            {
+                CLuaArgument* pArgument = FunctionArguments[maskArgument.index];
+                if (pArgument && !pArgument->GetString().empty())
+                    pArgument->ReadString("***");
+            }
+            else if (maskArgument.argType == EArgType::Url)
+            {
+                CLuaArgument* pArgument = FunctionArguments[maskArgument.index];
+                if (pArgument)
+                {
+                    // Remove query portion of URL
+                    SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F","?").Replace("#","?").SplitLeft("?");
+                    pArgument->ReadString(strUrlCleaned);   
+                }
+            }
+            else if (maskArgument.argType == EArgType::MaxArgs)
+            {
+                while(FunctionArguments.Count() > maskArgument.index)
+                    FunctionArguments.Pop();
+            }
         }
     }
 }

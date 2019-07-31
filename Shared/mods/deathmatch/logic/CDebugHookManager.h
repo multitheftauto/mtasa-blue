@@ -21,6 +21,19 @@ struct SDebugHookCallInfo
     CFastHashSet<SString> allowedNameMap;
 };
 
+enum class EArgType
+{
+    Password,
+    Url,
+    MaxArgs,
+};
+
+struct SMaskArgument
+{
+    EArgType argType;
+    uint index;
+};
+
 ///////////////////////////////////////////////////////////////
 //
 // CDebugHookManager
@@ -65,5 +78,5 @@ protected:
     std::vector<SDebugHookCallInfo>       m_PostFunctionHookList;
     std::vector<SDebugHookCallInfo>       m_PreEventFunctionHookList;
     std::vector<SDebugHookCallInfo>       m_PostEventFunctionHookList;
-    std::map<SString, std::vector<uint> > m_MaskArgumentsMap;
+    std::map<SString, std::vector<SMaskArgument> > m_MaskArgumentsMap;
 };
