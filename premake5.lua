@@ -138,6 +138,7 @@ workspace "MTASA"
 		include "vendor/libspeex"
 		include "vendor/hwbrk"
 		include "vendor/xatlas"
+		include "vendor/ide-ipl-lib"
 	end
 
 	filter {}

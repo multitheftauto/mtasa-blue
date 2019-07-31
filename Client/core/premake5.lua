@@ -19,7 +19,8 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/hwbrk",
-			"../../vendor/xatlas"
+			"../../vendor/xatlas",
+			"../../vendor/ide-ipl-lib"
 		}
 
 	libdirs {
@@ -48,7 +49,8 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "hwbrk", "xatlas"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "hwbrk", "xatlas", 
+		"ide-ipl-lib"
 	}
 
 	defines {
