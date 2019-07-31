@@ -19,6 +19,7 @@ public:
     unsigned int GetTotalPossibleCustomOutputFiles(std::vector<CIMGArchiveFile>* imgArchiveFiles);
     void         FlushDFFOptimizationDataToFile(const char* filePath);
     void         ReadDFFOptimizationInfoFiles();
+    bool         CreateOutputDirectories();
 
 private:
 
@@ -37,4 +38,7 @@ private:
 
     // n megabytes * 1024 * 1024
     const unsigned int imgReadWriteOperationSizeInBytes = 20 * 1024 * 1024;
+    const SString      m_outputFolder = "OptimizedFiles";
+    const SString      m_ideOutputFolder = m_outputFolder + "\\IDE";
+    const SString      m_OptimizedModelInfosFileName ="completeWithoutVehicleModsModels.gmoi";
 };

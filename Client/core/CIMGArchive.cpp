@@ -18,11 +18,18 @@ bool CIMGArchive::LoadIMGFile(const SString& filePath, eIMGFileOperation fileOpe
     if (fileOperation == IMG_FILE_READ)
     {
         fileStream.open(FromUTF8(archiveFilePath_), std::ios::binary | std::ios::ate);
-        return fileStream.fail() == false;
+        if (fileStream.fail())
+        {
+            printf("LoadIMGFile: fail\n");
+            return false;
+        }
+        return true;
     }
     else if (fileOperation == IMG_FILE_WRITE)
     {
+        return true;
     }
+    return false;
 }
 
 void CIMGArchive::ReadEntries()
@@ -134,14 +141,14 @@ std::vector<CIMGArchiveFile>* CIMGArchive::GetNextImgFiles(unsigned int imgReadW
 
     unsigned int bytesToRead = 0;
     unsigned int filesToRead = 0;
-    size_t       entryHeaderIndex = totalImgFilesRead; // 9
+    size_t       entryHeaderIndex = totalImgFilesRead;            // 9
     while (true)
     {
         EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
         unsigned int actualFileSize = entryHeader.usSize * 2048;
         bytesToRead += actualFileSize;
-        filesToRead++;                                    
-        entryHeaderIndex++;                              
+        filesToRead++;
+        entryHeaderIndex++;
 
         if (bytesToRead > imgReadWriteOperationSizeInBytes)
         {

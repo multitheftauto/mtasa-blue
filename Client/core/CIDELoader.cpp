@@ -16,170 +16,86 @@ void CIDELoader::FreeMemory()
 {
     std::map<unsigned int, SDFFDescriptor>().swap(mapOfDffDescriptors);
     std::map<unsigned int, STXDDescriptor>().swap(mapOfTxdDescriptors);
+    std::vector<ide::gtasa::ide_file>().swap(ideFiles);
 }
 
 void CIDELoader::LoadIDEFiles()
 {
+    ideFiles.reserve(ideFilePaths.size());
     for (auto& fileName : ideFilePaths)
     {
-        SString fileContents;
-        if (LoadFileToString(fileName, fileContents))
-        {
-            ParseContents(fileContents);
-        }
-        else
+        ide::gtasa::ide_file& ideFile = ideFiles.emplace_back(fileName);
+        if (!ideFile.LoadIDE())
         {
             std::printf("failed to read file: %s\n", fileName.c_str());
+            return;
+        }
+
+        for (auto& obj : ideFile.objs)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&obj, obj.id, obj.modelName, obj.txdName);
+        }
+
+        for (auto& tobj : ideFile.tobj)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&tobj, tobj.id, tobj.modelName, tobj.txdName);
+        }
+
+        for (auto& anim : ideFile.anim)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&anim, anim.id, anim.modelName, anim.txdName);
+        }
+
+        for (auto& weap : ideFile.weap)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&weap, weap.id, weap.modelName, weap.txdName);
+        }
+
+        for (auto& car : ideFile.cars)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&car, car.id, car.modelName, car.txdName);
+        }
+
+        for (auto& ped : ideFile.peds)
+        {
+            CreateModelDescriptor((ide::gtasa::tModelObject*)&ped, ped.id, ped.modelName, ped.txdName);
         }
     }
 }
 
-bool CIDELoader::LoadFileToString(const SString& fileName, SString& contents)
+bool CIDELoader::WriteIDEFiles(const SString& folderLocation)
 {
-    std::ifstream in(fileName);
-    if (in)
+    for (auto& ideFile : ideFiles)
     {
-        contents.assign((std::istreambuf_iterator<char>(in)), (std::istreambuf_iterator<char>()));
-        return true;
+        if (!ideFile.WriteIDE(folderLocation))
+        {
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
-void CIDELoader::RemoveStringTabsSpaces(SString& contents)
+void CIDELoader::CreateModelDescriptor(ide::gtasa::tModelObject* pModelObject, const int modelID, const char* modelName, const char* txdName)
 {
-    SString::iterator end_pos = std::remove(contents.begin(), contents.end(), ' ');
-    contents.erase(end_pos, contents.end());
+    SString strDFFName = modelName, strTXDName = txdName;
+    strDFFName += ".dff";
+    strTXDName += ".txd";
+    const unsigned int uiDFFNameHash = HashString(strDFFName.ToLower());
+    const unsigned int uiTXDNameHash = HashString(strTXDName.ToLower());
 
-    end_pos = std::remove(contents.begin(), contents.end(), '\t');
-    contents.erase(end_pos, contents.end());
-}
+    //  std::printf("dff name: %s | txd name: %s\n", strDFFName.c_str(), strTXDName.c_str());
 
-void CIDELoader::ParseObjsLine(const SString& line)
-{
-    if (line.size() == 0 || line[0] == '#')
+    auto it = mapOfTxdDescriptors.find(uiTXDNameHash);
+    if (it == mapOfTxdDescriptors.end())
     {
-        return;
+        auto thePair = mapOfTxdDescriptors.emplace(uiTXDNameHash, 0);
+        it = thePair.first;
     }
 
-    // std::cout << line << std::endl;
-    std::vector<SString> vecSplittedStrings;
-    line.Split(",", vecSplittedStrings);
-
-    if (vecSplittedStrings.size() >= 3)
+    auto dffDescriptorIterator = mapOfDffDescriptors.find(uiDFFNameHash);
+    if (dffDescriptorIterator == mapOfDffDescriptors.end())
     {
-        const int          modelID = std::stoi(vecSplittedStrings[0]);
-        const SString      strDFFName = vecSplittedStrings[1] + ".dff";
-        const SString      strTXDName = vecSplittedStrings[2] + ".txd";
-        const unsigned int uiDFFNameHash = HashString(strDFFName.ToLower());
-        const unsigned int uiTXDNameHash = HashString(strTXDName.ToLower());
-
-        //  std::printf("dff name: %s | txd name: %s\n", strDFFName.c_str(), strTXDName.c_str());
-
-        auto it = mapOfTxdDescriptors.find(uiTXDNameHash);
-        if (it == mapOfTxdDescriptors.end())
-        {
-            auto thePair = mapOfTxdDescriptors.emplace(uiTXDNameHash, 0);
-            it = thePair.first;
-        }
-
-        auto dffDescriptorIterator = mapOfDffDescriptors.find(uiDFFNameHash);
-        if (dffDescriptorIterator == mapOfDffDescriptors.end())
-        {
-            mapOfDffDescriptors.emplace(std::piecewise_construct, std::forward_as_tuple(uiDFFNameHash), std::forward_as_tuple(modelID, &it->second));
-        }
-    }
-    else
-    {
-        std::printf("\n\n\nError !!!: vecSplittedStrings SIZE IS LESS THAN 3 | line : %s\n\n\n", line.c_str());
-    }
-}
-
-// we only need to read the objs section
-void CIDELoader::ParseContents(SString& contents)
-{
-    SString            line;
-    std::istringstream inStream(contents);
-    while (std::getline(inStream, line))
-    {
-        RemoveStringTabsSpaces(line);
-        if (line == "objs")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
-        else if (line == "tobj")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
-        else if (line == "cars")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
-        else if (line == "peds")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
-        else if (line == "weap")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
-        else if (line == "anim")
-        {
-            while (std::getline(inStream, line))
-            {
-                RemoveStringTabsSpaces(line);
-                if (line == "end")
-                {
-                    break;
-                }
-
-                ParseObjsLine(line);
-            }
-        }
+        mapOfDffDescriptors.emplace(std::piecewise_construct, std::forward_as_tuple(uiDFFNameHash), std::forward_as_tuple(modelID, &it->second, pModelObject));
     }
 }
 

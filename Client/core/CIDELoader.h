@@ -1,6 +1,7 @@
 #pragma once
 #include "CIMGArchive.h"
 #include <array>
+#include <ide-ipl-lib/ide/gtasa.h>
 
 struct STXDDescriptor
 {
@@ -24,11 +25,13 @@ struct SDFFDescriptor
 {
     int             m_nModelID;
     STXDDescriptor* m_pTxdDescriptor;
+    ide::gtasa::tModelObject* m_pModelObject;
 
-    SDFFDescriptor(int modelID, STXDDescriptor* pTxdDescriptor)
+    SDFFDescriptor(int modelID, STXDDescriptor* pTxdDescriptor, ide::gtasa::tModelObject* pModelObject)
     {
         m_nModelID = modelID;
         m_pTxdDescriptor = pTxdDescriptor;
+        m_pModelObject = pModelObject;
     }
 
     int GetModelID() { return m_nModelID; }
@@ -43,12 +46,9 @@ public:
 
     void FreeMemory();
     void LoadIDEFiles();
-    bool LoadFileToString(const SString& fileName, SString& contents);
-    void RemoveStringTabsSpaces(SString& contents);
-    void ParseObjsLine(const SString& line);
+    bool WriteIDEFiles(const SString& folderLocation);
+    void CreateModelDescriptor(ide::gtasa::tModelObject* pModelObject, const int modelID, const char* modelName, const char* txdName);
 
-    // we only need to read the objs section
-    void            ParseContents(SString& contents);
     void            AddTXDDFFInfoToMaps(CIMGArchive* pIMgArchive);
     SDFFDescriptor* GetDFFDescriptor(const unsigned int uiDFFNameHash);
 
@@ -60,6 +60,8 @@ private:
 
     // Key: TXD name hash
     std::map<unsigned int, STXDDescriptor> mapOfTxdDescriptors;
+
+    std::vector<ide::gtasa::ide_file> ideFiles;
 
     const std::array<std::string, 59> ideFilePaths = {
         "ide\\barriers.ide", "ide\\countn2.ide",  "ide\\countrye.ide", "ide\\countryN.ide", "ide\\countryS.ide", "ide\\countryW.ide", "ide\\counxref.ide",

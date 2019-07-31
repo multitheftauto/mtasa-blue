@@ -127,7 +127,7 @@ SDFFDescriptor* CIMGArchiveOptimizer::GetDFFDescriptor(CIMGArchiveFile* pDFFArch
     SDFFDescriptor*    pDFFDescriptor = m_IdeLoader.GetDFFDescriptor(uiDFFNameHash);
     if (!pDFFDescriptor)
     {
-        std::printf("couldn't find dff descriptor for '%s'\n", pDFFArchiveFile->fileEntry.fileName);
+        // std::printf("couldn't find dff descriptor for '%s'\n", pDFFArchiveFile->fileEntry.fileName);
         return nullptr;
     }
 
@@ -241,7 +241,14 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
         return;
     }
 
-    SDFFDescriptor*  pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    SDFFDescriptor* pDFFDescriptor = GetDFFDescriptor(pDFFArchiveFile);
+    if (!pDFFDescriptor)
+    {
+        return;
+    }
+    std::printf("dff name: %s\n", pDFFArchiveFile->fileEntry.fileName);
+    return;
+
     /*
     int             modelID = 0;
     if (pDFFDescriptor && (modelID = pDFFDescriptor->GetModelID()), (modelID != 16682))
@@ -283,8 +290,8 @@ void CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
             // assert(pAtlasTxdDictionary != nullptr);
             //*/
 
-            //SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
-            //assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
+            // SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
+            // assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
 
             // WriteDFF(pClump, pDFFArchiveFile);
             // WriteTXD(pAtlasTxdDictionary, pDFFArchiveFile);
@@ -391,10 +398,8 @@ void CIMGArchiveOptimizer::FlushDFFOptimizationDataToFile(const char* filePath)
 
 void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
 {
-    SString outputFolder = "OptimizedFiles";
-
     m_dffOptimizationInfo.AllocateSpace(m_IdeLoader.GetMaximumOptimizableModelsCount());
-    assert(m_dffOptimizationInfo.CreateTheFile(outputFolder + "\\completeWithoutVehicleModsModels.gmoi", OPTIMIZE_FILE_READ) != false);
+    assert(m_dffOptimizationInfo.CreateTheFile(m_outputFolder + "\\" + m_OptimizedModelInfosFileName, OPTIMIZE_FILE_READ) != false);
     if (!m_dffOptimizationInfo.ReadOptimizedDFFs())
     {
         printf("ReadOptimizedDFFs failed\n");
@@ -444,6 +449,27 @@ void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
     */
 }
 
+bool CIMGArchiveOptimizer::CreateOutputDirectories()
+{
+    if (CreateDirectory(m_outputFolder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+    {
+        if (CreateDirectory(m_ideOutputFolder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+        {
+        }
+        else
+        {
+            printf("failed to create directory %s\n", m_ideOutputFolder.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        printf("failed to create directory %s\n", m_outputFolder.c_str());
+        return false;
+    }
+    return true;
+}
+
 bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 {
     std::printf("Generate button pressed\n");
@@ -454,9 +480,9 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         assert(m_pVehicleTxdDictionary != nullptr);
     }
 
-    SString outputFolder = "OptimizedFiles";
-    if (CreateDirectory(outputFolder.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError())
+    if (!CreateOutputDirectories())
     {
+        return true;
     }
 
     m_IdeLoader.LoadIDEFiles();
@@ -472,6 +498,20 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     m_IdeLoader.AddTXDDFFInfoToMaps(&m_gt3IMgArchive);
 
     ReadDFFOptimizationInfoFiles();
+
+    m_IdeLoader.WriteIDEFiles(m_ideOutputFolder);
+    // REMOVE THIS LATER AFTER TESTING
+    {
+        // Free memory
+        m_IdeLoader.FreeMemory();
+        m_gt3IMgArchive.FreeArchiveDirEntries();
+        m_dffOptimizationInfo.FreeMemory();
+
+        m_gt3IMgArchive.closeFile();
+        m_pRenderWare->TxdForceUnload(0, true, m_pVehicleTxdDictionary);
+    }
+    // REMOVE END
+    return true;
 
     CIMGArchive* newIMgArchiveOut = new CIMGArchive("proxy_test_gta3.img", IMG_FILE_WRITE);
 
