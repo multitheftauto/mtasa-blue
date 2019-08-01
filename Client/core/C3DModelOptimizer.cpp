@@ -961,13 +961,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     packOptions.padding = 1;
     packOptions.texelsPerUnit = texelsPerUnit;
 
-    // DECIDE HOW MANY TEXTURES TO IGNORE HERE?
-
     uint32_t bestAtlasResolution = GetBestAtlasMaxResolution();
-
-    if (IsAtlasResolutionTooBig(bestAtlasResolution))
-    {
-    }
 
     unsigned int atlasFindingAttempts = 0;
     do

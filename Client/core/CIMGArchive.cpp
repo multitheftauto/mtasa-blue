@@ -1,9 +1,10 @@
 #include "StdInc.h"
 #include "CIMGArchive.h"
 
-CIMGArchive::CIMGArchive(const SString& archiveFilePath, eIMGFileOperation fileOperation)
+CIMGArchive::CIMGArchive()
 {
-    LoadIMGFile(archiveFilePath, fileOperation);
+    totalImgFilesRead = 0;
+    totalOutputDataSizeInBytes = 0;
 }
 
 CIMGArchive::~CIMGArchive()
@@ -11,28 +12,45 @@ CIMGArchive::~CIMGArchive()
     archiveFileEntries_.clear();
 }
 
-bool CIMGArchive::LoadIMGFile(const SString& filePath, eIMGFileOperation fileOperation)
+bool CIMGArchive::CreateTheFile(const SString& filePath, eIMGFileOperation fileOperation)
 {
+    totalOutputDataSizeInBytes = 0;
     archiveFilePath_ = filePath;
-    totalImgFilesRead = 0;
+    m_fileOperation = fileOperation;
     if (fileOperation == IMG_FILE_READ)
     {
         fileStream.open(FromUTF8(archiveFilePath_), std::ios::binary | std::ios::ate);
         if (fileStream.fail())
         {
-            printf("LoadIMGFile: fail\n");
-            return false;
+            printf("CreateTheFile failed: %s\n", filePath.c_str());
         }
-        return true;
+        return fileStream.fail() == false;
     }
     else if (fileOperation == IMG_FILE_WRITE)
     {
-        return true;
+        outputStream.open(archiveFilePath_, std::ofstream::out | std::ios::binary | std::ios::trunc);
+        if (outputStream.fail())
+        {
+            printf("CreateTheFile failed: %s\n", filePath.c_str());
+        }
+        return outputStream.fail() == false;
     }
     return false;
 }
 
-void CIMGArchive::ReadEntries()
+void CIMGArchive::CloseFile()
+{
+    if (m_fileOperation == IMG_FILE_READ)
+    {
+        fileStream.close();
+    }
+    else
+    {
+        outputStream.close();
+    }
+}
+
+unsigned int CIMGArchive::ReadEntries()
 {
     if (!fileStream.fail())
     {
@@ -45,6 +63,7 @@ void CIMGArchive::ReadEntries()
             fileStream.read((char*)archiveFileEntries_.data(), sizeof(EntryHeader) * imgHeader.entryCount);
         }
     }
+    return archiveFileEntries_.size();
 }
 
 DWORD GetTotalBlockSize(DWORD blockSize)
@@ -54,31 +73,20 @@ DWORD GetTotalBlockSize(DWORD blockSize)
     return blockSize / IMG_BLOCK_SIZE;
 }
 
-#include <iostream>
-#include <fstream>
-#include <sys/stat.h>
-#include <cstring>
-#include <cerrno>
-
-void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
+void CIMGArchive::FlushEntriesToFile()
 {
-    DWORD       dwTotalEntries = imgEntries.size();
+    if (imgArchiveFiles.size() <= 0)
+    {
+        return;
+    }
+
+    DWORD       dwTotalEntries = imgArchiveFiles.size();
     const char* version = "VER2";
 
-    std::vector<EntryHeader> vecEntryHeaders;
-    vecEntryHeaders.reserve(dwTotalEntries);
-
-    std::ofstream outputStream(archiveFilePath_, std::ofstream::out | std::ios::binary | std::ios::trunc);
+    archiveFileEntries_.reserve(dwTotalEntries);
 
     using std::cerr;
     using std::strerror;
-
-    // outputStream.open(archiveFilePath_, std::ofstream::out | std::ios::binary);
-
-    if (outputStream.fail())
-    {
-        std::printf("WriteEntries: ostream failed to open: %s\n", strerror(errno));
-    }
 
     outputStream.write((char*)version, 4);
     outputStream.write((char*)&dwTotalEntries, 4);
@@ -87,20 +95,20 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
     uint64_t currentBlockOffset = GetTotalBlockSize(8 + dwTotalEntries * sizeof(EntryHeader));
     for (size_t i = 0; i < dwTotalEntries; i++)
     {
-        CIMGArchiveFile* pArchiveFile = imgEntries[i];
+        CIMGArchiveFile* pArchiveFile = &imgArchiveFiles[i];
         DWORD            fileBlockSize = pArchiveFile->fileEntry.usSize;
-        vecEntryHeaders.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry.fileName);
+        archiveFileEntries_.emplace_back(currentBlockOffset, fileBlockSize, 0, pArchiveFile->fileEntry.fileName);
         currentBlockOffset += fileBlockSize;
     }
 
-    outputStream.write((char*)vecEntryHeaders.data(), 32 * dwTotalEntries);
+    outputStream.write((char*)archiveFileEntries_.data(), 32 * dwTotalEntries);
 
     // now write the buffers
     for (DWORD i = 0; i < dwTotalEntries; i++)
     {
-        CIMGArchiveFile* pArchiveFile = imgEntries[i];
-        DWORD            actualFileOffset = vecEntryHeaders[i].offset * 2048;
-        DWORD            actualFileSize = vecEntryHeaders[i].usSize * 2048;
+        CIMGArchiveFile* pArchiveFile = &imgArchiveFiles[i];
+        DWORD            actualFileOffset = archiveFileEntries_[i].offset * 2048;
+        DWORD            actualFileSize = archiveFileEntries_[i].usSize * 2048;
 
         outputStream.seekp(actualFileOffset, std::ios::beg);
 
@@ -109,11 +117,36 @@ void CIMGArchive::WriteEntries(std::vector<CIMGArchiveFile*>& imgEntries)
     }
 
     std::printf("WriteEntries: okay done writing\n");
+
+    imgArchiveFiles.clear();
+    std::vector<EntryHeader>().swap(archiveFileEntries_);
 }
 
-void CIMGArchive::FreeArchiveDirEntries()
+CIMGArchiveFile* CIMGArchive::InsertArchiveFile(unsigned int actualFileSizeInBytes, unsigned int imgReadWriteOperationSizeInBytes)
+{
+    if (actualFileSizeInBytes < imgReadWriteOperationSizeInBytes)
+    {
+        if ((totalOutputDataSizeInBytes + actualFileSizeInBytes) >= imgReadWriteOperationSizeInBytes)
+        {
+            return nullptr;
+        }
+    }
+
+    totalOutputDataSizeInBytes += actualFileSizeInBytes;
+    CIMGArchiveFile& archiveFile = imgArchiveFiles.emplace_back();
+    return &archiveFile;
+}
+
+void CIMGArchive::AllocateSpace(size_t space)
+{
+    imgArchiveFiles.reserve(space);
+}
+
+void CIMGArchive::FreeMemory()
 {
     std::vector<EntryHeader>().swap(archiveFileEntries_);
+    std::vector<CIMGArchiveFile>().swap(imgArchiveFiles);
+    std::vector<char>().swap(m_vecImgArchiveFilesBuffer);
 }
 
 std::vector<EntryHeader>& CIMGArchive::GetArchiveDirEntries()
