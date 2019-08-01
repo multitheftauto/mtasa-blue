@@ -437,8 +437,9 @@ void CIMGArchiveOptimizer::ReadDFFOptimizationInfoFiles()
 
 void CIMGArchiveOptimizer::CreateNextOutputIMGFile()
 {
+    SString outputFilePath = m_outputFolder + "\\" + m_outputIMGFileFormat;
     SString outputFileName;
-    outputFileName.Format(m_outputIMGFileFormat.c_str(), (int)m_imgFilesWrittenCount);
+    outputFileName.Format(outputFilePath.c_str(), (int)m_imgFilesWrittenCount);
     assert(m_outputIMGArchive.CreateTheFile(outputFileName, IMG_FILE_WRITE) != false);
     m_imgFilesWrittenCount++;
 }
