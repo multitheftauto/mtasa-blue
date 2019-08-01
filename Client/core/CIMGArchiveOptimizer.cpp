@@ -251,21 +251,22 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
         return bDFFOptimized;
     }
 
+
+    int modelID = pDFFDescriptor->GetModelID();
     /*
-    int             modelID = 0;
-    if (pDFFDescriptor && (modelID = pDFFDescriptor->GetModelID()), (modelID != 16682))
+    if (pDFFDescriptor && (modelID != 3923))
     {
         return bDFFOptimized;
-    }*/
+    }
+    */
 
     unsigned int     defaultTXDSizeInBytes = 0;
-    RwTexDictionary* pTxdDictionary = pDFFDescriptor ? ReadTextureDictionary(pDFFDescriptor, defaultTXDSizeInBytes) : nullptr;
+    RwTexDictionary* pTxdDictionary = ReadTextureDictionary(pDFFDescriptor, defaultTXDSizeInBytes) ;
     if (!pTxdDictionary)
     {
         return bDFFOptimized;
     }
 
-    int modelID = pDFFDescriptor->GetModelID();
     m_pRenderWare->SetCurrentDFFWriteModelID(modelID);
     m_pRenderWare->SetCurrentReadDFFWithoutReplacingCOL(true);
 
@@ -340,10 +341,16 @@ void CIMGArchiveOptimizer::OptimizeIMGArchiveFiles(std::vector<CIMGArchiveFile>*
         SString strFileExtension = strFileName.substr(strFileName.find_last_of(".") + 1);
         if (strFileExtension == "dff")
         {
+            // REMOVE LATER
+            //OptimizeDFFFile(&archiveFile);
+            //break;
+            // REMOVE END
+            ///*
             if (OptimizeDFFFile(&archiveFile))
             {
                 continue;
             }
+            //*/
         }
 
         // Any file which is not optmimized, it should be added to the new img file
@@ -517,7 +524,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         dffModelInfosIndex++;
 
         // REMOVE THIS LATER
-        // break;
+        //break;
         // REMOVE END
     }
 
