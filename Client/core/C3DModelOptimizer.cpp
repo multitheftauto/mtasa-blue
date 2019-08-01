@@ -328,7 +328,7 @@ void C3DModelOptimizer::GetVerticesToMaterial()
             {
                 int vertexIndex = triangle.vertIndex[j];
 
-                unsigned short materialIndex = triangle.matIndex + FirstMaterialIndex;
+                unsigned short materialIndex = triangle.matIndex + static_cast < unsigned short>(FirstMaterialIndex);
                 vertexToMaterial[vertexIndex + FirstVertexIndex] = materialIndex;
             }
         }
