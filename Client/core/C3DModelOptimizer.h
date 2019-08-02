@@ -34,14 +34,14 @@ public:
     void GetUsedTexturesCount();
     SOptimizedTexture* RemoveHighestSizeOptimizedTextureFromContainer();
     void               IgnoreTexture(unsigned int textureNameHash);
-    void GetMostUsedTextureToIgnore();
+    bool               GetMostUsedTextureToIgnore();
     void DestroyMostUsedTexturesToIgnoreClones();
 
     bool             AddMeshesToXatlas();
     bool             GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF);
     void             GetDenormalizedUVs();
     void             SetupAtlasDataForOptimizationInfo();
-    void             SetupAtlasData();
+    bool             SetupAtlasData();
     void             ReplaceGeometriesInClump();
     void             GetAtlasTextures(CTextureAtlas& textureAtlas);
     RwTexDictionary* CreateTXDAtlas();
@@ -76,5 +76,11 @@ private:
 
     // We'll only optimize DFF models which have lots of used textures
     const unsigned int minimumModelUsedTexturesRequired = 2;
-    const float        texelsPerUnit = 1.0f;
+
+    // Set this to 1.0f later for maximum quality. We are reducing
+    // the quality by 50% by setting this to 0.5f only for testing!!!!
+
+    // WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // This will also AFFECT GetModelOptimizationInfo FUNCTION. 
+    const float        m_texelsPerUnit = 0.5f;
 };

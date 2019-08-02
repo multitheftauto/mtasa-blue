@@ -5,6 +5,7 @@
 #include <xatlas.h>
 #include "xatlas_repack.h"
 #include "C3DModelOptimizer.h"
+#include "CAtlasSizeReducer.h"
 
 C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, bool bDontLoadTextures)
 {
@@ -60,7 +61,10 @@ bool C3DModelOptimizer::Optimize()
 
 bool C3DModelOptimizer::CreateAtlas()
 {
-    SetupAtlasData();
+    if (!SetupAtlasData())
+    {
+        return false;
+    }
 
     // Generate the atlas.
     xatlas::SetPrint(printf, true);
@@ -72,7 +76,7 @@ bool C3DModelOptimizer::CreateAtlas()
     }
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
-    packOptions.texelsPerUnit = texelsPerUnit;
+    packOptions.texelsPerUnit = m_texelsPerUnit;
     xatlas::PackCharts(m_Atlas, packOptions);
     return true;
 }
@@ -461,21 +465,6 @@ unsigned int GetDXT1TextureSizeInBytes(unsigned int resolution)
     return atlasSizeInBytes;
 }
 
-bool C3DModelOptimizer::IsAtlasResolutionTooBig(unsigned int bestAtlasResolution)
-{
-    // Implying we are using DXT1 format for compressing textures.
-
-    float       atlasSizeInBytes = GetDXT1TextureSizeInBytes(bestAtlasResolution);
-    float       atlasSizeInMbs = ((atlasSizeInBytes / 1024) / 1024);
-    const float sizePermittedInMBs = 5.0f;
-    printf("\n[DEBUG] atlasSizeInMBs: %f | bestAtlasResolution: %u\n\n", atlasSizeInMbs, bestAtlasResolution);
-    if (atlasSizeInMbs > sizePermittedInMBs)
-    {
-        return true;
-    }
-    return false;
-}
-
 RpGeometry* C3DModelOptimizer::CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format)
 {
     auto RpGeometryUnlock = (RpGeometry * (__cdecl*)(RpGeometry * geometry))0x74C800;
@@ -569,9 +558,21 @@ void C3DModelOptimizer::IgnoreTexture(unsigned int textureNameHash)
     assert(bTextureFound != false);
 }
 
-void C3DModelOptimizer::GetMostUsedTextureToIgnore()
+bool C3DModelOptimizer::GetMostUsedTextureToIgnore()
 {
+    CAtlasSizeReducer atlasSizeReducer(m_pOptimizedDFF, m_defaultTXDSizeInBytes, &vecOptimizedTextures, &setOfUsedTextures);
+    atlasSizeReducer.ReduceSize();
+    if (!atlasSizeReducer.IsAtlasWorthIt())
+    {
+        return false;
+    }
 
+    std::set<unsigned int>& texturesToIgnore = atlasSizeReducer.GetSetOfIgnoredTextureNameHashes();
+    for (auto& textureNameHash : texturesToIgnore)
+    {
+        IgnoreTexture(textureNameHash);
+    }
+    return true;
 }
 
 void C3DModelOptimizer::DestroyMostUsedTexturesToIgnoreClones()
@@ -629,7 +630,7 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
     const float         texelsPerUnit = 1.0f;
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
-    packOptions.texelsPerUnit = texelsPerUnit;
+    packOptions.texelsPerUnit = m_texelsPerUnit;
 
     float theAtlasSize = (atlasSizeInBytes / 1024.0f) / 1024.0f;
     printf("atlas Size: %f mb | atlasSizeInBytes: %u\n", theAtlasSize, atlasSizeInBytes);
@@ -701,9 +702,12 @@ void C3DModelOptimizer::SetupAtlasDataForOptimizationInfo()
     GetDenormalizedUVs();
 }
 
-void C3DModelOptimizer::SetupAtlasData()
+bool C3DModelOptimizer::SetupAtlasData()
 {
-    GetMostUsedTextureToIgnore();
+    if (!GetMostUsedTextureToIgnore())
+    {
+        return false;
+    }
     GetTextures();
 
     // Map vertices to materials so rasterization knows which texture to sample.
@@ -719,6 +723,7 @@ void C3DModelOptimizer::SetupAtlasData()
     GetDenormalizedUVs();
     GetVertexIndices();
     GetFaceMaterials();
+    return true;
 }
 
 void C3DModelOptimizer::ReplaceGeometriesInClump()
@@ -834,7 +839,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 {
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
-    packOptions.texelsPerUnit = texelsPerUnit;
+    packOptions.texelsPerUnit = m_texelsPerUnit;
 
     uint32_t bestAtlasResolution = GetBestAtlasMaxResolution();
 
