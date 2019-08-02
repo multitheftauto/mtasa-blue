@@ -1948,7 +1948,7 @@ RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
     auto   RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
     auto   CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
 
-    printf("CRenderWareSA::CloneRwTexture: %s | pTextureToCopyFrom: %p\n", pTextureToCopyFrom->name, pTextureToCopyFrom);
+    //printf("CRenderWareSA::CloneRwTexture: %s | pTextureToCopyFrom: %p\n", pTextureToCopyFrom->name, pTextureToCopyFrom);
     /*
     // This code will crash for DXT3 compression. Same thing will happen when we call CClothesBuilder_CopyTexture
 
