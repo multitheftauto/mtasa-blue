@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-20 21:57+0100\n"
-"PO-Revision-Date: 2019-05-22 18:33+0000\n"
-"Last-Translator: Nikita <obrekht@gmail.com>\n"
+"PO-Revision-Date: 2019-06-04 21:46+0000\n"
+"Last-Translator: Сергей <sergeymilow@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; !; MeowCola; Rocketman; Nikita Obrekht; The_Creator; Napoleon  Hill; FranklinRoosevelt\n"
+"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; lil_Toady; SalwadoR; Gallardo994; Pavel Andreychenko; Rocketman; Nikita Obrekht; !; MeowCola; The_Creator; Napoleon  Hill; FranklinRoosevelt\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1558550000.0\n"
+"X-POOTLE-MTIME: 1559684775.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -228,7 +228,7 @@ msgstr "КОНСОЛЬ"
 #: ..\Client\core\CCore.cpp:696 ..\Client\loader\CInstallManager.cpp:657
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "Для установки MTA:SA недостаточно места на диске %s."
+msgstr "Недостаточно места на диске %s для установки MTA:SA."
 
 #: ..\Client\core\CCore.cpp:698 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
@@ -898,11 +898,11 @@ msgstr "Заглушить звуки эффектов, когда игра св
 
 #: ..\Client\core\CSettings.cpp:577
 msgid "Mute MTA sounds when minimized"
-msgstr "Глушить звуки MTA "
+msgstr "Выключать звук при сворачивании"
 
 #: ..\Client\core\CSettings.cpp:582
 msgid "Mute Voice sounds when minimized"
-msgstr "Глушить голосовой чат"
+msgstr "Выключать голосовой чат при сворачивании"
 
 #. *
 #. *  Video tab
@@ -913,7 +913,7 @@ msgstr "Разрешение:"
 
 #: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:648
 msgid "FOV:"
-msgstr "FOV:"
+msgstr "Угол обзора:"
 
 #: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:664
 msgid "Draw Distance:"
@@ -1021,7 +1021,7 @@ msgstr "16:9"
 
 #: ..\Client\core\CSettings.cpp:771
 msgid "HUD Match Aspect Ratio"
-msgstr "Размер интерфейса под соотношение"
+msgstr "Адаптировать интерфейс под соотношение сторон экрана"
 
 #: ..\Client\core\CSettings.cpp:777
 msgid "Volumetric Shadows"
@@ -1045,7 +1045,7 @@ msgstr "Всегда отображать транспорт в высоком �
 
 #: ..\Client\core\CSettings.cpp:798
 msgid "Full Screen Minimize"
-msgstr "Сворачиваться при нескольких экранах"
+msgstr "Сворачивание в полноэкранном режиме"
 
 #: ..\Client\core\CSettings.cpp:810
 msgid "Enable Device Selection Dialog"
@@ -1069,7 +1069,7 @@ msgstr "Чёрный список"
 
 #: ..\Client\core\CSettings.cpp:878 ..\Client\core\CSettings.cpp:906
 msgid "Enter a domain e.g. google.com"
-msgstr "Введите домен, например google.com"
+msgstr "Введите адрес, например google.com"
 
 #: ..\Client\core\CSettings.cpp:880
 msgid "Block"
@@ -1086,7 +1086,7 @@ msgstr "Удалить адрес"
 #. Reset vecTemp
 #: ..\Client\core\CSettings.cpp:896
 msgid "Custom whitelist"
-msgstr "Разрешённый список"
+msgstr "Белый список"
 
 #. Misc section label
 #: ..\Client\core\CSettings.cpp:931
@@ -1244,7 +1244,9 @@ msgstr "НЕОБХОДИМ ПЕРЕЗАПУСК"
 
 #: ..\Client\core\CSettings.cpp:1334
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Некоторые настройки изменятся после отключения от этого сервера"
+msgstr ""
+"Некоторые настройки будут изменены после того, как вы отключитесь от "
+"текущего сервера"
 
 #: ..\Client\core\CSettings.cpp:1335
 msgid ""
@@ -1258,7 +1260,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1338
 msgid "DISCONNECT REQUIRED"
-msgstr "НЕОБХОДИМО ОТКЛЮЧИТЬСЯ"
+msgstr "НЕОБХОДИМО ОТКЛЮЧЕНИЕ"
 
 #. Update the joystick name
 #: ..\Client\core\CSettings.cpp:1646
@@ -1856,7 +1858,7 @@ msgstr "Обновить"
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:253
 msgid "Add Favorite"
-msgstr "Добавить в избранное"
+msgstr "Добавить в Избранное"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:254
