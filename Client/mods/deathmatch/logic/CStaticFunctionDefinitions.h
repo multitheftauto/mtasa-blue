@@ -535,6 +535,8 @@ public:
     static void GUIGridListSetHorizontalScrollPosition(CClientEntity& Element, float fPosition);
     static void GUIGridListSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
+    static bool GUIGridListSetItemImage(CClientEntity& GridList, int iRow, int iColumn, CClientEntity& StaticImage);
+
     static void GUIWindowSetMovable(CClientEntity& Element, bool bFlag);
     static void GUIWindowSetSizable(CClientEntity& Element, bool bFlag);
 

@@ -5025,6 +5025,51 @@ bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(CClientEntity& Enti
     return false;
 }
 
+bool CStaticFunctionDefinitions::GUIGridListSetItemImage(CClientEntity& GridList, int iRow, int iColumn, CClientEntity& StaticImage)
+{
+    // Are we a GUI element?
+    if (IS_GUI(&GridList))
+    {
+        CClientGUIElement& GUIElementGridList = static_cast<CClientGUIElement&>(GridList);
+
+        // Are we a gridlist?
+        if (IS_CGUIELEMENT_GRIDLIST(&GUIElementGridList))
+        {
+            CGUIGridList* pGridList = static_cast<CGUIGridList*>(GUIElementGridList.GetCGUIElement());
+
+            if (iColumn > pGridList->GetColumnCount())
+                return false;
+            if (iRow > pGridList->GetRowCount())
+                return false;
+
+            if (&StaticImage == nullptr)
+            {
+                pGridList->SetItemImage(iRow, iColumn, nullptr);
+                return true;
+            }
+            else
+            {
+                // Is this a gui element?
+                if (IS_GUI(&StaticImage))
+                {
+                    CClientGUIElement& GUIElementStaticImage = static_cast<CClientGUIElement&>(StaticImage);
+
+                    // Are we a static image?
+                    if (IS_CGUIELEMENT_STATICIMAGE(&GUIElementStaticImage))
+                    {
+                        CGUIStaticImage* pStaticImage = static_cast<CGUIStaticImage*>(GUIElementStaticImage.GetCGUIElement());
+
+                        pGridList->SetItemImage(iRow, iColumn, pStaticImage);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                               bool bRelative, CClientGUIElement* pParent)
 {

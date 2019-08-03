@@ -105,6 +105,7 @@ void CLuaGUIDefs::LoadFunctions()
         {"guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition},
         {"guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition},
         {"guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition},
+        {"guiGridListSetItemImage", GUIGridListSetItemImage},
 
         {"guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars},
         {"guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition},
@@ -525,6 +526,7 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "setItemData", "guiGridListSetItemData");
     lua_classfunction(luaVM, "setItemText", "guiGridListSetItemText");
+    lua_classfunction(luaVM, "setItemImage", "guiGridListSetItemImage");
     lua_classfunction(luaVM, "setScrollBars", "guiGridListSetScrollBars");
     lua_classfunction(luaVM, "setSelectedItem", "guiGridListSetSelectedItem");
     lua_classfunction(luaVM, "setSelectionMode", "guiGridListSetSelectionMode");
@@ -2816,6 +2818,33 @@ int CLuaGUIDefs::GUIGridListGetVerticalScrollPosition(lua_State* luaVM)
     {
         float fPosition = static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetVerticalScrollPosition() * 100.0f;
         lua_pushnumber(luaVM, fPosition);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGridListSetItemImage(lua_State* luaVM)
+{
+    //  bool guiGridListSetItemImage ( element guiGridlist, int rowIndex, int columnIndex, element guiStaticImage )
+    CClientGUIElement* guiGridlist;
+    int                iRow, iColumn;
+    CClientGUIElement* guiStaticImage;
+
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData<CGUIGridList>(guiGridlist);
+    argStream.ReadNumber(iRow);
+    argStream.ReadNumber(iColumn);
+    argStream.ReadUserData(guiStaticImage, NULL);
+
+    if (!argStream.HasErrors())
+    {
+        bool bResult = CStaticFunctionDefinitions::GUIGridListSetItemImage(*guiGridlist, iRow, iColumn, *guiStaticImage);
+        m_pGUIManager->QueueGridListUpdate(guiGridlist);
+        lua_pushboolean(luaVM, bResult);
         return 1;
     }
     else

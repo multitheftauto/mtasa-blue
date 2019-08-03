@@ -539,18 +539,21 @@ void CGUIGridList_Impl::SetItemImage(int iRow, int hColumn, CGUIStaticImage* pIm
     CGUIListItem* pItem = GetItem(iRow, hColumn);
     if (pItem != NULL)
     {
-        pItem->SetImage(pImage);
+        CGUIListItem_Impl* pImplItem = m_Items[((CGUIListItem_Impl*)pItem)->GetListItem()];
+        pImplItem->SetImage(pImage);
     }
     else
-    // if ( pImage )
     {
-        // If it doesn't, create it and set it in the gridlist
-        CGUIListItem_Impl*  pNewItem = new CGUIListItem_Impl("", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl*)pImage);
-        CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem();
-        reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)), true);
+        //if (pImage)
+        //{
+            // If it doesn't, create it and set it in the gridlist
+            CGUIListItem_Impl*  pNewItem = new CGUIListItem_Impl("", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl*)pImage);
+            CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem();
+            reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, GetColumnIndex(hColumn)), true);
 
-        // Put our new item in the map
-        m_Items[pNewItem->GetListItem()] = pNewItem;
+            // Put our new item in the map
+            m_Items[pListboxItem] = pNewItem;
+        //}
     }
 }
 

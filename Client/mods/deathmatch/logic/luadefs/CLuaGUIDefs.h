@@ -85,6 +85,7 @@ public:
     LUA_DECLARE(GUIGridListGetHorizontalScrollPosition);
     LUA_DECLARE(GUIGridListSetVerticalScrollPosition);
     LUA_DECLARE(GUIGridListGetVerticalScrollPosition);
+    LUA_DECLARE(GUIGridListSetItemImage);
     LUA_DECLARE(GUIScrollPaneSetScrollBars);
     LUA_DECLARE(GUIScrollPaneSetHorizontalScrollPosition);
     LUA_DECLARE(GUIScrollPaneGetHorizontalScrollPosition);
