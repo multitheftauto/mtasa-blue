@@ -23,6 +23,7 @@ class CDXTexture
 public:
     RwTexture*             m_OriginalTexture;
     const D3DFORMAT        m_kTextureFormat = D3DFMT_A8R8G8B8;
+    const RwRasterFormat   m_kRasterTextureFormat = rwRASTERFORMAT8888; // equals to D3DFMT_A8R8G8B8 and vice-versa
     RwTexture*             m_pTexture;
     IDirect3DTexture9*     dxTexture;
     unsigned int           imageWidth, imageHeight;

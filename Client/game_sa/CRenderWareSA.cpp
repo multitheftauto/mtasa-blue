@@ -23,6 +23,8 @@ extern CGameSA* pGame;
 
 RwInt32& CRenderWareSA::_RwD3D9RasterExtOffset = *reinterpret_cast<int*>(0xB4E9E0);
 
+_rwD3D9FormatInfo* _rwD3D9PixelFormatInfo = reinterpret_cast<_rwD3D9FormatInfo*>(0xB4E7E0);
+
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
 struct SReplaceParts
 {
@@ -1926,13 +1928,25 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
+// This function should be only used for texture rasters created 
+// with RwTextureCreateWithFormat or RwRasterCreateWithFormat
 void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
 {
     if (!pTexture)
     {
         return;
     }
+    
+    // A simple way to check if the raster was created with RwTextureCreateWithFormat
+   // assert((pTexture->raster->cFlags & rwRASTERDONTALLOCATE) == false);
 
+    _rwD3D9RasterExt* rasterExt = GetRasterExt(pTexture->raster);
+    if (rasterExt->texture)
+    {
+        rasterExt->texture->Release();
+        rasterExt->texture = NULL;
+    }
+     
     while (pTexture->refs > 1)
     {
         RwTextureDestroy(pTexture);
@@ -1940,15 +1954,35 @@ void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
     RwTextureDestroy(pTexture);
 }
 
+// This function should be only used for TXD texture rasters created
+// with RwTextureCreateWithFormat or RwRasterCreateWithFormat
+void CRenderWareSA::DestroyTXDForcefully(RwTexDictionary* pTxd, bool bDestroyTextures)
+{
+    // We can abandon the textures instead of destroy. It might be safer, but will cause a memory leak
+    if (bDestroyTextures)
+    {
+        // Unref the textures
+        std::vector<RwTexture*> textureList;
+        pGame->GetRenderWareSA()->GetTxdTextures(textureList, pTxd);
+        for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+        {
+            RwTexture* pTexture = *iter;
+            DestroyTextureForcefully(pTexture);
+        }
+    }
+
+    DestroyTXD(pTxd);
+}
+
 RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 {
     auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
-    auto   RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
-    auto   RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
-    auto   RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
-    auto   CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
+    auto RwRasterLock = (RwUInt8 * (__cdecl*)(RwRaster * raster, RwUInt8 level, RwInt32 lockMode))0x07FB2D0;
+    auto RwRasterUnlock = (RwRaster * (__cdecl*)(RwRaster * raster))0x7FAEC0;
+    auto RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
+    auto CClothesBuilder_CopyTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x5A5730;
 
-    //printf("CRenderWareSA::CloneRwTexture: %s | pTextureToCopyFrom: %p\n", pTextureToCopyFrom->name, pTextureToCopyFrom);
+    // printf("CRenderWareSA::CloneRwTexture: %s | pTextureToCopyFrom: %p\n", pTextureToCopyFrom->name, pTextureToCopyFrom);
     /*
     // This code will crash for DXT3 compression. Same thing will happen when we call CClothesBuilder_CopyTexture
 
@@ -1958,7 +1992,7 @@ RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 
     RwUInt8* sourcePixels = RwRasterLock(raster, 0, 2);
     RwUInt8* destinationPixels = RwRasterLock(newRaster, 0, 1);
-    
+    
     std::printf("destinationPixels: %p | sourcePixels: %p | newRaster: %p\n", destinationPixels, sourcePixels, newRaster);
 
     memcpy(destinationPixels, sourcePixels, raster->height * raster->stride);
@@ -2029,6 +2063,73 @@ void GetRasterRect(RwRaster* raster, RECT& rect)
     rect.bottom = raster->nOffsetY + raster->height;
 }
 
+RwRaster* CRenderWareSA::RwRasterCreateWithFormat(unsigned int width, unsigned int height, D3DFORMAT textureFormat, RwRasterFormat rasterFormat)
+{
+    assert(IS_D3DFORMAT_ZBUFFER(textureFormat) == false && "RwTextureCreateWithFormat: ZBUFFER D3D format is not supported");
+
+    HRESULT hr = NULL;
+
+    IDirect3DTexture9* pDXTexture = nullptr;
+    IDirect3DDevice9*  pDevice = g_pCore->GetGraphics()->GetDevice();
+    hr = D3DXCreateTexture(pDevice, width, height, 1, 0, textureFormat, D3DPOOL_MANAGED, &pDXTexture);
+    if (hr != D3D_OK)
+    {
+        std::printf("pDevice->CreateTexture failed with error: %#.8x\n", hr);
+        return nullptr;
+    }
+
+    RwUInt32  rasterFlags = rwRASTERTYPETEXTURE | (rasterFormat & 0x9000);
+    RwRaster* raster = RwRasterCreate(width, height, 0, rasterFlags | rwRASTERDONTALLOCATE);
+    // RwD3D9RasterCreate(raster->width, raster->height, textureFormat, rasterFlags);
+    if (!raster)
+    {
+        std::printf("RwD3D9RasterCreate: Failed\n");
+        return nullptr;
+    }
+
+    _rwD3D9RasterExt* rasterExt = GetRasterExt(raster);
+
+    RwUInt32 convertedRasterFormat = RwRasterGetFormatMacro(raster);
+    rasterExt->texture = pDXTexture;
+
+    /* Remove any raster pixel format */
+    raster->cFormat &= ~(rwRASTERFORMATPIXELFORMATMASK >> 8);
+
+    rasterExt->d3dFormat = textureFormat;
+    if (textureFormat >= D3DFMT_DXT1 && textureFormat <= D3DFMT_DXT5)
+    {
+        rasterExt->compressed = true;
+
+        if (textureFormat == D3DFMT_DXT1)
+        {
+            rasterExt->alpha = false;
+            raster->cFormat |= (rwRASTERFORMAT565 >> 8);
+        }
+        else
+        {
+            rasterExt->alpha = true;
+            raster->cFormat |= (rwRASTERFORMAT4444 >> 8);
+        }
+
+        raster->depth = 16;
+    }
+    else
+    {
+        rasterExt->compressed = false;
+
+        if (textureFormat < MAX_PIXEL_FORMATS)
+        {
+            rasterExt->alpha = _rwD3D9PixelFormatInfo[textureFormat].alpha;
+            raster->depth = _rwD3D9PixelFormatInfo[textureFormat].depth;
+            raster->cFormat |= (_rwD3D9PixelFormatInfo[textureFormat].rwFormat >> 8);
+
+            assert(textureFormat != D3DFMT_P8);
+        }
+    }
+
+    return raster;
+}
+
 RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat)
 {
     auto RwTextureCreate = (RwTexture * (__cdecl*)(RwRaster * raster))0x007F37C0;
@@ -2037,10 +2138,7 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
     auto RwD3D9RasterCreate = (RwRaster * (__cdecl*)(RwUInt32 width, RwUInt32 height, RwUInt32 d3dFormat, RwUInt32 flags))0x4CD050;
 
     RwRaster* raster = pTexture->raster;
-
-    HRESULT hr = NULL;
-
-    RwRaster* convertedRaster = RwD3D9RasterCreate(raster->width, raster->height, textureFormat, rwRASTERTYPETEXTURE | (rasterFormat & 0x9000));
+    RwRaster* convertedRaster = RwRasterCreateWithFormat(raster->width, raster->height, textureFormat, rasterFormat);
     if (!convertedRaster)
     {
         std::printf("RwD3D9RasterCreate: Failed\n");
@@ -2055,7 +2153,7 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
     GetRasterRect(convertedRaster, destinationRect);
 
     IDirect3DSurface9* sourceSurface;
-    hr = rasterExt->texture->GetSurfaceLevel(0, &sourceSurface);
+    HRESULT            hr = rasterExt->texture->GetSurfaceLevel(0, &sourceSurface);
     if (hr != D3D_OK)
     {
         std::printf("Get surface level for sourceSurface failed with error: %#.8x\n", hr);
@@ -2080,11 +2178,11 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
     sourceSurface->Release();
     destinationSurface->Release();
 
+    // std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", textureFormat, rasterExt->d3dFormat);
+
     RwTexture* pConvertedTexture = RwTextureCreate(convertedRaster);
     memcpy(pConvertedTexture->name, pTexture->name, RW_TEXTURE_NAME_LENGTH);
     memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
-
-    //std::printf("texture successfully converted to D3DFormat = %u FROM d3dFOrmat: %u\n", textureFormat, rasterExt->d3dFormat);
 
     return pConvertedTexture;
 }

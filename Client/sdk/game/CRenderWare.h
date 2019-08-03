@@ -86,12 +86,14 @@ public:
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
     virtual void             DestroyTextureForcefully(RwTexture* pTexture) = 0;
+    virtual void             DestroyTXDForcefully(RwTexDictionary* pTxd, bool bDestroyTextures) = 0;
     virtual RwTexture*       CloneRwTexture(RwTexture* pTextureToCopyFrom) = 0;
     virtual void             AddTextureToDictionary(RwTexDictionary* pTextureDictionary, RwTexture* pTexture) = 0;
     virtual RwTexDictionary* CopyTexturesFromDictionary(RwTexDictionary* pResultTextureDictionary, RwTexDictionary* pTextureDictionaryToCopyFrom) = 0;
     virtual _rwD3D9RasterExt* GetRasterExt(RwRaster* raster) = 0;
     virtual D3DFORMAT        GetRasterD3DFormat(RwRaster* raster) = 0;
     virtual bool             IsRasterCompressed(RwRaster* raster) = 0;
+    virtual RwRaster*        RwRasterCreateWithFormat(unsigned int width, unsigned int height, D3DFORMAT textureFormat, RwRasterFormat rasterFormat) = 0;
     virtual RwTexture*       RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;

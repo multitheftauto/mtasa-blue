@@ -69,7 +69,14 @@ public:
 
     // Destroys a texture
     void DestroyTexture(RwTexture* pTex);
+
+    // This function should be only used for texture rasters created
+    // with RwTextureCreateWithFormat or RwRasterCreateWithFormat
     void DestroyTextureForcefully(RwTexture* pTexture);
+
+    // This function should be only used for texture rasters created
+    // with RwTextureCreateWithFormat or RwRasterCreateWithFormat
+    void DestroyTXDForcefully(RwTexDictionary* pTxd, bool bDestroyTextures);
 
     RwTexture* CloneRwTexture(RwTexture* pTextureToCopyFrom);
 
@@ -84,6 +91,7 @@ public:
 
     bool IsRasterCompressed(RwRaster* raster);
 
+    RwRaster*  RwRasterCreateWithFormat(unsigned int width, unsigned int height, D3DFORMAT textureFormat, RwRasterFormat rasterFormat);
     RwTexture* RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat);
 
     // Reads and parses a COL3 file with an optional collision key name

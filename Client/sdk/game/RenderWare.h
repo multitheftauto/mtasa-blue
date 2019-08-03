@@ -20,14 +20,22 @@
 /** RenderWare rendering types                                              **/
 /*****************************************************************************/
 
+enum RwRasterFormat;
 
 // RenderWare definitions
 #if (!defined(RWFORCEENUMSIZEINT))
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
 #endif /* (!defined(RWFORCEENUMSIZEINT)) */
 
+#define NUMPIXELFORMATS 11
+#define MAX_PIXEL_FORMATS 128
+
+#define IS_D3DFORMAT_ZBUFFER(_d3dformat) ((_d3dformat) >= D3DFMT_D16_LOCKABLE && (_d3dformat) <= D3DFMT_D16)
+
 #define RASTEREXTFROMRASTER(raster) \
 ((_rwD3D9RasterExt *)(((RwUInt8 *)(raster)) + CRenderWareSA::_RwD3D9RasterExtOffset))
+#define FMT2TBL(_p) (((_p)&rwRASTERFORMATPIXELFORMATMASK) >> 8)
+#define RwRasterGetFormatMacro(_raster) ((((_raster)->cFormat) & (rwRASTERFORMATMASK >> 8)) << 8)
 #define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
 #define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23

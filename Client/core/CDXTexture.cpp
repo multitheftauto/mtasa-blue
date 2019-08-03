@@ -31,7 +31,7 @@ CDXTexture::CDXTexture(RwTexture* pTexture, eCustomRWTextureDelete deleteSetting
     //printf("[Constructor] CDXTexture::CDXTexture: %s\n", m_pTexture->name);
     if (rasterExt->d3dFormat != m_kTextureFormat)
     {
-        m_pTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, m_kTextureFormat, rwRASTERFORMAT8888);
+        m_pTexture = pRenderware->RwTextureCreateWithFormat(m_pTexture, m_kTextureFormat, m_kRasterTextureFormat);
         rasterExt = pRenderware->GetRasterExt(m_pTexture->raster);
         bNewRwTextureCreated = m_pTexture ? true : false;
     }
@@ -148,7 +148,7 @@ bool CDXTexture::CreateTextureLocked(unsigned int width, unsigned int height, DW
     imageWidth = width;
     imageHeight = height;
 
-    RwRaster* raster = RwD3D9RasterCreate(width, height, m_kTextureFormat, rwRASTERTYPETEXTURE | (m_kTextureFormat & 0x9000));
+    RwRaster* raster = pRenderware->RwRasterCreateWithFormat(width, height, m_kTextureFormat, m_kRasterTextureFormat);
     if (!raster)
     {
         std::printf("CreateAtlasTextureResource: RwD3D9RasterCreate Failed\n");

@@ -29,7 +29,7 @@ void CIMGArchiveOptimizer::GetNextAtlasTxdName(SString& atlasTxdName)
 }
 
 void CIMGArchiveOptimizer::CreateGUI()
-    {
+{
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     CVector2D windowSize = CVector2D(499, 255);
     CGUI*     pManager = g_pCore->GetGUI();
@@ -170,14 +170,14 @@ void CIMGArchiveOptimizer::WriteDFF(RpClump* pClump, CIMGArchiveFile* pDFFArchiv
     m_pRenderWare->WriteDFF(pDFFData, dffArchiveFile->actualFileSize, pClump);
 
     // Remove this line later
-    //m_pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile->fileEntry.fileName, pClump);
+    // m_pRenderWare->WriteDFF(strPathOfGeneratedDff + dffArchiveFile->fileEntry.fileName, pClump);
 }
 
 void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, SDFFDescriptor* pDFFDescriptor)
 {
     auto RwTexDictionaryStreamGetSize = (unsigned int(__cdecl*)(RwTexDictionary * dict))0x804930;
 
-    SString     strPathOfGeneratedDff = "dffs\\";
+    SString strPathOfGeneratedDff = "dffs\\";
 
     SString strTXDFileName;
     GetNextAtlasTxdName(strTXDFileName);
@@ -203,7 +203,7 @@ void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, SDFFDescrip
     m_pRenderWare->WriteTXD(pTXDData, txdArchiveFile->actualFileSize, pTxdDictionary);
 
     // Remove this line later
-    //m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
+    // m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
 }
 
 bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
@@ -274,7 +274,6 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
             ///*
             RwTexDictionary* pAtlasTxdDictionary = modelOptimizer->CreateTXDAtlas();
             assert(pAtlasTxdDictionary != nullptr);
-            //*/
 
             // SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
             // assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
@@ -282,8 +281,9 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
             WriteDFF(pClump, pDFFArchiveFile);
             WriteTXD(pAtlasTxdDictionary, pDFFDescriptor);
 
-            m_pRenderWare->TxdForceUnload(0, true, pAtlasTxdDictionary);
+            m_pRenderWare->DestroyTXDForcefully(pAtlasTxdDictionary, true);
             bDFFOptimized = true;
+            //*/
         }
         delete modelOptimizer;
         modelOptimizer = nullptr;
@@ -468,8 +468,8 @@ bool CIMGArchiveOptimizer::AreGta3ImgFileNamesValid()
         SString fileName = entryHeader.fileName;
         if (fileName.find(m_atlasTxdPrefixWithoutExtension) != SString::npos)
         {
-            printf("ERROR: archive File name '%s' in 'models\\gta3.img' contains text '%s'. Change it!\n",
-                   entryHeader.fileName, m_atlasTxdPrefixWithoutExtension.c_str());
+            printf("ERROR: archive File name '%s' in 'models\\gta3.img' contains text '%s'. Change it!\n", entryHeader.fileName,
+                   m_atlasTxdPrefixWithoutExtension.c_str());
             return false;
         }
     }
