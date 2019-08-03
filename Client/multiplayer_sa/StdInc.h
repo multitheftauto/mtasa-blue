@@ -39,6 +39,7 @@
 #include "..\game_sa\CEntitySA.h"
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
+#include "..\game_sa\CAnimBlendAssocGroupSA.h"
 #include "..\game_sa\common.h"
 #include "..\core\CCrashDumpWriter.h"
 
