@@ -673,6 +673,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -680,13 +683,41 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
+        // Count the amount of space characters at the end
+        size_t       spaceCount = 0;
+        const size_t textLength = wcslen(wszText);
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
+        for (int i = textLength - 1; i >= 0; --i)
+        {
+            const wchar_t c = wszText[i];
 
-        return ((float)size.cx * fScale);
+            if (c == L' ')
+                ++spaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that to get the width of the ignored space characters
+        size_t trailingSpacePixels = 0;
+
+        if (spaceCount > 0)
+        {
+            SIZE size = {};
+            GetTextExtentPoint32W(pDXFont->GetDC(), L" ", 1, &size);
+            trailingSpacePixels = spaceCount * size.cx;
+        }
+
+        RECT rect = {};
+
+        if ((textLength - spaceCount) > 0)
+        {
+            pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        }
+
+        return static_cast<float>(rect.right - rect.left + trailingSpacePixels) * fScale;
     }
+
     return 0.0f;
 }
 

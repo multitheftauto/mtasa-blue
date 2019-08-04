@@ -94,6 +94,7 @@ public:
     void           DisableQuickReload(bool bDisable);
     void           DisableCloseRangeDamage(bool bDisable);
     void           DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
+    void           DisableUnloadingIFPBlocks();
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);
@@ -288,10 +289,11 @@ public:
     DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
-    CVector      m_vecAkimboTarget;
-    bool         m_bAkimboTargetUp;
-    static char* ms_PlayerImgCachePtr;
-    bool         m_bBadDrivebyHitboxesDisabled;
+    CVector                            m_vecAkimboTarget;
+    bool                               m_bAkimboTargetUp;
+    static char*                       ms_PlayerImgCachePtr;
+    static std::array<unsigned int, 3> arrGroupsToProtect;
+    bool                               m_bBadDrivebyHitboxesDisabled;
 
 private:
     bool                m_bSuspensionEnabled;

@@ -50,6 +50,8 @@ unsigned long CMultiplayerSA::ADDR_GotFocus;
 
 unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
 
+std::array<unsigned int, 3> CMultiplayerSA::arrGroupsToProtect = {{ANIM_GROUP_BBBAT_1, ANIM_GROUP_MUSCULAR, ANIM_GROUP_SWORD_1}};
+
 #define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
 
@@ -1492,6 +1494,8 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
+    DisableUnloadingIFPBlocks();
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -2346,6 +2350,15 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
         activeEntityForStreaming = NULL;
         bSetCenterOfWorld = false;
     }
+}
+
+void CMultiplayerSA::DisableUnloadingIFPBlocks()
+{
+    // 32 C0 : xor al, al
+    // C3    : retn
+    unsigned char  newBytes[5] = { 0x32, 0xC0, 0xC3, 0x90, 0x90 };
+    DWORD AddressOfCStreaming__AreAnimsUsedByRequestedModels = 0x407AD0;
+    MemCpy((void*)AddressOfCStreaming__AreAnimsUsedByRequestedModels, newBytes, sizeof(newBytes));
 }
 
 void _declspec(naked) HOOK_FindPlayerCoors()

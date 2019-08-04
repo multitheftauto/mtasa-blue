@@ -765,16 +765,19 @@ float CBassAudio::GetSoundBPM()
     if (m_fBPM == 0.0f && !m_bStream)
     {
         float fData = 0.0f;
+
         // open the same file as played but for bpm decoding detection
         DWORD bpmChan = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, BASS_STREAM_DECODE | BASS_UNICODE);
+        
         if (!bpmChan)
         {
             bpmChan = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_DECODE | BASS_MUSIC_PRESCAN | BASS_UNICODE, 0);
         }
-        // detect bpm in background and return progress in GetBPM_ProgressCallback function
+        
         if (bpmChan)
         {
             fData = BASS_FX_BPM_DecodeGet(bpmChan, 0, GetLength(), 0, BASS_FX_FREESOURCE, NULL, NULL);
+            BASS_FX_BPM_Free(bpmChan);
         }
 
         if (BASS_ErrorGetCode() != BASS_OK)
@@ -785,8 +788,8 @@ float CBassAudio::GetSoundBPM()
         {
             m_fBPM = floor(fData);
         }
-        BASS_FX_BPM_BeatFree(bpmChan);
     }
+
     return m_fBPM;
 }
 

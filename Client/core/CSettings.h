@@ -140,6 +140,7 @@ protected:
     CGUIComboBox*  m_pComboResolution;
     CGUICheckBox*  m_pCheckBoxMipMapping;
     CGUICheckBox*  m_pCheckBoxWindowed;
+    CGUICheckBox*  m_pCheckBoxDPIAware = nullptr;
     CGUICheckBox*  m_pCheckBoxHudMatchAspectRatio;
     CGUICheckBox*  m_pCheckBoxMinimize;
     CGUILabel*     m_pMapRenderingLabel;
@@ -380,6 +381,7 @@ protected:
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
+    bool OnDPIAwareClick(CGUIElement* pElement);
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
