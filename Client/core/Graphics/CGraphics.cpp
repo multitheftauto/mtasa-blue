@@ -2301,3 +2301,9 @@ HRESULT CGraphics::LoadSurfaceFromSurface(LPDIRECT3DSURFACE9 pDestSurface, CONST
 {
     return D3DXLoadSurfaceFromSurface(pDestSurface, pDestPalette, pDestRect, pSrcSurface, pSrcPalette, pSrcRect, Filter, ColorKey);
 }
+
+HRESULT CGraphics::CreateTexture(UINT Width, UINT Height, UINT MipLevels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, LPDIRECT3DTEXTURE9* ppTexture)
+
+{
+    return D3DXCreateTexture(m_pDevice, Width, Height, MipLevels, Usage, Format, Pool, ppTexture);
+}

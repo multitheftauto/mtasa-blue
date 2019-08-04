@@ -2070,8 +2070,7 @@ RwRaster* CRenderWareSA::RwRasterCreateWithFormat(unsigned int width, unsigned i
     HRESULT hr = NULL;
 
     IDirect3DTexture9* pDXTexture = nullptr;
-    IDirect3DDevice9*  pDevice = g_pCore->GetGraphics()->GetDevice();
-    hr = D3DXCreateTexture(pDevice, width, height, 1, 0, textureFormat, D3DPOOL_MANAGED, &pDXTexture);
+    hr = g_pCore->GetGraphics()->CreateTexture(width, height, 1, 0, textureFormat, D3DPOOL_MANAGED, &pDXTexture);
     if (hr != D3D_OK)
     {
         std::printf("pDevice->CreateTexture failed with error: %#.8x\n", hr);
