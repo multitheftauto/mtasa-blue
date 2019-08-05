@@ -170,7 +170,8 @@ void DilateAtlasTextures(xatlas::Atlas* atlas, xatlas::PackOptions& packOptions,
 }
 
 CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::PackOptions& packOptions, std::vector<uint16_t>& vertexToMaterial,
-                             std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures, std::vector<Vector2>& uvs)
+                             std::vector<CDXTexture>& texturesCache, std::vector<uint32_t>& textures, std::vector<Vector2>& uvs,
+                             std::vector<RpAtomic*>& outAtomicList)
 {
     unsigned int atlasTextureSize = atlas->width * atlas->height * 4;
     unsigned int atlasLookupSize = atlas->width * atlas->height;
@@ -189,9 +190,6 @@ CTextureAtlas::CTextureAtlas(RpClump* pClump, xatlas::Atlas* atlas, xatlas::Pack
     }
 
     CRenderWare*           pRenderWare = g_pCore->GetGame()->GetRenderWare();
-    std::vector<RpAtomic*> outAtomicList;
-    pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
-
     size_t FirstVertexIndex = 0;
     // Rasterize chart triangles.
     for (uint32_t geometryIndex = 0; geometryIndex < outAtomicList.size(); geometryIndex++)
