@@ -5,6 +5,15 @@ CIMGArchive::CIMGArchive()
 {
     totalImgFilesRead = 0;
     totalOutputDataSizeInBytes = 0;
+    totalIMGFilesWritten = 0;
+}
+
+
+CIMGArchive::CIMGArchive(int padding)
+{
+    totalImgFilesRead = 0;
+    totalOutputDataSizeInBytes = 0;
+    totalIMGFilesWritten = 0;
 }
 
 CIMGArchive::~CIMGArchive()
@@ -15,6 +24,7 @@ CIMGArchive::~CIMGArchive()
 bool CIMGArchive::CreateTheFile(const SString& filePath, eIMGFileOperation fileOperation)
 {
     totalOutputDataSizeInBytes = 0;
+    totalIMGFilesWritten = 0;
     archiveFilePath_ = filePath;
     m_fileOperation = fileOperation;
     if (fileOperation == IMG_FILE_READ)
@@ -122,6 +132,49 @@ void CIMGArchive::FlushEntriesToFile()
     std::vector<EntryHeader>().swap(archiveFileEntries_);
 }
 
+void CIMGArchive::WriteEntries(std::vector<EntryHeader>& vecFinalOutputIMGEntries)
+{
+    DWORD       dwTotalEntries = vecFinalOutputIMGEntries.size();
+    const char* version = "VER2";
+
+    using std::cerr;
+    using std::strerror;
+
+    outputStream.write((char*)version, 4);
+    outputStream.write((char*)&dwTotalEntries, 4);
+
+    // write the entry headers
+    uint64_t currentBlockOffset = GetTotalBlockSize(8 + dwTotalEntries * sizeof(EntryHeader));
+    for (size_t i = 0; i < dwTotalEntries; i++)
+    {
+        EntryHeader& entryHeader = vecFinalOutputIMGEntries[i];
+        DWORD        fileBlockSize = entryHeader.usSize;
+        entryHeader.offset = currentBlockOffset;
+        // vecFinalOutputIMGEntries[i.emplace_back(currentBlockOffset, fileBlockSize, 0, entryHeader.fileName);
+        currentBlockOffset += fileBlockSize;
+    }
+
+    outputStream.write((char*)vecFinalOutputIMGEntries.data(), 32 * dwTotalEntries);
+}
+
+void CIMGArchive::AppendArchiveFiles(std::vector<CIMGArchiveFile>& vecOutputIMGArchiveFiles, std::vector<EntryHeader>& vecFinalOutputIMGEntries)
+{
+    outputStream.seekp(vecFinalOutputIMGEntries[totalIMGFilesWritten].offset * 2048, std::ios::beg);
+
+    // now write the buffers
+    for (DWORD i = 0; i < vecOutputIMGArchiveFiles.size(); i++)
+    {
+        EntryHeader&     entryHeader = vecFinalOutputIMGEntries[i + totalIMGFilesWritten];
+        CIMGArchiveFile* pArchiveFile = &vecOutputIMGArchiveFiles[i];
+        DWORD            actualFileOffset = entryHeader.offset * 2048;
+        DWORD            actualFileSize = entryHeader.usSize * 2048;
+
+        outputStream.write((char*)pArchiveFile->GetData(), actualFileSize);
+    }
+    outputStream.flush();
+    totalIMGFilesWritten += vecOutputIMGArchiveFiles.size();
+}
+
 CIMGArchiveFile* CIMGArchive::InsertArchiveFile(unsigned int actualFileSizeInBytes, unsigned int imgReadWriteOperationSizeInBytes)
 {
     if (actualFileSizeInBytes < imgReadWriteOperationSizeInBytes)
@@ -221,6 +274,46 @@ std::vector<CIMGArchiveFile>* CIMGArchive::GetNextImgFiles(unsigned int imgReadW
 
     totalImgFilesRead += filesToRead;
 
+    return &imgArchiveFiles;
+}
+
+std::vector<CIMGArchiveFile>* CIMGArchive::GetAllImgFiles()
+{
+    fileStream.seekg(archiveFileEntries_[0].offset * 2048, std::ios::beg);
+
+    unsigned int bytesToRead = 0;
+    unsigned int filesToRead = 0;
+
+    for (unsigned int i = 0; i < archiveFileEntries_.size(); i++)
+    {
+        EntryHeader& entryHeader = archiveFileEntries_[i];
+        unsigned int actualFileSize = entryHeader.usSize * 2048;
+        bytesToRead += actualFileSize;
+        filesToRead++;
+    }
+
+    m_vecImgArchiveFilesBuffer.resize(bytesToRead);
+    imgArchiveFiles.resize(filesToRead);
+
+    fileStream.read(m_vecImgArchiveFilesBuffer.data(), bytesToRead);
+
+    unsigned char* pFilesData = (unsigned char*)m_vecImgArchiveFilesBuffer.data();
+    for (unsigned int i = 0; i < filesToRead; i++)
+    {
+        size_t       entryHeaderIndex = totalImgFilesRead + i;
+        EntryHeader& entryHeader = archiveFileEntries_[entryHeaderIndex];
+        unsigned int actualFileSize = entryHeader.usSize * 2048;
+
+        CIMGArchiveFile& archiveFile = imgArchiveFiles[i];
+        archiveFile.fileEntry = entryHeader;
+        archiveFile.actualFileOffset = entryHeader.offset * 2048;
+        archiveFile.actualFileSize = actualFileSize;
+        archiveFile.pFileData = pFilesData;
+
+        pFilesData += actualFileSize;
+    }
+
+    totalImgFilesRead += filesToRead;
     return &imgArchiveFiles;
 }
 

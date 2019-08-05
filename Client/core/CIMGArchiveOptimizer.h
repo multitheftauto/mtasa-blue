@@ -1,7 +1,7 @@
 #pragma once
 #include "CIDELoader.h"
 #include "CDFFModelOptimizationInfo.h"
-
+#include "CIMGArchive.h"
 class CIMGArchiveOptimizer
 {
 public:
@@ -23,6 +23,7 @@ public:
     void         CreateNextOutputIMGFile();
     bool         CreateOutputDirectories();
     bool             AreGta3ImgFileNamesValid();
+    void             MergeOutputIMGFilesIntoOne();
     void             FreeGeneratorAllocatedMemory();
 
 
@@ -39,12 +40,16 @@ private:
 
     RwTexDictionary* m_pVehicleTxdDictionary;
 
+    std::vector<EntryHeader> m_vecFinalOutputIMGHeaders;
+    std::vector<CIMGArchive> m_vecOutputIMGArchives;
+
     // n megabytes * 1024 * 1024
     const unsigned int imgReadWriteOperationSizeInBytes = 20 * 1024 * 1024;
 
     // Just to avoid having TXD files with the same names
     size_t             m_txdNameUniqueNumericSuffix;
     size_t             m_imgFilesWrittenCount;
+    const SString      m_finalOutputIMGFileName = "proxy_gta3_final.img";
     const SString      m_outputIMGFileNameFormat = "proxy_gta3_%d.img";
     const SString      m_atlasTxdPrefixWithoutExtension = "atlas_";
     const SString      m_atlasTxdFileNameFormat = m_atlasTxdPrefixWithoutExtension + "%u";

@@ -82,5 +82,8 @@ private:
 
     // WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // This will also AFFECT GetModelOptimizationInfo FUNCTION. 
-    const float        m_texelsPerUnit = 0.5f;
+    const float        m_texelsPerUnit = 0.5f;             // 0.5f;
+
+    // Charts bigger than this limit will be scaled down
+    const unsigned int  m_maximumChartSizeInPixels = 1024;
 };

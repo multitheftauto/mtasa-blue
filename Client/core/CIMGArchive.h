@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <fstream>
 #include <iostream>
@@ -85,24 +85,31 @@ struct CIMGArchiveFile
 class CIMGArchive
 {
 public:
+    CIMGArchive(int padding);
     CIMGArchive();
     ~CIMGArchive();
 
+    CIMGArchive(const CIMGArchive&) {}
+    CIMGArchive& operator=(const CIMGArchive&) {}
+
     std::vector<CIMGArchiveFile>* GetNextImgFiles(unsigned int imgReadWriteOperationSize);
+    std::vector<CIMGArchiveFile>* GetAllImgFiles();
     uint                          GetFileCount();
     bool                          GetFileByID(uint id, CIMGArchiveFile& archiveFile);
     bool                          GetFileByName(std::string fileName, CIMGArchiveFile& archiveFile);
     bool                          GetFileByTXDImgArchiveInfo(STXDImgArchiveInfo* pTXDImgArchiveInfo, CIMGArchiveFile& archiveFile);
 
+    void                      WriteEntries(std::vector<EntryHeader>& vecFinalOutputIMGEntries);
+    void                      AppendArchiveFiles(std::vector<CIMGArchiveFile>& vecOutputIMGArchiveFiles, std::vector<EntryHeader>& vecFinalOutputIMGEntries);
     CIMGArchiveFile*          InsertArchiveFile(unsigned int actualFileSizeInBytes, unsigned int imgReadWriteOperationSizeInBytes);
     void                      AllocateSpace(size_t space);
     void                      FreeMemory();
     std::vector<EntryHeader>& GetArchiveDirEntries();
 
-    bool                      CreateTheFile(const SString& filePath, eIMGFileOperation fileOperation);
-    void                      CloseFile();
-    unsigned int              ReadEntries();
-    void                      FlushEntriesToFile();
+    bool         CreateTheFile(const SString& filePath, eIMGFileOperation fileOperation);
+    void         CloseFile();
+    unsigned int ReadEntries();
+    void         FlushEntriesToFile();
 
 private:
     eIMGFileOperation            m_fileOperation;
@@ -110,6 +117,7 @@ private:
     std::ofstream                outputStream;
     std::string                  archiveFilePath_;
     unsigned int                 totalImgFilesRead;
+    unsigned int                 totalIMGFilesWritten;
     unsigned int                 totalOutputDataSizeInBytes;
     std::vector<CIMGArchiveFile> imgArchiveFiles;
     std::vector<char>            m_vecImgArchiveFilesBuffer;

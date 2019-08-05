@@ -1992,7 +1992,9 @@ RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 
     RwUInt8* sourcePixels = RwRasterLock(raster, 0, 2);
     RwUInt8* destinationPixels = RwRasterLock(newRaster, 0, 1);
-    
+    
+
+
     std::printf("destinationPixels: %p | sourcePixels: %p | newRaster: %p\n", destinationPixels, sourcePixels, newRaster);
 
     memcpy(destinationPixels, sourcePixels, raster->height * raster->stride);
