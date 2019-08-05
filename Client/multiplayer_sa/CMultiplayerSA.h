@@ -94,7 +94,6 @@ public:
     void           DisableQuickReload(bool bDisable);
     void           DisableCloseRangeDamage(bool bDisable);
     void           DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
-    void           DisableUnloadingIFPBlocks();
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);
