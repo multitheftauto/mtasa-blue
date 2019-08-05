@@ -77,6 +77,7 @@ bool C3DModelOptimizer::CreateAtlas()
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
     packOptions.texelsPerUnit = m_texelsPerUnit;
+    packOptions.maxChartSize = m_maximumChartSizeInPixels;
     xatlas::PackCharts(m_Atlas, packOptions);
     return true;
 }
@@ -631,6 +632,7 @@ bool C3DModelOptimizer::GetModelOptimizationInfo(SOptimizedDFF& optimizedDFF)
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
     packOptions.texelsPerUnit = m_texelsPerUnit;
+    packOptions.maxChartSize = m_maximumChartSizeInPixels;
 
     float theAtlasSize = (atlasSizeInBytes / 1024.0f) / 1024.0f;
     printf("atlas Size: %f mb | atlasSizeInBytes: %u\n", theAtlasSize, atlasSizeInBytes);
@@ -840,6 +842,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
     packOptions.texelsPerUnit = m_texelsPerUnit;
+    packOptions.maxChartSize = m_maximumChartSizeInPixels;
 
     uint32_t bestAtlasResolution = GetBestAtlasMaxResolution();
 
@@ -862,7 +865,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     printf("Copying texture data into atlas\n");
 
-    CTextureAtlas& textureAtlas = CTextureAtlas(pClump, m_Atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs);
+    CTextureAtlas& textureAtlas = CTextureAtlas(pClump, m_Atlas, packOptions, vertexToMaterial, texturesCache, textures, uvs, outAtomicList);
 
     GetAtlasTextures(textureAtlas);
 
