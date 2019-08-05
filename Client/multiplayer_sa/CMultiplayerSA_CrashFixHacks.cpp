@@ -15,6 +15,8 @@
 #include "../game_sa/CAnimBlendHierarchySA.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
+extern CCoreInterface* g_pCore;
+
 void CPlayerPed__ProcessControl_Abort();
 
 //
@@ -1584,6 +1586,45 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups_Protect()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CStreaming_AreAnimsUsedByRequestedModels
+//
+// GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
+// We will return true to disable unloading.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
+{
+    // GTA SA possibly cannot have more than 200 IFP blocks since that's the limit
+    const int maximumIFPBlocks = 200;
+    if (modelID < 0 || modelID > maximumIFPBlocks)
+    {
+        return false;
+    }
+
+    std::unique_ptr<CAnimBlock> pInternalBlock = g_pCore->GetGame()->GetAnimManager()->GetAnimationBlock(modelID);
+    if (!pInternalBlock->IsLoaded())
+    {
+        return false;
+    }
+    return true;
+}
+
+// Hook info
+#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD0
+#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               5
+void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
+{
+    _asm
+    {
+        push    [esp + 4]
+        call    OnMY_CStreaming_AreAnimsUsedByRequestedModels
+        add     esp, 0x4
+        retn
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1628,6 +1669,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CAnimManager_CreateAnimAssocGroups);
     EZHookInstall(CAnimBlendNode_GetCurrentTranslation);
     EZHookInstall(CAnimManager_CreateAnimAssocGroups_Protect);
+    EZHookInstall(CStreaming_AreAnimsUsedByRequestedModels);
     EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);
