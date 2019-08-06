@@ -795,11 +795,13 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
                 CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
+                if (pGUIElement != NULL)
+                {
+                    lua_pushelement(luaVM, pGUIElement);
+                    return 1;
+                }
             }
-            else
-                argStream.SetCustomError(path, "Bad file path");
+            argStream.SetCustomError(path, "Bad file path");
         }
     }
     if (argStream.HasErrors())
