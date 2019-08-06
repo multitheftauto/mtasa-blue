@@ -13,6 +13,10 @@ guiLabelSetHorizontalAlign(GUIEditor.label[1], "left", true)
 GUIEditor.button[1] = guiCreateButton(112, 108, 125, 47, "GENERATE", false, GUIEditor.window[1])
 */
 
+const SString CIMGArchiveOptimizer::m_outputFolder = "OptimizedFiles";
+const SString CIMGArchiveOptimizer::m_defaultDATFilePath = m_outputFolder + "\\DAT\\default.dat";
+const SString CIMGArchiveOptimizer::m_gtaDATFilePath = m_outputFolder + "\\DAT\\gta.dat";
+
 CIMGArchiveOptimizer::CIMGArchiveOptimizer()
 {
     CreateGUI();

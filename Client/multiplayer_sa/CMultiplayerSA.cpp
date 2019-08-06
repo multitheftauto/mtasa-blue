@@ -1492,6 +1492,8 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
+    SetAtlasDATFilePaths();
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1560,6 +1562,40 @@ void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
 CPed* CMultiplayerSA::GetContextSwitchedPed()
 {
     return pContextSwitchedPed;
+}
+
+void CMultiplayerSA::SetAtlasDATFilePaths()
+{
+    SString defaultDATFilePath, gtaDATFilePath;
+    g_pCore->GetAtlasDATFilePaths(defaultDATFilePath, gtaDATFilePath);
+
+    if (!FileExists(defaultDATFilePath) || !FileExists(gtaDATFilePath))
+    {
+        printf("WARNING: one of the atlas DAT file doesn't exist. DAT file paths have not been patched.\n");
+    }
+    else
+    {
+        const char* pDefaultDATFilePath = defaultDATFilePath.c_str();
+        const char* pGtaDATFilePath = gtaDATFilePath.c_str();
+        char*       pStrDefaultDATFilePath = new char[defaultDATFilePath.size() + 1];
+        char*       pStrGtaDATFilePath = new char[gtaDATFilePath.size() + 1];
+        memcpy(pStrDefaultDATFilePath, pDefaultDATFilePath, defaultDATFilePath.size() + 1);
+        memcpy(pStrGtaDATFilePath, pGtaDATFilePath, gtaDATFilePath.size() + 1);
+
+        // Push
+        DWORD AddressOfCGame_Initialise_defaultDat = 0x053BC90;
+        MemPut<unsigned char>(AddressOfCGame_Initialise_defaultDat, 0x68);
+        // the actual address
+        MemPut<unsigned int>(AddressOfCGame_Initialise_defaultDat + 1, (unsigned int)pStrDefaultDATFilePath);
+
+        // push
+        DWORD AddressOfCGame_Initialise_GtaDat = 0x53E580;
+        MemPut<unsigned char>(AddressOfCGame_Initialise_defaultDat, 0x68);
+        // the actual address
+        MemPut<unsigned int>(AddressOfCGame_Initialise_GtaDat + 1, (unsigned int)pStrGtaDATFilePath);
+
+        printf("WARNING: Atlas DAT file paths have been PATCHED!\n");
+    }
 }
 
 void CMultiplayerSA::AllowWindowsCursorShowing(bool bAllow)

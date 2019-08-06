@@ -21,7 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
-#include "CTextureAtlas.h"
+#include "CIMGArchiveOptimizer.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -2243,7 +2243,8 @@ HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK
     return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }
 
-/*std::unique_ptr<CTextureAtlasInterface> CCore::CreateTextureAtlas(std::vector <CTextureInfo>& vecTexturesInfo)
+void CCore::GetAtlasDATFilePaths(SString& defaultDATFilePath, SString& gtaDATFilePath)
 {
-    return std::make_unique<CTextureAtlas>(vecTexturesInfo);
-}*/
+    defaultDATFilePath = CIMGArchiveOptimizer::m_defaultDATFilePath;
+    gtaDATFilePath = CIMGArchiveOptimizer::m_gtaDATFilePath;
+}

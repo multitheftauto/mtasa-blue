@@ -190,6 +190,7 @@ public:
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
+    void SetAtlasDATFilePaths();
     void AllowWindowsCursorShowing(bool bAllow);
 
     CShotSyncData* GetLocalShotSyncData();

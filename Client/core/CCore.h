@@ -275,6 +275,7 @@ public:
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
     HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
+    void        GetAtlasDATFilePaths(SString& defaultDATFilePath, SString& gtaDATFilePath);
 
 private:
     void ApplyCoreInitSettings();
