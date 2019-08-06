@@ -212,16 +212,6 @@ void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, SDFFDescrip
 
 bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
 {
-    /*
-    // REMOVE LATER
-    //int         modelID = 0;
-    const char* pStrDFFName = "a51_jetroom.dff";            //"infernus.dff";
-    memcpy(pDFFArchiveFile->fileEntry.fileName, pStrDFFName, strlen(pStrDFFName) + 1);
-
-    RwTexDictionary* pTxdDictionary = m_pRenderWare->ReadTXD("a51.txd", CBuffer(), false);
-    // REMOVE END
-    */
-
     bool           bDFFOptimized = false;
     SOptimizedDFF* pOptimizedDFF = m_dffOptimizationInfo.GetOptimizedDFF(pDFFArchiveFile->fileEntry.fileName);
     if (!pOptimizedDFF)
@@ -234,6 +224,15 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     {
         return bDFFOptimized;
     }
+
+    // REMOVE THIS LATER
+    static unsigned int OptimizedDFFCount = 0;
+    if (OptimizedDFFCount >= 100)
+    {
+        return bDFFOptimized;
+    }
+    OptimizedDFFCount++;
+    // REMOVE END
 
     int modelID = pDFFDescriptor->GetModelID();
     /*
@@ -482,23 +481,22 @@ bool CIMGArchiveOptimizer::AreGta3ImgFileNamesValid()
 
 void CIMGArchiveOptimizer::MergeOutputIMGFilesIntoOne()
 {
-
     unsigned int sumOfIMGEntries = 0;
     SString      outputFilePath = m_outputFolder + "\\" + m_outputIMGFileNameFormat;
-    unsigned int outputImgFilesCount = 183;
+    unsigned int outputImgFilesCount = m_imgFilesWrittenCount;
     m_vecOutputIMGArchives.reserve(outputImgFilesCount);
 
     printf("outputImgFilesCount: %u\n", outputImgFilesCount);
 
     for (unsigned int i = 0; i < outputImgFilesCount; i++)
     {
-        CIMGArchive& imgArchive =  m_vecOutputIMGArchives.emplace_back(0);
+        CIMGArchive& imgArchive = m_vecOutputIMGArchives.emplace_back(0);
         SString      outputFileName;
         outputFileName.Format(outputFilePath.c_str(), (int)i);
         assert(imgArchive.CreateTheFile(outputFileName, IMG_FILE_READ) != false);
         sumOfIMGEntries += imgArchive.ReadEntries();
     }
-    
+
     m_vecFinalOutputIMGHeaders.resize(sumOfIMGEntries);
     unsigned int outputEntryIndex = 0;
     for (unsigned int i = 0; i < outputImgFilesCount; i++)
@@ -527,7 +525,6 @@ void CIMGArchiveOptimizer::MergeOutputIMGFilesIntoOne()
         m_outputIMGArchive.AppendArchiveFiles(*vecAllImgArchiveFiles, m_vecFinalOutputIMGHeaders);
         imgArchive.FreeMemory();
     }
-    
 }
 
 void CIMGArchiveOptimizer::FreeGeneratorAllocatedMemory()
@@ -553,7 +550,6 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 {
     std::printf("Generate button pressed\n");
 
-    /*
     if (!m_gt3IMgArchive.CreateTheFile("models\\gta3.img", IMG_FILE_READ))
     {
         std::printf("loading gta3.img failed\n");
@@ -618,7 +614,6 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
     printf("\n\ngTotalModelsToOptimize: %u\n\n", gTotalModelsToOptimize);
 
     m_IdeLoader.WriteIDEFiles(m_ideOutputFolder);
-    */
 
     MergeOutputIMGFilesIntoOne();
 

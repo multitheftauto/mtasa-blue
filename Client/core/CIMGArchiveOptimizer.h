@@ -26,6 +26,9 @@ public:
     void             MergeOutputIMGFilesIntoOne();
     void             FreeGeneratorAllocatedMemory();
 
+    static const SString m_outputFolder;
+    static const SString m_defaultDATFilePath;
+    static const SString m_gtaDATFilePath;
 
 private:
     bool OnImgGenerateClick(CGUIElement* pElement);
@@ -53,7 +56,6 @@ private:
     const SString      m_outputIMGFileNameFormat = "proxy_gta3_%d.img";
     const SString      m_atlasTxdPrefixWithoutExtension = "atlas_";
     const SString      m_atlasTxdFileNameFormat = m_atlasTxdPrefixWithoutExtension + "%u";
-    const SString      m_outputFolder = "OptimizedFiles";
     const SString      m_ideOutputFolder = m_outputFolder + "\\IDE";
     const SString      m_OptimizedModelInfosFileName ="completeWithoutVehicleModsModels.gmoi";
 };
