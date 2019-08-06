@@ -1610,8 +1610,8 @@ bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
 }
 
 // Hook info
-#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD0
-#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               5
+#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD5
+#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
 void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 {
     _asm
