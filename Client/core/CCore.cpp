@@ -53,6 +53,7 @@ CCore::CCore()
 
     // Load our settings and localization as early as possible
     CreateXML();
+    ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
 
     // Create a logger instance.
@@ -552,7 +553,8 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -1662,6 +1664,21 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::ApplyCoreInitSettings()
+{
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+    bool bValue;
+    CVARS_GET("process_dpi_aware", bValue);
+
+    if (bValue)
+    {
+        // Minimum supported client for the function below is Windows Vista
+        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+        SetProcessDPIAware();
+    }
+#endif
+}
+
 //
 // Called just before GTA calculates frame time deltas
 //
@@ -1689,6 +1706,8 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Apply client config setting
     uint uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    if (uiClientConfigRate > 0)
+        uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
