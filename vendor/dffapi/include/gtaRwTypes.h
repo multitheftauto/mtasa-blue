@@ -7,23 +7,44 @@
 #define rwFALSE 0
 #define rwTRUE 1
 
-typedef struct gtaRwGeometryList    gtaRwGeometryList;
-typedef struct gtaRwGeometry        gtaRwGeometry;
-typedef struct gtaRwAtomic          gtaRwAtomic;
-typedef enum gtaRwStreamType        gtaRwStreamType;
-typedef enum gtaRwStreamAccessType  gtaRwStreamAccessType;
-typedef struct gtaRwStreamMemory    gtaRwStreamMemory;
-typedef union gtaRwStreamFile       gtaRwStreamFile;
-typedef struct gtaRwStreamCustom    gtaRwStreamCustom;
-typedef union gtaRwStreamUnion      gtaRwStreamUnion;
-typedef struct gtaRwStream          gtaRwStream;
-typedef struct gtaRwMemory          gtaRwMemory;
-typedef struct gtaRwChunkHeaderInfo gtaRwChunkHeaderInfo;
-typedef struct gtaRwExtension       gtaRwExtension;
-typedef struct gtaRwMesh            gtaRwMesh;
-typedef struct gtaRwGeometryBinMesh gtaRwGeometryBinMesh;
-typedef struct gtaRwBoneIndices     gtaRwBoneIndices;
-typedef struct gtaRwBoneWeights     gtaRwBoneWeights;
+typedef struct gtaRwGeometryList         gtaRwGeometryList;
+typedef struct gtaRwGeometry             gtaRwGeometry;
+typedef struct gtaRwAtomic               gtaRwAtomic;
+typedef enum gtaRwStreamType             gtaRwStreamType;
+typedef enum gtaRwStreamAccessType       gtaRwStreamAccessType;
+typedef struct gtaRwStreamMemory         gtaRwStreamMemory;
+typedef union gtaRwStreamFile            gtaRwStreamFile;
+typedef struct gtaRwStreamCustom         gtaRwStreamCustom;
+typedef union gtaRwStreamUnion           gtaRwStreamUnion;
+typedef struct gtaRwStream               gtaRwStream;
+typedef struct gtaRwMemory               gtaRwMemory;
+typedef struct gtaRwChunkHeaderInfo      gtaRwChunkHeaderInfo;
+typedef struct gtaRwExtension            gtaRwExtension;
+typedef struct gtaRwMesh                 gtaRwMesh;
+typedef struct gtaRwGeometryBinMesh      gtaRwGeometryBinMesh;
+typedef struct gtaRwBoneIndices          gtaRwBoneIndices;
+typedef struct gtaRwBoneWeights          gtaRwBoneWeights;
+typedef struct gtaRwClump                gtaRwClump;
+typedef struct gtaClumpCollisionPlugin   gtaClumpCollisionPlugin;
+typedef struct gtaCollisionSphere        gtaCollisionSphere;
+typedef struct gtaCollisionFile_COLL     gtaCollisionFile_COLL;
+typedef struct gtaCollisionFile_COL2     gtaCollisionFile_COL2;
+typedef struct gtaCollisionFile_COL3     gtaCollisionFile_COL3;
+typedef struct gtaCollisionFile_COL3     gtaCollisionFile_COL3;
+typedef struct gtaCollisionFile_COL4     gtaCollisionFile_COL4;
+typedef struct gtaCollisionSphere_COL2   gtaCollisionSphere_COL2;
+typedef struct gtaCollisionBox_COL2      gtaCollisionBox_COL2;
+typedef struct gtaCollisionLine_COL2     gtaCollisionLine_COL2;
+typedef struct gtaCollisionDisk          gtaCollisionDisk;
+typedef struct gtaCollisionVertex_COL2   gtaCollisionVertex_COL2;
+typedef struct gtaCollisionTriangle_COL2 gtaCollisionTriangle_COL2;
+typedef struct gtaCollisionFaceGroup     gtaCollisionFaceGroup;
+typedef struct gtaCollisionBox           gtaCollisionBox;
+typedef struct gtaCollisionLine          gtaCollisionLine;
+typedef struct gtaCollisionVertex        gtaCollisionVertex;
+typedef struct gtaCollisionTriangle      gtaCollisionTriangle;
+typedef struct gtaCollisionFile          gtaCollisionFile;
+typedef enum gtaCollisionVersion         gtaCollisionVersion;
 
 typedef long gtaRwInt;
 typedef unsigned long gtaRwUInt;
@@ -114,8 +135,8 @@ enum gtaRwPluginVendor {
     rwVENDORID_CRITERIONWORLD = 0x000005L,
     rwVENDORID_BETA = 0x000006L,
     rwVENDORID_CRITERIONRM = 0x000007L,
-    rwVENDORID_CRITERIONRWA = 0x000008L,
-    rwVENDORID_CRITERIONRWP = 0x000009L,
+    rwVENDORID_CRITERIONRwA = 0x000008L,
+    rwVENDORID_CRITERIONRwP = 0x000009L,
 };
 
 #define MAKECHUNKID(vendorID, chunkID) ((((vendorID) & 0xFFFFFF) << 8) | ((chunkID) & 0xFF))

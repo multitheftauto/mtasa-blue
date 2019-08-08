@@ -74,9 +74,9 @@ typedef struct gtaRwGeometrySkin
 };
 
 
-void gtaRWSkinInitialise(gtaRwGeometrySkin* skinObj, gtaRwUInt8 NumBones, gtaRwUInt8 NumBoneIds, gtaRwUInt32 NumVertices, gtaRwUInt8 MaxNumWeightsPerVertex);
-void gtaRWSkinDestroy(gtaRwGeometrySkin* skinObj);
-gtaRwBool    gtaRWSkinStreamWrite(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative);
-gtaRwBool    gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative);
-unsigned int gtaRWSkinGetStreamSize(gtaRwGeometrySkin* skinObj, gtaRwBool IsNative, gtaRwUInt32 NumVertices);
-void         gtaRWSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertices, gtaRwInt32 NumBones);
+void gtaRwSkinInitialise(gtaRwGeometrySkin* skinObj, gtaRwUInt8 NumBones, gtaRwUInt8 NumBoneIds, gtaRwUInt32 NumVertices, gtaRwUInt8 MaxNumWeightsPerVertex);
+void gtaRwSkinDestroy(gtaRwGeometrySkin* skinObj);
+gtaRwBool    gtaRwSkinStreamWrite(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative);
+gtaRwBool    gtaRwSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative);
+unsigned int gtaRwSkinGetStreamSize(gtaRwGeometrySkin* skinObj, gtaRwBool IsNative, gtaRwUInt32 NumVertices);
+void         gtaRwSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertices, gtaRwInt32 NumBones);

@@ -35,7 +35,7 @@ gtaRwBool gtaRwGeometryListStreamRead(gtaRwGeometryList* geometryList, gtaRwStre
         {
             if (!gtaRwGeometryStreamRead(&geometryList->geometries[i], stream, ClumpVersion))
             {
-                Destroy();
+                gtaRwGeometryListDestroy(geometryList);
                 return rwFALSE;
             }
         }

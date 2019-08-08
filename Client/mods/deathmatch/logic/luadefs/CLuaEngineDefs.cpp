@@ -1332,25 +1332,37 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
 
 extern "C"
 {
-    #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\gtaRwTypes.h"
-    #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\gtaRwGlobal.h"
+   #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\dffApiExports.h"
 }
+
 int CLuaEngineDefs::EngineTest(lua_State* luaVM)
 {
     //CScriptArgReader argStream(luaVM);
 
-    gtaRwClump
-    lua_pushnumber(luaVM, gtaRwVersion);
+    gtaRwClump clump;
+    gtaRwClumpInitialiseIdentity(&clump, 1);
+    gtaRwFrameListInit(&clump.frameList, 1);
+    gtaRwFrameInitIdentity(&clump.frameList.frames[0], -1, 0);
+    gtaRwStream* stream = gtaRwStreamOpen(gtaRwStreamType::rwSTREAMMEMORY, gtaRwStreamAccessType::rwSTREAMWRITE, NULL);
+    gtaRwAtomic* atomic = (&clump)->atomics;
+    gtaRwGeometryInitialise(atomic->internalGeometry, 10, 10, 1, 0, 0, 0, 0, 0, 10);
+    gtaRwAtomicInit(atomic, 0, 0, 0, 0);
+    gtaRwString string;
+    gtaRwStringInit(&string, "as", rwFALSE);
+    gtaRwClumpStreamWrite(&clump, stream);
+    gtaRwStringWrite(&string, stream);
+    gtaRwStreamClose(stream, NULL);
+    gtaRwClumpDestroy(&clump);
+    lua_pushstring(luaVM, string.string);
     return 1;
 }
 
 /*
 
-    /*
+    /*  
     gtaRwStreamReadReal();
     stream
     gtaRwClump clump;
-    clump.Initialise(1, drawable->m_pSkeleton->m_wBoneCount + 1, 1);
     clump.frameList.frames[0].Initialise(-1, 0);
     gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMFILENAME, rwSTREAMWRITE, dstpath);
     bool         result = false;

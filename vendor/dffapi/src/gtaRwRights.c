@@ -4,20 +4,24 @@
 //
 #include "StdInc.h"
 
-void gtaRwRightsInit(gtaRwRights *rightsObj, gtaRwUInt32 pluginId, gtaRwUInt32 pluginData) {
+void gtaRwRightsInit(gtaRwRights* rightsObj, gtaRwUInt32 pluginId, gtaRwUInt32 pluginData)
+{
     gtaRwRightsDestroy(rightsObj);
     rightsObj->enabled = rwTRUE;
     rightsObj->pluginId = pluginId;
     rightsObj->pluginData = pluginData;
 }
 
-void gtaRwRightsDestroy(gtaRwRights *rightsObj) {
+void gtaRwRightsDestroy(gtaRwRights* rightsObj)
+{
     if (rightsObj)
         gtaRwMemZero(rightsObj, sizeof(gtaRwRights));
 }
 
-gtaRwBool gtaRwRightsWrite(gtaRwRights *rightsObj, gtaRwStream *stream) {
-    if (rightsObj->enabled) {
+gtaRwBool gtaRwRightsWrite(gtaRwRights* rightsObj, gtaRwStream* stream)
+{
+    if (rightsObj->enabled)
+    {
         if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_RIGHTTORENDER, 8, gtaRwVersion, gtaRwBuild))
             return rwFALSE;
         if (!gtaRwStreamWrite(stream, &rightsObj->pluginId, 8))
@@ -26,13 +30,16 @@ gtaRwBool gtaRwRightsWrite(gtaRwRights *rightsObj, gtaRwStream *stream) {
     return rwTRUE;
 }
 
-gtaRwBool gtaRwRightsRead(gtaRwRights *rightsObj, gtaRwStream *stream) {
+gtaRwBool gtaRwRightsRead(gtaRwRights* rightsObj, gtaRwStream* stream)
+{
     gtaRwRightsDestroy(rightsObj);
-    if (gtaRwStreamRead(stream, &rightsObj->pluginId, 4) != 4) {
+    if (gtaRwStreamRead(stream, &rightsObj->pluginId, 4) != 4)
+    {
         gtaRwRightsDestroy(rightsObj);
         return rwFALSE;
     }
-    if (gtaRwStreamRead(stream, &rightsObj->pluginData, 4) != 4) {
+    if (gtaRwStreamRead(stream, &rightsObj->pluginData, 4) != 4)
+    {
         gtaRwRightsDestroy(rightsObj);
         return rwFALSE;
     }
@@ -40,8 +47,9 @@ gtaRwBool gtaRwRightsRead(gtaRwRights *rightsObj, gtaRwStream *stream) {
     return rwTRUE;
 }
 
-gtaRwUInt32 gtaRwRightsSize(gtaRwRights *rightsObj) {
-    if (rightsObj->enabled)
+gtaRwUInt32 gtaRwRightsSize(gtaRwRights* rightsObj)
+{
+    if (rightsObj != NULL && rightsObj->enabled)
         return 20;
     return 0;
 }

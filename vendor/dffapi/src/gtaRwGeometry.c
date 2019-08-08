@@ -23,6 +23,7 @@ void gtaRwGeometryInitialise(gtaRwGeometry* geometryObj, gtaRwInt32 NumTriangles
                              gtaRwUInt8 NumTexCoordsCustom, gtaRwReal CenterX, gtaRwReal CenterY, gtaRwReal CenterZ, gtaRwReal Radius)
 
 {
+    geometryObj = malloc(sizeof(gtaRwGeometry));
     memset(geometryObj, 0, sizeof(gtaRwGeometry));
     geometryObj->format = Format;
     geometryObj->numTriangles = NumTriangles;
@@ -33,22 +34,22 @@ void gtaRwGeometryInitialise(gtaRwGeometry* geometryObj, gtaRwInt32 NumTriangles
     {
         if (NumTriangles > 0)
         {
-            geometryObj->triangles = (gtaRwTriangle*)gtaMemAlloc(sizeof(gtaRwTriangle) * NumTriangles);
+            geometryObj->triangles = (gtaRwTriangle*)gtaRwMemAlloc(sizeof(gtaRwTriangle) * NumTriangles);
             for (gtaRwInt32 i = 0; i < NumTriangles; i++)
                 geometryObj->triangles[i].mtlId = -1;
         }
         if (NumVertices > 0)
         {
             if (geometryObj->prelit)
-                geometryObj->preLitLum = (gtaRwRGBA*)gtaMemAlloc(sizeof(gtaRwRGBA) * NumVertices);
-            gtaRwUInt8 texCoordsCount = GetTexCoordsCount();
+                geometryObj->preLitLum = (gtaRwRGBA*)gtaRwMemAlloc(sizeof(gtaRwRGBA) * NumVertices);
+            gtaRwUInt8 texCoordsCount = gtaRwGeometryGetTexCoordsCount(geometryObj);
             for (gtaRwInt8 i = 0; i < texCoordsCount; i++)
-                geometryObj->texCoords[i] = (gtaRwTexCoords*)gtaMemAlloc(sizeof(gtaRwTexCoords) * NumVertices);
+                geometryObj->texCoords[i] = (gtaRwTexCoords*)gtaRwMemAlloc(sizeof(gtaRwTexCoords) * NumVertices);
         }
     }
     if (NumMorphTargets > 0)
     {
-        geometryObj->morphTarget = (gtaRwMorphTarget*)gtaMemAlloc(sizeof(gtaRwMorphTarget) * NumMorphTargets);
+        geometryObj->morphTarget = (gtaRwMorphTarget*)gtaRwMemAlloc(sizeof(gtaRwMorphTarget) * NumMorphTargets);
         for (gtaRwInt8 i = 0; i < NumMorphTargets; i++)
         {
             geometryObj->morphTarget[i].boundingSphere.center.x = CenterX;
@@ -63,7 +64,7 @@ void gtaRwGeometryInitialise(gtaRwGeometry* geometryObj, gtaRwInt32 NumTriangles
                 for (gtaRwInt8 i = 0; i < NumMorphTargets; i++)
                 {
                     geometryObj->morphTarget[i].hasVerts = TRUE;
-                    geometryObj->morphTarget[i].verts = (gtaRwV3d*)gtaMemAlloc(sizeof(gtaRwV3d) * NumVertices);
+                    geometryObj->morphTarget[i].verts = (gtaRwV3d*)gtaRwMemAlloc(sizeof(gtaRwV3d) * NumVertices);
                 }
             }
             if (geometryObj->normals)
@@ -71,7 +72,7 @@ void gtaRwGeometryInitialise(gtaRwGeometry* geometryObj, gtaRwInt32 NumTriangles
                 for (gtaRwInt8 i = 0; i < NumMorphTargets; i++)
                 {
                     geometryObj->morphTarget[i].hasNormals = TRUE;
-                    geometryObj->morphTarget[i].normals = (gtaRwV3d*)gtaMemAlloc(sizeof(gtaRwV3d) * NumVertices);
+                    geometryObj->morphTarget[i].normals = (gtaRwV3d*)gtaRwMemAlloc(sizeof(gtaRwV3d) * NumVertices);
                 }
             }
         }
@@ -82,22 +83,22 @@ void gtaRwGeometryInitialise(gtaRwGeometry* geometryObj, gtaRwInt32 NumTriangles
 void gtaRwGeometryDestroy(gtaRwGeometry* geometryObj)
 {
     if (geometryObj->triangles)
-        gtaMemFree(geometryObj->triangles);
+        gtaRwMemFree(geometryObj->triangles);
     if (geometryObj->preLitLum)
-        gtaMemFree(geometryObj->preLitLum);
+        gtaRwMemFree(geometryObj->preLitLum);
     for (int i = 0; i < 8; i++)
     {
         if (geometryObj->texCoords[i])
-            gtaMemFree(geometryObj->texCoords[i]);
+            gtaRwMemFree(geometryObj->texCoords[i]);
     }
     if (geometryObj->morphTarget)
     {
         for (gtaRwInt8 i = 0; i < geometryObj->numMorphTargets; i++)
         {
             if (geometryObj->morphTarget[i].verts)
-                gtaMemFree(geometryObj->morphTarget[i].verts);
+                gtaRwMemFree(geometryObj->morphTarget[i].verts);
             if (geometryObj->morphTarget[i].normals)
-                gtaMemFree(geometryObj->morphTarget[i].normals);
+                gtaRwMemFree(geometryObj->morphTarget[i].normals);
         }
         free(geometryObj->morphTarget);
     }
@@ -105,9 +106,9 @@ void gtaRwGeometryDestroy(gtaRwGeometry* geometryObj)
     gtaRwGeometryExtraVertColourDestroy(&geometryObj->Extension.extraColour);
     gtaRwGeometryBinMeshDestroy(&geometryObj->Extension.mesh);
     // geometryObj->Extension.effect2d.Destroy();
-    gtaRWSkinDestroy(&geometryObj->Extension.skin);
+    gtaRwSkinDestroy(&geometryObj->Extension.skin);
     gtaRwGeometryBreakableDestroy(&geometryObj->Extension.breakable);
-    gtaMemZero(geometryObj, sizeof(gtaRwGeometry));
+    gtaRwMemZero(geometryObj, sizeof(gtaRwGeometry));
 }
 
 gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* stream, gtaRwUInt32 ClumpVersion)
@@ -133,50 +134,50 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
         {
             if (geometryObj->prelit)
             {
-                geometryObj->preLitLum = (gtaRwRGBA*)gtaMemAlloc(4 * geometryObj->numVertices);
+                geometryObj->preLitLum = (gtaRwRGBA*)gtaRwMemAlloc(4 * geometryObj->numVertices);
                 if (gtaRwStreamRead(stream, geometryObj->preLitLum, 4 * geometryObj->numVertices) != 4 * geometryObj->numVertices)
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
             }
-            gtaRwUInt8 texCoordsCount = GetTexCoordsCount();
+            gtaRwUInt8 texCoordsCount = gtaRwGeometryGetTexCoordsCount(geometryObj);
             for (gtaRwInt8 i = 0; i < texCoordsCount; i++)
             {
-                geometryObj->texCoords[i] = (gtaRwTexCoords*)gtaMemAlloc(8 * geometryObj->numVertices);
+                geometryObj->texCoords[i] = (gtaRwTexCoords*)gtaRwMemAlloc(8 * geometryObj->numVertices);
                 if (gtaRwStreamRead(stream, geometryObj->texCoords[i], 8 * geometryObj->numVertices) != 8 * geometryObj->numVertices)
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
             }
         }
         if (geometryObj->numTriangles > 0)
         {
-            geometryObj->triangles = (gtaRwTriangle*)gtaMemAlloc(8 * geometryObj->numTriangles);
+            geometryObj->triangles = (gtaRwTriangle*)gtaRwMemAlloc(8 * geometryObj->numTriangles);
             if (gtaRwStreamRead(stream, geometryObj->triangles, 8 * geometryObj->numTriangles) != 8 * geometryObj->numTriangles)
             {
-                Destroy();
+                gtaRwGeometryDestroy(geometryObj);
                 return rwFALSE;
             }
         }
     }
     if (geometryObj->numMorphTargets > 0)
     {
-        geometryObj->morphTarget = (gtaRwMorphTarget*)gtaMemAlloc(sizeof(gtaRwMorphTarget) * geometryObj->numMorphTargets);
+        geometryObj->morphTarget = (gtaRwMorphTarget*)gtaRwMemAlloc(sizeof(gtaRwMorphTarget) * geometryObj->numMorphTargets);
         for (gtaRwInt8 i = 0; i < geometryObj->numMorphTargets; i++)
         {
             if (gtaRwStreamRead(stream, &geometryObj->morphTarget[i], 24) != 24)
             {
-                Destroy();
+                gtaRwGeometryDestroy(geometryObj);
                 return rwFALSE;
             }
             if (geometryObj->morphTarget[i].hasVerts)
             {
-                geometryObj->morphTarget[i].verts = (gtaRwV3d*)gtaMemAlloc(12 * geometryObj->numVertices);
+                geometryObj->morphTarget[i].verts = (gtaRwV3d*)gtaRwMemAlloc(12 * geometryObj->numVertices);
                 if (gtaRwStreamRead(stream, geometryObj->morphTarget[i].verts, 12 * geometryObj->numVertices) != 12 * geometryObj->numVertices)
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
             }
@@ -184,10 +185,10 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
                 geometryObj->morphTarget[i].verts = NULL;
             if (geometryObj->morphTarget[i].hasNormals)
             {
-                geometryObj->morphTarget[i].normals = (gtaRwV3d*)gtaMemAlloc(12 * geometryObj->numVertices);
+                geometryObj->morphTarget[i].normals = (gtaRwV3d*)gtaRwMemAlloc(12 * geometryObj->numVertices);
                 if (gtaRwStreamRead(stream, geometryObj->morphTarget[i].normals, 12 * geometryObj->numVertices) != 12 * geometryObj->numVertices)
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
             }
@@ -197,12 +198,12 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
     }
     if (!gtaRwMaterialListRead(&geometryObj->matList, stream))
     {
-        Destroy();
+        gtaRwGeometryDestroy(geometryObj);
         return rwFALSE;
     }
     if (!gtaRwStreamFindChunk(stream, rwID_EXTENSION, &length, NULL, NULL))
     {
-        Destroy();
+        gtaRwGeometryDestroy(geometryObj);
         return rwFALSE;
     }
     while (length && gtaRwStreamReadChunkHeader(stream, &type, &entryLength, NULL, NULL))
@@ -214,7 +215,7 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
                 
                 if (!gtaRwGeometryBinMeshStreamRead(&geometryObj->Extension.mesh, stream, geometryObj->native))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
                 break;
@@ -222,42 +223,42 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
 
                 if (!gtaNativeOGlStreamRead(&geometryObj->Extension.native, stream, geometryObj->numVertices))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
                 break;
             case rwID_SKIN:
-                if (!gtaRWSkinStreamRead(&geometryObj->Extension.skin, stream, geometryObj->numVertices, geometryObj->native))
+                if (!gtaRwSkinStreamRead(&geometryObj->Extension.skin, stream, geometryObj->numVertices, geometryObj->native))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
                 break;
             case gtaID_EXTRAVERTCOLOUR:
                 if (!gtaRwGeometryExtraVertColourRead(&geometryObj->Extension.extraColour, stream, geometryObj->numVertices))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
                 break;
             case gtaID_BREAKABLE:
                 if (!gtaRwGeometryBreakableDestroy(&geometryObj->Extension.breakable, stream))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
                 break;
             case gtaID_2DEFFECT:
                 /*if (!geometryObj->Extension.effect2d.StreamRead(stream))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }*/
                 break;
             default:
                 if (!gtaRwStreamSkip(stream, entryLength))
                 {
-                    Destroy();
+                    gtaRwGeometryDestroy(geometryObj);
                     return rwFALSE;
                 }
         }
@@ -268,9 +269,9 @@ gtaRwBool gtaRwGeometryStreamRead(gtaRwGeometry* geometryObj, gtaRwStream* strea
 
 gtaRwBool gtaRwGeometryStreamWrite(gtaRwGeometry* geometryObj, gtaRwStream* stream)
 {
-    if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_GEOMETRY, GetStreamSize() - 12, gtaRwVersion, gtaRwBuild))
+    if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_GEOMETRY, gtaRwGeometryGetStreamSize(geometryObj) - 12, gtaRwVersion, gtaRwBuild))
         return rwFALSE;
-    if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_STRUCT, GetStreamActualSize(), gtaRwVersion, gtaRwBuild))
+    if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_STRUCT, gtaRwGeometryGetStreamActualSize(geometryObj), gtaRwVersion, gtaRwBuild))
         return rwFALSE;
     if (!gtaRwStreamWrite(stream, &geometryObj->format, 16))
         return rwFALSE;
@@ -281,7 +282,7 @@ gtaRwBool gtaRwGeometryStreamWrite(gtaRwGeometry* geometryObj, gtaRwStream* stre
             if (!gtaRwStreamWrite(stream, geometryObj->preLitLum, 4 * geometryObj->numVertices))
                 return rwFALSE;
         }
-        gtaRwUInt8 texCoordsCount = GetTexCoordsCount();
+        gtaRwUInt8 texCoordsCount = gtaRwGeometryGetTexCoordsCount(geometryObj);
         for (gtaRwInt8 i = 0; i < texCoordsCount; i++)
         {
             if (geometryObj->texCoords[i])
@@ -298,13 +299,13 @@ gtaRwBool gtaRwGeometryStreamWrite(gtaRwGeometry* geometryObj, gtaRwStream* stre
                 }
                 else
                 {
-                    gtaRwChar* temporaryTexCoords = (gtaRwChar*)gtaMemAlloc(8 * geometryObj->numVertices);
+                    gtaRwChar* temporaryTexCoords = (gtaRwChar*)gtaRwMemAlloc(8 * geometryObj->numVertices);
                     if (!gtaRwStreamWrite(stream, temporaryTexCoords, 8 * geometryObj->numVertices))
                     {
-                        gtaMemFree(temporaryTexCoords);
+                        gtaRwMemFree(temporaryTexCoords);
                         return rwFALSE;
                     }
-                    gtaMemFree(temporaryTexCoords);
+                    gtaRwMemFree(temporaryTexCoords);
                 }
             }
         }
@@ -356,7 +357,7 @@ gtaRwBool gtaRwGeometryStreamWrite(gtaRwGeometry* geometryObj, gtaRwStream* stre
                                                   gtaRwGeometryBinMeshGetStreamSize(&geometryObj->Extension.mesh, geometryObj->native) +
                                                   /*geometryObj->Extension.effect2d.GetStreamSize() +*/
                                                   gtaRwGeometryNativeGetStreamSize(&geometryObj->Extension.native, geometryObj->numVertices) +
-                                                  gtaRWSkinGetStreamSize(&geometryObj->Extension.skin, geometryObj->native, geometryObj->numVertices) +
+                                                  gtaRwSkinGetStreamSize(&geometryObj->Extension.skin, geometryObj->native, geometryObj->numVertices) +
                                                   gtaRwGeometryBreakableSize(&geometryObj->Extension.breakable),
                                               gtaRwVersion, gtaRwBuild))
     {
@@ -369,7 +370,7 @@ gtaRwBool gtaRwGeometryStreamWrite(gtaRwGeometry* geometryObj, gtaRwStream* stre
         if (!gtaRwGeometryNativeStreamWrite(&geometryObj->Extension.native, stream, geometryObj->numVertices))
             return rwFALSE;
     }
-    if (!gtaRWSkinStreamWrite(&geometryObj->Extension.skin,stream, geometryObj->numVertices, geometryObj->native))
+    if (!gtaRwSkinStreamWrite(&geometryObj->Extension.skin,stream, geometryObj->numVertices, geometryObj->native))
         return rwFALSE;
     if (!gtaRwGeometryExtraVertColourWrite(&geometryObj->Extension.extraColour,stream, geometryObj->numVertices))
         return rwFALSE;
@@ -389,7 +390,7 @@ gtaRwUInt32 gtaRwGeometryGetStreamActualSize(gtaRwGeometry* geometryObj)
     {
         if (geometryObj->numVertices > 0)
         {
-            gtaRwUInt8 texCoordsCount = GetTexCoordsCount();
+            gtaRwUInt8 texCoordsCount = gtaRwGeometryGetTexCoordsCount(geometryObj);
             if (geometryObj->prelit)
                 size += 4 * geometryObj->numVertices;
             size += 8 * (geometryObj->numTriangles + geometryObj->numVertices * texCoordsCount);
@@ -411,12 +412,12 @@ gtaRwUInt32 gtaRwGeometryGetStreamActualSize(gtaRwGeometry* geometryObj)
 
 gtaRwUInt32 gtaRwGeometryGetStreamSize(gtaRwGeometry* geometryObj)
 {
-    return 36 + GetStreamActualSize() + gtaRwMaterialListSize(&geometryObj->matList) +
+    return 36 + gtaRwGeometryGetStreamActualSize(geometryObj) + gtaRwMaterialListSize(&geometryObj->matList) +
            gtaRwGeometryBinMeshGetStreamSize(&geometryObj->Extension.mesh,geometryObj->native) +
            gtaRwGeometryExtraVertColourSize(&geometryObj->Extension.extraColour,geometryObj->numVertices) +
            /*geometryObj->Extension.effect2d.GetStreamSize() +*/
            gtaRwGeometryNativeGetStreamSize(&geometryObj->Extension.native,geometryObj->numVertices) +
-           gtaRWSkinStreamWrite(&geometryObj->Extension.skin, geometryObj->native, geometryObj->numVertices, geometryObj->native) +
+           gtaRwSkinStreamWrite(&geometryObj->Extension.skin, geometryObj->native, geometryObj->numVertices, geometryObj->native) +
            gtaRwGeometryBreakableSize(&geometryObj->Extension.breakable);
 }
 
@@ -425,7 +426,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
     if (!geometryObj->native || !geometryObj->Extension.native.ogl.generated || !geometryObj->Extension.native.ogl.numVertexElements ||
         !geometryObj->Extension.native.ogl.vertexBuffer)
         return rwFALSE;
-    gtaRwUInt32* vertexElementSizes = (gtaRwUInt32*)gtaMemAlloc(4 * geometryObj->Extension.native.ogl.numVertexElements);
+    gtaRwUInt32* vertexElementSizes = (gtaRwUInt32*)gtaRwMemAlloc(4 * geometryObj->Extension.native.ogl.numVertexElements);
     gtaRwBool    hasPositions = rwFALSE, hasNormals = rwFALSE, hasColors = rwFALSE, hasExtraColors = rwFALSE, hasTexCoords = rwFALSE, hasBoneWeights = rwFALSE,
               hasBoneIndices = rwFALSE;
     for (gtaRwInt32 i = geometryObj->Extension.native.ogl.numVertexElements - 1; i >= 0; i--)
@@ -449,27 +450,27 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
         geometryObj->morphTarget[i].hasVerts = rwFALSE;
         geometryObj->morphTarget[i].hasNormals = rwFALSE;
         if (geometryObj->morphTarget[i].verts)
-            gtaMemFree(geometryObj->morphTarget[i].verts);
+            gtaRwMemFree(geometryObj->morphTarget[i].verts);
         if (geometryObj->morphTarget[i].normals)
-            gtaMemFree(geometryObj->morphTarget[i].normals);
+            gtaRwMemFree(geometryObj->morphTarget[i].normals);
     }
     for (gtaRwInt32 i = 0; i < 8; i++)
     {
         if (geometryObj->texCoords[i])
-            gtaMemFree(geometryObj->texCoords[i]);
+            gtaRwMemFree(geometryObj->texCoords[i]);
     }
     if (geometryObj->preLitLum)
-        gtaMemFree(geometryObj->preLitLum);
+        gtaRwMemFree(geometryObj->preLitLum);
     if (geometryObj->Extension.skin.enabled)
     {
         if (geometryObj->Extension.skin.vertexBoneIndices)
-            gtaMemFree(geometryObj->Extension.skin.vertexBoneIndices);
+            gtaRwMemFree(geometryObj->Extension.skin.vertexBoneIndices);
         if (geometryObj->Extension.skin.vertexBoneWeights)
-            gtaMemFree(geometryObj->Extension.skin.vertexBoneWeights);
-        geometryObj->Extension.skin.vertexBoneIndices = (gtaRwBoneIndices*)gtaMemAlloc(geometryObj->numVertices * 4);
-        geometryObj->Extension.skin.vertexBoneWeights = (gtaRwBoneWeights*)gtaMemAlloc(geometryObj->numVertices * 16);
+            gtaRwMemFree(geometryObj->Extension.skin.vertexBoneWeights);
+        geometryObj->Extension.skin.vertexBoneIndices = (gtaRwBoneIndices*)gtaRwMemAlloc(geometryObj->numVertices * 4);
+        geometryObj->Extension.skin.vertexBoneWeights = (gtaRwBoneWeights*)gtaRwMemAlloc(geometryObj->numVertices * 16);
         if (geometryObj->Extension.skin.skinToBoneMatrices)
-            gtaMemFree(geometryObj->Extension.skin.skinToBoneMatrices);
+            gtaRwMemFree(geometryObj->Extension.skin.skinToBoneMatrices);
     }
 
     for (gtaRwInt32 i = 0; i < geometryObj->Extension.native.ogl.numVertexElements; i++)
@@ -481,7 +482,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
                 for (gtaRwInt32 mt = 0; mt < geometryObj->numMorphTargets; mt++)
                 {
                     geometryObj->morphTarget[mt].hasVerts = rwTRUE;
-                    geometryObj->morphTarget[mt].verts = (gtaRwV3d*)gtaMemAlloc(geometryObj->numVertices * 12);
+                    geometryObj->morphTarget[mt].verts = (gtaRwV3d*)gtaRwMemAlloc(geometryObj->numVertices * 12);
                     for (gtaRwInt32 vertex = 0; vertex < geometryObj->numVertices; vertex++)
                     {
                         gtaRwV3d* position = (gtaRwV3d*)((gtaRwUInt32)geometryObj->Extension.native.ogl.vertexBuffer +
@@ -496,7 +497,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
                 for (gtaRwInt32 mt = 0; mt < geometryObj->numMorphTargets; mt++)
                 {
                     geometryObj->morphTarget[mt].hasNormals = rwTRUE;
-                    geometryObj->morphTarget[mt].normals = (gtaRwV3d*)gtaMemAlloc(geometryObj->numVertices * 12);
+                    geometryObj->morphTarget[mt].normals = (gtaRwV3d*)gtaRwMemAlloc(geometryObj->numVertices * 12);
                     for (gtaRwInt32 vertex = 0; vertex < geometryObj->numVertices; vertex++)
                     {
                         gtaNativeOGlCompressedNormal* normal =
@@ -521,7 +522,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
             case OGL_VERTEX_TEXCOORD0:
                 geometryObj->numTexCoordSets = 1;
                 geometryObj->textured = rwTRUE;
-                geometryObj->texCoords[0] = (gtaRwTexCoords*)gtaMemAlloc(geometryObj->numVertices * 8);
+                geometryObj->texCoords[0] = (gtaRwTexCoords*)gtaRwMemAlloc(geometryObj->numVertices * 8);
                 for (gtaRwInt32 vertex = 0; vertex < geometryObj->numVertices; vertex++)
                 {
                     gtaNativeOGlCompressedTexCoords* texCoordsCompressed =
@@ -534,7 +535,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
                 break;
             case OGL_VERTEX_GLOBALCOLOR:
                 geometryObj->prelit = rwTRUE;
-                geometryObj->preLitLum = (gtaRwRGBA*)gtaMemAlloc(geometryObj->numVertices * 4);
+                geometryObj->preLitLum = (gtaRwRGBA*)gtaRwMemAlloc(geometryObj->numVertices * 4);
                 for (gtaRwInt32 vertex = 0; vertex < geometryObj->numVertices; vertex++)
                 {
                     gtaRwRGBA* color = (gtaRwRGBA*)((gtaRwUInt32)geometryObj->Extension.native.ogl.vertexBuffer +
@@ -591,7 +592,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
             geometryObj->numTriangles = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
                 geometryObj->numTriangles += geometryObj->Extension.mesh.meshes[i].numIndices - 2;
-            geometryObj->triangles = (gtaRwTriangle*)gtaMemAlloc(geometryObj->numTriangles * 8);
+            geometryObj->triangles = (gtaRwTriangle*)gtaRwMemAlloc(geometryObj->numTriangles * 8);
             gtaRwUInt32 triangleId = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
             {
@@ -627,7 +628,7 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
         else
         {
             geometryObj->numTriangles = geometryObj->Extension.mesh.totalIndicesInMesh / 3;
-            geometryObj->triangles = (gtaRwTriangle*)gtaMemAlloc(geometryObj->numTriangles * 8);
+            geometryObj->triangles = (gtaRwTriangle*)gtaRwMemAlloc(geometryObj->numTriangles * 8);
             gtaRwUInt32 triangleId = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
             {
@@ -644,13 +645,13 @@ gtaRwBool gtaRwGeometryConvertFromOGlNative(gtaRwGeometry* geometryObj)
     }
     if (geometryObj->Extension.skin.enabled)
     {
-        gtaRWSkinFindUsedBoneIds(&geometryObj->Extension.skin,geometryObj->numVertices, geometryObj->Extension.skin.ogl.numBones);
-        geometryObj->Extension.skin.skinToBoneMatrices = (gtaRwMatrix*)gtaMemAlloc(geometryObj->Extension.skin.numBones * 64);
-        gtaMemCopy(geometryObj->Extension.skin.skinToBoneMatrices, geometryObj->Extension.skin.ogl.skinToBoneMatrices,
+        gtaRwSkinFindUsedBoneIds(&geometryObj->Extension.skin,geometryObj->numVertices, geometryObj->Extension.skin.ogl.numBones);
+        geometryObj->Extension.skin.skinToBoneMatrices = (gtaRwMatrix*)gtaRwMemAlloc(geometryObj->Extension.skin.numBones * 64);
+        gtaRwMemCopy(geometryObj->Extension.skin.skinToBoneMatrices, geometryObj->Extension.skin.ogl.skinToBoneMatrices,
                    geometryObj->Extension.skin.numBones * 64);
     }
     geometryObj->native = rwFALSE;
-    gtaMemFree(vertexElementSizes);
+    gtaRwMemFree(vertexElementSizes);
     return rwTRUE;
 }
 
@@ -659,7 +660,7 @@ void gtaRwGeometryRecalculateFaces(gtaRwGeometry* geometryObj)
     if (geometryObj->Extension.mesh.enabled)
     {
         if (geometryObj->triangles)
-            gtaMemFree(geometryObj->triangles);
+            gtaRwMemFree(geometryObj->triangles);
         gtaRwUInt32    tempNumTriangles;
         gtaRwTriangle* tempTriangles;
         if (geometryObj->Extension.mesh.tristrip)
@@ -668,7 +669,7 @@ void gtaRwGeometryRecalculateFaces(gtaRwGeometry* geometryObj)
             tempNumTriangles = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
                 tempNumTriangles += geometryObj->Extension.mesh.meshes[i].numIndices - 2;
-            tempTriangles = (gtaRwTriangle*)gtaMemAlloc(tempNumTriangles * 8);
+            tempTriangles = (gtaRwTriangle*)gtaRwMemAlloc(tempNumTriangles * 8);
             gtaRwUInt32 triangleId = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
             {
@@ -704,7 +705,7 @@ void gtaRwGeometryRecalculateFaces(gtaRwGeometry* geometryObj)
         else
         {
             tempNumTriangles = geometryObj->Extension.mesh.totalIndicesInMesh / 3;
-            tempTriangles = (gtaRwTriangle*)gtaMemAlloc(tempNumTriangles * 8);
+            tempTriangles = (gtaRwTriangle*)gtaRwMemAlloc(tempNumTriangles * 8);
             gtaRwUInt32 triangleId = 0;
             for (gtaRwInt32 i = 0; i < geometryObj->Extension.mesh.numMeshes; i++)
             {
@@ -731,9 +732,9 @@ void gtaRwGeometryRecalculateFaces(gtaRwGeometry* geometryObj)
             tempTriangles[geometryObj->numTriangles].vertC = tempTriangles[i].vertC;
             geometryObj->numTriangles++;
         }
-        geometryObj->triangles = (gtaRwTriangle*)gtaMemAlloc(geometryObj->numTriangles * 8);
-        gtaMemCopy(geometryObj->triangles, tempTriangles, geometryObj->numTriangles * 8);
-        gtaMemFree(tempTriangles);
+        geometryObj->triangles = (gtaRwTriangle*)gtaRwMemAlloc(geometryObj->numTriangles * 8);
+        gtaRwMemCopy(geometryObj->triangles, tempTriangles, geometryObj->numTriangles * 8);
+        gtaRwMemFree(tempTriangles);
     }
 }
 
@@ -742,7 +743,7 @@ void gtaRwGeometryConvertFromNative(gtaRwGeometry* geometryObj, gtaPlatformId Pl
     switch (Platform)
     {
         case PLATFORM_OGL:
-            ConvertFromOGlNative();
+            gtaRwGeometryConvertFromOGlNative(geometryObj);
             break;
         default:
             return;

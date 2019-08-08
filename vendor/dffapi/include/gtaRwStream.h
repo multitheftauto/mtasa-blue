@@ -69,7 +69,8 @@ struct gtaRwChunkHeaderInfo {
     gtaRwInt32 isComplex;
 };
 
-gtaRwBool gtaRwStreamClose(gtaRwStream *stream, void *pData);
+gtaRwStream* gtaRwStreamOpen(gtaRwStreamType type, gtaRwStreamAccessType accessType, const void* pData);
+gtaRwBool    gtaRwStreamClose(gtaRwStream* stream, void* pData);
 gtaRwUInt32 gtaRwStreamRead(gtaRwStream *stream, void *buffer, gtaRwUInt32 length);
 gtaRwStream *gtaRwStreamSkip(gtaRwStream *stream, gtaRwUInt32 offset);
 gtaRwBool gtaRwStreamReadChunkHeader(gtaRwStream *stream, gtaRwUInt32 *pType, gtaRwUInt32 *pLength, gtaRwUInt32 *pVersion, gtaRwUInt32 *pBuild);

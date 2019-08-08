@@ -5,14 +5,15 @@
 #include "StdInc.h"
 
 // affects writing to file
-gtaRwPlatformId gtaRwPlatform = PLATFORM_D3D9;
+gtaRwPlatformId gtaPlatform = PLATFORM_D3D9;
 gtaRwUInt32 gtaRwVersion = 0x36003;
-gtaRwUInt16 gtaRwBuild = 0xFFFF;
+gtaRwUInt16     gtaRwBuild = 0xFFFF;
+gtaRwBool       gtaIsMobile = FALSE;
 gtaRwBool gtaRwIgnoreUnknownExtensions = rwFALSE;
 gtaRwBool gtaRwIgnoreTxdExtensions = rwTRUE;
 
 void gtaRwSetVersion(gtaRwPlatformId platform, gtaRwUInt32 version, gtaRwUInt16 build) {
-    gtaRwPlatform = platform;
+    gtaPlatform = platform;
     gtaRwVersion = version;
     gtaRwBuild = build;
 }

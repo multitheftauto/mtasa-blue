@@ -48,7 +48,8 @@ gtaRwBool gtaRwGeometryBinMeshStreamWrite(gtaRwGeometryBinMesh* geometryBinMeshO
 {
     if (geometryBinMeshObj->enabled)
 	{
-		if(!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_BINMESH, GetStreamSize(IsNative) - 12, gtaRwVersion, gtaRwBuild))
+        if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_BINMESH, gtaRwGeometryBinMeshGetStreamSize(geometryBinMeshObj, IsNative) - 12, gtaRwVersion,
+                                                  gtaRwBuild))
 			return rwFALSE;
         if (!gtaRwStreamWrite(stream, &geometryBinMeshObj->flags, 12))
 			return rwFALSE;

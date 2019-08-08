@@ -4,6 +4,17 @@
 //
 #include "StdInc.h"
 
+gtaRwBool gtaRwErrorSet(char* message, ...)
+{
+    char    text[512];
+    va_list ap;
+    va_start(ap, message);
+    vsnprintf(text, 512, message, ap);
+    va_end(ap);
+    MessageBoxA(NULL, text, "gtaRwApi", 0);
+    return rwTRUE;
+}
+
 gtaRwStream *gtaRwStreamOpen(gtaRwStreamType type, gtaRwStreamAccessType accessType, const void *pData) {
     gtaRwStream *stream = (gtaRwStream *)gtaRwMemAllocAndZero(sizeof(gtaRwStream));
     if (stream) {

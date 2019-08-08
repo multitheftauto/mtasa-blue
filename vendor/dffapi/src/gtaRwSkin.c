@@ -1,6 +1,6 @@
 #include "StdInc.h"
 
-void gtaRWSkinInitialise(gtaRwGeometrySkin* skinObj, gtaRwUInt8 NumBones, gtaRwUInt8 NumBoneIds, gtaRwUInt32 NumVertices, gtaRwUInt8 MaxNumWeightsPerVertex)
+void gtaRwSkinInitialise(gtaRwGeometrySkin* skinObj, gtaRwUInt8 NumBones, gtaRwUInt8 NumBoneIds, gtaRwUInt32 NumVertices, gtaRwUInt8 MaxNumWeightsPerVertex)
 {
     memset(skinObj, 0, sizeof(gtaRwGeometrySkin));
     skinObj->enabled = rwTRUE;
@@ -8,41 +8,41 @@ void gtaRWSkinInitialise(gtaRwGeometrySkin* skinObj, gtaRwUInt8 NumBones, gtaRwU
 	if(NumBones > 0)
 	{
         skinObj->numBones = NumBones;
-        skinObj->skinToBoneMatrices = (gtaRwMatrix*)gtaMemAlloc(64 * NumBones);
+        skinObj->skinToBoneMatrices = (gtaRwMatrix*)gtaRwMemAlloc(64 * NumBones);
 	}
 	if(NumVertices > 0)
 	{
-        skinObj->vertexBoneIndices = (gtaRwBoneIndices*)gtaMemAlloc(4 * NumVertices);
-        skinObj->vertexBoneWeights = (gtaRwBoneWeights*)gtaMemAlloc(16 * NumVertices);
+        skinObj->vertexBoneIndices = (gtaRwBoneIndices*)gtaRwMemAlloc(4 * NumVertices);
+        skinObj->vertexBoneWeights = (gtaRwBoneWeights*)gtaRwMemAlloc(16 * NumVertices);
 	}
 	if(NumBoneIds > 0)
 	{
         skinObj->numBoneIds = NumBoneIds;
-        skinObj->boneIds = (gtaRwUInt8*)gtaMemAlloc(NumBoneIds);
+        skinObj->boneIds = (gtaRwUInt8*)gtaRwMemAlloc(NumBoneIds);
 	}
 }
 
-void gtaRWSkinDestroy(gtaRwGeometrySkin* skinObj)
+void gtaRwSkinDestroy(gtaRwGeometrySkin* skinObj)
 {
     if (skinObj->boneIds)
-        gtaMemFree(skinObj->boneIds);
+        gtaRwMemFree(skinObj->boneIds);
     if (skinObj->vertexBoneIndices)
-        gtaMemFree(skinObj->vertexBoneIndices);
+        gtaRwMemFree(skinObj->vertexBoneIndices);
     if (skinObj->vertexBoneWeights)
-        gtaMemFree(skinObj->vertexBoneWeights);
+        gtaRwMemFree(skinObj->vertexBoneWeights);
     if (skinObj->skinToBoneMatrices)
-        gtaMemFree(skinObj->skinToBoneMatrices);
+        gtaRwMemFree(skinObj->skinToBoneMatrices);
     if (skinObj->ogl.skinToBoneMatrices)
-        gtaMemFree(skinObj->ogl.skinToBoneMatrices);
+        gtaRwMemFree(skinObj->ogl.skinToBoneMatrices);
 	memset(skinObj, 0, sizeof(gtaRwGeometrySkin));
     skinObj->maxNumWeightsPerVertex = 4;
 }
 
-gtaRwBool gtaRWSkinStreamWrite(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative)
+gtaRwBool gtaRwSkinStreamWrite(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative)
 {
     if (skinObj->enabled)
 	{
-		if(!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_SKIN, GetStreamSize(IsNative, NumVertices) - 12, gtaRwVersion, gtaRwBuild))
+        if (!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_SKIN, gtaRwSkinGetStreamSize(skinObj, IsNative, NumVertices) - 12, gtaRwVersion, gtaRwBuild))
 			return rwTRUE;
 		if(IsNative)
 		{
@@ -134,7 +134,7 @@ gtaRwBool gtaRWSkinStreamWrite(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, 
 	return rwTRUE;
 }
 
-gtaRwBool gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative)
+gtaRwBool gtaRwSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, gtaRwUInt32 NumVertices, gtaRwBool IsNative)
 {
 	memset(skinObj, 0, sizeof(gtaRwGeometrySkin));
     skinObj->enabled = rwTRUE;
@@ -158,10 +158,10 @@ gtaRwBool gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, g
 				return rwFALSE;
             if (skinObj->ogl.numBones > 0)
 			{
-                skinObj->ogl.skinToBoneMatrices = (gtaRwMatrix*)gtaMemAlloc(64 * skinObj->ogl.numBones);
+                skinObj->ogl.skinToBoneMatrices = (gtaRwMatrix*)gtaRwMemAlloc(64 * skinObj->ogl.numBones);
                 if (gtaRwStreamRead(Stream, skinObj->ogl.skinToBoneMatrices, skinObj->ogl.numBones * 64) != skinObj->ogl.numBones * 64)
 				{
-					Destroy();
+                    gtaRwSkinDestroy(skinObj);
 					return rwFALSE;
 				}
 			}
@@ -178,49 +178,49 @@ gtaRwBool gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, g
 			return rwFALSE;
         if (skinObj->numBoneIds > 0 && skinObj->maxNumWeightsPerVertex > 0)
 		{
-            skinObj->boneIds = (gtaRwUInt8*)gtaMemAlloc(skinObj->numBoneIds);
+            skinObj->boneIds = (gtaRwUInt8*)gtaRwMemAlloc(skinObj->numBoneIds);
             if (gtaRwStreamRead(Stream, skinObj->boneIds, skinObj->numBoneIds) != skinObj->numBoneIds)
-			{
-				Destroy();
+            {
+                gtaRwSkinDestroy(skinObj);
 				return rwFALSE;
 			}
 		}
 		if(NumVertices > 0)
 		{
-            skinObj->vertexBoneIndices = (gtaRwBoneIndices*)gtaMemAlloc(4 * NumVertices);
+            skinObj->vertexBoneIndices = (gtaRwBoneIndices*)gtaRwMemAlloc(4 * NumVertices);
             if (gtaRwStreamRead(Stream, skinObj->vertexBoneIndices, NumVertices * 4) != NumVertices * 4)
-			{
-				Destroy();
+            {
+                gtaRwSkinDestroy(skinObj);
 				return rwFALSE;
 			}
-            skinObj->vertexBoneWeights = (gtaRwBoneWeights*)gtaMemAlloc(16 * NumVertices);
+            skinObj->vertexBoneWeights = (gtaRwBoneWeights*)gtaRwMemAlloc(16 * NumVertices);
             if (gtaRwStreamRead(Stream, skinObj->vertexBoneWeights, NumVertices * 16) != NumVertices * 16)
-			{
-				Destroy();
+            {
+                gtaRwSkinDestroy(skinObj);
 				return rwFALSE;
 			}
 		}
         if (skinObj->numBones > 0)
 		{
-            skinObj->skinToBoneMatrices = (gtaRwMatrix*)gtaMemAlloc(64 * skinObj->numBones);
+            skinObj->skinToBoneMatrices = (gtaRwMatrix*)gtaRwMemAlloc(64 * skinObj->numBones);
             if (skinObj->maxNumWeightsPerVertex > 0)
 			{
                 if (gtaRwStreamRead(Stream, skinObj->skinToBoneMatrices, skinObj->numBones * 64) != skinObj->numBones * 64)
-				{
-					Destroy();
+                {
+                    gtaRwSkinDestroy(skinObj);
 					return rwFALSE;
 				}
                 if (gtaRwStreamRead(Stream, &skinObj->boneLimit, 12) != 12)
-				{
-					Destroy();
+                {
+                    gtaRwSkinDestroy(skinObj);
 					return rwFALSE;
 				}
                 if (skinObj->numMeshes > 0)
 				{
                     if (gtaRwStreamRead(Stream, skinObj->meshBoneRemapIndices, skinObj->numBones + 2 * (skinObj->numRLE + skinObj->numMeshes)) != 
 						skinObj->numBones + 2 * (skinObj->numRLE + skinObj->numMeshes))
-					{
-						Destroy();
+                    {
+                        gtaRwSkinDestroy(skinObj);
 						return rwFALSE;
 					}
 				}
@@ -230,13 +230,13 @@ gtaRwBool gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, g
                 for (gtaRwInt32 i = 0; i < skinObj->numBones; i++)
 				{
 					if(!gtaRwStreamSkip(Stream, 4))
-					{
-						Destroy();
+                    {
+                        gtaRwSkinDestroy(skinObj);
 						return rwFALSE;
 					}
                     if (gtaRwStreamRead(Stream, &skinObj->skinToBoneMatrices[i], 64) != 64)
-					{
-						Destroy();
+                    {
+                        gtaRwSkinDestroy(skinObj);
 						return rwFALSE;
 					}
 				}
@@ -246,7 +246,7 @@ gtaRwBool gtaRWSkinStreamRead(gtaRwGeometrySkin* skinObj, gtaRwStream* Stream, g
 	return rwTRUE;
 }
 
-unsigned int gtaRWSkinGetStreamSize(gtaRwGeometrySkin* skinObj, gtaRwBool IsNative, gtaRwUInt32 NumVertices)
+unsigned int gtaRwSkinGetStreamSize(gtaRwGeometrySkin* skinObj, gtaRwBool IsNative, gtaRwUInt32 NumVertices)
 {
     if (skinObj->enabled)
 	{
@@ -291,10 +291,10 @@ unsigned int gtaRWSkinGetStreamSize(gtaRwGeometrySkin* skinObj, gtaRwBool IsNati
 	return 0;
 }
 
-void gtaRWSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertices, gtaRwInt32 NumBones)
+void gtaRwSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertices, gtaRwInt32 NumBones)
 {
     if (skinObj->boneIds)
-        gtaMemFree(skinObj->boneIds);
+        gtaRwMemFree(skinObj->boneIds);
     skinObj->numBoneIds = 0;
     skinObj->numBones = NumBones;
     if (skinObj->vertexBoneWeights && skinObj->vertexBoneIndices && skinObj->numBones > 0)
@@ -315,7 +315,7 @@ void gtaRWSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertice
 				break;
 		}
 		// Find all unique boneIds
-        gtaRwUInt8* myBoneIds = (gtaRwUInt8*)gtaMemAlloc(skinObj->numBones);
+        gtaRwUInt8* myBoneIds = (gtaRwUInt8*)gtaRwMemAlloc(skinObj->numBones);
 		for(gtaRwInt32 i = 0; i < NumVertices; i++)
 		{
 			// for all indices
@@ -346,9 +346,9 @@ void gtaRWSkinFindUsedBoneIds(gtaRwGeometrySkin* skinObj, gtaRwUInt32 NumVertice
 		// now copy our data
         if (skinObj->numBoneIds > 0)
 		{
-            skinObj->boneIds = (gtaRwUInt8*)gtaMemAlloc(4 * skinObj->numBoneIds);
-            gtaMemCopy(skinObj->boneIds, myBoneIds, 4 * skinObj->numBoneIds);
+            skinObj->boneIds = (gtaRwUInt8*)gtaRwMemAlloc(4 * skinObj->numBoneIds);
+            gtaRwMemCopy(skinObj->boneIds, myBoneIds, 4 * skinObj->numBoneIds);
 		}
-        gtaMemFree(myBoneIds);
+        gtaRwMemFree(myBoneIds);
 	}
 }

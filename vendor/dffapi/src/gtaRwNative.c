@@ -6,18 +6,18 @@ void gtaNativeOGlInitialise(gtaNativeOGl* native, gtaRwUInt32 NumVertexElements,
     native->generated = rwTRUE;
     native->numVertexElements = NumVertexElements;
     if (native->numVertexElements > 0)
-        native->vertexElements = (gtaNativeOGlVertexElement*)gtaMemAlloc(sizeof(gtaNativeOGlVertexElement) * native->numVertexElements);
+        native->vertexElements = (gtaNativeOGlVertexElement*)gtaRwMemAlloc(sizeof(gtaNativeOGlVertexElement) * native->numVertexElements);
 	if(NumVertices > 0 && VertexStride > 0)
-        native->vertexBuffer = gtaMemAlloc(NumVertices * VertexStride);
+        native->vertexBuffer = gtaRwMemAlloc(NumVertices * VertexStride);
 }
 
 void gtaNativeOGlDestroy(gtaNativeOGl* native)
 {
     if (native->vertexElements)
-        gtaMemFree(native->vertexElements);
+        gtaRwMemFree(native->vertexElements);
     if (native->vertexBuffer)
-        gtaMemFree(native->vertexBuffer);
-	gtaMemZero(native, sizeof(gtaNativeOGl));
+        gtaRwMemFree(native->vertexBuffer);
+    gtaRwMemZero(native, sizeof(gtaNativeOGl));
 }
 
 gtaRwUInt32 gtaNativeOGlGetStreamSize(gtaNativeOGl* native, gtaRwUInt32 NumVertices)
@@ -35,7 +35,7 @@ gtaRwBool gtaNativeOGlStreamWrite(gtaNativeOGl* native, gtaRwStream* Stream, gta
     if (native->generated)
 	{
 		gtaRwUInt32 stride = 0;
-		if(!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_NATIVEDATA, GetStreamSize(NumVertices) - 12, gtaRwVersion, gtaRwBuild))
+        if (!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_NATIVEDATA, gtaNativeOGlGetStreamSize(native, NumVertices) - 12, gtaRwVersion, gtaRwBuild))
 			return rwFALSE;
         if (!gtaRwStreamWrite(Stream, &native->numVertexElements, 4))
             return rwFALSE;
@@ -63,22 +63,22 @@ gtaRwBool gtaNativeOGlStreamRead(gtaNativeOGl* native, gtaRwStream* Stream, gtaR
 		return rwFALSE;
     if (native->numVertexElements > 0)
 	{
-        native->vertexElements = (gtaNativeOGlVertexElement*)gtaMemAlloc(sizeof(gtaNativeOGlVertexElement) * native->numVertexElements);
+        native->vertexElements = (gtaNativeOGlVertexElement*)gtaRwMemAlloc(sizeof(gtaNativeOGlVertexElement) * native->numVertexElements);
         for (gtaRwInt32 i = 0; i < native->numVertexElements; i++)
 		{
             if (gtaRwStreamRead(Stream, &native->vertexElements[i].paramType, 24) != 24)
-			{
-				Destroy();
+            {
+                gtaRwGeometryNativeDestroy(native);
                 return rwFALSE;
 			}
             stride = native->vertexElements[i].stride;
 		}
 		if(stride > 0)
 		{
-            native->vertexBuffer = gtaMemAlloc(NumVertices * stride);
+            native->vertexBuffer = gtaRwMemAlloc(NumVertices * stride);
             if (gtaRwStreamRead(Stream, native->vertexBuffer, NumVertices * stride) != NumVertices * stride)
-			{
-				Destroy();
+            {
+                gtaRwGeometryNativeDestroy(native);
                 return rwFALSE;
 			}
 		}
@@ -110,7 +110,7 @@ gtaRwBool gtaRwGeometryNativeStreamRead(gtaRwGeometryNative* geometryNativeObj, 
             geometryNativeObj->enabled = rwTRUE;
             if (!gtaNativeOGlStreamRead(&geometryNativeObj, Stream, NumVertices))
 			{
-				Destroy();
+                gtaRwGeometryNativeDestroy(geometryNativeObj);
                 return rwFALSE;
 			}
 		}

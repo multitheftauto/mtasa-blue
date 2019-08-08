@@ -1,10 +1,44 @@
+#include <Windows.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#ifndef _DFF_API_EXPORTS
-#define _DFF_API_EXPORTS
 
 #include "gtaRwTypes.h"
-//extern gtaRwUInt32 gtaRwVersion;
-//extern char* Test1(const char* key, const char* setting);
-//extern char* Test2(const char* key, const char* setting, void* data);
+#include "gtaRwStream.h"
+#include "gtaRwString.h"
+#include "gtaRwGlobal.h"
+#include "gtaRwNative.h"
 
-#endif
+#include "gtaRwSkin.h"
+#include "gtaRwUnknownExtension.h"
+#include "gtaRwAnimationDictionary.h"
+#include "gtaRwAnisot.h"
+#include "gtaRwSkyMipmap.h"
+#include "gtaRwMaterialTexture.h"
+#include "gtaRwMatFX.h"
+#include "gtaRwPipeline.h"
+#include "gtaRwMesh.h"
+#include "gtaRwRights.h"
+#include "gtaRwAtomic.h"
+#include "gtaRwBreakable.h"
+#include "gtaRwEnvMap.h"
+#include "gtaRwError.h"
+#include "gtaRwExtraVertColour.h"
+#include "gtaRwHAnim.h"
+#include "gtaRwNodeName.h"
+#include "gtaRwFrameList.h"
+#include "gtaRwNormalMap.h"
+#include "gtaRwSpecMap.h"
+#include "gtaRwUVAnim.h"
+#include "gtaRwMaterial.h"
+#include "gtaRwMaterialList.h"
+#include "gtaRwGeometry.h"
+#include "gtaRwGeometryList.h"
+#include "gtaRwMemory.h"
+#include "gtaRwTextureD3D.h"
+#include "gtaRwTxd.h"
+#include "gtaRwCollisionPlugin.h"
+#include "gtaRwClump.h"
