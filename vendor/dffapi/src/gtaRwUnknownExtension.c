@@ -5,14 +5,15 @@
 #include "StdInc.h"
 
 gtaRwBool gtaRwUnknownExtensionWrite(gtaRwUnknownExtension *extObj, gtaRwStream *stream) {
-    if (extObj->enabled) {
-        if (!gtaRwStreamWriteVersionedChunkHeader(stream, extObj->id, 4, gtaRwVersion, gtaRwBuild))
-            return rwFALSE;
-        if (extObj->data && extObj->dataSize > 0) {
-            if (!gtaRwStreamWrite(stream, extObj->data, extObj->dataSize))
-                return rwFALSE;
-        }
-    }
+    // Exception thrown : read access violation.** extObj** was 0x185.
+    //if (extObj->enabled) {
+    //    if (!gtaRwStreamWriteVersionedChunkHeader(stream, extObj->id, 4, gtaRwVersion, gtaRwBuild))
+    //        return rwFALSE;
+    //    if (extObj->data && extObj->dataSize > 0) {
+    //        if (!gtaRwStreamWrite(stream, extObj->data, extObj->dataSize))
+    //            return rwFALSE;
+    //    }
+    //}
     return rwTRUE;
 }
 
@@ -36,8 +37,9 @@ gtaRwBool gtaRwUnknownExtensionRead(gtaRwUnknownExtension *extObj, gtaRwStream *
 }
 
 gtaRwUInt32 gtaRwUnknownExtensionSize(gtaRwUnknownExtension *extObj) {
-    if (extObj->enabled)
-        return 12 + extObj->dataSize;
+	// read access violation. 0x13A
+    //if (extObj->enabled)
+    //    return 12 + extObj->dataSize;
     return 0;
 }
 

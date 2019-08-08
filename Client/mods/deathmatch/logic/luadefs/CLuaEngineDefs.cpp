@@ -1340,38 +1340,52 @@ int CLuaEngineDefs::EngineTest(lua_State* luaVM)
     //CScriptArgReader argStream(luaVM);
 
     gtaRwClump clump;
-    gtaRwClumpInitialiseIdentity(&clump, 1);
-    gtaRwFrameListInit(&clump.frameList, 1);
+    gtaRwClumpInitialise(&clump, 1, 1, 1);
     gtaRwFrameInitIdentity(&clump.frameList.frames[0], -1, 0);
-    gtaRwStream* stream = gtaRwStreamOpen(gtaRwStreamType::rwSTREAMMEMORY, gtaRwStreamAccessType::rwSTREAMWRITE, NULL);
-    gtaRwAtomic* atomic = (&clump)->atomics;
-    gtaRwGeometryInitialise(atomic->internalGeometry, 10, 10, 1, 0, 0, 0, 0, 0, 10);
-    gtaRwAtomicInit(atomic, 0, 0, 0, 0);
-    gtaRwString string;
-    gtaRwStringInit(&string, "as", rwFALSE);
+    char name[20];
+    strcpy(name, "test");
+
+    gtaRwAtomicInit(clump.atomics, 4, 1, 0, rwTRUE);
+    gtaRwGeometryListInitialise(&clump.geometryList, 1);
+    gtaRwGeometryInitialise(&clump.geometryList.geometries[0], 0, 0, 1, 0, 0, 0, 0, 0, 0);
+    gtaRwMaterialListInit(&clump.atomics->internalGeometry->matList, 1, 1);
+    gtaRwMaterialInit(&clump.atomics->internalGeometry->matList.materials[0], 1, 1, 1, 1, rwFALSE, 1, 1);
+    gtaRwMaterialTextureInit(&clump.atomics->internalGeometry->matList.materials[0].texture, gtaRwTextureFilterMode::rwFILTERNEAREST,
+                             gtaRwTextureAddressMode::rwTEXTUREADDRESSNATEXTUREADDRESS, gtaRwTextureAddressMode::rwTEXTUREADDRESSWRAP, 0, "textureName",
+                             "maskName");
+
+    gtaRwMaterialNormalMapInit(&clump.atomics->internalGeometry->matList.materials[0].normalMap, rwFALSE, rwFALSE, 0, rwFALSE);
+
+    clump.atomics->numRights = 2;
+    gtaRwRightsInit(&clump.atomics->rights[0], 0, 0);
+    gtaRwRightsInit(&clump.atomics->rights[1], 0, 0);
+    gtaRwFrameNodeNameInit(&clump.frameList.frames[0].nodeName, name);
+
+    gtaRwStream* stream = gtaRwStreamOpen(gtaRwStreamType::rwSTREAMFILENAME, gtaRwStreamAccessType::rwSTREAMWRITE, "kljtilkjasf.dff");
     gtaRwClumpStreamWrite(&clump, stream);
-    gtaRwStringWrite(&string, stream);
     gtaRwStreamClose(stream, NULL);
     gtaRwClumpDestroy(&clump);
-    lua_pushstring(luaVM, string.string);
+    lua_pushstring(luaVM, "Hi");
     return 1;
 }
 
 /*
+Working example:
+	gtaRwClump clump;
+	clump.Initialise(1, 1, 1);
+	clump.frameList.frames[0].Initialise(-1, 0);
+	char name[20];
+	strcpy(name, "test");
+	clump.frameList.frames[0].Extension.nodeName.Initialise(name);
 
-    /*  
-    gtaRwStreamReadReal();
-    stream
-    gtaRwClump clump;
-    clump.frameList.frames[0].Initialise(-1, 0);
-    gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMFILENAME, rwSTREAMWRITE, dstpath);
-    bool         result = false;
-    if (stream)
-    {
-        clump.StreamWrite(stream);
-        gtaRwStreamClose(stream);
-        result = true;
-    }
-    clump.Destroy();*/
-// lua_pushboolean(luaVM, true);
+	gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMFILENAME, rwSTREAMWRITE, "test.dff");
+	bool result = false;
+	if (stream)
+	{
+		clump.StreamWrite(stream);
+		gtaRwStreamClose(stream);
+		result = true;
+	}
+	clump.Destroy();
+    */
 

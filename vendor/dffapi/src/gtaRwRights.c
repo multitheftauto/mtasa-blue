@@ -6,6 +6,7 @@
 
 void gtaRwRightsInit(gtaRwRights* rightsObj, gtaRwUInt32 pluginId, gtaRwUInt32 pluginData)
 {
+    rightsObj = malloc(sizeof(gtaRwRights));
     gtaRwRightsDestroy(rightsObj);
     rightsObj->enabled = rwTRUE;
     rightsObj->pluginId = pluginId;

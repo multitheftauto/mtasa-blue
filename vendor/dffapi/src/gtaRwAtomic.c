@@ -143,9 +143,9 @@ gtaRwUInt32 gtaRwAtomicSize(gtaRwAtomic* atomicObj)
 void gtaRwAtomicInit(gtaRwAtomic* atomicObj, gtaRwInt32 frameIndex, gtaRwInt32 geometryIndex, gtaRwUInt32 flags, gtaRwBool usesInternalGeometry)
 {
     memset(atomicObj, 0, sizeof(gtaRwAtomic));
-    frameIndex = frameIndex;
-    geometryIndex = geometryIndex;
-    flags = flags;
+    atomicObj->frameIndex = frameIndex;
+    atomicObj->geometryIndex = geometryIndex;
+    atomicObj->flags = flags;
     if (usesInternalGeometry)
     {
         atomicObj->internalGeometry = (gtaRwGeometry*)malloc(sizeof(gtaRwGeometry));
