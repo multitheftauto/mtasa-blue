@@ -47,6 +47,7 @@ public:
     LUA_DECLARE(EngineSetSurfaceProperties);
     LUA_DECLARE(EngineGetSurfaceProperties);
     LUA_DECLARE(EngineResetSurfaceProperties);
+    LUA_DECLARE(EngineTest);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

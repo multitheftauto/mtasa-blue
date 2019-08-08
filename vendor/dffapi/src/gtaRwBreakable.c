@@ -27,7 +27,7 @@ void gtaRwGeometryBreakableInit(gtaRwGeometryBreakable *breakableObj, gtaRwUInt3
     }
 }
 
-void gtaRwGeometryBreakableDestroy(gtaRwGeometryBreakable *breakableObj) {
+gtaRwBool gtaRwGeometryBreakableDestroy(gtaRwGeometryBreakable *breakableObj) {
     if (breakableObj) {
         if (breakableObj->vertices)
             gtaRwMemFree(breakableObj->vertices);
@@ -47,6 +47,7 @@ void gtaRwGeometryBreakableDestroy(gtaRwGeometryBreakable *breakableObj) {
             gtaRwMemFree(breakableObj->matColors);
         gtaRwMemZero(breakableObj, sizeof(gtaRwGeometryBreakable));
     }
+    return rwTRUE;
 }
 
 gtaRwBool gtaRwGeometryBreakableWrite(gtaRwGeometryBreakable *breakableObj, gtaRwStream *stream) {

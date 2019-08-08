@@ -3,9 +3,8 @@
 // https://github.com/DK22Pac/dffapi
 //
 
-typedef struct gtaRwAtomic gtaRwAtomic;
-
-struct gtaRwAtomic {
+struct gtaRwAtomic
+{
     gtaRwInt32 frameIndex;
     gtaRwInt32 geometryIndex;
     union {

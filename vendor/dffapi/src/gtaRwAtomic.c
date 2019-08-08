@@ -1,156 +1,155 @@
 #include "StdInc.h"
 
-gtaRwAtomic::gtaRwAtomic()
-{
-	memset(this, 0, sizeof(gtaRwAtomic));
-}
-
-gtaRwBool gtaRwAtomic::StreamRead(gtaRwStream *Stream, gtaRwBool GeometryListIsEmpty, gtaRwUInt32 ClumpVersion)
+gtaRwBool gtaRwAtomicRead(gtaRwAtomic* atomicObj, gtaRwStream* stream, gtaRwBool geometryListIsEmpty, gtaRwUInt32 clumpVersion)
 {
 	gtaRwUInt32 length, entryLength, type;
-	memset(this, 0, sizeof(gtaRwAtomic));
-	if(!gtaRwStreamFindChunk(Stream, rwID_ATOMIC, NULL, NULL))
-		return false;
-	if(!gtaRwStreamFindChunk(Stream, rwID_STRUCT, &length, NULL))
-		return false;
-	if(gtaRwStreamRead(Stream, &frameIndex, length) != length)
-		return false;
-	if(GeometryListIsEmpty)
+    memset(atomicObj, 0, sizeof(gtaRwAtomic));
+    if (!gtaRwStreamFindChunk(stream, rwID_ATOMIC, NULL, NULL, NULL))
+		return rwFALSE;
+    if (!gtaRwStreamFindChunk(stream, rwID_STRUCT, &length, NULL, NULL))
+		return rwFALSE;
+    if (gtaRwStreamRead(stream, (void*)(&atomicObj->frameIndex), length) != length)
+		return rwFALSE;
+
+	if (geometryListIsEmpty)
 	{
-		internalGeometry = (gtaRwGeometry *)malloc(sizeof(gtaRwGeometry));
-		memset(internalGeometry, 0, sizeof(gtaRwGeometry));
-		if(!internalGeometry->StreamRead(Stream, ClumpVersion))
+		atomicObj->internalGeometry = (gtaRwGeometry *)malloc(sizeof(gtaRwGeometry));
+		memset(atomicObj->internalGeometry, 0, sizeof(gtaRwGeometry));
+        if (!gtaRwGeometryStreamRead(atomicObj->internalGeometry, stream, clumpVersion))
 		{
 			Destroy();
-			return false;
+			return rwFALSE;
 		}
 	}
-	if(!gtaRwStreamFindChunk(Stream, rwID_EXTENSION, &length, NULL))
+    if (!gtaRwStreamFindChunk(stream, rwID_EXTENSION, &length, NULL, NULL))
 	{
 		Destroy();
-		return false;
+		return rwFALSE;
 	}
-	while(length && gtaRwStreamReadChunkHeader(Stream, &type, &entryLength, NULL, NULL))
+	while(length && gtaRwStreamReadChunkHeader(stream, &type, &entryLength, NULL, NULL))
 	{
 		switch(type)
 		{
 		case rwID_RIGHTTORENDER:
-			if(Extension.rights[0].enabled)
+			if(atomicObj->rights[0].enabled)
 			{
-				if(!Extension.rights[1].enabled)
+				if(!atomicObj->rights[1].enabled)
 				{
-					if(!Extension.rights[1].StreamRead(Stream))
+                    if (gtaRwRightsRead(&atomicObj->rights[1], stream))
 					{
 						Destroy();
-						return false;
+						return rwFALSE;
 					}
 				}
 				else
 				{
-					if(!gtaRwStreamSkip(Stream, entryLength))
+                    if (!gtaRwStreamSkip(stream, entryLength))
 					{
 						Destroy();
-						return false;
+						return rwFALSE;
 					}
 				}
 			}
 			else
 			{
-				if(!Extension.rights[0].StreamRead(Stream))
+                if (!gtaRwRightsRead(&atomicObj->rights[0], stream))
 				{
 					Destroy();
-					return false;
+					return rwFALSE;
 				}
 			}
 			break;
 		case rwID_MATFX:
-			if(!Extension.matFx.StreamRead(Stream))
+            if (!gtaRwAtomicMatFXRead(&atomicObj->matFx,stream))
 			{
 				Destroy();
-				return false;
+				return rwFALSE;
 			}
 			break;
 		case gtaID_PIPELINE:
-			if(!Extension.pipeline.StreamRead(Stream))
+            if (!gtaRwAtomicPipelineRead(&atomicObj->pipeline,stream))
 			{
 				Destroy();
-				return false;
+				return rwFALSE;
 			}
 			break;
 		default:
-			if(!gtaRwStreamSkip(Stream, entryLength))
+            if (!gtaRwStreamSkip(stream, entryLength))
 			{
 				Destroy();
-				return false;
+				return rwFALSE;
 			}
 		}
 		length += -12 - entryLength;
 	}
-	return true;
+	return rwTRUE;
 }
 
-gtaRwBool gtaRwAtomic::StreamWrite(gtaRwStream *Stream)
+gtaRwBool gtaRwAtomicWrite(gtaRwAtomic* atomicObj, gtaRwStream* stream)
 {
-	if(!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_ATOMIC, GetStreamSize() - 12, gtaRwVersion, gtaRwBuild))
-		return false;
-	if(!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_STRUCT, 16, gtaRwVersion, gtaRwBuild))
-		return false;
-	if(!gtaRwStreamWrite(Stream, &frameIndex, 16))
-		return false;
-	if(internalGeometry)
+    if (!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_ATOMIC, gtaRAtomicSize(atomicObj) - 12, gtaRwVersion, gtaRwBuild))
+		return rwFALSE;
+	if(!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_STRUCT, 16, gtaRwVersion, gtaRwBuild))
+		return rwFALSE;
+    if (!gtaRwStreamWrite(stream, &atomicObj->frameIndex, 16))
+		return rwFALSE;
+	if(atomicObj->internalGeometry)
 	{
-		if(!internalGeometry->StreamWrite(Stream))
-			return false;
+        gtaRwUInt32 clumpVersion = 0;
+        if (!gtaRwGeometryStreamRead(atomicObj->internalGeometry, stream, clumpVersion))
+			return rwFALSE;
 	}
-	if(!gtaRwStreamWriteVersionedChunkHeader(Stream, rwID_EXTENSION, Extension.rights[0].GetStreamSize() + 
-		Extension.rights[1].GetStreamSize() + Extension.pipeline.GetStreamSize() + Extension.matFx.GetStreamSize(), 
+    if(!gtaRwStreamWriteVersionedChunkHeader(stream, rwID_EXTENSION, gtaRwRightsSize(&atomicObj->rights[0]) + 
+		gtaRwRightsSize(&atomicObj->rights[1]) + gtaRwAtomicPipelineSize(&atomicObj->pipeline) + gtaRwAtomicMatFXSize(&atomicObj->matFx), 
 		gtaRwVersion, gtaRwBuild))
 	{
-		return false;
+		return rwFALSE;
 	}
-	if(!Extension.rights[0].StreamWrite(Stream))
-		return false;
-	if(!Extension.rights[1].StreamWrite(Stream))
-		return false;
-	if(!Extension.matFx.StreamWrite(Stream))
-		return false;
-	if(!Extension.pipeline.StreamWrite(Stream))
-		return false;
-	return true;
+
+	if (!gtaRwRightsRead(&atomicObj->rights[0], stream))
+		return rwFALSE;
+    if (!gtaRwRightsRead(&atomicObj->rights[1], stream))
+		return rwFALSE;
+    if (!gtaRwAtomicMatFXRead(&atomicObj->matFx, stream))
+		return rwFALSE;
+    if (!gtaRwAtomicPipelineWrite(&atomicObj->pipeline, stream))
+		return rwFALSE;
+	return rwTRUE;
 }
 
-gtaRwUInt32 gtaRwAtomic::GetStreamSize()
+gtaRwUInt32 gtaRwAtomicSize(gtaRwAtomic* atomicObj)
 {
-	gtaRwUInt32 size = 52 + Extension.rights[0].GetStreamSize() + Extension.rights[1].GetStreamSize() + Extension.pipeline.GetStreamSize() +
-		Extension.matFx.GetStreamSize();
-	if(internalGeometry)
-		size += internalGeometry->GetStreamSize();
+    gtaRwUInt32 size = 52 + gtaRwRightsSize(&atomicObj->rights[0]) + gtaRwRightsSize(&atomicObj->rights[1]) + gtaRwAtomicPipelineSize(&atomicObj->pipeline) +
+                       gtaRwAtomicMatFXSize(&atomicObj->matFx);
+    if (atomicObj->internalGeometry)
+        size += gtaRwGeometryGetStreamSize(atomicObj->internalGeometry);
+
 	return size;
 }
 
-void gtaRwAtomic::Initialise(gtaRwInt32 FrameIndex, gtaRwInt32 GeometryIndex, gtaRwUInt32 Flags, gtaRwBool UsesInternalGeometry)
+void gtaRwAtomicInit(gtaRwAtomic* atomicObj, gtaRwInt32 frameIndex, gtaRwInt32 geometryIndex, gtaRwUInt32 flags, gtaRwBool usesInternalGeometry)
 {
-	memset(this, 0, sizeof(gtaRwAtomic));
-	frameIndex = FrameIndex;
-	geometryIndex = GeometryIndex;
-	flags = Flags;
-	if(UsesInternalGeometry)
+    memset(atomicObj, 0, sizeof(gtaRwAtomic));
+	frameIndex = frameIndex;
+	geometryIndex = geometryIndex;
+    flags = flags;
+	if(usesInternalGeometry)
 	{
-		internalGeometry = (gtaRwGeometry *)malloc(sizeof(gtaRwGeometry));
-		memset(internalGeometry, 0, sizeof(gtaRwGeometry));
+		atomicObj->internalGeometry = (gtaRwGeometry *)malloc(sizeof(gtaRwGeometry));
+		memset(atomicObj->internalGeometry, 0, sizeof(gtaRwGeometry));
 	}
 }
 
-void gtaRwAtomic::Destroy()
+void gtaRwAtomicDestroy(gtaRwAtomic* atomicObj)
 {
-	if(internalGeometry)
+	if(atomicObj->internalGeometry)
 	{
-		internalGeometry->Destroy();
-		free(internalGeometry);
+        gtaRwGeometryDestroy(atomicObj->internalGeometry);
+		free(atomicObj->internalGeometry);
 	}
-	Extension.matFx.Destroy();
-	Extension.rights[0].Destroy();
-	Extension.rights[1].Destroy();
-	Extension.pipeline.Destroy();
-	memset(this, 0, sizeof(gtaRwAtomic));
+    gtaRwAtomicMatFXDestroy(&atomicObj->matFx);
+    gtaRwRightsDestroy(&atomicObj->rights[0]);
+    gtaRwRightsDestroy(&atomicObj->rights[1]);
+    gtaRwAtomicPipelineDestroy(&atomicObj->pipeline);
+    memset(atomicObj, 0, sizeof(gtaRwAtomic));
 }

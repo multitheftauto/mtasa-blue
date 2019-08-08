@@ -37,6 +37,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
+        {"engineTest", EngineTest},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1328,3 +1329,37 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
 
     return 1;
 }
+
+extern "C"
+{
+    #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\gtaRwTypes.h"
+    #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\gtaRwGlobal.h"
+}
+int CLuaEngineDefs::EngineTest(lua_State* luaVM)
+{
+    //CScriptArgReader argStream(luaVM);
+
+    gtaRwClump
+    lua_pushnumber(luaVM, gtaRwVersion);
+    return 1;
+}
+
+/*
+
+    /*
+    gtaRwStreamReadReal();
+    stream
+    gtaRwClump clump;
+    clump.Initialise(1, drawable->m_pSkeleton->m_wBoneCount + 1, 1);
+    clump.frameList.frames[0].Initialise(-1, 0);
+    gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMFILENAME, rwSTREAMWRITE, dstpath);
+    bool         result = false;
+    if (stream)
+    {
+        clump.StreamWrite(stream);
+        gtaRwStreamClose(stream);
+        result = true;
+    }
+    clump.Destroy();*/
+// lua_pushboolean(luaVM, true);
+

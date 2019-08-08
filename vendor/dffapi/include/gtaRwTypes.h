@@ -7,6 +7,24 @@
 #define rwFALSE 0
 #define rwTRUE 1
 
+typedef struct gtaRwGeometryList    gtaRwGeometryList;
+typedef struct gtaRwGeometry        gtaRwGeometry;
+typedef struct gtaRwAtomic          gtaRwAtomic;
+typedef enum gtaRwStreamType        gtaRwStreamType;
+typedef enum gtaRwStreamAccessType  gtaRwStreamAccessType;
+typedef struct gtaRwStreamMemory    gtaRwStreamMemory;
+typedef union gtaRwStreamFile       gtaRwStreamFile;
+typedef struct gtaRwStreamCustom    gtaRwStreamCustom;
+typedef union gtaRwStreamUnion      gtaRwStreamUnion;
+typedef struct gtaRwStream          gtaRwStream;
+typedef struct gtaRwMemory          gtaRwMemory;
+typedef struct gtaRwChunkHeaderInfo gtaRwChunkHeaderInfo;
+typedef struct gtaRwExtension       gtaRwExtension;
+typedef struct gtaRwMesh            gtaRwMesh;
+typedef struct gtaRwGeometryBinMesh gtaRwGeometryBinMesh;
+typedef struct gtaRwBoneIndices     gtaRwBoneIndices;
+typedef struct gtaRwBoneWeights     gtaRwBoneWeights;
+
 typedef long gtaRwInt;
 typedef unsigned long gtaRwUInt;
 typedef int  gtaRwInt32;
@@ -20,25 +38,29 @@ typedef wchar_t gtaRwWideChar;
 typedef float gtaRwReal;
 typedef gtaRwInt32 gtaRwBool;
 
-typedef enum gtaRwPlatformID gtaRwPlatformID;
-typedef enum gtaRwPluginVendor gtaRwPluginVendor;
-typedef enum gtaRwCorePluginID gtaRwCorePluginID;
-typedef enum gtaRwTextureFilterMode gtaRwTextureFilterMode;
-typedef enum gtaRwTextureAddressMode gtaRwTextureAddressMode;
-typedef enum gtaRwMatFXMaterialFlags gtaRwMatFXMaterialFlags;
-typedef enum gtaRwGeometryFlag gtaRwGeometryFlag;
-typedef enum gtaRwMeshHeaderFlags gtaRwMeshHeaderFlags;
-typedef enum gtaRwRasterFormat gtaRwRasterFormat;
-typedef enum gtaRwAtomicFlag gtaRwAtomicFlag;
-typedef struct gtaRwV2d gtaRwV2d;
-typedef struct gtaRwV3d gtaRwV3d;
-typedef struct gtaRwRGBA gtaRwRGBA;
+typedef enum gtaRwPlatformID          gtaRwPlatformID;
+typedef enum gtaRwPluginVendor        gtaRwPluginVendor;
+typedef enum gtaRwCorePluginID        gtaRwCorePluginID;
+typedef enum gtaRwTextureFilterMode   gtaRwTextureFilterMode;
+typedef enum gtaRwTextureAddressMode  gtaRwTextureAddressMode;
+typedef enum gtaRwMatFXMaterialFlags  gtaRwMatFXMaterialFlags;
+typedef enum gtaRwGeometryFlag        gtaRwGeometryFlag;
+typedef enum gtaRwMeshHeaderFlags     gtaRwMeshHeaderFlags;
+typedef enum gtaRwRasterFormat        gtaRwRasterFormat;
+typedef enum gtaRwAtomicFlag          gtaRwAtomicFlag;
+typedef enum gtaGameVersionId         gtaGameVersionId;
+typedef enum gtaPlatformId            gtaPlatformId;
+typedef struct gtaRwV2d               gtaRwV2d;
+typedef struct gtaRwV3d               gtaRwV3d;
+typedef struct gtaRwRGBA              gtaRwRGBA;
 typedef struct gtaRwSurfaceProperties gtaRwSurfaceProperties;
-typedef struct gtaRwTexCoords gtaRwTexCoords;
-typedef struct gtaRwTriangle gtaRwTriangle;
-typedef struct gtaRwSphere gtaRwSphere;
-typedef struct gtaRwMorphTarget gtaRwMorphTarget;
-typedef struct gtaRwMatrix gtaRwMatrix;
+typedef struct gtaRwTexCoords         gtaRwTexCoords;
+typedef struct gtaRwTriangle          gtaRwTriangle;
+typedef struct gtaRwSphere            gtaRwSphere;
+typedef struct gtaRwMorphTarget       gtaRwMorphTarget;
+typedef struct gtaRwMatrix            gtaRwMatrix;
+typedef struct gtaRwGeometryNative    gtaRwGeometryNative;
+typedef struct gtaRwMaterialList      gtaRwMaterialList;
 
 enum gtaRwPlatformID {
     rwID_PCD3D7 = 1,
@@ -50,6 +72,37 @@ enum gtaRwPlatformID {
     rwID_SOFTRAS,
     rwID_PCD3D8,
     rwID_PCD3D9
+};
+
+enum gtaGameVersionId
+{
+    gtaGAME_GTA3,
+    gtaGAME_GTAVC,
+    gtaGAME_GTASA,
+    gtaGAME_MANHUNT
+};
+
+enum gtaPlatformId
+{
+    PLATFORM_NOTDEFINED,
+    PLATFORM_D3D8,
+    PLATFORM_D3D9,
+    PLATFORM_PS2,
+    PLATFORM_XBOX,
+    PLATFORM_OGL,
+    PLATFORM_MOBILE = PLATFORM_OGL
+};
+
+enum gtaCustomIds
+{
+    gtaID_PIPELINE = 0x253F2F3,
+    gtaID_SPECMAP = 0x253F2F6,
+    gtaID_2DEFFECT = 0x253F2F8,
+    gtaID_EXTRAVERTCOLOUR = 0x253F2F9,
+    gtaID_COLLISIONPLUGIN = 0x253F2FA,
+    gtaID_ENVMAP = 0x253F2FC,
+    gtaID_BREAKABLE = 0x253F2FD,
+    gtaID_NODENAME = 0x253F2FE,
 };
 
 enum gtaRwPluginVendor {

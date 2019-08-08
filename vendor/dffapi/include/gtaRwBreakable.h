@@ -33,7 +33,7 @@ struct gtaRwGeometryBreakable {
 };
 
 void gtaRwGeometryBreakableInit(gtaRwGeometryBreakable *breakableObj, gtaRwUInt32 vertexCount, gtaRwUInt32 faceCount, gtaRwUInt32 meshCount, gtaRwBool posnRelativeToCollision);
-void gtaRwGeometryBreakableDestroy(gtaRwGeometryBreakable *breakableObj);
+gtaRwBool gtaRwGeometryBreakableDestroy(gtaRwGeometryBreakable *breakableObj);
 gtaRwBool gtaRwGeometryBreakableWrite(gtaRwGeometryBreakable *breakableObj, gtaRwStream *stream);
 gtaRwBool gtaRwGeometryBreakableRead(gtaRwGeometryBreakable *breakableObj, gtaRwStream *stream);
 gtaRwUInt32 gtaRwGeometryBreakableSize(gtaRwGeometryBreakable *breakableObj);

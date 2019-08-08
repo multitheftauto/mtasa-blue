@@ -3,16 +3,6 @@
 // https://github.com/DK22Pac/dffapi
 //
 
-typedef enum gtaRwStreamType gtaRwStreamType;
-typedef enum gtaRwStreamAccessType gtaRwStreamAccessType;
-typedef struct gtaRwStreamMemory gtaRwStreamMemory;
-typedef union gtaRwStreamFile gtaRwStreamFile;
-typedef struct gtaRwStreamCustom gtaRwStreamCustom;
-typedef union gtaRwStreamUnion gtaRwStreamUnion;
-typedef struct gtaRwStream gtaRwStream;
-typedef struct gtaRwMemory gtaRwMemory;
-typedef struct gtaRwChunkHeaderInfo gtaRwChunkHeaderInfo;
-
 enum gtaRwStreamType {
     rwNASTREAM = 0,
     rwSTREAMFILE,

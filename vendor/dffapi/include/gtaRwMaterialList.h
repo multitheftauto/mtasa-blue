@@ -3,8 +3,6 @@
 // https://github.com/DK22Pac/dffapi
 //
 
-typedef struct gtaRwMaterialList gtaRwMaterialList;
-
 struct gtaRwMaterialList {
     gtaRwUInt32 materialReferencesCount;
     gtaRwInt32 *materialReferences;

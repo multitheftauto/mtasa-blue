@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct gtaRwGeometry gtaRwGeometry;
-
 #include "gtaRwTypes.h"
 #include "gtaRwStream.h"
 #include "gtaRwString.h"
+#include "gtaRwNative.h"
 
+#include "gtaRwSkin.h"
 #include "gtaRwUnknownExtension.h"
 #include "gtaRwAnimationDictionary.h"
 #include "gtaRwAnisot.h"
@@ -18,6 +18,7 @@ typedef struct gtaRwGeometry gtaRwGeometry;
 #include "gtaRwMaterialTexture.h"
 #include "gtaRwMatFX.h"
 #include "gtaRwPipeline.h"
+#include "gtaRwMesh.h"
 #include "gtaRwRights.h"
 #include "gtaRwAtomic.h"
 #include "gtaRwBreakable.h"
@@ -33,6 +34,8 @@ typedef struct gtaRwGeometry gtaRwGeometry;
 #include "gtaRwUVAnim.h"
 #include "gtaRwMaterial.h"
 #include "gtaRwMaterialList.h"
+#include "gtaRwGeometry.h"
+#include "gtaRwGeometryList.h"
 #include "gtaRwMemory.h"
 #include "gtaRwTextureD3D.h"
 #include "gtaRwTxd.h"
