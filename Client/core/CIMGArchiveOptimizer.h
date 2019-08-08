@@ -15,6 +15,8 @@ public:
     RwTexDictionary* ReadTextureDictionary(SDFFDescriptor* pDFFDescriptor, unsigned int& defaultTXDSizeInBytes);
     void         WriteDFF(RpClump* pClump, CIMGArchiveFile* pDFFArchiveFile);
     void         WriteTXD(RwTexDictionary* pTxdDictionary, SDFFDescriptor* pDFFDescriptor);
+    void         WriteMergedTXD();
+    void         RemoveTexturesWithNamesExistingInOutputTxdtextures(std::vector<RwTexture*>& outputTextures);
     bool         OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile);
     void         OptimizeIMGArchiveFiles(std::vector<CIMGArchiveFile>* imgArchiveFiles);
     CIMGArchiveFile* CreateOutputImgArchiveFile(unsigned int actualFileSize, unsigned int imgReadWriteOperationSizeInBytes);
@@ -47,6 +49,7 @@ private:
     std::vector<CIMGArchive> m_vecOutputIMGArchives;
 
     // n megabytes * 1024 * 1024
+    const unsigned int maxMergedAtlasTxdSizeInBytes = 2 * 1024 * 1024;
     const unsigned int imgReadWriteOperationSizeInBytes = 20 * 1024 * 1024;
 
     // Just to avoid having TXD files with the same names

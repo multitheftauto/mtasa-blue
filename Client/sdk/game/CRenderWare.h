@@ -95,6 +95,7 @@ public:
     virtual bool             IsRasterCompressed(RwRaster* raster) = 0;
     virtual RwRaster*        RwRasterCreateWithFormat(unsigned int width, unsigned int height, D3DFORMAT textureFormat, RwRasterFormat rasterFormat) = 0;
     virtual RwTexture*       RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat) = 0;
+    virtual unsigned int     GetTextureSizeInBytes(std::vector<RwTexture*>& vecTextures) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
     virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;

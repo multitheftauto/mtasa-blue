@@ -8,7 +8,6 @@ CIMGArchive::CIMGArchive()
     totalIMGFilesWritten = 0;
 }
 
-
 CIMGArchive::CIMGArchive(int padding)
 {
     totalImgFilesRead = 0;
@@ -279,6 +278,11 @@ std::vector<CIMGArchiveFile>* CIMGArchive::GetNextImgFiles(unsigned int imgReadW
 
 std::vector<CIMGArchiveFile>* CIMGArchive::GetAllImgFiles()
 {
+    if (archiveFileEntries_.size() <= 0)
+    {
+        return nullptr;
+    }
+
     fileStream.seekg(archiveFileEntries_[0].offset * 2048, std::ios::beg);
 
     unsigned int bytesToRead = 0;

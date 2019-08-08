@@ -1928,7 +1928,7 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     }
 }
 
-// This function should be only used for texture rasters created 
+// This function should be only used for texture rasters created
 // with RwTextureCreateWithFormat or RwRasterCreateWithFormat
 void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
 {
@@ -1936,9 +1936,9 @@ void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
     {
         return;
     }
-    
+
     // A simple way to check if the raster was created with RwTextureCreateWithFormat
-   // assert((pTexture->raster->cFlags & rwRASTERDONTALLOCATE) == false);
+    // assert((pTexture->raster->cFlags & rwRASTERDONTALLOCATE) == false);
 
     _rwD3D9RasterExt* rasterExt = GetRasterExt(pTexture->raster);
     if (rasterExt->texture)
@@ -1946,7 +1946,7 @@ void CRenderWareSA::DestroyTextureForcefully(RwTexture* pTexture)
         rasterExt->texture->Release();
         rasterExt->texture = NULL;
     }
-     
+
     while (pTexture->refs > 1)
     {
         RwTextureDestroy(pTexture);
@@ -1992,7 +1992,7 @@ RwTexture* CRenderWareSA::CloneRwTexture(RwTexture* pTextureToCopyFrom)
 
     RwUInt8* sourcePixels = RwRasterLock(raster, 0, 2);
     RwUInt8* destinationPixels = RwRasterLock(newRaster, 0, 1);
-    
+    
     std::printf("destinationPixels: %p | sourcePixels: %p | newRaster: %p\n", destinationPixels, sourcePixels, newRaster);
 
     memcpy(destinationPixels, sourcePixels, raster->height * raster->stride);
@@ -2184,6 +2184,22 @@ RwTexture* CRenderWareSA::RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORM
     memcpy(pConvertedTexture->mask, pTexture->mask, RW_TEXTURE_NAME_LENGTH);
 
     return pConvertedTexture;
+}
+
+unsigned int CRenderWareSA::GetTextureSizeInBytes(std::vector<RwTexture*>& vecTextures)
+{
+    auto _rwD3D9NativeTextureGetSize = (bool(__cdecl*)(unsigned int* sizeIn, RwTexture* pTexture))0x4CD360;
+    // bool _rwD3D9NativeTextureGetSize(unsigned int *sizeIn, RwTexture* pTexture)
+
+    unsigned int sumOfTextureSizes = 0;
+    for (auto& pTexture : vecTextures)
+    {
+        unsigned int textureSize = 0;
+        assert(_rwD3D9NativeTextureGetSize(&textureSize, pTexture) != false);
+        sumOfTextureSizes += textureSize;
+    }
+
+    return sumOfTextureSizes;
 }
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)

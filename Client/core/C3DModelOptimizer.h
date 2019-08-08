@@ -10,11 +10,10 @@ struct RpClump;
 class C3DModelOptimizer
 {
 public:
-    C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, bool bDontLoadTextures = false);
+    C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, int modelID, bool bDontLoadTextures = false);
     ~C3DModelOptimizer();
 
     void             SetOptimizationInfo(SOptimizedDFF* pOptimizedDFF);
-    RwTexDictionary* GetAtlasTexDictionary() { return m_pAtlasTexDictionary; }
     bool             Optimize();
     bool             CreateAtlas();
     bool             OutputClumpAsOBJ();
@@ -27,12 +26,10 @@ public:
     void             GetFaceMaterials();
     bool             GetMaterialIndex(RpGeometry* pGeometry, RpMaterial* pMaterial, size_t* materialIndex);
     uint32_t         GetBestAtlasMaxResolution();
-    bool             IsAtlasResolutionTooBig(unsigned int bestAtlasResolution);
 
     RpGeometry* CreateAtlasRpGeometry(RpGeometry* pOriginalGeometry, int numVerts, int numTriangles, int format);
 
     void GetUsedTexturesCount();
-    SOptimizedTexture* RemoveHighestSizeOptimizedTextureFromContainer();
     void               IgnoreTexture(unsigned int textureNameHash);
     bool               GetMostUsedTextureToIgnore();
     void DestroyMostUsedTexturesToIgnoreClones();
@@ -44,7 +41,7 @@ public:
     bool             SetupAtlasData();
     void             ReplaceGeometriesInClump();
     void             GetAtlasTextures(CTextureAtlas& textureAtlas);
-    RwTexDictionary* CreateTXDAtlas();
+    bool             CreateTXDAtlas(std::vector<RwTexture*>& outputTextures);
 
 private:
     bool                       m_bDontLoadTextures;
@@ -71,8 +68,8 @@ private:
     std::map<RwTexture*, RwTexture*> m_mapOfMostUsedTexturesToIgnore;
     std::vector<SOptimizedTexture*>  vecOptimizedTextures;
 
+    int              m_modelID;
     unsigned int     m_defaultTXDSizeInBytes;
-    RwTexDictionary* m_pAtlasTexDictionary;
 
     // We'll only optimize DFF models which have lots of used textures
     const unsigned int minimumModelUsedTexturesRequired = 2;

@@ -7,14 +7,14 @@
 #include "C3DModelOptimizer.h"
 #include "CAtlasSizeReducer.h"
 
-C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, bool bDontLoadTextures)
+C3DModelOptimizer::C3DModelOptimizer(RpClump* pTheClump, unsigned int defaultTXDSizeInBytes, int modelID, bool bDontLoadTextures)
 {
     m_defaultTXDSizeInBytes = defaultTXDSizeInBytes;
     pClump = pTheClump;
+    m_modelID = modelID;
     m_bDontLoadTextures = bDontLoadTextures;
     m_Atlas = nullptr;
     m_pOptimizedDFF = nullptr;
-    m_pAtlasTexDictionary = nullptr;
     pRenderWare = g_pCore->GetGame()->GetRenderWare();
     pRenderWare->GetClumpAtomicList(pClump, outAtomicList);
 }
@@ -830,14 +830,14 @@ void C3DModelOptimizer::GetAtlasTextures(CTextureAtlas& textureAtlas)
         CDXTexture& atlasTexture = textureAtlas.atlasDXTextures[i];
         printf("compressing atlas texture to DXT1: index = %u\n", i);
         assert(atlasTexture.Compress(D3DFMT_DXT1) != false);
-        sprintf(buffer, "myAtlas%d", i);
+        sprintf(buffer, "atlas_%d_%d", m_modelID, i);
         RwTexture* pTexture = atlasTexture.GetRwTexture();
         memcpy(pTexture->name, buffer, strlen(buffer) + 1);
         atlasTextures[i] = pTexture;
     }
 }
 
-RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
+bool C3DModelOptimizer::CreateTXDAtlas(std::vector<RwTexture*>& outputTextures)
 {
     xatlas::PackOptions packOptions;
     packOptions.padding = 1;
@@ -854,7 +854,7 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
         m_Atlas = xatlas::Create();
         if (!AddMeshesToXatlas())
         {
-            return nullptr;
+            return false;
         }
 
         printf("Attempt #%u: finding atlas size where atlas can be within a single image\n", atlasFindingAttempts);
@@ -869,15 +869,20 @@ RwTexDictionary* C3DModelOptimizer::CreateTXDAtlas()
 
     GetAtlasTextures(textureAtlas);
 
-    RwTexDictionary* pAtlasTexDictionary = pRenderWare->CreateTextureDictionary(atlasTextures);
+    //RwTexDictionary* pAtlasTexDictionary = pRenderWare->CreateTextureDictionary(atlasTextures);
+
+    outputTextures.reserve(atlasTextures.size() + m_mapOfMostUsedTexturesToIgnore.size());
+    for (auto& rwTexture : atlasTextures)
+    {
+        outputTextures.emplace_back(rwTexture);
+    }
 
     for (auto& it : m_mapOfMostUsedTexturesToIgnore)
     {
-        pRenderWare->AddTextureToDictionary(pAtlasTexDictionary, it.second);
+        outputTextures.emplace_back(it.second);
+        //pRenderWare->AddTextureToDictionary(pAtlasTexDictionary, it.second);
     }
 
     ReplaceGeometriesInClump();
-
-    m_pAtlasTexDictionary = pAtlasTexDictionary;
-    return pAtlasTexDictionary;
+    return true;
 }

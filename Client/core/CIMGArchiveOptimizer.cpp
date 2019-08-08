@@ -13,6 +13,12 @@ guiLabelSetHorizontalAlign(GUIEditor.label[1], "left", true)
 GUIEditor.button[1] = guiCreateButton(112, 108, 125, 47, "GENERATE", false, GUIEditor.window[1])
 */
 
+static unsigned int                 g_outputTxdTexturesSizeInBytes = 0;
+static std::vector<RwTexture*>      g_outputTxdTextures;
+static std::vector<SDFFDescriptor*> g_dffDescriptorsUsingTxd;
+
+static unsigned int gTotalModelsToOptimize = 0;
+
 const SString CIMGArchiveOptimizer::m_outputFolder = "OptimizedFiles";
 const SString CIMGArchiveOptimizer::m_defaultDATFilePath = m_outputFolder + "\\DAT\\default.dat";
 const SString CIMGArchiveOptimizer::m_gtaDATFilePath = m_outputFolder + "\\DAT\\gta.dat";
@@ -24,6 +30,9 @@ CIMGArchiveOptimizer::CIMGArchiveOptimizer()
     m_pRenderWare = g_pCore->GetGame()->GetRenderWare();
     m_imgFilesWrittenCount = 0;
     m_txdNameUniqueNumericSuffix = 0;
+
+    g_outputTxdTextures.reserve(60);
+    g_dffDescriptorsUsingTxd.reserve(30);
 }
 
 void CIMGArchiveOptimizer::GetNextAtlasTxdName(SString& atlasTxdName)
@@ -210,6 +219,77 @@ void CIMGArchiveOptimizer::WriteTXD(RwTexDictionary* pTxdDictionary, SDFFDescrip
     // m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
 }
 
+void CIMGArchiveOptimizer::WriteMergedTXD()
+{
+    auto RwTexDictionaryStreamGetSize = (unsigned int(__cdecl*)(RwTexDictionary * dict))0x804930;
+
+    SString strPathOfGeneratedDff = "dffs\\";
+
+    SString strTXDFileName;
+    GetNextAtlasTxdName(strTXDFileName);
+    const char*  pTXDNameWithoutExtension = strTXDFileName.c_str();
+    unsigned int txdNameWithoutExtensionSizeInBytes = strlen(pTXDNameWithoutExtension) + 1;
+    for (auto& pDFFDescriptor : g_dffDescriptorsUsingTxd)
+    {
+        memcpy(pDFFDescriptor->m_pModelObject->txdName, pTXDNameWithoutExtension, txdNameWithoutExtensionSizeInBytes);
+    }
+
+    strTXDFileName += ".txd";
+
+    const char* pTXDName = strTXDFileName.c_str();
+
+    RwTexDictionary* pTxdDictionary = m_pRenderWare->CreateTextureDictionary(g_outputTxdTextures);
+    unsigned int     txdSize = RwTexDictionaryStreamGetSize(pTxdDictionary);
+
+    // there's still an issue with size of empty extension headers of 12 bytes for TXD
+    txdSize += 24;
+
+    DWORD            actualFileSize = GetActualFileSize(txdSize);
+    CIMGArchiveFile* txdArchiveFile = CreateOutputImgArchiveFile(actualFileSize, imgReadWriteOperationSizeInBytes);
+    memcpy(txdArchiveFile->fileEntry.fileName, pTXDName, strlen(pTXDName) + 1);
+    txdArchiveFile->actualFileSize = actualFileSize;
+    txdArchiveFile->fileEntry.usSize = txdArchiveFile->actualFileSize / 2048;
+    txdArchiveFile->fileByteBuffer.SetSize(txdArchiveFile->actualFileSize);
+    void* pTXDData = txdArchiveFile->fileByteBuffer.GetData();
+    m_pRenderWare->WriteTXD(pTXDData, txdArchiveFile->actualFileSize, pTxdDictionary);
+
+    // Remove this line later
+    // m_pRenderWare->WriteTXD(strPathOfGeneratedDff + pTXDName, pTxdDictionary);
+
+    m_pRenderWare->DestroyTXDForcefully(pTxdDictionary, true);
+
+    g_dffDescriptorsUsingTxd.clear();
+    g_outputTxdTextures.clear();
+    g_outputTxdTexturesSizeInBytes = 0;
+}
+
+void CIMGArchiveOptimizer::RemoveTexturesWithNamesExistingInOutputTxdtextures(std::vector<RwTexture*>& outputTextures)
+{
+    auto it = outputTextures.begin();
+    while (it != outputTextures.end())
+    {
+        bool         bTextureNameFound = false;
+        unsigned int textureNameHash = HashString((*it)->name);
+        for (auto& pOutputTexture : g_outputTxdTextures)
+        {
+            if (textureNameHash == HashString(pOutputTexture->name))
+            {
+                bTextureNameFound = true;
+                break;
+            }
+        }
+
+        if (bTextureNameFound)
+        {
+            it = outputTextures.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
 bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
 {
     bool           bDFFOptimized = false;
@@ -226,12 +306,21 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     }
 
     // REMOVE THIS LATER
-    static unsigned int OptimizedDFFCount = 0;
-    if (OptimizedDFFCount >= 100)
-    {
-        return bDFFOptimized;
-    }
-    OptimizedDFFCount++;
+    /*
+   static unsigned int dffToSkipCount = 0;
+   if (dffToSkipCount < 2600)
+   {
+       dffToSkipCount++;
+       return bDFFOptimized;
+   }
+
+   static unsigned int OptimizedDFFCount = 0;
+   if (OptimizedDFFCount >= 1500)
+   {
+       return bDFFOptimized;
+   }
+   OptimizedDFFCount++;
+   */
     // REMOVE END
 
     int modelID = pDFFDescriptor->GetModelID();
@@ -265,7 +354,7 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     {
         // This should be set to false when generating atlases
         bool               bDontLoadTextures = false;
-        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, defaultTXDSizeInBytes, bDontLoadTextures);
+        C3DModelOptimizer* modelOptimizer = new C3DModelOptimizer(pClump, defaultTXDSizeInBytes, modelID, bDontLoadTextures);
         modelOptimizer->SetOptimizationInfo(pOptimizedDFF);
         // modelOptimizer->OutputClumpAsOBJ();
         if (!modelOptimizer->Optimize())
@@ -275,16 +364,40 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
         else
         {
             // /*
-            RwTexDictionary* pAtlasTxdDictionary = modelOptimizer->CreateTXDAtlas();
-            assert(pAtlasTxdDictionary != nullptr);
+            std::vector<RwTexture*> outputTextures;
+            assert(modelOptimizer->CreateTXDAtlas(outputTextures) != false);
 
             // SOptimizedDFF& dffModelOptimizationInfo = m_dffOptimizationInfo.InsertDFF(pDFFArchiveFile->fileEntry.fileName);
             // assert(modelOptimizer->GetModelOptimizationInfo(dffModelOptimizationInfo) != false);
 
             WriteDFF(pClump, pDFFArchiveFile);
-            WriteTXD(pAtlasTxdDictionary, pDFFDescriptor);
 
-            m_pRenderWare->DestroyTXDForcefully(pAtlasTxdDictionary, true);
+            unsigned int texturesSizeInBytes = m_pRenderWare->GetTextureSizeInBytes(outputTextures);
+            if (texturesSizeInBytes >= maxMergedAtlasTxdSizeInBytes)
+            {
+                RwTexDictionary* pAtlasTxdDictionary = m_pRenderWare->CreateTextureDictionary(outputTextures);
+                WriteTXD(pAtlasTxdDictionary, pDFFDescriptor);
+                m_pRenderWare->DestroyTXDForcefully(pAtlasTxdDictionary, true);
+            }
+            else
+            {
+                g_outputTxdTexturesSizeInBytes += texturesSizeInBytes;
+                g_dffDescriptorsUsingTxd.emplace_back(pDFFDescriptor);
+                RemoveTexturesWithNamesExistingInOutputTxdtextures(outputTextures);
+
+                for (auto& pTexture : outputTextures)
+                {
+                    auto RwTexDictionaryRemoveTexture = (RwTexture * (__cdecl*)(RwTexture * texture))0x07F39C0;
+                    RwTexDictionaryRemoveTexture(pTexture);
+                    g_outputTxdTextures.emplace_back(pTexture);
+                }
+
+                if (g_outputTxdTexturesSizeInBytes >= maxMergedAtlasTxdSizeInBytes)
+                {
+                    WriteMergedTXD();
+                }
+            }
+
             bDFFOptimized = true;
             //*/
         }
@@ -305,8 +418,6 @@ bool CIMGArchiveOptimizer::OptimizeDFFFile(CIMGArchiveFile* pDFFArchiveFile)
     m_pRenderWare->TxdForceUnload(0, true, pTxdDictionary);
     return bDFFOptimized;
 }
-
-static unsigned int gTotalModelsToOptimize = 0;
 
 void CIMGArchiveOptimizer::OptimizeIMGArchiveFiles(std::vector<CIMGArchiveFile>* imgArchiveFiles)
 {
@@ -550,7 +661,7 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
 {
     std::printf("Generate button pressed\n");
 
-    if (!m_gt3IMgArchive.CreateTheFile("models\\gta3.img", IMG_FILE_READ))
+    if (!m_gt3IMgArchive.CreateTheFile("models\\original_gta3\\gta3.img", IMG_FILE_READ))
     {
         std::printf("loading gta3.img failed\n");
         return true;
@@ -606,6 +717,11 @@ bool CIMGArchiveOptimizer::OnImgGenerateClick(CGUIElement* pElement)
         // REMOVE THIS LATER
         // break;
         // REMOVE END
+    }
+
+    if (g_outputTxdTexturesSizeInBytes > 0)
+    {
+        WriteMergedTXD();
     }
 
     // Flush the last IMG file if any data is there.

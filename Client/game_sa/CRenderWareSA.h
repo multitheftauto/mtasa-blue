@@ -94,6 +94,9 @@ public:
     RwRaster*  RwRasterCreateWithFormat(unsigned int width, unsigned int height, D3DFORMAT textureFormat, RwRasterFormat rasterFormat);
     RwTexture* RwTextureCreateWithFormat(RwTexture* pTexture, D3DFORMAT textureFormat, RwRasterFormat rasterFormat);
 
+
+    unsigned int GetTextureSizeInBytes(std::vector<RwTexture*>& vecTextures);
+
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const CBuffer& fileData);
 
