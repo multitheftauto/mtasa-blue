@@ -309,12 +309,13 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
+                bool    bIsRawData = CIFPEngine::IsIFPData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
                 {
-                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
+                    std::shared_ptr<CClientIFP> pIFP =
+                        CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
                     if (pIFP != nullptr)
                     {
                         // Return the IFP element
@@ -1330,62 +1331,35 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
     return 1;
 }
 
-extern "C"
-{
-   #include "D:\mtablue\mtasa-blue\vendor\dffapi\include\dffApiExports.h"
-}
-
 int CLuaEngineDefs::EngineTest(lua_State* luaVM)
 {
-    //CScriptArgReader argStream(luaVM);
+    // CScriptArgReader argStream(luaVM);
+    const char* result;
+    try
+    {
+        gtaRwClump clump;
+        clump.Initialise(1, 1, 1);
+        clump.frameList.frames[0].Initialise(-1, 0);
+        char name[20];
+        strcpy(name, "engineTest");
+        clump.frameList.frames[0].Extension.nodeName.Initialise(name);
 
-    gtaRwClump clump;
-    gtaRwClumpInitialise(&clump, 1, 1, 1);
-    gtaRwFrameInitIdentity(&clump.frameList.frames[0], -1, 0);
-    char name[20];
-    strcpy(name, "test");
+        gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMMEMORY, rwSTREAMWRITE, NULL);
+        if (stream)
+        {
+            clump.StreamWrite(stream);
+            clump.Destroy();
+            RwMemory memory;
 
-    gtaRwAtomicInit(clump.atomics, 4, 1, 0, rwTRUE);
-    gtaRwGeometryListInitialise(&clump.geometryList, 1);
-    gtaRwGeometryInitialise(&clump.geometryList.geometries[0], 0, 0, 1, 0, 0, 0, 0, 0, 0);
-    gtaRwMaterialListInit(&clump.atomics->internalGeometry->matList, 1, 1);
-    gtaRwMaterialInit(&clump.atomics->internalGeometry->matList.materials[0], 1, 1, 1, 1, rwFALSE, 1, 1);
-    gtaRwMaterialTextureInit(&clump.atomics->internalGeometry->matList.materials[0].texture, gtaRwTextureFilterMode::rwFILTERNEAREST,
-                             gtaRwTextureAddressMode::rwTEXTUREADDRESSNATEXTUREADDRESS, gtaRwTextureAddressMode::rwTEXTUREADDRESSWRAP, 0, "textureName",
-                             "maskName");
+            gtaRwStreamClose(stream, (void*)&memory);
+            lua_pushlstring(luaVM, (const char*)memory.start, memory.length);
+            return 1;
+        }
+    }
+    catch (void* e)
+    {
+    }
 
-    gtaRwMaterialNormalMapInit(&clump.atomics->internalGeometry->matList.materials[0].normalMap, rwFALSE, rwFALSE, 0, rwFALSE);
-
-    clump.atomics->numRights = 2;
-    gtaRwRightsInit(&clump.atomics->rights[0], 0, 0);
-    gtaRwRightsInit(&clump.atomics->rights[1], 0, 0);
-    gtaRwFrameNodeNameInit(&clump.frameList.frames[0].nodeName, name);
-
-    gtaRwStream* stream = gtaRwStreamOpen(gtaRwStreamType::rwSTREAMFILENAME, gtaRwStreamAccessType::rwSTREAMWRITE, "kljtilkjasf.dff");
-    gtaRwClumpStreamWrite(&clump, stream);
-    gtaRwStreamClose(stream, NULL);
-    gtaRwClumpDestroy(&clump);
-    lua_pushstring(luaVM, "Hi");
+    lua_pushstring(luaVM, "empty");
     return 1;
 }
-
-/*
-Working example:
-	gtaRwClump clump;
-	clump.Initialise(1, 1, 1);
-	clump.frameList.frames[0].Initialise(-1, 0);
-	char name[20];
-	strcpy(name, "test");
-	clump.frameList.frames[0].Extension.nodeName.Initialise(name);
-
-	gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMFILENAME, rwSTREAMWRITE, "test.dff");
-	bool result = false;
-	if (stream)
-	{
-		clump.StreamWrite(stream);
-		gtaRwStreamClose(stream);
-		result = true;
-	}
-	clump.Destroy();
-    */
-

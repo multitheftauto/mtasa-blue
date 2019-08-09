@@ -157,3 +157,8 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
+
+// dffapi
+#include "dffapi\Clump.h"
+#include "dffapi\Memory.h"
+#include "dffapi\Geometry.h"
