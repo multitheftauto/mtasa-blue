@@ -17,13 +17,13 @@
 #include <stdio.h>
 #endif
 
-CDynamicLibrary::CDynamicLibrary(void)
+CDynamicLibrary::CDynamicLibrary()
 {
     // Init
     m_hModule = 0;
 }
 
-CDynamicLibrary::~CDynamicLibrary(void)
+CDynamicLibrary::~CDynamicLibrary()
 {
     // Make sure we unload
     Unload();
@@ -68,7 +68,7 @@ bool CDynamicLibrary::Load(const char* szFilename)
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
 
         // Display the error message and exit the process
-        printf("Loading library %s failed; %s\n", szFilename, lpMsgBuf);
+        printf("Loading library %s failed; %s\n", szFilename, static_cast<const char*>(lpMsgBuf));
 
         // Free the error message buffer
         LocalFree(lpMsgBuf);
@@ -97,7 +97,7 @@ bool CDynamicLibrary::Load(const char* szFilename)
     return m_hModule != 0;
 }
 
-void CDynamicLibrary::Unload(void)
+void CDynamicLibrary::Unload()
 {
     // Got a module?
     if (m_hModule != 0)
@@ -113,7 +113,7 @@ void CDynamicLibrary::Unload(void)
     }
 }
 
-bool CDynamicLibrary::IsLoaded(void)
+bool CDynamicLibrary::IsLoaded()
 {
     return m_hModule != 0;
 }

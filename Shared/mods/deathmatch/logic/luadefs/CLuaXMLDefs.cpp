@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-void CLuaXMLDefs::LoadFunctions(void)
+void CLuaXMLDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"xmlCreateFile", xmlCreateFile},

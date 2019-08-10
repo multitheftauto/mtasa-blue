@@ -63,7 +63,7 @@ CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool
     }
 }
 
-CGUIGridList_Impl::~CGUIGridList_Impl(void)
+CGUIGridList_Impl::~CGUIGridList_Impl()
 {
     Clear();
     DestroyElement();
@@ -74,7 +74,7 @@ void CGUIGridList_Impl::SetSortingEnabled(bool bEnabled)
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setUserSortControlEnabled(bEnabled);
 }
 
-bool CGUIGridList_Impl::IsSortingEnabled(void)
+bool CGUIGridList_Impl::IsSortingEnabled()
 {
     return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->isUserSortControlEnabled();
 }
@@ -153,7 +153,7 @@ void CGUIGridList_Impl::SetVerticalScrollBar(bool bEnabled)
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setShowVertScrollbar(bEnabled);
 }
 
-int CGUIGridList_Impl::GetRowCount(void)
+int CGUIGridList_Impl::GetRowCount()
 {
     try
     {
@@ -165,7 +165,7 @@ int CGUIGridList_Impl::GetRowCount(void)
     }
 }
 
-int CGUIGridList_Impl::GetColumnCount(void)
+int CGUIGridList_Impl::GetColumnCount()
 {
     try
     {
@@ -177,7 +177,7 @@ int CGUIGridList_Impl::GetColumnCount(void)
     }
 }
 
-void CGUIGridList_Impl::ForceUpdate(void)
+void CGUIGridList_Impl::ForceUpdate()
 {
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->forceUpdate();
 }
@@ -256,7 +256,7 @@ void CGUIGridList_Impl::AutoSizeColumn(unsigned int hColumn)
     }
 }
 
-void CGUIGridList_Impl::Clear(void)
+void CGUIGridList_Impl::Clear()
 {
     try
     {
@@ -554,7 +554,7 @@ void CGUIGridList_Impl::SetItemImage(int iRow, int hColumn, CGUIStaticImage* pIm
     }
 }
 
-float CGUIGridList_Impl::GetHorizontalScrollPosition(void)
+float CGUIGridList_Impl::GetHorizontalScrollPosition()
 {
     try
     {
@@ -568,7 +568,7 @@ float CGUIGridList_Impl::GetHorizontalScrollPosition(void)
     return 0.0f;
 }
 
-float CGUIGridList_Impl::GetVerticalScrollPosition(void)
+float CGUIGridList_Impl::GetVerticalScrollPosition()
 {
     try
     {
@@ -624,7 +624,7 @@ int CGUIGridList_Impl::GetColumnIndex(int hColumn)
     return hColumn - 1;
 }
 
-int CGUIGridList_Impl::GetSelectedCount(void)
+int CGUIGridList_Impl::GetSelectedCount()
 {
     return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSelectedCount();
 }
@@ -672,7 +672,7 @@ void CGUIGridList_Impl::SetSelectionMode(SelectionMode mode)
     }
 }
 
-SelectionMode CGUIGridList_Impl::GetSelectionMode(void)
+SelectionMode CGUIGridList_Impl::GetSelectionMode()
 {
     return (SelectionMode)reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSelectionMode();
 }
@@ -682,7 +682,7 @@ void CGUIGridList_Impl::GetVisibleRowRange(int& iFirst, int& iLast)
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getVisibleRowRange(iFirst, iLast);
 }
 
-CGUIListItem* CGUIGridList_Impl::GetSelectedItem(void)
+CGUIListItem* CGUIGridList_Impl::GetSelectedItem()
 {
     return GetListItem(reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getFirstSelectedItem());
 }
@@ -695,7 +695,7 @@ CGUIListItem* CGUIGridList_Impl::GetNextSelectedItem(CGUIListItem* pItem)
         return GetListItem(reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getFirstSelectedItem());
 }
 
-int CGUIGridList_Impl::GetSelectedItemRow(void)
+int CGUIGridList_Impl::GetSelectedItemRow()
 {
     CEGUI::ListboxItem* pItem = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getFirstSelectedItem();
     if (pItem)
@@ -710,7 +710,7 @@ int CGUIGridList_Impl::GetSelectedItemRow(void)
     return -1;
 }
 
-int CGUIGridList_Impl::GetSelectedItemColumn(void)
+int CGUIGridList_Impl::GetSelectedItemColumn()
 {
     CEGUI::ListboxItem* pItem = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getFirstSelectedItem();
     if (pItem)
@@ -794,7 +794,7 @@ bool CGUIGridList_Impl::Event_OnSortColumn(const CEGUI::EventArgs& e)
     return true;
 }
 
-unsigned int CGUIGridList_Impl::GetUniqueHandle(void)
+unsigned int CGUIGridList_Impl::GetUniqueHandle()
 {
     return ++m_hUniqueHandle;
 }

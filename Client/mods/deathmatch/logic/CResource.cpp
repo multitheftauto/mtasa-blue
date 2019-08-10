@@ -21,7 +21,7 @@ extern CClientGame* g_pClientGame;
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                     const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP)
+                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;
@@ -86,7 +86,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     }
 }
 
-CResource::~CResource(void)
+CResource::~CResource()
 {
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
     // Make sure we don't force the cursor on
@@ -223,12 +223,12 @@ bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& 
     return false;
 }
 
-bool CResource::CanBeLoaded(void)
+bool CResource::CanBeLoaded()
 {
     return !IsActive() && !IsWaitingForInitialDownloads();
 }
 
-bool CResource::IsWaitingForInitialDownloads(void)
+bool CResource::IsWaitingForInitialDownloads()
 {
     for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
         if ((*iter)->IsWaitingForDownload())
@@ -241,7 +241,7 @@ bool CResource::IsWaitingForInitialDownloads(void)
     return false;
 }
 
-void CResource::Load(void)
+void CResource::Load()
 {
     dassert(CanBeLoaded());
     m_pRootEntity = g_pClientGame->GetRootEntity();
@@ -345,7 +345,7 @@ void CResource::Load(void)
         assert(0);
 }
 
-void CResource::Stop(void)
+void CResource::Stop()
 {
     m_bStarting = false;
     m_bStopping = true;
@@ -354,7 +354,7 @@ void CResource::Stop(void)
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
 }
 
-SString CResource::GetState(void)
+SString CResource::GetState()
 {
     if (m_bStarting)
         return "starting";
@@ -366,7 +366,7 @@ SString CResource::GetState(void)
         return "loaded";
 }
 
-void CResource::DeleteClientChildren(void)
+void CResource::DeleteClientChildren()
 {
     // Run this on our resource entity if we have one
     if (m_pResourceEntity)

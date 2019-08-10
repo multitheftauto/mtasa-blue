@@ -22,14 +22,14 @@ class CPrimitiveBatcher
 public:
     ZERO_ON_NEW
     CPrimitiveBatcher();
-    ~CPrimitiveBatcher(void);
+    ~CPrimitiveBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
     void SetDeviceStates();
-    void Flush(void);
+    void Flush();
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iSize, const void* pDataAddr, size_t iVertexStride);
-    void ClearQueue(void);
+    void ClearQueue();
     void AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices);
 
 protected:

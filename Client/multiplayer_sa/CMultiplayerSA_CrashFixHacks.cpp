@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 #include "../game_sa/CTasksSA.h"
+#include "../game_sa/CAnimBlendSequenceSA.h"
+#include "../game_sa/CAnimBlendHierarchySA.h"
+#include "../game_sa/CAnimBlendAssocGroupSA.h"
+
+extern CCoreInterface* g_pCore;
 
 void CPlayerPed__ProcessControl_Abort();
 
@@ -1088,7 +1093,7 @@ void OnMY_CVehicle_AddUpgrade_Pre(CVehicleSAInterface* pVehicle, int iUpgradeId,
     SetApplicationSetting("diagnostics", "gta-upgrade-fail", argMap.ToString());
 }
 
-void OnMY_CVehicle_AddUpgrade_Post(void)
+void OnMY_CVehicle_AddUpgrade_Post()
 {
     SetApplicationSetting("diagnostics", "gta-upgrade-fail", "");
 }
@@ -1189,12 +1194,12 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Render_Pre(void)
+void OnMY_CVolumetricShadowMgr_Render_Pre()
 {
     OnEnterCrashZone(1);
 }
 
-void OnMY_CVolumetricShadowMgr_Render_Post(void)
+void OnMY_CVolumetricShadowMgr_Render_Post()
 {
     OnEnterCrashZone(0);
 }
@@ -1235,12 +1240,12 @@ inner:
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Update_Pre(void)
+void OnMY_CVolumetricShadowMgr_Update_Pre()
 {
     OnEnterCrashZone(2);
 }
 
-void OnMY_CVolumetricShadowMgr_Update_Post(void)
+void OnMY_CVolumetricShadowMgr_Update_Post()
 {
     OnEnterCrashZone(0);
 }
@@ -1451,10 +1456,179 @@ cont:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CAnimBlendNode_GetCurrentTranslation
+//
+// Check for corrupt endKeyFrameIndex
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
+{
+    // Crash will occur at offset 0xCFCD6
+    OnCrashAverted(32);
+    CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
+    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
+    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+
+    bool                           bSequenceExistsInHierarchy = false;
+    CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
+    for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
+    {
+        if (pAnimHierSequence == pAnimSequence)
+        {
+            bSequenceExistsInHierarchy = true;
+            break;
+        }
+        pAnimHierSequence++;
+    }
+
+    LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
+             SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
+                pAnimSeq = %p | BoneID = %d | BoneHash = %u | \
+                pAnimHier = %p | HierHash = %u | SequenceExistsInHierarchy: %s",
+                     pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID, pAnimSequence, pAnimSequence->m_boneId,
+                     pAnimSequence->m_hash, pAnimHierarchy, pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"),
+             588);
+}
+
+// Hook info
+#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation                 0x4CFCB5
+#define HOOKSIZE_CAnimBlendNode_GetCurrentTranslation                6
+DWORD RETURN_CAnimBlendNode_GetCurrentTranslation = 0x4CFCBB;
+void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
+{
+    _asm
+    {
+        // if end key frame index is greater than 10,000 then return
+        cmp     eax, 0x2710
+        jg      altcode
+
+        push    ebx
+        mov     bl, [edx + 4]
+        shr     bl, 1
+        jmp     RETURN_CAnimBlendNode_GetCurrentTranslation
+
+        // do alternate code
+        altcode :
+        pushad
+        push    ebp // this
+        call    OnMY_CAnimBlendNode_GetCurrentTranslation
+        add     esp, 4 * 1
+        popad
+
+        pop     edi
+        pop     esi
+        pop     ebp
+        add     esp, 18h
+        retn    8
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAnimManager_CreateAnimAssocGroups
+//
+// Protect `pAssociationsArray` member of specific anim groups (CAnimBlendAssocGroupSAInterface)
+// from corruption by placing a WRITE operation breakpoint on its address.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl OnMY_CAnimManager_CreateAnimAssocGroups_Protect(CAnimBlendAssocGroupSAInterface* pGroupInterface)
+{
+    static std::set<unsigned int> setOfGroupBreakpointsAdded;
+
+    void* ppAssociationsArray = reinterpret_cast<void*>(&pGroupInterface->pAssociationsArray);
+    for (auto groupID : CMultiplayerSA::arrGroupsToProtect)
+    {
+        if (pGroupInterface->groupID == groupID && !MapContains(setOfGroupBreakpointsAdded, groupID))
+        {
+            HANDLE mainThread = OpenThread(THREAD_ALL_ACCESS, TRUE, SharedUtil::GetMainThreadId());
+            assert(mainThread != NULL);
+
+            SetHardwareBreakpoint(mainThread, HWBRK_TYPE_WRITE, HWBRK_SIZE_4, ppAssociationsArray);
+
+            CloseHandle(mainThread);
+
+            setOfGroupBreakpointsAdded.insert(groupID);
+
+            LogEvent(511, "Breakpoint", "Hardware Breakpoint set on WRITE access",
+                     SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", groupID, pGroupInterface,
+                             ppAssociationsArray, pGroupInterface->pAssociationsArray),
+                     511);
+            return;
+        }
+    }
+
+    LogEvent(512, "GroupLoaded", "Anim group loaded",
+             SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", pGroupInterface->groupID, pGroupInterface,
+                     ppAssociationsArray, pGroupInterface->pAssociationsArray),
+             512);
+}
+
+// Hook info
+#define HOOKPOS_CAnimManager_CreateAnimAssocGroups_Protect                0x4D3DAD
+#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups_Protect               6
+DWORD RETURN_CAnimManager_CreateAnimAssocGroups_Protect = 0x4D3DB3;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups_Protect()
+{
+    _asm
+    {
+        pushad
+        add     eax, esi
+        push    eax
+        call    OnMY_CAnimManager_CreateAnimAssocGroups_Protect
+        add     esp, 0x4
+        popad
+
+        mov     ecx, [esi + eax + 8]
+        xor     edi, edi
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Protect
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CStreaming_AreAnimsUsedByRequestedModels
+//
+// GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
+// We will return true to disable unloading.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
+{
+    // GTA SA possibly cannot have more than 200 IFP blocks since that's the limit
+    const int maximumIFPBlocks = 200;
+    if (modelID < 0 || modelID > maximumIFPBlocks)
+    {
+        return false;
+    }
+
+    std::unique_ptr<CAnimBlock> pInternalBlock = g_pCore->GetGame()->GetAnimManager()->GetAnimationBlock(modelID);
+    if (!pInternalBlock->IsLoaded())
+    {
+        return false;
+    }
+    return true;
+}
+
+// Hook info
+#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD5
+#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
+void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
+{
+    _asm
+    {
+        push    [esp + 4]
+        call    OnMY_CStreaming_AreAnimsUsedByRequestedModels
+        add     esp, 0x4
+        retn
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_CrashFixHacks(void)
+void CMultiplayerSA::InitHooks_CrashFixHacks()
 {
     EZHookInstall(CrashFix_Misc1);
     EZHookInstall(CrashFix_Misc2);
@@ -1493,6 +1667,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks(void)
     EZHookInstallChecked(CVolumetricShadowMgr_Render);
     EZHookInstallChecked(CVolumetricShadowMgr_Update);
     EZHookInstallChecked(CAnimManager_CreateAnimAssocGroups);
+    EZHookInstall(CAnimBlendNode_GetCurrentTranslation);
+    EZHookInstall(CAnimManager_CreateAnimAssocGroups_Protect);
+    EZHookInstall(CStreaming_AreAnimsUsedByRequestedModels);
     EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);

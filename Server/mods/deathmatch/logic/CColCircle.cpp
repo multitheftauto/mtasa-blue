@@ -40,7 +40,7 @@ bool CColCircle::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColCircle::GetWorldBoundingSphere(void)
+CSphere CColCircle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

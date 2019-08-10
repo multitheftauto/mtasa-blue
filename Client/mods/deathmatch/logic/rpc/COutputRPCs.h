@@ -16,7 +16,7 @@
 class COutputRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(ToggleDebugger);
 };

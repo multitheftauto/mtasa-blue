@@ -102,45 +102,12 @@ bool CResource::Load()
 
     if (m_bResourceIsZip)
     {
-        // See if zip file is actually a zip file
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-        if (!m_zipfile)
+        if (!UnzipResource())
         {
             // Unregister EHS stuff
             g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
 
-            // Show error
-            m_strFailureReason =
-                SString("Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str(), m_strResourceName.c_str());
-            CLogger::ErrorPrintf(m_strFailureReason);
             return false;
-        }
-
-        // Close the zip file
-        unzClose(m_zipfile);
-        m_zipfile = nullptr;
-
-        // See if the dir already exists
-        bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
-
-        // If the folder doesn't exist, create it
-        if (!bDirExists)
-        {
-            // If we're using a zip file, we need a temp directory for extracting
-            // 17 = already exists (on windows)
-
-            if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
-            {
-                // Unregister EHS stuff
-                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-
-                // Show error
-                m_strFailureReason =
-                    SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
-                            m_strResourceCachePath.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
-            }
         }
     }
 
@@ -174,19 +141,21 @@ bool CResource::Load()
                 m_pNodeSettings = pNodeSettings->CopyNode(nullptr);
 
             // Find the client and server version requirements
-            m_strMinClientReqFromMetaXml = "";
-            m_strMinServerReqFromMetaXml = "";
+            m_strMinClientFromMetaXml = "";
+            m_strMinServerFromMetaXml = "";
             CXMLNode* pNodeMinMtaVersion = pRoot->FindSubNode("min_mta_version", 0);
 
-            if (pNodeMinMtaVersion && MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE)
+            if (pNodeMinMtaVersion)
             {
                 if (CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes().Find("server"))
-                    m_strMinServerReqFromMetaXml = pAttr->GetValue();
+                    m_strMinServerFromMetaXml = pAttr->GetValue();
                 if (CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes().Find("client"))
-                    m_strMinClientReqFromMetaXml = pAttr->GetValue();
+                    m_strMinClientFromMetaXml = pAttr->GetValue();
                 if (CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes().Find("both"))
-                    m_strMinServerReqFromMetaXml = m_strMinClientReqFromMetaXml = pAttr->GetValue();
+                    m_strMinServerFromMetaXml = m_strMinClientFromMetaXml = pAttr->GetValue();
             }
+            m_strMinServerRequirement = m_strMinServerFromMetaXml;
+            m_strMinClientRequirement = m_strMinClientFromMetaXml;
 
             // Find the acl requets
             CXMLNode* pNodeAclRequest = pRoot->FindSubNode("aclrequest", 0);
@@ -499,37 +468,30 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
     }
 }
 
-bool CResource::GenerateChecksums()
+std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
 {
-    bool bOk = true;
-
-    for (CResourceFile* pResourceFile : m_ResourceFiles)
-    {
+    return SharedUtil::async([pResourceFile, this] { 
         SString strPath;
 
         if (!GetFilePath(pResourceFile->GetName(), strPath))
-            continue;
+            return SString();
 
         std::vector<char> buffer;
         FileLoad(strPath, buffer);
         uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? &buffer[0] : "";
-
-        CChecksum checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(checksum);
+        const char* pFileContents = uiFileSize ? buffer.data() : "";
+        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+        pResourceFile->SetLastChecksum(Checksum);
         pResourceFile->SetLastFileSize(uiFileSize);
 
         // Check if file is blocked
         char szHashResult[33];
-        CMD5Hasher::ConvertToHex(checksum.md5, szHashResult);
+        CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
         SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
 
         if (!strBlockReason.empty())
         {
-            m_strFailureReason = SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-            CLogger::LogPrintf(SString("ERROR: Resource '%s' %s\n", GetName().c_str(), *m_strFailureReason));
-            bOk = false;
-            continue;
+            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
         }
 
         // Copy file to http holding directory
@@ -544,20 +506,16 @@ bool CResource::GenerateChecksums()
                 if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
                 {
                     FileDelete(strCachedFilePath);
-                    CLogger::LogPrintf(
-                        SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath)));
-                    bOk = false;
-                    continue;
+                    return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                 }
 
                 CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
 
-                if (checksum != cachedChecksum)
+                if (pResourceFile->GetLastChecksum() != cachedChecksum)
                 {
                     if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
                     {
-                        CLogger::LogPrintf("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
-                        bOk = false;
+                        return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                     }
 
                     // If script is 'no client cache', make sure there is no trace of it in the output dir
@@ -569,6 +527,32 @@ bool CResource::GenerateChecksums()
             }
             default:
                 break;
+        }
+
+        return SString();
+    });
+}
+
+bool CResource::GenerateChecksums()
+{
+    std::vector<std::future<SString>> checksumTasks;
+    checksumTasks.reserve(m_ResourceFiles.size());
+
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        checksumTasks.push_back(GenerateChecksumForFile(pResourceFile));
+    }
+
+    bool bOk = true;
+
+    for (auto& task : checksumTasks)
+    {
+        const auto& result = task.get();
+        if (!result.empty())
+        {
+            m_strFailureReason = result;
+            CLogger::LogPrintf(result);
+            bOk = false;
         }
     }
 
@@ -585,6 +569,14 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
+    if (IsResourceZip() )
+    {
+        // Zip file might have changed
+        CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+        if (checksum != m_zipHash)
+            return true;
+
+    }
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -663,17 +655,18 @@ void CResource::LogUpgradeWarnings()
 bool CResource::GetCompatibilityStatus(SString& strOutStatus)
 {
     // Check declared version strings are valid
-    if (!IsValidVersionString(m_strMinServerReqFromMetaXml) || !IsValidVersionString(m_strMinClientReqFromMetaXml))
+    if (!IsValidVersionString(m_strMinServerRequirement) || !IsValidVersionString(m_strMinClientRequirement))
     {
         strOutStatus = "<min_mta_version> section in the meta.xml contains invalid version strings";
         return false;
     }
 
     // Check this server can run this resource
-    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
-    if (m_strMinServerReqFromMetaXml > strServerVersion)
+#if MTASA_VERSION_BUILD != 0
+    CMtaVersion strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
+    if (m_strMinServerRequirement > strServerVersion)
     {
-        strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);
+        strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerRequirement);
         return false;
     }
 
@@ -683,15 +676,16 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
         strOutStatus = "server has come back from the future";
         return false;
     }
+#endif
 
     // Check if calculated version is higher than declared version
-    if (m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml)
+    if (m_strMinClientReqFromSource > m_strMinClientFromMetaXml)
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
         strOutStatus += SString("client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason);
-        m_strMinClientReqFromMetaXml = m_strMinClientReqFromSource;            // Apply higher version requirement
+        m_strMinClientRequirement = m_strMinClientReqFromSource;            // Apply higher version requirement
     }
-    else if (m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml)
+    else if (m_strMinServerReqFromSource > m_strMinServerFromMetaXml)
     {
         strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
         strOutStatus += SString("server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason);
@@ -701,12 +695,12 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     {
         uint uiNumIncompatiblePlayers = 0;
         for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
+            if ((*iter)->IsJoined() && m_strMinClientRequirement > (*iter)->GetPlayerVersion() && !(*iter)->ShouldIgnoreMinClientVersionChecks())
                 uiNumIncompatiblePlayers++;
 
         if (uiNumIncompatiblePlayers > 0)
         {
-            strOutStatus = SString("%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml);
+            strOutStatus = SString("%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientRequirement);
             return false;
         }
     }
@@ -950,12 +944,13 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     m_bClientScripts = StartOptions.bClientScripts;
     m_bClientFiles = StartOptions.bClientFiles;
 
-    m_pResourceManager->ApplyMinClientRequirement(this, m_strMinClientReqFromMetaXml);
+    m_pResourceManager->ApplyMinClientRequirement(this, m_strMinClientRequirement);
 
     // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
     g_pGame->GetMapManager()->BroadcastResourceElements(m_pResourceElement, m_pDefaultElementGroup);
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName.c_str(), this));
     SendNoClientCacheScripts();
+    m_bClientSync = true;
 
     // HACK?: stops resources getting loaded twice when you change them then manually restart
     GenerateChecksums();
@@ -995,6 +990,7 @@ bool CResource::Stop(bool bManualStop)
 
     // Tell all the players that have joined that this resource is stopped
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStopPacket(m_usNetID));
+    m_bClientSync = false;
 
     // Call the onResourceStop event on this resource element
     CLuaArguments Arguments;
@@ -1231,75 +1227,14 @@ bool CResource::HasGoneAway()
     }
 }
 
-// gets the path of the file specified, may extract it from the zip
+// gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    if (!szFilename || szFilename[0] == '\0')
-        return false;
-
-    // first, check the resource folder, then check the zip file
-    strPath = m_strResourceDirectoryPath + szFilename;
-
-    if (FileExists(strPath))
-        return true;
-
-    // Don't check zip file if resource was not identified as zipped
-    if (!IsResourceZip())
-        return false;
-
-    if (!m_zipfile)
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-
-    if (m_zipfile)
-    {
-        if (unzLocateFile(m_zipfile, szFilename, false) != UNZ_END_OF_LIST_OF_FILE)
-        {
-            strPath = m_strResourceCachePath + szFilename;
-            FILE* temp = File::Fopen(strPath.c_str(), "r");
-
-            if (temp)
-            {
-                fclose(temp);
-
-                // we've already got a cached copy of this file, check its still the same
-                unsigned long ulFileInZipCRC = get_current_file_crc(m_zipfile);
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
-
-                if (ulFileInZipCRC == ulFileOnDiskCRC)
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Up to date %s already extracted from zip\n", szFilename);
-#endif
-                    unzClose(m_zipfile);
-                    m_zipfile = nullptr;
-                    return true;            // we've already extracted EXACTLY this file before
-                }
-                else
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Old version of %s already extracted, extracting again\n", szFilename);
-#endif
-                }
-            }
-            else
-            {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                CLogger::LogPrintf("Extracting %s from zip\n", szFilename);
-#endif
-            }
-
-            // we've never extracted this EXACT file (maybe an old version), so do it again
-            ExtractFile(szFilename);
-            unzClose(m_zipfile);
-            m_zipfile = nullptr;
-            return true;
-        }
-    }
-
-#ifdef RESOURCE_DEBUG_MESSAGES
-    CLogger::LogPrintf("Can't find %s in zip or in folder\n", szFilename);
-#endif
-    return false;
+    if (IsResourceZip())
+        strPath = m_strResourceCachePath + szFilename;
+    else
+        strPath = m_strResourceDirectoryPath + szFilename;
+    return FileExists(strPath);
 }
 
 // Return true if file name is used by this resource
@@ -1401,7 +1336,8 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                     // This one is supposed to be default, but there's already a default page
                     if (bFoundDefault && bIsDefault)
                     {
-                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(),
+                                           m_strResourceName.c_str());
                         bIsDefault = false;
                     }
 
@@ -1410,8 +1346,8 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                         bFoundDefault = true;
 
                     // Create a new resource HTML file and add it to the list
-                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted,
-                                                               m_bOOPEnabledInMetaXml);
+                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
+                                                               bIsRestricted, m_bOOPEnabledInMetaXml);
                     m_ResourceFiles.push_back(pResourceFile);
 
                     // This is the first HTML file? Remember it
@@ -1427,8 +1363,7 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'html' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'html' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1488,7 +1423,8 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
 
                 if (bClient && IsFilenameUsed(strFilename, true))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                       strFilename.c_str());
                     bClient = false;
                 }
                 if (bServer && IsFilenameUsed(strFilename, false))
@@ -1515,8 +1451,7 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1581,8 +1516,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'file' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'file' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1733,7 +1667,8 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
                 if (bClient && IsFilenameUsed(strFilename, true))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                       strFilename.c_str());
                     bClient = false;
                 }
                 if (bServer && IsFilenameUsed(strFilename, false))
@@ -1759,8 +1694,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1824,8 +1758,7 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -2395,33 +2328,12 @@ void Unescape(std::string& str)
 
 ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
 {
-    // Check for http general and if we have access to this resource
-    // if we're trying to return a http file. Otherwize it's the MTA
-    // client trying to download files.
-    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-    // Old way part 1
-    // Check for "resource.blah" being specifically denied
-    bool bResourceBlah = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName.c_str(),
-                                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
-
-    // Old way part 2
-    // Check for "general.http" being specifically denied
-    bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-    // New way
-    // Check for "resource.blah.http" being specifically allowed
-    bool bResourceBlahHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                            SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-    // If denied with both 'new way' and 'old way' then stop here
-    if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
+    if (!IsHttpAccessAllowed(pAccount))
     {
         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
     }
 
-    #define MAX_INPUT_VARIABLES       25
+#define MAX_INPUT_VARIABLES 25
 
     if (m_eState != EResourceState::Running)
     {
@@ -2501,7 +2413,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         SString strResourceFuncName("%s.function.%s", m_strResourceName.c_str(), strFuncName.c_str());
 
         // @@@@@ Deal with this the new way
-        if (!pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
                                             CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
         {
             return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
@@ -2713,37 +2625,13 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 // We need to be active if downloading a HTML file
                 if (m_eState == EResourceState::Running)
                 {
-                    // Check for http general and if we have access to this resource
-                    // if we're trying to return a http file. Otherwise it's the MTA
-                    // client trying to download files.
-                    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-                    // Old way part 1
-                    // Check for "resource.blah" being specifically denied
-                    bool bResourceBlah = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                                        m_strResourceName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
-                    // Old way part 2
-                    // Check for "general.http" being specifically denied
-                    bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-                    // New way
-                    // Check for "resource.blah.http" being specifically allowed
-                    bool bResourceBlahHttp =
-                        pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                       SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-                    // If denied with both 'new way' and 'old way' then stop here
-                    if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
+                    if (!IsHttpAccessAllowed(pAccount))
                     {
                         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
                     }
 
-                    assert(bResourceBlahHttp || (bResourceBlah && bGeneralHttp));
-
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
-
-                    if (pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                    if (g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
                                                        strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
@@ -2769,24 +2657,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
         else            // handle the default page
         {
-            // Check for http general and if we have access to this resource
-            // if we're trying to return a http file. Otherwize it's the MTA
-            // client trying to download files.
-            CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
-
-            // Old way
-            // Check for "general.http" being specifically denied
-            bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                               CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
-
-            // New way
-            // Check for "resource.blah.http" being specifically allowed
-            bool bResourceBlahHttp =
-                pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                               SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
-
-            // If denied with both 'new way' and 'old way' then stop here
-            if (!bResourceBlahHttp && !bGeneralHttp)
+            if (!IsHttpAccessAllowed(pAccount))
             {
                 return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
             }
@@ -2819,6 +2690,51 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
     SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
+}
+
+// Return true if http access allowed for the supplied account
+bool CResource::IsHttpAccessAllowed(CAccount* pAccount)
+{
+    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
+
+    // New way
+    // Check for "resource.<name>.http" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName + ".http",
+                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+    {
+        return true;
+    }
+
+    // Old way phase 1
+    // Check for "general.http" being explicitly denied
+    if (!pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
+                                        CAccessControlListRight::RIGHT_TYPE_GENERAL, true))
+    {
+        return false;
+    }
+    // Check for "resource.<name>" being explicitly denied
+    if (!pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName,
+                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
+    {
+        return false;
+    }
+
+    // Old way phase 2
+    // Check for "general.http" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    {
+        return true;
+    }
+    // Check for "resource.<name>" being explicitly allowed
+    if (pACLManager->CanObjectUseRight(pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName,
+                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+    {
+        return true;
+    }
+
+    // If nothing explicitly set, then default to denied
+    return false;
 }
 
 bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller)
@@ -2926,6 +2842,85 @@ void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
             }
         }
     }
+}
+
+bool CResource::UnzipResource()
+{
+    m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
+
+    if (!m_zipfile)
+        return false;
+
+    // See if the dir already exists
+    bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
+
+    // If the folder doesn't exist, create it
+    if (!bDirExists)
+    {
+        // If we're using a zip file, we need a temp directory for extracting
+        // 17 = already exists (on windows)
+        if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
+        {
+            // Show error
+            m_strFailureReason = SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
+                                         m_strResourceCachePath.c_str(), m_strResourceName.c_str());
+            CLogger::ErrorPrintf(m_strFailureReason);
+            return false;
+        }
+    }
+
+    std::vector<char> strFileName;
+    std::string       strPath;
+
+    if (unzGoToFirstFile(m_zipfile) == UNZ_OK)
+    {
+        do
+        {
+            // Check if we have this file already extracted
+            unz_file_info fileInfo = {0};
+
+            if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
+                return false;
+
+            strFileName.reserve(fileInfo.size_filename + 1);
+            unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
+
+            // Check if the current file is a directory path
+            if (strFileName[fileInfo.size_filename - 1] == '/')
+                continue;
+
+            strFileName[fileInfo.size_filename] = '\0';
+            strPath = m_strResourceCachePath + strFileName.data();
+
+            if (FileExists(strPath))
+            {
+                // We've already got a cached copy of this file, check its still the same
+                unsigned long ulFileInZipCRC = fileInfo.crc;
+                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
+
+                if (ulFileInZipCRC == ulFileOnDiskCRC)
+                    continue;            // we've already extracted EXACTLY this file before
+
+                RemoveFile(strPath.c_str());
+            }
+
+            // Doesn't exist or bad crc
+            int opt_extract_without_path = 0;
+            int opt_overwrite = 1;
+            int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, nullptr, m_strResourceCachePath.c_str());
+
+            if (ires != UNZ_OK)
+                return false;
+        } while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
+    }
+
+    // Close the zip file
+    unzClose(m_zipfile);
+    m_zipfile = nullptr;
+
+    // Store the hash so we can figure out whether it has changed later
+    m_zipHash = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+    return true;
 }
 
 unsigned long get_current_file_crc(unzFile uf)

@@ -17,10 +17,10 @@ class CClientColPolygon : public CClientColShape
 public:
     CClientColPolygon(CClientManager* pManager, ElementID ID, const CVector2D& vecPosition);
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
 
-    eColShapeType GetShapeType(void) { return COLSHAPE_POLYGON; }
+    eColShapeType GetShapeType() { return COLSHAPE_POLYGON; }
 
     bool DoHitDetection(const CVector& vecNowPosition, float fRadius);
 
@@ -28,12 +28,11 @@ public:
 
     void AddPoint(CVector2D vecPoint);
 
+    unsigned int                           CountPoints() const { return static_cast<unsigned int>(m_Points.size()); };
+    std::vector<CVector2D>::const_iterator IterBegin() { return m_Points.begin(); };
+    std::vector<CVector2D>::const_iterator IterEnd() { return m_Points.end(); };
     void SetHeight(float fFloor, float fCeil);
     void GetHeight(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
-
-    unsigned int                           CountPoints(void) const { return static_cast<unsigned int>(m_Points.size()); };
-    std::vector<CVector2D>::const_iterator IterBegin(void) { return m_Points.begin(); };
-    std::vector<CVector2D>::const_iterator IterEnd(void) { return m_Points.end(); };
 
 protected:
     std::vector<CVector2D> m_Points;

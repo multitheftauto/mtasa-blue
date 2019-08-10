@@ -24,7 +24,7 @@ public:
 
     static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
 
-    CClientPad(void);
+    CClientPad();
 
     bool GetControlState(const char* szName, bool& bState);
     bool SetControlState(const char* szName, bool bState);

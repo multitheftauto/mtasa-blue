@@ -22,7 +22,7 @@ namespace
     //////////////////////////////////////////////////////////
 
     // Ensure report log stuff has correct tags
-    void UpdateSettingsForReportLog(void)
+    void UpdateSettingsForReportLog()
     {
         UpdateMTAVersionApplicationSetting();
         SetApplicationSetting("os-version", SString("%d.%d", GetOSVersion().dwMajor, GetOSVersion().dwMinor));
@@ -35,13 +35,13 @@ namespace
     // Comms between 'Admin' and 'User' processes
     void SendStringToUserProcess(const SString& strText) { SetApplicationSetting("admin2user_comms", strText); }
 
-    SString ReceiveStringFromAdminProcess(void) { return GetApplicationSetting("admin2user_comms"); }
+    SString ReceiveStringFromAdminProcess() { return GetApplicationSetting("admin2user_comms"); }
 
-    bool IsBlockingUserProcess(void) { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
+    bool IsBlockingUserProcess() { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
 
-    void SetIsBlockingUserProcess(void) { SetApplicationSetting("admin2user_comms", "user_waiting"); }
+    void SetIsBlockingUserProcess() { SetApplicationSetting("admin2user_comms", "user_waiting"); }
 
-    void ClearIsBlockingUserProcess(void)
+    void ClearIsBlockingUserProcess()
     {
         if (IsBlockingUserProcess())
             SetApplicationSetting("admin2user_comms", "");
@@ -57,7 +57,7 @@ namespace
 //////////////////////////////////////////////////////////
 CInstallManager* g_pInstallManager = NULL;
 
-CInstallManager* GetInstallManager(void)
+CInstallManager* GetInstallManager()
 {
     if (!g_pInstallManager)
         g_pInstallManager = new CInstallManager();
@@ -71,7 +71,7 @@ CInstallManager* GetInstallManager(void)
 //
 //
 //////////////////////////////////////////////////////////
-void CInstallManager::InitSequencer(void)
+void CInstallManager::InitSequencer()
 {
     #define CR "\n"
     SString strSource = CR "initial: "                                             // *** Starts here  by default
@@ -204,7 +204,7 @@ void CInstallManager::SetMTASAPathSource(const SString& strCommandLineIn)
 // Process next step
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::Continue(void)
+SString CInstallManager::Continue()
 {
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
@@ -273,7 +273,7 @@ void CInstallManager::RestoreSequencerFromSnapshot(const SString& strText)
 // Save current sequencer position to a string
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::GetSequencerSnapshot(void)
+SString CInstallManager::GetSequencerSnapshot()
 {
     m_pSequencer->SetVariable("LastResult", "");
     return m_pSequencer->SaveStateToString();
@@ -286,7 +286,7 @@ SString CInstallManager::GetSequencerSnapshot(void)
 // Get path to launch exe
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::GetLauncherPathFilename(void)
+SString CInstallManager::GetLauncherPathFilename()
 {
     SString strLocation = m_pSequencer->GetVariable(INSTALL_LOCATION);
     SString strResult = PathJoin(strLocation == "far" ? GetSystemCurrentDirectory() : GetMTASAPath(), MTA_EXE_NAME);
@@ -306,7 +306,7 @@ SString CInstallManager::GetLauncherPathFilename(void)
 // Save the state of the sequencer and launch process as admin
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ChangeToAdmin(void)
+SString CInstallManager::_ChangeToAdmin()
 {
     if (!IsUserAdmin())
     {
@@ -339,7 +339,7 @@ SString CInstallManager::_ChangeToAdmin(void)
 // Save the state of the sequencer and exit back to the user process
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ChangeFromAdmin(void)
+SString CInstallManager::_ChangeFromAdmin()
 {
     if (IsUserAdmin() && IsBlockingUserProcess())
     {
@@ -358,7 +358,7 @@ SString CInstallManager::_ChangeFromAdmin(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ShowCrashFailDialog(void)
+SString CInstallManager::_ShowCrashFailDialog()
 {
     // Crashed before gta game started ?
     if (WatchDogIsSectionOpen("L1"))
@@ -399,7 +399,7 @@ SString CInstallManager::_ShowCrashFailDialog(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_CheckOnRestartCommand(void)
+SString CInstallManager::_CheckOnRestartCommand()
 {
     // Check for pending update
     const SString strResult = CheckOnRestartCommand();
@@ -426,7 +426,7 @@ SString CInstallManager::_CheckOnRestartCommand(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_MaybeSwitchToTempExe(void)
+SString CInstallManager::_MaybeSwitchToTempExe()
 {
     // If a new "Multi Theft Auto.exe" exists, let that complete the install
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
@@ -447,7 +447,7 @@ SString CInstallManager::_MaybeSwitchToTempExe(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_SwitchBackFromTempExe(void)
+SString CInstallManager::_SwitchBackFromTempExe()
 {
     // If currently running temp install exe, switch back
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
@@ -470,7 +470,7 @@ SString CInstallManager::_SwitchBackFromTempExe(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_InstallFiles(void)
+SString CInstallManager::_InstallFiles()
 {
     WatchDogReset();
 
@@ -500,7 +500,7 @@ SString CInstallManager::_InstallFiles(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ShowCopyFailDialog(void)
+SString CInstallManager::_ShowCopyFailDialog()
 {
     int iResponse = MessageBoxUTF8(NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error") + _E("CL02"),
                                    MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST);
@@ -534,7 +534,7 @@ void MigrateFile(const SString& strFilenameOld, const SString& strFilenameNew)
 // Make sure new reg/dir structure is ok
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessLayoutChecks(void)
+SString CInstallManager::_ProcessLayoutChecks()
 {
     //
     // Validation
@@ -668,7 +668,7 @@ SString CInstallManager::_ProcessLayoutChecks(void)
 // Make sure required language files exist
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessLangFileChecks(void)
+SString CInstallManager::_ProcessLangFileChecks()
 {
     if (!HasGTAPath())
         return "ok";
@@ -744,7 +744,7 @@ SString CInstallManager::_ProcessLangFileChecks(void)
 // Return false if admin required
 //
 //////////////////////////////////////////////////////////
-bool CInstallManager::UpdateOptimusSymbolExport(void)
+bool CInstallManager::UpdateOptimusSymbolExport()
 {
     return _ProcessExePatchChecks() == "ok";
 }
@@ -782,7 +782,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
 // Check which changes need to be made to the exe and make a copy if required
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessExePatchChecks(void)
+SString CInstallManager::_ProcessExePatchChecks()
 {
     if (!HasGTAPath())
         return "ok";
@@ -829,7 +829,7 @@ SString CInstallManager::_ProcessExePatchChecks(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessServiceChecks(void)
+SString CInstallManager::_ProcessServiceChecks()
 {
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
@@ -849,7 +849,7 @@ SString CInstallManager::_ProcessServiceChecks(void)
 // Remove/add required options from AppCompatFlags/Layers
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessAppCompatChecks(void)
+SString CInstallManager::_ProcessAppCompatChecks()
 {
     BOOL bIsWOW64 = false;            // 64bit OS
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
@@ -883,6 +883,13 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
     removeList.push_back(L"DISABLETHEMES");
     removeList.push_back(L"DISABLEDWM");
     removeList.push_back(L"HIGHDPIAWARE");
+
+    // Fix for GitHub issue #983 "crash on join server"
+#ifdef DEBUG
+    removeList.push_back(L"IgnoreFreeLibrary<client_d.dll>");
+#else
+    removeList.push_back(L"IgnoreFreeLibrary<client.dll>");
+#endif
 
     // Remove potential performance hit
     removeList.push_back(L"FaultTolerantHeap");
@@ -941,6 +948,21 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
                 bTryAdmin = true;
     }
 
+    // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
+    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+    WString strUrlItem = L"Games";
+    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+    if (!strUrlValue.empty())
+    {
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
+        {
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
+            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                bTryAdmin = true;
+        }
+    }
+
     // Handle admin requirement
     if (bTryAdmin)
     {
@@ -960,7 +982,7 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_InstallNewsItems(void)
+SString CInstallManager::_InstallNewsItems()
 {
     // Get install news queue
     CArgMap queue;
@@ -1017,7 +1039,7 @@ SString CInstallManager::_InstallNewsItems(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_Quit(void)
+SString CInstallManager::_Quit()
 {
     ExitProcess(0);
     // return "ok";

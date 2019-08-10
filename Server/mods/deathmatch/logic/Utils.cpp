@@ -294,7 +294,7 @@ void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCo
     pGame->QuitPlayer(Player, CClient::QUIT_CONNECTION_DESYNC);
 }
 
-bool InitializeSockets(void)
+bool InitializeSockets()
 {
 #ifdef WIN32
     WSADATA wsaData;
@@ -307,7 +307,7 @@ bool InitializeSockets(void)
     return true;
 }
 
-bool CleanupSockets(void)
+bool CleanupSockets()
 {
 #ifdef WIN32
     WSACleanup();
@@ -315,12 +315,12 @@ bool CleanupSockets(void)
     return true;
 }
 
-float GetRandomFloat(void)
+float GetRandomFloat()
 {
     return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f);
 }
 
-double GetRandomDouble(void)
+double GetRandomDouble()
 {
     return static_cast<double>(rand()) / (static_cast<double>(RAND_MAX) + 1.0);
 }

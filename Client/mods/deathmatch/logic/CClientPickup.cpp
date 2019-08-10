@@ -37,7 +37,7 @@ CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned sh
     UpdateStreamPosition(m_vecPosition = vecPosition);
 }
 
-CClientPickup::~CClientPickup(void)
+CClientPickup::~CClientPickup()
 {
     AttachTo(NULL);
 
@@ -48,7 +48,7 @@ CClientPickup::~CClientPickup(void)
     Unlink();
 }
 
-void CClientPickup::Unlink(void)
+void CClientPickup::Unlink()
 {
     m_pPickupManager->RemoveFromList(this);
 }
@@ -103,13 +103,13 @@ void CClientPickup::StreamIn(bool bInstantly)
     NotifyCreate();
 }
 
-void CClientPickup::StreamOut(void)
+void CClientPickup::StreamOut()
 {
     // Destroy it
     Destroy();
 }
 
-void CClientPickup::Create(void)
+void CClientPickup::Create()
 {
     if (!m_pPickup && m_bVisible)
     {
@@ -144,7 +144,7 @@ void CClientPickup::Create(void)
     }
 }
 
-void CClientPickup::Destroy(void)
+void CClientPickup::Destroy()
 {
     if (m_pCollision)
     {
@@ -163,7 +163,7 @@ void CClientPickup::Destroy(void)
     }
 }
 
-void CClientPickup::ReCreate(void)
+void CClientPickup::ReCreate()
 {
     // If we had a pickup, destroy and recreate it
     if (m_pPickup)

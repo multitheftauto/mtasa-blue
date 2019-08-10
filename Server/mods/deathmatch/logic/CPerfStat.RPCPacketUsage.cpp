@@ -245,12 +245,12 @@ class CPerfStatRPCPacketUsageImpl : public CPerfStatRPCPacketUsage
 public:
     ZERO_ON_NEW
 
-    CPerfStatRPCPacketUsageImpl(void);
-    virtual ~CPerfStatRPCPacketUsageImpl(void);
+    CPerfStatRPCPacketUsageImpl();
+    virtual ~CPerfStatRPCPacketUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatRPCPacketUsage
@@ -258,7 +258,7 @@ public:
     virtual void UpdatePacketUsageOut(uchar ucRpcId, uint uiSize);
 
     // CPerfStatRPCPacketUsageImpl
-    void MaybeRecordStats(void);
+    void MaybeRecordStats();
 
     int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
@@ -297,7 +297,7 @@ CPerfStatRPCPacketUsage* CPerfStatRPCPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl(void)
+CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl()
 {
     m_strCategoryName = "RPC Packet usage";
     assert(sizeof(m_PacketStatsIn) == sizeof(m_PrevPacketStatsIn));
@@ -311,7 +311,7 @@ CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl(void)
+CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl()
 {
 }
 
@@ -322,7 +322,7 @@ CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName(void)
+const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -334,7 +334,7 @@ const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatRPCPacketUsageImpl::DoPulse(void)
+void CPerfStatRPCPacketUsageImpl::DoPulse()
 {
     MaybeRecordStats();
 }
@@ -374,7 +374,7 @@ void CPerfStatRPCPacketUsageImpl::UpdatePacketUsageOut(uchar ucRpcId, uint uiSiz
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatRPCPacketUsageImpl::MaybeRecordStats(void)
+void CPerfStatRPCPacketUsageImpl::MaybeRecordStats()
 {
     // Someone watching?
     if (m_TimeSinceGetStats.Get() < 10000)

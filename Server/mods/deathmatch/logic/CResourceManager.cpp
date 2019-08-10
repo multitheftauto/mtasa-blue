@@ -26,7 +26,7 @@ struct SResInfo
     SString strAbsPathDup;
 };
 
-CResourceManager::CResourceManager(void)
+CResourceManager::CResourceManager()
 {
     m_bResourceListChanged = false;
     m_uiResourceLoadedCount = 0;
@@ -36,7 +36,7 @@ CResourceManager::CResourceManager(void)
     LoadBlockedFileReasons();
 }
 
-CResourceManager::~CResourceManager(void)
+CResourceManager::~CResourceManager()
 {
     // First process the queue to make sure all queued up tasks are done
     ProcessQueue();
@@ -258,14 +258,14 @@ void CResourceManager::CheckResources(CResource* pResource)
     }
 }
 
-const char* CResourceManager::GetResourceDirectory(void)
+const char* CResourceManager::GetResourceDirectory()
 {
     return m_strResourceDirectory;
 }
 
 // first, go through each resource then link up to other resources, any that fail are noted
 // then go through each resource and perform a recursive check
-void CResourceManager::CheckResourceDependencies(void)
+void CResourceManager::CheckResourceDependencies()
 {
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
@@ -402,8 +402,6 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     if (!pLoadedResource->IsLoaded())
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName);
-        UnloadAndDelete(pLoadedResource);
-        pLoadedResource = nullptr;
     }
     else
     {
@@ -431,7 +429,7 @@ CResource* CResourceManager::GetResourceFromScriptID(uint uiScriptID)
 }
 
 // Get net id for resource. (0xFFFF is never used)
-unsigned short CResourceManager::GenerateID(void)
+unsigned short CResourceManager::GenerateID()
 {
     static bool bHasWrapped = false;
 
@@ -667,7 +665,7 @@ bool CResourceManager::Reload(CResource* pResource)
     return true;
 }
 
-bool CResourceManager::StopAllResources(void)
+bool CResourceManager::StopAllResources()
 {
     CLogger::SetMinLogLevel(LOGLEVEL_MEDIUM);
     CLogger::LogPrint("Stopping resources...");
@@ -712,7 +710,7 @@ void CResourceManager::QueueResource(CResource* pResource, eResourceQueue eQueue
     m_resourceQueue.push_back(Item);
 }
 
-void CResourceManager::ProcessQueue(void)
+void CResourceManager::ProcessQueue()
 {
     // While we have queuestuff to process
     while (m_resourceQueue.size() > 0)
@@ -1106,7 +1104,7 @@ bool CResourceManager::DeleteResource(const SString& strResourceName, SString& s
 // CResourceManager::GetResourceTrashDir
 //
 /////////////////////////////////
-SString CResourceManager::GetResourceTrashDir(void)
+SString CResourceManager::GetResourceTrashDir()
 {
     return PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "trash");
 }
@@ -1197,7 +1195,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
 // If resource has a client version requirement, add it to the list
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::ApplyMinClientRequirement(CResource* pResource, const SString& strMinClientRequirement)
+void CResourceManager::ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement)
 {
     if (!strMinClientRequirement.empty())
     {
@@ -1229,11 +1227,11 @@ void CResourceManager::RemoveMinClientRequirement(CResource* pResource)
 // Recalculate highest client version requirement from all running resources
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::ReevaluateMinClientRequirement(void)
+void CResourceManager::ReevaluateMinClientRequirement()
 {
     // Calc highest requirement
     m_strMinClientRequirement = "";
-    for (CFastHashMap<CResource*, SString>::iterator iter = m_MinClientRequirementMap.begin(); iter != m_MinClientRequirementMap.end(); ++iter)
+    for (auto iter = m_MinClientRequirementMap.begin(); iter != m_MinClientRequirementMap.end(); ++iter)
         if (iter->second > m_strMinClientRequirement)
             m_strMinClientRequirement = iter->second;
 
@@ -1277,7 +1275,7 @@ void CResourceManager::RemoveSyncMapElementDataOption(CResource* pResource)
 //  and tell the config to apply it
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::ReevaluateSyncMapElementDataOption(void)
+void CResourceManager::ReevaluateSyncMapElementDataOption()
 {
     bool bSyncMapElementData = true;
     for (CFastHashMap<CResource*, bool>::iterator iter = m_SyncMapElementDataOptionMap.begin(); iter != m_SyncMapElementDataOptionMap.end(); ++iter)
@@ -1308,7 +1306,7 @@ void CResourceManager::ReevaluateSyncMapElementDataOption(void)
 // Load blocked file hashes from database
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::LoadBlockedFileReasons(void)
+void CResourceManager::LoadBlockedFileReasons()
 {
     CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager();
     SString           strDatabaseFilename = PathJoin(g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME);
@@ -1342,7 +1340,7 @@ void CResourceManager::LoadBlockedFileReasons(void)
 // Save blocked file hashes to database
 //
 /////////////////////////////////////////////////////////////////////////////
-void CResourceManager::SaveBlockedFileReasons(void)
+void CResourceManager::SaveBlockedFileReasons()
 {
     CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager();
     SString           strDatabaseFilename = PathJoin(g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME);

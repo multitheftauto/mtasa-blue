@@ -13,11 +13,11 @@
 
 using std::list;
 
-CResourceManager::CResourceManager(void)
+CResourceManager::CResourceManager()
 {
 }
 
-CResourceManager::~CResourceManager(void)
+CResourceManager::~CResourceManager()
 {
     while (!m_resources.empty())
     {
@@ -27,7 +27,7 @@ CResourceManager::~CResourceManager(void)
 }
 
 CResource* CResourceManager::Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                                 const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP)
+                                 const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     CResource* pResource = new CResource(usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP);
     if (pResource)
@@ -94,7 +94,7 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
     return NULL;
 }
 
-void CResourceManager::OnDownloadGroupFinished(void)
+void CResourceManager::OnDownloadGroupFinished()
 {
     // Try to load newly ready resources
     for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
@@ -141,7 +141,7 @@ bool CResourceManager::Exists(CResource* pResource)
     return m_resources.Contains(pResource);
 }
 
-void CResourceManager::StopAll(void)
+void CResourceManager::StopAll()
 {
     while (m_resources.size() > 0)
     {

@@ -11,13 +11,13 @@
 
 #include "StdInc.h"
 
-CPlayerTasks::CPlayerTasks(void)
+CPlayerTasks::CPlayerTasks()
 {
     memset(&m_PriorityTasks[0], 0, sizeof(m_PriorityTasks));
     memset(&m_SecondaryTasks[0], 0, sizeof(m_SecondaryTasks));
 }
 
-CPlayerTasks::~CPlayerTasks(void)
+CPlayerTasks::~CPlayerTasks()
 {
     unsigned int i;
     for (i = 0; i < TASK_PRIORITY_MAX; i++)

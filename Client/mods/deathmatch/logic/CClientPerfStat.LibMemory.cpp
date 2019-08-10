@@ -20,7 +20,7 @@ namespace
     class CLibMemory
     {
     public:
-        CLibMemory(void) { memset(this, 0, sizeof(*this)); }
+        CLibMemory() { memset(this, 0, sizeof(*this)); }
 
         int Delta;
         int Current;
@@ -54,12 +54,12 @@ namespace
 class CClientPerfStatLibMemoryImpl : public CClientPerfStatLibMemory
 {
 public:
-    CClientPerfStatLibMemoryImpl(void);
-    virtual ~CClientPerfStatLibMemoryImpl(void);
+    CClientPerfStatLibMemoryImpl();
+    virtual ~CClientPerfStatLibMemoryImpl();
 
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CClientPerfStatLibMemory
@@ -96,7 +96,7 @@ CClientPerfStatLibMemory* CClientPerfStatLibMemory::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLibMemoryImpl::CClientPerfStatLibMemoryImpl(void)
+CClientPerfStatLibMemoryImpl::CClientPerfStatLibMemoryImpl()
 {
     m_strCategoryName = "Lib memory";
 }
@@ -108,7 +108,7 @@ CClientPerfStatLibMemoryImpl::CClientPerfStatLibMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLibMemoryImpl::~CClientPerfStatLibMemoryImpl(void)
+CClientPerfStatLibMemoryImpl::~CClientPerfStatLibMemoryImpl()
 {
     for (unsigned int i = 0; i < m_LibraryList.size(); i++)
     {
@@ -124,7 +124,7 @@ CClientPerfStatLibMemoryImpl::~CClientPerfStatLibMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CClientPerfStatLibMemoryImpl::GetCategoryName(void)
+const SString& CClientPerfStatLibMemoryImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -157,7 +157,7 @@ void CClientPerfStatLibMemoryImpl::UpdateLibMemory(const SString& strLibName, in
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatLibMemoryImpl::DoPulse(void)
+void CClientPerfStatLibMemoryImpl::DoPulse()
 {
 }
 
@@ -211,34 +211,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
                 bool        bModDir;
                 const char* szName;
             } libs[] = {
-                {
-                    false,
-                    "cgui",
-                },
-                {
-                    false,
-                    "core",
-                },
-                {
-                    true,
-                    "client",
-                },
-                {
-                    false,
-                    "game_sa",
-                },
-                {
-                    false,
-                    "multiplayer_sa",
-                },
-                {
-                    false,
-                    "netc",
-                },
-                {
-                    false,
-                    "xmll",
-                },
+                {false, "cgui"}, {false, "core"}, {true, "client"}, {false, "game_sa"}, {false, "multiplayer_sa"}, {false, "netc"}, {false, "xmll"},
             };
 
             for (unsigned int i = 0; i < NUMELMS(libs); i++)

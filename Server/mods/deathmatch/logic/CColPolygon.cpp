@@ -107,7 +107,7 @@ bool CColPolygon::IsInBounds(CVector vecPoint)
     return fDist <= m_fRadius;
 }
 
-CSphere CColPolygon::GetWorldBoundingSphere(void)
+CSphere CColPolygon::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

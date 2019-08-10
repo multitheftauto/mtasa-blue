@@ -46,7 +46,7 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     m_fPlaybackSpeed = 1.0f;
     Init();
 }
-CClientPlayerVoice::~CClientPlayerVoice(void)
+CClientPlayerVoice::~CClientPlayerVoice()
 {
     DeInit();
 }
@@ -66,7 +66,7 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
     }
 }
 
-void CClientPlayerVoice::Init(void)
+void CClientPlayerVoice::Init()
 {
     // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
@@ -88,7 +88,7 @@ void CClientPlayerVoice::Init(void)
     speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &ucQuality);
 }
 
-void CClientPlayerVoice::DeInit(void)
+void CClientPlayerVoice::DeInit()
 {
     BASS_ChannelStop(m_pBassPlaybackStream);
     BASS_StreamFree(m_pBassPlaybackStream);
@@ -101,7 +101,7 @@ void CClientPlayerVoice::DeInit(void)
     m_SampleRate = SAMPLERATE_WIDEBAND;
 }
 
-void CClientPlayerVoice::DoPulse(void)
+void CClientPlayerVoice::DoPulse()
 {
     // Dispatch queued events
     ServiceEventQueue();
@@ -153,7 +153,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
     BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
 }
 
-void CClientPlayerVoice::ServiceEventQueue(void)
+void CClientPlayerVoice::ServiceEventQueue()
 {
     std::list<SString> eventQueue;
     {
@@ -187,7 +187,7 @@ void CClientPlayerVoice::SetPlayPosition(double dPosition)
     }
 }
 
-double CClientPlayerVoice::GetPlayPosition(void)
+double CClientPlayerVoice::GetPlayPosition()
 {
     if (m_pBassPlaybackStream)
     {
@@ -209,7 +209,7 @@ double CClientPlayerVoice::GetLength(bool bAvoidLoad)
     return 0;
 }
 
-float CClientPlayerVoice::GetVolume(void)
+float CClientPlayerVoice::GetVolume()
 {
     return m_fVolume;
 }
@@ -225,7 +225,7 @@ void CClientPlayerVoice::SetVolume(float fVolume, bool bStore)
     }
 }
 
-float CClientPlayerVoice::GetPlaybackSpeed(void)
+float CClientPlayerVoice::GetPlaybackSpeed()
 {
     return m_fPlaybackSpeed;
 }
@@ -331,7 +331,7 @@ float* CClientPlayerVoice::GetWaveData(int iLength)
     return NULL;
 }
 
-DWORD CClientPlayerVoice::GetLevelData(void)
+DWORD CClientPlayerVoice::GetLevelData()
 {
     if (m_pBassPlaybackStream)
     {
@@ -366,7 +366,7 @@ bool CClientPlayerVoice::SetFxEffect(uint uiFxEffect, bool bEnable)
 //
 // Copy state stored in m_EnabledEffects to actual BASS sound
 //
-void CClientPlayerVoice::ApplyFxEffects(void)
+void CClientPlayerVoice::ApplyFxEffects()
 {
     for (uint i = 0; i < NUMELMS(m_FxEffects) && NUMELMS(m_EnabledEffects); i++)
     {
@@ -452,7 +452,7 @@ void CClientPlayerVoice::SetPaused(bool bPaused)
     }
 }
 
-bool CClientPlayerVoice::IsPaused(void)
+bool CClientPlayerVoice::IsPaused()
 {
     return m_bPaused;
 }
