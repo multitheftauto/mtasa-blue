@@ -399,12 +399,15 @@ int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
 {
     //  bool SetColPolygonHeight ( colshape theColShape, float floor, float ceil )
     CColShape* pColShape;
-    float      fFloor, fCeil;
+    float      fFloor = std::numeric_limits<float>::min();
+    float      fCeil = std::numeric_limits<float>::max();
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(fFloor, std::numeric_limits<float>::min());
-    argStream.ReadNumber(fCeil, std::numeric_limits<float>::max());
+    if (argStream.NextIsNumber())
+        argStream.ReadNumber(fFloor);
+    if (argStream.NextIsNumber())
+        argStream.ReadNumber(fCeil);
 
     if (!argStream.HasErrors())
     {

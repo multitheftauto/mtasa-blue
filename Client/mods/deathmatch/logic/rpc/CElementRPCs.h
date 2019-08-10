@@ -49,4 +49,5 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponOwner);
     DECLARE_ELEMENT_RPC(SetWeaponConfig);
     DECLARE_ELEMENT_RPC(SetCallPropagationEnabled);
+    DECLARE_ELEMENT_RPC(SetColPolygonHeight);
 };
