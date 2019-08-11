@@ -385,6 +385,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
