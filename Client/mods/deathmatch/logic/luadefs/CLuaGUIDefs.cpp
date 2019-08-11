@@ -798,7 +798,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
                 if (FileExists(strPath))
                 {
                     CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                    if (pGUIElement != NULL)
+                    if (pGUIElement != nullptr)
                     {
                         lua_pushelement(luaVM, pGUIElement);
                         return 1;
