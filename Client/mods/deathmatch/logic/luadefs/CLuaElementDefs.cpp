@@ -35,6 +35,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementID", GetElementID},
         {"getElementParent", GetElementParent},
         {"getElementsByType", GetElementsByType},
+        {"getElementsCount", GetElementsCount},
         {"getElementInterior", GetElementInterior},
         {"isElementWithinColShape", IsElementWithinColShape},
         {"isElementWithinMarker", IsElementWithinMarker},
@@ -863,6 +864,29 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
             // Add all the elements with a matching type to it
             pStartAt->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::GetElementsCount(lua_State* luaVM)
+{
+    // Verify the argument
+    SString          strType = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strType);
+
+    if (!argStream.HasErrors())
+    {
+        // Find our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
         }
     }
     else
