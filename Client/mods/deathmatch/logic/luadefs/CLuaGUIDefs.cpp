@@ -795,14 +795,22 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             SString    strPath;
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                if (pGUIElement != NULL)
+                if (FileExists(strPath))
                 {
-                    lua_pushelement(luaVM, pGUIElement);
-                    return 1;
+                    CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
+                    if (pGUIElement != NULL)
+                    {
+                        lua_pushelement(luaVM, pGUIElement);
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(path, "Failed to create static image");
                 }
+                else 
+                    argStream.SetCustomError(path, "File not found");
             }
-            argStream.SetCustomError(path, "Bad file path");
+            else
+                argStream.SetCustomError(path, "Bad file path");
         }
     }
     if (argStream.HasErrors())
