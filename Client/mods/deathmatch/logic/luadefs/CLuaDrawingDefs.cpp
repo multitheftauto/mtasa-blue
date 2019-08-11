@@ -679,9 +679,9 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI);
 
+    std::vector<float> vecTableContent;
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {

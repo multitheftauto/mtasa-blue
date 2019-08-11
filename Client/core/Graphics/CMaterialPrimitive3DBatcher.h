@@ -25,7 +25,6 @@ struct sPrimitiveMaterial3D
 class CMaterialPrimitive3DBatcher
 {
 public:
-    ZERO_ON_NEW
     CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();

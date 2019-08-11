@@ -24,7 +24,6 @@ struct sPrimitive3D
 class CPrimitive3DBatcher
 {
 public:
-    ZERO_ON_NEW
     CPrimitive3DBatcher(bool bPreGUI);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();

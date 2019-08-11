@@ -179,9 +179,7 @@ void CMaterialPrimitive3DBatcher::ClearQueue()
         delete primitive.pVecVertices;
     }
 
-    size_t prevSize = m_primitiveList.size();
     m_primitiveList.clear();
-    m_primitiveList.reserve(prevSize);
 }
 ////////////////////////////////////////////////////////////////
 //
