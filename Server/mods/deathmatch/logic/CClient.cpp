@@ -21,7 +21,7 @@ CClient::CClient(bool bAddGuestAccount)
     }
 }
 
-CClient::~CClient(void)
+CClient::~CClient()
 {
     if (m_pAccount)
     {
@@ -33,12 +33,12 @@ CClient::~CClient(void)
     }
 }
 
-bool CClient::IsRegistered(void)
+bool CClient::IsRegistered()
 {
     return m_pAccount->IsRegistered();
 }
 
-CElement* CClient::GetElement(void)
+CElement* CClient::GetElement()
 {
     CElement* pElement = NULL;
     switch (GetClientType())

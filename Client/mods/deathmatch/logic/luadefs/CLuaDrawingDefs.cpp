@@ -13,7 +13,7 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
-void CLuaDrawingDefs::LoadFunctions(void)
+void CLuaDrawingDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"dxDrawLine", DxDrawLine},
@@ -1075,10 +1075,15 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
     if (!bValidFilePath || (strFile[0] != '@' && strFile[0] != ':'))
     {
-        bIsRawData = (strFile.find("technique ") != std::string::npos) &&
-            (strFile.find("pass ") != std::string::npos) &&
-            (strFile.find('{') != std::string::npos) &&
-            (strFile.find('}') != std::string::npos);
+        bIsRawData = strFile.find("\n") != std::string::npos;
+
+        if (!bIsRawData)
+        {
+            bIsRawData = (strFile.find("technique ") != std::string::npos) &&
+                (strFile.find("pass ") != std::string::npos) &&
+                (strFile.find('{') != std::string::npos) &&
+                (strFile.find('}') != std::string::npos);
+        }
     }
 
     SString strRootPath;

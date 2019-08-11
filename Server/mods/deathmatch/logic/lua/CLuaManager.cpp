@@ -43,7 +43,7 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
 #endif
 }
 
-CLuaManager::~CLuaManager(void)
+CLuaManager::~CLuaManager()
 {
     CLuaCFunctions::RemoveAllFunctions();
     list<CLuaMain*>::iterator iter;
@@ -101,7 +101,7 @@ void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
     MapRemove(m_VirtualMachineMap, pLuaMain->GetVirtualMachine());
 }
 
-void CLuaManager::DoPulse(void)
+void CLuaManager::DoPulse()
 {
     list<CLuaMain*>::iterator iter;
     for (iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
@@ -153,7 +153,7 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
     return NULL;
 }
 
-void CLuaManager::LoadCFunctions(void)
+void CLuaManager::LoadCFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"addEvent", CLuaFunctionDefs::AddEvent},

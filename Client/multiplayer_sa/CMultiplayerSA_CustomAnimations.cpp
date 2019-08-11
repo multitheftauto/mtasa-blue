@@ -19,7 +19,6 @@ DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock = 0x4CEA50;
 DWORD FUNC_UncompressAnimation = 0x4D41C0;
 DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
-DWORD RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW = 0x4CFC55;
 DWORD RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW = 0x4CEA88;
 DWORD RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW = 0x4D34F8;
 DWORD RETURN_CAnimManager_AddAnimation_NORMAL_FLOW = 0x4D3AAA;
@@ -67,33 +66,8 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
 
 CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
 {
-    DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
-    return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
-}
-
-void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
-{
-    _asm
-    {
-        pushad
-    }
-
-    if (bDisableCallsToCAnimBlendNode)
-    {
-        _asm
-        {
-            popad
-            retn 8
-        }
-    }
-
-    _asm
-    {
-        popad
-        sub     esp, 18h
-        xor     eax, eax
-        jmp     RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW
-    }
+    auto pAnimGroupArray = reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(*(DWORD*)0xb4ea34);
+    return &pAnimGroupArray[animGroup];
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()

@@ -24,20 +24,20 @@ class CNewsBrowser
 {
 public:
     ZERO_ON_NEW
-    CNewsBrowser(void);
-    ~CNewsBrowser(void);
+    CNewsBrowser();
+    ~CNewsBrowser();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
-    void CreateHeadlines(void);
+    bool IsVisible();
+    void CreateHeadlines();
     void SwitchToTab(int iIndex);
 
 protected:
-    void        InitNewsItemList(void);
+    void        InitNewsItemList();
     void        AddNewsTab(const SNewsItem& newsItem);
     CGUIWindow* LoadLayoutAndImages(CGUIElement* pParent, const SNewsItem& newsItem);
-    void        CreateGUI(void);
-    void        DestroyGUI(void);
+    void        CreateGUI();
+    void        DestroyGUI();
     bool        OnOKButtonClick(CGUIElement* pElement);
 
     std::vector<SNewsItem>   m_NewsitemList;

@@ -45,7 +45,7 @@ static CVector2D CalcScreenPosition(CGUIElement* pElement)
     return pos;
 }
 
-CServerBrowser::CServerBrowser(void)
+CServerBrowser::CServerBrowser()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -226,55 +226,13 @@ CServerBrowser::CServerBrowser(void)
             int         x, y, w, h;
             const char* szName;
         } iconInfoList[] = {
-            {
-                20,
-                iBase + iGap * 0,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\refresh.png",
-            },
-            {
-                25,
-                iBase + iGap * 1 + 5,
-                16,
-                16,
-                "cgui\\images\\serverbrowser\\favorite.png",
-            },
-            {
-                20,
-                iBase + iGap * 2,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\connect.png",
-            },
-            {
-                20,
-                iBase + iGap * 3,
-                26,
-                26,
-                "cgui\\images\\serverbrowser\\info.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 0 + 5,
-                29,
-                16,
-                "cgui\\images\\serverbrowser\\search-servers.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 1 + 5,
-                29,
-                16,
-                "cgui\\images\\serverbrowser\\search-players.png",
-            },
-            {
-                80 + static_cast<int>(fMaxLeft),
-                iBase + iGap * 2 + 5,
-                16,
-                16,
-                "cgui\\images\\serverbrowser\\search.png",
-            },
+            {20, iBase + iGap * 0, 26, 26, "cgui\\images\\serverbrowser\\refresh.png"},
+            {25, iBase + iGap * 1 + 5, 16, 16, "cgui\\images\\serverbrowser\\favorite.png"},
+            {20, iBase + iGap * 2, 26, 26, "cgui\\images\\serverbrowser\\connect.png"},
+            {20, iBase + iGap * 3, 26, 26, "cgui\\images\\serverbrowser\\info.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-servers.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5, 29, 16, "cgui\\images\\serverbrowser\\search-players.png"},
+            {80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5, 16, 16, "cgui\\images\\serverbrowser\\search.png"},
         };
 
         for (uint i = 0; i < NUMELMS(iconInfoList); i++)
@@ -310,7 +268,7 @@ CServerBrowser::CServerBrowser(void)
     }
 }
 
-CServerBrowser::~CServerBrowser(void)
+CServerBrowser::~CServerBrowser()
 {
     // Save options now and disable selection handler
     SaveOptions();
@@ -339,7 +297,6 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
     float fPlayerListSizeX = SB_PLAYERLIST_SIZE_X;
     float fSearchBarSizeX = pManager->GetTextExtent(_("Search players..."), "default-bold-small") + 90;
-    std::max(fSearchBarSizeX, pManager->GetTextExtent(_("Search servers..."), "default-bold-small") + 60);
 
     float fConnectButtonWidth = 26 + pManager->GetTextExtent(_("Connect"), "default-bold-small") + 5;
 
@@ -658,7 +615,7 @@ void CServerBrowser::DeleteTab(ServerBrowserType type)
     delete m_pTab[type];
 }
 
-ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave(void)
+ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave()
 {
     // If current tab is temporary, then save the one used befor it
     if (m_uiIsUsingTempTab)
@@ -667,7 +624,7 @@ ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave(void)
     return GetCurrentServerBrowserType();
 }
 
-ServerBrowserType CServerBrowser::GetCurrentServerBrowserType(void)
+ServerBrowserType CServerBrowser::GetCurrentServerBrowserType()
 {
     ServerBrowserType currentServerBrowserType;
 
@@ -691,7 +648,7 @@ ServerBrowserType CServerBrowser::GetCurrentServerBrowserType(void)
     return currentServerBrowserType;
 }
 
-void CServerBrowser::Update(void)
+void CServerBrowser::Update()
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
     CServerList*      pList = GetServerList(Type);
@@ -803,10 +760,11 @@ void CServerBrowser::SetVisible(bool bVisible)
         // Hide information windows.
         m_pGeneralHelpWindow->SetVisible(false);
         m_pQuickConnectHelpWindow->SetVisible(false);
+        CServerInfo::GetSingletonPtr()->Hide();
     }
 }
 
-bool CServerBrowser::IsVisible(void)
+bool CServerBrowser::IsVisible()
 {
     return m_pTopWindow && m_pTopWindow->IsVisible();
 }
@@ -909,7 +867,7 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
     pList->SetUpdated(false);
 }
 
-void CServerBrowser::CreateHistoryList(void)
+void CServerBrowser::CreateHistoryList()
 {
     // Clear our combo boxes first
     for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
@@ -960,7 +918,7 @@ void CServerBrowser::CreateHistoryList(void)
     m_ServersHistory.Refresh();
 }
 
-void CServerBrowser::UpdateHistoryList(void)
+void CServerBrowser::UpdateHistoryList()
 {
     // Assume our type is 0, then update all fields when appropriate
     unsigned int Type = 0;
@@ -1295,13 +1253,13 @@ void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort)
     SaveRecentlyPlayedList();
 }
 
-void CServerBrowser::CompleteConnect(void)
+void CServerBrowser::CompleteConnect()
 {
     CServerBrowser* pBrowser = CServerBrowser::GetSingletonPtr();
     pBrowser->ConnectToSelectedServer();
 }
 
-bool CServerBrowser::ConnectToSelectedServer(void)
+bool CServerBrowser::ConnectToSelectedServer()
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
     m_pServerPlayerList[Type]->Clear();
@@ -2200,7 +2158,7 @@ void CServerBrowser::SetAddressBarText(std::string strText)
     }
 }
 
-bool CServerBrowser::IsAddressBarAwaitingInput(void)
+bool CServerBrowser::IsAddressBarAwaitingInput()
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
     return m_pEditAddress[Type]->IsActive();
@@ -2236,7 +2194,7 @@ void CServerBrowser::SetNextHistoryText(bool bDown)
     }
 }
 
-void CServerBrowser::OnQuickConnectButtonClick(void)
+void CServerBrowser::OnQuickConnectButtonClick()
 {
     // Show help text
     if (m_uiShownQuickConnectHelpCount < 1)
@@ -2323,7 +2281,7 @@ void CServerBrowser::TabSkip(bool bBackwards)
     }
 }
 
-bool CServerBrowser::IsActive(void)
+bool CServerBrowser::IsActive()
 {
     return (m_pFrame && m_pFrame->IsActive()) || (m_pPanel && m_pPanel->IsActive());
 }

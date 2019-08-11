@@ -34,7 +34,7 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
     "text_scale"
 }};
 
-void CLuaGUIDefs::LoadFunctions(void)
+void CLuaGUIDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"guiGetInputEnabled", GUIGetInputEnabled},
@@ -74,6 +74,7 @@ void CLuaGUIDefs::LoadFunctions(void)
         {"guiDeleteTab", GUIDeleteTab},
 
         {"guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled},
+        {"guiGridListIsSortingEnabled", GUIGridListIsSortingEnabled},
         {"guiGridListAddColumn", GUIGridListAddColumn},
         {"guiGridListRemoveColumn", GUIGridListRemoveColumn},
         {"guiGridListSetColumnWidth", GUIGridListSetColumnWidth},
@@ -95,6 +96,7 @@ void CLuaGUIDefs::LoadFunctions(void)
         {"guiGridListSetItemColor", GUIGridListSetItemColor},
         {"guiGridListGetItemColor", GUIGridListGetItemColor},
         {"guiGridListSetSelectionMode", GUIGridListSetSelectionMode},
+        {"guiGridListGetSelectionMode", GUIGridListGetSelectionMode},
         {"guiGridListGetSelectedItem", GUIGridListGetSelectedItem},
         {"guiGridListGetSelectedItems", GUIGridListGetSelectedItems},
         {"guiGridListGetSelectedCount", GUIGridListGetSelectedCount},
@@ -124,6 +126,8 @@ void CLuaGUIDefs::LoadFunctions(void)
 
         {"guiBringToFront", GUIBringToFront},
         {"guiMoveToBack", GUIMoveToBack},
+        {"guiBlur", GUIBlur},
+        {"guiFocus", GUIFocus},
 
         {"guiCheckBoxSetSelected", GUICheckBoxSetSelected},
         {"guiRadioButtonSetSelected", GUIRadioButtonSetSelected},
@@ -225,6 +229,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "bringToFront", "guiBringToFront");
     lua_classfunction(luaVM, "moveToBack", "guiMoveToBack");
+    lua_classfunction(luaVM, "blur", "guiBlur");
+    lua_classfunction(luaVM, "focus", "guiFocus");
 
     lua_classfunction(luaVM, "isChatBoxInputActive", "isChatBoxInputActive");
     lua_classfunction(luaVM, "isConsoleActive", "isConsoleActive");
@@ -379,6 +385,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
@@ -507,6 +514,8 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getItemText", "guiGridListGetItemText");
     lua_classfunction(luaVM, "getRowCount", "guiGridListGetRowCount");
     lua_classfunction(luaVM, "getSelectedItem", "guiGridListGetSelectedItem");
+    lua_classfunction(luaVM, "getSelectionMode", "guiGridListGetSelectionMode");
+    lua_classfunction(luaVM, "isSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classfunction(luaVM, "getItemColor", "guiGridListGetItemColor");
     lua_classfunction(luaVM, "getColumnTitle", "guiGridListGetColumnTitle");
     lua_classfunction(luaVM, "getHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
@@ -531,8 +540,8 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classvariable(luaVM, "selectedCount", NULL, "guiGridListGetSelectedCount");
     lua_classvariable(luaVM, "selectedItems", NULL, "guiGridListGetSelectedItems");
     lua_classvariable(luaVM, "columnCount", NULL, "guiGridListGetColumnCount");
-    lua_classvariable(luaVM, "selectionMode", "guiGridListSetSelectionMode", NULL);
-    lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", NULL);
+    lua_classvariable(luaVM, "selectionMode", "guiGridListSetSelectionMode", "guiGridListGetSelectionMode");
+    lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classvariable(luaVM, "horizontalScrollPosition", "guiGridListSetHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
     lua_classvariable(luaVM, "verticalScrollPosition", "guiGridListGetVerticalScrollPosition", "guiGridListGetVerticalScrollPosition");
     // lua_classvariable ( luaVM, "selectedItem", NULL, "guiGridListGetSelectedItem" ); table
@@ -1893,6 +1902,46 @@ int CLuaGUIDefs::GUISetEnabled(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
+{
+    //  bool guiBlur ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIBlur(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
+{
+    //  bool guiFocus ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIFocus(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUISetProperty(lua_State* luaVM)
 {
     //  bool guiSetProperty ( element guiElement, string property, string value )
@@ -2097,6 +2146,26 @@ int CLuaGUIDefs::GUIGridListSetSortingEnabled(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGridListIsSortingEnabled(lua_State* luaVM)
+{
+    //  bool guiGridListIsSortingEnabled ( element guiGridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIGridList>(guiGridlist);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->IsSortingEnabled());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2460,6 +2529,26 @@ int CLuaGUIDefs::GUIGridListSetSelectionMode(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGridListGetSelectionMode(lua_State* luaVM)
+{
+    //  int guiGridListGetSelectionMode ( guiElement gridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIGridList>(guiGridlist);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetSelectionMode());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
     return 1;
 }
 

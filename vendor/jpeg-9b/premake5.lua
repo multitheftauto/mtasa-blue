@@ -2,13 +2,13 @@ project "jpeg"
 	language "C++"
 	kind "StaticLib"
 	targetname "jpeg"
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"jaricom.c",

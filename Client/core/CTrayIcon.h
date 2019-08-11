@@ -16,12 +16,14 @@
 class CTrayIcon : public CTrayIconInterface
 {
 public:
-    CTrayIcon(void);
-    ~CTrayIcon(void);
-    bool DoesTrayIconExist(void) { return m_bTrayIconExists; };
-    bool CreateTrayIcon(void);
-    void DestroyTrayIcon(void);
+    CTrayIcon();
+    ~CTrayIcon();
+    bool DoesTrayIconExist() { return m_bTrayIconExists; };
+    bool CreateTrayIcon();
+    void DestroyTrayIcon();
     bool CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound);
+
+    static LRESULT CALLBACK ProcessNotificationsWindowMessage(HWND hwnd, UINT uMsg, WPARAM wPAram, LPARAM lParam);
 
 private:
     NOTIFYICONDATAW* m_pNID;

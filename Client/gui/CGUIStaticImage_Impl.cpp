@@ -51,7 +51,7 @@ CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     }
 }
 
-CGUIStaticImage_Impl::~CGUIStaticImage_Impl(void)
+CGUIStaticImage_Impl::~CGUIStaticImage_Impl()
 {
     // Clear the image
     Clear();
@@ -123,7 +123,7 @@ bool CGUIStaticImage_Impl::LoadFromTexture(CGUITexture* pTexture)
     return true;
 }
 
-void CGUIStaticImage_Impl::Clear(void)
+void CGUIStaticImage_Impl::Clear()
 {
     // Stop the control from using it
     reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setImage(NULL);
@@ -163,17 +163,17 @@ void CGUIStaticImage_Impl::SetFrameEnabled(bool bFrameEnabled)
     reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
 }
 
-bool CGUIStaticImage_Impl::IsFrameEnabled(void)
+bool CGUIStaticImage_Impl::IsFrameEnabled()
 {
     return reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->isFrameEnabled();
 }
 
-CEGUI::Image* CGUIStaticImage_Impl::GetDirectImage(void)
+CEGUI::Image* CGUIStaticImage_Impl::GetDirectImage()
 {
     return const_cast<CEGUI::Image*>(reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->getImage());
 }
 
-void CGUIStaticImage_Impl::Render(void)
+void CGUIStaticImage_Impl::Render()
 {
     return reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->render();
 }

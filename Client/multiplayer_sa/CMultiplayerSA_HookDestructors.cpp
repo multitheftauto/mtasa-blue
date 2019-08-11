@@ -13,12 +13,13 @@
 
 namespace
 {
-    CAnimBlendAssocDestructorHandler* m_pCAnimBlendAssocDestructorHandler = nullptr;
-    GameObjectDestructHandler*        pGameObjectDestructHandler = NULL;
-    GameVehicleDestructHandler*       pGameVehicleDestructHandler = NULL;
-    GamePlayerDestructHandler*        pGamePlayerDestructHandler = NULL;
-    GameProjectileDestructHandler*    pGameProjectileDestructHandler = NULL;
-    GameModelRemoveHandler*           pGameModelRemoveHandler = NULL;
+    CAnimBlendAssocDestructorHandler*  m_pCAnimBlendAssocDestructorHandler = nullptr;
+    GameObjectDestructHandler*         pGameObjectDestructHandler = NULL;
+    GameVehicleDestructHandler*        pGameVehicleDestructHandler = NULL;
+    GamePlayerDestructHandler*         pGamePlayerDestructHandler = NULL;
+    GameProjectileDestructHandler*     pGameProjectileDestructHandler = NULL;
+    GameModelRemoveHandler*            pGameModelRemoveHandler = NULL;
+    GameRunNamedAnimDestructorHandler* pRunNamedAnimDestructorHandler = nullptr;
 
     #define FUNC_CPtrListSingleLink_Remove  0x0533610
     #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
@@ -513,6 +514,79 @@ void _declspec(naked) HOOK_CStreamingRemoveModel()
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
+void _cdecl OnCTaskSimpleRunNamedAnimDestructor(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    if (pRunNamedAnimDestructorHandler)
+        pRunNamedAnimDestructorHandler(pTask);
+}
+
+// Hook info
+#define HOOKPOS_CTaskSimpleRunNamedAnimDestructor        0x61BEF0
+#define HOOKSIZE_CTaskSimpleRunNamedAnimDestructor       8
+DWORD RETURN_CTaskSimpleRunNamedAnim = 0x61BEF8;
+void _declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        call    OnCTaskSimpleRunNamedAnimDestructor
+        add     esp, 4 * 1
+        popad
+
+        push    esi
+        mov     esi, ecx
+
+        // call the non-virtual destructor
+        // CTaskSimpleRunNamedAnim::~CTaskSimpleRunNamedAnim()
+        mov     eax, 0x61BF10
+        call    eax
+        jmp     RETURN_CTaskSimpleRunNamedAnim
+    }
+}
+
+void _cdecl OnCAnimBlendAssocGroupDestructor(CAnimBlendAssocGroupSAInterface* pGroupInterface)
+{
+    for (auto groupID : CMultiplayerSA::arrGroupsToProtect)
+    {
+        if (pGroupInterface->groupID == groupID)
+        {
+            void* ppAssociationsArray = reinterpret_cast<void*>(&pGroupInterface->pAssociationsArray);
+            LogEvent(519, "groupUnload", "Unloading anim group",
+                     SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", groupID, pGroupInterface,
+                             ppAssociationsArray, pGroupInterface->pAssociationsArray),
+                     519);
+
+            // crash it to get the stack
+            void* pPointer = nullptr;
+            assert(pPointer != nullptr);
+        }
+    }
+}
+
+// Hook info
+#define HOOKPOS_CAnimBlendAssocGroupDestructor        0x4CE1D0
+#define HOOKSIZE_CAnimBlendAssocGroupDestructor       6
+DWORD RETURN_CAnimBlendAssocGroupDestructor = 0x4CE1D6;
+void _declspec(naked) HOOK_CAnimBlendAssocGroupDestructor()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        call    OnCAnimBlendAssocGroupDestructor
+        add     esp, 0x4
+        popad
+
+        push    esi
+        mov     esi, ecx
+        mov     ecx, [esi + 0x4]
+        jmp     RETURN_CAnimBlendAssocGroupDestructor
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Set handlers
@@ -548,13 +622,20 @@ void CMultiplayerSA::SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler)
     pGameModelRemoveHandler = pHandler;
 }
 
+void CMultiplayerSA::SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler)
+{
+    pRunNamedAnimDestructorHandler = pHandler;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for HookDestructors
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_HookDestructors(void)
+void CMultiplayerSA::InitHooks_HookDestructors()
 {
+    EZHookInstall(CAnimBlendAssocGroupDestructor);
+    EZHookInstall(CTaskSimpleRunNamedAnimDestructor);
     EZHookInstall(CObjectDestructor);
     EZHookInstall(CVehicleDestructor);
     EZHookInstall(CProjectileDestructor);

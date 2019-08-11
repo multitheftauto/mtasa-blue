@@ -50,7 +50,7 @@ using EDrawMode::EDrawModeType;
 
 struct SCustomScaleFontInfo
 {
-    SCustomScaleFontInfo(void) : fScale(0), fontType(FONT_DEFAULT), pFont(NULL) {}
+    SCustomScaleFontInfo() : fScale(0), fontType(FONT_DEFAULT), pFont(NULL) {}
     float      fScale;
     eFontType  fontType;
     ID3DXFont* pFont;
@@ -72,10 +72,10 @@ class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 public:
     ZERO_ON_NEW
     CGraphics(CLocalGUI* pGUI);
-    ~CGraphics(void);
+    ~CGraphics();
 
     // DirectX misc. functions
-    IDirect3DDevice9* GetDevice(void) { return m_pDevice; };
+    IDirect3DDevice9* GetDevice() { return m_pDevice; };
 
     // Transformation functions
     void CalcWorldCoors(CVector* vecScreen, CVector* vecWorld);
@@ -90,18 +90,18 @@ public:
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
 
     void           SetBlendMode(EBlendModeType blendMode);
-    EBlendModeType GetBlendMode(void);
+    EBlendModeType GetBlendMode();
     SColor         ModifyColorForBlendMode(SColor color, EBlendModeType blendMode);
     void           BeginDrawBatch(EBlendModeType blendMode = EBlendMode::NONE);
-    void           EndDrawBatch(void);
+    void           EndDrawBatch();
     void           SetBlendModeRenderStates(EBlendModeType blendMode);
 
-    unsigned int GetViewportWidth(void);
-    unsigned int GetViewportHeight(void);
+    unsigned int GetViewportWidth();
+    unsigned int GetViewportHeight();
 
     void  SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRatio = 4 / 3.f);
-    bool  IsAspectRatioAdjustmentEnabled(void);
-    float GetAspectRatioAdjustmentSourceRatio(void);
+    bool  IsAspectRatioAdjustmentEnabled();
+    float GetAspectRatioAdjustmentSourceRatio();
     void  SetAspectRatioAdjustmentSuspended(bool bSuspended);
     float ConvertPositionForAspectRatio(float fY);
     void  ConvertSideForAspectRatio(float* pfY, float* pfHeight);
@@ -109,8 +109,8 @@ public:
     // DirectX font functions
     ID3DXFont* GetFont(eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL);
 
-    bool LoadStandardDXFonts(void);
-    bool DestroyStandardDXFonts(void);
+    bool LoadStandardDXFonts();
+    bool DestroyStandardDXFonts();
     bool CreateStandardDXFontWithCustomScale(eFontType fontType, float fScale, ID3DXFont** ppD3DXFont);
 
     bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont);
@@ -162,17 +162,17 @@ public:
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
     // Subsystems
-    CRenderItemManagerInterface* GetRenderItemManager(void) { return m_pRenderItemManager; }
-    CScreenGrabberInterface*     GetScreenGrabber(void) { return m_pScreenGrabber; }
-    CPixelsManagerInterface*     GetPixelsManager(void) { return m_pPixelsManager; }
+    CRenderItemManagerInterface* GetRenderItemManager() { return m_pRenderItemManager; }
+    CScreenGrabberInterface*     GetScreenGrabber() { return m_pScreenGrabber; }
+    CPixelsManagerInterface*     GetPixelsManager() { return m_pPixelsManager; }
 
     // Transition between GTA and MTA controlled rendering
-    virtual void EnteringMTARenderZone(void);
-    virtual void LeavingMTARenderZone(void);
-    virtual void MaybeEnteringMTARenderZone(void);
-    virtual void MaybeLeavingMTARenderZone(void);
-    void         SaveGTARenderStates(void);
-    void         RestoreGTARenderStates(void);
+    virtual void EnteringMTARenderZone();
+    virtual void LeavingMTARenderZone();
+    virtual void MaybeEnteringMTARenderZone();
+    virtual void MaybeLeavingMTARenderZone();
+    void         SaveGTARenderStates();
+    void         RestoreGTARenderStates();
 
     // Texture data manipulation
     bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
@@ -188,7 +188,7 @@ public:
     void DrawPrimitive3DPreGUIQueue(void);
     bool HasPrimitive3DPreGUIQueueItems(void);
 
-    void DidRenderScene(void);
+    void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
@@ -197,7 +197,7 @@ private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
     void       OnDeviceInvalidate(IDirect3DDevice9* pDevice);
     void       OnDeviceRestore(IDirect3DDevice9* pDevice);
-    void       OnZBufferModified(void);
+    void       OnZBufferModified();
     ID3DXFont* MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float& fScaleY);
     void       CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE);
     void       DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,

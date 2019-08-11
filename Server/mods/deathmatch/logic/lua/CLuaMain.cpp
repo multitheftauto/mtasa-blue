@@ -55,7 +55,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
 }
 
-CLuaMain::~CLuaMain(void)
+CLuaMain::~CLuaMain()
 {
     // remove all current remote calls originating from this VM
     g_pGame->GetRemoteCalls()->Remove(this);
@@ -96,17 +96,17 @@ CLuaMain::~CLuaMain(void)
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
 
-bool CLuaMain::BeingDeleted(void)
+bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
 }
 
-void CLuaMain::ResetInstructionCount(void)
+void CLuaMain::ResetInstructionCount()
 {
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity(void)
+void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
     static const luaL_reg osfuncs[] =
@@ -168,7 +168,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM(void)
+void CLuaMain::InitVM()
 {
     assert(!m_luaVM);
 
@@ -216,7 +216,7 @@ void CLuaMain::InitVM(void)
 }
 
 // Special function(s) that are only visible to HTMLD scripts
-void CLuaMain::RegisterHTMLDFunctions(void)
+void CLuaMain::RegisterHTMLDFunctions()
 {
     CLuaHTTPDefs::LoadFunctions(m_luaVM);
 }
@@ -237,8 +237,7 @@ void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
             strAbortInf += pLuaMain->GetScriptName();
 
             // Error out
-            lua_pushstring(luaVM, strAbortInf);
-            lua_error(luaVM);
+            luaL_error(luaVM, strAbortInf);
         }
     }
 }
@@ -354,11 +353,11 @@ bool CLuaMain::LoadScript(const char* szLUAScript)
 }
 
 // TODO: Check the purpose of this function
-void CLuaMain::Start(void)
+void CLuaMain::Start()
 {
 }
 
-void CLuaMain::UnloadScript(void)
+void CLuaMain::UnloadScript()
 {
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
@@ -381,7 +380,7 @@ void CLuaMain::UnloadScript(void)
     }
 }
 
-void CLuaMain::DoPulse(void)
+void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
 }
@@ -604,7 +603,7 @@ int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 // Issue warning if execution time is too long
 //
 ///////////////////////////////////////////////////////////////
-void CLuaMain::CheckExecutionTime(void)
+void CLuaMain::CheckExecutionTime()
 {
     // Do time check
     if (m_WarningTimer.Get() < 5000)

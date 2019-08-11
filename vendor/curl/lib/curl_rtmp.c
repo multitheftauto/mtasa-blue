@@ -5,7 +5,7 @@
  *                | (__| |_| |  _ <| |___
  *                 \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2010, Howard Chu, <hyc@highlandsun.com>
  *
  * This software is licensed as described in the file COPYING, which
@@ -37,8 +37,10 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
-#ifdef _WIN32
+#if defined(WIN32) && !defined(USE_LWIPSOCK)
 #define setsockopt(a,b,c,d,e) (setsockopt)(a,b,c,(const char *)d,(int)e)
+#define SET_RCVTIMEO(tv,s)   int tv = s*1000
+#elif defined(LWIP_SO_SNDRCVTIMEO_NONSTANDARD)
 #define SET_RCVTIMEO(tv,s)   int tv = s*1000
 #else
 #define SET_RCVTIMEO(tv,s)   struct timeval tv = {s,0}
@@ -237,17 +239,18 @@ static CURLcode rtmp_connect(struct connectdata *conn, bool *done)
 
 static CURLcode rtmp_do(struct connectdata *conn, bool *done)
 {
+  struct Curl_easy *data = conn->data;
   RTMP *r = conn->proto.generic;
 
   if(!RTMP_ConnectStream(r, 0))
     return CURLE_FAILED_INIT;
 
   if(conn->data->set.upload) {
-    Curl_pgrsSetUploadSize(conn->data, conn->data->state.infilesize);
-    Curl_setup_transfer(conn, -1, -1, FALSE, NULL, FIRSTSOCKET, NULL);
+    Curl_pgrsSetUploadSize(data, data->state.infilesize);
+    Curl_setup_transfer(data, -1, -1, FALSE, FIRSTSOCKET);
   }
   else
-    Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, NULL, -1, NULL);
+    Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
   *done = TRUE;
   return CURLE_OK;
 }

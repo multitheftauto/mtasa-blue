@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -91,6 +91,11 @@
 #include <support/SupportDefs.h>
 #endif
 
+/* Compatibility for non-Clang compilers */
+#ifndef __has_declspec_attribute
+#  define __has_declspec_attribute(x) 0
+#endif
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -109,7 +114,9 @@ typedef void CURLSH;
 
 #ifdef CURL_STATICLIB
 #  define CURL_EXTERN
-#elif defined(WIN32) || defined(_WIN32) || defined(__SYMBIAN32__)
+#elif defined(WIN32) || defined(__SYMBIAN32__) || \
+     (__has_declspec_attribute(dllexport) && \
+      __has_declspec_attribute(dllimport))
 #  if defined(BUILDING_LIBCURL)
 #    define CURL_EXTERN  __declspec(dllexport)
 #  else
@@ -144,15 +151,19 @@ typedef enum {
   CURLSSLBACKEND_POLARSSL = 6,
   CURLSSLBACKEND_WOLFSSL = 7,
   CURLSSLBACKEND_SCHANNEL = 8,
-  CURLSSLBACKEND_DARWINSSL = 9,
-  CURLSSLBACKEND_AXTLS = 10,
-  CURLSSLBACKEND_MBEDTLS = 11
+  CURLSSLBACKEND_SECURETRANSPORT = 9,
+  CURLSSLBACKEND_AXTLS = 10, /* never used since 7.63.0 */
+  CURLSSLBACKEND_MBEDTLS = 11,
+  CURLSSLBACKEND_MESALINK = 12
 } curl_sslbackend;
 
 /* aliases for library clones and renames */
 #define CURLSSLBACKEND_LIBRESSL CURLSSLBACKEND_OPENSSL
 #define CURLSSLBACKEND_BORINGSSL CURLSSLBACKEND_OPENSSL
+
+/* deprecated names: */
 #define CURLSSLBACKEND_CYASSL CURLSSLBACKEND_WOLFSSL
+#define CURLSSLBACKEND_DARWINSSL CURLSSLBACKEND_SECURETRANSPORT
 
 struct curl_httppost {
   struct curl_httppost *next;       /* next entry in the list */
@@ -198,16 +209,17 @@ struct curl_httppost {
                                        set. Added in 7.46.0 */
 };
 
-/* This is the CURLOPT_PROGRESSFUNCTION callback proto. It is now considered
-   deprecated but was the only choice up until 7.31.0 */
+/* This is the CURLOPT_PROGRESSFUNCTION callback prototype. It is now
+   considered deprecated but was the only choice up until 7.31.0 */
 typedef int (*curl_progress_callback)(void *clientp,
                                       double dltotal,
                                       double dlnow,
                                       double ultotal,
                                       double ulnow);
 
-/* This is the CURLOPT_XFERINFOFUNCTION callback proto. It was introduced in
-   7.32.0, it avoids floating point and provides more detailed information. */
+/* This is the CURLOPT_XFERINFOFUNCTION callback prototype. It was introduced
+   in 7.32.0, avoids the use of floating point numbers and provides more
+   detailed information. */
 typedef int (*curl_xferinfo_callback)(void *clientp,
                                       curl_off_t dltotal,
                                       curl_off_t dlnow,
@@ -279,7 +291,7 @@ typedef enum {
 struct curl_fileinfo {
   char *filename;
   curlfiletype filetype;
-  time_t time;
+  time_t time; /* always zero! */
   unsigned int perm;
   int uid;
   int gid;
@@ -354,10 +366,20 @@ typedef int (*curl_seek_callback)(void *instream,
    signal libcurl to pause sending data on the current transfer. */
 #define CURL_READFUNC_PAUSE 0x10000001
 
+/* Return code for when the trailing headers' callback has terminated
+   without any errors*/
+#define CURL_TRAILERFUNC_OK 0
+/* Return code for when was an error in the trailing header's list and we
+  want to abort the request */
+#define CURL_TRAILERFUNC_ABORT 1
+
 typedef size_t (*curl_read_callback)(char *buffer,
                                       size_t size,
                                       size_t nitems,
                                       void *instream);
+
+typedef int (*curl_trailer_callback)(struct curl_slist **list,
+                                      void *userdata);
 
 typedef enum {
   CURLSOCKTYPE_IPCXN,  /* socket created for a specific IP connection */
@@ -517,8 +539,7 @@ typedef enum {
   CURLE_UNKNOWN_OPTION,          /* 48 - User specified an unknown option */
   CURLE_TELNET_OPTION_SYNTAX,    /* 49 - Malformed telnet option */
   CURLE_OBSOLETE50,              /* 50 - NOT USED */
-  CURLE_PEER_FAILED_VERIFICATION, /* 51 - peer's certificate or fingerprint
-                                     wasn't verified fine */
+  CURLE_OBSOLETE51,              /* 51 - NOT USED */
   CURLE_GOT_NOTHING,             /* 52 - when this is a specific error */
   CURLE_SSL_ENGINE_NOTFOUND,     /* 53 - SSL crypto engine not found */
   CURLE_SSL_ENGINE_SETFAILED,    /* 54 - can not set SSL crypto engine as
@@ -528,7 +549,8 @@ typedef enum {
   CURLE_OBSOLETE57,              /* 57 - NOT IN USE */
   CURLE_SSL_CERTPROBLEM,         /* 58 - problem with the local certificate */
   CURLE_SSL_CIPHER,              /* 59 - couldn't use specified cipher */
-  CURLE_SSL_CACERT,              /* 60 - problem with the CA cert (path?) */
+  CURLE_PEER_FAILED_VERIFICATION, /* 60 - peer's certificate or fingerprint
+                                     wasn't verified fine */
   CURLE_BAD_CONTENT_ENCODING,    /* 61 - Unrecognized/bad encoding */
   CURLE_LDAP_INVALID_URL,        /* 62 - Invalid LDAP URL */
   CURLE_FILESIZE_EXCEEDED,       /* 63 - Maximum file size exceeded */
@@ -598,6 +620,9 @@ typedef enum {
 #define CURLOPT_ENCODING CURLOPT_ACCEPT_ENCODING
 #define CURLE_FTP_WEIRD_SERVER_REPLY CURLE_WEIRD_SERVER_REPLY
 
+/* The following were added in 7.62.0 */
+#define CURLE_SSL_CACERT CURLE_PEER_FAILED_VERIFICATION
+
 /* The following were added in 7.21.5, April 2011 */
 #define CURLE_UNKNOWN_TELNET_OPTION CURLE_UNKNOWN_OPTION
 
@@ -661,8 +686,10 @@ typedef enum {
 typedef CURLcode (*curl_conv_callback)(char *buffer, size_t length);
 
 typedef CURLcode (*curl_ssl_ctx_callback)(CURL *curl,    /* easy handle */
-                                          void *ssl_ctx, /* actually an
-                                                            OpenSSL SSL_CTX */
+                                          void *ssl_ctx, /* actually an OpenSSL
+                                                            or WolfSSL SSL_CTX,
+                                                            or an mbedTLS
+                                                          mbedtls_ssl_config */
                                           void *userptr);
 
 typedef enum {
@@ -800,6 +827,9 @@ typedef enum {
    this value, keep them in sync. */
 #define CURL_HET_DEFAULT 200L
 
+/* The default connection upkeep interval in milliseconds. */
+#define CURL_UPKEEP_INTERVAL_DEFAULT 60000L
+
 #ifndef CURL_NO_OLDIES /* define this to test if your app builds with all
                           the obsolete stuff removed! */
 
@@ -853,6 +883,14 @@ typedef enum {
 /* bitmask defines for CURLOPT_HEADEROPT */
 #define CURLHEADER_UNIFIED  0
 #define CURLHEADER_SEPARATE (1<<0)
+
+/* CURLALTSVC_* are bits for the CURLOPT_ALTSVC_CTRL option */
+#define CURLALTSVC_IMMEDIATELY  (1<<0)
+#define CURLALTSVC_ALTUSED      (1<<1)
+#define CURLALTSVC_READONLYFILE (1<<2)
+#define CURLALTSVC_H1           (1<<3)
+#define CURLALTSVC_H2           (1<<4)
+#define CURLALTSVC_H3           (1<<5)
 
 /* CURLPROTO_ defines are for the CURLOPT_*PROTOCOLS options */
 #define CURLPROTO_HTTP   (1<<0)
@@ -1279,9 +1317,9 @@ typedef enum {
      Note that setting multiple bits may cause extra network round-trips. */
   CINIT(HTTPAUTH, LONG, 107),
 
-  /* Set the ssl context callback function, currently only for OpenSSL ssl_ctx
-     in second argument. The function must be matching the
-     curl_ssl_ctx_callback proto. */
+  /* Set the ssl context callback function, currently only for OpenSSL or
+     WolfSSL ssl_ctx, or mbedTLS mbedtls_ssl_config in the second argument.
+     The function must match the curl_ssl_ctx_callback prototype. */
   CINIT(SSL_CTX_FUNCTION, FUNCTIONPOINT, 108),
 
   /* Set the userdata for the ssl context callback function's third
@@ -1855,6 +1893,36 @@ typedef enum {
 
   /* Disallow specifying username/login in URL. */
   CINIT(DISALLOW_USERNAME_IN_URL, LONG, 278),
+
+  /* DNS-over-HTTPS URL */
+  CINIT(DOH_URL, STRINGPOINT, 279),
+
+  /* Preferred buffer size to use for uploads */
+  CINIT(UPLOAD_BUFFERSIZE, LONG, 280),
+
+  /* Time in ms between connection upkeep calls for long-lived connections. */
+  CINIT(UPKEEP_INTERVAL_MS, LONG, 281),
+
+  /* Specify URL using CURL URL API. */
+  CINIT(CURLU, OBJECTPOINT, 282),
+
+  /* add trailing data just after no more data is available */
+  CINIT(TRAILERFUNCTION, FUNCTIONPOINT, 283),
+
+  /* pointer to be passed to HTTP_TRAILER_FUNCTION */
+  CINIT(TRAILERDATA, OBJECTPOINT, 284),
+
+  /* set this to 1L to allow HTTP/0.9 responses or 0L to disallow */
+  CINIT(HTTP09_ALLOWED, LONG, 285),
+
+  /* alt-svc control bitmask */
+  CINIT(ALTSVC_CTRL, LONG, 286),
+
+  /* alt-svc cache file name to possibly read from/write to */
+  CINIT(ALTSVC, STRINGPOINT, 287),
+
+  /* maximum age of a connection to consider it for reuse (in seconds) */
+  CINIT(MAXAGE_CONN, LONG, 288),
 
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;
@@ -2449,8 +2517,8 @@ CURL_EXTERN void curl_slist_free_all(struct curl_slist *);
  */
 CURL_EXTERN time_t curl_getdate(const char *p, const time_t *unused);
 
-/* info about the certificate chain, only for OpenSSL builds. Asked
-   for with CURLOPT_CERTINFO / CURLINFO_CERTINFO */
+/* info about the certificate chain, only for OpenSSL, GnuTLS, Schannel, NSS
+   and GSKit builds. Asked for with CURLOPT_CERTINFO / CURLINFO_CERTINFO */
 struct curl_certinfo {
   int num_of_certs;             /* number of certificates with information */
   struct curl_slist **certinfo; /* for each index in this array, there's a
@@ -2718,6 +2786,7 @@ typedef struct {
 #define CURL_VERSION_HTTPS_PROXY  (1<<21) /* HTTPS-proxy support built-in */
 #define CURL_VERSION_MULTI_SSL    (1<<22) /* Multiple SSL backends available */
 #define CURL_VERSION_BROTLI       (1<<23) /* Brotli features are present. */
+#define CURL_VERSION_ALTSVC       (1<<24) /* Alt-Svc handling built-in */
 
  /*
  * NAME curl_version_info()
@@ -2779,6 +2848,7 @@ CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);
   stuff before they can be included! */
 #include "easy.h" /* nothing in curl is fun without the easy stuff */
 #include "multi.h"
+#include "urlapi.h"
 
 /* the typechecker doesn't work in C++ (yet) */
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) && \

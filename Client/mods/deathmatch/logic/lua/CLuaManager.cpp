@@ -38,7 +38,7 @@ CLuaManager::CLuaManager(CClientGame* pClientGame)
     lua_registerUndumpHook(CLuaMain::OnUndump);
 }
 
-CLuaManager::~CLuaManager(void)
+CLuaManager::~CLuaManager()
 {
     // Delete all the VM's
     list<CLuaMain*>::iterator iter;
@@ -93,7 +93,7 @@ void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
     MapRemove(m_VirtualMachineMap, pLuaMain->GetVirtualMachine());
 }
 
-void CLuaManager::ProcessPendingDeleteList(void)
+void CLuaManager::ProcessPendingDeleteList()
 {
     while (!m_PendingDeleteList.empty())
     {
@@ -104,7 +104,7 @@ void CLuaManager::ProcessPendingDeleteList(void)
     }
 }
 
-void CLuaManager::DoPulse(void)
+void CLuaManager::DoPulse()
 {
     list<CLuaMain*>::iterator iter = m_virtualMachines.begin();
     for (; iter != m_virtualMachines.end(); ++iter)
@@ -146,7 +146,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     return NULL;
 }
 
-void CLuaManager::LoadCFunctions(void)
+void CLuaManager::LoadCFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
@@ -229,7 +229,6 @@ void CLuaManager::LoadCFunctions(void)
         {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
-        // {"getClipboard", CLuaFunctionDefs::GetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
 
@@ -376,6 +375,7 @@ void CLuaManager::LoadCFunctions(void)
         {"addCommandHandler", CLuaFunctionDefs::AddCommandHandler},
         {"removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler},
         {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
+        {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
         // Utility
         {"getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData},

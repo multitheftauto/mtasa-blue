@@ -347,13 +347,13 @@ CClientVehicleManager::CClientVehicleManager(CClientManager* pManager)
     }
 }
 
-CClientVehicleManager::~CClientVehicleManager(void)
+CClientVehicleManager::~CClientVehicleManager()
 {
     // Destroy all vehicles
     DeleteAll();
 }
 
-void CClientVehicleManager::DeleteAll(void)
+void CClientVehicleManager::DeleteAll()
 {
     // Delete all the vehicles
     m_bCanRemoveFromList = false;
@@ -368,7 +368,7 @@ void CClientVehicleManager::DeleteAll(void)
     m_bCanRemoveFromList = true;
 }
 
-void CClientVehicleManager::DoPulse(void)
+void CClientVehicleManager::DoPulse()
 {
     CClientVehicle* pVehicle = NULL;
     // Loop through our streamed-in vehicles
@@ -713,7 +713,7 @@ bool CClientVehicleManager::Exists(CClientVehicle* pVehicle)
     return ListContains(m_List, pVehicle);
 }
 
-bool CClientVehicleManager::IsVehicleLimitReached(void)
+bool CClientVehicleManager::IsVehicleLimitReached()
 {
     // GTA allows max 110 vehicles. We restrict ourselves to 64 for now
     // due to FPS issues and crashes around 100 vehicles.

@@ -20,24 +20,24 @@ public:
     CConsole(class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager,
              class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager,
              class CBanManager* pBanManager, class CAccessControlListManager* pACLManager);
-    ~CConsole(void);
+    ~CConsole();
 
     bool HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient);
 
     void             AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted);
     void             DeleteCommand(const char* szCommand);
-    void             DeleteAllCommands(void);
+    void             DeleteAllCommands();
     CConsoleCommand* GetCommand(const char* szKey);
 
-    list<CConsoleCommand*>::const_iterator CommandsBegin(void) { return m_Commands.begin(); };
-    list<CConsoleCommand*>::const_iterator CommandsEnd(void) { return m_Commands.end(); };
+    list<CConsoleCommand*>::const_iterator CommandsBegin() { return m_Commands.begin(); };
+    list<CConsoleCommand*>::const_iterator CommandsEnd() { return m_Commands.end(); };
 
-    class CBlipManager*    GetBlipManager(void) { return m_pBlipManager; };
-    class CLuaManager*     GetLuaManager(void) { return m_pLuaManager; };
-    class CMapManager*     GetMapManager(void) { return m_pMapManager; };
-    class CPlayerManager*  GetPlayerManager(void) { return m_pPlayerManager; };
-    class CVehicleManager* GetVehicleManager(void) { return m_pVehicleManager; };
-    class CBanManager*     GetBanManager(void) { return m_pBanManager; };
+    class CBlipManager*    GetBlipManager() { return m_pBlipManager; };
+    class CLuaManager*     GetLuaManager() { return m_pLuaManager; };
+    class CMapManager*     GetMapManager() { return m_pMapManager; };
+    class CPlayerManager*  GetPlayerManager() { return m_pPlayerManager; };
+    class CVehicleManager* GetVehicleManager() { return m_pVehicleManager; };
+    class CBanManager*     GetBanManager() { return m_pBanManager; };
 
 private:
     class CBlipManager*              m_pBlipManager;

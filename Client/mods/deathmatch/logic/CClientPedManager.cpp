@@ -19,12 +19,12 @@ CClientPedManager::CClientPedManager(CClientManager* pManager)
     m_bRemoveFromList = true;
 }
 
-CClientPedManager::~CClientPedManager(void)
+CClientPedManager::~CClientPedManager()
 {
     DeleteAll();
 }
 
-void CClientPedManager::DeleteAll(void)
+void CClientPedManager::DeleteAll()
 {
     m_bRemoveFromList = false;
     vector<CClientPed*>::iterator iter = m_List.begin();

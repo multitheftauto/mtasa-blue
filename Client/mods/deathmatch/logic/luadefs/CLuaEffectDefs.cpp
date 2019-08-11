@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaEffectDefs::LoadFunctions(void)
+void CLuaEffectDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"fxAddBlood", fxAddBlood},

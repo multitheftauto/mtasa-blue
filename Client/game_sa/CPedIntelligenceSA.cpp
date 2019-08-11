@@ -26,25 +26,25 @@ CPedIntelligenceSA::~CPedIntelligenceSA()
     delete this->TaskManager;
 }
 
-CTaskManager* CPedIntelligenceSA::GetTaskManager(void)
+CTaskManager* CPedIntelligenceSA::GetTaskManager()
 {
     DEBUG_TRACE("CTaskManager * CPedSA::GetTaskManager( void )");
     return this->TaskManager;
 }
 
-CVehicleScanner* CPedIntelligenceSA::GetVehicleScanner(void)
+CVehicleScanner* CPedIntelligenceSA::GetVehicleScanner()
 {
     return this->VehicleScanner;
 }
 
-bool CPedIntelligenceSA::IsRespondingToEvent(void)
+bool CPedIntelligenceSA::IsRespondingToEvent()
 {
     DWORD dwFunc = FUNC_IsRespondingToEvent;
 
     return false;
 }
 
-int CPedIntelligenceSA::GetCurrentEventType(void)
+int CPedIntelligenceSA::GetCurrentEventType()
 {
     DWORD dwFunc = FUNC_GetCurrentEventType;
     DWORD dwRet = 0;
@@ -58,7 +58,7 @@ int CPedIntelligenceSA::GetCurrentEventType(void)
     return dwRet;
 }
 
-CEvent* CPedIntelligenceSA::GetCurrentEvent(void)
+CEvent* CPedIntelligenceSA::GetCurrentEvent()
 {
     return NULL;
 }
@@ -80,7 +80,7 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     return bReturn;
 }
 
-CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun(void)
+CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun()
 {
     CTaskSimpleUseGunSAInterface* pTaskUseGun;
     DWORD                         dwThis = (DWORD)internalInterface;
@@ -93,4 +93,10 @@ CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun(void)
     }
 
     return pTaskUseGun;
+}
+
+CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
+{
+    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
+    return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
 }

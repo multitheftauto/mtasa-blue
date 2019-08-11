@@ -30,7 +30,7 @@ CClientPacketRecorder::CClientPacketRecorder(CClientManager* pManager)
     m_uiFrameSkip = 1;
 }
 
-CClientPacketRecorder::~CClientPacketRecorder(void)
+CClientPacketRecorder::~CClientPacketRecorder()
 {
     Stop();
 }
@@ -111,7 +111,7 @@ void CClientPacketRecorder::StartRecord(const char* szOutput, bool bFrameBased)
     }
 }
 
-void CClientPacketRecorder::Stop(void)
+void CClientPacketRecorder::Stop()
 {
     // Delete the filename
     if (m_szFilename)
@@ -129,22 +129,22 @@ void CClientPacketRecorder::Stop(void)
     m_lNextPacketTime = 0;
 }
 
-bool CClientPacketRecorder::IsPlaying(void)
+bool CClientPacketRecorder::IsPlaying()
 {
     return m_bPlaying;
 }
 
-bool CClientPacketRecorder::IsRecording(void)
+bool CClientPacketRecorder::IsRecording()
 {
     return m_bRecording;
 }
 
-bool CClientPacketRecorder::IsPlayingOrRecording(void)
+bool CClientPacketRecorder::IsPlayingOrRecording()
 {
     return m_bPlaying || m_bRecording;
 }
 
-bool CClientPacketRecorder::IsFrameBased(void)
+bool CClientPacketRecorder::IsFrameBased()
 {
     return m_bFrameBased;
 }
@@ -336,7 +336,7 @@ void CClientPacketRecorder::ReadLocalData(FILE* pFile)
 }
 
 bool bHack = false;
-void CClientPacketRecorder::DoPulse(void)
+void CClientPacketRecorder::DoPulse()
 {
     // Count the frame
     m_lFrames += m_uiFrameSkip;

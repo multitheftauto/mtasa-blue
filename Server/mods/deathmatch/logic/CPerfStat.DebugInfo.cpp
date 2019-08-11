@@ -33,12 +33,12 @@ class CPerfStatDebugInfoImpl : public CPerfStatDebugInfo
 public:
     ZERO_ON_NEW
 
-    CPerfStatDebugInfoImpl(void);
-    virtual ~CPerfStatDebugInfoImpl(void);
+    CPerfStatDebugInfoImpl();
+    virtual ~CPerfStatDebugInfoImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatDebugInfo
@@ -46,7 +46,7 @@ public:
     virtual void AddLine(const SString& strSection, const SString& strData);
 
     // CPerfStatDebugInfoImpl
-    void RecordStats(void);
+    void RecordStats();
 
     SString    m_strCategoryName;
     bool       m_bActive;
@@ -79,7 +79,7 @@ CPerfStatDebugInfo* CPerfStatDebugInfo::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugInfoImpl::CPerfStatDebugInfoImpl(void)
+CPerfStatDebugInfoImpl::CPerfStatDebugInfoImpl()
 {
     m_strCategoryName = "Debug info";
 }
@@ -91,7 +91,7 @@ CPerfStatDebugInfoImpl::CPerfStatDebugInfoImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugInfoImpl::~CPerfStatDebugInfoImpl(void)
+CPerfStatDebugInfoImpl::~CPerfStatDebugInfoImpl()
 {
 }
 
@@ -102,7 +102,7 @@ CPerfStatDebugInfoImpl::~CPerfStatDebugInfoImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatDebugInfoImpl::GetCategoryName(void)
+const SString& CPerfStatDebugInfoImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -114,7 +114,7 @@ const SString& CPerfStatDebugInfoImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugInfoImpl::DoPulse(void)
+void CPerfStatDebugInfoImpl::DoPulse()
 {
     // Check if time to auto deactivate
     if (m_bActive)

@@ -319,7 +319,7 @@ bool CClientTask::WriteParameters(lua_State* luaVM, int iTableIndex)
     return true;
 }
 
-unsigned long CClientTask::GenerateUniqueIdentifier(void)
+unsigned long CClientTask::GenerateUniqueIdentifier()
 {
     return ++m_ulLastUniqueIdentifier;
 }
@@ -339,7 +339,7 @@ void CClientTask::RemoveElement(CClientEntity* pElement)
     m_Elements.remove(pElement->GetID());
 }
 
-void CClientTask::ClearElements(void)
+void CClientTask::ClearElements()
 {
     // Clear the list
     m_Elements.clear();
@@ -393,7 +393,7 @@ void CClientTask::SetParameters(const std::list<std::string>& Keys, const std::l
     assert(m_Keys.size() == m_Values.size());
 }
 
-void CClientTask::ClearParameters(void)
+void CClientTask::ClearParameters()
 {
     // Clear all the parameters
     m_Keys.clear();

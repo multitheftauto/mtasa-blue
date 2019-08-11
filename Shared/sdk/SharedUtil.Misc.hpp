@@ -16,6 +16,7 @@
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
+    #include <Psapi.h>
 #else
     #include <wctype.h>
     #ifndef _GNU_SOURCE
@@ -29,6 +30,10 @@
     #endif
 #endif
 
+#ifdef __APPLE__
+    #include "cpuid.h"
+#endif
+
 CCriticalSection     CRefCountable::ms_CS;
 std::map<uint, uint> ms_ReportAmountMap;
 SString              ms_strProductRegistryPath;
@@ -39,7 +44,7 @@ struct SReportLine
 {
     SString strText;
     uint    uiId;
-            operator SString&(void) { return strText; }
+    void    operator+=(const char* szAppend) { strText += szAppend; }
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
@@ -64,6 +69,9 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
     // Default to warning icon
     if ((uType & ICON_MASK_VALUE) == 0)
         uType |= ICON_WARNING;
+    // Make topmost work
+    if (uType & MB_TOPMOST)
+        uType |= MB_SYSTEMMODAL;
     WString strText = MbUTF8ToUTF16(lpText);
     WString strCaption = MbUTF8ToUTF16(lpCaption);
     return MessageBoxW(hWnd, strText.c_str(), strCaption.c_str(), uType);
@@ -71,20 +79,63 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
 #endif
 
 //
+// Return full path and filename of parent exe
+//
+SString GetParentProcessPathFilename(int pid)
+{
+    HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if (Process32FirstW(hSnapshot, &pe))
+    {
+        do
+        {
+            if (pe.th32ProcessID == pid)
+            {
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe.th32ParentProcessID);
+                if (hProcess)
+                {
+                    WCHAR szModuleName[MAX_PATH * 2] = {0};
+                    GetModuleFileNameExW(hProcess, nullptr, szModuleName, NUMELMS(szModuleName));
+                    CloseHandle(hProcess);
+                    SString strModuleName = ToUTF8(szModuleName);
+                    if (FileExists(strModuleName))
+                    {
+                        CloseHandle(hSnapshot);
+                        if (IsShortPathName(strModuleName))
+                            return GetSystemLongPathName(strModuleName);
+                        return strModuleName;
+                    }
+                }
+            }
+        } while (Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return "";
+}
+
+//
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
-SString SharedUtil::GetMTASABaseDir(void)
+SString SharedUtil::GetMTASABaseDir()
 {
     static SString strInstallRoot;
     if (strInstallRoot.empty())
     {
-        strInstallRoot = GetRegistryValue("", "Last Run Location");
+        if (IsGTAProcess())
+        {
+            // Try to get base dir from parent process
+            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+        }
         if (strInstallRoot.empty())
         {
-            MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
-                           MB_OK | MB_ICONERROR | MB_TOPMOST);
-            TerminateProcess(GetCurrentProcess(), 9);
+            strInstallRoot = GetRegistryValue("", "Last Run Location");
+            if (strInstallRoot.empty())
+            {
+                MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
+                               MB_OK | MB_ICONERROR | MB_TOPMOST);
+                TerminateProcess(GetCurrentProcess(), 9);
+            }
         }
     }
     return strInstallRoot;
@@ -102,7 +153,7 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 //
 // Returns true if current process is GTA (i.e not MTA process)
 //
-bool SharedUtil::IsGTAProcess(void)
+bool SharedUtil::IsGTAProcess()
 {
     SString strLaunchPathFilename = GetLaunchPathFilename();
     if (strLaunchPathFilename.EndsWithI("gta_sa.exe") || strLaunchPathFilename.EndsWithI("proxy_sa.exe"))
@@ -175,7 +226,7 @@ static bool DeleteRegistryKey(HKEY hkRoot, const char* szSubKey)
 //
 // GetMajorVersionString
 //
-SString SharedUtil::GetMajorVersionString(void)
+SString SharedUtil::GetMajorVersionString()
 {
     return SStringX(MTA_DM_ASE_VERSION).Left(3);
 }
@@ -307,7 +358,7 @@ void SharedUtil::SetPostUpdateConnect(const SString& strHost)
 //
 // What server to connect to after update
 //
-SString SharedUtil::GetPostUpdateConnect(void)
+SString SharedUtil::GetPostUpdateConnect()
 {
     SString strPostUpdateConnect = GetRegistryValue("", "PostUpdateConnect");
     SetPostUpdateConnect("");
@@ -404,7 +455,7 @@ int SharedUtil::IncApplicationSettingInt(const SString& strName)
 // WatchDog
 //
 
-void SharedUtil::WatchDogReset(void)
+void SharedUtil::WatchDogReset()
 {
     RemoveApplicationSettingKey("watchdog");
 }
@@ -447,7 +498,7 @@ void SharedUtil::WatchDogClearCounter(const SString& str)
 static bool bWatchDogWasUncleanStopCached = false;
 static bool bWatchDogWasUncleanStopValue = false;
 
-bool SharedUtil::WatchDogWasUncleanStop(void)
+bool SharedUtil::WatchDogWasUncleanStop()
 {
     if (!bWatchDogWasUncleanStopCached)
     {
@@ -470,7 +521,7 @@ void SharedUtil::WatchDogSetUncleanStop(bool bOn)
 static bool bWatchDogWasLastRunCrashCached = false;
 static bool bWatchDogWasLastRunCrashValue = false;
 
-bool SharedUtil::WatchDogWasLastRunCrash(void)
+bool SharedUtil::WatchDogWasLastRunCrash()
 {
     if (!bWatchDogWasLastRunCrashCached)
     {
@@ -490,7 +541,7 @@ void SharedUtil::WatchDogSetLastRunCrash(bool bOn)
 //
 // Special things
 //
-void SharedUtil::WatchDogUserDidInteractWithMenu(void)
+void SharedUtil::WatchDogUserDidInteractWithMenu()
 {
     WatchDogCompletedSection(WD_SECTION_NOT_USED_MAIN_MENU);
     WatchDogCompletedSection(WD_SECTION_POST_INSTALL);
@@ -502,7 +553,7 @@ void SharedUtil::SetProductRegistryPath(const SString& strRegistryPath)
     ms_strProductRegistryPath = strRegistryPath;
 }
 
-const SString& SharedUtil::GetProductRegistryPath(void)
+const SString& SharedUtil::GetProductRegistryPath()
 {
     if (ms_strProductRegistryPath.empty())
         ms_strProductRegistryPath = PRODUCT_REGISTRY_PATH;
@@ -515,7 +566,7 @@ void SharedUtil::SetProductCommonDataDir(const SString& strCommonDataDir)
     ms_strProductCommonDataDir = strCommonDataDir;
 }
 
-const SString& SharedUtil::GetProductCommonDataDir(void)
+const SString& SharedUtil::GetProductCommonDataDir()
 {
     if (ms_strProductCommonDataDir.empty())
         ms_strProductCommonDataDir = PRODUCT_COMMON_DATA_DIR;
@@ -528,7 +579,7 @@ void SharedUtil::SetProductVersion(const SString& strVersion)
     ms_strProductVersion = strVersion;
 }
 
-const SString& SharedUtil::GetProductVersion(void)
+const SString& SharedUtil::GetProductVersion()
 {
     if (ms_strProductVersion.empty())
         ms_strProductVersion =
@@ -560,6 +611,25 @@ void SharedUtil::SetClipboardText(const SString& strText)
         // Close the clipboard
         CloseClipboard();
     }
+}
+
+SString SharedUtil::GetClipboardText()
+{
+    SString data;
+
+    if (OpenClipboard(NULL))
+    {
+        // Get the clipboard's data
+        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
+        void*  lockedData = GlobalLock(clipboardData);
+        if (lockedData)
+            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+
+        GlobalUnlock(clipboardData);
+        CloseClipboard();
+    }
+
+    return data;
 }
 
 //
@@ -596,7 +666,7 @@ void SharedUtil::BrowseToSolution(const SString& strType, int iFlags, const SStr
 // Process next BrowseToSolution
 // Return true if did browse
 //
-bool SharedUtil::ProcessPendingBrowseToSolution(void)
+bool SharedUtil::ProcessPendingBrowseToSolution()
 {
     SString strType, strMessageBoxMessage, strErrorCode;
     int     iFlags;
@@ -651,7 +721,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution(void)
 //
 // Clear BrowseToSolution
 //
-void SharedUtil::ClearPendingBrowseToSolution(void)
+void SharedUtil::ClearPendingBrowseToSolution()
 {
     SetApplicationSetting("pending-browse-to-solution", "");
 }
@@ -659,7 +729,7 @@ void SharedUtil::ClearPendingBrowseToSolution(void)
 //
 // For tracking results of new features
 //
-static SString GetReportLogHeaderText(void)
+static SString GetReportLogHeaderText()
 {
     SString strMTABuild = GetApplicationSetting("mta-version-ext").SplitRight("-");
     SString strOSVersion = GetApplicationSetting("os-version");
@@ -750,7 +820,7 @@ void SharedUtil::SetReportLogContents(const SString& strText)
     FileSave(strPathFilename, strText.length() ? &strText.at(0) : NULL, strText.length());
 }
 
-SString SharedUtil::GetReportLogContents(void)
+SString SharedUtil::GetReportLogContents()
 {
     SString strReportFilename = PathJoin(GetMTADataPath(), "report.log");
     // Load file into a string
@@ -760,7 +830,7 @@ SString SharedUtil::GetReportLogContents(void)
     return &buffer[0];
 }
 
-SString SharedUtil::GetReportLogProcessTag(void)
+SString SharedUtil::GetReportLogProcessTag()
 {
     static SString strResult;
     if (strResult.empty())
@@ -826,7 +896,7 @@ void SharedUtil::WriteErrorEvent(const SString& strText)
     WriteEvent("[Error]", strText);
 }
 
-void SharedUtil::BeginEventLog(void)
+void SharedUtil::BeginEventLog()
 {
     // Cycle now if flag requires it
     if (GetApplicationSettingInt("no-cycle-event-log") == 0)
@@ -837,7 +907,7 @@ void SharedUtil::BeginEventLog(void)
     WriteDebugEvent("BeginEventLog");
 }
 
-void SharedUtil::CycleEventLog(void)
+void SharedUtil::CycleEventLog()
 {
     // Set flag to cycle on next start
     SetApplicationSettingInt("no-cycle-event-log", 0);
@@ -1073,25 +1143,25 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 #ifdef WIN32
 
-SharedUtil::CCriticalSection::CCriticalSection(void)
+SharedUtil::CCriticalSection::CCriticalSection()
 {
     m_pCriticalSection = new CRITICAL_SECTION;
     InitializeCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
 }
 
-SharedUtil::CCriticalSection::~CCriticalSection(void)
+SharedUtil::CCriticalSection::~CCriticalSection()
 {
     DeleteCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
     delete (CRITICAL_SECTION*)m_pCriticalSection;
 }
 
-void SharedUtil::CCriticalSection::Lock(void)
+void SharedUtil::CCriticalSection::Lock()
 {
     if (m_pCriticalSection)
         EnterCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
 }
 
-void SharedUtil::CCriticalSection::Unlock(void)
+void SharedUtil::CCriticalSection::Unlock()
 {
     if (m_pCriticalSection)
         LeaveCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
@@ -1100,24 +1170,24 @@ void SharedUtil::CCriticalSection::Unlock(void)
 #else
     #include <pthread.h>
 
-SharedUtil::CCriticalSection::CCriticalSection(void)
+SharedUtil::CCriticalSection::CCriticalSection()
 {
     m_pCriticalSection = new pthread_mutex_t;
     pthread_mutex_init((pthread_mutex_t*)m_pCriticalSection, NULL);
 }
 
-SharedUtil::CCriticalSection::~CCriticalSection(void)
+SharedUtil::CCriticalSection::~CCriticalSection()
 {
     pthread_mutex_destroy((pthread_mutex_t*)m_pCriticalSection);
     delete (pthread_mutex_t*)m_pCriticalSection;
 }
 
-void SharedUtil::CCriticalSection::Lock(void)
+void SharedUtil::CCriticalSection::Lock()
 {
     pthread_mutex_lock((pthread_mutex_t*)m_pCriticalSection);
 }
 
-void SharedUtil::CCriticalSection::Unlock(void)
+void SharedUtil::CCriticalSection::Unlock()
 {
     pthread_mutex_unlock((pthread_mutex_t*)m_pCriticalSection);
 }
@@ -1127,18 +1197,14 @@ void SharedUtil::CCriticalSection::Unlock(void)
 //
 // Ensure rand() seed gets set to a new unique value
 //
-void SharedUtil::RandomizeRandomSeed(void)
+void SharedUtil::RandomizeRandomSeed()
 {
     srand(rand() + GetTickCount32());
 }
 
-//
-// Return true if currently executing the main thread.
-// (Linux: Main thread being defined as the thread the function is first called from.)
-//
-bool SharedUtil::IsMainThread(void)
-{
 #ifdef WIN32
+DWORD SharedUtil::GetMainThreadId()
+{
     static DWORD dwMainThreadID = 0;
     if (dwMainThreadID == 0)
     {
@@ -1175,10 +1241,22 @@ bool SharedUtil::IsMainThread(void)
 
         // Fallback
         if (dwMainThreadID == 0)
+        {
             dwMainThreadID = GetCurrentThreadId();
+        }
     }
+    return dwMainThreadID;
+}
+#endif
 
-    return dwMainThreadID == GetCurrentThreadId();
+//
+// Return true if currently executing the main thread.
+// (Linux: Main thread being defined as the thread the function is first called from.)
+//
+bool SharedUtil::IsMainThread()
+{
+#ifdef WIN32
+    return GetMainThreadId() == GetCurrentThreadId();
 #else
     static pthread_t dwMainThread = pthread_self();
     return pthread_equal(pthread_self(), dwMainThread) != 0;
@@ -1191,7 +1269,7 @@ bool SharedUtil::IsMainThread(void)
 #ifdef WIN32
     #include <time.h>
 
-int SharedUtil::GetBuildAge(void)
+int SharedUtil::GetBuildAge()
 {
     tm when;
     memset(&when, 0, sizeof(when));
@@ -1202,7 +1280,7 @@ int SharedUtil::GetBuildAge(void)
 }
 
 #if defined(MTA_DM_EXPIRE_DAYS)
-int SharedUtil::GetDaysUntilExpire(void)
+int SharedUtil::GetDaysUntilExpire()
 {
     tm when;
     memset(&when, 0, sizeof(when));
@@ -1310,7 +1388,7 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
 }
 
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
-std::wstring SharedUtil::MbUTF8ToUTF16(const std::string& input)
+std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
     return utf8_mbstowcs(input);
 }
@@ -1321,6 +1399,13 @@ std::string SharedUtil::UTF16ToMbUTF8(const std::wstring& input)
     return utf8_wcstombs(input);
 }
 
+std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
+{
+    if (input == nullptr)
+        return "";
+    return utf8_wcstombs(input);
+}
+
 // Get UTF8 confidence
 int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 {
@@ -1328,7 +1413,7 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 }
 
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
-std::wstring SharedUtil::ANSIToUTF16(const std::string& input)
+std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
@@ -1482,7 +1567,7 @@ namespace SharedUtil
         }
     }
 
-    SString CArgMap::ToString(void) const
+    SString CArgMap::ToString() const
     {
         SString strResult;
         for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
@@ -1494,7 +1579,7 @@ namespace SharedUtil
         return strResult;
     }
 
-    bool CArgMap::HasMultiValues(void) const
+    bool CArgMap::HasMultiValues() const
     {
         for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
         {
@@ -1506,7 +1591,7 @@ namespace SharedUtil
         return false;
     }
 
-    void CArgMap::RemoveMultiValues(void)
+    void CArgMap::RemoveMultiValues()
     {
         if (HasMultiValues())
             SetFromString(ToString(), false);
@@ -1595,6 +1680,31 @@ namespace SharedUtil
             outList.push_back(iter->first);
     }
 
+#ifdef WIN32
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
+    //
+    // Only a guide as it could change after the call has returned
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    DWORD _GetCurrentProcessorNumberXP()
+    {
+    #ifdef WIN_x64
+        return 0;
+    #else
+        _asm
+        {
+            mov eax, 1
+            cpuid
+            shr ebx, 24
+            mov eax, ebx
+        }
+    #endif
+    }
+
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumber for the current thread.
@@ -1602,11 +1712,11 @@ namespace SharedUtil
     // Only a guide as it could change after the call has returned
     //
     ///////////////////////////////////////////////////////////////////////////
-    DWORD _GetCurrentProcessorNumber(void)
+    DWORD _GetCurrentProcessorNumber()
     {
-        DWORD dwProcessorNumber = -1;
 #ifdef WIN32
-        typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)(VOID);
+        DWORD dwProcessorNumber = -1;
+        typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)();
 
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         static FUNC_GetCurrentProcessorNumber pfn = NULL;
@@ -1619,33 +1729,30 @@ namespace SharedUtil
         }
 
         if (pfn)
-            dwProcessorNumber = pfn();
-#endif
-        if (dwProcessorNumber == (DWORD)-1)
-        {
-            auto GetCurrentProcessorNumberXP = []() -> int {
-#ifdef WIN32
-    #ifdef WIN_x64
-                return 0;
-    #else
-                // This should work on XP
-                    _asm
-                    {
-                        mov eax, 1
-                        cpuid
-                        shr ebx, 24
-                        mov eax, ebx
-                    }
-    #endif
-#else
-                // This should work on Linux
-                return sched_getcpu();
-#endif
-            };
+            return pfn();
 
-            dwProcessorNumber = GetCurrentProcessorNumberXP();
-        }
-        return dwProcessorNumber;
+        return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__)
+        // Hacked from https://stackoverflow.com/a/40398183/1517394
+        unsigned long cpu;
+
+        uint32_t CPUInfo[4];
+        __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+
+        /* CPUInfo[1] is EBX, bits 24-31 are APIC ID */
+        if ((CPUInfo[3] & (1 << 9)) == 0)
+            cpu = -1; /* no APIC on chip */
+        else
+            cpu = (unsigned)CPUInfo[1] >> 24;
+
+        if (cpu < 0)
+            cpu = 0;
+
+        return cpu;
+#else
+        // This should work on Linux
+        return sched_getcpu();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

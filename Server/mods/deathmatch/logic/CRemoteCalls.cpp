@@ -125,7 +125,7 @@ EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQu
     }
 }
 
-void CRemoteCalls::ProcessQueuedFiles(void)
+void CRemoteCalls::ProcessQueuedFiles()
 {
     for (auto iter = m_QueueIndexMap.cbegin(); iter != m_QueueIndexMap.cend();)
     {
@@ -230,6 +230,11 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
     CRemoteCall* pCall = (CRemoteCall*)result.pObj;
     if (!g_pGame->GetRemoteCalls()->CallExists(pCall))
         return;
+
+    // Save final download status
+    pCall->m_lastDownloadStatus.uiAttemptNumber = result.uiAttemptNumber;
+    pCall->m_lastDownloadStatus.uiContentLength = result.uiContentLength;
+    pCall->m_lastDownloadStatus.uiBytesReceived = result.dataSize;
     pCall->m_downloadMode = EDownloadModeType::NONE;
 
     CLuaArguments arguments;
@@ -292,7 +297,7 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 }
 
 // Return true if cancel was done
-bool CRemoteCall::CancelDownload(void)
+bool CRemoteCall::CancelDownload()
 {
     if (m_downloadMode != EDownloadModeType::NONE)
     {
@@ -301,13 +306,15 @@ bool CRemoteCall::CancelDownload(void)
     return false;
 }
 
-// Return true if outDownloadStatus contains valid data
-bool CRemoteCall::GetDownloadStatus(SDownloadStatus& outDownloadStatus)
+const SDownloadStatus& CRemoteCall::GetDownloadStatus()
 {
     if (m_downloadMode != EDownloadModeType::NONE)
     {
-        return g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, outDownloadStatus);
+        SDownloadStatus newDownloadStatus;
+        if (g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, newDownloadStatus))
+        {
+            m_lastDownloadStatus = newDownloadStatus;
+        }
     }
-    outDownloadStatus = {0};
-    return false;
+    return m_lastDownloadStatus;
 }

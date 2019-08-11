@@ -38,7 +38,7 @@ public:
     virtual void AllQuery(CClientEntityResult& outResult);
 
     // CClientSpatialDatabaseImpl functions
-    void FlushUpdateQueue(void);
+    void FlushUpdateQueue();
     bool IsValidSphere(const CSphere& sphere);
 
     CClientEntityTree                     m_Tree;
@@ -157,7 +157,7 @@ void CClientSpatialDatabaseImpl::AllQuery(CClientEntityResult& outResult)
 // Process all entities that have changed since the last call
 //
 ///////////////////////////////////////////////////////////////
-void CClientSpatialDatabaseImpl::FlushUpdateQueue(void)
+void CClientSpatialDatabaseImpl::FlushUpdateQueue()
 {
     std::map<CClientEntity*, int> updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear();

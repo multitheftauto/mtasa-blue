@@ -156,7 +156,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
         }
         case CElement::RADAR_AREA:
         {
-            m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
         case CElement::TEAM:

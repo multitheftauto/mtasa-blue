@@ -11,12 +11,12 @@
 #include <StdInc.h>
 #include <fstream>
 
-CFileReader::CFileReader(void)
+CFileReader::CFileReader()
 {
     m_u32BytesReadFromBuffer = 0;
 }
 
-void CFileReader::FreeFileReaderMemory(void)
+void CFileReader::FreeFileReaderMemory()
 {
     std::vector<char>().swap(m_vecFileDataBuffer);
     m_u32BytesReadFromBuffer = 0;

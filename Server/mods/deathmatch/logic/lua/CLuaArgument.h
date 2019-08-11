@@ -29,10 +29,10 @@ class CLuaArguments;
 class CLuaArgument
 {
 public:
-    CLuaArgument(void);
+    CLuaArgument();
     CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    ~CLuaArgument(void);
+    ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
     bool                operator==(const CLuaArgument& Argument);
@@ -49,13 +49,13 @@ public:
     void ReadScriptID(uint uiScriptID);
     void ReadTable(class CLuaArguments* table);
 
-    int GetType(void) const { return m_iType; };
+    int GetType() const { return m_iType; };
 
-    bool               GetBoolean(void) const { return m_bBoolean; };
-    lua_Number         GetNumber(void) const { return m_Number; };
-    const std::string& GetString(void) { return m_strString; };
-    void*              GetUserData(void) const { return m_pUserData; };
-    CElement*          GetElement(void) const;
+    bool               GetBoolean() const { return m_bBoolean; };
+    lua_Number         GetNumber() const { return m_Number; };
+    const std::string& GetString() { return m_strString; };
+    void*              GetUserData() const { return m_pUserData; };
+    CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
     
@@ -83,5 +83,5 @@ private:
 
     void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
-    void DeleteTableData(void);
+    void DeleteTableData();
 };

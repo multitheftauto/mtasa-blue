@@ -69,7 +69,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     UpdateSpatialData();
 }
 
-CObject::~CObject(void)
+CObject::~CObject()
 {
     if (m_pMoveAnimation != NULL)
     {
@@ -89,7 +89,7 @@ CElement* CObject::Clone(bool* bAddEntity, CResource* pResource)
     return new CObject(*this);
 }
 
-void CObject::Unlink(void)
+void CObject::Unlink()
 {
     // Remove us from the manager's list
     m_pObjectManager->RemoveFromList(this);
@@ -156,10 +156,12 @@ bool CObject::ReadSpecialData(const int iLine)
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
     if (GetCustomDataInt("dimension", iTemp, true))
+    {
         if (iTemp == -1)
             m_bVisibleInAllDimensions = true;
         else
             m_usDimension = static_cast<unsigned short>(iTemp);
+    }
 
     if (!GetCustomDataBool("doublesided", m_bDoubleSided, true))
         m_bDoubleSided = false;
@@ -218,7 +220,7 @@ void CObject::SetMatrix(const CMatrix& matrix)
     SetRotation(vecRotation);
 }
 
-const CVector& CObject::GetPosition(void)
+const CVector& CObject::GetPosition()
 {
     CVector vecOldPosition = m_vecPosition;
 
@@ -303,7 +305,7 @@ void CObject::SetRotation(const CVector& vecRotation)
     }
 }
 
-bool CObject::IsMoving(void)
+bool CObject::IsMoving()
 {
     // Are we currently moving?
     if (m_pMoveAnimation != NULL)
@@ -344,7 +346,7 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
     }
 }
 
-void CObject::StopMoving(void)
+void CObject::StopMoving()
 {
     // Were we moving in the first place
     if (m_pMoveAnimation != NULL)
@@ -398,7 +400,7 @@ void CObject::SetSyncer(CPlayer* pPlayer)
     }
 }
 
-bool CObject::IsLowLod(void)
+bool CObject::IsLowLod()
 {
     return m_bIsLowLod;
 }
@@ -440,7 +442,7 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
     }
 }
 
-CObject* CObject::GetLowLodObject(void)
+CObject* CObject::GetLowLodObject()
 {
     if (m_bIsLowLod)
         return NULL;

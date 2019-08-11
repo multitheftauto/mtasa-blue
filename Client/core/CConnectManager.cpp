@@ -16,7 +16,7 @@ using namespace std;
 static CConnectManager* g_pConnectManager = NULL;
 extern CCore*           g_pCore;
 
-CConnectManager::CConnectManager(void)
+CConnectManager::CConnectManager()
 {
     g_pConnectManager = this;
 
@@ -34,7 +34,7 @@ CConnectManager::CConnectManager(void)
     m_bNotifyServerBrowser = false;
 }
 
-CConnectManager::~CConnectManager(void)
+CConnectManager::~CConnectManager()
 {
     if (m_pOnCancelClick)
     {
@@ -196,7 +196,7 @@ bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
     return true;
 }
 
-bool CConnectManager::Abort(void)
+bool CConnectManager::Abort()
 {
     // Stop the attempt
     CNet* pNet = CCore::GetSingleton().GetNetwork();
@@ -219,7 +219,7 @@ bool CConnectManager::Abort(void)
     return true;
 }
 
-void CConnectManager::DoPulse(void)
+void CConnectManager::DoPulse()
 {
     // Are we connecting?
     if (m_bIsConnecting)
@@ -323,7 +323,6 @@ void CConnectManager::DoPulse(void)
                 else            // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton().RemoveMessageBox(false);
-                    CCore::GetSingleton().HideQuickConnect();
                 }
 
                 CCore::GetSingleton().GetNetwork()->SetConnectionError(0);
@@ -370,11 +369,6 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
-
-                // If we connected from quick-connect, get rid of it
-                CQuickConnect* pQuickConnect = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuickConnectWindow();
-                if (pQuickConnect->IsVisible())
-                    pQuickConnect->SetVisible(false);
 
                 // Save the connection details into the config
                 if (g_pConnectManager->m_bSave)
@@ -449,7 +443,7 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
 //
 // Called at least once (maybe more) if a MTA server exists at the current address/port
 //
-void CConnectManager::OnServerExists(void)
+void CConnectManager::OnServerExists()
 {
     if (m_bNotifyServerBrowser)
     {

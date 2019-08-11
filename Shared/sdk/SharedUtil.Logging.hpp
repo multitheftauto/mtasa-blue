@@ -16,7 +16,7 @@ namespace SharedUtil
     //
     // Add tags here to hide permanently
     //
-    void InitDebugTags(void)
+    void InitDebugTags()
     {
         SetDebugTagHidden("Updater");
         SetDebugTagHidden("Shader");
@@ -97,7 +97,7 @@ namespace SharedUtil
 {
     struct SDebugCountInfo
     {
-        SDebugCountInfo(void) : iCount(0), iHigh(0) {}
+        SDebugCountInfo() : iCount(0), iHigh(0) {}
         int iCount;
         int iHigh;
     };

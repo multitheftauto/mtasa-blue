@@ -14,18 +14,18 @@
 template <>
 CClientVariables* CSingleton<CClientVariables>::m_pSingleton = NULL;
 
-CClientVariables::CClientVariables(void)
+CClientVariables::CClientVariables()
 {
     m_pStorage = NULL;
     m_bLoaded = false;
     m_iRevision = 1;
 }
 
-CClientVariables::~CClientVariables(void)
+CClientVariables::~CClientVariables()
 {
 }
 
-bool CClientVariables::Load(void)
+bool CClientVariables::Load()
 {
     // Get the root node
     CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
@@ -227,7 +227,7 @@ void CClientVariables::ClampValue(const std::string& strVariable, CVector2D minV
 }
 
 // Ensure CVars are within reasonable limits
-void CClientVariables::ValidateValues(void)
+void CClientVariables::ValidateValues()
 {
     uint uiViewportWidth = CCore::GetSingleton().GetGraphics()->GetViewportWidth();
     uint uiViewportHeight = CCore::GetSingleton().GetGraphics()->GetViewportHeight();
@@ -258,7 +258,7 @@ void CClientVariables::ValidateValues(void)
     ClampValue("mapalpha", 0, 255);
 }
 
-void CClientVariables::LoadDefaults(void)
+void CClientVariables::LoadDefaults()
 {
     #define DEFAULT(__x,__y)    if(!Exists(__x)) \
                                 Set(__x,__y)
@@ -328,6 +328,7 @@ void CClientVariables::LoadDefaults(void)
     DEFAULT("heat_haze", 1);                                                          // Enable heat haze
     DEFAULT("tyre_smoke_enabled", 1);                                                 // Enable tyre smoke
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
+    DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
     DEFAULT("max_clientscript_log_kb", 5000);                                         // Max size in KB (0-No limit)
@@ -336,6 +337,7 @@ void CClientVariables::LoadDefaults(void)
     DEFAULT("multimon_fullscreen_minimize", 1);                                       // 0-off 1-on
     DEFAULT("vertical_aim_sensitivity", 0.0015f);                                     // 0.0015f is GTA default setting
     DEFAULT("process_priority", 0);                                                   // 0-normal 1-above normal 2-high
+    DEFAULT("process_dpi_aware", false);                                              // Enable DPI awareness in core initialization
     DEFAULT("mute_master_when_minimized", 0);                                         // 0-off 1-on
     DEFAULT("mute_sfx_when_minimized", 0);                                            // 0-off 1-on
     DEFAULT("mute_radio_when_minimized", 0);                                          // 0-off 1-on
