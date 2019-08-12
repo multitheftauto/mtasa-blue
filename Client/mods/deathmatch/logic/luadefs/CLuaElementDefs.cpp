@@ -876,23 +876,6 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementsCount(lua_State* luaVM)
 {
-    // Verify the argument
-    SString          strType = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strType);
-
-    if (!argStream.HasErrors())
-    {
-        // Find our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -43,6 +43,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementVelocity", getElementVelocity},
         {"getElementAngularVelocity", getElementTurnVelocity},
         {"getElementsByType", getElementsByType},
+        {"getElementCount", GetElementCount},
         {"getElementType", getElementType},
         {"getElementInterior", getElementInterior},
         {"getElementsWithinColShape", getElementsWithinColShape},
@@ -1065,7 +1066,7 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
     {
         // Query the spatial database
         CElementResult result;
-        GetSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
         lua_newtable(luaVM);
         unsigned int index = 0;
@@ -2408,6 +2409,51 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::GetElementCount(lua_State* luaVM)
+{
+    // Verify the argument
+    SString           strType = "";
+    EElementCountType eType = ELEMENT_UNKNOWN;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadEnumString(eType);
+
+    if (argStream.HasErrors())
+    {
+        eType = ELEMENT_UNKNOWN;
+        argStream.ReadString(strType);
+    }
+
+    if (!argStream.HasErrors())
+    {
+        // Find our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            int iCount = -1;
+            if (eType != ELEMENT_UNKNOWN)
+            {
+                iCount = CStaticFunctionDefinitions::GetElementCount(eType);
+            }
+            else
+            {
+                // m_pRootEntity->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn);
+            }
+            if (iCount >= 0)
+            {
+                lua_pushnumber(luaVM, iCount);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    m_pScriptDebugging->LogBadPointer(luaVM, "element", 1);
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

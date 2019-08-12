@@ -30,6 +30,8 @@ public:
     std::vector<CColShape*>::const_iterator IterBegin() { return m_List.begin(); }
     std::vector<CColShape*>::const_iterator IterEnd() { return m_List.end(); }
 
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+
 private:
     void AddToList(CColShape* pShape) { m_List.push_back(pShape); };
     void RemoveFromList(CColShape* pShape);

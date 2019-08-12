@@ -34,6 +34,8 @@ public:
     std::list<CTeam*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CTeam*>::const_iterator IterEnd() { return m_List.end(); }
 
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+
 private:
     std::list<CTeam*> m_List;
 };

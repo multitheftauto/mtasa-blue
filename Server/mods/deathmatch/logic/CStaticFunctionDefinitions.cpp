@@ -4121,7 +4121,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
+    RUN_CHILDREN(
+        SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
 
     if (IS_PED(pElement))
     {
@@ -7522,6 +7523,36 @@ bool CStaticFunctionDefinitions::GetMarkerCount(unsigned int& uiCount)
 {
     uiCount = m_pMarkerManager->Count();
     return true;
+}
+
+int CStaticFunctionDefinitions::GetElementCount(EElementCountType eElementType)
+{
+    switch (eElementType)
+    {
+        case ELEMENT_PLAYER:
+            return m_pPlayerManager->Count();
+        case ELEMENT_PED:
+            return m_pPedManager->Count();
+        case ELEMENT_WATER:
+            return m_pWaterManager->Count();
+        case ELEMENT_VEHICLE:
+            return m_pVehicleManager->Count();
+        case ELEMENT_OBJECT:
+            return m_pObjectManager->Count();
+        case ELEMENT_PICKUP:
+            return m_pPickupManager->Count();
+        case ELEMENT_MARKER:
+            return m_pMarkerManager->Count();
+        case ELEMENT_COLSHAPE:
+            return m_pColManager->Count();
+        case ELEMENT_BLIP:
+            return m_pBlipManager->Count();
+        case ELEMENT_RADARAREA:
+            return m_pRadarAreaManager->Count();
+        case ELEMENT_TEAM:
+            return m_pTeamManager->Count();
+    }
+    return -1;
 }
 
 bool CStaticFunctionDefinitions::GetMarkerType(CMarker* pMarker, char* szType)
@@ -11235,7 +11266,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
-        
+
         if (pResponsible)
             Arguments.PushElement(pResponsible);
 
@@ -11408,10 +11439,10 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
-                
+
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                
+
                 // A script can call kickPlayer in the onPlayerBan event, which would
                 // show him the 'kicked' message instead of our 'banned' message.
                 const bool bLeavingServer = pPlayer->IsLeavingServer();

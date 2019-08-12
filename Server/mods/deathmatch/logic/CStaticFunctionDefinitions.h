@@ -71,6 +71,7 @@ public:
     static bool           GetLowLodElement(CElement* pElement, CElement*& pOutLowLodElement);
     static bool           IsElementLowLod(CElement* pElement, bool& bOutLowLod);
     static bool           IsElementCallPropagationEnabled(CElement* pElement, bool& bOutEnabled);
+    static int            GetElementCount(EElementCountType eElementType);
 
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
