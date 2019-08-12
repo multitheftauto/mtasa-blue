@@ -50,7 +50,7 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
 {
     if (bSynchronized)
     {
-        SCustomData* pDataSynced = MapFind(m_SyncedData, szName);
+        SCustomData* pDataSynced = GetSynced(szName);
         if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
@@ -74,7 +74,7 @@ bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
     assert(szName);
 
     // Grab the item with the given name
-    SCustomData* pData = MapFind(m_Data, szName);
+    SCustomData* pData = Get(szName);
     if (pData)
     {
         if (pData->bSynchronized != bSynchronized || pData->Variable != Variable)

@@ -73,7 +73,7 @@ namespace SharedUtil
 
     // Remove key from collection
     template <class T, class V, class T2>
-    bool MapRemove(CFastHashMap<T, V>& collection, const T2& key)
+    inline bool MapRemove(CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::iterator it = collection.find(key);
         if (it == collection.end())
@@ -84,7 +84,7 @@ namespace SharedUtil
 
     // Find value in collection
     template <class T, class V, class T2>
-    V* MapFind(CFastHashMap<T, V>& collection, const T2& key)
+    inline V* MapFind(CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::iterator it = collection.find(key);
         if (it == collection.end())
@@ -94,7 +94,7 @@ namespace SharedUtil
 
     // Find value in const collection
     template <class T, class V, class T2>
-    const V* MapFind(const CFastHashMap<T, V>& collection, const T2& key)
+    inline const V* MapFind(const CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::const_iterator it = collection.find(key);
         if (it == collection.end())
@@ -104,7 +104,7 @@ namespace SharedUtil
 
     // Find value reference in collection
     template <class T, class V, class T2>
-    V MapFindRef(CFastHashMap<T, V>& collection, const T2& key)
+    inline V MapFindRef(CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::iterator it = collection.find(key);
         if (it == collection.end())
@@ -114,7 +114,7 @@ namespace SharedUtil
 
     // Find value reference in const collection
     template <class T, class V, class T2>
-    const V MapFindRef(const CFastHashMap<T, V>& collection, const T2& key)
+    inline const V MapFindRef(const CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::const_iterator it = collection.find(key);
         if (it == collection.end())
@@ -124,7 +124,7 @@ namespace SharedUtil
 
     // Find or add a value in collection
     template <class T, class V, class T2>
-    V& MapGet(CFastHashMap<T, V>& collection, const T2& key)
+    inline V& MapGet(CFastHashMap<T, V>& collection, const T2& key)
     {
         typename CFastHashMap<T, V>::iterator it = collection.find(key);
         if (it == collection.end())

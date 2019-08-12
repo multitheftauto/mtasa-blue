@@ -33,7 +33,7 @@ SCustomData* CCustomData::Get(const char* szName)
 bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
     // Grab the item with the given name
-    SCustomData* pData = MapFind(m_Data, szName);
+    SCustomData* pData = Get(szName);
     if (pData)
     {   
         if (pData->Variable != Variable || pData->bSynchronized != bSynchronized)
