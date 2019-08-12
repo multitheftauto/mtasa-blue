@@ -154,7 +154,11 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
                  * If so, dont worry, thats fucked up
                  * Fix it if you want to, I dont know whats the problem with it(it was like that even before this pr(#907))
                  *
-                 * Note: This shit is called if element data is set on a custom element created with createElement, and not with other ones.
+                 * Note: It turns out its broken if the packet is sent before onResourceStart, or something like that. 
+                 *       It doesnt crash because this nullcheck is here, otherwise it would blow up(probably). 
+                 *       It's PROBABLY broken because elementIDs aren't sent until onResourceStart is triggered, but you can setElementData(or model, or anything else)
+                 *       before the event is triggered, its synced properly because after the resource has started the things the res. did are synced as well.
+                 *       Modifing an existing element's data / model / hp / etc.. works just fine, because he exists on the client before.
                  *
                  * - Pirulax
                  */
