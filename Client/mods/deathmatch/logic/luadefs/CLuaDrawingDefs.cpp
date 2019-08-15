@@ -1871,7 +1871,7 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawWiredSphere(lua_State* luaVM)
 {
-    //  bool DxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint density )
+    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint density )
     CVector          vecPosition;
     float            fRadius;
     SColorARGB       color(64, 255, 0, 0);
