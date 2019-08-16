@@ -162,3 +162,6 @@
 #include "dffapi\Clump.h"
 #include "dffapi\Memory.h"
 #include "dffapi\Geometry.h"
+
+// fbx
+#include "fbx/ofbx.h"

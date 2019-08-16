@@ -38,6 +38,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
         {"engineTest", EngineTest},
+        {"engineTest2", EngineTest2},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1361,5 +1362,21 @@ int CLuaEngineDefs::EngineTest(lua_State* luaVM)
     }
 
     lua_pushstring(luaVM, "empty");
+    return 1;
+}
+
+
+ofbx::IScene* g_scene = nullptr;
+int CLuaEngineDefs::EngineTest2(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    SString              str;
+    argStream.ReadString(str);
+
+    long file_size = str.size();
+    auto* content = new ofbx::u8[file_size];
+    memcpy(content, str.data(), file_size);
+    g_scene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+    lua_pushnumber(luaVM, g_scene->getAllObjectCount());
     return 1;
 }
