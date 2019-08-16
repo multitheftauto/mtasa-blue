@@ -71,6 +71,8 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementData", getElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
+        {"subscribeElementData", subscribeElementData},
+        {"unsubscribeElementData", unsubscribeElementData},
 
         // Set
         {"setElementID", setElementID},
@@ -119,6 +121,8 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
     lua_classfunction(luaVM, "removeData", "removeElementData");
+    lua_classfunction(luaVM, "subscribeData", "subscribeElementData");
+    lua_classfunction(luaVM, "unsubscribeData", "unsubscribeElementData");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
@@ -1065,7 +1069,7 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
     {
         // Query the spatial database
         CElementResult result;
-        GetSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
         lua_newtable(luaVM);
         unsigned int index = 0;
@@ -1594,17 +1598,29 @@ int CLuaElementDefs::setElementID(lua_State* luaVM)
 
 int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
-    //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+    //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
     CElement*    pElement;
     SString      strKey;
     CLuaArgument value;
-    bool         bSynchronize;
+    bool         bAutoSyncType = false;
+    ESyncType    syncType = ESyncType::SYNC_BROADCAST;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadString(strKey);
     argStream.ReadLuaArgument(value);
-    argStream.ReadBool(bSynchronize, true);
+
+    if (argStream.NextIsNil() || argStream.NextIsNone()) 
+        bAutoSyncType = true;
+    else if (argStream.NextIsBool())
+    {
+        bool bSynchronize;
+        argStream.ReadBool(bSynchronize, true);
+
+        syncType = bSynchronize ? ESyncType::SYNC_BROADCAST : ESyncType::SYNC_LOCAL;
+    }
+    else
+        argStream.ReadEnumString(syncType, ESyncType::SYNC_BROADCAST);
 
     if (!argStream.HasErrors())
     {
@@ -1621,7 +1637,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, bSynchronize))
+            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, bAutoSyncType, syncType))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1665,6 +1681,82 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::subscribeElementData(lua_State* luaVM)
+{
+    //  bool subscribeElementData ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+            if (IS_PLAYER(pPlayer))
+            {
+                if (CStaticFunctionDefinitions::SubscribeElementData(pElement, strKey, pPlayer))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+            else
+                argStream.SetTypeError("player", 1);
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::unsubscribeElementData(lua_State* luaVM)
+{
+    //  bool unsubscribeElementData ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+            if (IS_PLAYER(pPlayer))
+            {
+                if (CStaticFunctionDefinitions::UnsubscribeElementData(pElement, strKey, pPlayer))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+            else
+                argStream.SetTypeError("player", 1);
         }
     }
     else

@@ -271,6 +271,12 @@ ADD_ENUM(CAccountPassword::SHA256, "sha256")
 ADD_ENUM(CAccountPassword::MD5, "md5")
 IMPLEMENT_ENUM_END("account-password-type")
 
+IMPLEMENT_ENUM_BEGIN(ESyncType)
+ADD_ENUM(ESyncType::SYNC_BROADCAST, "broadcast")
+ADD_ENUM(ESyncType::SYNC_LOCAL, "local")
+ADD_ENUM(ESyncType::SYNC_SUBSCRIBE, "subscribe")
+IMPLEMENT_ENUM_END("sync-type")
+
 //
 // Get best guess at name of userdata type
 //
