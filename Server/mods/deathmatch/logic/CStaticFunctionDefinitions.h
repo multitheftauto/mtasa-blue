@@ -123,7 +123,7 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
     static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
@@ -200,7 +200,7 @@ public:
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
     static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame);
+                                bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
     static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
     static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
@@ -732,5 +732,5 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 };

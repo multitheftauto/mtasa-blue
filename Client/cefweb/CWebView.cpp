@@ -73,7 +73,7 @@ void CWebView::Initialise()
     CefWindowInfo windowInfo;
     windowInfo.SetAsWindowless(g_pCore->GetHookedWindow());
 
-    CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr);
+    CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr, nullptr);
 }
 
 void CWebView::CloseBrowser()
@@ -478,9 +478,9 @@ bool CWebView::ToggleDevTools(bool visible)
     return CWebDevTools::Close(this);
 }
 
-bool CWebView::VerifyFile(const SString& strPath)
+bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath);
+    return m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
 }
 
 bool CWebView::CanGoBack()
@@ -545,7 +545,8 @@ void CWebView::Refresh(bool bIgnoreCache)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message)
+bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
+                                        CefRefPtr<CefProcessMessage> message)
 {
     CefRefPtr<CefListValue> argList = message->GetArgumentList();
     if (message->GetName() == "TriggerLuaEvent")
@@ -808,7 +809,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
+CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
                                                               CefRefPtr<CefRequestCallback> callback)
 {
     // Mostly the same as CWebView::OnBeforeBrowse
@@ -903,7 +904,8 @@ void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
                              CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
-                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access)
+                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
+                             bool* no_javascript_access)
 {
     // ATTENTION: This method is called on the IO thread
 

@@ -559,7 +559,13 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
 
     for (; n > 0; --n)
     {
-        vecOut.push_back(GetZone(xZone, yZone));
+        // A bound check here fixes client crash (https://github.com/multitheftauto/mtasa-blue/issues/835)
+        // See PR https://github.com/multitheftauto/mtasa-blue/pull/836
+        if (Between<int>(lowXZone, xZone, highXZone) &&
+            Between<int>(lowYZone, yZone, highYZone))
+        {
+            vecOut.push_back(GetZone(xZone, yZone));
+        }
         if (dist > 0)
         {
             yZone++;
@@ -846,7 +852,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     for (auto& zone : vecZones)
     {
         CWaterZoneSA::iterator iter;
-        for (iter = zone->begin(); *iter; ++iter)
+        for (iter = zone->begin(); iter != zone->end(); ++iter)
         {
             auto poly = *iter;
             int iNumVertices = poly->GetNumVertices();

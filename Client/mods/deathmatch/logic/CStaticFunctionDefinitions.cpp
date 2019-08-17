@@ -281,24 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
 {
     g_pCore->SetChatVisible(bShow);
@@ -2160,7 +2142,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+            std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
@@ -2176,8 +2158,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
                     auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
@@ -7949,8 +7931,7 @@ bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPanEnabled(CClientSound& Sound, bool bEnabled)
 {
-    Sound.SetPanEnabled(bEnabled);
-    return true;
+    return Sound.SetPanEnabled(bEnabled);
 }
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight)

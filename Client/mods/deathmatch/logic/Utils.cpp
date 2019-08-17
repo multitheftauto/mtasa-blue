@@ -82,7 +82,7 @@ unsigned int StripControlCodes(char* szText, unsigned char cReplace)
     char*        szTemp = szText;
     while (*szTemp != 0)
     {
-        if (IsControlCode(*szTemp))
+        if (IsControlCode(*szTemp) && *szTemp != '\n' && *szTemp != '\t')
         {
             *szTemp = cReplace;
             ++uiReplaced;

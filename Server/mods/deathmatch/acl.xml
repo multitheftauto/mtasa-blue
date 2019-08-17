@@ -158,6 +158,7 @@
       <right name="function.startResource" access="true" />
       <right name="function.stopResource" access="true" />
       <right name="function.restartResource" access="true" />
+      <right name="function.refreshResources" access="true" />
       <right name="function.redirectPlayer" access="true" />
    </acl>
    <acl name="SuperModerator">

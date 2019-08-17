@@ -301,7 +301,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        SString strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
+        CMtaVersion strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
         lua_pushstring(luaVM, strPlayerVersion);
         return 1;
     }
@@ -957,13 +957,10 @@ int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
     if (argStream.NextIsBool())
     {
         bool bTemp;
-
         argStream.ReadBool(bTemp);
 
         if (bTemp)
-        {
             argStream.SetCustomError("You can only pass false to hide the debug window or a level (0-3)");
-        }
         else
             bHideDebugger = true;
     }
@@ -972,9 +969,7 @@ int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
         argStream.ReadNumber(uiMode);
 
         if (uiMode < 0 || uiMode > 3)
-        {
             argStream.SetCustomError("Invalid level (0-3)");
-        }
     }
 
     if (!argStream.HasErrors())
