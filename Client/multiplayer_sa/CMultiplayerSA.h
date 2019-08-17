@@ -288,11 +288,10 @@ public:
     DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
-    CVector                            m_vecAkimboTarget;
-    bool                               m_bAkimboTargetUp;
-    static char*                       ms_PlayerImgCachePtr;
-    static std::array<unsigned int, 3> arrGroupsToProtect;
-    bool                               m_bBadDrivebyHitboxesDisabled;
+    CVector      m_vecAkimboTarget;
+    bool         m_bAkimboTargetUp;
+    static char* ms_PlayerImgCachePtr;
+    bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
     bool                m_bSuspensionEnabled;
