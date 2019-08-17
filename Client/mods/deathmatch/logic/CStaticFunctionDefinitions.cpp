@@ -281,24 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
 {
     g_pCore->SetChatVisible(bShow);
@@ -1460,42 +1442,76 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (Ped.GetModel() == usModel)
+            const unsigned short usCurrentModel = Ped.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
-            if (!CClientPlayerManager::IsValidModel(usModel))
+
+            if (!Ped.SetModel(usModel))
                 return false;
-            Ped.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Ped.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            if (Vehicle.GetModel() == usModel)
+            const unsigned short usCurrentModel = Vehicle.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientVehicleManager::IsValidModel(usModel))
                 return false;
+
             Vehicle.SetModelBlocking(usModel, 255, 255);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
-            if (Object.GetModel() == usModel)
+            const unsigned short usCurrentModel = Object.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Object.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Object.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
-            if (Projectile.GetGameEntity() && Projectile.GetGameEntity()->GetModelIndex() == usModel)
+            const unsigned short usCurrentModel = Projectile.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Projectile.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         default:
@@ -2126,7 +2142,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+            std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
@@ -2142,8 +2158,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
                     auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
@@ -7926,8 +7942,7 @@ bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPanEnabled(CClientSound& Sound, bool bEnabled)
 {
-    Sound.SetPanEnabled(bEnabled);
-    return true;
+    return Sound.SetPanEnabled(bEnabled);
 }
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight)

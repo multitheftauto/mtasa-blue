@@ -225,23 +225,15 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
         int  overrideWidth;
         int  overrideHeight;
     } static sectionList[] = {
-        {{3, 3, 5, 5}, 0, 0, 0, 0}            // Center
-        ,
-        {{3, 0, 5, 2}, 0, -2, 0, 2}            // Top
-        ,
-        {{0, 0, 2, 2}, -2, -2, 2, 2}            // Top left
-        ,
-        {{0, 3, 2, 5}, -2, 0, 2, 0}            // Left
-        ,
-        {{0, 6, 2, 8}, -2, 2, 2, 2}            // Bottom left
-        ,
-        {{3, 6, 5, 8}, 0, 2, 0, 2}            // Bottom
-        ,
-        {{6, 6, 8, 8}, 2, 2, 2, 2}            // Bottom right
-        ,
-        {{6, 3, 8, 5}, 2, 0, 2, 0}            // Right
-        ,
-        {{6, 0, 8, 2}, 2, -2, 2, 2}            // Top right
+        {{3, 3, 5, 5}, 0, 0, 0, 0},              // Center
+        {{3, 0, 5, 2}, 0, -2, 0, 2},             // Top
+        {{0, 0, 2, 2}, -2, -2, 2, 2},            // Top left
+        {{0, 3, 2, 5}, -2, 0, 2, 0},             // Left
+        {{0, 6, 2, 8}, -2, 2, 2, 2},             // Bottom left
+        {{3, 6, 5, 8}, 0, 2, 0, 2},              // Bottom
+        {{6, 6, 8, 8}, 2, 2, 2, 2},              // Bottom right
+        {{6, 3, 8, 5}, 2, 0, 2, 0},              // Right
+        {{6, 0, 8, 2}, 2, -2, 2, 2},             // Top right
     };
 
     D3DXMATRIX        matrix;
@@ -681,6 +673,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -688,13 +683,41 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
+        // Count the amount of space characters at the end
+        size_t       spaceCount = 0;
+        const size_t textLength = wcslen(wszText);
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
+        for (int i = textLength - 1; i >= 0; --i)
+        {
+            const wchar_t c = wszText[i];
 
-        return ((float)size.cx * fScale);
+            if (c == L' ')
+                ++spaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that to get the width of the ignored space characters
+        size_t trailingSpacePixels = 0;
+
+        if (spaceCount > 0)
+        {
+            SIZE size = {};
+            GetTextExtentPoint32W(pDXFont->GetDC(), L" ", 1, &size);
+            trailingSpacePixels = spaceCount * size.cx;
+        }
+
+        RECT rect = {};
+
+        if ((textLength - spaceCount) > 0)
+        {
+            pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        }
+
+        return static_cast<float>(rect.right - rect.left + trailingSpacePixels) * fScale;
     }
+
     return 0.0f;
 }
 
@@ -832,16 +855,16 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     fStartAngle = D3DXToRadian(fStartAngle);
     fStopAngle = D3DXToRadian(fStopAngle);
     // Calculate each segment angle
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments-1);
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments - 1);
 
     // Add center point
-    pVecVertices->push_back({ fX,fY,0.0f,ulColorCenter });
+    pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
 
     // And calculate all other vertices
     for (short siSeg = 0; siSeg < siSegments; siSeg++)
     {
         PrimitiveVertice vert;
-        float curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
         vert.fX = fX + fRadius * cos(curAngle) * fRatio;
         vert.fY = fY + fRadius * sin(curAngle);
         vert.fZ = 0.0f;
@@ -872,7 +895,7 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     Item.eType = QUEUE_PRIMITIVE;
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
-    AddQueueItem (Item, bPostGUI);
+    AddQueueItem(Item, bPostGUI);
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -908,7 +931,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     AddQueueRef(pMaterial);
 }
 
-bool CGraphics::IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType)
+bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 {
     if (iNumVertives < 1)
     {
@@ -942,7 +965,7 @@ bool CGraphics::IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType)
             }
             break;
     }
-    
+
     return true;
 }
 
@@ -1662,8 +1685,8 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_PRIMITIVE:
         {
             const sDrawQueuePrimitive primitive = Item.Primitive;
-            CheckModes (EDrawMode::PRIMITIVE);
-            m_pPrimitiveBatcher->AddPrimitive (primitive.eType, primitive.pVecVertices);
+            CheckModes(EDrawMode::PRIMITIVE);
+            m_pPrimitiveBatcher->AddPrimitive(primitive.eType, primitive.pVecVertices);
             break;
         }
         case QUEUE_PRIMITIVEMATERIAL:

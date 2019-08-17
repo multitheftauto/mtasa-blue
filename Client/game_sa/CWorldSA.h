@@ -129,7 +129,5 @@ private:
     std::map<DWORD, bool>                                     m_pRemovedEntities;
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
-
     CSurfaceType*                                             m_pSurfaceInfo;
-    CSurfaceType                                              m_pOriginalSurfaceInfo;
 };

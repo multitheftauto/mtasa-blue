@@ -296,7 +296,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        SString strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
+        CMtaVersion strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
         lua_pushstring(luaVM, strPlayerVersion);
         return 1;
     }
