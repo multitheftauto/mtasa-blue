@@ -2133,9 +2133,7 @@ int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
 
     if (argStream.HasErrors())
     {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushnil(luaVM);
-        return 1;
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
     lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
