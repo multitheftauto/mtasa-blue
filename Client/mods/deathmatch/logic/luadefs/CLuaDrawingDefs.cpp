@@ -591,6 +591,9 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
             case PrimitiveVerticeSizes::VERT_XY_COLOR:
                 pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
                 break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
+                break;
         }
     }
 
@@ -642,6 +645,9 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
             case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
                 pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
                                                                vecTableContent[3], vecTableContent[4]});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
