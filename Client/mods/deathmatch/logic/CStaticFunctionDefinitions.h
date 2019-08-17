@@ -42,7 +42,6 @@ public:
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
     static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
-    static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
 
@@ -632,6 +631,9 @@ public:
     static bool SetMoonSize(int iSize);
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
+
+    static bool ResetAllSurfaceInfo();
+    static bool ResetSurfaceInfo(short sSurfaceID);
 
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);

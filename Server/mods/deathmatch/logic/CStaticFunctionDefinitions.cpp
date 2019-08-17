@@ -231,7 +231,7 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
         // Set the type name
         pDummy->SetTypeName(szTypeName);
 
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
         {
             CEntityAddPacket Packet;
             Packet.Add(pDummy);
@@ -336,7 +336,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
 
         if (bAddEntity)
         {
-            if (pResource->HasStarted())
+            if (pResource->IsClientSynced())
             {
                 CEntityAddPacket Packet;
                 Packet.Add(pNewElement);
@@ -1857,7 +1857,7 @@ CAccount* CStaticFunctionDefinitions::GetPlayerAccount(CElement* pElement)
     return NULL;
 }
 
-const SString& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
+const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
 {
     assert(pPlayer);
 
@@ -1971,8 +1971,8 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
 
             pPed->SetRotation(fRotationRadians);
 
-            // Only sync if the resource has fully started
-            if (pResource->HasStarted())
+            // Only sync if the resource has started on client
+            if (pResource->IsClientSynced())
             {
                 CEntityAddPacket Packet;
                 Packet.Add(pPed);
@@ -4118,10 +4118,10 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CElement* pElement, bool
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop,
-                                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
+                                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
 
     if (IS_PED(pElement))
     {
@@ -4150,6 +4150,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 BitStream.pBitStream->WriteBit(bInterruptable);
                 BitStream.pBitStream->WriteBit(bFreezeLastFrame);
                 BitStream.pBitStream->Write(iBlend);
+                BitStream.pBitStream->WriteBit(bTaskToBeRestoredOnAnimEnd);
             }
             else
             {
@@ -4680,8 +4681,8 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
 
-        // Only sync if the resource has fully started
-        if (pResource->HasStarted())
+        // Only sync if the resource has started on client
+        if (pResource->IsClientSynced())
         {
             CEntityAddPacket Packet;
             Packet.Add(pVehicle);
@@ -7508,7 +7509,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
             }
 
             // Tell everyone about it
-            if (pResource->HasStarted())
+            if (pResource->IsClientSynced())
                 pMarker->Sync(true);
             return pMarker;
         }
@@ -7695,7 +7696,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
             }
 
             // Tell everyone about it
-            if (pResource->HasStarted())
+            if (pResource->IsClientSynced())
                 pBlip->Sync(true);
             return pBlip;
         }
@@ -7731,7 +7732,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource* pResource, CE
             pBlip->AttachTo(pElement);
 
             // Tell everyone about it
-            if (pResource->HasStarted())
+            if (pResource->IsClientSynced())
                 pBlip->Sync(true);
 
             return pBlip;
@@ -7931,7 +7932,7 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
     pObject->SetRotation(vecRadians);
     pObject->SetModel(usModelID);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pObject);
@@ -8026,8 +8027,8 @@ bool CStaticFunctionDefinitions::MoveObject(CResource* pResource, CElement* pEle
         // Start moving it here so we can keep track of the position/rotation
         pObject->Move(moveAnimation);
 
-        // Has this resource started yet?
-        if (pResource->HasStarted())
+        // Has this resource started for the client?
+        if (pResource->IsClientSynced())
         {
             // Tell the players
             CBitStream BitStream;
@@ -8132,7 +8133,7 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
     }
 
     // Tell all the players
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
         pRadarArea->Sync(true);
 
     return pRadarArea;
@@ -8298,7 +8299,7 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
         pPickup->SetRespawnIntervals(ulRespawnInterval);
         pPickup->SetPosition(vecPosition);
 
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
         {
             // Tell the clients
             CEntityAddPacket Packet;
@@ -8899,7 +8900,7 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     CTeam* const pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), szTeamName, ucRed, ucGreen, ucBlue);
 
     // Tell everyone to add this team
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pTeam);
@@ -9060,7 +9061,7 @@ CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* p
         return nullptr;
     }
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pWater);
@@ -9190,7 +9191,7 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, co
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9209,7 +9210,7 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource* pResource, co
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9228,7 +9229,7 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource* pResource, co
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9247,7 +9248,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9274,7 +9275,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, 
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9293,7 +9294,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pColShape);
@@ -9345,7 +9346,7 @@ CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eW
     CCustomWeapon* const pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), m_pObjectManager, m_pCustomWeaponManager, weaponType);
     pWeapon->SetPosition(vecPosition);
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pWeapon);
@@ -11909,7 +11910,7 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
     return MTA_DM_BUILDTAG_LONG;
 }
 
-SString CStaticFunctionDefinitions::GetVersionSortable()
+CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }

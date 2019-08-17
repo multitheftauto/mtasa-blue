@@ -237,8 +237,7 @@ void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
             strAbortInf += pLuaMain->GetScriptName();
 
             // Error out
-            lua_pushstring(luaVM, strAbortInf);
-            lua_error(luaVM);
+            luaL_error(luaVM, strAbortInf);
         }
     }
 }

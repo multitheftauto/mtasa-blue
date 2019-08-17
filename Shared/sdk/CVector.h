@@ -177,7 +177,7 @@ public:
         }
 
         float t = f * vecEdge2.DotProduct(&sCrossE1);
-        if (t > fEpsilon)
+        if (t > fEpsilon && t <= vecSegment.Length())
         {
             *outVec = *this + vecRay * t;
             return true;

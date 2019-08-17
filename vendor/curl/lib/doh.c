@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2018 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include "curl_setup.h"
+
+#ifndef CURL_DISABLE_DOH
 
 #include "urldata.h"
 #include "curl_addrinfo.h"
@@ -160,7 +162,7 @@ static int Curl_doh_done(struct Curl_easy *doh, CURLcode result)
   struct Curl_easy *data = doh->set.dohfor;
   /* so one of the DOH request done for the 'data' transfer is now complete! */
   data->req.doh.pending--;
-  infof(data, "a DOH request is completed, %d to go\n", data->req.doh.pending);
+  infof(data, "a DOH request is completed, %u to go\n", data->req.doh.pending);
   if(result)
     infof(data, "DOH request %s\n", curl_easy_strerror(result));
 
@@ -173,8 +175,12 @@ static int Curl_doh_done(struct Curl_easy *doh, CURLcode result)
   return 0;
 }
 
-#define ERROR_CHECK_SETOPT(x,y) result = curl_easy_setopt(doh, x, y);   \
-  if(result) goto error
+#define ERROR_CHECK_SETOPT(x,y) \
+do {                                      \
+  result = curl_easy_setopt(doh, x, y);   \
+  if(result)                              \
+    goto error;                           \
+} WHILE_FALSE
 
 static CURLcode dohprobe(struct Curl_easy *data,
                          struct dnsprobe *p, DNStype dnstype,
@@ -242,7 +248,68 @@ static CURLcode dohprobe(struct Curl_easy *data,
     ERROR_CHECK_SETOPT(CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
 #endif
     ERROR_CHECK_SETOPT(CURLOPT_TIMEOUT_MS, (long)timeout_ms);
-    ERROR_CHECK_SETOPT(CURLOPT_VERBOSE, 1L);
+    if(data->set.verbose)
+      ERROR_CHECK_SETOPT(CURLOPT_VERBOSE, 1L);
+    if(data->set.no_signal)
+      ERROR_CHECK_SETOPT(CURLOPT_NOSIGNAL, 1L);
+
+    /* Inherit *some* SSL options from the user's transfer. This is a
+       best-guess as to which options are needed for compatibility. #3661 */
+    if(data->set.ssl.falsestart)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_FALSESTART, 1L);
+    if(data->set.ssl.primary.verifyhost)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_VERIFYHOST, 2L);
+    if(data->set.proxy_ssl.primary.verifyhost)
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_SSL_VERIFYHOST, 2L);
+    if(data->set.ssl.primary.verifypeer)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_VERIFYPEER, 1L);
+    if(data->set.proxy_ssl.primary.verifypeer)
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_SSL_VERIFYPEER, 1L);
+    if(data->set.ssl.primary.verifystatus)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_VERIFYSTATUS, 1L);
+    if(data->set.str[STRING_SSL_CAFILE_ORIG]) {
+      ERROR_CHECK_SETOPT(CURLOPT_CAINFO,
+        data->set.str[STRING_SSL_CAFILE_ORIG]);
+    }
+    if(data->set.str[STRING_SSL_CAFILE_PROXY]) {
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_CAINFO,
+        data->set.str[STRING_SSL_CAFILE_PROXY]);
+    }
+    if(data->set.str[STRING_SSL_CAPATH_ORIG]) {
+      ERROR_CHECK_SETOPT(CURLOPT_CAPATH,
+        data->set.str[STRING_SSL_CAPATH_ORIG]);
+    }
+    if(data->set.str[STRING_SSL_CAPATH_PROXY]) {
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_CAPATH,
+        data->set.str[STRING_SSL_CAPATH_PROXY]);
+    }
+    if(data->set.str[STRING_SSL_CRLFILE_ORIG]) {
+      ERROR_CHECK_SETOPT(CURLOPT_CRLFILE,
+        data->set.str[STRING_SSL_CRLFILE_ORIG]);
+    }
+    if(data->set.str[STRING_SSL_CRLFILE_PROXY]) {
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_CRLFILE,
+        data->set.str[STRING_SSL_CRLFILE_PROXY]);
+    }
+    if(data->set.ssl.certinfo)
+      ERROR_CHECK_SETOPT(CURLOPT_CERTINFO, 1L);
+    if(data->set.str[STRING_SSL_RANDOM_FILE]) {
+      ERROR_CHECK_SETOPT(CURLOPT_RANDOM_FILE,
+        data->set.str[STRING_SSL_RANDOM_FILE]);
+    }
+    if(data->set.str[STRING_SSL_EGDSOCKET]) {
+      ERROR_CHECK_SETOPT(CURLOPT_EGDSOCKET,
+        data->set.str[STRING_SSL_EGDSOCKET]);
+    }
+    if(data->set.ssl.no_revoke)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+    if(data->set.proxy_ssl.no_revoke)
+      ERROR_CHECK_SETOPT(CURLOPT_PROXY_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+    if(data->set.ssl.fsslctx)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_CTX_FUNCTION, data->set.ssl.fsslctx);
+    if(data->set.ssl.fsslctxp)
+      ERROR_CHECK_SETOPT(CURLOPT_SSL_CTX_DATA, data->set.ssl.fsslctxp);
+
     doh->set.fmultidone = Curl_doh_done;
     doh->set.dohfor = data; /* identify for which transfer this is done */
     p->easy = doh;
@@ -517,7 +584,6 @@ UNITTEST DOHcode doh_decode(unsigned char *doh,
   unsigned short qdcount;
   unsigned short ancount;
   unsigned short type = 0;
-  unsigned short class;
   unsigned short rdlength;
   unsigned short nscount;
   unsigned short arcount;
@@ -545,6 +611,7 @@ UNITTEST DOHcode doh_decode(unsigned char *doh,
 
   ancount = get16bit(doh, 6);
   while(ancount) {
+    unsigned short class;
     unsigned int ttl;
 
     rc = skipqname(doh, dohlen, &index);
@@ -829,8 +896,6 @@ CURLcode Curl_doh_is_resolved(struct connectdata *conn,
     DOHcode rc;
     DOHcode rc2;
     struct dohentry de;
-    struct Curl_dns_entry *dns;
-    struct Curl_addrinfo *ai;
     /* remove DOH handles from multi handle and close them */
     curl_multi_remove_handle(data->multi, data->req.doh.probe[0].easy);
     Curl_close(data->req.doh.probe[0].easy);
@@ -860,6 +925,9 @@ CURLcode Curl_doh_is_resolved(struct connectdata *conn,
             data->req.doh.host);
     }
     if(!rc || !rc2) {
+      struct Curl_dns_entry *dns;
+      struct Curl_addrinfo *ai;
+
       infof(data, "DOH Host name: %s\n", data->req.doh.host);
       showdoh(data, &de);
 
@@ -895,3 +963,5 @@ CURLcode Curl_doh_is_resolved(struct connectdata *conn,
 
   return CURLE_OK;
 }
+
+#endif /* CURL_DISABLE_DOH */

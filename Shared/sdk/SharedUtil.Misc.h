@@ -149,6 +149,7 @@ namespace SharedUtil
 
     SString GetSystemErrorMessage(uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
     void    SetClipboardText(const SString& strText);
+    SString GetClipboardText();
 
     // Version checks
     bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
@@ -161,6 +162,8 @@ namespace SharedUtil
 
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
+
+    DWORD GetMainThreadId();
 
     //
     // Return true if currently executing the main thread
@@ -213,11 +216,12 @@ namespace SharedUtil
     // string stuff
     //
 
-    std::wstring MbUTF8ToUTF16(const std::string& s);
+    std::wstring MbUTF8ToUTF16(const SString& s);
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
+    std::string UTF16ToMbUTF8(const wchar_t* ws);
 
-    std::wstring ANSIToUTF16(const std::string& s);
+    std::wstring ANSIToUTF16(const SString& s);
 
     int GetUTF8Confidence(const unsigned char* input, int len);
 
@@ -235,6 +239,13 @@ namespace SharedUtil
     T Clamp(const T& min, const T& a, const T& max)
     {
         return a < min ? min : a > max ? max : a;
+    }
+
+    // Checks whether a value is between two other values ( min <= a <= max )
+    template <class T>
+    bool Between(const T& min, const T& a, const T& max)
+    {
+        return a >= min && a <= max;
     }
 
     // Lerps between two values depending on the weight
@@ -1254,14 +1265,14 @@ namespace SharedUtil
     };
 
     #define DECLARE_ENUM2(T, U) \
-        CEnumInfo<U>*          GetEnumInfo     ( const T& ); \
-        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
-        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
-        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
-        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
+        CEnumInfo<U>*          GetEnumInfo     ( const T* ); \
+        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( (T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( (T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( (T*)0 )->GetTypeName (); }\
+        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( (T*)0 )->ValueValid  ( (eDummy)value ); }\
 
     #define IMPLEMENT_ENUM_BEGIN2(T, U) \
-        CEnumInfo<U>* GetEnumInfo( const T& ) \
+        CEnumInfo<U>* GetEnumInfo( const T* ) \
         { \
             using CEnumInfo = CEnumInfo<U>; \
             static const CEnumInfo::SEnumItem items[] = {
@@ -1681,7 +1692,7 @@ namespace SharedUtil
 
         T* operator->() { return pPointer->GetData(); }
 
-        const T* operator->()const { return pPointer->GetData(); }
+        const T* operator->() const { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 

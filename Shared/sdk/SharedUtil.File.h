@@ -57,7 +57,7 @@ namespace SharedUtil
     SString ExtractBeforeExtension(const SString& strPathFilename);
 
     bool                 FileDelete(const SString& strFilename, bool bForce = true);
-    bool                 FileRename(const SString& strFilenameOld, const SString& strFilenameNew);
+    bool                 FileRename(const SString& strFilenameOld, const SString& strFilenameNew, int* pOutErrorCode = nullptr);
     bool                 DelTree(const SString& strPath, const SString& strInsideHere);
     bool                 MkDir(const SString& strInPath, bool bTree = true);
     bool                 FileCopy(const SString& strSrc, const SString& strDest, bool bForce = true);

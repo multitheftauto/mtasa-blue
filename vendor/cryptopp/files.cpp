@@ -1,4 +1,4 @@
-// files.cpp - written and placed in the public domain by Wei Dai
+// files.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 
@@ -10,7 +10,7 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
+#if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void Files_TestInstantiations()
 {
 	FileStore f0;
@@ -22,12 +22,12 @@ void Files_TestInstantiations()
 void FileStore::StoreInitialize(const NameValuePairs &parameters)
 {
 	m_waiting = false;
-	m_stream = NULL;
+	m_stream = NULLPTR;
 	m_file.release();
 
-	const char *fileName = NULL;
+	const char *fileName = NULLPTR;
 #if defined(CRYPTOPP_UNIX_AVAILABLE) || _MSC_VER >= 1400
-	const wchar_t *fileNameWide = NULL;
+	const wchar_t *fileNameWide = NULLPTR;
 	if (!parameters.GetValue(Name::InputFileNameWide(), fileNameWide))
 #endif
 		if (!parameters.GetValue(Name::InputFileName(), fileName))
@@ -178,12 +178,12 @@ lword FileStore::Skip(lword skipMax)
 
 void FileSink::IsolatedInitialize(const NameValuePairs &parameters)
 {
-	m_stream = NULL;
+	m_stream = NULLPTR;
 	m_file.release();
 
-	const char *fileName = NULL;
+	const char *fileName = NULLPTR;
 #if defined(CRYPTOPP_UNIX_AVAILABLE) || _MSC_VER >= 1400
-	const wchar_t *fileNameWide = NULL;
+	const wchar_t *fileNameWide = NULLPTR;
 	if (!parameters.GetValue(Name::OutputFileNameWide(), fileNameWide))
 #endif
 		if (!parameters.GetValue(Name::OutputFileName(), fileName))
