@@ -1388,7 +1388,7 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
 }
 
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
-std::wstring SharedUtil::MbUTF8ToUTF16(const std::string& input)
+std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
     return utf8_mbstowcs(input);
 }
@@ -1399,6 +1399,13 @@ std::string SharedUtil::UTF16ToMbUTF8(const std::wstring& input)
     return utf8_wcstombs(input);
 }
 
+std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
+{
+    if (input == nullptr)
+        return "";
+    return utf8_wcstombs(input);
+}
+
 // Get UTF8 confidence
 int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 {
@@ -1406,7 +1413,7 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 }
 
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
-std::wstring SharedUtil::ANSIToUTF16(const std::string& input)
+std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)

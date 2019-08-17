@@ -266,7 +266,7 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
     return false;
 }
 
-bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath)
+bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuffer& outFileData)
 {
     // If no resource is set, we do not require to verify the file
     if (!m_pResource)
@@ -278,7 +278,7 @@ bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath)
     if (pFile == nullptr)
         return true;
 
-    pFile->GenerateClientChecksum();
+    pFile->GenerateClientChecksum(outFileData);
     return pFile->DoesClientAndServerChecksumMatch();
 }
 

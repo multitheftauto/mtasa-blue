@@ -4807,7 +4807,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         bitStream.Read(usNoClientCacheScriptCount);
 
     // Read the declared min client version for this resource
-    SString strMinServerReq, strMinClientReq;
+    CMtaVersion strMinServerReq, strMinClientReq;
     if (bitStream.Version() >= 0x32)
     {
         bitStream.ReadString(strMinServerReq);

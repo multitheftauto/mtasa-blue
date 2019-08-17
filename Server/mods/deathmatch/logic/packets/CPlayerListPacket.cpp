@@ -116,9 +116,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (BitStream.Version() >= 0x34)
         {
             BitStream.Write(pPlayer->GetBitStreamVersion());
-            SString strBuild = pPlayer->GetPlayerVersion().SubStr(8);
-            uint    uiBuildNumber = atoi(strBuild);
-            BitStream.Write(uiBuildNumber);
+            BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
         }
 
         // Flags

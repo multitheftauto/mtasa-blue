@@ -479,7 +479,7 @@ public:
         ReadNumber(color);
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //
@@ -491,7 +491,7 @@ public:
         ReadNumber(color, static_cast<lua_Number>(defaultValue));
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //

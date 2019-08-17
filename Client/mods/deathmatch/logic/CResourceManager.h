@@ -32,7 +32,7 @@ public:
     ~CResourceManager();
 
     CResource* Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                   const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
+                   const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     CResource* GetResource(const char* szResourceName);
     CResource* GetResourceFromNetID(unsigned short usNetID);
     CResource* GetResourceFromScriptID(uint uiScriptID);
