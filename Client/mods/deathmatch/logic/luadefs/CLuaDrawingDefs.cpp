@@ -577,9 +577,11 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI);
 
+    std::vector<float> vecTableContent;
+
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
+        vecTableContent.clear();
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
@@ -625,9 +627,11 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI);
 
+    std::vector<float> vecTableContent;
+
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
+        vecTableContent.clear();
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
