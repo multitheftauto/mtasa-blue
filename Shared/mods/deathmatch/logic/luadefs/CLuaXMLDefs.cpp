@@ -223,25 +223,23 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strXmlContent);
 
-    if (!argStream.HasErrors())
-    {
-        // Grab our resource
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
-
-            if (rootNode && rootNode->IsValid())
-            {
-                lua_pushxmlnode(luaVM, rootNode);
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
-        }
-    }
-    else
+    if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    // Grab our resource
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
+
+        if (rootNode && rootNode->IsValid())
+        {
+            lua_pushxmlnode(luaVM, rootNode);
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
