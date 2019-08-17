@@ -1017,16 +1017,11 @@ int CLuaVehicleDefs::AreVehicleLightsOn(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
 
-    if (!argStream.HasErrors())
-    {
-        bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
-        lua_pushboolean(luaVM, bLightsOn);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
+    lua_pushboolean(luaVM, bLightsOn);
     return 1;
 }
 
