@@ -973,6 +973,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
+            // TODO: Find out why this is a nullptr, and fix underlying bug
             if (pVehicleModel->pVisualInfo != nullptr)
                 pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
