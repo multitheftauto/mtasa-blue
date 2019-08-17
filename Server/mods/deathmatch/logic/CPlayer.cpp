@@ -206,6 +206,16 @@ void CPlayer::SetNick(const char* szNick)
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
 }
 
+// Ignore min client version checks if is a custom build and both player and server have build number of 0
+bool CPlayer::ShouldIgnoreMinClientVersionChecks()
+{
+#if (MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM) && (MTASA_VERSION_BUILD == 0)
+    if (GetPlayerVersion().GetBuildNumber() == 0)
+        return true;
+#endif
+    return false;
+}
+
 const char* CPlayer::GetSourceIP()
 {
     if (m_strIP.empty())
@@ -1098,7 +1108,7 @@ float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
     return m_fWeaponRangeLast;
 }
 
-void CPlayer::SetPlayerVersion(const SString& strPlayerVersion)
+void CPlayer::SetPlayerVersion(const CMtaVersion& strPlayerVersion)
 {
     m_strPlayerVersion = strPlayerVersion;
 }

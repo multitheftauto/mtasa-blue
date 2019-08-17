@@ -23,7 +23,6 @@ typedef void (*PFN_NETRESULT)(class CNetJobData* pJobData, void* pContext);
 class CNetJobData
 {
 public:
-    ZERO_ON_NEW
     bool SetCallback(PFN_NETRESULT pfnNetResult, void* pContext);
     bool HasCallback();
     void ProcessCallback();
@@ -35,16 +34,16 @@ public:
         DEBUG_DESTROY_COUNT("CNetJobData");
     }
 
-    EJobStageType stage;
-    SArgs*        pArgs;
-    bool          bAutoFree;
+    EJobStageType stage = EJobStageType::NONE;
+    SArgs*        pArgs = nullptr;
+    bool          bAutoFree = false;
 
     struct
     {
-        PFN_NETRESULT pfnNetResult;
-        void*         pContext;
-        bool          bSet;
-        bool          bDone;
+        PFN_NETRESULT pfnNetResult = nullptr;
+        void*         pContext = nullptr;
+        bool          bSet = false;
+        bool          bDone = false;
     } callback;
 };
 

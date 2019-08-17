@@ -1857,7 +1857,7 @@ CAccount* CStaticFunctionDefinitions::GetPlayerAccount(CElement* pElement)
     return NULL;
 }
 
-const SString& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
+const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
 {
     assert(pPlayer);
 
@@ -11910,7 +11910,7 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
     return MTA_DM_BUILDTAG_LONG;
 }
 
-SString CStaticFunctionDefinitions::GetVersionSortable()
+CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }

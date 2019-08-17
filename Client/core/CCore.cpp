@@ -31,54 +31,6 @@ extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
 
-BOOL AC_RestrictAccess()
-{
-    EXPLICIT_ACCESS NewAccess;
-    PACL            pTempDacl;
-    HANDLE          hProcess;
-    DWORD           dwFlags;
-    DWORD           dwErr;
-
-    ///////////////////////////////////////////////
-    // Get the HANDLE to the current process.
-    hProcess = GetCurrentProcess();
-
-    ///////////////////////////////////////////////
-    // Setup which accesses we want to deny.
-    dwFlags = GENERIC_WRITE | PROCESS_ALL_ACCESS | WRITE_DAC | DELETE | WRITE_OWNER | READ_CONTROL;
-
-    ///////////////////////////////////////////////
-    // Build our EXPLICIT_ACCESS structure.
-    BuildExplicitAccessWithName(&NewAccess, "CURRENT_USER", dwFlags, DENY_ACCESS, NO_INHERITANCE);
-
-    ///////////////////////////////////////////////
-    // Create our Discretionary Access Control List.
-    if (ERROR_SUCCESS != (dwErr = SetEntriesInAcl(1, &NewAccess, NULL, &pTempDacl)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetEntriesInAcl(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Set the new DACL to our current process.
-    if (ERROR_SUCCESS != (dwErr = SetSecurityInfo(hProcess, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pTempDacl, NULL)))
-    {
-        #ifdef DEBUG
-//        pConsole->Con_Printf("Error at SetSecurityInfo(): %i", dwErr);
-        #endif
-        return FALSE;
-    }
-
-    ////////////////////////////////////////////////
-    // Free the DACL (see msdn on SetEntriesInAcl)
-    LocalFree(pTempDacl);
-    CloseHandle(hProcess);
-
-    return TRUE;
-}
-
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
@@ -86,10 +38,6 @@ CCore::CCore()
 {
     // Initialize the global pointer
     g_pCore = this;
-
-    #if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
-    AC_RestrictAccess();
-    #endif
 
     m_pConfigFile = NULL;
 
@@ -105,6 +53,7 @@ CCore::CCore()
 
     // Load our settings and localization as early as possible
     CreateXML();
+    ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
 
     // Create a logger instance.
@@ -604,7 +553,8 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -1116,6 +1066,7 @@ CWebCoreInterface* CCore::GetWebCore()
     if (m_pWebCore == nullptr)
     {
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
+        m_pWebCore->Initialise();
     }
     return m_pWebCore;
 }
@@ -1714,6 +1665,21 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::ApplyCoreInitSettings()
+{
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+    bool bValue;
+    CVARS_GET("process_dpi_aware", bValue);
+
+    if (bValue)
+    {
+        // Minimum supported client for the function below is Windows Vista
+        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+        SetProcessDPIAware();
+    }
+#endif
+}
+
 //
 // Called just before GTA calculates frame time deltas
 //
@@ -1741,6 +1707,8 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Apply client config setting
     uint uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    if (uiClientConfigRate > 0)
+        uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
