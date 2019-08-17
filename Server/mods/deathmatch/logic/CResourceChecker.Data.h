@@ -460,5 +460,8 @@ namespace
         {true, "unbanSerial", "Please manually update this.  Refer to the wiki for details"},
         {true, "getBansXML", "Please manually update this.  Refer to the wiki for details"},
         {true, "canPlayerUseFunction", "Please manually update this.  Refer to the wiki for details"},
+
+        // callRemote warning. See #294, #295
+        {true, "callRemote", "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b callbacks will set `errno` to `0`, instead of `nil`. Please update your scripts if necessary."},
     };
 }            // namespace
