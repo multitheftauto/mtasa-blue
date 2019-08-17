@@ -241,7 +241,7 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
