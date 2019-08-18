@@ -764,7 +764,7 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
 // Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId)
+void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId, std::vector<SString> vTextureNames)
 {
     outTextureList.clear();
 
@@ -788,12 +788,41 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
+    //If any texture names specified in vTextureNames, we should only return these
+    bool bExcludeTextures = false;
+
+    if (vTextureNames.size() > 0)
+    {
+        bExcludeTextures = true;
+    }
+
     for (std::vector<RwTexture*>::iterator iter = rwTextureList.begin(); iter != rwTextureList.end(); iter++)
     {
-        RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
-        CPixels       texture;
-        g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
-        outTextureList.emplace_back((*iter)->name, std::move(texture));
+        SString strTextureName = (*iter)->name;
+        bool    bValidTexture = false;
+
+        if (bExcludeTextures)
+        {
+            for (const auto& str : vTextureNames)
+            {
+                if (strTextureName == str)
+                {
+                    bValidTexture = true;
+                }
+            }
+        }
+        else
+        {
+            bValidTexture = true;
+        }
+
+        if (bValidTexture)
+        {
+            RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
+            CPixels       texture;
+            g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
+            outTextureList.emplace_back(strTextureName, std::move(texture));      
+        }
     }
 
     if (bLoadedModel)

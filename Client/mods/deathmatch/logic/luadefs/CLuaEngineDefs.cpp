@@ -1072,11 +1072,26 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
 {
-    //  table engineGetModelTextures ( string modelName )
-    SString strModelName;
+    //  table engineGetModelTextures ( string modelName, string/table textureNames )
+    SString              strModelName;
+    std::vector<SString> vTextureNames;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelName, "");
+
+    if (argStream.NextIsString())
+    {
+        SString strTextureName;
+        argStream.ReadString(strTextureName, "");
+        vTextureNames.push_back(strTextureName);
+    }
+    else
+    {
+        if (argStream.NextIsTable())
+        {
+            argStream.ReadStringTable(vTextureNames);
+        }
+    }
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
@@ -1087,14 +1102,15 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
         lua_pushboolean(luaVM, false);
         return 1;
     }
-    
+
     std::vector<std::tuple<std::string, CPixels>> textureList;
-    g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID);
+    g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames);
 
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
-        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
+                                                                                                         RFORMAT_UNKNOWN, TADDRESS_WRAP);
         lua_pushstring(luaVM, std::get<0>(pair).c_str());
         lua_pushelement(luaVM, pTexture);
         lua_settable(luaVM, -3);
