@@ -9,61 +9,63 @@ project "Deathmatch"
 
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
-	
+
 	filter {}
-		includedirs { 
-			"../../sdk", 
-			"../../../vendor/bochs", 
-			"../../../vendor/pme", 
-			"../../../vendor/zip", 
-			"../../../vendor/zlib", 
-			"../../../vendor/pcre", 
-			"../../../vendor/json-c", 
-			"../../../vendor/bob_withers", 
-			"../../../vendor/lua/src", 
-			"../../../Shared/mods/deathmatch/logic", 
-			"../../../Shared/animation", 
-			"../../../Shared/publicsdk/include", 
+		includedirs {
+			"../../sdk",
+			"../../../vendor/bochs",
+			"../../../vendor/pme",
+			"../../../vendor/zip",
+			"../../../vendor/zlib",
+			"../../../vendor/pcre",
+			"../../../vendor/json-c",
+			"../../../vendor/bob_withers",
+			"../../../vendor/lua/src",
+			"../../../Shared/mods/deathmatch/logic",
+			"../../../Shared/animation",
+			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
-			"logic", 
+			"logic",
 			"utils",
 			"."
 		}
-	
+
 	defines { "SDK_WITH_BCRYPT" }
 	links {
 		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
-	
+
 	vpaths {
 		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
 		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp", "../../**.cpp"},
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"**.h",
 		"**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.h",
-		"../../../Shared/animation/CEasingCurve.cpp", 
+		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
-	
+
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 		links { "ws2_32", "pthread" }
-		
+
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
-		links { "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-	
+
+	filter "system:linux"
+		links { "rt" }
+
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

@@ -97,6 +97,7 @@ typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* p
                                              AnimationId animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
+typedef bool(BlendAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
 typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface*& pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
@@ -113,6 +114,7 @@ typedef void(GameVehicleDestructHandler)(CEntitySAInterface* pVehicle);
 typedef void(GamePlayerDestructHandler)(CEntitySAInterface* pPlayer);
 typedef void(GameProjectileDestructHandler)(CEntitySAInterface* pProjectile);
 typedef void(GameModelRemoveHandler)(ushort usModelId);
+typedef void(GameRunNamedAnimDestructorHandler)(class CTaskSimpleRunNamedAnimSAInterface* pTask);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
@@ -179,7 +181,6 @@ public:
         FAST_CLOTHES_ON = 2,
     };
 
-    virtual void                InitializeAnimationHooks(bool bIsHostSmotra) = 0;
     virtual CRemoteDataStorage* CreateRemoteDataStorage() = 0;
     virtual void                DestroyRemoteDataStorage(CRemoteDataStorage* pData) = 0;
     virtual void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData) = 0;
@@ -221,6 +222,7 @@ public:
     virtual void  SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
     virtual void  SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler) = 0;
     virtual void  SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler) = 0;
+    virtual void  SetBlendAnimationHandler(BlendAnimationHandler* pHandler) = 0;
     virtual void  SetProcessCollisionHandler(ProcessCollisionHandler* pHandler) = 0;
     virtual void  SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler) = 0;
     virtual void  SetVehicleDamageHandler(VehicleDamageHandler* pHandler) = 0;
@@ -234,6 +236,7 @@ public:
     virtual void  SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler) = 0;
     virtual void  SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler) = 0;
     virtual void  SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
+    virtual void  SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler) = 0;
     virtual void  SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
@@ -378,4 +381,5 @@ public:
 
     virtual DWORD GetLastStaticAnimationGroupID() = 0;
     virtual DWORD GetLastStaticAnimationID() = 0;
+    virtual DWORD GetLastAnimArrayAddress() = 0;
 };

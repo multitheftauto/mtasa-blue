@@ -21,6 +21,5 @@ extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInt
     IsMainThread();
 
     CWebCore* pWebCore = new CWebCore;
-    pWebCore->Initialise();
     return pWebCore;
 }

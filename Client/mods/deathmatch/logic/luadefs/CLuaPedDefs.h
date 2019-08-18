@@ -79,7 +79,6 @@ public:
     LUA_DECLARE(RemovePedClothes);
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
-    LUA_DECLARE(SetPedSunbathing);
     LUA_DECLARE(SetPedDoingGangDriveby);
     LUA_DECLARE(SetPedFightingStyle);
     LUA_DECLARE(SetPedLookAt);

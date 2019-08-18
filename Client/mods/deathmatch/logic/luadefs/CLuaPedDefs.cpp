@@ -2007,6 +2007,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     bool           bUpdatePosition = true;
     bool           bInterruptable = true;
     bool           bFreezeLastFrame = true;
+    bool           bTaskToBeRestoredOnAnimEnd = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2023,6 +2024,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadBool(bInterruptable, true);
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
+    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
 
     if (!argStream.HasErrors())
     {
@@ -2030,6 +2032,17 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
                                                         strAnimName == "" ? NULL : strAnimName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable,
                                                         bFreezeLastFrame))
         {
+            CClientPed* pPed = static_cast<CClientPed*>(pEntity);
+            if (pPed->IsDucked())
+            {
+                pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
+            }
+            else
+            {
+                bTaskToBeRestoredOnAnimEnd = false;
+            }
+
+            pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
             lua_pushboolean(luaVM, true);
             return 1;
         }

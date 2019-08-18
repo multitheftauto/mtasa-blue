@@ -30,6 +30,7 @@ struct
     {15, "data/pedstats.dat"}, {17, "data/txdcut.ide"},  {14, "data/vehicles.ide"}, {20, "data/weapon.dat"},         {4, "data/melee.dat"},
     {16, "data/water.dat"},    {18, "data/water1.dat"},  {2, "data/handling.cfg"},  {19, "models/coll/weapons.col"}, {21, "data/plants.dat"},
     {23, "data/furnitur.dat"}, {24, "data/procobj.dat"}, {8, "data/surface.dat"},   {12, "data/surfinfo.dat"},       {22, "anim/ped.ifp"},
+    {26, "data/timecyc.dat"},
 };
 
 CMainConfig::CMainConfig(CConsole* pConsole, CLuaManager* pLuaMain) : CXMLConfig(NULL)

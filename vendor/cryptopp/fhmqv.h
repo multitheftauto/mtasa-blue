@@ -4,9 +4,9 @@
 #ifndef CRYPTOPP_FHMQV_H
 #define CRYPTOPP_FHMQV_H
 
-//! \file fhmqv.h
-//! \brief Classes for Fully Hashed Menezes-Qu-Vanstone key agreement in GF(p)
-//! \since Crypto++ 5.6.4
+/// \file fhmqv.h
+/// \brief Classes for Fully Hashed Menezes-Qu-Vanstone key agreement in GF(p)
+/// \since Crypto++ 5.6.4
 
 #include "gfpcrypt.h"
 #include "algebra.h"
@@ -14,13 +14,13 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! \brief Fully Hashed Menezes-Qu-Vanstone in GF(p)
-//! \details This implementation follows Augustin P. Sarr and Philippe Elbaz–Vincent, and Jean–Claude Bajard's
-//!   <a href="http://eprint.iacr.org/2009/408">A Secure and Efficient Authenticated Diffie-Hellman Protocol</a>.
-//!   Note: this is FHMQV, Protocol 5, from page 11; and not FHMQV-C.
-//! \sa MQV, HMQV, FHMQV, and AuthenticatedKeyAgreementDomain
-//! \since Crypto++ 5.6.4
-template <class GROUP_PARAMETERS, class COFACTOR_OPTION = CPP_TYPENAME GROUP_PARAMETERS::DefaultCofactorOption, class HASH = SHA512>
+/// \brief Fully Hashed Menezes-Qu-Vanstone in GF(p)
+/// \details This implementation follows Augustin P. Sarr and Philippe Elbaz–Vincent, and Jean–Claude Bajard's
+///   <a href="http://eprint.iacr.org/2009/408">A Secure and Efficient Authenticated Diffie-Hellman Protocol</a>.
+///   Note: this is FHMQV, Protocol 5, from page 11; and not FHMQV-C.
+/// \sa MQV, HMQV, FHMQV, and AuthenticatedKeyAgreementDomain
+/// \since Crypto++ 5.6.4
+template <class GROUP_PARAMETERS, class COFACTOR_OPTION = typename GROUP_PARAMETERS::DefaultCofactorOption, class HASH = SHA512>
 class FHMQV_Domain : public AuthenticatedKeyAgreementDomain
 {
 public:
@@ -28,9 +28,7 @@ public:
   typedef typename GroupParameters::Element Element;
   typedef FHMQV_Domain<GROUP_PARAMETERS, COFACTOR_OPTION, HASH> Domain;
 
-#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
-	virtual ~FHMQV_Domain() {}
-#endif
+  virtual ~FHMQV_Domain() {}
 
   FHMQV_Domain(bool clientRole = true): m_role(clientRole ? RoleClient : RoleServer) {}
 
@@ -68,14 +66,14 @@ public:
 
   CryptoParameters & AccessCryptoParameters(){return AccessAbstractGroupParameters();}
 
-  //! return length of agreed value produced
+  /// return length of agreed value produced
   unsigned int AgreedValueLength() const {return GetAbstractGroupParameters().GetEncodedElementSize(false);}
-  //! return length of static private keys in this domain
+  /// return length of static private keys in this domain
   unsigned int StaticPrivateKeyLength() const {return GetAbstractGroupParameters().GetSubgroupOrder().ByteCount();}
-  //! return length of static public keys in this domain
+  /// return length of static public keys in this domain
   unsigned int StaticPublicKeyLength() const{return GetAbstractGroupParameters().GetEncodedElementSize(true);}
 
-  //! generate static private key
+  /// generate static private key
   /*! \pre size of privateKey == PrivateStaticKeyLength() */
   void GenerateStaticPrivateKey(RandomNumberGenerator &rng, byte *privateKey) const
   {
@@ -83,7 +81,7 @@ public:
     x.Encode(privateKey, StaticPrivateKeyLength());
   }
 
-  //! generate static public key
+  /// generate static public key
   /*! \pre size of publicKey == PublicStaticKeyLength() */
   void GenerateStaticPublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
   {
@@ -97,7 +95,7 @@ public:
   unsigned int EphemeralPrivateKeyLength() const {return StaticPrivateKeyLength() + StaticPublicKeyLength();}
   unsigned int EphemeralPublicKeyLength() const{return StaticPublicKeyLength();}
 
-  //! return length of ephemeral private keys in this domain
+  /// return length of ephemeral private keys in this domain
   void GenerateEphemeralPrivateKey(RandomNumberGenerator &rng, byte *privateKey) const
   {
     const DL_GroupParameters<Element> &params = GetAbstractGroupParameters();
@@ -107,14 +105,14 @@ public:
     params.EncodeElement(true, y, privateKey+StaticPrivateKeyLength());
   }
 
-  //! return length of ephemeral public keys in this domain
+  /// return length of ephemeral public keys in this domain
   void GenerateEphemeralPublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
   {
     CRYPTOPP_UNUSED(rng);
     memcpy(publicKey, privateKey+StaticPrivateKeyLength(), EphemeralPublicKeyLength());
   }
 
-  //! derive agreed value from your private keys and couterparty's public keys, return false in case of failure
+  /// derive agreed value from your private keys and couterparty's public keys, return false in case of failure
   /*! \note The ephemeral public key will always be validated.
   If you have previously validated the static public key, use validateStaticOtherPublicKey=false to save time.
   \pre size of agreedValue == AgreedValueLength()
@@ -128,7 +126,7 @@ public:
     const byte *staticOtherPublicKey, const byte *ephemeralOtherPublicKey,
     bool validateStaticOtherPublicKey=true) const
   {
-    byte *XX = NULL, *YY = NULL, *AA = NULL, *BB = NULL;
+    byte *XX = NULLPTR, *YY = NULLPTR, *AA = NULLPTR, *BB = NULLPTR;
     size_t xxs = 0, yys = 0, aas = 0, bbs = 0;
 
     // Depending on the role, this will hold either A's or B's static
@@ -137,6 +135,7 @@ public:
 
     try
     {
+      this->GetMaterial().DoQuickSanityCheck();
       const DL_GroupParameters<Element> &params = GetAbstractGroupParameters();
 
       if(m_role == RoleServer)
@@ -179,13 +178,13 @@ public:
       // VerifyPoint to ensure the element is in G*. If the other's PublicKey is
       // requested to be validated, we manually call ValidateElement at level 3.
       Element VV1 = params.DecodeElement(staticOtherPublicKey, false);
-      if(!params.ValidateElement(validateStaticOtherPublicKey ? 3 : 1, VV1, NULL))
+      if(!params.ValidateElement(validateStaticOtherPublicKey ? 3 : 1, VV1, NULLPTR))
         return false;
 
       // DecodeElement calls ValidateElement at level 1. Level 1 only calls
       // VerifyPoint to ensure the element is in G*. Crank it up.
       Element VV2 = params.DecodeElement(ephemeralOtherPublicKey, false);
-      if(!params.ValidateElement(3, VV2, NULL))
+      if(!params.ValidateElement(3, VV2, NULLPTR))
         return false;
 
       const Integer& q = params.GetSubgroupOrder();
@@ -194,10 +193,10 @@ public:
       Integer d, e;
       SecByteBlock dd(len), ee(len);
 
-      Hash(NULL, XX, xxs, YY, yys, AA, aas, BB, bbs, dd.BytePtr(), dd.SizeInBytes());
+      Hash(NULLPTR, XX, xxs, YY, yys, AA, aas, BB, bbs, dd.BytePtr(), dd.SizeInBytes());
       d.Decode(dd.BytePtr(), dd.SizeInBytes());
 
-      Hash(NULL, YY, yys, XX, xxs, AA, aas, BB, bbs, ee.BytePtr(), ee.SizeInBytes());
+      Hash(NULLPTR, YY, yys, XX, xxs, AA, aas, BB, bbs, ee.BytePtr(), ee.SizeInBytes());
       e.Decode(ee.BytePtr(), ee.SizeInBytes());
 
       Element sigma;
@@ -291,12 +290,12 @@ private:
   KeyAgreementRole m_role;
 };
 
-//! \brief Fully Hashed Menezes-Qu-Vanstone in GF(p)
-//! \details This implementation follows Augustin P. Sarr and Philippe Elbaz–Vincent, and Jean–Claude Bajard's
-//!   <a href="http://eprint.iacr.org/2009/408">A Secure and Efficient Authenticated Diffie-Hellman Protocol</a>.
-//!   Note: this is FHMQV, Protocol 5, from page 11; and not FHMQV-C.
-//! \sa FHMQV, MQV_Domain, HMQV_Domain, AuthenticatedKeyAgreementDomain
-//! \since Crypto++ 5.6.4
+/// \brief Fully Hashed Menezes-Qu-Vanstone in GF(p)
+/// \details This implementation follows Augustin P. Sarr and Philippe Elbaz–Vincent, and Jean–Claude Bajard's
+///   <a href="http://eprint.iacr.org/2009/408">A Secure and Efficient Authenticated Diffie-Hellman Protocol</a>.
+///   Note: this is FHMQV, Protocol 5, from page 11; and not FHMQV-C.
+/// \sa FHMQV, MQV_Domain, HMQV_Domain, AuthenticatedKeyAgreementDomain
+/// \since Crypto++ 5.6.4
 typedef FHMQV_Domain<DL_GroupParameters_GFP_DefaultSafePrime> FHMQV;
 
 NAMESPACE_END
