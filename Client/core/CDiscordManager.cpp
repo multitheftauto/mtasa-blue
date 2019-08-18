@@ -10,7 +10,6 @@
 
 #include "StdInc.h"
 #include "SharedUtil.Thread.h"
-#include <chrono>
 #include "CDiscordManager.h"
 
 #ifndef DISCORD_CLIENT_ID
