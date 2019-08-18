@@ -14,8 +14,6 @@
 #include <core/CDiscordManagerInterface.h>
 #include "SharedUtil.Thread.h"
 
-#define DISCORD_CLIENT_ID 592783250678874125
-
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:

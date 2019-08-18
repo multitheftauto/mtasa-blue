@@ -13,6 +13,10 @@
 #include <chrono>
 #include "CDiscordManager.h"
 
+#ifndef DISCORD_CLIENT_ID
+#define DISCORD_CLIENT_ID 468493322583801867
+#endif
+
 CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}
 {
     Reconnect(true); // Try to interact with discord on construction
