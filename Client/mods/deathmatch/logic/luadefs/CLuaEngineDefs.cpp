@@ -1082,25 +1082,23 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     ushort usModelID = CModelNames::ResolveModelID(strModelName);
-    if (usModelID != INVALID_MODEL_ID)
+    if (usModelID == INVALID_MODEL_ID)
     {
-        std::vector<std::tuple<std::string, CPixels>> textureList;
-        g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID);
-
-        lua_newtable(luaVM);
-        for (auto pair : textureList)
-        {
-            CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT,RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
-            lua_pushstring(luaVM, (const char*)&std::get<0>(pair));
-            lua_pushelement(luaVM, pTexture);
-            lua_settable(luaVM, -3);
-        }
-
+        lua_pushboolean(luaVM, false);
         return 1;
     }
+    
+    std::vector<std::tuple<std::string, CPixels>> textureList;
+    g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID);
 
-    // We failed
-    lua_pushboolean(luaVM, false);
+    lua_newtable(luaVM);
+    for (const auto& pair : textureList)
+    {
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        lua_pushstring(luaVM, std::get<0>(pair).c_str());
+        lua_pushelement(luaVM, pTexture);
+        lua_settable(luaVM, -3);
+    }
     return 1;
 }
 

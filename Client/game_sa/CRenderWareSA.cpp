@@ -768,12 +768,6 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
 {
     outTextureList.clear();
 
-    // Special case for CJ
-    //if (usModelId == 0)
-    //{
-    //    outTextureList.push_back("CJ");
-    //    return;
-    //}
     ushort usTxdId = GetTXDIDForModelID(usModelId);
 
     if (usTxdId == 0)
@@ -799,7 +793,7 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
         RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
         CPixels       texture;
         g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
-        outTextureList.emplace_back((*iter)->name, texture);
+        outTextureList.emplace_back((*iter)->name, std::move(texture));
     }
 
     if (bLoadedModel)
