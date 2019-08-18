@@ -18,10 +18,10 @@
 
 CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}
 {
-    Reconnect(true); // Try to interact with discord on construction
+    Reconnect(true);            // Try to interact with discord on construction
     m_Thread = new CThreadHandle(CDiscordManager::DiscordThread, this);
 
-    m_StoredActivity.GetAssets().SetLargeImage("mta_logo_round"); // Always thing
+    m_StoredActivity.GetAssets().SetLargeImage("mta_logo_round");            // Always thing
     m_StoredActivity.GetAssets().SetLargeText("Playing MTA:SA");
 }
 
@@ -29,11 +29,11 @@ CDiscordManager::~CDiscordManager()
 {
     m_Suicide = true;
     int iTries = 0;
-    while (iTries++ < 400 && m_Suicide) // Wait maximum of 2 sec on this
+    while (iTries++ < 400 && m_Suicide)            // Wait maximum of 2 sec on this
         Sleep(5);
 
     if (m_Suicide)
-        m_Thread->Cancel(); // Kill it anyway
+        m_Thread->Cancel();            // Kill it anyway
 
     delete m_Thread;
     SAFE_DELETE(m_DiscordCore);
@@ -45,7 +45,7 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
     bool discordRichPresence;
     CVARS_GET("discord_rich_presence", discordRichPresence);
     if (!discordRichPresence)
-        return; // Disabled
+        return;            // Disabled
 
     discord::Result res;
     {
@@ -53,7 +53,8 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
         res = discord::Core::Create(DISCORD_CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &m_DiscordCore);
     }
 
-    if (!m_DiscordCore && bOnInitialization) {
+    if (!m_DiscordCore && bOnInitialization)
+    {
         // Output error only when trying to connect on initialization
         WriteErrorEvent(SString("[DISCORD]: Failed to instantiate core, error code: %i", static_cast<int>(res)));
         return;
@@ -65,7 +66,7 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
     m_DiscordCore->ActivityManager().RegisterCommand(SString("%s /from_discord", *GetParentProcessPathFilename(GetCurrentProcessId())));
     m_DiscordCore->ActivityManager().OnActivityJoin.Connect(OnActivityJoin);
 
-    if (!bOnInitialization) // Player could be in a server or in menu by now
+    if (!bOnInitialization)            // Player could be in a server or in menu by now
     {
         if (g_pCore->IsConnected())
             Restore();
@@ -77,8 +78,10 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
 void CDiscordManager::DiscordLogCallback(discord::LogLevel level, const char* message)
 {
     SString strMessage("[DISCORD]: %s", message);
-    if (level >= discord::LogLevel::Warn) WriteDebugEvent(strMessage);
-    else WriteErrorEvent(strMessage);
+    if (level >= discord::LogLevel::Warn)
+        WriteDebugEvent(strMessage);
+    else
+        WriteErrorEvent(strMessage);
 }
 
 void CDiscordManager::OnActivityJoin(const char* joinSecret)
@@ -120,7 +123,7 @@ void CDiscordManager::OnActivityJoin(const char* joinSecret)
             }
         }
     }
-    
+
     SString nick;
     CVARS_GET("nick", nick);
 
@@ -160,7 +163,8 @@ void* CDiscordManager::DiscordThread(void* arg)
     return nullptr;
 }
 
-// Called from separate thread so the unnecessary load won't affect the main thread, establishing connection with discord is sometimes time-consuming, especially when it's not running
+// Called from separate thread so the unnecessary load won't affect the main thread,
+// establishing connection with discord is sometimes time-consuming, especially when it's not running
 void CDiscordManager::DoPulse()
 {
     if (!m_DiscordCore)
@@ -178,7 +182,7 @@ void CDiscordManager::DoPulse()
 
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
 
-    if (m_WaitingForServerName) // Query request sent
+    if (m_WaitingForServerName)            // Query request sent
     {
         auto info = m_QueryReceiver.GetServerResponse();
         if (info.containingInfo)
@@ -187,7 +191,7 @@ void CDiscordManager::DoPulse()
             UpdateActivity([](EDiscordRes) {});
             m_WaitingForServerName = false;
         }
-        else if (m_QueryReceiver.GetElapsedTimeSinceLastQuery() > 2000) // Resend query request every 2s if no response came
+        else if (m_QueryReceiver.GetElapsedTimeSinceLastQuery() > 2000)            // Resend query request every 2s if no response came
         {
             SString      ipaddr;
             unsigned int port;
@@ -198,7 +202,7 @@ void CDiscordManager::DoPulse()
     }
 
     discord::Result res = m_DiscordCore->RunCallbacks();
-    if (res == discord::Result::NotRunning) // Discord is now closed, needs to be reinstated in the next 15s
+    if (res == discord::Result::NotRunning)            // Discord is now closed, needs to be reinstated in the next 15s
     {
         delete m_DiscordCore;
         m_DiscordCore = nullptr;
@@ -226,9 +230,7 @@ void CDiscordManager::UpdateActivity(std::function<void(EDiscordRes)> callback)
     if (!m_DiscordCore)
         return;
 
-    m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res) {
-        callback(static_cast<EDiscordRes>(res));
-    });
+    m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res) { callback(static_cast<EDiscordRes>(res)); });
 }
 
 void CDiscordManager::SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback)
@@ -318,7 +320,11 @@ void CDiscordManager::RegisterPlay(bool connected)
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
     m_StoredActivity.SetDetails("Retrieving server name...");
     m_StoredActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
-    m_StoredActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
+
+    // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one
+    // containing a small image to set using this function
+    m_StoredActivity.GetAssets().SetSmallImage("a-server");
+
     m_StoredActivity.GetTimestamps().SetStart(currentTime);
     UpdateActivity([=](EDiscordRes res) {
         if (res != DiscordRes_Ok)
@@ -351,6 +357,6 @@ void CDiscordManager::Disconnect()
 void CDiscordManager::DisconnectNotification()
 {
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
-    m_WaitingForServerName = false; // No longer wait
+    m_WaitingForServerName = false;            // No longer wait
     m_QueryReceiver.InvalidateSocket();
 }

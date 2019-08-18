@@ -26,6 +26,5 @@ public:
     SString GetSecret() const { return m_secretKey; }
 
 private:
-    
     SString m_secretKey;
 };

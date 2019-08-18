@@ -7,9 +7,9 @@
  *
  *****************************************************************************/
 
-// 
+//
 // Some enums are redefined so the interface won't require discord's header
-// 
+//
 
 #pragma once
 
@@ -73,16 +73,25 @@ enum EDiscordRes
 
 struct SDiscordActivity
 {
-    SDiscordActivity() : m_activityType(EDiscordActivityT_Playing), m_startTimestamp(0), m_endTimestamp(0),
-                         m_name(""), m_state(""), m_details(""), m_joinSecret(""), m_spectateSecret("") {}
+    SDiscordActivity()
+        : m_activityType(EDiscordActivityT_Playing),
+          m_startTimestamp(0),
+          m_endTimestamp(0),
+          m_name(""),
+          m_state(""),
+          m_details(""),
+          m_joinSecret(""),
+          m_spectateSecret("")
+    {
+    }
 
-    int64 m_startTimestamp;
-    int64 m_endTimestamp;
-    const char* m_name;
-    const char* m_state;
-    const char* m_details;
-    const char* m_joinSecret;
-    const char* m_spectateSecret;
+    int64             m_startTimestamp;
+    int64             m_endTimestamp;
+    const char*       m_name;
+    const char*       m_state;
+    const char*       m_details;
+    const char*       m_joinSecret;
+    const char*       m_spectateSecret;
     EDiscordActivityT m_activityType;
 };
 
