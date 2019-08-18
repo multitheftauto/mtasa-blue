@@ -1084,15 +1084,15 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     ushort usModelID = CModelNames::ResolveModelID(strModelName);
     if (usModelID != INVALID_MODEL_ID)
     {
-        std::vector<CPixels> textureList;
-        uint                 i = 1;
+        std::vector<std::tuple<std::string, CPixels>> textureList;
         g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID);
 
+        uint i = 1;
         lua_newtable(luaVM);
-        for (std::vector<CPixels>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+        for (std::vector<std::tuple<std::string, CPixels>>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
         {
-            CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &(*iter), RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
-            lua_pushnumber(luaVM, i);
+            CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(*iter), RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+            lua_pushstring(luaVM, (const char*)&std::get<0>(*iter));
             lua_pushelement(luaVM, pTexture);
             lua_settable(luaVM, -3);
             i++;

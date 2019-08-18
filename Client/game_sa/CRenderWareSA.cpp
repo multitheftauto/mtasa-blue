@@ -764,7 +764,7 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
 // Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetModelTextures(std::vector<CPixels>& outTextureList, ushort usModelId)
+void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId)
 {
     outTextureList.clear();
 
@@ -799,7 +799,7 @@ void CRenderWareSA::GetModelTextures(std::vector<CPixels>& outTextureList, ushor
         RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
         CPixels       texture;
         g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
-        outTextureList.push_back(texture);
+        outTextureList.emplace_back((*iter)->name, texture);
     }
 
     if (bLoadedModel)
