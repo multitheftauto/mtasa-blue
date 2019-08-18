@@ -1988,7 +1988,7 @@ void CCore::ResetDiscordRichPresence()
 {
     // Set default parameters
     SDiscordActivity activity;
-    activity.m_details = "Awaiting joining a server";
+    activity.m_details = "In Main Menu";
     m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
         if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
         else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
