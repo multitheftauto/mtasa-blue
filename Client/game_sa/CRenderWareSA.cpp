@@ -792,9 +792,7 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     bool bExcludeTextures = false;
 
     if (vTextureNames.size() > 0)
-    {
         bExcludeTextures = true;
-    }
 
     for (std::vector<RwTexture*>::iterator iter = rwTextureList.begin(); iter != rwTextureList.end(); iter++)
     {
@@ -812,9 +810,7 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
             }
         }
         else
-        {
             bValidTexture = true;
-        }
 
         if (bValidTexture)
         {

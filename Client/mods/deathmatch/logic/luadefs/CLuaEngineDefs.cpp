@@ -1085,13 +1085,8 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
         argStream.ReadString(strTextureName, "");
         vTextureNames.push_back(strTextureName);
     }
-    else
-    {
-        if (argStream.NextIsTable())
-        {
-            argStream.ReadStringTable(vTextureNames);
-        }
-    }
+    else if (argStream.NextIsTable())
+        argStream.ReadStringTable(vTextureNames);
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
