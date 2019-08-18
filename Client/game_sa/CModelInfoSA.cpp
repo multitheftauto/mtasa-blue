@@ -978,7 +978,7 @@ void CModelInfoSA::ResetVehicleDummies()
         return; // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    for (auto& dummy : ms_ModelDefaultDummiesPosition[this])
+    for (const auto& dummy : ms_ModelDefaultDummiesPosition[this])
     {
         if (pVehicleModel->pVisualInfo != nullptr)
             pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
