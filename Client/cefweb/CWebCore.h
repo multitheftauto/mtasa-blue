@@ -48,7 +48,7 @@ class CWebCore : public CWebCoreInterface
 public:
     CWebCore();
     ~CWebCore();
-    bool Initialise();
+    bool Initialise() override;
 
     CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);

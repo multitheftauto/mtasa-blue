@@ -278,6 +278,10 @@ public:
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
     HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
+
+private:
+    void ApplyCoreInitSettings();
+
 private:
     // Core devices.
     CXML*               m_pXML;

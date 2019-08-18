@@ -7,9 +7,9 @@
  *
  *****************************************************************************/
 
-// 
+//
 // Some enums are redefined so the interface won't require discord's header
-// 
+//
 
 #pragma once
 
@@ -73,16 +73,25 @@ enum EDiscordRes
 
 struct SDiscordActivity
 {
-    SDiscordActivity() : m_activityType(EDiscordActivityT_Playing), m_startTimestamp(0), m_endTimestamp(0),
-                         m_name(""), m_state(""), m_details(""), m_joinSecret(""), m_spectateSecret("") {}
+    SDiscordActivity()
+        : m_activityType(EDiscordActivityT_Playing),
+          m_startTimestamp(0),
+          m_endTimestamp(0),
+          m_name(""),
+          m_state(""),
+          m_details(""),
+          m_joinSecret(""),
+          m_spectateSecret("")
+    {
+    }
 
-    int64 m_startTimestamp;
-    int64 m_endTimestamp;
-    const char* m_name;
-    const char* m_state;
-    const char* m_details;
-    const char* m_joinSecret;
-    const char* m_spectateSecret;
+    int64             m_startTimestamp;
+    int64             m_endTimestamp;
+    const char*       m_name;
+    const char*       m_state;
+    const char*       m_details;
+    const char*       m_joinSecret;
+    const char*       m_spectateSecret;
     EDiscordActivityT m_activityType;
 };
 
@@ -97,6 +106,6 @@ public:
     virtual void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback) = 0;
     virtual void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback) = 0;
     virtual void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void RegisterPlay(bool connect) = 0;
+    virtual void RegisterPlay(bool connected) = 0;
     virtual void Disconnect() = 0;
 };

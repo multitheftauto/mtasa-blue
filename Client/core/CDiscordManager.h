@@ -14,12 +14,9 @@
 #include <core/CDiscordManagerInterface.h>
 #include "SharedUtil.Thread.h"
 
-#define DISCORD_CLIENT_ID 592783250678874125
-
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:
-
     CDiscordManager();
     ~CDiscordManager();
 
@@ -31,26 +28,25 @@ public:
     void DoPulse();
 
     // ActivityManager
-    void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback); // Change it all, or ...
-    void UpdateActivity(std::function<void(EDiscordRes)> callback); // Change it all, or ...
-    void SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback); // Singular modifications
+    void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback);            // Change it all, or ...
+    void UpdateActivity(std::function<void(EDiscordRes)> callback);                                        // Change it all, or ...
+    void SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback);                       // Singular modifications
     void SetName(char const* name, std::function<void(EDiscordRes)> callback);
     void SetState(char const* state, std::function<void(EDiscordRes)> callback);
     void SetDetails(char const* details, std::function<void(EDiscordRes)> callback);
     void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback);
     void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback);
     void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback);
-    void RegisterPlay(bool connect);
+    void RegisterPlay(bool connected);
     void Disconnect();
 
-    discord::Activity GetStoredActivity() const { return m_StoredActivity; } // For retrieving stored information in rich presence
+    discord::Activity GetStoredActivity() const { return m_StoredActivity; }            // For retrieving stored information in rich presence
 
     bool NeedsSuicide() const { return m_Suicide; }
     void SetDead() { m_Suicide = false; }
     void DisconnectNotification();
 
 private:
-
     void Restore();
 
     discord::Core*    m_DiscordCore;
@@ -58,12 +54,11 @@ private:
 
     bool m_WaitingForServerName;
 
-    volatile bool m_Suicide; // Thread kill command
+    volatile bool m_Suicide;            // Thread kill command
 
     std::mutex                 m_ThreadSafety;
     SharedUtil::CThreadHandle* m_Thread;
 
     CElapsedTime   m_TimeForReconnection;
     CQueryReceiver m_QueryReceiver;
-
 };

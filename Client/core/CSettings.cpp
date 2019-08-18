@@ -624,6 +624,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxWindowed = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Windowed"), true));
     m_pCheckBoxWindowed->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
     m_pCheckBoxWindowed->AutoSize(NULL, 20.0f);
+    m_pCheckBoxWindowed->GetPosition(vecTemp, false);
+    m_pCheckBoxWindowed->GetSize(vecSize);
+
+    m_pCheckBoxDPIAware = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("DPI aware"), false));
+    m_pCheckBoxDPIAware->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY));
+    m_pCheckBoxDPIAware->AutoSize(NULL, 20.0f);
 
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);            // Restore our label position
 
@@ -1214,6 +1220,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
+    m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -1433,6 +1440,11 @@ void CSettings::UpdateVideoTab()
     m_pCheckBoxMinimize->SetSelected(bNextFSMinimize);
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);
     m_pBrightness->SetScrollPosition((float)gameSettings->GetBrightness() / 384);
+
+    // DPI aware
+    bool processDPIAware = false;
+    CVARS_GET("process_dpi_aware", processDPIAware);
+    m_pCheckBoxDPIAware->SetSelected(processDPIAware);
 
     // FieldOfView
     int iFieldOfView;
@@ -3278,6 +3290,15 @@ void CSettings::SaveData()
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
     SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
 
+    // Process DPI awareness
+    bool previousProcessDPIAware = false;
+    CVARS_GET("process_dpi_aware", previousProcessDPIAware);
+
+    const bool processsDPIAwareChanged = (m_pCheckBoxDPIAware->GetSelected() != previousProcessDPIAware);
+
+    if (processsDPIAwareChanged)
+        CVARS_SET("process_dpi_aware", !previousProcessDPIAware);
+
     // iFieldOfView
     int iFieldOfView = std::min<int>(4, (m_pFieldOfView->GetScrollPosition()) * (4 + 1)) * 5 + 70;
     CVARS_SET("fov", iFieldOfView);
@@ -3546,7 +3567,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4383,6 +4404,48 @@ bool CSettings::OnWindowedClick(CGUIElement* pElement)
 {
     UpdateFullScreenComboBoxEnabled();
     return true;
+}
+
+//
+// OnDPIAwareClick
+//
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton);
+
+bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
+{
+    static bool shownWarning = false;
+
+    if (m_pCheckBoxDPIAware->GetSelected() && !shownWarning)
+    {
+        shownWarning = true;
+
+        SStringX strMessage(
+            _("Enabling DPI awareness is an experimental feature and\n"
+              "we only recommend it when you play MTA:SA on a scaled monitor.\n"
+              "You may experience graphical issues if you enable this option."
+              "\n\nAre you sure you want to enable this option?"));
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
+        pQuestionBox->SetMessage(strMessage);
+        pQuestionBox->SetButton(0, _("No"));
+        pQuestionBox->SetButton(1, _("Yes"));
+        pQuestionBox->SetCallback(DPIAwareQuestionCallBack, m_pCheckBoxDPIAware);
+        pQuestionBox->Show();
+    }
+
+    return true;
+}
+
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    if (uiButton == 0)
+    {
+        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
+        checkBox->SetSelected(false);
+    }
 }
 
 bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)

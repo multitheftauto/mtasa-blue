@@ -87,6 +87,10 @@ workspace "MTASA"
 
 	filter {"system:windows", "toolset:*_xp*"}
 		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
+		defines { "_WIN32_WINNT=0x502" } -- _WIN32_WINNT_WS03 (Windows Server 2003)
+
+	filter {"system:windows", "toolset:not *_xp*"}
+		defines { "_WIN32_WINNT=0x601" } -- _WIN32_WINNT_WIN7 (Windows 7)
 
 	filter "system:windows"
 		toolset "v141"

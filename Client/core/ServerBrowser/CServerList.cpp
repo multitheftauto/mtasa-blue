@@ -473,7 +473,8 @@ void CServerListItem::Query()
 bool CServerListItem::ParseQuery()
 {
     SQueryInfo info = queryReceiver.GetServerResponse(uiMasterServerSaysRestrictions);
-    if (!info.containingInfo) return false;
+    if (!info.containingInfo)
+        return false;
 
     // Get IP as string
     strHost = inet_ntoa(Address);

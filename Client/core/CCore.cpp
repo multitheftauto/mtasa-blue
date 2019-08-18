@@ -54,6 +54,7 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
 
     // Load our settings and localization as early as possible
     CreateXML();
+    ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
 
     // Create a logger instance.
@@ -1070,6 +1071,7 @@ CWebCoreInterface* CCore::GetWebCore()
     if (m_pWebCore == nullptr)
     {
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
+        m_pWebCore->Initialise();
     }
     return m_pWebCore;
 }
@@ -1668,6 +1670,21 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::ApplyCoreInitSettings()
+{
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+    bool bValue;
+    CVARS_GET("process_dpi_aware", bValue);
+
+    if (bValue)
+    {
+        // Minimum supported client for the function below is Windows Vista
+        // See also: https://technet.microsoft.com/en-us/evalcenter/dn469266(v=vs.90)
+        SetProcessDPIAware();
+    }
+#endif
+}
+
 //
 // Called just before GTA calculates frame time deltas
 //
@@ -1695,6 +1712,8 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     // Apply client config setting
     uint uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    if (uiClientConfigRate > 0)
+        uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
@@ -1967,12 +1986,19 @@ uint CCore::GetMaxStreamingMemory()
 //
 void CCore::ResetDiscordRichPresence()
 {
+    time_t currentTime;
+    time(&currentTime);
+
     // Set default parameters
     SDiscordActivity activity;
-    activity.m_details = "Awaiting joining a server";
+    activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
     m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
-        if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
-        else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+        if (res == DiscordRes_Ok)
+            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else
+            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
     });
     m_DiscordManager->RegisterPlay(false);
 }

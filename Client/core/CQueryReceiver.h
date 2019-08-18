@@ -64,7 +64,6 @@ public:
     bool IsSocketValid() const { return (m_Socket != INVALID_SOCKET); }
 
 private:
-
     bool ReadString(std::string& strRead, const char* szBuffer, int& i, int nLength);
 
     SOCKET       m_Socket;
