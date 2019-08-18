@@ -97,6 +97,6 @@ public:
     virtual void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback) = 0;
     virtual void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback) = 0;
     virtual void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void RegisterPlay(bool connect) = 0;
+    virtual void RegisterPlay(bool connected) = 0;
     virtual void Disconnect() = 0;
 };

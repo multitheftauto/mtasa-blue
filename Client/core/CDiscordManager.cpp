@@ -31,7 +31,10 @@ CDiscordManager::~CDiscordManager()
     int iTries = 0;
     while (iTries++ < 400 && m_Suicide) // Wait maximum of 2 sec on this
         Sleep(5);
-    if (m_Suicide) m_Thread->Cancel(); // Kill it anyway
+
+    if (m_Suicide)
+        m_Thread->Cancel(); // Kill it anyway
+
     delete m_Thread;
     SAFE_DELETE(m_DiscordCore);
 }
@@ -41,7 +44,8 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
 {
     bool discordRichPresence;
     CVARS_GET("discord_rich_presence", discordRichPresence);
-    if (!discordRichPresence) return; // Disabled
+    if (!discordRichPresence)
+        return; // Disabled
 
     discord::Result res;
     {
@@ -49,21 +53,24 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
         res = discord::Core::Create(DISCORD_CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &m_DiscordCore);
     }
 
-    if (!m_DiscordCore && bOnInitialization) // Output error only when trying to connect on initialization
+    if (!m_DiscordCore && bOnInitialization) {
+        // Output error only when trying to connect on initialization
         WriteErrorEvent(SString("[DISCORD]: Failed to instantiate core, error code: %i", static_cast<int>(res)));
-    else
+        return;
+    }
+
+    m_DiscordCore->SetLogHook(discord::LogLevel::Info, DiscordLogCallback);
+    WriteDebugEvent(SString("[DISCORD]: Instantiated at %08X", m_DiscordCore));
+
+    m_DiscordCore->ActivityManager().RegisterCommand(SString("%s /from_discord", *GetParentProcessPathFilename(GetCurrentProcessId())));
+    m_DiscordCore->ActivityManager().OnActivityJoin.Connect(OnActivityJoin);
+
+    if (!bOnInitialization) // Player could be in a server or in menu by now
     {
-        m_DiscordCore->SetLogHook(discord::LogLevel::Info, DiscordLogCallback);
-        WriteDebugEvent(SString("[DISCORD]: Instantiated at %08X", m_DiscordCore));
-
-        m_DiscordCore->ActivityManager().RegisterCommand(SString("%s /from_discord", *GetParentProcessPathFilename(GetCurrentProcessId())));
-        m_DiscordCore->ActivityManager().OnActivityJoin.Connect(OnActivityJoin);
-
-        if (!bOnInitialization) // Player could be in a server or in menu by now
-        {
-            if (g_pCore->IsConnected()) Restore();
-            else g_pCore->ResetDiscordRichPresence();
-        }
+        if (g_pCore->IsConnected())
+            Restore();
+        else
+            g_pCore->ResetDiscordRichPresence();
     }
 }
 
@@ -140,7 +147,8 @@ void* CDiscordManager::DiscordThread(void* arg)
 
     while (true)
     {
-        if (that->NeedsSuicide()) break;
+        if (that->NeedsSuicide())
+            break;
 
         that->DoPulse();
 
@@ -149,48 +157,13 @@ void* CDiscordManager::DiscordThread(void* arg)
 
     that->SetDead();
 
-    return NULL;
+    return nullptr;
 }
 
 // Called from separate thread so the unnecessary load won't affect the main thread, establishing connection with discord is sometimes time-consuming, especially when it's not running
 void CDiscordManager::DoPulse()
 {
-    if (m_DiscordCore)
-    {
-        std::lock_guard<std::mutex> guardian(m_ThreadSafety);
-
-        if (m_WaitingForServerName) // Query request sent
-        {
-            auto info = m_QueryReceiver.GetServerResponse();
-            if (!info.containingInfo)
-            {
-                if (m_QueryReceiver.GetElapsedTimeSinceLastQuery() > 2000) // Resend query request every 2s if no response came
-                {
-                    SString      ipaddr;
-                    unsigned int port;
-                    CVARS_GET("host", ipaddr);
-                    CVARS_GET("port", port);
-                    m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
-                }
-            }
-            else
-            {
-                m_StoredActivity.SetDetails(info.serverName);
-                UpdateActivity([](EDiscordRes) {});
-                m_WaitingForServerName = false;
-            }
-        }
-
-        discord::Result res = m_DiscordCore->RunCallbacks();
-        if (res == discord::Result::NotRunning) // Discord is now closed, needs to be reinstated in the next 15s
-        {
-            delete m_DiscordCore;
-            m_DiscordCore = nullptr;
-            m_TimeForReconnection.Reset();
-            WriteDebugEvent("[DISCORD]: Lost the connection.");
-        }
-    }
-    else
+    if (!m_DiscordCore)
     {
         // Discord is not initialized, maybe it's not installed or not yet running
         // So every 15sec we will check if the player got discord running
@@ -199,6 +172,38 @@ void CDiscordManager::DoPulse()
             Reconnect();
             m_TimeForReconnection.Reset();
         }
+
+        return;
+    }
+
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+
+    if (m_WaitingForServerName) // Query request sent
+    {
+        auto info = m_QueryReceiver.GetServerResponse();
+        if (info.containingInfo)
+        {
+            m_StoredActivity.SetDetails(info.serverName);
+            UpdateActivity([](EDiscordRes) {});
+            m_WaitingForServerName = false;
+        }
+        else if (m_QueryReceiver.GetElapsedTimeSinceLastQuery() > 2000) // Resend query request every 2s if no response came
+        {
+            SString      ipaddr;
+            unsigned int port;
+            CVARS_GET("host", ipaddr);
+            CVARS_GET("port", port);
+            m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
+        }
+    }
+
+    discord::Result res = m_DiscordCore->RunCallbacks();
+    if (res == discord::Result::NotRunning) // Discord is now closed, needs to be reinstated in the next 15s
+    {
+        delete m_DiscordCore;
+        m_DiscordCore = nullptr;
+        m_TimeForReconnection.Reset();
+        WriteDebugEvent("[DISCORD]: Lost the connection.");
     }
 }
 
@@ -218,7 +223,8 @@ void CDiscordManager::UpdateActivity(SDiscordActivity& activity, std::function<v
 
 void CDiscordManager::UpdateActivity(std::function<void(EDiscordRes)> callback)
 {
-    if (!m_DiscordCore) return;
+    if (!m_DiscordCore)
+        return;
 
     m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res) {
         callback(static_cast<EDiscordRes>(res));
@@ -263,7 +269,8 @@ void CDiscordManager::SetStartEndTimestamp(int64 start, int64 end, std::function
 
 void CDiscordManager::SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback)
 {
-    if (!joinSecret || !partyId) return;
+    if (!joinSecret || !partyId)
+        return;
 
     SString      ipaddr;
     unsigned int port;
@@ -281,7 +288,8 @@ void CDiscordManager::SetJoinParameters(const char* joinSecret, const char* part
 
 void CDiscordManager::SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback)
 {
-    if (!spectateSecret) return;
+    if (!spectateSecret)
+        return;
 
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
     m_StoredActivity.GetSecrets().SetSpectate(spectateSecret);
@@ -289,39 +297,39 @@ void CDiscordManager::SetSpectateSecret(const char* spectateSecret, std::functio
 }
 
 // Default rich presence settings
-void CDiscordManager::RegisterPlay(bool connect)
+void CDiscordManager::RegisterPlay(bool connected)
 {
-    if (connect)
-    {
-        SString      ipaddr;
-        unsigned int port;
-        CVARS_GET("host", ipaddr);
-        CVARS_GET("port", port);
-
-        time_t currentTime;
-        time(&currentTime);
-
-        std::lock_guard<std::mutex> guardian(m_ThreadSafety);
-        m_StoredActivity.SetDetails("Retrieving server name...");
-        m_StoredActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
-        m_StoredActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
-        m_StoredActivity.GetTimestamps().SetStart(currentTime);
-        UpdateActivity([=](EDiscordRes res) {
-            if (res != DiscordRes_Ok) WriteErrorEvent("[DISCORD]: Unable to register play rich presence.");
-            else
-            {
-                m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
-
-                m_WaitingForServerName = true;
-            }
-        });
-    }
-    else
+    if (!connected)
     {
         m_StoredActivity.GetAssets().SetSmallText("");
         m_StoredActivity.GetAssets().SetSmallImage("");
         UpdateActivity([=](EDiscordRes res) {});
+        return;
     }
+
+    SString      ipaddr;
+    unsigned int port;
+    CVARS_GET("host", ipaddr);
+    CVARS_GET("port", port);
+
+    time_t currentTime;
+    time(&currentTime);
+
+    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
+    m_StoredActivity.SetDetails("Retrieving server name...");
+    m_StoredActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
+    m_StoredActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
+    m_StoredActivity.GetTimestamps().SetStart(currentTime);
+    UpdateActivity([=](EDiscordRes res) {
+        if (res != DiscordRes_Ok)
+            WriteErrorEvent("[DISCORD]: Unable to register play rich presence.");
+        else
+        {
+            m_QueryReceiver.RequestQuery(ipaddr, static_cast<ushort>(port + SERVER_LIST_QUERY_PORT_OFFSET));
+
+            m_WaitingForServerName = true;
+        }
+    });
 }
 
 void CDiscordManager::Restore()

@@ -38,7 +38,7 @@ public:
     void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback);
     void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback);
     void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback);
-    void RegisterPlay(bool connect);
+    void RegisterPlay(bool connected);
     void Disconnect();
 
     discord::Activity GetStoredActivity() const { return m_StoredActivity; } // For retrieving stored information in rich presence
