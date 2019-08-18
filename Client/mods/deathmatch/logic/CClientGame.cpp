@@ -633,9 +633,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
 
             if (g_pNet->GetServerBitStreamVersion() >= 0x06D)
             {
-                SString joinSecret;
-                if (szSecret)
-                    joinSecret = szSecret;
+                SString joinSecret = SStringX(szSecret);
                 pBitStream->WriteString<uchar>(joinSecret);
             }
 
