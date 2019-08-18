@@ -49,6 +49,8 @@ class CWebCoreInterface
 {
 public:
     virtual ~CWebCoreInterface() {}
+    virtual bool Initialise() = 0;
+
     virtual CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                              bool bTransparent) = 0;
     virtual void               DestroyWebView(CWebViewInterface* pWebView) = 0;

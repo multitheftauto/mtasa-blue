@@ -547,46 +547,6 @@ void _declspec(naked) HOOK_CTaskSimpleRunNamedAnimDestructor()
     }
 }
 
-void _cdecl OnCAnimBlendAssocGroupDestructor(CAnimBlendAssocGroupSAInterface* pGroupInterface)
-{
-    for (auto groupID : CMultiplayerSA::arrGroupsToProtect)
-    {
-        if (pGroupInterface->groupID == groupID)
-        {
-            void* ppAssociationsArray = reinterpret_cast<void*>(&pGroupInterface->pAssociationsArray);
-            LogEvent(519, "groupUnload", "Unloading anim group",
-                     SString("groupID: %u | pGroupInterface: %#.8x, ppAssociationsArray = %#.8x | pAssociationsArray: %p", groupID, pGroupInterface,
-                             ppAssociationsArray, pGroupInterface->pAssociationsArray),
-                     519);
-
-            // crash it to get the stack
-            void* pPointer = nullptr;
-            assert(pPointer != nullptr);
-        }
-    }
-}
-
-// Hook info
-#define HOOKPOS_CAnimBlendAssocGroupDestructor        0x4CE1D0
-#define HOOKSIZE_CAnimBlendAssocGroupDestructor       6
-DWORD RETURN_CAnimBlendAssocGroupDestructor = 0x4CE1D6;
-void _declspec(naked) HOOK_CAnimBlendAssocGroupDestructor()
-{
-    _asm
-    {
-        pushad
-        push    ecx
-        call    OnCAnimBlendAssocGroupDestructor
-        add     esp, 0x4
-        popad
-
-        push    esi
-        mov     esi, ecx
-        mov     ecx, [esi + 0x4]
-        jmp     RETURN_CAnimBlendAssocGroupDestructor
-    }
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Set handlers
@@ -634,7 +594,6 @@ void CMultiplayerSA::SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestru
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_HookDestructors()
 {
-    EZHookInstall(CAnimBlendAssocGroupDestructor);
     EZHookInstall(CTaskSimpleRunNamedAnimDestructor);
     EZHookInstall(CObjectDestructor);
     EZHookInstall(CVehicleDestructor);

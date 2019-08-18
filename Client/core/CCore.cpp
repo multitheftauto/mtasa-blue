@@ -1071,6 +1071,7 @@ CWebCoreInterface* CCore::GetWebCore()
     if (m_pWebCore == nullptr)
     {
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
+        m_pWebCore->Initialise();
     }
     return m_pWebCore;
 }
