@@ -117,7 +117,6 @@ public:
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
     void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler);
     void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler);
-    void SetBlendAnimationHandler(BlendAnimationHandler* pHandler);
     void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler);
     void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler);
     void SetVehicleDamageHandler(VehicleDamageHandler* pHandler);
