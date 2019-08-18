@@ -416,3 +416,6 @@ utils/DXFiles/
 !*.dll
 !*.exe
 utils/vswhere.exe
+
+# Allow discord sdk library
+!vendor/discordgsdk/lib/discord_game_sdk.lib
