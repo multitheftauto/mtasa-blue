@@ -1986,9 +1986,14 @@ uint CCore::GetMaxStreamingMemory()
 //
 void CCore::ResetDiscordRichPresence()
 {
+    time_t currentTime;
+    time(&currentTime);
+
     // Set default parameters
     SDiscordActivity activity;
     activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
     m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
         if (res == DiscordRes_Ok) WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
         else WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
