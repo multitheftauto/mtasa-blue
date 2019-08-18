@@ -255,6 +255,7 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
 
     // Restore all the models we replaced.
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    pModelInfo->ResetVehicleDummies();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
 

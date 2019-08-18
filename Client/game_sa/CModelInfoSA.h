@@ -276,7 +276,7 @@ protected:
     static std::map<unsigned short, int>                                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>>                 ms_ModelDefaultDummiesPosition;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
@@ -348,6 +348,7 @@ public:
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
+    void         ResetVehicleDummies();
     static void  ResetAllVehicleDummies();
 
     // ONLY use for peds
