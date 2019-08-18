@@ -96,6 +96,14 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+enum eFBXDataType
+{
+    FBX_DATA_TYPE_VERTEX,
+    FBX_DATA_TYPE_MATERIAL,
+    FBX_DATA_TYPE_INDICATOR,
+};
+DECLARE_ENUM(eFBXDataType);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -420,6 +428,10 @@ inline SString GetClassTypeName(eSurfaceSkidMarkType*)
 inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
+}
+inline SString GetClassTypeName(eFBXDataType*)
+{
+    return "fbx-data-type";
 }
 
 //

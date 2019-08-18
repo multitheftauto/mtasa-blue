@@ -237,5 +237,6 @@ private:
     static CClientPickupManager*      m_pPickupManager;
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
+    static CClientFBXManager*         m_pFBXManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
 };

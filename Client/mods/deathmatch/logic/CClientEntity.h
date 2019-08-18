@@ -77,6 +77,7 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
+    CCLIENTFBX,
     CCLIENTUNKNOWN,
 };
 
@@ -141,7 +142,8 @@ enum eCClientEntityClassTypes
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
-    CLASS_CClientSearchLight
+    CLASS_CClientSearchLight,
+    CLASS_CClientFBX,
 };
 
 class CClientEntity : public CClientEntityBase

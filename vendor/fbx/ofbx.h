@@ -277,7 +277,7 @@ namespace ofbx
         virtual int         getVertexCount() const = 0;
 
         virtual const int* getFaceIndices() const = 0;
-        virtual int        getIndexCount() const = 0;
+        virtual int        getIndicesCount() const = 0;
 
         virtual const Vec3* getNormals() const = 0;
         virtual const Vec2* getUVs(int index = 0) const = 0;
@@ -285,6 +285,12 @@ namespace ofbx
         virtual const Vec3* getTangents() const = 0;
         virtual const Skin* getSkin() const = 0;
         virtual const int*  getMaterials() const = 0;
+
+		virtual int getNormalCount() const = 0;
+        virtual int getUVCount(int s) const = 0;
+        virtual int getColorCount() const = 0;
+        virtual int getTangentCount() const = 0;
+        virtual int getMaterialCount() const = 0;
     };
 
     struct Mesh : Object

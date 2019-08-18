@@ -1063,8 +1063,13 @@ namespace ofbx
 
         Type        getType() const override { return Type::GEOMETRY; }
         int         getVertexCount() const override { return (int)vertices.size(); }
+        int         getNormalCount() const override { return (int)normals.size(); }
+        int         getUVCount(int s) const override { return (int)uvs[s].size(); }
+        int         getColorCount() const override { return (int)colors.size(); }
+        int         getTangentCount() const override { return (int)tangents.size(); }
+        int         getMaterialCount() const override { return (int)materials.size(); }
+        int         getIndicesCount() const override { return (int)indices.size(); }
         const int*  getFaceIndices() const override { return indices.empty() ? nullptr : &indices[0]; }
-        int         getIndexCount() const override { return (int)indices.size(); }
         const Vec3* getVertices() const override { return &vertices[0]; }
         const Vec3* getNormals() const override { return normals.empty() ? nullptr : &normals[0]; }
         const Vec2* getUVs(int index = 0) const override { return index < 0 || index >= s_uvs_max || uvs[index].empty() ? nullptr : &uvs[index][0]; }
@@ -2951,7 +2956,7 @@ namespace ofbx
                 Object* obj = scene.m_object_map.find(connection.to)->second.object;
                 if (obj && obj->is_node)
                 {
-                    assert(parent == nullptr);
+                    //assert(parent == nullptr);
                     parent = obj;
                 }
             }

@@ -597,6 +597,12 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
+IMPLEMENT_ENUM_BEGIN(eFBXDataType)
+ADD_ENUM(FBX_DATA_TYPE_VERTEX, "vertex")
+ADD_ENUM(FBX_DATA_TYPE_INDICATOR, "indicator")
+ADD_ENUM(FBX_DATA_TYPE_MATERIAL, "material")
+IMPLEMENT_ENUM_END("fbx-data-type")
+
 //
 // Get best guess at name of userdata type
 //

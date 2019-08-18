@@ -89,6 +89,8 @@
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
 #include <CClientEffect.h>
+#include <CClientFBX.h>
+#include <CClientFBXManager.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>
@@ -118,6 +120,7 @@
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
+#include <luadefs/CLuaFBXDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
