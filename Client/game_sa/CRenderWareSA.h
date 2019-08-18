@@ -94,6 +94,7 @@ public:
     ushort             GetTXDIDForModelID(ushort usModelID);
     void               PulseWorldTextureWatch();
     void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
+    void               GetModelTextures(std::vector<CPixels>& outTextureList, ushort usModelID);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);

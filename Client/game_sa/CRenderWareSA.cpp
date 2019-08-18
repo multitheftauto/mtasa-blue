@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
+#include <game/RenderWareD3D.h>
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
@@ -749,6 +750,56 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
     {
         outNameList.push_back((*iter)->name);
+    }
+
+    if (bLoadedModel)
+        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetModelTextures
+//
+// Get textures associated with the model
+// Will try to load the model if needed
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetModelTextures(std::vector<CPixels>& outTextureList, ushort usModelId)
+{
+    outTextureList.clear();
+
+    // Special case for CJ
+    //if (usModelId == 0)
+    //{
+    //    outTextureList.push_back("CJ");
+    //    return;
+    //}
+    ushort usTxdId = GetTXDIDForModelID(usModelId);
+
+    if (usTxdId == 0)
+        return;
+
+    // Get the TXD corresponding to this ID
+    RwTexDictionary* pTXD = CTxdStore_GetTxd(usTxdId);
+
+    bool bLoadedModel = false;
+    if (!pTXD)
+    {
+        // Try model load
+        bLoadedModel = true;
+        pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
+        pTXD = CTxdStore_GetTxd(usTxdId);
+    }
+
+    std::vector<RwTexture*> rwTextureList;
+    GetTxdTextures(rwTextureList, pTXD);
+
+    for (std::vector<RwTexture*>::iterator iter = rwTextureList.begin(); iter != rwTextureList.end(); iter++)
+    {
+        RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
+        CPixels       texture;
+        g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
+        outTextureList.push_back(texture);
     }
 
     if (bLoadedModel)

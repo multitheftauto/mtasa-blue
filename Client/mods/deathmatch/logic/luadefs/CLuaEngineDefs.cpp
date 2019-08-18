@@ -36,6 +36,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
@@ -73,6 +74,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
+    lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
@@ -1062,6 +1064,42 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
+{
+    //  table engineGetModelTextures ( string modelName )
+    SString strModelName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelName, "");
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    ushort usModelID = CModelNames::ResolveModelID(strModelName);
+    if (usModelID != INVALID_MODEL_ID)
+    {
+        std::vector<CPixels> textureList;
+        uint                 i = 1;
+        g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID);
+
+        lua_newtable(luaVM);
+        for (std::vector<CPixels>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+        {
+            CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &(*iter), RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+            lua_pushnumber(luaVM, i);
+            lua_pushelement(luaVM, pTexture);
+            lua_settable(luaVM, -3);
+            i++;
+        }
+
+        return 1;
+    }
 
     // We failed
     lua_pushboolean(luaVM, false);
