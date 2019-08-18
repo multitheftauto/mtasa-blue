@@ -299,11 +299,14 @@ void CDiscordManager::RegisterPlay(bool connect)
         CVARS_GET("host", ipaddr);
         CVARS_GET("port", port);
 
+        time_t currentTime;
+        time(&currentTime);
+
         std::lock_guard<std::mutex> guardian(m_ThreadSafety);
         m_StoredActivity.SetDetails("Retrieving server name...");
         m_StoredActivity.GetAssets().SetSmallText(SString("Connected to %s:%i", *ipaddr, port));
         m_StoredActivity.GetAssets().SetSmallImage("a-server"); // TODO: Maybe contact with MTA:SA servers and check if this ip is a premium one containing a small image to set using this function
-        m_StoredActivity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+        m_StoredActivity.GetTimestamps().SetStart(currentTime);
         UpdateActivity([=](EDiscordRes res) {
             if (res != DiscordRes_Ok) WriteErrorEvent("[DISCORD]: Unable to register play rich presence.");
             else
