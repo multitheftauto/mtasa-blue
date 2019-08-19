@@ -42,6 +42,16 @@ void CAjaxResourceHandler::Cancel()
 {
 }
 
+bool CAjaxResourceHandler::CanGetCookie(const CefCookie& cookie)
+{
+    return false;
+}
+
+bool CAjaxResourceHandler::CanSetCookie(const CefCookie& cookie)
+{
+    return false;
+}
+
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
 {
     response->SetStatus(200);
