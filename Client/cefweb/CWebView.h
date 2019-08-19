@@ -87,7 +87,7 @@ public:
     virtual CVector2D GetSize() override;
 
     bool GetFullPathFromLocal(SString& strPath);
-    bool VerifyFile(const SString& strPath);
+    bool VerifyFile(const SString& strPath, CBuffer& outFileData);
 
     virtual bool RegisterAjaxHandler(const SString& strURL) override;
     virtual bool UnregisterAjaxHandler(const SString& strURL) override;

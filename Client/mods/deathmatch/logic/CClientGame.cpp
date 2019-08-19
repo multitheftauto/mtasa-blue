@@ -263,7 +263,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(CClientGame::StaticAssocGroupCopyAnimationHandler);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(CClientGame::StaticBlendAnimationHierarchyHandler);
-    g_pMultiplayer->SetBlendAnimationHandler(CClientGame::StaticBlendAnimationHandler);
     g_pMultiplayer->SetProcessCollisionHandler(CClientGame::StaticProcessCollisionHandler);
     g_pMultiplayer->SetVehicleCollisionHandler(CClientGame::StaticVehicleCollisionHandler);
     g_pMultiplayer->SetVehicleDamageHandler(CClientGame::StaticVehicleDamageHandler);
@@ -429,7 +428,6 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler(NULL);
     g_pMultiplayer->SetBlendAnimationHierarchyHandler(NULL);
-    g_pMultiplayer->SetBlendAnimationHandler(nullptr);
     g_pMultiplayer->SetProcessCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleDamageHandler(NULL);
@@ -3673,11 +3671,6 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
-bool CClientGame::StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
-{
-    return g_pClientGame->BlendAnimationHandler(pClump, animGroup, animID, fBlendData);
-}
-
 void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
@@ -4024,20 +4017,40 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
     {
-        auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
-        if (pReplacedAnimation != nullptr)
+        std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
         {
-            std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
-            InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
+            // check for idle animation
+            if (animID == 3)
+            {
+                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                {
+                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
+                    isCustomAnimationToPlay = true;
+                }
+            }
+        }
+        else
+        {
+            auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
+            if (pReplacedAnimation != nullptr)
+            {
+                std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
+                InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
 
-            // Play our custom animation instead of default
-            auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
+                // Play our custom animation instead of default
+                pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
+                isCustomAnimationToPlay = true;
+            }
+        }
+        if (isCustomAnimationToPlay)
+        {
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
             pAnimAssociation->InitializeForCustomAnimation(pClump, pAnimHierarchy->GetInterface());
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
-            isCustomAnimationToPlay = true;
         }
     }
 
@@ -4090,26 +4103,6 @@ bool CClientGame::BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterfac
         pClientPed->SetNextAnimationNormal();
     }
     return isCustomAnimationToPlay;
-}
-
-bool CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
-{
-    CClientPed* pClientPed = GetClientPedByClump(*pClump);
-    if (pClientPed != nullptr)
-    {
-        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
-        {
-            // check for idle animation
-            if (animID == 3)
-            {
-                if ((animGroup == 0) || (animGroup >= 54 && animGroup <= 70) || (animGroup >= 118))
-                {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
 }
 
 bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)

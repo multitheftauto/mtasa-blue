@@ -178,11 +178,15 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 return HandleError("404 - Not found", 404);
 
             // Verify local files
-            if (!pWebView->VerifyFile(path))
+            CBuffer fileData;
+            if (!pWebView->VerifyFile(path, fileData))
                 return HandleError("403 - Access Denied", 403);
 
             // Finally, load the file stream
-            auto stream = CefStreamReader::CreateForFile(path);
+            if (fileData.GetData() == nullptr || fileData.GetSize() == 0)
+                fileData = CBuffer("", sizeof(""));
+
+            auto stream = CefStreamReader::CreateForData(fileData.GetData(), fileData.GetSize());
             if (stream.get())
                 return new CefStreamResourceHandler(mimeType, stream);
             return HandleError("404 - Not found", 404);

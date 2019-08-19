@@ -478,9 +478,9 @@ bool CWebView::ToggleDevTools(bool visible)
     return CWebDevTools::Close(this);
 }
 
-bool CWebView::VerifyFile(const SString& strPath)
+bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath);
+    return m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
 }
 
 bool CWebView::CanGoBack()

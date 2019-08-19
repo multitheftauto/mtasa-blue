@@ -74,8 +74,8 @@ protected:
     bool           m_bUpgradeScripts;
     unsigned long  m_ulDeprecatedWarningCount;
     vector<string> m_upgradedFullPathList;
-    CMtaVersion    m_strMinClientReqFromMetaXml;
-    CMtaVersion    m_strMinServerReqFromMetaXml;
+    CMtaVersion    m_strMinClientFromMetaXml;
+    CMtaVersion    m_strMinServerFromMetaXml;
     CMtaVersion    m_strReqClientVersion;
     CMtaVersion    m_strReqServerVersion;
     SString        m_strReqClientReason;

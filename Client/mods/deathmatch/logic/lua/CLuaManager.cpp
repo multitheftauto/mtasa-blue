@@ -393,6 +393,7 @@ void CLuaManager::LoadCFunctions()
 
         // Localization functions
         {"getLocalization", CLuaFunctionDefs::GetLocalization},
+        {"getKeyboardLayout", CLuaFunctionDefs::GetKeyboardLayout},
 
         // Voice functions
         {"isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled},

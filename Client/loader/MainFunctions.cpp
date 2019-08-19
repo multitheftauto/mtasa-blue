@@ -834,13 +834,21 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"4C9EAC6B86F3D62E6006D3A423F5A690", "bass.dll"},     {"1FBC05C021659A3005816587C824AF0B", "bass_aac.dll"},
-                              {"3935396799611AD3FDE5A66832D69DD6", "bass_ac3.dll"}, {"6ED2288A5B104BFB3AD6FBFD0FA0D976", "bass_fx.dll"},
-                              {"FCD2410EA754C38C26F99AEB99C59138", "bassflac.dll"}, {"24E77F3E208224D0633D142755E317D3", "bassmidi.dll"},
-                              {"F6079CE1DBE9305CBA846874ABC48940", "bassmix.dll"},  {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
-                              {"12E4FA4DF33BB7D6AEF6DC0EAA53BB10", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+    } integrityCheckList[] = {{"16B23FA1D3F952F6FF8BB02DE0CD36A2", "bass.dll"},
+                              {"56116E495EE5E74749F8DB37616B22EA", "bass_aac.dll"},
+                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
+                              {"8B17186F19002C9D30A18D39FC8FEFA7", "bass_fx.dll"},
+                              {"6673527EF2AE564A57DA6AED4A230819", "bassflac.dll"},
+                              {"DD1AFB287DACC48C0C08CDB603D234AE", "bassmidi.dll"},
+                              {"BA59B11522793EBC1D75C777CC598737", "bassmix.dll"},
+                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
+                              {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
+                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
+                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
+                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
