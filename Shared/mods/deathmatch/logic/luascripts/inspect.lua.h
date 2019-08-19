@@ -403,11 +403,10 @@ end
 
 function iprint(...)
     local arg = {...}
-    local o = {}
     for i = 1, select("#",...) do
-        o[i] = inspect(arg[i])
+        arg[i] = inspect(arg[i])
     end
-    outputDebugString(table_concat(o,"    "),3,180,180,180)
+    outputDebugString(table_concat(arg,"    "),3,180,180,180)
 end
 
 -------------------------------------------------------------------
