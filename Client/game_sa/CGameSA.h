@@ -304,6 +304,7 @@ public:
     CPointLights*       GetPointLights() { return m_pPointLights; }
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
+    CFBXManager*        GetFBXManager() { return m_pFBXManager; }
 
     CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*  GetModelInfo(DWORD dwModelID);
@@ -462,6 +463,7 @@ private:
     CWaterManager*      m_pWaterManager;
     CWeaponStatManager* m_pWeaponStatsManager;
     CPointLights*       m_pPointLights;
+    CFBXManager*        m_pFBXManager;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;

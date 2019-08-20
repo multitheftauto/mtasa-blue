@@ -28,6 +28,7 @@ class CLine3DBatcher;
 class CMaterialLine3DBatcher;
 class CPrimitiveBatcher;
 class CPrimitiveMaterialBatcher;
+class CFBXBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -217,6 +218,7 @@ private:
     CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
     CPrimitiveBatcher*         m_pPrimitiveBatcher;
     CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
+    CFBXBatcher*               m_pFBXBatcher;
     CAspectRatioConverter*     m_pAspectRatioConverter;
 
     // Fonts

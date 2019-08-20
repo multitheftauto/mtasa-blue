@@ -15,6 +15,7 @@
 #include "CMaterialLine3DBatcher.h"
 #include "CPrimitiveBatcher.h"
 #include "CPrimitiveMaterialBatcher.h"
+#include "CFBXBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -60,6 +61,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
+    m_pFBXBatcher = new CFBXBatcher();
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -1438,6 +1440,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pFBXBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1522,6 +1525,7 @@ void CGraphics::DrawLine3DPreGUIQueue()
 {
     m_pLine3DBatcherPreGUI->Flush();
     m_pMaterialLine3DBatcherPreGUI->Flush();
+    m_pFBXBatcher->Flush();
 }
 
 bool CGraphics::HasLine3DPreGUIQueueItems()

@@ -36,8 +36,16 @@ void CClientFBXManager::DeleteAll(void)
     m_List.clear();
 }
 
-void CClientFBXManager::RemoveFromList(CClientFBX* pLight)
+void CClientFBXManager::RemoveFromList(CClientFBX* pFBX)
 {
     if (!m_List.empty())
-        m_List.remove(pLight);
+        m_List.remove(pFBX);
+}
+
+void CClientFBXManager::Render()
+{
+    for (CClientFBX* pFBX : m_List)
+    {
+        pFBX->Render();
+    }
 }

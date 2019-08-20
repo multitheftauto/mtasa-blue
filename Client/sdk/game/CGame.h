@@ -79,6 +79,7 @@ typedef void(InRenderer)();
 #include "CWeaponInfo.h"
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
+#include "CFBXManager.h"
 
 #include <windows.h>
 
@@ -166,6 +167,7 @@ public:
     virtual CWaterManager*            GetWaterManager() = 0;
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
+    virtual CFBXManager*              GetFBXManager() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID) = 0;

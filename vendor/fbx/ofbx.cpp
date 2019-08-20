@@ -1,3 +1,4 @@
+#include <map>
 #include "ofbx.h"
 #include "miniz.h"
 #include <cassert>
@@ -1264,9 +1265,17 @@ namespace ofbx
         float                 getSceneFrameRate() const override { return m_scene_frame_rate; }
         const GlobalSettings* getGlobalSettings() const override { return &m_settings; }
 
-        const Object* const* getAllObjects() const override { return m_all_objects.empty() ? nullptr : &m_all_objects[0]; }
+        const Object* const*         getAllObjects() const override { return m_all_objects.empty() ? nullptr : &m_all_objects[0]; }
 
         int getAllObjectCount() const override { return (int)m_all_objects.size(); }
+		
+		const DataView* const* getTextureContent() const override { return m_texturesContent.empty() ? nullptr : &m_texturesContent[0]; }
+        const DataView* const* getTextureFilePath() const override { return m_texturesFilePath.empty() ? nullptr : &m_texturesFilePath[0]; }
+        const Texture* const*  getTextures() const override { return m_texturesList.empty() ? nullptr : &m_texturesList[0]; }
+        const Material* const* getMaterials() const override { return m_materials.empty() ? nullptr : &m_materials[0]; }
+        
+		int getTexturesCount() const override { return (int)m_texturesContent.size(); }
+        int getMaterialsCount() const override { return (int)m_materials.size(); }
 
         const AnimationStack* getAnimationStack(int index) const override
         {
@@ -1318,6 +1327,11 @@ namespace ofbx
         std::vector<Connection>             m_connections;
         std::vector<u8>                     m_data;
         std::vector<TakeInfo>               m_take_infos;
+
+        std::vector<DataView*> m_texturesFilePath;
+        std::vector<DataView*> m_texturesContent;
+        std::vector<Texture*>  m_texturesList;
+        std::vector<Material*> m_materials;
     };
 
     bool PoseImpl::postprocess(Scene* scene)
@@ -2550,44 +2564,46 @@ namespace ofbx
             else if (iter.second.element->id == "Material")
             {
                 obj = parseMaterial(*scene, *iter.second.element);
-            }
-            else if (iter.second.element->id == "AnimationStack")
-            {
-                obj = parse<AnimationStackImpl>(*scene, *iter.second.element);
                 if (!obj.isError())
-                {
-                    AnimationStackImpl* stack = (AnimationStackImpl*)obj.getValue();
-                    scene->m_animation_stacks.push_back(stack);
-                }
+					scene->m_materials.push_back((Material*)obj.getValue());
             }
-            else if (iter.second.element->id == "AnimationLayer")
-            {
-                obj = parse<AnimationLayerImpl>(*scene, *iter.second.element);
-            }
-            else if (iter.second.element->id == "AnimationCurve")
-            {
-                obj = parseAnimationCurve(*scene, *iter.second.element);
-            }
-            else if (iter.second.element->id == "AnimationCurveNode")
-            {
-                obj = parse<AnimationCurveNodeImpl>(*scene, *iter.second.element);
-            }
-            else if (iter.second.element->id == "Deformer")
-            {
-                IElementProperty* class_prop = iter.second.element->getProperty(2);
+            //else if (iter.second.element->id == "AnimationStack")
+            //{
+            //    obj = parse<AnimationStackImpl>(*scene, *iter.second.element);
+            //    if (!obj.isError())
+            //    {
+            //        AnimationStackImpl* stack = (AnimationStackImpl*)obj.getValue();
+            //        scene->m_animation_stacks.push_back(stack);
+            //    }
+            //}
+            //else if (iter.second.element->id == "AnimationLayer")
+            //{
+            //    obj = parse<AnimationLayerImpl>(*scene, *iter.second.element);
+            //}
+            //else if (iter.second.element->id == "AnimationCurve")
+            //{
+            //    obj = parseAnimationCurve(*scene, *iter.second.element);
+            //}
+            //else if (iter.second.element->id == "AnimationCurveNode")
+            //{
+            //    obj = parse<AnimationCurveNodeImpl>(*scene, *iter.second.element);
+            //}
+            //else if (iter.second.element->id == "Deformer")
+            //{
+            //    IElementProperty* class_prop = iter.second.element->getProperty(2);
 
-                if (class_prop)
-                {
-                    if (class_prop->getValue() == "Cluster")
-                        obj = parseCluster(*scene, *iter.second.element);
-                    else if (class_prop->getValue() == "Skin")
-                        obj = parse<SkinImpl>(*scene, *iter.second.element);
-                }
-            }
-            else if (iter.second.element->id == "NodeAttribute")
-            {
-                obj = parseNodeAttribute(*scene, *iter.second.element);
-            }
+            //    if (class_prop)
+            //    {
+            //        if (class_prop->getValue() == "Cluster")
+            //            obj = parseCluster(*scene, *iter.second.element);
+            //        else if (class_prop->getValue() == "Skin")
+            //            obj = parse<SkinImpl>(*scene, *iter.second.element);
+            //    }
+            //}
+            //else if (iter.second.element->id == "NodeAttribute")
+            //{
+            //    obj = parseNodeAttribute(*scene, *iter.second.element);
+            //}
             else if (iter.second.element->id == "Model")
             {
                 IElementProperty* class_prop = iter.second.element->getProperty(2);
@@ -2613,11 +2629,30 @@ namespace ofbx
             else if (iter.second.element->id == "Texture")
             {
                 obj = parseTexture(*scene, *iter.second.element);
+                if (!obj.isError())
+					scene->m_texturesList.push_back((Texture*)obj.getValue());
             }
-            else if (iter.second.element->id == "Pose")
+            else if (iter.second.element->id == "Video")
             {
-                obj = parsePose(*scene, *iter.second.element);
+                auto pTexture = iter.second.element;
+
+                const Element* texture_content = findChild(*pTexture, "Content");
+                if (texture_content && texture_content->first_property)
+                {
+                    DataView*       content = &texture_content->first_property->value;
+                    const Element* file_name = findChild(*pTexture, "Filename");
+                    if (file_name && file_name->first_property)
+                    {
+                        DataView* filename = &file_name->first_property->value;
+                        scene->m_texturesContent.push_back(content);
+                        scene->m_texturesFilePath.push_back(filename);
+                    }
+                }
             }
+            //else if (iter.second.element->id == "Pose")
+            //{
+            //    obj = parsePose(*scene, *iter.second.element);
+            //}
 
             if (obj.isError())
                 return false;
@@ -2956,7 +2991,7 @@ namespace ofbx
                 Object* obj = scene.m_object_map.find(connection.to)->second.object;
                 if (obj && obj->is_node)
                 {
-                    //assert(parent == nullptr);
+                    // assert(parent == nullptr);
                     parent = obj;
                 }
             }

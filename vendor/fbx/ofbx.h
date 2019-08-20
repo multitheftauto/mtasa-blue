@@ -430,6 +430,17 @@ namespace ofbx
         virtual const Object* const*  getAllObjects() const = 0;
         virtual int                   getAllObjectCount() const = 0;
 
+		virtual const DataView* const* getTextureContent() const = 0;
+        virtual const DataView* const* getTextureFilePath() const = 0;
+        virtual const Texture* const*  getTextures() const = 0;
+
+        virtual const Material* const* getMaterials() const = 0;
+
+		virtual int getTexturesCount() const = 0;
+        virtual int getMaterialsCount() const = 0;
+
+
+
     protected:
         virtual ~IScene() {}
     };

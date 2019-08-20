@@ -10,7 +10,7 @@
 
 #pragma once
 
-class CClientFBXManager
+class CClientFBXManager : CFBXManager
 {
     friend class CClientManager;
     friend class CClientFBX;
@@ -27,6 +27,7 @@ private:
     void AddToList(CClientFBX* pFBX) { m_List.push_back(pFBX); };
     void RemoveFromList(CClientFBX* pFBX);
     void DeleteAll();
+    void Render();
 
 private:
     CClientManager* m_pManager;

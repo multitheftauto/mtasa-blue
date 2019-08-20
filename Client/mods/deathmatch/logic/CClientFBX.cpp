@@ -9,6 +9,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <iostream>
+#include <string>
+#include <tuple>
+
+using namespace std;
 
 CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -20,6 +25,9 @@ CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this)
 
     // Add us to FBX manager's list
     m_pFBXManager->AddToList(this);
+
+    CClientFBXRenderTemplate* pTemplate = new CClientFBXRenderTemplate();
+    m_templateMap[nextFreeId] = pTemplate;
 }
 
 CClientFBX::~CClientFBX(void)
@@ -58,15 +66,17 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData)
         return false;
 
     m_pRoot = m_pScene->getRoot();
-    CacheMeshes();
     FixIndices();
-
+    CacheObjects();
+    CacheMeshes();
+    CacheTextures();
+    CacheMaterials();
     return true;
 }
 
 void CClientFBX::FixIndices()
 {
-    const ofbx::Mesh* pMesh;
+    const ofbx::Mesh*     pMesh;
     const ofbx::Geometry* pGeometry;
     for (int i = 0; i < m_pScene->getMeshCount(); i++)
     {
@@ -140,8 +150,23 @@ const char* CClientFBX::GetObjectType(const ofbx::Object const* pObject)
     return label;
 }
 
+void CClientFBX::CacheObjects()
+{
+    const ofbx::Object* const* pObject;
+    for (int i = 0; i < m_pScene->getAllObjectCount(); i++)
+    {
+        pObject = m_pScene->getAllObjects() + i;
+        m_objectList[(*pObject)->id] = pObject;
+    }
+}
+
 void CClientFBX::CacheMeshes()
 {
+    if (m_bMeshesCached)
+        return;
+
+    m_bMeshesCached = true;
+
     SString           name;
     const ofbx::Mesh* pMesh;
     for (int i = 0; i < m_pScene->getMeshCount(); i++)
@@ -150,6 +175,50 @@ void CClientFBX::CacheMeshes()
         GetMeshPath(pMesh, name);
         if (name.compare("") != 0)            // eliminate some unnamed objects like BaseLayers
             m_meshList[name] = pMesh;
+    }
+}
+
+void CClientFBX::CacheTextures()
+{
+    if (m_bTexturesCached)
+        return;
+
+    m_bTexturesCached = true;
+
+    SString                     name;
+    const ofbx::DataView const* pFilePath;
+    const ofbx::DataView const* pContent;
+    const ofbx::Texture*        pTexture;
+    for (int i = 0; i < m_pScene->getTexturesCount(); i++)
+    {
+        pFilePath = *(m_pScene->getTextureFilePath() + i);
+        pContent = *(m_pScene->getTextureContent() + i);
+        pTexture = *(m_pScene->getTextures() + i);
+
+        SString strFilePath = (const char*)pFilePath->begin;
+        strFilePath = strFilePath.substr(0, pFilePath->end - pFilePath->begin);
+
+        std::vector<char> vecContent;
+        vecContent.resize(pContent->end - pContent->begin - 4);
+        memcpy(vecContent.data(), pContent->begin + 4, vecContent.size());
+
+        m_textureContentList[pTexture->id] = vecContent;
+        m_textureList[strFilePath] = pTexture;
+    }
+}
+void CClientFBX::CacheMaterials()
+{
+    if (m_bMaterialsCached)
+        return;
+
+    m_bMaterialsCached = true;
+
+    SString                      name;
+    const ofbx::Material* const* pMaterial;
+    for (int i = 0; i < m_pScene->getMaterialsCount(); i++)
+    {
+        pMaterial = m_pScene->getMaterials() + i;
+        m_materialList.push_back(pMaterial);
     }
 }
 
@@ -175,10 +244,10 @@ void CClientFBX::GetMeshPath(const ofbx::Mesh* pMesh, SString& name)
 
 void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
 {
-    CGraphicsInterface*   pGraphics = g_pCore->GetGraphics();
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
     pTempGeometry = pMesh->getGeometry();
 
-    int size = pTempGeometry->getIndicesCount() - 3;
+    int               size = pTempGeometry->getIndicesCount() - 3;
     const ofbx::Vec3* pVertices = pTempGeometry->getVertices();
     const int*        pFaceIndices = pTempGeometry->getFaceIndices();
     for (int i = 0; i < size; i += 3)
@@ -204,18 +273,62 @@ void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColo
     }
 }
 
-void CClientFBX::LuaGetMeshes(lua_State* luaVM, const SString& strFilter)
+void CClientFBX::Render()
 {
-    int i = 0;
+    for (auto const& pair : m_templateMap)
+    {
+        g_pCore->GetConsole()->Printf("draw id %i", pair.first);
+    }
+}
+
+void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
+{
+    for (auto const& pair : m_objectList)
+    {
+        lua_pushnumber(luaVM, pair.first);
+        lua_pushstring(luaVM, GetObjectType(*pair.second));
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CClientFBX::LuaGetTextures(lua_State* luaVM)
+{
+    for (auto const& pTexture : m_textureList)
+    {
+        lua_pushnumber(luaVM, pTexture.second->id);
+        lua_pushstring(luaVM, pTexture.first.c_str());
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CClientFBX::LuaGetMaterials(lua_State* luaVM)
+{
+    for (auto const& pMaterial : m_materialList)
+    {
+        lua_pushnumber(luaVM, (*pMaterial)->id);
+        lua_pushstring(luaVM, (*pMaterial)->name);
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CClientFBX::LuaGetMeshes(lua_State* luaVM)
+{
     for (auto const& pair : m_meshList)
     {
-        if (pair.first._Starts_with(strFilter))
-        {
-            lua_pushnumber(luaVM, ++i);
-            lua_pushstring(luaVM, pair.first.c_str());
-            lua_settable(luaVM, -3);
-        }
+        lua_pushnumber(luaVM, pair.second->id);
+        lua_pushstring(luaVM, pair.first.c_str());
+        lua_settable(luaVM, -3);
     }
+}
+
+bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject)
+{
+    lua_newtable(luaVM);
+    lua_pushstring(luaVM, "id");
+    lua_pushnumber(luaVM, (*pObject)->id);
+    lua_settable(luaVM, -3);
+
+    return true;
 }
 
 bool CClientFBX::LuaGetMeshProperties(lua_State* luaVM, const ofbx::Mesh const* pMesh)
@@ -290,6 +403,7 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMe
             lua_settable(luaVM, -3);
             lua_settable(luaVM, -3);
         }
+        return true;
     }
     if (iStart >= 0 && iStop < 0)            // select only 1 vertex
     {
@@ -306,6 +420,7 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMe
             lua_pushnumber(luaVM, 3);
             lua_pushnumber(luaVM, pVertex->z);
             lua_settable(luaVM, -3);
+            return true;
         }
     }
     else if (iStart >= 0 && iStop >= 0)            // get range
@@ -333,6 +448,7 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMe
                     lua_settable(luaVM, -3);
                     lua_settable(luaVM, -3);
                 }
+                return true;
             }
         }
     }
@@ -340,11 +456,116 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMe
     return false;
 }
 
+bool CClientFBX::LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop)
+{
+    const ofbx::Material* pMaterial;
+    const ofbx::Texture*  pTexture;
+    const ofbx::Vec3*     pVertex;
+    ofbx::DataView        file;
+
+    if (iStart < 0 && iStop < 0)            // get all
+    {
+        lua_newtable(luaVM);
+        SString strFileName;
+        for (int i = 0; i < pMesh->getMaterialCount(); i++)
+        {
+            pMaterial = pMesh->getMaterial(i);
+            int diffuseColor =
+                pMaterial->getDiffuseColor().r * 255 * 255 * 255 + pMaterial->getDiffuseColor().g * 255 * 255 + pMaterial->getDiffuseColor().b * 255;
+            int specularColor =
+                pMaterial->getSpecularColor().r * 255 * 255 * 255 + pMaterial->getSpecularColor().g * 255 * 255 + pMaterial->getSpecularColor().b * 255;
+
+            lua_pushnumber(luaVM, i + 1);
+            lua_newtable(luaVM);
+            lua_pushstring(luaVM, "id");
+            lua_pushnumber(luaVM, pMaterial->id);
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "name");
+            lua_pushstring(luaVM, pMaterial->name);
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "diffuseColor");
+            lua_pushnumber(luaVM, diffuseColor);
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "specularColor");
+            lua_pushnumber(luaVM, specularColor);
+            lua_settable(luaVM, -3);
+            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::DIFFUSE);
+            if (pTexture != nullptr)
+            {
+                lua_pushstring(luaVM, "diffuseTexture");
+                strFileName = SString("%s", pTexture->getFileName().begin);
+                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
+                lua_pushstring(luaVM, strFileName.c_str());
+                lua_settable(luaVM, -3);
+
+                /*             lua_pushstring(luaVM, "diffuseTextureContent");
+                             strFileName = SString("%s", pTexture->getContent().begin);
+                             strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getContent().end));
+                             lua_pushstring(luaVM, strFileName.c_str());
+                             lua_settable(luaVM, -3);*/
+                // Content
+            }
+
+            lua_pushstring(luaVM, "normalTexture");
+            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::NORMAL);
+            if (pTexture != nullptr)
+            {
+                strFileName = SString("%s", pTexture->getFileName().begin);
+                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
+                lua_pushstring(luaVM, strFileName.c_str());
+            }
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "specularTexture");
+            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::SPECULAR);
+            if (pTexture != nullptr)
+            {
+                strFileName = SString("%s", pTexture->getFileName().begin);
+                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
+                lua_pushstring(luaVM, strFileName.c_str());
+            }
+            else
+                lua_pushboolean(luaVM, false);
+
+            lua_settable(luaVM, -3);
+
+            lua_settable(luaVM, -3);
+        }
+        return true;
+    }
+    /*
+    if (iStart >= 0 && iStop < 0)            // select only 1 vertex
+    {
+        lua_pushnumber(luaVM, pGeometry->getFaceIndices()[iStart]);
+    }
+    else if (iStart >= 0 && iStop >= 0)            // get range
+    {
+        if (iStart < iStop)
+        {
+            if (pMesh->getMaterialCount() > iStart && pMesh->getMaterialCount() > iStop)
+            {
+                lua_newtable(luaVM);
+
+                int id = 0;
+                for (int i = iStart; i <= iStop; i++)
+                {
+                    lua_pushnumber(luaVM, ++id);
+                    lua_pushnumber(luaVM, abs(pGeometry->getFaceIndices()[i]));
+                    lua_settable(luaVM, -3);
+                }
+            }
+        }
+    }
+    */
+    return false;
+}
+
 bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop)
 {
     const ofbx::Geometry* pGeometry = pMesh->getGeometry();
     const ofbx::Vec3*     pVertex;
-
     if (iStart < 0 && iStop < 0)            // get all
     {
         lua_newtable(luaVM);

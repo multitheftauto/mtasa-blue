@@ -15,8 +15,11 @@ void CLuaFBXDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
         {"fbxLoadFile", FBXLoadFile},
+        {"fbxGetAllObjectsIds", FBXGetAllObjectsIds},
         {"fbxGetAllMeshes", FBXGetAllMeshes},
-        {"fbxGetMeshProperties", FBXGetMeshProperties},
+        {"fbxGetAllTextures", FBXGetAllTextures},
+        {"fbxGetAllMaterials", FBXGetAllMaterials},
+        {"fbxGetProperties", FBXGetProperties},
         {"fbxGetMeshRawData", FBXGetMeshRawData},
         {"fbxDrawPreview", FBXDrawPreview},
 
@@ -99,6 +102,26 @@ int CLuaFBXDefs::FBXLoadFile(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFBXDefs::FBXGetAllObjectsIds(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    SString          strFilter;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+
+    if (!argStream.HasErrors())
+    {
+        lua_newtable(luaVM);
+        pFBX->LuaGetAllObjectsIds(luaVM);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 int CLuaFBXDefs::FBXGetAllMeshes(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
@@ -110,7 +133,47 @@ int CLuaFBXDefs::FBXGetAllMeshes(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         lua_newtable(luaVM);
-        pFBX->LuaGetMeshes(luaVM, strFilter);
+        pFBX->LuaGetMeshes(luaVM);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetAllTextures(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+
+    if (!argStream.HasErrors())
+    {
+        lua_newtable(luaVM);
+        pFBX->LuaGetTextures(luaVM);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetAllMaterials(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+
+    if (!argStream.HasErrors())
+    {
+        lua_newtable(luaVM);
+        pFBX->LuaGetMaterials(luaVM);
         return 1;
     }
     else
@@ -142,7 +205,8 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
     {
         if (pFBX->IsMeshExists(strHierarchyMesh))
         {
-            pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
+            //pFBX->Draw(pFBX->GetMeshByName(strHierarchyMesh), vecPosition);
+            //pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -160,19 +224,19 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFBXDefs::FBXGetMeshProperties(lua_State* luaVM)
+int CLuaFBXDefs::FBXGetProperties(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
-    SString          strHierarchyMesh;
+    unsigned long long ulId;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFBX);
-    argStream.ReadString(strHierarchyMesh);
+    argStream.ReadNumber(ulId);
 
     if (!argStream.HasErrors())
     {
-        if (pFBX->IsMeshExists(strHierarchyMesh))
+        if (pFBX->IsObjectWithId(ulId))
         {
-            if (pFBX->LuaGetMeshProperties(luaVM, pFBX->GetMeshByName(strHierarchyMesh)))
+            if (pFBX->LuaGetObjectProperties(luaVM, pFBX->GetObjectById(ulId)))
             {
                 return 1;
             }
@@ -216,6 +280,16 @@ int CLuaFBXDefs::FBXGetMeshRawData(lua_State* luaVM)
                     if (!pFBX->LuaRawGetVertices(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
                     {
                         argStream.SetCustomError("Invalid vertex range");
+                    }
+                    break;
+                case FBX_DATA_TYPE_MATERIAL:
+
+                    argStream.ReadNumber(iStart, 0);
+                    argStream.ReadNumber(iStop, 0);
+                    iStart--, iStop--;
+                    if (!pFBX->LuaRawGetMaterials(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
+                    {
+                        argStream.SetCustomError("Invalid material range");
                     }
                     break;
                 case FBX_DATA_TYPE_INDICATOR:
