@@ -1525,12 +1525,12 @@ void CGraphics::DrawLine3DPreGUIQueue()
 {
     m_pLine3DBatcherPreGUI->Flush();
     m_pMaterialLine3DBatcherPreGUI->Flush();
-    m_pFBXBatcher->Flush();
+    m_pFBXBatcher->Render();
 }
 
 bool CGraphics::HasLine3DPreGUIQueueItems()
 {
-    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
+    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems() || true;
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)

@@ -174,6 +174,9 @@ CClientManager::~CClientManager()
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
+
+    delete m_pFBXManager;
+    m_pFBXManager = NULL;
 }
 
 //

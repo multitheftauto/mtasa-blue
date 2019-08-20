@@ -275,8 +275,20 @@ void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColo
 
 void CClientFBX::Render()
 {
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
     for (auto const& pair : m_templateMap)
     {
+        /*
+                const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
+        uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
+
+        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
+        */
+        std::vector<CVector> asd;
+        asd.emplace_back(0, 0, 0);
+        asd.emplace_back(10, 0, 0);
+        asd.emplace_back(0, 10, 0);
+        pGraphics->GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 3, &asd.at(0), sizeof(CVector));
         g_pCore->GetConsole()->Printf("draw id %i", pair.first);
     }
 }
