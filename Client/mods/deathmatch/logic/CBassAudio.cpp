@@ -365,8 +365,9 @@ void CBassAudio::PlayStreamIntern(void* arguments)
         }
         else
         {
-            // Deal with unwanted pSound
-            g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
+            // Deal with unwanted pSound unless we're disconnecting already
+            if (g_pClientGame != nullptr && !g_pClientGame->IsBeingDeleted())
+                g_pClientGame->GetManager()->GetSoundManager()->QueueChannelStop(pSound);
         }
     }
 
