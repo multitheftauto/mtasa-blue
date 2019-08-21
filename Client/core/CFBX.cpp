@@ -114,7 +114,6 @@ void CFBXScene::FixIndices()
     }
 }
 
-
 const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
 {
     const char* label;
@@ -176,14 +175,42 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene)
     return pFBXScene;
 }
 
+bool CFBX::HasAnyFBXLoaded()
+{
+    return m_sceneList.size() > 0;
+}
+
 CFBX::CFBX()
 {
+}
 
+void CFBX::Initialize()
+{
+    m_pDevice = g_pCore->GetGraphics()->GetDevice();
+    vertices = {
+        {0, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 5, 3, D3DCOLOR_XRGB(255, 0, 0)},
+        {3, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 2, 5, D3DCOLOR_XRGB(255, 0, 0)},
+    };
+    indices.emplace_back(0);
+    indices.emplace_back(1);
+    indices.emplace_back(2);
+    indices.emplace_back(3);
+    indices.emplace_back(4);
+    indices.emplace_back(5);
+
+    m_pDevice->CreateVertexBuffer(vertices.size() * sizeof(CUSTOMVERTEX), D3DUSAGE_WRITEONLY, CUSTOMFVF, D3DPOOL_MANAGED, &v_buffer, NULL);
+    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, vertices.data(), vertices.size() * sizeof(CUSTOMVERTEX));
+    v_buffer->Unlock();
+
+    m_pDevice->CreateIndexBuffer(indices.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
+    i_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, indices.data(), indices.size() * sizeof(int));
+    i_buffer->Unlock();
 }
 
 CFBX::~CFBX()
 {
-
 }
 
 void CFBX::RemoveScene(CFBXScene* pScene)
@@ -192,9 +219,20 @@ void CFBX::RemoveScene(CFBXScene* pScene)
 
 void CFBX::Render()
 {
+
     int i = 0;
     for (auto const& pFBXScene : m_sceneList)
     {
         g_pCore->GetConsole()->Printf("render! %i", i++);
     }
+
+    // select which vertex format we are using
+    m_pDevice->SetFVF(CUSTOMFVF);
+
+    // select the vertex buffer to display
+    m_pDevice->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+    m_pDevice->SetIndices(i_buffer);
+
+    // copy the vertex buffer to the back buffer
+    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, indices.size(), 0, indices.size() / 3);
 }

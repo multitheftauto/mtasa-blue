@@ -7,15 +7,6 @@
  *
  *
  *****************************************************************************/
-
-
-struct CUSTOMVERTEX
-{
-    float x, y, z;
-    DWORD color;
-};
-
-
 //
 // Batches fbx drawing
 //
@@ -41,12 +32,5 @@ protected:
     float                            m_fViewportSizeY;
     D3DXMATRIX                       m_MatWorld;
     D3DXMATRIX                       m_MatView;
-    D3DXMATRIX                       m_MatProjection;
-
-    std::vector<CUSTOMVERTEX> vertices;
-    std::vector<int> indices;
-    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
-    LPDIRECT3DINDEXBUFFER9  i_buffer = NULL;
-    VOID*                   pVoid;
-    
+    D3DXMATRIX                       m_MatProjection;    
 };

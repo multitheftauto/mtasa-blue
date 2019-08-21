@@ -24,6 +24,8 @@ class CFBXInterface
 public:
     virtual CFBXScene* AddScene(ofbx::IScene* pScene) = 0;
     virtual void       Render() = 0;
+    virtual void       Initialize() = 0;
+    virtual bool       HasAnyFBXLoaded() = 0;
 };
 
 class CFBXSceneInterface

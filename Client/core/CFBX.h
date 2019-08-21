@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 
+struct CUSTOMVERTEX
+{
+    float x, y, z;
+    DWORD color;
+};
+#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)            // | D3DFVF_TEX1;
+
+
 class CFBXTemplate
 {
 
@@ -58,7 +66,16 @@ public:
     CFBXScene*          AddScene(ofbx::IScene* pScene);
     void                RemoveScene(CFBXScene* pScene);
     void                Render();
+    void                Initialize();
+    bool                HasAnyFBXLoaded();
 
 protected:
     std::vector<CFBXScene*> m_sceneList;
+
+    std::vector<CUSTOMVERTEX> vertices;
+    std::vector<int>          indices;
+    LPDIRECT3DVERTEXBUFFER9   v_buffer = NULL;
+    LPDIRECT3DINDEXBUFFER9    i_buffer = NULL;
+    VOID*                     pVoid;
+    IDirect3DDevice9*         m_pDevice;
 };

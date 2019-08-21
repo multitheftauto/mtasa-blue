@@ -1530,7 +1530,7 @@ void CGraphics::DrawLine3DPreGUIQueue()
 
 bool CGraphics::HasLine3DPreGUIQueueItems()
 {
-    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
+    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems() || g_pCore->GetFBX()->HasAnyFBXLoaded();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)

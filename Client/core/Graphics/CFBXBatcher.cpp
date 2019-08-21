@@ -18,20 +18,9 @@
 //
 ////////////////////////////////////////////////////////////////
 
-#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)            // | D3DFVF_TEX1;
 CFBXBatcher::CFBXBatcher()
 {
     D3DXMatrixIdentity(&m_MatWorld);
-    vertices = {
-        {0, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 5, 3, D3DCOLOR_XRGB(255, 0, 0)},
-        {3, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 2, 5, D3DCOLOR_XRGB(255, 0, 0)},
-    };
-    indices.emplace_back(0);
-    indices.emplace_back(1);
-    indices.emplace_back(2);
-    indices.emplace_back(3);
-    indices.emplace_back(4);
-    indices.emplace_back(5);
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -56,15 +45,7 @@ void CFBXBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
 
-    m_pDevice->CreateVertexBuffer(vertices.size() * sizeof(CUSTOMVERTEX), D3DUSAGE_WRITEONLY, CUSTOMFVF, D3DPOOL_MANAGED, &v_buffer, NULL);
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vertices.data(), vertices.size() * sizeof(CUSTOMVERTEX));
-    v_buffer->Unlock();
-
-    m_pDevice->CreateIndexBuffer(indices.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
-    i_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, indices.data(), indices.size() * sizeof(int));
-    i_buffer->Unlock();
+    g_pCore->GetFBX()->Initialize();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -206,19 +187,7 @@ void CFBXBatcher::Render()
     // Cache last used material, so we don't set directx parameters needlessly
     CMaterialItem* pLastMaterial = nullptr;
 
-    uint uiVertexStreamZeroStride = sizeof(PrimitiveMaterialVertice);
-
-    // select which vertex format we are using
-    m_pDevice->SetFVF(CUSTOMFVF);
-
-    // select the vertex buffer to display
-    m_pDevice->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
-    m_pDevice->SetIndices(i_buffer);
-
-    // copy the vertex buffer to the back buffer
-    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, indices.size(), 0, indices.size() / 3);
-
-    //g_pCore->GetFBX()->Render();
+    g_pCore->GetFBX()->Render();
     // CMaterialItem* pMaterial = primitive.pMaterial;
     // if (pMaterial != pLastMaterial)
     //{
