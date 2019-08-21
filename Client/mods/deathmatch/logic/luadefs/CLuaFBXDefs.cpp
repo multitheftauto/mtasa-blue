@@ -15,7 +15,7 @@ void CLuaFBXDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
         {"fbxLoadFile", FBXLoadFile},
-        {"fbxGetAllObjectsIds", FBXGetAllObjectsIds},
+        {"fbxGetAllObjects", FBXGetAllObjects},
         {"fbxGetAllMeshes", FBXGetAllMeshes},
         {"fbxGetAllTextures", FBXGetAllTextures},
         {"fbxGetAllMaterials", FBXGetAllMaterials},
@@ -102,7 +102,7 @@ int CLuaFBXDefs::FBXLoadFile(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFBXDefs::FBXGetAllObjectsIds(lua_State* luaVM)
+int CLuaFBXDefs::FBXGetAllObjects(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
     SString          strFilter;
@@ -203,7 +203,7 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pFBX->IsMeshExists(strHierarchyMesh))
+        if (pFBX->IsMeshValid(strHierarchyMesh))
         {
             //pFBX->Draw(pFBX->GetMeshByName(strHierarchyMesh), vecPosition);
             //pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
@@ -234,7 +234,7 @@ int CLuaFBXDefs::FBXGetProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pFBX->IsObjectWithId(ulId))
+        if (pFBX->IsObjectValid(ulId))
         {
             if (pFBX->LuaGetObjectProperties(luaVM, pFBX->GetObjectById(ulId)))
             {
@@ -267,7 +267,7 @@ int CLuaFBXDefs::FBXGetMeshRawData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pFBX->IsMeshExists(strHierarchyMesh))
+        if (pFBX->IsMeshValid(strHierarchyMesh))
         {
             int iStart, iStop;
             switch (eDataType)

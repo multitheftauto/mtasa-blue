@@ -41,11 +41,3 @@ void CClientFBXManager::RemoveFromList(CClientFBX* pFBX)
     if (!m_List.empty())
         m_List.remove(pFBX);
 }
-
-void CClientFBXManager::Render()
-{
-    for (CClientFBX* pFBX : m_List)
-    {
-        pFBX->Render();
-    }
-}

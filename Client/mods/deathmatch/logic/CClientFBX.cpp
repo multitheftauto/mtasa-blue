@@ -26,8 +26,6 @@ CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this)
     // Add us to FBX manager's list
     m_pFBXManager->AddToList(this);
 
-    CClientFBXRenderTemplate* pTemplate = new CClientFBXRenderTemplate();
-    m_templateMap[nextFreeId] = pTemplate;
 }
 
 CClientFBX::~CClientFBX(void)
@@ -61,32 +59,13 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData)
             return false;
     }
 
-    m_pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
-    if (m_pScene == nullptr)
+    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+    if (pScene == nullptr)
         return false;
 
-    m_pRoot = m_pScene->getRoot();
-    FixIndices();
-    CacheObjects();
-    CacheMeshes();
-    CacheTextures();
-    CacheMaterials();
-    return true;
-}
+    m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene);
 
-void CClientFBX::FixIndices()
-{
-    const ofbx::Mesh*     pMesh;
-    const ofbx::Geometry* pGeometry;
-    for (int i = 0; i < m_pScene->getMeshCount(); i++)
-    {
-        pMesh = m_pScene->getMesh(i);
-        pGeometry = pMesh->getGeometry();
-        for (int i = 0; i < pGeometry->getIndicesCount(); i++)
-        {
-            (int)pGeometry->getFaceIndices()[i] = abs(pGeometry->getFaceIndices()[i]);
-        }
-    }
+    return true;
 }
 
 // Return true if data looks like FBX file contents
@@ -96,241 +75,99 @@ bool CClientFBX::IsFBXData(const SString& strData)
     return strData.length() > 128;
 }
 
-const char* CClientFBX::GetObjectType(const ofbx::Object const* pObject)
-{
-    const char* label;
-    switch (pObject->getType())
-    {
-        case ofbx::Object::Type::GEOMETRY:
-            label = "geometry";
-            break;
-        case ofbx::Object::Type::MESH:
-            label = "mesh";
-            break;
-        case ofbx::Object::Type::MATERIAL:
-            label = "material";
-            break;
-        case ofbx::Object::Type::ROOT:
-            label = "root";
-            break;
-        case ofbx::Object::Type::TEXTURE:
-            label = "texture";
-            break;
-        case ofbx::Object::Type::NULL_NODE:
-            label = "null";
-            break;
-        case ofbx::Object::Type::LIMB_NODE:
-            label = "limb node";
-            break;
-        case ofbx::Object::Type::NODE_ATTRIBUTE:
-            label = "node attribute";
-            break;
-        case ofbx::Object::Type::CLUSTER:
-            label = "cluster";
-            break;
-        case ofbx::Object::Type::SKIN:
-            label = "skin";
-            break;
-        case ofbx::Object::Type::ANIMATION_STACK:
-            label = "animation stack";
-            break;
-        case ofbx::Object::Type::ANIMATION_LAYER:
-            label = "animation layer";
-            break;
-        case ofbx::Object::Type::ANIMATION_CURVE:
-            label = "animation curve";
-            break;
-        case ofbx::Object::Type::ANIMATION_CURVE_NODE:
-            label = "animation curve node";
-            break;
-        default:
-            label = "unknown";
-            break;
-    }
-    return label;
-}
-
-void CClientFBX::CacheObjects()
-{
-    const ofbx::Object* const* pObject;
-    for (int i = 0; i < m_pScene->getAllObjectCount(); i++)
-    {
-        pObject = m_pScene->getAllObjects() + i;
-        m_objectList[(*pObject)->id] = pObject;
-    }
-}
-
-void CClientFBX::CacheMeshes()
-{
-    if (m_bMeshesCached)
-        return;
-
-    m_bMeshesCached = true;
-
-    SString           name;
-    const ofbx::Mesh* pMesh;
-    for (int i = 0; i < m_pScene->getMeshCount(); i++)
-    {
-        pMesh = m_pScene->getMesh(i);
-        GetMeshPath(pMesh, name);
-        if (name.compare("") != 0)            // eliminate some unnamed objects like BaseLayers
-            m_meshList[name] = pMesh;
-    }
-}
-
-void CClientFBX::CacheTextures()
-{
-    if (m_bTexturesCached)
-        return;
-
-    m_bTexturesCached = true;
-
-    SString                     name;
-    const ofbx::DataView const* pFilePath;
-    const ofbx::DataView const* pContent;
-    const ofbx::Texture*        pTexture;
-    for (int i = 0; i < m_pScene->getTexturesCount(); i++)
-    {
-        pFilePath = *(m_pScene->getTextureFilePath() + i);
-        pContent = *(m_pScene->getTextureContent() + i);
-        pTexture = *(m_pScene->getTextures() + i);
-
-        SString strFilePath = (const char*)pFilePath->begin;
-        strFilePath = strFilePath.substr(0, pFilePath->end - pFilePath->begin);
-
-        std::vector<char> vecContent;
-        vecContent.resize(pContent->end - pContent->begin - 4);
-        memcpy(vecContent.data(), pContent->begin + 4, vecContent.size());
-
-        m_textureContentList[pTexture->id] = vecContent;
-        m_textureList[strFilePath] = pTexture;
-    }
-}
-void CClientFBX::CacheMaterials()
-{
-    if (m_bMaterialsCached)
-        return;
-
-    m_bMaterialsCached = true;
-
-    SString                      name;
-    const ofbx::Material* const* pMaterial;
-    for (int i = 0; i < m_pScene->getMaterialsCount(); i++)
-    {
-        pMaterial = m_pScene->getMaterials() + i;
-        m_materialList.push_back(pMaterial);
-    }
-}
-
-void CClientFBX::GetMeshPath(const ofbx::Mesh* pMesh, SString& name)
-{
-    std::vector<SString> vecNames;
-
-    int uknownId = 0;
-
-    const ofbx::Object const* pObject = (const ofbx::Object const*)pMesh;
-    vecNames.push_back(pObject->name);
-    while (pObject = pObject->getParent())
-    {
-        if (pObject == nullptr)
-            break;
-
-        vecNames.push_back(pObject->name);
-    }
-
-    std::reverse(std::begin(vecNames), std::end(vecNames));
-    name = SString::Join("/", vecNames, 1 /* 1 = ignore RootNode */, vecNames.size());
-}
-
-void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
-{
-    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-    pTempGeometry = pMesh->getGeometry();
-
-    int               size = pTempGeometry->getIndicesCount() - 3;
-    const ofbx::Vec3* pVertices = pTempGeometry->getVertices();
-    const int*        pFaceIndices = pTempGeometry->getFaceIndices();
-    for (int i = 0; i < size; i += 3)
-    {
-        tempVertexPosition[0] = pVertices + pFaceIndices[i];
-        tempVertexPosition[1] = pVertices + pFaceIndices[i + 1];
-        tempVertexPosition[2] = pVertices + pFaceIndices[i + 2];
-        tempVecPos[0].fX = tempVertexPosition[0]->x + vecPosition.fX;
-        tempVecPos[0].fY = tempVertexPosition[0]->y + vecPosition.fY;
-        tempVecPos[0].fZ = tempVertexPosition[0]->z + vecPosition.fZ;
-
-        tempVecPos[1].fX = tempVertexPosition[1]->x + vecPosition.fX;
-        tempVecPos[1].fY = tempVertexPosition[1]->y + vecPosition.fY;
-        tempVecPos[1].fZ = tempVertexPosition[1]->z + vecPosition.fZ;
-
-        tempVecPos[2].fX = tempVertexPosition[2]->x + vecPosition.fX;
-        tempVecPos[2].fY = tempVertexPosition[2]->y + vecPosition.fY;
-        tempVecPos[2].fZ = tempVertexPosition[2]->z + vecPosition.fZ;
-
-        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[1], fWidth, color, bPostGUI);
-        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[2], fWidth, color, bPostGUI);
-        pGraphics->DrawLine3DQueued(tempVecPos[1], tempVecPos[2], fWidth, color, bPostGUI);
-    }
-}
-
-void CClientFBX::Render()
-{
-    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-    for (auto const& pair : m_templateMap)
-    {
-        /*
-                const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
-        uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
-
-        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
-        */
-        std::vector<CVector> asd;
-        asd.emplace_back(0, 0, 0);
-        asd.emplace_back(10, 0, 0);
-        asd.emplace_back(0, 10, 0);
-        pGraphics->GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 3, &asd.at(0), sizeof(CVector));
-        g_pCore->GetConsole()->Printf("draw id %i", pair.first);
-    }
-}
+//
+//void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
+//{
+//    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+//    pTempGeometry = pMesh->getGeometry();
+//
+//    int               size = pTempGeometry->getIndicesCount() - 3;
+//    const ofbx::Vec3* pVertices = pTempGeometry->getVertices();
+//    const int*        pFaceIndices = pTempGeometry->getFaceIndices();
+//    for (int i = 0; i < size; i += 3)
+//    {
+//        tempVertexPosition[0] = pVertices + pFaceIndices[i];
+//        tempVertexPosition[1] = pVertices + pFaceIndices[i + 1];
+//        tempVertexPosition[2] = pVertices + pFaceIndices[i + 2];
+//        tempVecPos[0].fX = tempVertexPosition[0]->x + vecPosition.fX;
+//        tempVecPos[0].fY = tempVertexPosition[0]->y + vecPosition.fY;
+//        tempVecPos[0].fZ = tempVertexPosition[0]->z + vecPosition.fZ;
+//
+//        tempVecPos[1].fX = tempVertexPosition[1]->x + vecPosition.fX;
+//        tempVecPos[1].fY = tempVertexPosition[1]->y + vecPosition.fY;
+//        tempVecPos[1].fZ = tempVertexPosition[1]->z + vecPosition.fZ;
+//
+//        tempVecPos[2].fX = tempVertexPosition[2]->x + vecPosition.fX;
+//        tempVecPos[2].fY = tempVertexPosition[2]->y + vecPosition.fY;
+//        tempVecPos[2].fZ = tempVertexPosition[2]->z + vecPosition.fZ;
+//
+//        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[1], fWidth, color, bPostGUI);
+//        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[2], fWidth, color, bPostGUI);
+//        pGraphics->DrawLine3DQueued(tempVecPos[1], tempVecPos[2], fWidth, color, bPostGUI);
+//    }
+//}
+//
+//void CClientFBX::Render()
+//{
+//    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+//    for (auto const& pair : m_templateMap)
+//    {
+//        /*
+//                const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
+//        uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
+//
+//        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
+//        */
+//        std::vector<CVector> asd;
+//        asd.emplace_back(0, 0, 0);
+//        asd.emplace_back(10, 0, 0);
+//        asd.emplace_back(0, 10, 0);
+//        pGraphics->GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 3, &asd.at(0), sizeof(CVector));
+//        g_pCore->GetConsole()->Printf("draw id %i", pair.first);
+//    }
+//}
 
 void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
 {
-    for (auto const& pair : m_objectList)
+    std::vector<unsigned long long> vecIds;
+    m_pFBXScene->GetAllObjectsIds(vecIds);
+    int i = 1;
+    for (unsigned long long iId : vecIds)
     {
-        lua_pushnumber(luaVM, pair.first);
-        lua_pushstring(luaVM, GetObjectType(*pair.second));
+        lua_pushnumber(luaVM, i++);
+        lua_pushnumber(luaVM, iId);
         lua_settable(luaVM, -3);
     }
 }
 
 void CClientFBX::LuaGetTextures(lua_State* luaVM)
 {
-    for (auto const& pTexture : m_textureList)
-    {
-        lua_pushnumber(luaVM, pTexture.second->id);
-        lua_pushstring(luaVM, pTexture.first.c_str());
-        lua_settable(luaVM, -3);
-    }
+    //for (auto const& pTexture : m_textureList)
+    //{
+    //    lua_pushnumber(luaVM, pTexture.second->id);
+    //    lua_pushstring(luaVM, pTexture.first.c_str());
+    //    lua_settable(luaVM, -3);
+    //}
 }
 
 void CClientFBX::LuaGetMaterials(lua_State* luaVM)
 {
-    for (auto const& pMaterial : m_materialList)
-    {
-        lua_pushnumber(luaVM, (*pMaterial)->id);
-        lua_pushstring(luaVM, (*pMaterial)->name);
-        lua_settable(luaVM, -3);
-    }
+    //for (auto const& pMaterial : m_materialList)
+    //{
+    //    lua_pushnumber(luaVM, (*pMaterial)->id);
+    //    lua_pushstring(luaVM, (*pMaterial)->name);
+    //    lua_settable(luaVM, -3);
+    //}
 }
 
 void CClientFBX::LuaGetMeshes(lua_State* luaVM)
 {
-    for (auto const& pair : m_meshList)
-    {
-        lua_pushnumber(luaVM, pair.second->id);
-        lua_pushstring(luaVM, pair.first.c_str());
-        lua_settable(luaVM, -3);
-    }
+    //for (auto const& pair : m_meshList)
+    //{
+    //    lua_pushnumber(luaVM, pair.second->id);
+    //    lua_pushstring(luaVM, pair.first.c_str());
+    //    lua_settable(luaVM, -3);
+    //}
 }
 
 bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject)

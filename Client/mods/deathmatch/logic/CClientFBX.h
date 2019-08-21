@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientColModel.h
+ *  FILE:        mods/shared_logic/CClientFBX.h
  *  PURPOSE:     Model collision (.col file) entity class
  *
  *****************************************************************************/
@@ -11,12 +11,7 @@
 #include <list>
 #include "CClientEntity.h"
 #include "CClientFBXManager.h"
-#include "fbx/ofbx.h"
 
-class CClientFBXRenderTemplate
-{
-
-};
 
 class CClientFBX : public CClientEntity
 {
@@ -33,16 +28,13 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     bool LoadFBX(const SString& strFile, bool bIsRawData);
-
-    bool        IsMeshExists(const SString& strHierarchyMesh) { return m_meshList.find(strHierarchyMesh) != m_meshList.end(); }
-    bool        IsObjectWithId(long long int ulId) { return m_objectList.find(ulId) != m_objectList.end(); }
+    
+    bool        IsMeshValid(const SString& strHierarchyMesh) { return m_pFBXScene->IsMeshValid(strHierarchyMesh); }
+    bool        IsObjectValid(long long int ulId) { return m_pFBXScene->IsObjectValid(ulId); }
     static bool IsFBXData(const SString& strData);
 
-    const ofbx::Mesh const* GetMeshByName(const SString& strHierarchyMesh) { return IsMeshExists(strHierarchyMesh) ? m_meshList[strHierarchyMesh] : nullptr; }
-    const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectWithId(ulId) ? m_objectList[ulId] : nullptr; }
-
-    void DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI);
-    void Render();
+    const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) { return m_pFBXScene->GetMeshByName(strHierarchyMesh); }
+    const ofbx::Object* const* GetObjectById(long long int ulId) { return m_pFBXScene->GetObjectById(ulId); }
 
     void LuaGetMeshes(lua_State* luaVM);
     void LuaGetTextures(lua_State* luaVM);
@@ -55,33 +47,11 @@ public:
     void LuaGetAllObjectsIds(lua_State* luaVM);
 
 private:
-    void        GetMeshPath(const ofbx::Mesh* pObject, SString& name);
-    void        CacheObjects();
-    void        CacheMeshes();
-    void        CacheTextures();
-    void        CacheMaterials();
-    void        FixIndices();
-    const char* GetObjectType(const ofbx::Object const* pObject);
-
-    SString            m_strFbxFilename;
-    CBuffer            m_RawDataBuffer;
-    bool               m_bIsRawData;
-    CClientFBXManager* m_pFBXManager;
-
-    const ofbx::Object* m_pRoot;
-    ofbx::IScene*       m_pScene;
-
-    std::map<unsigned long long, const ofbx::Object* const*> m_objectList;
-    bool                                                     m_bMeshesCached = false;
-    std::map<SString, const ofbx::Mesh*>                     m_meshList;
-    bool                                                     m_bTexturesCached = false;
-    std::map<SString, const ofbx::Texture*>                  m_textureList;
-    std::map<unsigned long long, std::vector<char>>          m_textureContentList;
-    bool                                                     m_bMaterialsCached = false;
-    std::vector<const ofbx::Material* const*>                m_materialList;
-
-    std::map<unsigned int, CClientFBXRenderTemplate*> m_templateMap;
-
+    CFBXSceneInterface* m_pFBXScene;
+    SString             m_strFbxFilename;
+    CBuffer             m_RawDataBuffer;
+    bool                m_bIsRawData;
+    CClientFBXManager*  m_pFBXManager;
     
     unsigned int          nextFreeId = 0;
     const ofbx::Geometry* pTempGeometry;

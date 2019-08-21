@@ -49,6 +49,9 @@
 #include "CIdArray.h"
 #include "pcrecpp.h"
 
+// fbx
+#include "fbx/ofbx.h"
+
 // Shared logic includes
 #include <Utils.h>
 #include <CClientCommon.h>
@@ -165,6 +168,3 @@
 #include "dffapi\Clump.h"
 #include "dffapi\Memory.h"
 #include "dffapi\Geometry.h"
-
-// fbx
-#include "fbx/ofbx.h"

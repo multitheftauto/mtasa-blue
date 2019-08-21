@@ -41,6 +41,7 @@ class CCore;
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
 
+class CFBX;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -102,6 +103,7 @@ public:
     CLocalizationInterface* GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore();
     CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
+    CFBXInterface*          GetFBX() { return m_pFBX; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -294,6 +296,7 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
+    CFBXInterface*     m_pFBX;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;

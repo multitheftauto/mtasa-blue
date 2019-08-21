@@ -125,6 +125,8 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    //m_pFBX = (CFBXInterface*)new CFBX();
 }
 
 CCore::~CCore()

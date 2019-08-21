@@ -69,3 +69,6 @@
 #include "CNickGen.h"
 #include <core/CWebViewInterface.h>
 #include "CTrayIcon.h"
+#include "fbx/ofbx.h"
+#include <core/CFBXInterface.h>
+#include "CFBX.h"

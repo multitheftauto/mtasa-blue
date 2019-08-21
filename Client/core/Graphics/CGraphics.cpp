@@ -1530,7 +1530,7 @@ void CGraphics::DrawLine3DPreGUIQueue()
 
 bool CGraphics::HasLine3DPreGUIQueueItems()
 {
-    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems() || true;
+    return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)

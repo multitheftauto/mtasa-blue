@@ -76,7 +76,7 @@ void CFBXBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX
 void CFBXBatcher::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY)
 {
     // Flush dx draws
-    Render();
+    //Render();
     // Make new projection transform
     UpdateMatrices(uiNewViewportSizeX, uiNewViewportSizeY);
 }
@@ -218,6 +218,7 @@ void CFBXBatcher::Render()
     // copy the vertex buffer to the back buffer
     m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, indices.size(), 0, indices.size() / 3);
 
+    //g_pCore->GetFBX()->Render();
     // CMaterialItem* pMaterial = primitive.pMaterial;
     // if (pMaterial != pLastMaterial)
     //{

@@ -23,6 +23,7 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
+#include "CFBXInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -77,6 +78,7 @@ public:
     virtual CLocalizationInterface* GetLocalization() = 0;
     virtual CWebCoreInterface*      GetWebCore() = 0;
     virtual CTrayIconInterface*     GetTrayIcon() = 0;
+    virtual CFBXInterface*          GetFBX() = 0;
 
     // Temporary functions for r1
     virtual void DebugEcho(const char* szText) = 0;

@@ -19,7 +19,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(FBXLoadFile);
-    LUA_DECLARE(FBXGetAllObjectsIds);
+    LUA_DECLARE(FBXGetAllObjects);
     LUA_DECLARE(FBXGetProperties);
     LUA_DECLARE(FBXGetAllMeshes);
     LUA_DECLARE(FBXGetAllTextures);
