@@ -972,19 +972,21 @@ int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
             argStream.SetCustomError("Invalid level (0-3)");
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 }
 
 int CLuaPlayerDefs::SetPlayerWantedLevel(lua_State* luaVM)
@@ -1485,21 +1487,23 @@ int CLuaPlayerDefs::GetPlayerScriptDebugLevel(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        unsigned int uiLevel;
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
 
-        if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
-        {
-            lua_pushnumber(luaVM, uiLevel);
-            return 1;
-        }
+    unsigned int uiLevel;
+
+    if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
+    {
+        lua_pushnumber(luaVM, uiLevel);
+        return 1;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
