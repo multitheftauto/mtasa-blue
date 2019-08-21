@@ -4279,7 +4279,10 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
         SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDamagePed->GetInterface());
         if (pPedClientEntity)
         {
+            assert(pPedClientEntity->pEntity != nullptr);
+            assert(pPedClientEntity->pClientEntity != nullptr);
             pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            assert(pDamagedPed->GetGamePlayer() != nullptr);
         }
     }
 
