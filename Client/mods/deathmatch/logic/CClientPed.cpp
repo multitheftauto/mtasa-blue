@@ -3584,10 +3584,7 @@ void CClientPed::_CreateModel()
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    CPed* gamePed = g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel));
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(gamePed);
-    assert(gamePed == nullptr && m_pPlayerPed == nullptr || gamePed != nullptr && m_pPlayerPed != nullptr);
-
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel)));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
@@ -3711,10 +3708,7 @@ void CClientPed::_CreateLocalModel()
 {
     // Init the local player and grab the pointers
     g_pGame->InitLocalPlayer(this);
-
-    CPed* gamePed = g_pGame->GetPools()->GetPedFromRef((DWORD)1);
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(gamePed);
-    assert(gamePed == nullptr && m_pPlayerPed == nullptr || gamePed != nullptr && m_pPlayerPed != nullptr);
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->GetPedFromRef((DWORD)1));
 
     if (m_pPlayerPed)
     {
@@ -3812,17 +3806,10 @@ void CClientPed::_DestroyModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Store the amount of peds in the ped pool before removal
-    unsigned long const previousPedCount = g_pGame->GetPools()->GetPedCount();
-
     // Remove the ped from the world
     g_pGame->GetPools()->RemovePed(m_pPlayerPed);
-    m_pPlayerPed = nullptr;
-    m_pTaskManager = nullptr;
-
-    // Verify that our ped got actually removed from the ped pool
-    unsigned long const currentPedCount = g_pGame->GetPools()->GetPedCount();
-    assert(currentPedCount < previousPedCount);
+    m_pPlayerPed = NULL;
+    m_pTaskManager = NULL;
 
     // Remove the reference to its model
     m_pLoadedModelInfo->RemoveRef();
