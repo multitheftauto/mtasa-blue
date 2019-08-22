@@ -4415,6 +4415,24 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                          CEventDamage* pEvent)
 {
+    if (pDamagedPed->GetGamePlayer() == nullptr)
+    {
+        // Shouldn't happen, but it does anyway. Log some information about the damaged ped and the ped pool; and then crash optionally
+        auto          entityType = static_cast<int>(pDamagedPed->GetType());
+        bool          isInVehicle = pDamagedPed->IsInVehicle();
+        bool          isDead = pDamagedPed->IsDead();
+        bool          isLocalPlayer = pDamagedPed->IsLocalPlayer();
+        unsigned long pedCount = g_pGame->GetPools()->GetPedCount();
+        
+        WriteDebugEvent(
+            SString("CClientGame::ApplyPedDamageFromGame: GetGamePlayer() == nullptr (type: %d, inVehicle: %d, isDead: %d, isLocalPlayer: %d, pedCount: %lu)",
+                    entityType, isInVehicle, isDead, isLocalPlayer, pedCount));
+
+        // Crash on purpose to gather crash information for this offset and not somewhere else
+        assert(false);
+        return false;
+    }
+
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
     float fPreviousArmor = pDamagedPed->m_fArmor;
