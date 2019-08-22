@@ -18,7 +18,7 @@ public:
     void ReadString(const SString& strKeyName, SString& strOutValue, const char* szDefaultValue)
     {
         V* pstrValue = MapFind(*this, strKeyName);
-        strOutValue = pstrValue ? **pstrValue : szDefaultValue;
+        strOutValue = pstrValue ? *pstrValue : szDefaultValue;
     }
 
     template <typename T, typename U>
