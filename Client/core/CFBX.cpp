@@ -11,6 +11,97 @@
 
 #include "StdInc.h"
 
+FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList)
+{
+    IDirect3DDevice9* m_pDevice = g_pCore->GetGraphics()->GetDevice();
+    VOID*             pVoid;
+    m_pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(FBXVertex), D3DUSAGE_WRITEONLY, CUSTOMFVF, D3DPOOL_MANAGED, &v_buffer, NULL);
+    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, vecVertexList.data(), vecVertexList.size() * sizeof(FBXVertex));
+    v_buffer->Unlock();
+
+    m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
+    i_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(int));
+    i_buffer->Unlock();
+
+    vertexCount = vecVertexList.size();
+    indicesCount = vecIndexList.size();
+}
+
+void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
+{
+    // select which vertex format we are using
+    pDevice->SetFVF(CUSTOMFVF);
+    FBXBuffer* pBuffer;
+    for (auto const& object : m_objectList)
+    {
+        pBuffer = pScene->GetFBXBuffer(object->ullObjectId);
+        if (pBuffer != nullptr)
+        {
+            // select the vertex buffer to display
+            pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
+            pDevice->SetIndices(pBuffer->i_buffer);
+
+            // copy the vertex buffer to the back buffer
+            pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
+            //pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pBuffer->indicesCount, 0, pBuffer->indicesCount / 3);
+        }
+    }
+}
+
+void CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
+{
+    m_objectList.push_back(pObject);
+}
+
+unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
+{
+    m_templateMap[uiNextFreeTemplateId] = pTemplate;
+    return uiNextFreeTemplateId++;
+}
+
+FBXBuffer* CFBXScene::GetFBXBuffer(unsigned long long ullId)
+{
+    if (m_mapMeshBuffer.find(ullId) != m_mapMeshBuffer.end())
+    {
+        return m_mapMeshBuffer[ullId];
+    }
+    return nullptr;
+}
+
+bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
+{
+    if ((*pObject)->getType() != ofbx::Object::Type::GEOMETRY)
+        return false;
+
+    const ofbx::Geometry* const* pGeometry = (const ofbx::Geometry* const*)pObject;
+    std::vector<FBXVertex>       vecVertices;
+    std::vector<int>             vecIndices((*pGeometry)->getIndicesCount());
+
+    const ofbx::Vec3* vertices = (*pGeometry)->getVertices();
+    const ofbx::Vec3* vertex;
+    for (int i = 0; i < (*pGeometry)->getVertexCount(); i++)
+    {
+        vertex = vertices + i;
+        vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, D3DCOLOR_XRGB((i % 2 == 0) ? 0 : 255, (i % 2 == 0) ? 255 : 0, 0));
+    }
+    memcpy(vecIndices.data(), (*pGeometry)->getFaceIndices(), sizeof(int) * vecIndices.size());
+
+    FBXBuffer* pBuffer = new FBXBuffer(vecVertices, vecIndices);
+    AddBuffer((*pObject)->id, pBuffer);
+    return true;
+}
+
+bool CFBXScene::AddBuffer(unsigned long long ullObjectId, FBXBuffer* pBuffer)
+{
+    if (m_mapMeshBuffer.find(ullObjectId) != m_mapMeshBuffer.end())
+        return false;
+
+    m_mapMeshBuffer[ullObjectId] = pBuffer;
+    return true;
+}
+
 CFBXScene::CFBXScene(ofbx::IScene* scene) : m_pScene(scene)
 {
     m_pRoot = m_pScene->getRoot();
@@ -19,6 +110,50 @@ CFBXScene::CFBXScene(ofbx::IScene* scene) : m_pScene(scene)
     CacheMeshes();
     CacheTextures();
     CacheMaterials();
+
+    // std::vector<FBXVertex> vertices = {
+    //    {0, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 5, 3, D3DCOLOR_XRGB(255, 0, 0)},
+    //    {3, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 2, 5, D3DCOLOR_XRGB(255, 0, 0)},
+    //};
+    // std::vector<int> indices;
+    // indices.emplace_back(0);
+    // indices.emplace_back(1);
+    // indices.emplace_back(2);
+    // indices.emplace_back(3);
+    // indices.emplace_back(4);
+    // indices.emplace_back(5);
+    // indices.emplace_back(1);
+    // indices.emplace_back(4);
+    // indices.emplace_back(5);
+
+    // std::vector<FBXVertex> vertices;
+    // std::vector<int>       indices;
+    // for (int x = 0; x < 100; x++)
+    //{
+    //    for (int y = 0; y < 100; y++)
+    //    {
+    //        for (int z = 0; z < 100; z++)
+    //        {
+    //            indices.emplace_back(vertices.size());
+    //            vertices.emplace_back(x + y, x, 5 + z, D3DCOLOR_XRGB(255, 0, 0));
+    //            indices.emplace_back(vertices.size());
+    //            vertices.emplace_back(x + y, x + 1, 5 + z, D3DCOLOR_XRGB(0, 255, 0));
+    //            indices.emplace_back(vertices.size());
+    //            vertices.emplace_back(x + 1 + y, x + 1, 5 + z, D3DCOLOR_XRGB(0, 0, 255));
+    //        }
+    //    }
+    //}
+
+    CFBXTemplate* pTemplate = new CFBXTemplate();
+    for (const auto& pair : m_objectList)
+    {
+        if (CreateFBXBuffer(pair.second))
+        {
+            CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject((*pair.second)->id);
+            pTemplate->AddTemplateObject(pTemplateObject);
+        }
+    }
+    AddTemplete(pTemplate);
 }
 
 void CFBXScene::CacheObjects()
@@ -114,6 +249,14 @@ void CFBXScene::FixIndices()
     }
 }
 
+void CFBXScene::Render(IDirect3DDevice9* pDevice)
+{
+    for (auto const& pair : m_templateMap)
+    {
+        pair.second->Render(pDevice, this);
+    }
+}
+
 const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
 {
     const char* label;
@@ -187,26 +330,6 @@ CFBX::CFBX()
 void CFBX::Initialize()
 {
     m_pDevice = g_pCore->GetGraphics()->GetDevice();
-    vertices = {
-        {0, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 5, 3, D3DCOLOR_XRGB(255, 0, 0)},
-        {3, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 2, 5, D3DCOLOR_XRGB(255, 0, 0)},
-    };
-    indices.emplace_back(0);
-    indices.emplace_back(1);
-    indices.emplace_back(2);
-    indices.emplace_back(3);
-    indices.emplace_back(4);
-    indices.emplace_back(5);
-
-    m_pDevice->CreateVertexBuffer(vertices.size() * sizeof(CUSTOMVERTEX), D3DUSAGE_WRITEONLY, CUSTOMFVF, D3DPOOL_MANAGED, &v_buffer, NULL);
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vertices.data(), vertices.size() * sizeof(CUSTOMVERTEX));
-    v_buffer->Unlock();
-
-    m_pDevice->CreateIndexBuffer(indices.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
-    i_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, indices.data(), indices.size() * sizeof(int));
-    i_buffer->Unlock();
 }
 
 CFBX::~CFBX()
@@ -219,20 +342,8 @@ void CFBX::RemoveScene(CFBXScene* pScene)
 
 void CFBX::Render()
 {
-
-    int i = 0;
     for (auto const& pFBXScene : m_sceneList)
     {
-        g_pCore->GetConsole()->Printf("render! %i", i++);
+        pFBXScene->Render(m_pDevice);
     }
-
-    // select which vertex format we are using
-    m_pDevice->SetFVF(CUSTOMFVF);
-
-    // select the vertex buffer to display
-    m_pDevice->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
-    m_pDevice->SetIndices(i_buffer);
-
-    // copy the vertex buffer to the back buffer
-    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, indices.size(), 0, indices.size() / 3);
 }
