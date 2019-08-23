@@ -37,16 +37,29 @@ public:
 class CFBXTemplateObject
 {
 public:
-    CMatrix Matrix;
+    CFBXTemplateObject(unsigned long long ullObjectId);
+
     unsigned long long ullObjectId;
-    CFBXTemplateObject(unsigned long long ullObjectId) : ullObjectId(ullObjectId) {}
+
+    void SetPosition(CVector& pos);
+    void SetRotation(CVector& rot);
+    void SetScale(CVector& scale);
+
+    CMatrix* pViewMatrix;
 };
 
 class CFBXTemplate
 {
 public:
+    CFBXTemplate();
     void Render(IDirect3DDevice9* pDevice, CFBXScene* pScene);
     void AddTemplateObject(CFBXTemplateObject * pObject);
+    
+    void SetPosition(CVector& pos);
+    void SetRotation(CVector& rot);
+    void SetScale(CVector& scale);
+
+    CMatrix* pViewMatrix;
 
 private:
     std::vector<CFBXTemplateObject*> m_objectList;

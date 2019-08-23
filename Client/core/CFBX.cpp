@@ -33,26 +33,72 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
 {
     // select which vertex format we are using
     pDevice->SetFVF(CUSTOMFVF);
+
     FBXBuffer* pBuffer;
+    D3DMATRIX* pObjectMatrix = new D3DMATRIX();
+    pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+    pDevice->SetRenderState(D3DRS_AMBIENT, 0x00202020);
     for (auto const& object : m_objectList)
     {
+        pViewMatrix->GetBuffer((float*)pObjectMatrix);
+        pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
         pBuffer = pScene->GetFBXBuffer(object->ullObjectId);
         if (pBuffer != nullptr)
         {
-            // select the vertex buffer to display
+            object->pViewMatrix->GetBuffer((float*)pObjectMatrix);
+            pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+
             pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
             pDevice->SetIndices(pBuffer->i_buffer);
 
-            // copy the vertex buffer to the back buffer
             pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
-            //pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pBuffer->indicesCount, 0, pBuffer->indicesCount / 3);
         }
     }
+}
+
+CFBXTemplate::CFBXTemplate()
+{
+    pViewMatrix = new CMatrix();
+}
+
+void CFBXTemplate::SetPosition(CVector& pos)
+{
+    pViewMatrix->SetPosition(pos);
+}
+
+void CFBXTemplate::SetRotation(CVector& rot)
+{
+    pViewMatrix->SetRotation(rot);
+}
+
+void CFBXTemplate::SetScale(CVector& scale)
+{
+    pViewMatrix->SetScale(scale);
 }
 
 void CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 {
     m_objectList.push_back(pObject);
+}
+
+CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObjectId(ullObjectId)
+{
+    pViewMatrix = new CMatrix();
+}
+
+void CFBXTemplateObject::SetPosition(CVector& pos)
+{
+    pViewMatrix->SetPosition(pos);
+}
+
+void CFBXTemplateObject::SetRotation(CVector& rot)
+{
+    pViewMatrix->SetRotation(rot);
+}
+
+void CFBXTemplateObject::SetScale(CVector& scale)
+{
+    pViewMatrix->SetScale(scale);
 }
 
 unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
@@ -111,46 +157,22 @@ CFBXScene::CFBXScene(ofbx::IScene* scene) : m_pScene(scene)
     CacheTextures();
     CacheMaterials();
 
-    // std::vector<FBXVertex> vertices = {
-    //    {0, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 3, D3DCOLOR_XRGB(255, 0, 0)}, {5, 5, 3, D3DCOLOR_XRGB(255, 0, 0)},
-    //    {3, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 0, 5, D3DCOLOR_XRGB(255, 0, 0)}, {5, 2, 5, D3DCOLOR_XRGB(255, 0, 0)},
-    //};
-    // std::vector<int> indices;
-    // indices.emplace_back(0);
-    // indices.emplace_back(1);
-    // indices.emplace_back(2);
-    // indices.emplace_back(3);
-    // indices.emplace_back(4);
-    // indices.emplace_back(5);
-    // indices.emplace_back(1);
-    // indices.emplace_back(4);
-    // indices.emplace_back(5);
-
-    // std::vector<FBXVertex> vertices;
-    // std::vector<int>       indices;
-    // for (int x = 0; x < 100; x++)
-    //{
-    //    for (int y = 0; y < 100; y++)
-    //    {
-    //        for (int z = 0; z < 100; z++)
-    //        {
-    //            indices.emplace_back(vertices.size());
-    //            vertices.emplace_back(x + y, x, 5 + z, D3DCOLOR_XRGB(255, 0, 0));
-    //            indices.emplace_back(vertices.size());
-    //            vertices.emplace_back(x + y, x + 1, 5 + z, D3DCOLOR_XRGB(0, 255, 0));
-    //            indices.emplace_back(vertices.size());
-    //            vertices.emplace_back(x + 1 + y, x + 1, 5 + z, D3DCOLOR_XRGB(0, 0, 255));
-    //        }
-    //    }
-    //}
-
+    // test code, remove later
     CFBXTemplate* pTemplate = new CFBXTemplate();
+    pTemplate->pViewMatrix->SetPosition(CVector(0, 0, 50));
+    pTemplate->pViewMatrix->SetRotation(CVector(0,0,0));
+    pTemplate->pViewMatrix->SetScale(CVector(1,1,1));
+    int           i = 0;
     for (const auto& pair : m_objectList)
     {
         if (CreateFBXBuffer(pair.second))
         {
             CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject((*pair.second)->id);
+            pTemplateObject->pViewMatrix->SetPosition(CVector(i * 20, 0, 0));
+            pTemplateObject->pViewMatrix->SetRotation(CVector(i * 20, 0, 0));
+            pTemplateObject->pViewMatrix->SetScale(CVector(1, (i + 1) * 1.5, 1));
             pTemplate->AddTemplateObject(pTemplateObject);
+            i++;
         }
     }
     AddTemplete(pTemplate);
