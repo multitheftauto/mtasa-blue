@@ -1050,6 +1050,7 @@ namespace ofbx
         std::vector<Vec3> vertices;
         std::vector<Vec3> normals;
         std::vector<Vec2> uvs[s_uvs_max];
+        std::vector<const char*> uvsName[s_uvs_max];
         std::vector<Vec4> colors;
         std::vector<Vec3> tangents;
         std::vector<int>  materials;
@@ -1265,16 +1266,16 @@ namespace ofbx
         float                 getSceneFrameRate() const override { return m_scene_frame_rate; }
         const GlobalSettings* getGlobalSettings() const override { return &m_settings; }
 
-        const Object* const*         getAllObjects() const override { return m_all_objects.empty() ? nullptr : &m_all_objects[0]; }
+        const Object* const* getAllObjects() const override { return m_all_objects.empty() ? nullptr : &m_all_objects[0]; }
 
         int getAllObjectCount() const override { return (int)m_all_objects.size(); }
-		
-		const DataView* const* getTextureContent() const override { return m_texturesContent.empty() ? nullptr : &m_texturesContent[0]; }
+
+        const DataView* const* getTextureContent() const override { return m_texturesContent.empty() ? nullptr : &m_texturesContent[0]; }
         const DataView* const* getTextureFilePath() const override { return m_texturesFilePath.empty() ? nullptr : &m_texturesFilePath[0]; }
         const Texture* const*  getTextures() const override { return m_texturesList.empty() ? nullptr : &m_texturesList[0]; }
         const Material* const* getMaterials() const override { return m_materials.empty() ? nullptr : &m_materials[0]; }
-        
-		int getTexturesCount() const override { return (int)m_texturesContent.size(); }
+
+        int getTexturesCount() const override { return (int)m_texturesContent.size(); }
         int getMaterialsCount() const override { return (int)m_materials.size(); }
 
         const AnimationStack* getAnimationStack(int index) const override
@@ -2160,6 +2161,14 @@ namespace ofbx
                     splat(&uvs, mapping, tmp, tmp_indices, original_indices);
                     remap(&uvs, to_old_indices);
                 }
+
+                //const Element* name_element = findChild(*layer_uv_element, "Name");
+                //if (name_element)
+                //{
+                //    char tmp[32];
+                //    name_element->first_property->value.toString(tmp);
+                //    geom->uvsName[uv_index].push_back((const char*)tmp);
+                //}
             }
 
             do
@@ -2565,9 +2574,9 @@ namespace ofbx
             {
                 obj = parseMaterial(*scene, *iter.second.element);
                 if (!obj.isError())
-					scene->m_materials.push_back((Material*)obj.getValue());
+                    scene->m_materials.push_back((Material*)obj.getValue());
             }
-            //else if (iter.second.element->id == "AnimationStack")
+            // else if (iter.second.element->id == "AnimationStack")
             //{
             //    obj = parse<AnimationStackImpl>(*scene, *iter.second.element);
             //    if (!obj.isError())
@@ -2576,19 +2585,19 @@ namespace ofbx
             //        scene->m_animation_stacks.push_back(stack);
             //    }
             //}
-            //else if (iter.second.element->id == "AnimationLayer")
+            // else if (iter.second.element->id == "AnimationLayer")
             //{
             //    obj = parse<AnimationLayerImpl>(*scene, *iter.second.element);
             //}
-            //else if (iter.second.element->id == "AnimationCurve")
+            // else if (iter.second.element->id == "AnimationCurve")
             //{
             //    obj = parseAnimationCurve(*scene, *iter.second.element);
             //}
-            //else if (iter.second.element->id == "AnimationCurveNode")
+            // else if (iter.second.element->id == "AnimationCurveNode")
             //{
             //    obj = parse<AnimationCurveNodeImpl>(*scene, *iter.second.element);
             //}
-            //else if (iter.second.element->id == "Deformer")
+            // else if (iter.second.element->id == "Deformer")
             //{
             //    IElementProperty* class_prop = iter.second.element->getProperty(2);
 
@@ -2600,7 +2609,7 @@ namespace ofbx
             //            obj = parse<SkinImpl>(*scene, *iter.second.element);
             //    }
             //}
-            //else if (iter.second.element->id == "NodeAttribute")
+            // else if (iter.second.element->id == "NodeAttribute")
             //{
             //    obj = parseNodeAttribute(*scene, *iter.second.element);
             //}
@@ -2630,7 +2639,7 @@ namespace ofbx
             {
                 obj = parseTexture(*scene, *iter.second.element);
                 if (!obj.isError())
-					scene->m_texturesList.push_back((Texture*)obj.getValue());
+                    scene->m_texturesList.push_back((Texture*)obj.getValue());
             }
             else if (iter.second.element->id == "Video")
             {
@@ -2639,7 +2648,7 @@ namespace ofbx
                 const Element* texture_content = findChild(*pTexture, "Content");
                 if (texture_content && texture_content->first_property)
                 {
-                    DataView*       content = &texture_content->first_property->value;
+                    DataView*      content = &texture_content->first_property->value;
                     const Element* file_name = findChild(*pTexture, "Filename");
                     if (file_name && file_name->first_property)
                     {
@@ -2649,7 +2658,7 @@ namespace ofbx
                     }
                 }
             }
-            //else if (iter.second.element->id == "Pose")
+            // else if (iter.second.element->id == "Pose")
             //{
             //    obj = parsePose(*scene, *iter.second.element);
             //}

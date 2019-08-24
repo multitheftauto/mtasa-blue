@@ -25,7 +25,6 @@ CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this)
 
     // Add us to FBX manager's list
     m_pFBXManager->AddToList(this);
-
 }
 
 CClientFBX::~CClientFBX(void)
@@ -63,7 +62,7 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData)
     if (pScene == nullptr)
         return false;
 
-    m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene);
+    m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
 
     return true;
 }
@@ -76,7 +75,7 @@ bool CClientFBX::IsFBXData(const SString& strData)
 }
 
 //
-//void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
+// void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
 //{
 //    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 //    pTempGeometry = pMesh->getGeometry();
@@ -107,7 +106,7 @@ bool CClientFBX::IsFBXData(const SString& strData)
 //    }
 //}
 //
-//void CClientFBX::Render()
+// void CClientFBX::Render()
 //{
 //    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 //    for (auto const& pair : m_templateMap)
@@ -142,17 +141,17 @@ void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
 
 void CClientFBX::LuaGetTextures(lua_State* luaVM)
 {
-    //for (auto const& pTexture : m_textureList)
-    //{
-    //    lua_pushnumber(luaVM, pTexture.second->id);
-    //    lua_pushstring(luaVM, pTexture.first.c_str());
-    //    lua_settable(luaVM, -3);
-    //}
+    for (auto const& pTexture : m_mapTexture)
+    {
+        lua_pushstring(luaVM, pTexture.first);
+        lua_pushelement(luaVM, pTexture.second);
+        lua_settable(luaVM, -3);
+    }
 }
 
 void CClientFBX::LuaGetMaterials(lua_State* luaVM)
 {
-    //for (auto const& pMaterial : m_materialList)
+    // for (auto const& pMaterial : m_materialList)
     //{
     //    lua_pushnumber(luaVM, (*pMaterial)->id);
     //    lua_pushstring(luaVM, (*pMaterial)->name);
@@ -162,7 +161,7 @@ void CClientFBX::LuaGetMaterials(lua_State* luaVM)
 
 void CClientFBX::LuaGetMeshes(lua_State* luaVM)
 {
-    //for (auto const& pair : m_meshList)
+    // for (auto const& pair : m_meshList)
     //{
     //    lua_pushnumber(luaVM, pair.second->id);
     //    lua_pushstring(luaVM, pair.first.c_str());
@@ -450,4 +449,28 @@ bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMes
     }
 
     return false;
+}
+
+void CClientFBX::CreateTexture(SString strTextureName, CPixels* pPixels)
+{
+    if (m_mapTexture.find(strTextureName) == m_mapTexture.end())
+        m_mapTexture[strTextureName] = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+}
+
+bool CClientFBX::IsTextureCreated(SString strTextureName)
+{
+    return m_mapTexture.find(strTextureName) != m_mapTexture.end();
+}
+
+CMaterialItem* CClientFBX::GetTextureByName(SString strTextureName)
+{
+    if (m_mapTexture.find(strTextureName) == m_mapTexture.end())
+    {
+        return nullptr;
+    }
+
+    CClientTexture* pTexture = m_mapTexture[strTextureName];
+    if (pTexture != nullptr)
+        return pTexture->GetMaterialItem();
+    return nullptr;
 }

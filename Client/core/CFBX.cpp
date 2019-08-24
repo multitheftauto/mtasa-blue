@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList)
+FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMaterialId)
 {
     IDirect3DDevice9* m_pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
@@ -27,32 +27,123 @@ FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecI
 
     vertexCount = vecVertexList.size();
     indicesCount = vecIndexList.size();
+    this->ullMaterialId = ullMaterialId;
+}
+
+FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList,
+                                 const ofbx::Mesh* const* pMesh)
+{
+    if (vecMaterialList.size() > 0)
+    {
+        std::map<int, std::vector<FBXVertex>> fbxBufferMap;
+        std::map<int, std::vector<int>>       fbxIndexMap;
+        std::map<int, unsigned long long>     fbxMaterialMap;
+
+        int i = 0;
+        for (int const& iMaterial : vecMaterialList)
+        {
+            if (fbxBufferMap.count(iMaterial) == 0)
+            {
+                fbxBufferMap[iMaterial] = std::vector<FBXVertex>();
+            }
+            if (fbxIndexMap.count(iMaterial) == 0)
+            {
+                fbxIndexMap[iMaterial] = std::vector<int>();
+            }
+            fbxBufferMap[iMaterial].push_back(vecVertexList[i * 3]);
+            fbxBufferMap[iMaterial].push_back(vecVertexList[i * 3 + 1]);
+            fbxBufferMap[iMaterial].push_back(vecVertexList[i * 3 + 2]);
+            fbxIndexMap[iMaterial].push_back(vecIndexList[i * 3]);
+            fbxIndexMap[iMaterial].push_back(vecIndexList[i * 3 + 1]);
+            fbxIndexMap[iMaterial].push_back(vecIndexList[i * 3 + 2]);
+            i++;
+        }
+
+        const ofbx::Material* pMaterial;
+        int                   iCount = 0;
+        for (auto const& pair : fbxBufferMap)
+        {
+            pMaterial = (*pMesh)->getMaterial(pair.first);
+            fbxMaterialMap[pair.first] = pMaterial->id;
+            iCount++;
+        }
+
+        if (iCount > 0)
+        {
+            for (int i = 0; i < iCount; i++)
+            {
+                bufferList.push_back(new FBXBuffer(fbxBufferMap[i], fbxIndexMap[i], fbxMaterialMap[i]));
+            }
+        }
+    }
+
+    else            // model has 0 or 1 material
+    {
+        unsigned long long id = 0;
+        if ((*pMesh)->getMaterialCount() != 0)
+        {
+            id = (*pMesh)->getMaterial(0)->id;
+        }
+        bufferList.push_back(new FBXBuffer(vecVertexList, vecIndexList, id));
+    }
 }
 
 void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
 {
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
+    pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+
     // select which vertex format we are using
     pDevice->SetFVF(CUSTOMFVF);
+    FBXObjectBuffer* pObjectBuffer;
+    D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
+    CTextureItem*    pTextureItem;
+    // pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+    // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+    // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
-    FBXBuffer* pBuffer;
-    D3DMATRIX* pObjectMatrix = new D3DMATRIX();
-    pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    pDevice->SetRenderState(D3DRS_AMBIENT, 0x00202020);
+    // pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
+    // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
+    // pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+    // pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
     for (auto const& object : m_objectList)
     {
         pViewMatrix->GetBuffer((float*)pObjectMatrix);
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
-        pBuffer = pScene->GetFBXBuffer(object->ullObjectId);
-        if (pBuffer != nullptr)
+        pObjectBuffer = pScene->GetFBXBuffer(object->ullObjectId);
+        if (pObjectBuffer != nullptr)
         {
             object->pViewMatrix->GetBuffer((float*)pObjectMatrix);
+            // pDevice->SetMaterial(&object->material);
             pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+            for (auto const& pBuffer : pObjectBuffer->bufferList)
+            {
+                if (pBuffer->ullMaterialId != 0)
+                {
+                    pTextureItem = pScene->GetTexture(pBuffer->ullMaterialId);
+                    // Set texture addressing mode
+                    pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
+                    pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
 
-            pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
-            pDevice->SetIndices(pBuffer->i_buffer);
+                    if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
+                        pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
 
-            pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
+                    pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                }
+                // pDevice->SetLight(0, &object->light);
+                // pDevice->LightEnable(0, TRUE);
+
+                pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
+                pDevice->SetIndices(pBuffer->i_buffer);
+
+                pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
+            }
         }
+    }
+    if (pSavedStateBlock)
+    {
+        pSavedStateBlock->Apply();
+        SAFE_RELEASE(pSavedStateBlock);
     }
 }
 
@@ -84,6 +175,16 @@ void CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObjectId(ullObjectId)
 {
     pViewMatrix = new CMatrix();
+
+    ZeroMemory(&material, sizeof(D3DMATERIAL9));                      // clear out the struct for use
+    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);             // set diffuse color to white
+    material.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);             // set ambient color to white
+    material.Specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set ambient color to white
+
+    ZeroMemory(&light, sizeof(light));                            // clear out the light struct for use
+    light.Type = D3DLIGHT_DIRECTIONAL;                            // make the light type 'directional light'
+    light.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);            // set the light's color
+    light.Direction = D3DXVECTOR3(1.0f, 0.3f, 1.0f);
 }
 
 void CFBXTemplateObject::SetPosition(CVector& pos)
@@ -107,7 +208,7 @@ unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
     return uiNextFreeTemplateId++;
 }
 
-FBXBuffer* CFBXScene::GetFBXBuffer(unsigned long long ullId)
+FBXObjectBuffer* CFBXScene::GetFBXBuffer(unsigned long long ullId)
 {
     if (m_mapMeshBuffer.find(ullId) != m_mapMeshBuffer.end())
     {
@@ -118,28 +219,67 @@ FBXBuffer* CFBXScene::GetFBXBuffer(unsigned long long ullId)
 
 bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
 {
-    if ((*pObject)->getType() != ofbx::Object::Type::GEOMETRY)
+    if ((*pObject)->getType() != ofbx::Object::Type::MESH)
         return false;
 
-    const ofbx::Geometry* const* pGeometry = (const ofbx::Geometry* const*)pObject;
-    std::vector<FBXVertex>       vecVertices;
-    std::vector<int>             vecIndices((*pGeometry)->getIndicesCount());
+    const ofbx::Mesh* const* pMesh = (const ofbx::Mesh* const*)pObject;
+    const ofbx::Geometry*    pGeometry = (*pMesh)->getGeometry();
+    std::vector<FBXVertex>   vecVertices;
+    std::vector<int>         vecIndices(pGeometry->getIndicesCount());
+    std::vector<int>         vecMaterials(pGeometry->getMaterialCount());
 
-    const ofbx::Vec3* vertices = (*pGeometry)->getVertices();
+    const ofbx::Vec3* vertices = pGeometry->getVertices();
+    const ofbx::Vec3* normals = pGeometry->getNormals();
+    const ofbx::Vec4* colors = pGeometry->getColors();
+    const ofbx::Vec2* UVs = pGeometry->getUVs(0);
     const ofbx::Vec3* vertex;
-    for (int i = 0; i < (*pGeometry)->getVertexCount(); i++)
+    const ofbx::Vec3* normal;
+    const ofbx::Vec2* uv;
+    DWORD             dColor;
+    if (pGeometry->getColorCount() == 0)
     {
-        vertex = vertices + i;
-        vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, D3DCOLOR_XRGB((i % 2 == 0) ? 0 : 255, (i % 2 == 0) ? 255 : 0, 0));
+        if (m_mapMeshMaterials[*pMesh].size() > 0)
+        {
+            const ofbx::Material* pMaterialFirst = m_mapMeshMaterials[*pMesh].at(0);
+            ofbx::Color           diffuseColor = (*pMaterialFirst).getDiffuseColor();
+            dColor = D3DCOLOR_XRGB((DWORD)(diffuseColor.r * 255), (DWORD)(diffuseColor.g * 255), (DWORD)(diffuseColor.b * 255));
+        
+}
+        else
+        {
+            dColor = D3DCOLOR_XRGB(255, 255, 255);
+        }
+        for (int i = 0; i < pGeometry->getVertexCount(); i++)
+        {
+            vertex = vertices + i;
+            normal = normals + i;
+            uv = UVs + i;
+            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, dColor, uv->x, uv->y);
+        }
     }
-    memcpy(vecIndices.data(), (*pGeometry)->getFaceIndices(), sizeof(int) * vecIndices.size());
+    else
+    {
+        const ofbx::Vec4* color;
+        for (int i = 0; i < pGeometry->getVertexCount(); i++)
+        {
+            vertex = vertices + i;
+            normal = normals + i;
+            color = colors + i;
+            uv = UVs + i;
+            dColor = D3DCOLOR_XRGB((DWORD)((*color).x * 255), (DWORD)((*color).y * 255), (DWORD)((*color).z * 255), (DWORD)((*color).w * 255));
+            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, dColor, uv->x, uv->y);
+        }
+    }
 
-    FBXBuffer* pBuffer = new FBXBuffer(vecVertices, vecIndices);
+    memcpy(vecIndices.data(), pGeometry->getFaceIndices(), sizeof(int) * vecIndices.size());
+    memcpy(vecMaterials.data(), pGeometry->getMaterials(), sizeof(int) * vecMaterials.size());
+
+    FBXObjectBuffer* pBuffer = new FBXObjectBuffer(vecVertices, vecIndices, vecMaterials, pMesh);
     AddBuffer((*pObject)->id, pBuffer);
     return true;
 }
 
-bool CFBXScene::AddBuffer(unsigned long long ullObjectId, FBXBuffer* pBuffer)
+bool CFBXScene::AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuffer)
 {
     if (m_mapMeshBuffer.find(ullObjectId) != m_mapMeshBuffer.end())
         return false;
@@ -148,21 +288,57 @@ bool CFBXScene::AddBuffer(unsigned long long ullObjectId, FBXBuffer* pBuffer)
     return true;
 }
 
-CFBXScene::CFBXScene(ofbx::IScene* scene) : m_pScene(scene)
+CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
+{
+    const ofbx::Material* const* pMaterial = m_materialList[ullMaterialId];
+    if (pMaterial == nullptr)
+        return nullptr;
+
+    const ofbx::Texture* pTexture = (*pMaterial)->getTexture(ofbx::Texture::TextureType::DIFFUSE);
+    if (pTexture == nullptr)
+        return nullptr;
+
+    SString strTextureName = m_textureNamesList[pTexture->id];
+    if (!pClientFBXInterface->IsTextureCreated(strTextureName))
+    {
+        std::vector<char> textureRawData = m_textureContentList[pTexture->id];
+        CPixels*          pPixels = new CPixels();
+
+        pPixels->SetSize(textureRawData.size());
+        memcpy(pPixels->GetData(), textureRawData.data(), pPixels->GetSize());
+        pClientFBXInterface->CreateTexture(strTextureName, pPixels);
+        delete pPixels;
+    }
+    CMaterialItem* pMaterialItem = pClientFBXInterface->GetTextureByName(strTextureName);
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterialItem))
+    {
+        // If material is a shader, use its current instance
+        pMaterialItem = pShaderItem->m_pShaderInstance;
+    }
+    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterialItem))
+    {
+        return pTextureItem;
+    }
+    return nullptr;
+}
+
+CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface) : m_pScene(scene)
 {
     m_pRoot = m_pScene->getRoot();
+    this->pClientFBXInterface = pClientFBXInterface;
     FixIndices();
     CacheObjects();
     CacheMeshes();
     CacheTextures();
     CacheMaterials();
+    CacheMeshMaterials();
 
     // test code, remove later
     CFBXTemplate* pTemplate = new CFBXTemplate();
     pTemplate->pViewMatrix->SetPosition(CVector(0, 0, 50));
-    pTemplate->pViewMatrix->SetRotation(CVector(0,0,0));
-    pTemplate->pViewMatrix->SetScale(CVector(1,1,1));
-    int           i = 0;
+    pTemplate->pViewMatrix->SetRotation(CVector(0, 0, 0));
+    pTemplate->pViewMatrix->SetScale(CVector(1, 1, 1));
+    int i = 0;
     for (const auto& pair : m_objectList)
     {
         if (CreateFBXBuffer(pair.second))
@@ -170,9 +346,12 @@ CFBXScene::CFBXScene(ofbx::IScene* scene) : m_pScene(scene)
             CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject((*pair.second)->id);
             pTemplateObject->pViewMatrix->SetPosition(CVector(i * 20, 0, 0));
             pTemplateObject->pViewMatrix->SetRotation(CVector(i * 20, 0, 0));
-            pTemplateObject->pViewMatrix->SetScale(CVector(1, (i + 1) * 1.5, 1));
+            pTemplateObject->pViewMatrix->SetScale(CVector(1, 1, 1));
             pTemplate->AddTemplateObject(pTemplateObject);
             i++;
+        }
+        if ((*pair.second)->getType() == ofbx::Object::Type::TEXTURE)
+        {
         }
     }
     AddTemplete(pTemplate);
@@ -243,6 +422,22 @@ void CFBXScene::CacheTextures()
 
         m_textureContentList[pTexture->id] = vecContent;
         m_textureList[strFilePath] = pTexture;
+        m_textureNamesList[pTexture->id] = strFilePath;
+    }
+}
+
+void CFBXScene::CacheMeshMaterials()
+{
+    const ofbx::Mesh* pMesh;
+    for (int i = 0; i < m_pScene->getMeshCount(); i++)
+    {
+        pMesh = m_pScene->getMesh(i);
+        std::vector<const ofbx::Material*> vecMaterial;
+        for (int iMaterial = 0; iMaterial < pMesh->getMaterialCount(); iMaterial++)
+        {
+            vecMaterial.push_back(pMesh->getMaterial(iMaterial));
+        }
+        m_mapMeshMaterials[pMesh] = vecMaterial;
     }
 }
 void CFBXScene::CacheMaterials()
@@ -252,7 +447,7 @@ void CFBXScene::CacheMaterials()
     for (int i = 0; i < m_pScene->getMaterialsCount(); i++)
     {
         pMaterial = m_pScene->getMaterials() + i;
-        m_materialList.push_back(pMaterial);
+        m_materialList[(*pMaterial)->id] = pMaterial;
     }
 }
 
@@ -333,9 +528,10 @@ const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
     return label;
 }
 
-CFBXScene* CFBX::AddScene(ofbx::IScene* pScene)
+CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)
 {
-    CFBXScene* pFBXScene = new CFBXScene(pScene);
+    CFBXScene* pFBXScene = new CFBXScene(pScene, pClientFBXInterface);
+
     m_sceneList.push_back(pFBXScene);
     return pFBXScene;
 }

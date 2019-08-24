@@ -70,5 +70,6 @@
 #include <core/CWebViewInterface.h>
 #include "CTrayIcon.h"
 #include "fbx/ofbx.h"
+#include "..//mods/deathmatch/logic/CClientFBXInterface.h"
 #include <core/CFBXInterface.h>
 #include "CFBX.h"

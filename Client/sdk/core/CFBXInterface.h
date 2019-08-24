@@ -12,6 +12,8 @@
 
 class CFBXScene;
 class SString;
+class CClientFBXInterface;
+
 namespace ofbx
 {
     class IScene;
@@ -22,7 +24,7 @@ namespace ofbx
 class CFBXInterface
 {
 public:
-    virtual CFBXScene* AddScene(ofbx::IScene* pScene) = 0;
+    virtual CFBXScene* AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
     virtual void       Render() = 0;
     virtual void       Initialize() = 0;
     virtual bool       HasAnyFBXLoaded() = 0;
