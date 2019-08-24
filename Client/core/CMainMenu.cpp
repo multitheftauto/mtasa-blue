@@ -853,15 +853,9 @@ bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement)
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
-    m_ServerBrowser.SetVisible(true);
-    m_ServerBrowser.OnQuickConnectButtonClick();
-    /*
-    //    if ( !m_bIsInSubWindow )
-        {
-            m_QuickConnect.SetVisible ( true );
-    //        m_bIsInSubWindow = true;
-        }
-    */
+    // TODO(qaisjp): refactor out of CCommandFuncs::Reconnect
+    CCommandFuncs::Reconnect(nullptr);
+
     return true;
 }
 

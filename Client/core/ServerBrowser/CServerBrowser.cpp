@@ -56,7 +56,6 @@ CServerBrowser::CServerBrowser()
     m_PrevServerBrowserType = ServerBrowserTypes::INTERNET;
 
     m_bFocusTextEdit = false;
-    m_uiShownQuickConnectHelpCount = 0;
     m_uiIsUsingTempTab = 0;
     m_BeforeTempServerBrowserType = ServerBrowserTypes::INTERNET;
     m_llLastGeneralHelpTime = 0;
@@ -160,41 +159,6 @@ CServerBrowser::CServerBrowser()
     CVector2D helpPos;
     helpPos.fX = resolution.fX * (512 / 1024.f);
     helpPos.fY = widgetPosition.fY + (115 - 58);
-
-    m_pQuickConnectHelpWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, ""));
-    m_pQuickConnectHelpWindow->SetMovable(false);
-    m_pQuickConnectHelpWindow->SetPosition(helpPos);
-    m_pQuickConnectHelpWindow->SetSize(CVector2D(320, 150));
-    m_pQuickConnectHelpWindow->SetAlwaysOnTop(true);
-    m_pQuickConnectHelpWindow->SetFrameEnabled(false);
-    m_pQuickConnectHelpWindow->SetTitlebarEnabled(false);
-    m_pQuickConnectHelpWindow->SetCloseButtonEnabled(false);
-    m_pQuickConnectHelpWindow->SetVisible(false);
-
-    // Quick connect help label
-    {
-        CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pQuickConnectHelpWindow, ""));
-        pLabel->SetPosition(CVector2D(5, 0));
-        pLabel->SetSize(CVector2D(310, 150));
-        pLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        pLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
-        pLabel->SetProperty("BackgroundEnabled", "True");
-
-        // Create second slightly smaller label so wrapped text looks better
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pQuickConnectHelpWindow, ""));
-        pLabel->SetPosition(CVector2D(5 + 10, 0));
-        pLabel->SetSize(CVector2D(310 - 10 * 2, 150));
-        pLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        pLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
-
-        SString strHelpMessage =
-            _("FOR QUICK CONNECT:\n"
-              "\n"
-              "Type the address and port into the address bar.\n"
-              "Or select a server from the history list and press 'Connect'");
-
-        pLabel->SetText(strHelpMessage);
-    }
 
     // General help
     CVector2D helpButtonSize = m_pButtonGeneralHelp[0]->GetSize();
@@ -759,7 +723,6 @@ void CServerBrowser::SetVisible(bool bVisible)
     {
         // Hide information windows.
         m_pGeneralHelpWindow->SetVisible(false);
-        m_pQuickConnectHelpWindow->SetVisible(false);
         CServerInfo::GetSingletonPtr()->Hide();
     }
 }
@@ -1422,9 +1385,6 @@ bool CServerBrowser::OnHistorySelected(CGUIElement* pElement)
 
 bool CServerBrowser::OnHistoryDropListRemove(CGUIElement* pElementx)
 {
-    // Hide quick connect help if visible
-    m_pQuickConnectHelpWindow->SetVisible(false);
-
     // Grab our cursor position
     tagPOINT cursor;
     GetCursorPos(&cursor);
@@ -2196,13 +2156,6 @@ void CServerBrowser::SetNextHistoryText(bool bDown)
 
 void CServerBrowser::OnQuickConnectButtonClick()
 {
-    // Show help text
-    if (m_uiShownQuickConnectHelpCount < 1)
-    {
-        m_pQuickConnectHelpWindow->SetVisible(true);
-        m_pQuickConnectHelpWindow->BringToFront();
-        m_uiShownQuickConnectHelpCount++;
-    }
 
     // Switch to LAN tab, but don't save it as selected
     if (!m_uiIsUsingTempTab)

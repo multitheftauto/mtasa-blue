@@ -250,10 +250,8 @@ private:
     std::map<SString, int> m_blockedVersionMap;
     std::map<SString, int> m_allowedVersionMap;
 
-    CGUIWindow* m_pQuickConnectHelpWindow;
     bool        m_bFocusTextEdit;
 
-    uint              m_uiShownQuickConnectHelpCount;
     uint              m_uiIsUsingTempTab;
     ServerBrowserType m_BeforeTempServerBrowserType;
     CGUIWindow*       m_pGeneralHelpWindow;
