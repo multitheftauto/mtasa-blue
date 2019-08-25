@@ -974,7 +974,7 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
     SString strFile = strInFile;
     SString strParameters = strInParameters;
 
-    if (strAction == "open" && strFile.BeginsWithI("http://") && strParameters.empty())
+    if (strAction == "open" && (strFile.BeginsWithI("http://") || strFile.BeginsWithI("https://")) && strParameters.empty())
     {
         strParameters = "url.dll,FileProtocolHandler " + strFile;
         strFile = "rundll32.exe";
