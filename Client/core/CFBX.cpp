@@ -99,6 +99,10 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
     FBXObjectBuffer* pObjectBuffer;
     D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
     CTextureItem*    pTextureItem;
+    CMatrix*         matrixFixInvertedUVs = new CMatrix();
+    matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
+    matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
+    matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
     // pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
     // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
     // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
@@ -110,6 +114,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
     for (auto const& object : m_objectList)
     {
         pViewMatrix->GetBuffer((float*)pObjectMatrix);
+        pDevice->SetTransform(D3DTS_TEXTURE0, (D3DXMATRIX*)matrixFixInvertedUVs);
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
         pObjectBuffer = pScene->GetFBXBuffer(object->ullObjectId);
         if (pObjectBuffer != nullptr)
@@ -128,7 +133,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
 
                     if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
                         pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
-
+                    pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
                     pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
                 }
                 // pDevice->SetLight(0, &object->light);
