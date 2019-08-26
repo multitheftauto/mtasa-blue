@@ -143,7 +143,7 @@ void CClientFBX::LuaGetTextures(lua_State* luaVM)
 {
     for (auto const& pTexture : m_mapTexture)
     {
-        lua_pushstring(luaVM, pTexture.first);
+        lua_pushnumber(luaVM, pTexture.first);
         lua_pushelement(luaVM, pTexture.second);
         lua_settable(luaVM, -3);
     }
@@ -451,25 +451,25 @@ bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMes
     return false;
 }
 
-void CClientFBX::CreateTexture(SString strTextureName, CPixels* pPixels)
+void CClientFBX::CreateTexture(unsigned long long ullTextureId, CPixels* pPixels)
 {
-    if (m_mapTexture.find(strTextureName) == m_mapTexture.end())
-        m_mapTexture[strTextureName] = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+    if (m_mapTexture.find(ullTextureId) == m_mapTexture.end())
+        m_mapTexture[ullTextureId] = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
 }
 
-bool CClientFBX::IsTextureCreated(SString strTextureName)
+bool CClientFBX::IsTextureCreated(unsigned long long ullTextureId)
 {
-    return m_mapTexture.find(strTextureName) != m_mapTexture.end();
+    return m_mapTexture.find(ullTextureId) != m_mapTexture.end();
 }
 
-CMaterialItem* CClientFBX::GetTextureByName(SString strTextureName)
+CMaterialItem* CClientFBX::GetTextureById(unsigned long long ullTextureId)
 {
-    if (m_mapTexture.find(strTextureName) == m_mapTexture.end())
+    if (m_mapTexture.find(ullTextureId) == m_mapTexture.end())
     {
         return nullptr;
     }
 
-    CClientTexture* pTexture = m_mapTexture[strTextureName];
+    CClientTexture* pTexture = m_mapTexture[ullTextureId];
     if (pTexture != nullptr)
         return pTexture->GetMaterialItem();
     return nullptr;

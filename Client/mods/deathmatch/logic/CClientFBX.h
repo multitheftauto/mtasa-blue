@@ -46,9 +46,9 @@ public:
     bool LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     void LuaGetAllObjectsIds(lua_State* luaVM);
 
-    void             CreateTexture(SString strTextureName, CPixels* pPixels);
-    CMaterialItem*   GetTextureByName(SString strTextureName);
-    bool             IsTextureCreated(SString strTextureName);
+    void             CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
+    CMaterialItem*   GetTextureById(unsigned long long strTextureName);
+    bool             IsTextureCreated(unsigned long long strTextureName);
 
 private:
     CFBXSceneInterface* m_pFBXScene;
@@ -62,5 +62,5 @@ private:
     const ofbx::Vec3*     tempVertexPosition[3];
     CVector               tempVecPos[3];
 
-    std::map<SString, CClientTexture*> m_mapTexture;
+    std::map<unsigned long long, CClientTexture*> m_mapTexture;
 };

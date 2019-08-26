@@ -80,7 +80,8 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
     else            // model has 0 or 1 material
     {
         unsigned long long id = 0;
-        if ((*pMesh)->getMaterialCount() != 0)
+        int                count = (*pMesh)->getMaterialCount();
+        if (count != 0)
         {
             id = (*pMesh)->getMaterial(0)->id;
         }
@@ -243,8 +244,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
             const ofbx::Material* pMaterialFirst = m_mapMeshMaterials[*pMesh].at(0);
             ofbx::Color           diffuseColor = (*pMaterialFirst).getDiffuseColor();
             dColor = D3DCOLOR_XRGB((DWORD)(diffuseColor.r * 255), (DWORD)(diffuseColor.g * 255), (DWORD)(diffuseColor.b * 255));
-        
-}
+        }
         else
         {
             dColor = D3DCOLOR_XRGB(255, 255, 255);
@@ -298,18 +298,16 @@ CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
     if (pTexture == nullptr)
         return nullptr;
 
-    SString strTextureName = m_textureNamesList[pTexture->id];
-    if (!pClientFBXInterface->IsTextureCreated(strTextureName))
+    if (!pClientFBXInterface->IsTextureCreated(pTexture->id))
     {
-        std::vector<char> textureRawData = m_textureContentList[pTexture->id];
-        CPixels*          pPixels = new CPixels();
+        char fileName[120];
+        pTexture->getFileName().toString(fileName);
+        SString name = fileName;
+        CPixels* pTexturePixels = m_textureContentList[name];
 
-        pPixels->SetSize(textureRawData.size());
-        memcpy(pPixels->GetData(), textureRawData.data(), pPixels->GetSize());
-        pClientFBXInterface->CreateTexture(strTextureName, pPixels);
-        delete pPixels;
+        pClientFBXInterface->CreateTexture(pTexture->id, pTexturePixels);
     }
-    CMaterialItem* pMaterialItem = pClientFBXInterface->GetTextureByName(strTextureName);
+    CMaterialItem* pMaterialItem = pClientFBXInterface->GetTextureById(pTexture->id);
     if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterialItem))
     {
         // If material is a shader, use its current instance
@@ -335,7 +333,7 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
 
     // test code, remove later
     CFBXTemplate* pTemplate = new CFBXTemplate();
-    pTemplate->pViewMatrix->SetPosition(CVector(0, 0, 50));
+    pTemplate->pViewMatrix->SetPosition(CVector(1823.41199, -2477.37476, 13.55469));
     pTemplate->pViewMatrix->SetRotation(CVector(0, 0, 0));
     pTemplate->pViewMatrix->SetScale(CVector(1, 1, 1));
     int i = 0;
@@ -345,13 +343,10 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
         {
             CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject((*pair.second)->id);
             pTemplateObject->pViewMatrix->SetPosition(CVector(i * 20, 0, 0));
-            pTemplateObject->pViewMatrix->SetRotation(CVector(i * 20, 0, 0));
+            pTemplateObject->pViewMatrix->SetRotation(CVector(0, 0, 0));
             pTemplateObject->pViewMatrix->SetScale(CVector(1, 1, 1));
             pTemplate->AddTemplateObject(pTemplateObject);
             i++;
-        }
-        if ((*pair.second)->getType() == ofbx::Object::Type::TEXTURE)
-        {
         }
     }
     AddTemplete(pTemplate);
@@ -407,22 +402,24 @@ void CFBXScene::CacheTextures()
     const ofbx::DataView const* pFilePath;
     const ofbx::DataView const* pContent;
     const ofbx::Texture*        pTexture;
+    int                         iTextureSize;
     for (int i = 0; i < m_pScene->getTexturesCount(); i++)
     {
-        pFilePath = *(m_pScene->getTextureFilePath() + i);
         pContent = *(m_pScene->getTextureContent() + i);
         pTexture = *(m_pScene->getTextures() + i);
+        pFilePath = *(m_pScene->getTextureFilePath() + i);
 
-        SString strFilePath = (const char*)pFilePath->begin;
-        strFilePath = strFilePath.substr(0, pFilePath->end - pFilePath->begin);
+        char fileName[120];
+        pFilePath->toString(fileName);
+        SString strFilePath = fileName;
 
-        std::vector<char> vecContent;
-        vecContent.resize(pContent->end - pContent->begin - 4);
-        memcpy(vecContent.data(), pContent->begin + 4, vecContent.size());
+        iTextureSize = pContent->end - pContent->begin - 4;
+        CPixels* pPixels = new CPixels();
 
-        m_textureContentList[pTexture->id] = vecContent;
-        m_textureList[strFilePath] = pTexture;
-        m_textureNamesList[pTexture->id] = strFilePath;
+        pPixels->SetSize(iTextureSize);
+        memcpy(pPixels->GetData(), pContent->begin + 4, pPixels->GetSize());
+
+        m_textureContentList[strFilePath] = pPixels;
     }
 }
 
@@ -440,9 +437,9 @@ void CFBXScene::CacheMeshMaterials()
         m_mapMeshMaterials[pMesh] = vecMaterial;
     }
 }
+
 void CFBXScene::CacheMaterials()
 {
-    SString                      name;
     const ofbx::Material* const* pMaterial;
     for (int i = 0; i < m_pScene->getMaterialsCount(); i++)
     {
@@ -466,12 +463,20 @@ void CFBXScene::FixIndices()
     }
 }
 
-void CFBXScene::Render(IDirect3DDevice9* pDevice)
+void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
     for (auto const& pair : m_templateMap)
     {
         pair.second->Render(pDevice, this);
     }
+}
+
+CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)
+{
+    CFBXScene* pFBXScene = new CFBXScene(pScene, pClientFBXInterface);
+
+    m_sceneList.push_back(pFBXScene);
+    return pFBXScene;
 }
 
 const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
@@ -528,14 +533,6 @@ const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
     return label;
 }
 
-CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)
-{
-    CFBXScene* pFBXScene = new CFBXScene(pScene, pClientFBXInterface);
-
-    m_sceneList.push_back(pFBXScene);
-    return pFBXScene;
-}
-
 bool CFBX::HasAnyFBXLoaded()
 {
     return m_sceneList.size() > 0;
@@ -562,6 +559,6 @@ void CFBX::Render()
 {
     for (auto const& pFBXScene : m_sceneList)
     {
-        pFBXScene->Render(m_pDevice);
+        pFBXScene->RenderScene(m_pDevice);
     }
 }

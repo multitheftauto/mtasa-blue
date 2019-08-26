@@ -93,7 +93,7 @@ public:
     const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) { return IsMeshValid(strHierarchyMesh) ? m_meshList[strHierarchyMesh] : nullptr; }
     const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectValid(ulId) ? m_objectList[ulId] : nullptr; }
     void                       GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
-    void                       Render(IDirect3DDevice9* pDevice);
+    void                       RenderScene(IDirect3DDevice9* pDevice);
     FBXObjectBuffer*           GetFBXBuffer(unsigned long long ullId);
     unsigned int               AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*              GetTexture(unsigned long long ullMaterialId);
@@ -116,12 +116,10 @@ private:
 
     unsigned int                                                    uiNextFreeTemplateId = 0;
     const ofbx::Object*                                             m_pRoot;
-    std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
     std::vector<unsigned long long>                                 m_objectIdsList;
+    std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
     std::map<SString, const ofbx::Mesh*>                            m_meshList;
-    std::map<SString, const ofbx::Texture*>                         m_textureList;
-    std::map<unsigned long long, SString>                           m_textureNamesList;
-    std::map<unsigned long long, std::vector<char>>                 m_textureContentList;
+    std::map<SString, CPixels*>                                     m_textureContentList;
     std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;
     std::map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;
     std::map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;

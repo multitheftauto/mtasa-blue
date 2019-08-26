@@ -13,7 +13,7 @@ class CClientMaterial;
 class CClientFBXInterface
 {
 public:
-    virtual void             CreateTexture(SString strTextureName, CPixels* pPixels) = 0;
-    virtual CMaterialItem*   GetTextureByName(SString strTextureName) = 0;
-    virtual bool             IsTextureCreated(SString strTextureName) = 0;
+    virtual void             CreateTexture(unsigned long long ullTextureId, CPixels* pPixels) = 0;
+    virtual CMaterialItem*   GetTextureById(unsigned long long ullTextureId) = 0;
+    virtual bool             IsTextureCreated(unsigned long long ullTextureId) = 0;
 };
