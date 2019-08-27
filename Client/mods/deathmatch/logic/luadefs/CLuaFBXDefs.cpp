@@ -16,10 +16,15 @@ void CLuaFBXDefs::LoadFunctions(void)
     std::map<const char*, lua_CFunction> functions{
         {"fbxLoadFile", FBXLoadFile},
         {"fbxGetAllObjects", FBXGetAllObjects},
+        {"fbxGetAllTemplates", FBXGetAllTemplates},
+        {"fbxGetAllTemplateModels", FBXGetAllTemplateModels},
+        {"fbxGetProperties", FBXGetProperties},
+        {"fbxGetTemplateProperties", FBXGetTemplateProperties},
+        {"fbxSetTemplateProperties", FBXSetTemplateProperties},
+
         {"fbxGetAllMeshes", FBXGetAllMeshes},
         {"fbxGetAllTextures", FBXGetAllTextures},
         {"fbxGetAllMaterials", FBXGetAllMaterials},
-        {"fbxGetProperties", FBXGetProperties},
         {"fbxGetMeshRawData", FBXGetMeshRawData},
         {"fbxDrawPreview", FBXDrawPreview},
 
@@ -122,6 +127,49 @@ int CLuaFBXDefs::FBXGetAllObjects(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFBXDefs::FBXGetAllTemplates(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    SString          strFilter;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+
+    if (!argStream.HasErrors())
+    {
+        pFBX->LuaGetAllTemplates(luaVM);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetAllTemplateModels(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    SString          strFilter;
+    unsigned int     uiTemplateId;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplateId);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX->LuaGetAllTemplateModels(luaVM, uiTemplateId))
+            return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFBXDefs::FBXGetAllMeshes(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
@@ -186,12 +234,12 @@ int CLuaFBXDefs::FBXGetAllMaterials(lua_State* luaVM)
 
 int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
 {
-    CClientFBX*      pFBX;
-    SString          strHierarchyMesh;
-    CVector          vecPosition;
-    SColor           color;
-    float            fWidth;
-    bool             bPostGUI;
+    CClientFBX* pFBX;
+    SString     strHierarchyMesh;
+    CVector     vecPosition;
+    SColor      color;
+    float       fWidth;
+    bool        bPostGUI;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFBX);
@@ -205,8 +253,8 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
     {
         if (pFBX->IsMeshValid(strHierarchyMesh))
         {
-            //pFBX->Draw(pFBX->GetMeshByName(strHierarchyMesh), vecPosition);
-            //pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
+            // pFBX->Draw(pFBX->GetMeshByName(strHierarchyMesh), vecPosition);
+            // pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -226,9 +274,9 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
 
 int CLuaFBXDefs::FBXGetProperties(lua_State* luaVM)
 {
-    CClientFBX*      pFBX;
+    CClientFBX*        pFBX;
     unsigned long long ulId;
-    CScriptArgReader argStream(luaVM);
+    CScriptArgReader   argStream(luaVM);
     argStream.ReadUserData(pFBX);
     argStream.ReadNumber(ulId);
 
@@ -243,8 +291,58 @@ int CLuaFBXDefs::FBXGetProperties(lua_State* luaVM)
         }
         else
         {
-            argStream.SetCustomError("Mesh in hierarchy not found");
+            argStream.SetCustomError("Object id not found");
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetTemplateProperties(lua_State* luaVM)
+{
+    CClientFBX*          pFBX;
+    unsigned int         uiId;
+    eFBXTemplateProperty eProperty;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX->LuaGetTemplateProperties(luaVM, uiId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXSetTemplateProperties(lua_State* luaVM)
+{
+    CClientFBX*          pFBX;
+    unsigned int         uiId;
+    eFBXTemplateProperty eProperty;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX->LuaSetTemplateProperties(luaVM, argStream, uiId, eProperty))
+        {
+            return 1;
         }
     }
     else

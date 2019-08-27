@@ -19,23 +19,35 @@ namespace ofbx
     class IScene;
     class Mesh;
     class Object;
+    class Vec3;
 }            // namespace ofbx
 
 class CFBXInterface
 {
 public:
-    virtual CFBXScene* AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
-    virtual void       Render() = 0;
-    virtual void       Initialize() = 0;
-    virtual bool       HasAnyFBXLoaded() = 0;
+    virtual CFBXScene*  AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
+    virtual void        Render() = 0;
+    virtual void        Initialize() = 0;
+    virtual bool        HasAnyFBXLoaded() = 0;
+    virtual const char* GetObjectType(const ofbx::Object const* pObject) = 0;
 };
 
 class CFBXSceneInterface
 {
 public:
     virtual bool IsMeshValid(const SString& strHierarchyMesh) = 0;
-    virtual bool IsObjectValid(long long int ulId) = 0;
+    virtual bool IsObjectValid(unsigned long long ullId) = 0;
+    virtual bool IsTemplateValid(unsigned int uiId) = 0;
     virtual void GetAllObjectsIds(std::vector<unsigned long long>& vecIds) = 0;
+    virtual void GetAllTemplatesIds(std::vector<unsigned int>& vecIds) = 0;
+    virtual bool GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId) = 0;
+
+    virtual void GetTemplatePosition(unsigned int uiTemplateId, CVector& position) = 0;
+    virtual void GetTemplateRotation(unsigned int uiTemplateId, CVector& rotation) = 0;
+    virtual void GetTemplateScale(unsigned int uiTemplateId, CVector& scale) = 0;
+    virtual void SetTemplatePosition(unsigned int uiTemplateId, CVector& position) = 0;
+    virtual void SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation) = 0;
+    virtual void SetTemplateScale(unsigned int uiTemplateId, CVector& scale) = 0;
 
     virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;

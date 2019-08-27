@@ -955,6 +955,21 @@ namespace ofbx
     {
         MeshImpl(const Scene& _scene, const IElement& _element) : Mesh(_scene, _element), scene(_scene) { is_node = true; }
 
+        Vec3 getGeometricTranslation() const override
+		{
+			Vec3 translation = resolveVec3Property(*this, "GeometricTranslation", {0, 0, 0});
+            return translation;
+		}
+        Vec3 getGeometricRotation() const override
+		{
+			Vec3 translation = resolveVec3Property(*this, "GeometricRotation", {0, 0, 0});
+            return translation;
+		}
+        Vec3 getGeometricScaling() const override
+		{
+			Vec3 translation = resolveVec3Property(*this, "GeometricScaling", {1, 1, 1});
+            return translation;
+		}
         Matrix getGeometricMatrix() const override
         {
             Vec3 translation = resolveVec3Property(*this, "GeometricTranslation", {0, 0, 0});
@@ -1047,13 +1062,13 @@ namespace ofbx
             NewVertex* next = nullptr;
         };
 
-        std::vector<Vec3> vertices;
-        std::vector<Vec3> normals;
-        std::vector<Vec2> uvs[s_uvs_max];
+        std::vector<Vec3>        vertices;
+        std::vector<Vec3>        normals;
+        std::vector<Vec2>        uvs[s_uvs_max];
         std::vector<const char*> uvsName[s_uvs_max];
-        std::vector<Vec4> colors;
-        std::vector<Vec3> tangents;
-        std::vector<int>  materials;
+        std::vector<Vec4>        colors;
+        std::vector<Vec3>        tangents;
+        std::vector<int>         materials;
 
         const Skin* skin = nullptr;
 
@@ -2162,8 +2177,8 @@ namespace ofbx
                     remap(&uvs, to_old_indices);
                 }
 
-                //const Element* name_element = findChild(*layer_uv_element, "Name");
-                //if (name_element)
+                // const Element* name_element = findChild(*layer_uv_element, "Name");
+                // if (name_element)
                 //{
                 //    char tmp[32];
                 //    name_element->first_property->value.toString(tmp);

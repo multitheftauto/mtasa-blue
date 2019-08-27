@@ -99,10 +99,6 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
     FBXObjectBuffer* pObjectBuffer;
     D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
     CTextureItem*    pTextureItem;
-    CMatrix*         matrixFixInvertedUVs = new CMatrix();
-    matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
-    matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
-    matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
     // pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
     // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
     // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
@@ -111,15 +107,21 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
     // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
     // pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
     // pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
-    for (auto const& object : m_objectList)
+
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+    // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
+    // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+    for (auto const& object : m_objectMap)
     {
         pViewMatrix->GetBuffer((float*)pObjectMatrix);
-        pDevice->SetTransform(D3DTS_TEXTURE0, (D3DXMATRIX*)matrixFixInvertedUVs);
+        pDevice->SetTransform(D3DTS_TEXTURE0, pScene->GetMatrixUVFlip());
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
-        pObjectBuffer = pScene->GetFBXBuffer(object->ullObjectId);
+        pObjectBuffer = pScene->GetFBXBuffer(object.second->ullObjectId);
         if (pObjectBuffer != nullptr)
         {
-            object->pViewMatrix->GetBuffer((float*)pObjectMatrix);
+            object.second->pViewMatrix->GetBuffer((float*)pObjectMatrix);
             // pDevice->SetMaterial(&object->material);
             pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
             for (auto const& pBuffer : pObjectBuffer->bufferList)
@@ -127,15 +129,25 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
                 if (pBuffer->ullMaterialId != 0)
                 {
                     pTextureItem = pScene->GetTexture(pBuffer->ullMaterialId);
-                    // Set texture addressing mode
-                    pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
-                    pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
+                    if (pTextureItem != nullptr)
+                    {
+                        // Set texture addressing mode
+                        pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
+                        pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
+                        // pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+                        // pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
 
-                    if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
-                        pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
-                    pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
-                    pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                        if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
+                            pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
+                        pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
+                        pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                    }
                 }
+                pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+                pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+                pDevice->SetRenderState(D3DRS_STENCILREF, 0);
+                pDevice->SetRenderState(D3DRS_STENCILMASK, 0);
+
                 // pDevice->SetLight(0, &object->light);
                 // pDevice->LightEnable(0, TRUE);
 
@@ -173,9 +185,26 @@ void CFBXTemplate::SetScale(CVector& scale)
     pViewMatrix->SetScale(scale);
 }
 
-void CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
+void CFBXTemplate::GetPosition(CVector& position)
 {
-    m_objectList.push_back(pObject);
+    position = pViewMatrix->GetPosition();
+}
+
+void CFBXTemplate::GetRotation(CVector& rotation)
+{
+    rotation = pViewMatrix->GetRotation();
+}
+
+void CFBXTemplate::GetScale(CVector& scale)
+{
+    scale = pViewMatrix->GetScale();
+}
+
+unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
+{
+    m_objectMap[uiNextFreeObjectId] = pObject;
+    uiNextFreeObjectId++;
+    return uiNextFreeObjectId - 1;
 }
 
 CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObjectId(ullObjectId)
@@ -206,6 +235,21 @@ void CFBXTemplateObject::SetRotation(CVector& rot)
 void CFBXTemplateObject::SetScale(CVector& scale)
 {
     pViewMatrix->SetScale(scale);
+}
+
+void CFBXTemplateObject::GetPosition(CVector& position)
+{
+    position = pViewMatrix->GetPosition();
+}
+
+void CFBXTemplateObject::GetRotation(CVector& rotation)
+{
+    rotation = pViewMatrix->GetRotation();
+}
+
+void CFBXTemplateObject::GetScale(CVector& scale)
+{
+    scale = pViewMatrix->GetScale();
 }
 
 unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
@@ -303,11 +347,14 @@ CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
     if (pTexture == nullptr)
         return nullptr;
 
+    if (pClientFBXInterface == nullptr)
+        return nullptr;
+
     if (!pClientFBXInterface->IsTextureCreated(pTexture->id))
     {
         char fileName[120];
         pTexture->getFileName().toString(fileName);
-        SString name = fileName;
+        SString  name = fileName;
         CPixels* pTexturePixels = m_textureContentList[name];
 
         pClientFBXInterface->CreateTexture(pTexture->id, pTexturePixels);
@@ -335,6 +382,12 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     CacheTextures();
     CacheMaterials();
     CacheMeshMaterials();
+
+    CMatrix* matrixFixInvertedUVs = new CMatrix();
+    matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
+    matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
+    matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
+    m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
 
     // test code, remove later
     CFBXTemplate* pTemplate = new CFBXTemplate();
@@ -468,12 +521,67 @@ void CFBXScene::FixIndices()
     }
 }
 
+void CFBXScene::GetAllTemplatesIds(std::vector<unsigned int>& vecIds)
+{
+    for (auto const& pair : m_templateMap)
+    {
+        vecIds.emplace_back(pair.first);
+    }
+}
+bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId)
+{
+    if (!IsTemplateValid(uiTemplateId))
+        return false;
+
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    for (auto const& pair : pTemplate->GetObjectsMap())
+    {
+        vecIds.emplace_back(pair.first);
+    }
+}
+
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
     for (auto const& pair : m_templateMap)
     {
         pair.second->Render(pDevice, this);
     }
+}
+
+void CFBXScene::GetTemplatePosition(unsigned int uiTemplateId, CVector& position)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetPosition(position);
+}
+
+void CFBXScene::GetTemplateRotation(unsigned int uiTemplateId, CVector& rotation)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetRotation(rotation);
+}
+
+void CFBXScene::GetTemplateScale(unsigned int uiTemplateId, CVector& scale)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetScale(scale);
+}
+
+void CFBXScene::SetTemplatePosition(unsigned int uiTemplateId, CVector& position)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetPosition(position);
+}
+
+void CFBXScene::SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetRotation(rotation);
+}
+
+void CFBXScene::SetTemplateScale(unsigned int uiTemplateId, CVector& scale)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetScale(scale);
 }
 
 CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)
@@ -484,7 +592,7 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXI
     return pFBXScene;
 }
 
-const char* CFBXScene::GetObjectType(const ofbx::Object const* pObject)
+const char* CFBX::GetObjectType(const ofbx::Object const* pObject)
 {
     const char* label;
     switch (pObject->getType())

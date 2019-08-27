@@ -104,6 +104,14 @@ enum eFBXDataType
 };
 DECLARE_ENUM(eFBXDataType);
 
+enum eFBXTemplateProperty
+{
+    FBX_TEMPLATE_PROPERTY_POSITION,
+    FBX_TEMPLATE_PROPERTY_ROTATION,
+    FBX_TEMPLATE_PROPERTY_SCALE,
+};
+DECLARE_ENUM(eFBXTemplateProperty);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -432,6 +440,11 @@ inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 inline SString GetClassTypeName(eFBXDataType*)
 {
     return "fbx-data-type";
+}
+
+inline SString GetClassTypeName(eFBXTemplateProperty*)
+{
+    return "fbx-template-property";
 }
 
 //

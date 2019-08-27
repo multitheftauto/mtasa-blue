@@ -13,6 +13,9 @@
 #include "CClientFBXManager.h"
 #include "CClientFBXInterface.h"
 
+class CScriptArgReader;
+enum eFBXTemplateProperty;
+
 class CClientFBX : public CClientEntity, CClientFBXInterface
 {
     DECLARE_CLASS(CClientFBX, CClientEntity)
@@ -38,13 +41,16 @@ public:
 
     void LuaGetMeshes(lua_State* luaVM);
     void LuaGetTextures(lua_State* luaVM);
+    bool LuaGetAllTemplates(lua_State* luaVM);
     void LuaGetMaterials(lua_State* luaVM);
     bool LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject);
-    bool LuaGetMeshProperties(lua_State* luaVM, const ofbx::Mesh const* pMesh);
     bool LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     bool LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     bool LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
+    bool LuaGetAllTemplateModels(lua_State* luaVM, unsigned int uiTemplateId);
     void LuaGetAllObjectsIds(lua_State* luaVM);
+    bool LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty);
+    bool LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, eFBXTemplateProperty eProperty);
 
     void             CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem*   GetTextureById(unsigned long long strTextureName);

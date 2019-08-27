@@ -603,6 +603,12 @@ ADD_ENUM(FBX_DATA_TYPE_INDICATOR, "indicator")
 ADD_ENUM(FBX_DATA_TYPE_MATERIAL, "material")
 IMPLEMENT_ENUM_END("fbx-data-type")
 
+IMPLEMENT_ENUM_BEGIN(eFBXTemplateProperty)
+ADD_ENUM(FBX_TEMPLATE_PROPERTY_POSITION, "position")
+ADD_ENUM(FBX_TEMPLATE_PROPERTY_ROTATION, "rotation")
+ADD_ENUM(FBX_TEMPLATE_PROPERTY_SCALE, "scale")
+IMPLEMENT_ENUM_END("fbx-template-property")
+
 //
 // Get best guess at name of userdata type
 //

@@ -21,6 +21,10 @@ public:
     LUA_DECLARE(FBXLoadFile);
     LUA_DECLARE(FBXGetAllObjects);
     LUA_DECLARE(FBXGetProperties);
+    LUA_DECLARE(FBXGetTemplateProperties);
+    LUA_DECLARE(FBXSetTemplateProperties);
+    LUA_DECLARE(FBXGetAllTemplates);
+    LUA_DECLARE(FBXGetAllTemplateModels);
     LUA_DECLARE(FBXGetAllMeshes);
     LUA_DECLARE(FBXGetAllTextures);
     LUA_DECLARE(FBXGetAllMaterials);

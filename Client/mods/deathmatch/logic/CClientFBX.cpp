@@ -11,9 +11,10 @@
 #include "StdInc.h"
 #include <iostream>
 #include <string>
-#include <tuple>
+#include <tuple>    
 
 using namespace std;
+class CScriptArgReader;
 
 CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -130,13 +131,98 @@ void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
 {
     std::vector<unsigned long long> vecIds;
     m_pFBXScene->GetAllObjectsIds(vecIds);
-    int i = 1;
-    for (unsigned long long iId : vecIds)
+    const ofbx::Object* const* pObject;
+    for (unsigned long long ullId : vecIds)
     {
-        lua_pushnumber(luaVM, i++);
-        lua_pushnumber(luaVM, iId);
+        pObject = m_pFBXScene->GetObjectById(ullId);
+        lua_pushnumber(luaVM, ullId);
+        lua_pushstring(luaVM, g_pCore->GetFBX()->GetObjectType(*m_pFBXScene->GetObjectById(ullId)));
         lua_settable(luaVM, -3);
     }
+}
+
+bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, eFBXTemplateProperty eProperty)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+    {
+        return false;
+    }
+
+    CVector vector;
+    switch (eProperty)
+    {
+        case FBX_TEMPLATE_PROPERTY_POSITION:
+            m_pFBXScene->GetTemplatePosition(uiId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+        case FBX_TEMPLATE_PROPERTY_ROTATION:
+            m_pFBXScene->GetTemplateRotation(uiId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+        case FBX_TEMPLATE_PROPERTY_SCALE:
+            m_pFBXScene->GetTemplateScale(uiId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+    }
+    return true;
+}
+
+bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+    {
+        return false;
+    }
+
+    CVector vector;
+    switch (eProperty)
+    {
+        case FBX_TEMPLATE_PROPERTY_POSITION:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplatePosition(uiId, vector);
+        case FBX_TEMPLATE_PROPERTY_ROTATION:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateRotation(uiId, vector);
+            break;
+        case FBX_TEMPLATE_PROPERTY_SCALE:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateScale(uiId, vector);
+            break;
+    }
+    return true;
 }
 
 void CClientFBX::LuaGetTextures(lua_State* luaVM)
@@ -171,58 +257,282 @@ void CClientFBX::LuaGetMeshes(lua_State* luaVM)
 
 bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject)
 {
-    lua_newtable(luaVM);
-    lua_pushstring(luaVM, "id");
-    lua_pushnumber(luaVM, (*pObject)->id);
-    lua_settable(luaVM, -3);
+    if (pObject == nullptr)
+    {
+        lua_pushboolean(luaVM, false);
+        return false;
+    }
+    double                m[16] = {};
+    float                 array[16];
+    CMatrix               matrix;
+    CVector               vector;
+    ofbx::Vec3            vec3;
+    const ofbx::Geometry* pGeometry;
+    const ofbx::Mesh*     pMesh;
+    const ofbx::Material* pMaterial;
+    const ofbx::Texture*  pTexture;
+    bool                  bSupportsTransform = false;
+    ofbx::Object*         pObjectParent = (*pObject)->getParent();
 
+    lua_newtable(luaVM);
+    lua_pushstring(luaVM, "type");
+    lua_pushstring(luaVM, g_pCore->GetFBX()->GetObjectType(*pObject));
+    lua_settable(luaVM, -3);
+    if (pObjectParent != nullptr)
+    {
+        lua_pushstring(luaVM, "parent");
+        if (pObjectParent->id != 0)
+            lua_pushnumber(luaVM, pObjectParent->id);
+        else
+            lua_pushboolean(luaVM, false);
+        lua_settable(luaVM, -3);
+    }
+
+    switch ((*pObject)->getType())
+    {
+        case ofbx::Object::Type::ROOT:
+            break;
+        case ofbx::Object::Type::GEOMETRY:
+            pGeometry = (const ofbx::Geometry*)(*pObject);
+            lua_pushstring(luaVM, "colorCount");
+            lua_pushnumber(luaVM, pGeometry->getColorCount());
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "indexCount");
+            lua_pushnumber(luaVM, pGeometry->getIndicesCount());
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "materialFaceIdCount");
+            lua_pushnumber(luaVM, pGeometry->getMaterialCount());
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "normalCount");
+            lua_pushnumber(luaVM, pGeometry->getNormalCount());
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "vertexCount");
+            lua_pushnumber(luaVM, pGeometry->getVertexCount());
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "uvCount");
+            lua_pushnumber(luaVM, pGeometry->getUVCount(0));
+            lua_settable(luaVM, -3);
+            bSupportsTransform = true;
+            break;
+        case ofbx::Object::Type::MATERIAL:
+            pMaterial = (const ofbx::Material*)(*pObject);
+            lua_pushstring(luaVM, "diffuseColor");
+            lua_pushnumber(luaVM, SColorRGBA(pMaterial->getDiffuseColor().r, pMaterial->getDiffuseColor().g, pMaterial->getDiffuseColor().b, 255).ulARGB);
+            lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "specularColor");
+            lua_pushnumber(luaVM, SColorRGBA(pMaterial->getSpecularColor().r, pMaterial->getSpecularColor().g, pMaterial->getSpecularColor().b, 255).ulARGB);
+            lua_settable(luaVM, -3);
+            pTexture = pMaterial->getTexture(ofbx::Texture::DIFFUSE);
+            lua_pushstring(luaVM, "diffuseTexture");
+            if (pTexture != nullptr)
+                lua_pushnumber(luaVM, pTexture->id);
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+            pTexture = pMaterial->getTexture(ofbx::Texture::SPECULAR);
+            lua_pushstring(luaVM, "specularTexture");
+            if (pTexture != nullptr)
+                lua_pushnumber(luaVM, pTexture->id);
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+            pTexture = pMaterial->getTexture(ofbx::Texture::NORMAL);
+            lua_pushstring(luaVM, "normalTexture");
+            if (pTexture != nullptr)
+                lua_pushnumber(luaVM, pTexture->id);
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+            break;
+        case ofbx::Object::Type::MESH:
+            pMesh = (const ofbx::Mesh*)(*pObject);
+            pGeometry = pMesh->getGeometry();
+            if (pGeometry != nullptr)
+            {
+                lua_pushstring(luaVM, "geometry");
+                lua_pushnumber(luaVM, pGeometry->id);
+                lua_settable(luaVM, -3);
+            }
+            lua_pushstring(luaVM, "materials");
+            lua_newtable(luaVM);
+            for (int i = 0; i < pMesh->getMaterialCount(); i++)
+            {
+                lua_pushnumber(luaVM, i + 1);
+                lua_pushnumber(luaVM, pMesh->getMaterial(i)->id);
+                lua_settable(luaVM, -3);
+            }
+            lua_settable(luaVM, -3);
+            bSupportsTransform = true;
+            break;
+        case ofbx::Object::Type::TEXTURE:
+            break;
+        case ofbx::Object::Type::LIMB_NODE:
+            break;
+        case ofbx::Object::Type::NULL_NODE:
+            break;
+        case ofbx::Object::Type::NODE_ATTRIBUTE:
+            break;
+        case ofbx::Object::Type::CLUSTER:
+            break;
+        case ofbx::Object::Type::SKIN:
+            break;
+        case ofbx::Object::Type::ANIMATION_STACK:
+            break;
+        case ofbx::Object::Type::ANIMATION_LAYER:
+            break;
+        case ofbx::Object::Type::ANIMATION_CURVE:
+            break;
+        case ofbx::Object::Type::ANIMATION_CURVE_NODE:
+            break;
+        case ofbx::Object::Type::POSE:
+            break;
+        default:
+            break;
+    }
+
+    if (bSupportsTransform)
+    {
+        memcpy(m, (*pObject)->getLocalTransform().m, sizeof(double) * 16);
+        for (char i = 0; i < 16; i++)
+            array[i] = (float)m[i];
+
+        matrix = CMatrix(array);
+        vector = matrix.GetRotation();
+        lua_pushstring(luaVM, "localRotation");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        vector = matrix.GetScale();
+        lua_pushstring(luaVM, "localScale");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        vector = matrix.GetPosition();
+        lua_pushstring(luaVM, "localPosition");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        memcpy(m, (*pObject)->getGlobalTransform().m, sizeof(double) * 16);
+        for (char i = 0; i < 16; i++)
+            array[i] = (float)m[i];
+
+        vector = matrix.GetRotation();
+        lua_pushstring(luaVM, "rotation");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        vector = matrix.GetScale();
+        lua_pushstring(luaVM, "scale");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        vector = matrix.GetPosition();
+        lua_pushstring(luaVM, "position");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, vector.fX);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, vector.fY);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, vector.fZ);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        // vec3 = (*pObject)->getRotationOffset();
+
+        // lua_pushstring(luaVM, "rotationOffset");
+        // lua_newtable(luaVM);
+        // lua_pushnumber(luaVM, 1);
+        // lua_pushnumber(luaVM, vec3.x);
+        // lua_settable(luaVM, -3);
+        // lua_pushnumber(luaVM, 2);
+        // lua_pushnumber(luaVM, vec3.y);
+        // lua_settable(luaVM, -3);
+        // lua_pushnumber(luaVM, 3);
+        // lua_pushnumber(luaVM, vec3.z);
+        // lua_settable(luaVM, -3);
+        // lua_settable(luaVM, -3);
+    }
     return true;
 }
 
-bool CClientFBX::LuaGetMeshProperties(lua_State* luaVM, const ofbx::Mesh const* pMesh)
+bool CClientFBX::LuaGetAllTemplates(lua_State* luaVM)
 {
+    std::vector<unsigned int> vecIds;
+    m_pFBXScene->GetAllTemplatesIds(vecIds);
     lua_newtable(luaVM);
-    lua_pushstring(luaVM, "id");
-    lua_pushnumber(luaVM, pMesh->id);
-    lua_settable(luaVM, -3);
+    for (int i = 0; i < vecIds.size(); i++)
+    {
+        lua_pushnumber(luaVM, i);
+        lua_pushnumber(luaVM, vecIds[i]);
+        lua_settable(luaVM, -3);
+    }
+    return true;
+}
 
-    const ofbx::Geometry* pGeometry = pMesh->getGeometry();
-    lua_pushstring(luaVM, "vertexCount");
-    lua_pushnumber(luaVM, pGeometry->getVertexCount());
-    lua_settable(luaVM, -3);
-    lua_pushstring(luaVM, "normalCount");
-    lua_pushnumber(luaVM, pGeometry->getNormalCount());
-    lua_settable(luaVM, -3);
-    lua_pushstring(luaVM, "UVCount");
+bool CClientFBX::LuaGetAllTemplateModels(lua_State* luaVM, unsigned int uiTemplateId)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+    {
+        return false;
+    }
 
+    std::vector<unsigned int> vecIds;
+    m_pFBXScene->GetAllTemplatesModelsIds(vecIds, uiTemplateId);
     lua_newtable(luaVM);
-    lua_pushnumber(luaVM, 1);
-    lua_pushnumber(luaVM, pGeometry->getUVCount(0));
-    lua_settable(luaVM, -3);
-    lua_pushnumber(luaVM, 2);
-    lua_pushnumber(luaVM, pGeometry->getUVCount(2));
-    lua_settable(luaVM, -3);
-    lua_pushnumber(luaVM, 3);
-    lua_pushnumber(luaVM, pGeometry->getUVCount(3));
-    lua_settable(luaVM, -3);
-    lua_pushnumber(luaVM, 4);
-    lua_pushnumber(luaVM, pGeometry->getUVCount(4));
-    lua_settable(luaVM, -3);
-    lua_settable(luaVM, -3);
-
-    lua_pushstring(luaVM, "colorCount");
-    lua_pushnumber(luaVM, pGeometry->getColorCount());
-    lua_settable(luaVM, -3);
-    lua_pushstring(luaVM, "tangentCount");
-    lua_pushnumber(luaVM, pGeometry->getTangentCount());
-    lua_settable(luaVM, -3);
-    lua_pushstring(luaVM, "triangleCount");
-    lua_pushnumber(luaVM, pGeometry->getIndicesCount() / 3);
-    lua_settable(luaVM, -3);
-
-    lua_pushstring(luaVM, "materialCount");
-    lua_pushnumber(luaVM, pMesh->getMaterialCount());
-    lua_settable(luaVM, -3);
+    for (int i = 0; i < vecIds.size(); i++)
+    {
+        lua_pushnumber(luaVM, i + 1);
+        lua_pushnumber(luaVM, vecIds[i]);
+        lua_settable(luaVM, -3);
+    }
     return true;
 }
 
@@ -454,7 +764,8 @@ bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMes
 void CClientFBX::CreateTexture(unsigned long long ullTextureId, CPixels* pPixels)
 {
     if (m_mapTexture.find(ullTextureId) == m_mapTexture.end())
-        m_mapTexture[ullTextureId] = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        m_mapTexture[ullTextureId] =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
 }
 
 bool CClientFBX::IsTextureCreated(unsigned long long ullTextureId)

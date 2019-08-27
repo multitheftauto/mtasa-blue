@@ -27,6 +27,15 @@ public:
         vUp = CVector(0.0f, 0.0f, 1.0f);
         vPos = CVector(0.0f, 0.0f, 0.0f);
     }
+    
+    CMatrix(float* floats)
+    {
+        // Load the identity matrix
+        vRight = CVector(floats[0], floats[1], floats[2]);
+        vFront = CVector(floats[4], floats[5], floats[6]);
+        vUp = CVector(floats[8], floats[9], floats[10]);
+        vPos = CVector(floats[12], floats[13], floats[14]);
+    }
 
     CMatrix(const CVector& vecPosition)
     {
