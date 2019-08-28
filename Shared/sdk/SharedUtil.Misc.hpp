@@ -1223,7 +1223,7 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
         HMODULE ntdll = LoadLibraryA("ntdll.dll");
 
         if (ntdll)
-            lookup.function = (FunctionPointer)GetProcAddress(ntdll, "NtQueryInformationThread");
+            lookup.function = reinterpret_cast<FunctionPointer>(GetProcAddress(ntdll, "NtQueryInformationThread"));
         else
             return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
     }
@@ -1246,10 +1246,13 @@ DWORD SharedUtil::GetMainThreadId()
     if (dwMainThreadID == 0)
     {
         // Get the module information for the currently running process
+        DWORD      processEntryPointAddress = 0;
         MODULEINFO moduleInfo = {};
-        GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO));
-
-        DWORD processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+        
+        if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
+        {
+            processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+        }
 
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -1258,26 +1261,31 @@ DWORD SharedUtil::GetMainThreadId()
         {
             ULONGLONG ullMinCreateTime = ULLONG_MAX;
 
+            DWORD currentProcessID = GetCurrentProcessId();
+
             THREADENTRY32 th32 = {};
             th32.dwSize = sizeof(THREADENTRY32);
 
             for (BOOL bOK = Thread32First(hThreadSnap, &th32); bOK; bOK = Thread32Next(hThreadSnap, &th32))
             {
-                if (th32.th32OwnerProcessID == GetCurrentProcessId())
+                if (th32.th32OwnerProcessID == currentProcessID)
                 {
                     HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION, TRUE, th32.th32ThreadID);
 
                     if (hThread)
                     {
                         // Check the thread by entry point first
-                        DWORD entryPointAddress = 0;
-
-                        if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
+                        if (processEntryPointAddress != 0)
                         {
-                            dwMainThreadID = th32.th32ThreadID;
-                            CloseHandle(hThread);
-                            CloseHandle(hThreadSnap);
-                            return dwMainThreadID;
+                            DWORD entryPointAddress = 0;
+
+                            if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
+                            {
+                                dwMainThreadID = th32.th32ThreadID;
+                                CloseHandle(hThread);
+                                CloseHandle(hThreadSnap);
+                                return dwMainThreadID;
+                            }
                         }
 
                         // If entry point check failed, find the oldest thread in the system
