@@ -1325,7 +1325,7 @@ bool SharedUtil::IsMainThread()
 
 #ifdef MTA_CLIENT
     if (mainThreadID != currentThreadID)
-        WriteDebugEvent(SString("IsMainThread() - Main: %lu, Current: %lu\n", mainThreadID, currentThreadID));
+        WriteDebugEvent(SString("IsMainThread() - Main: %lu, Current: %lu", mainThreadID, currentThreadID));
 #endif
 
     return mainThreadID == currentThreadID;
