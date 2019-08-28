@@ -837,7 +837,7 @@ void CheckDataFiles()
     } integrityCheckList[] = {{"16B23FA1D3F952F6FF8BB02DE0CD36A2", "bass.dll"},
                               {"56116E495EE5E74749F8DB37616B22EA", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"8B17186F19002C9D30A18D39FC8FEFA7", "bass_fx.dll"},
+                              {"B061682BA7725602103BC3F27EDD187B", "bass_fx.dll"},
                               {"6673527EF2AE564A57DA6AED4A230819", "bassflac.dll"},
                               {"DD1AFB287DACC48C0C08CDB603D234AE", "bassmidi.dll"},
                               {"BA59B11522793EBC1D75C777CC598737", "bassmix.dll"},
