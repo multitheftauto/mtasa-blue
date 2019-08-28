@@ -1203,39 +1203,102 @@ void SharedUtil::RandomizeRandomSeed()
 }
 
 #ifdef WIN32
+static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
+                                         PULONG ReturnLength)
+{
+    using FunctionPointer = LONG(__stdcall*)(HANDLE, INT /*= THREADINFOCLASS*/, PVOID, ULONG, PULONG);
+
+    struct FunctionLookup
+    {
+        FunctionPointer function;
+        bool            once;
+    };
+
+    static FunctionLookup lookup = {};
+
+    if (!lookup.once)
+    {
+        lookup.once = true;
+
+        HMODULE ntdll = LoadLibraryA("ntdll.dll");
+
+        if (ntdll)
+            lookup.function = (FunctionPointer)GetProcAddress(ntdll, "NtQueryInformationThread");
+        else
+            return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
+    }
+
+    if (lookup.function)
+        return lookup.function(ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
+    else
+        return 0xC00000BBL;            // STATUS_NOT_SUPPORTED
+}
+
+bool SharedUtil::QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress)
+{
+    return SafeNtQueryInformationThread(thread, 9 /*ThreadQuerySetWin32StartAddress*/, entryPointAddress, sizeof(DWORD), nullptr) == 0;
+}
+
 DWORD SharedUtil::GetMainThreadId()
 {
     static DWORD dwMainThreadID = 0;
+
     if (dwMainThreadID == 0)
     {
+        // Get the module information for the currently running process
+        MODULEINFO moduleInfo = {};
+        GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO));
+
+        DWORD processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+
         if (hThreadSnap != INVALID_HANDLE_VALUE)
         {
-            ULONGLONG     ullMinCreateTime = ULLONG_MAX;
-            THREADENTRY32 th32;
+            ULONGLONG ullMinCreateTime = ULLONG_MAX;
+
+            THREADENTRY32 th32 = {};
             th32.dwSize = sizeof(THREADENTRY32);
+
             for (BOOL bOK = Thread32First(hThreadSnap, &th32); bOK; bOK = Thread32Next(hThreadSnap, &th32))
             {
                 if (th32.th32OwnerProcessID == GetCurrentProcessId())
                 {
                     HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION, TRUE, th32.th32ThreadID);
+
                     if (hThread)
                     {
-                        FILETIME afTimes[4] = {0};
+                        // Check the thread by entry point first
+                        DWORD entryPointAddress = 0;
+
+                        if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
+                        {
+                            dwMainThreadID = th32.th32ThreadID;
+                            CloseHandle(hThread);
+                            CloseHandle(hThreadSnap);
+                            return dwMainThreadID;
+                        }
+
+                        // If entry point check failed, find the oldest thread in the system
+                        FILETIME afTimes[4] = {};
+
                         if (GetThreadTimes(hThread, &afTimes[0], &afTimes[1], &afTimes[2], &afTimes[3]))
                         {
                             ULONGLONG ullTest = (ULONGLONG(afTimes[0].dwHighDateTime) << 32) + afTimes[0].dwLowDateTime;
+
                             if (ullTest && ullTest < ullMinCreateTime)
                             {
                                 ullMinCreateTime = ullTest;
                                 dwMainThreadID = th32.th32ThreadID;
                             }
                         }
+
                         CloseHandle(hThread);
                     }
                 }
             }
+
             CloseHandle(hThreadSnap);
         }
 
@@ -1245,6 +1308,7 @@ DWORD SharedUtil::GetMainThreadId()
             dwMainThreadID = GetCurrentThreadId();
         }
     }
+
     return dwMainThreadID;
 }
 #endif
