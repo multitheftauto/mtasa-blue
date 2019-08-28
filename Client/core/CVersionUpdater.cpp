@@ -1913,6 +1913,10 @@ void CVersionUpdater::_DialogUpdateQueryError()
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
     _PollAnyButton();
+
+    #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
+    CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
+    _PollAnyButton();
 }
 
 ///////////////////////////////////////////////////////////////
