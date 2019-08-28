@@ -68,11 +68,11 @@ R"=====(
     <disableac></disableac>
 
     <!-- Comma separated list of enabled special detections.
-         A special detection is a type of anti-cheat for (usually) harmless game modifications.
+         A special detection is a type of anti-cheat for usually harmless game modifications and blocking certain software.
          Competitive servers may wish to enable certain special detections, but most servers should leave this setting on its default.
          For details and SD codes, see http://wiki.multitheftauto.com/wiki/Anti-cheat_guide
-         Available values: special detection (SD) codes ; default value: 31,32 (e.g. enables special detections #31 and #32) -->
-    <enablesd>31,32</enablesd>
+         Available values: special detection (SD) codes ; (e.g. To enable special detection #15 use: 15) -->
+    <enablesd></enablesd>
 
     <!-- Minimum client version. Clients with a lower version will not be allowed to connect. After
          disconnection, clients will be given an opportunity to download an update.
