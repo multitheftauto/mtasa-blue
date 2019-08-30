@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include <iostream>
 #include <string>
-#include <tuple>    
+#include <tuple>
 
 using namespace std;
 class CScriptArgReader;
@@ -194,6 +194,96 @@ bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, e
     return true;
 }
 
+bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int uiId, unsigned int uiModelId, eFBXTemplateModelProperty eProperty)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+    {
+        return false;
+    }
+
+    if (!m_pFBXScene->IsTemplateModelValid(uiId, uiModelId))
+    {
+        return false;
+    }
+
+    CVector vector;
+    switch (eProperty)
+    {
+        case FBX_TEMPLATE_PROPERTY_POSITION:
+            m_pFBXScene->GetTemplateModelPosition(uiId, uiModelId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+        case FBX_TEMPLATE_PROPERTY_ROTATION:
+            m_pFBXScene->GetTemplateModelRotation(uiId, uiModelId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+        case FBX_TEMPLATE_PROPERTY_SCALE:
+            m_pFBXScene->GetTemplateModelScale(uiId, uiModelId, vector);
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vector.fX);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vector.fZ);
+            lua_settable(luaVM, -3);
+            break;
+    }
+    return true;
+}
+
+bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, unsigned int uiModelId,
+                                               eFBXTemplateModelProperty eProperty)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+    {
+        return false;
+    }
+
+    CVector vector;
+    switch (eProperty)
+    {
+        case FBX_TEMPLATE_MODEL_PROPERTY_POSITION:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelPosition(uiId, uiModelId, vector);
+        case FBX_TEMPLATE_MODEL_PROPERTY_ROTATION:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelRotation(uiId, uiModelId, vector);
+            break;
+        case FBX_TEMPLATE_MODEL_PROPERTY_SCALE:
+            argStream.ReadVector3D(vector);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelScale(uiId, uiModelId, vector);
+            break;
+    }
+    return true;
+}
+
 bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty)
 {
     if (!m_pFBXScene->IsTemplateValid(uiId))
@@ -222,6 +312,27 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
             m_pFBXScene->SetTemplateScale(uiId, vector);
             break;
     }
+    return true;
+}
+
+bool CClientFBX::AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned long long ullMesh, unsigned long long ullParentMesh, CVector vecPosition,
+                                   unsigned int& uiObjectId)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+    {
+        return false;
+    }
+
+    const ofbx::Object* const* pObject = m_pFBXScene->GetObjectById(ullMesh);
+    if (pObject == nullptr || *pObject == nullptr)
+        return false;
+
+    if ((*pObject)->getType() != ofbx::Object::Type::MESH)
+        return false;
+
+    uiObjectId = m_pFBXScene->AddMeshToTemplate(uiId, ullMesh);
+
+    m_pFBXScene->SetTemplateModelPosition(uiId, uiObjectId, vecPosition);
     return true;
 }
 

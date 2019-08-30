@@ -112,6 +112,14 @@ enum eFBXTemplateProperty
 };
 DECLARE_ENUM(eFBXTemplateProperty);
 
+enum eFBXTemplateModelProperty
+{
+    FBX_TEMPLATE_MODEL_PROPERTY_POSITION,
+    FBX_TEMPLATE_MODEL_PROPERTY_ROTATION,
+    FBX_TEMPLATE_MODEL_PROPERTY_SCALE,
+};
+DECLARE_ENUM(eFBXTemplateModelProperty);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -445,6 +453,11 @@ inline SString GetClassTypeName(eFBXDataType*)
 inline SString GetClassTypeName(eFBXTemplateProperty*)
 {
     return "fbx-template-property";
+}
+
+inline SString GetClassTypeName(eFBXTemplateModelProperty*)
+{
+    return "fbx-template-model-property";
 }
 
 //

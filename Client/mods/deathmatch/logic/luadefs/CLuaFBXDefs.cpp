@@ -21,6 +21,10 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxGetProperties", FBXGetProperties},
         {"fbxGetTemplateProperties", FBXGetTemplateProperties},
         {"fbxSetTemplateProperties", FBXSetTemplateProperties},
+        {"fbxGetTemplateModelProperties", FBXGetTemplateModelProperties},
+        {"fbxSetTemplateModelProperties", FBXSetTemplateModelProperties},
+        {"fbxTemplateAddModel", FBXTemplateAddModel},
+        {"fbxTemplateRemoveModel", FBXTemplateRemoveModel},
 
         {"fbxGetAllMeshes", FBXGetAllMeshes},
         {"fbxGetAllTextures", FBXGetAllTextures},
@@ -341,6 +345,121 @@ int CLuaFBXDefs::FBXSetTemplateProperties(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (pFBX->LuaSetTemplateProperties(luaVM, argStream, uiId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetTemplateModelProperties(lua_State* luaVM)
+{
+    CClientFBX*               pFBX;
+    unsigned int              uiId;
+    unsigned int              uiModelId;
+    eFBXTemplateModelProperty eProperty;
+    CScriptArgReader          argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadNumber(uiModelId);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX->LuaGetTemplateModelProperties(luaVM, uiId, uiModelId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXSetTemplateModelProperties(lua_State* luaVM)
+{
+    CClientFBX*          pFBX;
+    unsigned int              uiId;
+    unsigned int              uiModelId;
+    eFBXTemplateModelProperty eProperty;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadNumber(uiModelId);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX->LuaSetTemplateModelProperties(luaVM, argStream, uiId, uiModelId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXTemplateAddModel(lua_State* luaVM)
+{
+    CClientFBX*        pFBX;
+    unsigned int       uiId;
+    unsigned long long ullMesh;
+    unsigned long long ullParentMesh;
+    CVector            vecPosition;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadNumber(ullMesh);
+    argStream.ReadNumber(ullParentMesh, 0);
+    argStream.ReadVector3D(vecPosition, CVector(0,0,0));
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int uiObjectId;
+        if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
+        {
+            lua_pushnumber(luaVM, uiObjectId);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXTemplateRemoveModel(lua_State* luaVM)
+{
+    CClientFBX*        pFBX;
+    unsigned int       uiId;
+    unsigned long long ullMesh;
+    unsigned long long ullParentMesh;
+    CVector            vecPosition;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadNumber(ullMesh);
+    argStream.ReadNumber(ullParentMesh, 0);
+    argStream.ReadVector3D(vecPosition, CVector(0,0,0));
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int uiObjectId;
+        if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
         {
             return 1;
         }

@@ -38,6 +38,7 @@ public:
     virtual bool IsMeshValid(const SString& strHierarchyMesh) = 0;
     virtual bool IsObjectValid(unsigned long long ullId) = 0;
     virtual bool IsTemplateValid(unsigned int uiId) = 0;
+    virtual bool IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModel) = 0;
     virtual void GetAllObjectsIds(std::vector<unsigned long long>& vecIds) = 0;
     virtual void GetAllTemplatesIds(std::vector<unsigned int>& vecIds) = 0;
     virtual bool GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId) = 0;
@@ -48,7 +49,14 @@ public:
     virtual void SetTemplatePosition(unsigned int uiTemplateId, CVector& position) = 0;
     virtual void SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation) = 0;
     virtual void SetTemplateScale(unsigned int uiTemplateId, CVector& scale) = 0;
+    virtual void GetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale) = 0;
+    virtual void GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position) = 0;
+    virtual void GetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation) = 0;
+    virtual void SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale) = 0;
+    virtual void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position) = 0;
+    virtual void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation) = 0;
 
     virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;
+    virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
 };

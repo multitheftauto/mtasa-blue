@@ -337,6 +337,26 @@ bool CFBXScene::AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuff
     return true;
 }
 
+bool CFBXScene::IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId)
+{
+    if (m_templateMap.count(uiTemplate) == 0)
+        return false;
+
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplate];
+    if (!pTemplate->IsModelValid(uiModelId))
+        return false;
+
+    return true;
+}
+
+unsigned int CFBXScene::AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplate];
+    CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(uiModelId);
+    unsigned int uiNewObjectId = pTemplate->AddTemplateObject(pTemplateObject);
+    return uiNewObjectId;
+}
+
 CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
 {
     const ofbx::Material* const* pMaterial = m_materialList[ullMaterialId];
@@ -582,6 +602,48 @@ void CFBXScene::SetTemplateScale(unsigned int uiTemplateId, CVector& scale)
 {
     CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
     pTemplate->SetScale(scale);
+}
+
+void CFBXScene::GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetPosition(position);
+}
+
+void CFBXScene::GetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetRotation(rotation);
+}
+
+void CFBXScene::GetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetScale(scale);
+}
+
+void CFBXScene::SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetPosition(position);
+}
+
+void CFBXScene::SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetRotation(rotation);
+}
+
+void CFBXScene::SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetScale(scale);
 }
 
 CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)

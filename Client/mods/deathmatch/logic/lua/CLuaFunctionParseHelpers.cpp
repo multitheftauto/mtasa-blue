@@ -609,6 +609,12 @@ ADD_ENUM(FBX_TEMPLATE_PROPERTY_ROTATION, "rotation")
 ADD_ENUM(FBX_TEMPLATE_PROPERTY_SCALE, "scale")
 IMPLEMENT_ENUM_END("fbx-template-property")
 
+IMPLEMENT_ENUM_BEGIN(eFBXTemplateModelProperty)
+ADD_ENUM(FBX_TEMPLATE_MODEL_PROPERTY_POSITION, "position")
+ADD_ENUM(FBX_TEMPLATE_MODEL_PROPERTY_ROTATION, "rotation")
+ADD_ENUM(FBX_TEMPLATE_MODEL_PROPERTY_SCALE, "scale")
+IMPLEMENT_ENUM_END("fbx-template-model-property")
+
 //
 // Get best guess at name of userdata type
 //

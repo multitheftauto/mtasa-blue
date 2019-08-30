@@ -85,7 +85,9 @@ public:
 
     CMatrix* pViewMatrix;
 
+    CFBXTemplateObject*                         GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
+    bool                                        IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
 
 private:
     std::map<unsigned int, CFBXTemplateObject*> m_objectMap;
@@ -110,6 +112,8 @@ public:
     FBXObjectBuffer*           GetFBXBuffer(unsigned long long ullId);
     unsigned int               AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*              GetTexture(unsigned long long ullMaterialId);
+    bool                       IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId);
+    unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
 
     void GetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void GetTemplatePosition(unsigned int uiTemplateId, CVector& position);
@@ -117,6 +121,12 @@ public:
     void SetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void SetTemplatePosition(unsigned int uiTemplateId, CVector& position);
     void SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation);
+    void GetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale);
+    void GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
+    void GetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
+    void SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale);
+    void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
+    void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
 
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }

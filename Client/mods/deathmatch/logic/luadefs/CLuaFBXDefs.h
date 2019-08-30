@@ -23,6 +23,10 @@ public:
     LUA_DECLARE(FBXGetProperties);
     LUA_DECLARE(FBXGetTemplateProperties);
     LUA_DECLARE(FBXSetTemplateProperties);
+    LUA_DECLARE(FBXSetTemplateModelProperties);
+    LUA_DECLARE(FBXGetTemplateModelProperties);
+    LUA_DECLARE(FBXTemplateAddModel);
+    LUA_DECLARE(FBXTemplateRemoveModel);
     LUA_DECLARE(FBXGetAllTemplates);
     LUA_DECLARE(FBXGetAllTemplateModels);
     LUA_DECLARE(FBXGetAllMeshes);

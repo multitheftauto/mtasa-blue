@@ -15,6 +15,7 @@
 
 class CScriptArgReader;
 enum eFBXTemplateProperty;
+enum eFBXTemplateModelProperty;
 
 class CClientFBX : public CClientEntity, CClientFBXInterface
 {
@@ -51,6 +52,12 @@ public:
     void LuaGetAllObjectsIds(lua_State* luaVM);
     bool LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty);
     bool LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, eFBXTemplateProperty eProperty);
+    bool LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, unsigned int uiModelId,
+                                       eFBXTemplateModelProperty eProperty);
+    bool LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int uiId, unsigned int uiModelId, eFBXTemplateModelProperty eProperty);
+    
+    bool AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned long long ullMesh, unsigned long long ullParentMesh, CVector vecPosition,
+                           unsigned int& uiObjectId);
 
     void             CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem*   GetTextureById(unsigned long long strTextureName);
