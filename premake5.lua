@@ -102,6 +102,9 @@ workspace "MTASA"
 		libdirs {
 			path.join(dxdir, "Lib/x86")
 		}
+        links {
+            "Psapi"
+        }
 
 	filter {"system:windows", "configurations:Debug"}
 		buildoptions { "/MT" } -- Don't use debug runtime when static linking
