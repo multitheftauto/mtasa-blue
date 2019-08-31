@@ -351,9 +351,9 @@ bool CFBXScene::IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiMod
 
 unsigned int CFBXScene::AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId)
 {
-    CFBXTemplate* pTemplate = m_templateMap[uiTemplate];
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplate];
     CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(uiModelId);
-    unsigned int uiNewObjectId = pTemplate->AddTemplateObject(pTemplateObject);
+    unsigned int        uiNewObjectId = pTemplate->AddTemplateObject(pTemplateObject);
     return uiNewObjectId;
 }
 
@@ -410,7 +410,8 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
 
     // test code, remove later
-    CFBXTemplate* pTemplate = new CFBXTemplate();
+    unsigned int  uiTemplateId = CreateTemplate();
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
     pTemplate->pViewMatrix->SetPosition(CVector(1823.41199, -2477.37476, 13.55469));
     pTemplate->pViewMatrix->SetRotation(CVector(0, 0, 0));
     pTemplate->pViewMatrix->SetScale(CVector(1, 1, 1));
@@ -427,7 +428,17 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
             i++;
         }
     }
-    AddTemplete(pTemplate);
+}
+
+unsigned int CFBXScene::CreateTemplate()
+{
+    CFBXTemplate* pTemplate = new CFBXTemplate();
+    unsigned int  uiTemplateId = AddTemplete(pTemplate);
+    return uiTemplateId;
+}
+
+void CFBXScene::RemoveTemplate(unsigned int uiTemplateId)
+{
 }
 
 void CFBXScene::CacheObjects()
@@ -441,6 +452,28 @@ void CFBXScene::CacheObjects()
     }
 }
 
+void CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
+{
+    unsigned long long id = pGeometry->id;
+
+    CFBXBoundingBox   boundingBox;
+    const ofbx::Vec3* vertices = pGeometry->getVertices();
+    const ofbx::Vec3* vertex;
+    CVector           center(0, 0, 0);
+    for (int i = 0; i < pGeometry->getVertexCount(); i++)
+    {
+        vertex = vertices + i;
+        boundingBox.max.fX = std::max((float)vertex->x, boundingBox.max.fX);
+        boundingBox.max.fY = std::max((float)vertex->y, boundingBox.max.fY);
+        boundingBox.max.fZ = std::max((float)vertex->z, boundingBox.max.fZ);
+        boundingBox.min.fX = std::min((float)vertex->x, boundingBox.min.fX);
+        boundingBox.min.fY = std::min((float)vertex->y, boundingBox.min.fY);
+        boundingBox.min.fZ = std::min((float)vertex->z, boundingBox.min.fZ);
+        boundingBox.radius = std::max(boundingBox.radius, (float)sqrt(vertex->x * vertex->x + vertex->y * vertex->y + vertex->z * vertex->z));
+    }
+    m_geometryBoundingBox[id] = boundingBox;
+}
+
 void CFBXScene::CacheMeshes()
 {
     SString           name;
@@ -450,7 +483,11 @@ void CFBXScene::CacheMeshes()
         pMesh = m_pScene->getMesh(i);
         GetMeshPath(pMesh, name);
         if (name.compare("") != 0)            // eliminate some unnamed objects like BaseLayers
-            m_meshList[name] = pMesh;
+        {
+            m_meshName[pMesh->id] = name;
+            m_meshList[pMesh->id] = pMesh;
+            CalculateBoundingBox(pMesh->getGeometry());
+        }
     }
 }
 
@@ -541,6 +578,28 @@ void CFBXScene::FixIndices()
     }
 }
 
+ofbx::Mesh const* CFBXScene::GetMeshByName(const SString& strHierarchyMesh)
+{
+    for (auto const& pair : m_meshName)
+    {
+        if (pair.second == strHierarchyMesh)
+            return m_meshList[pair.first];
+    }
+
+    return nullptr;
+}
+
+bool CFBXScene::IsMeshValid(const SString& strHierarchyMesh)
+{
+    for (auto const& pair : m_meshName)
+    {
+        if (pair.second == strHierarchyMesh)
+            return true;
+    }
+
+    return false;
+}
+
 void CFBXScene::GetAllTemplatesIds(std::vector<unsigned int>& vecIds)
 {
     for (auto const& pair : m_templateMap)
@@ -548,6 +607,7 @@ void CFBXScene::GetAllTemplatesIds(std::vector<unsigned int>& vecIds)
         vecIds.emplace_back(pair.first);
     }
 }
+
 bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId)
 {
     if (!IsTemplateValid(uiTemplateId))
@@ -606,7 +666,7 @@ void CFBXScene::SetTemplateScale(unsigned int uiTemplateId, CVector& scale)
 
 void CFBXScene::GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position)
 {
-    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
     CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
     pTemplateObject->GetPosition(position);
 }

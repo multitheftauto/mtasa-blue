@@ -9,6 +9,13 @@
  *
  *****************************************************************************/
 
+struct CFBXBoundingBox
+{
+    CVector min;
+    CVector max;
+    float   radius;
+};
+
 struct FBXVertex
 {
     CVector   pos;
@@ -100,10 +107,10 @@ class CFBXScene : public CFBXSceneInterface
 public:
     CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface);
 
-    bool                       IsMeshValid(const SString& strHierarchyMesh) { return m_meshList.find(strHierarchyMesh) != m_meshList.end(); }
+    bool                       IsMeshValid(const SString& strHierarchyMesh);
     bool                       IsObjectValid(unsigned long long ulId) { return m_objectList.find(ulId) != m_objectList.end(); }
     bool                       IsTemplateValid(unsigned int uiId) { return m_templateMap.count(uiId) != 0; }
-    const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) { return IsMeshValid(strHierarchyMesh) ? m_meshList[strHierarchyMesh] : nullptr; }
+    const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh);
     const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectValid(ulId) ? m_objectList[ulId] : nullptr; }
     void                       GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void                       GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
@@ -112,8 +119,11 @@ public:
     FBXObjectBuffer*           GetFBXBuffer(unsigned long long ullId);
     unsigned int               AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*              GetTexture(unsigned long long ullMaterialId);
+    void                       CalculateBoundingBox(const ofbx::Geometry* pGeometry);
     bool                       IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId);
     unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
+    unsigned int               CreateTemplate();
+    void                       RemoveTemplate(unsigned int uiTemplateId);
 
     void GetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void GetTemplatePosition(unsigned int uiTemplateId, CVector& position);
@@ -127,7 +137,6 @@ public:
     void SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale);
     void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
     void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
-
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
 
@@ -150,7 +159,9 @@ private:
     const ofbx::Object*                                             m_pRoot;
     std::vector<unsigned long long>                                 m_objectIdsList;
     std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
-    std::map<SString, const ofbx::Mesh*>                            m_meshList;
+    std::map<unsigned long long, const ofbx::Mesh*>                 m_meshList;
+    std::map<unsigned long long, SString>                           m_meshName;
+    std::map<unsigned long long, CFBXBoundingBox>                   m_geometryBoundingBox;
     std::map<SString, CPixels*>                                     m_textureContentList;
     std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;
     std::map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;

@@ -20,7 +20,7 @@ public:
 
     LUA_DECLARE(FBXLoadFile);
     LUA_DECLARE(FBXGetAllObjects);
-    LUA_DECLARE(FBXGetProperties);
+    LUA_DECLARE(FBXGetObjectProperties);
     LUA_DECLARE(FBXGetTemplateProperties);
     LUA_DECLARE(FBXSetTemplateProperties);
     LUA_DECLARE(FBXSetTemplateModelProperties);
@@ -34,4 +34,6 @@ public:
     LUA_DECLARE(FBXGetAllMaterials);
     LUA_DECLARE(FBXGetMeshRawData);
     LUA_DECLARE(FBXDrawPreview);
+    LUA_DECLARE(FBXAddTemplate);
+    LUA_DECLARE(FBXRemoveTemplate);
 };

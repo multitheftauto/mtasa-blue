@@ -18,11 +18,13 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxGetAllObjects", FBXGetAllObjects},
         {"fbxGetAllTemplates", FBXGetAllTemplates},
         {"fbxGetAllTemplateModels", FBXGetAllTemplateModels},
-        {"fbxGetProperties", FBXGetProperties},
+        {"fbxGetObjectProperties", FBXGetObjectProperties},
         {"fbxGetTemplateProperties", FBXGetTemplateProperties},
         {"fbxSetTemplateProperties", FBXSetTemplateProperties},
         {"fbxGetTemplateModelProperties", FBXGetTemplateModelProperties},
         {"fbxSetTemplateModelProperties", FBXSetTemplateModelProperties},
+        {"fbxAddTemplate", FBXAddTemplate},
+        {"fbxRemoveTemplate", FBXRemoveTemplate},
         {"fbxTemplateAddModel", FBXTemplateAddModel},
         {"fbxTemplateRemoveModel", FBXTemplateRemoveModel},
 
@@ -276,19 +278,21 @@ int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFBXDefs::FBXGetProperties(lua_State* luaVM)
+int CLuaFBXDefs::FBXGetObjectProperties(lua_State* luaVM)
 {
     CClientFBX*        pFBX;
     unsigned long long ulId;
+    eFBXObjectProperty eProperty;
     CScriptArgReader   argStream(luaVM);
     argStream.ReadUserData(pFBX);
     argStream.ReadNumber(ulId);
+    argStream.ReadEnumString(eProperty);
 
     if (!argStream.HasErrors())
     {
         if (pFBX->IsObjectValid(ulId))
         {
-            if (pFBX->LuaGetObjectProperties(luaVM, pFBX->GetObjectById(ulId)))
+            if (pFBX->LuaGetObjectProperties(luaVM, pFBX->GetObjectById(ulId), eProperty))
             {
                 return 1;
             }
@@ -431,6 +435,56 @@ int CLuaFBXDefs::FBXTemplateAddModel(lua_State* luaVM)
         if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
         {
             lua_pushnumber(luaVM, uiObjectId);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXAddTemplate(lua_State* luaVM)
+{
+    CClientFBX*        pFBX;
+    unsigned int       uiTemplate;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplate, 0);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int uiTemplateId;
+        if (pFBX->AddTemplate(uiTemplate, uiTemplateId))
+        {
+            lua_pushnumber(luaVM, uiTemplateId);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXRemoveTemplate(lua_State* luaVM)
+{
+    CClientFBX*        pFBX;
+    unsigned int       uiTemplate;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplate, 0);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int uiTemplateId;
+        if (pFBX->AddTemplate(uiTemplate, uiTemplateId))
+        {
+            lua_pushnumber(luaVM, uiTemplateId);
             return 1;
         }
     }

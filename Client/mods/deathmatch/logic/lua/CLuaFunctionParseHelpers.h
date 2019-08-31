@@ -120,6 +120,33 @@ enum eFBXTemplateModelProperty
 };
 DECLARE_ENUM(eFBXTemplateModelProperty);
 
+enum eFBXObjectProperty
+{
+    FBX_OBJECT_PROPERTY_TYPE,
+    FBX_OBJECT_PROPERTY_PARENT,
+    FBX_OBJECT_PROPERTY_COLOR_COUNT,
+    FBX_OBJECT_PROPERTY_INDEX_COUNT,
+    FBX_OBJECT_PROPERTY_MATERIAL_FACE_ID_COUNT,
+    FBX_OBJECT_PROPERTY_NORMAL_COUNT,
+    FBX_OBJECT_PROPERTY_VERTEX_COUNT,
+    FBX_OBJECT_PROPERTY_UV_COUNT,
+    FBX_OBJECT_PROPERTY_DIFFUSE_COLOR,
+    FBX_OBJECT_PROPERTY_SPECULAR_COLOR, 
+    FBX_OBJECT_PROPERTY_DIFFUSE_TEXTURE,
+    FBX_OBJECT_PROPERTY_SPECULAR_TEXTURE, 
+    FBX_OBJECT_PROPERTY_NORMAL_TEXTURE, 
+    FBX_OBJECT_PROPERTY_GEOMETRY, 
+    FBX_OBJECT_PROPERTY_MATERIALS,
+    FBX_OBJECT_PROPERTY_POSITION,
+    FBX_OBJECT_PROPERTY_ROTATION,
+    FBX_OBJECT_PROPERTY_SCALE,
+    FBX_OBJECT_PROPERTY_LOCAL_POSITION,
+    FBX_OBJECT_PROPERTY_LOCAL_ROTATION,
+    FBX_OBJECT_PROPERTY_LOCAL_SCALE,
+
+};
+DECLARE_ENUM(eFBXObjectProperty);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -455,9 +482,9 @@ inline SString GetClassTypeName(eFBXTemplateProperty*)
     return "fbx-template-property";
 }
 
-inline SString GetClassTypeName(eFBXTemplateModelProperty*)
+inline SString GetClassTypeName(eFBXObjectProperty*)
 {
-    return "fbx-template-model-property";
+    return "fbx-object-property";
 }
 
 //
