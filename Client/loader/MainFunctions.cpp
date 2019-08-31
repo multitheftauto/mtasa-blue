@@ -1144,6 +1144,7 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);
