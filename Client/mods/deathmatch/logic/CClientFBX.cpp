@@ -639,6 +639,14 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     return false;
 }
 
+void CClientFBX::RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
+{
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    m_pFBXScene->AddToRenderQueue(uiTemplateId, vecPosition, vecRotation, vecScale);
+}
+
 bool CClientFBX::LuaGetAllTemplates(lua_State* luaVM)
 {
     std::vector<unsigned int> vecIds;

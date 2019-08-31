@@ -61,6 +61,7 @@ public:
                            unsigned int& uiObjectId);
     bool             AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId);
     void             RemoveTemplate(unsigned int uiTemplateId);
+    void             RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
 
     void             CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem*   GetTextureById(unsigned long long strTextureName);

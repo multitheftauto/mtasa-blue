@@ -9,6 +9,18 @@
  *
  *****************************************************************************/
 
+struct CFBXRenderItem
+{
+    unsigned int uiTemplateId;
+    CVector      position;
+    CVector      rotation;
+    CVector      scale;
+    CFBXRenderItem(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
+        : uiTemplateId(uiTemplateId), position(vecPosition), rotation(vecRotation), scale(vecScale)
+    {
+    }
+};
+
 struct CFBXBoundingBox
 {
     CVector min;
@@ -80,7 +92,7 @@ class CFBXTemplate
 {
 public:
     CFBXTemplate();
-    void         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene);
+    void         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix);
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
 
     void SetPosition(CVector& position);
@@ -137,6 +149,7 @@ public:
     void SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale);
     void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
     void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
+    void AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
 
@@ -166,6 +179,8 @@ private:
     std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;
     std::map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;
     std::map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;
+
+    std::vector<CFBXRenderItem*> m_vecTemporaryRenderLoop;
 
     D3DXMATRIX* m_pMatrixUVFlip;
 };

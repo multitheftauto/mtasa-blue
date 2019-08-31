@@ -89,7 +89,7 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
     }
 }
 
-void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
+void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
 {
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
@@ -118,6 +118,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene)
         pViewMatrix->GetBuffer((float*)pObjectMatrix);
         pDevice->SetTransform(D3DTS_TEXTURE0, pScene->GetMatrixUVFlip());
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+        pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
         pObjectBuffer = pScene->GetFBXBuffer(object.second->ullObjectId);
         if (pObjectBuffer != nullptr)
         {
@@ -441,6 +442,11 @@ void CFBXScene::RemoveTemplate(unsigned int uiTemplateId)
 {
 }
 
+void CFBXScene::AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
+{
+    m_vecTemporaryRenderLoop.push_back(new CFBXRenderItem(uiTemplateId, vecPosition, vecRotation, vecScale));
+}
+
 void CFBXScene::CacheObjects()
 {
     const ofbx::Object* const* pObject;
@@ -622,10 +628,28 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
 
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
-    for (auto const& pair : m_templateMap)
+    // for (auto const& pair : m_templateMap)
+    //{
+    //    pair.second->Render(pDevice, this);
+    //}
+
+    CMatrix*      pMatrix = new CMatrix();
+    D3DMATRIX*    pObjectMatrix = new D3DMATRIX();
+    CFBXTemplate* pTemplate;
+    for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
-        pair.second->Render(pDevice, this);
+        if (!IsTemplateValid(renderItem->uiTemplateId))
+            continue;
+
+        pMatrix->SetPosition(renderItem->position);
+        pMatrix->SetRotation(renderItem->rotation);
+        pMatrix->SetScale(renderItem->scale);
+
+        pMatrix->GetBuffer((float*)pObjectMatrix);
+        pTemplate = m_templateMap[renderItem->uiTemplateId];
+        pTemplate->Render(pDevice, this, pObjectMatrix);
     }
+    ListClearAndReserve(m_vecTemporaryRenderLoop);
 }
 
 void CFBXScene::GetTemplatePosition(unsigned int uiTemplateId, CVector& position)
@@ -792,8 +816,11 @@ void CFBX::RemoveScene(CFBXScene* pScene)
 
 void CFBX::Render()
 {
-    for (auto const& pFBXScene : m_sceneList)
+    if (m_pDevice != nullptr)
     {
-        pFBXScene->RenderScene(m_pDevice);
+        for (auto const& pFBXScene : m_sceneList)
+        {
+            pFBXScene->RenderScene(m_pDevice);
+        }
     }
 }

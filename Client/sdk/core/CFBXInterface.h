@@ -59,4 +59,7 @@ public:
     virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;
     virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
+    virtual unsigned int               CreateTemplate() = 0;
+    virtual void                       RemoveTemplate(unsigned int uiTemplateId) = 0;
+    virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
 };
