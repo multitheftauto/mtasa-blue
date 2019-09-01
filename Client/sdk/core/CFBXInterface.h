@@ -55,6 +55,10 @@ public:
     virtual void SetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale) = 0;
     virtual void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position) = 0;
     virtual void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation) = 0;
+    virtual void GetTemplateDrawDistance(unsigned int uiTemplateId, float& drawDistance) = 0;
+    virtual void SetTemplateDrawDistance(unsigned int uiTemplateId, float drawDistance) = 0;
+    virtual void GetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fDrawDistance) = 0;
+    virtual void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance) = 0;
 
     virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;

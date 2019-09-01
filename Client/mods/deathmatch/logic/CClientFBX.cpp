@@ -149,6 +149,7 @@ bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, e
     }
 
     CVector vector;
+    float   distance;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -190,6 +191,10 @@ bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, e
             lua_pushnumber(luaVM, vector.fZ);
             lua_settable(luaVM, -3);
             break;
+        case FBX_TEMPLATE_PROPERTY_DRAW_DISTANCE:
+            m_pFBXScene->GetTemplateDrawDistance(uiId, distance);
+            lua_pushnumber(luaVM, distance);
+            break;
     }
     return true;
 }
@@ -207,6 +212,7 @@ bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int ui
     }
 
     CVector vector;
+    float   distance;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -248,6 +254,10 @@ bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int ui
             lua_pushnumber(luaVM, vector.fZ);
             lua_settable(luaVM, -3);
             break;
+        case FBX_TEMPLATE_PROPERTY_DRAW_DISTANCE:
+            m_pFBXScene->GetTemplateModelDrawDistance(uiId, uiModelId, distance);
+            lua_pushnumber(luaVM, distance);
+            break;
     }
     return true;
 }
@@ -261,6 +271,7 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
     }
 
     CVector vector;
+    float   distance;
     switch (eProperty)
     {
         case FBX_TEMPLATE_MODEL_PROPERTY_POSITION:
@@ -279,6 +290,12 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
             if (argStream.HasErrors())
                 return false;
             m_pFBXScene->SetTemplateModelScale(uiId, uiModelId, vector);
+            break;
+        case FBX_TEMPLATE_MODEL_PROPERTY_DRAW_DISTANCE:
+            argStream.ReadNumber(distance);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelDrawDistance(uiId, uiModelId, distance);
             break;
     }
     return true;

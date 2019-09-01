@@ -78,14 +78,17 @@ public:
     void SetPosition(CVector& pos);
     void SetRotation(CVector& rot);
     void SetScale(CVector& scale);
+    void SetDrawDistance(float fDrawDistance);
     void GetPosition(CVector& pos);
     void GetRotation(CVector& rot);
     void GetScale(CVector& scale);
+    void GetDrawDistance(float& fDrawDistance);
 
     CMatrix* pViewMatrix;
 
     D3DMATERIAL9 material;
     D3DLIGHT9    light;
+    float        fDrawDistance = 500.0f;
 };
 
 class CFBXTemplate
@@ -98,9 +101,11 @@ public:
     void SetPosition(CVector& position);
     void SetRotation(CVector& rotation);
     void SetScale(CVector& scale);
+    void SetDrawDistance(float fDrawDisntace);
     void GetPosition(CVector& position);
     void GetRotation(CVector& rotation);
     void GetScale(CVector& scale);
+    void GetDrawDistance(float& fDrawDisntace);
 
     CMatrix* pViewMatrix;
 
@@ -115,6 +120,7 @@ private:
 
     unsigned int uiInterior = 0;
     unsigned int uiDimension = 0;
+    float        fDrawDistance = 1000;
     unsigned int uiNextFreeObjectId = 1;
 };
 
@@ -155,6 +161,10 @@ public:
     void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
     void AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
     bool GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius);
+    void GetTemplateDrawDistance(unsigned int uiTemplateId, float& drawDistance);
+    void SetTemplateDrawDistance(unsigned int uiTemplateId, float drawDistance);
+    void GetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fDrawDistance);
+    void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance);
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
 
