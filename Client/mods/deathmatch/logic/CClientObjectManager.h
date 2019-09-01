@@ -40,6 +40,7 @@ public:
     bool        IsLowLodObjectLimitReached();
     bool        IsHardObjectLimitReached();
 
+    std::vector<CClientObject*> GetObjectsByModel(unsigned short usModel);
     void RestreamObjects(unsigned short usModel);
 
     void AddToList(CClientObject* pObject) { m_Objects.push_back(pObject); }

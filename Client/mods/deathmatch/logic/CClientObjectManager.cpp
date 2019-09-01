@@ -351,6 +351,22 @@ void CClientObjectManager::RestreamObjects(unsigned short usModel)
     }
 }
 
+std::vector<CClientObject*> CClientObjectManager::GetObjectsByModel(unsigned short usModel)
+{
+    std::vector<CClientObject*> vecObjects;
+    for (uint i = 0; i < m_Objects.size(); i++)
+    {
+        CClientObject* pObject = m_Objects[i];
+
+        if (pObject->GetModel() == usModel)
+        {
+            if (pObject != nullptr && !pObject->IsBeingDeleted())
+                vecObjects.push_back(pObject);
+        }
+    }
+    return vecObjects;
+}
+
 void CClientObjectManager::RemoveFromLists(CClientObject* pObject)
 {
     if (m_bCanRemoveFromList)

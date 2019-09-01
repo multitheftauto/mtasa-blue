@@ -107,10 +107,14 @@ public:
     CFBXTemplateObject*                         GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
     bool                                        IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
+    unsigned int                                GetInterior() { return uiInterior; }; 
+    unsigned int                                GetDimension() { return uiDimension; }; 
 
 private:
     std::map<unsigned int, CFBXTemplateObject*> m_objectMap;
 
+    unsigned int uiInterior = 0;
+    unsigned int uiDimension = 0;
     unsigned int uiNextFreeObjectId = 1;
 };
 

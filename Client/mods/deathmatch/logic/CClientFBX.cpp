@@ -682,15 +682,61 @@ bool CClientFBX::RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatc
     }
 
     for (auto const& templateId : m_mapElementRenderLoop[pElement])
-            if (templateId == uiTemplateId)
+        if (templateId == uiTemplateId)
+        {
+            ListRemove(m_mapElementRenderLoop[pElement], templateId);
+            if (m_mapElementRenderLoop[pElement].size() == 0)
             {
-                ListRemove(m_mapElementRenderLoop[pElement], templateId);
-                if (m_mapElementRenderLoop[pElement].size() == 0)
-                {
-                    m_mapElementRenderLoop.erase(pElement);
-                }
-                return true;
+                m_mapElementRenderLoop.erase(pElement);
             }
+            return true;
+        }
+
+    return false;
+}
+
+bool CClientFBX::ApplyTemplateToModel(unsigned int uiTemplateId, unsigned long ulModel)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+        return false;
+
+    if (m_mapModelRenderLoop.count(ulModel) == 0)
+    {
+        m_mapModelRenderLoop[ulModel] = std::vector<unsigned int>{uiTemplateId};
+        return true;
+    }
+    else
+    {
+        for (auto const& templateId : m_mapModelRenderLoop[ulModel])
+            if (templateId == uiTemplateId)
+                return false;
+
+        m_mapModelRenderLoop[ulModel].push_back(uiTemplateId);
+    }
+
+    return true;
+}
+
+bool CClientFBX::RemoveTemplateFromModel(unsigned int uiTemplateId, unsigned long ulModel)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+        return false;
+
+    if (m_mapModelRenderLoop.count(ulModel) == 0)
+    {
+        return false;
+    }
+
+    for (auto const& templateId : m_mapModelRenderLoop[ulModel])
+        if (templateId == uiTemplateId)
+        {
+            ListRemove(m_mapModelRenderLoop[ulModel], templateId);
+            if (m_mapModelRenderLoop[ulModel].size() == 0)
+            {
+                m_mapModelRenderLoop.erase(ulModel);
+            }
+            return true;
+        }
 
     return false;
 }
@@ -980,8 +1026,12 @@ CMaterialItem* CClientFBX::GetTextureById(unsigned long long ullTextureId)
 
 std::map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRenderingMatrix()
 {
+    unsigned short                                     usDimension = g_pClientGame->GetLocalPlayer()->GetDimension();
+    unsigned char                                      ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
     std::map<unsigned long long, std::vector<CMatrix>> templatesMatrix;
-    std::vector<unsigned long long>                    cleanUp;
+    CVector                                            scale;
+    std::vector<CClientObject*>                        vecObjects;
+
     for (const auto& pair : m_mapElementRenderLoop)
     {
         if (pair.first->IsBeingDeleted())
@@ -990,16 +1040,44 @@ std::map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRende
         }
         else
         {
-            for (const auto& templateId : pair.second)
+            if (pair.first->GetInterior() == ucInterior && pair.first->GetDimension() == usDimension)
             {
-                if (templatesMatrix.count(templateId) == 0)
+                for (const auto& templateId : pair.second)
                 {
-                    templatesMatrix[templateId] = std::vector<CMatrix>();
-                }
-                CMatrix pMatrix;
+                    if (templatesMatrix.count(templateId) == 0)
+                    {
+                        templatesMatrix[templateId] = std::vector<CMatrix>();
+                    }
+                    CMatrix pMatrix;
 
-                pair.first->GetMatrix(pMatrix);
-                templatesMatrix[templateId].push_back(pMatrix);
+                    pair.first->GetMatrix(pMatrix);
+                    pair.first->GetScale(scale);
+                    pMatrix.SetScale(scale);
+                    templatesMatrix[templateId].push_back(pMatrix);
+                }
+            }
+        }
+    }
+
+    for (const auto& pair : m_mapModelRenderLoop)
+    {
+        vecObjects = g_pClientGame->GetObjectManager()->GetObjectsByModel(pair.first);
+        for (const auto& templateId : pair.second)
+        {
+            if (templatesMatrix.count(templateId) == 0)
+            {
+                templatesMatrix[templateId] = std::vector<CMatrix>();
+            }
+            for (CClientObject* pObject : vecObjects)
+            {
+                if (pObject->GetInterior() == ucInterior && pObject->GetDimension() == usDimension)
+                {
+                    CMatrix pMatrix;
+                    pObject->GetMatrix(pMatrix);
+                    pObject->GetScale(scale);
+                    pMatrix.SetScale(scale);
+                    templatesMatrix[templateId].push_back(pMatrix);
+                }
             }
         }
     }

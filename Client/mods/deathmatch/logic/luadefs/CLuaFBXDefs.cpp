@@ -28,6 +28,7 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxTemplateAddModel", FBXTemplateAddModel},
         {"fbxTemplateRemoveModel", FBXTemplateRemoveModel},
         {"fbxApplyTemplateToModel", FBXApplyTemplateToModel},
+        {"fbxRemoveTemplateFromModel", FBXRemoveTemplateFromModel},
         {"fbxApplyTemplateToElement", FBXApplyTemplateToElement},
         {"fbxRemoveTemplateFromElement", FBXRemoveTemplateFromElement},
         {"fbxRenderTemplate", FBXRenderTemplate},
@@ -534,22 +535,54 @@ int CLuaFBXDefs::FBXApplyTemplateToModel(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
     unsigned int     uiTemplateId;
-    int              iModel;
+    unsigned long    ulModelID;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFBX);
     argStream.ReadNumber(uiTemplateId);
-    argStream.ReadNumber(iModel);
+    argStream.ReadNumber(ulModelID);
 
-    // if (!argStream.HasErrors())
-    //{
-    //    unsigned int uiObjectId;
-    //    if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
-    //    {
-    //        return 1;
-    //    }
-    //}
-    // else
-    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!argStream.HasErrors())
+    {
+        if (CClientObjectManager::IsValidModel(ulModelID))
+        {
+            if (pFBX->ApplyTemplateToModel(uiTemplateId, ulModelID))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXRemoveTemplateFromModel(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    unsigned int     uiTemplateId;
+    unsigned long    ulModelID;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplateId);
+    argStream.ReadNumber(ulModelID);
+
+    if (!argStream.HasErrors())
+    {
+        if (CClientObjectManager::IsValidModel(ulModelID))
+        {
+            if (pFBX->RemoveTemplateFromModel(uiTemplateId, ulModelID))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);
@@ -566,19 +599,19 @@ int CLuaFBXDefs::FBXApplyTemplateToElement(lua_State* luaVM)
     argStream.ReadNumber(uiTemplateId);
     argStream.ReadUserData(pElement);
 
-     if (!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
-         if (IS_OBJECT(pElement))
-         {
-             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
-             if (pFBX->ApplyTemplateToElement(uiTemplateId, Object))
-             {
-                 lua_pushboolean(luaVM, true);
-                 return 1;
-             }
-         }
+        if (IS_OBJECT(pElement))
+        {
+            CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
+            if (pFBX->ApplyTemplateToElement(uiTemplateId, Object))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
     }
-     else
+    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -596,19 +629,19 @@ int CLuaFBXDefs::FBXRemoveTemplateFromElement(lua_State* luaVM)
     argStream.ReadNumber(uiTemplateId);
     argStream.ReadUserData(pElement);
 
-     if (!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
-         if (IS_OBJECT(pElement))
-         {
-             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
-             if (pFBX->RemoveTemplateFromElement(uiTemplateId, Object))
-             {
-                 lua_pushboolean(luaVM, true);
-                 return 1;
-             }
-         }
+        if (IS_OBJECT(pElement))
+        {
+            CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
+            if (pFBX->RemoveTemplateFromElement(uiTemplateId, Object))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
     }
-     else
+    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed

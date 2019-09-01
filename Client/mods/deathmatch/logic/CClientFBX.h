@@ -65,6 +65,8 @@ public:
     bool RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
     bool ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
     bool RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
+    bool ApplyTemplateToModel(unsigned int uiTemplateId, unsigned long ulModel);
+    bool RemoveTemplateFromModel(unsigned int uiTemplateId, unsigned long ulModel);
 
     void           CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem* GetTextureById(unsigned long long strTextureName);
@@ -86,4 +88,5 @@ private:
 
     std::map<unsigned long long, CClientTexture*> m_mapTexture;
     std::map<CDeathmatchObject*, std::vector<unsigned int>> m_mapElementRenderLoop;
+    std::map<unsigned long, std::vector<unsigned int>> m_mapModelRenderLoop;
 };
