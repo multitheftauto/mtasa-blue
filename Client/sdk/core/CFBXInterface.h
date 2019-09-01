@@ -62,4 +62,5 @@ public:
     virtual unsigned int               CreateTemplate() = 0;
     virtual void                       RemoveTemplate(unsigned int uiTemplateId) = 0;
     virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
+    virtual bool                       GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius) = 0;
 };

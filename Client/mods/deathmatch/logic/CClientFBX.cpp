@@ -397,6 +397,8 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     bool                  bSupportsTransform = false;
     ofbx::Object*         pObjectParent;
     ofbx::Object::Type    eType = (*pObject)->getType();
+    CVector               min, max;
+    float                 radius;
     switch (eProperty)
     {
         case FBX_OBJECT_PROPERTY_TYPE:
@@ -473,6 +475,48 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
                 case ofbx::Object::Type::GEOMETRY:
                     pGeometry = (const ofbx::Geometry*)(*pObject);
                     lua_pushnumber(luaVM, pGeometry->getUVCount(0));
+                    return true;
+                default:
+                    return false;            // unsupported property
+            }
+            break;
+        case FBX_OBJECT_PROPERTY_BOUNDING_BOX:
+            switch (eType)
+            {
+                case ofbx::Object::Type::GEOMETRY:
+                    m_pFBXScene->GetBoundingBox((*pObject)->id,min, max, radius);
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, min.fX);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, min.fY);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, min.fZ);
+                    lua_settable(luaVM, -3);
+
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, max.fX);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, max.fY);
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, max.fZ);
+                    lua_settable(luaVM, -3);
+
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, radius);
+                    lua_settable(luaVM, -3);
                     return true;
                 default:
                     return false;            // unsupported property

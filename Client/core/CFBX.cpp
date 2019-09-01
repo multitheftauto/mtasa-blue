@@ -358,6 +358,19 @@ unsigned int CFBXScene::AddMeshToTemplate(unsigned int uiTemplate, unsigned long
     return uiNewObjectId;
 }
 
+bool CFBXScene::GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius)
+{
+    if (m_geometryBoundingBox.count(ullObjectId) == 0)
+        return false;
+
+    CFBXBoundingBox boundingBox = m_geometryBoundingBox[ullObjectId];
+
+    min = boundingBox.min;
+    max = boundingBox.max;
+    fRadius = boundingBox.radius;
+    return true;
+}
+
 CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
 {
     const ofbx::Material* const* pMaterial = m_materialList[ullMaterialId];
@@ -632,7 +645,7 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
     //{
     //    pair.second->Render(pDevice, this);
     //}
-
+    //unsigned char ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
     CMatrix*      pMatrix = new CMatrix();
     D3DMATRIX*    pObjectMatrix = new D3DMATRIX();
     CFBXTemplate* pTemplate;

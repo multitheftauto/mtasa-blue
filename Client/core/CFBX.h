@@ -154,6 +154,7 @@ public:
     void SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
     void SetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);
     void AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
+    bool GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius);
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
 
