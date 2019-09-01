@@ -21,7 +21,7 @@ extern CClientGame* g_pClientGame;
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                     const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP)
+                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;

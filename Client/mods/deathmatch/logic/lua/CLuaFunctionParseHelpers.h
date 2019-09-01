@@ -268,6 +268,14 @@ inline SString GetClassTypeName(CClientMaterial*)
 {
     return "material";
 }
+inline SString GetClassTypeName(CClientRenderTarget*)
+{
+    return "render-target-texture";
+}
+inline SString GetClassTypeName(CClientScreenSource*)
+{
+    return "screen-source-texture";
+}
 inline SString GetClassTypeName(CClientTexture*)
 {
     return "texture";

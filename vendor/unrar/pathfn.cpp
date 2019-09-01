@@ -16,7 +16,7 @@ wchar* PointToLastChar(const wchar *Path)
 }
 
 
-wchar* ConvertPath(const wchar *SrcPath,wchar *DestPath)
+wchar* ConvertPath(const wchar *SrcPath,wchar *DestPath,size_t DestSize)
 {
   const wchar *DestPtr=SrcPath;
 
@@ -25,7 +25,7 @@ wchar* ConvertPath(const wchar *SrcPath,wchar *DestPath)
     if (IsPathDiv(s[0]) && s[1]=='.' && s[2]=='.' && IsPathDiv(s[3]))
       DestPtr=s+4;
 
-  // Remove <d>:\ and any sequence of . and \ in the beginning of path string.
+  // Remove any amount of <d>:\ and any sequence of . and \ in the beginning of path string.
   while (*DestPtr!=0)
   {
     const wchar *s=DestPtr;
@@ -58,7 +58,7 @@ wchar* ConvertPath(const wchar *SrcPath,wchar *DestPath)
     // so we use the temporary buffer for copying.
     wchar TmpStr[NM];
     wcsncpyz(TmpStr,DestPtr,ASIZE(TmpStr));
-    wcscpy(DestPath,TmpStr);
+    wcsncpyz(DestPath,TmpStr,DestSize);
   }
   return (wchar *)DestPtr;
 }
@@ -120,7 +120,14 @@ bool CmpExt(const wchar *Name,const wchar *Ext)
 
 bool IsWildcard(const wchar *Str)
 {
-  return Str==NULL ? false:wcspbrk(Str,L"*?")!=NULL;
+  if (Str==NULL)
+    return false;
+#ifdef _WIN_ALL
+  // Not treat the special NTFS \\?\d: path prefix as a wildcard.
+  if (Str[0]=='\\' && Str[1]=='\\' && Str[2]=='?' && Str[3]=='\\')
+    Str+=4;
+#endif
+  return wcspbrk(Str,L"*?")!=NULL;
 }
 
 
@@ -144,9 +151,16 @@ bool IsDriveDiv(int Ch)
 }
 
 
+bool IsDriveLetter(const wchar *Path)
+{
+  wchar Letter=etoupperw(Path[0]);
+  return Letter>='A' && Letter<='Z' && IsDriveDiv(Path[1]);
+}
+
+
 int GetPathDisk(const wchar *Path)
 {
-  if (IsDiskLetter(Path))
+  if (IsDriveLetter(Path))
     return etoupperw(*Path)-'A';
   else
     return -1;
@@ -156,8 +170,8 @@ int GetPathDisk(const wchar *Path)
 void AddEndSlash(wchar *Path,size_t MaxLength)
 {
   size_t Length=wcslen(Path);
-  if (Length>0 && Path[Length-1]!=CPATHDIVIDER && Length+1<MaxLength)
-    wcscat(Path,SPATHDIVIDER);
+  if (Length>0 && Path[Length-1]!=CPATHDIVIDER)
+    wcsncatz(Path,SPATHDIVIDER,MaxLength);
 }
 
 
@@ -253,9 +267,9 @@ bool EnumConfigPaths(uint Number,wchar *Path,size_t MaxSize,bool Create)
   {
     char *EnvStr=getenv("HOME");
     if (EnvStr!=NULL)
-      GetWideName(EnvStr,NULL,Path,MaxSize);
+      CharToWide(EnvStr,Path,MaxSize);
     else
-      wcsncpyz(Path, ConfPath[0], MaxSize);
+      wcsncpyz(Path,ConfPath[0],MaxSize);
     return true;
   }
   Number--;
@@ -296,9 +310,13 @@ void GetConfigName(const wchar *Name,wchar *FullName,size_t MaxSize,bool CheckEx
 #endif
 
 
-// Returns a pointer to rightmost digit of volume number.
+// Returns a pointer to rightmost digit of volume number or to beginning
+// of file name if numeric part is missing.
 wchar* GetVolNumPart(const wchar *ArcName)
 {
+  if (*ArcName==0)
+    return (wchar *)ArcName;
+
   // Pointing to last name character.
   const wchar *ChPtr=ArcName+wcslen(ArcName)-1;
 
@@ -339,18 +357,33 @@ void NextVolumeName(wchar *ArcName,uint MaxLength,bool OldNumbering)
     ChPtr=GetExt(ArcName);
   }
   else
-    if (ChPtr[1]==0 && wcslen(ArcName)<MaxLength-3 || wcsicomp(ChPtr+1,L"exe")==0 || wcsicomp(ChPtr+1,L"sfx")==0)
-      wcscpy(ChPtr+1,L"rar");
+    if (ChPtr[1]==0 || wcsicomp(ChPtr,L".exe")==0 || wcsicomp(ChPtr,L".sfx")==0)
+      wcsncpyz(ChPtr,L".rar",MaxLength-(ChPtr-ArcName));
+
+  if (ChPtr==NULL || *ChPtr!='.' || ChPtr[1]==0)
+  {
+    // Normally we shall have some extension here. If we don't, it means
+    // the name has no extension and buffer has no free space to append one.
+    // Let's clear the name to prevent a new call with same name and return.
+    *ArcName=0;
+    return;
+  }
+
   if (!OldNumbering)
   {
     ChPtr=GetVolNumPart(ArcName);
 
+    // We should not check for IsDigit(*ChPtr) here and should increment
+    // even non-digits. If we got a corrupt archive with volume flag,
+    // but without numeric part, we still need to modify its name somehow,
+    // so while (exist(name)) {NextVolumeName()} loops do not run infinitely.
     while ((++(*ChPtr))=='9'+1)
     {
       *ChPtr='0';
       ChPtr--;
       if (ChPtr<ArcName || !IsDigit(*ChPtr))
       {
+        // Convert .part:.rar (.part9.rar after increment) to part10.rar.
         for (wchar *EndPtr=ArcName+wcslen(ArcName);EndPtr!=ChPtr;EndPtr--)
           *(EndPtr+1)=*EndPtr;
         *(ChPtr+1)='1';
@@ -359,15 +392,15 @@ void NextVolumeName(wchar *ArcName,uint MaxLength,bool OldNumbering)
     }
   }
   else
-    if (!IsDigit(*(ChPtr+2)) || !IsDigit(*(ChPtr+3)))
-      wcscpy(ChPtr+2,L"00");
+    if (!IsDigit(ChPtr[2]) || !IsDigit(ChPtr[3]))
+      wcsncpyz(ChPtr+2,L"00",MaxLength-(ChPtr-ArcName)-2); // From .rar to .r00.
     else
     {
-      ChPtr+=3;
-      while ((++(*ChPtr))=='9'+1)
-        if (*(ChPtr-1)=='.')
+      ChPtr+=wcslen(ChPtr)-1; // Set to last character.
+      while (++(*ChPtr)=='9'+1)
+        if (ChPtr<=ArcName || *(ChPtr-1)=='.')
         {
-          *ChPtr='A';
+          *ChPtr='a'; // From .999 to .a00 if started from .001 or for too short names.
           break;
         }
         else
@@ -534,7 +567,7 @@ bool IsFullPath(const wchar *Path)
     return true;
 */
 #if defined(_WIN_ALL) || defined(_EMX)
-  return Path[0]=='\\' && Path[1]=='\\' || IsDiskLetter(Path) && IsPathDiv(Path[2]);
+  return Path[0]=='\\' && Path[1]=='\\' || IsDriveLetter(Path) && IsPathDiv(Path[2]);
 #else
   return IsPathDiv(Path[0]);
 #endif
@@ -547,17 +580,10 @@ bool IsFullRootPath(const wchar *Path)
 }
 
 
-bool IsDiskLetter(const wchar *Path)
-{
-  wchar Letter=etoupperw(Path[0]);
-  return Letter>='A' && Letter<='Z' && IsDriveDiv(Path[1]);
-}
-
-
 void GetPathRoot(const wchar *Path,wchar *Root,size_t MaxSize)
 {
   *Root=0;
-  if (IsDiskLetter(Path))
+  if (IsDriveLetter(Path))
     swprintf(Root,MaxSize,L"%c:\\",*Path);
   else
     if (Path[0]=='\\' && Path[1]=='\\')
@@ -585,8 +611,7 @@ int ParseVersionFileName(wchar *Name,bool Truncate)
   wchar *VerText=wcsrchr(Name,';');
   if (VerText!=NULL)
   {
-    if (Version==0)
-      Version=atoiw(VerText+1);
+    Version=atoiw(VerText+1);
     if (Truncate)
       *VerText=0;
   }
@@ -594,7 +619,7 @@ int ParseVersionFileName(wchar *Name,bool Truncate)
 }
 
 
-#if !defined(SFX_MODULE) && !defined(SETUP)
+#if !defined(SFX_MODULE)
 // Get the name of first volume. Return the leftmost digit of volume number.
 wchar* VolNameToFirstName(const wchar *VolName,wchar *FirstName,size_t MaxSize,bool NewNumbering)
 {
@@ -652,7 +677,7 @@ wchar* VolNameToFirstName(const wchar *VolName,wchar *FirstName,size_t MaxSize,b
 
 
 #ifndef SFX_MODULE
-static void GenArcName(wchar *ArcName,const wchar *GenerateMask,uint ArcNumber,bool &ArcNumPresent)
+static void GenArcName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask,uint ArcNumber,bool &ArcNumPresent)
 {
   bool Prefix=false;
   if (*GenerateMask=='+')
@@ -713,7 +738,7 @@ static void GenArcName(wchar *ArcName,const wchar *GenerateMask,uint ArcNumber,b
   wchar Ext[NM],*Dot=GetExt(ArcName);
   *Ext=0;
   if (Dot==NULL)
-    wcscpy(Ext,*PointToName(ArcName)==0 ? L".rar":L"");
+    wcsncpyz(Ext,*PointToName(ArcName)==0 ? L".rar":L"",ASIZE(Ext));
   else
   {
     wcsncpyz(Ext,Dot,ASIZE(Ext));
@@ -733,23 +758,23 @@ static void GenArcName(wchar *ArcName,const wchar *GenerateMask,uint ArcNumber,b
 
   char Field[10][6];
 
-  sprintf(Field[0],"%04d",rlt.Year);
-  sprintf(Field[1],"%02d",rlt.Month);
-  sprintf(Field[2],"%02d",rlt.Day);
-  sprintf(Field[3],"%02d",rlt.Hour);
-  sprintf(Field[4],"%02d",rlt.Minute);
-  sprintf(Field[5],"%02d",rlt.Second);
-  sprintf(Field[6],"%02d",CurWeek);
-  sprintf(Field[7],"%d",WeekDay+1);
-  sprintf(Field[8],"%03d",rlt.yDay+1);
-  sprintf(Field[9],"%05d",ArcNumber);
+  sprintf(Field[0],"%04u",rlt.Year);
+  sprintf(Field[1],"%02u",rlt.Month);
+  sprintf(Field[2],"%02u",rlt.Day);
+  sprintf(Field[3],"%02u",rlt.Hour);
+  sprintf(Field[4],"%02u",rlt.Minute);
+  sprintf(Field[5],"%02u",rlt.Second);
+  sprintf(Field[6],"%02u",(uint)CurWeek);
+  sprintf(Field[7],"%u",(uint)WeekDay+1);
+  sprintf(Field[8],"%03u",rlt.yDay+1);
+  sprintf(Field[9],"%05u",ArcNumber);
 
   const wchar *MaskChars=L"YMDHISWAEN";
 
   int CField[sizeof(Field)/sizeof(Field[0])];
   memset(CField,0,sizeof(CField));
   QuoteMode=false;
-  for (int I=0;Mask[I]!=0;I++)
+  for (uint I=0;Mask[I]!=0;I++)
   {
     if (Mask[I]=='{' || Mask[I]=='}')
     {
@@ -810,21 +835,17 @@ static void GenArcName(wchar *ArcName,const wchar *GenerateMask,uint ArcNumber,b
     AddEndSlash(NewName,ASIZE(NewName));
     wcsncatz(NewName,DateText,ASIZE(NewName));
     wcsncatz(NewName,PointToName(ArcName),ASIZE(NewName));
-    wcscpy(ArcName,NewName);
+    wcsncpyz(ArcName,NewName,MaxSize);
   }
   else
-    wcscat(ArcName,DateText);
-  wcscat(ArcName,Ext);
+    wcsncatz(ArcName,DateText,MaxSize);
+  wcsncatz(ArcName,Ext,MaxSize);
 }
 
 
 void GenerateArchiveName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask,bool Archiving)
 {
-  // Must be enough space for archive name plus all stuff in mask plus
-  // extra overhead produced by mask 'N' (archive number) characters.
-  // One 'N' character can result in several numbers if we process more
-  // than 9 archives.
-  wchar NewName[NM+MAX_GENERATE_MASK+20];
+  wchar NewName[NM];
 
   uint ArcNumber=1;
   while (true) // Loop for 'N' (archive number) processing.
@@ -833,7 +854,7 @@ void GenerateArchiveName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask
     
     bool ArcNumPresent=false;
 
-    GenArcName(NewName,GenerateMask,ArcNumber,ArcNumPresent);
+    GenArcName(NewName,ASIZE(NewName),GenerateMask,ArcNumber,ArcNumPresent);
     
     if (!ArcNumPresent)
       break;
@@ -845,7 +866,7 @@ void GenerateArchiveName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask
         // existing archive before the first unused name. So we generate
         // the name for (ArcNumber-1) below.
         wcsncpyz(NewName,NullToEmpty(ArcName),ASIZE(NewName));
-        GenArcName(NewName,GenerateMask,ArcNumber-1,ArcNumPresent);
+        GenArcName(NewName,ASIZE(NewName),GenerateMask,ArcNumber-1,ArcNumPresent);
       }
       break;
     }
@@ -873,7 +894,7 @@ wchar* GetWideName(const char *Name,const wchar *NameW,wchar *DestW,size_t DestS
   if (DestSize>0)
     DestW[DestSize-1]=0;
 
-  return(DestW);
+  return DestW;
 }
 
 
@@ -887,16 +908,16 @@ bool GetWinLongPath(const wchar *Src,wchar *Dest,size_t MaxSize)
     return false;
   const wchar *Prefix=L"\\\\?\\";
   const size_t PrefixLength=4;
-  bool FullPath=IsDiskLetter(Src) && IsPathDiv(Src[2]);
+  bool FullPath=IsDriveLetter(Src) && IsPathDiv(Src[2]);
   size_t SrcLength=wcslen(Src);
   if (IsFullPath(Src)) // Paths in d:\path\name format.
   {
-    if (IsDiskLetter(Src))
+    if (IsDriveLetter(Src))
     {
       if (MaxSize<=PrefixLength+SrcLength)
         return false;
-      wcsncpy(Dest,Prefix,PrefixLength);
-      wcscpy(Dest+PrefixLength,Src);
+      wcsncpyz(Dest,Prefix,MaxSize);
+      wcsncatz(Dest,Src,MaxSize); // "\\?\D:\very long path".
       return true;
     }
     else
@@ -904,9 +925,9 @@ bool GetWinLongPath(const wchar *Src,wchar *Dest,size_t MaxSize)
       {
         if (MaxSize<=PrefixLength+SrcLength+2)
           return false;
-        wcsncpy(Dest,Prefix,PrefixLength);
-        wcscpy(Dest+PrefixLength,L"UNC");
-        wcscpy(Dest+PrefixLength+3,Src+1);
+        wcsncpyz(Dest,Prefix,MaxSize);
+        wcsncatz(Dest,L"UNC",MaxSize);
+        wcsncatz(Dest,Src+1,MaxSize); // "\\?\UNC\server\share".
         return true;
       }
     // We may be here only if we modify IsFullPath in the future.
@@ -923,9 +944,10 @@ bool GetWinLongPath(const wchar *Src,wchar *Dest,size_t MaxSize)
     {
       if (MaxSize<=PrefixLength+SrcLength+2)
         return false;
-      wcsncpy(Dest,Prefix,PrefixLength);
-      wcsncpy(Dest+PrefixLength,CurDir,2); // Copy drive letter 'd:'.
-      wcscpy(Dest+PrefixLength+2,Src);
+      wcsncpyz(Dest,Prefix,MaxSize);
+      CurDir[2]=0;
+      wcsncatz(Dest,CurDir,MaxSize); // Copy drive letter 'd:'.
+      wcsncatz(Dest,Src,MaxSize);
       return true;
     }
     else  // Paths in path\name format.
@@ -933,8 +955,8 @@ bool GetWinLongPath(const wchar *Src,wchar *Dest,size_t MaxSize)
       AddEndSlash(CurDir,ASIZE(CurDir));
       if (MaxSize<=PrefixLength+wcslen(CurDir)+SrcLength)
         return false;
-      wcsncpy(Dest,Prefix,PrefixLength);
-      wcscpy(Dest+PrefixLength,CurDir);
+      wcsncpyz(Dest,Prefix,MaxSize);
+      wcsncatz(Dest,CurDir,MaxSize);
 
       if (Src[0]=='.' && IsPathDiv(Src[1])) // Remove leading .\ in pathname.
         Src+=2;
@@ -944,5 +966,41 @@ bool GetWinLongPath(const wchar *Src,wchar *Dest,size_t MaxSize)
     }
   }
   return false;
+}
+
+
+// Convert Unix, OS X and Android decomposed chracters to Windows precomposed.
+void ConvertToPrecomposed(wchar *Name,size_t NameSize)
+{
+  wchar FileName[NM];
+  if (WinNT()>=WNT_VISTA && // MAP_PRECOMPOSED is not supported in XP.
+      FoldString(MAP_PRECOMPOSED,Name,-1,FileName,ASIZE(FileName))!=0)
+  {
+    FileName[ASIZE(FileName)-1]=0;
+    wcsncpyz(Name,FileName,NameSize);
+  }
+}
+
+
+// Remove trailing spaces and dots in file name and in dir names in path.
+void MakeNameCompatible(wchar *Name)
+{
+  int Src=0,Dest=0;
+  while (true)
+  {
+    if (IsPathDiv(Name[Src]) || Name[Src]==0)
+      for (int I=Dest-1;I>0 && (Name[I]==' ' || Name[I]=='.');I--)
+      {
+        // Permit path1/./path2 and ../path1 paths.
+        if (Name[I]=='.' && (IsPathDiv(Name[I-1]) || Name[I-1]=='.' && I==1))
+          break;
+        Dest--;
+      }
+    Name[Dest]=Name[Src];
+    if (Name[Src]==0)
+      break;
+    Src++;
+    Dest++;
+  }
 }
 #endif

@@ -13,6 +13,8 @@
 # See http://www.cryptopp.com/wiki/ARM_Embedded_(Command_Line) for details.
 # ====================================================================
 
+# set -eu
+
 # Unset old options
 
 unset IS_CROSS_COMPILE
@@ -21,7 +23,7 @@ unset IS_IOS
 unset IS_ANDROID
 unset IS_ARM_EMBEDDED
 
-if [ -z "$ARM_EMBEDDED_TOOLCHAIN" ]; then
+if [ -z "${ARM_EMBEDDED_TOOLCHAIN-}" ]; then
 	ARM_EMBEDDED_TOOLCHAIN="/usr/bin"
 fi
 
@@ -42,7 +44,8 @@ export CXX="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-g++"
 export LD="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-ld"
 export AR="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-ar"
 export AS="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-as"
-export RANLIB="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-gcc-ranlib-4.7"
+export RANLIB="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-ranlib"
+# export RANLIB="$ARM_EMBEDDED_TOOLCHAIN/$TOOL_PREFIX-gcc-ranlib-4.7"
 
 # Test a few of the tools
 if [ ! -e "$CPP" ]; then
@@ -95,7 +98,8 @@ if [ ! -d "$ARM_EMBEDDED_SYSROOT" ]; then
 fi
 
 # Fix C++ header paths for Ubuntu
-ARM_EMBEDDED_TOOLCHAIN_VERSION="4.7.3"
+# ARM_EMBEDDED_TOOLCHAIN_VERSION="4.7.3"
+ARM_EMBEDDED_TOOLCHAIN_VERSION="5.4.0"
 ARM_EMBEDDED_CXX_HEADERS="$ARM_EMBEDDED_SYSROOT/include/c++/$ARM_EMBEDDED_TOOLCHAIN_VERSION"
 
 if [ ! -d "$ARM_EMBEDDED_CXX_HEADERS" ]; then
@@ -132,8 +136,9 @@ fi
 
 echo
 echo "*******************************************************************************"
-echo "It looks the the environment is set correctly. Your next step is"
-echo "build the library with 'make -f GNUmakefile-cross'"
+echo "It looks the the environment is set correctly. Your next step is build"
+echo "the library with 'make -f GNUmakefile-cross'. You can create a versioned"
+echo "shared object using 'HAS_SOLIB_VERSION=1 make -f GNUmakefile-cross'"
 echo "*******************************************************************************"
 echo
 

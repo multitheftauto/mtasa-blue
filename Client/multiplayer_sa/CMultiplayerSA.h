@@ -130,6 +130,7 @@ public:
     void SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler);
     void SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler);
     void SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler);
+    void SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler);
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);

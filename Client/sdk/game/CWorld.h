@@ -285,13 +285,13 @@ public:
         for (usForNext--; usForNext >= 0; usForNext--)
         {
             if (bEnabled)
-                flags[flagsGroup] = flags[flagsGroup] |= 1UL << sFlagID + usForNext;
+                flags[flagsGroup] |= 1UL << (sFlagID + usForNext);
             else
-                flags[flagsGroup] = flags[flagsGroup] &= ~(1UL << sFlagID + usForNext);
+                flags[flagsGroup] &= ~(1UL << (sFlagID + usForNext));
         }
     }
     inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
-        return (flags[flagsGroup] >> sFlagID) & 1U == 1;
+        return ((flags[flagsGroup] >> sFlagID) & 1U) == 1;
     }
 };
 

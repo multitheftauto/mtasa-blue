@@ -956,6 +956,8 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
         ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
+        // Increment this model references count, so we don't unload it before we have a chance to reset the positions
+        m_pInterface->usNumberOfRefs++;
     }
 
     if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
@@ -974,9 +976,13 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
-            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+            // TODO: Find out why this is a nullptr, and fix underlying bug
+            if (pVehicleModel->pVisualInfo != nullptr)
+                pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
         ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
+        // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
+        info.first->usNumberOfRefs--;
     }
     ms_ModelDefaultDummiesPosition.clear();
 }

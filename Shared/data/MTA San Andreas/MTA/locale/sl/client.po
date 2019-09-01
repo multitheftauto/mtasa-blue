@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-10 04:47+0000\n"
-"PO-Revision-Date: 2019-03-10 04:40+0000\n"
+"POT-Creation-Date: 2019-05-20 21:57+0100\n"
+"PO-Revision-Date: 2019-07-11 21:03+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 "Translators: PrimoXD; Boštjan Kozar; Bine\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1552192825.0\n"
+"X-POOTLE-MTIME: 1562878992.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -107,14 +107,12 @@ msgstr "Povezava prekinjena. Neveljavno ime!"
 #: ..\Client\core\CConnectManager.cpp:127
 #: ..\Client\core\CConnectManager.cpp:263
 #: ..\Client\core\CConnectManager.cpp:321
-#: ..\Client\core\CConnectManager.cpp:410
-#: ..\Client\core\CConnectManager.cpp:417
-#: ..\Client\core\CConnectManager.cpp:427 ..\Client\core\CCore.cpp:1234
-#: ..\Client\core\CCore.cpp:1247 ..\Client\core\CGUI.cpp:85
-#: ..\Client\core\CQuickConnect.cpp:142 ..\Client\core\CQuickConnect.cpp:151
-#: ..\Client\core\CQuickConnect.cpp:156 ..\Client\core\CQuickConnect.cpp:165
-#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:3952
-#: ..\Client\core\CSettings.cpp:3980 ..\Client\core\CSettings.cpp:4425
+#: ..\Client\core\CConnectManager.cpp:404
+#: ..\Client\core\CConnectManager.cpp:411
+#: ..\Client\core\CConnectManager.cpp:421 ..\Client\core\CCore.cpp:1182
+#: ..\Client\core\CCore.cpp:1195 ..\Client\core\CGUI.cpp:85
+#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:3955
+#: ..\Client\core\CSettings.cpp:3983 ..\Client\core\CSettings.cpp:4428
 #: ..\Client\core\DXHook\CDirect3DHook9.cpp:128
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
@@ -126,21 +124,21 @@ msgstr "Povezava prekinjena. Neveljavno ime!"
 #: ..\Client\loader\MainFunctions.cpp:254
 #: ..\Client\loader\MainFunctions.cpp:256
 #: ..\Client\loader\MainFunctions.cpp:817
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:572
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:640
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:664
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:686
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1002
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1082
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1092
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1161
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1195
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1244
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1256
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:644
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:668
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:690
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1006
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1086
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1096
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1165
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1199
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1248
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1260
 #: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 #: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Error"
 msgstr "Napaka"
 
@@ -161,180 +159,180 @@ msgstr "Vzpostavljanje povezave s %s:%u ..."
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:148
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:588
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:592
 msgid "CONNECTING"
 msgstr "VZPOSTAVLJANJE POVEZAVE"
 
 #: ..\Client\core\CConnectManager.cpp:263
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1161
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1165
 msgid "Connection timed out"
 msgstr "Povezava je potekla"
 
 #: ..\Client\core\CConnectManager.cpp:277
 #: ..\Client\core\CConnectManager.cpp:281
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1206
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1210
 msgid "Disconnected: unknown protocol error"
 msgstr "Prekinjeno: neznana napaka protokola"
 
 #: ..\Client\core\CConnectManager.cpp:285
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1210
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1214
 msgid "Disconnected: disconnected remotely"
 msgstr "Povezava prekinjena: povezava prekinjena na daljavo"
 
 #: ..\Client\core\CConnectManager.cpp:289
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1218
 msgid "Disconnected: connection lost remotely"
 msgstr "Povezava prekinjena: povezava izgubljena na daljavo"
 
 #: ..\Client\core\CConnectManager.cpp:293
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1218
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1222
 msgid "Disconnected: you are banned from this server"
 msgstr "Povezava prekinjena: Nimate več dostopa do strežnika"
 
 #: ..\Client\core\CConnectManager.cpp:300
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1226
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1230
 msgid "Disconnected: disconnected from the server"
 msgstr "Povezava prekinjena: Odjava iz strežnika"
 
 #: ..\Client\core\CConnectManager.cpp:304
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1230
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1234
 msgid "Disconnected: connection to the server was lost"
 msgstr "Povezava prekinjena: Povezava s strežnikom je bila prekinjena."
 
 #: ..\Client\core\CConnectManager.cpp:311
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1238
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1242
 msgid "Disconnected: connection was refused"
 msgstr "Povezava prekinjena: Povezava je bila zavrnjena"
 
 #. Failed loading the mod
-#: ..\Client\core\CConnectManager.cpp:409
+#: ..\Client\core\CConnectManager.cpp:403
 #, c-format, c-format
 msgid "No such mod installed (%s)"
 msgstr "Tak način ni nameščena (%s)"
 
-#: ..\Client\core\CConnectManager.cpp:417
+#: ..\Client\core\CConnectManager.cpp:411
 msgid "Bad server response (2)"
 msgstr "Slab odziv strežnika (2)"
 
-#: ..\Client\core\CConnectManager.cpp:427
+#: ..\Client\core\CConnectManager.cpp:421
 msgid "Bad server response (1)"
 msgstr "Slab odziv strežnika (1)"
 
 #. Create window
-#: ..\Client\core\CConsole.cpp:427
+#: ..\Client\core\CConsole.cpp:417
 msgid "CONSOLE"
 msgstr "KONZOLA"
 
-#: ..\Client\core\CCore.cpp:743 ..\Client\loader\CInstallManager.cpp:657
+#: ..\Client\core\CCore.cpp:696 ..\Client\loader\CInstallManager.cpp:657
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
 
-#: ..\Client\core\CCore.cpp:745 ..\Client\mods\deathmatch\logic\Utils.cpp:144
+#: ..\Client\core\CCore.cpp:698 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "Usodna napaka"
 
-#: ..\Client\core\CCore.cpp:893
+#: ..\Client\core\CCore.cpp:841
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr ""
 
-#: ..\Client\core\CCore.cpp:925
+#: ..\Client\core\CCore.cpp:873
 #, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modul je napačen!"
 
-#: ..\Client\core\CCore.cpp:1234
+#: ..\Client\core\CCore.cpp:1182
 msgid "Error executing URL"
 msgstr "Napaka pri izvrševanju internetnega naslova"
 
-#: ..\Client\core\CCore.cpp:1246
+#: ..\Client\core\CCore.cpp:1194
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Napaka pri teku modifikacije je določena v ukazni vrstici ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: ..\Client\core\CCore.cpp:1331
+#: ..\Client\core\CCore.cpp:1279
 msgid "this help screen"
 msgstr "ta stran z navodili"
 
-#: ..\Client\core\CCore.cpp:1332 ..\Client\core\CCore.cpp:1333
+#: ..\Client\core\CCore.cpp:1280 ..\Client\core\CCore.cpp:1281
 msgid "exits the application"
 msgstr "Končaj aplikacijo"
 
-#: ..\Client\core\CCore.cpp:1334
+#: ..\Client\core\CCore.cpp:1282
 msgid "shows the version"
 msgstr "prikaže različico"
 
-#: ..\Client\core\CCore.cpp:1335
+#: ..\Client\core\CCore.cpp:1283
 msgid "shows the time"
 msgstr "prikaže čas"
 
-#: ..\Client\core\CCore.cpp:1336
+#: ..\Client\core\CCore.cpp:1284
 msgid "shows the hud"
 msgstr "pokaže hud"
 
-#: ..\Client\core\CCore.cpp:1337
+#: ..\Client\core\CCore.cpp:1285
 msgid "shows all the binds"
 msgstr "pokaže vse bližnjice"
 
-#: ..\Client\core\CCore.cpp:1338
+#: ..\Client\core\CCore.cpp:1286
 msgid "shows your serial"
 msgstr "prikaže vašo serijsko številko"
 
-#: ..\Client\core\CCore.cpp:1347
+#: ..\Client\core\CCore.cpp:1295
 msgid "connects to a server (host port nick pass)"
 msgstr "se povezuje s strežnikom (gostitelj vrata ime geslo)"
 
-#: ..\Client\core\CCore.cpp:1348
+#: ..\Client\core\CCore.cpp:1296
 msgid "connects to a previous server"
 msgstr "se povezuje na prejšnji strežnik"
 
-#: ..\Client\core\CCore.cpp:1349
+#: ..\Client\core\CCore.cpp:1297
 msgid "binds a key (key control)"
 msgstr "določi tipko kot funkcijo (tipka ukaz)"
 
-#: ..\Client\core\CCore.cpp:1350
+#: ..\Client\core\CCore.cpp:1298
 msgid "unbinds a key (key)"
 msgstr "zbriše funkcijo na tipki (tipka)"
 
-#: ..\Client\core\CCore.cpp:1351
+#: ..\Client\core\CCore.cpp:1299
 msgid "copies the default gta controls"
 msgstr "kopira privzete gta nastavitve"
 
-#: ..\Client\core\CCore.cpp:1352
+#: ..\Client\core\CCore.cpp:1300
 msgid "outputs a screenshot"
 msgstr "prikaže posnetek zaslona"
 
-#: ..\Client\core\CCore.cpp:1353
+#: ..\Client\core\CCore.cpp:1301
 msgid "immediately saves the config"
 msgstr "takoj shrani konfiguracije"
 
-#: ..\Client\core\CCore.cpp:1355
+#: ..\Client\core\CCore.cpp:1303
 msgid "clears the debug view"
 msgstr "počisti pogled odpravljalca napak"
 
-#: ..\Client\core\CCore.cpp:1356
+#: ..\Client\core\CCore.cpp:1304
 msgid "scrolls the chatbox upwards"
 msgstr "pomakne klepet navzgor"
 
-#: ..\Client\core\CCore.cpp:1357
+#: ..\Client\core\CCore.cpp:1305
 msgid "scrolls the chatbox downwards"
 msgstr "pomakne klepet navzdol"
 
-#: ..\Client\core\CCore.cpp:1358
+#: ..\Client\core\CCore.cpp:1306
 msgid "scrolls the debug view upwards"
 msgstr "pomakne pogled odpravljalca napak navzgor"
 
-#: ..\Client\core\CCore.cpp:1359
+#: ..\Client\core\CCore.cpp:1307
 msgid "scrolls the debug view downwards"
 msgstr "pomakne pogled odpravljalca napak navzdol"
 
-#: ..\Client\core\CCore.cpp:1362
+#: ..\Client\core\CCore.cpp:1310
 msgid "shows the memory statistics"
 msgstr "prikaže statistiko spomina"
 
-#: ..\Client\core\CCore.cpp:1363
+#: ..\Client\core\CCore.cpp:1311
 msgid "shows the frame timing graph"
 msgstr "prikaže časovni graf okvirja"
 
@@ -346,15 +344,15 @@ msgstr "Programiranje"
 msgid "Contributors"
 msgstr "Avtorji prispevkov"
 
-#: ..\Client\core\CCredits.cpp:75
+#: ..\Client\core\CCredits.cpp:76
 msgid "Game Design / Scripting"
 msgstr "Dizajn igre / Skriptanje"
 
-#: ..\Client\core\CCredits.cpp:95
+#: ..\Client\core\CCredits.cpp:96
 msgid "Language Localization"
 msgstr "Prevod"
 
-#: ..\Client\core\CCredits.cpp:101
+#: ..\Client\core\CCredits.cpp:102
 msgid "Patch contributors"
 msgstr "Avtorji popravka"
 
@@ -572,13 +570,23 @@ msgstr "Nadzor skupine nazaj"
 msgid "English"
 msgstr "Slovenščina"
 
-#: ..\Client\core\CMainMenu.cpp:316
+#: ..\Client\core\CMainMenu.cpp:315
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
 
-#: ..\Client\core\CMainMenu.cpp:1110
+#: ..\Client\core\CMainMenu.cpp:334
+msgid ""
+"MTA will not receive updates on XP/Vista after July 2019.\n"
+"\n"
+"Upgrade Windows to play on the latest servers."
+msgstr ""
+"MTA ne bo pridobivala posodobitev na XP/Vista po Juliju 2019.\n"
+"\n"
+"Nadgradite Windows za igranje na najnovejših strežnikih."
+
+#: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -588,17 +596,17 @@ msgstr ""
 "\n"
 "Ali ste prepričani da želite prekiniti povezavo?"
 
-#: ..\Client\core\CMainMenu.cpp:1114
+#: ..\Client\core\CMainMenu.cpp:1137
 msgid "DISCONNECT WARNING"
 msgstr "OPOZORILO O PREKINJENI POVEZAVI"
 
-#: ..\Client\core\CMainMenu.cpp:1116 ..\Client\core\CQuestionBox.cpp:194
+#: ..\Client\core\CMainMenu.cpp:1139 ..\Client\core\CQuestionBox.cpp:194
 #: ..\Client\core\CSettings.cpp:1316 ..\Client\core\CSettings.cpp:1340
-#: ..\Client\core\CSettings.cpp:4272 ..\Client\core\CSettings.cpp:4321
-#: ..\Client\core\CVersionUpdater.cpp:1568
-#: ..\Client\core\CVersionUpdater.cpp:1586
-#: ..\Client\core\CVersionUpdater.cpp:1855
-#: ..\Client\core\CVersionUpdater.cpp:1874
+#: ..\Client\core\CSettings.cpp:4275 ..\Client\core\CSettings.cpp:4324
+#: ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CVersionUpdater.cpp:1588
+#: ..\Client\core\CVersionUpdater.cpp:1857
+#: ..\Client\core\CVersionUpdater.cpp:1876
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
 #: ..\Client\loader\Dialogs.cpp:32
 msgid "No"
@@ -607,42 +615,21 @@ msgstr "Ne"
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
 #. /////////////////////////////////////////////////////////////////////////
-#: ..\Client\core\CMainMenu.cpp:1117 ..\Client\core\CQuestionBox.cpp:195
+#: ..\Client\core\CMainMenu.cpp:1140 ..\Client\core\CQuestionBox.cpp:195
 #: ..\Client\core\CSettings.cpp:1317 ..\Client\core\CSettings.cpp:1341
-#: ..\Client\core\CSettings.cpp:4273 ..\Client\core\CSettings.cpp:4322
-#: ..\Client\core\CVersionUpdater.cpp:1569
-#: ..\Client\core\CVersionUpdater.cpp:1587
-#: ..\Client\core\CVersionUpdater.cpp:1856
-#: ..\Client\core\CVersionUpdater.cpp:1875
+#: ..\Client\core\CSettings.cpp:4276 ..\Client\core\CSettings.cpp:4325
+#: ..\Client\core\CVersionUpdater.cpp:1571
+#: ..\Client\core\CVersionUpdater.cpp:1589
+#: ..\Client\core\CVersionUpdater.cpp:1858
+#: ..\Client\core\CVersionUpdater.cpp:1877
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:72 ..\Client\loader\Dialogs.cpp:31
 msgid "Yes"
 msgstr "Da"
 
-#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:621
+#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Ali si želite ogledati internetno pomoč o tem problemu?"
-
-#: ..\Client\core\CQuickConnect.cpp:142
-msgid "No host specified!"
-msgstr "Gostitelj ni določen!"
-
-#: ..\Client\core\CQuickConnect.cpp:151
-msgid "No port specified!"
-msgstr "Vrata niso določena!"
-
-#: ..\Client\core\CQuickConnect.cpp:156
-msgid "Invalid port specified!"
-msgstr "Določena so bila napačna vrata!"
-
-#: ..\Client\core\CQuickConnect.cpp:165
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:572
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:664
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr ""
-"Napačen vzdevek! Prosimo pojdite na Nastavitve in si izberite drugega!"
 
 #: ..\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
@@ -688,26 +675,26 @@ msgstr "Napredno"
 
 #. Create buttons
 #. OK button
-#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4446
-#: ..\Client\core\CVersionUpdater.cpp:1604
-#: ..\Client\core\CVersionUpdater.cpp:1820
-#: ..\Client\core\CVersionUpdater.cpp:1913
-#: ..\Client\core\CVersionUpdater.cpp:1935
-#: ..\Client\core\CVersionUpdater.cpp:1953
-#: ..\Client\core\CVersionUpdater.cpp:1965
-#: ..\Client\core\CVersionUpdater.cpp:2117
-#: ..\Client\core\CVersionUpdater.cpp:2126
-#: ..\Client\core\CVersionUpdater.cpp:2135
-#: ..\Client\core\CVersionUpdater.cpp:2149
+#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4449
+#: ..\Client\core\CVersionUpdater.cpp:1606
+#: ..\Client\core\CVersionUpdater.cpp:1822
+#: ..\Client\core\CVersionUpdater.cpp:1915
+#: ..\Client\core\CVersionUpdater.cpp:1937
+#: ..\Client\core\CVersionUpdater.cpp:1955
+#: ..\Client\core\CVersionUpdater.cpp:1967
+#: ..\Client\core\CVersionUpdater.cpp:2119
+#: ..\Client\core\CVersionUpdater.cpp:2128
+#: ..\Client\core\CVersionUpdater.cpp:2137
+#: ..\Client\core\CVersionUpdater.cpp:2151
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
 msgstr "V redu"
 
 #. Cancel button
-#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4445
-#: ..\Client\core\CVersionUpdater.cpp:1787
-#: ..\Client\core\CVersionUpdater.cpp:1803
-#: ..\Client\core\CVersionUpdater.cpp:1838
+#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4448
+#: ..\Client\core\CVersionUpdater.cpp:1789
+#: ..\Client\core\CVersionUpdater.cpp:1805
+#: ..\Client\core\CVersionUpdater.cpp:1840
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
@@ -987,7 +974,7 @@ msgid "Medium"
 msgstr "Srednje"
 
 #: ..\Client\core\CSettings.cpp:710 ..\Client\core\CSettings.cpp:1020
-#: ..\Client\core\CSettings.cpp:1444 ..\Client\core\CSettings.cpp:2995
+#: ..\Client\core\CSettings.cpp:1444 ..\Client\core\CSettings.cpp:2998
 msgid "High"
 msgstr "Visoko"
 
@@ -998,8 +985,8 @@ msgstr "Zelo visoko"
 #: ..\Client\core\CSettings.cpp:726 ..\Client\core\CSettings.cpp:749
 #: ..\Client\core\CSettings.cpp:951 ..\Client\core\CSettings.cpp:1005
 #: ..\Client\core\CSettings.cpp:1136 ..\Client\core\CSettings.cpp:1450
-#: ..\Client\core\CSettings.cpp:3002 ..\Client\core\CSettings.cpp:3034
-#: ..\Client\core\CSettings.cpp:3056 ..\Client\core\CSettings.cpp:4020
+#: ..\Client\core\CSettings.cpp:3005 ..\Client\core\CSettings.cpp:3037
+#: ..\Client\core\CSettings.cpp:3059 ..\Client\core\CSettings.cpp:4023
 msgid "Off"
 msgstr "Izklopljeno"
 
@@ -1016,7 +1003,7 @@ msgid "3x"
 msgstr "3-krat"
 
 #: ..\Client\core\CSettings.cpp:765 ..\Client\core\CSettings.cpp:953
-#: ..\Client\core\CSettings.cpp:1462 ..\Client\core\CSettings.cpp:3004
+#: ..\Client\core\CSettings.cpp:1462 ..\Client\core\CSettings.cpp:3007
 msgid "Auto"
 msgstr "Samodejno"
 
@@ -1108,49 +1095,49 @@ msgstr "Razno"
 
 #. Fast clothes loading
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:944
-#: ..\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Fast CJ clothes loading:"
 msgstr "Hitro nalaganje CJ-jevih oblek:"
 
 #. Browser scan speed
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:958
-#: ..\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Browser speed:"
 msgstr "Hitrost brskalnika:"
 
 #. Single download
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:972
-#: ..\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Single connection:"
 msgstr "Ena povezava:"
 
 #. Packet tag
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:985
-#: ..\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Packet tag:"
 msgstr ""
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:998
-#: ..\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Progress animation:"
 msgstr ""
 
 #. Process priority
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1011
-#: ..\Client\core\CSettings.cpp:4462
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Process priority:"
 msgstr "Prednost procesa:"
 
 #. Debug setting
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1025
-#: ..\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:4477
 msgid "Debug setting:"
 msgstr "Nastavitve odpravljalca napak:"
 
 #. Streaming memory
 #: ..\Client\core\CSettings.cpp:939 ..\Client\core\CSettings.cpp:1048
-#: ..\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:4479
 msgid "Streaming memory:"
 msgstr "Spomin za pretakanje:"
 
@@ -1165,12 +1152,12 @@ msgid "Install important updates:"
 msgstr ""
 
 #: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:980
-#: ..\Client\core\CSettings.cpp:993 ..\Client\core\CSettings.cpp:3006
-#: ..\Client\core\CSettings.cpp:3022 ..\Client\core\CSettings.cpp:3029
+#: ..\Client\core\CSettings.cpp:993 ..\Client\core\CSettings.cpp:3009
+#: ..\Client\core\CSettings.cpp:3025 ..\Client\core\CSettings.cpp:3032
 msgid "On"
 msgstr "Vključeno"
 
-#: ..\Client\core\CSettings.cpp:965 ..\Client\core\CSettings.cpp:3011
+#: ..\Client\core\CSettings.cpp:965 ..\Client\core\CSettings.cpp:3014
 msgid "Very slow"
 msgstr "Zelo počasi"
 
@@ -1178,21 +1165,21 @@ msgstr "Zelo počasi"
 #: ..\Client\core\CSettings.cpp:992 ..\Client\core\CSettings.cpp:1006
 #: ..\Client\core\CSettings.cpp:1032 ..\Client\core\CSettings.cpp:1044
 #: ..\Client\core\CSettings.cpp:1137 ..\Client\core\CSettings.cpp:1157
-#: ..\Client\core\CSettings.cpp:3013 ..\Client\core\CSettings.cpp:3020
-#: ..\Client\core\CSettings.cpp:3027 ..\Client\core\CSettings.cpp:3036
-#: ..\Client\core\CSettings.cpp:3049
+#: ..\Client\core\CSettings.cpp:3016 ..\Client\core\CSettings.cpp:3023
+#: ..\Client\core\CSettings.cpp:3030 ..\Client\core\CSettings.cpp:3039
+#: ..\Client\core\CSettings.cpp:3052
 msgid "Default"
 msgstr "Privzeto"
 
-#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:3015
+#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:3018
 msgid "Fast"
 msgstr "Hitro"
 
-#: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2991
+#: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2994
 msgid "Normal"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:1019 ..\Client\core\CSettings.cpp:2993
+#: ..\Client\core\CSettings.cpp:1019 ..\Client\core\CSettings.cpp:2996
 msgid "Above normal"
 msgstr ""
 
@@ -1460,44 +1447,44 @@ msgstr "UKAZI IGRE GTA"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "UKAZI  VEČIGRALSKEGA NAČINA"
 
-#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:4425
+#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:4428
 msgid "Your nickname contains invalid characters!"
 msgstr "Vaš vzdevek vsebuje napačne znake!"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Red:"
 msgstr "Rdeča:"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Green:"
 msgstr "Zelena:"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Blue:"
 msgstr "Modra:"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Transparency:"
 msgstr "Prosojnost:"
 
-#: ..\Client\core\CSettings.cpp:3567
+#: ..\Client\core\CSettings.cpp:3570
 msgid "Color"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3644
+#: ..\Client\core\CSettings.cpp:3647
 msgid "Preview"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3952
+#: ..\Client\core\CSettings.cpp:3955
 #, fuzzy
 msgid "Please disconnect before changing language"
 msgstr "Prosimo, da prekinete povezavo, preden spremenite kožo"
 
-#: ..\Client\core\CSettings.cpp:3980
+#: ..\Client\core\CSettings.cpp:3983
 msgid "Please disconnect before changing skin"
 msgstr "Prosimo, da prekinete povezavo, preden spremenite kožo"
 
-#: ..\Client\core\CSettings.cpp:4266
+#: ..\Client\core\CSettings.cpp:4269
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1507,11 +1494,11 @@ msgstr ""
 "\n"
 "Ali ste prepričani, da jih želite omogočiti?"
 
-#: ..\Client\core\CSettings.cpp:4270
+#: ..\Client\core\CSettings.cpp:4273
 msgid "PERFORMANCE WARNING"
 msgstr "OPOZORILO UČINKOVITOSTI"
 
-#: ..\Client\core\CSettings.cpp:4290
+#: ..\Client\core\CSettings.cpp:4293
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1521,11 +1508,11 @@ msgstr ""
 "\n"
 "(Klepet in GUI sta izključena iz nalaganja)\n"
 
-#: ..\Client\core\CSettings.cpp:4292
+#: ..\Client\core\CSettings.cpp:4295
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "INFORMACIJE O NALOŽENEM ZASLONU"
 
-#: ..\Client\core\CSettings.cpp:4313
+#: ..\Client\core\CSettings.cpp:4316
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1541,15 +1528,15 @@ msgstr ""
 "\n"
 "Ali ste prepričani da jih želite uporabiti?"
 
-#: ..\Client\core\CSettings.cpp:4319 ..\Client\core\CVersionUpdater.cpp:2078
+#: ..\Client\core\CSettings.cpp:4322 ..\Client\core\CVersionUpdater.cpp:2080
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "SPREMENJENE GTA:SA DATOTEKE"
 
-#: ..\Client\core\CSettings.cpp:4443
+#: ..\Client\core\CSettings.cpp:4446
 msgid "Please enter a nickname"
 msgstr "Prosimo vnesite vzdevek"
 
-#: ..\Client\core\CSettings.cpp:4444
+#: ..\Client\core\CSettings.cpp:4447
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1557,83 +1544,83 @@ msgstr ""
 "Prosimo vnesite vzdevek, ki ga boste uporabljali v igri.\n"
 "To bo vaše ime, ko boste povezani na strežnik"
 
-#: ..\Client\core\CSettings.cpp:4462
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Very experimental feature."
 msgstr "Zelo eksperimentalna funkcija."
 
-#: ..\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Ustavi stojnice z CJ-jevimi variacijami (Porabi 65MB več spomina RAM)"
 
-#: ..\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Older routers may require a slower scan speed."
 msgstr ""
 "Starejši usmerjevalniki lahko zahtevajo počasnejšo hitrost pregledovanja."
 
-#: ..\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Switch on to use only one connection when downloading."
 msgstr "Označite, če želite med nalaganjem uporabljati samo eno povezavo."
 
-#: ..\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:4477
 msgid "Select default always. (This setting is not saved)"
 msgstr "Vedno izberi privzeto. (Ta nastavitev se ne shrani)"
 
-#: ..\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:4479
 msgid "Maximum is usually best"
 msgstr "Največ je običajno najboljše"
 
-#: ..\Client\core\CSettings.cpp:4478 ..\Client\core\CSettings.cpp:4480
+#: ..\Client\core\CSettings.cpp:4481 ..\Client\core\CSettings.cpp:4483
 msgid "Auto updater:"
 msgstr "Avtomatični posodobljevalnik:"
 
-#: ..\Client\core\CSettings.cpp:4478
+#: ..\Client\core\CSettings.cpp:4481
 msgid "Select default unless you like filling out bug reports."
 msgstr "Izberite privzeto, razen če želite izpolnjevati poročila o napakah."
 
-#: ..\Client\core\CSettings.cpp:4480
+#: ..\Client\core\CSettings.cpp:4483
 msgid "Select default to automatically install important updates."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4485
 msgid "16-bit color:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4485
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4487
 msgid "Mouse fix:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4487
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 
-#: ..\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Busy"
 msgstr "Zaposlen"
 
-#: ..\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Can't check for updates right now"
 msgstr "Trenutno ni mogoče preveriti za posodobitve"
 
-#: ..\Client\core\CVersionUpdater.cpp:1564
-#: ..\Client\core\CVersionUpdater.cpp:1584
-#: ..\Client\core\CVersionUpdater.cpp:1602
+#: ..\Client\core\CVersionUpdater.cpp:1566
+#: ..\Client\core\CVersionUpdater.cpp:1586
+#: ..\Client\core\CVersionUpdater.cpp:1604
 #, c-format, c-format
 msgid "MTA:SA %s required"
 msgstr "MTA:SA %s potreben"
 
-#: ..\Client\core\CVersionUpdater.cpp:1565
+#: ..\Client\core\CVersionUpdater.cpp:1567
 #, c-format, c-format
 msgid ""
 "An updated version of MTA:SA %s is required to join the selected server.\n"
@@ -1644,12 +1631,12 @@ msgstr ""
 "\n"
 "Ali želite naložiti in namestiti MTA:SA %s ?"
 
-#: ..\Client\core\CVersionUpdater.cpp:1585
+#: ..\Client\core\CVersionUpdater.cpp:1587
 #, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "Ali želite zagnati MTA:SA %s in se povezati s tem strežnikom?"
 
-#: ..\Client\core\CVersionUpdater.cpp:1603
+#: ..\Client\core\CVersionUpdater.cpp:1605
 msgid ""
 "It is not possible to connect at this time.\n"
 "\n"
@@ -1659,41 +1646,41 @@ msgstr ""
 "\n"
 "Prosimo poskusite kasneje."
 
-#: ..\Client\core\CVersionUpdater.cpp:1785
+#: ..\Client\core\CVersionUpdater.cpp:1787
 msgid "Connecting"
 msgstr "Vzpostavljanje povezave"
 
-#: ..\Client\core\CVersionUpdater.cpp:1786
-#: ..\Client\core\CVersionUpdater.cpp:1802
+#: ..\Client\core\CVersionUpdater.cpp:1788
+#: ..\Client\core\CVersionUpdater.cpp:1804
 msgid "Please wait..."
 msgstr "Prosimo, počakajte..."
 
-#: ..\Client\core\CVersionUpdater.cpp:1801
+#: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "CHECKING"
 msgstr "PREVERJANJE"
 
-#: ..\Client\core\CVersionUpdater.cpp:1818
-#: ..\Client\core\CVersionUpdater.cpp:1911
+#: ..\Client\core\CVersionUpdater.cpp:1820
+#: ..\Client\core\CVersionUpdater.cpp:1913
 msgid "UPDATE CHECK"
 msgstr "PREVERJANJE POSODOBITVE"
 
-#: ..\Client\core\CVersionUpdater.cpp:1819
+#: ..\Client\core\CVersionUpdater.cpp:1821
 msgid "No update needed"
 msgstr "Posodobitve niso potrebne"
 
-#: ..\Client\core\CVersionUpdater.cpp:1836
+#: ..\Client\core\CVersionUpdater.cpp:1838
 msgid "DOWNLOADING"
 msgstr "NALAGANJE"
 
-#: ..\Client\core\CVersionUpdater.cpp:1837
+#: ..\Client\core\CVersionUpdater.cpp:1839
 msgid "waiting..."
 msgstr "čakanje..."
 
-#: ..\Client\core\CVersionUpdater.cpp:1853
+#: ..\Client\core\CVersionUpdater.cpp:1855
 msgid "MANDATORY UPDATE"
 msgstr "OBVEZNA POSODOBITEV"
 
-#: ..\Client\core\CVersionUpdater.cpp:1854
+#: ..\Client\core\CVersionUpdater.cpp:1856
 msgid ""
 "To join this server, you must update MTA.\n"
 "\n"
@@ -1703,11 +1690,11 @@ msgstr ""
 "\n"
 "Želite posodobiti zdaj?"
 
-#: ..\Client\core\CVersionUpdater.cpp:1872
+#: ..\Client\core\CVersionUpdater.cpp:1874
 msgid "OPTIONAL UPDATE"
 msgstr "NEOBVEZNA POSODOBITEV"
 
-#: ..\Client\core\CVersionUpdater.cpp:1873
+#: ..\Client\core\CVersionUpdater.cpp:1875
 msgid ""
 "Server says an update is recommended, but not essential.\n"
 "\n"
@@ -1717,7 +1704,7 @@ msgstr ""
 "\n"
 "Ali želite posodobiti zdaj?"
 
-#: ..\Client\core\CVersionUpdater.cpp:1912
+#: ..\Client\core\CVersionUpdater.cpp:1914
 msgid ""
 "Update not currently avalable.\n"
 "\n"
@@ -1727,52 +1714,52 @@ msgstr ""
 "\n"
 "Prosimo obiščite http://www.mtasa.com/"
 
-#: ..\Client\core\CVersionUpdater.cpp:1933
-#: ..\Client\core\CVersionUpdater.cpp:2115
+#: ..\Client\core\CVersionUpdater.cpp:1935
+#: ..\Client\core\CVersionUpdater.cpp:2117
 msgid "ERROR SAVING"
 msgstr "NAPAKA PRI SHRANJEVANJU"
 
-#: ..\Client\core\CVersionUpdater.cpp:1934
-#: ..\Client\core\CVersionUpdater.cpp:2116
+#: ..\Client\core\CVersionUpdater.cpp:1936
+#: ..\Client\core\CVersionUpdater.cpp:2118
 msgid "Unable to create the file."
 msgstr "Ni mogoče ustvariti datoteke."
 
-#: ..\Client\core\CVersionUpdater.cpp:1942
-#: ..\Client\core\CVersionUpdater.cpp:1951
-#: ..\Client\core\CVersionUpdater.cpp:2124
-#: ..\Client\core\CVersionUpdater.cpp:2133
+#: ..\Client\core\CVersionUpdater.cpp:1944
+#: ..\Client\core\CVersionUpdater.cpp:1953
+#: ..\Client\core\CVersionUpdater.cpp:2126
+#: ..\Client\core\CVersionUpdater.cpp:2135
 msgid "ERROR DOWNLOADING"
 msgstr "NAPAKA PRI NALAGANJU"
 
-#: ..\Client\core\CVersionUpdater.cpp:1943
-#: ..\Client\core\CVersionUpdater.cpp:2125
+#: ..\Client\core\CVersionUpdater.cpp:1945
+#: ..\Client\core\CVersionUpdater.cpp:2127
 msgid "The downloaded file appears to be incorrect."
 msgstr "Naložena datoteka je napačna."
 
-#: ..\Client\core\CVersionUpdater.cpp:1952
-#: ..\Client\core\CVersionUpdater.cpp:2134
+#: ..\Client\core\CVersionUpdater.cpp:1954
+#: ..\Client\core\CVersionUpdater.cpp:2136
 msgid "For some reason."
 msgstr "Iz neznanega razloga."
 
-#: ..\Client\core\CVersionUpdater.cpp:1963
-#: ..\Client\core\CVersionUpdater.cpp:2147
+#: ..\Client\core\CVersionUpdater.cpp:1965
+#: ..\Client\core\CVersionUpdater.cpp:2149
 msgid "DOWNLOAD COMPLETE"
 msgstr "NALAGANJE ZAKLJUČENO"
 
-#: ..\Client\core\CVersionUpdater.cpp:1987
+#: ..\Client\core\CVersionUpdater.cpp:1989
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "- Neznan problem v _DialogUpdateResult"
 
-#: ..\Client\core\CVersionUpdater.cpp:2085
-#: ..\Client\core\CVersionUpdater.cpp:2095
+#: ..\Client\core\CVersionUpdater.cpp:2087
+#: ..\Client\core\CVersionUpdater.cpp:2097
 msgid "Ok"
 msgstr "V redu"
 
-#: ..\Client\core\CVersionUpdater.cpp:2093
+#: ..\Client\core\CVersionUpdater.cpp:2095
 msgid "ERROR"
 msgstr "NAPAKA"
 
-#: ..\Client\core\CVersionUpdater.cpp:2094
+#: ..\Client\core\CVersionUpdater.cpp:2096
 msgid ""
 "Some MTA:SA data files are missing.\n"
 "\n"
@@ -1784,12 +1771,12 @@ msgstr ""
 "\n"
 "Prosimo, da ponovno namestite MTA:SA"
 
-#: ..\Client\core\CVersionUpdater.cpp:2721
+#: ..\Client\core\CVersionUpdater.cpp:2723
 #, c-format, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% končano"
 
-#: ..\Client\core\CVersionUpdater.cpp:2723
+#: ..\Client\core\CVersionUpdater.cpp:2725
 #, c-format, c-format
 msgid ""
 "\n"
@@ -1873,8 +1860,8 @@ msgstr "Dodaj med priljubljene"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:254
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:302
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:362
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:301
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:361
 msgid "Connect"
 msgstr "Poveži"
 
@@ -1903,70 +1890,69 @@ msgstr "Začni z iskanjem"
 msgid "Search players..."
 msgstr "Išči igralce..."
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:300
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:412
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:411
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1614
 msgid "Search servers..."
 msgstr "Išči strežnike..."
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:442
 msgid "Name"
 msgstr "Ime"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
 msgid "Players"
 msgstr "Igralci"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
 msgid "Ping"
 msgstr "Ping"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:446
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
 msgid "Gamemode"
 msgstr "Način igre"
 
 #. Player List Columns
 #. Column for player names
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:468
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:467
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:138
 msgid "Player list"
 msgstr "Seznam igralcev"
 
 #. Include label
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:476
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:475
 msgid "Include:"
 msgstr "Vključi:"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:482
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:481
 msgid "Empty"
 msgstr "Prazno"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:488
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:487
 msgid "Full"
 msgstr "Polno"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:494
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:493
 msgid "Locked"
 msgstr "Zaklenjeno"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:506
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:505
 msgid "Offline"
 msgstr "Brez povezave"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:519
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:518
 msgid "Other Versions"
 msgstr "Druge različice"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:540
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:539
 msgid "Back"
 msgstr "Nazaj"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:546
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:545
 #: ..\Client\loader\Dialogs.cpp:35
 msgid "Help"
 msgstr "Pomoč"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:729
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:728
 msgid "Loading..."
 msgstr "Nalaganje..."
 
@@ -1987,6 +1973,14 @@ msgstr "Neznan protokol"
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
 msgid "Please use the mtasa:// protocol!"
 msgstr "Prosimo uporabite mtasa:// protokol!"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:668
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr ""
+"Napačen vzdevek! Prosimo pojdite na Nastavitve in si izberite drugega!"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
@@ -2385,7 +2379,7 @@ msgstr "Prosimo zaženite Grand Theft Auto San Andreas"
 msgid "Installing update..."
 msgstr ""
 
-#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:287
+#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:290
 msgid "Extracting files..."
 msgstr ""
 
@@ -2848,11 +2842,11 @@ msgstr "(Razvojni način) pokaže colshapes"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Razvojni način) kopira isd zvok sveta v okno odpravljalca napak"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:588
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:592
 msgid "Entering the game ..."
 msgstr "Vstopam v igro..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:640
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:644
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
@@ -2860,51 +2854,51 @@ msgstr ""
 "Niste povezani; prosimo uporabite Hitra vzpostavitev povezave ali ukaz "
 "'poveži' da se povežete na strežnik."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:686
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:690
 msgid "The server is not installed"
 msgstr "Strežnik ni nameščen"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:696
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1071
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:700
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1075
 msgid "Local Server"
 msgstr "Lokalni strežnik"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:696
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:700
 msgid "Starting local server ..."
 msgstr "Zaganjanje lokalnega strežnika ..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1002
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1006
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Bil si brcnjen iz igre ( %s )"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1071
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1075
 msgid "Connecting to local server..."
 msgstr "Vzpostavljam povezavo z lokalnim strežnikom..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1082
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1086
 msgid "Error connecting to server."
 msgstr "Napaka pri vzpostavljanju povezave s strežnikom."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1092
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1096
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 "Vzpostavljanje povezave s strežnikom je poteklo. Glej konzolo za "
 "podrobnosti."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1195
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1199
 msgid "Connection with the server was lost"
 msgstr "Povezava s strežnikom je bila izgubljena"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1222
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1226
 msgid "Disconnected: the server is currently full"
 msgstr "Povezava prekinjena: strežnik je trenutno poln"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1234
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1238
 msgid "Disconnected: invalid password specified"
 msgstr "Povezava prekinjena: določeno napačno geslo"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1256
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1260
 msgid "MTA Client verification failed!"
 msgstr "Preverjanje MTA klienta se je izjalovilo!"
 
@@ -3237,16 +3231,16 @@ msgid "Connection error"
 msgstr "Napaka povezave"
 
 #. Couldn't create render target for CPostEffects
-#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1378
+#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1380
 msgid "Problem with graphics driver"
 msgstr ""
 
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr ""
 "Multi Theft Auto ni bil pravilno nameščen, prosimo, da ga ponovno namestite."
 
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:635
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:705
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
@@ -3255,6 +3249,15 @@ msgstr ""
 "Vaš brskalnik bo sedaj prikazal spletno stran za pomoč in informacije.\n"
 "\n"
 "(Če se prikaz strani izjalovi, kopirajte (CTRL + V) spletni naslov v vaš internetni brskalnik)"
+
+#~ msgid "No host specified!"
+#~ msgstr "Gostitelj ni določen!"
+
+#~ msgid "No port specified!"
+#~ msgstr "Vrata niso določena!"
+
+#~ msgid "Invalid port specified!"
+#~ msgstr "Določena so bila napačna vrata!"
 
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "povezava: Sintaksa je 'connect <host> <port> [<nick> <pass>]'"

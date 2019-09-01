@@ -28,7 +28,7 @@ struct SLogEventLine
     SString strBody;
     SString strType;
     SString strContext;
-            operator SString&() { return strBody; }
+    void    operator+=(const char* szAppend) { strBody += szAppend; }
     bool    operator==(const SLogEventLine& other) const { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
 };
 

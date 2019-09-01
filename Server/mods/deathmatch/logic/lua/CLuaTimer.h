@@ -17,7 +17,7 @@ class CLuaTimer;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL 50
+#define LUA_TIMER_MIN_INTERVAL 0
 
 class CLuaTimer
 {
