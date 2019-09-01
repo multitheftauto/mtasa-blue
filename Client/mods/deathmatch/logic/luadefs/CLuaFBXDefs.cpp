@@ -559,22 +559,25 @@ int CLuaFBXDefs::FBXApplyTemplateToElement(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
     unsigned int     uiTemplateId;
-    int              iModel;
+    CClientEntity*   pElement;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFBX);
     argStream.ReadNumber(uiTemplateId);
-    argStream.ReadNumber(iModel);
+    argStream.ReadUserData(pElement);
 
-    // if (!argStream.HasErrors())
-    //{
-    //    unsigned int uiObjectId;
-    //    if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
-    //    {
-    //        return 1;
-    //    }
-    //}
-    // else
-    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+     if (!argStream.HasErrors())
+    {
+         if (IS_OBJECT(pElement))
+         {
+             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
+             if (pFBX->ApplyTemplateToElement(uiTemplateId, Object))
+             {
+                 return 1;
+             }
+         }
+    }
+     else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);

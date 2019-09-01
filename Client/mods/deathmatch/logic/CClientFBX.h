@@ -17,6 +17,7 @@ class CScriptArgReader;
 enum eFBXTemplateProperty;
 enum eFBXTemplateModelProperty;
 enum eFBXObjectProperty;
+class CDeathmatchObject;
 
 class CClientFBX : public CClientEntity, CClientFBXInterface
 {
@@ -56,16 +57,19 @@ public:
     bool LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, unsigned int uiModelId,
                                        eFBXTemplateModelProperty eProperty);
     bool LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int uiId, unsigned int uiModelId, eFBXTemplateModelProperty eProperty);
-    
+
     bool AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned long long ullMesh, unsigned long long ullParentMesh, CVector vecPosition,
                            unsigned int& uiObjectId);
-    bool             AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId);
-    void             RemoveTemplate(unsigned int uiTemplateId);
-    void             RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
+    bool AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId);
+    void RemoveTemplate(unsigned int uiTemplateId);
+    bool RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
+    bool ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
 
-    void             CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
-    CMaterialItem*   GetTextureById(unsigned long long strTextureName);
-    bool             IsTextureCreated(unsigned long long strTextureName);
+    void           CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
+    CMaterialItem* GetTextureById(unsigned long long strTextureName);
+    bool           IsTextureCreated(unsigned long long strTextureName);
+    std::map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix();
+
 
 private:
     CFBXSceneInterface* m_pFBXScene;
@@ -80,4 +84,5 @@ private:
     CVector               tempVecPos[3];
 
     std::map<unsigned long long, CClientTexture*> m_mapTexture;
+    std::map<CDeathmatchObject*, std::vector<unsigned int>> m_mapElementRenderLoop;
 };

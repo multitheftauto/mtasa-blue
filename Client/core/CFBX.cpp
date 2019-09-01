@@ -413,7 +413,7 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     // test code, remove later
     unsigned int  uiTemplateId = CreateTemplate();
     CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
-    pTemplate->pViewMatrix->SetPosition(CVector(1823.41199, -2477.37476, 13.55469));
+    pTemplate->pViewMatrix->SetPosition(CVector(0, 0, 0));
     pTemplate->pViewMatrix->SetRotation(CVector(0, 0, 0));
     pTemplate->pViewMatrix->SetScale(CVector(1, 1, 1));
     int i = 0;
@@ -645,10 +645,22 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
         pMatrix->SetRotation(renderItem->rotation);
         pMatrix->SetScale(renderItem->scale);
 
-        pMatrix->GetBuffer((float*)pObjectMatrix);
         pTemplate = m_templateMap[renderItem->uiTemplateId];
+        pMatrix->GetBuffer((float*)pObjectMatrix);
         pTemplate->Render(pDevice, this, pObjectMatrix);
     }
+
+    std::map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = pClientFBXInterface->GetTemplatesRenderingMatrix();
+    for (auto const& pair : pTemplatesMatrix)
+    {
+        for (CMatrix matrix : pair.second)
+        {
+            pTemplate = m_templateMap[pair.first];
+            matrix.GetBuffer((float*)pObjectMatrix);
+            pTemplate->Render(pDevice, this, pObjectMatrix);
+        }
+    }
+
     ListClearAndReserve(m_vecTemporaryRenderLoop);
 }
 

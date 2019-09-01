@@ -593,7 +593,6 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
 
         matrixLocal = CMatrix(array);
 
-        
         memcpy(m, (*pObject)->getGlobalTransform().m, sizeof(double) * 16);
         for (char i = 0; i < 16; i++)
             array[i] = (float)m[i];
@@ -639,12 +638,41 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     return false;
 }
 
-void CClientFBX::RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
+bool CClientFBX::RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
 {
     if (g_pCore->IsWindowMinimized())
-        return;
+        return false;
+
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+        return false;
 
     m_pFBXScene->AddToRenderQueue(uiTemplateId, vecPosition, vecRotation, vecScale);
+    return true;
+}
+
+bool CClientFBX::ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement)
+{
+    if (g_pCore->IsWindowMinimized())
+        return false;
+
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+        return false;
+
+    if (m_mapElementRenderLoop.count(pElement) == 0)
+    {
+        m_mapElementRenderLoop[pElement] = std::vector<unsigned int>{uiTemplateId};
+        return true;
+    }
+    else
+    {
+        for (auto const& templateId : m_mapElementRenderLoop[pElement])
+            if (templateId == uiTemplateId)
+                return false;
+
+        m_mapElementRenderLoop[pElement].push_back(uiTemplateId);
+    }
+
+    return true;
 }
 
 bool CClientFBX::LuaGetAllTemplates(lua_State* luaVM)
@@ -928,4 +956,32 @@ CMaterialItem* CClientFBX::GetTextureById(unsigned long long ullTextureId)
     if (pTexture != nullptr)
         return pTexture->GetMaterialItem();
     return nullptr;
+}
+
+std::map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRenderingMatrix()
+{
+    std::map<unsigned long long, std::vector<CMatrix>> templatesMatrix;
+    std::vector<unsigned long long>                    cleanUp;
+    for (const auto& pair : m_mapElementRenderLoop)
+    {
+        if (pair.first->IsBeingDeleted())
+        {
+            m_mapElementRenderLoop.erase(pair.first);
+        }
+        else
+        {
+            for (const auto& templateId : pair.second)
+            {
+                if (templatesMatrix.count(templateId) == 0)
+                {
+                    templatesMatrix[templateId] = std::vector<CMatrix>();
+                }
+                CMatrix pMatrix;
+
+                pair.first->GetMatrix(pMatrix);
+                templatesMatrix[templateId].push_back(pMatrix);
+            }
+        }
+    }
+    return templatesMatrix;
 }
