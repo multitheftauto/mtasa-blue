@@ -652,9 +652,6 @@ bool CClientFBX::RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, 
 
 bool CClientFBX::ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement)
 {
-    if (g_pCore->IsWindowMinimized())
-        return false;
-
     if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
         return false;
 
@@ -673,6 +670,29 @@ bool CClientFBX::ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchOb
     }
 
     return true;
+}
+bool CClientFBX::RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatchObject* pElement)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiTemplateId))
+        return false;
+
+    if (m_mapElementRenderLoop.count(pElement) == 0)
+    {
+        return false;
+    }
+
+    for (auto const& templateId : m_mapElementRenderLoop[pElement])
+            if (templateId == uiTemplateId)
+            {
+                ListRemove(m_mapElementRenderLoop[pElement], templateId);
+                if (m_mapElementRenderLoop[pElement].size() == 0)
+                {
+                    m_mapElementRenderLoop.erase(pElement);
+                }
+                return true;
+            }
+
+    return false;
 }
 
 bool CClientFBX::LuaGetAllTemplates(lua_State* luaVM)

@@ -29,6 +29,7 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxTemplateRemoveModel", FBXTemplateRemoveModel},
         {"fbxApplyTemplateToModel", FBXApplyTemplateToModel},
         {"fbxApplyTemplateToElement", FBXApplyTemplateToElement},
+        {"fbxRemoveTemplateFromElement", FBXRemoveTemplateFromElement},
         {"fbxRenderTemplate", FBXRenderTemplate},
 
         {"fbxGetAllMeshes", FBXGetAllMeshes},
@@ -572,6 +573,37 @@ int CLuaFBXDefs::FBXApplyTemplateToElement(lua_State* luaVM)
              CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
              if (pFBX->ApplyTemplateToElement(uiTemplateId, Object))
              {
+                 lua_pushboolean(luaVM, true);
+                 return 1;
+             }
+         }
+    }
+     else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXRemoveTemplateFromElement(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    unsigned int     uiTemplateId;
+    CClientEntity*   pElement;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplateId);
+    argStream.ReadUserData(pElement);
+
+     if (!argStream.HasErrors())
+    {
+         if (IS_OBJECT(pElement))
+         {
+             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
+             if (pFBX->RemoveTemplateFromElement(uiTemplateId, Object))
+             {
+                 lua_pushboolean(luaVM, true);
                  return 1;
              }
          }

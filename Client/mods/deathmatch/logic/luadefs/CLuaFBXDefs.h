@@ -38,5 +38,6 @@ public:
     LUA_DECLARE(FBXRemoveTemplate);
     LUA_DECLARE(FBXApplyTemplateToModel);
     LUA_DECLARE(FBXApplyTemplateToElement);
+    LUA_DECLARE(FBXRemoveTemplateFromElement);
     LUA_DECLARE(FBXRenderTemplate);
 };

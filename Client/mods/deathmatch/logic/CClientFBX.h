@@ -64,6 +64,7 @@ public:
     void RemoveTemplate(unsigned int uiTemplateId);
     bool RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
     bool ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
+    bool RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
 
     void           CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem* GetTextureById(unsigned long long strTextureName);
