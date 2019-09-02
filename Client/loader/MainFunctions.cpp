@@ -834,13 +834,21 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"329BE376559DB1F51A02B3246F103300", "bass.dll"},     {"5068A49A706BCACA9D98C3533734195D", "bass_aac.dll"},
-                              {"3935396799611AD3FDE5A66832D69DD6", "bass_ac3.dll"}, {"9CA432745025427D6FF6C2B38F63A89F", "bass_fx.dll"},
-                              {"FCD2410EA754C38C26F99AEB99C59138", "bassflac.dll"}, {"76044062E21176F47E329BDB64240BE7", "bassmidi.dll"},
-                              {"39613507057827F338CFA4519ACCA7A9", "bassmix.dll"},  {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
-                              {"12E4FA4DF33BB7D6AEF6DC0EAA53BB10", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+    } integrityCheckList[] = {{"16B23FA1D3F952F6FF8BB02DE0CD36A2", "bass.dll"},
+                              {"56116E495EE5E74749F8DB37616B22EA", "bass_aac.dll"},
+                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
+                              {"8B17186F19002C9D30A18D39FC8FEFA7", "bass_fx.dll"},
+                              {"6673527EF2AE564A57DA6AED4A230819", "bassflac.dll"},
+                              {"DD1AFB287DACC48C0C08CDB603D234AE", "bassmidi.dll"},
+                              {"BA59B11522793EBC1D75C777CC598737", "bassmix.dll"},
+                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
+                              {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
+                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
+                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
+                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
@@ -1136,6 +1144,7 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);
