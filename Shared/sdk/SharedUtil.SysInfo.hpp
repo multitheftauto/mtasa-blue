@@ -12,7 +12,6 @@
 #ifdef MTA_CLIENT
 
 #define _WIN32_DCOM
-using namespace std;
 #include <comdef.h>
 #include <Wbemidl.h>
 
@@ -234,10 +233,10 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
         // Fill each cell
         for (unsigned int i = 0; i < vecKeys.size(); i++)
         {
-            string strKey = vecKeys[i];
-            string strValue;
+            std::string strKey = vecKeys[i];
+            std::string strValue;
 
-            wstring wstrKey(strKey.begin(), strKey.end());
+            std::wstring wstrKey(strKey.begin(), strKey.end());
             hr = pclsObj->Get(wstrKey.c_str(), 0, &vtProp, 0, 0);
 
             if (hr == WBEM_S_NO_ERROR)
