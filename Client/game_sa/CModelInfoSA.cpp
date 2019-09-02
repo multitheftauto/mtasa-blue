@@ -975,7 +975,9 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
-            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+            // TODO: Find out why this is a nullptr, and fix underlying bug
+            if (pVehicleModel->pVisualInfo != nullptr)
+                pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
         ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
         // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded

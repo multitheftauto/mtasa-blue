@@ -1039,7 +1039,8 @@ protected:
                 SStringMapValue value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
                 {
-                    value = (lua_tostring(m_luaVM, -1));
+                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    value.assign(lua_tostring(m_luaVM, -1), uiLength);
                 }
                 else if (valueType == LUA_TBOOLEAN)
                 {

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        xml/CXMLImpl.h
  *  PURPOSE:     XML handler class
@@ -20,6 +20,8 @@ public:
     virtual ~CXMLImpl();
 
     CXMLFile* CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly);
+    CXMLNode* ParseString(const char* strXmlContent);
+    CXMLNode* BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode);
     void      DeleteXML(CXMLFile* pFile);
 
     CXMLNode* CreateDummyNode();
