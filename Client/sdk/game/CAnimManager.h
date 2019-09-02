@@ -48,7 +48,7 @@ class CAnimManager
 public:
     typedef std::unique_ptr<CAnimBlendAssociation>       AnimBlendAssoc_type;
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
-
+    typedef std::unique_ptr<CAnimBlendAssocGroup>        AnimAssocGroup_type;
     virtual void Initialize() = 0;
     virtual void Shutdown() = 0;
 
@@ -57,16 +57,16 @@ public:
     virtual int GetNumAnimAssocDefinitions() = 0;
 
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID) = 0;
-    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, CAnimBlock* pBlock) = 0;
-    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, CAnimBlock* pBlock) = 0;
+    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, std::unique_ptr<CAnimBlock>& pBlock) = 0;
+    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, std::unique_ptr<CAnimBlock>& pBlock) = 0;
 
-    virtual CAnimBlock* GetAnimationBlock(int ID) = 0;
-    virtual CAnimBlock* GetAnimationBlock(const char* szName) = 0;
-    virtual int         GetAnimationBlockIndex(const char* szName) = 0;
-    virtual int         RegisterAnimBlock(const char* szName) = 0;
+    virtual std::unique_ptr<CAnimBlock> GetAnimationBlock(int ID) = 0;
+    virtual std::unique_ptr<CAnimBlock> GetAnimationBlock(const char* szName) = 0;
+    virtual int                         GetAnimationBlockIndex(const char* szName) = 0;
+    virtual int                         RegisterAnimBlock(const char* szName) = 0;
 
-    virtual CAnimBlendAssocGroup* GetAnimBlendAssoc(AssocGroupId groupID) = 0;
-    virtual AssocGroupId          GetFirstAssocGroup(const char* szName) = 0;
+    virtual AnimAssocGroup_type GetAnimBlendAssoc(AssocGroupId groupID) = 0;
+    virtual AssocGroupId        GetFirstAssocGroup(const char* szName) = 0;
 
     virtual const char* GetAnimGroupName(AssocGroupId groupID) = 0;
     virtual const char* GetAnimBlockName(AssocGroupId groupID) = 0;
@@ -107,15 +107,14 @@ public:
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetFirstAssociation(RpClump* pClump) = 0;
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName) = 0;
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID) = 0;
-    virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey) = 0;
     virtual AnimBlendAssoc_type RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation) = 0;
     virtual int                 RpAnimBlendClumpGetNumAssociations(RpClump* pClump) = 0;
     virtual void                RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1) = 0;
 
     // MTA members
     virtual AnimBlendAssoc_type                  GetAnimBlendAssociation(CAnimBlendAssociationSAInterface* pInterface) = 0;
-    virtual CAnimBlendAssocGroup*                GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface) = 0;
-    virtual CAnimBlock*                          GetAnimBlock(CAnimBlockSAInterface* pInterface) = 0;
+    virtual AnimAssocGroup_type                  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface) = 0;
+    virtual std::unique_ptr<CAnimBlock>          GetAnimBlock(CAnimBlockSAInterface* pInterface) = 0;
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
 
     virtual StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface) = 0;

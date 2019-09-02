@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CClientVariables.cpp
  *  PURPOSE:     Managed storage of client variables (cvars)
@@ -328,14 +328,17 @@ void CClientVariables::LoadDefaults()
     DEFAULT("heat_haze", 1);                                                          // Enable heat haze
     DEFAULT("tyre_smoke_enabled", 1);                                                 // Enable tyre smoke
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
+    DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
+    DEFAULT("allow_external_sounds", 1);                                              // 0-off 1-on
     DEFAULT("max_clientscript_log_kb", 5000);                                         // Max size in KB (0-No limit)
     DEFAULT("display_fullscreen_style", 0);                                           // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
     DEFAULT("display_windowed", 0);                                                   // 0-off 1-on
     DEFAULT("multimon_fullscreen_minimize", 1);                                       // 0-off 1-on
     DEFAULT("vertical_aim_sensitivity", 0.0015f);                                     // 0.0015f is GTA default setting
     DEFAULT("process_priority", 0);                                                   // 0-normal 1-above normal 2-high
+    DEFAULT("process_dpi_aware", false);                                              // Enable DPI awareness in core initialization
     DEFAULT("mute_master_when_minimized", 0);                                         // 0-off 1-on
     DEFAULT("mute_sfx_when_minimized", 0);                                            // 0-off 1-on
     DEFAULT("mute_radio_when_minimized", 0);                                          // 0-off 1-on

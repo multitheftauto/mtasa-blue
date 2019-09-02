@@ -48,6 +48,7 @@
 #include "vtls.h"
 #include "strcase.h"
 #include "hostcheck.h"
+#include "multiif.h"
 #include "curl_printf.h"
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
@@ -65,12 +66,16 @@
 #include <openssl/buffer.h>
 #include <openssl/pkcs12.h>
 
+#ifdef USE_AMISSL
+#include "amigaos.h"
+#endif
+
 #if (OPENSSL_VERSION_NUMBER >= 0x0090808fL) && !defined(OPENSSL_NO_OCSP)
 #include <openssl/ocsp.h>
 #endif
 
 #if (OPENSSL_VERSION_NUMBER >= 0x0090700fL) && /* 0.9.7 or later */     \
-  !defined(OPENSSL_NO_ENGINE)
+  !defined(OPENSSL_NO_ENGINE) && !defined(OPENSSL_NO_UI_CONSOLE)
 #define USE_OPENSSL_ENGINE
 #include <openssl/engine.h>
 #endif
@@ -149,6 +154,10 @@
     !(defined(LIBRESSL_VERSION_NUMBER) && \
       LIBRESSL_VERSION_NUMBER < 0x20700000L)
 #define HAVE_X509_GET0_SIGNATURE 1
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x1000200fL) /* 1.0.2 or later */
+#define HAVE_SSL_GET_SHUTDOWN 1
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x10002003L && \
@@ -820,8 +829,11 @@ int cert_stuff(struct connectdata *conn,
   fail:
       EVP_PKEY_free(pri);
       X509_free(x509);
+#ifdef USE_AMISSL
+      sk_X509_pop_free(ca, Curl_amiga_X509_free);
+#else
       sk_X509_pop_free(ca, X509_free);
-
+#endif
       if(!cert_done)
         return 0; /* failure! */
       break;
@@ -831,15 +843,15 @@ int cert_stuff(struct connectdata *conn,
       return 0;
     }
 
-    file_type = do_file_type(key_type);
+    if(!key_file)
+      key_file = cert_file;
+    else
+      file_type = do_file_type(key_type);
 
     switch(file_type) {
     case SSL_FILETYPE_PEM:
       if(cert_done)
         break;
-      if(!key_file)
-        /* cert & key can only be in PEM case in the same file */
-        key_file = cert_file;
       /* FALLTHROUGH */
     case SSL_FILETYPE_ASN1:
       if(SSL_CTX_use_PrivateKey_file(ctx, key_file, file_type) != 1) {
@@ -1014,14 +1026,8 @@ static int Curl_ossl_init(void)
   ENGINE_load_builtin_engines();
 #endif
 
-  /* OPENSSL_config(NULL); is "strongly recommended" to use but unfortunately
-     that function makes an exit() call on wrongly formatted config files
-     which makes it hard to use in some situations. OPENSSL_config() itself
-     calls CONF_modules_load_file() and we use that instead and we ignore
-     its return code! */
-
-  /* CONF_MFLAGS_DEFAULT_SECTION introduced some time between 0.9.8b and
-     0.9.8e */
+/* CONF_MFLAGS_DEFAULT_SECTION was introduced some time between 0.9.8b and
+   0.9.8e */
 #ifndef CONF_MFLAGS_DEFAULT_SECTION
 #define CONF_MFLAGS_DEFAULT_SECTION 0x0
 #endif
@@ -1300,6 +1306,7 @@ static int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
   int err;
   bool done = FALSE;
 
+#ifndef CURL_DISABLE_FTP
   /* This has only been tested on the proftpd server, and the mod_tls code
      sends a close notify alert without waiting for a close notify alert in
      response. Thus we wait for a close notify alert from the server, but
@@ -1307,6 +1314,7 @@ static int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
 
   if(data->set.ftp_ccc == CURLFTPSSL_CCC_ACTIVE)
       (void)SSL_shutdown(BACKEND->handle);
+#endif
 
   if(BACKEND->handle) {
     buffsize = (int)sizeof(buf);
@@ -2808,6 +2816,12 @@ static CURLcode ossl_connect_step2(struct connectdata *conn, int sockindex)
       connssl->connecting_state = ssl_connect_2_writing;
       return CURLE_OK;
     }
+#ifdef SSL_ERROR_WANT_ASYNC
+    if(SSL_ERROR_WANT_ASYNC == detail) {
+      connssl->connecting_state = ssl_connect_2;
+      return CURLE_OK;
+    }
+#endif
     else {
       /* untreated error */
       unsigned long errdetail;
@@ -2904,6 +2918,9 @@ static CURLcode ossl_connect_step2(struct connectdata *conn, int sockindex)
       }
       else
         infof(data, "ALPN, server did not agree to a protocol\n");
+
+      Curl_multiuse_state(conn, conn->negnpn == CURL_HTTP_VERSION_2 ?
+                          BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
     }
 #endif
 
@@ -3072,18 +3089,25 @@ static CURLcode get_cert_chain(struct connectdata *conn,
 
 #if defined(HAVE_X509_GET0_SIGNATURE) && defined(HAVE_X509_GET0_EXTENSIONS)
     {
-      const X509_ALGOR *palg = NULL;
-      ASN1_STRING *a = ASN1_STRING_new();
-      if(a) {
-        X509_get0_signature(&psig, &palg, x);
-        X509_signature_print(mem, ARG2_X509_signature_print palg, a);
-        ASN1_STRING_free(a);
+      const X509_ALGOR *sigalg = NULL;
+      X509_PUBKEY *xpubkey = NULL;
+      ASN1_OBJECT *pubkeyoid = NULL;
 
-        if(palg) {
-          i2a_ASN1_OBJECT(mem, palg->algorithm);
+      X509_get0_signature(&psig, &sigalg, x);
+      if(sigalg) {
+        i2a_ASN1_OBJECT(mem, sigalg->algorithm);
+        push_certinfo("Signature Algorithm", i);
+      }
+
+      xpubkey = X509_get_X509_PUBKEY(x);
+      if(xpubkey) {
+        X509_PUBKEY_get0_param(&pubkeyoid, NULL, NULL, NULL, xpubkey);
+        if(pubkeyoid) {
+          i2a_ASN1_OBJECT(mem, pubkeyoid);
           push_certinfo("Public Key Algorithm", i);
         }
       }
+
       X509V3_ext(data, i, X509_get0_extensions(x));
     }
 #else
@@ -3135,7 +3159,7 @@ static CURLcode get_cert_chain(struct connectdata *conn,
           const BIGNUM *e;
 
           RSA_get0_key(rsa, &n, &e, NULL);
-          BN_print(mem, n);
+          BIO_printf(mem, "%d", BN_num_bits(n));
           push_certinfo("RSA Public Key", i);
           print_pubkey_BN(rsa, n, i);
           print_pubkey_BN(rsa, e, i);
@@ -3210,11 +3234,6 @@ static CURLcode get_cert_chain(struct connectdata *conn,
 #endif
         break;
       }
-#if 0
-      case EVP_PKEY_EC: /* symbol not present in OpenSSL 0.9.6 */
-        /* left TODO */
-        break;
-#endif
       }
       EVP_PKEY_free(pubkey);
     }
@@ -3265,7 +3284,6 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data, X509* cert,
     if(len1 < 1)
       break; /* failed */
 
-    /* https://www.openssl.org/docs/crypto/buffer.html */
     buff1 = temp = malloc(len1);
     if(!buff1)
       break; /* failed */
@@ -3287,7 +3305,6 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data, X509* cert,
     result = Curl_pin_peer_pubkey(data, pinnedpubkey, buff1, len1);
   } while(0);
 
-  /* https://www.openssl.org/docs/crypto/buffer.html */
   if(buff1)
     free(buff1);
 
@@ -3743,7 +3760,10 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
 
     switch(err) {
     case SSL_ERROR_NONE: /* this is not an error */
+      break;
     case SSL_ERROR_ZERO_RETURN: /* no more data */
+      /* close_notify alert */
+      connclose(conn, "TLS close_notify");
       break;
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_WRITE:
@@ -3806,7 +3826,11 @@ static size_t Curl_ossl_version(char *buffer, size_t size)
       sub[0]='\0';
   }
 
-  return msnprintf(buffer, size, "%s/%lx.%lx.%lx%s",
+  return msnprintf(buffer, size, "%s/%lx.%lx.%lx%s"
+#ifdef OPENSSL_FIPS
+                   "-fips"
+#endif
+                   ,
                    OSSL_PACKAGE,
                    (ssleay_value>>28)&0xf,
                    (ssleay_value>>20)&0xff,

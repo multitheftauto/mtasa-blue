@@ -47,6 +47,9 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
+	// Close and remove LVM from memory
+	ProcessPendingDeleteList();
+
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
 }
@@ -229,7 +232,6 @@ void CLuaManager::LoadCFunctions()
         {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
-        // {"getClipboard", CLuaFunctionDefs::GetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
 
@@ -393,6 +395,7 @@ void CLuaManager::LoadCFunctions()
 
         // Localization functions
         {"getLocalization", CLuaFunctionDefs::GetLocalization},
+        {"getKeyboardLayout", CLuaFunctionDefs::GetKeyboardLayout},
 
         // Voice functions
         {"isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled},
