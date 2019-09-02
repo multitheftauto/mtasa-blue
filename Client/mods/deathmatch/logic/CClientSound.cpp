@@ -62,12 +62,15 @@ void CClientSound::DistanceStreamIn()
 {
     if (!m_pAudio)
     {
-        Create();
-        m_pSoundManager->OnDistanceStreamIn(this);
+        // If the sound was successfully created, we stream it in
+        if (Create())
+        {
+            m_pSoundManager->OnDistanceStreamIn(this);
 
-        // Call Stream In event
-        CLuaArguments Arguments;
-        CallEvent("onClientElementStreamIn", Arguments, true);
+            // Call Stream In event
+            CLuaArguments Arguments;
+            CallEvent("onClientElementStreamIn", Arguments, true);
+        }
     }
 }
 
