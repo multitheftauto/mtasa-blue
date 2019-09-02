@@ -2450,6 +2450,17 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedArmor(CClientPed& Ped, float fArmor)
+{
+    if (Ped.IsLocalEntity())
+    {
+        Ped.SetArmor(fArmor);
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedOxygenLevel(CClientEntity& Entity, float fOxygen)
 {
     if (IS_PED(&Entity))
