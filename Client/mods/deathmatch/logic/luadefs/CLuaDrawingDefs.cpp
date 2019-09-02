@@ -571,9 +571,9 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 {
     // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveVertice>();
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveVertice>();
+    bool             bPostGUI;
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI, false);
@@ -582,6 +582,8 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
     while (argStream.NextIsTable())
     {
+        vecTableContent.clear();
+
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
@@ -597,18 +599,14 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
-        {
-            g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
@@ -620,10 +618,11 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 {
     // bool DxDrawMaterialPrimitive3D (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
-    CClientMaterial*    pMaterialElement;
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial* pMaterialElement;
+    bool             bPostGUI;
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
     MixedReadMaterialString(argStream, pMaterialElement);
@@ -633,14 +632,18 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 
     while (argStream.NextIsTable())
     {
+        vecTableContent.clear();
+
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
             case Primitive3DVerticeSizes::VERT_XYZ_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF, vecTableContent[3], vecTableContent[4] });
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF,
+                                                                 vecTableContent[3], vecTableContent[4]});
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{ vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3]),vecTableContent[4], vecTableContent[5] });
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2],
+                                                                 static_cast<DWORD>(vecTableContent[3]), vecTableContent[4], vecTableContent[5]});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -648,18 +651,14 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
-        {
-            g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
@@ -671,9 +670,9 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveVertice>();
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveVertice>();
+    bool             bPostGUI;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
@@ -700,18 +699,14 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
-        {
-            g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }       
-    }
-    else
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
@@ -723,10 +718,10 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE    ePrimitiveType;
-    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
-    CClientMaterial*    pMaterialElement;
-    bool                bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial* pMaterialElement;
+    bool             bPostGUI;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
@@ -738,6 +733,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     while (argStream.NextIsTable())
     {
         vecTableContent.clear();
+
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
@@ -747,7 +743,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
                 pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
-                                                               vecTableContent[3], vecTableContent[4]});
+                                                                 vecTableContent[3], vecTableContent[4]});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -755,18 +751,14 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
         }
     }
 
-    if (!argStream.HasErrors())
-    {
-        if (pMaterialElement && g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
-        {
-            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
     if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
