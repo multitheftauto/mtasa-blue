@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-20 21:57+0100\n"
-"PO-Revision-Date: 2019-07-11 21:18+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2019-08-06 22:18+0000\n"
+"Last-Translator: Alex \"Dredd\" <alexybt1999@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: Alex \"Dredd\" Georgiou\n"
+"Translators: Alex \"Dredd\" Georgiou; Zer0\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1562879924.0\n"
+"X-POOTLE-MTIME: 1565129918.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -820,7 +820,7 @@ msgstr "Αδιαφάνεια:"
 #. *
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:419
 msgid "Master volume:"
-msgstr ""
+msgstr "Κύρια ένταση:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:438
 msgid "Radio volume:"
@@ -853,7 +853,7 @@ msgstr "Γενικά"
 
 #: ..\Client\core\CSettings.cpp:514
 msgid "Radio options"
-msgstr ""
+msgstr "Επιλογές ραδιοφώνου"
 
 #: ..\Client\core\CSettings.cpp:520
 msgid "Radio Equalizer"
@@ -884,14 +884,12 @@ msgid "Automatic Media Scan"
 msgstr "Αυτόματη σάρωση Media"
 
 #: ..\Client\core\CSettings.cpp:556
-#, fuzzy
 msgid "Mute options"
-msgstr "Ρυθμίσεις ποντικιού"
+msgstr "Ρυθμίσεις απενεργοποίησης ήχου"
 
 #: ..\Client\core\CSettings.cpp:562
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Απενεργοποίηση ήχων SFX κατά την ελαχιστοποίηση"
+msgstr "Απενεργοποίηση όλων των ήχων κατά την ελαχιστοποίηση"
 
 #: ..\Client\core\CSettings.cpp:567
 msgid "Mute Radio sounds when minimized"
@@ -3133,55 +3131,58 @@ msgstr "Διωχθήκατε από το παιχνίδι"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr ""
+"Αυτός ο διακομιστής χρειάζεται μια μη τροποποιημένη έκδοση του gta_sa.exe"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr ""
+msgstr "Παρακαλώ αντικαταστήστε το gta_sa.exe"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgstr "Αυτός ο διακομιστής δεν επιτρέπει τροποποιημένο D3D9.DLLs"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr ""
+"Αφαιρέστε το D3D9.DLL από τον κατάλογο εγκατάστασης του GTA και "
+"επανεκκίνηστε το MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr ""
+msgstr "Αυτός ο διακομιστής δεν επιτρέπει εικονικές μηχανές "
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Αυτός ο διακομιστής απαιτεί ενεργοποιημένο singing οδηγό"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr ""
+msgstr "Παρακαλώ επανεκκίνηστε τον Η/Υ"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "Ο διακομιστής έχει εντοπίσει αγνοούμενα anti-cheat στοιχεία"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "Προσπαθήστε να επανεκκίνησετε το MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "Ο διακομιστής απαιτεί μη τροποποίημενα gta3.img και gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Παρακαλώ αντικαταστήστε το gta3.img ή το gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Ο διακομιστής δεν επιτρέπει το Wine"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "Εξασφαλίστε ότι κανένα άλλο πρόγραμμα δεν τροποποιεί το MTA:SA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "

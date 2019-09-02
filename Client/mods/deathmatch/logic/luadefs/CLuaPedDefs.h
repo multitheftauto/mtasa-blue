@@ -81,6 +81,7 @@ public:
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
+    LUA_DECLARE(SetPedFightingStyle);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);

@@ -39,11 +39,13 @@ protected:
     void        CreateGUI();
     void        DestroyGUI();
     bool        OnOKButtonClick(CGUIElement* pElement);
+    bool        OnNewsLinkButtonClick(CGUIElement* pElement);
 
     std::vector<SNewsItem>   m_NewsitemList;
     CGUIWindow*              m_pWindow;
     CGUITabPanel*            m_pTabPanel;
     CGUIButton*              m_pButtonOK;
+    CGUIButton*              m_pButtonNewsLink;
     std::vector<CGUITab*>    m_TabList;
     std::vector<CGUIWindow*> m_TabContentList;
 };
