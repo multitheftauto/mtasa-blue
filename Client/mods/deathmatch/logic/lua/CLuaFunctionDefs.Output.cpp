@@ -97,17 +97,6 @@ int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetClipboard(lua_State* luaVM)
-{
-    SString strText;
-    if (CStaticFunctionDefinitions::GetClipboard(strText))
-        lua_pushstring(luaVM, strText.c_str());
-    else
-        lua_pushnil(luaVM);
-
-    return 1;
-}
-
 int CLuaFunctionDefs::ShowChat(lua_State* luaVM)
 {
     bool             bShow = false;

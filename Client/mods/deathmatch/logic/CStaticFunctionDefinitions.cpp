@@ -281,24 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
 {
     g_pCore->SetChatVisible(bShow);
@@ -2322,6 +2304,25 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         Ped.SetDoingGangDriveby(bGangDriveby);
         return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
+{
+    RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
+    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.GetFightingStyle() != ucStyle)
+        {
+            // Is valid style
+            if (ucStyle >= 4 && ucStyle <= 16)
+            {
+                Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+                return true;
+            }
+        }
     }
     return false;
 }

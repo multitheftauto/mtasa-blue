@@ -323,7 +323,6 @@ void CConnectManager::DoPulse()
                 else            // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton().RemoveMessageBox(false);
-                    CCore::GetSingleton().HideQuickConnect();
                 }
 
                 CCore::GetSingleton().GetNetwork()->SetConnectionError(0);
@@ -370,11 +369,6 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
-
-                // If we connected from quick-connect, get rid of it
-                CQuickConnect* pQuickConnect = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuickConnectWindow();
-                if (pQuickConnect->IsVisible())
-                    pQuickConnect->SetVisible(false);
 
                 // Save the connection details into the config
                 if (g_pConnectManager->m_bSave)

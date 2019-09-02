@@ -252,23 +252,30 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
             if (!blockName.empty())
             {
                 std::string animName;
-                int iTime;
-                int iBlend = 250;
-                bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+                int         iTime;
+                int         iBlend = 250;
+                bool        bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
 
-                if (bitStream.ReadString<unsigned char>(animName) &&
-                    bitStream.Read(iTime) &&
-                    bitStream.ReadBit(bLoop) &&
-                    bitStream.ReadBit(bUpdatePosition) &&
-                    bitStream.ReadBit(bInterruptable) &&
-                    bitStream.ReadBit(bFreezeLastFrame))
-                 {
+                if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
+                    bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
+                {
                     if (bitStream.Version() >= 0x065)
+                    {
                         bitStream.Read(iBlend);
+                        bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
+                        if (!pPed->IsDucked())
+                        {
+                            bTaskToBeRestoredOnAnimEnd = false;
+                        }
+                    }
 
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
                     if (pBlock)
+                    {
                         pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+                        pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
+                    }
                 }
             }
             else
@@ -283,7 +290,7 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
 {
     // Read out the player and vehicle id
     std::string animName;
-    float fProgress;
+    float       fProgress;
 
     if (bitStream.ReadString<unsigned char>(animName))
     {
@@ -313,7 +320,7 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
 void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     std::string animName;
-    float fSpeed;
+    float       fSpeed;
 
     if (bitStream.ReadString<unsigned char>(animName))
     {

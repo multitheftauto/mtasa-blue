@@ -42,7 +42,6 @@ public:
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
     static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
-    static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
 
@@ -178,6 +177,7 @@ public:
     static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
+    static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
     static bool SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget);
     static bool SetPedHeadless(CClientEntity& Entity, bool bHeadless);
     static bool SetPedFrozen(CClientEntity& Entity, bool bFrozen);

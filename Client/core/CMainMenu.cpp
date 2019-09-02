@@ -276,7 +276,6 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->MoveToBack();
 
     // Submenus
-    m_QuickConnect.SetVisible(false);
     m_ServerBrowser.SetVisible(false);
     m_ServerInfo.Hide();
     m_Settings.SetVisible(false);
@@ -319,6 +318,24 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFeatureBranchAlertLabel->SetFont("clear-normal");
     m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
     m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+#endif
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+    // Add annonying alert
+    m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
+    std::int32_t buffer = 0xFFFF0000;
+    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
+
+    m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
+    m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
+    m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
+
+    #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
+    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
+    m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
+    m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
+    m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
 #endif
 }
 
@@ -624,6 +641,13 @@ void CMainMenu::Update()
         if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+        if (WaitForMenu == 275)
+        {
+            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
+        }
+#endif
+
         if (WaitForMenu < 300)
             WaitForMenu++;
     }
@@ -695,7 +719,6 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     {
         m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered();
-        m_QuickConnect.SetVisible(false);
         m_ServerBrowser.SetVisible(false);
         m_Settings.SetVisible(false);
         m_Credits.SetVisible(false);

@@ -6,7 +6,7 @@ project "Falagard"
 	pchheader "StdInc.h"
 	pchsource "src/StdInc.cpp"
 	
-	defines { "FALAGARDBASE_EXPORTS" }
+	defines { "FALAGARDBASE_EXPORTS", "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
 	
 	includedirs { 
 		"include",

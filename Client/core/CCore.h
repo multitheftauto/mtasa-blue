@@ -135,7 +135,6 @@ public:
     bool IsCursorForcedVisible();
     bool IsCursorControlsToggled() { return m_bCursorToggleControls; }
     void HideMainMenu();
-    void HideQuickConnect();
     void SetCenterCursor(bool bEnabled);
 
     void ShowServerInfo(unsigned int WindowType);
@@ -276,6 +275,10 @@ public:
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
     HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
+
+private:
+    void ApplyCoreInitSettings();
+
 private:
     // Core devices.
     CXML*               m_pXML;

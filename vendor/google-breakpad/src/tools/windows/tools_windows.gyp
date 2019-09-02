@@ -1,4 +1,4 @@
-# Copyright 2014 Google Inc. All rights reserved.
+# Copyright 2017 Google Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,64 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 {
+  'includes': [
+    '../../build/common.gypi',
+  ],
   'targets': [
     {
-      'target_name': 'gtest',
-      'type': 'static_library',
-      'sources': [
-        '../testing/gtest/src/gtest-all.cc',
-      ],
-      'include_dirs': [
-        '../testing/gtest',
-        '../testing/gtest/include',
-      ],
-      'direct_dependent_settings': {
-        'include_dirs': [
-          '../testing/gtest/include',
-        ],
-      },
-    },
-    {
-      'target_name': 'gtest_main',
-      'type': 'static_library',
+      'target_name': 'build_all',
+      'type': 'none',
       'dependencies': [
-        'gtest',
-      ],
-      'sources': [
-        'gtest/src/gtest_main.cc',
-      ],
-    },
-    {
-      'target_name': 'gmock',
-      'type': 'static_library',
-      'dependencies': [
-        'gtest',
-      ],
-      'sources': [
-        '../testing/src/gmock-all.cc',
-      ],
-      'include_dirs': [
-        '../testing',
-        '../testing/include',
-      ],
-      'direct_dependent_settings': {
-        'include_dirs': [
-          '../testing/include',
-        ],
-      },
-      'export_dependent_settings': [
-        'gtest',
-      ],
-    },
-    {
-      'target_name': 'gmock_main',
-      'type': 'static_library',
-      'dependencies': [
-        'gmock',
-      ],
-      'sources': [
-        '../testing/src/gmock_main.cc',
+        './converter/ms_symbol_server_converter.gyp:*',
+        './dump_syms/dump_syms.gyp:*',
+        './symupload/symupload.gyp:*',
       ],
     },
   ],
