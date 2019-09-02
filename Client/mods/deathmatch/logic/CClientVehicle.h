@@ -261,6 +261,8 @@ public:
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
 
+    bool AreLightsOn();
+
     void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
     void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
