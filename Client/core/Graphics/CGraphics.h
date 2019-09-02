@@ -28,6 +28,8 @@ class CLine3DBatcher;
 class CMaterialLine3DBatcher;
 class CPrimitiveBatcher;
 class CPrimitiveMaterialBatcher;
+class CPrimitive3DBatcher;
+class CMaterialPrimitive3DBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -65,6 +67,7 @@ class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 {
     friend class CDirect3DEvents9;
     friend CPrimitiveMaterialBatcher;
+    friend CMaterialPrimitive3DBatcher;
 
 public:
     ZERO_ON_NEW
@@ -147,6 +150,10 @@ public:
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
+    
+    void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
+    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
+
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
 
@@ -174,10 +181,12 @@ public:
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
 
     // To draw queued up drawings
-    void DrawPreGUIQueue();
-    void DrawPostGUIQueue();
-    void DrawLine3DPreGUIQueue();
-    bool HasLine3DPreGUIQueueItems();
+    void DrawPreGUIQueue(void);
+    void DrawPostGUIQueue(void);
+    void DrawLine3DPreGUIQueue(void);
+    bool HasLine3DPreGUIQueueItems(void);
+    void DrawPrimitive3DPreGUIQueue(void);
+    bool HasPrimitive3DPreGUIQueueItems(void);
 
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
@@ -207,17 +216,21 @@ private:
 
     IDirect3DDevice9* m_pDevice;
 
-    CRenderItemManager*        m_pRenderItemManager;
-    CScreenGrabberInterface*   m_pScreenGrabber;
-    CPixelsManagerInterface*   m_pPixelsManager;
-    CTileBatcher*              m_pTileBatcher;
-    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
-    CPrimitiveBatcher*         m_pPrimitiveBatcher;
-    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
-    CAspectRatioConverter*     m_pAspectRatioConverter;
+    CRenderItemManager*          m_pRenderItemManager;
+    CScreenGrabberInterface*     m_pScreenGrabber;
+    CPixelsManagerInterface*     m_pPixelsManager;
+    CTileBatcher*                m_pTileBatcher;
+    CLine3DBatcher*              m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*              m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI;
+    CPrimitiveBatcher*           m_pPrimitiveBatcher;
+    CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI;
+    CAspectRatioConverter*       m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
