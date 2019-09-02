@@ -40,7 +40,6 @@ public:
     LUA_DECLARE(GetSoundBufferLength);
     LUA_DECLARE(SetSoundPaused);
     LUA_DECLARE(IsSoundPaused);
-    LUA_DECLARE(IsSoundStopped);
     LUA_DECLARE(SetSoundVolume);
     LUA_DECLARE(GetSoundVolume);
     LUA_DECLARE(SetSoundSpeed);

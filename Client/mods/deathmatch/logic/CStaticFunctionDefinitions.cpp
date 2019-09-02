@@ -7756,12 +7756,6 @@ bool CStaticFunctionDefinitions::IsSoundPaused(CClientPlayer& Player, bool& bPau
     return false;
 }
 
-bool CStaticFunctionDefinitions::IsSoundStopped(CClientSound& Sound, bool& bStopped)
-{
-    bStopped = Sound.IsSoundStopped();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetSoundVolume(CClientSound& Sound, float fVolume)
 {
     Sound.SetVolume(fVolume);

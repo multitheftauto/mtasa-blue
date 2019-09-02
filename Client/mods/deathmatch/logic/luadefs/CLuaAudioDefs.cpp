@@ -36,7 +36,6 @@ void CLuaAudioDefs::LoadFunctions()
         {"getSoundBufferLength", GetSoundBufferLength},
         {"setSoundPaused", SetSoundPaused},
         {"isSoundPaused", IsSoundPaused},
-        {"isSoundStopped", IsSoundStopped},
         {"setSoundVolume", SetSoundVolume},
         {"getSoundVolume", GetSoundVolume},
         {"setSoundSpeed", SetSoundSpeed},
@@ -522,31 +521,6 @@ int CLuaAudioDefs::IsSoundPaused(lua_State* luaVM)
             if (CStaticFunctionDefinitions::IsSoundPaused(*pPlayer, bPaused))
             {
                 lua_pushboolean(luaVM, bPaused);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::IsSoundStopped(lua_State* luaVM)
-{
-    CClientSound*    pSound;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            bool bStopped = false;
-            if (CStaticFunctionDefinitions::IsSoundStopped(*pSound, bStopped))
-            {
-                lua_pushboolean(luaVM, bStopped);
                 return 1;
             }
         }
