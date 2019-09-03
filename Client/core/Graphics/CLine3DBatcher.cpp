@@ -119,7 +119,7 @@ void CLine3DBatcher::Flush()
     m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bZTest ? D3DZB_TRUE : D3DZB_FALSE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-    m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
     m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
     m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
     m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);

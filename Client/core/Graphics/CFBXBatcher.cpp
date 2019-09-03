@@ -178,9 +178,6 @@ void CFBXBatcher::Render()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-    // Set vertex stream
-    // static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-    m_pDevice->SetFVF(D3DFVF_XYZ);
 
     // Draw
     m_pDevice->SetTexture(0, nullptr);

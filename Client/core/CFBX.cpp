@@ -111,14 +111,27 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
     // pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
     // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
-    // pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    // pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
+    pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
+    pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
+    pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+    pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
+    pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);            // double side
+    pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 
     pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
     pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
     // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
     // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+
+    pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+    pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_LESSEQUAL);
+    pDevice->SetRenderState(D3DRS_STENCILREF, 0);
+    pDevice->SetRenderState(D3DRS_STENCILMASK, 0);
+
+    pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 
     CMatrix* pCameraMatrix = new CMatrix();
     g_pCore->GetGame()->GetCamera()->GetMatrix(pCameraMatrix);
@@ -151,8 +164,19 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                             // Set texture addressing mode
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
-                            // pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-                            // pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+                          /*  
+                            pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                            pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                            pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+                            pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                            pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                            pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);*/
+                            //pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                            //pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
+                            //pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
+                            //pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                            //pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
+                            //pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
 
                             if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
                                 pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
@@ -160,13 +184,10 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                             pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
                         }
                     }
-                    pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
-                    pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
-                    pDevice->SetRenderState(D3DRS_STENCILREF, 0);
-                    pDevice->SetRenderState(D3DRS_STENCILMASK, 0);
 
-                    // pDevice->SetLight(0, &object->light);
-                    // pDevice->LightEnable(0, TRUE);
+                    pDevice->SetMaterial(&object.second->material);
+                    pDevice->SetLight(0, &object.second->light);
+                    pDevice->LightEnable(0, TRUE);
 
                     pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
                     pDevice->SetIndices(pBuffer->i_buffer);
@@ -240,14 +261,13 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObje
     pViewMatrix = new CMatrix();
 
     ZeroMemory(&material, sizeof(D3DMATERIAL9));                      // clear out the struct for use
-    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);             // set diffuse color to white
-    material.Ambient = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);             // set ambient color to white
-    material.Specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set ambient color to white
+    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set diffuse color to white
+    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);             // set ambient color to white
 
     ZeroMemory(&light, sizeof(light));                            // clear out the light struct for use
     light.Type = D3DLIGHT_DIRECTIONAL;                            // make the light type 'directional light'
-    light.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);            // set the light's color
-    light.Direction = D3DXVECTOR3(1.0f, 0.3f, 1.0f);
+    light.Diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);            // set the light's color
+    light.Direction = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 }
 
 void CFBXTemplateObject::SetPosition(CVector& pos)
