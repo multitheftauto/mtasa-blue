@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CAudioRPCs_H
-#define __CAudioRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CAudioRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(PlaySound);
 
@@ -29,5 +28,3 @@ private:
         AUDIO_MISSION_PLAY
     };
 };
-
-#endif

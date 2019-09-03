@@ -19,7 +19,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel) : CElement(pParent, pNode)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
@@ -54,7 +54,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigne
     memset(&m_Weapons[0], 0, sizeof(m_Weapons));
     m_ucAlpha = 255;
     m_pContactElement = NULL;
-    m_bIsDead = true;
+    m_bIsDead = false;
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
@@ -81,7 +81,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigne
     }
 }
 
-CPed::~CPed(void)
+CPed::~CPed()
 {
     // Make sure we've no longer occupied any vehicle
     if (m_pVehicle)
@@ -101,7 +101,25 @@ CPed::~CPed(void)
     Unlink();
 }
 
-void CPed::Unlink(void)
+CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CPed* const pTemp = m_pPedManager->Create(GetModel(), GetParentEntity());
+
+    if (pTemp)
+    {
+        pTemp->SetPosition(GetPosition());
+        pTemp->SetRotation(GetRotation());
+        pTemp->SetHealth(GetHealth());
+        pTemp->SetArmor(GetArmor());
+        pTemp->SetSyncable(IsSyncable());
+        pTemp->SetSpawned(IsSpawned());
+        pTemp->SetIsDead(IsDead());
+    }
+
+    return pTemp;
+}
+
+void CPed::Unlink()
 {
     // Remove us from the Ped manager
     if (m_pPedManager)
@@ -131,26 +149,26 @@ void CPed::SetMatrix(const CMatrix& matrix)
     SetRotation(vecRotation.fZ);
 }
 
-bool CPed::ReadSpecialData(void)
+bool CPed::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
@@ -171,13 +189,13 @@ bool CPed::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <ped> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model' id specified in <ped> (line %d)\n", iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
@@ -216,7 +234,7 @@ bool CPed::ReadSpecialData(void)
     return true;
 }
 
-bool CPed::HasValidModel(void)
+bool CPed::HasValidModel()
 {
     return CPedManager::IsValidModel(m_usModel);
 }
@@ -303,7 +321,7 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
-float CPed::GetMaxHealth(void)
+float CPed::GetMaxHealth()
 {
     // TODO: Verify this formula
 
@@ -375,7 +393,7 @@ void CPed::SetVehicleAction(unsigned int uiAction)
     m_uiVehicleAction = uiAction;
 }
 
-bool CPed::IsAttachToable(void)
+bool CPed::IsAttachToable()
 {
     // We're not attachable if we're inside a vehicle (that would get messy)
     if (!GetOccupiedVehicle())

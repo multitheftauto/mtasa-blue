@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKS
-#define __CGAME_TASKS
+#pragma once
 
 #include <CVector.h>
 #include "CTaskManager.h"
@@ -34,8 +33,8 @@ enum eClimbHeights
 class CTasks
 {
 public:
-    virtual CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot(void) = 0;
-    virtual CTaskComplexFacial*      CreateTaskComplexFacial(void) = 0;
+    virtual CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot() = 0;
+    virtual CTaskComplexFacial*      CreateTaskComplexFacial() = 0;
 
     virtual CTaskSimpleCarSetPedInAsDriver*    CreateTaskSimpleCarSetPedInAsDriver(CVehicle* pVehicle) = 0;
     virtual CTaskSimpleCarSetPedInAsPassenger* CreateTaskSimpleCarSetPedInAsPassenger(CVehicle* pVehicle, int iTargetDoor) = 0;
@@ -89,5 +88,3 @@ public:
                                                            unsigned char bAimImmediate = false) = 0;
     virtual CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000) = 0;
 };
-
-#endif

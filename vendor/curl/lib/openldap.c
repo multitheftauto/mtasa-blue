@@ -6,7 +6,7 @@
  *                 \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2010, Howard Chu, <hyc@openldap.org>
- * Copyright (C) 2011 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2011 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -196,9 +196,6 @@ static CURLcode ldap_setup_connection(struct connectdata *conn)
   li->proto = proto;
   conn->proto.generic = li;
   connkeep(conn, "OpenLDAP default");
-  /* TODO:
-   * - provide option to choose SASL Binds instead of Simple
-   */
   return CURLE_OK;
 }
 
@@ -220,8 +217,8 @@ static CURLcode ldap_connect(struct connectdata *conn, bool *done)
   ptr = hosturl + 4;
   if(conn->handler->flags & PROTOPT_SSL)
     *ptr++ = 's';
-  snprintf(ptr, sizeof(hosturl)-(ptr-hosturl), "://%s:%d",
-           conn->host.name, conn->remote_port);
+  msnprintf(ptr, sizeof(hosturl)-(ptr-hosturl), "://%s:%d",
+            conn->host.name, conn->remote_port);
 
 #ifdef CURL_OPENLDAP_DEBUG
   static int do_trace = 0;
@@ -414,7 +411,7 @@ static CURLcode ldap_do(struct connectdata *conn, bool *done)
     return CURLE_OUT_OF_MEMORY;
   lr->msgid = msgid;
   data->req.protop = lr;
-  Curl_setup_transfer(conn, FIRSTSOCKET, -1, FALSE, NULL, -1, NULL);
+  Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
   *done = TRUE;
   return CURLE_OK;
 }
@@ -510,8 +507,6 @@ static ssize_t ldap_recv(struct connectdata *conn, int sockindex, char *buf,
     lr->nument++;
     rc = ldap_get_dn_ber(li->ld, ent, &ber, &bv);
     if(rc < 0) {
-      /* TODO: verify that this is really how this return code should be
-         handled */
       *err = CURLE_RECV_ERROR;
       return -1;
     }
@@ -536,7 +531,7 @@ static ssize_t ldap_recv(struct connectdata *conn, int sockindex, char *buf,
     data->req.bytecount += bv.bv_len + 5;
 
     for(rc = ldap_get_attribute_ber(li->ld, ent, ber, &bv, &bvals);
-        (rc == LDAP_SUCCESS) && bvals;
+        rc == LDAP_SUCCESS;
         rc = ldap_get_attribute_ber(li->ld, ent, ber, &bv, &bvals)) {
       int i;
 
@@ -547,6 +542,27 @@ static ssize_t ldap_recv(struct connectdata *conn, int sockindex, char *buf,
         binary = 1;
       else
         binary = 0;
+
+      if(bvals == NULL) {
+        writeerr = Curl_client_write(conn, CLIENTWRITE_BODY, (char *)"\t", 1);
+        if(writeerr) {
+          *err = writeerr;
+          return -1;
+        }
+        writeerr = Curl_client_write(conn, CLIENTWRITE_BODY, (char *)bv.bv_val,
+                                     bv.bv_len);
+        if(writeerr) {
+          *err = writeerr;
+          return -1;
+        }
+        writeerr = Curl_client_write(conn, CLIENTWRITE_BODY, (char *)":\n", 2);
+        if(writeerr) {
+          *err = writeerr;
+          return -1;
+        }
+        data->req.bytecount += bv.bv_len + 3;
+        continue;
+      }
 
       for(i = 0; bvals[i].bv_val != NULL; i++) {
         int binval = 0;

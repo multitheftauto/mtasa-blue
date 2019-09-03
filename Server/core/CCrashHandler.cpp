@@ -16,15 +16,30 @@
     #include <execinfo.h>
 #endif
 
+// clang-format off
 #ifndef WIN32
-    #include <ncursesw/curses.h>
-extern "C" WINDOW* m_wndMenu;
-extern "C" WINDOW* m_wndInput;
-extern "C" bool    g_bNoCurses;
-    #include <client/linux/handler/exception_handler.h>
-bool           DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
-static SString ms_strDumpPathFilename;
+    #if __has_include(<ncursesw/curses.h>)
+        #include <ncursesw/curses.h>
+    #else
+        #include <ncurses.h>
+    #endif
+
+    extern "C" WINDOW* m_wndMenu;
+    extern "C" WINDOW* m_wndInput;
+    extern "C" bool    g_bNoCurses;
+
+    #ifdef __APPLE__
+        #include <client/mac/handler/exception_handler.h>
+        bool           DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded);
+    #else
+        #include <client/linux/handler/exception_handler.h>
+        bool           DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
+    #endif
+
+    static SString ms_strDumpPathFilename;
 #endif
+// clang-format on
+
 static SString ms_strDumpPath;
 
 #ifdef WIN32
@@ -49,6 +64,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
     #ifdef WIN32
     SetCrashHandlerFilter(HandleExceptionGlobal);
     #else
+
     // Prepare initial dumpfile name
     time_t     pTime = time(NULL);
     struct tm* tm = localtime(&pTime);
@@ -59,8 +75,12 @@ void CCrashHandler::Init(const SString& strInServerPath)
         #ifdef WITH_BACKTRACE_ONLY
     signal(SIGSEGV, HandleExceptionGlobal);
         #else
-    google_breakpad::MinidumpDescriptor      descriptor(ms_strDumpPath);
-    static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
+            #ifdef __APPLE__
+                static google_breakpad::ExceptionHandler eh(ms_strDumpPath, NULL, DumpCallback, NULL, true, NULL);
+            #else
+                google_breakpad::MinidumpDescriptor      descriptor(ms_strDumpPath);
+                static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
+            #endif
         #endif
     #endif
 }
@@ -119,11 +139,18 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-// Linux crash callback when using google-breakpad
+// Linux/Mac crash callback when using google-breakpad
+#ifdef __APPLE__
+bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
+{
+    auto path = PathJoin(dump_dir, SString("%s.dmp", minidump_id));
+#else
 bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
 {
+    auto path = descriptor.path();
+#endif
     // Set inital dump file name (Safeish)
-    File::Rename(descriptor.path(), ms_strDumpPathFilename);
+    File::Rename(path, ms_strDumpPathFilename);
 
     // Set final dump file name (Not so safe)
     time_t     pTime = time(NULL);
@@ -202,6 +229,10 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
             if (strModuleName.length() == 0)
                 strModuleName = "unknown";
 
+            #ifdef _WIN64
+                strModuleName += "64";
+            #endif
+
             SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
                                 pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,
                                 SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
@@ -277,7 +308,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     }
 }
 
-void CCrashHandler::RunErrorTool(void)
+void CCrashHandler::RunErrorTool()
 {
 }
 

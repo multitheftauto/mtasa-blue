@@ -11,9 +11,8 @@
 
 #include "StdInc.h"
 
-CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, const char* szName, unsigned char ucRed, unsigned char ucGreen,
-             unsigned char ucBlue)
-    : CElement(pParent, pNode)
+CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+    : CElement(pParent)
 {
     m_pTeamManager = pTeamManager;
 
@@ -27,18 +26,18 @@ CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, con
     m_pTeamManager->AddToList(this);
 }
 
-CTeam::~CTeam(void)
+CTeam::~CTeam()
 {
     RemoveAllPlayers();
     Unlink();
 }
 
-void CTeam::Unlink(void)
+void CTeam::Unlink()
 {
     m_pTeamManager->RemoveFromList(this);
 }
 
-bool CTeam::ReadSpecialData(void)
+bool CTeam::ReadSpecialData(const int iLine)
 {
     // Grab the "name"
     char szTemp[MAX_TEAM_NAME];
@@ -48,7 +47,7 @@ bool CTeam::ReadSpecialData(void)
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing name' attribute in <team> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing name' attribute in <team> (line %d)\n", iLine);
         return false;
     }
 
@@ -60,7 +59,7 @@ bool CTeam::ReadSpecialData(void)
         unsigned char ucAlpha;
         if (!XMLColorToInt(szTemp, m_ucRed, m_ucGreen, m_ucBlue, ucAlpha))
         {
-            CLogger::ErrorPrintf("Bad 'color' value specified in <team> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'color' value specified in <team> (line %d)\n", iLine);
             return false;
         }
     }
@@ -113,7 +112,7 @@ void CTeam::RemovePlayer(CPlayer* pPlayer, bool bChangePlayer)
         pPlayer->SetTeam(NULL, false);
 }
 
-void CTeam::RemoveAllPlayers(void)
+void CTeam::RemoveAllPlayers()
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)

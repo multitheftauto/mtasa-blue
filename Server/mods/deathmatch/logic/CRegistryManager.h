@@ -16,8 +16,8 @@ class CRegistry;
 class CRegistryManager
 {
 public:
-    ~CRegistryManager(void);
-    void       DoPulse(void);
+    ~CRegistryManager();
+    void       DoPulse();
     CRegistry* OpenRegistry(const std::string& strFileName);
     bool       CloseRegistry(CRegistry* pRegistry);
 

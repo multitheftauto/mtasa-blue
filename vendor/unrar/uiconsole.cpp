@@ -6,8 +6,8 @@ UIASKREP_RESULT uiAskReplace(wchar *Name,size_t MaxNameSize,int64 FileSize,RarTi
   FindData ExistingFD;
   memset(&ExistingFD,0,sizeof(ExistingFD)); // In case find fails.
   FindFile::FastFind(Name,&ExistingFD);
-  itoa(ExistingFD.Size,SizeText1);
-  ExistingFD.mtime.GetText(DateStr1,ASIZE(DateStr1),true,false);
+  itoa(ExistingFD.Size,SizeText1,ASIZE(SizeText1));
+  ExistingFD.mtime.GetText(DateStr1,ASIZE(DateStr1),false);
 
   if (FileSize==INT64NDF || FileTime==NULL)
   {
@@ -16,9 +16,12 @@ UIASKREP_RESULT uiAskReplace(wchar *Name,size_t MaxNameSize,int64 FileSize,RarTi
   }
   else
   {
-    itoa(FileSize,SizeText2);
-    FileTime->GetText(DateStr2,ASIZE(DateStr2),true,false);
-    eprintf(St(MAskReplace),Name,SizeText1,DateStr1,SizeText2,DateStr2);
+    itoa(FileSize,SizeText2,ASIZE(SizeText2));
+    FileTime->GetText(DateStr2,ASIZE(DateStr2),false);
+    if ((Flags & UIASKREP_F_EXCHSRCDEST)==0)
+      eprintf(St(MAskReplace),Name,SizeText1,DateStr1,SizeText2,DateStr2);
+    else
+      eprintf(St(MAskReplace),Name,SizeText2,DateStr2,SizeText1,DateStr1);
   }
 
   bool AllowRename=(Flags & UIASKREP_F_NORENAME)==0;
@@ -96,9 +99,11 @@ void uiMsgStore::Msg()
       Log(Str[0],St(MDataBadCRC),Str[1],Str[0]);
       break;
     case UIERROR_BADPSW:
+    case UIWAIT_BADPSW:
       Log(Str[0],St(MWrongPassword));
       break;
     case UIERROR_MEMORY:
+      mprintf(L"\n");
       Log(NULL,St(MErrOutMem));
       break;
     case UIERROR_FILEOPEN:
@@ -123,6 +128,9 @@ void uiMsgStore::Msg()
     case UIERROR_FILEDELETE:
       Log(Str[0],St(MCannotDelete),Str[1]);
       break;
+    case UIERROR_RECYCLEFAILED:
+      Log(Str[0],St(MRecycleFailed));
+      break;
     case UIERROR_FILERENAME:
       Log(Str[0],St(MErrRename),Str[1],Str[2]);
       break;
@@ -135,6 +143,7 @@ void uiMsgStore::Msg()
       break;
     case UIERROR_FILECOPYHINT:
       Log(Str[0],St(MCopyErrorHint));
+      mprintf(L"     "); // For progress percent.
       break;
     case UIERROR_DIRCREATE:
       Log(Str[0],St(MExtrErrMkDir),Str[1]);
@@ -144,6 +153,10 @@ void uiMsgStore::Msg()
       break;
     case UIERROR_HLINKCREATE:
       Log(NULL,St(MErrCreateLnkH),Str[0]);
+      break;
+    case UIERROR_NOLINKTARGET:
+      Log(NULL,St(MErrLnkTarget));
+      mprintf(L"     "); // For progress percent.
       break;
     case UIERROR_NEEDADMIN:
       Log(NULL,St(MNeedAdmin));
@@ -176,7 +189,11 @@ void uiMsgStore::Msg()
       Log(Str[0],St(MUnknownMeth),Str[1]);
       break;
     case UIERROR_UNKNOWNENCMETHOD:
-      Log(Str[0],St(MUnkEncMethod),Str[1]);
+      {
+        wchar Msg[256];
+        swprintf(Msg,ASIZE(Msg),St(MUnkEncMethod),Str[1]);
+        Log(Str[0],L"%s: %s",Msg,Str[2]);
+      }
       break;
 #ifndef SFX_MODULE
    case UIERROR_RENAMING:
@@ -209,6 +226,7 @@ void uiMsgStore::Msg()
       break;
     case UIERROR_INVALIDNAME:
       Log(Str[0],St(MInvalidName),Str[1]);
+      mprintf(L"\n"); // Needed when called from CmdExtract::ExtractCurrentFile.
       break;
 #ifndef SFX_MODULE
     case UIERROR_NEWRARFORMAT:
@@ -227,6 +245,9 @@ void uiMsgStore::Msg()
       break;
     case UIERROR_UNKNOWNEXTRA:
       Log(Str[0],St(MUnknownExtra),Str[1]);
+      break;
+    case UIERROR_CORRUPTEXTRA:
+      Log(Str[0],St(MCorruptExtra),Str[1],Str[2]);
       break;
 #endif
 #if !defined(SFX_MODULE) && defined(_WIN_ALL)
@@ -334,22 +355,32 @@ void uiMsgStore::Msg()
 
 bool uiGetPassword(UIPASSWORD_TYPE Type,const wchar *FileName,SecPassword *Password)
 {
-  return GetConsolePassword(Type,FileName,Password);
+  // Unlike GUI we cannot provide Cancel button here, so we use the empty
+  // password to abort. Otherwise user not knowing a password would need to
+  // press Ctrl+C multiple times to quit from infinite password request loop.
+  return GetConsolePassword(Type,FileName,Password) && Password->IsSet();
+}
+
+
+bool uiIsGlobalPasswordSet()
+{
+  return false;
 }
 
 
 void uiAlarm(UIALARM_TYPE Type)
 {
-  if (uiSoundEnabled)
+  if (uiSoundNotify==SOUND_NOTIFY_ON)
   {
-    static clock_t LastTime=clock();
-    if ((clock()-LastTime)/CLOCKS_PER_SEC>5)
+    static clock_t LastTime=-10; // Negative to always beep first time.
+    if ((MonoClock()-LastTime)/CLOCKS_PER_SEC>5)
     {
 #ifdef _WIN_ALL
       MessageBeep(-1);
 #else
       putwchar('\007');
 #endif
+      LastTime=MonoClock();
     }
   }
 }

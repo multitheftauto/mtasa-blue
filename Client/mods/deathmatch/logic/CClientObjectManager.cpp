@@ -90,13 +90,13 @@ CClientObjectManager::CClientObjectManager(CClientManager* pManager)
     m_uiMaxLowLodStreamedInCount = MAX_OBJECTS_MTA - m_uiMaxStreamedInCount;
 }
 
-CClientObjectManager::~CClientObjectManager(void)
+CClientObjectManager::~CClientObjectManager()
 {
     // Destroy all objects
     DeleteAll();
 }
 
-void CClientObjectManager::DoPulse(void)
+void CClientObjectManager::DoPulse()
 {
     UpdateLimitInfo();
 
@@ -112,7 +112,7 @@ void CClientObjectManager::DoPulse(void)
     assert(m_uiLowLodStreamedInCount + m_uiStreamedInCount == m_StreamedIn.size());
 }
 
-void CClientObjectManager::DeleteAll(void)
+void CClientObjectManager::DeleteAll()
 {
     // Delete all the objects
     m_bCanRemoveFromList = false;
@@ -127,6 +127,7 @@ void CClientObjectManager::DeleteAll(void)
     m_bCanRemoveFromList = true;
 }
 
+
 CClientObject* CClientObjectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
@@ -137,16 +138,6 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
     }
 
     return NULL;
-}
-
-CClientObject* CClientObjectManager::Get(CObject* pObject, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientObject(pObject);
-}
-
-CClientObject* CClientObjectManager::GetSafe(CEntity* pEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientObject(pEntity);
 }
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
@@ -284,7 +275,7 @@ void CClientObjectManager::OnDestruction(CClientObject* pObject)
     UpdateLimitInfo();
 }
 
-void CClientObjectManager::UpdateLimitInfo(void)
+void CClientObjectManager::UpdateLimitInfo()
 {
     CPools* pPools = g_pGame->GetPools();
     m_iEntryInfoNodeEntries = pPools->GetEntryInfoNodePool()->GetNumberOfUsedSpaces();
@@ -292,31 +283,31 @@ void CClientObjectManager::UpdateLimitInfo(void)
     m_iPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool()->GetNumberOfUsedSpaces();
 }
 
-bool CClientObjectManager::StaticIsObjectLimitReached(void)
+bool CClientObjectManager::StaticIsObjectLimitReached()
 {
     return g_pClientGame->GetObjectManager()->IsObjectLimitReached();
 }
 
-bool CClientObjectManager::StaticIsLowLodObjectLimitReached(void)
+bool CClientObjectManager::StaticIsLowLodObjectLimitReached()
 {
     return g_pClientGame->GetObjectManager()->IsLowLodObjectLimitReached();
 }
 
-bool CClientObjectManager::IsObjectLimitReached(void)
+bool CClientObjectManager::IsObjectLimitReached()
 {
     if (IsHardObjectLimitReached() || m_uiStreamedInCount >= m_uiMaxStreamedInCount)
         return true;
     return false;
 }
 
-bool CClientObjectManager::IsLowLodObjectLimitReached(void)
+bool CClientObjectManager::IsLowLodObjectLimitReached()
 {
     if (IsHardObjectLimitReached() || m_uiLowLodStreamedInCount >= m_uiMaxLowLodStreamedInCount)
         return true;
     return false;
 }
 
-bool CClientObjectManager::IsHardObjectLimitReached(void)
+bool CClientObjectManager::IsHardObjectLimitReached()
 {
     if (m_uiStreamedInCount + m_uiLowLodStreamedInCount >= MAX_OBJECTS_MTA)
         return true;

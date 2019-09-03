@@ -51,8 +51,8 @@ public:
     LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
-    LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
+    LUA_DECLARE(ClearChatBox);
 
     // Notification functions
     LUA_DECLARE(CreateTrayNotification);
@@ -78,8 +78,6 @@ public:
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE(GetTok);
-    LUA_DECLARE(tocolor);
     LUA_DECLARE(GetValidPedModels);
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);
@@ -150,6 +148,9 @@ public:
     LUA_DECLARE(GetVehiclesLODDistance);
     LUA_DECLARE(SetVehiclesLODDistance);
     LUA_DECLARE(ResetVehiclesLODDistance);
+    LUA_DECLARE(GetPedsLODDistance); 
+    LUA_DECLARE(SetPedsLODDistance); 
+    LUA_DECLARE(ResetPedsLODDistance); 
     LUA_DECLARE(GetFogDistance);
     LUA_DECLARE(SetFogDistance);
     LUA_DECLARE(ResetFogDistance);
@@ -199,6 +200,7 @@ public:
     LUA_DECLARE(AddCommandHandler);
     LUA_DECLARE(RemoveCommandHandler);
     LUA_DECLARE(ExecuteCommandHandler);
+    LUA_DECLARE(GetCommandHandlers);
 
     // Utility
     LUA_DECLARE(GetNetworkUsageData);
@@ -210,6 +212,7 @@ public:
 
     // L10n
     LUA_DECLARE(GetLocalization);
+    LUA_DECLARE(GetKeyboardLayout);
 
     // Voice functions
     LUA_DECLARE(IsVoiceEnabled);

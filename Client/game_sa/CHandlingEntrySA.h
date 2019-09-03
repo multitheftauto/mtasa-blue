@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CHANDLINGENTRY
-#define __CGAMESA_CHANDLINGENTRY
+#pragma once
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
@@ -89,62 +88,62 @@ class CHandlingEntrySA : public CHandlingEntry
 {
 public:
     // Constructor for creatable dummy entries
-    CHandlingEntrySA(void);
+    CHandlingEntrySA();
 
     // Constructor for original entries
     CHandlingEntrySA(tHandlingDataSA* pOriginal);
 
-    virtual ~CHandlingEntrySA(void);
+    virtual ~CHandlingEntrySA();
 
     // Use this to copy data from an another handling class to this
     void Assign(const CHandlingEntry* pData);
 
     // Get functions
-    float          GetMass(void) const { return m_Handling.fMass; };
-    float          GetTurnMass(void) const { return m_Handling.fTurnMass; };
-    float          GetDragCoeff(void) const { return m_Handling.fDragCoeff; };
-    const CVector& GetCenterOfMass(void) const { return m_Handling.vecCenterOfMass; };
+    float          GetMass() const { return m_Handling.fMass; };
+    float          GetTurnMass() const { return m_Handling.fTurnMass; };
+    float          GetDragCoeff() const { return m_Handling.fDragCoeff; };
+    const CVector& GetCenterOfMass() const { return m_Handling.vecCenterOfMass; };
 
-    unsigned int GetPercentSubmerged(void) const { return m_Handling.uiPercentSubmerged; };
-    float        GetTractionMultiplier(void) const { return m_Handling.fTractionMultiplier; };
+    unsigned int GetPercentSubmerged() const { return m_Handling.uiPercentSubmerged; };
+    float        GetTractionMultiplier() const { return m_Handling.fTractionMultiplier; };
 
-    eDriveType    GetCarDriveType(void) const { return static_cast<eDriveType>(m_Handling.Transmission.ucDriveType); };
-    eEngineType   GetCarEngineType(void) const { return static_cast<eEngineType>(m_Handling.Transmission.ucEngineType); };
-    unsigned char GetNumberOfGears(void) const { return m_Handling.Transmission.ucNumberOfGears; };
+    eDriveType    GetCarDriveType() const { return static_cast<eDriveType>(m_Handling.Transmission.ucDriveType); };
+    eEngineType   GetCarEngineType() const { return static_cast<eEngineType>(m_Handling.Transmission.ucEngineType); };
+    unsigned char GetNumberOfGears() const { return m_Handling.Transmission.ucNumberOfGears; };
 
-    float GetEngineAcceleration(void) const { return m_Handling.Transmission.fEngineAcceleration; };
-    float GetEngineInertia(void) const { return m_Handling.Transmission.fEngineInertia; };
-    float GetMaxVelocity(void) const { return m_Handling.Transmission.fMaxVelocity; };
+    float GetEngineAcceleration() const { return m_Handling.Transmission.fEngineAcceleration; };
+    float GetEngineInertia() const { return m_Handling.Transmission.fEngineInertia; };
+    float GetMaxVelocity() const { return m_Handling.Transmission.fMaxVelocity; };
 
-    float GetBrakeDeceleration(void) const { return m_Handling.fBrakeDeceleration; };
-    float GetBrakeBias(void) const { return m_Handling.fBrakeBias; };
-    bool  GetABS(void) const { return m_Handling.bABS; };
+    float GetBrakeDeceleration() const { return m_Handling.fBrakeDeceleration; };
+    float GetBrakeBias() const { return m_Handling.fBrakeBias; };
+    bool  GetABS() const { return m_Handling.bABS; };
 
-    float GetSteeringLock(void) const { return m_Handling.fSteeringLock; };
-    float GetTractionLoss(void) const { return m_Handling.fTractionLoss; };
-    float GetTractionBias(void) const { return m_Handling.fTractionBias; };
+    float GetSteeringLock() const { return m_Handling.fSteeringLock; };
+    float GetTractionLoss() const { return m_Handling.fTractionLoss; };
+    float GetTractionBias() const { return m_Handling.fTractionBias; };
 
-    float GetSuspensionForceLevel(void) const { return m_Handling.fSuspensionForceLevel; };
-    float GetSuspensionDamping(void) const { return m_Handling.fSuspensionDamping; };
-    float GetSuspensionHighSpeedDamping(void) const { return m_Handling.fSuspensionHighSpdDamping; };
-    float GetSuspensionUpperLimit(void) const { return m_Handling.fSuspensionUpperLimit; };
-    float GetSuspensionLowerLimit(void) const { return m_Handling.fSuspensionLowerLimit; };
-    float GetSuspensionFrontRearBias(void) const { return m_Handling.fSuspensionFrontRearBias; };
-    float GetSuspensionAntiDiveMultiplier(void) const { return m_Handling.fSuspensionAntiDiveMultiplier; };
+    float GetSuspensionForceLevel() const { return m_Handling.fSuspensionForceLevel; };
+    float GetSuspensionDamping() const { return m_Handling.fSuspensionDamping; };
+    float GetSuspensionHighSpeedDamping() const { return m_Handling.fSuspensionHighSpdDamping; };
+    float GetSuspensionUpperLimit() const { return m_Handling.fSuspensionUpperLimit; };
+    float GetSuspensionLowerLimit() const { return m_Handling.fSuspensionLowerLimit; };
+    float GetSuspensionFrontRearBias() const { return m_Handling.fSuspensionFrontRearBias; };
+    float GetSuspensionAntiDiveMultiplier() const { return m_Handling.fSuspensionAntiDiveMultiplier; };
 
-    float GetCollisionDamageMultiplier(void) const { return m_Handling.fCollisionDamageMultiplier; };
+    float GetCollisionDamageMultiplier() const { return m_Handling.fCollisionDamageMultiplier; };
 
-    unsigned int GetHandlingFlags(void) const { return m_Handling.uiHandlingFlags; };
-    unsigned int GetModelFlags(void) const { return m_Handling.uiModelFlags; };
-    float        GetSeatOffsetDistance(void) const { return m_Handling.fSeatOffsetDistance; };
-    unsigned int GetMonetary(void) const { return m_Handling.uiMonetary; };
+    unsigned int GetHandlingFlags() const { return m_Handling.uiHandlingFlags; };
+    unsigned int GetModelFlags() const { return m_Handling.uiModelFlags; };
+    float        GetSeatOffsetDistance() const { return m_Handling.fSeatOffsetDistance; };
+    unsigned int GetMonetary() const { return m_Handling.uiMonetary; };
 
-    eLightType    GetHeadLight(void) const { return static_cast<eLightType>(m_Handling.ucHeadLight); };
-    eLightType    GetTailLight(void) const { return static_cast<eLightType>(m_Handling.ucTailLight); };
-    unsigned char GetAnimGroup(void) const { return m_Handling.ucAnimGroup; };
+    eLightType    GetHeadLight() const { return static_cast<eLightType>(m_Handling.ucHeadLight); };
+    eLightType    GetTailLight() const { return static_cast<eLightType>(m_Handling.ucTailLight); };
+    unsigned char GetAnimGroup() const { return m_Handling.ucAnimGroup; };
 
-    eVehicleTypes GetModel(void) const { return static_cast<eVehicleTypes>(m_Handling.iVehicleID); };
-    bool          HasSuspensionChanged(void) const { return true; };
+    eVehicleTypes GetModel() const { return static_cast<eVehicleTypes>(m_Handling.iVehicleID); };
+    bool          HasSuspensionChanged() const { return true; };
 
     // Set functions
     void SetMass(float fMass) { m_Handling.fMass = fMass; };
@@ -192,7 +191,7 @@ public:
 
     void Recalculate(unsigned short usModel);
 
-    tHandlingDataSA* GetInterface(void) { return m_pHandlingSA; };
+    tHandlingDataSA* GetInterface() { return m_pHandlingSA; };
 
     void SetSuspensionChanged(bool bChanged) { m_bChanged = bChanged; };
 
@@ -228,5 +227,3 @@ struct tFlyingHandlingDataSA
     CVector TurnResistance;
     CVector SpeedResistance;
 };
-
-#endif

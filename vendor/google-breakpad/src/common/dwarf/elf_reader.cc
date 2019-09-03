@@ -47,7 +47,8 @@
 
 #include "third_party/musl/include/elf.h"
 #include "elf_reader.h"
-//#include "using_std_string.h"
+#include "common/using_std_string.h"
+
 // EM_AARCH64 is not defined by elf.h of GRTE v3 on x86.
 // TODO(dougkwan): Remove this when v17 is retired.
 #if !defined(EM_AARCH64)
@@ -74,7 +75,6 @@
 //DEFINE_bool(elfreader_process_dynsyms, true,
 //            "Activate PLT function processing");
 
-using std::string;
 using std::vector;
 
 namespace {

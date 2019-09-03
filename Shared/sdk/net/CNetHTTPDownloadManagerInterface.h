@@ -9,17 +9,19 @@
  *
  *****************************************************************************/
 
-#ifndef __CNETHTTPDOWNLOADMANAGERINTERFACE_H
-#define __CNETHTTPDOWNLOADMANAGERINTERFACE_H
+#pragma once
 
 struct SHttpRequestOptions
 {
     SHttpRequestOptions() {}
     SHttpRequestOptions(const struct SHttpRequestOptionsTx& in);
-    bool    bIsLegacy = false;            // true = old error behaviour
+    bool    bIsLegacy = false;                 // true = sets CURLOPT_FAILONERROR
+    bool    bIsLocal = false;                  // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
+    bool    bCheckContents = false;            // true = check for naughty things before saving file
+    bool    bResumeFile = false;               // true = attempt to resume previously interrupted download
     SString strPostData;
-    bool    bPostBinary =
-        false;            // false = truncate strPostData to first null character and send as text/plain (true = send as application/octet-stream)
+    bool    bPostBinary = false;                      // false = truncate strPostData to first null character and send as text/plain
+                                                      // (true = send as application/octet-stream)
     std::map<SString, SString> formFields;            // If set, send items as multipart/formdata (and ignore strPostData)
     uint                       uiConnectionAttempts = 10;
     uint                       uiConnectTimeoutMs = 10000;
@@ -38,6 +40,8 @@ struct SHttpDownloadResult
     bool        bSuccess;
     int         iErrorCode;
     const char* szHeaders;
+    uint        uiAttemptNumber;
+    uint        uiContentLength;
 };
 
 // For transferring SString to net module
@@ -48,7 +52,7 @@ struct SStringContent
         length = other.length();
         pData = *other;
     }
-                operator SString(void) const { return SStringX(pData, length); }
+                operator SString() const { return SStringX(pData, length); }
     size_t      length = 0;
     const char* pData = nullptr;
 };
@@ -69,7 +73,7 @@ struct SStringMapContent
         }
         assert(pos == numItems);
     }
-    operator std::map<SString, SString>(void) const
+    operator std::map<SString, SString>() const
     {
         std::map<SString, SString> result;
         for (size_t i = 0; i < numItems; i += 2)
@@ -88,6 +92,9 @@ struct SHttpRequestOptionsTx
     SHttpRequestOptionsTx() {}
     SHttpRequestOptionsTx(const SHttpRequestOptions& in);
     bool              bIsLegacy = false;
+    bool              bIsLocal = false;
+    bool              bCheckContents = false;
+    bool              bResumeFile = false;
     SStringContent    strPostData;
     bool              bPostBinary = false;
     SStringMapContent formFields;
@@ -104,6 +111,9 @@ struct SHttpRequestOptionsTx
 inline SHttpRequestOptions::SHttpRequestOptions(const SHttpRequestOptionsTx& in)
 {
     bIsLegacy = in.bIsLegacy;
+    bIsLocal = in.bIsLocal;
+    bCheckContents = in.bCheckContents;
+    bResumeFile = in.bResumeFile;
     strPostData = in.strPostData;
     bPostBinary = in.bPostBinary;
     formFields = in.formFields;
@@ -120,6 +130,9 @@ inline SHttpRequestOptions::SHttpRequestOptions(const SHttpRequestOptionsTx& in)
 inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& in)
 {
     bIsLegacy = in.bIsLegacy;
+    bIsLocal = in.bIsLocal;
+    bCheckContents = in.bCheckContents;
+    bResumeFile = in.bResumeFile;
     strPostData = in.strPostData;
     bPostBinary = in.bPostBinary;
     formFields = in.formFields;
@@ -131,6 +144,13 @@ inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& i
     strUsername = in.strUsername;
     strPassword = in.strPassword;
 }
+
+struct SDownloadStatus
+{
+    uint uiAttemptNumber = 0;   // 0=Queued 1+=Downloading
+    uint uiContentLength = 0;   // Item total size. Will be 0 if http header 'Content-Length' is missing
+    uint uiBytesReceived = 0;   // Download progress
+};
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
 // If bSuccess is true, then pData+dataSize will be set or the output file will be ready.
@@ -144,28 +164,27 @@ class CNetHTTPDownloadManagerInterface
 {
 public:
     // Get some stats regarding the current download size now & total
-    virtual uint GetDownloadSizeNow(void) = 0;
-    virtual void ResetDownloadSize(void) = 0;
+    virtual uint GetDownloadSizeNow() = 0;
+    virtual void ResetDownloadSize() = 0;
 
     // Get an error if one has been set
-    virtual const char* GetError(void) = 0;
+    virtual const char* GetError() = 0;
 
     // Process the queued files
     // Returns true if all of the downloads have completed, false if there are additional downloads
-    virtual bool ProcessQueuedFiles(void) = 0;
+    virtual bool ProcessQueuedFiles() = 0;
 
     // Queue a file to download
-    virtual bool QueueFile(const char* szURL, const char* szOutputFile, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false,
-                           void* objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false,
-                           uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false) = 0;
     virtual bool QueueFile(const char* szURL, const char* szOutputFile, void* objectPtr = NULL,
-                           PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false,
-                           const SHttpRequestOptionsTx& options = SHttpRequestOptionsTx(), bool bCheckContents = false, bool bResumeFile = false) = 0;
+                           PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL,
+                           const SHttpRequestOptionsTx&   options = SHttpRequestOptionsTx()) = 0;
 
     // Limit number of concurrent http client connections
     virtual void SetMaxConnections(int iMaxConnections) = 0;
 
-    virtual void Reset(void) = 0;
-};
+    virtual void Reset() = 0;
 
-#endif
+    // objectPtr and pfnDownloadFinishedCallback are used to identify the download and should be the same as when QueueFile was originally called
+    virtual bool CancelDownload(void* objectPtr, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback) = 0;
+    virtual bool GetDownloadStatus(void* objectPtr, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback, SDownloadStatus& outDownloadStatus) = 0;
+};

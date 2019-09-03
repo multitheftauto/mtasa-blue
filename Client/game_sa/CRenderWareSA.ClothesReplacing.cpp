@@ -95,7 +95,7 @@ void CRenderWareSA::ClothesRemoveReplacementTxd(char* pFileData)
 // Returns true (once) if clothes textures need regenerating
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::HasClothesReplacementChanged(void)
+bool CRenderWareSA::HasClothesReplacementChanged()
 {
     bool bResult = bClothesReplacementChanged;
     bClothesReplacementChanged = false;
@@ -220,7 +220,7 @@ skip:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CRenderWareSA::StaticSetClothesReplacingHooks(void)
+void CRenderWareSA::StaticSetClothesReplacingHooks()
 {
     EZHookInstall(CStreaming_RequestModel_Mid);
 }

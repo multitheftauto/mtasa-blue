@@ -82,7 +82,7 @@ unsigned int StripControlCodes(char* szText, unsigned char cReplace)
     char*        szTemp = szText;
     while (*szTemp != 0)
     {
-        if (IsControlCode(*szTemp))
+        if (IsControlCode(*szTemp) && *szTemp != '\n' && *szTemp != '\t')
         {
             *szTemp = cReplace;
             ++uiReplaced;
@@ -214,12 +214,12 @@ void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
     }
 }
 
-float GetRandomFloat(void)
+float GetRandomFloat()
 {
     return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f);
 }
 
-double GetRandomDouble(void)
+double GetRandomDouble()
 {
     return static_cast<double>(rand()) / (static_cast<double>(RAND_MAX) + 1.0);
 }

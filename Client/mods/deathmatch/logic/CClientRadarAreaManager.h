@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTRADARAREAMANAGER_H
-#define __CCLIENTRADARAREAMANAGER_H
+#pragma once
 
 #include "CClientRadarArea.h"
 #include <list>
@@ -22,23 +21,23 @@ class CClientRadarAreaManager
 
 public:
     CClientRadarAreaManager(CClientManager* pManager);
-    ~CClientRadarAreaManager(void);
+    ~CClientRadarAreaManager();
 
     CClientRadarArea* Create(ElementID ID);
 
     void Delete(CClientRadarArea* pRadarArea);
-    void DeleteAll(void);
+    void DeleteAll();
 
-    std::list<CClientRadarArea*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CClientRadarArea*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CClientRadarArea*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientRadarArea*>::const_iterator IterEnd() { return m_List.end(); };
 
     static CClientRadarArea* Get(ElementID ID);
 
-    unsigned short GetDimension(void) { return m_usDimension; };
+    unsigned short GetDimension() { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
 private:
-    void DoPulse(void);
+    void DoPulse();
     void DoPulse(bool bRender);
 
     void AddToList(CClientRadarArea* pRadarArea) { m_List.push_back(pRadarArea); };
@@ -51,5 +50,3 @@ private:
     bool                         m_bDontRemoveFromList;
     unsigned short               m_usDimension;
 };
-
-#endif

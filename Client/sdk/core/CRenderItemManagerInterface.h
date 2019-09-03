@@ -126,6 +126,7 @@ struct SDxStatus
         bool         bHUDMatchAspectRatio;
         float        fFieldOfView;
         bool         bHighDetailVehicles;
+        bool         bHighDetailPeds;
     } settings;
 };
 
@@ -139,25 +140,25 @@ struct SDxStatus
 class CRenderItemManagerInterface
 {
 public:
-    virtual ~CRenderItemManagerInterface(void) {}
+    virtual ~CRenderItemManagerInterface() {}
 
     // CRenderItemManagerInterface
-    virtual void          DoPulse(void) = 0;
+    virtual void          DoPulse() = 0;
     virtual CDxFontItem*  CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY) = 0;
     virtual CGuiFontItem* CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize) = 0;
     virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                         ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
-    virtual CShaderItem*  CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance,
+    virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                        bool bLayered, bool bDebug, int iTypeMask) = 0;
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
     virtual CScreenSourceItem* CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
     virtual CWebBrowserItem*   CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
     virtual bool               SetRenderTarget(CRenderTargetItem* pItem, bool bClear) = 0;
     virtual void               EnableSetRenderTargetOldVer(bool bEnable) = 0;
-    virtual bool               IsSetRenderTargetEnabledOldVer(void) = 0;
-    virtual bool               RestoreDefaultRenderTarget(void) = 0;
-    virtual void               UpdateBackBufferCopy(void) = 0;
+    virtual bool               IsSetRenderTargetEnabledOldVer() = 0;
+    virtual bool               RestoreDefaultRenderTarget() = 0;
+    virtual void               UpdateBackBufferCopy() = 0;
     virtual void               UpdateScreenSource(CScreenSourceItem* pScreenSourceItem, bool bResampleNow) = 0;
     virtual SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData) = 0;
     virtual bool               ApplyShaderItemToWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity,
@@ -165,15 +166,15 @@ public:
     virtual bool           RemoveShaderItemFromWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity) = 0;
     virtual void           RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void           GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID) = 0;
-    virtual eDxTestMode    GetTestMode(void) = 0;
+    virtual eDxTestMode    GetTestMode() = 0;
     virtual void           SetTestMode(eDxTestMode testMode) = 0;
     virtual void           GetDxStatus(SDxStatus& outStatus) = 0;
-    virtual CEffectCloner* GetEffectCloner(void) = 0;
-    virtual void           PreDrawWorld(void) = 0;
+    virtual CEffectCloner* GetEffectCloner() = 0;
+    virtual void           PreDrawWorld() = 0;
     virtual void           SetDepthBufferFormat(ERenderFormat depthBufferFormat) = 0;
-    virtual ERenderFormat  GetDepthBufferFormat(void) = 0;
-    virtual void           SaveReadableDepthBuffer(void) = 0;
-    virtual void           FlushNonAARenderTarget(void) = 0;
+    virtual ERenderFormat  GetDepthBufferFormat() = 0;
+    virtual void           SaveReadableDepthBuffer() = 0;
+    virtual void           FlushNonAARenderTarget() = 0;
     virtual void           HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                              int Filter) = 0;
 };
@@ -241,18 +242,18 @@ enum eRenderItemClassTypes
 class CRenderItem
 {
     DECLARE_BASE_CLASS(CRenderItem)
-    CRenderItem(void) : ClassInit(this) {}
-    virtual ~CRenderItem(void);
+    CRenderItem() : ClassInit(this) {}
+    virtual ~CRenderItem();
     virtual void PostConstruct(CRenderItemManager* pManager, bool bIncludeInMemoryStats = true);
-    virtual void PreDestruct(void);
-    virtual void Release(void);
-    virtual void AddRef(void);
-    virtual bool IsValid(void) = 0;
-    virtual void OnLostDevice(void) = 0;
-    virtual void OnResetDevice(void) = 0;
-    int          GetVideoMemoryKBUsed(void) { return m_iMemoryKBUsed; }
-    int          GetRevision(void) { return m_iRevision; }
-    bool         GetIncludeInMemoryStats(void) { return m_bIncludeInMemoryStats; }
+    virtual void PreDestruct();
+    virtual void Release();
+    virtual void AddRef();
+    virtual bool IsValid() = 0;
+    virtual void OnLostDevice() = 0;
+    virtual void OnResetDevice() = 0;
+    int          GetVideoMemoryKBUsed() { return m_iMemoryKBUsed; }
+    int          GetRevision() { return m_iRevision; }
+    bool         GetIncludeInMemoryStats() { return m_bIncludeInMemoryStats; }
 
     CRenderItemManager* m_pManager;
     IDirect3DDevice9*   m_pDevice;
@@ -270,14 +271,14 @@ class CRenderItem
 class CDxFontItem : public CRenderItem
 {
     DECLARE_CLASS(CDxFontItem, CRenderItem)
-    CDxFontItem(void) : ClassInit(this) {}
+    CDxFontItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
     void         CreateUnderlyingData(uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
-    void         ReleaseUnderlyingData(void);
+    void         ReleaseUnderlyingData();
 
     SString    m_strFullFilePath;
     ID3DXFont* m_pFntNormal;
@@ -291,14 +292,14 @@ class CDxFontItem : public CRenderItem
 class CGuiFontItem : public CRenderItem
 {
     DECLARE_CLASS(CGuiFontItem, CRenderItem)
-    CGuiFontItem(void) : ClassInit(this) {}
+    CGuiFontItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFullFilePath, const SString& strFontName, uint uiSize);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
     void         CreateUnderlyingData(const SString& strFullFilePath, const SString& strFontName, uint uiSize);
-    void         ReleaseUnderlyingData(void);
+    void         ReleaseUnderlyingData();
 
     SString   m_strCEGUIFontName;
     CGUIFont* m_pFntCEGUI;
@@ -312,16 +313,16 @@ class CGuiFontItem : public CRenderItem
 class CEffectWrap : public CRenderItem
 {
     DECLARE_CLASS(CEffectWrap, CRenderItem)
-    CEffectWrap(void) : ClassInit(this) {}
+    CEffectWrap() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, CEffectTemplate* pEffectTemplate);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
     HRESULT      Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
-    HRESULT      End(void);
-    bool         ApplyCommonHandles(void);
-    bool         ApplyMappedHandles(void);
+    HRESULT      End();
+    bool         ApplyCommonHandles();
+    bool         ApplyMappedHandles();
 
     CEffectTemplate* m_pEffectTemplate;
     ID3DXEffect*     m_pD3DEffect;
@@ -335,7 +336,7 @@ class CEffectWrap : public CRenderItem
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS(CMaterialItem, CRenderItem)
-    CMaterialItem(void) : ClassInit(this), m_TextureAddress(TADDRESS_WRAP), m_uiBorderColor(0) {}
+    CMaterialItem() : ClassInit(this), m_TextureAddress(TADDRESS_WRAP), m_uiBorderColor(0) {}
 
     uint            m_uiSizeX;
     uint            m_uiSizeY;
@@ -351,23 +352,23 @@ class CMaterialItem : public CRenderItem
 class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS(CShaderItem, CMaterialItem)
-    CShaderItem(void) : ClassInit(this) {}
-    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority,
+    CShaderItem() : ClassInit(this) {}
+    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-    void         CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
-    void         ReleaseUnderlyingData(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
+    void         ReleaseUnderlyingData();
     virtual bool SetValue(const SString& strName, CTextureItem* pTextureItem);
     virtual bool SetValue(const SString& strName, bool bValue);
     virtual bool SetValue(const SString& strName, const float* pfValues, uint uiCount);
-    void         MaybeRenewShaderInstance(void);
-    void         RenewShaderInstance(void);
+    void         MaybeRenewShaderInstance();
+    void         RenewShaderInstance();
     virtual void SetTessellation(uint uiTessellationX, uint uiTessellationY);
     virtual void SetTransform(const SShaderTransform& transform);
-    virtual bool GetUsesVertexShader(void);
+    virtual bool GetUsesVertexShader();
 
     CEffectWrap* m_pEffectWrap;
     float        m_fPriority;
@@ -390,14 +391,14 @@ class CShaderItem : public CMaterialItem
 class CShaderInstance : public CMaterialItem
 {
     DECLARE_CLASS(CShaderInstance, CMaterialItem)
-    CShaderInstance(void) : ClassInit(this) {}
+    CShaderInstance() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, CShaderItem* pShaderItem);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
     void         CreateUnderlyingData(CShaderItem* pShaderItem);
-    void         ReleaseUnderlyingData(void);
+    void         ReleaseUnderlyingData();
 
     void          SetTextureValue(D3DXHANDLE hHandle, CTextureItem* pTextureItem);
     void          SetBoolValue(D3DXHANDLE hHandle, bool pTextureItem);
@@ -406,7 +407,7 @@ class CShaderInstance : public CMaterialItem
     bool          CmpBoolValue(D3DXHANDLE hHandle, bool pTextureItem);
     bool          CmpFloatsValue(D3DXHANDLE hHandle, const float* pfValues, uint uiCount);
     SShaderValue* GetParam(D3DXHANDLE hHandle);
-    void          ApplyShaderParameters(void);
+    void          ApplyShaderParameters();
 
     CEffectWrap*                       m_pEffectWrap;
     uint                               m_uiTessellationX;
@@ -426,7 +427,7 @@ class CShaderInstance : public CMaterialItem
 class CTextureItem : public CMaterialItem
 {
     DECLARE_CLASS(CTextureItem, CMaterialItem)
-    CTextureItem(void) : ClassInit(this) {}
+    CTextureItem() : ClassInit(this) {}
 
     IDirect3DBaseTexture9* m_pD3DTexture;
     uint                   m_uiSurfaceSizeX;
@@ -441,18 +442,18 @@ class CTextureItem : public CMaterialItem
 class CFileTextureItem : public CTextureItem
 {
     DECLARE_CLASS(CFileTextureItem, CTextureItem)
-    CFileTextureItem(void) : ClassInit(this) {}
+    CFileTextureItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
     void         CreateUnderlyingData(const SString& strFilename, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format);
     void         CreateUnderlyingData(const CPixels* pPixels, bool bMipMaps, ERenderFormat format);
     void         CreateUnderlyingData(bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth);
-    void         ReleaseUnderlyingData(void);
+    void         ReleaseUnderlyingData();
 
     uint         m_uiVolumeDepth;
     ETextureType m_TextureType;
@@ -466,14 +467,14 @@ class CFileTextureItem : public CTextureItem
 class CRenderTargetItem : public CTextureItem
 {
     DECLARE_CLASS(CRenderTargetItem, CTextureItem)
-    CRenderTargetItem(void) : ClassInit(this) {}
+    CRenderTargetItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bIncludeInMemoryStats);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-    void         CreateUnderlyingData(void);
-    void         ReleaseUnderlyingData(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    void         CreateUnderlyingData();
+    void         ReleaseUnderlyingData();
     bool         ReadPixels(CBuffer& outBuffer, SString& strOutError);
 
     bool               m_bWithAlphaChannel;
@@ -490,14 +491,14 @@ class CRenderTargetItem : public CTextureItem
 class CScreenSourceItem : public CTextureItem
 {
     DECLARE_CLASS(CScreenSourceItem, CTextureItem)
-    CScreenSourceItem(void) : ClassInit(this) {}
+    CScreenSourceItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-    void         CreateUnderlyingData(void);
-    void         ReleaseUnderlyingData(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    void         CreateUnderlyingData();
+    void         ReleaseUnderlyingData();
 
     IDirect3DSurface9* m_pD3DRenderTargetSurface;
     uint               m_uiRevision;
@@ -511,14 +512,14 @@ class CScreenSourceItem : public CTextureItem
 class CWebBrowserItem : public CTextureItem
 {
     DECLARE_CLASS(CWebBrowserItem, CTextureItem)
-    CWebBrowserItem(void) : ClassInit(this) {}
+    CWebBrowserItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-    void         CreateUnderlyingData(void);
-    void         ReleaseUnderlyingData(void);
+    virtual void PreDestruct();
+    virtual bool IsValid();
+    virtual void OnLostDevice();
+    virtual void OnResetDevice();
+    void         CreateUnderlyingData();
+    void         ReleaseUnderlyingData();
     virtual void Resize(const CVector2D& size);
 
     IDirect3DSurface9* m_pD3DRenderTargetSurface;

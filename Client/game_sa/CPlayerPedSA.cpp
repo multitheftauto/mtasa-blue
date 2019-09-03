@@ -123,7 +123,7 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
     GetPlayerPedInterface()->pedFlags.bNeverEverTargetThisPed = true;
 }
 
-CPlayerPedSA::~CPlayerPedSA(void)
+CPlayerPedSA::~CPlayerPedSA()
 {
     DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
@@ -155,12 +155,12 @@ CPlayerPedSA::~CPlayerPedSA(void)
     }
 }
 
-CWanted* CPlayerPedSA::GetWanted(void)
+CWanted* CPlayerPedSA::GetWanted()
 {
     return m_pWanted;
 }
 
-float CPlayerPedSA::GetSprintEnergy(void)
+float CPlayerPedSA::GetSprintEnergy()
 {
     /*
     OutputDebugString("GetSprintEnergy HACK\n");
@@ -185,7 +185,7 @@ void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
     m_pData->m_fSprintEnergy = fSprintEnergy;
 }
 
-void CPlayerPedSA::SetInitialState(void)
+void CPlayerPedSA::SetInitialState()
 {
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
@@ -205,7 +205,7 @@ void CPlayerPedSA::SetInitialState(void)
     GetPlayerPedInterface()->pedFlags.bStayInSamePlace = false;
 }
 
-eMoveAnim CPlayerPedSA::GetMoveAnim(void)
+eMoveAnim CPlayerPedSA::GetMoveAnim()
 {
     CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
@@ -285,7 +285,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     // Need to load ?
     if (!IsBlendAssocGroupLoaded(iAnimGroup))
     {
-        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+        std::unique_ptr<CAnimBlock> pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
 
         // Try load
         if (pAnimBlock && !pAnimBlock->IsLoaded())
@@ -304,7 +304,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         return;
 
     // Ensure we add a ref to this block, even if it wasn't loaded by us
-    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+    std::unique_ptr<CAnimBlock> pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
     if (!pAnimBlock)
         return;
     if (!MapContains(ms_DoneAnimBlockRefMap, strBlockName))
@@ -494,7 +494,8 @@ int GetAnimPose(int iAnim)
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim)
 {
-    CPed* pPed = pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface);
+    SClientEntity<CPedSA>* pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 
     if (pPed)
     {
@@ -602,7 +603,7 @@ void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CPlayerPedSA::StaticSetHooks(void)
+void CPlayerPedSA::StaticSetHooks()
 {
     EZHookInstall(CPlayerPed_ProcessAnimGroups_Mid);
     EZHookInstall(CClothes_GetDefaultPlayerMotionGroup);

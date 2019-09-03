@@ -54,7 +54,7 @@ CGUIComboBox_Impl::CGUIComboBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, cons
     }
 }
 
-CGUIComboBox_Impl::~CGUIComboBox_Impl(void)
+CGUIComboBox_Impl::~CGUIComboBox_Impl()
 {
     Clear();
     DestroyElement();
@@ -97,12 +97,12 @@ bool CGUIComboBox_Impl::RemoveItem(int index)
     return false;
 }
 
-CGUIListItem* CGUIComboBox_Impl::GetSelectedItem(void)
+CGUIListItem* CGUIComboBox_Impl::GetSelectedItem()
 {
     return GetListItem(reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getSelectedItem());
 }
 
-int CGUIComboBox_Impl::GetSelectedItemIndex(void)
+int CGUIComboBox_Impl::GetSelectedItemIndex()
 {
     CEGUI::ListboxItem*                                             pItem = reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getSelectedItem();
     CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*>::iterator it;
@@ -227,7 +227,7 @@ bool CGUIComboBox_Impl::SetSelectedItemByIndex(int index)
     return false;
 }
 
-void CGUIComboBox_Impl::Clear(void)
+void CGUIComboBox_Impl::Clear()
 {
     reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getDropList()->resetList();
 
@@ -239,6 +239,11 @@ void CGUIComboBox_Impl::Clear(void)
 
     m_Items.clear();
     m_pWindow->setText(storedCaption);
+}
+
+bool CGUIComboBox_Impl::IsOpen()
+{
+    return reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->isDropDownListVisible();
 }
 
 void CGUIComboBox_Impl::SetReadOnly(bool bReadonly)
@@ -256,7 +261,7 @@ CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem(CEGUI::ListboxItem* pItem)
     return it->second;
 }
 
-size_t CGUIComboBox_Impl::GetItemCount(void)
+size_t CGUIComboBox_Impl::GetItemCount()
 {
     return reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getItemCount();
 }
@@ -285,13 +290,13 @@ bool CGUIComboBox_Impl::Event_OnDropListRemoved(const CEGUI::EventArgs& e)
     return true;
 }
 
-void CGUIComboBox_Impl::ShowDropList(void)
+void CGUIComboBox_Impl::ShowDropList()
 {
     reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->showDropList();
     reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->setSingleClickEnabled(true);
 }
 
-void CGUIComboBox_Impl::HideDropList(void)
+void CGUIComboBox_Impl::HideDropList()
 {
     reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->hideDropList();
 }

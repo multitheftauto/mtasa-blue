@@ -10,8 +10,7 @@
 
 class CClientRadarMarker;
 
-#ifndef __CCLIENTRADARMARKER_H
-#define __CCLIENTRADARMARKER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -29,47 +28,47 @@ class CClientRadarMarker : public CClientEntity
 
 public:
     CClientRadarMarker(class CClientManager* pManager, ElementID ID, short usOrdering = 0, unsigned short usVisibleDistance = 16383);
-    ~CClientRadarMarker(void);
+    ~CClientRadarMarker();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTRADARMARKER; };
+    eClientEntityType GetType() const { return CCLIENTRADARMARKER; };
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetPosition(const CVector& vecPosition);
     void GetPosition(CVector& vecPosition) const;
 
-    unsigned short GetScale(void) { return m_usScale; };
+    unsigned short GetScale() { return m_usScale; };
     void           SetScale(unsigned short usScale);
 
-    SColor GetColor(void) const { return m_Color; }
+    SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor color);
 
-    unsigned long GetSprite(void) const { return m_ulSprite; };
+    unsigned long GetSprite() const { return m_ulSprite; };
     void          SetSprite(unsigned long ulSprite);
 
-    bool IsVisible(void) const { return m_bIsVisible; };
+    bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usDimension);
 
-    short GetOrdering(void) { return m_sOrdering; }
+    short GetOrdering() { return m_sOrdering; }
     void  SetOrdering(short sOrdering);
 
-    unsigned short GetVisibleDistance(void) { return m_usVisibleDistance; }
+    unsigned short GetVisibleDistance() { return m_usVisibleDistance; }
     void           SetVisibleDistance(unsigned short usVisibleDistance) { m_usVisibleDistance = usVisibleDistance; }
 
-    bool IsInVisibleDistance(void);
+    bool IsInVisibleDistance();
 
 private:
-    bool Create(void);
-    void InternalCreate(void);
-    void Destroy(void);
+    bool Create();
+    void InternalCreate();
+    void Destroy();
 
-    void CreateMarker(void);
-    void DestroyMarker(void);
+    void CreateMarker();
+    void DestroyMarker();
 
     class CClientRadarMarkerManager* m_pRadarMarkerManager;
     CMarker*                         m_pMarker;
@@ -83,5 +82,3 @@ private:
     short          m_sOrdering;
     unsigned short m_usVisibleDistance;
 };
-
-#endif

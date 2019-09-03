@@ -37,7 +37,7 @@ CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
     HookInstall(HOOKPOS_Camera_CollisionDetection, (DWORD)HOOK_Camera_CollisionDetection, 5);
 }
 
-CCameraSA::~CCameraSA(void)
+CCameraSA::~CCameraSA()
 {
     for (int i = 0; i < MAX_CAMS; i++)
     {
@@ -194,7 +194,7 @@ VOID CCameraSA::TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* Attach
 }
 
 // LSOD recovery
-void CCameraSA::RestoreLastGoodState(void)
+void CCameraSA::RestoreLastGoodState()
 {
     CMatrix defmat;
     SetMatrix(&defmat);
@@ -314,7 +314,7 @@ VOID CCameraSA::Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuz
     }
 }
 
-float CCameraSA::Find3rdPersonQuickAimPitch(void)
+float CCameraSA::Find3rdPersonQuickAimPitch()
 {
     DEBUG_TRACE("float CCameraSA::Find3rdPersonQuickAimPitch ( void )");
     float               fReturn;
@@ -453,7 +453,7 @@ void CCameraSA::VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool
     }
 }
 
-bool CCameraSA::IsFading(void)
+bool CCameraSA::IsFading()
 {
     DWORD               dwFunc = FUNC_GetFading;
     CCameraSAInterface* cameraInterface = this->GetInterface();
@@ -467,7 +467,7 @@ bool CCameraSA::IsFading(void)
     return bRet;
 }
 
-int CCameraSA::GetFadingDirection(void)
+int CCameraSA::GetFadingDirection()
 {
     DWORD               dwFunc = FUNC_GetFadingDirection;
     CCameraSAInterface* cameraInterface = this->GetInterface();
@@ -511,12 +511,12 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
     }
 }
 
-float CCameraSA::GetCameraRotation(void)
+float CCameraSA::GetCameraRotation()
 {
     return *(float*)VAR_CameraRotation;
 }
 
-RwMatrix* CCameraSA::GetLTM(void)
+RwMatrix* CCameraSA::GetLTM()
 {
     DWORD frame = *(DWORD*)(((DWORD)this->GetInterface()->m_pRwCamera) + 4);
     DWORD dwReturn;
@@ -530,30 +530,15 @@ RwMatrix* CCameraSA::GetLTM(void)
     return (RwMatrix*)dwReturn;
 }
 
-CEntity* CCameraSA::GetTargetEntity(void)
+CEntity* CCameraSA::GetTargetEntity()
 {
     CEntitySAInterface* pInterface = this->GetInterface()->pTargetEntity;
-    CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
-    CEntity*            pReturn = NULL;
-
-    if (pPools && pInterface)
+    if (pInterface)
     {
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface));
-                break;
-            case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));
-                break;
-            case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface));
-                break;
-            default:
-                break;
-        }
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
-    return pReturn;
+    return nullptr;
 }
 
 void CCameraSA::SetCameraClip(bool bObjects, bool bVehicles)
@@ -596,7 +581,7 @@ void _declspec(naked) HOOK_Camera_CollisionDetection()
     }
 }
 
-BYTE CCameraSA::GetCameraViewMode(void)
+BYTE CCameraSA::GetCameraViewMode()
 {
     // TODO: Add support for ped camera view, this will only work on vehicles for now.
     return *(BYTE*)VAR_VehicleCameraView;
@@ -613,7 +598,7 @@ void CCameraSA::SetShakeForce(float fShakeForce)
     pCameraInterface->m_fCamShakeForce = fShakeForce;
 }
 
-float CCameraSA::GetShakeForce(void)
+float CCameraSA::GetShakeForce()
 {
     CCameraSAInterface* pCameraInterface = GetInterface();
     return pCameraInterface->m_fCamShakeForce;

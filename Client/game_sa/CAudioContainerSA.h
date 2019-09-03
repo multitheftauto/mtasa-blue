@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAUDIOCONTAINERSA_H
-#define __CAUDIOCONTAINERSA_H
+#pragma once
 
 #include <game/CAudioContainer.h>
 #include "CAudioContainerLookupTableSA.h"
@@ -85,8 +84,8 @@ static_assert(sizeof(SRadioTrackHeader) == 8068, "Invalid size for SRadioTrackHe
 class CAudioContainerSA : public CAudioContainer
 {
 public:
-    CAudioContainerSA(void);
-    ~CAudioContainerSA(void);
+    CAudioContainerSA();
+    ~CAudioContainerSA();
 
     bool GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length);
     bool ValidateContainer(eAudioLookupIndex lookupIndex);
@@ -124,5 +123,3 @@ protected:
         }
     }
 };
-
-#endif

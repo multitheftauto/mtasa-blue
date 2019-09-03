@@ -13,26 +13,34 @@
 
 void CLuaBanDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("addBan", AddBan);
-    CLuaCFunctions::AddFunction("removeBan", RemoveBan);
+    std::map<const char*, lua_CFunction> functions{
+        {"addBan", AddBan},
+        {"removeBan", RemoveBan},
 
-    CLuaCFunctions::AddFunction("getBans", GetBans);
-    CLuaCFunctions::AddFunction("reloadBans", ReloadBanList);
+        {"getBans", GetBans},
+        {"reloadBans", ReloadBanList},
 
-    CLuaCFunctions::AddFunction("getBanIP", GetBanIP);
-    CLuaCFunctions::AddFunction("getBanSerial", GetBanSerial);
-    CLuaCFunctions::AddFunction("getBanUsername", GetBanUsername);
-    CLuaCFunctions::AddFunction("getBanNick", GetBanNick);
-    CLuaCFunctions::AddFunction("getBanTime", GetBanTime);
-    CLuaCFunctions::AddFunction("getUnbanTime", GetUnbanTime);
-    CLuaCFunctions::AddFunction("getBanReason", GetBanReason);
-    CLuaCFunctions::AddFunction("getBanAdmin", GetBanAdmin);
+        {"getBanIP", GetBanIP},
+        {"getBanSerial", GetBanSerial},
+        {"getBanUsername", GetBanUsername},
+        {"getBanNick", GetBanNick},
+        {"getBanTime", GetBanTime},
+        {"getUnbanTime", GetUnbanTime},
+        {"getBanReason", GetBanReason},
+        {"getBanAdmin", GetBanAdmin},
 
-    CLuaCFunctions::AddFunction("setUnbanTime", SetUnbanTime);
-    CLuaCFunctions::AddFunction("setBanReason", SetBanReason);
-    CLuaCFunctions::AddFunction("setBanAdmin", SetBanAdmin);
-    CLuaCFunctions::AddFunction("setBanNick", SetBanNick);
-    CLuaCFunctions::AddFunction("isBan", IsBan);
+        {"setUnbanTime", SetUnbanTime},
+        {"setBanReason", SetBanReason},
+        {"setBanAdmin", SetBanAdmin},
+        {"setBanNick", SetBanNick},
+        {"isBan", IsBan},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaBanDefs::AddClass(lua_State* luaVM)

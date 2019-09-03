@@ -22,7 +22,7 @@ CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long 
     m_accessType = accessType;
 }
 
-CScriptFile::~CScriptFile(void)
+CScriptFile::~CScriptFile()
 {
     // Close the file
     Unload();
@@ -71,13 +71,13 @@ bool CScriptFile::Load(CResource* pResourceForFilePath, eMode Mode)
     return false;
 }
 
-void CScriptFile::Unload(void)
+void CScriptFile::Unload()
 {
     // Close the file if required
     SAFE_DELETE(m_pFile);
 }
 
-bool CScriptFile::IsEOF(void)
+bool CScriptFile::IsEOF()
 {
     if (!m_pFile)
         return true;
@@ -86,7 +86,7 @@ bool CScriptFile::IsEOF(void)
     return m_pFile->FEof();
 }
 
-long CScriptFile::GetPointer(void)
+long CScriptFile::GetPointer()
 {
     if (!m_pFile)
         return -1;
@@ -94,7 +94,7 @@ long CScriptFile::GetPointer(void)
     return m_pFile->FTell();
 }
 
-long CScriptFile::GetSize(void)
+long CScriptFile::GetSize()
 {
     if (!m_pFile)
         return -1;
@@ -142,7 +142,7 @@ long CScriptFile::SetPointer(unsigned long ulPosition)
     return ulPosition;
 }
 
-void CScriptFile::Flush(void)
+void CScriptFile::Flush()
 {
     if (!m_pFile)
         return;
@@ -182,7 +182,7 @@ long CScriptFile::Write(unsigned long ulSize, const char* pData)
 }
 
 // If file was downloaded with a resource, validate checksum
-void CScriptFile::DoResourceFileCheck(void)
+void CScriptFile::DoResourceFileCheck()
 {
     if (!m_pFile || m_bDoneResourceFileCheck)
         return;
@@ -211,7 +211,7 @@ void CScriptFile::DoResourceFileCheck(void)
     }
 }
 
-CResource* CScriptFile::GetResource(void)
+CResource* CScriptFile::GetResource()
 {
     return m_pResource;
 }

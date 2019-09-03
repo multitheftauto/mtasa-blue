@@ -13,6 +13,10 @@
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "CPrimitiveBatcher.h"
+#include "CPrimitiveMaterialBatcher.h"
+#include "CPrimitive3DBatcher.h"
+#include "CMaterialPrimitive3DBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -56,6 +60,12 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
+    m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
+    m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
+    m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
+    m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
+    m_pPrimitiveBatcher = new CPrimitiveBatcher();
+    m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -63,7 +73,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pAspectRatioConverter = new CAspectRatioConverter();
 }
 
-CGraphics::~CGraphics(void)
+CGraphics::~CGraphics()
 {
     if (m_pLineInterface)
         m_pLineInterface->Release();
@@ -78,6 +88,12 @@ CGraphics::~CGraphics(void)
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitiveBatcher);
+    SAFE_DELETE(m_pPrimitiveMaterialBatcher);
+    SAFE_DELETE(m_pPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitive3DBatcherPostGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -219,23 +235,15 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
         int  overrideWidth;
         int  overrideHeight;
     } static sectionList[] = {
-        {{3, 3, 5, 5}, 0, 0, 0, 0}            // Center
-        ,
-        {{3, 0, 5, 2}, 0, -2, 0, 2}            // Top
-        ,
-        {{0, 0, 2, 2}, -2, -2, 2, 2}            // Top left
-        ,
-        {{0, 3, 2, 5}, -2, 0, 2, 0}            // Left
-        ,
-        {{0, 6, 2, 8}, -2, 2, 2, 2}            // Bottom left
-        ,
-        {{3, 6, 5, 8}, 0, 2, 0, 2}            // Bottom
-        ,
-        {{6, 6, 8, 8}, 2, 2, 2, 2}            // Bottom right
-        ,
-        {{6, 3, 8, 5}, 2, 0, 2, 0}            // Right
-        ,
-        {{6, 0, 8, 2}, 2, -2, 2, 2}            // Top right
+        {{3, 3, 5, 5}, 0, 0, 0, 0},              // Center
+        {{3, 0, 5, 2}, 0, -2, 0, 2},             // Top
+        {{0, 0, 2, 2}, -2, -2, 2, 2},            // Top left
+        {{0, 3, 2, 5}, -2, 0, 2, 0},             // Left
+        {{0, 6, 2, 8}, -2, 2, 2, 2},             // Bottom left
+        {{3, 6, 5, 8}, 0, 2, 0, 2},              // Bottom
+        {{6, 6, 8, 8}, 2, 2, 2, 2},              // Bottom right
+        {{6, 3, 8, 5}, 2, 0, 2, 0},              // Right
+        {{6, 0, 8, 2}, 2, -2, 2, 2},             // Top right
     };
 
     D3DXMATRIX        matrix;
@@ -280,12 +288,12 @@ void CGraphics::SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRati
     m_pAspectRatioConverter->SetSourceRatioValue(bEnabled ? fSourceRatio : 0);
 }
 
-bool CGraphics::IsAspectRatioAdjustmentEnabled(void)
+bool CGraphics::IsAspectRatioAdjustmentEnabled()
 {
     return m_pAspectRatioConverter->IsEnabled();
 }
 
-float CGraphics::GetAspectRatioAdjustmentSourceRatio(void)
+float CGraphics::GetAspectRatioAdjustmentSourceRatio()
 {
     return m_pAspectRatioConverter->GetSourceRatioValue();
 }
@@ -313,7 +321,7 @@ void CGraphics::SetBlendMode(EBlendModeType blendMode)
     m_ActiveBlendMode = blendMode;
 }
 
-EBlendModeType CGraphics::GetBlendMode(void)
+EBlendModeType CGraphics::GetBlendMode()
 {
     return m_ActiveBlendMode;
 }
@@ -466,7 +474,7 @@ void CGraphics::BeginDrawBatch(EBlendModeType xxblendMode)
 //
 // EndDrawBatch
 //
-void CGraphics::EndDrawBatch(void)
+void CGraphics::EndDrawBatch()
 {
     if (--m_iDrawBatchRefCount == 0)
         CheckModes(EDrawMode::NONE, EBlendMode::BLEND);
@@ -497,6 +505,14 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         else if (m_CurDrawMode == EDrawMode::TILE_BATCHER)
         {
             m_pTileBatcher->Flush();
+        }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE)
+        {
+            m_pPrimitiveBatcher->Flush();
+        }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE_MATERIAL)
+        {
+            m_pPrimitiveMaterialBatcher->Flush();
         }
 
         // Start new
@@ -567,12 +583,12 @@ void CGraphics::CalcScreenCoors(CVector* vecWorld, CVector* vecScreen)
     vecScreen->fY *= fRecip * (*dwLenY);
 }
 
-unsigned int CGraphics::GetViewportWidth(void)
+unsigned int CGraphics::GetViewportWidth()
 {
     return CDirect3DData::GetSingleton().GetViewportWidth();
 }
 
-unsigned int CGraphics::GetViewportHeight(void)
+unsigned int CGraphics::GetViewportHeight()
 {
     return CDirect3DData::GetSingleton().GetViewportHeight();
 }
@@ -667,6 +683,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -674,13 +693,41 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
+        // Count the amount of space characters at the end
+        size_t       spaceCount = 0;
+        const size_t textLength = wcslen(wszText);
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
+        for (int i = textLength - 1; i >= 0; --i)
+        {
+            const wchar_t c = wszText[i];
 
-        return ((float)size.cx * fScale);
+            if (c == L' ')
+                ++spaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that to get the width of the ignored space characters
+        size_t trailingSpacePixels = 0;
+
+        if (spaceCount > 0)
+        {
+            SIZE size = {};
+            GetTextExtentPoint32W(pDXFont->GetDC(), L" ", 1, &size);
+            trailingSpacePixels = spaceCount * size.cx;
+        }
+
+        RECT rect = {};
+
+        if ((textLength - spaceCount) > 0)
+        {
+            pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        }
+
+        return static_cast<float>(rect.right - rect.left + trailingSpacePixels) * fScale;
     }
+
     return 0.0f;
 }
 
@@ -805,6 +852,169 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
 
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                                 short siSegments, float fRatio, bool bPostGUI)
+{
+    // Check if window is minimized so we don't calculate vertices for no reason.
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    auto pVecVertices = new std::vector<PrimitiveVertice>();
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
+    // Calculate each segment angle
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments - 1);
+
+    // Add center point
+    pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
+
+    // And calculate all other vertices
+    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    {
+        PrimitiveVertice vert;
+        float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        vert.fX = fX + fRadius * cos(curAngle) * fRatio;
+        vert.fY = fY + fRadius * sin(curAngle);
+        vert.fZ = 0.0f;
+        vert.Color = ulColor;
+        pVecVertices->push_back(vert);
+    }
+
+    DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
+}
+
+void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        m_pPrimitiveBatcher->ClearQueue();
+        return;
+    }
+
+    for (auto& vert : *pVecVertices)
+    {
+        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+    }
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVE;
+    Item.Primitive.eType = eType;
+    Item.Primitive.pVecVertices = pVecVertices;
+    AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
+    else
+        m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
+}
+
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+    else
+        m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+}
+
+void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                            bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        m_pPrimitiveMaterialBatcher->ClearQueue();
+        return;
+    }
+
+    for (auto& vert : *pVecVertices)
+    {
+        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+    }
+
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.PrimitiveMaterial.eType = eType;
+    Item.PrimitiveMaterial.pMaterial = pMaterial;
+    Item.PrimitiveMaterial.pVecVertices = pVecVertices;
+    AddQueueItem(Item, bPostGUI);
+
+    AddQueueRef(pMaterial);
+}
+
+bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
+{
+    if (iNumVertives < 1)
+    {
+        return false;
+    }
+
+    switch (eType)
+    {
+        case D3DPT_LINESTRIP:
+            if (iNumVertives < 2)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_LINELIST:
+            if (iNumVertives % 2 != 0)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_TRIANGLELIST:
+            if (iNumVertives % 3 != 0)
+            {
+                return false;
+            }
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            if (iNumVertives < 3)
+            {
+                return false;
+            }
+            break;
+    }
+
+    return true;
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1097,7 +1307,7 @@ static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
                                       {"beckett", 30, FW_NORMAL},
                                       {"unifont", 14, FW_NORMAL}};
 
-bool CGraphics::LoadStandardDXFonts(void)
+bool CGraphics::LoadStandardDXFonts()
 {
     // Add our custom font resources
     if (m_FontResourceNames.empty())
@@ -1202,7 +1412,7 @@ bool CGraphics::DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3D
     return bResult;
 }
 
-bool CGraphics::DestroyStandardDXFonts(void)
+bool CGraphics::DestroyStandardDXFonts()
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
     for (uint i = 0; i < m_FontResourceNames.size(); i++)
@@ -1274,6 +1484,11 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1334,35 +1549,48 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
     m_pScreenGrabber->OnResetDevice();
 }
 
-void CGraphics::OnZBufferModified(void)
+void CGraphics::OnZBufferModified()
 {
     m_pTileBatcher->OnZBufferModified();
 }
 
-void CGraphics::DrawPreGUIQueue(void)
+void CGraphics::DrawPreGUIQueue()
 {
     DrawQueue(m_PreGUIQueue);
 }
 
-void CGraphics::DrawPostGUIQueue(void)
+void CGraphics::DrawPostGUIQueue()
 {
     DrawQueue(m_PostGUIQueue);
     m_pLine3DBatcherPostGUI->Flush();
     m_pMaterialLine3DBatcherPostGUI->Flush();
+    m_pPrimitive3DBatcherPostGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPostGUI->Flush();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
 }
 
-void CGraphics::DrawLine3DPreGUIQueue(void)
+void CGraphics::DrawLine3DPreGUIQueue()
 {
     m_pLine3DBatcherPreGUI->Flush();
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
+void CGraphics::DrawPrimitive3DPreGUIQueue(void)
+{
+    m_pPrimitive3DBatcherPreGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+}
+
 bool CGraphics::HasLine3DPreGUIQueueItems(void)
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
+}
+
+bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
+{
+    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
@@ -1407,7 +1635,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
 {
     switch (Item.eType)
     {
-        // Line type?
+            // Line type?
         case QUEUE_LINE:
         {
             // Got a line interface?
@@ -1445,6 +1673,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
+
         case QUEUE_TEXT:
         {
             RECT rect;
@@ -1515,6 +1744,20 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
+            break;
+        }
+        case QUEUE_PRIMITIVE:
+        {
+            const sDrawQueuePrimitive primitive = Item.Primitive;
+            CheckModes(EDrawMode::PRIMITIVE);
+            m_pPrimitiveBatcher->AddPrimitive(primitive.eType, primitive.pVecVertices);
+            break;
+        }
+        case QUEUE_PRIMITIVEMATERIAL:
+        {
+            const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }
     }
@@ -1590,8 +1833,10 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
 {
     // Flush dx draws
     DrawPreGUIQueue();
-    // Inform tile batcher
+    // Inform batchers
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -1601,7 +1846,7 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
 // Called when entering known areas of MTA rendering activity
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::EnteringMTARenderZone(void)
+void CGraphics::EnteringMTARenderZone()
 {
     SaveGTARenderStates();
     m_MTARenderZone = MTA_RZONE_MAIN;
@@ -1615,7 +1860,7 @@ void CGraphics::EnteringMTARenderZone(void)
 // Called when leaving known areas of MTA rendering activity
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::LeavingMTARenderZone(void)
+void CGraphics::LeavingMTARenderZone()
 {
     RestoreGTARenderStates();
     m_MTARenderZone = MTA_RZONE_NONE;
@@ -1629,7 +1874,7 @@ void CGraphics::LeavingMTARenderZone(void)
 // Should be called before MTA rendering activity, if there is a chance it will be outside the known areas
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::MaybeEnteringMTARenderZone(void)
+void CGraphics::MaybeEnteringMTARenderZone()
 {
     if (m_MTARenderZone == MTA_RZONE_OUTSIDE)
     {
@@ -1655,7 +1900,7 @@ void CGraphics::MaybeEnteringMTARenderZone(void)
 // Should be called sometime after MaybeEnteringMTARenderZone
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::MaybeLeavingMTARenderZone(void)
+void CGraphics::MaybeLeavingMTARenderZone()
 {
     if (m_MTARenderZone == MTA_RZONE_OUTSIDE)
     {
@@ -1677,7 +1922,7 @@ void CGraphics::MaybeLeavingMTARenderZone(void)
 // Handle moving into MTA controlled rendering
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::SaveGTARenderStates(void)
+void CGraphics::SaveGTARenderStates()
 {
     SAFE_RELEASE(m_pSavedStateBlock);
     // Create a state block.
@@ -1699,7 +1944,7 @@ void CGraphics::SaveGTARenderStates(void)
 // Handle moving out of MTA controlled rendering
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::RestoreGTARenderStates(void)
+void CGraphics::RestoreGTARenderStates()
 {
     // Restore these transforms to fix various weird stuff
     m_pDevice->SetTransform(D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION);
@@ -1721,7 +1966,7 @@ void CGraphics::RestoreGTARenderStates(void)
 // Notify that scene rendering is working
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::DidRenderScene(void)
+void CGraphics::DidRenderScene()
 {
     if (m_bProgressVisible)
     {

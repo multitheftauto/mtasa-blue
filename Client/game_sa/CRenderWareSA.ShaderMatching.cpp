@@ -512,7 +512,7 @@ void CMatchChannelManager::AddToRematchQueue(CMatchChannel* pChannel)
 //
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::FlushChanges(void)
+void CMatchChannelManager::FlushChanges()
 {
     if (!m_OptimizeQueue.empty())
         ProcessOptimizeChannelsQueue();
@@ -534,7 +534,7 @@ void CMatchChannelManager::FlushChanges(void)
 // Reset replacement info for all changed channels
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::RecalcEverything(void)
+void CMatchChannelManager::RecalcEverything()
 {
     OutputDebug(SString("RecalcEverything - %d channels", m_CreatedChannelList.size()));
 
@@ -590,7 +590,7 @@ void CMatchChannelManager::RecalcEverything(void)
 // Recheck all textures against the required channels
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::ProcessRematchTexturesQueue(void)
+void CMatchChannelManager::ProcessRematchTexturesQueue()
 {
     OutputDebug(SString("ProcessRematchTexturesQueue - %d items (%d textures)", m_RematchQueue.size(), m_AllTextureList.size()));
 
@@ -635,7 +635,7 @@ void CMatchChannelManager::ProcessRematchTexturesQueue(void)
 // Merge channels which have the same match chain
 //
 //////////////////////////////////////////////////////////////////
-void CMatchChannelManager::ProcessOptimizeChannelsQueue(void)
+void CMatchChannelManager::ProcessOptimizeChannelsQueue()
 {
     OutputDebug(SString("ProcessOptimizeChannelsQueue - %d items", m_OptimizeQueue.size()));
 
@@ -793,7 +793,7 @@ CMatchChannel* CMatchChannelManager::GetChannel(const CShaderAndEntityPair& key)
 // Create a channel
 //
 //////////////////////////////////////////////////////////////////
-CMatchChannel* CMatchChannelManager::NewChannel(void)
+CMatchChannel* CMatchChannelManager::NewChannel()
 {
     CMatchChannel* pChannel = new CMatchChannel();
     MapInsert(m_CreatedChannelList, pChannel);

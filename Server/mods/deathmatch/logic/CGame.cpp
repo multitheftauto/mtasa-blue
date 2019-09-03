@@ -62,8 +62,12 @@ BOOL WINAPI ConsoleEventHandler(DWORD dwCtrlType)
     {
         if (g_pGame)
         {
-            // Graceful close on Ctrl-C or Ctrl-Break
-            g_pGame->SetIsFinished(true);
+            // If we have nothing in the input buffer, let's close the server, otherwise just reset input
+            if (!g_pServerInterface->ResetInput())
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished(true);
+            }
             return TRUE;
         }
     }
@@ -74,7 +78,8 @@ void sighandler(int sig)
 {
     if (sig == SIGTERM || sig == SIGINT)
     {
-        if (g_pGame)
+        // If we received a Ctrl-C, let's try resetting input buffer first, otherwise close the server
+        if (g_pGame && (sig != SIGINT || (sig == SIGINT && !g_pServerInterface->ResetInput())))
         {
             // Graceful close on Ctrl-C or 'kill'
             g_pGame->SetIsFinished(true);
@@ -83,7 +88,7 @@ void sighandler(int sig)
 }
 #endif
 
-CGame::CGame(void) : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
+CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;
@@ -201,7 +206,7 @@ CGame::CGame(void) : m_FloodProtect(4, 30000, 30000)            // Max of 4 conn
     pthread_mutex_init(&mutexhttp, NULL);
 }
 
-void CGame::ResetMapInfo(void)
+void CGame::ResetMapInfo()
 {
     // Add variables to get reset in resetMapInfo here
     m_fGravity = 0.008f;
@@ -238,7 +243,7 @@ void CGame::ResetMapInfo(void)
     g_pGame->SetHasMoonSize(false);
 }
 
-CGame::~CGame(void)
+CGame::~CGame()
 {
     m_bBeingDeleted = true;
 
@@ -365,7 +370,7 @@ void CGame::HandleInput(char* szCommand)
     Unlock();
 }
 
-void CGame::DoPulse(void)
+void CGame::DoPulse()
 {
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock();
@@ -514,7 +519,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
                               m_pBanManager, m_pACLManager);
     m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
     m_pRPCFunctions = new CRPCFunctions;
@@ -940,7 +945,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     return true;
 }
 
-void CGame::Stop(void)
+void CGame::Stop()
 {
     m_bServerFullyUp = false;
 
@@ -955,7 +960,7 @@ void CGame::Stop(void)
 }
 
 // Handle logging output from the net module
-void CGame::PrintLogOutputFromNetModule(void)
+void CGame::PrintLogOutputFromNetModule()
 {
     std::vector<SString> lineList;
     SStringX(g_pRealNetServer->GetLogOutput()).Split("\n", lineList);
@@ -964,7 +969,7 @@ void CGame::PrintLogOutputFromNetModule(void)
             CLogger::LogPrint(*iter + "\n");
 }
 
-void CGame::StartOpenPortsTest(void)
+void CGame::StartOpenPortsTest()
 {
     if (m_pOpenPortsTester)
         m_pOpenPortsTester->Start();
@@ -1350,6 +1355,11 @@ void CGame::InitialDataStream(CPlayer& Player)
 
 void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer)
 {
+    if (Player.IsLeavingServer())
+        return;
+
+    Player.SetLeavingServer(true);
+    
     // Grab quit reaason
     const char* szReason = "Unknown";
     switch (Reason)
@@ -1431,7 +1441,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     m_lightsyncManager.UnregisterPlayer(&Player);
 }
 
-void CGame::AddBuiltInEvents(void)
+void CGame::AddBuiltInEvents()
 {
     // Resource events
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
@@ -1626,7 +1636,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             NetServerPlayerID p = Packet.GetSourceSocket();
             SString           strSerial;
             SString           strExtra;
-            SString           strPlayerVersion;
+            CMtaVersion       strPlayerVersion;
             {
                 SFixedString<32> strSerialTemp;
                 SFixedString<64> strExtraTemp;
@@ -1699,7 +1709,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 pPlayer->SetPlayerVersion(strPlayerVersion);
 
                                 // Check if client must update
-                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()))
+                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick,
@@ -1712,7 +1722,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 }
 
                                 // Check if client should optionally update
-                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()))
+                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
@@ -1789,9 +1799,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                     return;
                                 }
                             #endif
-
-                                // Add him to the whowas list
-                                m_WhoWas.Add(szNick, Packet.GetSourceIP(), pPlayer->GetSerial(), pPlayer->GetPlayerVersion(), pPlayer->GetAccount()->GetName());
 
                                 PlayerCompleteConnect(pPlayer);
                             }
@@ -1935,6 +1942,8 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
     {
         pPlayer->SetSpawned(false);
         pPlayer->SetIsDead(true);
+        pPlayer->SetHealth(0.0f);
+        pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
         // Remove him from any occupied vehicle
@@ -3663,7 +3672,7 @@ void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
             // Handle special info
             std::vector<SString> parts;
             Packet.m_strMessage.Split(",", parts);
-            if (parts.size() > 2)
+            if (parts.size() > 3)
             {
                 pPlayer->m_strDetectedAC = parts[0].Replace("|", ",");
                 pPlayer->m_uiD3d9Size = atoi(parts[1]);
@@ -3915,12 +3924,12 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     pPlayer->SetSpawned(true);
 }
 
-void CGame::Lock(void)
+void CGame::Lock()
 {
     pthread_mutex_lock(&mutexhttp);
 }
 
-void CGame::Unlock(void)
+void CGame::Unlock()
 {
     pthread_mutex_unlock(&mutexhttp);
 }
@@ -3950,7 +3959,7 @@ void CGame::SetCloudsEnabled(bool bEnabled)
 {
     m_bCloudsEnabled = bEnabled;
 }
-bool CGame::GetCloudsEnabled(void)
+bool CGame::GetCloudsEnabled()
 {
     return m_bCloudsEnabled;
 }
@@ -3975,7 +3984,7 @@ void CGame::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
 //
 // Handle basic backup of databases and config files
 //
-void CGame::HandleBackup(void)
+void CGame::HandleBackup()
 {
     // Get backup vars
     SString strBackupPath = PathConform(m_pMainConfig->GetBackupPath()).TrimEnd(PATH_SEPERATOR);
@@ -4132,7 +4141,7 @@ bool CGame::SendPacket(unsigned char ucPacketID, const NetServerPlayerID& player
 //
 // Optimization for latent sends
 //
-void CGame::SendPacketBatchEnd(void)
+void CGame::SendPacketBatchEnd()
 {
     if (m_bLatentSendsEnabled)
         GetLatentTransferManager()->AddSendBatchEnd();
@@ -4145,7 +4154,7 @@ void CGame::SendPacketBatchEnd(void)
 // Determine the state of bullet sync
 //
 //////////////////////////////////////////////////////////////////
-bool CGame::IsBulletSyncActive(void)
+bool CGame::IsBulletSyncActive()
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled();
 #if 0       // No auto bullet sync as there are some problems with it
@@ -4222,7 +4231,7 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
 // Check if supplied version string is below current minimum requirement
 //
 //////////////////////////////////////////////////////////////////
-bool CGame::IsBelowMinimumClient(const SString& strVersion)
+bool CGame::IsBelowMinimumClient(const CMtaVersion& strVersion)
 {
     return strVersion < CalculateMinClientRequirement();
 }
@@ -4234,7 +4243,7 @@ bool CGame::IsBelowMinimumClient(const SString& strVersion)
 // Check if supplied version string is below recommended
 //
 //////////////////////////////////////////////////////////////////
-bool CGame::IsBelowRecommendedClient(const SString& strVersion)
+bool CGame::IsBelowRecommendedClient(const CMtaVersion& strVersion)
 {
     return strVersion < m_pMainConfig->GetRecommendedClientVersion();
 }
@@ -4246,16 +4255,16 @@ bool CGame::IsBelowRecommendedClient(const SString& strVersion)
 // Determine min client version setting to apply for connecting players
 //
 //////////////////////////////////////////////////////////////////
-SString CGame::CalculateMinClientRequirement(void)
+CMtaVersion CGame::CalculateMinClientRequirement()
 {
     if (g_pGame->IsBeingDeleted())
         return "";
 
     // Calc effective min client version
-    SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion();
-    SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement();
+    CMtaVersion strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion();
+    CMtaVersion strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement();
 
-    SString strNewMin;
+    CMtaVersion strNewMin;
 
     if (strNewMin < strMinClientRequirementFromConfig)
         strNewMin = strMinClientRequirementFromConfig;
@@ -4303,7 +4312,7 @@ SString CGame::CalculateMinClientRequirement(void)
 
     // Do version based kick check as well
     {
-        SString strKickMin;
+        CMtaVersion strKickMin;
 
         if (g_pGame->IsBulletSyncActive())
         {
@@ -4356,7 +4365,7 @@ SString CGame::CalculateMinClientRequirement(void)
 //
 // Handle encryption of Windows crash dump files
 //
-void CGame::HandleCrashDumpEncryption(void)
+void CGame::HandleCrashDumpEncryption()
 {
 #ifdef WIN32
     SString strDumpDirPath = g_pServerInterface->GetAbsolutePath(SERVER_DUMP_PATH);

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNC_H
-#define __CUNOCCUPIEDVEHICLESYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CDeathmatchVehicle.h"
@@ -19,17 +18,17 @@ class CUnoccupiedVehicleSync
 {
 public:
     CUnoccupiedVehicleSync(CClientVehicleManager* pVehicleManager);
-    ~CUnoccupiedVehicleSync(void);
+    ~CUnoccupiedVehicleSync();
 
     bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
-    void DoPulse(void);
+    void DoPulse();
 
     void AddVehicle(CDeathmatchVehicle* pVehicle);
     void RemoveVehicle(CDeathmatchVehicle* pVehicle);
-    void ClearVehicles(void);
+    void ClearVehicles();
 
-    std::list<CDeathmatchVehicle*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CDeathmatchVehicle*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CDeathmatchVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CDeathmatchVehicle*>::const_iterator IterEnd() { return m_List.end(); };
 
     bool Exists(CDeathmatchVehicle* pVehicle);
 
@@ -38,13 +37,11 @@ private:
     void Packet_UnoccupiedVehicleStopSync(NetBitStreamInterface& BitStream);
     void Packet_UnoccupiedVehicleSync(NetBitStreamInterface& BitStream);
 
-    void UpdateDamageModels(void);
-    void UpdateStates(void);
+    void UpdateDamageModels();
+    void UpdateStates();
     bool WriteVehicleInformation(NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle);
 
     CClientVehicleManager*           m_pVehicleManager;
     CMappedList<CDeathmatchVehicle*> m_List;
     unsigned long                    m_ulLastSyncTime;
 };
-
-#endif

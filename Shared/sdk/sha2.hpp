@@ -978,7 +978,7 @@ void test(const char* vector, unsigned char* digest, unsigned int digest_size)
     }
 }
 
-int main(void)
+int main()
 {
     static const char* vectors[4][3] = {/* SHA-224 */
                                         {

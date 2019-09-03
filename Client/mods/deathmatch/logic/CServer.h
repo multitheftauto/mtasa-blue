@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVER_H
-#define __CSERVER_H
+#pragma once
 
 #include "CDynamicLibrary.h"
 #include <list>
@@ -19,27 +18,27 @@
 class CServer
 {
 public:
-    CServer(void);
-    ~CServer(void);
+    CServer();
+    ~CServer();
 
-    void DoPulse(void);
+    void DoPulse();
 
     bool Start(const char* szConfig);
-    bool Stop(void);
-    bool IsStarted(void);
-    bool IsRunning(void) { return m_pLibrary != NULL; };
-    bool IsReady(void) { return m_bIsReady; };
+    bool Stop();
+    bool IsStarted();
+    bool IsRunning() { return m_pLibrary != NULL; };
+    bool IsReady() { return m_bIsReady; };
 
-    int GetLastError(void) { return m_iLastError; };
+    int GetLastError() { return m_iLastError; };
 
     bool Send(const char* szString);
 
-    const std::string& GetPassword(void) { return m_strPassword; };
+    const std::string& GetPassword() { return m_strPassword; };
     void               SetPassword(const char* szPassword) { m_strPassword = szPassword; };
 
 private:
     static DWORD WINAPI Thread_EntryPoint(LPVOID pThis);
-    unsigned long       Thread_Run(void);
+    unsigned long       Thread_Run();
 
     bool   m_bIsReady;
     HANDLE m_hThread;
@@ -58,5 +57,3 @@ private:
 
     static void AddServerOutput(const char* szOutput);
 };
-
-#endif

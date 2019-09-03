@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMOVINGOBJECTSMANAGER_H
-#define __CMOVINGOBJECTSMANAGER_H
+#pragma once
 
 #include "CDeathmatchObject.h"
 #include <list>
@@ -25,10 +24,8 @@ public:
             m_List.remove(pObject);
     };
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     std::list<CDeathmatchObject*> m_List;
 };
-
-#endif

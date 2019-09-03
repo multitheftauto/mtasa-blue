@@ -32,9 +32,9 @@ extern "C" bool g_bNoTopBar;
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #define MTA_OS_STRING       "BSD"
     #define MTA_LIB_EXTENSION   ".so"
-#elif defined(__APPLE__) && defined(__MACH__)
-    #define MTA_OS_STRING       "Mac OS X"
-    #define MTA_LIB_EXTENSION   ".so"
+#elif defined(__APPLE__)
+    #define MTA_OS_STRING       "macOS"
+    #define MTA_LIB_EXTENSION   ".dylib"
 #else
     #error "Unsupported operating system"
 #endif
@@ -74,10 +74,17 @@ typedef int socklen_t;
     #include <string.h>
     #include <string>
     #include <fcntl.h>
-    #include <ncursesw/curses.h>
     #include <dlfcn.h>
     #include <sys/time.h>
     #include <sys/times.h>
+
+    #if defined(__APPLE__)
+        #include <ncurses.h>
+    #elif __has_include(<ncursesw/curses.h>)
+        #include <ncursesw/curses.h>
+    #else
+        #include <ncurses.h>
+    #endif
 
     #define MAX_PATH 255
 
@@ -90,7 +97,7 @@ typedef int socklen_t;
     #endif
 
     #ifndef Sleep
-        #define Sleep(duration) usleep(duration * 1000)
+        #define Sleep(duration) usleep((duration) * 1000)
     #endif
 
 #endif

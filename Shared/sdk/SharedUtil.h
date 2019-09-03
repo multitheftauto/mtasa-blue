@@ -55,6 +55,7 @@ typedef float          FLOAT;            //  32
 #include <string.h>
 #include <string>
 #include <stdarg.h>
+#include <chrono>
 
 // Vendor
 #ifndef _
@@ -89,6 +90,8 @@ typedef float          FLOAT;            //  32
 #include "SharedUtil.Profiling.h"
 #include "SharedUtil.Logging.h"
 #include "SharedUtil.AsyncTaskScheduler.h"
+#include "SharedUtil.ThreadPool.h"
+#include "CMtaVersion.h"
 #include "CFastList.h"
 #include "CDuplicateLineFilter.h"
 

@@ -126,6 +126,29 @@ int CLuaFunctionDefs::OOP_OutputChatBox(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
+{
+    CElement* pElement;
+
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadUserData(pElement, m_pRootElement);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::ClearChatBox(pElement))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::OutputConsole(lua_State* luaVM)
 {
     SString   strMessage;
@@ -315,41 +338,34 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
 int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
 {
     // table getCommandHandlers ( [ resource sourceResource ] );
-    CResource* pResource;
-    bool       bSpecificResource = false;
+    CResource* pResource = nullptr;
 
     CScriptArgReader argStream(luaVM);
-    if (!argStream.NextIsNone())
-    {
+
+    if (!argStream.NextIsNil() && !argStream.NextIsNone())
         argStream.ReadUserData(pResource);
-        bSpecificResource = true;
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
     }
 
-    if (!argStream.HasErrors())
+    if (pResource)
     {
-        if (bSpecificResource)
-        {
-            // Grab resource virtual machine
-            CLuaMain* pLuaMain = pResource->GetVirtualMachine();
+        CLuaMain* pLuaMain = pResource->GetVirtualMachine();
 
-            if (pLuaMain)
-            {
-                m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
-
-                return 1;
-            }
-        }
+        if (pLuaMain)
+            m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
         else
-        {
-            m_pRegisteredCommands->GetCommands(luaVM);
-
-            return 1;
-        }
+            lua_newtable(luaVM);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        m_pRegisteredCommands->GetCommands(luaVM);
+    }
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 

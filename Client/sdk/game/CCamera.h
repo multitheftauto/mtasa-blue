@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CAMERA
-#define __CGAME_CAMERA
+#pragma once
 
 #include "CEntity.h"
 #include "CCam.h"
@@ -117,7 +116,7 @@ public:
     virtual VOID      SetMatrix(CMatrix* matrix) = 0;
     virtual VOID      SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset) = 0;
     virtual VOID      Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget) = 0;
-    virtual float     Find3rdPersonQuickAimPitch(void) = 0;
+    virtual float     Find3rdPersonQuickAimPitch() = 0;
     virtual BYTE      GetActiveCam() = 0;
     virtual CCam*     GetCam(BYTE bCameraID) = 0;
     virtual VOID      SetWidescreen(BOOL bWidescreen) = 0;
@@ -127,19 +126,17 @@ public:
     virtual bool      TryToStartNewCamMode(DWORD dwCamMode) = 0;
     virtual bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist) = 0;
     virtual void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds) = 0;
-    virtual bool      IsFading(void) = 0;
-    virtual int       GetFadingDirection(void) = 0;
+    virtual bool      IsFading() = 0;
+    virtual int       GetFadingDirection() = 0;
     virtual void      Fade(float fFadeOutTime, int iOutOrIn) = 0;
     virtual void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) = 0;
-    virtual float     GetCameraRotation(void) = 0;
-    virtual RwMatrix* GetLTM(void) = 0;
-    virtual CEntity*  GetTargetEntity(void) = 0;
+    virtual float     GetCameraRotation() = 0;
+    virtual RwMatrix* GetLTM() = 0;
+    virtual CEntity*  GetTargetEntity() = 0;
     virtual void      SetCameraClip(bool bObjects, bool bVehicles) = 0;
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
     virtual VOID      SetCameraViewMode(BYTE dwCamMode) = 0;
-    virtual BYTE      GetCameraViewMode(void) = 0;
+    virtual BYTE      GetCameraViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
-    virtual float     GetShakeForce(void) = 0;
+    virtual float     GetShakeForce() = 0;
 };
-
-#endif

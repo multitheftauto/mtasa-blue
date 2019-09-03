@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCORESCREENSHOT_H
-#define __CCORESCREENSHOT_H
+#pragma once
 
 #include "CCore.h"
 #include <time.h>
@@ -18,17 +17,15 @@
 class CScreenShot
 {
 public:
-    static SString PreScreenShot(void);
+    static SString PreScreenShot();
     static void    PostScreenShot(const SString& strFileName);
     static void    SetPath(const char* szPath);
 
     static SString GetScreenShotPath(int iNumber);
-    static SString GetValidScreenshotFilename(void);
-    static int     GetScreenShots(void);
+    static SString GetValidScreenshotFilename();
+    static int     GetScreenShots();
 
     static void  BeginSave(const char* szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight);
-    static bool  IsSaving(void);
+    static bool  IsSaving();
     static DWORD ThreadProc(LPVOID lpdwThreadParam);
 };
-
-#endif

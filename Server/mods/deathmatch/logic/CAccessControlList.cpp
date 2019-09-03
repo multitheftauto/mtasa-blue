@@ -18,7 +18,7 @@ CAccessControlList::CAccessControlList(const char* szACLName, CAccessControlList
     m_pACLManager = pACLManager;
 }
 
-CAccessControlList::~CAccessControlList(void)
+CAccessControlList::~CAccessControlList()
 {
     CIdArray::PushUniqueId(this, EIdClass::ACL, m_uiScriptID);
     list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
@@ -106,12 +106,12 @@ void CAccessControlList::WriteToXMLNode(CXMLNode* pNode)
     }
 }
 
-void CAccessControlList::OnChange(void)
+void CAccessControlList::OnChange()
 {
     g_pGame->GetACLManager()->OnChange();
 }
 
-bool CAccessControlList::CanBeModifiedByScript(void)
+bool CAccessControlList::CanBeModifiedByScript()
 {
     // If this isn't horrible, I don't know what is
     return !SStringX(GetName()).BeginsWith("autoACL_");

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CHECKPOINT
-#define __CGAMESA_CHECKPOINT
+#pragma once
 
 #include <game/CCheckpoint.h>
 #include <CMatrix_Pad.h>
@@ -66,5 +65,3 @@ public:
     FLOAT    GetPulseFraction();
     VOID     Remove();
 };
-
-#endif

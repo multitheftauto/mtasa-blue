@@ -125,7 +125,7 @@ EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQu
     }
 }
 
-void CRemoteCalls::ProcessQueuedFiles(void)
+void CRemoteCalls::ProcessQueuedFiles()
 {
     for (auto iter = m_QueueIndexMap.cbegin(); iter != m_QueueIndexMap.cend();)
     {
@@ -224,10 +224,10 @@ void CRemoteCall::MakeCall()
     if (strDomain.empty())
         strDomain = g_pCore->GetWebCore()->GetDomainFromURL("http://" + m_strURL);
     // Bypass net module IP check if we are allowed to access the URL
-    bool                              bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
-    EDownloadModeType                 downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
-    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(downloadMode);
-    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
+    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
+    m_downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(m_downloadMode);
+    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
@@ -235,6 +235,12 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
     CRemoteCall* pCall = (CRemoteCall*)result.pObj;
     if (!g_pClientGame->GetRemoteCalls()->CallExists(pCall))
         return;
+
+    // Save final download status
+    pCall->m_lastDownloadStatus.uiAttemptNumber = result.uiAttemptNumber;
+    pCall->m_lastDownloadStatus.uiContentLength = result.uiContentLength;
+    pCall->m_lastDownloadStatus.uiBytesReceived = result.dataSize;
+    pCall->m_downloadMode = EDownloadModeType::NONE;
 
     CLuaArguments arguments;
     if (pCall->IsLegacy())
@@ -293,4 +299,27 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 
     arguments.Call(pCall->m_VM, pCall->m_iFunction);
     g_pClientGame->GetRemoteCalls()->Remove(pCall);
+}
+
+// Return true if cancel was done
+bool CRemoteCall::CancelDownload()
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        return g_pNet->GetHTTPDownloadManager(m_downloadMode)->CancelDownload(this, DownloadFinishedCallback);
+    }
+    return false;
+}
+
+const SDownloadStatus& CRemoteCall::GetDownloadStatus()
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        SDownloadStatus newDownloadStatus;
+        if (g_pNet->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, newDownloadStatus))
+        {
+            m_lastDownloadStatus = newDownloadStatus;
+        }
+    }
+    return m_lastDownloadStatus;
 }

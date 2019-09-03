@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef __CIFPANIMATIONS_H
-#define __CIFPANIMATIONS_H
 #pragma once
 
 #include "CClientIFP.h"
@@ -28,7 +26,6 @@ public:
     std::vector<SAnimation> vecAnimations;
 
 public:
-    ~CIFPAnimations(void);
-    void DeleteAnimations(void);
+    ~CIFPAnimations();
+    void DeleteAnimations();
 };
-#endif

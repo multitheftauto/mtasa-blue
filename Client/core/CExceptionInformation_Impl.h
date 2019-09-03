@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEXCEPTIONINFORMATION_IMPL_H
-#define __CEXCEPTIONINFORMATION_IMPL_H
+#pragma once
 
 #include <core/CExceptionInformation.h>
 #include <windows.h>
@@ -18,32 +17,32 @@
 class CExceptionInformation_Impl : public CExceptionInformation
 {
 public:
-    CExceptionInformation_Impl(void);
-    ~CExceptionInformation_Impl(void);            //            {};
+    CExceptionInformation_Impl();
+    ~CExceptionInformation_Impl();            //            {};
 
-    unsigned int        GetCode(void) { return m_uiCode; };
-    void*               GetAddress(void) { return m_pAddress; };
+    unsigned int        GetCode() { return m_uiCode; };
+    void*               GetAddress() { return m_pAddress; };
     bool                GetModule(void* pQueryAddress, char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
-    virtual const char* GetModulePathName(void) { return m_szModulePathName; };
-    virtual const char* GetModuleBaseName(void) { return m_szModuleBaseName; };
-    virtual uint        GetAddressModuleOffset(void) { return m_uiAddressModuleOffset; };
+    virtual const char* GetModulePathName() { return m_szModulePathName; };
+    virtual const char* GetModuleBaseName() { return m_szModuleBaseName; };
+    virtual uint        GetAddressModuleOffset() { return m_uiAddressModuleOffset; };
 
-    unsigned long GetEAX(void) { return m_ulEAX; };
-    unsigned long GetEBX(void) { return m_ulEBX; };
-    unsigned long GetECX(void) { return m_ulECX; };
-    unsigned long GetEDX(void) { return m_ulEDX; };
-    unsigned long GetESI(void) { return m_ulESI; };
-    unsigned long GetEDI(void) { return m_ulEDI; };
-    unsigned long GetEBP(void) { return m_ulEBP; };
-    unsigned long GetESP(void) { return m_ulESP; };
-    unsigned long GetEIP(void) { return m_ulEIP; };
-    unsigned long GetCS(void) { return m_ulCS; };
-    unsigned long GetDS(void) { return m_ulDS; };
-    unsigned long GetES(void) { return m_ulES; };
-    unsigned long GetFS(void) { return m_ulFS; };
-    unsigned long GetGS(void) { return m_ulGS; };
-    unsigned long GetSS(void) { return m_ulSS; };
-    unsigned long GetEFlags(void) { return m_ulEFlags; };
+    unsigned long GetEAX() { return m_ulEAX; };
+    unsigned long GetEBX() { return m_ulEBX; };
+    unsigned long GetECX() { return m_ulECX; };
+    unsigned long GetEDX() { return m_ulEDX; };
+    unsigned long GetESI() { return m_ulESI; };
+    unsigned long GetEDI() { return m_ulEDI; };
+    unsigned long GetEBP() { return m_ulEBP; };
+    unsigned long GetESP() { return m_ulESP; };
+    unsigned long GetEIP() { return m_ulEIP; };
+    unsigned long GetCS() { return m_ulCS; };
+    unsigned long GetDS() { return m_ulDS; };
+    unsigned long GetES() { return m_ulES; };
+    unsigned long GetFS() { return m_ulFS; };
+    unsigned long GetGS() { return m_ulGS; };
+    unsigned long GetSS() { return m_ulSS; };
+    unsigned long GetEFlags() { return m_ulEFlags; };
 
     void Set(unsigned int iCode, _EXCEPTION_POINTERS* pException);
 
@@ -70,5 +69,3 @@ private:
     unsigned long m_ulSS;
     unsigned long m_ulEFlags;
 };
-
-#endif

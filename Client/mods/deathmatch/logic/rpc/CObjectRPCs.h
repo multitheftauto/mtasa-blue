@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CObjectRPCs_H
-#define __CObjectRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CObjectRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllObjects);
     DECLARE_ELEMENT_RPC(SetModel);
@@ -27,5 +26,3 @@ public:
     DECLARE_ELEMENT_RPC(SetObjectScale);
     DECLARE_ELEMENT_RPC(SetObjectVisibleInAllDimensions);
 };
-
-#endif

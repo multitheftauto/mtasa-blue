@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPEDSYNC_H
-#define __CPEDSYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CClientVehicle.h"
@@ -19,16 +18,16 @@ class CPedSync
 {
 public:
     CPedSync(CClientPedManager* pPedManager);
-    ~CPedSync(void);
+    ~CPedSync();
 
     bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
-    void DoPulse(void);
+    void DoPulse();
 
     void AddPed(CClientPed* pPed);
     void RemovePed(CClientPed* pPed);
 
-    std::list<CClientPed*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CClientPed*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CClientPed*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientPed*>::const_iterator IterEnd() { return m_List.end(); };
 
     bool Exists(CClientPed* pPed);
 
@@ -37,12 +36,10 @@ private:
     void Packet_PedStopSync(NetBitStreamInterface& BitStream);
     void Packet_PedSync(NetBitStreamInterface& BitStream);
 
-    void Update(void);
+    void Update();
     void WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed* pPed);
 
     CClientPedManager*       m_pPedManager;
     CMappedList<CClientPed*> m_List;
     unsigned long            m_ulLastSyncTime;
 };
-
-#endif

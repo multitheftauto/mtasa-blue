@@ -13,8 +13,8 @@
 
 using namespace std;
 
-CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode, bool bIsPartnered)
-    : CColShape(pManager, pParent, pNode, bIsPartnered)
+CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, bool bIsPartnered)
+    : CColShape(pManager, pParent, bIsPartnered)
 {
     m_vecPosition.fX = vecPosition.fX;
     m_vecPosition.fY = vecPosition.fY;
@@ -29,7 +29,7 @@ bool CColCircle::DoHitDetection(const CVector& vecNowPosition)
     return IsPointNearPoint2D(vecNowPosition, m_vecPosition, m_fRadius);
 }
 
-bool CColCircle::ReadSpecialData(void)
+bool CColCircle::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
@@ -40,7 +40,7 @@ bool CColCircle::ReadSpecialData(void)
     return true;
 }
 
-CSphere CColCircle::GetWorldBoundingSphere(void)
+CSphere CColCircle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

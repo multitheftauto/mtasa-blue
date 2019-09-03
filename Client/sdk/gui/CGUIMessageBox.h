@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMESSAGEBOX_H
-#define __CGUIMESSAGEBOX_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUIWindow.h"
@@ -19,17 +18,15 @@
 class CGUIMessageBox
 {
 public:
-    virtual ~CGUIMessageBox(void){};
+    virtual ~CGUIMessageBox(){};
 
     virtual void SetAutoDestroy(bool bAutoDestroy) = 0;
-    virtual bool GetAutoDestroy(void) = 0;
+    virtual bool GetAutoDestroy() = 0;
 
     virtual void SetVisible(bool bVisible) = 0;
-    virtual bool IsVisible(void) = 0;
+    virtual bool IsVisible() = 0;
 
     virtual void SetClickHandler(GUI_CALLBACK Callback) = 0;
 
-    virtual CGUIWindow* GetWindow(void) = 0;
+    virtual CGUIWindow* GetWindow() = 0;
 };
-
-#endif

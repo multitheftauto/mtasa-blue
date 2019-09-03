@@ -12,22 +12,30 @@
 
 #define mask(n) (~((0xFFFFFFFF << 1) << ((n) - 1)))
 
-void CLuaBitDefs::LoadFunctions(void)
+void CLuaBitDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("bitAnd", bitAnd);
-    CLuaCFunctions::AddFunction("bitNot", bitNot);
-    CLuaCFunctions::AddFunction("bitOr", bitOr);
-    CLuaCFunctions::AddFunction("bitTest", bitTest);
-    CLuaCFunctions::AddFunction("bitXor", bitXor);
+    std::map<const char*, lua_CFunction> functions{
+        {"bitAnd", bitAnd},
+        {"bitNot", bitNot},
+        {"bitOr", bitOr},
+        {"bitTest", bitTest},
+        {"bitXor", bitXor},
 
-    CLuaCFunctions::AddFunction("bitLRotate", bitLRotate);
-    CLuaCFunctions::AddFunction("bitRRotate", bitRRotate);
-    CLuaCFunctions::AddFunction("bitLShift", bitLShift);
-    CLuaCFunctions::AddFunction("bitRShift", bitRShift);
-    CLuaCFunctions::AddFunction("bitArShift", bitArShift);
+        {"bitLRotate", bitLRotate},
+        {"bitRRotate", bitRRotate},
+        {"bitLShift", bitLShift},
+        {"bitRShift", bitRShift},
+        {"bitArShift", bitArShift},
 
-    CLuaCFunctions::AddFunction("bitExtract", bitExtract);
-    CLuaCFunctions::AddFunction("bitReplace", bitReplace);
+        {"bitExtract", bitExtract},
+        {"bitReplace", bitReplace},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 int CLuaBitDefs::bitAnd(lua_State* luaVM)

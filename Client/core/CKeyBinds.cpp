@@ -283,9 +283,15 @@ CKeyBinds::CKeyBinds(CCore* pCore)
     m_KeyStrokeHandler = NULL;
     m_CharacterKeyHandler = NULL;
     m_bWaitingToLoadDefaults = false;
+    m_bLastStateForwards = false;
+    m_bLastStateBackwards = false;
+    m_bMoveForwards = false;
+    m_bLastStateLeft = false;
+    m_bLastStateRight = false;
+    m_bMoveLeft = false;
 }
 
-CKeyBinds::~CKeyBinds(void)
+CKeyBinds::~CKeyBinds()
 {
     Clear();
     delete m_pList;
@@ -476,6 +482,13 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         }
     }
 
+    if (bAllowed)
+    {
+        // Check for pasting the clipboard
+        if (bState && strcmp(pKey->szKey, "v") == 0 && (GetKeyState(VK_CONTROL) & 0x8000))
+            OnPaste(SharedUtil::GetClipboardText());
+    }
+
     m_bProcessingKeyStroke = false;
     RemoveDeletedBinds();
     return bFound;
@@ -498,7 +511,7 @@ void CKeyBinds::Remove(CKeyBind* pKeyBind)
     }
 }
 
-void CKeyBinds::Clear(void)
+void CKeyBinds::Clear()
 {
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
@@ -509,7 +522,7 @@ void CKeyBinds::Clear(void)
     m_pList->clear();
 }
 
-void CKeyBinds::RemoveDeletedBinds(void)
+void CKeyBinds::RemoveDeletedBinds()
 {
     list<CKeyBind*>::iterator iter = m_pList->begin();
     while (iter != m_pList->end())
@@ -524,7 +537,7 @@ void CKeyBinds::RemoveDeletedBinds(void)
     }
 }
 
-void CKeyBinds::ClearCommandsAndControls(void)
+void CKeyBinds::ClearCommandsAndControls()
 {
     list<CKeyBind*>*                keyList = new list<CKeyBind*>;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
@@ -730,7 +743,7 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllCommands(void)
+bool CKeyBinds::RemoveAllCommands()
 {
     bool                      bFound = false;
     list<CKeyBind*>           cloneList = *m_pList;
@@ -953,7 +966,7 @@ void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKe
 //
 // Sort command binds for consistency in settings gui
 //
-void CKeyBinds::SortCommandBinds(void)
+void CKeyBinds::SortCommandBinds()
 {
     struct Sorter
     {
@@ -1106,7 +1119,7 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllGTAControls(void)
+bool CKeyBinds::RemoveAllGTAControls()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -1376,7 +1389,7 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
     }
 }
 
-void CKeyBinds::ResetAllGTAControlStates(void)
+void CKeyBinds::ResetAllGTAControlStates()
 {
     // Set all our control states to false
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
@@ -1518,7 +1531,7 @@ bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllFunctions(void)
+bool CKeyBinds::RemoveAllFunctions()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -1700,7 +1713,7 @@ bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllControlFunctions(void)
+bool CKeyBinds::RemoveAllControlFunctions()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -2013,7 +2026,7 @@ unsigned int CKeyBinds::Count(eKeyBindType bindType)
     return uiCount;
 }
 
-void CKeyBinds::DoPreFramePulse(void)
+void CKeyBinds::DoPreFramePulse()
 {
     CControllerState cs;
     m_pCore->GetGame()->GetPad()->GetCurrentControllerState(&cs);
@@ -2053,7 +2066,79 @@ void CKeyBinds::DoPreFramePulse(void)
     }
 }
 
-void CKeyBinds::DoPostFramePulse(void)
+bool CKeyBinds::ControlForwardsBackWards(CControllerState& cs)
+{
+    bool bCurrentStateForwards = g_bcControls[3].bState;
+    bool bCurrentStateBackwards = g_bcControls[4].bState;
+    if (bCurrentStateForwards && !bCurrentStateBackwards)
+    {
+        m_bLastStateForwards = true;
+        m_bLastStateBackwards = false;
+    }
+    else if (!bCurrentStateForwards && bCurrentStateBackwards)
+    {
+        m_bLastStateForwards = false;
+        m_bLastStateBackwards = true;
+    }
+
+    bool bBothKeysPressed = false;
+    if (bCurrentStateForwards && bCurrentStateBackwards)
+    {
+        bBothKeysPressed = true;
+        if (!m_bLastStateForwards && m_bLastStateBackwards)
+        {
+            m_bMoveForwards = true;
+        }
+        else if (m_bLastStateForwards && !m_bLastStateBackwards)
+        {
+            m_bMoveForwards = false;
+        }
+
+        bool bForwardsState = m_bMoveForwards;
+        bool bBackwardsState = !m_bMoveForwards;
+        cs.LeftStickY = (short)((bForwardsState) ? bForwardsState * -128 : bBackwardsState * 128);
+    }
+
+    return bBothKeysPressed;
+}
+
+bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
+{
+    bool bCurrentStateLeft = g_bcControls[5].bState;
+    bool bCurrentStateRight = g_bcControls[6].bState;
+    if (bCurrentStateLeft && !bCurrentStateRight)
+    {
+        m_bLastStateLeft = true;
+        m_bLastStateRight = false;
+    }
+    else if (!bCurrentStateLeft && bCurrentStateRight)
+    {
+        m_bLastStateLeft = false;
+        m_bLastStateRight = true;
+    }
+
+    bool bBothKeysPressed = false;
+    if (bCurrentStateLeft && bCurrentStateRight)
+    {
+        bBothKeysPressed = true;
+        if (!m_bLastStateLeft && m_bLastStateRight)
+        {
+            m_bMoveLeft = true;
+        }
+        else if (m_bLastStateLeft && !m_bLastStateRight)
+        {
+            m_bMoveLeft = false;
+        }
+
+        bool bLeftState = m_bMoveLeft;
+        bool bRightState = !m_bMoveLeft;
+        cs.LeftStickX = (short)((bLeftState) ? bLeftState * -128 : bRightState * 128);
+    }
+
+    return bBothKeysPressed;
+}
+
+void CKeyBinds::DoPostFramePulse()
 {
     eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
@@ -2112,12 +2197,17 @@ void CKeyBinds::DoPostFramePulse(void)
             cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;                                         // Fire
             cs.RightShoulder2 = (g_bcControls[1].bState || (bAimingWeapon && g_bcControls[7].bState)) ? 255 : 0;            // Next Weapon / Zoom In
             cs.LeftShoulder2 = (g_bcControls[2].bState || (bAimingWeapon && g_bcControls[8].bState)) ? 255 : 0;             // Previous Weapon / Zoom Out
-            cs.LeftStickY = ((g_bcControls[3].bState && g_bcControls[4].bState) || (!g_bcControls[3].bState && !g_bcControls[4].bState))
-                                ? 0
-                                : (g_bcControls[3].bState) ? -128 : 128;
-            cs.LeftStickX = ((g_bcControls[5].bState && g_bcControls[6].bState) || (!g_bcControls[5].bState && !g_bcControls[6].bState))
-                                ? 0
-                                : (g_bcControls[5].bState) ? -128 : 128;
+
+            if (!ControlForwardsBackWards(cs))
+            {
+                cs.LeftStickY = (!g_bcControls[3].bState && !g_bcControls[4].bState) ? 0 : (g_bcControls[3].bState) ? -128 : 128;
+            }
+
+            if (!ControlLeftAndRight(cs))
+            {
+                cs.LeftStickX = (!g_bcControls[5].bState && !g_bcControls[6].bState) ? 0 : (g_bcControls[5].bState) ? -128 : 128;
+            }
+
             // * Enter Exit
             // * Change View
             cs.ButtonSquare = (!bEnteringVehicle && g_bcControls[11].bState) ? 255 : 0;            // Jump
@@ -2422,7 +2512,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
     return false;
 }
 
-void CKeyBinds::LoadDefaultBinds(void)
+void CKeyBinds::LoadDefaultBinds()
 {
     ClearCommandsAndControls();
 
@@ -2440,7 +2530,7 @@ void CKeyBinds::LoadDefaultCommands(bool bForce)
     }
 }
 
-void CKeyBinds::LoadControlsFromGTA(void)
+void CKeyBinds::LoadControlsFromGTA()
 {
     for (int i = FIRE; i <= GROUP_CONTROL_BACK; i++)
     {
@@ -2572,7 +2662,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
 {
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
-    char* szError = "* Syntax: unbind <all/key> [<up/down> <command>]";
+    char* szError = "* Syntax: unbind <all/key> [<up/down/both> <command>]";
     if (szCmdLine == NULL)
     {
         pConsole->Print(szError);
@@ -2606,24 +2696,31 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
             }
             else
             {
-                bool bState = true;
-                if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0)
+                bool        bState = true;
+                bool        both = true;
+                const char* szState = "both";
+
+                if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0 || strcmp(szCommand, "both") == 0)
                 {
                     bState = (strcmp(szCommand, "down") == 0);
+                    szState = szCommand;
                     szCommand = strtok(NULL, " ");
+
+                    if (strcmp(szState, "both") != 0)
+                        both = false;
                 }
 
                 if (szCommand)
                 {
-                    if (RemoveCommand(szKey, szCommand, true, bState))
-                        pConsole->Printf("* Unbound key '%s' '%s' from command '%s'", szKey, (bState) ? "down" : "up", szCommand);
+                    if (RemoveCommand(szKey, szCommand, !both, bState))
+                        pConsole->Printf("* Unbound key '%s' '%s' from command '%s'", szKey, szState, szCommand);
                     else
-                        pConsole->Printf("* Failed to unbind '%s' '%s' from command '%s'", szKey, (bState) ? "down" : "up", szCommand);
+                        pConsole->Printf("* Failed to unbind '%s' '%s' from command '%s'", szKey, szState, szCommand);
                 }
-                else if (RemoveAllCommands(szKey, true, bState))
-                    pConsole->Printf("* Removed all binds from key '%s' '%s'", szKey, (bState) ? "down" : "up");
+                else if (RemoveAllCommands(szKey, !both, bState))
+                    pConsole->Printf("* Removed all binds from key '%s' '%s'", szKey, szState);
                 else
-                    pConsole->Printf("* Failed to remove binds from key '%s' '%s'", szKey, (bState) ? "down" : "up");
+                    pConsole->Printf("* Failed to remove binds from key '%s' '%s'", szKey, szState);
             }
         }
         else
