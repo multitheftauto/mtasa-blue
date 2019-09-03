@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-10 04:47+0000\n"
+"POT-Creation-Date: 2019-05-20 21:57+0100\n"
 "PO-Revision-Date: 2019-03-10 04:29+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,14 +109,12 @@ msgstr "接続に失敗しました。無効なニックネームが記入され
 #: ..\Client\core\CConnectManager.cpp:127
 #: ..\Client\core\CConnectManager.cpp:263
 #: ..\Client\core\CConnectManager.cpp:321
-#: ..\Client\core\CConnectManager.cpp:410
-#: ..\Client\core\CConnectManager.cpp:417
-#: ..\Client\core\CConnectManager.cpp:427 ..\Client\core\CCore.cpp:1234
-#: ..\Client\core\CCore.cpp:1247 ..\Client\core\CGUI.cpp:85
-#: ..\Client\core\CQuickConnect.cpp:142 ..\Client\core\CQuickConnect.cpp:151
-#: ..\Client\core\CQuickConnect.cpp:156 ..\Client\core\CQuickConnect.cpp:165
-#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:3952
-#: ..\Client\core\CSettings.cpp:3980 ..\Client\core\CSettings.cpp:4425
+#: ..\Client\core\CConnectManager.cpp:404
+#: ..\Client\core\CConnectManager.cpp:411
+#: ..\Client\core\CConnectManager.cpp:421 ..\Client\core\CCore.cpp:1182
+#: ..\Client\core\CCore.cpp:1195 ..\Client\core\CGUI.cpp:85
+#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:3955
+#: ..\Client\core\CSettings.cpp:3983 ..\Client\core\CSettings.cpp:4428
 #: ..\Client\core\DXHook\CDirect3DHook9.cpp:128
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
@@ -128,21 +126,21 @@ msgstr "接続に失敗しました。無効なニックネームが記入され
 #: ..\Client\loader\MainFunctions.cpp:254
 #: ..\Client\loader\MainFunctions.cpp:256
 #: ..\Client\loader\MainFunctions.cpp:817
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:572
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:640
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:664
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:686
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1002
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1082
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1092
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1161
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1195
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1244
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1256
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:644
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:668
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:690
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1006
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1086
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1096
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1165
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1199
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1248
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1260
 #: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 #: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Error"
 msgstr "エラー"
 
@@ -163,180 +161,180 @@ msgstr "%s:%u に接続中。。。"
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:148
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:588
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:592
 msgid "CONNECTING"
 msgstr "接続中"
 
 #: ..\Client\core\CConnectManager.cpp:263
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1161
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1165
 msgid "Connection timed out"
 msgstr "接続がタイムアウトしました"
 
 #: ..\Client\core\CConnectManager.cpp:277
 #: ..\Client\core\CConnectManager.cpp:281
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1206
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1210
 msgid "Disconnected: unknown protocol error"
 msgstr "切断：不明なプロトコルエラー"
 
 #: ..\Client\core\CConnectManager.cpp:285
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1210
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1214
 msgid "Disconnected: disconnected remotely"
 msgstr "切断：リモートで切断しました"
 
 #: ..\Client\core\CConnectManager.cpp:289
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1218
 msgid "Disconnected: connection lost remotely"
 msgstr "切断： リモートで接続が失われました"
 
 #: ..\Client\core\CConnectManager.cpp:293
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1218
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1222
 msgid "Disconnected: you are banned from this server"
 msgstr "切断： あなたはこのサーバーから禁止されました"
 
 #: ..\Client\core\CConnectManager.cpp:300
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1226
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1230
 msgid "Disconnected: disconnected from the server"
 msgstr "切断： サーバーから切断されました"
 
 #: ..\Client\core\CConnectManager.cpp:304
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1230
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1234
 msgid "Disconnected: connection to the server was lost"
 msgstr "切断：サーバーとの接続が失われました"
 
 #: ..\Client\core\CConnectManager.cpp:311
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1238
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1242
 msgid "Disconnected: connection was refused"
 msgstr "切断： 接続が拒否されました"
 
 #. Failed loading the mod
-#: ..\Client\core\CConnectManager.cpp:409
+#: ..\Client\core\CConnectManager.cpp:403
 #, c-format, c-format
 msgid "No such mod installed (%s)"
 msgstr "MODはインストールしていません (%s)"
 
-#: ..\Client\core\CConnectManager.cpp:417
+#: ..\Client\core\CConnectManager.cpp:411
 msgid "Bad server response (2)"
 msgstr "無効なサーバーレスポンス (2)"
 
-#: ..\Client\core\CConnectManager.cpp:427
+#: ..\Client\core\CConnectManager.cpp:421
 msgid "Bad server response (1)"
 msgstr "無効なサーバー返答でした (1)"
 
 #. Create window
-#: ..\Client\core\CConsole.cpp:427
+#: ..\Client\core\CConsole.cpp:417
 msgid "CONSOLE"
 msgstr "コンソール"
 
-#: ..\Client\core\CCore.cpp:743 ..\Client\loader\CInstallManager.cpp:657
+#: ..\Client\core\CCore.cpp:696 ..\Client\loader\CInstallManager.cpp:657
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "%s ドライブのスペースが不足しているため、MTA:SAは続行不能。"
 
-#: ..\Client\core\CCore.cpp:745 ..\Client\mods\deathmatch\logic\Utils.cpp:144
+#: ..\Client\core\CCore.cpp:698 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "致命的なエラー"
 
-#: ..\Client\core\CCore.cpp:893
+#: ..\Client\core\CCore.cpp:841
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "修正するには、このファイルを消してください："
 
-#: ..\Client\core\CCore.cpp:925
+#: ..\Client\core\CCore.cpp:873
 #, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "%s モジュールは正しくありません！"
 
-#: ..\Client\core\CCore.cpp:1234
+#: ..\Client\core\CCore.cpp:1182
 msgid "Error executing URL"
 msgstr "URL実行エラー"
 
-#: ..\Client\core\CCore.cpp:1246
+#: ..\Client\core\CCore.cpp:1194
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "コマンドラインに記入されたMODの実行が失敗しました ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: ..\Client\core\CCore.cpp:1331
+#: ..\Client\core\CCore.cpp:1279
 msgid "this help screen"
 msgstr "このヘルプ画面"
 
-#: ..\Client\core\CCore.cpp:1332 ..\Client\core\CCore.cpp:1333
+#: ..\Client\core\CCore.cpp:1280 ..\Client\core\CCore.cpp:1281
 msgid "exits the application"
 msgstr "アプリケーションを終了する"
 
-#: ..\Client\core\CCore.cpp:1334
+#: ..\Client\core\CCore.cpp:1282
 msgid "shows the version"
 msgstr "バージョンを表示する"
 
-#: ..\Client\core\CCore.cpp:1335
+#: ..\Client\core\CCore.cpp:1283
 msgid "shows the time"
 msgstr "時間を表示する"
 
-#: ..\Client\core\CCore.cpp:1336
+#: ..\Client\core\CCore.cpp:1284
 msgid "shows the hud"
 msgstr "HUDを表示する"
 
-#: ..\Client\core\CCore.cpp:1337
+#: ..\Client\core\CCore.cpp:1285
 msgid "shows all the binds"
 msgstr "すべてのバインドを表示する"
 
-#: ..\Client\core\CCore.cpp:1338
+#: ..\Client\core\CCore.cpp:1286
 msgid "shows your serial"
 msgstr "シリアル番号を表示する"
 
-#: ..\Client\core\CCore.cpp:1347
+#: ..\Client\core\CCore.cpp:1295
 msgid "connects to a server (host port nick pass)"
 msgstr "サーバーに接続する (ホスト ポート ニックネーム パスワード)"
 
-#: ..\Client\core\CCore.cpp:1348
+#: ..\Client\core\CCore.cpp:1296
 msgid "connects to a previous server"
 msgstr "以前のサーバーに接続する"
 
-#: ..\Client\core\CCore.cpp:1349
+#: ..\Client\core\CCore.cpp:1297
 msgid "binds a key (key control)"
 msgstr "キーをバインドします (キーコントローラ)"
 
-#: ..\Client\core\CCore.cpp:1350
+#: ..\Client\core\CCore.cpp:1298
 msgid "unbinds a key (key)"
 msgstr "キーバインドを削除します (キー)"
 
-#: ..\Client\core\CCore.cpp:1351
+#: ..\Client\core\CCore.cpp:1299
 msgid "copies the default gta controls"
 msgstr "GTA: San Andreasのデフォルトコントロールをコピーする"
 
-#: ..\Client\core\CCore.cpp:1352
+#: ..\Client\core\CCore.cpp:1300
 msgid "outputs a screenshot"
 msgstr "スクリーンショットを出す"
 
-#: ..\Client\core\CCore.cpp:1353
+#: ..\Client\core\CCore.cpp:1301
 msgid "immediately saves the config"
 msgstr "設定をすぐに保存する"
 
-#: ..\Client\core\CCore.cpp:1355
+#: ..\Client\core\CCore.cpp:1303
 msgid "clears the debug view"
 msgstr "デバッグスクリーンを消す"
 
-#: ..\Client\core\CCore.cpp:1356
+#: ..\Client\core\CCore.cpp:1304
 msgid "scrolls the chatbox upwards"
 msgstr "チャットボックスを上にスクロールする"
 
-#: ..\Client\core\CCore.cpp:1357
+#: ..\Client\core\CCore.cpp:1305
 msgid "scrolls the chatbox downwards"
 msgstr "チャットボックスを下にスクロールする"
 
-#: ..\Client\core\CCore.cpp:1358
+#: ..\Client\core\CCore.cpp:1306
 msgid "scrolls the debug view upwards"
 msgstr "デバッグを上にスクロールする"
 
-#: ..\Client\core\CCore.cpp:1359
+#: ..\Client\core\CCore.cpp:1307
 msgid "scrolls the debug view downwards"
 msgstr "デバッグを下にスクロールする"
 
-#: ..\Client\core\CCore.cpp:1362
+#: ..\Client\core\CCore.cpp:1310
 msgid "shows the memory statistics"
 msgstr "メモリデータを表示する"
 
-#: ..\Client\core\CCore.cpp:1363
+#: ..\Client\core\CCore.cpp:1311
 msgid "shows the frame timing graph"
 msgstr "FPSグラフを表示する"
 
@@ -348,15 +346,15 @@ msgstr "プログラミング"
 msgid "Contributors"
 msgstr "寄稿者"
 
-#: ..\Client\core\CCredits.cpp:75
+#: ..\Client\core\CCredits.cpp:76
 msgid "Game Design / Scripting"
 msgstr "ゲームデザイン / スクリプティング"
 
-#: ..\Client\core\CCredits.cpp:95
+#: ..\Client\core\CCredits.cpp:96
 msgid "Language Localization"
 msgstr "言語ローカリゼーション"
 
-#: ..\Client\core\CCredits.cpp:101
+#: ..\Client\core\CCredits.cpp:102
 msgid "Patch contributors"
 msgstr "パッチ協力者"
 
@@ -570,13 +568,20 @@ msgstr "グループコントロール後方"
 msgid "English"
 msgstr "日本語"
 
-#: ..\Client\core\CMainMenu.cpp:316
+#: ..\Client\core\CMainMenu.cpp:315
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr "新機能ブランチを利用しています！これはテストビルドであるため、公共サーバーには接続できません！"
 
-#: ..\Client\core\CMainMenu.cpp:1110
+#: ..\Client\core\CMainMenu.cpp:334
+msgid ""
+"MTA will not receive updates on XP/Vista after July 2019.\n"
+"\n"
+"Upgrade Windows to play on the latest servers."
+msgstr ""
+
+#: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -586,17 +591,17 @@ msgstr ""
 "\n"
 "サーバーから切断に確かですか？"
 
-#: ..\Client\core\CMainMenu.cpp:1114
+#: ..\Client\core\CMainMenu.cpp:1137
 msgid "DISCONNECT WARNING"
 msgstr "切断警告"
 
-#: ..\Client\core\CMainMenu.cpp:1116 ..\Client\core\CQuestionBox.cpp:194
+#: ..\Client\core\CMainMenu.cpp:1139 ..\Client\core\CQuestionBox.cpp:194
 #: ..\Client\core\CSettings.cpp:1316 ..\Client\core\CSettings.cpp:1340
-#: ..\Client\core\CSettings.cpp:4272 ..\Client\core\CSettings.cpp:4321
-#: ..\Client\core\CVersionUpdater.cpp:1568
-#: ..\Client\core\CVersionUpdater.cpp:1586
-#: ..\Client\core\CVersionUpdater.cpp:1855
-#: ..\Client\core\CVersionUpdater.cpp:1874
+#: ..\Client\core\CSettings.cpp:4275 ..\Client\core\CSettings.cpp:4324
+#: ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CVersionUpdater.cpp:1588
+#: ..\Client\core\CVersionUpdater.cpp:1857
+#: ..\Client\core\CVersionUpdater.cpp:1876
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
 #: ..\Client\loader\Dialogs.cpp:32
 msgid "No"
@@ -605,41 +610,21 @@ msgstr "いいえ"
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
 #. /////////////////////////////////////////////////////////////////////////
-#: ..\Client\core\CMainMenu.cpp:1117 ..\Client\core\CQuestionBox.cpp:195
+#: ..\Client\core\CMainMenu.cpp:1140 ..\Client\core\CQuestionBox.cpp:195
 #: ..\Client\core\CSettings.cpp:1317 ..\Client\core\CSettings.cpp:1341
-#: ..\Client\core\CSettings.cpp:4273 ..\Client\core\CSettings.cpp:4322
-#: ..\Client\core\CVersionUpdater.cpp:1569
-#: ..\Client\core\CVersionUpdater.cpp:1587
-#: ..\Client\core\CVersionUpdater.cpp:1856
-#: ..\Client\core\CVersionUpdater.cpp:1875
+#: ..\Client\core\CSettings.cpp:4276 ..\Client\core\CSettings.cpp:4325
+#: ..\Client\core\CVersionUpdater.cpp:1571
+#: ..\Client\core\CVersionUpdater.cpp:1589
+#: ..\Client\core\CVersionUpdater.cpp:1858
+#: ..\Client\core\CVersionUpdater.cpp:1877
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:72 ..\Client\loader\Dialogs.cpp:31
 msgid "Yes"
 msgstr "はい"
 
-#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:621
+#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "この問題についてにオンラインで調べたいですか？"
-
-#: ..\Client\core\CQuickConnect.cpp:142
-msgid "No host specified!"
-msgstr "ホストが指定されていません！"
-
-#: ..\Client\core\CQuickConnect.cpp:151
-msgid "No port specified!"
-msgstr "ポートが指定されていません！"
-
-#: ..\Client\core\CQuickConnect.cpp:156
-msgid "Invalid port specified!"
-msgstr "無効なポートが指定されました！"
-
-#: ..\Client\core\CQuickConnect.cpp:165
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:572
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:664
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "無効なニックネームです！ 設定でニックネームを変更してください！"
 
 #: ..\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
@@ -685,26 +670,26 @@ msgstr "上級"
 
 #. Create buttons
 #. OK button
-#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4446
-#: ..\Client\core\CVersionUpdater.cpp:1604
-#: ..\Client\core\CVersionUpdater.cpp:1820
-#: ..\Client\core\CVersionUpdater.cpp:1913
-#: ..\Client\core\CVersionUpdater.cpp:1935
-#: ..\Client\core\CVersionUpdater.cpp:1953
-#: ..\Client\core\CVersionUpdater.cpp:1965
-#: ..\Client\core\CVersionUpdater.cpp:2117
-#: ..\Client\core\CVersionUpdater.cpp:2126
-#: ..\Client\core\CVersionUpdater.cpp:2135
-#: ..\Client\core\CVersionUpdater.cpp:2149
+#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4449
+#: ..\Client\core\CVersionUpdater.cpp:1606
+#: ..\Client\core\CVersionUpdater.cpp:1822
+#: ..\Client\core\CVersionUpdater.cpp:1915
+#: ..\Client\core\CVersionUpdater.cpp:1937
+#: ..\Client\core\CVersionUpdater.cpp:1955
+#: ..\Client\core\CVersionUpdater.cpp:1967
+#: ..\Client\core\CVersionUpdater.cpp:2119
+#: ..\Client\core\CVersionUpdater.cpp:2128
+#: ..\Client\core\CVersionUpdater.cpp:2137
+#: ..\Client\core\CVersionUpdater.cpp:2151
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
 msgstr "OK"
 
 #. Cancel button
-#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4445
-#: ..\Client\core\CVersionUpdater.cpp:1787
-#: ..\Client\core\CVersionUpdater.cpp:1803
-#: ..\Client\core\CVersionUpdater.cpp:1838
+#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4448
+#: ..\Client\core\CVersionUpdater.cpp:1789
+#: ..\Client\core\CVersionUpdater.cpp:1805
+#: ..\Client\core\CVersionUpdater.cpp:1840
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
@@ -982,7 +967,7 @@ msgid "Medium"
 msgstr "中"
 
 #: ..\Client\core\CSettings.cpp:710 ..\Client\core\CSettings.cpp:1020
-#: ..\Client\core\CSettings.cpp:1444 ..\Client\core\CSettings.cpp:2995
+#: ..\Client\core\CSettings.cpp:1444 ..\Client\core\CSettings.cpp:2998
 msgid "High"
 msgstr "高"
 
@@ -993,8 +978,8 @@ msgstr "最高"
 #: ..\Client\core\CSettings.cpp:726 ..\Client\core\CSettings.cpp:749
 #: ..\Client\core\CSettings.cpp:951 ..\Client\core\CSettings.cpp:1005
 #: ..\Client\core\CSettings.cpp:1136 ..\Client\core\CSettings.cpp:1450
-#: ..\Client\core\CSettings.cpp:3002 ..\Client\core\CSettings.cpp:3034
-#: ..\Client\core\CSettings.cpp:3056 ..\Client\core\CSettings.cpp:4020
+#: ..\Client\core\CSettings.cpp:3005 ..\Client\core\CSettings.cpp:3037
+#: ..\Client\core\CSettings.cpp:3059 ..\Client\core\CSettings.cpp:4023
 msgid "Off"
 msgstr "無効"
 
@@ -1011,7 +996,7 @@ msgid "3x"
 msgstr "3x"
 
 #: ..\Client\core\CSettings.cpp:765 ..\Client\core\CSettings.cpp:953
-#: ..\Client\core\CSettings.cpp:1462 ..\Client\core\CSettings.cpp:3004
+#: ..\Client\core\CSettings.cpp:1462 ..\Client\core\CSettings.cpp:3007
 msgid "Auto"
 msgstr "自動"
 
@@ -1103,49 +1088,49 @@ msgstr "その他"
 
 #. Fast clothes loading
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:944
-#: ..\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Fast CJ clothes loading:"
 msgstr "CJの服を高速読み込み:"
 
 #. Browser scan speed
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:958
-#: ..\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Browser speed:"
 msgstr "ブラウザの速さ:"
 
 #. Single download
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:972
-#: ..\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Single connection:"
 msgstr "単一接続:"
 
 #. Packet tag
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:985
-#: ..\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Packet tag:"
 msgstr "パケットタッグ："
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:998
-#: ..\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Progress animation:"
 msgstr "アニメーション進歩："
 
 #. Process priority
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1011
-#: ..\Client\core\CSettings.cpp:4462
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Process priority:"
 msgstr "プロセス優先度："
 
 #. Debug setting
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1025
-#: ..\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:4477
 msgid "Debug setting:"
 msgstr "デバッグ設定："
 
 #. Streaming memory
 #: ..\Client\core\CSettings.cpp:939 ..\Client\core\CSettings.cpp:1048
-#: ..\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:4479
 msgid "Streaming memory:"
 msgstr "ストリーミングメモリ量："
 
@@ -1160,12 +1145,12 @@ msgid "Install important updates:"
 msgstr "重要なアップデートをインストール："
 
 #: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:980
-#: ..\Client\core\CSettings.cpp:993 ..\Client\core\CSettings.cpp:3006
-#: ..\Client\core\CSettings.cpp:3022 ..\Client\core\CSettings.cpp:3029
+#: ..\Client\core\CSettings.cpp:993 ..\Client\core\CSettings.cpp:3009
+#: ..\Client\core\CSettings.cpp:3025 ..\Client\core\CSettings.cpp:3032
 msgid "On"
 msgstr "つける"
 
-#: ..\Client\core\CSettings.cpp:965 ..\Client\core\CSettings.cpp:3011
+#: ..\Client\core\CSettings.cpp:965 ..\Client\core\CSettings.cpp:3014
 msgid "Very slow"
 msgstr "さらに遅く"
 
@@ -1173,21 +1158,21 @@ msgstr "さらに遅く"
 #: ..\Client\core\CSettings.cpp:992 ..\Client\core\CSettings.cpp:1006
 #: ..\Client\core\CSettings.cpp:1032 ..\Client\core\CSettings.cpp:1044
 #: ..\Client\core\CSettings.cpp:1137 ..\Client\core\CSettings.cpp:1157
-#: ..\Client\core\CSettings.cpp:3013 ..\Client\core\CSettings.cpp:3020
-#: ..\Client\core\CSettings.cpp:3027 ..\Client\core\CSettings.cpp:3036
-#: ..\Client\core\CSettings.cpp:3049
+#: ..\Client\core\CSettings.cpp:3016 ..\Client\core\CSettings.cpp:3023
+#: ..\Client\core\CSettings.cpp:3030 ..\Client\core\CSettings.cpp:3039
+#: ..\Client\core\CSettings.cpp:3052
 msgid "Default"
 msgstr "デフォルト"
 
-#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:3015
+#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:3018
 msgid "Fast"
 msgstr "速い"
 
-#: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2991
+#: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2994
 msgid "Normal"
 msgstr "普通"
 
-#: ..\Client\core\CSettings.cpp:1019 ..\Client\core\CSettings.cpp:2993
+#: ..\Client\core\CSettings.cpp:1019 ..\Client\core\CSettings.cpp:2996
 msgid "Above normal"
 msgstr "良い"
 
@@ -1450,43 +1435,43 @@ msgstr "GTAゲームコントロール"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "ネットゲームコントロール"
 
-#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:4425
+#: ..\Client\core\CSettings.cpp:2824 ..\Client\core\CSettings.cpp:4428
 msgid "Your nickname contains invalid characters!"
 msgstr "ニックネームに無効な文字が含まれています！"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Red:"
 msgstr "R (赤):"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Green:"
 msgstr "G (緑):"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Blue:"
 msgstr "B (青):"
 
-#: ..\Client\core\CSettings.cpp:3564
+#: ..\Client\core\CSettings.cpp:3567
 msgid "Transparency:"
 msgstr "透明:"
 
-#: ..\Client\core\CSettings.cpp:3567
+#: ..\Client\core\CSettings.cpp:3570
 msgid "Color"
 msgstr "色"
 
-#: ..\Client\core\CSettings.cpp:3644
+#: ..\Client\core\CSettings.cpp:3647
 msgid "Preview"
 msgstr "プリビュー"
 
-#: ..\Client\core\CSettings.cpp:3952
+#: ..\Client\core\CSettings.cpp:3955
 msgid "Please disconnect before changing language"
 msgstr "言語を変更する前に、切断してください"
 
-#: ..\Client\core\CSettings.cpp:3980
+#: ..\Client\core\CSettings.cpp:3983
 msgid "Please disconnect before changing skin"
 msgstr "スキンを変更する前に、切断してください"
 
-#: ..\Client\core\CSettings.cpp:4266
+#: ..\Client\core\CSettings.cpp:4269
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1496,11 +1481,11 @@ msgstr ""
 "\n"
 "有効にたしかですか？"
 
-#: ..\Client\core\CSettings.cpp:4270
+#: ..\Client\core\CSettings.cpp:4273
 msgid "PERFORMANCE WARNING"
 msgstr "パフォーマンス警告"
 
-#: ..\Client\core\CSettings.cpp:4290
+#: ..\Client\core\CSettings.cpp:4293
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1510,11 +1495,11 @@ msgstr ""
 "\n"
 "（チャットボックスとGUIがアップロードに除外されています）\n"
 
-#: ..\Client\core\CSettings.cpp:4292
+#: ..\Client\core\CSettings.cpp:4295
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "スクリーンアップロード情報"
 
-#: ..\Client\core\CSettings.cpp:4313
+#: ..\Client\core\CSettings.cpp:4316
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1530,15 +1515,15 @@ msgstr ""
 "\n"
 "利用するに確かですか？"
 
-#: ..\Client\core\CSettings.cpp:4319 ..\Client\core\CVersionUpdater.cpp:2078
+#: ..\Client\core\CSettings.cpp:4322 ..\Client\core\CVersionUpdater.cpp:2080
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "カスタムGTA:SAファイル"
 
-#: ..\Client\core\CSettings.cpp:4443
+#: ..\Client\core\CSettings.cpp:4446
 msgid "Please enter a nickname"
 msgstr "ニックネームを入れてください"
 
-#: ..\Client\core\CSettings.cpp:4444
+#: ..\Client\core\CSettings.cpp:4447
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1546,82 +1531,82 @@ msgstr ""
 "ゲームで利用するニックネームを記入して。  \n"
 "これはサーバーに接続しプレイするニックネームになります"
 
-#: ..\Client\core\CSettings.cpp:4462
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Very experimental feature."
 msgstr "とても実験的な機能"
 
-#: ..\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "CJバリエーション屋台を停止（65MB RAM以上）"
 
-#: ..\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Older routers may require a slower scan speed."
 msgstr "古いルーターは遅いスキャンスピードが必要かも知れません。"
 
-#: ..\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Switch on to use only one connection when downloading."
 msgstr "ダウンロード中に単一接続にスイッチします。"
 
-#: ..\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "ISPがMTAの交通を確認するため、パケットをタッグします。"
 
-#: ..\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "画面の底に回転するサークル"
 
-#: ..\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:4477
 msgid "Select default always. (This setting is not saved)"
 msgstr "いつもデフォルトを選ぶ。（この設定は保存されません）"
 
-#: ..\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:4479
 msgid "Maximum is usually best"
 msgstr "最高は普通に一番良い"
 
-#: ..\Client\core\CSettings.cpp:4478 ..\Client\core\CSettings.cpp:4480
+#: ..\Client\core\CSettings.cpp:4481 ..\Client\core\CSettings.cpp:4483
 msgid "Auto updater:"
 msgstr "自動アップデータ："
 
-#: ..\Client\core\CSettings.cpp:4478
+#: ..\Client\core\CSettings.cpp:4481
 msgid "Select default unless you like filling out bug reports."
 msgstr "バグレポートが得意な人以外、デフォルトを選んでください。"
 
-#: ..\Client\core\CSettings.cpp:4480
+#: ..\Client\core\CSettings.cpp:4483
 msgid "Select default to automatically install important updates."
 msgstr "重要なアップデートをインストールするようにディフォルトを選んでください。"
 
-#: ..\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4485
 msgid "16-bit color:"
 msgstr "16-ビットカラー"
 
-#: ..\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4485
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "16-ビットカラーモードを有効する - MTAを再起動するのが必要です"
 
-#: ..\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4487
 msgid "Mouse fix:"
 msgstr "マウス修正："
 
-#: ..\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4487
 msgid "Mouse movement fix - May need PC restart"
 msgstr "マウス移動修正 - パソコンを再起動するのが必要かもしれません"
 
-#: ..\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Busy"
 msgstr "忙しい"
 
-#: ..\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Can't check for updates right now"
 msgstr "現在、アップデートチェックは出来ません"
 
-#: ..\Client\core\CVersionUpdater.cpp:1564
-#: ..\Client\core\CVersionUpdater.cpp:1584
-#: ..\Client\core\CVersionUpdater.cpp:1602
+#: ..\Client\core\CVersionUpdater.cpp:1566
+#: ..\Client\core\CVersionUpdater.cpp:1586
+#: ..\Client\core\CVersionUpdater.cpp:1604
 #, c-format, c-format
 msgid "MTA:SA %s required"
 msgstr "MTA:SA %s が必要です"
 
-#: ..\Client\core\CVersionUpdater.cpp:1565
+#: ..\Client\core\CVersionUpdater.cpp:1567
 #, c-format, c-format
 msgid ""
 "An updated version of MTA:SA %s is required to join the selected server.\n"
@@ -1632,12 +1617,12 @@ msgstr ""
 "\n"
 "MTA:SA %s をダウンロードして、インストールしますか？"
 
-#: ..\Client\core\CVersionUpdater.cpp:1585
+#: ..\Client\core\CVersionUpdater.cpp:1587
 #, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "MTA:SA %s を実行して、このサーバーに参加しますか？"
 
-#: ..\Client\core\CVersionUpdater.cpp:1603
+#: ..\Client\core\CVersionUpdater.cpp:1605
 msgid ""
 "It is not possible to connect at this time.\n"
 "\n"
@@ -1647,41 +1632,41 @@ msgstr ""
 "\n"
 "後で、もう一回試してみてください。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1785
+#: ..\Client\core\CVersionUpdater.cpp:1787
 msgid "Connecting"
 msgstr "接続中"
 
-#: ..\Client\core\CVersionUpdater.cpp:1786
-#: ..\Client\core\CVersionUpdater.cpp:1802
+#: ..\Client\core\CVersionUpdater.cpp:1788
+#: ..\Client\core\CVersionUpdater.cpp:1804
 msgid "Please wait..."
 msgstr "しばらくお待ちください。。。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1801
+#: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "CHECKING"
 msgstr "チェック中"
 
-#: ..\Client\core\CVersionUpdater.cpp:1818
-#: ..\Client\core\CVersionUpdater.cpp:1911
+#: ..\Client\core\CVersionUpdater.cpp:1820
+#: ..\Client\core\CVersionUpdater.cpp:1913
 msgid "UPDATE CHECK"
 msgstr "アップデートチェック中"
 
-#: ..\Client\core\CVersionUpdater.cpp:1819
+#: ..\Client\core\CVersionUpdater.cpp:1821
 msgid "No update needed"
 msgstr "アップデートする必要はありません"
 
-#: ..\Client\core\CVersionUpdater.cpp:1836
+#: ..\Client\core\CVersionUpdater.cpp:1838
 msgid "DOWNLOADING"
 msgstr "ダウンロード中"
 
-#: ..\Client\core\CVersionUpdater.cpp:1837
+#: ..\Client\core\CVersionUpdater.cpp:1839
 msgid "waiting..."
 msgstr "待機中..."
 
-#: ..\Client\core\CVersionUpdater.cpp:1853
+#: ..\Client\core\CVersionUpdater.cpp:1855
 msgid "MANDATORY UPDATE"
 msgstr "義務的なアップデート"
 
-#: ..\Client\core\CVersionUpdater.cpp:1854
+#: ..\Client\core\CVersionUpdater.cpp:1856
 msgid ""
 "To join this server, you must update MTA.\n"
 "\n"
@@ -1691,11 +1676,11 @@ msgstr ""
 "\n"
 "今にアップデートしますか。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1872
+#: ..\Client\core\CVersionUpdater.cpp:1874
 msgid "OPTIONAL UPDATE"
 msgstr "不要なアップデート"
 
-#: ..\Client\core\CVersionUpdater.cpp:1873
+#: ..\Client\core\CVersionUpdater.cpp:1875
 msgid ""
 "Server says an update is recommended, but not essential.\n"
 "\n"
@@ -1705,7 +1690,7 @@ msgstr ""
 "\n"
 "アップデートしますか？"
 
-#: ..\Client\core\CVersionUpdater.cpp:1912
+#: ..\Client\core\CVersionUpdater.cpp:1914
 msgid ""
 "Update not currently avalable.\n"
 "\n"
@@ -1715,52 +1700,52 @@ msgstr ""
 "\n"
 "「www.mtasa.com 」にチェックしてください。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1933
-#: ..\Client\core\CVersionUpdater.cpp:2115
+#: ..\Client\core\CVersionUpdater.cpp:1935
+#: ..\Client\core\CVersionUpdater.cpp:2117
 msgid "ERROR SAVING"
 msgstr "保存エラー"
 
-#: ..\Client\core\CVersionUpdater.cpp:1934
-#: ..\Client\core\CVersionUpdater.cpp:2116
+#: ..\Client\core\CVersionUpdater.cpp:1936
+#: ..\Client\core\CVersionUpdater.cpp:2118
 msgid "Unable to create the file."
 msgstr "ファイルを作成できません。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1942
-#: ..\Client\core\CVersionUpdater.cpp:1951
-#: ..\Client\core\CVersionUpdater.cpp:2124
-#: ..\Client\core\CVersionUpdater.cpp:2133
+#: ..\Client\core\CVersionUpdater.cpp:1944
+#: ..\Client\core\CVersionUpdater.cpp:1953
+#: ..\Client\core\CVersionUpdater.cpp:2126
+#: ..\Client\core\CVersionUpdater.cpp:2135
 msgid "ERROR DOWNLOADING"
 msgstr "ダウンロードエラー"
 
-#: ..\Client\core\CVersionUpdater.cpp:1943
-#: ..\Client\core\CVersionUpdater.cpp:2125
+#: ..\Client\core\CVersionUpdater.cpp:1945
+#: ..\Client\core\CVersionUpdater.cpp:2127
 msgid "The downloaded file appears to be incorrect."
 msgstr "ダウンロードしたファイルは無効のようです。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1952
-#: ..\Client\core\CVersionUpdater.cpp:2134
+#: ..\Client\core\CVersionUpdater.cpp:1954
+#: ..\Client\core\CVersionUpdater.cpp:2136
 msgid "For some reason."
 msgstr "なんとか。"
 
-#: ..\Client\core\CVersionUpdater.cpp:1963
-#: ..\Client\core\CVersionUpdater.cpp:2147
+#: ..\Client\core\CVersionUpdater.cpp:1965
+#: ..\Client\core\CVersionUpdater.cpp:2149
 msgid "DOWNLOAD COMPLETE"
 msgstr "ダウンロード成功"
 
-#: ..\Client\core\CVersionUpdater.cpp:1987
+#: ..\Client\core\CVersionUpdater.cpp:1989
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "- _DialogUpdateResult に不明なエラー "
 
-#: ..\Client\core\CVersionUpdater.cpp:2085
-#: ..\Client\core\CVersionUpdater.cpp:2095
+#: ..\Client\core\CVersionUpdater.cpp:2087
+#: ..\Client\core\CVersionUpdater.cpp:2097
 msgid "Ok"
 msgstr "OK"
 
-#: ..\Client\core\CVersionUpdater.cpp:2093
+#: ..\Client\core\CVersionUpdater.cpp:2095
 msgid "ERROR"
 msgstr "エラー"
 
-#: ..\Client\core\CVersionUpdater.cpp:2094
+#: ..\Client\core\CVersionUpdater.cpp:2096
 msgid ""
 "Some MTA:SA data files are missing.\n"
 "\n"
@@ -1772,12 +1757,12 @@ msgstr ""
 "\n"
 "MTA:SAを再インストールしてください"
 
-#: ..\Client\core\CVersionUpdater.cpp:2721
+#: ..\Client\core\CVersionUpdater.cpp:2723
 #, c-format, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% 完了"
 
-#: ..\Client\core\CVersionUpdater.cpp:2723
+#: ..\Client\core\CVersionUpdater.cpp:2725
 #, c-format, c-format
 msgid ""
 "\n"
@@ -1861,8 +1846,8 @@ msgstr "お気に入りに追加"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:254
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:302
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:362
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:301
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:361
 msgid "Connect"
 msgstr "接続する"
 
@@ -1891,70 +1876,69 @@ msgstr "検索開始"
 msgid "Search players..."
 msgstr "プレイヤー検索。。。"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:300
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:412
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:411
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1614
 msgid "Search servers..."
 msgstr "サーバーを検索する…"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:442
 msgid "Name"
 msgstr "名前"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
 msgid "Players"
 msgstr "プレイヤー"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
 msgid "Ping"
 msgstr "レイテンシ"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:446
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
 msgid "Gamemode"
 msgstr "ゲームモード"
 
 #. Player List Columns
 #. Column for player names
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:468
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:467
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:138
 msgid "Player list"
 msgstr "プレイヤーリスト"
 
 #. Include label
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:476
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:475
 msgid "Include:"
 msgstr "含む:"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:482
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:481
 msgid "Empty"
 msgstr "空"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:488
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:487
 msgid "Full"
 msgstr "満杯"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:494
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:493
 msgid "Locked"
 msgstr "ロック中"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:506
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:505
 msgid "Offline"
 msgstr "オフライン"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:519
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:518
 msgid "Other Versions"
 msgstr "他のバージョン"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:540
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:539
 msgid "Back"
 msgstr "戻る"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:546
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:545
 #: ..\Client\loader\Dialogs.cpp:35
 msgid "Help"
 msgstr "ヘルプ"
 
-#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:729
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:728
 msgid "Loading..."
 msgstr "読み込み中。。。"
 
@@ -1975,6 +1959,13 @@ msgstr "不明なプロトコル"
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
 msgid "Please use the mtasa:// protocol!"
 msgstr "「mtasa://」プロトコルを利用してください！"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:668
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "無効なニックネームです！ 設定でニックネームを変更してください！"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
@@ -2373,7 +2364,7 @@ msgstr "Grand Theft Auto San Andreas をスタートしてください"
 msgid "Installing update..."
 msgstr "アップデートインストール中。。。"
 
-#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:287
+#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:290
 msgid "Extracting files..."
 msgstr "ファイルを抽出中。。。"
 
@@ -2846,59 +2837,59 @@ msgstr "（デベロップメントモード）コリジョン形を表示する
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "（デベロップメントモード）世界音IDをデバッグウインドウに表示する"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:588
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:592
 msgid "Entering the game ..."
 msgstr "参加中。。。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:640
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:644
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr "接続していません；「クイックコネクト」や「connect」コマンドを利用して、サーバーに参加してください。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:686
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:690
 msgid "The server is not installed"
 msgstr "サーバーはインストールしていません"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:696
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1071
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:700
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1075
 msgid "Local Server"
 msgstr "ローカルサーバー"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:696
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:700
 msgid "Starting local server ..."
 msgstr "ローカルサーバーを実行しています。。。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1002
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1006
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "ゲームからキックされました （理由： %s）"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1071
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1075
 msgid "Connecting to local server..."
 msgstr "ローカルサーバーに接続中..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1082
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1086
 msgid "Error connecting to server."
 msgstr "サーバー接続エラー。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1092
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1096
 msgid "Connecting to local server timed out. See console for details."
 msgstr "ローカルサーバの接続がタイムアウトしてしまいました。情報はコンソールにあります。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1195
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1199
 msgid "Connection with the server was lost"
 msgstr "サーバーとの接続が失われてしまいました"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1222
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1226
 msgid "Disconnected: the server is currently full"
 msgstr "切断：サーバーは現在満ちています"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1234
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1238
 msgid "Disconnected: invalid password specified"
 msgstr "切断：パスワードは無効です。"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1256
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1260
 msgid "MTA Client verification failed!"
 msgstr "MTAクライアント確認失敗！"
 
@@ -3213,15 +3204,15 @@ msgid "Connection error"
 msgstr "接続エラー"
 
 #. Couldn't create render target for CPostEffects
-#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1378
+#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1380
 msgid "Problem with graphics driver"
 msgstr "グラフィックドライバと問題があります"
 
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Autoは正しくインストールできませんでした。再インストールしてください。"
 
-#: ..\Shared\sdk\SharedUtil.Misc.hpp:635
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:705
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
@@ -3230,6 +3221,15 @@ msgstr ""
 "ブラウザは情報のあるウェッブページを表す。\n"
 "\n"
 "（ページのロード失敗したら、URLをブラウザにペーストしてください（CTRL-V））"
+
+#~ msgid "No host specified!"
+#~ msgstr "ホストが指定されていません！"
+
+#~ msgid "No port specified!"
+#~ msgstr "ポートが指定されていません！"
+
+#~ msgid "Invalid port specified!"
+#~ msgstr "無効なポートが指定されました！"
 
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
 #~ msgstr "接続構文：'connect <host> <port> [<nick> <pass>]'"

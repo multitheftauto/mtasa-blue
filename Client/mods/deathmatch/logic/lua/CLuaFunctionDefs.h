@@ -51,7 +51,6 @@ public:
     LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
-    LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
     LUA_DECLARE(ClearChatBox);
 
@@ -213,6 +212,7 @@ public:
 
     // L10n
     LUA_DECLARE(GetLocalization);
+    LUA_DECLARE(GetKeyboardLayout);
 
     // Voice functions
     LUA_DECLARE(IsVoiceEnabled);

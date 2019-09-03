@@ -23,6 +23,8 @@ public:
     void DestroyTrayIcon();
     bool CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound);
 
+    static LRESULT CALLBACK ProcessNotificationsWindowMessage(HWND hwnd, UINT uMsg, WPARAM wPAram, LPARAM lParam);
+
 private:
     NOTIFYICONDATAW* m_pNID;
     bool             m_bTrayIconExists;

@@ -479,7 +479,7 @@ public:
         ReadNumber(color);
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //
@@ -491,7 +491,7 @@ public:
         ReadNumber(color, static_cast<lua_Number>(defaultValue));
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //
@@ -1039,7 +1039,8 @@ protected:
                 SStringMapValue value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
                 {
-                    value = (lua_tostring(m_luaVM, -1));
+                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    value.assign(lua_tostring(m_luaVM, -1), uiLength);
                 }
                 else if (valueType == LUA_TBOOLEAN)
                 {

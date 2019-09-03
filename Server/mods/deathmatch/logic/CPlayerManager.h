@@ -56,7 +56,7 @@ public:
 
     void           ResetAll();
     void           OnPlayerJoin(CPlayer* pPlayer);
-    const SString& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
+    const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
 
 private:
     void AddToList(CPlayer* pPlayer);
@@ -66,6 +66,6 @@ private:
 
     CMappedList<CPlayer*>                 m_Players;
     std::map<NetServerPlayerID, CPlayer*> m_SocketPlayerMap;
-    SString                               m_strLowestConnectedPlayerVersion;
+    CMtaVersion                           m_strLowestConnectedPlayerVersion;
     CElapsedTime                          m_ZombieCheckTimer;
 };

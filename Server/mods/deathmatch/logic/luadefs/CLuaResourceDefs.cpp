@@ -492,7 +492,7 @@ int CLuaResourceDefs::startResource(lua_State* luaVM)
         // In the event 'onResourcePreStart' the resource will be in the 'starting' state
         // and in the event 'onResourceStart' the resource is already in the 'running' state
         // and you can't force-start resources in the 'stopping' state
-        lua_pushboolean(luaVM, true);
+        lua_pushboolean(luaVM, false);
     }
     else if (pResource->IsLoaded())
     {
@@ -577,9 +577,11 @@ int CLuaResourceDefs::stopResource(lua_State* luaVM)
 
         // Schedule it for a stop
         m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_STOP, nullptr);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
-    lua_pushboolean(luaVM, true);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
