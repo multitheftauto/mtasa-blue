@@ -79,16 +79,19 @@ public:
     void SetRotation(CVector& rot);
     void SetScale(CVector& scale);
     void SetDrawDistance(float fDrawDistance);
+    void SetCullMode(eCullMode cullMode);
     void GetPosition(CVector& pos);
     void GetRotation(CVector& rot);
     void GetScale(CVector& scale);
     void GetDrawDistance(float& fDrawDistance);
+    void GetCullMode(eCullMode& cullMode);
 
     CMatrix* pViewMatrix;
 
     D3DMATERIAL9 material;
     D3DLIGHT9    light;
     float        fDrawDistance = 500.0f;
+    eCullMode    cullMode = (eCullMode)2;
 };
 
 class CFBXTemplate
@@ -165,6 +168,8 @@ public:
     void SetTemplateDrawDistance(unsigned int uiTemplateId, float drawDistance);
     void GetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fDrawDistance);
     void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance);
+    void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode);
+    void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode);
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
 

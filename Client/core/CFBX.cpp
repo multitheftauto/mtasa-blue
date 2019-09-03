@@ -115,7 +115,6 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
     pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
     pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
-    pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);            // double side
     pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 
     pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
@@ -154,6 +153,8 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
             if (((vecTemplatePosition + vecTemplateObjectPosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
             {
+                pDevice->SetRenderState(D3DRS_CULLMODE, object.second->cullMode);
+
                 for (auto const& pBuffer : pObjectBuffer->bufferList)
                 {
                     if (pBuffer->ullMaterialId != 0)
@@ -309,6 +310,16 @@ void CFBXTemplateObject::GetScale(CVector& scale)
 void CFBXTemplateObject::GetDrawDistance(float& fDrawDistance)
 {
     fDrawDistance = this->fDrawDistance;
+}
+
+void CFBXTemplateObject::GetCullMode(eCullMode& cullMode)
+{
+    cullMode = this->cullMode;
+}
+
+void CFBXTemplateObject::SetCullMode(eCullMode cullMode)
+{
+    this->cullMode = cullMode;
 }
 
 unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
@@ -856,6 +867,20 @@ void CFBXScene::SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned
     CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
     CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
     pTemplateObject->SetDrawDistance(fDrawDistance);
+}
+
+void CFBXScene::SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetCullMode(cullMode);
+}
+
+void CFBXScene::GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetCullMode(cullMode);
 }
 
 CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)

@@ -13,6 +13,7 @@
 class CFBXScene;
 class SString;
 class CClientFBXInterface;
+enum eCullMode;
 
 namespace ofbx
 {
@@ -59,6 +60,8 @@ public:
     virtual void SetTemplateDrawDistance(unsigned int uiTemplateId, float drawDistance) = 0;
     virtual void GetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fDrawDistance) = 0;
     virtual void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance) = 0;
+    virtual void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode) = 0;
+    virtual void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode) = 0;
 
     virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;

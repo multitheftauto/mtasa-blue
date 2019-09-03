@@ -211,8 +211,9 @@ bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int ui
         return false;
     }
 
-    CVector vector;
-    float   distance;
+    CVector   vector;
+    float     distance;
+    eCullMode cullMode;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -258,6 +259,22 @@ bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int ui
             m_pFBXScene->GetTemplateModelDrawDistance(uiId, uiModelId, distance);
             lua_pushnumber(luaVM, distance);
             break;
+        case FBX_TEMPLATE_MODEL_PROPERTY_CULL_MODE:
+            m_pFBXScene->GetTemplateModelCullMode(uiId, uiModelId, cullMode);
+            switch (cullMode)
+            {
+                case CULL_BOTH:
+                    lua_pushstring(luaVM, "both");
+                    break;
+                case CULL_INSIDE:
+                    lua_pushstring(luaVM, "inside");
+                    break;
+                case CULL_OUTSIDE:
+                    lua_pushstring(luaVM, "outside");
+                    break;
+
+            }
+            break;
     }
     return true;
 }
@@ -270,8 +287,9 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
         return false;
     }
 
-    CVector vector;
-    float   distance;
+    CVector   vector;
+    float     distance;
+    eCullMode cullMode;
     switch (eProperty)
     {
         case FBX_TEMPLATE_MODEL_PROPERTY_POSITION:
@@ -297,6 +315,11 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
                 return false;
             m_pFBXScene->SetTemplateModelDrawDistance(uiId, uiModelId, distance);
             break;
+        case FBX_TEMPLATE_MODEL_PROPERTY_CULL_MODE:
+            argStream.ReadEnumString(cullMode);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelCullMode(uiId, uiModelId, cullMode);
     }
     return true;
 }
@@ -501,10 +524,10 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
             switch (eType)
             {
                 case ofbx::Object::Type::GEOMETRY:
-                    m_pFBXScene->GetBoundingBox((*pObject)->id,min, max, radius);
+                    m_pFBXScene->GetBoundingBox((*pObject)->id, min, max, radius);
                     lua_newtable(luaVM);
                     lua_pushnumber(luaVM, 1);
-                    
+
                     lua_newtable(luaVM);
                     lua_pushnumber(luaVM, 1);
                     lua_pushnumber(luaVM, min.fX);
