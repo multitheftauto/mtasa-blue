@@ -356,7 +356,7 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
         CSphere sphere = pSound->GetWorldBoundingSphere();
         float   fDistance = (vecListenerPosition - sphere.vecPosition).Length() - sphere.fRadius;
 
-        if ((fDistance > 40 || m_usDimension != pSound->GetDimension() && MapContains(m_DistanceStreamedInMap, pSound)))
+        if ((fDistance > 40 || m_usDimension != pSound->GetDimension()) && MapContains(m_DistanceStreamedInMap, pSound))
             pSound->DistanceStreamOut();
         else if (fDistance < 20) 
             pSound->DistanceStreamIn();
