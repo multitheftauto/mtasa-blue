@@ -5152,7 +5152,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed
 CTrainTrack* CStaticFunctionDefinitions::GetTrainTrack(CVehicle* pVehicle)
 {
     assert(pVehicle);
-    
+
     if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return nullptr;
     else if (pVehicle->IsDerailed())
@@ -11955,9 +11955,9 @@ CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, 
     }
 
     // Create track
-    auto pTrainTrack = pTrainTrackManager->CreateTrainTrack(trackNodes, linkLastNodes, pResource->GetDynamicElementRoot(), nullptr);
+    auto pTrainTrack = pTrainTrackManager->CreateTrainTrack(trackNodes, linkLastNodes, pResource->GetDynamicElementRoot());
 
-    if (pResource->HasStarted())
+    if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
         Packet.Add(pTrainTrack);

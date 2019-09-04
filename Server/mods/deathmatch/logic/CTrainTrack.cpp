@@ -11,8 +11,8 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, uchar defaultTrackId)
-    : CElement(pParent, pNode), m_pManager(pManager)
+CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
+    : CElement(pParent), m_pManager(pManager)
 {
     m_iType = CElement::TRAINTRACK;
     SetTypeName("train-track");

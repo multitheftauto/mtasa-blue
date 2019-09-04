@@ -32,7 +32,7 @@ struct STrackNode
 class CTrainTrack : public CElement
 {
 public:
-    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, uchar defaultTrackId = 0xFF);
+    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
     // TODO: Add move constructor
     virtual ~CTrainTrack();
 
@@ -49,8 +49,8 @@ public:
     inline uchar GetDefaultTrackId() { return m_DefaultTrackId; }
 
     // CClientEntity methods
-    virtual void Unlink() override {}
-    virtual bool ReadSpecialData() override { return false; }
+    virtual void Unlink() override {} // todo(qaisjp): should this be defined?
+    bool ReadSpecialData(const int iLine) override { return false; }
 
 private:
     CTrainTrackManager* m_pManager;
