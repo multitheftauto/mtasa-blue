@@ -20,8 +20,9 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
-CModelInfoSA::CModelInfoSA(void)
+CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
     this->m_dwModelID = 0xFFFFFFFF;
@@ -45,7 +46,7 @@ CModelInfoSA::CModelInfoSA(DWORD dwModelID)
     m_bAddedRefForCollision = false;
 }
 
-CBaseModelInfoSAInterface* CModelInfoSA::GetInterface(void)
+CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 {
     return m_pInterface = ppModelInfo[m_dwModelID];
 }
@@ -255,7 +256,7 @@ bool CModelInfoSA::IsPlayerModel()
             (m_dwModelID >= 274 && m_dwModelID <= 288) || (m_dwModelID >= 290 && m_dwModelID <= 312));
 }
 
-BOOL CModelInfoSA::IsUpgrade(void)
+BOOL CModelInfoSA::IsUpgrade()
 {
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
 }
@@ -297,7 +298,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     //  return NULL;
 }
 
-uint CModelInfoSA::GetAnimFileIndex(void)
+uint CModelInfoSA::GetAnimFileIndex()
 {
     DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -624,7 +625,7 @@ void CModelInfoSA::RestreamIPL()
         MapSet(ms_RestreamTxdIDMap, GetTextureDictionaryID(), 0);
 }
 
-void CModelInfoSA::StaticFlushPendingRestreamIPL(void)
+void CModelInfoSA::StaticFlushPendingRestreamIPL()
 {
     if (ms_RestreamTxdIDMap.empty())
         return;
@@ -889,7 +890,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     else szStoredText[0] = 0;
 }
 
-unsigned int CModelInfoSA::GetNumRemaps(void)
+unsigned int CModelInfoSA::GetNumRemaps()
 {
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
@@ -904,7 +905,7 @@ unsigned int CModelInfoSA::GetNumRemaps(void)
     return uiReturn;
 }
 
-void* CModelInfoSA::GetVehicleSuspensionData(void)
+void* CModelInfoSA::GetVehicleSuspensionData()
 {
     return GetInterface()->pColModel->pColData->pSuspensionLines;
 }
@@ -955,6 +956,8 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
         ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
+        // Increment this model references count, so we don't unload it before we have a chance to reset the positions
+        m_pInterface->usNumberOfRefs++;
     }
 
     if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
@@ -973,9 +976,13 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
-            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+            // TODO: Find out why this is a nullptr, and fix underlying bug
+            if (pVehicleModel->pVisualInfo != nullptr)
+                pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
         ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
+        // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
+        info.first->usNumberOfRefs--;
     }
     ms_ModelDefaultDummiesPosition.clear();
 }
@@ -1008,7 +1015,7 @@ void CModelInfoSA::SetCustomModel(RpClump* pClump)
     }
 }
 
-void CModelInfoSA::RestoreOriginalModel(void)
+void CModelInfoSA::RestoreOriginalModel()
 {
     // Are we loaded?
     if (IsLoaded())
@@ -1095,7 +1102,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
     }
 }
 
-void CModelInfoSA::RestoreColModel(void)
+void CModelInfoSA::RestoreColModel()
 {
     // Are we loaded?
     m_pInterface = ppModelInfo[m_dwModelID];
@@ -1141,7 +1148,7 @@ void CModelInfoSA::RestoreColModel(void)
     }
 }
 
-void CModelInfoSA::MakeCustomModel(void)
+void CModelInfoSA::MakeCustomModel()
 {
     // We have a custom model?
     if (m_pCustomClump)
@@ -1251,7 +1258,7 @@ void _declspec(naked) HOOK_NodeNameStreamRead()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CModelInfoSA::StaticSetHooks(void)
+void CModelInfoSA::StaticSetHooks()
 {
     EZHookInstall(NodeNameStreamRead);
 }
@@ -1362,14 +1369,54 @@ void CModelInfoSA::InitialiseSupportedUpgrades(RpClump* pClump)
     m_ModelSupportedUpgrades.m_bInitialised = true;
 }
 
-void CModelInfoSA::ResetSupportedUpgrades(void)
+void CModelInfoSA::ResetSupportedUpgrades()
 {
     m_ModelSupportedUpgrades.Reset();
 }
 
-eModelInfoType CModelInfoSA::GetModelType(void)
+void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 {
-    return ((eModelInfoType(*)(void))m_pInterface->VFTBL->GetModelType)();
+    unsigned short usOrgGroup = GetObjectPropertiesGroup();
+    if (usOrgGroup == usNewGroup)
+        return;
+
+    if (!MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID))
+        MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, usOrgGroup);
+
+    GetInterface()->usDynamicIndex = usNewGroup;
+}
+
+unsigned short CModelInfoSA::GetObjectPropertiesGroup()
+{
+    unsigned short usGroup = GetInterface()->usDynamicIndex;
+    if (usGroup == 0xFFFF)
+        usGroup = 0;
+
+    return usGroup;
+}
+
+void CModelInfoSA::RestoreObjectPropertiesGroup()
+{
+    unsigned short* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    if (usGroupInMap)
+    {
+        GetInterface()->usDynamicIndex = *usGroupInMap;
+        MapRemove(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    }
+}
+
+void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
+{
+    for (const auto& pair : ms_OriginalObjectPropertiesGroups)
+    {
+        pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
+    }
+    ms_OriginalObjectPropertiesGroups.clear();
+}
+
+eModelInfoType CModelInfoSA::GetModelType()
+{
+    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1389,7 +1436,7 @@ eModelInfoType CModelInfoSA::GetModelType(void)
 // Returns true if model was unloaded
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool CModelInfoSA::ForceUnload(void)
+bool CModelInfoSA::ForceUnload()
 {
     CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
 

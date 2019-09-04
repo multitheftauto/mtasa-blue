@@ -27,7 +27,7 @@ public:
     void ApplyHook(HWND hFocusWindow);
     void RemoveHook();
     HWND GetHookedWindowHandle() const;
-    void MaybeRefreshMsgQueue(void);
+    void MaybeRefreshMsgQueue();
     void SetRefreshMsgQueueEnabled(bool bEnable);
     void StartWindowMovement();
 

@@ -16,7 +16,7 @@ typedef std::vector<long long>                            JoinTimesMap;
 
 struct CConnectHistoryItem
 {
-    CConnectHistoryItem(void) : llBanEndTime(0) {}
+    CConnectHistoryItem() : llBanEndTime(0) {}
     long long    llBanEndTime;
     JoinTimesMap joinTimes;
 };
@@ -30,12 +30,12 @@ public:
     bool                 AddConnect(const std::string& strIP);
     bool                 IsFlooding(const std::string& strIP);
     CConnectHistoryItem& GetHistoryItem(const std::string& strIP);
-    uint                 GetTotalFloodingCount(void);
+    uint                 GetTotalFloodingCount();
     SString              DebugDump(long long llTickCountAdd);
 
 private:
-    void      RemoveExpired(void);
-    long long GetModuleTickCount64(void);
+    void      RemoveExpired();
+    long long GetModuleTickCount64();
 
     unsigned long  m_ulSamplePeriod;
     unsigned long  m_ulMaxConnections;

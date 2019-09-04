@@ -17,9 +17,8 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(bool m_bZTest, CGraphics* graphics)
+CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(CGraphics* graphics)
 {
-    m_bZTest = m_bZTest;
     m_pGraphics = graphics;
 }
 ////////////////////////////////////////////////////////////////
@@ -29,7 +28,7 @@ CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(bool m_bZTest, CGraphics* g
 //
 //
 ////////////////////////////////////////////////////////////////
-CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher(void)
+CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 {
 }
 ////////////////////////////////////////////////////////////////
@@ -93,31 +92,15 @@ void CPrimitiveMaterialBatcher::UpdateMatrices(float fViewportSizeX, float fView
 }
 ////////////////////////////////////////////////////////////////
 //
-// CPrimitiveMaterialBatcher::Flush
+// CPrimitiveMaterialBatcher::SetDeviceStates
 //
-// Send all buffered vertices to D3D
+//
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveMaterialBatcher::Flush(void)
+void CPrimitiveMaterialBatcher::SetDeviceStates()
 {
-    if (m_primitiveList.empty())
-        return;
-
-    // Save render states
-    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
-    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
-    // Set transformations
-    D3DXMATRIX matWorld;
-    D3DXMatrixIdentity(&matWorld);
-    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
-    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
-
-    // Set vertex FVF
-    m_pDevice->SetFVF(PrimitiveMaterialVertice::FNV);
-
     // Set states
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bZTest ? D3DZB_TRUE : D3DZB_FALSE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -137,20 +120,46 @@ void CPrimitiveMaterialBatcher::Flush(void)
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+}
+////////////////////////////////////////////////////////////////
+//
+// CPrimitiveMaterialBatcher::Flush
+//
+// Send all buffered vertices to D3D
+//
+////////////////////////////////////////////////////////////////
+void CPrimitiveMaterialBatcher::Flush()
+{
+    if (m_primitiveList.empty())
+        return;
+
+    // Save render states
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
+    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+    // Set transformations
+    D3DXMATRIX matWorld;
+    D3DXMatrixIdentity(&matWorld);
+    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
+    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
+    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+
+    // Set vertex FVF
+    m_pDevice->SetFVF(PrimitiveMaterialVertice::FNV);
+
+    // Set device states
+    SetDeviceStates();
 
     // Draw
     m_pDevice->SetTexture(0, nullptr);
     // Cache last used material, so we don't set directx parameters needlessly
     CMaterialItem* pLastMaterial = nullptr;
 
-    for (uint i = 0; i < m_primitiveList.size(); i++)
+    for (auto& primitive : m_primitiveList)
     {
-        sDrawQueuePrimitiveMaterial primitive = m_primitiveList[i];
-        // uint PrimitiveCount = m_triangleList.size () / 3;
-        const void* pVertexStreamZeroData = &primitive.vertices[0];
+        const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
         uint        uiVertexStreamZeroStride = sizeof(PrimitiveMaterialVertice);
 
-        CMaterialItem* pMaterial = primitive.material;
+        CMaterialItem* pMaterial = primitive.pMaterial;
         if (pMaterial != pLastMaterial)
         {
             // Set texture addressing mode
@@ -169,7 +178,7 @@ void CPrimitiveMaterialBatcher::Flush(void)
                 m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
             }
 
-            DrawPrimitive(primitive.type, primitive.vertices.size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
+            DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
         }
         else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
         {
@@ -194,7 +203,7 @@ void CPrimitiveMaterialBatcher::Flush(void)
             for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
             {
                 pD3DEffect->BeginPass(uiPass);
-                DrawPrimitive(primitive.type, primitive.vertices.size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
+                DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
                 pD3DEffect->EndPass();
             }
             pShaderInstance->m_pEffectWrap->End();
@@ -260,6 +269,11 @@ void CPrimitiveMaterialBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCo
 void CPrimitiveMaterialBatcher::ClearQueue()
 {
     // Clean up
+    for (auto& primitive : m_primitiveList)
+    {
+        delete primitive.pVecVertices;
+    }
+
     size_t prevSize = m_primitiveList.size();
     m_primitiveList.clear();
     m_primitiveList.reserve(prevSize);
@@ -271,7 +285,7 @@ void CPrimitiveMaterialBatcher::ClearQueue()
 // Add a new primitive to the list
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveMaterialBatcher::AddPrimitive(sDrawQueuePrimitiveMaterial primitive)
+void CPrimitiveMaterialBatcher::AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices)
 {
-    m_primitiveList.push_back(primitive);
+    m_primitiveList.push_back({eType, pMaterial, pVecVertices});
 }

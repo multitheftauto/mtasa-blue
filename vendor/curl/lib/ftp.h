@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -102,9 +102,10 @@ typedef enum {
    perhaps the Curl_easy is changed between the times the connection is
    used. */
 struct FTP {
-  curl_off_t *bytecountp;
   char *user;    /* user name string */
   char *passwd;  /* password string */
+  char *path;    /* points to the urlpieces struct field */
+  char *pathalloc; /* if non-NULL a pointer to an allocated path */
 
   /* transfer a file/body or not, done as a typedefed enum just to make
      debuggers display the full symbol and not just the numerical value */

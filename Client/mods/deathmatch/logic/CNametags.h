@@ -22,22 +22,22 @@ class CNametags
 {
 public:
     CNametags(CClientManager* pManager);
-    ~CNametags(void);
+    ~CNametags();
 
-    bool GetDrawHealth(void) { return m_bDrawHealth; };
+    bool GetDrawHealth() { return m_bDrawHealth; };
     void SetDrawHealth(bool bDrawHealth) { m_bDrawHealth = bDrawHealth; };
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void DrawFromAim(void);
-    void DrawDefault(void);
+    void DrawFromAim();
+    void DrawDefault();
 
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
-    unsigned int GetDimension(void) { return m_usDimension; }
+    unsigned int GetDimension() { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
-    bool IsVisible(void) { return m_bVisible; }
+    bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
 private:

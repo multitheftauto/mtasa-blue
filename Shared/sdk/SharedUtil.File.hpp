@@ -86,12 +86,34 @@ bool SharedUtil::FileDelete(const SString& strFilename, bool bForce)
     return File::Delete(strFilename) == 0;
 }
 
-bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFilenameNew)
+bool SharedUtil::FileRename(const SString& strFilenameOld, const SString& strFilenameNew, int* pOutErrorCode)
 {
 #ifdef WIN32
-    return MoveFile(strFilenameOld, strFilenameNew) != 0;
+    if (MoveFileExW(FromUTF8(strFilenameOld), FromUTF8(strFilenameNew), MOVEFILE_COPY_ALLOWED) == 0)
+    {
+        int errorCode = GetLastError();
+        if (errorCode == ERROR_ACCESS_DENIED)
+        {
+            // Try alternate rename strategy
+            if (!FileExists(strFilenameNew) && FileCopy(strFilenameOld, strFilenameNew))
+            {
+                FileDelete(strFilenameOld);
+                return true;
+            }
+        }
+        if (pOutErrorCode)
+            *pOutErrorCode = errorCode;
+        return false;
+    }
+    return true;
 #else
-    return rename(strFilenameOld, strFilenameNew) == 0;
+    if (rename(strFilenameOld, strFilenameNew) != 0)
+    {
+        if (pOutErrorCode)
+            *pOutErrorCode = errno;
+        return false;
+    }
+    return true;
 #endif
 }
 
@@ -284,7 +306,7 @@ SString SharedUtil::PathMakeRelative(const SString& strInBasePath, const SString
     return strAbsPath;
 }
 
-SString SharedUtil::GetSystemCurrentDirectory(void)
+SString SharedUtil::GetSystemCurrentDirectory()
 {
 #ifdef WIN32
     wchar_t szResult[1024] = L"";
@@ -302,7 +324,7 @@ SString SharedUtil::GetSystemCurrentDirectory(void)
 #ifdef WIN32
 #ifdef MTA_CLIENT
 
-SString SharedUtil::GetSystemDllDirectory(void)
+SString SharedUtil::GetSystemDllDirectory()
 {
     wchar_t szResult[1024] = L"";
     GetDllDirectoryW(NUMELMS(szResult), szResult);
@@ -311,7 +333,7 @@ SString SharedUtil::GetSystemDllDirectory(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemLocalAppDataPath(void)
+SString SharedUtil::GetSystemLocalAppDataPath()
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult);
@@ -320,7 +342,7 @@ SString SharedUtil::GetSystemLocalAppDataPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemCommonAppDataPath(void)
+SString SharedUtil::GetSystemCommonAppDataPath()
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW(NULL, CSIDL_COMMON_APPDATA, NULL, 0, szResult);
@@ -329,7 +351,7 @@ SString SharedUtil::GetSystemCommonAppDataPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemPersonalPath(void)
+SString SharedUtil::GetSystemPersonalPath()
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, szResult);
@@ -338,7 +360,7 @@ SString SharedUtil::GetSystemPersonalPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemWindowsPath(void)
+SString SharedUtil::GetSystemWindowsPath()
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW(NULL, CSIDL_WINDOWS, NULL, 0, szResult);
@@ -347,7 +369,7 @@ SString SharedUtil::GetSystemWindowsPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemSystemPath(void)
+SString SharedUtil::GetSystemSystemPath()
 {
     wchar_t szResult[MAX_PATH] = L"";
     SHGetFolderPathW(NULL, CSIDL_SYSTEM, NULL, 0, szResult);
@@ -356,7 +378,7 @@ SString SharedUtil::GetSystemSystemPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetSystemTempPath(void)
+SString SharedUtil::GetSystemTempPath()
 {
     wchar_t szResult[4030] = L"";
     GetTempPathW(4000, szResult);
@@ -365,23 +387,23 @@ SString SharedUtil::GetSystemTempPath(void)
     return ToUTF8(szResult);
 }
 
-SString SharedUtil::GetMTADataPath(void)
+SString SharedUtil::GetMTADataPath()
 {
     return PathJoin(GetSystemCommonAppDataPath(), GetProductCommonDataDir(), GetMajorVersionString());
 }
 
-SString SharedUtil::GetMTADataPathCommon(void)
+SString SharedUtil::GetMTADataPathCommon()
 {
     return PathJoin(GetSystemCommonAppDataPath(), GetProductCommonDataDir(), "Common");
 }
 
-SString SharedUtil::GetMTATempPath(void)
+SString SharedUtil::GetMTATempPath()
 {
     return PathJoin(GetSystemTempPath(), "MTA" + GetMajorVersionString());
 }
 
 // C:\Program Files\gta_sa.exe
-SString SharedUtil::GetLaunchPathFilename(void)
+SString SharedUtil::GetLaunchPathFilename()
 {
     static SString strLaunchPathFilename;
     if (strLaunchPathFilename.empty())
@@ -398,13 +420,13 @@ SString SharedUtil::GetLaunchPathFilename(void)
 }
 
 // C:\Program Files
-SString SharedUtil::GetLaunchPath(void)
+SString SharedUtil::GetLaunchPath()
 {
     return ExtractPath(GetLaunchPathFilename());
 }
 
 // gta_sa.exe
-SString SharedUtil::GetLaunchFilename(void)
+SString SharedUtil::GetLaunchFilename()
 {
     return ExtractFilename(GetLaunchPathFilename());
 }
@@ -522,7 +544,7 @@ bool SharedUtil::DelTree(const SString& strPath, const SString& strInsideHere)
     sfos.wFunc = FO_DELETE;
     sfos.pFrom = szBuffer;            // Double NULL terminated
     sfos.pTo = NULL;
-    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_ALLOWUNDO;
+    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
 
     int status = SHFileOperationW(&sfos);
     return status == 0;

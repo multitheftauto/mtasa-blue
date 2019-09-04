@@ -610,7 +610,8 @@ static CURLcode smb_send_and_recv(struct connectdata *conn, void **msg)
 
   /* Check if there is data in the transfer buffer */
   if(!smbc->send_size && smbc->upload_size) {
-    size_t nread = smbc->upload_size > UPLOAD_BUFSIZE ? UPLOAD_BUFSIZE :
+    size_t nread = smbc->upload_size > conn->data->set.upload_buffer_size ?
+      conn->data->set.upload_buffer_size :
       smbc->upload_size;
     conn->data->req.upload_fromhere = conn->data->state.ulbuf;
     result = Curl_fillreadbuffer(conn, nread, &nread);
@@ -784,6 +785,8 @@ static CURLcode smb_request_state(struct connectdata *conn, bool *done)
   case SMB_OPEN:
     if(h->status || smbc->got < sizeof(struct smb_nt_create_response)) {
       req->result = CURLE_REMOTE_FILE_NOT_FOUND;
+      if(h->status == smb_swap32(SMB_ERR_NOACCESS))
+        req->result = CURLE_REMOTE_ACCESS_DENIED;
       next_state = SMB_TREE_DISCONNECT;
       break;
     }
@@ -946,29 +949,25 @@ static int smb_getsock(struct connectdata *conn, curl_socket_t *socks,
 static CURLcode smb_do(struct connectdata *conn, bool *done)
 {
   struct smb_conn *smbc = &conn->proto.smbc;
-  struct smb_request *req = conn->data->req.protop;
 
   *done = FALSE;
   if(smbc->share) {
-    req->path = strchr(smbc->share, '\0');
-    if(req->path) {
-      req->path++;
-      return CURLE_OK;
-    }
+    return CURLE_OK;
   }
   return CURLE_URL_MALFORMAT;
 }
 
 static CURLcode smb_parse_url_path(struct connectdata *conn)
 {
-  CURLcode result = CURLE_OK;
   struct Curl_easy *data = conn->data;
+  struct smb_request *req = data->req.protop;
   struct smb_conn *smbc = &conn->proto.smbc;
   char *path;
   char *slash;
 
   /* URL decode the path */
-  result = Curl_urldecode(data, data->state.path, 0, &path, NULL, TRUE);
+  CURLcode result = Curl_urldecode(data, data->state.up.path, 0, &path, NULL,
+                                   TRUE);
   if(result)
     return result;
 
@@ -991,6 +990,7 @@ static CURLcode smb_parse_url_path(struct connectdata *conn)
   /* Parse the path for the file path converting any forward slashes into
      backslashes */
   *slash++ = 0;
+  req->path = slash;
 
   for(; *slash; slash++) {
     if(*slash == '/')

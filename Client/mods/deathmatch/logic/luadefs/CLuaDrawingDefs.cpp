@@ -13,7 +13,7 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
-void CLuaDrawingDefs::LoadFunctions(void)
+void CLuaDrawingDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"dxDrawLine", DxDrawLine},
@@ -26,7 +26,9 @@ void CLuaDrawingDefs::LoadFunctions(void)
         {"dxDrawImage", DxDrawImage},
         {"dxDrawImageSection", DxDrawImageSection},
         {"dxDrawPrimitive", DxDrawPrimitive},
+        {"dxDrawPrimitive3D", DxDrawPrimitive3D},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
+        {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
@@ -451,6 +453,10 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
 
+                    // Clamp the angle, so we never draw more than 360 degrees
+                    if (fStartAngle + 360.0f < fStopAngle)
+                        fStopAngle = fStartAngle + 360.0f;
+
                     g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
                                                              fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);
@@ -562,82 +568,149 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
     return 1;
 }
 
-int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
+int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 {
-    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE              primitiveType;
-    std::vector<PrimitiveVertice> vecVertices;
-    bool                          bPostGUI;
-
+    // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveVertice>();
+    bool             bPostGUI;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(primitiveType);
-    argStream.ReadBool(bPostGUI);
+    argStream.ReadEnumString(ePrimitiveType);
+    argStream.ReadBool(bPostGUI, false);
+
+    std::vector<float> vecTableContent;
 
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
+        vecTableContent.clear();
+
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
-            case 2:
-                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+            case Primitive3DVerticeSizes::VERT_XYZ:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF});
                 break;
-            case 3:
-                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
+            case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3])});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        if (vecVertices.size() < 1)
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        switch (primitiveType)
-        {
-            case D3DPT_LINESTRIP:
-                if (vecVertices.size() < 2)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-            case D3DPT_LINELIST:
-                if (vecVertices.size() % 2 != 0)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-            case D3DPT_TRIANGLELIST:
-                if (vecVertices.size() % 3 != 0)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-            case D3DPT_TRIANGLEFAN:
-            case D3DPT_TRIANGLESTRIP:
-                if (vecVertices.size() < 3)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-        }
-
-        g_pCore->GetGraphics()->DrawPrimitiveQueued(vecVertices, primitiveType, bPostGUI);
+        g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
-    else
+
+    // Failed
+    delete pVecVertices;
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
+{
+    // bool DxDrawMaterialPrimitive3D (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial* pMaterialElement;
+    bool             bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    MixedReadMaterialString(argStream, pMaterialElement);
+    argStream.ReadBool(bPostGUI, false);
+
+    std::vector<float> vecTableContent;
+
+    while (argStream.NextIsTable())
     {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        vecTableContent.clear();
+
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case Primitive3DVerticeSizes::VERT_XYZ_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF,
+                                                                 vecTableContent[3], vecTableContent[4]});
+                break;
+            case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2],
+                                                                 static_cast<DWORD>(vecTableContent[3]), vecTableContent[4], vecTableContent[5]});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
+                break;
+        }
+    }
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+    {
+        g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
+    delete pVecVertices;
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveVertice>();
+    bool             bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    argStream.ReadBool(bPostGUI);
+
+    std::vector<float> vecTableContent;
+
+    while (argStream.NextIsTable())
+    {
+        vecTableContent.clear();
+
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case PrimitiveVerticeSizes::VERT_XY:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+                break;
+            case PrimitiveVerticeSizes::VERT_XY_COLOR:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
+                break;
+        }
+    }
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+    {
+        g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+
+    // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -645,86 +718,51 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE                      primitiveType;
-    std::vector<PrimitiveMaterialVertice> vecVertices;
-    CClientMaterial*                      pMaterialElement;
-    bool                                  bPostGUI;
+    D3DPRIMITIVETYPE ePrimitiveType;
+    auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial* pMaterialElement;
+    bool             bPostGUI;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(primitiveType);
+    argStream.ReadEnumString(ePrimitiveType);
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI);
 
+    std::vector<float> vecTableContent;
+
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
+        vecTableContent.clear();
+
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
-            case 4:
-                vecVertices.push_back(
+            case PrimitiveVerticeSizes::VERT_XY_UV:
+                pVecVertices->push_back(
                     PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
                 break;
-            case 5:
-                vecVertices.push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
-                                                               vecTableContent[3], vecTableContent[4]});
+            case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
+                                                                 vecTableContent[3], vecTableContent[4]});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
 
-    if (!argStream.HasErrors())
-    {
-        if (pMaterialElement)
-        {
-            if (vecVertices.size() < 1)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-
-            switch (primitiveType)
-            {
-                case D3DPT_LINESTRIP:
-                    if (vecVertices.size() < 2)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-                case D3DPT_LINELIST:
-                    if (vecVertices.size() % 2 != 0)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-                case D3DPT_TRIANGLELIST:
-                    if (vecVertices.size() % 3 != 0)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                case D3DPT_TRIANGLEFAN:
-                case D3DPT_TRIANGLESTRIP:
-                    if (vecVertices.size() < 3)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-            }
-
-            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(vecVertices, primitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
     if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
 
     // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -1003,53 +1041,92 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     argStream.ReadBool(bLayered, false);
     argStream.ReadEnumStringList(elementTypeList, "world,vehicle,object,other");
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        int iEntityTypeMaskResult = 0;
-        for (uint i = 0; i < elementTypeList.size(); i++)
-            iEntityTypeMaskResult |= elementTypeList[i];
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
 
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+    if (strFile.empty())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "expected non-empty string at argument 1");
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    CLuaMain* const pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (!pLuaMain)
+    {
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    int iEntityTypeMaskResult = 0;
+
+    for (EEntityTypeMask elementType : elementTypeList)
+        iEntityTypeMaskResult |= elementType;
+
+    CResource* pParentResource = pLuaMain->GetResource();
+    CResource* pFileResource = pParentResource;
+    SString    strPath, strMetaPath;
+
+    bool bIsRawData = false;
+
+    const bool bValidFilePath = CResourceManager::ParseResourcePathInput(strFile, pFileResource, &strPath, &strMetaPath);
+
+    if (!bValidFilePath || (strFile[0] != '@' && strFile[0] != ':'))
+    {
+        bIsRawData = strFile.find("\n") != std::string::npos;
+
+        if (!bIsRawData)
         {
-            CResource* pParentResource = pLuaMain->GetResource();
-            CResource* pFileResource = pParentResource;
-            SString    strPath, strMetaPath, strRootPath, strStatus;
-
-            // If we can't parse path input or file doesn't exists then consider strFile as a raw data
-            bool bIsRawData = !CResourceManager::ParseResourcePathInput(strFile, pFileResource, &strPath, &strMetaPath) || !FileExists(strPath);
-            if (bIsRawData)
-            {
-                strPath = strFile;
-                strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, NULL);
-            }
-            else
-                strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
-
-            CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
-                strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
-            if (pShader)
-            {
-                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
-                // ElementGroup? **
-                pShader->SetParent(pParentResource->GetResourceDynamicEntity());
-                lua_pushelement(luaVM, pShader);
-                lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
-                return 2;
-            }
-            else
-            {
-                // Replace any path in the error message with our own one
-                SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
-                strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-                argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
-            }
+            bIsRawData = (strFile.find("technique ") != std::string::npos) &&
+                (strFile.find("pass ") != std::string::npos) &&
+                (strFile.find('{') != std::string::npos) &&
+                (strFile.find('}') != std::string::npos);
         }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // error: bad arguments
+    SString strRootPath;
+
+    if (bIsRawData)
+    {
+        strPath = strFile;
+        pFileResource = pParentResource;
+        strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPath);
+    }
+    else
+    {
+        if (!pFileResource || !FileExists(strPath))
+        {
+            argStream.SetCustomError(strFile, "file doesn't exist");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
+    }
+
+    SString        strStatus;
+    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
+        strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+
+    if (pShader)
+    {
+        pShader->SetParent(pParentResource->GetResourceDynamicEntity());
+        lua_pushelement(luaVM, pShader);
+        lua_pushstring(luaVM, strStatus);
+        return 2;
+    }
+
+    // Replace any path in the error message with our own one
+    SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
+    strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
+    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
     return 1;
 }

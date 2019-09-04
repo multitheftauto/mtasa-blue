@@ -12,27 +12,25 @@
 #include "StdInc.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
-constexpr CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
-{
-    DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
-    return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
-}
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId* pAnimGroup, int* pAnimId)
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId)
 {
-    // if we exceed total animGroup then it means crash is about to happen
-    if (*pAnimGroup >= TOTAL_ANIM_GROUPS)
+    pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId, *(DWORD*)0xb4ea34);
+    CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
+
+    DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);
+    if (pInterface < (DWORD*)0x250)
     {
-        LogEvent(534, "CopyAnimation", "Incorrect Group ID", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId));
+        LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 534);
 
         // switch to idle animation
         *pAnimGroup = ANIM_GROUP_DEFAULT;
         *pAnimId = 3;
+        pGroup = getAnimAssocGroupInterface(*pAnimGroup);
     }
-
-    auto pGroup = getAnimAssocGroupInterface(*pAnimGroup);
 
     // Apply offset
     int iUseAnimId = *pAnimId - pGroup->iIDOffset;
@@ -64,27 +62,6 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId* pAnimGroup, int* pA
     *pAnimId = iUseAnimId + pGroup->iIDOffset;
 
     return *pAnimId;
-}
-
-// Hook info
-#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation        0x4CE130
-#define HOOKSIZE_CAnimBlendAssocGroupCopyAnimation       6
-DWORD RETURN_CAnimBlendAssocGroupCopyAnimation = 0x4CE136;
-void _declspec(naked) HOOK_CAnimBlendAssocGroupCopyAnimation()
-{
-    _asm
-    {
-        pushad
-        push[esp + 32 + 4 * 1]
-        push    ecx
-        call    OnCAnimBlendAssocGroupCopyAnimation
-        add     esp, 4 * 2
-        mov[esp + 32 + 4 * 1], eax
-        popad
-
-        mov     eax, fs:0
-        jmp     RETURN_CAnimBlendAssocGroupCopyAnimation
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +105,7 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_FixBadAnimId(void)
+void CMultiplayerSA::InitHooks_FixBadAnimId()
 {
     EZHookInstall(GetAnimHierarchyFromSkinClump);
 }

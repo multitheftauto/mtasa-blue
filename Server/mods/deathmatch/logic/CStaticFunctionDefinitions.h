@@ -17,7 +17,7 @@ class CStaticFunctionDefinitions
 {
 public:
     CStaticFunctionDefinitions(CGame* pGame);
-    ~CStaticFunctionDefinitions(void);
+    ~CStaticFunctionDefinitions();
 
     // Event funcs
     static bool AddEvent(CLuaMain* pLuaMain, const char* szName, const char* szArguments, bool bAllowRemoteTrigger);
@@ -31,7 +31,7 @@ public:
 
     static bool        CancelEvent(bool bCancel, const char* szReason);
     static const char* GetCancelReason();
-    static bool        WasEventCancelled(void);
+    static bool        WasEventCancelled();
 
     // Element create/destroy
     static CDummy*   CreateElement(CResource* pResource, const char* szTypeName, const char* szID);
@@ -100,12 +100,12 @@ public:
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
 
     // Player get funcs
-    static unsigned int       GetPlayerCount(void);
+    static unsigned int       GetPlayerCount();
     static CPlayer*           GetPlayerFromName(const char* szNick);
     static bool               GetPlayerPing(CPlayer* pPlayer, unsigned int& uiPing);
     static bool               GetPlayerMoney(CPlayer* pPlayer, long& lMoney);
     static bool               GetPlayerSourceIP(CPlayer* pPlayer, SString& strOutIP);
-    static CPlayer*           GetRandomPlayer(void);
+    static CPlayer*           GetRandomPlayer();
     static bool               IsPlayerMuted(CPlayer* pPlayer, bool& bMuted);
     static CTeam*             GetPlayerTeam(CPlayer* pPlayer);
     static bool               CanPlayerUseFunction(CPlayer* pPlayer, const char* szFunction, bool& bCanUse);
@@ -123,7 +123,8 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
+    static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -132,6 +133,7 @@ public:
     static bool TakePlayerMoney(CElement* pElement, long lMoney);
     static bool ShowPlayerHudComponent(CElement* pElement, eHudComponent component, bool bShow);
     static bool SetPlayerDebuggerVisible(CElement* pElement, bool bVisible);
+    static bool SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel);
     static bool SetPlayerWantedLevel(CElement* pElement, unsigned int iLevel);
     static bool ForcePlayerMap(CElement* pElement, bool bVisible);
     static bool SetPlayerNametagText(CElement* pElement, const char* szText);
@@ -197,10 +199,10 @@ public:
     static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0);
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
-    static bool SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame);
-    static bool SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress);
-    static bool SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed);
+    static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
+    static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
+    static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
@@ -532,7 +534,7 @@ public:
     static bool    SetElementWaterLevel(CWater* pWater, float fLevel);
     static bool    SetAllElementWaterLevel(float fLevel);
     static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
-    static bool    ResetWorldWaterLevel(void);
+    static bool    ResetWorldWaterLevel();
     static bool    GetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    SetWaterVertexPosition(CWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool    GetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
@@ -540,7 +542,7 @@ public:
     static bool    ResetWaterColor();
 
     // Standard server functions
-    static unsigned int GetMaxPlayers(void);
+    static unsigned int GetMaxPlayers();
     static bool         SetMaxPlayers(unsigned int uiMax);
     static bool OutputChatBox(const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded,
                               CLuaMain* pLuaMain);
@@ -585,10 +587,10 @@ public:
                                unsigned char& ucBottomGreen, unsigned char& ucBottomBlue);
     static bool SetSkyGradient(unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed,
                                unsigned char ucBottomGreen, unsigned char ucBottomBlue);
-    static bool ResetSkyGradient(void);
+    static bool ResetSkyGradient();
     static bool GetHeatHaze(SHeatHazeSettings& heatHazeSettings);
     static bool SetHeatHaze(const SHeatHazeSettings& heatHazeSettings);
-    static bool ResetHeatHaze(void);
+    static bool ResetHeatHaze();
     static bool SetFPSLimit(unsigned short usLimit, bool bSave);
     static bool SetMinuteDuration(unsigned long ulDuration);
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
@@ -597,7 +599,7 @@ public:
     static bool GetJetpackWeaponEnabled(eWeaponType weaponType, bool& bEnabled);
     static bool SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     static bool SetCloudsEnabled(bool bEnabled);
-    static bool GetCloudsEnabled(void);
+    static bool GetCloudsEnabled();
     static bool SetTrafficLightState(unsigned char ucState, bool bForced = false);
     static bool SetTrafficLightsLocked(bool bLocked);
     static bool SetJetpackMaxHeight(float fMaxHeight);
@@ -612,21 +614,21 @@ public:
     static bool SetAircraftMaxHeight(float fMaxHeight);
     static bool SetAircraftMaxVelocity(float fVelocity);
     static bool SetOcclusionsEnabled(bool bEnabled);
-    static bool ResetRainLevel(void);
-    static bool ResetSunSize(void);
-    static bool ResetSunColor(void);
-    static bool ResetWindVelocity(void);
-    static bool ResetFarClipDistance(void);
-    static bool ResetFogDistance(void);
+    static bool ResetRainLevel();
+    static bool ResetSunSize();
+    static bool ResetSunColor();
+    static bool ResetWindVelocity();
+    static bool ResetFarClipDistance();
+    static bool ResetFogDistance();
     static bool RemoveWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
     static bool RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior);
-    static bool RestoreAllWorldModels(void);
+    static bool RestoreAllWorldModels();
     static bool SendSyncIntervals(CPlayer* pPlayer = NULL);
     static bool SetMoonSize(int iMoonSize);
-    static bool ResetMoonSize(void);
+    static bool ResetMoonSize();
 
     // Loaded Map Functions
-    static CElement* GetRootElement(void);
+    static CElement* GetRootElement();
     static CElement* LoadMapData(CLuaMain* pLuaMain, CElement* pParent, CXMLNode* pNode);
     static CXMLNode* SaveMapData(CElement* pElement, CXMLNode* pNode, bool bChildren);
 
@@ -640,7 +642,7 @@ public:
     static bool        SetPlayerAnnounceValue(CElement* pElement, const std::string& strKey, const std::string& strValue);
 
     // Registry funcs
-    static const std::string& SQLGetLastError(void);
+    static const std::string& SQLGetLastError();
     static void               ExecuteSQLCreateTable(const std::string& strTable, const std::string& strDefinition);
     static void               ExecuteSQLDropTable(const std::string& strTable);
     static bool               ExecuteSQLDelete(const std::string& strTable, const std::string& strWhere);
@@ -651,7 +653,7 @@ public:
     static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResult* pResult);
 
     // Account get funcs
-    static CAccount*                     GetAccount(const char* szName, const char* szPassword);
+    static CAccount*                     GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive = true);
     static void                          GetAccounts(lua_State* pLua);
     static CClient*                      GetAccountPlayer(CAccount* pAccount);
     static bool                          IsGuestAccount(CAccount* pAccount, bool& bGuest);
@@ -687,7 +689,7 @@ public:
     static bool  RemoveBan(CBan* pBan, CPlayer* pResponsible = NULL);
 
     static bool GetBans(lua_State* luaVM);
-    static bool ReloadBanList(void);
+    static bool ReloadBanList();
 
     static bool GetBanIP(CBan* pBan, SString& strOutIP);
     static bool GetBanSerial(CBan* pBan, SString& strOutSerial);
@@ -730,8 +732,8 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 
     // Train track funcs
-    static CTrainTrack*             CreateTrainTrack(CResource* pResource, const std::vector<CLuaVector3D*>&, bool linkLastNodes);
+    static CTrainTrack*  CreateTrainTrack(CResource* pResource, const std::vector<CLuaVector3D*>&, bool linkLastNodes);
 };

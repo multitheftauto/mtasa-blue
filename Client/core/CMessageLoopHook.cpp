@@ -89,7 +89,7 @@ void CMessageLoopHook::SetRefreshMsgQueueEnabled(bool bEnable)
 }
 
 // Process one message every 5 seconds during busy periods to stop Windows 'Not responding' stuff
-void CMessageLoopHook::MaybeRefreshMsgQueue(void)
+void CMessageLoopHook::MaybeRefreshMsgQueue()
 {
     if (m_ProcessMessageTimer.Get() < 5000)
         return;
@@ -366,6 +366,23 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                             else
                             {
                                 CLocalGUI::GetSingleton().GetConsole()->ResetAutoCompleteMatch();
+                            }
+                        }
+                    }
+                    // If the chat is accepting input, and we pressed down/up, scroll the console history
+                    //                          or if we pressed tab, step through possible autocomplete matches
+                    else if (CLocalGUI::GetSingleton().GetChat()->IsInputVisible())
+                    {
+                        if (uMsg == WM_KEYDOWN)
+                        {
+                            if (wParam == VK_DOWN)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetPreviousHistoryText();
+                            }
+
+                            if (wParam == VK_UP)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetNextHistoryText();
                             }
                         }
                     }

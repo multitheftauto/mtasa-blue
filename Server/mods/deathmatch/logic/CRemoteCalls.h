@@ -27,6 +27,8 @@ private:
     SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
     SHttpRequestOptions m_options;
+    EDownloadModeType   m_downloadMode = EDownloadModeType::NONE;
+    SDownloadStatus     m_lastDownloadStatus;
 
 public:
     CRemoteCall(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
@@ -40,6 +42,8 @@ public:
     ~CRemoteCall();
     void           MakeCall();
     static void    DownloadFinishedCallback(const SHttpDownloadResult& result);
+    bool           CancelDownload();
+    const SDownloadStatus& GetDownloadStatus();
     CLuaMain*      GetVM() { return m_VM; };
     bool           IsFetch() { return m_bIsFetch; }
     bool           IsLegacy() { return m_options.bIsLegacy; }
@@ -72,7 +76,7 @@ public:
     void              Remove(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
     bool              CallExists(CRemoteCall* call);
-    void              ProcessQueuedFiles(void);
+    void              ProcessQueuedFiles();
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex);
 };

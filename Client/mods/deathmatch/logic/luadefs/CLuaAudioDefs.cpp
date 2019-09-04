@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.x
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaAudioDefs.cpp
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaAudioDefs.cpp
  *  PURPOSE:     Lua audio definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaAudioDefs::LoadFunctions(void)
+void CLuaAudioDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Audio funcs
@@ -33,6 +33,7 @@ void CLuaAudioDefs::LoadFunctions(void)
         {"setSoundPosition", SetSoundPosition},
         {"getSoundPosition", GetSoundPosition},
         {"getSoundLength", GetSoundLength},
+        {"getSoundBufferLength", GetSoundBufferLength},
         {"setSoundPaused", SetSoundPaused},
         {"isSoundPaused", IsSoundPaused},
         {"setSoundVolume", SetSoundVolume},
@@ -90,6 +91,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
     lua_classfunction(luaVM, "getLength", "getSoundLength");
+    lua_classfunction(luaVM, "getBufferLength", "getSoundBufferLength");
     lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
     lua_classfunction(luaVM, "getBPM", "getSoundBPM");
     lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
@@ -110,6 +112,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "pan", "setSoundPan", "getSoundPan");
     lua_classvariable(luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled");
     lua_classvariable(luaVM, "length", NULL, "getSoundLength");
+    lua_classvariable(luaVM, "bufferLength", NULL, "getSoundBufferLength");
 
     lua_registerclass(luaVM, "Sound", "Element");
 
@@ -399,6 +402,37 @@ int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
+{
+    CClientSound*    pSound;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pSound);
+
+    if (!argStream.HasErrors())
+    {
+        if (pSound)
+        {
+            double dBufferLength = 0;
+            if (CStaticFunctionDefinitions::GetSoundBufferLength(*pSound, dBufferLength))
+            {
+                lua_pushnumber(luaVM, dBufferLength);
+                return 1;
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
     return 1;
 }
 

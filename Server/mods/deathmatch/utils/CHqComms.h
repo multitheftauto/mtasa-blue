@@ -25,7 +25,7 @@ class CHqComms : public CRefCountable
 public:
     ZERO_ON_NEW
 
-    CHqComms(void)
+    CHqComms()
     {
         m_iPollInterval = TICKS_FROM_MINUTES(60);
         m_strURL = HQCOMMS_URL;
@@ -36,7 +36,7 @@ public:
     //
     // Send query if it's time
     //
-    void Pulse(void)
+    void Pulse()
     {
         // Check for min client version info
         if (m_Stage == HQCOMMS_STAGE_NONE || (m_Stage == HQCOMMS_STAGE_TIMER && m_CheckTimer.Get() > (uint)m_iPollInterval))
@@ -88,8 +88,11 @@ public:
 
             // Send request
             this->AddRef();            // Keep object alive
-            GetDownloadManager()->QueueFile(m_strURL, NULL, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this,
-                                            StaticDownloadFinishedCallback, false, 2);
+            SHttpRequestOptions options;
+            options.strPostData = SStringX((const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed());
+            options.bPostBinary = true;
+            options.uiConnectionAttempts = 2;
+            GetDownloadManager()->QueueFile(m_strURL, NULL, this, StaticDownloadFinishedCallback, options);
         }
     }
 
@@ -140,11 +143,11 @@ public:
     void ProcessMinClientVersion(CBitStream& bitStream)
     {
         int     iForceSetting = 0;
-        SString strResultMinClientVersion;
+        CMtaVersion strResultMinClientVersion;
 
         bitStream->Read(iForceSetting);
         bitStream->ReadStr(strResultMinClientVersion);
-        SString strSetttingsMinClientVersion = g_pGame->GetConfig()->GetMinClientVersion();
+        CMtaVersion strSetttingsMinClientVersion = g_pGame->GetConfig()->GetMinClientVersion();
         if (strResultMinClientVersion > strSetttingsMinClientVersion || iForceSetting)
         {
             g_pGame->GetConfig()->SetSetting("minclientversion", strResultMinClientVersion, true);
@@ -237,10 +240,10 @@ public:
     //
     // Get http downloader used for hq comms etc.
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
-    ~CHqComms(void) {}            // Must use Release()
+    ~CHqComms() {}            // Must use Release()
 
     int          m_iPollInterval;
     int          m_iPrevBadFileHashesRev;

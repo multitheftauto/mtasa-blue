@@ -12,7 +12,7 @@
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
-void CLuaFileDefs::LoadFunctions(void)
+void CLuaFileDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"fileOpen", fileOpen},
@@ -550,7 +550,8 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         // Make sure the destination folder exists so we can move the file
                         MakeSureDirExists(strDestAbsPath);
 
-                        if (FileRename(strSrcAbsPath, strDestAbsPath))
+                        int errorCode;
+                        if (FileRename(strSrcAbsPath, strDestAbsPath, &errorCode))
                         {
                             // If file renamed/moved return success
                             lua_pushboolean(luaVM, true);
@@ -558,7 +559,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         }
 
                         // Output error
-                        m_pScriptDebugging->LogWarning(luaVM, "fileRename failed; unable to rename file");
+                        m_pScriptDebugging->LogWarning(luaVM, SString("fileRename failed; unable to rename file (Error %d)", errorCode));
                     }
                     else
                     {
@@ -732,7 +733,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);
 
-    // Ensure we have atleast one string
+    // Ensure we have at least one string
     if (!argStream.NextIsString())
         argStream.SetTypeError("string");
 
@@ -745,12 +746,14 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
         while (argStream.NextIsString())
         {
             // Grab argument and length
-            SString strData;
-            argStream.ReadString(strData);
-            unsigned long ulDataLen = strData.length();
+            SCharStringRef strData;
+            argStream.ReadCharStringRef(strData);
+
+            if (argStream.HasErrors() || !strData.pData)
+                continue;
 
             // Write the data
-            long lArgBytesWritten = pFile->Write(ulDataLen, strData);
+            long lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
 
             // Did the file mysteriously disappear?
             if (lArgBytesWritten == -1)

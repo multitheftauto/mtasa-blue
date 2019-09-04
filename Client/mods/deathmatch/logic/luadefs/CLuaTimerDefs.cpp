@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaTimerDefs::LoadFunctions(void)
+void CLuaTimerDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"setTimer", SetTimer},
@@ -68,7 +68,7 @@ int CLuaTimerDefs::SetTimer(lua_State* luaVM)
             // Check for the minimum interval
             if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
             {
-                argStream.SetCustomError("Interval is below 50");
+                argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
             }
             else
             {

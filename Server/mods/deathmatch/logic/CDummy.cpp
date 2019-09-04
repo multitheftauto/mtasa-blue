@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CDummy::CDummy(CGroups* pGroups, CElement* pParent, CXMLNode* pNode) : CElement(pParent, pNode)
+CDummy::CDummy(CGroups* pGroups, CElement* pParent) : CElement(pParent)
 {
     // Init
     m_iType = CElement::DUMMY;
@@ -25,7 +25,7 @@ CDummy::CDummy(CGroups* pGroups, CElement* pParent, CXMLNode* pNode) : CElement(
     }
 }
 
-CDummy::~CDummy(void)
+CDummy::~CDummy()
 {
     // Unlink from manager
     Unlink();
@@ -39,7 +39,7 @@ CElement* CDummy::Clone(bool* bAddEntity, CResource* pResource)
     return pNewElement;
 }
 
-void CDummy::Unlink(void)
+void CDummy::Unlink()
 {
     // Remove us from groupmanager's list
     if (m_pGroups)
@@ -48,7 +48,7 @@ void CDummy::Unlink(void)
     }
 }
 
-bool CDummy::ReadSpecialData(void)
+bool CDummy::ReadSpecialData(const int iLine)
 {
     // Grab the position data
     GetCustomDataFloat("posX", m_vecPosition.fX, true);

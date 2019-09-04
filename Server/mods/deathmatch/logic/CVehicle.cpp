@@ -13,9 +13,8 @@
 
 extern CGame* g_pGame;
 
-CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
-                   unsigned char ucVariant2)
-    : CElement(pParent, pNode)
+CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+    : CElement(pParent)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
 
@@ -103,7 +102,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
-CVehicle::~CVehicle(void)
+CVehicle::~CVehicle()
 {
     if (m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle() == this)
     {
@@ -177,7 +176,8 @@ CVehicle::~CVehicle(void)
 
 CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
 {
-    CVehicle* pTemp = m_pVehicleManager->Create(GetModel(), GetVariant(), GetVariant2(), GetParentEntity());
+    CVehicle* const pTemp = m_pVehicleManager->Create(GetParentEntity(), GetModel(), GetVariant(), GetVariant2());
+
     if (pTemp)
     {
         CVector vecRotationDegrees;
@@ -195,32 +195,32 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CVehicle::Unlink(void)
+void CVehicle::Unlink()
 {
     // Remove us from the vehicle manager
     m_pVehicleManager->RemoveFromList(this);
 }
 
-bool CVehicle::ReadSpecialData(void)
+bool CVehicle::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
@@ -252,13 +252,13 @@ bool CVehicle::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <vehicle> (line %u)\n", iTemp, m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <vehicle> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
@@ -415,7 +415,7 @@ void CVehicle::SetMatrix(const CMatrix& matrix)
     SetRotationDegrees(vecRotation);
 }
 
-const CVector& CVehicle::GetPosition(void)
+const CVector& CVehicle::GetPosition()
 {
     // Are we attached to something?
     if (m_pAttachedTo)
@@ -482,7 +482,7 @@ void CVehicle::SetModel(unsigned short usModel)
     }
 }
 
-bool CVehicle::HasValidModel(void)
+bool CVehicle::HasValidModel()
 {
     return CVehicleManager::IsValidModel(m_usModel);
 }
@@ -493,7 +493,7 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
     m_ucVariant2 = ucVariant2;
 }
 
-CVehicleColor& CVehicle::RandomizeColor(void)
+CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
     m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
@@ -533,7 +533,7 @@ CPed* CVehicle::GetOccupant(unsigned int uiSeat)
     return NULL;
 }
 
-CPed* CVehicle::GetFirstOccupant(void)
+CPed* CVehicle::GetFirstOccupant()
 {
     // Try finding a seat with a Player in it
     unsigned int i = 0;
@@ -549,7 +549,7 @@ CPed* CVehicle::GetFirstOccupant(void)
     return NULL;
 }
 
-CPed* CVehicle::GetController(void)
+CPed* CVehicle::GetController()
 {
     CPed* pController = m_pOccupants[0];
 
@@ -631,12 +631,12 @@ void CVehicle::SetSyncer(CPlayer* pPlayer)
     }
 }
 
-unsigned char CVehicle::GetMaxPassengers(void)
+unsigned char CVehicle::GetMaxPassengers()
 {
     return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModel) : m_ucMaxPassengersOverride);
 }
 
-unsigned char CVehicle::GetFreePassengerSeat(void)
+unsigned char CVehicle::GetFreePassengerSeat()
 {
     // Grab the max passengers this vehicle can have and check the rage
     unsigned char ucMaxPassengers = GetMaxPassengers();
@@ -744,7 +744,7 @@ void CVehicle::SetRegPlate(const char* szRegPlate)
     STRNCPY(m_szRegPlate, szRegPlate, 9);
 }
 
-void CVehicle::GenerateRegPlate(void)
+void CVehicle::GenerateRegPlate()
 {
     // For all our 8 letters
     for (int i = 0; i < 8; i++)
@@ -804,7 +804,7 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
     }
 }
 
-void CVehicle::GenerateHandlingData(void)
+void CVehicle::GenerateHandlingData()
 {
     // Make a new CHandlingEntry
     if (m_pHandlingEntry == NULL)
@@ -837,7 +837,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
 }
-void CVehicle::RemoveVehicleSirens(void)
+void CVehicle::RemoveVehicleSirens()
 {
     for (int i = 0; i <= 7; i++)
     {
@@ -850,14 +850,14 @@ void CVehicle::RemoveVehicleSirens(void)
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
-void CVehicle::ResetDoors(void)
+void CVehicle::ResetDoors()
 {
     GetInitialDoorStates(m_ucDoorStates);
     for (unsigned int i = 0; i < 6; ++i)
         m_fDoorOpenRatio[i] = 0.0f;
 }
 
-void CVehicle::ResetDoorsWheelsPanelsLights(void)
+void CVehicle::ResetDoorsWheelsPanelsLights()
 {
     ResetDoors();
     memset(&m_ucWheelStates[0], 0, sizeof(m_ucWheelStates));
@@ -874,38 +874,38 @@ void CVehicle::SetIsBlown(bool bBlown)
         m_llBlowTime = CTickCount::Now();
 }
 
-bool CVehicle::GetIsBlown(void)
+bool CVehicle::GetIsBlown()
 {
     return m_llBlowTime.ToLongLong() != 0;
 }
 
-bool CVehicle::IsBlowTimerFinished(void)
+bool CVehicle::IsBlowTimerFinished()
 {
     return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
 }
 
-void CVehicle::StopIdleTimer(void)
+void CVehicle::StopIdleTimer()
 {
     m_llIdleTime = CTickCount(0LL);
 }
 
-void CVehicle::RestartIdleTimer(void)
+void CVehicle::RestartIdleTimer()
 {
     m_llIdleTime = CTickCount::Now();
 }
 
-bool CVehicle::IsIdleTimerRunning(void)
+bool CVehicle::IsIdleTimerRunning()
 {
     return m_llIdleTime.ToLongLong() != 0;
 }
 
-bool CVehicle::IsIdleTimerFinished(void)
+bool CVehicle::IsIdleTimerFinished()
 {
     return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((long long)m_ulIdleRespawnInterval);
 }
 
 // Check if vehicle has not moved (much) since the last call
-bool CVehicle::IsStationary(void)
+bool CVehicle::IsStationary()
 {
     const CVector& vecPosition = GetPosition();
     if ((vecPosition - m_vecStationaryCheckPosition).LengthSquared() < 0.1f * 0.1f)
@@ -935,14 +935,14 @@ void CVehicle::SetJackingPlayer(CPlayer* pPlayer)
         m_pJackingPlayer->SetJackingVehicle(this);
 }
 
-void CVehicle::OnRelayUnoccupiedSync(void)
+void CVehicle::OnRelayUnoccupiedSync()
 {
     // Detect dimension change
     m_bNeedsDimensionResync |= (GetDimension() != m_usLastUnoccupiedSyncDimension);
     m_usLastUnoccupiedSyncDimension = GetDimension();
 }
 
-void CVehicle::HandleDimensionResync(void)
+void CVehicle::HandleDimensionResync()
 {
     if (m_bNeedsDimensionResync)
     {

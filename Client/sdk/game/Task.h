@@ -28,7 +28,7 @@ class CEvent;
 class CTask
 {
 public:
-    virtual ~CTask(void){};
+    virtual ~CTask(){};
 
     virtual CTask*                  Clone() = 0;
     virtual void                    SetParent(CTask* pParent) = 0;
@@ -39,8 +39,8 @@ public:
     virtual void                    StopTimer(const CEvent* pEvent) = 0;
     virtual bool                    MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent) = 0;
     virtual const char*             GetTaskName() = 0;
-    virtual class CTaskSAInterface* GetInterface(void) = 0;
-    virtual bool                    IsValid(void) = 0;
+    virtual class CTaskSAInterface* GetInterface() = 0;
+    virtual bool                    IsValid() = 0;
     virtual void                    SetAsPedTask(CPed* pPed, const int iTaskPriority, const bool bForceNewTask = false) = 0;
     virtual void                    SetAsSecondaryPedTask(CPed* pPed, const int iType) = 0;
 
@@ -51,7 +51,7 @@ public:
 class CTaskSimple : public virtual CTask
 {
 public:
-    virtual ~CTaskSimple(void){};
+    virtual ~CTaskSimple(){};
 
     virtual bool ProcessPed(CPed* pPed) = 0;
     virtual bool SetPedPosition(CPed* pPed) = 0;
@@ -60,7 +60,7 @@ public:
 class CTaskComplex : public virtual CTask
 {
 public:
-    virtual ~CTaskComplex(void){};
+    virtual ~CTaskComplex(){};
 
     virtual void   SetSubTask(CTask* pSubTask) = 0;
     virtual CTask* CreateNextSubTask(CPed* pPed) = 0;

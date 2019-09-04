@@ -10,11 +10,11 @@
 
 #include <StdInc.h>
 
-CClientMarkerCommon::CClientMarkerCommon(void)
+CClientMarkerCommon::CClientMarkerCommon()
 {
 }
 
-CClientMarkerCommon::~CClientMarkerCommon(void)
+CClientMarkerCommon::~CClientMarkerCommon()
 {
 }
 
@@ -28,6 +28,6 @@ bool CClientMarkerCommon::IsHit(CClientEntity* pEntity) const
     return IsHit(vecPosition);
 }
 
-void CClientMarkerCommon::DoPulse(void)
+void CClientMarkerCommon::DoPulse()
 {
 }

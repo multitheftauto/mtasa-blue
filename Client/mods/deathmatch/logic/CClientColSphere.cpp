@@ -142,7 +142,7 @@ bool CClientColSphere::DoHitDetection(const CVector& vecNowPosition, float fRadi
     return IsPointNearPoint3D(vecNowPosition, m_vecPosition, fRadius + m_fRadius);
 }
 
-CSphere CClientColSphere::GetWorldBoundingSphere(void)
+CSphere CClientColSphere::GetWorldBoundingSphere()
 {
     return CSphere(m_vecPosition, m_fRadius);
 }

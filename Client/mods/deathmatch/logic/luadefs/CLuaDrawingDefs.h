@@ -15,7 +15,7 @@
 class CLuaDrawingDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(DxDrawLine);
@@ -29,6 +29,8 @@ public:
     LUA_DECLARE(DxDrawImageSection);
     LUA_DECLARE(DxDrawPrimitive);
     LUA_DECLARE(DxDrawMaterialPrimitive);
+    LUA_DECLARE(DxDrawPrimitive3D);
+    LUA_DECLARE(DxDrawMaterialPrimitive3D);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);

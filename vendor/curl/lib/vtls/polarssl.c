@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2010 - 2011, Hoi-Ho Chan, <hoiho.chan@gmail.com>
  *
  * This software is licensed as described in the file COPYING, which
@@ -55,6 +55,7 @@
 #include "select.h"
 #include "strcase.h"
 #include "polarssl_threadlock.h"
+#include "multiif.h"
 #include "curl_printf.h"
 #include "curl_memory.h"
 /* The last #include file should be: */
@@ -185,14 +186,11 @@ set_ssl_version_min_max(struct connectdata *conn, int sockindex)
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
       ssl_version = CURL_SSLVERSION_TLSv1_0;
-      ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
   }
 
   switch(ssl_version_max) {
     case CURL_SSLVERSION_MAX_NONE:
-      ssl_version_max = ssl_version << 16;
-      break;
     case CURL_SSLVERSION_MAX_DEFAULT:
       ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
@@ -500,7 +498,7 @@ polarssl_connect_step2(struct connectdata *conn,
 
     if(ret & BADCERT_REVOKED) {
       failf(data, "Cert verify failed: BADCERT_REVOKED");
-      return CURLE_SSL_CACERT;
+      return CURLE_PEER_FAILED_VERIFICATION;
     }
 
     if(ret & BADCERT_CN_MISMATCH)
@@ -596,6 +594,8 @@ polarssl_connect_step2(struct connectdata *conn,
     }
     else
       infof(data, "ALPN, server did not agree to a protocol\n");
+    Curl_multiuse_state(conn, conn->negnpn == CURL_HTTP_VERSION_2 ?
+                        BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
   }
 #endif
 
@@ -719,9 +719,9 @@ static void Curl_polarssl_session_free(void *ptr)
 static size_t Curl_polarssl_version(char *buffer, size_t size)
 {
   unsigned int version = version_get_number();
-  return snprintf(buffer, size, "%s/%d.%d.%d",
-                  version >= 0x01030A00?"mbedTLS":"PolarSSL",
-                  version>>24, (version>>16)&0xff, (version>>8)&0xff);
+  return msnprintf(buffer, size, "%s/%d.%d.%d",
+                   version >= 0x01030A00?"mbedTLS":"PolarSSL",
+                   version>>24, (version>>16)&0xff, (version>>8)&0xff);
 }
 
 static CURLcode
@@ -911,9 +911,7 @@ const struct Curl_ssl Curl_ssl_polarssl = {
   Curl_none_check_cxn,               /* check_cxn */
   Curl_none_shutdown,                /* shutdown */
   Curl_polarssl_data_pending,        /* data_pending */
-  /* This might cause libcurl to use a weeker random!
-   * TODO: use Polarssl's CTR-DRBG or HMAC-DRBG
-  */
+  /* This might cause libcurl to use a weeker random! */
   Curl_none_random,                  /* random */
   Curl_none_cert_status_request,     /* cert_status_request */
   Curl_polarssl_connect,             /* connect */

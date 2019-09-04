@@ -20,7 +20,7 @@ namespace CCreditsGUI
 }            // namespace CCreditsGUI
 using namespace CCreditsGUI;
 
-CCredits::CCredits(void)
+CCredits::CCredits()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -60,6 +60,7 @@ CCredits::CCredits(void)
     m_strCredits +=
         "\n\n"
 
+        "Patrik \"myonlake\" Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
         "Marek \"botder\" Kulik\n"
         "Arran\n"
@@ -107,8 +108,9 @@ CCredits::CCredits(void)
         "Callum \"Callum\" Dawson\n"
         "Philip \"Fenix\" Farquharson\n"
         "Robin \"robhol\" Holm\n"
-        "Patrik \"myonlake\" Juvonen\n"
         "Gabrielius \"Dezash\" Laurinavicius\n"
+        "Nikita \"StrixG\" Obrecht\n"
+        "Fedor \"Ted\" Sinev\n"
         "Adam \"50p\" Telega\n"
         "Ilya \"Kenix\" Volkov\n"
         "Gothem\n"
@@ -140,7 +142,6 @@ CCredits::CCredits(void)
         "John_Michael\n"
         "-ffs-Sniper\n"
         "W\n"
-        "Fedor Sinev\n"
         "zneext\n"
         "ZReC\n"
         "Pawelo / 4O4\n"
@@ -180,8 +181,8 @@ CCredits::CCredits(void)
         "Pugwipe\n"
         "The_GTA\n"
         "Phatlooser\n"
-        "Dwayne 'The 'Woovie' Rock' Johnson\n"
-        "max 'Hobo Pie' Power\n"
+        "Jordan \"Woovie\" Banasik\n"
+        "max \"Hobo Pie\" Power\n"
         "diegofkda\n"
         "Ren712\n"
         "StifflersMom\n"
@@ -275,7 +276,7 @@ CCredits::CCredits(void)
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CCredits::OnOKButtonClick, this));
 }
 
-CCredits::~CCredits(void)
+CCredits::~CCredits()
 {
     // Delete all the labels
     int i = 0;
@@ -295,7 +296,7 @@ CCredits::~CCredits(void)
     delete m_pWindow;
 }
 
-void CCredits::Update(void)
+void CCredits::Update()
 {
     if (m_pWindow->IsVisible())
     {
@@ -337,7 +338,7 @@ void CCredits::SetVisible(bool bVisible)
     m_clkStart = clock();
 }
 
-bool CCredits::IsVisible(void)
+bool CCredits::IsVisible()
 {
     return m_pWindow->IsVisible();
 }

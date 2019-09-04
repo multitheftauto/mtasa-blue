@@ -28,11 +28,11 @@ enum eAccessType
 class CResourceManager
 {
 public:
-    CResourceManager(void);
-    ~CResourceManager(void);
+    CResourceManager();
+    ~CResourceManager();
 
     CResource* Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                   const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
+                   const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     CResource* GetResource(const char* szResourceName);
     CResource* GetResourceFromNetID(unsigned short usNetID);
     CResource* GetResourceFromScriptID(uint uiScriptID);
@@ -42,9 +42,9 @@ public:
     bool RemoveResource(unsigned short usID);
     void Remove(CResource* pResource);
     bool Exists(CResource* pResource);
-    void StopAll(void);
+    void StopAll();
 
-    void OnDownloadGroupFinished(void);
+    void OnDownloadGroupFinished();
 
     void                   OnAddResourceFile(CDownloadableResource* pResourceFile);
     void                   OnRemoveResourceFile(CDownloadableResource* pResourceFile);

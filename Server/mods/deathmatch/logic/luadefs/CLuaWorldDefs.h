@@ -15,7 +15,7 @@
 class CLuaWorldDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // Get
     LUA_DECLARE(getTime);

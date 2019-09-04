@@ -76,11 +76,11 @@ CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
     AddHandlers();
 }
 
-CRPCFunctions::~CRPCFunctions(void)
+CRPCFunctions::~CRPCFunctions()
 {
 }
 
-void CRPCFunctions::AddHandlers(void)
+void CRPCFunctions::AddHandlers()
 {
     CAudioRPCs::LoadFunctions();
     CBlipRPCs::LoadFunctions();
@@ -157,7 +157,7 @@ void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfac
             if (pSource == NULL)
             {
 #ifdef MTA_DEBUG
-                SString strMessage("CRPCFunctions::ProcessPacket - FIXME (%s)", *pElementHandler->strName);
+                SString strMessage("FIXME: CRPCFunctions::ProcessPacket - Element doesn't exist on client (%s)", *pElementHandler->strName);
                 OutputDebugLine(SStringX("[RPC] ") + strMessage);
                 CLogger::ErrorPrintf("%s", *strMessage);
 #endif

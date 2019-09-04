@@ -21,17 +21,17 @@ class CGUIMessageBox_Impl : public CGUIMessageBox
 {
 public:
     CGUIMessageBox_Impl(class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags);
-    ~CGUIMessageBox_Impl(void);
+    ~CGUIMessageBox_Impl();
 
     void SetAutoDestroy(bool bAutoDestroy);
-    bool GetAutoDestroy(void);
+    bool GetAutoDestroy();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
     void SetClickHandler(GUI_CALLBACK Callback);
 
-    CGUIWindow* GetWindow(void);
+    CGUIWindow* GetWindow();
 
 private:
     bool OnResponseHandler(CGUIElement* pElement);

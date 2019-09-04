@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket(void)
+CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket()
 {
     m_Syncs.clear();
 }

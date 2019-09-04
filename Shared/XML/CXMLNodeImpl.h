@@ -22,28 +22,28 @@ class CXMLNodeImpl : public CXMLNode
 {
 public:
     CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
-    ~CXMLNodeImpl(void);
+    ~CXMLNodeImpl();
 
     CXMLNode* CreateSubNode(const char* szTagName, CXMLNode* pInsertBefore = nullptr);
     void      DeleteSubNode(CXMLNode* pNode) { delete pNode; };
-    void      DeleteAllSubNodes(void);
+    void      DeleteAllSubNodes();
 
-    unsigned int GetSubNodeCount(void);
+    unsigned int GetSubNodeCount();
     CXMLNode*    GetSubNode(unsigned int uiIndex);
     CXMLNode*    FindSubNode(const char* szTagName, unsigned int uiIndex = 0);
 
-    std::list<CXMLNode*>::iterator ChildrenBegin(void) { return m_Children.begin(); };
-    std::list<CXMLNode*>::iterator ChildrenEnd(void) { return m_Children.end(); };
+    std::list<CXMLNode*>::iterator ChildrenBegin() { return m_Children.begin(); };
+    std::list<CXMLNode*>::iterator ChildrenEnd() { return m_Children.end(); };
 
-    CXMLAttributes& GetAttributes(void);
-    CXMLNode*       GetParent(void);
+    CXMLAttributes& GetAttributes();
+    CXMLNode*       GetParent();
 
-    int GetLine(void);
+    int GetLine();
 
-    const std::string& GetTagName(void);
+    const std::string& GetTagName();
     void               SetTagName(const std::string& strString);
 
-    const std::string GetTagContent(void);
+    const std::string GetTagContent();
     bool              GetTagContent(bool& bContent);
     bool              GetTagContent(int& iContent);
     bool              GetTagContent(unsigned int& uiContent);
@@ -56,28 +56,28 @@ public:
     void SetTagContent(float fContent);
     void SetTagContentf(const char* szFormat, ...);
 
-    eXMLClass     GetClassType(void) { return CXML_NODE; };
-    unsigned long GetID(void)
+    eXMLClass     GetClassType() { return CXML_NODE; };
+    unsigned long GetID()
     {
-        dassert(m_pFile && m_pFile->IsUsingIDs());
+        dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
     };
-    bool IsUsingIDs(void) { return m_bUsingIDs; };
+    bool IsUsingIDs() { return m_bUsingIDs; };
 
     CXMLNode* CopyNode(CXMLNode* pParent = NULL);
     bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
 
-    TiXmlElement* GetNode(void);
-    void          DeleteWrapper(void);
+    TiXmlElement* GetNode();
+    void          DeleteWrapper();
 
     void AddToList(CXMLNode* pNode);
     void RemoveFromList(CXMLNode* pNode);
-    void RemoveAllFromList(void);
+    void RemoveAllFromList();
 
-    bool IsValid(void) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
     virtual SString GetAttributeValue(const SString& strAttributeName);
-    virtual SString GetCommentText(void);
+    virtual SString GetCommentText();
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false);
 
 private:

@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CVehicleRPCs.h"
 
-void CVehicleRPCs::LoadFunctions(void)
+void CVehicleRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_VEHICLES, DestroyAllVehicles, "DestroyAllVehicles");
     AddHandler(FIX_VEHICLE, FixVehicle, "FixVehicle");

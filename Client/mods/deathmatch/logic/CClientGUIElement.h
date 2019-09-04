@@ -50,27 +50,27 @@ class CClientGUIElement : public CClientEntity
 
 public:
     CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID);
-    virtual ~CClientGUIElement(void);
+    virtual ~CClientGUIElement();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTGUI; };
-    eCGUIType         GetCGUIType(void) const { return m_pCGUIElement->GetType(); };
-    const char*       GetCGUITypeName(void) const { return m_strCGUITypeName; };
+    eClientEntityType GetType() const { return CCLIENTGUI; };
+    eCGUIType         GetCGUIType() const { return m_pCGUIElement->GetType(); };
+    const char*       GetCGUITypeName() const { return m_strCGUITypeName; };
 
-    GUI_CALLBACK GetCallback1(void) { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent1, this); };
-    GUI_CALLBACK GetCallback2(void) { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent2, this); };
+    GUI_CALLBACK GetCallback1() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent1, this); };
+    GUI_CALLBACK GetCallback2() { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent2, this); };
 
     void SetEvents(const char* szFunc1, const char* szFunc2 = NULL);
 
-    CLuaMain* GetVirtualMachine(void) { return m_pLuaMain; }
+    CLuaMain* GetVirtualMachine() { return m_pLuaMain; }
 
     // dummy overrides
     void SetPosition(const CVector& vecDummy){};
     void GetPosition(CVector& vecDummy) const {};
 
     // cgui element access
-    CGUIElement* GetCGUIElement(void) { return m_pCGUIElement; };
+    CGUIElement* GetCGUIElement() { return m_pCGUIElement; };
     void         SetCGUIElement(CGUIElement* pCGUIElement) { m_pCGUIElement = pCGUIElement; };
 
     SString GetFont(class CClientGuiFont** ppFontElement);
