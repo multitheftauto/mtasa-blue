@@ -272,7 +272,6 @@ bool CClientFBX::LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int ui
                 case CULL_OUTSIDE:
                     lua_pushstring(luaVM, "outside");
                     break;
-
             }
             break;
     }
@@ -434,6 +433,7 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     const ofbx::Mesh*     pMesh;
     const ofbx::Material* pMaterial;
     const ofbx::Texture*  pTexture;
+    CClientTexture*       pClientTexture;
     bool                  bSupportsTransform = false;
     ofbx::Object*         pObjectParent;
     ofbx::Object::Type    eType = (*pObject)->getType();
@@ -624,6 +624,21 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
                     pTexture = pMaterial->getTexture(ofbx::Texture::NORMAL);
                     if (pTexture != nullptr)
                         lua_pushnumber(luaVM, pTexture->id);
+                    else
+                        lua_pushboolean(luaVM, false);
+                    return true;
+                default:
+                    return false;            // unsupported property
+            }
+            break;
+        case FBX_OBJECT_PROPERTY_TEXTURE:
+            switch (eType)
+            {
+                case ofbx::Object::Type::TEXTURE:
+                    pTexture = (const ofbx::Texture*)(*pObject);
+                    pClientTexture = m_mapTexture[pTexture->id];
+                    if (pClientTexture != nullptr)
+                        lua_pushelement(luaVM, pClientTexture);
                     else
                         lua_pushboolean(luaVM, false);
                     return true;
