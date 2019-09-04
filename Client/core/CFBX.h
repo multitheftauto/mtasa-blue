@@ -144,7 +144,7 @@ public:
     FBXObjectBuffer*           GetFBXBuffer(unsigned long long ullId);
     unsigned int               AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*              GetTexture(unsigned long long ullMaterialId);
-    void                       CalculateBoundingBox(const ofbx::Geometry* pGeometry);
+    CFBXBoundingBox            CalculateBoundingBox(const ofbx::Geometry* pGeometry);
     bool                       IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId);
     unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
     unsigned int               CreateTemplate();
@@ -184,6 +184,7 @@ private:
     void CacheTextures();
     void CacheMaterials();
     void CacheMeshMaterials();
+    void CacheBoundingBoxes();
     void GetMeshPath(const ofbx::Mesh* pObject, SString& name);
     bool CreateFBXBuffer(const ofbx::Object* const* pObject);
     bool AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuffer);

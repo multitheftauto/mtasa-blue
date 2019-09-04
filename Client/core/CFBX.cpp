@@ -165,19 +165,19 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                             // Set texture addressing mode
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
-                          /*  
-                            pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                            pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-                            pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-                            pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-                            pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-                            pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);*/
-                            //pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                            //pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
-                            //pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
-                            //pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                            //pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
-                            //pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
+                            /*
+                              pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                              pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                              pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+                              pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                              pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                              pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);*/
+                            // pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                            // pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
+                            // pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
+                            // pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
+                            // pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
+                            // pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
 
                             if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
                                 pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
@@ -261,9 +261,9 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObje
 {
     pViewMatrix = new CMatrix();
 
-    ZeroMemory(&material, sizeof(D3DMATERIAL9));                      // clear out the struct for use
+    ZeroMemory(&material, sizeof(D3DMATERIAL9));                     // clear out the struct for use
     material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set diffuse color to white
-    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);             // set ambient color to white
+    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set ambient color to white
 
     ZeroMemory(&light, sizeof(light));                            // clear out the light struct for use
     light.Type = D3DLIGHT_DIRECTIONAL;                            // make the light type 'directional light'
@@ -485,6 +485,7 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     CacheTextures();
     CacheMaterials();
     CacheMeshMaterials();
+    CacheBoundingBoxes();
 
     CMatrix* matrixFixInvertedUVs = new CMatrix();
     matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
@@ -540,7 +541,7 @@ void CFBXScene::CacheObjects()
     }
 }
 
-void CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
+CFBXBoundingBox CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
 {
     unsigned long long id = pGeometry->id;
 
@@ -559,7 +560,7 @@ void CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
         boundingBox.min.fZ = std::min((float)vertex->z, boundingBox.min.fZ);
         boundingBox.radius = std::max(boundingBox.radius, (float)sqrt(vertex->x * vertex->x + vertex->y * vertex->y + vertex->z * vertex->z));
     }
-    m_geometryBoundingBox[id] = boundingBox;
+    return boundingBox;
 }
 
 void CFBXScene::CacheMeshes()
@@ -574,8 +575,19 @@ void CFBXScene::CacheMeshes()
         {
             m_meshName[pMesh->id] = name;
             m_meshList[pMesh->id] = pMesh;
-            CalculateBoundingBox(pMesh->getGeometry());
         }
+    }
+}
+
+void CFBXScene::CacheBoundingBoxes()
+{
+    CFBXBoundingBox boundingBox;
+    const ofbx::Geometry* pGeometry;
+    for (const auto& pair : m_meshList)
+    {
+        pGeometry = pair.second->getGeometry();
+        boundingBox = CalculateBoundingBox(pGeometry);
+        m_geometryBoundingBox[pGeometry->id] = boundingBox;
     }
 }
 
