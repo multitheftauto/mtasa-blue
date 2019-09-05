@@ -132,11 +132,10 @@ class CFBXScene : public CFBXSceneInterface
 public:
     CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface);
 
-    bool                       IsMeshValid(const SString& strHierarchyMesh);
     bool                       IsObjectValid(unsigned long long ulId) { return m_objectList.find(ulId) != m_objectList.end(); }
     bool                       IsTemplateValid(unsigned int uiId) { return m_templateMap.count(uiId) != 0; }
-    const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh);
     const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectValid(ulId) ? m_objectList[ulId] : nullptr; }
+    bool                       GetMeshName(long long int ulId, SString& strMeshName);
     void                       GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void                       GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool                       GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
@@ -185,7 +184,6 @@ private:
     void CacheMaterials();
     void CacheMeshMaterials();
     void CacheBoundingBoxes();
-    void GetMeshPath(const ofbx::Mesh* pObject, SString& name);
     bool CreateFBXBuffer(const ofbx::Object* const* pObject);
     bool AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuffer);
 

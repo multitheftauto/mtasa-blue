@@ -35,11 +35,8 @@ public:
 
     bool LoadFBX(const SString& strFile, bool bIsRawData);
 
-    bool        IsMeshValid(const SString& strHierarchyMesh) { return m_pFBXScene->IsMeshValid(strHierarchyMesh); }
-    bool        IsObjectValid(long long int ulId) { return m_pFBXScene->IsObjectValid(ulId); }
     static bool IsFBXData(const SString& strData);
 
-    const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) { return m_pFBXScene->GetMeshByName(strHierarchyMesh); }
     const ofbx::Object* const* GetObjectById(long long int ulId) { return m_pFBXScene->GetObjectById(ulId); }
 
     void LuaGetMeshes(lua_State* luaVM);
@@ -68,9 +65,9 @@ public:
     bool ApplyTemplateToModel(unsigned int uiTemplateId, unsigned long ulModel);
     bool RemoveTemplateFromModel(unsigned int uiTemplateId, unsigned long ulModel);
 
-    void           CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
-    CMaterialItem* GetTextureById(unsigned long long strTextureName);
-    bool           IsTextureCreated(unsigned long long strTextureName);
+    void                                               CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
+    CMaterialItem*                                     GetTextureById(unsigned long long strTextureName);
+    bool                                               IsTextureCreated(unsigned long long strTextureName);
     std::map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix();
 
 

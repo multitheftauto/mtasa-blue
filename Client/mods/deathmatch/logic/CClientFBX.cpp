@@ -439,6 +439,7 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     ofbx::Object::Type    eType = (*pObject)->getType();
     CVector               min, max;
     float                 radius;
+    SString               meshName;
     switch (eProperty)
     {
         case FBX_OBJECT_PROPERTY_TYPE:
@@ -661,16 +662,27 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
                     return false;            // unsupported property
             }
             break;
+        case FBX_OBJECT_PROPERTY_NAME:
+            switch (eType)
+            {
+                case ofbx::Object::Type::MESH:
+                    m_pFBXScene->GetMeshName((*pObject)->id, meshName);
+                    lua_pushstring(luaVM, meshName.c_str());
+                    return true;
+                default:
+                    return false;            // unsupported property
+            }
+            break;
         case FBX_OBJECT_PROPERTY_MATERIALS:
             switch (eType)
             {
                 case ofbx::Object::Type::MESH:
                     pMesh = (const ofbx::Mesh*)(*pObject);
                     lua_newtable(luaVM);
-                    for (int i = 0; i < pMesh->getMaterialCount(); i++)
+                    for (int materialIndex = 0; materialIndex < pMesh->getMaterialCount(); materialIndex++)
                     {
-                        lua_pushnumber(luaVM, i + 1);
-                        lua_pushnumber(luaVM, pMesh->getMaterial(i)->id);
+                        lua_pushnumber(luaVM, materialIndex + 1);
+                        lua_pushnumber(luaVM, pMesh->getMaterial(materialIndex)->id);
                         lua_settable(luaVM, -3);
                     }
                     return true;

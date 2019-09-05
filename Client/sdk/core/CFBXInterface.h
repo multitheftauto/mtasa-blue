@@ -36,7 +36,6 @@ public:
 class CFBXSceneInterface
 {
 public:
-    virtual bool IsMeshValid(const SString& strHierarchyMesh) = 0;
     virtual bool IsObjectValid(unsigned long long ullId) = 0;
     virtual bool IsTemplateValid(unsigned int uiId) = 0;
     virtual bool IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModel) = 0;
@@ -63,11 +62,11 @@ public:
     virtual void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode) = 0;
     virtual void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode) = 0;
 
-    virtual const ofbx::Mesh const*    GetMeshByName(const SString& strHierarchyMesh) = 0;
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;
     virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
     virtual unsigned int               CreateTemplate() = 0;
     virtual void                       RemoveTemplate(unsigned int uiTemplateId) = 0;
     virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
     virtual bool                       GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius) = 0;
+    virtual bool                       GetMeshName(long long int ulId, SString& strMeshName) = 0;
 };

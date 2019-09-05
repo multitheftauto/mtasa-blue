@@ -565,23 +565,18 @@ CFBXBoundingBox CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
 
 void CFBXScene::CacheMeshes()
 {
-    SString           name;
     const ofbx::Mesh* pMesh;
     for (int i = 0; i < m_pScene->getMeshCount(); i++)
     {
         pMesh = m_pScene->getMesh(i);
-        GetMeshPath(pMesh, name);
-        if (name.compare("") != 0)            // eliminate some unnamed objects like BaseLayers
-        {
-            m_meshName[pMesh->id] = name;
-            m_meshList[pMesh->id] = pMesh;
-        }
+        m_meshName[pMesh->id] = pMesh->name;
+        m_meshList[pMesh->id] = pMesh;
     }
 }
 
 void CFBXScene::CacheBoundingBoxes()
 {
-    CFBXBoundingBox boundingBox;
+    CFBXBoundingBox       boundingBox;
     const ofbx::Geometry* pGeometry;
     for (const auto& pair : m_meshList)
     {
@@ -589,26 +584,6 @@ void CFBXScene::CacheBoundingBoxes()
         boundingBox = CalculateBoundingBox(pGeometry);
         m_geometryBoundingBox[pGeometry->id] = boundingBox;
     }
-}
-
-void CFBXScene::GetMeshPath(const ofbx::Mesh* pMesh, SString& name)
-{
-    std::vector<SString> vecNames;
-
-    int uknownId = 0;
-
-    const ofbx::Object const* pObject = (const ofbx::Object const*)pMesh;
-    vecNames.push_back(pObject->name);
-    while (pObject = pObject->getParent())
-    {
-        if (pObject == nullptr)
-            break;
-
-        vecNames.push_back(pObject->name);
-    }
-
-    std::reverse(std::begin(vecNames), std::end(vecNames));
-    name = SString::Join("/", vecNames, 1 /* 1 = ignore RootNode */, vecNames.size());
 }
 
 void CFBXScene::CacheTextures()
@@ -678,34 +653,22 @@ void CFBXScene::FixIndices()
     }
 }
 
-ofbx::Mesh const* CFBXScene::GetMeshByName(const SString& strHierarchyMesh)
-{
-    for (auto const& pair : m_meshName)
-    {
-        if (pair.second == strHierarchyMesh)
-            return m_meshList[pair.first];
-    }
-
-    return nullptr;
-}
-
-bool CFBXScene::IsMeshValid(const SString& strHierarchyMesh)
-{
-    for (auto const& pair : m_meshName)
-    {
-        if (pair.second == strHierarchyMesh)
-            return true;
-    }
-
-    return false;
-}
-
 void CFBXScene::GetAllTemplatesIds(std::vector<unsigned int>& vecIds)
 {
     for (auto const& pair : m_templateMap)
     {
         vecIds.emplace_back(pair.first);
     }
+}
+
+bool CFBXScene::GetMeshName(long long int ulId, SString& strMeshName)
+{
+    if (m_meshName.count(ulId) != 0)
+    {
+        strMeshName = m_meshName[ulId];
+        return true;
+    }
+    return false;
 }
 
 bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId)

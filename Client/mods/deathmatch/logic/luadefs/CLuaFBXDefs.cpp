@@ -37,7 +37,6 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxGetAllTextures", FBXGetAllTextures},
         {"fbxGetAllMaterials", FBXGetAllMaterials},
         {"fbxGetMeshRawData", FBXGetMeshRawData},
-        {"fbxDrawPreview", FBXDrawPreview},
 
     };
 
@@ -243,46 +242,6 @@ int CLuaFBXDefs::FBXGetAllMaterials(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFBXDefs::FBXDrawPreview(lua_State* luaVM)
-{
-    CClientFBX* pFBX;
-    SString     strHierarchyMesh;
-    CVector     vecPosition;
-    SColor      color;
-    float       fWidth;
-    bool        bPostGUI;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFBX);
-    argStream.ReadString(strHierarchyMesh);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadColor(color, 0xFFFFFFFF);
-    argStream.ReadNumber(fWidth, 1);
-    argStream.ReadBool(bPostGUI, false);
-
-    if (!argStream.HasErrors())
-    {
-        if (pFBX->IsMeshValid(strHierarchyMesh))
-        {
-            // pFBX->Draw(pFBX->GetMeshByName(strHierarchyMesh), vecPosition);
-            // pFBX->DrawPreview(pFBX->GetMeshByName(strHierarchyMesh), vecPosition, color, fWidth, bPostGUI);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-        {
-            argStream.SetCustomError("Mesh in hierarchy not found");
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFBXDefs::FBXGetObjectProperties(lua_State* luaVM)
 {
     CClientFBX*        pFBX;
@@ -295,7 +254,8 @@ int CLuaFBXDefs::FBXGetObjectProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pFBX->IsObjectValid(ulId))
+        const ofbx::Object* const* pObject = pFBX->GetObjectById(ulId);
+        if (pObject != nullptr)
         {
             if (pFBX->LuaGetObjectProperties(luaVM, pFBX->GetObjectById(ulId), eProperty))
             {
@@ -678,67 +638,67 @@ int CLuaFBXDefs::FBXRenderTemplate(lua_State* luaVM)
 
 int CLuaFBXDefs::FBXGetMeshRawData(lua_State* luaVM)
 {
-    CClientFBX*      pFBX;
-    SString          strHierarchyMesh;
-    eFBXDataType     eDataType;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFBX);
-    argStream.ReadString(strHierarchyMesh);
-    argStream.ReadEnumString(eDataType);
+    //CClientFBX*      pFBX;
+    //SString          strHierarchyMesh;
+    //eFBXDataType     eDataType;
+    //CScriptArgReader argStream(luaVM);
+    //argStream.ReadUserData(pFBX);
+    //argStream.ReadString(strHierarchyMesh);
+    //argStream.ReadEnumString(eDataType);
 
-    if (!argStream.HasErrors())
-    {
-        if (pFBX->IsMeshValid(strHierarchyMesh))
-        {
-            int iStart, iStop;
-            switch (eDataType)
-            {
-                case FBX_DATA_TYPE_VERTEX:
+    //if (!argStream.HasErrors())
+    //{
+    //    if (pFBX->IsMeshValid(strHierarchyMesh))
+    //    {
+    //        int iStart, iStop;
+    //        switch (eDataType)
+    //        {
+    //            case FBX_DATA_TYPE_VERTEX:
 
-                    argStream.ReadNumber(iStart, 0);
-                    argStream.ReadNumber(iStop, 0);
-                    iStart--, iStop--;
-                    if (!pFBX->LuaRawGetVertices(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
-                    {
-                        argStream.SetCustomError("Invalid vertex range");
-                    }
-                    break;
-                case FBX_DATA_TYPE_MATERIAL:
+    //                argStream.ReadNumber(iStart, 0);
+    //                argStream.ReadNumber(iStop, 0);
+    //                iStart--, iStop--;
+    //                if (!pFBX->LuaRawGetVertices(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
+    //                {
+    //                    argStream.SetCustomError("Invalid vertex range");
+    //                }
+    //                break;
+    //            case FBX_DATA_TYPE_MATERIAL:
 
-                    argStream.ReadNumber(iStart, 0);
-                    argStream.ReadNumber(iStop, 0);
-                    iStart--, iStop--;
-                    if (!pFBX->LuaRawGetMaterials(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
-                    {
-                        argStream.SetCustomError("Invalid material range");
-                    }
-                    break;
-                case FBX_DATA_TYPE_INDICATOR:
+    //                argStream.ReadNumber(iStart, 0);
+    //                argStream.ReadNumber(iStop, 0);
+    //                iStart--, iStop--;
+    //                if (!pFBX->LuaRawGetMaterials(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
+    //                {
+    //                    argStream.SetCustomError("Invalid material range");
+    //                }
+    //                break;
+    //            case FBX_DATA_TYPE_INDICATOR:
 
-                    argStream.ReadNumber(iStart, 0);
-                    argStream.ReadNumber(iStop, 0);
-                    iStart--, iStop--;
-                    if (!pFBX->LuaRawGetIndices(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
-                    {
-                        argStream.SetCustomError("Invalid vertex range");
-                    }
-                    break;
-                default:
-                    argStream.SetCustomError("Not supported data type");
-                    break;
-            }
-            return 1;
-        }
-        else
-        {
-            argStream.SetCustomError("Mesh in hierarchy not found");
-        }
-    }
+    //                argStream.ReadNumber(iStart, 0);
+    //                argStream.ReadNumber(iStop, 0);
+    //                iStart--, iStop--;
+    //                if (!pFBX->LuaRawGetIndices(luaVM, pFBX->GetMeshByName(strHierarchyMesh), iStart, iStop))
+    //                {
+    //                    argStream.SetCustomError("Invalid vertex range");
+    //                }
+    //                break;
+    //            default:
+    //                argStream.SetCustomError("Not supported data type");
+    //                break;
+    //        }
+    //        return 1;
+    //    }
+    //    else
+    //    {
+    //        argStream.SetCustomError("Mesh in hierarchy not found");
+    //    }
+    //}
 
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
+    //if (argStream.HasErrors())
+    //{
+    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    //}
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
