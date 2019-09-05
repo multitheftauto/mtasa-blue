@@ -48,7 +48,7 @@ public:
     bool LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     bool LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     bool LuaGetAllTemplateModels(lua_State* luaVM, unsigned int uiTemplateId);
-    void LuaGetAllObjectsIds(lua_State* luaVM);
+    void LuaGetAllObjectsIds(lua_State* luaVM, eFBXObjectType eObjectType);
     bool LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty);
     bool LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, eFBXTemplateProperty eProperty);
     bool LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, unsigned int uiModelId,

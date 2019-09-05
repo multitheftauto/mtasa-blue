@@ -120,14 +120,15 @@ int CLuaFBXDefs::FBXLoadFile(lua_State* luaVM)
 int CLuaFBXDefs::FBXGetAllObjects(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
-    SString          strFilter;
+    eFBXObjectType   eObjectType;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFBX);
+    argStream.ReadEnumString(eObjectType, FBX_OBJECT_ALL);
 
     if (!argStream.HasErrors())
     {
         lua_newtable(luaVM);
-        pFBX->LuaGetAllObjectsIds(luaVM);
+        pFBX->LuaGetAllObjectsIds(luaVM, eObjectType);
         return 1;
     }
     else

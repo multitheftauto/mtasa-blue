@@ -127,7 +127,7 @@ bool CClientFBX::IsFBXData(const SString& strData)
 //    }
 //}
 
-void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
+void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM, eFBXObjectType eObjectType)
 {
     std::vector<unsigned long long> vecIds;
     m_pFBXScene->GetAllObjectsIds(vecIds);
@@ -135,9 +135,12 @@ void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM)
     for (unsigned long long ullId : vecIds)
     {
         pObject = m_pFBXScene->GetObjectById(ullId);
-        lua_pushnumber(luaVM, ullId);
-        lua_pushstring(luaVM, g_pCore->GetFBX()->GetObjectType(*m_pFBXScene->GetObjectById(ullId)));
-        lua_settable(luaVM, -3);
+        if (eObjectType == FBX_OBJECT_ALL || (*pObject)->getType() == (ofbx::Object::Type)eObjectType)
+        {
+            lua_pushnumber(luaVM, ullId);
+            lua_pushstring(luaVM, g_pCore->GetFBX()->GetObjectType(*pObject));
+            lua_settable(luaVM, -3);
+        }
     }
 }
 

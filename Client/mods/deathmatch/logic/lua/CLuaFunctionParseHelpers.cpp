@@ -652,6 +652,24 @@ ADD_ENUM(CULL_OUTSIDE, "outside")
 ADD_ENUM(CULL_BOTH, "both")
 IMPLEMENT_ENUM_END("cull-mode")
 
+IMPLEMENT_ENUM_BEGIN(eFBXObjectType)
+//ADD_ENUM(FBX_OBJECT_ROOT, "root")
+ADD_ENUM(FBX_OBJECT_GEOMETRY, "geometry")
+ADD_ENUM(FBX_OBJECT_MATERIAL, "material")
+ADD_ENUM(FBX_OBJECT_MESH, "mesh")
+ADD_ENUM(FBX_OBJECT_TEXTURE, "texture")
+//ADD_ENUM(FBX_OBJECT_LIMB_NODE, "limbnode")
+//ADD_ENUM(FBX_OBJECT_NULL_NODE, "nullnode")
+//ADD_ENUM(FBX_OBJECT_NODE_ATTRIBUTE, "nodeattribute")
+//ADD_ENUM(FBX_OBJECT_CLUSTER, "cluster")
+//ADD_ENUM(FBX_OBJECT_SKIN, "skin")
+//ADD_ENUM(FBX_OBJECT_ANIMATION_STACK, "animationstack")
+//ADD_ENUM(FBX_OBJECT_ANIMATION_LAYER, "animationlayer")
+//ADD_ENUM(FBX_OBJECT_ANIMATION_CURVE, "animationcurve")
+//ADD_ENUM(FBX_OBJECT_ANIMATION_CURVE_NODE, "animationcurvenode")
+//ADD_ENUM(FBX_OBJECT_POSE, "pose")
+IMPLEMENT_ENUM_END("fbx-object-type")
+
 //
 // Get best guess at name of userdata type
 //
