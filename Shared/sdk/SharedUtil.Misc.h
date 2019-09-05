@@ -158,12 +158,14 @@ namespace SharedUtil
     bool IsWindows7OrGreater();
     bool IsWindows8OrGreater();
 
+    bool QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress);
+
+    DWORD GetMainThreadId();
+
 #endif
 
     // Ensure rand() seed gets set to a new unique value
     void RandomizeRandomSeed();
-
-    DWORD GetMainThreadId();
 
     //
     // Return true if currently executing the main thread
@@ -216,11 +218,12 @@ namespace SharedUtil
     // string stuff
     //
 
-    std::wstring MbUTF8ToUTF16(const std::string& s);
+    std::wstring MbUTF8ToUTF16(const SString& s);
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
+    std::string UTF16ToMbUTF8(const wchar_t* ws);
 
-    std::wstring ANSIToUTF16(const std::string& s);
+    std::wstring ANSIToUTF16(const SString& s);
 
     int GetUTF8Confidence(const unsigned char* input, int len);
 

@@ -93,8 +93,9 @@ public:
     void           SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
     unsigned short GetBitStreamVersion() { return m_usBitStreamVersion; };
     void           SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
-    void           SetPlayerVersion(const SString& strPlayerVersion);
-    const SString& GetPlayerVersion() { return m_strPlayerVersion; };
+    void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
+    const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
+    bool               ShouldIgnoreMinClientVersionChecks();
 
     void           SetLocalization(const SString& strLocalization) { m_strLocalization = strLocalization; };
     const SString& GetLocalization() { return m_strLocalization; };
@@ -354,7 +355,7 @@ private:
     int            m_iGameVersion;
     unsigned short m_usMTAVersion;
     unsigned short m_usBitStreamVersion;
-    SString        m_strPlayerVersion;
+    CMtaVersion    m_strPlayerVersion;
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
     bool           m_bIsJoined;

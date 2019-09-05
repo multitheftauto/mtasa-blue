@@ -383,7 +383,7 @@ static bool pickoneauth(struct auth *pick, unsigned long mask)
 }
 
 /*
- * Curl_http_perhapsrewind()
+ * http_perhapsrewind()
  *
  * If we are doing POST or PUT {
  *   If we have more data to send {
@@ -644,7 +644,7 @@ output_auth_headers(struct connectdata *conn,
 #endif
 
 #ifdef USE_SPNEGO
-  if((authstatus->picked == CURLAUTH_NEGOTIATE)) {
+  if(authstatus->picked == CURLAUTH_NEGOTIATE) {
     auth = "Negotiate";
     result = Curl_output_negotiate(conn, proxy);
     if(result)
@@ -1881,9 +1881,10 @@ CURLcode Curl_add_custom_headers(struct connectdata *conn,
 }
 
 #ifndef CURL_DISABLE_PARSEDATE
-CURLcode Curl_add_timecondition(struct Curl_easy *data,
+CURLcode Curl_add_timecondition(const struct connectdata *conn,
                                 Curl_send_buffer *req_buffer)
 {
+  struct Curl_easy *data = conn->data;
   const struct tm *tm;
   struct tm keeptime;
   CURLcode result;
@@ -1916,6 +1917,11 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
     break;
   }
 
+  if(Curl_checkheaders(conn, condp)) {
+    /* A custom header was specified; it will be sent instead. */
+    return CURLE_OK;
+  }
+
   /* The If-Modified-Since header family should have their times set in
    * GMT as RFC2616 defines: "All HTTP date/time stamps MUST be
    * represented in Greenwich Mean Time (GMT), without exception. For the
@@ -1941,10 +1947,10 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
 }
 #else
 /* disabled */
-CURLcode Curl_add_timecondition(struct Curl_easy *data,
+CURLcode Curl_add_timecondition(const struct connectdata *conn,
                                 Curl_send_buffer *req_buffer)
 {
-  (void)data;
+  (void)conn;
   (void)req_buffer;
   return CURLE_OK;
 }
@@ -2683,7 +2689,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
   }
 #endif
 
-  result = Curl_add_timecondition(data, req_buffer);
+  result = Curl_add_timecondition(conn, req_buffer);
   if(result)
     return result;
 
@@ -3147,6 +3153,9 @@ static CURLcode header_append(struct Curl_easy *data,
                               struct SingleRequest *k,
                               size_t length)
 {
+  /* length is at most the size of a full read buffer, for which the upper
+     bound is CURL_MAX_READ_SIZE. There is thus no chance of overflow in this
+     calculation. */
   size_t newsize = k->hbuflen + length;
   if(newsize > CURL_MAX_HTTP_HEADER) {
     /* The reason to have a max limit for this is to avoid the risk of a bad
@@ -3511,8 +3520,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
               else {
                 infof(data, "HTTP error before end of send, stop sending\n");
                 streamclose(conn, "Stop sending data before everything sent");
+                result = Curl_done_sending(conn, k);
+                if(result)
+                  return result;
                 k->upload_done = TRUE;
-                k->keepon &= ~KEEP_SEND; /* don't send */
                 if(data->state.expect100header)
                   k->exp100 = EXP100_FAILED;
               }
@@ -3769,6 +3780,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                        "HTTP 1.1 or later with persistent connection\n"));
         }
 
+        k->http_bodyless = k->httpcode >= 100 && k->httpcode < 200;
         switch(k->httpcode) {
         case 304:
           /* (quote from RFC2616, section 10.3.5): The 304 response
@@ -3786,10 +3798,9 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
            * empty line after the header fields. */
           k->size = 0;
           k->maxdownload = 0;
-          k->ignorecl = TRUE; /* ignore Content-Length headers */
+          k->http_bodyless = TRUE;
           break;
         default:
-          /* nothing */
           break;
         }
       }
@@ -3805,8 +3816,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       return result;
 
     /* Check for Content-Length: header lines to get size */
-    if(!k->ignorecl && !data->set.ignorecl &&
-       checkprefix("Content-Length:", k->p)) {
+    if(!k->http_bodyless &&
+       !data->set.ignorecl && checkprefix("Content-Length:", k->p)) {
       curl_off_t contentlength;
       CURLofft offt = curlx_strtoofft(k->p + 15, NULL, 10, &contentlength);
 
@@ -3895,7 +3906,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
        */
       streamclose(conn, "Connection: close used");
     }
-    else if(checkprefix("Transfer-Encoding:", k->p)) {
+    else if(!k->http_bodyless && checkprefix("Transfer-Encoding:", k->p)) {
       /* One or more encodings. We check for chunked and/or a compression
          algorithm. */
       /*
@@ -3911,7 +3922,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       if(result)
         return result;
     }
-    else if(checkprefix("Content-Encoding:", k->p) &&
+    else if(!k->http_bodyless && checkprefix("Content-Encoding:", k->p) &&
             data->set.str[STRING_ENCODING]) {
       /*
        * Process Content-Encoding. Look for the values: identity,
@@ -3924,7 +3935,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       if(result)
         return result;
     }
-    else if(checkprefix("Content-Range:", k->p)) {
+    else if(!k->http_bodyless && checkprefix("Content-Range:", k->p)) {
       /* Content-Range: bytes [num]-
          Content-Range: bytes: [num]-
          Content-Range: [num]-
@@ -3970,7 +3981,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
 #endif
-    else if(checkprefix("Last-Modified:", k->p) &&
+    else if(!k->http_bodyless && checkprefix("Last-Modified:", k->p) &&
             (data->set.timecondition || data->set.get_filetime) ) {
       time_t secs = time(NULL);
       k->timeofdoc = curl_getdate(k->p + strlen("Last-Modified:"),

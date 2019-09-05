@@ -42,7 +42,6 @@ project "Client Webbrowser"
 	}
 
 	defines {
-		"_WIN32_WINNT=0x502",
 		"PSAPI_VERSION=1"
 	}
 

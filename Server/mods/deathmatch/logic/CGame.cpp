@@ -1633,7 +1633,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             NetServerPlayerID p = Packet.GetSourceSocket();
             SString           strSerial;
             SString           strExtra;
-            SString           strPlayerVersion;
+            CMtaVersion       strPlayerVersion;
             {
                 SFixedString<32> strSerialTemp;
                 SFixedString<64> strExtraTemp;
@@ -1707,7 +1707,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 pPlayer->SetLocalization(Packet.GetLocalization());
 
                                 // Check if client must update
-                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()))
+                                if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick,
@@ -1720,7 +1720,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 }
 
                                 // Check if client should optionally update
-                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()))
+                                if (Packet.IsOptionalUpdateInfoRequired() && IsBelowRecommendedClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                                 {
                                     // Tell the console
                                     CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
@@ -3670,7 +3670,7 @@ void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
             // Handle special info
             std::vector<SString> parts;
             Packet.m_strMessage.Split(",", parts);
-            if (parts.size() > 2)
+            if (parts.size() > 3)
             {
                 pPlayer->m_strDetectedAC = parts[0].Replace("|", ",");
                 pPlayer->m_uiD3d9Size = atoi(parts[1]);
@@ -4230,7 +4230,7 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
 // Check if supplied version string is below current minimum requirement
 //
 //////////////////////////////////////////////////////////////////
-bool CGame::IsBelowMinimumClient(const SString& strVersion)
+bool CGame::IsBelowMinimumClient(const CMtaVersion& strVersion)
 {
     return strVersion < CalculateMinClientRequirement();
 }
@@ -4242,7 +4242,7 @@ bool CGame::IsBelowMinimumClient(const SString& strVersion)
 // Check if supplied version string is below recommended
 //
 //////////////////////////////////////////////////////////////////
-bool CGame::IsBelowRecommendedClient(const SString& strVersion)
+bool CGame::IsBelowRecommendedClient(const CMtaVersion& strVersion)
 {
     return strVersion < m_pMainConfig->GetRecommendedClientVersion();
 }
@@ -4254,16 +4254,16 @@ bool CGame::IsBelowRecommendedClient(const SString& strVersion)
 // Determine min client version setting to apply for connecting players
 //
 //////////////////////////////////////////////////////////////////
-SString CGame::CalculateMinClientRequirement()
+CMtaVersion CGame::CalculateMinClientRequirement()
 {
     if (g_pGame->IsBeingDeleted())
         return "";
 
     // Calc effective min client version
-    SString strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion();
-    SString strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement();
+    CMtaVersion strMinClientRequirementFromConfig = m_pMainConfig->GetMinClientVersion();
+    CMtaVersion strMinClientRequirementFromResources = m_pResourceManager->GetMinClientRequirement();
 
-    SString strNewMin;
+    CMtaVersion strNewMin;
 
     if (strNewMin < strMinClientRequirementFromConfig)
         strNewMin = strMinClientRequirementFromConfig;
@@ -4311,7 +4311,7 @@ SString CGame::CalculateMinClientRequirement()
 
     // Do version based kick check as well
     {
-        SString strKickMin;
+        CMtaVersion strKickMin;
 
         if (g_pGame->IsBulletSyncActive())
         {

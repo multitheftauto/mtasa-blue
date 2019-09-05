@@ -31,7 +31,7 @@ public:
 
     unsigned short GetMTAVersion() { return m_usMTAVersion; };
     unsigned short GetBitStreamVersion() { return m_usBitStreamVersion; };
-    const SString& GetPlayerVersion() { return m_strPlayerVersion; };
+    const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
 
     const char* GetNick() { return m_strNick; };
     void        SetNick(const char* szNick) { m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH); };
@@ -55,6 +55,6 @@ private:
     SString        m_strNick;
     MD5            m_Password;
     SString        m_strSerialUser;
-    SString        m_strPlayerVersion;
+    CMtaVersion    m_strPlayerVersion;
     SString        m_strLocalization;
 };
