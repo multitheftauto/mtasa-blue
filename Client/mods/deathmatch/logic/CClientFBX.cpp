@@ -1123,7 +1123,7 @@ bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMes
 
 void CClientFBX::CreateTexture(unsigned long long ullTextureId, CPixels* pPixels)
 {
-    if (m_mapTexture.find(ullTextureId) == m_mapTexture.end())
+    if (m_mapTexture.find(ullTextureId) == m_mapTexture.end() || m_mapTexture[ullTextureId] == nullptr)
         m_mapTexture[ullTextureId] =
             g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", pPixels, RDEFAULT, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
 }
