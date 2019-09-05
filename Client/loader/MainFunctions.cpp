@@ -834,15 +834,15 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"16B23FA1D3F952F6FF8BB02DE0CD36A2", "bass.dll"},
-                              {"56116E495EE5E74749F8DB37616B22EA", "bass_aac.dll"},
+    } integrityCheckList[] = {{"9946320CE991CEC2DB1D78726B87BCA0", "bass.dll"},
+                              {"FFFEC557DC0FC8696D4E0248C619860C", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
                               {"8B17186F19002C9D30A18D39FC8FEFA7", "bass_fx.dll"},
                               {"6673527EF2AE564A57DA6AED4A230819", "bassflac.dll"},
                               {"DD1AFB287DACC48C0C08CDB603D234AE", "bassmidi.dll"},
                               {"BA59B11522793EBC1D75C777CC598737", "bassmix.dll"},
                               {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
-                              {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
+                              {"07252BFB4B9A943B5B42809579536BE0", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
                               {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
                               {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
@@ -1144,6 +1144,7 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);

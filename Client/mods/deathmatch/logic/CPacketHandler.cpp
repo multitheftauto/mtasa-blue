@@ -4845,10 +4845,28 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement(ResourceDynamicEntityID);
 
+    if (!pResourceEntity || !pResourceDynamicEntity)
+    {
+        // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
+        WriteDebugEvent(SString("Packet_ResourceStart() [1] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
+                                ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
+        assert(false);
+        return;
+    }
+
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
+        if (!pResource->GetResourceEntity())
+        {
+            // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
+            WriteDebugEvent(SString("Packet_ResourceStart() [2] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
+                                    ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
+            assert(false);
+            return;
+        }
+
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
 
@@ -4971,7 +4989,18 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         {
             // Load the resource now
             if (pResource->CanBeLoaded())
+            {
+                if (!pResource->GetResourceEntity())
+                {
+                    // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
+                    WriteDebugEvent(SString("Packet_ResourceStart() [3] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
+                                            ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
+                    assert(false);
+                    return;
+                }
+
                 pResource->Load();
+            }
         }
     }
 
