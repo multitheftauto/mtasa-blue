@@ -2230,14 +2230,9 @@ int CLuaPlayerDefs::GetPlayerLocalization(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
 
-    if (!argStream.HasErrors())
-    {
-        lua_pushstring(luaVM, pPlayer->GetLocalization().c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushstring(luaVM, pPlayer->GetLocalization().c_str());
     return 1;
 }
