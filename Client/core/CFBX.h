@@ -136,6 +136,7 @@ public:
     bool                       IsTemplateValid(unsigned int uiId) { return m_templateMap.count(uiId) != 0; }
     const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectValid(ulId) ? m_objectList[ulId] : nullptr; }
     bool                       GetMeshName(long long int ulId, SString& strMeshName);
+    bool                       GetTexturePath(long long int ulId, SString& strTexturePath);
     void                       GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void                       GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool                       GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
@@ -193,6 +194,7 @@ private:
     std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
     std::map<unsigned long long, const ofbx::Mesh*>                 m_meshList;
     std::map<unsigned long long, SString>                           m_meshName;
+    std::map<unsigned long long, SString>                           m_texturePath;
     std::map<unsigned long long, CFBXBoundingBox>                   m_geometryBoundingBox;
     std::map<SString, CPixels*>                                     m_textureContentList;
     std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;

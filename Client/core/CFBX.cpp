@@ -610,6 +610,7 @@ void CFBXScene::CacheTextures()
         memcpy(pPixels->GetData(), pContent->begin + 4, pPixels->GetSize());
 
         m_textureContentList[strFilePath] = pPixels;
+        m_texturePath[pTexture->id] = strFilePath;
     }
 }
 
@@ -666,6 +667,16 @@ bool CFBXScene::GetMeshName(long long int ulId, SString& strMeshName)
     if (m_meshName.count(ulId) != 0)
     {
         strMeshName = m_meshName[ulId];
+        return true;
+    }
+    return false;
+}
+
+bool CFBXScene::GetTexturePath(long long int ulId, SString& strTexturePath)
+{
+    if (m_texturePath.count(ulId) != 0)
+    {
+        strTexturePath = m_texturePath[ulId];
         return true;
     }
     return false;

@@ -439,7 +439,7 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     ofbx::Object::Type    eType = (*pObject)->getType();
     CVector               min, max;
     float                 radius;
-    SString               meshName;
+    SString               string;
     switch (eProperty)
     {
         case FBX_OBJECT_PROPERTY_TYPE:
@@ -647,6 +647,17 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
                     return false;            // unsupported property
             }
             break;
+        case FBX_OBJECT_PROPERTY_TEXTURE_PATH:
+            switch (eType)
+            {
+                case ofbx::Object::Type::TEXTURE:
+                    m_pFBXScene->GetTexturePath((*pObject)->id, string);
+                    lua_pushstring(luaVM, string.c_str());
+                    return true;
+                default:
+                    return false;            // unsupported property
+            }
+            break;
         case FBX_OBJECT_PROPERTY_GEOMETRY:
             switch (eType)
             {
@@ -666,8 +677,8 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
             switch (eType)
             {
                 case ofbx::Object::Type::MESH:
-                    m_pFBXScene->GetMeshName((*pObject)->id, meshName);
-                    lua_pushstring(luaVM, meshName.c_str());
+                    m_pFBXScene->GetMeshName((*pObject)->id, string);
+                    lua_pushstring(luaVM, string.c_str());
                     return true;
                 default:
                     return false;            // unsupported property

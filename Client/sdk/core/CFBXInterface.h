@@ -69,4 +69,5 @@ public:
     virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
     virtual bool                       GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius) = 0;
     virtual bool                       GetMeshName(long long int ulId, SString& strMeshName) = 0;
+    virtual bool                       GetTexturePath(long long int ulId, SString& strTexturePath) = 0;
 };
