@@ -996,10 +996,15 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             CLuaArguments Arguments;
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
+            // Set discord state to players[/slot] count
+            uint playerCount = g_pClientGame->GetPlayerManager()->Count();
+            SString state(std::to_string(playerCount));
+
             if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
-                g_pCore->GetDiscordManager()->SetState(SString("%i/%i Players", g_pClientGame->GetPlayerManager()->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers()), [](EDiscordRes) {});
-            else
-                g_pCore->GetDiscordManager()->SetState(SString("%i Players", g_pClientGame->GetPlayerManager()->Count()), [](EDiscordRes) {});
+                state += "/" + std::to_string(g_pClientGame->GetServerInfo()->GetMaxPlayers());
+            
+            state += (playerCount == 1 ? " Player" : " Players");
+            g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
         }
     }
 }
