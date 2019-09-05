@@ -1330,12 +1330,6 @@ bool SharedUtil::IsMainThread()
 #ifdef WIN32
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
-
-#ifdef MTA_CLIENT
-    if (mainThreadID != currentThreadID)
-        WriteDebugEvent(SString("IsMainThread() - Main: %lu, Current: %lu", mainThreadID, currentThreadID));
-#endif
-
     return mainThreadID == currentThreadID;
 #else
     static pthread_t dwMainThread = pthread_self();
