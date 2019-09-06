@@ -19,5 +19,5 @@ CServerInfo::CServerInfo() : m_MaxPlayersCount(0)
 void CServerInfo::SetMaxPlayers(uint set)
 {
     m_MaxPlayersCount = set;
-    g_pCore->GetDiscordManager()->SetState(SString("%i/%i Players", g_pClientGame->GetPlayerManager()->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers()), [](EDiscordRes) {});
+    g_pClientGame->UpdateDiscordState();
 }

@@ -7100,3 +7100,16 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     arguments.PushNumber(event.iColSurface);
     pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
 }
+
+void CClientGame::UpdateDiscordState()
+{
+    // Set discord state to players[/slot] count
+    uint playerCount = g_pClientGame->GetPlayerManager()->Count();
+    SString state(std::to_string(playerCount));
+
+    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
+        state += "/" + std::to_string(g_pClientGame->GetServerInfo()->GetMaxPlayers());
+
+    state += (playerCount == 1 ? " Player" : " Players");
+    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
+}

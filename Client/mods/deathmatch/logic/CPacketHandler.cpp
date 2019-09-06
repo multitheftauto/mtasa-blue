@@ -457,9 +457,6 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
     g_pCore->UpdateRecentlyPlayed();
-
-    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() < 0x06D)
-        g_pCore->GetDiscordManager()->SetState(SString("%i Players", ucNumberOfPlayers), [](EDiscordRes) {});
 }
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
@@ -995,18 +992,10 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             // Call the onClientPlayerJoin event
             CLuaArguments Arguments;
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
-
-            // Set discord state to players[/slot] count
-            uint playerCount = g_pClientGame->GetPlayerManager()->Count();
-            SString state(std::to_string(playerCount));
-
-            if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
-                state += "/" + std::to_string(g_pClientGame->GetServerInfo()->GetMaxPlayers());
-            
-            state += (playerCount == 1 ? " Player" : " Players");
-            g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
         }
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1038,6 +1027,8 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
