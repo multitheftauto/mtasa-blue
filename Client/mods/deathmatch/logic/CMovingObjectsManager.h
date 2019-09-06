@@ -1,18 +1,19 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CMovingObjectsManager.h
- *  PURPOSE:     Header for moving objects manager class
+ *  PURPOSE:     Manager for moving objects
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#include "CDeathmatchObject.h"
 #include <list>
+
+class CDeathmatchObject;
 
 class CMovingObjectsManager
 {
