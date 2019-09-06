@@ -40,6 +40,11 @@ DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
 DECLARE_ENUM(eObjectProperty);
+DECLARE_ENUM(eObjectGroup::Modifiable);
+DECLARE_ENUM(eObjectGroup::DamageEffect);
+DECLARE_ENUM(eObjectGroup::CollisionResponse);
+DECLARE_ENUM(eObjectGroup::FxType);
+DECLARE_ENUM(eObjectGroup::BreakMode);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -479,6 +484,26 @@ inline SString GetClassTypeName(eSurfaceSkidMarkType*)
 inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
+}
+inline SString GetClassByTypeName(eObjectGroup::Modifiable*)
+{
+    return "objectgroup-modifiable";
+}
+inline SString GetClassByTypeName(eObjectGroup::DamageEffect*)
+{
+    return "objectgroup-damageeffect";
+}
+inline SString GetClassByTypeName(eObjectGroup::CollisionResponse*)
+{
+    return "objectgroup-collisionresponse";
+}
+inline SString GetClassByTypeName(eObjectGroup::FxType*)
+{
+    return "objectgroup-fxtype";
+}
+inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
+{
+    return "objectgroup-breakmode";
 }
 inline SString GetClassTypeName(eFBXDataType*)
 {

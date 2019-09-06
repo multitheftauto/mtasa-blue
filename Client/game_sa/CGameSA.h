@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CModelInfoSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
@@ -33,6 +34,7 @@
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
 #define     MODELINFO_MAX                   26000       // Actual max is 25755
+#define     OBJECTDYNAMICINFO_MAX           160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -103,6 +105,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
+    CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
 
 public:
     ZERO_ON_NEW
@@ -306,8 +309,9 @@ public:
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
     CFBXManager*        GetFBXManager() { return m_pFBXManager; }
 
-    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID);
+    CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*                     GetModelInfo(DWORD dwModelID);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()
     {
@@ -430,39 +434,40 @@ public:
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
 private:
-    CPools*             m_pPools;
-    CPlayerInfo*        m_pPlayerInfo;
-    CProjectileInfo*    m_pProjectileInfo;
-    CRadar*             m_pRadar;
-    CRestart*           m_pRestart;
-    CClock*             m_pClock;
-    CCoronas*           m_pCoronas;
-    CCheckpoints*       m_pCheckpoints;
-    CEventList*         m_pEventList;
-    CFireManager*       m_pFireManager;
-    CGarages*           m_pGarages;
-    CHud*               m_pHud;
-    CWanted*            m_pWanted;
-    CWeather*           m_pWeather;
-    CWorld*             m_pWorld;
-    CCamera*            m_pCamera;
-    CModelInfo*         m_pModelInfo;
-    CPickups*           m_pPickups;
-    CWeaponInfo*        m_pWeaponInfo;
-    CExplosionManager*  m_pExplosionManager;
-    C3DMarkers*         m_p3DMarkers;
-    CRenderWareSA*      m_pRenderWare;
-    CHandlingManager*   m_pHandlingManager;
-    CAnimManager*       m_pAnimManager;
-    CStreaming*         m_pStreaming;
-    CVisibilityPlugins* m_pVisibilityPlugins;
-    CKeyGen*            m_pKeyGen;
-    CRopes*             m_pRopes;
-    CFx*                m_pFx;
-    CFxManagerSA*       m_pFxManager;
-    CWaterManager*      m_pWaterManager;
-    CWeaponStatManager* m_pWeaponStatsManager;
-    CPointLights*       m_pPointLights;
+    CPools*                         m_pPools;
+    CPlayerInfo*                    m_pPlayerInfo;
+    CProjectileInfo*                m_pProjectileInfo;
+    CRadar*                         m_pRadar;
+    CRestart*                       m_pRestart;
+    CClock*                         m_pClock;
+    CCoronas*                       m_pCoronas;
+    CCheckpoints*                   m_pCheckpoints;
+    CEventList*                     m_pEventList;
+    CFireManager*                   m_pFireManager;
+    CGarages*                       m_pGarages;
+    CHud*                           m_pHud;
+    CWanted*                        m_pWanted;
+    CWeather*                       m_pWeather;
+    CWorld*                         m_pWorld;
+    CCamera*                        m_pCamera;
+    CModelInfo*                     m_pModelInfo;
+    CPickups*                       m_pPickups;
+    CWeaponInfo*                    m_pWeaponInfo;
+    CExplosionManager*              m_pExplosionManager;
+    C3DMarkers*                     m_p3DMarkers;
+    CRenderWareSA*                  m_pRenderWare;
+    CHandlingManager*               m_pHandlingManager;
+    CAnimManager*                   m_pAnimManager;
+    CStreaming*                     m_pStreaming;
+    CVisibilityPlugins*             m_pVisibilityPlugins;
+    CKeyGen*                        m_pKeyGen;
+    CRopes*                         m_pRopes;
+    CFx*                            m_pFx;
+    CFxManagerSA*                   m_pFxManager;
+    CWaterManager*                  m_pWaterManager;
+    CWeaponStatManager*             m_pWeaponStatsManager;
+    CPointLights*                   m_pPointLights;
+    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CFBXManager*        m_pFBXManager;
 
     CPad*                     m_pPad;

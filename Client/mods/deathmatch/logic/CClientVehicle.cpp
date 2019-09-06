@@ -1582,6 +1582,16 @@ void CClientVehicle::SetLightStatus(unsigned char ucLight, unsigned char ucStatu
     }
 }
 
+bool CClientVehicle::AreLightsOn()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetLightsOn();
+    }
+
+    return false;
+}
+
 float CClientVehicle::GetHeliRotorSpeed()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)

@@ -19,6 +19,7 @@ class CXML
 {
 public:
     virtual CXMLFile* CreateXML(const char* szFilename, bool bUseIDs = false, bool bReadOnly = false) = 0;
+    virtual CXMLNode* ParseString(const char* strXmlContent) = 0;
     virtual void      DeleteXML(CXMLFile* pFile) = 0;
     virtual CXMLNode* CreateDummyNode() = 0;
 

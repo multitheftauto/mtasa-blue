@@ -212,6 +212,7 @@ public:
 
     // L10n
     LUA_DECLARE(GetLocalization);
+    LUA_DECLARE(GetKeyboardLayout);
 
     // Voice functions
     LUA_DECLARE(IsVoiceEnabled);
