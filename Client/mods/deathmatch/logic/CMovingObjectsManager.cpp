@@ -22,11 +22,14 @@ void CMovingObjectsManager::DoPulse()
         Iterator current = iter++;
 
         CDeathmatchObject* const object = *current;
+        m_currentPulseObject = object;
         object->UpdateMovement();
 
-        if (!object->IsMoving())
+        if (m_currentPulseObject && !object->IsMoving())
         {
             m_List.erase(current);
         }
     }
+
+    m_currentPulseObject = nullptr;
 }
