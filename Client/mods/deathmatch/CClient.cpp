@@ -305,28 +305,32 @@ CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arg
 
     InitializeArguments result;
 
-    // Search for the first whitespace delimiter character
-    if (size_t nicknameDelimiter = view.find_first_of(' '); nicknameDelimiter != std::string_view::npos)
+    // Search for the first non-whitespace character
+    if (size_t nicknameBegin = view.find_first_not_of(' '); nicknameBegin != std::string_view::npos)
     {
-        result.nickname = view.substr(0, nicknameDelimiter);
-
-        // Search for the next non-whitespace character
-        if (nicknameDelimiter = view.find_first_not_of(' ', nicknameDelimiter); nicknameDelimiter != std::string_view::npos)
+        // Search for the first whitespace delimiter character
+        if (size_t nicknameDelimiter = view.find_first_of(' ', nicknameBegin); nicknameDelimiter != std::string_view::npos)
         {
-            // Extract password from the string remainder
-            if (size_t passwordDelimiter = view.find_first_of(' ', nicknameDelimiter); passwordDelimiter != std::string_view::npos)
+            result.nickname = view.substr(nicknameBegin, nicknameDelimiter - nicknameBegin);
+
+            // Search for the next non-whitespace character
+            if (nicknameDelimiter = view.find_first_not_of(' ', nicknameDelimiter); nicknameDelimiter != std::string_view::npos)
             {
-                result.password = view.substr(nicknameDelimiter, passwordDelimiter - nicknameDelimiter);
-            }
-            else
-            {
-                result.password = view.substr(nicknameDelimiter);
+                // Extract password from the string remainder
+                if (size_t passwordDelimiter = view.find_first_of(' ', nicknameDelimiter); passwordDelimiter != std::string_view::npos)
+                {
+                    result.password = view.substr(nicknameDelimiter, passwordDelimiter - nicknameDelimiter);
+                }
+                else
+                {
+                    result.password = view.substr(nicknameDelimiter);
+                }
             }
         }
-    }
-    else
-    {
-        result.nickname = view;
+        else
+        {
+            result.nickname = view.substr(nicknameBegin);
+        }
     }
 
     return result;
