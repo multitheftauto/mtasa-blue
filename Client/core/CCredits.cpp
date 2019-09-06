@@ -110,6 +110,7 @@ CCredits::CCredits()
         "Seweryn \"Neproify\" Figura\n"
         "Robin \"robhol\" Holm\n"
         "Gabrielius \"Dezash\" Laurinavicius\n"
+        "Kamil \"forkerer\" Marciniak\n"
         "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Ali \"Haxardous\" Qamber\n"
