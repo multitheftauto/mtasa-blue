@@ -7105,11 +7105,12 @@ void CClientGame::UpdateDiscordState()
 {
     // Set discord state to players[/slot] count
     uint playerCount = g_pClientGame->GetPlayerManager()->Count();
+    uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
     SString state(std::to_string(playerCount));
 
     if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
-        state += "/" + std::to_string(g_pClientGame->GetServerInfo()->GetMaxPlayers());
+        state += "/" + std::to_string(playerSlot);
 
-    state += (playerCount == 1 ? " Player" : " Players");
+    state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
     g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
 }
