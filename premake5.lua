@@ -140,7 +140,6 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
-		include "vendor/dffapi"
 		include "vendor/fbx"
 	end
 

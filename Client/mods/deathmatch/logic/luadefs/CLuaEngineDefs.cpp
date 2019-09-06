@@ -37,7 +37,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
-        {"engineTest", EngineTest},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1328,38 +1327,5 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
     else
         lua_pushboolean(luaVM, false);
 
-    return 1;
-}
-
-int CLuaEngineDefs::EngineTest(lua_State* luaVM)
-{
-    // CScriptArgReader argStream(luaVM);
-    const char* result;
-    try
-    {
-        gtaRwClump clump;
-        clump.Initialise(1, 1, 1);
-        clump.frameList.frames[0].Initialise(-1, 0);
-        char name[20];
-        strcpy(name, "engineTest");
-        clump.frameList.frames[0].Extension.nodeName.Initialise(name);
-
-        gtaRwStream* stream = gtaRwStreamOpen(rwSTREAMMEMORY, rwSTREAMWRITE, NULL);
-        if (stream)
-        {
-            clump.StreamWrite(stream);
-            clump.Destroy();
-            RwMemory memory;
-
-            gtaRwStreamClose(stream, (void*)&memory);
-            lua_pushlstring(luaVM, (const char*)memory.start, memory.length);
-            return 1;
-        }
-    }
-    catch (void* e)
-    {
-    }
-
-    lua_pushstring(luaVM, "empty");
     return 1;
 }
