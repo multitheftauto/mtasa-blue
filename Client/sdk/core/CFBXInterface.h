@@ -31,6 +31,7 @@ public:
     virtual void        Initialize() = 0;
     virtual bool        HasAnyFBXLoaded() = 0;
     virtual const char* GetObjectType(const ofbx::Object const* pObject) = 0;
+    virtual D3DLIGHT9*  GetGlobalLight() = 0;
 };
 
 class CFBXSceneInterface

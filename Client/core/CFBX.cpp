@@ -13,21 +13,39 @@
 
 FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMaterialId)
 {
-    IDirect3DDevice9* m_pDevice = g_pCore->GetGraphics()->GetDevice();
+    IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
-    m_pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(FBXVertex), D3DUSAGE_WRITEONLY, CUSTOMFVF, D3DPOOL_MANAGED, &v_buffer, NULL);
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vecVertexList.data(), vecVertexList.size() * sizeof(FBXVertex));
-    v_buffer->Unlock();
 
-    m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
+    pFBXVertexBuffer = new FBXVertexBuffer(vecVertexList, (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1));
+
+    pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
     i_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(int));
     i_buffer->Unlock();
 
-    vertexCount = vecVertexList.size();
     indicesCount = vecIndexList.size();
     this->ullMaterialId = ullMaterialId;
+}
+
+template <typename T>
+FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
+{
+    IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+    VOID*             pVoid;
+    pDevice->CreateVertexBuffer(vector.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &v_buffer, NULL);
+    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    memcpy(pVoid, vector.data(), vector.size() * sizeof(T));
+    v_buffer->Unlock();
+
+    bufferSize = vector.size();
+    this->FVF = FVF;
+    iTypeSize = sizeof(T);
+}
+
+void FBXVertexBuffer::Select(UINT StreamNumber)
+{
+    IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+    pDevice->SetStreamSource(StreamNumber, v_buffer, 0, iTypeSize);
 }
 
 FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList,
@@ -95,7 +113,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
 
     // select which vertex format we are using
-    pDevice->SetFVF(CUSTOMFVF);
+    pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
     FBXObjectBuffer* pObjectBuffer;
     D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
     CTextureItem*    pTextureItem;
@@ -109,46 +127,61 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
     // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
-    // pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
-    // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
-    pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
-    pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
+
+    pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
     pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));
-    pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, true);
+    pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(102, 102, 102));
 
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-    // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
-    // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-
-    pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
-    pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_LESSEQUAL);
-    pDevice->SetRenderState(D3DRS_STENCILREF, 0);
-    pDevice->SetRenderState(D3DRS_STENCILMASK, 0);
+    pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, true);
+    // pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+    // pDevice->SetRenderState(D3DRS_ALPHAREF, 0xf);
+    //pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
+    //pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_COLOR1);
+    //pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);
+    //pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1);
 
     pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
     pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
     pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 
+    pDevice->SetRenderState(D3DRS_LASTPIXEL, FALSE);
+    pDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
+    pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
+    pDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE);
+    pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+
+    pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CURRENT);
+    pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
+    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
+    pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
+    pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
+
+    // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
     CMatrix* pCameraMatrix = new CMatrix();
     g_pCore->GetGame()->GetCamera()->GetMatrix(pCameraMatrix);
     CVector vecCameraPosition = pCameraMatrix->GetPosition();
+    pDevice->SetVertexDeclaration(pScene->GetVertexDeclaration(0));
+
+    pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
+    pDevice->LightEnable(7, TRUE);
+
     for (auto const& object : m_objectMap)
     {
         object.second->GetDrawDistance(fDrawDistance);
         object.second->GetPosition(vecTemplateObjectPosition);
 
-        pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
-        pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
+        pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+        pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
 
         pDevice->SetTransform(D3DTS_TEXTURE0, pScene->GetMatrixUVFlip());
         pObjectBuffer = pScene->GetFBXBuffer(object.second->ullObjectId);
         if (pObjectBuffer != nullptr)
         {
             object.second->pViewMatrix->GetBuffer((float*)pObjectMatrix);
-            // pDevice->SetMaterial(&object->material);
             pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
 
             if (((vecTemplatePosition + vecTemplateObjectPosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
@@ -157,7 +190,11 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
                 for (auto const& pBuffer : pObjectBuffer->bufferList)
                 {
-                    if (pBuffer->ullMaterialId != 0)
+                    if (pBuffer->ullMaterialId == 0)
+                    {
+                        pDevice->SetTexture(0, nullptr);
+                    }
+                    else
                     {
                         pTextureItem = pScene->GetTexture(pBuffer->ullMaterialId);
                         if (pTextureItem != nullptr)
@@ -165,32 +202,18 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                             // Set texture addressing mode
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
                             pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
-                            /*
-                              pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                              pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-                              pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-                              pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-                              pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-                              pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);*/
-                            // pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                            // pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
-                            // pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
-                            // pDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_GAUSSIANQUAD);
-                            // pDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_GAUSSIANQUAD);
-                            // pDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_GAUSSIANQUAD);
 
                             if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
                                 pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
-                            pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
+                            pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
                             pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
                         }
                     }
 
                     pDevice->SetMaterial(&object.second->material);
-                    pDevice->SetLight(0, &object.second->light);
-                    pDevice->LightEnable(0, TRUE);
 
-                    pDevice->SetStreamSource(0, pBuffer->v_buffer, 0, sizeof(FBXVertex));
+                    pBuffer->pFBXVertexBuffer->Select(0);
+                    pObjectBuffer->diffuseBuffer->Select(1);
                     pDevice->SetIndices(pBuffer->i_buffer);
 
                     pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
@@ -198,6 +221,8 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             }
         }
     }
+
+    pDevice->LightEnable(7, FALSE);
     if (pSavedStateBlock)
     {
         pSavedStateBlock->Apply();
@@ -261,14 +286,12 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObje
 {
     pViewMatrix = new CMatrix();
 
-    ZeroMemory(&material, sizeof(D3DMATERIAL9));                     // clear out the struct for use
-    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set diffuse color to white
-    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);            // set ambient color to white
-
-    ZeroMemory(&light, sizeof(light));                            // clear out the light struct for use
-    light.Type = D3DLIGHT_DIRECTIONAL;                            // make the light type 'directional light'
-    light.Diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);            // set the light's color
-    light.Direction = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+    ZeroMemory(&material, sizeof(D3DMATERIAL9));
+    material.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+    material.Ambient = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+    material.Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f); // depends
+    material.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+    material.Power = 500.0f;
 }
 
 void CFBXTemplateObject::SetPosition(CVector& pos)
@@ -289,7 +312,6 @@ void CFBXTemplateObject::SetScale(CVector& scale)
 void CFBXTemplateObject::SetDrawDistance(float fDrawDistance)
 {
     this->fDrawDistance = fDrawDistance;
-    ;
 }
 
 void CFBXTemplateObject::GetPosition(CVector& position)
@@ -347,6 +369,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
     std::vector<FBXVertex>   vecVertices;
     std::vector<int>         vecIndices(pGeometry->getIndicesCount());
     std::vector<int>         vecMaterials(pGeometry->getMaterialCount());
+    std::vector<DWORD>       vecColors;
 
     const ofbx::Vec3* vertices = pGeometry->getVertices();
     const ofbx::Vec3* normals = pGeometry->getNormals();
@@ -373,7 +396,8 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
             vertex = vertices + i;
             normal = normals + i;
             uv = UVs + i;
-            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, dColor, uv->x, uv->y);
+            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, uv->x, uv->y);
+            vecColors.emplace_back(dColor);
         }
     }
     else
@@ -386,7 +410,8 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
             color = colors + i;
             uv = UVs + i;
             dColor = D3DCOLOR_XRGB((DWORD)((*color).x * 255), (DWORD)((*color).y * 255), (DWORD)((*color).z * 255), (DWORD)((*color).w * 255));
-            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, dColor, uv->x, uv->y);
+            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, uv->x, uv->y);
+            vecColors.push_back(dColor);
         }
     }
 
@@ -394,6 +419,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
     memcpy(vecMaterials.data(), pGeometry->getMaterials(), sizeof(int) * vecMaterials.size());
 
     FBXObjectBuffer* pBuffer = new FBXObjectBuffer(vecVertices, vecIndices, vecMaterials, pMesh);
+    pBuffer->diffuseBuffer = new FBXVertexBuffer(vecColors, D3DFVF_DIFFUSE);
     AddBuffer((*pObject)->id, pBuffer);
     return true;
 }
@@ -512,6 +538,30 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
             i++;
         }
     }
+    /*
+        CVector   pos;
+    CVector   normal;
+    CVector2D uv;
+    */
+
+    D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {
+        {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+        {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+        {1, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+        D3DDECL_END()
+    };
+
+    IDirect3DDevice9*            pDevice = g_pCore->GetGraphics()->GetDevice();
+    pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[0]);
+    D3DVERTEXELEMENT9 dwDeclPosNormalTex[] = {
+        {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+        {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+        D3DDECL_END()
+    };
+
+    pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[1]);
 }
 
 unsigned int CFBXScene::CreateTemplate()
@@ -692,6 +742,7 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
     {
         vecIds.emplace_back(pair.first);
     }
+    return true;
 }
 
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
@@ -938,6 +989,23 @@ bool CFBX::HasAnyFBXLoaded()
 
 CFBX::CFBX()
 {
+    m_pDevice = nullptr;
+
+    ZeroMemory(&m_globalLight, sizeof(m_globalLight));
+    m_globalLight.Type = D3DLIGHT_DIRECTIONAL;
+    m_globalLight.Diffuse.r = 0.4f;
+    m_globalLight.Diffuse.g = 0.4f;
+    m_globalLight.Diffuse.b = 0.4f;
+    m_globalLight.Ambient.r = 0.4f;
+    m_globalLight.Ambient.g = 0.4f;
+    m_globalLight.Ambient.b = 0.4f;
+    m_globalLight.Ambient.a = 1.0f;
+    m_globalLight.Specular = *(D3DCOLORVALUE*)&CVector4D(0.0f, 1.0f, 0.0f, 0.5f);
+    m_globalLight.Direction = *(D3DVECTOR*)&CVector(0.0f, 0, -1.0f);
+    m_globalLight.Attenuation0 = 0.2f;
+    m_globalLight.Attenuation1 = 0.2f;
+    m_globalLight.Attenuation2 = 0.2f;
+    m_globalLight.Phi = 0.2f;
 }
 
 void CFBX::Initialize()

@@ -32,10 +32,9 @@ struct FBXVertex
 {
     CVector   pos;
     CVector   normal;
-    D3DCOLOR  diffuse;
     CVector2D uv;
     FBXVertex() {}
-    FBXVertex(float x, float y, float z, float nx, float ny, float nz, D3DCOLOR diffuse, float u, float v) : diffuse(diffuse)
+    FBXVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v)
     {
         pos.fX = x;
         pos.fY = y;
@@ -47,15 +46,31 @@ struct FBXVertex
         uv.fY = v;
     }
 };
+
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
+
+class FBXVertexBuffer
+{
+public:
+    template<typename T>
+    FBXVertexBuffer(std::vector<T> vector, int FVF);
+    void Select(UINT StreamNumber);
+    private:
+    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
+    int                     bufferSize;
+    int                     iTypeSize;
+    int                     FVF;
+};
 
 class FBXBuffer
 {
 public:
     FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMterialId);
 
-    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
+    FBXVertexBuffer*        pFBXVertexBuffer;
     LPDIRECT3DINDEXBUFFER9  i_buffer = NULL;
+    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
+    int                     bufferSize;
     int                     indicesCount;
     int                     vertexCount;
     unsigned long long      ullMaterialId;
@@ -66,6 +81,8 @@ class FBXObjectBuffer
 public:
     FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList, const ofbx::Mesh* const* pMesh);
     std::vector<FBXBuffer*> bufferList;
+    FBXVertexBuffer*        diffuseBuffer;
+
 };
 
 class CFBXTemplateObject
@@ -115,8 +132,8 @@ public:
     CFBXTemplateObject*                         GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
     bool                                        IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
-    unsigned int                                GetInterior() { return uiInterior; }; 
-    unsigned int                                GetDimension() { return uiDimension; }; 
+    unsigned int                                GetInterior() { return uiInterior; };
+    unsigned int                                GetDimension() { return uiDimension; };
 
 private:
     std::map<unsigned int, CFBXTemplateObject*> m_objectMap;
@@ -172,6 +189,7 @@ public:
     void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode);
 
     D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
+    LPDIRECT3DVERTEXDECLARATION9 GetVertexDeclaration(int index) { return m_pVertexDeclaration[index]; }
 
 private:
     const ofbx::IScene*                   m_pScene;
@@ -203,7 +221,8 @@ private:
 
     std::vector<CFBXRenderItem*> m_vecTemporaryRenderLoop;
 
-    D3DXMATRIX* m_pMatrixUVFlip;
+    D3DXMATRIX*                  m_pMatrixUVFlip;
+    LPDIRECT3DVERTEXDECLARATION9 m_pVertexDeclaration[2];
 };
 
 class CFBX : public CFBXInterface
@@ -218,8 +237,10 @@ public:
     void        Initialize();
     bool        HasAnyFBXLoaded();
     const char* GetObjectType(const ofbx::Object const* pObject);
+    D3DLIGHT9*  GetGlobalLight() { return &m_globalLight; }
 
 private:
     std::vector<CFBXScene*> m_sceneList;
     IDirect3DDevice9*       m_pDevice;
+    D3DLIGHT9               m_globalLight;
 };
