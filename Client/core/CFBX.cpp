@@ -119,7 +119,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
     FBXObjectBuffer* pObjectBuffer;
     D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
-    CTextureItem*    pTextureItem;
+    CFBXTextureSet*  pTextureSet;
     float            fDrawDistance;
     CVector          vecTemplatePosition;
     CVector          vecTemplateObjectPosition;
@@ -163,9 +163,11 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
     DWORD      materialDiffuse;
     D3DXCOLOR* globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
-    float      globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
-    D3DCOLOR   d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
-        
+    DWORD      colorGlobalAmbient =
+        D3DCOLOR_ARGB((DWORD)(globalAmbient->a * 255), (DWORD)(globalAmbient->r * 255), (DWORD)(globalAmbient->g * 255), (DWORD)(globalAmbient->b * 255));
+    float    globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
+    D3DCOLOR d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
+
     for (auto const& object : m_objectMap)
     {
         materialDiffuse = D3DCOLOR_ARGB((DWORD)(object.second->material.Diffuse.a * 255), (DWORD)(object.second->material.Diffuse.r * 255),
@@ -178,7 +180,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
         pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
         pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
         pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
-        pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, *(D3DCOLOR*)globalAmbient);
+        pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, colorGlobalAmbient);
 
         pDevice->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
         pDevice->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
@@ -213,17 +215,32 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                     }
                     else
                     {
-                        pTextureItem = pScene->GetTexture(pBuffer->ullMaterialId);
-                        if (pTextureItem != nullptr)
+                        pTextureSet = pScene->GetTextureSet(pBuffer->ullMaterialId);
+                        if (pTextureSet != nullptr)
                         {
-                            // Set texture addressing mode
-                            pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureItem->m_TextureAddress);
-                            pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureItem->m_TextureAddress);
+                            if (pTextureSet->diffuse != nullptr)
+                            {
+                                // Set texture addressing mode
+                                pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pTextureSet->diffuse->m_TextureAddress);
+                                pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pTextureSet->diffuse->m_TextureAddress);
 
-                            if (pTextureItem->m_TextureAddress == TADDRESS_BORDER)
-                                pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureItem->m_uiBorderColor);
-                            pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
-                            pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                                if (pTextureSet->diffuse->m_TextureAddress == TADDRESS_BORDER)
+                                    pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pTextureSet->diffuse->m_uiBorderColor);
+                                pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
+                                pDevice->SetTexture(0, pTextureSet->diffuse->m_pD3DTexture);
+                            }
+
+                            if (pTextureSet->normal != nullptr)
+                            {
+                                // Set texture addressing mode
+                                pDevice->SetSamplerState(1, D3DSAMP_ADDRESSU, pTextureSet->normal->m_TextureAddress);
+                                pDevice->SetSamplerState(1, D3DSAMP_ADDRESSV, pTextureSet->normal->m_TextureAddress);
+
+                                if (pTextureSet->normal->m_TextureAddress == TADDRESS_BORDER)
+                                    pDevice->SetSamplerState(1, D3DSAMP_BORDERCOLOR, pTextureSet->normal->m_uiBorderColor);
+                                pDevice->SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
+                                pDevice->SetTexture(1, pTextureSet->normal->m_pD3DTexture);
+                            }
                         }
                     }
 
@@ -483,13 +500,8 @@ bool CFBXScene::GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVe
     return true;
 }
 
-CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
+CTextureItem* CFBXScene::GetTexture(const ofbx::Texture* pTexture)
 {
-    const ofbx::Material* const* pMaterial = m_materialList[ullMaterialId];
-    if (pMaterial == nullptr)
-        return nullptr;
-
-    const ofbx::Texture* pTexture = (*pMaterial)->getTexture(ofbx::Texture::TextureType::DIFFUSE);
     if (pTexture == nullptr)
         return nullptr;
 
@@ -516,6 +528,26 @@ CTextureItem* CFBXScene::GetTexture(unsigned long long ullMaterialId)
         return pTextureItem;
     }
     return nullptr;
+}
+
+CFBXTextureSet* CFBXScene::GetTextureSet(unsigned long long ullMaterialId)
+{
+    const ofbx::Material* const* pMaterial = m_materialList[ullMaterialId];
+    if (pMaterial == nullptr)
+        return nullptr;
+
+    if (m_mapMaterialTextureSet.count(ullMaterialId) == 0)
+    {
+        CFBXTextureSet* pTextureSet = new CFBXTextureSet();
+
+        const ofbx::Texture* pDiffuseTexture = (*pMaterial)->getTexture(ofbx::Texture::TextureType::DIFFUSE);
+        pTextureSet->diffuse = GetTexture(pDiffuseTexture);
+
+        const ofbx::Texture* pNormalTexture = (*pMaterial)->getTexture(ofbx::Texture::TextureType::NORMAL);
+        pTextureSet->normal = GetTexture(pNormalTexture);
+        m_mapMaterialTextureSet[ullMaterialId] = pTextureSet;
+    }
+    return m_mapMaterialTextureSet[ullMaterialId];
 }
 
 CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface) : m_pScene(scene)
@@ -1021,8 +1053,8 @@ CFBX::CFBX()
     m_globalLight.Attenuation2 = 0.2f;
     m_globalLight.Phi = 0.2f;
 
-    m_globalAmbient = new D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-    m_globalLighting = 0.4f;
+    m_globalAmbient = new D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+    m_globalLighting = 0.8f;
 }
 
 void CFBX::Initialize()
@@ -1040,6 +1072,17 @@ void CFBX::RemoveScene(CFBXScene* pScene)
 
 void CFBX::Render()
 {
+    unsigned char ucHour, ucMin;
+    g_pCore->GetGame()->GetClock()->Get(&ucHour, &ucMin);
+    if (ucHour > 23 || ucHour < 7)
+    {
+        m_globalLighting = 0.2f;
+    }
+    else
+    {
+        m_globalLighting = 0.8f;
+    }
+
     if (m_pDevice != nullptr)
     {
         for (auto const& pFBXScene : m_sceneList)

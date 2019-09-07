@@ -9,6 +9,13 @@
  *
  *****************************************************************************/
 
+class CFBXTextureSet
+{
+public:
+    CTextureItem* diffuse;
+    CTextureItem* normal;
+};
+
 struct CFBXRenderItem
 {
     unsigned int uiTemplateId;
@@ -52,10 +59,11 @@ struct FBXVertex
 class FBXVertexBuffer
 {
 public:
-    template<typename T>
+    template <typename T>
     FBXVertexBuffer(std::vector<T> vector, int FVF);
     void Select(UINT StreamNumber);
-    private:
+
+private:
     LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
     int                     bufferSize;
     int                     iTypeSize;
@@ -82,7 +90,6 @@ public:
     FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList, const ofbx::Mesh* const* pMesh);
     std::vector<FBXBuffer*> bufferList;
     FBXVertexBuffer*        diffuseBuffer;
-
 };
 
 class CFBXTemplateObject
@@ -160,7 +167,8 @@ public:
     void                       RenderScene(IDirect3DDevice9* pDevice);
     FBXObjectBuffer*           GetFBXBuffer(unsigned long long ullId);
     unsigned int               AddTemplete(CFBXTemplate* pTemplate);
-    CTextureItem*              GetTexture(unsigned long long ullMaterialId);
+    CTextureItem*              GetTexture(const ofbx::Texture* pTexture);
+    CFBXTextureSet*            GetTextureSet(unsigned long long ullMaterialId);
     CFBXBoundingBox            CalculateBoundingBox(const ofbx::Geometry* pGeometry);
     bool                       IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId);
     unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
@@ -188,7 +196,7 @@ public:
     void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode);
     void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode);
 
-    D3DMATRIX* GetMatrixUVFlip() { return m_pMatrixUVFlip; }
+    D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
     LPDIRECT3DVERTEXDECLARATION9 GetVertexDeclaration(int index) { return m_pVertexDeclaration[index]; }
 
 private:
@@ -217,6 +225,7 @@ private:
     std::map<SString, CPixels*>                                     m_textureContentList;
     std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;
     std::map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;
+    std::map<unsigned long long, CFBXTextureSet*>                   m_mapMaterialTextureSet;
     std::map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;
 
     std::vector<CFBXRenderItem*> m_vecTemporaryRenderLoop;
@@ -246,5 +255,5 @@ private:
     IDirect3DDevice9*       m_pDevice;
     D3DLIGHT9               m_globalLight;
     D3DXCOLOR*              m_globalAmbient;
-    float                   m_globalLighting; // how bright are objects, 0.0f - 1.0f
+    float                   m_globalLighting;            // how bright are objects, 0.0f - 1.0f
 };
