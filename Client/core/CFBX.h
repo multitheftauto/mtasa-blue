@@ -238,9 +238,13 @@ public:
     bool        HasAnyFBXLoaded();
     const char* GetObjectType(const ofbx::Object const* pObject);
     D3DLIGHT9*  GetGlobalLight() { return &m_globalLight; }
+    D3DXCOLOR*  GetGlobalAmbient() { return m_globalAmbient; }
+    float       GetGlobalLighting() { return m_globalLighting; }
 
 private:
     std::vector<CFBXScene*> m_sceneList;
     IDirect3DDevice9*       m_pDevice;
     D3DLIGHT9               m_globalLight;
+    D3DXCOLOR*              m_globalAmbient;
+    float                   m_globalLighting; // how bright are objects, 0.0f - 1.0f
 };

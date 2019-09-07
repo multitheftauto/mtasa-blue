@@ -107,6 +107,9 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
     }
 }
 
+int  a = D3DTOP_MODULATE;
+int  b = D3DTA_CURRENT;
+int  c = D3DTA_CONSTANT;
 void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
 {
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
@@ -127,18 +130,17 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
     // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
-
     pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
     pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(102, 102, 102));
+    // pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 255, 50));
 
     pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, true);
     // pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
     // pDevice->SetRenderState(D3DRS_ALPHAREF, 0xf);
-    //pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
-    //pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_COLOR1);
-    //pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);
-    //pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1);
+    pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
+    pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_COLOR1);
+    pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);
+    pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1);
 
     pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
     pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
@@ -150,16 +152,6 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE);
     pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
-    pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CURRENT);
-    pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
-    pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
-    pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-    pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
-    pDevice->SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
-
     // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
     CMatrix* pCameraMatrix = new CMatrix();
     g_pCore->GetGame()->GetCamera()->GetMatrix(pCameraMatrix);
@@ -169,8 +161,33 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
     pDevice->LightEnable(7, TRUE);
 
+    DWORD      materialDiffuse;
+    D3DXCOLOR* globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
+    float      globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
+    D3DCOLOR   d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
+        
     for (auto const& object : m_objectMap)
     {
+        materialDiffuse = D3DCOLOR_ARGB((DWORD)(object.second->material.Diffuse.a * 255), (DWORD)(object.second->material.Diffuse.r * 255),
+                                        (DWORD)(object.second->material.Diffuse.g * 255), (DWORD)(object.second->material.Diffuse.b * 255));
+
+        pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+
+        pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
+        pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+        pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, *(D3DCOLOR*)globalAmbient);
+
+        pDevice->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        pDevice->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
+        pDevice->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+        pDevice->SetTextureStageState(2, D3DTSS_CONSTANT, d3GlobalLightingColor);
+
+        // pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        // pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        // pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         object.second->GetDrawDistance(fDrawDistance);
         object.second->GetPosition(vecTemplateObjectPosition);
 
@@ -287,11 +304,11 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObje
     pViewMatrix = new CMatrix();
 
     ZeroMemory(&material, sizeof(D3DMATERIAL9));
-    material.Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
-    material.Ambient = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-    material.Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f); // depends
+    material.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.5f, 1.0f);
+    material.Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+    material.Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f);            // depends
     material.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-    material.Power = 500.0f;
+    material.Power = 10000.0f;
 }
 
 void CFBXTemplateObject::SetPosition(CVector& pos)
@@ -544,22 +561,18 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     CVector2D uv;
     */
 
-    D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {
-        {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-        {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-        {1, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-        D3DDECL_END()
-    };
+    D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                                   {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+                                                   {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                                   {1, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                                   D3DDECL_END()};
 
-    IDirect3DDevice9*            pDevice = g_pCore->GetGraphics()->GetDevice();
+    IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[0]);
-    D3DVERTEXELEMENT9 dwDeclPosNormalTex[] = {
-        {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-        {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-        D3DDECL_END()
-    };
+    D3DVERTEXELEMENT9 dwDeclPosNormalTex[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                              {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+                                              {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                              D3DDECL_END()};
 
     pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[1]);
 }
@@ -996,6 +1009,7 @@ CFBX::CFBX()
     m_globalLight.Diffuse.r = 0.4f;
     m_globalLight.Diffuse.g = 0.4f;
     m_globalLight.Diffuse.b = 0.4f;
+    m_globalLight.Diffuse.a = 1.0f;
     m_globalLight.Ambient.r = 0.4f;
     m_globalLight.Ambient.g = 0.4f;
     m_globalLight.Ambient.b = 0.4f;
@@ -1006,6 +1020,9 @@ CFBX::CFBX()
     m_globalLight.Attenuation1 = 0.2f;
     m_globalLight.Attenuation2 = 0.2f;
     m_globalLight.Phi = 0.2f;
+
+    m_globalAmbient = new D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+    m_globalLighting = 0.4f;
 }
 
 void CFBX::Initialize()

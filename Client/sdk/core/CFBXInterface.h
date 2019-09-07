@@ -14,6 +14,7 @@ class CFBXScene;
 class SString;
 class CClientFBXInterface;
 enum eCullMode;
+class D3DXCOLOR;
 
 namespace ofbx
 {
@@ -32,6 +33,8 @@ public:
     virtual bool        HasAnyFBXLoaded() = 0;
     virtual const char* GetObjectType(const ofbx::Object const* pObject) = 0;
     virtual D3DLIGHT9*  GetGlobalLight() = 0;
+    virtual D3DXCOLOR*  GetGlobalAmbient() = 0;
+    virtual float       GetGlobalLighting() = 0;
 };
 
 class CFBXSceneInterface
