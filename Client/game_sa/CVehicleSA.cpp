@@ -331,12 +331,6 @@ void CVehicleSA::Init()
     // dump the frames
     VehicleDump(this);
 
-    if (GetVehicleInterface()->m_nModelIndex == 449)
-    {
-        CVehicleSAInterface * pInterface = GetVehicleInterface();
-        pInterface->m_ucRailTrackID = 4;
-    }
-
     FinalizeFramesList();
 }
 
