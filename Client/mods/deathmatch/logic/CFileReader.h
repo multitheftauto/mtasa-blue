@@ -38,6 +38,14 @@ public:
     void ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead);
     void SkipBytes(const std::uint32_t u32BytesToSkip);
 
+    std::uint32_t GetRemainingBytesCount() const noexcept
+    {
+        if (static_cast<std::uint32_t>(m_vecFileDataBuffer.size()) > m_u32BytesReadFromBuffer)
+            return static_cast<std::uint32_t>(m_vecFileDataBuffer.size()) - m_u32BytesReadFromBuffer;
+        else
+            return 0;
+    }
+
 private:
     std::vector<char> m_vecFileDataBuffer;
     std::uint32_t     m_u32BytesReadFromBuffer;
