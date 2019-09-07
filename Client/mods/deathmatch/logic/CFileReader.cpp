@@ -52,7 +52,7 @@ bool CFileReader::LoadFileToMemory(const SString& strFilePath)
     }
 
     fileStream.seekg(0, std::ios::beg);
-    m_vecFileDataBuffer.reserve(static_cast<size_t>(iFileSize));
+    m_vecFileDataBuffer.resize(static_cast<size_t>(iFileSize), '\0');
     if (fileStream.read(m_vecFileDataBuffer.data(), iFileSize))
     {
         return true;

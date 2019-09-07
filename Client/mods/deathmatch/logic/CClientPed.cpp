@@ -5584,52 +5584,54 @@ bool CClientPed::IsDoingGangDriveby()
 
 void CClientPed::SetDoingGangDriveby(bool bDriveby)
 {
-    if (m_pPlayerPed)
+    m_bDoingGangDriveby = bDriveby;
+
+    if (!m_pPlayerPed)
+        return;
+
+    CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+
+    if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
     {
-        CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
-        if (pTask && pTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+        if (!bDriveby)
         {
-            if (!bDriveby)
-            {
-                pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
-            }
-        }
-        else if (bDriveby)
-        {
-            char   cSeat = GetOccupiedVehicleSeat();
-            bool   bRight = (cSeat % 2 != 0);
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight);
-            if (pTask)
-            {
-                pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-            }
-
-            char cWindow = -1;
-            switch (cSeat)
-            {
-                case 0:
-                    cWindow = WINDOW_LEFT_FRONT;
-                    break;
-
-                case 1:
-                    cWindow = WINDOW_RIGHT_FRONT;
-                    break;
-
-                case 2:
-                    cWindow = WINDOW_LEFT_BACK;
-                    break;
-
-                case 3:
-                    cWindow = WINDOW_RIGHT_BACK;
-                    break;
-            }
-            if (cWindow != -1)
-            {
-                GetOccupiedVehicle()->SetWindowOpen(cWindow, true);
-            }
+            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
     }
-    m_bDoingGangDriveby = bDriveby;
+    else if (bDriveby)
+    {
+        unsigned int seat = GetOccupiedVehicleSeat();
+        bool         bRight = (seat % 2 != 0);
+
+        if (CTask* task = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight); task != nullptr)
+        {
+            task->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+        }
+
+        uchar ucWindow = -1;
+
+        switch (seat)
+        {
+            case 0:
+                ucWindow = WINDOW_LEFT_FRONT;
+                break;
+            case 1:
+                ucWindow = WINDOW_RIGHT_FRONT;
+                break;
+            case 2:
+                ucWindow = WINDOW_LEFT_BACK;
+                break;
+            case 3:
+                ucWindow = WINDOW_RIGHT_BACK;
+                break;
+        }
+
+        if (ucWindow != -1)
+        {
+            if (CClientVehicle* vehicle = GetOccupiedVehicle(); vehicle != nullptr)
+                vehicle->SetWindowOpen(ucWindow, true);
+        }
+    }
 }
 
 bool CClientPed::IsRunningAnimation()
