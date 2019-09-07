@@ -1585,7 +1585,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(bDirection);
         BitStream.Write(fSpeed);
         
-        if (pTrainTrack && pTrainTrack->GetID() == INVALID_ELEMENT_ID)
+        if (pTrainTrack && pTrainTrack->IsDefault())
         {
             BitStream.WriteBit(true); // is default track
             BitStream.Write(pTrainTrack->GetTrackIndex());

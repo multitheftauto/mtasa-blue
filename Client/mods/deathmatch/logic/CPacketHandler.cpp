@@ -4001,7 +4001,7 @@ retry:
                         trackNode.SetPosition(position);
                         trackNodes.push_back(std::move(trackNode));
                     }
-                    pEntity = new CClientTrainTrack(EntityID, trackNodes, linkLastNode);
+                    pEntity = new CClientTrainTrack(EntityID, trackNodes, linkLastNode, false);
                     break;
                 }
 

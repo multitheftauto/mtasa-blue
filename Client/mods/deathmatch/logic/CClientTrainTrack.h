@@ -9,12 +9,13 @@
 *
 *****************************************************************************/
 #pragma once
-#include "CClientEntity.h"
+
+class CClientEntity;
 
 class CClientTrainTrack : public CClientEntity
 {
 public:
-    CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode);
+    CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode, bool isDefault);
     virtual ~CClientTrainTrack();
 
     virtual eClientEntityType GetType() const { return CCLIENTTRAINTRACK; }
@@ -29,6 +30,7 @@ public:
     size_t GetNumberOfNodes();
 
     void SetLastNodesLinked(bool linked);
+    bool IsDefault() { return m_defaultTrack; }
 
     // Sorta a hack that these are required by CClientEntity
     void Unlink () {}
@@ -37,4 +39,5 @@ public:
 
 private:
     CTrainTrack* m_pTrainTrack;
+    bool         m_defaultTrack = false;
 };

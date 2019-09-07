@@ -25,7 +25,7 @@ void CClientTrainTrackManager::Reset()
             delete pTrainTrack;
 
         // Create train tracks
-        pTrainTrack = new CClientTrainTrack(INVALID_ELEMENT_ID, OriginalTrackNodes[i], true);
+        pTrainTrack = new CClientTrainTrack(INVALID_ELEMENT_ID, OriginalTrackNodes[i], true, true);
         pTrainTrack->MakeSystemEntity();
     }
 }

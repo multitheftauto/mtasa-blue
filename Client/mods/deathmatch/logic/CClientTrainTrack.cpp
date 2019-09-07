@@ -11,11 +11,11 @@
 #include <StdInc.h>
 #include "CClientTrainTrack.h"
 
-CClientTrainTrack::CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode) : CClientEntity(ID)
+CClientTrainTrack::CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode, bool isDefault) : CClientEntity(ID)
 {
     SetTypeName("train-track");
     m_pTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(trackNodes, linkLastNode);
-
+    m_defaultTrack = isDefault;
     g_pClientGame->GetManager()->GetTrainTrackManager()->RegisterTrainTrack(this);
 }
 
