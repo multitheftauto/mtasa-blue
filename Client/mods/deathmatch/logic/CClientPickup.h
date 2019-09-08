@@ -107,6 +107,8 @@ public:
     void           SetPosition(const CVector& vecPosition);
     void           SetModel(unsigned short usModel);
 
+    void AttachTo(CClientEntity* pEntity) override;
+
     bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);
 

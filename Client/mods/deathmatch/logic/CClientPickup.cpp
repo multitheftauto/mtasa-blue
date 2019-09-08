@@ -79,6 +79,17 @@ void CClientPickup::SetModel(unsigned short usModel)
     }
 }
 
+void CClientPickup::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
+    }
+}
+
 void CClientPickup::SetVisible(bool bVisible)
 {
     // Update the flag
@@ -140,6 +151,9 @@ void CClientPickup::Create()
             // Restore the attributes
             SetInterior(ucAreaCode);
             SetDimension(usDimension);
+
+            // Reattach to an entity + any entities attached to this
+            ReattachEntities();
         }
     }
 }
