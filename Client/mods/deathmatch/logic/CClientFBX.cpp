@@ -13,7 +13,6 @@
 #include <string>
 #include <tuple>
 
-using namespace std;
 class CScriptArgReader;
 
 CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
@@ -33,6 +32,12 @@ CClientFBX::~CClientFBX(void)
         g_pCore->GetFBX()->RemoveScene((CFBXScene*)m_pFBXScene);
 
     m_pFBXManager->RemoveFromList(this);
+}
+
+template <typename R>
+bool is_ready(std::future<R> const& f)
+{
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
 
 bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* luaVM, SString strError)
@@ -60,13 +65,12 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* lua
             return false;
     }
 
-    std::thread threadAsyncLoad(&CClientFBX::LoadScene, this, luaVM, strError);
+    threadAsyncLoad = std::thread(&CClientFBX::LoadScene, this);
     threadAsyncLoad.detach();
-
     return true;
 }
 
-void CClientFBX::LoadScene(lua_State* luaVM, SString strError)
+void CClientFBX::LoadScene()
 {
     ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
@@ -74,9 +78,6 @@ void CClientFBX::LoadScene(lua_State* luaVM, SString strError)
     {
         return;
     }
-
-    if (luaVM != nullptr)
-        CLuaDefs::m_pScriptDebugging->LogCustom(luaVM, strError.Format("qaisjp it working").c_str());
 
     if (this != nullptr)
     {
@@ -86,6 +87,15 @@ void CClientFBX::LoadScene(lua_State* luaVM, SString strError)
     }
 }
 
+void CClientFBX::Render()
+{
+    if (m_bLoaded  && !m_bEventCalled)
+    {
+        CLuaArguments Arguments;
+        CallEvent("onFBXLoaded", Arguments, false);
+        m_bEventCalled = true;
+    }
+}
 // Return true if data looks like FBX file contents
 bool CClientFBX::IsFBXData(const SString& strData)
 {

@@ -17,4 +17,6 @@ public:
     virtual CMaterialItem*                                      GetTextureById(unsigned long long ullTextureId) = 0;
     virtual bool                                                IsTextureCreated(unsigned long long ullTextureId) = 0;
     virtual std::map<unsigned long long, std::vector<CMatrix>>  GetTemplatesRenderingMatrix() = 0;
+    virtual bool                                                IsLoaded() = 0;
+    virtual void                                                Render() = 0;
 };

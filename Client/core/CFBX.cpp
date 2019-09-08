@@ -778,13 +778,11 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
 
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
-    if (IsBeingRemove)
+    if (!pClientFBXInterface->IsLoaded())
         return;
-    // for (auto const& pair : m_templateMap)
-    //{
-    //    pair.second->Render(pDevice, this);
-    //}
-    // unsigned char ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
+
+    pClientFBXInterface->Render();
+
     CMatrix*      pMatrix = new CMatrix();
     D3DMATRIX*    pObjectMatrix = new D3DMATRIX();
     CFBXTemplate* pTemplate;
@@ -963,7 +961,6 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXI
 
 void CFBX::RemoveScene(CFBXScene* pScene)
 {
-    pScene->IsBeingRemove = true;
     ListRemove(m_sceneList, pScene);
     delete pScene;
 }
@@ -1059,7 +1056,6 @@ void CFBX::Initialize()
 
 CFBX::~CFBX()
 {
-
 }
 
 void CFBX::Render()

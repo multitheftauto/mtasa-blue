@@ -34,7 +34,8 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     bool LoadFBX(const SString& strFile, bool bIsRawData, lua_State* luaVM, SString strError);
-    void LoadScene(lua_State* luaVM, SString strError);
+    void LoadScene();
+    void Render();
 
     bool        IsLoaded() { return m_bLoaded; };
 
@@ -71,6 +72,7 @@ public:
     bool                                               IsTextureCreated(unsigned long long strTextureName);
     std::map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix();
 
+    CBuffer* GetBuffer() { return &m_RawDataBuffer; }
 
 private:
     CFBXSceneInterface* m_pFBXScene;
@@ -84,7 +86,9 @@ private:
     const ofbx::Vec3*     tempVertexPosition[3];
     CVector               tempVecPos[3];
     bool                                                    m_bLoaded = false;
+    bool                                                    m_bEventCalled = false;
     std::thread           threadAsyncLoad;
+    std::mutex                                              mutex;
 
     std::map<unsigned long long, CClientTexture*> m_mapTexture;
     std::map<CDeathmatchObject*, std::vector<unsigned int>> m_mapElementRenderLoop;
