@@ -53,6 +53,23 @@ void CClientPickup::Unlink()
     m_pPickupManager->RemoveFromList(this);
 }
 
+void CClientPickup::GetPosition(CVector& vecPosition) const
+{
+    if (m_pObject)
+    {
+        vecPosition = *m_pObject->GetPosition();
+    }
+    else if (m_pAttachedToEntity)
+    {
+        m_pAttachedToEntity->GetPosition(vecPosition);
+        vecPosition += m_vecAttachedPosition;
+    }
+    else
+    {
+        vecPosition = m_vecPosition;
+    }
+}
+
 void CClientPickup::SetPosition(const CVector& vecPosition)
 {
     // Different from our current position?
