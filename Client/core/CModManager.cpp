@@ -142,6 +142,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
+        m_hClientDLL = nullptr;
         return NULL;
     }
 
@@ -153,6 +154,8 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unable to init, bad version?)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
+        m_pClientBase = nullptr;
+        m_hClientDLL = nullptr;
         return NULL;
     }
 
