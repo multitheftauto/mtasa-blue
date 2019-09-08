@@ -46,7 +46,7 @@ CConnectManager::~CConnectManager()
     g_pConnectManager = NULL;
 }
 
-bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
+bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, const char* szSecret)
 {
     assert(szHost);
     assert(szNick);
@@ -99,6 +99,11 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     m_Address.s_addr = 0;
     m_usPort = usPort;
     m_bSave = true;
+
+    if (szSecret)
+        m_strDiscordSecretJoin = szSecret;
+    else
+        m_strDiscordSecretJoin.clear();
 
     m_strLastHost = m_strHost;
     m_usLastPort = m_usPort;
@@ -365,7 +370,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             if (strModName != "")
             {
                 // Populate the arguments to pass it (-c host port nick)
-                SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
+                SString strArguments("%s %s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str(), *g_pConnectManager->m_strDiscordSecretJoin);
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
@@ -389,6 +394,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 g_pConnectManager->m_strNick = "";
                 g_pConnectManager->m_strHost = "";
                 g_pConnectManager->m_strPassword = "";
+                g_pConnectManager->m_strDiscordSecretJoin = "";
 
                 g_pConnectManager->m_Address.s_addr = 0;
                 g_pConnectManager->m_usPort = 0;

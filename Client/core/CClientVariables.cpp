@@ -350,6 +350,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_remote_websites", true);                                         // Load remote websites?
     DEFAULT("browser_remote_javascript", true);                                       // Execute javascript on remote websites?
     DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
+    DEFAULT("discord_rich_presence", true);                                           // Enable Discord Game SDK
 
     if (!Exists("locale"))
     {

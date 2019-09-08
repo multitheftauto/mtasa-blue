@@ -50,6 +50,7 @@
 #include <hwbrk.h>
 
 // Core-level includes
+#include "CQueryReceiver.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"

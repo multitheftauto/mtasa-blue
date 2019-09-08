@@ -95,20 +95,20 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     g_pCore->GetCommands()->Add("showsync", "show sync data", COMMAND_ShowSyncData);
     // g_pCore->GetCommands ()->Add ( "dumpall",           "dump internals (comment)",                           COMMAND_DumpPlayers );
 #endif
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     g_pCore->GetCommands()->Add("foo", "debug command for devs", COMMAND_Foo);
-    #endif
+#endif
 
-    // Debug commands
-    #if defined (MTA_DEBUG) || defined(MTA_BETA)
+// Debug commands
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     g_pCore->GetCommands()->Add("showsyncing", "shows syncing information", COMMAND_ShowSyncing);
-    #endif
+#endif
 
 #ifdef MTA_WEPSYNCDBG
     pCore->GetCommands()->Add("showwepdata", "shows the given player weapon data (nick)", COMMAND_ShowWepdata);
 #endif
 
-    #if defined (MTA_DEBUG) || defined (MTA_DEBUG_COMMANDS)
+#if defined(MTA_DEBUG) || defined(MTA_DEBUG_COMMANDS)
     pCore->GetCommands()->Add("showwepdata", "shows the given player weapon data (nick)", COMMAND_ShowWepdata);
     pCore->GetCommands()->Add("showtasks", "shows the local player tasks (nick)", COMMAND_ShowTasks);
     pCore->GetCommands()->Add("showplayer", "shows extended player information (nick)", COMMAND_ShowPlayer);
@@ -127,7 +127,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->GetCommands()->Add("debug2", "debug function 2", COMMAND_Debug2);
     pCore->GetCommands()->Add("debug3", "debug function 3", COMMAND_Debug3);
     pCore->GetCommands()->Add("debug4", "debug function 4", COMMAND_Debug4);
-    #endif
+#endif
 
     // Got any arguments?
     if (szArguments && szArguments[0] != '\0')
@@ -176,7 +176,9 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     // g_pClientGame->EnablePacketRecorder ( "log.rec" );
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
-                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str());
+                    // Start the game
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL,
+                                             arguments.secret.c_str());
                 }
                 else
                 {
@@ -262,8 +264,8 @@ void CClient::RestreamModel(unsigned short usModel)
 
 bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
 {
-    #ifndef MTA_DEBUG
-    #ifndef MTA_ALLOW_DEBUG
+#ifndef MTA_DEBUG
+#ifndef MTA_ALLOW_DEBUG
     // Let the clientgame write its dump, then make the core terminate our process
     if (g_pClientGame && pExceptionInformation)
     {
@@ -271,14 +273,14 @@ bool CClient::HandleException(CExceptionInformation* pExceptionInformation)
     }
 
     return false;
-    #else
+#else
     // We want to be able to debug using the debugger in debug-mode
     return true;
-    #endif
-    #else
+#endif
+#else
     // We want to be able to debug using the debugger in debug-mode
     return true;
-    #endif
+#endif
 }
 
 void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
@@ -296,30 +298,49 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
     }
 }
 
+void CClient::TriggerDiscordJoin(SString strSecret)
+{
+    g_pClientGame->TriggerDiscordJoin(strSecret);
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
-    // Format: "nickname [password]"
-    // Examples: "GloriousToaster99 secret", "RandomPainter10"
+    // Format: "nickname [password] [secret]"
+    // Examples: "GloriousToaster99 secret", "RandomPainter10", "RandomNickname pw123 abc123def"
     std::string_view view(arguments);
     using size_type = std::string_view::size_type;
 
     InitializeArguments result;
 
     // Search for the first non-whitespace character
-    if (size_t nicknameBegin = view.find_first_not_of(' '); nicknameBegin != std::string_view::npos)
+    if (size_type nicknameBegin = view.find_first_not_of(' '); nicknameBegin != std::string_view::npos)
     {
         // Search for the first whitespace delimiter character
-        if (size_t nicknameDelimiter = view.find_first_of(' ', nicknameBegin); nicknameDelimiter != std::string_view::npos)
+        if (size_type nicknameDelimiter = view.find_first_of(' ', nicknameBegin); nicknameDelimiter != std::string_view::npos)
         {
             result.nickname = view.substr(nicknameBegin, nicknameDelimiter - nicknameBegin);
 
             // Search for the next non-whitespace character
             if (nicknameDelimiter = view.find_first_not_of(' ', nicknameDelimiter); nicknameDelimiter != std::string_view::npos)
             {
-                // Extract password from the string remainder
-                if (size_t passwordDelimiter = view.find_first_of(' ', nicknameDelimiter); passwordDelimiter != std::string_view::npos)
+                // Extract password from the string
+                if (size_type passwordDelimiter = view.find_first_of(' ', nicknameDelimiter); passwordDelimiter != std::string_view::npos)
                 {
                     result.password = view.substr(nicknameDelimiter, passwordDelimiter - nicknameDelimiter);
+
+                    // Search for the next non-whitespace character
+                    if (passwordDelimiter = view.find_first_not_of(' ', passwordDelimiter); passwordDelimiter != std::string_view::npos)
+                    {
+                        // Extract secret from the string
+                        if (size_type secretDelimiter = view.find_first_of(' ', passwordDelimiter); secretDelimiter != std::string_view::npos)
+                        {
+                            result.secret = view.substr(passwordDelimiter, secretDelimiter - passwordDelimiter);
+                        }
+                        else
+                        {
+                            result.secret = view.substr(passwordDelimiter);
+                        }
+                    }
                 }
                 else
                 {

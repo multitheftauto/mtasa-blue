@@ -21,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -34,7 +35,7 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-CCore::CCore()
+CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -565,6 +566,9 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (bConnected) m_DiscordManager->RegisterPlay(true);
+    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -779,6 +783,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1978,6 +1983,28 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
+}
+
+//
+// ResetDiscordRichPresence
+//
+void CCore::ResetDiscordRichPresence()
+{
+    time_t currentTime;
+    time(&currentTime);
+
+    // Set default parameters
+    SDiscordActivity activity;
+    activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
+    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+        if (res == DiscordRes_Ok)
+            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else
+            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+    });
+    m_DiscordManager->RegisterPlay(false);
 }
 
 //
