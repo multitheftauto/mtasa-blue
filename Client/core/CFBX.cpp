@@ -126,17 +126,11 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     CVector          vecPosition(pOffsetMatrix->m[3][0], pOffsetMatrix->m[3][1], pOffsetMatrix->m[3][2]);
     pViewMatrix->GetBuffer((float*)pObjectMatrix);
     vecTemplatePosition = pViewMatrix->GetPosition();
-    // pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-    // pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-    // pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
     pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
     pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    // pDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 255, 50));
 
     pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, true);
-    // pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-    // pDevice->SetRenderState(D3DRS_ALPHAREF, 0xf);
     pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
     pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_COLOR1);
     pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);
@@ -146,11 +140,8 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
     pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 
-    pDevice->SetRenderState(D3DRS_LASTPIXEL, FALSE);
     pDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
     pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
-    pDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE);
-    pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
     // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
     CMatrix* pCameraMatrix = new CMatrix();
@@ -174,8 +165,8 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                                         (DWORD)(object.second->material.Diffuse.g * 255), (DWORD)(object.second->material.Diffuse.b * 255));
 
         pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
         pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
         pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
@@ -321,11 +312,11 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObje
     pViewMatrix = new CMatrix();
 
     ZeroMemory(&material, sizeof(D3DMATERIAL9));
-    material.Diffuse = D3DXCOLOR(0.0f, 0.0f, 0.5f, 1.0f);
+    material.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
     material.Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
     material.Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f);            // depends
-    material.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-    material.Power = 10000.0f;
+    material.Emissive = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.5f);
+    material.Power = 5.0f;
 }
 
 void CFBXTemplateObject::SetPosition(CVector& pos)
@@ -587,11 +578,6 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
             i++;
         }
     }
-    /*
-        CVector   pos;
-    CVector   normal;
-    CVector2D uv;
-    */
 
     D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
                                                    {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
@@ -1039,14 +1025,14 @@ CFBX::CFBX()
     ZeroMemory(&m_globalLight, sizeof(m_globalLight));
     m_globalLight.Type = D3DLIGHT_DIRECTIONAL;
     m_globalLight.Diffuse.r = 0.4f;
-    m_globalLight.Diffuse.g = 0.4f;
+    m_globalLight.Diffuse.g = 1.0f;
     m_globalLight.Diffuse.b = 0.4f;
     m_globalLight.Diffuse.a = 1.0f;
-    m_globalLight.Ambient.r = 0.4f;
-    m_globalLight.Ambient.g = 0.4f;
-    m_globalLight.Ambient.b = 0.4f;
+    m_globalLight.Ambient.r = 1.0f;
+    m_globalLight.Ambient.g = 1.0f;
+    m_globalLight.Ambient.b = 1.0f;
     m_globalLight.Ambient.a = 1.0f;
-    m_globalLight.Specular = *(D3DCOLORVALUE*)&CVector4D(0.0f, 1.0f, 0.0f, 0.5f);
+    m_globalLight.Specular = *(D3DCOLORVALUE*)&CVector4D(0.5f, 0.5f, 0.5f, 0.5f);
     m_globalLight.Direction = *(D3DVECTOR*)&CVector(0.0f, 0, -1.0f);
     m_globalLight.Attenuation0 = 0.2f;
     m_globalLight.Attenuation1 = 0.2f;
@@ -1064,10 +1050,12 @@ void CFBX::Initialize()
 
 CFBX::~CFBX()
 {
+
 }
 
 void CFBX::RemoveScene(CFBXScene* pScene)
 {
+
 }
 
 void CFBX::Render()

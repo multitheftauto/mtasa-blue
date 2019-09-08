@@ -29,9 +29,7 @@ public:
     LUA_DECLARE(FBXTemplateRemoveModel);
     LUA_DECLARE(FBXGetAllTemplates);
     LUA_DECLARE(FBXGetAllTemplateModels);
-    LUA_DECLARE(FBXGetAllMeshes);
     LUA_DECLARE(FBXGetAllTextures);
-    LUA_DECLARE(FBXGetAllMaterials);
     LUA_DECLARE(FBXGetMeshRawData);
     LUA_DECLARE(FBXAddTemplate);
     LUA_DECLARE(FBXRemoveTemplate);

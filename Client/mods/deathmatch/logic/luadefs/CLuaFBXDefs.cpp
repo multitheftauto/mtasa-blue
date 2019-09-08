@@ -33,9 +33,7 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxRemoveTemplateFromElement", FBXRemoveTemplateFromElement},
         {"fbxRenderTemplate", FBXRenderTemplate},
 
-        {"fbxGetAllMeshes", FBXGetAllMeshes},
         {"fbxGetAllTextures", FBXGetAllTextures},
-        {"fbxGetAllMaterials", FBXGetAllMaterials},
         {"fbxGetMeshRawData", FBXGetMeshRawData},
 
     };
@@ -181,28 +179,6 @@ int CLuaFBXDefs::FBXGetAllTemplateModels(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFBXDefs::FBXGetAllMeshes(lua_State* luaVM)
-{
-    CClientFBX*      pFBX;
-    SString          strFilter;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFBX);
-    argStream.ReadString(strFilter, "");
-
-    if (!argStream.HasErrors())
-    {
-        lua_newtable(luaVM);
-        pFBX->LuaGetMeshes(luaVM);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFBXDefs::FBXGetAllTextures(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
@@ -213,26 +189,6 @@ int CLuaFBXDefs::FBXGetAllTextures(lua_State* luaVM)
     {
         lua_newtable(luaVM);
         pFBX->LuaGetTextures(luaVM);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFBXDefs::FBXGetAllMaterials(lua_State* luaVM)
-{
-    CClientFBX*      pFBX;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFBX);
-
-    if (!argStream.HasErrors())
-    {
-        lua_newtable(luaVM);
-        pFBX->LuaGetMaterials(luaVM);
         return 1;
     }
     else

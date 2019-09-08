@@ -75,58 +75,6 @@ bool CClientFBX::IsFBXData(const SString& strData)
     return strData.length() > 128;
 }
 
-//
-// void CClientFBX::DrawPreview(const ofbx::Mesh* pMesh, CVector vecPosition, SColor color, float fWidth, bool bPostGUI)
-//{
-//    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-//    pTempGeometry = pMesh->getGeometry();
-//
-//    int               size = pTempGeometry->getIndicesCount() - 3;
-//    const ofbx::Vec3* pVertices = pTempGeometry->getVertices();
-//    const int*        pFaceIndices = pTempGeometry->getFaceIndices();
-//    for (int i = 0; i < size; i += 3)
-//    {
-//        tempVertexPosition[0] = pVertices + pFaceIndices[i];
-//        tempVertexPosition[1] = pVertices + pFaceIndices[i + 1];
-//        tempVertexPosition[2] = pVertices + pFaceIndices[i + 2];
-//        tempVecPos[0].fX = tempVertexPosition[0]->x + vecPosition.fX;
-//        tempVecPos[0].fY = tempVertexPosition[0]->y + vecPosition.fY;
-//        tempVecPos[0].fZ = tempVertexPosition[0]->z + vecPosition.fZ;
-//
-//        tempVecPos[1].fX = tempVertexPosition[1]->x + vecPosition.fX;
-//        tempVecPos[1].fY = tempVertexPosition[1]->y + vecPosition.fY;
-//        tempVecPos[1].fZ = tempVertexPosition[1]->z + vecPosition.fZ;
-//
-//        tempVecPos[2].fX = tempVertexPosition[2]->x + vecPosition.fX;
-//        tempVecPos[2].fY = tempVertexPosition[2]->y + vecPosition.fY;
-//        tempVecPos[2].fZ = tempVertexPosition[2]->z + vecPosition.fZ;
-//
-//        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[1], fWidth, color, bPostGUI);
-//        pGraphics->DrawLine3DQueued(tempVecPos[0], tempVecPos[2], fWidth, color, bPostGUI);
-//        pGraphics->DrawLine3DQueued(tempVecPos[1], tempVecPos[2], fWidth, color, bPostGUI);
-//    }
-//}
-//
-// void CClientFBX::Render()
-//{
-//    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-//    for (auto const& pair : m_templateMap)
-//    {
-//        /*
-//                const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
-//        uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
-//
-//        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
-//        */
-//        std::vector<CVector> asd;
-//        asd.emplace_back(0, 0, 0);
-//        asd.emplace_back(10, 0, 0);
-//        asd.emplace_back(0, 10, 0);
-//        pGraphics->GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 3, &asd.at(0), sizeof(CVector));
-//        g_pCore->GetConsole()->Printf("draw id %i", pair.first);
-//    }
-//}
-
 void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM, eFBXObjectType eObjectType)
 {
     std::vector<unsigned long long> vecIds;
@@ -402,26 +350,6 @@ void CClientFBX::LuaGetTextures(lua_State* luaVM)
         lua_pushelement(luaVM, pTexture.second);
         lua_settable(luaVM, -3);
     }
-}
-
-void CClientFBX::LuaGetMaterials(lua_State* luaVM)
-{
-    // for (auto const& pMaterial : m_materialList)
-    //{
-    //    lua_pushnumber(luaVM, (*pMaterial)->id);
-    //    lua_pushstring(luaVM, (*pMaterial)->name);
-    //    lua_settable(luaVM, -3);
-    //}
-}
-
-void CClientFBX::LuaGetMeshes(lua_State* luaVM)
-{
-    // for (auto const& pair : m_meshList)
-    //{
-    //    lua_pushnumber(luaVM, pair.second->id);
-    //    lua_pushstring(luaVM, pair.first.c_str());
-    //    lua_settable(luaVM, -3);
-    //}
 }
 
 bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject, eFBXObjectProperty eProperty)

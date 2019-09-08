@@ -39,10 +39,8 @@ public:
 
     const ofbx::Object* const* GetObjectById(long long int ulId) { return m_pFBXScene->GetObjectById(ulId); }
 
-    void LuaGetMeshes(lua_State* luaVM);
     void LuaGetTextures(lua_State* luaVM);
     bool LuaGetAllTemplates(lua_State* luaVM);
-    void LuaGetMaterials(lua_State* luaVM);
     bool LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject, eFBXObjectProperty eProperty);
     bool LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
     bool LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
