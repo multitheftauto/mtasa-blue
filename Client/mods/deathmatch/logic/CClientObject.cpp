@@ -835,5 +835,15 @@ void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNe
     m_bVisibleInAllDimensions = bVisible;
 
     // Stream-in/out the object as needed
-    this->SetDimension(bVisible ? g_pClientGame->GetLocalPlayer()->GetDimension() : usNewDimension);
+    if (bVisible)
+    {
+        if (g_pClientGame->GetLocalPlayer())
+        {
+            SetDimension(g_pClientGame->GetLocalPlayer()->GetDimension());
+        }
+    }
+    else
+    {
+        SetDimension(usNewDimension);
+    }
 }
