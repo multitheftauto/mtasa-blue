@@ -39,6 +39,12 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
+        {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
+        {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
+        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
+        {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
+        {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -69,6 +75,12 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
+    lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "setObjectGroupPhysicalProperty", "engineSetObjectGroupPhysicalProperty");
+    lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
+    lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -1395,5 +1407,435 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
     else
         lua_pushboolean(luaVM, false);
 
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  int engineGetModelPhysicalPropertiesGroup ( int modelID )
+    int iModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+
+    if (!argStream.HasErrors())
+    {
+        if (iModelID < 0 || iModelID >= 20000)
+        {
+            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        }
+
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
+    int          iModelID;
+    unsigned int iNewGroup;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+    argStream.ReadNumber(iNewGroup);
+
+    if (!argStream.HasErrors())
+    {
+        if (iModelID < 0 || iModelID > 19999)
+        {
+            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        }
+
+        if (iNewGroup < 0 || iNewGroup > 159)
+        {
+            argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        }
+
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            pModelInfo->SetObjectPropertiesGroup(iNewGroup);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  bool engineRestoreModelPhysicalPropertiesGroup ( int modelID )
+    int iModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+
+    if (!argStream.HasErrors())
+    {
+        if (iModelID < 0 || iModelID > 19999)
+        {
+            argStream.SetCustomError("Expected model ID in range [0-19999] at argument 1");
+            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        }
+
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            pModelInfo->RestoreObjectPropertiesGroup();
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, float)>> g_GroupPropertiesSettersFloat{
+    {eObjectGroup::Modifiable::MASS,                [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetMass(fValue); }},
+    {eObjectGroup::Modifiable::TURNMASS,            [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetTurnMass(fValue); }},
+    {eObjectGroup::Modifiable::AIRRESISTANCE,       [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetAirResistance(fValue); }},
+    {eObjectGroup::Modifiable::ELASTICITY,          [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetElasticity(fValue); }},
+    {eObjectGroup::Modifiable::BUOYANCY,            [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetBuoyancy(fValue); }},
+    {eObjectGroup::Modifiable::UPROOTLIMIT,         [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetUprootLimit(fValue); }},
+    {eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetCollisionDamageMultiplier(fValue); }},
+    {eObjectGroup::Modifiable::SMASHMULTIPLIER,     [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetSmashMultiplier(fValue); }},
+    {eObjectGroup::Modifiable::BREAKVELOCITYRAND,   [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetBreakVelocityRandomness(fValue); }},
+};
+std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, bool)>> g_GroupPropertiesSettersBool{
+    {eObjectGroup::Modifiable::CAMERAAVOID,    [](CObjectGroupPhysicalProperties* pGroup, bool bValue) { pGroup->SetCameraAvoidObject(bValue); }},
+    {eObjectGroup::Modifiable::EXPLOSION,      [](CObjectGroupPhysicalProperties* pGroup, bool bValue) { pGroup->SetCausesExplosion(bValue); }},
+    {eObjectGroup::Modifiable::SPARKSONIMPACT, [](CObjectGroupPhysicalProperties* pGroup, bool bValue) { pGroup->SetSparksOnImpact(bValue); }},
+};
+std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, CVector)>> g_GroupPropertiesSettersVector{
+    {eObjectGroup::Modifiable::FXOFFSET,      [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetFxOffset(vecValue); }},
+    {eObjectGroup::Modifiable::BREAKVELOCITY, [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetBreakVelocity(vecValue); }},
+};
+
+int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
+{
+    //  bool engineSetObjectGroupPhysicalProperty ( int groupID, string property, ...)
+    int                      iGivenGroup;
+    eObjectGroup::Modifiable eProperty;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iGivenGroup);
+    argStream.ReadEnumString(eProperty);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (iGivenGroup < 0 || iGivenGroup > 159)
+    {
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    switch (eProperty)
+    {
+        case eObjectGroup::Modifiable::MASS:
+        case eObjectGroup::Modifiable::TURNMASS:
+        case eObjectGroup::Modifiable::AIRRESISTANCE:
+        case eObjectGroup::Modifiable::ELASTICITY:
+        case eObjectGroup::Modifiable::BUOYANCY:
+        case eObjectGroup::Modifiable::UPROOTLIMIT:
+        case eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER:
+        case eObjectGroup::Modifiable::SMASHMULTIPLIER:
+        case eObjectGroup::Modifiable::BREAKVELOCITYRAND:
+        {
+            float fValue;
+            argStream.ReadNumber(fValue);
+            if (argStream.HasErrors())
+                break;
+
+            g_GroupPropertiesSettersFloat[eProperty](pGroup, fValue);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::CAMERAAVOID:
+        case eObjectGroup::Modifiable::EXPLOSION:
+        case eObjectGroup::Modifiable::SPARKSONIMPACT:
+        {
+            bool bValue;
+            argStream.ReadBool(bValue);
+            if (argStream.HasErrors())
+                break;
+
+            g_GroupPropertiesSettersBool[eProperty](pGroup, bValue);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXOFFSET:
+        case eObjectGroup::Modifiable::BREAKVELOCITY:
+        {
+            CVector vecValue;
+            argStream.ReadVector3D(vecValue);
+            if (argStream.HasErrors())
+                break;
+
+            g_GroupPropertiesSettersVector[eProperty](pGroup, vecValue);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::COLDAMAGEEFFECT:
+        {
+            eObjectGroup::DamageEffect eDamEffect;
+            argStream.ReadEnumString(eDamEffect);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetCollisionDamageEffect(eDamEffect);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::SPECIALCOLRESPONSE:
+        {
+            eObjectGroup::CollisionResponse eColRepsonse;
+            argStream.ReadEnumString(eColRepsonse);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetCollisionSpecialResponseCase(eColRepsonse);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXTYPE:
+        {
+            eObjectGroup::FxType eFxType;
+            argStream.ReadEnumString(eFxType);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetFxType(eFxType);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::BREAKMODE:
+        {
+            eObjectGroup::BreakMode eBreakMode;
+            argStream.ReadEnumString(eBreakMode);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBreakMode(eBreakMode);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXSYSTEM:
+        {
+            if (argStream.NextIsBool())
+            {
+                bool bRemove;
+                argStream.ReadBool(bRemove);
+                if (!bRemove)
+                {
+                    pGroup->RemoveFxParticleSystem();
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+
+                argStream.SetCustomError("Expected either false, or valid fx system name at argument 3");
+                break;
+            }
+            else
+            {
+                SString sName;
+                argStream.ReadString(sName);
+                if (argStream.HasErrors())
+                    break;
+
+                if (!g_pGame->GetFxManager()->IsValidFxSystemBlueprintName(sName))
+                {
+                    argStream.SetCustomError("Expected valid fx system name at argument 3");
+                    break;
+                }
+
+                CFxSystemBPSAInterface* pBlueprint = g_pGame->GetFxManager()->GetFxSystemBlueprintByName(sName);
+                if (pGroup->SetFxParticleSystem(pBlueprint))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                else
+                {
+                    argStream.SetCustomError("Given fx system isn't supported");
+                    break;
+                }
+            }
+        }
+    }
+    
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+std::unordered_map<eObjectGroup::Modifiable, std::function<float(CObjectGroupPhysicalProperties*)>> g_GroupPropertiesGettersFloat{
+    {eObjectGroup::Modifiable::MASS,                [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetMass(); }},
+    {eObjectGroup::Modifiable::TURNMASS,            [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetTurnMass(); }},
+    {eObjectGroup::Modifiable::AIRRESISTANCE,       [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetAirResistance(); }},
+    {eObjectGroup::Modifiable::ELASTICITY,          [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetElasticity(); }},
+    {eObjectGroup::Modifiable::BUOYANCY,            [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBuoyancy(); }},
+    {eObjectGroup::Modifiable::UPROOTLIMIT,         [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetUprootLimit(); }},
+    {eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetCollisionDamageMultiplier(); }},
+    {eObjectGroup::Modifiable::SMASHMULTIPLIER,     [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetSmashMultiplier(); }},
+    {eObjectGroup::Modifiable::BREAKVELOCITYRAND,   [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBreakVelocityRandomness(); }},
+};
+std::unordered_map<eObjectGroup::Modifiable, std::function<bool(CObjectGroupPhysicalProperties*)>> g_GroupPropertiesGettersBool{
+    {eObjectGroup::Modifiable::CAMERAAVOID,    [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetCameraAvoidObject(); }},
+    {eObjectGroup::Modifiable::EXPLOSION,      [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetCausesExplosion(); }},
+    {eObjectGroup::Modifiable::SPARKSONIMPACT, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetSparksOnImpact(); }},
+};
+std::unordered_map<eObjectGroup::Modifiable, std::function<CVector(CObjectGroupPhysicalProperties*)>> g_GroupPropertiesGettersVector{
+    {eObjectGroup::Modifiable::FXOFFSET,      [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetFxOffset(); }},
+    {eObjectGroup::Modifiable::BREAKVELOCITY, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBreakVelocity(); }},
+};
+int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
+{
+    //  bool engineGetObjectGroupPhysicalProperty ( int groupID, string property )
+    int                      iGivenGroup;
+    eObjectGroup::Modifiable eProperty;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iGivenGroup);
+    argStream.ReadEnumString(eProperty);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (iGivenGroup < 0 || iGivenGroup > 159)
+    {
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    switch (eProperty)
+    {
+        case eObjectGroup::Modifiable::MASS:
+        case eObjectGroup::Modifiable::TURNMASS:
+        case eObjectGroup::Modifiable::AIRRESISTANCE:
+        case eObjectGroup::Modifiable::ELASTICITY:
+        case eObjectGroup::Modifiable::BUOYANCY:
+        case eObjectGroup::Modifiable::UPROOTLIMIT:
+        case eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER:
+        case eObjectGroup::Modifiable::SMASHMULTIPLIER:
+        case eObjectGroup::Modifiable::BREAKVELOCITYRAND:
+        {
+            float fValue = g_GroupPropertiesGettersFloat[eProperty](pGroup);
+            lua_pushnumber(luaVM, fValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::CAMERAAVOID:
+        case eObjectGroup::Modifiable::EXPLOSION:
+        case eObjectGroup::Modifiable::SPARKSONIMPACT:
+        {
+            bool bValue = g_GroupPropertiesGettersBool[eProperty](pGroup);
+            lua_pushboolean(luaVM, bValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXOFFSET:
+        case eObjectGroup::Modifiable::BREAKVELOCITY:
+        {
+            CVector vecValue = g_GroupPropertiesGettersVector[eProperty](pGroup);
+            lua_pushvector(luaVM, vecValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::COLDAMAGEEFFECT:
+        {
+            eObjectGroup::DamageEffect eDamEffect = pGroup->GetCollisionDamageEffect();
+            if (!EnumValueValid(eDamEffect))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eDamEffect));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::SPECIALCOLRESPONSE:
+        {
+            eObjectGroup::CollisionResponse eColRepsonse = pGroup->GetCollisionSpecialResponseCase();
+            if (!EnumValueValid(eColRepsonse))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eColRepsonse));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXTYPE:
+        {
+            eObjectGroup::FxType eFxType = pGroup->GetFxType();
+            if (!EnumValueValid(eFxType))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eFxType));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::BREAKMODE:
+        {
+            eObjectGroup::BreakMode eBreakMode = pGroup->GetBreakMode();
+            if (!EnumValueValid(eBreakMode))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eBreakMode));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXSYSTEM:
+        {
+            argStream.SetCustomError("Fx system name isn't possible to be extracted.");
+            break;
+        }
+    }
+
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
+{
+    //  bool engineRestoreObjectGroupPhysicalProperties ( int groupID )
+    int iGivenGroup;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iGivenGroup);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (iGivenGroup < 0 || iGivenGroup > 159)
+    {
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    pGroup->RestoreDefault();
+    lua_pushboolean(luaVM, true);
     return 1;
 }

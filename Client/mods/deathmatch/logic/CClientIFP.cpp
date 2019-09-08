@@ -68,6 +68,10 @@ bool CClientIFP::LoadIFPFile(const SString& strFile, const bool isRawData)
 
 bool CClientIFP::ReadIFPByVersion()
 {
+    // Check if we have enough bytes in memory to check the version
+    if (GetRemainingBytesCount() < 4)
+        return false;
+
     char Version[4];
     ReadBytes(Version, sizeof(Version));
 

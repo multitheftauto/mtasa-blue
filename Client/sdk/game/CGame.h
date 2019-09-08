@@ -79,6 +79,7 @@ typedef void(InRenderer)();
 #include "CWeaponInfo.h"
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
+#include "CObjectGroupPhysicalProperties.h"
 
 #include <windows.h>
 
@@ -247,4 +248,6 @@ public:
     virtual void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) = 0;
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
+
+    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
 };

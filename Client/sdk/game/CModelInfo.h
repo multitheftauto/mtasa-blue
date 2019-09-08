@@ -175,4 +175,8 @@ public:
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
+
+    virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
+    virtual unsigned short GetObjectPropertiesGroup() = 0;
+    virtual void           RestoreObjectPropertiesGroup() = 0;
 };

@@ -65,6 +65,12 @@ CGameSA::CGameSA()
         ModelInfo[i].SetModelID(i);
     }
 
+    // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
+    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    {
+        ObjectGroupsInfo[i].SetGroup(i);
+    }
+
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
@@ -458,6 +464,9 @@ void CGameSA::Reset()
 
         // Restore model dummies' positions
         CModelInfoSA::ResetAllVehicleDummies();
+        CModelInfoSA::RestoreAllObjectsPropertiesGroups();
+        // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
+        CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
     }
 }
 
@@ -855,4 +864,13 @@ CPed* CGameSA::GetPedContext()
     if (!m_pPedContext)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);
     return m_pPedContext;
+}
+
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+{
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
+    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
+        return &ObjectGroupsInfo[ucObjectGroup];
+
+    return nullptr;
 }
