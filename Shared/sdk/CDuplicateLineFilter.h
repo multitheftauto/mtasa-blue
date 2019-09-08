@@ -32,6 +32,7 @@ public:
     //////////////////////////////////////////////////////////
     void AddLine(const T& line)
     {
+        std::lock_guard<std::mutex> lock(m_EventQueueMutex);
         if (m_bIsMatching == false)
         {
             // Not currently matching
@@ -132,7 +133,10 @@ public:
         if (m_PendingOutput.empty())
         {
             if (time(NULL) - m_tLastOutputTime > m_uiMaxDelaySeconds)
+            {
+                std::lock_guard<std::mutex> lock(m_EventQueueMutex);
                 Flush();
+            }
             if (m_PendingOutput.empty())
                 return false;
         }
@@ -156,4 +160,5 @@ protected:
     time_t                 m_tLastOutputTime;
     uint                   m_uiMaxNumOfLinesInMatch;            // Max number lines in a matching set
     uint                   m_uiMaxDelaySeconds;                 // Max seconds to delay outputting duplicated lines
+    std::mutex             m_EventQueueMutex;
 };
