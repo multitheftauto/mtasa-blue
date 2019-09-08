@@ -84,8 +84,11 @@ int CLuaFBXDefs::FBXLoadFile(lua_State* luaVM)
                     // Create a DFF element
                     CClientFBX* pFBX = new CClientFBX(m_pManager, INVALID_ELEMENT_ID);
 
+                    // prepare error message for future
+                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "%s");
+
                     // Try to load the DFF file
-                    if (pFBX->LoadFBX(bIsRawData ? strFile : strPath, bIsRawData))
+                    if (pFBX->LoadFBX(bIsRawData ? strFile : strPath, bIsRawData, luaVM, argStream.GetFullErrorMessage()))
                     {
                         // Success loading the file. Set parent to DFF root
                         pFBX->SetParent(pRoot);
@@ -124,6 +127,12 @@ int CLuaFBXDefs::FBXGetAllObjects(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         lua_newtable(luaVM);
         pFBX->LuaGetAllObjectsIds(luaVM, eObjectType);
         return 1;
@@ -145,6 +154,12 @@ int CLuaFBXDefs::FBXGetAllTemplates(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         pFBX->LuaGetAllTemplates(luaVM);
         return 1;
     }
@@ -167,6 +182,12 @@ int CLuaFBXDefs::FBXGetAllTemplateModels(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (pFBX->LuaGetAllTemplateModels(luaVM, uiTemplateId))
             return 1;
     }
@@ -186,6 +207,12 @@ int CLuaFBXDefs::FBXGetAllTextures(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         lua_newtable(luaVM);
         pFBX->LuaGetTextures(luaVM);
         return 1;
@@ -210,6 +237,12 @@ int CLuaFBXDefs::FBXGetObjectProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         const ofbx::Object* const* pObject = pFBX->GetObjectById(ulId);
         if (pObject != nullptr)
         {
@@ -244,6 +277,12 @@ int CLuaFBXDefs::FBXGetTemplateProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (pFBX->LuaGetTemplateProperties(luaVM, uiId, eProperty))
         {
             return 1;
@@ -269,6 +308,12 @@ int CLuaFBXDefs::FBXSetTemplateProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (pFBX->LuaSetTemplateProperties(luaVM, argStream, uiId, eProperty))
         {
             return 1;
@@ -296,6 +341,12 @@ int CLuaFBXDefs::FBXGetTemplateModelProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (pFBX->LuaGetTemplateModelProperties(luaVM, uiId, uiModelId, eProperty))
         {
             return 1;
@@ -323,6 +374,12 @@ int CLuaFBXDefs::FBXSetTemplateModelProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (pFBX->LuaSetTemplateModelProperties(luaVM, argStream, uiId, uiModelId, eProperty))
         {
             return 1;
@@ -352,6 +409,12 @@ int CLuaFBXDefs::FBXTemplateAddModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         unsigned int uiObjectId;
         if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
         {
@@ -377,6 +440,12 @@ int CLuaFBXDefs::FBXAddTemplate(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         unsigned int uiTemplateId;
         if (pFBX->AddTemplate(uiTemplate, uiTemplateId))
         {
@@ -402,6 +471,12 @@ int CLuaFBXDefs::FBXRemoveTemplate(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         unsigned int uiTemplateId;
         if (pFBX->AddTemplate(uiTemplate, uiTemplateId))
         {
@@ -433,6 +508,12 @@ int CLuaFBXDefs::FBXTemplateRemoveModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         unsigned int uiObjectId;
         if (pFBX->AddMeshToTemplate(luaVM, uiId, ullMesh, ullParentMesh, vecPosition, uiObjectId))
         {
@@ -459,6 +540,12 @@ int CLuaFBXDefs::FBXApplyTemplateToModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (CClientObjectManager::IsValidModel(ulModelID))
         {
             if (pFBX->ApplyTemplateToModel(uiTemplateId, ulModelID))
@@ -488,6 +575,12 @@ int CLuaFBXDefs::FBXRemoveTemplateFromModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (CClientObjectManager::IsValidModel(ulModelID))
         {
             if (pFBX->RemoveTemplateFromModel(uiTemplateId, ulModelID))
@@ -517,6 +610,12 @@ int CLuaFBXDefs::FBXApplyTemplateToElement(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (IS_OBJECT(pElement))
         {
             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
@@ -547,6 +646,12 @@ int CLuaFBXDefs::FBXRemoveTemplateFromElement(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         if (IS_OBJECT(pElement))
         {
             CDeathmatchObject* Object = static_cast<CDeathmatchObject*>(pElement);
@@ -581,6 +686,12 @@ int CLuaFBXDefs::FBXRenderTemplate(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         pFBX->RenderTemplate(uiTemplateId, vecPosition, vecRotation, vecScale);
         lua_pushboolean(luaVM, true);
     }
@@ -604,6 +715,13 @@ int CLuaFBXDefs::FBXGetObjectRawData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         if (pFBX->IsObjectValid(ullObjectId))
         {
             const ofbx::Object* const* pObject = pFBX->GetObjectById(ullObjectId);

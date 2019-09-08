@@ -35,7 +35,7 @@ CClientFBX::~CClientFBX(void)
     m_pFBXManager->RemoveFromList(this);
 }
 
-bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData)
+bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* luaVM, SString strError)
 {
     // Should only be called once, directly after construction
     m_bIsRawData = bIsRawData;
@@ -60,13 +60,30 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData)
             return false;
     }
 
-    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
-    if (pScene == nullptr)
-        return false;
-
-    m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
+    std::thread threadAsyncLoad(&CClientFBX::LoadScene, this, luaVM, strError);
+    threadAsyncLoad.detach();
 
     return true;
+}
+
+void CClientFBX::LoadScene(lua_State* luaVM, SString strError)
+{
+    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+
+    if (pScene == nullptr)
+    {
+        return;
+    }
+
+    if (luaVM != nullptr)
+        CLuaDefs::m_pScriptDebugging->LogCustom(luaVM, strError.Format("qaisjp it working").c_str());
+
+    if (this != nullptr)
+    {
+        m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
+
+        m_bLoaded = true;
+    }
 }
 
 // Return true if data looks like FBX file contents

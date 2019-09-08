@@ -33,7 +33,10 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    bool LoadFBX(const SString& strFile, bool bIsRawData);
+    bool LoadFBX(const SString& strFile, bool bIsRawData, lua_State* luaVM, SString strError);
+    void LoadScene(lua_State* luaVM, SString strError);
+
+    bool        IsLoaded() { return m_bLoaded; };
 
     static bool IsFBXData(const SString& strData);
 
@@ -80,6 +83,8 @@ private:
     const ofbx::Geometry* pTempGeometry;
     const ofbx::Vec3*     tempVertexPosition[3];
     CVector               tempVecPos[3];
+    bool                                                    m_bLoaded = false;
+    std::thread           threadAsyncLoad;
 
     std::map<unsigned long long, CClientTexture*> m_mapTexture;
     std::map<CDeathmatchObject*, std::vector<unsigned int>> m_mapElementRenderLoop;

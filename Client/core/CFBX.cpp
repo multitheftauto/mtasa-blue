@@ -778,6 +778,8 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
 
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
+    if (IsBeingRemove)
+        return;
     // for (auto const& pair : m_templateMap)
     //{
     //    pair.second->Render(pDevice, this);
@@ -961,7 +963,9 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXI
 
 void CFBX::RemoveScene(CFBXScene* pScene)
 {
+    pScene->IsBeingRemove = true;
     ListRemove(m_sceneList, pScene);
+    delete pScene;
 }
 
 const char* CFBX::GetObjectType(const ofbx::Object const* pObject)
