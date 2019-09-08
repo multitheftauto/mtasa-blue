@@ -24,13 +24,14 @@ CClientFBX::CClientFBX(CClientManager* pManager, ElementID ID) : ClassInit(this)
 
     SetTypeName("FBX");
 
-    // Add us to FBX manager's list
     m_pFBXManager->AddToList(this);
 }
 
 CClientFBX::~CClientFBX(void)
 {
-    // Remove us from FBX manager's list
+    if (m_pFBXScene != nullptr)
+        g_pCore->GetFBX()->RemoveScene((CFBXScene*)m_pFBXScene);
+
     m_pFBXManager->RemoveFromList(this);
 }
 
@@ -827,229 +828,48 @@ bool CClientFBX::LuaGetAllTemplateModels(lua_State* luaVM, unsigned int uiTempla
     return true;
 }
 
-bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop)
+bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Object* const* pObject)
 {
-    const ofbx::Geometry* pGeometry = pMesh->getGeometry();
-    const ofbx::Vec3*     pVertex;
+    const ofbx::Mesh* const* pMesh = (const ofbx::Mesh* const*)pObject;
+    const ofbx::Geometry*    pGeometry = (*pMesh)->getGeometry();
+    const ofbx::Vec3*        pVertex;
 
-    if (iStart < 0 && iStop < 0)            // get all
+    lua_newtable(luaVM);
+
+    for (int i = 0; i < pGeometry->getVertexCount(); i++)
     {
+        pVertex = pGeometry->getVertices() + i;
+        lua_pushnumber(luaVM, i + 1);
         lua_newtable(luaVM);
-
-        for (int i = 0; i < pGeometry->getVertexCount(); i++)
-        {
-            pVertex = pGeometry->getVertices() + i;
-            lua_pushnumber(luaVM, i + 1);
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, pVertex->x);
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, pVertex->y);
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, pVertex->z);
-            lua_settable(luaVM, -3);
-            lua_settable(luaVM, -3);
-        }
-        return true;
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, pVertex->x);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, pVertex->y);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, pVertex->z);
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
     }
-    if (iStart >= 0 && iStop < 0)            // select only 1 vertex
-    {
-        if (pGeometry->getVertexCount() > iStart)
-        {
-            pVertex = pGeometry->getVertices() + iStart;
-            lua_newtable(luaVM);
-            lua_pushnumber(luaVM, 1);
-            lua_pushnumber(luaVM, pVertex->x);
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 2);
-            lua_pushnumber(luaVM, pVertex->y);
-            lua_settable(luaVM, -3);
-            lua_pushnumber(luaVM, 3);
-            lua_pushnumber(luaVM, pVertex->z);
-            lua_settable(luaVM, -3);
-            return true;
-        }
-    }
-    else if (iStart >= 0 && iStop >= 0)            // get range
-    {
-        if (iStart < iStop)
-        {
-            if (pGeometry->getVertexCount() > iStart && pGeometry->getVertexCount() > iStop)
-            {
-                lua_newtable(luaVM);
-
-                int id = 0;
-                for (int i = iStart; i <= iStop; i++)
-                {
-                    pVertex = pGeometry->getVertices() + i;
-                    lua_pushnumber(luaVM, ++id);
-                    lua_newtable(luaVM);
-                    lua_pushnumber(luaVM, 1);
-                    lua_pushnumber(luaVM, pVertex->x);
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 2);
-                    lua_pushnumber(luaVM, pVertex->y);
-                    lua_settable(luaVM, -3);
-                    lua_pushnumber(luaVM, 3);
-                    lua_pushnumber(luaVM, pVertex->z);
-                    lua_settable(luaVM, -3);
-                    lua_settable(luaVM, -3);
-                }
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
-bool CClientFBX::LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop)
+bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Object* const* pObject)
 {
-    const ofbx::Material* pMaterial;
-    const ofbx::Texture*  pTexture;
-    const ofbx::Vec3*     pVertex;
-    ofbx::DataView        file;
+    const ofbx::Mesh* const* pMesh = (const ofbx::Mesh* const*)pObject;
+    const ofbx::Geometry*    pGeometry = (*pMesh)->getGeometry();
+    const ofbx::Vec3*        pVertex;
 
-    if (iStart < 0 && iStop < 0)            // get all
+    lua_newtable(luaVM);
+
+    for (int i = 0; i < pGeometry->getIndicesCount() - 1; i++)
     {
-        lua_newtable(luaVM);
-        SString strFileName;
-        for (int i = 0; i < pMesh->getMaterialCount(); i++)
-        {
-            pMaterial = pMesh->getMaterial(i);
-            int diffuseColor =
-                pMaterial->getDiffuseColor().r * 255 * 255 * 255 + pMaterial->getDiffuseColor().g * 255 * 255 + pMaterial->getDiffuseColor().b * 255;
-            int specularColor =
-                pMaterial->getSpecularColor().r * 255 * 255 * 255 + pMaterial->getSpecularColor().g * 255 * 255 + pMaterial->getSpecularColor().b * 255;
-
-            lua_pushnumber(luaVM, i + 1);
-            lua_newtable(luaVM);
-            lua_pushstring(luaVM, "id");
-            lua_pushnumber(luaVM, pMaterial->id);
-            lua_settable(luaVM, -3);
-            lua_pushstring(luaVM, "name");
-            lua_pushstring(luaVM, pMaterial->name);
-            lua_settable(luaVM, -3);
-            lua_pushstring(luaVM, "diffuseColor");
-            lua_pushnumber(luaVM, diffuseColor);
-            lua_settable(luaVM, -3);
-            lua_pushstring(luaVM, "specularColor");
-            lua_pushnumber(luaVM, specularColor);
-            lua_settable(luaVM, -3);
-            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::DIFFUSE);
-            if (pTexture != nullptr)
-            {
-                lua_pushstring(luaVM, "diffuseTexture");
-                strFileName = SString("%s", pTexture->getFileName().begin);
-                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
-                lua_pushstring(luaVM, strFileName.c_str());
-                lua_settable(luaVM, -3);
-
-                /*             lua_pushstring(luaVM, "diffuseTextureContent");
-                             strFileName = SString("%s", pTexture->getContent().begin);
-                             strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getContent().end));
-                             lua_pushstring(luaVM, strFileName.c_str());
-                             lua_settable(luaVM, -3);*/
-                // Content
-            }
-
-            lua_pushstring(luaVM, "normalTexture");
-            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::NORMAL);
-            if (pTexture != nullptr)
-            {
-                strFileName = SString("%s", pTexture->getFileName().begin);
-                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
-                lua_pushstring(luaVM, strFileName.c_str());
-            }
-            else
-                lua_pushboolean(luaVM, false);
-            lua_settable(luaVM, -3);
-
-            lua_pushstring(luaVM, "specularTexture");
-            pTexture = pMaterial->getTexture(ofbx::Texture::TextureType::SPECULAR);
-            if (pTexture != nullptr)
-            {
-                strFileName = SString("%s", pTexture->getFileName().begin);
-                strFileName = strFileName.substr(0, strFileName.size() - strlen((const char*)pTexture->getFileName().end));
-                lua_pushstring(luaVM, strFileName.c_str());
-            }
-            else
-                lua_pushboolean(luaVM, false);
-
-            lua_settable(luaVM, -3);
-
-            lua_settable(luaVM, -3);
-        }
-        return true;
+        lua_pushnumber(luaVM, i + 1);
+        lua_pushnumber(luaVM, pGeometry->getFaceIndices()[i]);
+        lua_settable(luaVM, -3);
     }
-    /*
-    if (iStart >= 0 && iStop < 0)            // select only 1 vertex
-    {
-        lua_pushnumber(luaVM, pGeometry->getFaceIndices()[iStart]);
-    }
-    else if (iStart >= 0 && iStop >= 0)            // get range
-    {
-        if (iStart < iStop)
-        {
-            if (pMesh->getMaterialCount() > iStart && pMesh->getMaterialCount() > iStop)
-            {
-                lua_newtable(luaVM);
-
-                int id = 0;
-                for (int i = iStart; i <= iStop; i++)
-                {
-                    lua_pushnumber(luaVM, ++id);
-                    lua_pushnumber(luaVM, abs(pGeometry->getFaceIndices()[i]));
-                    lua_settable(luaVM, -3);
-                }
-            }
-        }
-    }
-    */
-    return false;
-}
-
-bool CClientFBX::LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop)
-{
-    const ofbx::Geometry* pGeometry = pMesh->getGeometry();
-    const ofbx::Vec3*     pVertex;
-    if (iStart < 0 && iStop < 0)            // get all
-    {
-        lua_newtable(luaVM);
-
-        for (int i = 0; i < pGeometry->getIndicesCount() - 1; i++)
-        {
-            lua_pushnumber(luaVM, i + 1);
-            lua_pushnumber(luaVM, pGeometry->getFaceIndices()[i]);
-            lua_settable(luaVM, -3);
-        }
-    }
-    if (iStart >= 0 && iStop < 0)            // select only 1 vertex
-    {
-        lua_pushnumber(luaVM, pGeometry->getFaceIndices()[iStart]);
-    }
-    else if (iStart >= 0 && iStop >= 0)            // get range
-    {
-        if (iStart < iStop)
-        {
-            if (pGeometry->getIndicesCount() > iStart && pGeometry->getIndicesCount() > iStop)
-            {
-                lua_newtable(luaVM);
-
-                int id = 0;
-                for (int i = iStart; i <= iStop; i++)
-                {
-                    lua_pushnumber(luaVM, ++id);
-                    lua_pushnumber(luaVM, abs(pGeometry->getFaceIndices()[i]));
-                    lua_settable(luaVM, -3);
-                }
-            }
-        }
-    }
-
-    return false;
+    return true;
 }
 
 void CClientFBX::CreateTexture(unsigned long long ullTextureId, CPixels* pPixels)

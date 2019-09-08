@@ -959,6 +959,11 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXI
     return pFBXScene;
 }
 
+void CFBX::RemoveScene(CFBXScene* pScene)
+{
+    ListRemove(m_sceneList, pScene);
+}
+
 const char* CFBX::GetObjectType(const ofbx::Object const* pObject)
 {
     const char* label;
@@ -1049,11 +1054,6 @@ void CFBX::Initialize()
 }
 
 CFBX::~CFBX()
-{
-
-}
-
-void CFBX::RemoveScene(CFBXScene* pScene)
 {
 
 }

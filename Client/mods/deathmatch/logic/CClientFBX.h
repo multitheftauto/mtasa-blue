@@ -37,14 +37,14 @@ public:
 
     static bool IsFBXData(const SString& strData);
 
-    const ofbx::Object* const* GetObjectById(long long int ulId) { return m_pFBXScene->GetObjectById(ulId); }
+    const ofbx::Object* const* GetObjectById(unsigned long long ullId) { return m_pFBXScene->GetObjectById(ullId); }
+    bool                       IsObjectValid(unsigned long long ullId) { return GetObjectById(ullId) != nullptr; }
 
     void LuaGetTextures(lua_State* luaVM);
     bool LuaGetAllTemplates(lua_State* luaVM);
     bool LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* const* pObject, eFBXObjectProperty eProperty);
-    bool LuaRawGetVertices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
-    bool LuaRawGetIndices(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
-    bool LuaRawGetMaterials(lua_State* luaVM, const ofbx::Mesh const* pMesh, int iStart, int iStop);
+    bool LuaRawGetVertices(lua_State* luaVM, const ofbx::Object* const* pObject);
+    bool LuaRawGetIndices(lua_State* luaVM, const ofbx::Object* const* pObject);
     bool LuaGetAllTemplateModels(lua_State* luaVM, unsigned int uiTemplateId);
     void LuaGetAllObjectsIds(lua_State* luaVM, eFBXObjectType eObjectType);
     bool LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader argStream, unsigned int uiId, eFBXTemplateProperty eProperty);

@@ -30,7 +30,7 @@ public:
     LUA_DECLARE(FBXGetAllTemplates);
     LUA_DECLARE(FBXGetAllTemplateModels);
     LUA_DECLARE(FBXGetAllTextures);
-    LUA_DECLARE(FBXGetMeshRawData);
+    LUA_DECLARE(FBXGetObjectRawData);
     LUA_DECLARE(FBXAddTemplate);
     LUA_DECLARE(FBXRemoveTemplate);
     LUA_DECLARE(FBXApplyTemplateToModel);
