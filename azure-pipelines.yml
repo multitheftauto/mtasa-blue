@@ -61,6 +61,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   dependsOn: windows
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   variables:
     MTA_WINDOWS_ARTIFACT: 'Windows'
     INSTALL_ZIP_FILE: '$(Pipeline.Workspace)/$(MTA_WINDOWS_ARTIFACT)/InstallFiles.zip'
