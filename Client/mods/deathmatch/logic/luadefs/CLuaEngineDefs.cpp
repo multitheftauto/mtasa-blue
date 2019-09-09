@@ -559,8 +559,7 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
         if (pModel && pModel->Deallocate())
             lua_pushboolean(luaVM, true);
-
-        return 1;
+            return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
