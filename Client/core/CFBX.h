@@ -234,6 +234,10 @@ private:
 
     D3DXMATRIX*                  m_pMatrixUVFlip;
     LPDIRECT3DVERTEXDECLARATION9 m_pVertexDeclaration[2];
+
+    CMatrix* pMatrix;
+    D3DMATRIX* pObjectMatrix;
+    CMatrix*   pCameraMatrix;
 };
 
 class CFBX : public CFBXInterface

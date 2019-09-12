@@ -75,12 +75,12 @@ public:
     bool                                               IsTextureCreated(unsigned long long strTextureName);
     std::map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix();
 
-    CBuffer* GetBuffer() { return &m_RawDataBuffer; }
+    CBuffer* GetBuffer() { return m_RawDataBuffer; }
 
 private:
     CFBXSceneInterface* m_pFBXScene;
     SString             m_strFbxFilename;
-    CBuffer             m_RawDataBuffer;
+    CBuffer*            m_RawDataBuffer;
     bool                m_bIsRawData;
     CClientFBXManager*  m_pFBXManager;
 

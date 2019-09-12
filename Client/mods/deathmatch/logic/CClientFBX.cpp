@@ -60,10 +60,12 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* lua
     }
     else
     {
-        m_RawDataBuffer = CBuffer(strFile, strFile.length());
-        if (!g_pCore->GetNetwork()->CheckFile("fbx", "", m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize()))
+
+        m_RawDataBuffer = new CBuffer(strFile, strFile.length());
+        if (!g_pCore->GetNetwork()->CheckFile("fbx", "", m_RawDataBuffer->GetData(), m_RawDataBuffer->GetSize()))
             return false;
     }
+
 
     threadAsyncLoad = std::thread(&CClientFBX::LoadScene, this);
     threadAsyncLoad.detach();
@@ -72,7 +74,10 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* lua
 
 void CClientFBX::LoadScene()
 {
-    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+    if (m_RawDataBuffer->GetSize() < 200)
+        return;
+
+    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer->GetData(), m_RawDataBuffer->GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
     if (pScene == nullptr)
     {
@@ -85,11 +90,12 @@ void CClientFBX::LoadScene()
 
         m_bLoaded = true;
     }
+    m_RawDataBuffer->Clear();
 }
 
 void CClientFBX::Render()
 {
-    if (m_bLoaded  && !m_bEventCalled)
+    if (m_bLoaded && !m_bEventCalled)
     {
         CLuaArguments Arguments;
         CallEvent("onFBXLoaded", Arguments, false);

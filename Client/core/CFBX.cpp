@@ -559,6 +559,10 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
     m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
 
+    pMatrix = new CMatrix();
+    pObjectMatrix = new D3DMATRIX();
+    pCameraMatrix = new CMatrix();
+
     // test code, remove later
     unsigned int  uiTemplateId = CreateTemplate();
     CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
@@ -783,10 +787,7 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 
     pClientFBXInterface->Render();
 
-    CMatrix*      pMatrix = new CMatrix();
-    D3DMATRIX*    pObjectMatrix = new D3DMATRIX();
     CFBXTemplate* pTemplate;
-    CMatrix*      pCameraMatrix = new CMatrix();
     CVector       vecCameraPosition;
     CVector       vecTemplatePosition;
     CVector       vecTemplateOffset;

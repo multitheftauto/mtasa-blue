@@ -956,20 +956,20 @@ namespace ofbx
         MeshImpl(const Scene& _scene, const IElement& _element) : Mesh(_scene, _element), scene(_scene) { is_node = true; }
 
         Vec3 getGeometricTranslation() const override
-		{
-			Vec3 translation = resolveVec3Property(*this, "GeometricTranslation", {0, 0, 0});
+        {
+            Vec3 translation = resolveVec3Property(*this, "GeometricTranslation", {0, 0, 0});
             return translation;
-		}
+        }
         Vec3 getGeometricRotation() const override
-		{
-			Vec3 translation = resolveVec3Property(*this, "GeometricRotation", {0, 0, 0});
+        {
+            Vec3 translation = resolveVec3Property(*this, "GeometricRotation", {0, 0, 0});
             return translation;
-		}
+        }
         Vec3 getGeometricScaling() const override
-		{
-			Vec3 translation = resolveVec3Property(*this, "GeometricScaling", {1, 1, 1});
+        {
+            Vec3 translation = resolveVec3Property(*this, "GeometricScaling", {1, 1, 1});
             return translation;
-		}
+        }
         Matrix getGeometricMatrix() const override
         {
             Vec3 translation = resolveVec3Property(*this, "GeometricTranslation", {0, 0, 0});
@@ -1072,7 +1072,8 @@ namespace ofbx
 
         const Skin* skin = nullptr;
 
-        std::vector<int>       indices;
+        std::vector<int> indices;
+
         std::vector<int>       to_old_vertices;
         std::vector<NewVertex> to_new_vertices;
 
@@ -1139,13 +1140,16 @@ namespace ofbx
 
             indices.reserve(old_indices.size());
             weights.reserve(old_indices.size());
-            int*    ir = old_indices.empty() ? nullptr : &old_indices[0];
-            double* wr = old_weights.empty() ? nullptr : &old_weights[0];
+            int*                     ir = old_indices.empty() ? nullptr : &old_indices[0];
+            double*                  wr = old_weights.empty() ? nullptr : &old_weights[0];
+            int                      old_idx;
+            double                   w;
+            GeometryImpl::NewVertex* n;
             for (int i = 0, c = (int)old_indices.size(); i < c; ++i)
             {
-                int                      old_idx = ir[i];
-                double                   w = wr[i];
-                GeometryImpl::NewVertex* n = &geom->to_new_vertices[old_idx];
+                old_idx = ir[i];
+                w = wr[i];
+                n = &geom->to_new_vertices[old_idx];
                 if (n->index == -1)
                     continue;            // skip vertices which aren't indexed.
                 while (n)
@@ -1959,7 +1963,7 @@ namespace ofbx
     }
 
     template <typename T>
-    static void remap(std::vector<T>* out, const std::vector<int>& map)
+    static void remap(std::vector<T>* out, const std::vector<int>* map)
     {
         if (out->empty())
             return;
@@ -1967,10 +1971,10 @@ namespace ofbx
         std::vector<T> old;
         old.swap(*out);
         int old_size = (int)old.size();
-        for (int i = 0, c = (int)map.size(); i < c; ++i)
+        for (int i = 0, c = (int)map->size(); i < c; ++i)
         {
-            if (map[i] < old_size)
-                out->push_back(old[map[i]]);
+            if ((*map)[i] < old_size)
+                out->push_back(old[(*map)[i]]);
             else
                 out->push_back(T());
         }
@@ -2036,10 +2040,10 @@ namespace ofbx
         }
     }
 
-    static void triangulate(const std::vector<int>& old_indices, std::vector<int>* to_old_vertices, std::vector<int>* to_old_indices)
+    static void triangulate(const std::vector<int>& old_indices, std::vector<int>& to_old_vertices, std::vector<int>& to_old_indices)
     {
-        assert(to_old_vertices);
-        assert(to_old_indices);
+        assert(&to_old_vertices);
+        assert(&to_old_indices);
 
         auto getIdx = [&old_indices](int i) -> int {
             int idx = old_indices[i];
@@ -2047,22 +2051,22 @@ namespace ofbx
         };
 
         int in_polygon_idx = 0;
-        for (int i = 0; i < old_indices.size(); ++i)
+        for (int i = 0; i < (&old_indices)->size(); ++i)
         {
             int idx = getIdx(i);
             if (in_polygon_idx <= 2)
             {
-                to_old_vertices->push_back(idx);
-                to_old_indices->push_back(i);
+                (&to_old_vertices)->push_back(idx);
+                (&to_old_indices)->push_back(i);
             }
             else
             {
-                to_old_vertices->push_back(old_indices[i - in_polygon_idx]);
-                to_old_indices->push_back(i - in_polygon_idx);
-                to_old_vertices->push_back(old_indices[i - 1]);
-                to_old_indices->push_back(i - 1);
-                to_old_vertices->push_back(idx);
-                to_old_indices->push_back(i);
+                (&to_old_vertices)->push_back(old_indices[i - in_polygon_idx]);
+                (&to_old_indices)->push_back(i - in_polygon_idx);
+                (&to_old_vertices)->push_back(old_indices[i - 1]);
+                (&to_old_indices)->push_back(i - 1);
+                (&to_old_vertices)->push_back(idx);
+                (&to_old_indices)->push_back(i);
             }
             ++in_polygon_idx;
             if (old_indices[i] < 0)
@@ -2077,7 +2081,7 @@ namespace ofbx
     {
         if (triangulationEnabled)
         {
-            triangulate(original_indices, &geom->to_old_vertices, &to_old_indices);
+            triangulate(original_indices, geom->to_old_vertices, to_old_indices);
             geom->vertices.resize(geom->to_old_vertices.size());
             geom->indices.resize(geom->vertices.size());
             for (int i = 0, c = (int)geom->to_old_vertices.size(); i < c; ++i)
@@ -2106,6 +2110,10 @@ namespace ofbx
             int old = to_old_vertices[i];
             add(geom->to_new_vertices[old], i);
         }
+        geom->to_new_vertices.clear();
+        geom->to_new_vertices.shrink_to_fit();
+        geom->to_old_vertices.clear();
+        geom->to_old_vertices.shrink_to_fit();
     }
 
     static OptionalError<Object*> parseGeometryMaterials(const std::unique_ptr<GeometryImpl>& geom, const Element& element,
@@ -2174,7 +2182,7 @@ namespace ofbx
                 {
                     uvs.resize(tmp_indices.empty() ? tmp.size() : tmp_indices.size());
                     splat(&uvs, mapping, tmp, tmp_indices, original_indices);
-                    remap(&uvs, to_old_indices);
+                    remap(&uvs, &to_old_indices);
                 }
 
                 // const Element* name_element = findChild(*layer_uv_element, "Name");
@@ -2221,7 +2229,7 @@ namespace ofbx
             if (!tmp.empty())
             {
                 splat(&geom->tangents, mapping, tmp, tmp_indices, original_indices);
-                remap(&geom->tangents, to_old_indices);
+                remap(&geom->tangents, &to_old_indices);
             }
         }
         return {nullptr};
@@ -2241,7 +2249,7 @@ namespace ofbx
             if (!tmp.empty())
             {
                 splat(&geom->colors, mapping, tmp, tmp_indices, original_indices);
-                remap(&geom->colors, to_old_indices);
+                remap(&geom->colors, &to_old_indices);
             }
         }
         return {nullptr};
@@ -2261,7 +2269,7 @@ namespace ofbx
             if (!tmp.empty())
             {
                 splat(&geom->normals, mapping, tmp, tmp_indices, original_indices);
-                remap(&geom->normals, to_old_indices);
+                remap(&geom->normals, &to_old_indices);
             }
         }
         return {nullptr};
@@ -2301,9 +2309,10 @@ namespace ofbx
         if (uvParsingError.isError())
             return uvParsingError;
 
-        OptionalError<Object*> tangentsParsingError = parseGeometryTangents(geom, element, original_indices, to_old_indices);
-        if (tangentsParsingError.isError())
-            return tangentsParsingError;
+        // not supported right now
+        // OptionalError<Object*> tangentsParsingError = parseGeometryTangents(geom, element, original_indices, to_old_indices);
+        // if (tangentsParsingError.isError())
+        //    return tangentsParsingError;
 
         OptionalError<Object*> colorsParsingError = parseGeometryColors(geom, element, original_indices, to_old_indices);
         if (colorsParsingError.isError())
@@ -2312,6 +2321,9 @@ namespace ofbx
         OptionalError<Object*> normalsParsingError = parseGeometryNormals(geom, element, original_indices, to_old_indices);
         if (normalsParsingError.isError())
             return normalsParsingError;
+
+        original_indices.clear();
+        to_old_indices.clear();
 
         return geom.release();
     }
