@@ -334,8 +334,12 @@ CClientGUIWebBrowser::CClientGUIWebBrowser(bool isLocal, bool isTransparent, uin
 {
     m_pManager = pManager;
     m_pBrowser = g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(width, height, isLocal, isTransparent);
-    m_pBrowser->SetParent(this);            // m_pBrowser gets deleted automatically by the element tree logic
 
-    // Set our owner resource
-    m_pBrowser->SetResource(pLuaMain->GetResource());
+    if (m_pBrowser)
+    {
+        m_pBrowser->SetParent(this); // m_pBrowser gets deleted automatically by the element tree logic
+
+        // Set our owner resource
+        m_pBrowser->SetResource(pLuaMain->GetResource());
+    }
 }
