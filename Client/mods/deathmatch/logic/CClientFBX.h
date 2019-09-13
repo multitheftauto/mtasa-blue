@@ -40,7 +40,9 @@ public:
     void LoadScene();
     void Render();
 
-    bool        IsLoaded() { return m_bLoaded; };
+    bool         IsLoaded() { return m_bLoaded; };
+
+    void LuaGetLoadingStatus(lua_State* luaVM);
 
     static bool IsFBXData(const SString& strData);
 
@@ -88,12 +90,12 @@ private:
     const ofbx::Geometry* pTempGeometry;
     const ofbx::Vec3*     tempVertexPosition[3];
     CVector               tempVecPos[3];
-    bool                                                    m_bLoaded = false;
-    bool                                                    m_bEventCalled = false;
+    bool                  m_bLoaded = false;
+    bool                  m_bEventCalled = false;
     std::thread           threadAsyncLoad;
-    std::mutex                                              mutex;
+    CFBXLoading*          pLoadingState;
 
-    std::map<unsigned long long, CClientTexture*> m_mapTexture;
+    std::map<unsigned long long, CClientTexture*>           m_mapTexture;
     std::map<CDeathmatchObject*, std::vector<unsigned int>> m_mapElementRenderLoop;
-    std::map<unsigned long, std::vector<unsigned int>> m_mapModelRenderLoop;
+    std::map<unsigned long, std::vector<unsigned int>>      m_mapModelRenderLoop;
 };

@@ -60,13 +60,12 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* lua
     }
     else
     {
-
         m_RawDataBuffer = new CBuffer(strFile, strFile.length());
         if (!g_pCore->GetNetwork()->CheckFile("fbx", "", m_RawDataBuffer->GetData(), m_RawDataBuffer->GetSize()))
             return false;
     }
 
-
+    pLoadingState = new CFBXLoading();
     threadAsyncLoad = std::thread(&CClientFBX::LoadScene, this);
     threadAsyncLoad.detach();
     return true;
@@ -77,7 +76,8 @@ void CClientFBX::LoadScene()
     if (m_RawDataBuffer->GetSize() < 200)
         return;
 
-    ofbx::IScene* pScene = ofbx::load((ofbx::u8*)m_RawDataBuffer->GetData(), m_RawDataBuffer->GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+    ofbx::IScene* pScene =
+        ofbx::load((ofbx::u8*)m_RawDataBuffer->GetData(), m_RawDataBuffer->GetSize(), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE, pLoadingState);
 
     if (pScene == nullptr)
     {
@@ -107,6 +107,29 @@ bool CClientFBX::IsFBXData(const SString& strData)
 {
     // return strData.length() > 128 && memcmp(strData, "\x10\x00\x00\x00", 4) == 0;
     return strData.length() > 128;
+}
+
+void CClientFBX::LuaGetLoadingStatus(lua_State* luaVM)
+{
+    EFBXLoadingStep eStep;
+    const char*     message;
+    int             iSubStep;
+    int             iSubStepOf;
+    pLoadingState->Get(eStep, message, iSubStep, iSubStepOf);
+
+    lua_newtable(luaVM);
+    lua_pushstring(luaVM, "step");
+    lua_pushnumber(luaVM, eStep);
+    lua_settable(luaVM, -3);
+    lua_pushstring(luaVM, "message");
+    lua_pushstring(luaVM, message);
+    lua_settable(luaVM, -3);
+    lua_pushstring(luaVM, "subStep");
+    lua_pushnumber(luaVM, iSubStep);
+    lua_settable(luaVM, -3);
+    lua_pushstring(luaVM, "subStepOf");
+    lua_pushnumber(luaVM, iSubStepOf);
+    lua_settable(luaVM, -3);
 }
 
 void CClientFBX::LuaGetAllObjectsIds(lua_State* luaVM, eFBXObjectType eObjectType)

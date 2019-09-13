@@ -13,6 +13,7 @@
 class CFBXScene;
 class SString;
 class CClientFBXInterface;
+class CFBXLoading;
 enum eCullMode;
 class D3DXCOLOR;
 

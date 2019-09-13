@@ -15,6 +15,7 @@ void CLuaFBXDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
         {"fbxLoadFile", FBXLoadFile},
+        {"fbxGetLoadingStatus", FBXGetLoadingStatus},
         {"fbxGetAllObjects", FBXGetAllObjects},
         {"fbxGetAllTemplates", FBXGetAllTemplates},
         {"fbxGetAllTemplateModels", FBXGetAllTemplateModels},
@@ -117,6 +118,24 @@ int CLuaFBXDefs::FBXLoadFile(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFBXDefs::FBXGetLoadingStatus(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+
+    if (!argStream.HasErrors())
+    {
+        pFBX->LuaGetLoadingStatus(luaVM);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 int CLuaFBXDefs::FBXGetAllObjects(lua_State* luaVM)
 {
     CClientFBX*      pFBX;

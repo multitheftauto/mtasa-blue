@@ -1,5 +1,33 @@
 #pragma once
 
+enum EFBXLoadingStep
+{
+    FBX_LOADING_FAILED = -1,
+    FBX_LOADING_INITIALIZATION,
+    FBX_LOADING_ALLOCATING_MEMORY,
+    FBX_LOADING_PARSING_CONNECTIONS,
+    FBX_LOADING_PARSING_TAKES,
+    FBX_LOADING_PARSING_OBJECTS,
+    FBX_LOADING_PARSING_GLOBAL_SETTINGS,
+    FBX_LOADING_FINISHING,
+};
+
+class CFBXLoading
+{
+public:
+    CFBXLoading();
+    void Update(EFBXLoadingStep eStep, const char* message, int iSubStep = 0, int iSubStepOf = 0);
+    void Get(EFBXLoadingStep& eStep, const char*& message, int& iSubStep, int& iSubStepOf);
+
+private:
+    EFBXLoadingStep eStep;
+    const char*     szMessage;
+    std::mutex      mutex;
+    int             iSubStep;
+    int             iSubStepOf;
+};
+
+
 namespace ofbx
 {
     typedef unsigned char      u8;
@@ -448,7 +476,7 @@ namespace ofbx
         virtual ~IScene() {}
     };
 
-    IScene*     load(const u8* data, int size, u64 flags);
+    IScene*     load(const u8* data, int size, u64 flags, CFBXLoading* pLoadingState);
     const char* getError();
 
 }            // namespace ofbx

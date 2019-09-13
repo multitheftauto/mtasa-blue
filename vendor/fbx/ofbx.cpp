@@ -1,4 +1,5 @@
 #include <map>
+#include <mutex>
 #include "ofbx.h"
 #include "miniz.h"
 #include <cassert>
@@ -9,6 +10,32 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+CFBXLoading::CFBXLoading()
+{
+    eStep = FBX_LOADING_INITIALIZATION;
+    szMessage = "";
+    iSubStep = 0;
+    iSubStepOf = 0;
+}
+
+void CFBXLoading::Update(EFBXLoadingStep eStep, const char* message, int iSubStep, int iSubStepOf)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    this->eStep = eStep;
+    this->szMessage = message;
+    this->iSubStep = iSubStep;
+    this->iSubStepOf = iSubStepOf;
+}
+
+void CFBXLoading::Get(EFBXLoadingStep& eStep, const char*& message, int& iSubStep, int& iSubStepOf)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    eStep = this->eStep;
+    message = this->szMessage;
+    iSubStep = this->iSubStep;
+    iSubStepOf = this->iSubStepOf;
+}
 
 namespace ofbx
 {
@@ -2342,7 +2369,7 @@ namespace ofbx
         return prop->getType() == Property::LONG;
     }
 
-    static bool parseConnections(const Element& root, Scene* scene)
+    static bool parseConnections(const Element& root, Scene* scene, CFBXLoading* pLoadingState)
     {
         assert(scene);
 
@@ -2350,7 +2377,19 @@ namespace ofbx
         if (!connections)
             return true;
 
+        // count them
+        int            iCount = 0;
+        int            iCountTotal = 0;
         const Element* connection = connections->child;
+        while (connection)
+        {
+            connection = connection->sibling;
+            iCount++;
+		}
+        iCountTotal = iCount;
+        pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "", 0, iCount);
+
+        connection = connections->child;
         while (connection)
         {
             if (!isString(connection->first_property) || !isLong(connection->first_property->next) || !isLong(connection->first_property->next->next))
@@ -2365,6 +2404,7 @@ namespace ofbx
             if (connection->first_property->value == "OO")
             {
                 c.type = Scene::Connection::OBJECT_OBJECT;
+
             }
             else if (connection->first_property->value == "OP")
             {
@@ -2385,6 +2425,8 @@ namespace ofbx
             scene->m_connections.push_back(c);
 
             connection = connection->sibling;
+            iCount--;
+            pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "", iCountTotal - iCount, iCountTotal);
         }
         return true;
     }
@@ -2554,7 +2596,7 @@ namespace ofbx
         }
     }
 
-    static bool parseObjects(const Element& root, Scene* scene, u64 flags)
+    static bool parseObjects(const Element& root, Scene* scene, u64 flags, CFBXLoading* pLoadingState)
     {
         const bool     triangulate = (flags & (u64)LoadFlags::TRIANGULATE) != 0;
         const bool     ignore_geometry = (flags & (u64)LoadFlags::IGNORE_GEOMETRY) != 0;
@@ -2567,6 +2609,8 @@ namespace ofbx
         scene->m_object_map[0] = {&root, scene->m_root};
 
         const Element* object = objs->child;
+        int            iCount = 0;
+        int            iTotalCount = 0;
         while (object)
         {
             if (!isLong(object->first_property))
@@ -2578,8 +2622,14 @@ namespace ofbx
             u64 id = object->first_property->value.toU64();
             scene->m_object_map[id] = {object, nullptr};
             object = object->sibling;
+            iCount++;
         }
+        iTotalCount = iCount;
 
+        pLoadingState->Update(FBX_LOADING_PARSING_OBJECTS, "", 0, iTotalCount);
+
+		char idTempName[30];
+        const char* idName;
         for (auto iter : scene->m_object_map)
         {
             OptionalError<Object*> obj = nullptr;
@@ -2587,7 +2637,13 @@ namespace ofbx
             if (iter.second.object == scene->m_root)
                 continue;
 
-            if (iter.second.element->id == "Geometry")
+			iter.second.element->id.toString(idTempName);
+            idName = idTempName;
+
+            iCount--;
+            pLoadingState->Update(FBX_LOADING_PARSING_OBJECTS, idName, iTotalCount - iCount, iTotalCount);
+
+            if (strcmp(idName, "Geometry") == 0)
             {
                 Property* last_prop = iter.second.element->first_property;
                 while (last_prop->next)
@@ -2597,50 +2653,50 @@ namespace ofbx
                     obj = parseGeometry(*scene, *iter.second.element, triangulate);
                 }
             }
-            else if (iter.second.element->id == "Material")
+            else if (strcmp(idName, "Material") == 0)
             {
                 obj = parseMaterial(*scene, *iter.second.element);
                 if (!obj.isError())
                     scene->m_materials.push_back((Material*)obj.getValue());
             }
-            // else if (iter.second.element->id == "AnimationStack")
-            //{
-            //    obj = parse<AnimationStackImpl>(*scene, *iter.second.element);
-            //    if (!obj.isError())
-            //    {
-            //        AnimationStackImpl* stack = (AnimationStackImpl*)obj.getValue();
-            //        scene->m_animation_stacks.push_back(stack);
-            //    }
-            //}
-            // else if (iter.second.element->id == "AnimationLayer")
-            //{
-            //    obj = parse<AnimationLayerImpl>(*scene, *iter.second.element);
-            //}
-            // else if (iter.second.element->id == "AnimationCurve")
-            //{
-            //    obj = parseAnimationCurve(*scene, *iter.second.element);
-            //}
-            // else if (iter.second.element->id == "AnimationCurveNode")
-            //{
-            //    obj = parse<AnimationCurveNodeImpl>(*scene, *iter.second.element);
-            //}
-            // else if (iter.second.element->id == "Deformer")
-            //{
-            //    IElementProperty* class_prop = iter.second.element->getProperty(2);
+            else if (strcmp(idName, "AnimationStack") == 0)
+            {
+                obj = parse<AnimationStackImpl>(*scene, *iter.second.element);
+                if (!obj.isError())
+                {
+                    AnimationStackImpl* stack = (AnimationStackImpl*)obj.getValue();
+                    scene->m_animation_stacks.push_back(stack);
+                }
+            }
+            else if (strcmp(idName, "AnimationLayer") == 0)
+            {
+                obj = parse<AnimationLayerImpl>(*scene, *iter.second.element);
+            }
+            else if (strcmp(idName, "AnimationCurve") == 0)
+            {
+                obj = parseAnimationCurve(*scene, *iter.second.element);
+            }
+            else if (strcmp(idName, "AnimationCurveNode") == 0)
+            {
+                obj = parse<AnimationCurveNodeImpl>(*scene, *iter.second.element);
+            }
+            else if (strcmp(idName, "Deformer") == 0)
+            {
+                IElementProperty* class_prop = iter.second.element->getProperty(2);
 
-            //    if (class_prop)
-            //    {
-            //        if (class_prop->getValue() == "Cluster")
-            //            obj = parseCluster(*scene, *iter.second.element);
-            //        else if (class_prop->getValue() == "Skin")
-            //            obj = parse<SkinImpl>(*scene, *iter.second.element);
-            //    }
-            //}
-            // else if (iter.second.element->id == "NodeAttribute")
-            //{
-            //    obj = parseNodeAttribute(*scene, *iter.second.element);
-            //}
-            else if (iter.second.element->id == "Model")
+                if (class_prop)
+                {
+                    if (class_prop->getValue() == "Cluster")
+                        obj = parseCluster(*scene, *iter.second.element);
+                    else if (class_prop->getValue() == "Skin")
+                        obj = parse<SkinImpl>(*scene, *iter.second.element);
+                }
+            }
+            else if (strcmp(idName, "NodeAttribute") == 0)
+            {
+                obj = parseNodeAttribute(*scene, *iter.second.element);
+            }
+            else if (strcmp(idName, "Model") == 0)
             {
                 IElementProperty* class_prop = iter.second.element->getProperty(2);
 
@@ -2662,13 +2718,13 @@ namespace ofbx
                         obj = parse<NullImpl>(*scene, *iter.second.element);
                 }
             }
-            else if (iter.second.element->id == "Texture")
+            else if (strcmp(idName, "Texture") == 0)
             {
                 obj = parseTexture(*scene, *iter.second.element);
                 if (!obj.isError())
                     scene->m_texturesList.push_back((Texture*)obj.getValue());
             }
-            else if (iter.second.element->id == "Video")
+            else if (strcmp(idName, "Video") == 0)
             {
                 auto pTexture = iter.second.element;
 
@@ -2685,10 +2741,10 @@ namespace ofbx
                     }
                 }
             }
-            // else if (iter.second.element->id == "Pose")
-            //{
-            //    obj = parsePose(*scene, *iter.second.element);
-            //}
+            else if (strcmp(idName, "Pose") == 0)
+            {
+                obj = parsePose(*scene, *iter.second.element);
+            }
 
             if (obj.isError())
                 return false;
@@ -3035,8 +3091,9 @@ namespace ofbx
         return parent;
     }
 
-    IScene* load(const u8* data, int size, u64 flags)
+    IScene* load(const u8* data, int size, u64 flags, CFBXLoading* pLoadingState)
     {
+        pLoadingState->Update(FBX_LOADING_ALLOCATING_MEMORY, "");
         std::unique_ptr<Scene> scene(new Scene());
         scene->m_data.resize(size);
         memcpy(&scene->m_data[0], data, size);
@@ -3045,6 +3102,7 @@ namespace ofbx
         if (version < 6200)
         {
             Error::s_message = "Unsupported FBX file format version. Minimum supported version is 6.2";
+            pLoadingState->Update(FBX_LOADING_FAILED, Error::s_message);
             return nullptr;
         }
         if (root.isError())
@@ -3059,14 +3117,33 @@ namespace ofbx
         assert(scene->m_root_element);
 
         // if (parseTemplates(*root.getValue()).isError()) return nullptr;
-        if (!parseConnections(*root.getValue(), scene.get()))
+
+        pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "");
+        if (!parseConnections(*root.getValue(), scene.get(), pLoadingState))
+        {
+            pLoadingState->Update(FBX_LOADING_FAILED, Error::s_message);
             return nullptr;
-        if (!parseTakes(scene.get()))
+        }
+
+		// not supported right now
+        //pLoadingState->Update(FBX_LOADING_PARSING_TAKES, "");
+        //if (!parseTakes(scene.get()))
+        //{
+        //    pLoadingState->Update(FBX_LOADING_FAILED, Error::s_message);
+        //    return nullptr;
+        //}
+
+        pLoadingState->Update(FBX_LOADING_PARSING_OBJECTS, "");
+        if (!parseObjects(*root.getValue(), scene.get(), flags, pLoadingState))
+        {
+            pLoadingState->Update(FBX_LOADING_FAILED, Error::s_message);
             return nullptr;
-        if (!parseObjects(*root.getValue(), scene.get(), flags))
-            return nullptr;
+        }
+
+        pLoadingState->Update(FBX_LOADING_PARSING_GLOBAL_SETTINGS, "");
         parseGlobalSettings(*root.getValue(), scene.get());
 
+        pLoadingState->Update(FBX_LOADING_FINISHING, "");
         return scene.release();
     }
 
