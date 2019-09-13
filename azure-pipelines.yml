@@ -70,5 +70,5 @@ jobs:
   - download: current
     artifact: $(MTA_WINDOWS_ARTIFACT)
     displayName: 'Fetch installation files for Windows'
-  - script: curl -i -F "branch_name=$(REPO_BRANCH)" -F "commit_hash=$(REPO_COMMIT_HASH)" -F "commit_title=$(REPO_COMMIT_TITLE)" -F build_type=$(BUILD_TYPE) -F "secret=$(UPLOAD_SECRET)" -F build_upload=@$(INSTALL_ZIP_FILE) $(NIGHTLY_API)
+  - script: curl -i -F "branch_name=$(REPO_BRANCH)" -F "commit_hash=$(REPO_COMMIT_HASH)" -F "commit_title=$(REPO_COMMIT_TITLE)" -F "build_type=$(BUILD_TYPE)" -F "secret=$(UPLOAD_SECRET)" -F "build_upload=@$(INSTALL_ZIP_FILE)" $(NIGHTLY_API)
     displayName: 'Upload zip file to MTA builds'
