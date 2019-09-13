@@ -42,6 +42,7 @@ class CClientManager;
 #include "CClientWeaponManager.h"
 #include "CClientEffectManager.h"
 #include "CClientPointLightsManager.h"
+#include "CClientModelManager.h"
 #include "CClientFBXManager.h"
 
 class CClientProjectileManager;
@@ -66,6 +67,7 @@ public:
     CClientGUIManager*           GetGUIManager() { return m_pGUIManager; }
     CClientMarkerManager*        GetMarkerManager() { return m_pMarkerManager; }
     CClientStreamer*             GetMarkerStreamer() { return m_pMarkerStreamer; }
+    CClientModelManager*         GetModelManager() { return m_pModelManager; }
     CClientModelRequestManager*  GetModelRequestManager() { return m_pModelRequestManager; }
     CClientObjectManager*        GetObjectManager() { return m_pObjectManager; }
     CClientStreamer*             GetObjectStreamer() { return m_pObjectStreamer; }
@@ -146,6 +148,7 @@ private:
     CClientWeaponManager*        m_pWeaponManager;
     CClientEffectManager*        m_pEffectManager;
     CClientPointLightsManager*   m_pPointLightsManager;
+    CClientModelManager*         m_pModelManager;
     CClientPacketRecorder*       m_pPacketRecorder;
     CClientFBXManager*           m_pFBXManager;
     bool                         m_bBeingDeleted;

@@ -361,6 +361,7 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
+    void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 

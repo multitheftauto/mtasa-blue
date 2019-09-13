@@ -22,11 +22,20 @@ public:
     void Remove(CDeathmatchObject* pObject)
     {
         if (!m_List.empty())
+        {
             m_List.remove(pObject);
+
+            if (m_currentPulseObject == pObject)
+                m_currentPulseObject = nullptr;
+        }
     };
 
     void DoPulse();
 
 private:
     std::list<CDeathmatchObject*> m_List;
+
+    // Current object being updated in DoPulse method. Setting it to nullptr during this period
+    // will prevent the code from trying to erase it from m_List.
+    CDeathmatchObject* m_currentPulseObject = nullptr;
 };

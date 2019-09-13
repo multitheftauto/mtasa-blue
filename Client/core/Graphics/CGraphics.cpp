@@ -45,9 +45,6 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pGUI = pGUI;
     memset(m_pDXFonts, 0, sizeof(m_pDXFonts));
     memset(m_pBigDXFonts, 0, sizeof(m_pBigDXFonts));
-    m_pDevice = NULL;
-    m_pLineInterface = NULL;
-    m_pDXSprite = NULL;
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;

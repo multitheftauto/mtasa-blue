@@ -297,7 +297,7 @@ void CClientVehicle::GetPosition(CVector& vecPosition) const
 void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze)
 {
     // Is the local player in the vehicle
-    if (g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
+    if (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
     {
         // If move is big enough, do ground checks
         float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
@@ -3760,7 +3760,7 @@ void CClientVehicle::UpdateTargetPosition()
         }
 
 #ifdef MTA_DEBUG
-        if (g_pClientGame->IsShowingInterpolation() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
+        if (g_pClientGame->IsShowingInterpolation() && g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
         {
             // DEBUG
             SString strBuffer(
