@@ -40,7 +40,6 @@ project "Client Deathmatch"
 			"../../../vendor/json-c",
 			"../../../vendor/bob_withers",
 			"../../../vendor/lua/src",
-			"../../../vendor/dffapi/src",
 			"../../../vendor/fbx",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",

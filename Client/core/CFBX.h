@@ -199,8 +199,6 @@ public:
     D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
     LPDIRECT3DVERTEXDECLARATION9 GetVertexDeclaration(int index) { return m_pVertexDeclaration[index]; }
 
-    bool IsBeingRemove;
-
 private:
     const ofbx::IScene*                   m_pScene;
     std::map<unsigned int, CFBXTemplate*> m_templateMap;
