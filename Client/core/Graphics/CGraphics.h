@@ -232,7 +232,7 @@ private:
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
-    CFBXBatcher*               m_pFBXBatcher;
+    CFBXBatcher*                 m_pFBXBatcher = nullptr;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
