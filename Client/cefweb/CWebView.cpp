@@ -673,7 +673,11 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
         // Copy popup buffer
         if (paintType == PET_POPUP)
         {
-            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            if (m_RenderData.popupBuffer)
+            {
+                memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            }
+
             return;            // We don't have to wait as we've copied the buffer already
         }
 
