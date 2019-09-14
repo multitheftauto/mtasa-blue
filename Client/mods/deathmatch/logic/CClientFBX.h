@@ -12,6 +12,7 @@
 #include "CClientEntity.h"
 #include "CClientFBXManager.h"
 #include "CClientFBXInterface.h"
+#include "..//Client/sdk/core/CFBXInterface.h"
 
 // from unknown reason fbx global transform position/rotation/scale are ~39,37007874015748 smaller than should be
 #define FBX_MAGIC_TRANSFORM (1 / 0.0254)

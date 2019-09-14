@@ -408,6 +408,7 @@ void CLuaManager::LoadCFunctions()
     }
 
     // Luadef definitions
+    // Please put new defs in alphabetical order
     CLuaAudioDefs::LoadFunctions();
     CLuaBlipDefs::LoadFunctions();
     CLuaBrowserDefs::LoadFunctions();
@@ -417,6 +418,7 @@ void CLuaManager::LoadCFunctions()
     CLuaEffectDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
     CLuaEngineDefs::LoadFunctions();
+    CLuaFBXDefs::LoadFunctions();
     CLuaFireDefs::LoadFunctions();
     CLuaGUIDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
@@ -437,5 +439,4 @@ void CLuaManager::LoadCFunctions()
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
-    CLuaFBXDefs::LoadFunctions();
 }

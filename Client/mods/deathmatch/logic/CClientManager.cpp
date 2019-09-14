@@ -180,7 +180,7 @@ CClientManager::~CClientManager()
     m_pModelManager = nullptr;
 
     delete m_pFBXManager;
-    m_pFBXManager = NULL;
+    m_pFBXManager = nullptr;
 }
 
 //

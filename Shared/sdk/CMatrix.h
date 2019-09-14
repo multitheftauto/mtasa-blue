@@ -28,7 +28,7 @@ public:
         vPos = CVector(0.0f, 0.0f, 0.0f);
     }
     
-    CMatrix(float* floats)
+    CMatrix(float floats[16])
     {
         // Load the identity matrix
         vRight = CVector(floats[0], floats[1], floats[2]);

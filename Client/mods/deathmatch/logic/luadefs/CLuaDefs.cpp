@@ -30,7 +30,7 @@ CClientPickupManager*      CLuaDefs::m_pPickupManager = NULL;
 CClientDFFManager*         CLuaDefs::m_pDFFManager = NULL;
 CClientColModelManager*    CLuaDefs::m_pColModelManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands = NULL;
-CClientFBXManager*         CLuaDefs::m_pFBXManager = NULL;
+CClientFBXManager*         CLuaDefs::m_pFBXManager = nullptr;
 bool                       ms_bRegisterdPostCallHook = false;
 
 void CLuaDefs::Initialize(CClientGame* pClientGame, CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging)

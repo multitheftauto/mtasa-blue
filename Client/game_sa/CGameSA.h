@@ -468,7 +468,7 @@ private:
     CWeaponStatManager*             m_pWeaponStatsManager;
     CPointLights*                   m_pPointLights;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
-    CFBXManager*        m_pFBXManager;
+    CFBXManager*                    m_pFBXManager;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;

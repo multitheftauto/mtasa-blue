@@ -26,7 +26,7 @@ class CClientPlayerManager;
 class CClientRadarMarkerManager;
 class CClientTeamManager;
 class CClientVehicleManager;
-class CClientFBX;
+class CClientFBXManager;
 class CElementDeleter;
 class CLuaManager;
 class CRegisteredCommands;

@@ -23,12 +23,12 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
-#include "CFBXInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
 typedef bool (*pfnProcessMessage)(HWND, UINT, WPARAM, LPARAM);
 
+class CFBXInterface;
 class CMultiplayer;
 class CNet;
 class CGame;
