@@ -118,14 +118,13 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     // select which vertex format we are using
     pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
     FBXObjectBuffer* pObjectBuffer;
-    D3DMATRIX*       pObjectMatrix = new D3DMATRIX();
     CFBXTextureSet*  pTextureSet;
     float            fDrawDistance;
     CVector          vecTemplatePosition;
     CVector          vecTemplateObjectPosition;
     CVector          vecPosition(pOffsetMatrix->m[3][0], pOffsetMatrix->m[3][1], pOffsetMatrix->m[3][2]);
-    pViewMatrix->GetBuffer((float*)pObjectMatrix);
-    vecTemplatePosition = pViewMatrix->GetPosition();
+    m_pViewMatrix->GetBuffer((float*)m_pObjectMatrix);
+    vecTemplatePosition = m_pViewMatrix->GetPosition();
 
     pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
     pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
@@ -143,10 +142,8 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
     pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
 
-    // pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DRS_DIFFUSEMATERIALSOURCE);
-    CMatrix* pCameraMatrix = new CMatrix();
-    g_pCore->GetGame()->GetCamera()->GetMatrix(pCameraMatrix);
-    CVector vecCameraPosition = pCameraMatrix->GetPosition();
+    g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
+    CVector vecCameraPosition = m_pCameraMatrix->GetPosition();
     pDevice->SetVertexDeclaration(pScene->GetVertexDeclaration(0));
 
     pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
@@ -184,15 +181,15 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
         object.second->GetDrawDistance(fDrawDistance);
         object.second->GetPosition(vecTemplateObjectPosition);
 
-        pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+        pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
 
         pDevice->SetTransform(D3DTS_TEXTURE0, pScene->GetMatrixUVFlip());
         pObjectBuffer = pScene->GetFBXBuffer(object.second->ullObjectId);
         if (pObjectBuffer != nullptr)
         {
-            object.second->pViewMatrix->GetBuffer((float*)pObjectMatrix);
-            pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), pObjectMatrix);
+            object.second->pViewMatrix->GetBuffer((float*)m_pObjectMatrix);
+            pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
 
             if (((vecTemplatePosition + vecTemplateObjectPosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
             {
@@ -257,22 +254,24 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
 CFBXTemplate::CFBXTemplate()
 {
-    pViewMatrix = new CMatrix();
+    m_pViewMatrix = new CMatrix();
+    m_pObjectMatrix = new D3DMATRIX();
+    m_pCameraMatrix = new CMatrix();
 }
 
 void CFBXTemplate::SetPosition(CVector& pos)
 {
-    pViewMatrix->SetPosition(pos);
+    m_pViewMatrix->SetPosition(pos);
 }
 
 void CFBXTemplate::SetRotation(CVector& rot)
 {
-    pViewMatrix->SetRotation(rot);
+    m_pViewMatrix->SetRotation(rot);
 }
 
 void CFBXTemplate::SetScale(CVector& scale)
 {
-    pViewMatrix->SetScale(scale);
+    m_pViewMatrix->SetScale(scale);
 }
 
 void CFBXTemplate::SetDrawDistance(float fDrawDistance)
@@ -282,17 +281,17 @@ void CFBXTemplate::SetDrawDistance(float fDrawDistance)
 
 void CFBXTemplate::GetPosition(CVector& position)
 {
-    position = pViewMatrix->GetPosition();
+    position = m_pViewMatrix->GetPosition();
 }
 
 void CFBXTemplate::GetRotation(CVector& rotation)
 {
-    rotation = pViewMatrix->GetRotation();
+    rotation = m_pViewMatrix->GetRotation();
 }
 
 void CFBXTemplate::GetScale(CVector& scale)
 {
-    scale = pViewMatrix->GetScale();
+    scale = m_pViewMatrix->GetScale();
 }
 
 void CFBXTemplate::GetDrawDistance(float& fDrawDistance)
@@ -566,9 +565,9 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     // test code, remove later
     unsigned int  uiTemplateId = CreateTemplate();
     CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
-    pTemplate->pViewMatrix->SetPosition(CVector(0, 0, 0));
-    pTemplate->pViewMatrix->SetRotation(CVector(0, 0, 0));
-    pTemplate->pViewMatrix->SetScale(CVector(1, 1, 1));
+    pTemplate->GetViewMatrix()->SetPosition(CVector(0, 0, 0));
+    pTemplate->GetViewMatrix()->SetRotation(CVector(0, 0, 0));
+    pTemplate->GetViewMatrix()->SetScale(CVector(1, 1, 1));
     int i = 0;
     for (const auto& pair : m_objectList)
     {

@@ -134,13 +134,13 @@ public:
     void GetScale(CVector& scale);
     void GetDrawDistance(float& fDrawDisntace);
 
-    CMatrix* pViewMatrix;
-
     CFBXTemplateObject*                         GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
     bool                                        IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
     unsigned int                                GetInterior() { return uiInterior; };
     unsigned int                                GetDimension() { return uiDimension; };
+    CMatrix*                                    GetViewMatrix() const { return m_pViewMatrix; };
+
 
 private:
     std::map<unsigned int, CFBXTemplateObject*> m_objectMap;
@@ -149,6 +149,10 @@ private:
     unsigned int uiDimension = 0;
     float        fDrawDistance = 1000;
     unsigned int uiNextFreeObjectId = 1;
+
+    CMatrix*   m_pViewMatrix;
+    D3DMATRIX* m_pObjectMatrix;
+    CMatrix*   m_pCameraMatrix;
 };
 
 class CFBXScene : public CFBXSceneInterface
