@@ -253,13 +253,12 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 {
-    // ATTENTION: This method is called within a secondary thread so be sure to use only thread safe functions
-
     // If no resource is set, we are allowed to use the requested file
     if (!m_pResource)
         return true;
 
     CResource* pTempResource = m_pResource;            // Make a copy to ignore a changed resource
+
     if (CResourceManager::ParseResourcePathInput(strURL, pTempResource, &strURL))
         return true;
 

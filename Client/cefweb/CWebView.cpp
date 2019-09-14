@@ -444,7 +444,18 @@ CVector2D CWebView::GetSize()
 
 bool CWebView::GetFullPathFromLocal(SString& strPath)
 {
-    return m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+            result = true;
+    }, this);
+
+    return result;
 }
 
 bool CWebView::RegisterAjaxHandler(const SString& strURL)
