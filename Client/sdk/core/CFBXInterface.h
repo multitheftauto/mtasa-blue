@@ -68,6 +68,8 @@ public:
     virtual void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode) = 0;
     virtual void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode) = 0;
 
+    virtual float GetUnitScaleFactor() = 0;
+
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;
     virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
     virtual unsigned int               CreateTemplate() = 0;

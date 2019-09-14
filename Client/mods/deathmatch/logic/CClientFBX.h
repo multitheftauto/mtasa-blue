@@ -14,9 +14,6 @@
 #include "CClientFBXInterface.h"
 #include "..//Client/sdk/core/CFBXInterface.h"
 
-// from unknown reason fbx global transform position/rotation/scale are ~39,37007874015748 smaller than should be
-#define FBX_MAGIC_TRANSFORM (1 / 0.0254)
-
 class CScriptArgReader;
 enum eFBXTemplateProperty;
 enum eFBXTemplateModelProperty;
@@ -72,6 +69,7 @@ public:
     bool RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
     bool ApplyTemplateToModel(unsigned int uiTemplateId, unsigned long ulModel);
     bool RemoveTemplateFromModel(unsigned int uiTemplateId, unsigned long ulModel);
+    float GetUnitScaleFactor() { return m_pFBXScene->GetUnitScaleFactor(); }
 
     void                                               CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem*                                     GetTextureById(unsigned long long strTextureName);

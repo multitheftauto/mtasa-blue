@@ -723,6 +723,7 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
     if (eType == ofbx::Object::Type::GEOMETRY || eType == ofbx::Object::Type::MESH)
     {
         double  m[16] = {};
+
         float   array[16];
         CMatrix matrix, matrixLocal;
         CVector vector;
@@ -737,16 +738,17 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
             array[i] = (float)m[i];
 
         matrix = CMatrix(array);
+
         switch (eProperty)
         {
             case FBX_OBJECT_PROPERTY_POSITION:
-                vector = matrix.GetPosition() * FBX_MAGIC_TRANSFORM;
+                vector = matrix.GetPosition() * GetUnitScaleFactor();
                 break;
             case FBX_OBJECT_PROPERTY_ROTATION:
-                vector = matrix.GetRotation() * FBX_MAGIC_TRANSFORM;
+                vector = matrix.GetRotation() * GetUnitScaleFactor();
                 break;
             case FBX_OBJECT_PROPERTY_SCALE:
-                vector = matrix.GetScale() * FBX_MAGIC_TRANSFORM;
+                vector = matrix.GetScale() * GetUnitScaleFactor();
                 break;
             case FBX_OBJECT_PROPERTY_LOCAL_POSITION:
                 vector = matrixLocal.GetPosition();

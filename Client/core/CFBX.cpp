@@ -558,6 +558,7 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
     m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
 
+    m_fUnitScaleFactor = 1 / (m_pScene->getGlobalSettings()->OriginalUnitScaleFactor / m_pScene->getGlobalSettings()->UnitScaleFactor);
     pMatrix = new CMatrix();
     pObjectMatrix = new D3DMATRIX();
     pCameraMatrix = new CMatrix();
