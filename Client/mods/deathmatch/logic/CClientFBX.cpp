@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <tuple>
 
@@ -34,10 +35,25 @@ CClientFBX::~CClientFBX(void)
     m_pFBXManager->RemoveFromList(this);
 }
 
-template <typename R>
-bool is_ready(std::future<R> const& f)
+bool getFileContent(const std::string& path, CBuffer*& pBuffer)
 {
-    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+    std::ifstream file(path, std::ifstream::binary);
+
+    if (file)
+    {
+        file.seekg(0, file.end);
+        int length = file.tellg();
+        file.seekg(0, file.beg);
+
+        char* buffer = new char[length];
+        file.read(buffer, length);
+        pBuffer = new CBuffer(buffer, length);
+
+        file.close();
+        delete[] buffer;
+        return true;
+    }
+    return false;
 }
 
 bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* luaVM, SString strError)
@@ -55,8 +71,10 @@ bool CClientFBX::LoadFBX(const SString& strFile, bool bIsRawData, lua_State* lua
         if (!FileExists(m_strFbxFilename))
             return false;
 
-        // if (!g_pCore->GetNetwork()->CheckFile("fbx", m_strDffFilename))
-        //    return false;
+        if (!g_pCore->GetNetwork()->CheckFile("fbx", m_strFbxFilename))
+            return false;
+
+        getFileContent(strFile, m_RawDataBuffer);
     }
     else
     {
@@ -147,7 +165,6 @@ void CClientFBX::LuaGetLoadingStatus(lua_State* luaVM)
         case FBX_LOADING_FINISHED:
             lua_pushstring(luaVM, "finished");
             break;
-
     }
     lua_settable(luaVM, -3);
     lua_pushstring(luaVM, "message");
@@ -722,7 +739,7 @@ bool CClientFBX::LuaGetObjectProperties(lua_State* luaVM, const ofbx::Object* co
 
     if (eType == ofbx::Object::Type::GEOMETRY || eType == ofbx::Object::Type::MESH)
     {
-        double  m[16] = {};
+        double m[16] = {};
 
         float   array[16];
         CMatrix matrix, matrixLocal;
