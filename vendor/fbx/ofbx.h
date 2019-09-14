@@ -10,6 +10,7 @@ enum EFBXLoadingStep
     FBX_LOADING_PARSING_OBJECTS,
     FBX_LOADING_PARSING_GLOBAL_SETTINGS,
     FBX_LOADING_FINISHING,
+    FBX_LOADING_FINISHED,
 };
 
 class CFBXLoading
@@ -478,5 +479,7 @@ namespace ofbx
 
     IScene*     load(const u8* data, int size, u64 flags, CFBXLoading* pLoadingState);
     const char* getError();
+    const char* GetObjectType(const Object const* pObject);
+    const char* GetObjectType(Object::Type pType);
 
 }            // namespace ofbx

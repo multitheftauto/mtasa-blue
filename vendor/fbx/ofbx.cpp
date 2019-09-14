@@ -39,6 +39,46 @@ void CFBXLoading::Get(EFBXLoadingStep& eStep, const char*& message, int& iSubSte
 
 namespace ofbx
 {
+    const char* GetObjectType(const Object const* pObject) { return GetObjectType(pObject->getType()); }
+
+    const char* GetObjectType(Object::Type pType)
+    {
+        switch (pType)
+        {
+            case ofbx::Object::Type::GEOMETRY:
+                return "geometry";
+            case ofbx::Object::Type::MESH:
+                return "mesh";
+            case ofbx::Object::Type::MATERIAL:
+                return "material";
+            case ofbx::Object::Type::ROOT:
+                return "root";
+            case ofbx::Object::Type::TEXTURE:
+                return "texture";
+            case ofbx::Object::Type::NULL_NODE:
+                return "null";
+            case ofbx::Object::Type::LIMB_NODE:
+                return "limb node";
+            case ofbx::Object::Type::NODE_ATTRIBUTE:
+                return "node attribute";
+            case ofbx::Object::Type::CLUSTER:
+                return "cluster";
+            case ofbx::Object::Type::SKIN:
+                return "skin";
+            case ofbx::Object::Type::ANIMATION_STACK:
+                return "animation stack";
+            case ofbx::Object::Type::ANIMATION_LAYER:
+                return "animation layer";
+            case ofbx::Object::Type::ANIMATION_CURVE:
+                return "animation curve";
+            case ofbx::Object::Type::ANIMATION_CURVE_NODE:
+                return "animation curve node";
+            default:
+                return "unknown";
+        }
+        return "unknown";
+    }
+
     struct Error
     {
         Error() {}
@@ -2749,6 +2789,8 @@ namespace ofbx
             if (obj.isError())
                 return false;
 
+            pLoadingState->Update(FBX_LOADING_PARSING_OBJECTS, idName, iTotalCount - iCount, iTotalCount);
+
             scene->m_object_map[iter.first].object = obj.getValue();
             if (obj.getValue())
             {
@@ -2757,6 +2799,9 @@ namespace ofbx
             }
         }
 
+        pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "");
+
+		int i = 0;
         for (const Scene::Connection& con : scene->m_connections)
         {
             Object* parent = scene->m_object_map[con.to].object;
@@ -2766,6 +2811,7 @@ namespace ofbx
             if (!parent)
                 continue;
 
+            pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, GetObjectType(child->getType()), ++i, scene->m_connections.size());
             switch (child->getType())
             {
                 case Object::Type::NODE_ATTRIBUTE:

@@ -967,56 +967,7 @@ void CFBX::RemoveScene(CFBXScene* pScene)
 
 const char* CFBX::GetObjectType(const ofbx::Object const* pObject)
 {
-    const char* label;
-    switch (pObject->getType())
-    {
-        case ofbx::Object::Type::GEOMETRY:
-            label = "geometry";
-            break;
-        case ofbx::Object::Type::MESH:
-            label = "mesh";
-            break;
-        case ofbx::Object::Type::MATERIAL:
-            label = "material";
-            break;
-        case ofbx::Object::Type::ROOT:
-            label = "root";
-            break;
-        case ofbx::Object::Type::TEXTURE:
-            label = "texture";
-            break;
-        case ofbx::Object::Type::NULL_NODE:
-            label = "null";
-            break;
-        case ofbx::Object::Type::LIMB_NODE:
-            label = "limb node";
-            break;
-        case ofbx::Object::Type::NODE_ATTRIBUTE:
-            label = "node attribute";
-            break;
-        case ofbx::Object::Type::CLUSTER:
-            label = "cluster";
-            break;
-        case ofbx::Object::Type::SKIN:
-            label = "skin";
-            break;
-        case ofbx::Object::Type::ANIMATION_STACK:
-            label = "animation stack";
-            break;
-        case ofbx::Object::Type::ANIMATION_LAYER:
-            label = "animation layer";
-            break;
-        case ofbx::Object::Type::ANIMATION_CURVE:
-            label = "animation curve";
-            break;
-        case ofbx::Object::Type::ANIMATION_CURVE_NODE:
-            label = "animation curve node";
-            break;
-        default:
-            label = "unknown";
-            break;
-    }
-    return label;
+    return ofbx::GetObjectType(pObject);
 }
 
 bool CFBX::HasAnyFBXLoaded()

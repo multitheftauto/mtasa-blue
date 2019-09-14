@@ -84,13 +84,11 @@ void CClientFBX::LoadScene()
         return;
     }
 
-    if (this != nullptr)
-    {
-        m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
+    free(m_RawDataBuffer);
+    m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
 
-        m_bLoaded = true;
-    }
-    m_RawDataBuffer->Clear();
+    pLoadingState->Update(FBX_LOADING_FINISHED, "");
+    m_bLoaded = true;
 }
 
 void CClientFBX::Render()
@@ -102,6 +100,7 @@ void CClientFBX::Render()
         m_bEventCalled = true;
     }
 }
+
 // Return true if data looks like FBX file contents
 bool CClientFBX::IsFBXData(const SString& strData)
 {
@@ -113,13 +112,43 @@ void CClientFBX::LuaGetLoadingStatus(lua_State* luaVM)
 {
     EFBXLoadingStep eStep;
     const char*     message;
+    const char*     extraMessage;
     int             iSubStep;
     int             iSubStepOf;
     pLoadingState->Get(eStep, message, iSubStep, iSubStepOf);
-
     lua_newtable(luaVM);
     lua_pushstring(luaVM, "step");
-    lua_pushnumber(luaVM, eStep);
+    switch (eStep)
+    {
+        case FBX_LOADING_FAILED:
+            lua_pushstring(luaVM, "failed");
+            break;
+        case FBX_LOADING_INITIALIZATION:
+            lua_pushstring(luaVM, "initialization");
+            break;
+        case FBX_LOADING_ALLOCATING_MEMORY:
+            lua_pushstring(luaVM, "allocating memory");
+            break;
+        case FBX_LOADING_PARSING_CONNECTIONS:
+            lua_pushstring(luaVM, "parsing connections");
+            break;
+        case FBX_LOADING_PARSING_TAKES:
+            lua_pushstring(luaVM, "parsing takes");
+            break;
+        case FBX_LOADING_PARSING_OBJECTS:
+            lua_pushstring(luaVM, "parsing objects");
+            break;
+        case FBX_LOADING_PARSING_GLOBAL_SETTINGS:
+            lua_pushstring(luaVM, "parsing global settings");
+            break;
+        case FBX_LOADING_FINISHING:
+            lua_pushstring(luaVM, "finishing");
+            break;
+        case FBX_LOADING_FINISHED:
+            lua_pushstring(luaVM, "finished");
+            break;
+
+    }
     lua_settable(luaVM, -3);
     lua_pushstring(luaVM, "message");
     lua_pushstring(luaVM, message);
