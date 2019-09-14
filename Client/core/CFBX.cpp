@@ -11,20 +11,27 @@
 
 #include "StdInc.h"
 
+CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
+: m_uiTemplateId(uiTemplateId), m_vecPosition(vecPosition), m_vecRotation(vecRotation), m_vecScale(vecScale)
+{
+
+}
+
 FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMaterialId)
 {
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
 
-    pFBXVertexBuffer = new FBXVertexBuffer(vecVertexList, (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1));
+    m_pFBXVertexBuffer = new FBXVertexBuffer(vecVertexList, (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1));
 
-    pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &i_buffer, NULL);
-    i_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
+    m_pIndexBuffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(int));
-    i_buffer->Unlock();
+    m_pIndexBuffer->Unlock();
 
-    indicesCount = vecIndexList.size();
-    this->ullMaterialId = ullMaterialId;
+    m_iIndicesCount = vecIndexList.size();
+    m_iFacesCount = m_iIndicesCount / 3;
+    m_ullMaterialId = ullMaterialId;
 }
 
 template <typename T>
@@ -32,20 +39,20 @@ FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
 {
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
-    pDevice->CreateVertexBuffer(vector.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &v_buffer, NULL);
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    pDevice->CreateVertexBuffer(vector.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_pBuffer, NULL);
+    m_pBuffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vector.data(), vector.size() * sizeof(T));
-    v_buffer->Unlock();
+    m_pBuffer->Unlock();
 
-    bufferSize = vector.size();
-    this->FVF = FVF;
-    iTypeSize = sizeof(T);
+    m_iBufferSize = vector.size();
+    m_FVF = FVF;
+    m_iTypeSize = sizeof(T);
 }
 
 void FBXVertexBuffer::Select(UINT StreamNumber)
 {
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
-    pDevice->SetStreamSource(StreamNumber, v_buffer, 0, iTypeSize);
+    pDevice->SetStreamSource(StreamNumber, m_pBuffer, 0, m_iTypeSize);
 }
 
 FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList,
@@ -53,9 +60,9 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
 {
     if (vecMaterialList.size() > 0)
     {
-        std::map<int, std::vector<FBXVertex>> fbxBufferMap;
-        std::map<int, std::vector<int>>       fbxIndexMap;
-        std::map<int, unsigned long long>     fbxMaterialMap;
+        std::unordered_map<int, std::vector<FBXVertex>> fbxBufferMap;
+        std::unordered_map<int, std::vector<int>>       fbxIndexMap;
+        std::unordered_map<int, unsigned long long>     fbxMaterialMap;
 
         int i = 0;
         for (int const& iMaterial : vecMaterialList)
@@ -90,7 +97,7 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
         {
             for (int i = 0; i < iCount; i++)
             {
-                bufferList.push_back(new FBXBuffer(fbxBufferMap[i], fbxIndexMap[i], fbxMaterialMap[i]));
+                m_bufferList.push_back(new FBXBuffer(fbxBufferMap[i], fbxIndexMap[i], fbxMaterialMap[i]));
             }
         }
     }
@@ -103,19 +110,15 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
         {
             id = (*pMesh)->getMaterial(0)->id;
         }
-        bufferList.push_back(new FBXBuffer(vecVertexList, vecIndexList, id));
+        m_bufferList.push_back(new FBXBuffer(vecVertexList, vecIndexList, id));
     }
 }
 
-int  a = D3DTOP_MODULATE;
-int  b = D3DTA_CURRENT;
-int  c = D3DTA_CONSTANT;
 void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
 {
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
 
-    // select which vertex format we are using
     pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
     FBXObjectBuffer* pObjectBuffer;
     CFBXTextureSet*  pTextureSet;
@@ -144,12 +147,14 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
     g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
     CVector vecCameraPosition = m_pCameraMatrix->GetPosition();
-    pDevice->SetVertexDeclaration(pScene->GetVertexDeclaration(0));
+    pDevice->SetVertexDeclaration(g_pCore->GetFBX()->GetVertexDeclaration(VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE));
 
     pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
     pDevice->LightEnable(7, TRUE);
 
     DWORD      materialDiffuse;
+    eCullMode  cullMode;
+    D3DMATERIAL9* pMaterial;
     D3DXCOLOR* globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
     DWORD      colorGlobalAmbient =
         D3DCOLOR_ARGB((DWORD)(globalAmbient->a * 255), (DWORD)(globalAmbient->r * 255), (DWORD)(globalAmbient->g * 255), (DWORD)(globalAmbient->b * 255));
@@ -158,8 +163,9 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
     for (auto const& object : m_objectMap)
     {
-        materialDiffuse = D3DCOLOR_ARGB((DWORD)(object.second->material.Diffuse.a * 255), (DWORD)(object.second->material.Diffuse.r * 255),
-                                        (DWORD)(object.second->material.Diffuse.g * 255), (DWORD)(object.second->material.Diffuse.b * 255));
+        object.second->GetMaterial(pMaterial);
+        materialDiffuse = D3DCOLOR_ARGB((DWORD)(pMaterial->Diffuse.a * 255), (DWORD)(pMaterial->Diffuse.r * 255), (DWORD)(pMaterial->Diffuse.g * 255),
+                                        (DWORD)(pMaterial->Diffuse.b * 255));
 
         pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
         pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -184,26 +190,27 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
         pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
 
-        pDevice->SetTransform(D3DTS_TEXTURE0, pScene->GetMatrixUVFlip());
-        pObjectBuffer = pScene->GetFBXBuffer(object.second->ullObjectId);
+        pDevice->SetTransform(D3DTS_TEXTURE0, g_pCore->GetFBX()->GetMatrixUVFlip());
+        pObjectBuffer = pScene->GetFBXBuffer(object.second->GetObjectId());
         if (pObjectBuffer != nullptr)
         {
-            object.second->pViewMatrix->GetBuffer((float*)m_pObjectMatrix);
+            object.second->GetMatrix(m_pObjectMatrix);
             pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
 
             if (((vecTemplatePosition + vecTemplateObjectPosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
             {
-                pDevice->SetRenderState(D3DRS_CULLMODE, object.second->cullMode);
+                object.second->GetCullMode(cullMode);
+                pDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
 
-                for (auto const& pBuffer : pObjectBuffer->bufferList)
+                for (auto const& pBuffer : pObjectBuffer->m_bufferList)
                 {
-                    if (pBuffer->ullMaterialId == 0)
+                    if (pBuffer->m_ullMaterialId == 0)
                     {
                         pDevice->SetTexture(0, nullptr);
                     }
                     else
                     {
-                        pTextureSet = pScene->GetTextureSet(pBuffer->ullMaterialId);
+                        pTextureSet = pScene->GetTextureSet(pBuffer->m_ullMaterialId);
                         if (pTextureSet != nullptr)
                         {
                             if (pTextureSet->diffuse != nullptr)
@@ -232,13 +239,14 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                         }
                     }
 
-                    pDevice->SetMaterial(&object.second->material);
+                    object.second->GetMaterial(pMaterial);
+                    pDevice->SetMaterial(pMaterial);
 
-                    pBuffer->pFBXVertexBuffer->Select(0);
-                    pObjectBuffer->diffuseBuffer->Select(1);
-                    pDevice->SetIndices(pBuffer->i_buffer);
+                    pBuffer->m_pFBXVertexBuffer->Select(0);
+                    pObjectBuffer->m_pDiffuseBuffer->Select(1);
+                    pDevice->SetIndices(pBuffer->m_pIndexBuffer);
 
-                    pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->indicesCount / 3);
+                    pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->m_iFacesCount);
                 }
             }
         }
@@ -259,119 +267,28 @@ CFBXTemplate::CFBXTemplate()
     m_pCameraMatrix = new CMatrix();
 }
 
-void CFBXTemplate::SetPosition(CVector& pos)
-{
-    m_pViewMatrix->SetPosition(pos);
-}
-
-void CFBXTemplate::SetRotation(CVector& rot)
-{
-    m_pViewMatrix->SetRotation(rot);
-}
-
-void CFBXTemplate::SetScale(CVector& scale)
-{
-    m_pViewMatrix->SetScale(scale);
-}
-
-void CFBXTemplate::SetDrawDistance(float fDrawDistance)
-{
-    this->fDrawDistance = fDrawDistance;
-}
-
-void CFBXTemplate::GetPosition(CVector& position)
-{
-    position = m_pViewMatrix->GetPosition();
-}
-
-void CFBXTemplate::GetRotation(CVector& rotation)
-{
-    rotation = m_pViewMatrix->GetRotation();
-}
-
-void CFBXTemplate::GetScale(CVector& scale)
-{
-    scale = m_pViewMatrix->GetScale();
-}
-
-void CFBXTemplate::GetDrawDistance(float& fDrawDistance)
-{
-    fDrawDistance = this->fDrawDistance;
-}
-
 unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 {
-    m_objectMap[uiNextFreeObjectId] = pObject;
-    uiNextFreeObjectId++;
-    return uiNextFreeObjectId - 1;
+    m_objectMap[m_uiNextFreeObjectId] = pObject;
+    return m_uiNextFreeObjectId ++;
 }
 
-CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : ullObjectId(ullObjectId)
+CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : m_ullObjectId(ullObjectId)
 {
-    pViewMatrix = new CMatrix();
+    m_pViewMatrix = new CMatrix();
 
-    ZeroMemory(&material, sizeof(D3DMATERIAL9));
-    material.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
-    material.Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
-    material.Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f);            // depends
-    material.Emissive = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.5f);
-    material.Power = 5.0f;
-}
-
-void CFBXTemplateObject::SetPosition(CVector& pos)
-{
-    pViewMatrix->SetPosition(pos);
-}
-
-void CFBXTemplateObject::SetRotation(CVector& rot)
-{
-    pViewMatrix->SetRotation(rot);
-}
-
-void CFBXTemplateObject::SetScale(CVector& scale)
-{
-    pViewMatrix->SetScale(scale);
-}
-
-void CFBXTemplateObject::SetDrawDistance(float fDrawDistance)
-{
-    this->fDrawDistance = fDrawDistance;
-}
-
-void CFBXTemplateObject::GetPosition(CVector& position)
-{
-    position = pViewMatrix->GetPosition();
-}
-
-void CFBXTemplateObject::GetRotation(CVector& rotation)
-{
-    rotation = pViewMatrix->GetRotation();
-}
-
-void CFBXTemplateObject::GetScale(CVector& scale)
-{
-    scale = pViewMatrix->GetScale();
-}
-
-void CFBXTemplateObject::GetDrawDistance(float& fDrawDistance)
-{
-    fDrawDistance = this->fDrawDistance;
-}
-
-void CFBXTemplateObject::GetCullMode(eCullMode& cullMode)
-{
-    cullMode = this->cullMode;
-}
-
-void CFBXTemplateObject::SetCullMode(eCullMode cullMode)
-{
-    this->cullMode = cullMode;
+    m_pMaterial = new D3DMATERIAL9();
+    m_pMaterial->Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+    m_pMaterial->Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+    m_pMaterial->Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f);            // depends
+    m_pMaterial->Emissive = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.5f);
+    m_pMaterial->Power = 5.0f;
 }
 
 unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
 {
-    m_templateMap[uiNextFreeTemplateId] = pTemplate;
-    return uiNextFreeTemplateId++;
+    m_templateMap[m_uiNextFreeTemplateId] = pTemplate;
+    return m_uiNextFreeTemplateId++;
 }
 
 FBXObjectBuffer* CFBXScene::GetFBXBuffer(unsigned long long ullId)
@@ -443,7 +360,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
     memcpy(vecMaterials.data(), pGeometry->getMaterials(), sizeof(int) * vecMaterials.size());
 
     FBXObjectBuffer* pBuffer = new FBXObjectBuffer(vecVertices, vecIndices, vecMaterials, pMesh);
-    pBuffer->diffuseBuffer = new FBXVertexBuffer(vecColors, D3DFVF_DIFFUSE);
+    pBuffer->m_pDiffuseBuffer = new FBXVertexBuffer(vecColors, D3DFVF_DIFFUSE);
     AddBuffer((*pObject)->id, pBuffer);
     return true;
 }
@@ -495,19 +412,19 @@ CTextureItem* CFBXScene::GetTexture(const ofbx::Texture* pTexture)
     if (pTexture == nullptr)
         return nullptr;
 
-    if (pClientFBXInterface == nullptr)
+    if (m_pClientFBXInterface == nullptr)
         return nullptr;
 
-    if (!pClientFBXInterface->IsTextureCreated(pTexture->id))
+    if (!m_pClientFBXInterface->IsTextureCreated(pTexture->id))
     {
-        char fileName[120];
+        char fileName[128];
         pTexture->getFileName().toString(fileName);
         SString  name = fileName;
         CPixels* pTexturePixels = m_textureContentList[name];
 
-        pClientFBXInterface->CreateTexture(pTexture->id, pTexturePixels);
+        m_pClientFBXInterface->CreateTexture(pTexture->id, pTexturePixels);
     }
-    CMaterialItem* pMaterialItem = pClientFBXInterface->GetTextureById(pTexture->id);
+    CMaterialItem* pMaterialItem = m_pClientFBXInterface->GetTextureById(pTexture->id);
     if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterialItem))
     {
         // If material is a shader, use its current instance
@@ -543,7 +460,8 @@ CFBXTextureSet* CFBXScene::GetTextureSet(unsigned long long ullMaterialId)
 CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface) : m_pScene(scene)
 {
     m_pRoot = m_pScene->getRoot();
-    this->pClientFBXInterface = pClientFBXInterface;
+    m_pClientFBXInterface = pClientFBXInterface;
+
     FixIndices();
     CacheObjects();
     CacheMeshes();
@@ -552,33 +470,13 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     CacheMeshMaterials();
     CacheBoundingBoxes();
 
-    CMatrix* matrixFixInvertedUVs = new CMatrix();
-    matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
-    matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
-    matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
-    m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
-
     m_fUnitScaleFactor = 1 / (m_pScene->getGlobalSettings()->OriginalUnitScaleFactor / m_pScene->getGlobalSettings()->UnitScaleFactor);
-    pMatrix = new CMatrix();
-    pObjectMatrix = new D3DMATRIX();
-    pCameraMatrix = new CMatrix();
+    m_pMatrix = new CMatrix();
+    m_pObjectMatrix = new D3DMATRIX();
+    m_pCameraMatrix = new CMatrix();
 
     CreateBaseTemplate();
-
-    D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                                   {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-                                                   {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-                                                   {1, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-                                                   D3DDECL_END()};
-
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
-    pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[0]);
-    D3DVERTEXELEMENT9 dwDeclPosNormalTex[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                              {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-                                              {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-                                              D3DDECL_END()};
-
-    pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[1]);
 }
 
 // makes as much excact copy of scene as possible
@@ -608,9 +506,9 @@ void CFBXScene::CreateBaseTemplate()
             matrix = CMatrix(array);
 
             CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(ullObjectId);
-            pTemplateObject->pViewMatrix->SetPosition(matrix.GetPosition() * GetUnitScaleFactor());
-            pTemplateObject->pViewMatrix->SetRotation(matrix.GetRotation() * GetUnitScaleFactor());
-            pTemplateObject->pViewMatrix->SetScale(matrix.GetScale() * GetUnitScaleFactor());
+            pTemplateObject->SetPosition(matrix.GetPosition() * GetUnitScaleFactor());
+            pTemplateObject->SetRotation(matrix.GetRotation() * GetUnitScaleFactor());
+            pTemplateObject->SetScale(matrix.GetScale() * GetUnitScaleFactor());
             pTemplate->AddTemplateObject(pTemplateObject);
             i++;
         }
@@ -800,39 +698,39 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
 
 void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
 {
-    if (!pClientFBXInterface->IsLoaded())
+    if (!m_pClientFBXInterface->IsLoaded())
         return;
 
-    pClientFBXInterface->Render();
+    m_pClientFBXInterface->Render();
 
     CFBXTemplate* pTemplate;
     CVector       vecCameraPosition;
     CVector       vecTemplatePosition;
     CVector       vecTemplateOffset;
     float         fDrawDistance;
-    g_pCore->GetGame()->GetCamera()->GetMatrix(pCameraMatrix);
-    vecCameraPosition = pCameraMatrix->GetPosition();
+    g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
+    vecCameraPosition = m_pCameraMatrix->GetPosition();
     for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
-        if (!IsTemplateValid(renderItem->uiTemplateId))
+        if (!IsTemplateValid(renderItem->m_uiTemplateId))
             continue;
 
-        pTemplate = m_templateMap[renderItem->uiTemplateId];
+        pTemplate = m_templateMap[renderItem->m_uiTemplateId];
         pTemplate->GetPosition(vecTemplatePosition);
         pTemplate->GetDrawDistance(fDrawDistance);
 
-        if (((vecTemplatePosition + renderItem->position) - vecCameraPosition).Length() < fDrawDistance)
+        if (((vecTemplatePosition + renderItem->m_vecPosition) - vecCameraPosition).Length() < fDrawDistance)
         {
-            pMatrix->SetPosition(renderItem->position);
-            pMatrix->SetRotation(renderItem->rotation);
-            pMatrix->SetScale(renderItem->scale);
+            m_pMatrix->SetPosition(renderItem->m_vecPosition);
+            m_pMatrix->SetRotation(renderItem->m_vecRotation);
+            m_pMatrix->SetScale(renderItem->m_vecScale);
 
-            pMatrix->GetBuffer((float*)pObjectMatrix);
-            pTemplate->Render(pDevice, this, pObjectMatrix);
+            m_pMatrix->GetBuffer((float*)m_pObjectMatrix);
+            pTemplate->Render(pDevice, this, m_pObjectMatrix);
         }
     }
 
-    std::map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = pClientFBXInterface->GetTemplatesRenderingMatrix();
+    std::unordered_map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = m_pClientFBXInterface->GetTemplatesRenderingMatrix();
     for (auto const& pair : pTemplatesMatrix)
     {
         for (CMatrix matrix : pair.second)
@@ -843,8 +741,8 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
             vecTemplateOffset = matrix.GetPosition();
             if (((vecTemplatePosition + vecTemplateOffset) - vecCameraPosition).Length() < fDrawDistance)
             {
-                matrix.GetBuffer((float*)pObjectMatrix);
-                pTemplate->Render(pDevice, this, pObjectMatrix);
+                matrix.GetBuffer((float*)m_pObjectMatrix);
+                pTemplate->Render(pDevice, this, m_pObjectMatrix);
             }
         }
     }
@@ -1017,11 +915,32 @@ CFBX::CFBX()
 
     m_globalAmbient = new D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
     m_globalLighting = 0.8f;
+
+    
+    CMatrix* matrixFixInvertedUVs = new CMatrix();
+    matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
+    matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
+    matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
+    m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
 }
 
 void CFBX::Initialize()
 {
     m_pDevice = g_pCore->GetGraphics()->GetDevice();
+    
+    D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                                   {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+                                                   {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                                   {1, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                                   D3DDECL_END()};
+
+    D3DVERTEXELEMENT9 dwDeclPosNormalTex[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                              {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+                                              {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                              D3DDECL_END()};
+
+    m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE]);
+    m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE]);
 }
 
 CFBX::~CFBX()

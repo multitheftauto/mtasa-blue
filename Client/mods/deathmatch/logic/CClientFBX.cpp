@@ -1001,13 +1001,13 @@ CMaterialItem* CClientFBX::GetTextureById(unsigned long long ullTextureId)
     return nullptr;
 }
 
-std::map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRenderingMatrix()
+std::unordered_map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRenderingMatrix()
 {
-    unsigned short                                     usDimension = g_pClientGame->GetLocalPlayer()->GetDimension();
-    unsigned char                                      ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
-    std::map<unsigned long long, std::vector<CMatrix>> templatesMatrix;
-    CVector                                            scale;
-    std::vector<CClientObject*>                        vecObjects;
+    unsigned short                                               usDimension = g_pClientGame->GetLocalPlayer()->GetDimension();
+    unsigned char                                                ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
+    std::unordered_map<unsigned long long, std::vector<CMatrix>> templatesMatrix;
+    CVector                                                      scale;
+    std::vector<CClientObject*>                                  vecObjects;
 
     for (const auto& pair : m_mapElementRenderLoop)
     {

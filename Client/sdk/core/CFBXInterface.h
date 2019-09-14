@@ -14,8 +14,9 @@ class CFBXScene;
 class SString;
 class CClientFBXInterface;
 class CFBXLoading;
-enum eCullMode;
 class D3DXCOLOR;
+enum eCullMode;
+enum eVertexType;
 
 namespace ofbx
 {
@@ -28,15 +29,17 @@ namespace ofbx
 class CFBXInterface
 {
 public:
-    virtual CFBXScene*  AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
-    virtual void        RemoveScene(CFBXScene* pScene) = 0;
-    virtual void        Render() = 0;
-    virtual void        Initialize() = 0;
-    virtual bool        HasAnyFBXLoaded() = 0;
-    virtual const char* GetObjectType(const ofbx::Object const* pObject) = 0;
-    virtual D3DLIGHT9*  GetGlobalLight() = 0;
-    virtual D3DXCOLOR*  GetGlobalAmbient() = 0;
-    virtual float       GetGlobalLighting() = 0;
+    virtual CFBXScene*            AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
+    virtual void                  RemoveScene(CFBXScene* pScene) = 0;
+    virtual void                  Render() = 0;
+    virtual void                  Initialize() = 0;
+    virtual bool                  HasAnyFBXLoaded() = 0;
+    virtual const char*           GetObjectType(const ofbx::Object const* pObject) = 0;
+    virtual D3DLIGHT9*            GetGlobalLight() = 0;
+    virtual D3DXCOLOR*            GetGlobalAmbient() = 0;
+    virtual float                 GetGlobalLighting() = 0;
+    virtual D3DMATRIX*            GetMatrixUVFlip() = 0;
+    virtual IDirect3DVertexDeclaration9*  GetVertexDeclaration(eVertexType index) = 0;
 };
 
 class CFBXSceneInterface

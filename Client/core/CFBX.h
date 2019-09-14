@@ -9,6 +9,15 @@
  *
  *****************************************************************************/
 
+#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
+
+enum eVertexType
+{
+    VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE,
+    VERTEX_TYPE_POS_NORMAL_TEXTURE,
+    COUNT,
+};
+
 class CFBXTextureSet
 {
 public:
@@ -18,14 +27,11 @@ public:
 
 struct CFBXRenderItem
 {
-    unsigned int uiTemplateId;
-    CVector      position;
-    CVector      rotation;
-    CVector      scale;
-    CFBXRenderItem(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
-        : uiTemplateId(uiTemplateId), position(vecPosition), rotation(vecRotation), scale(vecScale)
-    {
-    }
+    unsigned int m_uiTemplateId;
+    CVector      m_vecPosition;
+    CVector      m_vecRotation;
+    CVector      m_vecScale;
+    CFBXRenderItem(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
 };
 
 struct CFBXBoundingBox
@@ -37,15 +43,15 @@ struct CFBXBoundingBox
 
 struct FBXVertex
 {
-    CVector   pos;
+    CVector   position;
     CVector   normal;
     CVector2D uv;
     FBXVertex() {}
     FBXVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v)
     {
-        pos.fX = x;
-        pos.fY = y;
-        pos.fZ = z;
+        position.fX = x;
+        position.fY = y;
+        position.fZ = z;
         normal.fX = nx;
         normal.fY = ny;
         normal.fZ = nz;
@@ -53,8 +59,6 @@ struct FBXVertex
         uv.fY = v;
     }
 };
-
-#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 class FBXVertexBuffer
 {
@@ -64,10 +68,10 @@ public:
     void Select(UINT StreamNumber);
 
 private:
-    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
-    int                     bufferSize;
-    int                     iTypeSize;
-    int                     FVF;
+    IDirect3DVertexBuffer9*  m_pBuffer;
+    int                      m_iBufferSize;
+    int                      m_iTypeSize;
+    int                      m_FVF;
 };
 
 class FBXBuffer
@@ -75,21 +79,22 @@ class FBXBuffer
 public:
     FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMterialId);
 
-    FBXVertexBuffer*        pFBXVertexBuffer;
-    LPDIRECT3DINDEXBUFFER9  i_buffer = NULL;
-    LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;
-    int                     bufferSize;
-    int                     indicesCount;
-    int                     vertexCount;
-    unsigned long long      ullMaterialId;
+    FBXVertexBuffer*        m_pFBXVertexBuffer;
+    LPDIRECT3DINDEXBUFFER9  m_pIndexBuffer;
+    LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
+    int                     m_iBufferSize;
+    int                     m_iIndicesCount;
+    int                     m_iFacesCount;
+    int                     m_iVertexCount;
+    unsigned long long      m_ullMaterialId;
 };
 
 class FBXObjectBuffer
 {
 public:
     FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList, const ofbx::Mesh* const* pMesh);
-    std::vector<FBXBuffer*> bufferList;
-    FBXVertexBuffer*        diffuseBuffer;
+    std::vector<FBXBuffer*> m_bufferList;
+    FBXVertexBuffer*        m_pDiffuseBuffer;
 };
 
 class CFBXTemplateObject
@@ -97,25 +102,28 @@ class CFBXTemplateObject
 public:
     CFBXTemplateObject(unsigned long long ullObjectId);
 
-    unsigned long long ullObjectId;
+    void               SetPosition(CVector& position) { m_pViewMatrix->SetPosition(position); };
+    void               SetRotation(CVector& rotation) { m_pViewMatrix->SetRotation(rotation); };
+    void               SetScale(CVector& scale) { m_pViewMatrix->SetScale(scale); };
+    void               SetDrawDistance(float fDrawDistance) { this->m_fDrawDistance = fDrawDistance; };
+    void               SetCullMode(eCullMode cullMode) { this->m_eCullMode = cullMode; };
+    void               GetPosition(CVector& position) { position = m_pViewMatrix->GetPosition(); };
+    void               GetRotation(CVector& rotation) { rotation = m_pViewMatrix->GetRotation(); };
+    void               GetScale(CVector& scale) { scale = m_pViewMatrix->GetScale(); };
+    void               GetDrawDistance(float& fDrawDistance) { fDrawDistance = this->m_fDrawDistance; };
+    void               GetCullMode(eCullMode& cullMode) { cullMode = this->m_eCullMode; };
+    unsigned long long GetObjectId() { return m_ullObjectId; };
+    void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
+    void               GetMaterial(D3DMATERIAL9*& pMaterial) const { pMaterial = m_pMaterial; };
+    //void               GetLight(D3DLIGHT9*& pLight) const { pLight = m_pLight; };
 
-    void SetPosition(CVector& pos);
-    void SetRotation(CVector& rot);
-    void SetScale(CVector& scale);
-    void SetDrawDistance(float fDrawDistance);
-    void SetCullMode(eCullMode cullMode);
-    void GetPosition(CVector& pos);
-    void GetRotation(CVector& rot);
-    void GetScale(CVector& scale);
-    void GetDrawDistance(float& fDrawDistance);
-    void GetCullMode(eCullMode& cullMode);
-
-    CMatrix* pViewMatrix;
-
-    D3DMATERIAL9 material;
-    D3DLIGHT9    light;
-    float        fDrawDistance = 500.0f;
-    eCullMode    cullMode = (eCullMode)2;
+private:
+    CMatrix*           m_pViewMatrix;
+    D3DMATERIAL9*      m_pMaterial;
+    //D3DLIGHT9*         m_pLight;
+    float              m_fDrawDistance = 500.0f;
+    eCullMode          m_eCullMode = (eCullMode)2;
+    unsigned long long m_ullObjectId;
 };
 
 class CFBXTemplate
@@ -125,34 +133,32 @@ public:
     void         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix);
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
 
-    void SetPosition(CVector& position);
-    void SetRotation(CVector& rotation);
-    void SetScale(CVector& scale);
-    void SetDrawDistance(float fDrawDisntace);
-    void GetPosition(CVector& position);
-    void GetRotation(CVector& rotation);
-    void GetScale(CVector& scale);
-    void GetDrawDistance(float& fDrawDisntace);
+    void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
+    void SetRotation(CVector& rotation) const { m_pViewMatrix->SetRotation(rotation); };
+    void SetScale(CVector& scale) const { m_pViewMatrix->SetScale(scale); };
+    void SetDrawDistance(float fDrawDisntace) const { fDrawDisntace = m_fDrawDistance; };
+    void GetPosition(CVector& position) const { position = m_pViewMatrix->GetPosition(); };
+    void GetRotation(CVector& rotation) const { rotation = m_pViewMatrix->GetRotation(); };
+    void GetScale(CVector& scale) const { scale = m_pViewMatrix->GetScale(); };
+    void GetDrawDistance(float& fDrawDisntace) const { fDrawDisntace = m_fDrawDistance; };
 
-    CFBXTemplateObject*                         GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
-    std::map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
-    bool                                        IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
-    unsigned int                                GetInterior() { return uiInterior; };
-    unsigned int                                GetDimension() { return uiDimension; };
-    CMatrix*                                    GetViewMatrix() const { return m_pViewMatrix; };
-
+    CFBXTemplateObject* GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
+    std::unordered_map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
+    bool                                                  IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
+    unsigned int                                          GetInterior() { return m_uiInterior; };
+    unsigned int                                          GetDimension() { return m_uiDimension; };
+    CMatrix*                                              GetViewMatrix() const { return m_pViewMatrix; };
 
 private:
-    std::map<unsigned int, CFBXTemplateObject*> m_objectMap;
+    std::unordered_map<unsigned int, CFBXTemplateObject*> m_objectMap;
 
-    unsigned int uiInterior = 0;
-    unsigned int uiDimension = 0;
-    float        fDrawDistance = 1000;
-    unsigned int uiNextFreeObjectId = 1;
-
-    CMatrix*   m_pViewMatrix;
-    D3DMATRIX* m_pObjectMatrix;
-    CMatrix*   m_pCameraMatrix;
+    unsigned int m_uiInterior = 0;
+    unsigned int m_uiDimension = 0;
+    float        m_fDrawDistance = 1000;
+    unsigned int m_uiNextFreeObjectId = 1;
+    CMatrix*     m_pViewMatrix;
+    D3DMATRIX*   m_pObjectMatrix;
+    CMatrix*     m_pCameraMatrix;
 };
 
 class CFBXScene : public CFBXSceneInterface
@@ -200,16 +206,9 @@ public:
     void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode);
     void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode);
 
-    D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
-    LPDIRECT3DVERTEXDECLARATION9 GetVertexDeclaration(int index) { return m_pVertexDeclaration[index]; }
-    float                        GetUnitScaleFactor() { return m_fUnitScaleFactor; }
+    float GetUnitScaleFactor() { return m_fUnitScaleFactor; }
 
 private:
-    const ofbx::IScene*                   m_pScene;
-    std::map<unsigned int, CFBXTemplate*> m_templateMap;
-    CClientFBXInterface*                  pClientFBXInterface;
-    float                                 m_fUnitScaleFactor;
-
     void FixIndices();
     void CacheObjects();
     void CacheMeshes();
@@ -221,28 +220,27 @@ private:
     bool CreateFBXBuffer(const ofbx::Object* const* pObject);
     bool AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuffer);
 
-    unsigned int                                                    uiNextFreeTemplateId = 0;            // user defined templates starts from 1, below are special ones
-    const ofbx::Object*                                             m_pRoot;
-    std::vector<unsigned long long>                                 m_objectIdsList;
-    std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
-    std::map<unsigned long long, const ofbx::Mesh*>                 m_meshList;
-    std::map<unsigned long long, SString>                           m_meshName;
-    std::map<unsigned long long, SString>                           m_texturePath;
-    std::map<unsigned long long, CFBXBoundingBox>                   m_geometryBoundingBox;
-    std::map<SString, CPixels*>                                     m_textureContentList;
-    std::map<unsigned long long, const ofbx::Material* const*>      m_materialList;
-    std::map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;
-    std::map<unsigned long long, CFBXTextureSet*>                   m_mapMaterialTextureSet;
-    std::map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;
-
-    std::vector<CFBXRenderItem*> m_vecTemporaryRenderLoop;
-
-    D3DXMATRIX*                  m_pMatrixUVFlip;
-    LPDIRECT3DVERTEXDECLARATION9 m_pVertexDeclaration[2];
-
-    CMatrix* pMatrix;
-    D3DMATRIX* pObjectMatrix;
-    CMatrix*   pCameraMatrix;
+    const ofbx::IScene*                             m_pScene;
+    CClientFBXInterface*                            m_pClientFBXInterface;
+    float                                           m_fUnitScaleFactor;
+    unsigned int                                    m_uiNextFreeTemplateId = 0;            // user defined templates starts from 1, below are special ones
+    const ofbx::Object*                             m_pRoot;
+    std::vector<unsigned long long>                 m_objectIdsList;
+    std::unordered_map<unsigned int, CFBXTemplate*> m_templateMap;
+    std::unordered_map<unsigned long long, const ofbx::Object* const*>        m_objectList;
+    std::unordered_map<unsigned long long, const ofbx::Mesh*>                 m_meshList;
+    std::unordered_map<unsigned long long, SString>                           m_meshName;
+    std::unordered_map<unsigned long long, SString>                           m_texturePath;
+    std::unordered_map<unsigned long long, CFBXBoundingBox>                   m_geometryBoundingBox;
+    std::unordered_map<unsigned long long, const ofbx::Material* const*>      m_materialList;
+    std::unordered_map<unsigned long long, FBXObjectBuffer*>                  m_mapMeshBuffer;
+    std::unordered_map<unsigned long long, CFBXTextureSet*>                   m_mapMaterialTextureSet;
+    std::unordered_map<SString, CPixels*>                                     m_textureContentList;
+    std::unordered_map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;
+    std::vector<CFBXRenderItem*>                                              m_vecTemporaryRenderLoop;
+    CMatrix*                                                                  m_pMatrix;
+    D3DMATRIX*                                                                m_pObjectMatrix;
+    CMatrix*                                                                  m_pCameraMatrix;
 };
 
 class CFBX : public CFBXInterface
@@ -251,20 +249,24 @@ public:
     CFBX();
     ~CFBX();
 
-    CFBXScene*  AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface);
-    void        RemoveScene(CFBXScene* pScene);
-    void        Render();
-    void        Initialize();
-    bool        HasAnyFBXLoaded();
-    const char* GetObjectType(const ofbx::Object const* pObject);
-    D3DLIGHT9*  GetGlobalLight() { return &m_globalLight; }
-    D3DXCOLOR*  GetGlobalAmbient() { return m_globalAmbient; }
-    float       GetGlobalLighting() { return m_globalLighting; }
+    CFBXScene*                    AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface);
+    void                          RemoveScene(CFBXScene* pScene);
+    void                          Render();
+    void                          Initialize();
+    bool                          HasAnyFBXLoaded();
+    const char*                   GetObjectType(const ofbx::Object const* pObject);
+    D3DLIGHT9*                    GetGlobalLight() { return &m_globalLight; }
+    D3DXCOLOR*                    GetGlobalAmbient() { return m_globalAmbient; }
+    float                         GetGlobalLighting() { return m_globalLighting; }
+    D3DMATRIX*                    GetMatrixUVFlip() { return m_pMatrixUVFlip; }
+    IDirect3DVertexDeclaration9*  GetVertexDeclaration(eVertexType index) { return m_pVertexDeclaration[index]; }
 
 private:
-    std::vector<CFBXScene*> m_sceneList;
-    IDirect3DDevice9*       m_pDevice;
-    D3DLIGHT9               m_globalLight;
-    D3DXCOLOR*              m_globalAmbient;
-    float                   m_globalLighting;            // how bright are objects, 0.0f - 1.0f
+    std::vector<CFBXScene*>       m_sceneList;
+    IDirect3DDevice9*             m_pDevice;
+    D3DLIGHT9                     m_globalLight;
+    D3DXCOLOR*                    m_globalAmbient;
+    float                         m_globalLighting;            // how bright are objects, 0.0f - 1.0f
+    D3DXMATRIX*                   m_pMatrixUVFlip;
+    IDirect3DVertexDeclaration9*  m_pVertexDeclaration[eVertexType::COUNT];
 };
