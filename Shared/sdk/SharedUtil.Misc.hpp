@@ -56,7 +56,7 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 #ifndef MTA_DM_ASE_VERSION
-    #include <../../Client/version.h>
+    #include <version.h>
 #endif
 
 //
@@ -1248,7 +1248,7 @@ DWORD SharedUtil::GetMainThreadId()
         // Get the module information for the currently running process
         DWORD      processEntryPointAddress = 0;
         MODULEINFO moduleInfo = {};
-        
+
         if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
         {
             processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);

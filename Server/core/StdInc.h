@@ -17,7 +17,7 @@
     #define WITH_ALLOC_TRACKING 0
 #endif
 #include "SharedUtil.h"
-#include "../version.h"
+#include "version.h"
 
 #ifdef WIN32
     #include "CExceptionInformation_Impl.h"

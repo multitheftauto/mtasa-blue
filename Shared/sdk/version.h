@@ -25,9 +25,9 @@
 #define MTASA_VERSION_BUILD         0
 
 #ifdef MTA_CLIENT
-#include "build_overrides_c.h"
+#include "../../Client/build_overrides_c.h"
 #else
-#include "build_overrides_s.h"
+#include "../../Server/build_overrides_s.h"
 #endif
 
 // Old version info
