@@ -563,25 +563,7 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     pObjectMatrix = new D3DMATRIX();
     pCameraMatrix = new CMatrix();
 
-    // test code, remove later
-    unsigned int  uiTemplateId = CreateTemplate();
-    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
-    pTemplate->GetViewMatrix()->SetPosition(CVector(0, 0, 0));
-    pTemplate->GetViewMatrix()->SetRotation(CVector(0, 0, 0));
-    pTemplate->GetViewMatrix()->SetScale(CVector(1, 1, 1));
-    int i = 0;
-    for (const auto& pair : m_objectList)
-    {
-        if (CreateFBXBuffer(pair.second))
-        {
-            CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject((*pair.second)->id);
-            pTemplateObject->pViewMatrix->SetPosition(CVector(i * 20, 0, 0));
-            pTemplateObject->pViewMatrix->SetRotation(CVector(0, 0, 0));
-            pTemplateObject->pViewMatrix->SetScale(CVector(1, 1, 1));
-            pTemplate->AddTemplateObject(pTemplateObject);
-            i++;
-        }
-    }
+    CreateBaseTemplate();
 
     D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
                                                    {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
@@ -597,6 +579,42 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
                                               D3DDECL_END()};
 
     pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[1]);
+}
+
+// makes as much excact copy of scene as possible
+void CFBXScene::CreateBaseTemplate()
+{
+    unsigned int  uiTemplateId = CreateTemplate();
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetViewMatrix()->SetPosition(CVector(0, 0, 0));
+    pTemplate->GetViewMatrix()->SetRotation(CVector(0, 0, 0));
+    pTemplate->GetViewMatrix()->SetScale(CVector(1, 1, 1));
+    int                i = 0;
+    unsigned long long ullObjectId;
+    double             m[16] = {};
+    CMatrix            matrix;
+    float              array[16];
+
+    for (const auto& pair : m_objectList)
+    {
+        if (CreateFBXBuffer(pair.second))
+        {
+            ullObjectId = (*pair.second)->id;
+
+            memcpy(m, (*pair.second)->getGlobalTransform().m, sizeof(double) * 16);
+            for (char i = 0; i < 16; i++)
+                array[i] = (float)m[i];
+
+            matrix = CMatrix(array);
+
+            CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(ullObjectId);
+            pTemplateObject->pViewMatrix->SetPosition(matrix.GetPosition() * GetUnitScaleFactor());
+            pTemplateObject->pViewMatrix->SetRotation(matrix.GetRotation() * GetUnitScaleFactor());
+            pTemplateObject->pViewMatrix->SetScale(matrix.GetScale() * GetUnitScaleFactor());
+            pTemplate->AddTemplateObject(pTemplateObject);
+            i++;
+        }
+    }
 }
 
 unsigned int CFBXScene::CreateTemplate()

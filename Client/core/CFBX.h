@@ -215,10 +215,11 @@ private:
     void CacheMaterials();
     void CacheMeshMaterials();
     void CacheBoundingBoxes();
+    void CreateBaseTemplate();
     bool CreateFBXBuffer(const ofbx::Object* const* pObject);
     bool AddBuffer(unsigned long long ullObjectId, FBXObjectBuffer* pBuffer);
 
-    unsigned int                                                    uiNextFreeTemplateId = 1;            // 0 is special
+    unsigned int                                                    uiNextFreeTemplateId = 0;            // user defined templates starts from 1, below are special ones
     const ofbx::Object*                                             m_pRoot;
     std::vector<unsigned long long>                                 m_objectIdsList;
     std::map<unsigned long long, const ofbx::Object* const*>        m_objectList;
