@@ -414,6 +414,8 @@ public:
     bool GetShowCollision() { return m_bShowCollision; }
     void SetShowSound(bool bEnable) { m_bShowSound = bEnable; }
     bool GetShowSound() { return m_bShowSound; }
+    void SetShowFBX(bool bEnable) { m_bShowFBX = bEnable; }
+    bool GetShowFBX() { return m_bShowFBX; }
 
     void        TakePlayerScreenShot(uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize,
                                      CResource* pResource, uint uiServerSentTime);
@@ -805,6 +807,7 @@ private:
     bool m_bDevelopmentMode;
     bool m_bShowCollision;
     bool m_bShowSound;
+    bool m_bShowFBX;
 
     // Debug class. Empty in release.
 public:

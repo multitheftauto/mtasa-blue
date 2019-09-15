@@ -89,6 +89,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 
     // Development mode
     g_pCore->GetCommands()->Add("showcol", _("(Development mode) shows the colshapes"), COMMAND_ShowCollision);
+    g_pCore->GetCommands()->Add("showfbx", _("(Development mode) shows the fbx models"), COMMAND_ShowFBX);
     g_pCore->GetCommands()->Add("showsound", _("(Development mode) prints world sound ids into the debug window"), COMMAND_ShowSound);
 
 #ifdef MTA_DEBUG

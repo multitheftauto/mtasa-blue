@@ -6601,6 +6601,8 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
 
     if (g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->SetTestModeEnabled(bEnableWeb);
+    
+    g_pCore->GetFBX()->SetDevelopmentModeEnabled(bEnable);
 }
 
 //////////////////////////////////////////////////////////////////

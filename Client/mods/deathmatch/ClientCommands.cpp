@@ -1042,3 +1042,14 @@ void COMMAND_ShowSound(const char* szCmdLine)
     if (bShow && !g_pClientGame->GetDevelopmentMode())
         g_pCore->GetConsole()->Print("showsound will have no effect because development mode is off");
 }
+
+void COMMAND_ShowFBX(const char* szCmdLine)
+{
+    int  iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
+    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !g_pClientGame->GetShowFBX();
+    g_pClientGame->SetShowFBX(bShow);
+    g_pCore->GetFBX()->SetShowFBXEnabled(bShow);
+    g_pCore->GetConsole()->Printf("showfbx is now set to %d", bShow ? 1 : 0);
+    if (bShow && !g_pClientGame->GetDevelopmentMode())
+        g_pCore->GetConsole()->Print("showfbx will have no effect because development mode is off");
+}

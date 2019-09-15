@@ -1573,9 +1573,9 @@ void CGraphics::DrawPostGUIQueue()
 
 void CGraphics::DrawLine3DPreGUIQueue()
 {
+    m_pFBXBatcher->Render();
     m_pLine3DBatcherPreGUI->Flush();
     m_pMaterialLine3DBatcherPreGUI->Flush();
-    m_pFBXBatcher->Render();
 }
 
 void CGraphics::DrawPrimitive3DPreGUIQueue(void)

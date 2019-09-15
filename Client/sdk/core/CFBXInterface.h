@@ -15,6 +15,7 @@ class SString;
 class CClientFBXInterface;
 class CFBXLoading;
 class D3DXCOLOR;
+class CFBXBoundingBox;
 enum eCullMode;
 enum eVertexType;
 
@@ -29,17 +30,22 @@ namespace ofbx
 class CFBXInterface
 {
 public:
-    virtual CFBXScene*            AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
-    virtual void                  RemoveScene(CFBXScene* pScene) = 0;
-    virtual void                  Render() = 0;
-    virtual void                  Initialize() = 0;
-    virtual bool                  HasAnyFBXLoaded() = 0;
-    virtual const char*           GetObjectType(const ofbx::Object const* pObject) = 0;
-    virtual D3DLIGHT9*            GetGlobalLight() = 0;
-    virtual D3DXCOLOR*            GetGlobalAmbient() = 0;
-    virtual float                 GetGlobalLighting() = 0;
-    virtual D3DMATRIX*            GetMatrixUVFlip() = 0;
-    virtual IDirect3DVertexDeclaration9*  GetVertexDeclaration(eVertexType index) = 0;
+    virtual CFBXScene*                   AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
+    virtual void                         RemoveScene(CFBXScene* pScene) = 0;
+    virtual void                         Render() = 0;
+    virtual void                         Initialize() = 0;
+    virtual bool                         HasAnyFBXLoaded() = 0;
+    virtual CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry) = 0;
+    virtual const char*                  GetObjectType(const ofbx::Object const* pObject) = 0;
+    virtual D3DLIGHT9*                   GetGlobalLight() = 0;
+    virtual D3DXCOLOR*                   GetGlobalAmbient() = 0;
+    virtual float                        GetGlobalLighting() = 0;
+    virtual D3DMATRIX*                   GetMatrixUVFlip() = 0;
+    virtual IDirect3DVertexDeclaration9* GetVertexDeclaration(eVertexType index) = 0;
+    virtual void                         SetDevelopmentModeEnabled(bool bEnabled) = 0;
+    virtual bool                         GetDevelopmentModeEnabled() = 0;
+    virtual void                         SetShowFBXEnabled(bool bEnabled) = 0;
+    virtual bool                         GetShowFBXEnabled() = 0;
 };
 
 class CFBXSceneInterface

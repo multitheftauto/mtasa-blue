@@ -11,10 +11,8 @@
 
 #include "StdInc.h"
 
-CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
-: m_uiTemplateId(uiTemplateId), m_vecPosition(vecPosition), m_vecRotation(vecRotation), m_vecScale(vecScale)
+CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CMatrix matrix) : m_uiTemplateId(uiTemplateId), m_matrix(matrix)
 {
-
 }
 
 FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMaterialId)
@@ -152,11 +150,11 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
     pDevice->LightEnable(7, TRUE);
 
-    DWORD      materialDiffuse;
-    eCullMode  cullMode;
+    DWORD         materialDiffuse;
+    eCullMode     cullMode;
     D3DMATERIAL9* pMaterial;
-    D3DXCOLOR* globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
-    DWORD      colorGlobalAmbient =
+    D3DXCOLOR*    globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
+    DWORD         colorGlobalAmbient =
         D3DCOLOR_ARGB((DWORD)(globalAmbient->a * 255), (DWORD)(globalAmbient->r * 255), (DWORD)(globalAmbient->g * 255), (DWORD)(globalAmbient->b * 255));
     float    globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
     D3DCOLOR d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
@@ -265,24 +263,69 @@ CFBXTemplate::CFBXTemplate()
     m_pViewMatrix = new CMatrix();
     m_pObjectMatrix = new D3DMATRIX();
     m_pCameraMatrix = new CMatrix();
+    m_pBoundingBox = new CFBXBoundingBox();
 }
 
 unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 {
     m_objectMap[m_uiNextFreeObjectId] = pObject;
-    return m_uiNextFreeObjectId ++;
+    UpdateBoundingBox();
+    return m_uiNextFreeObjectId++;
 }
 
-CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId) : m_ullObjectId(ullObjectId)
+void CFBXTemplate::UpdateBoundingBox()
+{
+    CVector          min;
+    CVector          max;
+    float            radius;
+    CFBXBoundingBox* pBoundingBox;
+    CVector          vecMin, vecMax, vecPosition;
+    for (const auto& pair : m_objectMap)
+    {
+        pBoundingBox = pair.second->GetBoundingBox();
+        pair.second->GetPosition(vecPosition);
+        vecMin = pBoundingBox->min + vecPosition;
+        vecMax = pBoundingBox->max + vecPosition;
+        min.fX = std::min(vecMin.fX, min.fX);
+        min.fY = std::min(vecMin.fY, min.fY);
+        min.fZ = std::min(vecMin.fZ, min.fZ);
+        max.fX = std::max(vecMax.fX, max.fX);
+        max.fY = std::max(vecMax.fY, max.fY);
+        max.fZ = std::max(vecMax.fZ, max.fZ);
+    }
+
+    float fDistanceX = min.fX - max.fX;
+    float fDistanceY = min.fY - max.fY;
+    float fDistanceZ = min.fZ - max.fZ;
+    m_pBoundingBox->min = min;
+    m_pBoundingBox->max = max;
+    m_pBoundingBox->radius = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
+}
+
+CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId, CFBXScene* pScene) : m_ullObjectId(ullObjectId), m_pScene(pScene)
 {
     m_pViewMatrix = new CMatrix();
-
+    m_pBoundingBox = new CFBXBoundingBox();
     m_pMaterial = new D3DMATERIAL9();
     m_pMaterial->Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
     m_pMaterial->Ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
     m_pMaterial->Specular = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.8f);            // depends
     m_pMaterial->Emissive = D3DXCOLOR(0.5f, 0.5f, 0.5f, 0.5f);
     m_pMaterial->Power = 5.0f;
+
+    UpdateBoundingBox();
+}
+
+void CFBXTemplateObject::UpdateBoundingBox()
+{
+    CVector min;
+    CVector max;
+    float   radius;
+
+    m_pScene->GetBoundingBox(m_ullObjectId, min, max, radius);
+    m_pBoundingBox->min = min;
+    m_pBoundingBox->max = max;
+    m_pBoundingBox->radius = radius;
 }
 
 unsigned int CFBXScene::AddTemplete(CFBXTemplate* pTemplate)
@@ -389,7 +432,7 @@ bool CFBXScene::IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiMod
 unsigned int CFBXScene::AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId)
 {
     CFBXTemplate*       pTemplate = m_templateMap[uiTemplate];
-    CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(uiModelId);
+    CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(uiModelId, this);
     unsigned int        uiNewObjectId = pTemplate->AddTemplateObject(pTemplateObject);
     return uiNewObjectId;
 }
@@ -399,11 +442,11 @@ bool CFBXScene::GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVe
     if (m_geometryBoundingBox.count(ullObjectId) == 0)
         return false;
 
-    CFBXBoundingBox boundingBox = m_geometryBoundingBox[ullObjectId];
+    CFBXBoundingBox* boundingBox = m_geometryBoundingBox[ullObjectId];
 
-    min = boundingBox.min;
-    max = boundingBox.max;
-    fRadius = boundingBox.radius;
+    min = boundingBox->min;
+    max = boundingBox->max;
+    fRadius = boundingBox->radius;
     return true;
 }
 
@@ -505,7 +548,7 @@ void CFBXScene::CreateBaseTemplate()
 
             matrix = CMatrix(array);
 
-            CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(ullObjectId);
+            CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(ullObjectId, this);
             pTemplateObject->SetPosition(matrix.GetPosition() * GetUnitScaleFactor());
             pTemplateObject->SetRotation(matrix.GetRotation() * GetUnitScaleFactor());
             pTemplateObject->SetScale(matrix.GetScale() * GetUnitScaleFactor());
@@ -528,7 +571,11 @@ void CFBXScene::RemoveTemplate(unsigned int uiTemplateId)
 
 void CFBXScene::AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
 {
-    m_vecTemporaryRenderLoop.push_back(new CFBXRenderItem(uiTemplateId, vecPosition, vecRotation, vecScale));
+    CMatrix matrix;
+    matrix.SetPosition(vecPosition);
+    matrix.SetRotation(vecRotation);
+    matrix.SetScale(vecScale);
+    m_vecTemporaryRenderLoop.push_back(new CFBXRenderItem(uiTemplateId, matrix));
 }
 
 void CFBXScene::CacheObjects()
@@ -542,24 +589,43 @@ void CFBXScene::CacheObjects()
     }
 }
 
-CFBXBoundingBox CFBXScene::CalculateBoundingBox(const ofbx::Geometry* pGeometry)
+void CFBXBoundingBox::Draw(CMatrix& matrix, float fLineWidth, SColorARGB color)
 {
-    unsigned long long id = pGeometry->id;
+    const CVector arr[24] = {
+        CVector(min.fX, min.fY, min.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, min.fZ), CVector(min.fX, max.fY, max.fZ),
+        CVector(max.fX, min.fY, min.fZ), CVector(max.fX, min.fY, max.fZ), CVector(max.fX, max.fY, min.fZ), CVector(max.fX, max.fY, max.fZ),
+        CVector(min.fX, min.fY, min.fZ), CVector(max.fX, min.fY, min.fZ), CVector(min.fX, min.fY, min.fZ), CVector(min.fX, max.fY, min.fZ),
+        CVector(max.fX, max.fY, min.fZ), CVector(max.fX, min.fY, min.fZ), CVector(max.fX, max.fY, min.fZ), CVector(min.fX, max.fY, min.fZ),
+        CVector(min.fX, min.fY, max.fZ), CVector(max.fX, min.fY, max.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, max.fZ),
+        CVector(max.fX, max.fY, max.fZ), CVector(max.fX, min.fY, max.fZ), CVector(max.fX, max.fY, max.fZ), CVector(min.fX, max.fY, max.fZ),
+    };
 
-    CFBXBoundingBox   boundingBox;
+    for (int i = 0; i < 24; i+=2)
+    {
+        g_pCore->GetGraphics()->DrawLine3DQueued(matrix.TransformVector(arr[i]), matrix.TransformVector(arr[i+1]), fLineWidth, color, false);
+
+    }
+}
+
+CFBXBoundingBox* CFBX::CalculateBoundingBox(const ofbx::Mesh* pMesh)
+{
+    unsigned long long    id = pMesh->id;
+    const ofbx::Geometry* pGeometry = pMesh->getGeometry();
+
+    CFBXBoundingBox*  boundingBox = new CFBXBoundingBox();
     const ofbx::Vec3* vertices = pGeometry->getVertices();
     const ofbx::Vec3* vertex;
     CVector           center(0, 0, 0);
     for (int i = 0; i < pGeometry->getVertexCount(); i++)
     {
         vertex = vertices + i;
-        boundingBox.max.fX = std::max((float)vertex->x, boundingBox.max.fX);
-        boundingBox.max.fY = std::max((float)vertex->y, boundingBox.max.fY);
-        boundingBox.max.fZ = std::max((float)vertex->z, boundingBox.max.fZ);
-        boundingBox.min.fX = std::min((float)vertex->x, boundingBox.min.fX);
-        boundingBox.min.fY = std::min((float)vertex->y, boundingBox.min.fY);
-        boundingBox.min.fZ = std::min((float)vertex->z, boundingBox.min.fZ);
-        boundingBox.radius = std::max(boundingBox.radius, (float)sqrt(vertex->x * vertex->x + vertex->y * vertex->y + vertex->z * vertex->z));
+        boundingBox->max.fX = std::max((float)vertex->x, boundingBox->max.fX);
+        boundingBox->max.fY = std::max((float)vertex->y, boundingBox->max.fY);
+        boundingBox->max.fZ = std::max((float)vertex->z, boundingBox->max.fZ);
+        boundingBox->min.fX = std::min((float)vertex->x, boundingBox->min.fX);
+        boundingBox->min.fY = std::min((float)vertex->y, boundingBox->min.fY);
+        boundingBox->min.fZ = std::min((float)vertex->z, boundingBox->min.fZ);
+        boundingBox->radius = std::max(boundingBox->radius, (float)sqrt(vertex->x * vertex->x + vertex->y * vertex->y + vertex->z * vertex->z));
     }
     return boundingBox;
 }
@@ -577,13 +643,9 @@ void CFBXScene::CacheMeshes()
 
 void CFBXScene::CacheBoundingBoxes()
 {
-    CFBXBoundingBox       boundingBox;
-    const ofbx::Geometry* pGeometry;
     for (const auto& pair : m_meshList)
     {
-        pGeometry = pair.second->getGeometry();
-        boundingBox = CalculateBoundingBox(pGeometry);
-        m_geometryBoundingBox[pGeometry->id] = boundingBox;
+        m_geometryBoundingBox[pair.second->id] = g_pCore->GetFBX()->CalculateBoundingBox(pair.second);
     }
 }
 
@@ -701,32 +763,44 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
     if (!m_pClientFBXInterface->IsLoaded())
         return;
 
+    bRenderDebug = g_pCore->GetFBX()->GetDevelopmentModeEnabled() && g_pCore->GetFBX()->GetDevelopmentModeEnabled();
     m_pClientFBXInterface->Render();
 
-    CFBXTemplate* pTemplate;
-    CVector       vecCameraPosition;
-    CVector       vecTemplatePosition;
-    CVector       vecTemplateOffset;
-    float         fDrawDistance;
+    CFBXTemplate*    pTemplate;
+    CVector          vecCameraPosition;
+    CVector          vecTemplatePosition;
+    CVector          vecTemplateOffset;
+    float            fDrawDistance;
+    CFBXBoundingBox* pBoundingBox;
+
+    SColorARGB color(255, 255, 0, 0);
+    float      fLineWidth = 5.0f;
+    CVector    vecMin, vecMax;
+    CMatrix    matrix;
+
+    CVector vecPosition;
     g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
     vecCameraPosition = m_pCameraMatrix->GetPosition();
     for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
         if (!IsTemplateValid(renderItem->m_uiTemplateId))
             continue;
-
         pTemplate = m_templateMap[renderItem->m_uiTemplateId];
         pTemplate->GetPosition(vecTemplatePosition);
         pTemplate->GetDrawDistance(fDrawDistance);
 
-        if (((vecTemplatePosition + renderItem->m_vecPosition) - vecCameraPosition).Length() < fDrawDistance)
-        {
-            m_pMatrix->SetPosition(renderItem->m_vecPosition);
-            m_pMatrix->SetRotation(renderItem->m_vecRotation);
-            m_pMatrix->SetScale(renderItem->m_vecScale);
+        matrix = renderItem->m_matrix * *(pTemplate->GetViewMatrix());
 
-            m_pMatrix->GetBuffer((float*)m_pObjectMatrix);
+        vecPosition = renderItem->m_matrix.GetPosition();
+        if (((vecTemplatePosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
+        {
+            renderItem->m_matrix.GetBuffer((float*)m_pObjectMatrix);
             pTemplate->Render(pDevice, this, m_pObjectMatrix);
+            if (bRenderDebug)
+            {
+                pBoundingBox = pTemplate->GetBoundingBox();
+                pBoundingBox->Draw(matrix, fLineWidth, color);
+            }
         }
     }
 
@@ -916,7 +990,6 @@ CFBX::CFBX()
     m_globalAmbient = new D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
     m_globalLighting = 0.8f;
 
-    
     CMatrix* matrixFixInvertedUVs = new CMatrix();
     matrixFixInvertedUVs->SetPosition(CVector(0, 0, 0));
     matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
@@ -927,7 +1000,7 @@ CFBX::CFBX()
 void CFBX::Initialize()
 {
     m_pDevice = g_pCore->GetGraphics()->GetDevice();
-    
+
     D3DVERTEXELEMENT9 dwDeclPosNormalTexColor[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
                                                    {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
                                                    {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
