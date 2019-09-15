@@ -173,6 +173,7 @@ void CFBXBatcher::Render()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
+    g_pCore->GetFBX()->UpdateFrustum(65535, matProjection, matView);
     g_pCore->GetFBX()->Render();
 
 

@@ -18,6 +18,7 @@ class D3DXCOLOR;
 class CFBXBoundingBox;
 enum eCullMode;
 enum eVertexType;
+class D3DXMATRIX;
 
 namespace ofbx
 {
@@ -33,6 +34,7 @@ public:
     virtual CFBXScene*                   AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface) = 0;
     virtual void                         RemoveScene(CFBXScene* pScene) = 0;
     virtual void                         Render() = 0;
+    virtual void                         UpdateFrustum(float screenDepth, D3DXMATRIX projectionMatrix, D3DXMATRIX viewMatrix) = 0;
     virtual void                         Initialize() = 0;
     virtual bool                         HasAnyFBXLoaded() = 0;
     virtual CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry) = 0;

@@ -11,6 +11,30 @@
 
 #include "StdInc.h"
 
+void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
+{
+    static SColorRGBA color(255, 0, 0, 255);
+    static CVector    vecCorner[8];
+    static float      fLineWidth = 8.0f;
+
+    pTemplate->GetBoundingBoxCornersByMatrix(vecCorner, matrix * *pTemplate->GetViewMatrix());
+
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[0], vecCorner[4], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[1], vecCorner[5], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[2], vecCorner[6], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[3], vecCorner[7], fLineWidth, color, false);
+
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[0], vecCorner[1], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[0], vecCorner[2], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[2], vecCorner[3], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[1], vecCorner[3], fLineWidth, color, false);
+
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[4], vecCorner[5], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[4], vecCorner[6], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[6], vecCorner[7], fLineWidth, color, false);
+    g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[5], vecCorner[7], fLineWidth, color, false);
+}
+
 CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CMatrix matrix) : m_uiTemplateId(uiTemplateId), m_matrix(matrix)
 {
 }
@@ -114,10 +138,6 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
 
 void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
 {
-    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
-    pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
-
-    pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1);
     FBXObjectBuffer* pObjectBuffer;
     CFBXTextureSet*  pTextureSet;
     float            fDrawDistance;
@@ -156,14 +176,16 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     D3DXCOLOR*    globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
     DWORD         colorGlobalAmbient =
         D3DCOLOR_ARGB((DWORD)(globalAmbient->a * 255), (DWORD)(globalAmbient->r * 255), (DWORD)(globalAmbient->g * 255), (DWORD)(globalAmbient->b * 255));
+
     float    globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
     D3DCOLOR d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
 
     for (auto const& object : m_objectMap)
     {
-        object.second->GetMaterial(pMaterial);
-        materialDiffuse = D3DCOLOR_ARGB((DWORD)(pMaterial->Diffuse.a * 255), (DWORD)(pMaterial->Diffuse.r * 255), (DWORD)(pMaterial->Diffuse.g * 255),
-                                        (DWORD)(pMaterial->Diffuse.b * 255));
+        // Reset transform for each object each time
+        pDevice->SetTransform(D3DTS_TEXTURE0, g_pCore->GetFBX()->GetMatrixUVFlip());
+
+        object.second->GetMaterialDiffuseColor(materialDiffuse);
 
         pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
         pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -179,16 +201,17 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
         pDevice->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_CONSTANT);
         pDevice->SetTextureStageState(2, D3DTSS_CONSTANT, d3GlobalLightingColor);
 
-        // pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        // pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        // pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        pDevice->SetTextureStageState(3, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        pDevice->SetTextureStageState(3, D3DTSS_COLORARG1, D3DTA_CURRENT);
+        pDevice->SetTextureStageState(3, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+        pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, materialDiffuse);
+
         object.second->GetDrawDistance(fDrawDistance);
         object.second->GetPosition(vecTemplateObjectPosition);
 
         pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
         pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
 
-        pDevice->SetTransform(D3DTS_TEXTURE0, g_pCore->GetFBX()->GetMatrixUVFlip());
         pObjectBuffer = pScene->GetFBXBuffer(object.second->GetObjectId());
         if (pObjectBuffer != nullptr)
         {
@@ -222,6 +245,10 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                                 pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
                                 pDevice->SetTexture(0, pTextureSet->diffuse->m_pD3DTexture);
                             }
+                            else
+                            {
+                                pDevice->SetTexture(0, nullptr);
+                            }
 
                             if (pTextureSet->normal != nullptr)
                             {
@@ -233,6 +260,10 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                                     pDevice->SetSamplerState(1, D3DSAMP_BORDERCOLOR, pTextureSet->normal->m_uiBorderColor);
                                 pDevice->SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT3);
                                 pDevice->SetTexture(1, pTextureSet->normal->m_pD3DTexture);
+                            }
+                            else
+                            {
+                                pDevice->SetTexture(1, nullptr);
                             }
                         }
                     }
@@ -251,11 +282,6 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     }
 
     pDevice->LightEnable(7, FALSE);
-    if (pSavedStateBlock)
-    {
-        pSavedStateBlock->Apply();
-        SAFE_RELEASE(pSavedStateBlock);
-    }
 }
 
 CFBXTemplate::CFBXTemplate()
@@ -271,6 +297,21 @@ unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
     m_objectMap[m_uiNextFreeObjectId] = pObject;
     UpdateBoundingBox();
     return m_uiNextFreeObjectId++;
+}
+
+void CFBXTemplate::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix)
+{
+    CFBXBoundingBox* pBoundingBox = GetBoundingBox();
+    CVector          min = pBoundingBox->min;
+    CVector          max = pBoundingBox->max;
+    vecCorner[0] = matrix.TransformVector(CVector(min.fX, min.fY, min.fZ));
+    vecCorner[1] = matrix.TransformVector(CVector(min.fX, max.fY, min.fZ));
+    vecCorner[2] = matrix.TransformVector(CVector(max.fX, min.fY, min.fZ));
+    vecCorner[3] = matrix.TransformVector(CVector(max.fX, max.fY, min.fZ));
+    vecCorner[4] = matrix.TransformVector(CVector(min.fX, min.fY, max.fZ));
+    vecCorner[5] = matrix.TransformVector(CVector(min.fX, max.fY, max.fZ));
+    vecCorner[6] = matrix.TransformVector(CVector(max.fX, min.fY, max.fZ));
+    vecCorner[7] = matrix.TransformVector(CVector(max.fX, max.fY, max.fZ));
 }
 
 void CFBXTemplate::UpdateBoundingBox()
@@ -316,6 +357,11 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId, CFBXScene
     UpdateBoundingBox();
 }
 
+void CFBXTemplateObject::GetMaterialDiffuseColor(DWORD& color)
+{
+    color = D3DCOLOR_ARGB((DWORD)(m_pMaterial->Diffuse.a * 255), (DWORD)(m_pMaterial->Diffuse.r * 255), (DWORD)(m_pMaterial->Diffuse.g * 255),
+                          (DWORD)(m_pMaterial->Diffuse.b * 255));
+}
 void CFBXTemplateObject::UpdateBoundingBox()
 {
     CVector min;
@@ -589,24 +635,6 @@ void CFBXScene::CacheObjects()
     }
 }
 
-void CFBXBoundingBox::Draw(CMatrix& matrix, float fLineWidth, SColorARGB color)
-{
-    const CVector arr[24] = {
-        CVector(min.fX, min.fY, min.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, min.fZ), CVector(min.fX, max.fY, max.fZ),
-        CVector(max.fX, min.fY, min.fZ), CVector(max.fX, min.fY, max.fZ), CVector(max.fX, max.fY, min.fZ), CVector(max.fX, max.fY, max.fZ),
-        CVector(min.fX, min.fY, min.fZ), CVector(max.fX, min.fY, min.fZ), CVector(min.fX, min.fY, min.fZ), CVector(min.fX, max.fY, min.fZ),
-        CVector(max.fX, max.fY, min.fZ), CVector(max.fX, min.fY, min.fZ), CVector(max.fX, max.fY, min.fZ), CVector(min.fX, max.fY, min.fZ),
-        CVector(min.fX, min.fY, max.fZ), CVector(max.fX, min.fY, max.fZ), CVector(min.fX, min.fY, max.fZ), CVector(min.fX, max.fY, max.fZ),
-        CVector(max.fX, max.fY, max.fZ), CVector(max.fX, min.fY, max.fZ), CVector(max.fX, max.fY, max.fZ), CVector(min.fX, max.fY, max.fZ),
-    };
-
-    for (int i = 0; i < 24; i+=2)
-    {
-        g_pCore->GetGraphics()->DrawLine3DQueued(matrix.TransformVector(arr[i]), matrix.TransformVector(arr[i+1]), fLineWidth, color, false);
-
-    }
-}
-
 CFBXBoundingBox* CFBX::CalculateBoundingBox(const ofbx::Mesh* pMesh)
 {
     unsigned long long    id = pMesh->id;
@@ -758,7 +786,7 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
     return true;
 }
 
-void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
+void CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum)
 {
     if (!m_pClientFBXInterface->IsLoaded())
         return;
@@ -772,15 +800,14 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
     CVector          vecTemplateOffset;
     float            fDrawDistance;
     CFBXBoundingBox* pBoundingBox;
-
-    SColorARGB color(255, 255, 0, 0);
-    float      fLineWidth = 5.0f;
-    CVector    vecMin, vecMax;
-    CMatrix    matrix;
+    CVector          center, size;
+    CVector          vecTemp;
+    CMatrix          matrix;
 
     CVector vecPosition;
     g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
     vecCameraPosition = m_pCameraMatrix->GetPosition();
+    int i = 0;
     for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
         if (!IsTemplateValid(renderItem->m_uiTemplateId))
@@ -794,15 +821,23 @@ void CFBXScene::RenderScene(IDirect3DDevice9* pDevice)
         vecPosition = renderItem->m_matrix.GetPosition();
         if (((vecTemplatePosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
         {
-            renderItem->m_matrix.GetBuffer((float*)m_pObjectMatrix);
-            pTemplate->Render(pDevice, this, m_pObjectMatrix);
-            if (bRenderDebug)
+            pBoundingBox = pTemplate->GetBoundingBox();
+            size = CVector(abs(pBoundingBox->max.fX) + abs(pBoundingBox->min.fX), abs(pBoundingBox->max.fY) + abs(pBoundingBox->min.fY),
+                           abs(pBoundingBox->max.fZ) + abs(pBoundingBox->min.fZ));
+            center = vecPosition + size / 2;
+            if (pFrustum->CheckRectangle(center, size))
             {
-                pBoundingBox = pTemplate->GetBoundingBox();
-                pBoundingBox->Draw(matrix, fLineWidth, color);
+                renderItem->m_matrix.GetBuffer((float*)m_pObjectMatrix);
+                pTemplate->Render(pDevice, this, m_pObjectMatrix);
+                i++;
+                if (bRenderDebug)
+                {
+                    CFBXDebugging::DrawBoundingBox(pTemplate, renderItem->m_matrix);
+                }
             }
         }
     }
+    g_pCore->GetConsole()->Printf("i = %i", i);
 
     std::unordered_map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = m_pClientFBXInterface->GetTemplatesRenderingMatrix();
     for (auto const& pair : pTemplatesMatrix)
@@ -995,6 +1030,8 @@ CFBX::CFBX()
     matrixFixInvertedUVs->SetScale(CVector(1, 1, 1));
     matrixFixInvertedUVs->SetRotation(CVector(PI * 1.5, 0, 0));
     m_pMatrixUVFlip = (D3DXMATRIX*)matrixFixInvertedUVs;
+
+    m_pFrustum = new CFrustum();
 }
 
 void CFBX::Initialize()
@@ -1020,6 +1057,11 @@ CFBX::~CFBX()
 {
 }
 
+void CFBX::UpdateFrustum(float screenDepth, D3DXMATRIX projectionMatrix, D3DXMATRIX viewMatrix)
+{
+    m_pFrustum->ConstructFrustum(screenDepth, projectionMatrix, viewMatrix);
+}
+
 void CFBX::Render()
 {
     unsigned char ucHour, ucMin;
@@ -1035,9 +1077,25 @@ void CFBX::Render()
 
     if (m_pDevice != nullptr)
     {
+        m_pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+        m_pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+        m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+        m_pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
+        m_pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_COLOR1);
+        m_pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);
+        m_pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1);
+
+        m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+        m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+        m_pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+
+        m_pDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
+        m_pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE);
+
         for (auto const& pFBXScene : m_sceneList)
         {
-            pFBXScene->RenderScene(m_pDevice);
+            pFBXScene->RenderScene(m_pDevice, m_pFrustum);
         }
     }
 }

@@ -9,13 +9,22 @@
  *
  *****************************************************************************/
 
+#include "CFrustum.h"
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
+
+class CFBXTemplate;
 
 enum eVertexType
 {
     VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE,
     VERTEX_TYPE_POS_NORMAL_TEXTURE,
     COUNT,
+};
+
+static class CFBXDebugging
+{
+public:
+    static void DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix);
 };
 
 class CFBXTextureSet
@@ -37,7 +46,6 @@ struct CFBXBoundingBox
     CVector min;
     CVector max;
     float   radius;
-    void    Draw(CMatrix& matrix, float fLineWidth, SColorARGB color);
 };
 
 struct FBXVertex
@@ -67,10 +75,10 @@ public:
     void Select(UINT StreamNumber);
 
 private:
-    IDirect3DVertexBuffer9*  m_pBuffer;
-    int                      m_iBufferSize;
-    int                      m_iTypeSize;
-    int                      m_FVF;
+    IDirect3DVertexBuffer9* m_pBuffer;
+    int                     m_iBufferSize;
+    int                     m_iTypeSize;
+    int                     m_FVF;
 };
 
 class FBXBuffer
@@ -101,13 +109,13 @@ class CFBXTemplateObject
 public:
     CFBXTemplateObject(unsigned long long ullObjectId, CFBXScene* pScene);
 
-    void               SetPosition(CVector& position) { m_pViewMatrix->SetPosition(position); };
+    void SetPosition(CVector& position) { m_pViewMatrix->SetPosition(position); };
     void SetRotation(CVector& rotation)
     {
         m_pViewMatrix->SetRotation(rotation);
         UpdateBoundingBox();
     };
-    void               SetScale(CVector& scale)
+    void SetScale(CVector& scale)
     {
         m_pViewMatrix->SetScale(scale);
         UpdateBoundingBox();
@@ -122,8 +130,9 @@ public:
     unsigned long long GetObjectId() { return m_ullObjectId; };
     void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
     void               GetMaterial(D3DMATERIAL9*& pMaterial) const { pMaterial = m_pMaterial; };
+    void               GetMaterialDiffuseColor(DWORD& pMaterial);
     CFBXBoundingBox*   GetBoundingBox() const { return m_pBoundingBox; }
-    //void               GetLight(D3DLIGHT9*& pLight) const { pLight = m_pLight; };
+    // void               GetLight(D3DLIGHT9*& pLight) const { pLight = m_pLight; };
 
 private:
     void UpdateBoundingBox();
@@ -131,7 +140,7 @@ private:
     // D3DLIGHT9*         m_pLight;
     CMatrix*           m_pViewMatrix;
     D3DMATERIAL9*      m_pMaterial;
-    float              m_fDrawDistance = 500.0f;
+    float              m_fDrawDistance = 50000.0f;
     eCullMode          m_eCullMode = (eCullMode)2;
     unsigned long long m_ullObjectId;
     CFBXBoundingBox*   m_pBoundingBox;
@@ -161,14 +170,15 @@ public:
     unsigned int                                          GetDimension() { return m_uiDimension; };
     CMatrix*                                              GetViewMatrix() const { return m_pViewMatrix; };
     CFBXBoundingBox*                                      GetBoundingBox() const { return m_pBoundingBox; };
+    void                                                  GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix);
 
 private:
-    void                                                  UpdateBoundingBox();
+    void UpdateBoundingBox();
 
     std::unordered_map<unsigned int, CFBXTemplateObject*> m_objectMap;
     unsigned int                                          m_uiInterior = 0;
     unsigned int                                          m_uiDimension = 0;
-    float                                                 m_fDrawDistance = 1000;
+    float                                                 m_fDrawDistance = 10000;
     unsigned int                                          m_uiNextFreeObjectId = 1;
     CMatrix*                                              m_pViewMatrix;
     D3DMATRIX*                                            m_pObjectMatrix;
@@ -191,7 +201,7 @@ public:
     void             GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void             GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool             GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
-    void             RenderScene(IDirect3DDevice9* pDevice);
+    void             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum);
     FBXObjectBuffer* GetFBXBuffer(unsigned long long ullId);
     unsigned int     AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*    GetTexture(const ofbx::Texture* pTexture);
@@ -200,7 +210,6 @@ public:
     unsigned int     AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
     unsigned int     CreateTemplate();
     void             RemoveTemplate(unsigned int uiTemplateId);
-
 
     void GetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void GetTemplatePosition(unsigned int uiTemplateId, CVector& position);
@@ -267,31 +276,33 @@ public:
     CFBX();
     ~CFBX();
 
-    CFBXScene*                    AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface);
-    void                          RemoveScene(CFBXScene* pScene);
-    void                          Render();
-    void                          Initialize();
-    bool                          HasAnyFBXLoaded();
-    CFBXBoundingBox*              CalculateBoundingBox(const ofbx::Mesh* pGeometry);
-    const char*                   GetObjectType(const ofbx::Object const* pObject);
-    D3DLIGHT9*                    GetGlobalLight() { return &m_globalLight; }
-    D3DXCOLOR*                    GetGlobalAmbient() { return m_globalAmbient; }
-    float                         GetGlobalLighting() { return m_globalLighting; }
-    D3DMATRIX*                    GetMatrixUVFlip() { return m_pMatrixUVFlip; }
-    IDirect3DVertexDeclaration9*  GetVertexDeclaration(eVertexType index) { return m_pVertexDeclaration[index]; }
-    void                          SetDevelopmentModeEnabled(bool bEnabled) { m_pDevelopmentModeEnabled = bEnabled; }
-    bool                          GetDevelopmentModeEnabled() { return m_pDevelopmentModeEnabled; }
-    void                          SetShowFBXEnabled(bool bEnabled) { m_pShowFBX = bEnabled; }
-    bool                          GetShowFBXEnabled() { return m_pShowFBX; }
+    CFBXScene*                   AddScene(ofbx::IScene* pScene, CClientFBXInterface* pInterface);
+    void                         RemoveScene(CFBXScene* pScene);
+    void                         Render();
+    void                         UpdateFrustum(float screenDepth, D3DXMATRIX projectionMatrix, D3DXMATRIX viewMatrix);
+    void                         Initialize();
+    bool                         HasAnyFBXLoaded();
+    CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry);
+    const char*                  GetObjectType(const ofbx::Object const* pObject);
+    D3DLIGHT9*                   GetGlobalLight() { return &m_globalLight; }
+    D3DXCOLOR*                   GetGlobalAmbient() { return m_globalAmbient; }
+    float                        GetGlobalLighting() { return m_globalLighting; }
+    D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
+    IDirect3DVertexDeclaration9* GetVertexDeclaration(eVertexType index) { return m_pVertexDeclaration[index]; }
+    void                         SetDevelopmentModeEnabled(bool bEnabled) { m_pDevelopmentModeEnabled = bEnabled; }
+    bool                         GetDevelopmentModeEnabled() { return m_pDevelopmentModeEnabled; }
+    void                         SetShowFBXEnabled(bool bEnabled) { m_pShowFBX = bEnabled; }
+    bool                         GetShowFBXEnabled() { return m_pShowFBX; }
 
 private:
-    std::vector<CFBXScene*>       m_sceneList;
-    IDirect3DDevice9*             m_pDevice;
-    D3DLIGHT9                     m_globalLight;
-    D3DXCOLOR*                    m_globalAmbient;
-    float                         m_globalLighting;            // how bright are objects, 0.0f - 1.0f
-    D3DXMATRIX*                   m_pMatrixUVFlip;
-    bool                          m_pShowFBX;
-    bool                          m_pDevelopmentModeEnabled;
-    IDirect3DVertexDeclaration9*  m_pVertexDeclaration[eVertexType::COUNT];
+    std::vector<CFBXScene*>      m_sceneList;
+    IDirect3DDevice9*            m_pDevice;
+    D3DLIGHT9                    m_globalLight;
+    D3DXCOLOR*                   m_globalAmbient;
+    float                        m_globalLighting;            // how bright are objects, 0.0f - 1.0f
+    D3DXMATRIX*                  m_pMatrixUVFlip;
+    CFrustum*                    m_pFrustum;
+    bool                         m_pShowFBX;
+    bool                         m_pDevelopmentModeEnabled;
+    IDirect3DVertexDeclaration9* m_pVertexDeclaration[eVertexType::COUNT];
 };
