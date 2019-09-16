@@ -470,7 +470,7 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
 
 std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
 {
-    return SharedUtil::async([pResourceFile, this] { 
+    return SharedUtil::async([pResourceFile, this] {
         SString strPath;
 
         if (!GetFilePath(pResourceFile->GetName(), strPath))
@@ -569,13 +569,12 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
-    if (IsResourceZip() )
+    if (IsResourceZip())
     {
         // Zip file might have changed
         CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
         if (checksum != m_zipHash)
             return true;
-
     }
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
@@ -1230,10 +1229,17 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    if (IsResourceZip())
-        strPath = m_strResourceCachePath + szFilename;
-    else
-        strPath = m_strResourceDirectoryPath + szFilename;
+    // Always prefer the local resource directory, as scripts may 
+    // have added new files to the regular folder, rather than the zip
+    strPath = m_strResourceDirectoryPath + szFilename;
+    if (FileExists(strPath))
+        return true;
+
+    // If this is a zipped resource, try to use the unzipped file
+    if (!IsResourceZip())
+        return false;
+    
+    strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }
 
@@ -2413,8 +2419,8 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         SString strResourceFuncName("%s.function.%s", m_strResourceName.c_str(), strFuncName.c_str());
 
         // @@@@@ Deal with this the new way
-        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFuncName.c_str(),
-                                            CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                         strResourceFuncName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, true))
         {
             return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
         }
@@ -2632,7 +2638,8 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
 
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
                     if (g_pGame->GetACLManager()->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                       strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
+                                                                    strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+                                                                    !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
                     }

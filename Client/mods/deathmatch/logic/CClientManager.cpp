@@ -52,6 +52,7 @@ CClientManager::CClientManager()
     m_pWeaponManager = new CClientWeaponManager(this);
     m_pEffectManager = new CClientEffectManager(this);
     m_pPointLightsManager = new CClientPointLightsManager(this);
+    m_pModelManager = new CClientModelManager(this);
     m_pPacketRecorder = new CClientPacketRecorder(this);
     m_pTrainTrackManager = new CClientTrainTrackManager;
 
@@ -177,6 +178,9 @@ CClientManager::~CClientManager()
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
+
+    delete m_pModelManager;
+    m_pModelManager = nullptr;
 }
 
 //
