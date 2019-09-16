@@ -2748,6 +2748,7 @@ void CClientVehicle::Create()
 
             if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
             {
+                // A train is never towing other vehicles, other trains are linked by other means
                 isTowable = false;
             }
             else if (m_usModel == 525 || m_usModel == 531)
@@ -2777,7 +2778,6 @@ void CClientVehicle::Create()
             }
             else
             {
-                // A train is never towing other vehicles, other trains are linked by other means
                 m_pTowedVehicle->m_pTowedByVehicle = nullptr;
 
                 // Stream-in the old unlinked trailer
