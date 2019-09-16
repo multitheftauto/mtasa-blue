@@ -2744,20 +2744,25 @@ void CClientVehicle::Create()
         // Reattach a towed vehicle?
         if (m_pTowedVehicle)
         {
+            bool isTowable = true;
+
             if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
             {
-                // A train is never towing other vehicles, other trains are linked by other means
-                m_pTowedVehicle->m_pTowedByVehicle = nullptr;
-
-                // Stream-in the old unlinked trailer
-                if (!m_pTowedVehicle->GetGameVehicle())
-                {
-                    m_pTowedVehicle->StreamIn(true);
-                }
-
-                m_pTowedVehicle = nullptr;
+                isTowable = false;
             }
-            else
+            else if (m_usModel == 525 || m_usModel == 531)
+            {
+                const eClientVehicleType vehicleType = m_pTowedVehicle->GetVehicleType();
+
+                // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+                if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT ||
+                    vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX)
+                {
+                    isTowable = false;
+                }
+            }
+
+            if (isTowable)
             {
                 // Make sure that the trailer is streamed in
                 if (!m_pTowedVehicle->GetGameVehicle())
@@ -2769,6 +2774,19 @@ void CClientVehicle::Create()
                 {
                     InternalSetTowLink(m_pTowedVehicle);
                 }
+            }
+            else
+            {
+                // A train is never towing other vehicles, other trains are linked by other means
+                m_pTowedVehicle->m_pTowedByVehicle = nullptr;
+
+                // Stream-in the old unlinked trailer
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                m_pTowedVehicle = nullptr;
             }
         }
 
@@ -3171,6 +3189,17 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
     else if (this->GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN))
     {
         return false;
+    }
+    else if ((m_usModel == 525 || m_usModel == 531) && pVehicle)
+    {
+        const eClientVehicleType vehicleType = pVehicle->GetVehicleType();
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_BIKE || 
+            vehicleType == CLIENTVEHICLE_BMX)
+        {
+            return false;
+        }
     }
 
     if (pVehicle == m_pTowedVehicle)
