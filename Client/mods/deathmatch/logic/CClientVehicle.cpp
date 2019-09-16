@@ -1758,7 +1758,7 @@ void CClientVehicle::PlaceProperlyOnGround()
         {
             m_pVehicle->PlaceBikeOnRoadProperly();
         }
-        else if (m_eVehicleType != CLIENTVEHICLE_BOAT)
+        else if (m_eVehicleType != CLIENTVEHICLE_BOAT && m_eVehicleType != CLIENTVEHICLE_TRAIN)
         {
             m_pVehicle->PlaceAutomobileOnRoadProperly();
         }
@@ -2744,23 +2744,50 @@ void CClientVehicle::Create()
         // Reattach a towed vehicle?
         if (m_pTowedVehicle)
         {
-            // Make sure that the trailer is streamed in
-            if (!m_pTowedVehicle->GetGameVehicle())
+            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
             {
-                m_pTowedVehicle->StreamIn(true);
-            }
+                // A train is never towing other vehicles, other trains are linked by other means
+                m_pTowedVehicle->m_pTowedByVehicle = nullptr;
 
-            // Attach him
-            if (m_pTowedVehicle->GetGameVehicle())
+                // Stream-in the old unlinked trailer
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                m_pTowedVehicle = nullptr;
+            }
+            else
             {
-                InternalSetTowLink(m_pTowedVehicle);
+                // Make sure that the trailer is streamed in
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                if (m_pTowedVehicle->GetGameVehicle())
+                {
+                    InternalSetTowLink(m_pTowedVehicle);
+                }
             }
         }
 
         // Reattach if we're being towed
-        if (m_pTowedByVehicle && m_pTowedByVehicle->GetGameVehicle())
+        if (m_pTowedByVehicle)
         {
-            m_pTowedByVehicle->InternalSetTowLink(this);
+            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
+            {
+                // A train is never towed by other vehicles, it's linked by other means
+                m_pTowedByVehicle->m_pTowedVehicle = nullptr;
+                m_pTowedByVehicle = nullptr;
+            }
+            else
+            {
+                if (m_pTowedByVehicle->GetGameVehicle())
+                {
+                    m_pTowedByVehicle->InternalSetTowLink(this);
+                }
+            }
         }
 
         // Reattach to an entity + any entities attached to this
