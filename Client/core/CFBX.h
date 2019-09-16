@@ -45,6 +45,7 @@ struct CFBXBoundingBox
 {
     CVector min;
     CVector max;
+    CVector center;
     float   radius;
 };
 

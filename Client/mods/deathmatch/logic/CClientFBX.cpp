@@ -936,7 +936,7 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Object* const* 
 {
     const ofbx::Mesh* const* pMesh = (const ofbx::Mesh* const*)pObject;
     const ofbx::Geometry*    pGeometry = (*pMesh)->getGeometry();
-    const ofbx::Vec3*        pVertex;
+    const CVector*        pVertex;
 
     lua_newtable(luaVM);
 
@@ -946,13 +946,13 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Object* const* 
         lua_pushnumber(luaVM, i + 1);
         lua_newtable(luaVM);
         lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, pVertex->x);
+        lua_pushnumber(luaVM, pVertex->fX);
         lua_settable(luaVM, -3);
         lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, pVertex->y);
+        lua_pushnumber(luaVM, pVertex->fY);
         lua_settable(luaVM, -3);
         lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, pVertex->z);
+        lua_pushnumber(luaVM, pVertex->fZ);
         lua_settable(luaVM, -3);
         lua_settable(luaVM, -3);
     }

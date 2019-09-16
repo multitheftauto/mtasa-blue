@@ -302,7 +302,7 @@ namespace ofbx
 
         Geometry(const Scene& _scene, const IElement& _element);
 
-        virtual const Vec3* getVertices() const = 0;
+        virtual const CVector* getVertices() const = 0;
         virtual int         getVertexCount() const = 0;
 
         virtual const int* getFaceIndices() const = 0;

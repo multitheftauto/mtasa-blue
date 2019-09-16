@@ -1,5 +1,8 @@
 #include <map>
 #include <mutex>
+
+#define PI (3.14159265358979323846f)            // for CVector
+#include "CVector.h"
 #include "ofbx.h"
 #include "miniz.h"
 #include <cassert>
@@ -1129,7 +1132,7 @@ namespace ofbx
             NewVertex* next = nullptr;
         };
 
-        std::vector<Vec3>        vertices;
+        std::vector<CVector>     vertices;
         std::vector<Vec3>        normals;
         std::vector<Vec2>        uvs[s_uvs_max];
         std::vector<const char*> uvsName[s_uvs_max];
@@ -1146,22 +1149,22 @@ namespace ofbx
 
         GeometryImpl(const Scene& _scene, const IElement& _element) : Geometry(_scene, _element) {}
 
-        Type        getType() const override { return Type::GEOMETRY; }
-        int         getVertexCount() const override { return (int)vertices.size(); }
-        int         getNormalCount() const override { return (int)normals.size(); }
-        int         getUVCount(int s) const override { return (int)uvs[s].size(); }
-        int         getColorCount() const override { return (int)colors.size(); }
-        int         getTangentCount() const override { return (int)tangents.size(); }
-        int         getMaterialCount() const override { return (int)materials.size(); }
-        int         getIndicesCount() const override { return (int)indices.size(); }
-        const int*  getFaceIndices() const override { return indices.empty() ? nullptr : &indices[0]; }
-        const Vec3* getVertices() const override { return &vertices[0]; }
-        const Vec3* getNormals() const override { return normals.empty() ? nullptr : &normals[0]; }
-        const Vec2* getUVs(int index = 0) const override { return index < 0 || index >= s_uvs_max || uvs[index].empty() ? nullptr : &uvs[index][0]; }
-        const Vec4* getColors() const override { return colors.empty() ? nullptr : &colors[0]; }
-        const Vec3* getTangents() const override { return tangents.empty() ? nullptr : &tangents[0]; }
-        const Skin* getSkin() const override { return skin; }
-        const int*  getMaterials() const override { return materials.empty() ? nullptr : &materials[0]; }
+        Type           getType() const override { return Type::GEOMETRY; }
+        int            getVertexCount() const override { return (int)vertices.size(); }
+        int            getNormalCount() const override { return (int)normals.size(); }
+        int            getUVCount(int s) const override { return (int)uvs[s].size(); }
+        int            getColorCount() const override { return (int)colors.size(); }
+        int            getTangentCount() const override { return (int)tangents.size(); }
+        int            getMaterialCount() const override { return (int)materials.size(); }
+        int            getIndicesCount() const override { return (int)indices.size(); }
+        const int*     getFaceIndices() const override { return indices.empty() ? nullptr : &indices[0]; }
+        const CVector* getVertices() const override { return &vertices[0]; }
+        const Vec3*    getNormals() const override { return normals.empty() ? nullptr : &normals[0]; }
+        const Vec2*    getUVs(int index = 0) const override { return index < 0 || index >= s_uvs_max || uvs[index].empty() ? nullptr : &uvs[index][0]; }
+        const Vec4*    getColors() const override { return colors.empty() ? nullptr : &colors[0]; }
+        const Vec3*    getTangents() const override { return tangents.empty() ? nullptr : &tangents[0]; }
+        const Skin*    getSkin() const override { return skin; }
+        const int*     getMaterials() const override { return materials.empty() ? nullptr : &materials[0]; }
     };
 
     Cluster::Cluster(const Scene& _scene, const IElement& _element) : Object(_scene, _element) {}
@@ -2151,15 +2154,20 @@ namespace ofbx
             triangulate(original_indices, geom->to_old_vertices, to_old_indices);
             geom->vertices.resize(geom->to_old_vertices.size());
             geom->indices.resize(geom->vertices.size());
+            Vec3 vec;
             for (int i = 0, c = (int)geom->to_old_vertices.size(); i < c; ++i)
             {
-                geom->vertices[i] = vertices[geom->to_old_vertices[i]];
+                vec = vertices[geom->to_old_vertices[i]];
+                geom->vertices[i] = CVector(vec.x, vec.y, vec.z);
                 geom->indices[i] = codeIndex(i, i % 3 == 2);
             }
         }
         else
         {
-            geom->vertices = vertices;
+            for (int i = 0; i < vertices.size(); i++)
+            {
+                geom->vertices.emplace_back(vertices[i].x, vertices[i].y, vertices[i].z);
+            }
             geom->to_old_vertices.resize(original_indices.size());
             for (size_t i = 0; i < original_indices.size(); ++i)
             {
@@ -2425,7 +2433,7 @@ namespace ofbx
         {
             connection = connection->sibling;
             iCount++;
-		}
+        }
         iCountTotal = iCount;
         pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "", 0, iCount);
 
@@ -2444,7 +2452,6 @@ namespace ofbx
             if (connection->first_property->value == "OO")
             {
                 c.type = Scene::Connection::OBJECT_OBJECT;
-
             }
             else if (connection->first_property->value == "OP")
             {
@@ -2668,7 +2675,7 @@ namespace ofbx
 
         pLoadingState->Update(FBX_LOADING_PARSING_OBJECTS, "", 0, iTotalCount);
 
-		char idTempName[30];
+        char        idTempName[30];
         const char* idName;
         for (auto iter : scene->m_object_map)
         {
@@ -2677,7 +2684,7 @@ namespace ofbx
             if (iter.second.object == scene->m_root)
                 continue;
 
-			iter.second.element->id.toString(idTempName);
+            iter.second.element->id.toString(idTempName);
             idName = idTempName;
 
             iCount--;
@@ -2801,7 +2808,7 @@ namespace ofbx
 
         pLoadingState->Update(FBX_LOADING_PARSING_CONNECTIONS, "");
 
-		int i = 0;
+        int i = 0;
         for (const Scene::Connection& con : scene->m_connections)
         {
             Object* parent = scene->m_object_map[con.to].object;
@@ -3171,9 +3178,9 @@ namespace ofbx
             return nullptr;
         }
 
-		// not supported right now
-        //pLoadingState->Update(FBX_LOADING_PARSING_TAKES, "");
-        //if (!parseTakes(scene.get()))
+        // not supported right now
+        // pLoadingState->Update(FBX_LOADING_PARSING_TAKES, "");
+        // if (!parseTakes(scene.get()))
         //{
         //    pLoadingState->Update(FBX_LOADING_FAILED, Error::s_message);
         //    return nullptr;

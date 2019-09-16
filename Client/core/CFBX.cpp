@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "d3dx9mesh.h"
 
 void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
 {
@@ -401,11 +402,11 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
     std::vector<int>         vecMaterials(pGeometry->getMaterialCount());
     std::vector<DWORD>       vecColors;
 
-    const ofbx::Vec3* vertices = pGeometry->getVertices();
+    const CVector* vertices = pGeometry->getVertices();
     const ofbx::Vec3* normals = pGeometry->getNormals();
     const ofbx::Vec4* colors = pGeometry->getColors();
     const ofbx::Vec2* UVs = pGeometry->getUVs(0);
-    const ofbx::Vec3* vertex;
+    const CVector* vertex;
     const ofbx::Vec3* normal;
     const ofbx::Vec2* uv;
     DWORD             dColor;
@@ -426,7 +427,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
             vertex = vertices + i;
             normal = normals + i;
             uv = UVs + i;
-            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, uv->x, uv->y);
+            vecVertices.emplace_back(vertex->fX, vertex->fY, vertex->fZ, normal->x, normal->y, normal->z, uv->x, uv->y);
             vecColors.emplace_back(dColor);
         }
     }
@@ -440,7 +441,7 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
             color = colors + i;
             uv = UVs + i;
             dColor = D3DCOLOR_XRGB((DWORD)((*color).x * 255), (DWORD)((*color).y * 255), (DWORD)((*color).z * 255), (DWORD)((*color).w * 255));
-            vecVertices.emplace_back(vertex->x, vertex->y, vertex->z, normal->x, normal->y, normal->z, uv->x, uv->y);
+            vecVertices.emplace_back(vertex->fX, vertex->fY, vertex->fZ, normal->x, normal->y, normal->z, uv->x, uv->y);
             vecColors.push_back(dColor);
         }
     }
@@ -640,21 +641,28 @@ CFBXBoundingBox* CFBX::CalculateBoundingBox(const ofbx::Mesh* pMesh)
     unsigned long long    id = pMesh->id;
     const ofbx::Geometry* pGeometry = pMesh->getGeometry();
 
-    CFBXBoundingBox*  boundingBox = new CFBXBoundingBox();
-    const ofbx::Vec3* vertices = pGeometry->getVertices();
-    const ofbx::Vec3* vertex;
-    CVector           center(0, 0, 0);
-    for (int i = 0; i < pGeometry->getVertexCount(); i++)
-    {
-        vertex = vertices + i;
-        boundingBox->max.fX = std::max((float)vertex->x, boundingBox->max.fX);
-        boundingBox->max.fY = std::max((float)vertex->y, boundingBox->max.fY);
-        boundingBox->max.fZ = std::max((float)vertex->z, boundingBox->max.fZ);
-        boundingBox->min.fX = std::min((float)vertex->x, boundingBox->min.fX);
-        boundingBox->min.fY = std::min((float)vertex->y, boundingBox->min.fY);
-        boundingBox->min.fZ = std::min((float)vertex->z, boundingBox->min.fZ);
-        boundingBox->radius = std::max(boundingBox->radius, (float)sqrt(vertex->x * vertex->x + vertex->y * vertex->y + vertex->z * vertex->z));
-    }
+    CFBXBoundingBox* boundingBox = new CFBXBoundingBox();
+
+    const CVector* vertices = pGeometry->getVertices();
+    D3DXVECTOR3       vecMin;
+    D3DXVECTOR3       vecMax;
+    D3DXVECTOR3       vecCenter;
+    float             fRadius;
+
+    D3DXComputeBoundingBox((D3DXVECTOR3*)vertices, pGeometry->getVertexCount(), sizeof(D3DXVECTOR3),
+                                                                             &vecMin, &vecMax);
+    D3DXComputeBoundingSphere((D3DXVECTOR3*)vertices, pGeometry->getVertexCount(), sizeof(D3DXVECTOR3), &vecCenter, &fRadius);
+    boundingBox->min.fX = vecMin.x;
+    boundingBox->min.fY = vecMin.y;
+    boundingBox->min.fZ = vecMin.z;
+    boundingBox->max.fX = vecMax.x;
+    boundingBox->max.fY = vecMax.y;
+    boundingBox->max.fZ = vecMax.z;
+    boundingBox->radius = fRadius;
+    boundingBox->center.fX = vecCenter.x;
+    boundingBox->center.fY = vecCenter.y;
+    boundingBox->center.fZ = vecCenter.z;
+
     return boundingBox;
 }
 
