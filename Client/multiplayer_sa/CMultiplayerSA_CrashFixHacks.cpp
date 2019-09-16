@@ -1565,6 +1565,74 @@ void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CTrain::ProcessControl
+//
+// This hook overwrites the logic to wrap the train's rail distance, because in the
+// original game code this could cause an infinite loop
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x6F8F83 | 88 9E CA 05 00 00 | mov     [esi + 5CAh], bl
+// >>> 0x6F8F89 | D9 86 A8 05 00 00 | fld     dword ptr [esi + 5A8h]
+//     0x6F8F8F | D8 1D 50 8B 85 00 | fcomp   ds: __real @00000000
+#define HOOKPOS_CTrain__ProcessControl         0x6F8F89
+#define HOOKSIZE_CTrain__ProcessControl        6
+static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
+
+// 0xC37FEC; float RailTrackLength[NUM_TRACKS]
+static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
+
+static void _cdecl WrapTrainRailDistance(CVehicleSAInterface* train)
+{
+    // Check if the train is driving on a valid rail track (id < NUM_TRACKS)
+    if (train->m_ucRailTrackID >= 4)
+    {
+        train->m_fTrainRailDistance = 0.0f;
+        return;
+    }
+
+    // Check if the current rail track has a valid length (>= 1.0f)
+    const float railTrackLength = RailTrackLength[train->m_ucRailTrackID];
+
+    if (railTrackLength < 1.0f)
+    {
+        train->m_fTrainRailDistance = 0.0f;
+        return;
+    }
+
+    // Check if the current rail distance is in the interval [0, railTrackLength)
+    float railDistance = train->m_fTrainRailDistance;
+
+    if (railDistance >= 0.0f && railDistance < railTrackLength)
+        return;
+
+    // Wrap the current rail distance
+    if (railDistance > 0.0f)
+    {
+        railDistance = std::fmodf(railDistance, railTrackLength);
+    }
+    else
+    {
+        railDistance = railTrackLength - std::fmodf(std::fabsf(railDistance), railTrackLength);
+    }
+
+    train->m_fTrainRailDistance = railDistance;
+}
+
+static void _declspec(naked) HOOK_CTrain__ProcessControl()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    WrapTrainRailDistance
+        add     esp, 4
+        popad
+        jmp     CONTINUE_CTrain__ProcessControl
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1612,6 +1680,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);
+    EZHookInstall(CTrain__ProcessControl);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

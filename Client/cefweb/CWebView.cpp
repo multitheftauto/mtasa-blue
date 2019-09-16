@@ -444,7 +444,18 @@ CVector2D CWebView::GetSize()
 
 bool CWebView::GetFullPathFromLocal(SString& strPath)
 {
-    return m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+            result = true;
+    }, this);
+
+    return result;
 }
 
 bool CWebView::RegisterAjaxHandler(const SString& strURL)
@@ -662,7 +673,11 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
         // Copy popup buffer
         if (paintType == PET_POPUP)
         {
-            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            if (m_RenderData.popupBuffer)
+            {
+                memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            }
+
             return;            // We don't have to wait as we've copied the buffer already
         }
 

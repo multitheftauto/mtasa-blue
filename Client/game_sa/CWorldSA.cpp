@@ -633,7 +633,7 @@ uint CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, CTrainTrack*
             }
         }
     }
-    
+
     return foundNodeIndex;
 }
 
