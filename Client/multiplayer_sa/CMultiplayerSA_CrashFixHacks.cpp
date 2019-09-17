@@ -1633,6 +1633,45 @@ static void _declspec(naked) HOOK_CTrain__ProcessControl()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
+//
+// This hook adds a null-pointer check for eax, which stores the ped's current vehicle.
+// Returning a null-pointer from this function will prevent the animation from being played.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x648AAC | C2 04 00             | retn   4
+// >>> 0x648AAF | 8B 80 84 03 00 00    | mov    eax, [eax + 384h]
+//     0x648AB5 | 0F B6 80 DE 00 00 00 | movzx  eax, byte ptr [eax + 0DEh]
+#define HOOKPOS_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask         0x648AAF
+#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask        6
+static DWORD CONTINUE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask = 0x648AB5;
+
+static void _cdecl LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
+{
+    LogEvent(819, "CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask", "eax is null", "");
+}
+
+static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
+{
+    _asm
+    {
+        test    eax, eax
+        jz      returnZeroTaskLocation
+        mov     eax, [eax + 384h]
+        jmp     CONTINUE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask
+
+        returnZeroTaskLocation:
+        pushad
+        call    LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask
+        popad
+        pop     edi
+        pop     esi
+        retn    4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1681,6 +1720,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(printf);
     EZHookInstallChecked(RwMatrixMultiply);
     EZHookInstall(CTrain__ProcessControl);
+    EZHookInstall(CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
