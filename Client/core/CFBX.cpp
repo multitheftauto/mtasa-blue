@@ -12,6 +12,17 @@
 #include "StdInc.h"
 #include "d3dx9mesh.h"
 
+int CFBXDebugging::iRenderedTemplates = 0;
+int CFBXDebugging::iRenderedObjects = 0;
+int CFBXDebugging::iRenderedScenes = 0;
+
+void CFBXDebugging::Start()
+{
+    ResetTemplatesCounter();
+    ResetObjectsCounter();
+    ResetScenesCounter();
+}
+
 void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
 {
     static SColorRGBA color(255, 0, 0, 255);
@@ -402,11 +413,11 @@ bool CFBXScene::CreateFBXBuffer(const ofbx::Object* const* pObject)
     std::vector<int>         vecMaterials(pGeometry->getMaterialCount());
     std::vector<DWORD>       vecColors;
 
-    const CVector* vertices = pGeometry->getVertices();
+    const CVector*    vertices = pGeometry->getVertices();
     const ofbx::Vec3* normals = pGeometry->getNormals();
     const ofbx::Vec4* colors = pGeometry->getColors();
     const ofbx::Vec2* UVs = pGeometry->getUVs(0);
-    const CVector* vertex;
+    const CVector*    vertex;
     const ofbx::Vec3* normal;
     const ofbx::Vec2* uv;
     DWORD             dColor;
@@ -638,19 +649,17 @@ void CFBXScene::CacheObjects()
 
 CFBXBoundingBox* CFBX::CalculateBoundingBox(const ofbx::Mesh* pMesh)
 {
-    unsigned long long    id = pMesh->id;
     const ofbx::Geometry* pGeometry = pMesh->getGeometry();
 
     CFBXBoundingBox* boundingBox = new CFBXBoundingBox();
 
     const CVector* vertices = pGeometry->getVertices();
-    D3DXVECTOR3       vecMin;
-    D3DXVECTOR3       vecMax;
-    D3DXVECTOR3       vecCenter;
-    float             fRadius;
+    D3DXVECTOR3    vecMin;
+    D3DXVECTOR3    vecMax;
+    D3DXVECTOR3    vecCenter;
+    float          fRadius;
 
-    D3DXComputeBoundingBox((D3DXVECTOR3*)vertices, pGeometry->getVertexCount(), sizeof(D3DXVECTOR3),
-                                                                             &vecMin, &vecMax);
+    D3DXComputeBoundingBox((D3DXVECTOR3*)vertices, pGeometry->getVertexCount(), sizeof(D3DXVECTOR3), &vecMin, &vecMax);
     D3DXComputeBoundingSphere((D3DXVECTOR3*)vertices, pGeometry->getVertexCount(), sizeof(D3DXVECTOR3), &vecCenter, &fRadius);
     boundingBox->min.fX = vecMin.x;
     boundingBox->min.fY = vecMin.y;
@@ -794,77 +803,85 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
     return true;
 }
 
-void CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum)
+bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix)
 {
-    if (!m_pClientFBXInterface->IsLoaded())
-        return;
-
-    bRenderDebug = g_pCore->GetFBX()->GetDevelopmentModeEnabled() && g_pCore->GetFBX()->GetDevelopmentModeEnabled();
-    m_pClientFBXInterface->Render();
-
-    CFBXTemplate*    pTemplate;
     CVector          vecCameraPosition;
     CVector          vecTemplatePosition;
     CVector          vecTemplateOffset;
     float            fDrawDistance;
     CFBXBoundingBox* pBoundingBox;
-    CVector          center, size;
     CVector          vecTemp;
     CMatrix          matrix;
-
-    CVector vecPosition;
+    CVector          vecPosition;
     g_pCore->GetGame()->GetCamera()->GetMatrix(m_pCameraMatrix);
     vecCameraPosition = m_pCameraMatrix->GetPosition();
-    int i = 0;
+    pTemplate->GetPosition(vecTemplatePosition);
+    pTemplate->GetDrawDistance(fDrawDistance);
+
+    matrix = *pMatrix * *pTemplate->GetViewMatrix();
+
+    vecPosition = pMatrix->GetPosition();
+    if (((vecTemplatePosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
+    {
+        pBoundingBox = pTemplate->GetBoundingBox();
+        if (g_pCore->GetFBX()->CheckCulling(pBoundingBox, &matrix))
+        {
+            matrix.GetBuffer((float*)m_pObjectMatrix);
+            pTemplate->Render(m_pDevice, this, m_pObjectMatrix);
+            if (bRenderDebug)
+            {
+                CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum)
+{
+    if (!m_pClientFBXInterface->IsLoaded())
+        return false;
+
+    m_pDevice = pDevice;
+    bRenderDebug = g_pCore->GetFBX()->GetDevelopmentModeEnabled() && g_pCore->GetFBX()->GetDevelopmentModeEnabled();
+    m_pClientFBXInterface->Render();
+
+    bool          renderedAtLeastOneTemplate = false;
+    CFBXTemplate* pTemplate;
+
+    std::unordered_map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = m_pClientFBXInterface->GetTemplatesRenderingMatrix();
+
     for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
         if (!IsTemplateValid(renderItem->m_uiTemplateId))
             continue;
+
         pTemplate = m_templateMap[renderItem->m_uiTemplateId];
-        pTemplate->GetPosition(vecTemplatePosition);
-        pTemplate->GetDrawDistance(fDrawDistance);
-
-        matrix = renderItem->m_matrix * *(pTemplate->GetViewMatrix());
-
-        vecPosition = renderItem->m_matrix.GetPosition();
-        if (((vecTemplatePosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
+        if (RenderTemplate(pTemplate, &renderItem->m_matrix))
         {
-            pBoundingBox = pTemplate->GetBoundingBox();
-            size = CVector(abs(pBoundingBox->max.fX) + abs(pBoundingBox->min.fX), abs(pBoundingBox->max.fY) + abs(pBoundingBox->min.fY),
-                           abs(pBoundingBox->max.fZ) + abs(pBoundingBox->min.fZ));
-            center = vecPosition + size / 2;
-            if (pFrustum->CheckRectangle(center, size))
-            {
-                renderItem->m_matrix.GetBuffer((float*)m_pObjectMatrix);
-                pTemplate->Render(pDevice, this, m_pObjectMatrix);
-                i++;
-                if (bRenderDebug)
-                {
-                    CFBXDebugging::DrawBoundingBox(pTemplate, renderItem->m_matrix);
-                }
-            }
+            CFBXDebugging::AddRenderedTemplate();
+            renderedAtLeastOneTemplate = true;
         }
     }
-    g_pCore->GetConsole()->Printf("i = %i", i);
 
-    std::unordered_map<unsigned long long, std::vector<CMatrix>> pTemplatesMatrix = m_pClientFBXInterface->GetTemplatesRenderingMatrix();
     for (auto const& pair : pTemplatesMatrix)
     {
+        if (!IsTemplateValid(pair.first))
+            continue;
+        pTemplate = m_templateMap[pair.first];
         for (CMatrix matrix : pair.second)
         {
-            pTemplate = m_templateMap[pair.first];
-            pTemplate->GetPosition(vecTemplatePosition);
-            pTemplate->GetDrawDistance(fDrawDistance);
-            vecTemplateOffset = matrix.GetPosition();
-            if (((vecTemplatePosition + vecTemplateOffset) - vecCameraPosition).Length() < fDrawDistance)
+            if (RenderTemplate(pTemplate, &matrix))
             {
-                matrix.GetBuffer((float*)m_pObjectMatrix);
-                pTemplate->Render(pDevice, this, m_pObjectMatrix);
+                CFBXDebugging::AddRenderedTemplate();
+                renderedAtLeastOneTemplate = true;
             }
         }
     }
-
+    g_pCore->GetConsole()->Printf("templates: %i", CFBXDebugging::iRenderedTemplates);
     ListClearAndReserve(m_vecTemporaryRenderLoop);
+    return renderedAtLeastOneTemplate;
 }
 
 void CFBXScene::GetTemplatePosition(unsigned int uiTemplateId, CVector& position)
@@ -1059,6 +1076,8 @@ void CFBX::Initialize()
 
     m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE]);
     m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE]);
+
+    CFBXDebugging::Start();
 }
 
 CFBX::~CFBX()
@@ -1068,6 +1087,20 @@ CFBX::~CFBX()
 void CFBX::UpdateFrustum(float screenDepth, D3DXMATRIX projectionMatrix, D3DXMATRIX viewMatrix)
 {
     m_pFrustum->ConstructFrustum(screenDepth, projectionMatrix, viewMatrix);
+}
+
+bool CFBX::CheckCulling(CFBXBoundingBox* pBoundingBox, CMatrix* pMatrix)
+{
+    CVector vecPosition = pMatrix->GetPosition();
+    if (!m_pFrustum->CheckSphere(pBoundingBox->center + vecPosition, pBoundingBox->radius))
+        return false;
+
+    CVector vecCenter = (pBoundingBox->max - pBoundingBox->min) / 2 + vecPosition;
+
+    if (!m_pFrustum->CheckRectangle(pBoundingBox->center + vecPosition, pBoundingBox->max - pBoundingBox->min))
+        return false;
+
+    return true;
 }
 
 void CFBX::Render()
@@ -1082,6 +1115,11 @@ void CFBX::Render()
     {
         m_globalLighting = 0.8f;
     }
+
+    CFBXDebugging::ResetScenesCounter();
+    CFBXDebugging::ResetTemplatesCounter();
+    CFBXDebugging::ResetObjectsCounter();
+    g_pCore->GetGame()->GetCamera()->GetMatrix(&m_pCameraMatrix);
 
     if (m_pDevice != nullptr)
     {
@@ -1103,7 +1141,10 @@ void CFBX::Render()
 
         for (auto const& pFBXScene : m_sceneList)
         {
-            pFBXScene->RenderScene(m_pDevice, m_pFrustum);
+            if (pFBXScene->RenderScene(m_pDevice, m_pFrustum))
+            {
+                CFBXDebugging::AddRenderedScene();
+            }
         }
     }
 }

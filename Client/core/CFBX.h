@@ -25,6 +25,19 @@ static class CFBXDebugging
 {
 public:
     static void DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix);
+    static void AddRenderedTemplate() { iRenderedTemplates++; };
+    static void AddRenderedObject() { iRenderedObjects++; };
+    static void AddRenderedScene() { iRenderedScenes++; };
+    static void ResetTemplatesCounter() { iRenderedTemplates = 0; };
+    static void ResetObjectsCounter() { iRenderedObjects = 0; };
+    static void ResetScenesCounter() { iRenderedScenes = 0; };
+
+    static void Start();
+
+    // last frame
+    static int iRenderedTemplates;
+    static int iRenderedObjects;
+    static int iRenderedScenes;
 };
 
 class CFBXTextureSet
@@ -202,7 +215,8 @@ public:
     void             GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void             GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool             GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
-    void             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum);
+    bool             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum);
+    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix);
     FBXObjectBuffer* GetFBXBuffer(unsigned long long ullId);
     unsigned int     AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*    GetTexture(const ofbx::Texture* pTexture);
@@ -269,6 +283,7 @@ private:
     D3DMATRIX*                                                                m_pObjectMatrix;
     CMatrix*                                                                  m_pCameraMatrix;
     bool                                                                      bRenderDebug;
+    IDirect3DDevice9*                                                         m_pDevice;
 };
 
 class CFBX : public CFBXInterface
@@ -281,6 +296,7 @@ public:
     void                         RemoveScene(CFBXScene* pScene);
     void                         Render();
     void                         UpdateFrustum(float screenDepth, D3DXMATRIX projectionMatrix, D3DXMATRIX viewMatrix);
+    bool                         CheckCulling(CFBXBoundingBox* pBoundingBox, CMatrix* pMatrix);
     void                         Initialize();
     bool                         HasAnyFBXLoaded();
     CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry);
@@ -305,5 +321,6 @@ private:
     CFrustum*                    m_pFrustum;
     bool                         m_pShowFBX;
     bool                         m_pDevelopmentModeEnabled;
+    CMatrix                      m_pCameraMatrix;
     IDirect3DVertexDeclaration9* m_pVertexDeclaration[eVertexType::COUNT];
 };
