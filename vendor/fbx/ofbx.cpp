@@ -2159,7 +2159,7 @@ namespace ofbx
             {
                 vec = vertices[geom->to_old_vertices[i]];
                 geom->vertices[i] = CVector(vec.x, vec.y, vec.z);
-                geom->indices[i] = codeIndex(i, i % 3 == 2);
+                geom->indices[i] = std::abs(codeIndex(i, i % 3 == 2));
             }
         }
         else

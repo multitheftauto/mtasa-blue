@@ -563,7 +563,6 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     m_pRoot = m_pScene->getRoot();
     m_pClientFBXInterface = pClientFBXInterface;
 
-    FixIndices();
     CacheObjects();
     CacheMeshes();
     CacheTextures();
@@ -744,21 +743,6 @@ void CFBXScene::CacheMaterials()
     {
         pMaterial = m_pScene->getMaterials() + i;
         m_materialList[(*pMaterial)->id] = pMaterial;
-    }
-}
-
-void CFBXScene::FixIndices()
-{
-    const ofbx::Mesh*     pMesh;
-    const ofbx::Geometry* pGeometry;
-    for (int i = 0; i < m_pScene->getMeshCount(); i++)
-    {
-        pMesh = m_pScene->getMesh(i);
-        pGeometry = pMesh->getGeometry();
-        for (int i = 0; i < pGeometry->getIndicesCount(); i++)
-        {
-            (int)pGeometry->getFaceIndices()[i] = abs(pGeometry->getFaceIndices()[i]);
-        }
     }
 }
 

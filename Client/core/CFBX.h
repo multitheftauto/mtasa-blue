@@ -250,7 +250,6 @@ public:
     float GetUnitScaleFactor() { return m_fUnitScaleFactor; }
 
 private:
-    void FixIndices();
     void CacheObjects();
     void CacheMeshes();
     void CacheTextures();
