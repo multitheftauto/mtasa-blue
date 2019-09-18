@@ -309,6 +309,7 @@ public:
     bool                         GetDevelopmentModeEnabled() { return m_pDevelopmentModeEnabled; }
     void                         SetShowFBXEnabled(bool bEnabled) { m_pShowFBX = bEnabled; }
     bool                         GetShowFBXEnabled() { return m_pShowFBX; }
+    CTextureItem*                GetBlankTexture() { return m_pBlankTexture; }
 
 private:
     std::vector<CFBXScene*>      m_sceneList;
@@ -322,4 +323,5 @@ private:
     bool                         m_pDevelopmentModeEnabled;
     CMatrix                      m_pCameraMatrix;
     IDirect3DVertexDeclaration9* m_pVertexDeclaration[eVertexType::COUNT];
+    CTextureItem*                m_pBlankTexture;            // used if original doesn't exists and is enabled
 };

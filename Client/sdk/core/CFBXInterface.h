@@ -49,6 +49,7 @@ public:
     virtual void                         SetShowFBXEnabled(bool bEnabled) = 0;
     virtual bool                         GetShowFBXEnabled() = 0;
     virtual bool                         CheckCulling(CFBXBoundingBox* pBoundingBox, CMatrix* pMatrix) = 0;
+    virtual CTextureItem*                GetBlankTexture() = 0;
 };
 
 class CFBXSceneInterface

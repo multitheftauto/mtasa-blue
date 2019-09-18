@@ -349,6 +349,8 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
+
+    g_pCore->GetFBX()->Initialize();
 }
 
 CClientGame::~CClientGame()

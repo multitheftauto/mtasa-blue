@@ -259,7 +259,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                             }
                             else
                             {
-                                pDevice->SetTexture(0, nullptr);
+                                pDevice->SetTexture(0, g_pCore->GetFBX()->GetBlankTexture()->m_pD3DTexture);
                             }
 
                             if (pTextureSet->normal != nullptr)
@@ -1060,6 +1060,9 @@ void CFBX::Initialize()
 
     m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTexColor, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE]);
     m_pDevice->CreateVertexDeclaration(dwDeclPosNormalTex, &m_pVertexDeclaration[VERTEX_TYPE_POS_NORMAL_TEXTURE]);
+
+    m_pBlankTexture =
+        g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\blanktexture.jpg"), NULL, false, 2, 2, RFORMAT_DXT1);
 
     CFBXDebugging::Start();
 }
