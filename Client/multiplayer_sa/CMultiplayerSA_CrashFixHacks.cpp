@@ -1672,6 +1672,89 @@ static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cre
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicleModelInfo::LoadVehicleColours
+//
+// A modified data/carcols.dat can have entries with invalid model names and these cause
+// CModelInfo::GetModelInfo to return a null pointer, but the original code doesn't verify
+// the return value and tries to use the null pointer. This hook adds a null pointer check
+// and then skips the line if in the null case. There are two locations to hook.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const char* modelName)
+{
+    LogEvent(820 + location, "CVehicleModelInfo::LoadVehicleColours", "Could not find model by name:", modelName);
+}
+
+//     0x5B6B1B | E8 20 EE F0 FF | call  CModelInfo::GetModelInfo
+// >>> 0x5B6B20 | 8B F0          | mov   esi, eax
+//     0x5B6B22 | 8D 47 FF       | lea   eax, [edi - 1]
+//     0x5B6B25 | 99             | cdq
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1         0x5B6B20
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1        5
+static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6B25;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1     = 0x5B6D04;
+
+static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
+{
+    _asm
+    {
+        test    eax, eax
+        jnz     continueLoadingColorLineLocation
+        
+        pushad
+        lea     ecx, [esp + 55Ch - 440h]
+        push    ecx
+        push    0
+        call    LOG_CVehicleModelInfo__LoadVehicleColours
+        add     esp, 8
+        popad
+
+        add     esp, 54h
+        jmp     SKIP_CVehicleModelInfo__LoadVehicleColours_1
+
+        continueLoadingColorLineLocation:
+        mov     esi, eax
+        lea     eax, [edi - 1]
+        jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_1
+    }
+}
+
+//     0x5B6CA5 | E8 96 EC F0 FF | call  CModelInfo::GetModelInfo
+// >>> 0x5B6CAA | 8B F0          | mov   esi, eax
+//     0x5B6CAC | 8D 47 FF       | lea   eax, [edi - 1]
+//     0x5B6CAF | 99             | cdq
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2         0x5B6CAA
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2        5
+static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6CAF;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2     = 0x5B6D04;
+
+static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
+{
+    _asm
+    {
+        test    eax, eax
+        jnz     continueLoadingColorLineLocation
+        
+        pushad
+        lea     ecx, [esp + 59Ch - 440h]
+        push    ecx
+        push    1
+        call    LOG_CVehicleModelInfo__LoadVehicleColours
+        add     esp, 8
+        popad
+
+        add     esp, 94h
+        jmp     SKIP_CVehicleModelInfo__LoadVehicleColours_2
+
+        continueLoadingColorLineLocation:
+        mov     esi, eax
+        lea     eax, [edi - 1]
+        jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_2
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1721,6 +1804,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(RwMatrixMultiply);
     EZHookInstall(CTrain__ProcessControl);
     EZHookInstall(CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask);
+    EZHookInstall(CVehicleModelInfo__LoadVehicleColours_1);
+    EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
