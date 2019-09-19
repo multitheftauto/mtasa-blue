@@ -451,8 +451,7 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
             if (aborted)
                 return;
 
-            m_pEventsInterface->Events_OnResourcePathCheck(strPath);
-            result = true;
+            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
     }, this);
 
     return result;
