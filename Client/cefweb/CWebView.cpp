@@ -490,7 +490,17 @@ bool CWebView::ToggleDevTools(bool visible)
 
 bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    }, this);
+
+    return result;
 }
 
 bool CWebView::CanGoBack()
