@@ -141,23 +141,6 @@ void CTileBatcher::Flush()
         if (g_pDeviceState->AdapterState.bRequiresClipping)
             m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
         m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bUseCustomMatrices ? D3DZB_TRUE : D3DZB_FALSE);
-        m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-        m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
-        m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-        m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-        m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-        m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-        m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
-        m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-        m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-        m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
         if (m_bUseCustomMatrices)
         {
