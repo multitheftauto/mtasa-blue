@@ -488,6 +488,9 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
+        SetBlendModeRenderStates(newBlendMode);
+        m_CurBlendMode = newBlendMode;
+
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -521,16 +524,9 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pLineInterface->Begin();
         }
-    }
 
-    // Blend mode changing?
-    if (bDrawModeChanging || bBlendModeChanging)
-    {
-        SetBlendModeRenderStates(newBlendMode);
+        m_CurDrawMode = newDrawMode;
     }
-
-    m_CurDrawMode = newDrawMode;
-    m_CurBlendMode = newBlendMode;
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
