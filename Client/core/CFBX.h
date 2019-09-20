@@ -24,6 +24,7 @@ enum eVertexType
 static class CFBXDebugging
 {
 public:
+    static void DrawBoundingBox(CFBXBoundingBox* pBoundingBox, CMatrix& matrix, SColorRGBA color = SColorRGBA(255, 0, 0, 255), float fLineWidth = 2.0f);
     static void DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix);
     static void AddRenderedTemplate() { iRenderedTemplates++; };
     static void AddRenderedObject() { iRenderedObjects++; };
@@ -60,6 +61,7 @@ struct CFBXBoundingBox
     CVector max;
     CVector center;
     float   radius;
+    void    GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix);
 };
 
 struct FBXVertex
@@ -166,7 +168,7 @@ class CFBXTemplate
 {
 public:
     CFBXTemplate();
-    void         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix);
+    bool         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix);
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
 
     void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };

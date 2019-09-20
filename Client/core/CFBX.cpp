@@ -23,13 +23,11 @@ void CFBXDebugging::Start()
     ResetScenesCounter();
 }
 
-void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
+void CFBXDebugging::DrawBoundingBox(CFBXBoundingBox* pBoundingBox, CMatrix& matrix, SColorRGBA color, float fLineWidth)
 {
-    static SColorRGBA color(255, 0, 0, 255);
     static CVector    vecCorner[8];
-    static float      fLineWidth = 8.0f;
 
-    pTemplate->GetBoundingBoxCornersByMatrix(vecCorner, matrix * *pTemplate->GetViewMatrix());
+    pBoundingBox->GetBoundingBoxCornersByMatrix(vecCorner, matrix);
 
     g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[0], vecCorner[4], fLineWidth, color, false);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[1], vecCorner[5], fLineWidth, color, false);
@@ -45,6 +43,27 @@ void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
     g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[4], vecCorner[6], fLineWidth, color, false);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[6], vecCorner[7], fLineWidth, color, false);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecCorner[5], vecCorner[7], fLineWidth, color, false);
+}
+
+void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
+{
+    static SColorRGBA color(255, 0, 0, 255);
+    static CVector    vecCorner[8];
+    static float      fLineWidth = 8.0f;
+
+    DrawBoundingBox(pTemplate->GetBoundingBox(), matrix * *pTemplate->GetViewMatrix());
+}
+
+void CFBXBoundingBox::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix)
+{
+    vecCorner[0] = matrix.TransformVector(CVector(min.fX, min.fY, min.fZ));
+    vecCorner[1] = matrix.TransformVector(CVector(min.fX, max.fY, min.fZ));
+    vecCorner[2] = matrix.TransformVector(CVector(max.fX, min.fY, min.fZ));
+    vecCorner[3] = matrix.TransformVector(CVector(max.fX, max.fY, min.fZ));
+    vecCorner[4] = matrix.TransformVector(CVector(min.fX, min.fY, max.fZ));
+    vecCorner[5] = matrix.TransformVector(CVector(min.fX, max.fY, max.fZ));
+    vecCorner[6] = matrix.TransformVector(CVector(max.fX, min.fY, max.fZ));
+    vecCorner[7] = matrix.TransformVector(CVector(max.fX, max.fY, max.fZ));
 }
 
 CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CMatrix matrix) : m_uiTemplateId(uiTemplateId), m_matrix(matrix)
@@ -148,8 +167,10 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
     }
 }
 
-void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
+// returns false if model wans't rendered due being out of screen, too far, something went wrong etc.
+bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
 {
+    bool             bRenderedAtLeastOneMesh = false;
     FBXObjectBuffer* pObjectBuffer;
     CFBXTextureSet*  pTextureSet;
     float            fDrawDistance;
@@ -235,7 +256,7 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             {
                 object.second->GetCullMode(cullMode);
                 pDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
-
+                CFBXDebugging::DrawBoundingBox(object.second->GetBoundingBox(), pTemplateObjectMatrix, SColorRGBA(0,255,0,255), 2.0f);
                 for (auto const& pBuffer : pObjectBuffer->m_bufferList)
                 {
                     if (pBuffer->m_ullMaterialId == 0)
@@ -289,12 +310,15 @@ void CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
                     pDevice->SetIndices(pBuffer->m_pIndexBuffer);
 
                     pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, pBuffer->m_iFacesCount);
+                    bRenderedAtLeastOneMesh = true;
                 }
             }
         }
     }
 
     pDevice->LightEnable(7, FALSE);
+
+    return bRenderedAtLeastOneMesh;
 }
 
 CFBXTemplate::CFBXTemplate()
@@ -315,16 +339,7 @@ unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 void CFBXTemplate::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix)
 {
     CFBXBoundingBox* pBoundingBox = GetBoundingBox();
-    CVector          min = pBoundingBox->min;
-    CVector          max = pBoundingBox->max;
-    vecCorner[0] = matrix.TransformVector(CVector(min.fX, min.fY, min.fZ));
-    vecCorner[1] = matrix.TransformVector(CVector(min.fX, max.fY, min.fZ));
-    vecCorner[2] = matrix.TransformVector(CVector(max.fX, min.fY, min.fZ));
-    vecCorner[3] = matrix.TransformVector(CVector(max.fX, max.fY, min.fZ));
-    vecCorner[4] = matrix.TransformVector(CVector(min.fX, min.fY, max.fZ));
-    vecCorner[5] = matrix.TransformVector(CVector(min.fX, max.fY, max.fZ));
-    vecCorner[6] = matrix.TransformVector(CVector(max.fX, min.fY, max.fZ));
-    vecCorner[7] = matrix.TransformVector(CVector(max.fX, max.fY, max.fZ));
+    pBoundingBox->GetBoundingBoxCornersByMatrix(vecCorner, matrix);
 }
 
 void CFBXTemplate::UpdateBoundingBox()
@@ -810,15 +825,16 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVecto
         if (g_pCore->GetFBX()->CheckCulling(pBoundingBox, &matrix))
         {
             matrix.GetBuffer((float*)m_pObjectMatrix);
-            pTemplate->Render(m_pDevice, this, m_pObjectMatrix);
-            if (bRenderDebug)
+            if (pTemplate->Render(m_pDevice, this, m_pObjectMatrix))
             {
-                CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
+                if (bRenderDebug)
+                {
+                    CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
+                }
             }
             return true;
         }
     }
-    //             if (((vecTemplatePosition + vecTemplateObjectPosition + vecPosition) - vecCameraPosition).Length() < fDrawDistance)
     return false;
 }
 
@@ -871,7 +887,6 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
             }
         }
     }
-    g_pCore->GetConsole()->Printf("templates: %i", CFBXDebugging::iRenderedTemplates);
     ListClearAndReserve(m_vecTemporaryRenderLoop);
     return renderedAtLeastOneTemplate;
 }
