@@ -16,7 +16,8 @@ public:
     virtual void                                                         CreateTexture(unsigned long long ullTextureId, CPixels* pPixels) = 0;
     virtual CMaterialItem*                                               GetTextureById(unsigned long long ullTextureId) = 0;
     virtual bool                                                         IsTextureCreated(unsigned long long ullTextureId) = 0;
-    virtual std::unordered_map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix() = 0;
+    virtual void                                                         GetTemplatesRenderingMatrix(std::unordered_map<unsigned long long, std::vector<CMatrix>>& templatesMatrix, unsigned char ucInterior, unsigned short usDimension) = 0;
     virtual bool                                                         IsLoaded() = 0;
     virtual void                                                         Render() = 0;
+    virtual unsigned short                                               GetPlayerDimension() = 0;
 };

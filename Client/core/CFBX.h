@@ -143,6 +143,7 @@ public:
     void               GetCullMode(eCullMode& cullMode) { cullMode = this->m_eCullMode; };
     unsigned long long GetObjectId() { return m_ullObjectId; };
     void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
+    void               GetMatrix(CMatrix& pMatrix) { pMatrix = *m_pViewMatrix; };
     void               GetMaterial(D3DMATERIAL9*& pMaterial) const { pMaterial = m_pMaterial; };
     void               GetMaterialDiffuseColor(DWORD& pMaterial);
     CFBXBoundingBox*   GetBoundingBox() const { return m_pBoundingBox; }
@@ -171,11 +172,11 @@ public:
     void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
     void SetRotation(CVector& rotation) const { m_pViewMatrix->SetRotation(rotation); };
     void SetScale(CVector& scale) const { m_pViewMatrix->SetScale(scale); };
-    void SetDrawDistance(float fDrawDisntace) const { fDrawDisntace = m_fDrawDistance; };
+    void SetDrawDistance(float fDrawDistance) { m_fDrawDistance = fDrawDistance; };
     void GetPosition(CVector& position) const { position = m_pViewMatrix->GetPosition(); };
     void GetRotation(CVector& rotation) const { rotation = m_pViewMatrix->GetRotation(); };
     void GetScale(CVector& scale) const { scale = m_pViewMatrix->GetScale(); };
-    void GetDrawDistance(float& fDrawDisntace) const { fDrawDisntace = m_fDrawDistance; };
+    void GetDrawDistance(float& fDrawDistance) const { fDrawDistance = m_fDrawDistance; };
 
     CFBXTemplateObject* GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::unordered_map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
@@ -192,7 +193,7 @@ private:
     std::unordered_map<unsigned int, CFBXTemplateObject*> m_objectMap;
     unsigned int                                          m_uiInterior = 0;
     unsigned int                                          m_uiDimension = 0;
-    float                                                 m_fDrawDistance = 10000;
+    float                                                 m_fDrawDistance = 10000.0f;
     unsigned int                                          m_uiNextFreeObjectId = 1;
     CMatrix*                                              m_pViewMatrix;
     D3DMATRIX*                                            m_pObjectMatrix;
@@ -215,8 +216,8 @@ public:
     void             GetAllObjectsIds(std::vector<unsigned long long>& vecIds) { vecIds = m_objectIdsList; };
     void             GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool             GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
-    bool             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum);
-    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix);
+    bool             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVector& vecCameraPosition);
+    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVector& vecCameraPosition);
     FBXObjectBuffer* GetFBXBuffer(unsigned long long ullId);
     unsigned int     AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*    GetTexture(const ofbx::Texture* pTexture);

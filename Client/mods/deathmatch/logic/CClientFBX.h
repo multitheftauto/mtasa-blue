@@ -74,8 +74,9 @@ public:
     void                                               CreateTexture(unsigned long long stTextureName, CPixels* pPixels);
     CMaterialItem*                                     GetTextureById(unsigned long long strTextureName);
     bool                                               IsTextureCreated(unsigned long long strTextureName);
-    std::unordered_map<unsigned long long, std::vector<CMatrix>> GetTemplatesRenderingMatrix();
-
+    void           GetTemplatesRenderingMatrix(std::unordered_map<unsigned long long, std::vector<CMatrix>>& templatesMatrix, unsigned char ucInterior,
+                                               unsigned short usDimension);
+    unsigned short                                               GetPlayerDimension();
     CBuffer* GetBuffer() { return m_RawDataBuffer; }
 
 private:

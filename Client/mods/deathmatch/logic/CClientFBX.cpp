@@ -385,6 +385,7 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
     }
 
     CVector vector;
+    float   fDrawDistance;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -403,6 +404,12 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
             if (argStream.HasErrors())
                 return false;
             m_pFBXScene->SetTemplateScale(uiId, vector);
+            break;
+        case FBX_TEMPLATE_PROPERTY_DRAW_DISTANCE:
+            argStream.ReadNumber(fDrawDistance);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateDrawDistance(uiId, fDrawDistance);
             break;
     }
     return true;
@@ -1001,11 +1008,15 @@ CMaterialItem* CClientFBX::GetTextureById(unsigned long long ullTextureId)
     return nullptr;
 }
 
-std::unordered_map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemplatesRenderingMatrix()
+unsigned short CClientFBX::GetPlayerDimension()
 {
-    unsigned short                                               usDimension = g_pClientGame->GetLocalPlayer()->GetDimension();
-    unsigned char                                                ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
-    std::unordered_map<unsigned long long, std::vector<CMatrix>> templatesMatrix;
+    unsigned short usDimension = g_pClientGame->GetLocalPlayer()->GetDimension();
+    return usDimension;
+}
+
+void CClientFBX::GetTemplatesRenderingMatrix(std::unordered_map<unsigned long long, std::vector<CMatrix>>& templatesMatrix, unsigned char ucInterior,
+                                             unsigned short usDimension)
+{
     CVector                                                      scale;
     std::vector<CClientObject*>                                  vecObjects;
 
@@ -1058,5 +1069,4 @@ std::unordered_map<unsigned long long, std::vector<CMatrix>> CClientFBX::GetTemp
             }
         }
     }
-    return templatesMatrix;
 }
