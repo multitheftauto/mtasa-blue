@@ -1733,7 +1733,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 fU2 *= fUScale;
                 fV2 *= fVScale;
             }
-            CheckModes(EDrawMode::TILE_BATCHER);
+            CheckModes(EDrawMode::TILE_BATCHER, Item.blendMode);
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
