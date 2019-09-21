@@ -126,6 +126,8 @@ void CLuaGUIDefs::LoadFunctions()
 
         {"guiBringToFront", GUIBringToFront},
         {"guiMoveToBack", GUIMoveToBack},
+        {"guiBlur", GUIBlur},
+        {"guiFocus", GUIFocus},
 
         {"guiCheckBoxSetSelected", GUICheckBoxSetSelected},
         {"guiRadioButtonSetSelected", GUIRadioButtonSetSelected},
@@ -227,6 +229,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "bringToFront", "guiBringToFront");
     lua_classfunction(luaVM, "moveToBack", "guiMoveToBack");
+    lua_classfunction(luaVM, "blur", "guiBlur");
+    lua_classfunction(luaVM, "focus", "guiFocus");
 
     lua_classfunction(luaVM, "isChatBoxInputActive", "isChatBoxInputActive");
     lua_classfunction(luaVM, "isConsoleActive", "isConsoleActive");
@@ -381,6 +385,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
@@ -790,9 +795,19 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             SString    strPath;
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
+                if (FileExists(strPath))
+                {
+                    CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
+                    if (pGUIElement != nullptr)
+                    {
+                        lua_pushelement(luaVM, pGUIElement);
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(path, "Failed to create static image");
+                }
+                else 
+                    argStream.SetCustomError(path, "File not found");
             }
             else
                 argStream.SetCustomError(path, "Bad file path");
@@ -1888,6 +1903,46 @@ int CLuaGUIDefs::GUISetEnabled(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUISetEnabled(*guiElement, enabled);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
+{
+    //  bool guiBlur ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIBlur(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
+{
+    //  bool guiFocus ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIFocus(*guiElement));
         return 1;
     }
     else

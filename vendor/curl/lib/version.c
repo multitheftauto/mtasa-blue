@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -31,7 +31,7 @@
 
 #ifdef USE_ARES
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) && \
-     (defined(WIN32) || defined(_WIN32) || defined(__SYMBIAN32__))
+     (defined(WIN32) || defined(__SYMBIAN32__))
 #    define CARES_STATICLIB
 #  endif
 #  include <ares.h>
@@ -212,6 +212,10 @@ char *curl_version(void)
   }
 #endif
 
+  /* Silent scan-build even if librtmp is not enabled. */
+  (void) left;
+  (void) ptr;
+
   initialized = true;
   return version;
 }
@@ -270,7 +274,7 @@ static const char * const protocols[] = {
 #ifndef CURL_DISABLE_RTSP
   "rtsp",
 #endif
-#if defined(USE_LIBSSH) || defined(USE_LIBSSH2)
+#if defined(USE_SSH)
   "scp",
   "sftp",
 #endif
@@ -366,6 +370,9 @@ static curl_version_info_data version_info = {
 #if defined(HAVE_BROTLI)
   | CURL_VERSION_BROTLI
 #endif
+#if defined(USE_ALTSVC)
+  | CURL_VERSION_ALTSVC
+#endif
   ,
   NULL, /* ssl_version */
   0,    /* ssl_version_num, this is kept at zero */
@@ -383,11 +390,15 @@ static curl_version_info_data version_info = {
 curl_version_info_data *curl_version_info(CURLversion stamp)
 {
   static bool initialized;
-#if defined(USE_LIBSSH) || defined(USE_LIBSSH2)
+#if defined(USE_SSH)
   static char ssh_buffer[80];
 #endif
 #ifdef USE_SSL
+#ifdef CURL_WITH_MULTI_SSL
+  static char ssl_buffer[200];
+#else
   static char ssl_buffer[80];
+#endif
 #endif
 #ifdef HAVE_BROTLI
   static char brotli_buffer[80];

@@ -107,8 +107,9 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
     if (pWebView)
     {
-        // Ensure that no attached events are in the queue
+        // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView);
+        RemoveWebViewTasks(pWebView);
 
         m_WebViews.remove(pWebView);
         // pWebView->Release(); // Do not release since other references get corrupted then
@@ -120,6 +121,9 @@ void CWebCore::DoPulse()
 {
     // Check for queued whitelist/blacklist downloads
     g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)->ProcessQueuedFiles();
+
+    // Execute queued tasks on the main thread
+    DoTaskQueuePulse();
 
     // Execute queued events on the main thread (Lua calls must be executed on the main thread)
     DoEventQueuePulse();
@@ -195,6 +199,52 @@ void CWebCore::DoEventQueuePulse()
     for (auto& view : m_WebViews)
     {
         view->UpdateTexture();
+    }
+}
+
+void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
+{
+    if (!webView || webView->IsBeingDestroyed())
+        return;
+
+    // NOTE: Tasks are processed in the main thread: NEVER call this method in the main thread
+    assert(!IsMainThread());
+
+    std::future<void> result;
+    {
+        std::scoped_lock lock(m_TaskQueueMutex);
+        m_TaskQueue.emplace_back(TaskEntry{task, webView});
+        result = m_TaskQueue.back().task.get_future();
+    }
+
+    result.get();
+}
+
+void CWebCore::RemoveWebViewTasks(CWebView* webView)
+{
+    std::scoped_lock lock(m_TaskQueueMutex);
+
+    for (auto iter = m_TaskQueue.begin(); iter != m_TaskQueue.end(); ++iter)
+    {
+        if (iter->webView != webView)
+            continue;
+
+        iter->task(true);
+        iter = m_TaskQueue.erase(iter);
+    }
+}
+
+void CWebCore::DoTaskQueuePulse()
+{
+    std::list<TaskEntry> taskQueue;
+    {
+        std::scoped_lock lock(m_TaskQueueMutex);
+        std::swap(m_TaskQueue, taskQueue);
+    }
+
+    for (TaskEntry& entry : taskQueue)
+    {
+        entry.task(false);
     }
 }
 
@@ -280,7 +330,7 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
         // Hardcoded whitelist
         static SString whitelist[] = {
             "google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com",           "player.vimeo.com", "code.jquery.com", "mtasa.com",
-            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com", "localhost",        "127.0.0.1"};
+            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com"};
 
         // Hardcoded blacklist
         static SString blacklist[] = {"nobrain.dk"};

@@ -27,6 +27,8 @@ public:
     LUA_DECLARE(EngineRestoreCOL);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
+    LUA_DECLARE(EngineRequestModel);
+    LUA_DECLARE(EngineFreeModel);
     LUA_DECLARE(EngineReplaceAnimation);
     LUA_DECLARE(EngineRestoreAnimation);
     LUA_DECLARE(EngineReplaceMatchingAtomics);
@@ -45,6 +47,15 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
+    LUA_DECLARE(EngineSetSurfaceProperties);
+    LUA_DECLARE(EngineGetSurfaceProperties);
+    LUA_DECLARE(EngineResetSurfaceProperties);
+    LUA_DECLARE(EngineGetModelPhysicalPropertiesGroup)
+    LUA_DECLARE(EngineSetModelPhysicalPropertiesGroup)
+    LUA_DECLARE(EngineRestoreModelPhysicalPropertiesGroup)
+    LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
+    LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
+    LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

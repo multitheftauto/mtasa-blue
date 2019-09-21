@@ -43,6 +43,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerACInfo", GetPlayerACInfo},
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
+        {"getPlayerScriptDebugLevel", GetPlayerScriptDebugLevel},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -63,6 +64,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
+        {"setPlayerScriptDebugLevel", SetPlayerScriptDebugLevel},
 
         // All seeing eye
         {"getPlayerAnnounceValue", GetPlayerAnnounceValue},
@@ -151,6 +153,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setCameraMatrix", "setCameraMatrix");
     lua_classfunction(luaVM, "setCameraInterior", "setCameraInterior");
     lua_classfunction(luaVM, "setCameraTarget", "setCameraTarget");
+    lua_classfunction(luaVM, "setScriptDebugLevel", "setPlayerScriptDebugLevel");
 
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMuted", "isPlayerMuted");
@@ -173,6 +176,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraInterior", "getCameraInterior");
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
+    lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
 
     lua_classvariable(luaVM, "account", NULL, "getPlayerAccount");
     lua_classvariable(luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior");
@@ -195,6 +199,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "mapForced", "forcePlayerMap", "isPlayerMapForced");
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
+    lua_classvariable(luaVM, "scriptDebugLevel", "setPlayerScriptDebugLevel", "getPlayerScriptDebugLevel");
     // lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaPlayerDefs::SetPlayerNametagColor,
     // OOP_GetPlayerNametagColor ); lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue",
     // CLuaPlayerDefs::SetPlayerAnnounceValue, OOP_GetPlayerAnnounceValue ); // .announceValue[key]=value lua_classvariable ( luaVM, "hudComponent",
@@ -296,7 +301,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        SString strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
+        CMtaVersion strPlayerVersion = CStaticFunctionDefinitions::GetPlayerVersion(pPlayer);
         lua_pushstring(luaVM, strPlayerVersion);
         return 1;
     }
@@ -941,6 +946,49 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
     return 1;
 }
 
+int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
+{
+    CElement*    pElement;
+    unsigned int uiMode;
+    bool         bHideDebugger = false;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    if (argStream.NextIsBool())
+    {
+        bool bTemp;
+        argStream.ReadBool(bTemp);
+
+        if (bTemp)
+            argStream.SetCustomError("You can only pass false to hide the debug window or a level (0-3)");
+        else
+            bHideDebugger = true;
+    }
+    else
+    {
+        argStream.ReadNumber(uiMode);
+
+        if (uiMode < 0 || uiMode > 3)
+            argStream.SetCustomError("Invalid level (0-3)");
+    }
+
+    if (argStream.HasErrors())
+    {
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+}
+
 int CLuaPlayerDefs::SetPlayerWantedLevel(lua_State* luaVM)
 {
     CElement*    pElement;
@@ -1429,6 +1477,33 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+int CLuaPlayerDefs::GetPlayerScriptDebugLevel(lua_State* luaVM)
+{
+    // int getPlayerScriptDebugLevel ( player thePlayer )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPlayer);
+
+    if (argStream.HasErrors())
+    {
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    unsigned int uiLevel;
+
+    if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
+    {
+        lua_pushnumber(luaVM, uiLevel);
+        return 1;
+    }
+    else
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)

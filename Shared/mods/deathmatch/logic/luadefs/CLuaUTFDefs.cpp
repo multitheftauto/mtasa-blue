@@ -135,7 +135,7 @@ int CLuaUTFDefs::UtfChar(lua_State* luaVM)
         }
 
         // Generate a null-terminating string for our character
-        wchar_t wUNICODE[2] = {iCode, '\0'};
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(iCode), '\0'};
 
         // Convert our UTF character into an ANSI string
         SString strANSI = UTF16ToMbUTF8(wUNICODE);
