@@ -297,7 +297,7 @@ void CClientVehicle::GetPosition(CVector& vecPosition) const
 void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze)
 {
     // Is the local player in the vehicle
-    if (g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
+    if (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
     {
         // If move is big enough, do ground checks
         float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
@@ -1758,7 +1758,7 @@ void CClientVehicle::PlaceProperlyOnGround()
         {
             m_pVehicle->PlaceBikeOnRoadProperly();
         }
-        else if (m_eVehicleType != CLIENTVEHICLE_BOAT)
+        else if (m_eVehicleType != CLIENTVEHICLE_BOAT && m_eVehicleType != CLIENTVEHICLE_TRAIN)
         {
             m_pVehicle->PlaceAutomobileOnRoadProperly();
         }
@@ -2744,23 +2744,68 @@ void CClientVehicle::Create()
         // Reattach a towed vehicle?
         if (m_pTowedVehicle)
         {
-            // Make sure that the trailer is streamed in
-            if (!m_pTowedVehicle->GetGameVehicle())
+            bool isTowable = true;
+
+            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
             {
-                m_pTowedVehicle->StreamIn(true);
+                // A train is never towing other vehicles, other trains are linked by other means
+                isTowable = false;
+            }
+            else if (m_usModel == 525 || m_usModel == 531)
+            {
+                const eClientVehicleType vehicleType = m_pTowedVehicle->GetVehicleType();
+
+                // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+                if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT ||
+                    vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX)
+                {
+                    isTowable = false;
+                }
             }
 
-            // Attach him
-            if (m_pTowedVehicle->GetGameVehicle())
+            if (isTowable)
             {
-                InternalSetTowLink(m_pTowedVehicle);
+                // Make sure that the trailer is streamed in
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                if (m_pTowedVehicle->GetGameVehicle())
+                {
+                    InternalSetTowLink(m_pTowedVehicle);
+                }
+            }
+            else
+            {
+                m_pTowedVehicle->m_pTowedByVehicle = nullptr;
+
+                // Stream-in the old unlinked trailer
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                m_pTowedVehicle = nullptr;
             }
         }
 
         // Reattach if we're being towed
-        if (m_pTowedByVehicle && m_pTowedByVehicle->GetGameVehicle())
+        if (m_pTowedByVehicle)
         {
-            m_pTowedByVehicle->InternalSetTowLink(this);
+            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
+            {
+                // A train is never towed by other vehicles, it's linked by other means
+                m_pTowedByVehicle->m_pTowedVehicle = nullptr;
+                m_pTowedByVehicle = nullptr;
+            }
+            else
+            {
+                if (m_pTowedByVehicle->GetGameVehicle())
+                {
+                    m_pTowedByVehicle->InternalSetTowLink(this);
+                }
+            }
         }
 
         // Reattach to an entity + any entities attached to this
@@ -3144,6 +3189,17 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
     else if (this->GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN))
     {
         return false;
+    }
+    else if ((m_usModel == 525 || m_usModel == 531) && pVehicle)
+    {
+        const eClientVehicleType vehicleType = pVehicle->GetVehicleType();
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_BIKE || 
+            vehicleType == CLIENTVEHICLE_BMX)
+        {
+            return false;
+        }
     }
 
     if (pVehicle == m_pTowedVehicle)
@@ -3760,7 +3816,7 @@ void CClientVehicle::UpdateTargetPosition()
         }
 
 #ifdef MTA_DEBUG
-        if (g_pClientGame->IsShowingInterpolation() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
+        if (g_pClientGame->IsShowingInterpolation() && g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == this)
         {
             // DEBUG
             SString strBuffer(

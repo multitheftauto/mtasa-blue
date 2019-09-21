@@ -212,25 +212,25 @@ private:
     EDrawModeType  m_CurDrawMode;
     EBlendModeType m_CurBlendMode;
 
-    LPD3DXSPRITE m_pDXSprite;
+    LPD3DXSPRITE m_pDXSprite = nullptr;
 
-    IDirect3DDevice9* m_pDevice;
+    IDirect3DDevice9* m_pDevice = nullptr;
 
-    CRenderItemManager*          m_pRenderItemManager;
-    CScreenGrabberInterface*     m_pScreenGrabber;
-    CPixelsManagerInterface*     m_pPixelsManager;
-    CTileBatcher*                m_pTileBatcher;
-    CLine3DBatcher*              m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*              m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI;
-    CPrimitiveBatcher*           m_pPrimitiveBatcher;
-    CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher;
-    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI;
-    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI;
-    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI;
-    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI;
-    CAspectRatioConverter*       m_pAspectRatioConverter;
+    CRenderItemManager*          m_pRenderItemManager = nullptr;
+    CScreenGrabberInterface*     m_pScreenGrabber = nullptr;
+    CPixelsManagerInterface*     m_pPixelsManager = nullptr;
+    CTileBatcher*                m_pTileBatcher = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPreGUI = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPostGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI = nullptr;
+    CPrimitiveBatcher*           m_pPrimitiveBatcher = nullptr;
+    CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
+    CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
@@ -351,7 +351,7 @@ private:
     void RemoveQueueRef(IUnknown* pUnknown);
 
     // Drawing types
-    struct ID3DXLine* m_pLineInterface;
+    struct ID3DXLine* m_pLineInterface = nullptr;
 
     enum EMTARenderZone
     {
@@ -361,13 +361,13 @@ private:
     };
 
     EMTARenderZone                          m_MTARenderZone;
-    int                                     m_iOutsideZoneCount;
-    IDirect3DStateBlock9*                   m_pSavedStateBlock;
+    int                                     m_iOutsideZoneCount = 0;
+    IDirect3DStateBlock9*                   m_pSavedStateBlock = nullptr;
     CElapsedTime                            m_LastRenderedSceneTimer;
-    IDirect3DSurface9*                      m_pSavedFrontBufferData;
-    CRenderTargetItem*                      m_pTempBackBufferData;
-    CTextureItem*                           m_ProgressSpinnerTexture;
-    CTextureItem*                           m_RectangleEdgeTexture;
+    IDirect3DSurface9*                      m_pSavedFrontBufferData = nullptr;
+    CRenderTargetItem*                      m_pTempBackBufferData = nullptr;
+    CTextureItem*                           m_ProgressSpinnerTexture = nullptr;
+    CTextureItem*                           m_RectangleEdgeTexture = nullptr;
     SString                                 m_strProgressMessage;
     CElapsedTime                            m_FirstDrawnProgressTimer;
     CElapsedTime                            m_LastDrawnProgressTimer;

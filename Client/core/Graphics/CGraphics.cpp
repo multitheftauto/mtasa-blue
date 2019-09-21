@@ -44,9 +44,6 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pGUI = pGUI;
     memset(m_pDXFonts, 0, sizeof(m_pDXFonts));
     memset(m_pBigDXFonts, 0, sizeof(m_pBigDXFonts));
-    m_pDevice = NULL;
-    m_pLineInterface = NULL;
-    m_pDXSprite = NULL;
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;
@@ -865,13 +862,13 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     fStartAngle = D3DXToRadian(fStartAngle);
     fStopAngle = D3DXToRadian(fStopAngle);
     // Calculate each segment angle
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments - 1);
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
 
     // Add center point
     pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
 
     // And calculate all other vertices
-    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    for (short siSeg = 0; siSeg <= siSegments; siSeg++)
     {
         PrimitiveVertice vert;
         float            curAngle = fStartAngle + siSeg * kfSegmentAngle;

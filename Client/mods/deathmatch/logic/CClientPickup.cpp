@@ -53,6 +53,23 @@ void CClientPickup::Unlink()
     m_pPickupManager->RemoveFromList(this);
 }
 
+void CClientPickup::GetPosition(CVector& vecPosition) const
+{
+    if (m_pObject)
+    {
+        vecPosition = *m_pObject->GetPosition();
+    }
+    else if (m_pAttachedToEntity)
+    {
+        m_pAttachedToEntity->GetPosition(vecPosition);
+        vecPosition += m_vecAttachedPosition;
+    }
+    else
+    {
+        vecPosition = m_vecPosition;
+    }
+}
+
 void CClientPickup::SetPosition(const CVector& vecPosition)
 {
     // Different from our current position?
@@ -76,6 +93,17 @@ void CClientPickup::SetModel(unsigned short usModel)
         m_usModel = usModel;
         UpdateSpatialData();
         ReCreate();
+    }
+}
+
+void CClientPickup::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
     }
 }
 
@@ -140,6 +168,9 @@ void CClientPickup::Create()
             // Restore the attributes
             SetInterior(ucAreaCode);
             SetDimension(usDimension);
+
+            // Reattach to an entity + any entities attached to this
+            ReattachEntities();
         }
     }
 }
