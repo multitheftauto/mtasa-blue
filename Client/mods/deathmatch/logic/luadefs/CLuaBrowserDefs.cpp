@@ -251,28 +251,14 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
             lua_pushboolean(luaVM, pWebBrowser->LoadURL(strURL, !isLocalURL, strPostData, bURLEncoded));
             return 1;
         }
-
-        // Are we dealing with a local website? If so, parse resource path. Otherwise, return false and load nothing
-        // Todo: Add an ACL right which is necessary to load local websites or websites in general
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        else
         {
-            SString    strAbsPath;
-            CResource* pResource = pLuaMain->GetResource();
-            if (CResourceManager::ParseResourcePathInput(strURL, pResource, &strAbsPath) && pWebBrowser->IsLocal())
-            {
-                // Output deprecated warning, TODO: Remove this at a later point
-                m_pScriptDebugging->LogWarning(luaVM,
-                                               "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. "
-                                               "See https://wiki.mtasa.com/wiki/LoadBrowserURL for details");
-
-                lua_pushboolean(luaVM, pWebBrowser->LoadURL("mtalocal://" + strURL, false, strPostData, bURLEncoded));
-                return 1;
-            }
+            argStream.SetCustomError("Invalid URL scheme provided. Only http:// and https:// is supported.", "Invalid parameter");
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -938,7 +924,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
             }
         }
     }
-    
+
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
