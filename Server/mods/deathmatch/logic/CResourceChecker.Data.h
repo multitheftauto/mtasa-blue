@@ -192,6 +192,20 @@ namespace
         {"guiFocus", "1.5.6-9.16361"},
         {"getPedFightingStyle", "1.5.6-9.16362"},
         {"onClientElementModelChange", "1.5.6-9.16404"},
+        {"setPedFightingStyle", "1.5.7-9.20157"},
+        {"setPedArmor", "1.5.7-9.20157"},
+        {"areVehicleLightsOn", "1.5.7-9.20157"},
+        {"dxDrawPrimitive3D", "1.5.7-9.20157"},
+        {"dxDrawMaterialPrimitive3D", "1.5.7-9.20157"},
+        {"engineGetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineRestoreModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineGetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineRestoreObjectGroupPhysicalProperties", "1.5.7-9.20157"},
+        {"engineRequestModel", "1.5.7-9.20157"},
+        {"engineFreeModel", "1.5.7-9.20157"},
+        {"xmlLoadString", "1.5.7-9.20157"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -272,6 +286,9 @@ namespace
         {"setPedWearingJetpack", "1.5.5-9.13846"},
         {"setElementAngularVelocity", "1.5.5-9.14060"},
         {"getElementAngularVelocity", "1.5.5-9.14060"},
+        {"xmlLoadString", "1.5.7-9.20157"},
+        {"getPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"setPlayerScriptDebugLevel", "1.5.7-9.20157"},
     };
 
     //
@@ -460,8 +477,5 @@ namespace
         {true, "unbanSerial", "Please manually update this.  Refer to the wiki for details"},
         {true, "getBansXML", "Please manually update this.  Refer to the wiki for details"},
         {true, "canPlayerUseFunction", "Please manually update this.  Refer to the wiki for details"},
-
-        // callRemote warning. See #294, #295
-        {true, "callRemote", "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b callbacks will set `errno` to `0`, instead of `nil`. Please update your scripts if necessary."},
     };
 }            // namespace
