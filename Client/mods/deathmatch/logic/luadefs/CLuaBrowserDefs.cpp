@@ -130,39 +130,37 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
         }
         else if (vecSize.fX == 0 || vecSize.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
     {
-        if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pParentResource = pLuaMain->GetResource();
-
-            CClientWebBrowser* pBrowserTexture =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
-            if (pBrowserTexture)
-            {
-                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
-
-                // Set our owner resource
-                pBrowserTexture->SetResource(pParentResource);
-            }
-            lua_pushelement(luaVM, pBrowserTexture);
-            return 1;
-        }
+        lua_pushboolean(luaVM, false);
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CResource* pParentResource = pLuaMain->GetResource();
+
+        CClientWebBrowser* pBrowserTexture =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
+        if (pBrowserTexture)
+        {
+            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+            pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+
+            // Set our owner resource
+            pBrowserTexture->SetResource(pParentResource);
+        }
+        lua_pushelement(luaVM, pBrowserTexture);
+        return 1;
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -911,7 +909,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         }
         else if (size.fX == 0 || size.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
@@ -942,7 +940,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     }
     
     if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
