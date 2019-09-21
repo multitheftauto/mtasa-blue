@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MD4_H
-#define HEADER_CURL_MD4_H
+#ifndef HEADER_CURL_QUIC_H
+#define HEADER_CURL_QUIC_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -24,12 +24,30 @@
 
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+#ifdef ENABLE_QUIC
+#ifdef USE_NGTCP2
+#include "vquic/ngtcp2.h"
+#endif
+#ifdef USE_QUICHE
+#include "vquic/quiche.h"
+#endif
 
-#define MD4_DIGEST_LENGTH 16
+#include "urldata.h"
 
-void Curl_md4it(unsigned char *output, const unsigned char *input, size_t len);
+/* functions provided by the specific backends */
+CURLcode Curl_quic_connect(struct connectdata *conn,
+                           curl_socket_t sockfd,
+                           int sockindex,
+                           const struct sockaddr *addr,
+                           socklen_t addrlen);
+CURLcode Curl_quic_is_connected(struct connectdata *conn,
+                                curl_socket_t sockfd,
+                                bool *connected);
+int Curl_quic_ver(char *p, size_t len);
+CURLcode Curl_quic_done_sending(struct connectdata *conn);
 
-#endif /* !defined(CURL_DISABLE_CRYPTO_AUTH) */
+#else /* ENABLE_QUIC */
+#define Curl_quic_done_sending(x)
+#endif /* !ENABLE_QUIC */
 
-#endif /* HEADER_CURL_MD4_H */
+#endif /* HEADER_CURL_QUIC_H */

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TIMEVAL_H
-#define HEADER_CURL_TIMEVAL_H
+#ifndef HEADER_CURL_VQUIC_QUICHE_H
+#define HEADER_CURL_VQUIC_QUICHE_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -24,35 +24,26 @@
 
 #include "curl_setup.h"
 
-/* Use a larger type even for 32 bit time_t systems so that we can keep
-   microsecond accuracy in it */
-typedef curl_off_t timediff_t;
-#define CURL_FORMAT_TIMEDIFF_T CURL_FORMAT_CURL_OFF_T
+#ifdef USE_QUICHE
 
-#define TIMEDIFF_T_MAX CURL_OFF_T_MAX
-#define TIMEDIFF_T_MIN CURL_OFF_T_MIN
+#include <quiche.h>
 
-struct curltime {
-  time_t tv_sec; /* seconds */
-  int tv_usec;   /* microseconds */
+struct quic_handshake {
+  char *buf;       /* pointer to the buffer */
+  size_t alloclen; /* size of allocation */
+  size_t len;      /* size of content in buffer */
+  size_t nread;    /* how many bytes have been read */
 };
 
-struct curltime Curl_now(void);
+struct quicsocket {
+  quiche_config *cfg;
+  quiche_conn *conn;
+  quiche_h3_conn *h3c;
+  quiche_h3_config *h3config;
+  uint8_t scid[QUICHE_MAX_CONN_ID_LEN];
+  uint32_t version;
+};
 
-/*
- * Make sure that the first argument (t1) is the more recent time and t2 is
- * the older time, as otherwise you get a weird negative time-diff back...
- *
- * Returns: the time difference in number of milliseconds.
- */
-timediff_t Curl_timediff(struct curltime t1, struct curltime t2);
+#endif
 
-/*
- * Make sure that the first argument (t1) is the more recent time and t2 is
- * the older time, as otherwise you get a weird negative time-diff back...
- *
- * Returns: the time difference in number of microseconds.
- */
-timediff_t Curl_timediff_us(struct curltime newer, struct curltime older);
-
-#endif /* HEADER_CURL_TIMEVAL_H */
+#endif /* HEADER_CURL_VQUIC_QUICHE_H */
