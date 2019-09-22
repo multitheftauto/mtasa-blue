@@ -1421,6 +1421,27 @@ eModelInfoType CModelInfoSA::GetModelType()
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
 }
 
+bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
+{
+    bool isTowable = true;
+    
+    if (IsTrain() || towingModel->IsTrain())
+    {
+        // A train is never towing other vehicles. Trains are linked by other means
+        isTowable = false;
+    }
+    else if (towingModel->GetModel() == 525 || towingModel->GetModel() == 531)
+    {
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (IsTrailer() || IsBoat() || IsBike() || IsBmx())
+        {
+            isTowable = false;
+        }
+    }
+
+    return isTowable;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CModelInfoSA::ForceUnload

@@ -354,6 +354,7 @@ public:
     bool            SetTowedVehicle(CClientVehicle* pVehicle, const CVector* vecRotationDegrees = NULL);
     CClientVehicle* GetTowedByVehicle() { return m_pTowedByVehicle; }
     bool            InternalSetTowLink(CClientVehicle* pTrailer);
+    bool            IsTowableBy(CClientVehicle* towingVehicle);
 
     eWinchType     GetWinchType() { return m_eWinchType; }
     bool           SetWinchType(eWinchType winchType);
