@@ -1711,15 +1711,14 @@ void CVehicleSA::SetTowLink(CVehicle* pVehicle)
     DEBUG_TRACE("void CVehicleSA::SetTowLink ( CVehicle* pVehicle )");
     // We can't use the vtable func, because it teleports the trailer parallel to the vehicle => make our own one (see #1655)
 
-    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
+    CVehicleSA* towingVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
 
-    if (pVehicleSA)
+    if (towingVehicleSA)
     {
-        DWORD dwThis = (DWORD)GetInterface();
-        DWORD dwVehicleInt = (DWORD)pVehicleSA->GetVehicleInterface();
-
-        *(DWORD*)(dwThis + 1220) = dwVehicleInt;
-        *(DWORD*)(dwVehicleInt + 1224) = dwThis;
+        CVehicleSAInterface* trailerVehicle = GetVehicleInterface();
+        CVehicleSAInterface* towingVehicle = towingVehicleSA->GetVehicleInterface();
+        towingVehicle->m_trailerVehicle = trailerVehicle;
+        trailerVehicle->m_towingVehicle = towingVehicle;
 
         // Set the trailer's status to "remote controlled"
         SetEntityStatus(eEntityStatus::STATUS_REMOTE_CONTROLLED);
@@ -1731,7 +1730,7 @@ bool CVehicleSA::BreakTowLink()
     DEBUG_TRACE("bool CVehicleSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD)GetInterface();
 
-    CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(this->GetInterface()->vtbl);
+    CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(GetInterface()->vtbl);
     DWORD                    dwFunc = vehicleVTBL->BreakTowLink;
     bool                     bReturn = false;
 
@@ -1741,31 +1740,36 @@ bool CVehicleSA::BreakTowLink()
         call    dwFunc
         mov     bReturn, al
     }
+
     return bReturn;
 }
 
 CVehicle* CVehicleSA::GetTowedVehicle()
 {
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
-    CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1224);
-    if (pTowedVehicle)
+    CVehicleSAInterface* trailerVehicle = GetVehicleInterface()->m_trailerVehicle;
+
+    if (trailerVehicle)
     {
-        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)trailerVehicle);
         return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 CVehicle* CVehicleSA::GetTowedByVehicle()
 {
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
-    CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1220);
-    if (pTowedVehicle)
+    CVehicleSAInterface* towingVehicle = GetVehicleInterface()->m_towingVehicle;
+
+    if (towingVehicle)
     {
-        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)towingVehicle);
         return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 void CVehicleSA::SetWinchType(eWinchType winchType)
