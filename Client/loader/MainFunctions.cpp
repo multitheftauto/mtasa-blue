@@ -873,9 +873,12 @@ void CheckDataFiles()
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
-    if (FileExists(PathJoin(strGTAPath, "d3d9.dll")))
+    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
-        ShowD3dDllDialog(g_hInstance, PathJoin(strGTAPath, "d3d9.dll"));
+        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+
+        ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
     }
 
