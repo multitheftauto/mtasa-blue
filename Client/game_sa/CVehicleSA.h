@@ -425,8 +425,11 @@ public:
     // 1216
     float m_nHealth;            // 1000.0f = full health. 0 -> explode
 
+    CVehicleSAInterface* m_towingVehicle;      // 1220
+    CVehicleSAInterface* m_trailerVehicle;     // 1224
+
     /*** BEGIN SECTION that was added by us ***/
-    BYTE      Padding200[45];            // 1220
+    BYTE      Padding200[37];            // 1228
     CVehicle* m_pVehicle;                // 1268
     /*** END SECTION that was added by us ***/
 
