@@ -29,6 +29,7 @@ CClientMarkerManager*      CLuaDefs::m_pMarkerManager = NULL;
 CClientPickupManager*      CLuaDefs::m_pPickupManager = NULL;
 CClientDFFManager*         CLuaDefs::m_pDFFManager = NULL;
 CClientColModelManager*    CLuaDefs::m_pColModelManager = NULL;
+CClientPhysicsManager*    CLuaDefs::m_pPhysicsManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands = NULL;
 bool                       ms_bRegisterdPostCallHook = false;
 
@@ -53,6 +54,7 @@ void CLuaDefs::Initialize(CClientGame* pClientGame, CLuaManager* pLuaManager, CS
     m_pPickupManager = m_pManager->GetPickupManager();
     m_pDFFManager = m_pManager->GetDFFManager();
     m_pColModelManager = m_pManager->GetColModelManager();
+    m_pPhysicsManager = m_pManager->GetPhysicsManager();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
 }
 

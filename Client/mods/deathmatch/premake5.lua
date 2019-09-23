@@ -9,11 +9,11 @@ project "Client Deathmatch"
 
 	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt",
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "BulletDynamics", "BulletCollision", "LinearMath",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
-		"../../../vendor/bass/lib/tags"
+		"../../../vendor/bass/lib/tags",
 	}
 
 	vpaths {
@@ -42,7 +42,8 @@ project "Client Deathmatch"
 			"../../../vendor/lua/src",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
-			"../../../vendor/sparsehash/src/"
+			"../../../vendor/sparsehash/src/",
+			"../../../vendor/bulletphysics3d/src/"
 	}
 
 	files {

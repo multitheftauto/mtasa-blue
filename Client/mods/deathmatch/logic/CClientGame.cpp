@@ -3942,6 +3942,7 @@ void CClientGame::PostWorldProcessHandler()
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
+    m_pManager->GetPhysicsManager()->DoPulse();
 
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();

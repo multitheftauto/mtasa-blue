@@ -26,6 +26,7 @@ class CClientPlayerManager;
 class CClientRadarMarkerManager;
 class CClientTeamManager;
 class CClientVehicleManager;
+class CClienPhysicsManager;
 class CElementDeleter;
 class CLuaManager;
 class CRegisteredCommands;
@@ -63,5 +64,6 @@ public:
     static CClientPickupManager*      m_pPickupManager;
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
+    static CClientPhysicsManager*     m_pPhysicsManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
 };
