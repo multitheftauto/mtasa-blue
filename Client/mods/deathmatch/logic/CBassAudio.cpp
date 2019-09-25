@@ -341,9 +341,9 @@ void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user)
     UnlockCallbackId();
 }
 
-void CBassAudio::PlayStreamIntern(void* arguments)
+DWORD CBassAudio::PlayStreamIntern(LPVOID argument)
 {
-    CBassAudio* pBassAudio = LockCallbackId(arguments);
+    CBassAudio* pBassAudio = LockCallbackId(argument);
     if (pBassAudio)
     {
         pBassAudio->m_pVars->criticalSection.Lock();
@@ -355,7 +355,7 @@ void CBassAudio::PlayStreamIntern(void* arguments)
         // This can take a while
         HSTREAM pSound = BASS_StreamCreateURL(FromUTF8(strURL), 0, lFlags | BASS_UNICODE, NULL, NULL);
 
-        CBassAudio* pBassAudio = LockCallbackId(arguments);
+        CBassAudio* pBassAudio = LockCallbackId(argument);
         if (pBassAudio)
         {
             pBassAudio->m_pVars->criticalSection.Lock();
@@ -372,6 +372,7 @@ void CBassAudio::PlayStreamIntern(void* arguments)
     }
 
     UnlockCallbackId();
+    return 0;
 }
 
 //
