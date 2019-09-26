@@ -78,6 +78,7 @@ enum eDXVerticalAlign
     DX_ALIGN_VCENTER = DT_VCENTER,
     DX_ALIGN_BOTTOM = DT_BOTTOM,
 };
+
 DECLARE_ENUM(eDXVerticalAlign);
 
 DECLARE_ENUM(eHudComponent);
@@ -100,6 +101,14 @@ enum eJSONPrettyType
     JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
 };
 DECLARE_ENUM(eJSONPrettyType);
+
+enum ePhysicsShapeType
+{
+    PHYSICS_SHAPE_BOX,
+    PHYSICS_SHAPE_SPHERE,
+};
+
+DECLARE_ENUM(ePhysicsShapeType);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
@@ -374,6 +383,10 @@ inline SString GetClassTypeName(CLuaTimer*)
 {
     return "lua-timer";
 }
+inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
+{
+    return "physics-rigid-body";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -475,6 +488,20 @@ CLuaTimer* UserDataCast(CLuaTimer*, void* ptr, lua_State* luaVM)
     if (pLuaMain)
     {
         return pLuaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
+
+//
+// CLuaPhysicsRigidBody from userdata
+//
+template <class T>
+CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }

@@ -10,6 +10,19 @@
 
 #include "StdInc.h"
 
+void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
+{
+    SColorARGB sColor(255.0f, 255, 0, 0);
+
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, sColor, false);
+}
+void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+{
+    SColorARGB sColor(255.0f, 0, 255, 0);
+
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, sColor, false);
+}
+
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -18,21 +31,16 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassIn
 
     SetTypeName("physics");
 
-	/// collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+    m_pOverlappingPairCache = new btDbvtBroadphase();
+    m_pCollisionConfiguration = new btDefaultCollisionConfiguration();
+    m_pDispatcher = new btCollisionDispatcher(m_pCollisionConfiguration);
+    m_pSolver = new btSequentialImpulseConstraintSolver();
+    m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
+    m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
 
-    /// use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-
-    /// btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-    btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
-
-    /// the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-    btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-
-    dynamicsWorld->setGravity(btVector3(0, -9.81f, 0));
+    m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
+    m_pDebugDrawer->setDebugMode(m_pDebugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints);
+    m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
 
     // Add us to Physics manager's list
     m_pPhysicsManager->AddToList(this);
@@ -40,12 +48,30 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassIn
 
 CClientPhysics::~CClientPhysics(void)
 {
+    // delete dynamics world
+    delete m_pDynamicsWorld;
+    delete m_pSolver;
+    delete m_pOverlappingPairCache;
+    delete m_pDispatcher;
+    delete m_pCollisionConfiguration;
+
     // Remove us from Physics manager's list
     m_pPhysicsManager->RemoveFromList(this);
+}
 
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaMain* luaMain)
+{
+    CLuaPhysicsRigidBody* pRigidBody = luaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld);
+    return pRigidBody;
 }
 
 void CClientPhysics::DoPulse()
 {
+    CTickCount tickCountNow = CTickCount::Now();
 
+    int iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
+    m_LastTimeMs = tickCountNow;
+
+    m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f);
+    m_pDynamicsWorld->debugDrawWorld();
 }

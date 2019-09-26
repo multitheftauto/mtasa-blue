@@ -15,6 +15,7 @@ class CLuaFunctionDefinitions;
 #include "LuaCommon.h"
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
+#include "CLuaPhysicsRigidBodyManager.h"
 
 class CRegisteredCommands;
 

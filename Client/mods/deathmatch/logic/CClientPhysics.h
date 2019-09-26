@@ -15,6 +15,35 @@
 #include "CClientPhysicsManager.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 
+
+class CDebugDrawer : public btIDebugDraw
+{
+    int m_debugMode;
+    CGraphicsInterface* m_pGraphics;
+
+public:
+    CDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};
+    ~CDebugDrawer(){};
+
+    void drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor);
+
+    void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+
+    void drawSphere(const btVector3& p, btScalar radius, const btVector3& color){};
+
+    void drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& color, btScalar alpha){};
+
+    void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color){};
+
+    void reportErrorWarning(const char* warningString){};
+
+    void draw3dText(const btVector3& location, const char* textString){};
+
+    void setDebugMode(int debugMode) { m_debugMode = debugMode; };
+
+    int getDebugMode() const { return m_debugMode; }
+};
+
 class CClientPhysics : public CClientEntity
 {
     DECLARE_CLASS(CClientPhysics, CClientEntity)
@@ -31,7 +60,19 @@ public:
 
     void DoPulse();
 
-    int testint = 3;
+    CLuaPhysicsRigidBody* CreateRigidBody(CLuaMain* luaMain);
+
+
 private:
+    btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
+    btCollisionDispatcher*               m_pDispatcher;
+    btBroadphaseInterface*               m_pOverlappingPairCache;
+    btSequentialImpulseConstraintSolver* m_pSolver;
+    btDiscreteDynamicsWorld*             m_pDynamicsWorld;
+
+    CDebugDrawer* m_pDebugDrawer;
+
     CClientPhysicsManager* m_pPhysicsManager;
+
+    CTickCount m_LastTimeMs;
 };

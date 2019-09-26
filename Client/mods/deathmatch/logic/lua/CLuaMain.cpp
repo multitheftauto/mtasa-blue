@@ -34,6 +34,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_luaVM = NULL;
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
+    m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;
@@ -55,8 +56,9 @@ CLuaMain::~CLuaMain()
     UnloadScript();
     m_bBeingDeleted = true;
 
-    // Delete the timer manager
+    // Delete the managers
     delete m_pLuaTimerManager;
+    delete m_pLuaPhysicsRigidBodyManager;
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
@@ -326,6 +328,9 @@ void CLuaMain::UnloadScript()
 
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers();
+    
+    // BULLETPHYSICS3 TODO
+    //m_pLuaPhysicsRigidBodyManager->RemoveAllRigidBodies();
 
     // Delete all GUI elements
     // m_pLuaManager->m_pGUIManager->DeleteAll ( this );

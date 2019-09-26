@@ -15,6 +15,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
         {"physicsCreateWorld", PhysicsCreateWorld},
+        {"physicsCreateRigidBody", PhysicsCreateRigidBody},
+        {"physicsAddShape", PhysicsAddShape},
     };
 
     // Add functions
@@ -28,9 +30,8 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    //lua_classfunction(luaVM, "set", "PhysicsTestSet");
-    //lua_classfunction(luaVM, "get", "PhysicsTestGet");
-
+    // lua_classfunction(luaVM, "set", "PhysicsTestSet");
+    // lua_classfunction(luaVM, "get", "PhysicsTestGet");
 
     lua_registerstaticclass(luaVM, "Physics");
 }
@@ -41,44 +42,86 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
     lua_pushelement(luaVM, pPhysics);
     return 1;
 }
-//
-//int CLuaPhysicsDefs::PhysicsTestSet(lua_State* luaVM)
-//{
-//    CClientPhysics* pPhysics;
-//    int bTest;
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadUserData(pPhysics);
-//    argStream.ReadNumber(bTest);
-//
-//    if (!argStream.HasErrors())
-//    {
-//        pPhysics->testint = bTest;
-//        lua_pushboolean(luaVM, true);
-//        return 1;
-//    }
-//    else
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    // Failed
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
-//
-//int CLuaPhysicsDefs::PhysicsTestGet(lua_State* luaVM)
-//{
-//    CClientPhysics* pPhysics;
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadUserData(pPhysics);
-//
-//    if (!argStream.HasErrors())
-//    {
-//        lua_pushnumber(luaVM, pPhysics->testint);
-//        return 1;
-//    }
-//    else
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    // Failed
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
+
+int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(shapeType);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody(luaMain);
+            CVector vector;
+            float   fRadius;
+            switch (shapeType)
+            {
+                case PHYSICS_SHAPE_BOX:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->InitializeWithBox(vector);
+                    }
+                    break;
+                case PHYSICS_SHAPE_SPHERE:
+                    argStream.ReadNumber(fRadius);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->InitializeWithSphere(fRadius);
+                    }
+                    break;
+            }
+            lua_pushrigidbody(luaVM, pRigidBody);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsAddShape(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody* pRigidBody;
+    ePhysicsShapeType     shapeType;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pRigidBody);
+    argStream.ReadEnumString(shapeType);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vector;
+        float   fRadius;
+        switch (shapeType)
+        {
+            case PHYSICS_SHAPE_BOX:
+                argStream.ReadVector3D(vector);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->AddBox(vector);
+                }
+                break;
+            case PHYSICS_SHAPE_SPHERE:
+                argStream.ReadNumber(fRadius);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->AddSphere(fRadius);
+                }
+                break;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

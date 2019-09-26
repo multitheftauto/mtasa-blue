@@ -44,6 +44,7 @@ class CClientRadarArea;
 class CClientPointLights;
 class CClientPhysics;
 class CLuaTimer;
+class CLuaPhysicsRigidBody;
 class CResource;
 class CXMLNode;
 
@@ -54,6 +55,7 @@ class CClientEntity* lua_toelement(lua_State* luaVM, int iArgument);
 void lua_pushelement(lua_State* luaVM, CClientEntity* pElement);
 void lua_pushresource(lua_State* luaVM, CResource* pElement);
 void lua_pushtimer(lua_State* luaVM, CLuaTimer* pElement);
+void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement);
 void lua_pushuserdata(lua_State* luaVM, void* pData);
 
