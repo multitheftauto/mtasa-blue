@@ -23,4 +23,6 @@ public:
     LUA_DECLARE(PhysicsAddShape);
     LUA_DECLARE(PhysicsSetProperties);
     LUA_DECLARE(PhysicsCreateStaticCollision);
+    LUA_DECLARE(PhysicsSetDebugMode);
+    LUA_DECLARE(PhysicsDrawDebug);
 };

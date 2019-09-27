@@ -15,6 +15,7 @@
 #include "CClientPhysicsManager.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 
+enum ePhysicsDebugMode;
 
 class CDebugDrawer : public btIDebugDraw
 {
@@ -59,10 +60,12 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
+    void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
 
     CLuaPhysicsRigidBody*       CreateRigidBody(CLuaMain* luaMain);
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaMain* luaMain);
+    bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
 
 
 private:
@@ -73,6 +76,8 @@ private:
     btDiscreteDynamicsWorld*             m_pDynamicsWorld;
 
     CDebugDrawer* m_pDebugDrawer;
+
+    bool m_bDrawDebugNextTime;
 
     CClientPhysicsManager* m_pPhysicsManager;
 

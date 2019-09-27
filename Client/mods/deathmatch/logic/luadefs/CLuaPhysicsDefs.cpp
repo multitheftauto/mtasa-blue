@@ -19,6 +19,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
         {"physicsAddShape", PhysicsAddShape},
         {"physicsSetProperties", PhysicsSetProperties},
+        {"physicsDrawDebug", PhysicsDrawDebug},
+        {"physicsSetDebugMode", PhysicsSetDebugMode},
     };
 
     // Add functions
@@ -42,6 +44,45 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
 {
     CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID);
     lua_pushelement(luaVM, pPhysics);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    ePhysicsDebugMode eDebugMode;
+    bool              bEnabled;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(eDebugMode);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (pPhysics->SetDebugMode(eDebugMode, bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+int CLuaPhysicsDefs::PhysicsDrawDebug(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+
+    if (!argStream.HasErrors())
+    {
+        pPhysics->DrawDebug();
+    }
     return 1;
 }
 

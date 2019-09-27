@@ -67,6 +67,29 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaMain* luaM
     return pRigidBody;
 }
 
+bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
+{
+    if (eDebugMode == PHYSICS_DEBUG_NoDebug && bEnabled)
+    {
+        m_pDebugDrawer->setDebugMode(0);
+        return true;
+    }
+
+    int debugMode = m_pDebugDrawer->getDebugMode();
+
+    if (bEnabled)
+    {
+        debugMode |= 1UL << (int)eDebugMode;
+    }
+    else
+    {
+        debugMode &= ~(1UL << (int)eDebugMode);
+    }
+    m_pDebugDrawer->setDebugMode(debugMode);
+
+    return true;
+}
+
 void CClientPhysics::DoPulse()
 {
     CTickCount tickCountNow = CTickCount::Now();
@@ -75,6 +98,9 @@ void CClientPhysics::DoPulse()
     m_LastTimeMs = tickCountNow;
 
     m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f);
-    m_pDynamicsWorld->debugDrawWorld();
-
+    if (m_bDrawDebugNextTime)
+    {
+        m_pDynamicsWorld->debugDrawWorld();
+        m_bDrawDebugNextTime = false;
+    }
 }
