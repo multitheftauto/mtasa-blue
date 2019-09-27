@@ -32,33 +32,101 @@ void CLuaPhysicsRigidBody::RemoveScriptID()
     }
 }
 
-
 void CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
 {
+    if (bInitialized)
+        return;
     btCollisionShape* boxCollisionShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
     btTransform       transformZero;
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
 
-    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, boxCollisionShape, btVector3(0, 0, 0));
-    btRigidBody*                             rigidBody = new btRigidBody(rigidBodyCI);
+    btVector3 localInertia(0, 0, 0);
+    boxCollisionShape->calculateLocalInertia(1.0f, localInertia);
 
-    m_pWorld->addRigidBody(rigidBody);
+    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, boxCollisionShape, localInertia);
+    m_pBtRigidBody = new btRigidBody(rigidBodyCI);
+
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    bInitialized = true;
 }
 
 void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
 {
-    btCollisionShape* boxCollisionShape = new btSphereShape(btScalar(fRadius));
+    if (bInitialized)
+        return;
+    btCollisionShape* sphereCollisionShape = new btSphereShape(btScalar(fRadius));
     btTransform       transformZero;
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
 
-    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, boxCollisionShape, btVector3(0, 0, 0));
-    btRigidBody*                             rigidBody = new btRigidBody(rigidBodyCI);
+    btVector3 localInertia(0, 0, 0);
+    sphereCollisionShape->calculateLocalInertia(1.0f, localInertia);
 
-    m_pWorld->addRigidBody(rigidBody);
+    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, sphereCollisionShape, localInertia);
+    m_pBtRigidBody = new btRigidBody(rigidBodyCI);
+
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    bInitialized = true;
+}
+
+void CLuaPhysicsRigidBody::SetMass(float fMass)
+{
+    if (!bInitialized)
+        return;
+
+    const btVector3 localInertia = m_pBtRigidBody->getLocalInertia();
+    m_pBtRigidBody->setMassProps(fMass, localInertia);
+}
+
+void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
+{
+    if (!bInitialized)
+        return;
+
+    // not working
+    //if (bStatic)
+    //{
+    //    m_pBtRigidBody->setLinearFactor(btVector3(0, 0, 0));
+    //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+    //    m_pBtRigidBody->setActivationState(DISABLE_SIMULATION);
+    //}
+    //else
+    //{
+    //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+    //    m_pBtRigidBody->setActivationState(DISABLE_DEACTIVATION);
+    //}
+}
+
+void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
+{
+    if (!bInitialized)
+        return;
+
+    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    transform.setOrigin(*(btVector3*)&vecPosition);
+    m_pBtRigidBody->setWorldTransform(transform);
+}
+
+void CLuaPhysicsRigidBody::SetRotation(CVector& vecPosition)
+{
+    if (!bInitialized)
+        return;
+
+    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    btQuaternion quanternion = transform.getRotation();
+    quanternion.setEuler(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+    m_pBtRigidBody->setWorldTransform(transform);
+}
+
+void CLuaPhysicsRigidBody::SetLinearVelocity(CVector& vecVelocity)
+{
+    if (!bInitialized)
+        return;
+
+    m_pBtRigidBody->setLinearVelocity(btVector3(vecVelocity.fZ, vecVelocity.fY, vecVelocity.fZ));
 }
 
 void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)
@@ -86,6 +154,7 @@ void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)
     pCompoundShape->addChildShape(defaultTransform, pBox);
     m_pBtRigidBody->setCollisionShape(pBox);
     m_pBtRigidBody->setMassProps(100, btVector3(0, 0, 0));
+    m_pBtRigidBody->setDamping(0, 0);
 }
 
 void CLuaPhysicsRigidBody::AddSphere(float fRadius)
@@ -112,4 +181,5 @@ void CLuaPhysicsRigidBody::AddSphere(float fRadius)
 
     pCompoundShape->addChildShape(defaultTransform, pSphere);
     m_pBtRigidBody->setCollisionShape(pCompoundShape);
+    m_pBtRigidBody->setDamping(0, 0);
 }

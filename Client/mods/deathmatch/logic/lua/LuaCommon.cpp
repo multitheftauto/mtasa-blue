@@ -98,6 +98,16 @@ void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pRigidBody)
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pRigidBody->GetScriptID()));
 }
 
+void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    const char* szClass = NULL;
+    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    //if (pLuaMain->IsOOPEnabled())
+    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
+
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pStaticCollision->GetScriptID()));
+}
+
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 {
     const char* szClass = NULL;

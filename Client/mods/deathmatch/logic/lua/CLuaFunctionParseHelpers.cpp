@@ -539,6 +539,13 @@ ADD_ENUM(PHYSICS_SHAPE_BOX, "box")
 ADD_ENUM(PHYSICS_SHAPE_SPHERE, "sphere")
 IMPLEMENT_ENUM_END("physics-shape-type")
 
+IMPLEMENT_ENUM_BEGIN(ePhysicsProperty)
+ADD_ENUM(PHYSICS_PROPERTY_STATIC, "static")
+ADD_ENUM(PHYSICS_PROPERTY_MASS, "mass")
+ADD_ENUM(PHYSICS_PROPERTY_POSITION, "position")
+ADD_ENUM(PHYSICS_PROPERTY_ROTATION, "rotation")
+IMPLEMENT_ENUM_END("physics-shape-type")
+
 IMPLEMENT_ENUM_BEGIN(eCursorType)
 ADD_ENUM(CURSORTYPE_NONE, "none")                            // cursor has no image
 ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")                        // default cursor
@@ -683,7 +690,9 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))            // Try timer
+    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))            // Try rigid body
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))   // Try static collision
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);

@@ -16,6 +16,7 @@ class CLuaFunctionDefinitions;
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
 #include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
 
 class CRegisteredCommands;
 

@@ -2,14 +2,14 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBody.h
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsStaticCollision.h
  *  PURPOSE:     Lua timer class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-class CLuaPhysicsRigidBody;
+class CLuaPhysicsStaticCollision;
 
 #pragma once
 
@@ -17,34 +17,26 @@ class CLuaPhysicsRigidBody;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-class CLuaPhysicsRigidBody
+class CLuaPhysicsStaticCollision
 {
 public:
-    CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld);
-    ~CLuaPhysicsRigidBody();
+    CLuaPhysicsStaticCollision(btDiscreteDynamicsWorld* pWorld);
+    ~CLuaPhysicsStaticCollision();
 
     void RemoveScriptID();
 
-    // for compound rigid bodies
-    void AddBox(CVector& vecHalf);
-    void AddSphere(float fRadius);
-
+    // use only once
     void InitializeWithBox(CVector& vecHalf);
     void InitializeWithSphere(float fRadius);
 
-    void SetStatic(bool bStatic);
-    void SetMass(float fMass);
     void SetPosition(CVector& vecPosition);
-    void SetRotation(CVector& vecPosition);
-
-    void SetLinearVelocity(CVector& vecVelocity);
+    void SetRotation(CVector& vecRotation);
 
     uint GetScriptID() const { return m_uiScriptID; }
 
 private:
-    bool         bInitialized;
     btDiscreteDynamicsWorld* m_pWorld;
     uint m_uiScriptID;
-    btRigidBody* m_pBtRigidBody;
+    btCollisionObject*       m_btCollisionObject;
 
 };

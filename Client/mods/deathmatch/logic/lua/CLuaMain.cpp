@@ -35,6 +35,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_bBeingDeleted = false;
     m_pLuaTimerManager = new CLuaTimerManager;
     m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
+    m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;

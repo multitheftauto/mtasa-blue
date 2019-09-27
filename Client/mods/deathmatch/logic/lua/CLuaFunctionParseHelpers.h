@@ -107,8 +107,16 @@ enum ePhysicsShapeType
     PHYSICS_SHAPE_BOX,
     PHYSICS_SHAPE_SPHERE,
 };
-
 DECLARE_ENUM(ePhysicsShapeType);
+
+enum ePhysicsProperty
+{
+    PHYSICS_PROPERTY_STATIC,
+    PHYSICS_PROPERTY_MASS,
+    PHYSICS_PROPERTY_POSITION,
+    PHYSICS_PROPERTY_ROTATION,
+};
+DECLARE_ENUM(ePhysicsProperty);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
@@ -387,6 +395,10 @@ inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
     return "physics-rigid-body";
 }
+inline SString GetClassTypeName(CLuaPhysicsStaticCollision*)
+{
+    return "physics-static-collision";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -502,6 +514,20 @@ CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* 
     if (pLuaMain)
     {
         return pLuaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
+
+//
+// CLuaPhysicsStaticCollision from userdata
+//
+template <class T>
+CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }

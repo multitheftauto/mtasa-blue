@@ -20,6 +20,7 @@ class CDebugDrawer : public btIDebugDraw
 {
     int m_debugMode;
     CGraphicsInterface* m_pGraphics;
+    SColorARGB          color = SColorARGB(255, 255, 0, 0);
 
 public:
     CDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};
@@ -60,7 +61,8 @@ public:
 
     void DoPulse();
 
-    CLuaPhysicsRigidBody* CreateRigidBody(CLuaMain* luaMain);
+    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaMain* luaMain);
+    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaMain* luaMain);
 
 
 private:
@@ -75,4 +77,5 @@ private:
     CClientPhysicsManager* m_pPhysicsManager;
 
     CTickCount m_LastTimeMs;
+
 };

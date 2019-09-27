@@ -12,15 +12,11 @@
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
-    SColorARGB sColor(255.0f, 255, 0, 0);
-
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, sColor, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, color, false);
 }
-void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    SColorARGB sColor(255.0f, 0, 255, 0);
-
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, sColor, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, color, false);
 }
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
@@ -39,7 +35,7 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassIn
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
 
     m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
-    m_pDebugDrawer->setDebugMode(m_pDebugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints);
+    m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
 
     // Add us to Physics manager's list
@@ -65,6 +61,12 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaMain* luaMain)
     return pRigidBody;
 }
 
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaMain* luaMain)
+{
+    CLuaPhysicsStaticCollision* pRigidBody = luaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    return pRigidBody;
+}
+
 void CClientPhysics::DoPulse()
 {
     CTickCount tickCountNow = CTickCount::Now();
@@ -74,4 +76,5 @@ void CClientPhysics::DoPulse()
 
     m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f);
     m_pDynamicsWorld->debugDrawWorld();
+
 }
