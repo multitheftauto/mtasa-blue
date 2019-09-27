@@ -28,6 +28,7 @@ public:
     // use only once
     void InitializeWithBox(CVector& vecHalf);
     void InitializeWithSphere(float fRadius);
+    void InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
 
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);

@@ -50,7 +50,7 @@ void CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
 void CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
 {
     btSphereShape* sphereCollisionShape = new btSphereShape(fRadius);
-    btTransform       transformZero;
+    btTransform    transformZero;
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
@@ -63,6 +63,21 @@ void CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
     m_pWorld->addCollisionObject(m_btCollisionObject);
 }
 
+void CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
+{
+    btTriangleMesh* triangleMesh = new btTriangleMesh();
+    for (int i = 0; i < vecIndices.size(); i += 3)
+    {
+        triangleMesh->addTriangle(*(const btVector3*)&vecIndices[i], *(const btVector3*)&vecIndices[i + 1], *(const btVector3*)&vecIndices[i + 2]);
+    }
+    bool                    useQuantizedAabbCompression = true;
+    btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(triangleMesh, useQuantizedAabbCompression);
+
+    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject->setCollisionShape(trimeshShape);
+    m_pWorld->addCollisionObject(m_btCollisionObject);
+}
+
 void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
 {
     btTransform transform = m_btCollisionObject->getWorldTransform();
@@ -72,10 +87,8 @@ void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
 
 void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
 {
-
     btTransform  transform = m_btCollisionObject->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
     quanternion.setEuler(vecRotation.fX, vecRotation.fY, vecRotation.fZ);
     m_btCollisionObject->setWorldTransform(transform);
 }
-

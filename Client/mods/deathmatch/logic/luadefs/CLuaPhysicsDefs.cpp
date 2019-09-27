@@ -66,9 +66,8 @@ int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
         }
     }
     else
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -147,6 +146,7 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
             CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(luaMain);
             CVector                     vector;
             float                       fRadius;
+            std::vector<CVector>        vecVector;
             switch (shapeType)
             {
                 case PHYSICS_SHAPE_BOX:
@@ -161,6 +161,20 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
                     if (!argStream.HasErrors())
                     {
                         pStaticCollision->InitializeWithSphere(fRadius);
+                    }
+                    break;
+                case PHYSICS_SHAPE_TRIANGLE_MESH:
+                    while (argStream.NextIsVector3D())
+                    {
+                        argStream.ReadVector3D(vector);
+                        vecVector.push_back(vector);
+                    }
+                    if (!argStream.HasErrors())
+                    {
+                        if (vecVector.size() % 3 == 0)
+                        {
+                            pStaticCollision->InitializeWithTriangleMesh(vecVector);
+                        }
                     }
                     break;
             }

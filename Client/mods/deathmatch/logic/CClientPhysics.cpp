@@ -16,7 +16,13 @@ void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const bt
 }
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f), false);
+}
+void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
+{
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&b, 4, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&b, *(CVector*)&c, 4, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&c, 4, color, false);
 }
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
