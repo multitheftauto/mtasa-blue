@@ -348,4 +348,6 @@ public:
     virtual CSurfaceType*     GetSurfaceInfo() = 0;
     virtual void              ResetAllSurfaceInfo() = 0;
     virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
+
+    virtual void GetWorldModels(unsigned char usInterior, std::vector<std::pair<unsigned short, CMatrix>>& pOut) = 0;
 };

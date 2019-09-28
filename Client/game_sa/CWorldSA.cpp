@@ -1315,6 +1315,100 @@ void CWorldSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface)
     m_pAddedEntities[(DWORD)pInterface] = false;
 }
 
+void CWorldSA::GetWorldModels(unsigned char ucInterior, std::vector<std::pair<unsigned short, CMatrix>>& pOut)
+{
+    // Init loop variables
+    auto                                                                     iterators = m_pDataBuildings->begin();
+    std::multimap<unsigned short, sDataBuildingRemovalItem*>::const_iterator iter = iterators;
+    for (; iter != m_pDataBuildings->end(); ++iter)
+    {
+        sDataBuildingRemovalItem* pFind = (*iter).second;
+        if (pFind)
+        {
+            // if the count is <= 0 and the interface is valid check the distance in case we found a removal (count is used to store if we have already removed
+            // this once)
+            if (pFind->m_iCount <= 0 && pFind->m_pInterface)
+            {
+                // Is it in range
+                if (pFind->m_pInterface->m_areaCode == ucInterior || ucInterior == -1)
+                {
+                    CEntitySAInterface* pInterface = pFind->m_pInterface;
+                    // while ( pInterface && pInterface != NULL )
+                    // if the interface is valid
+                    if (pInterface && pInterface != NULL)
+                    {
+                        // if the building type is dummy or building and it's not already being removed
+                        if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
+                            pInterface->bRemoveFromWorld != 1)
+                        {
+                            if ((DWORD)(pInterface->vtbl) != VTBL_CPlaceable)
+                            {
+                                CMatrix matrix;
+
+                                if (pInterface->Placeable.matrix == nullptr)
+                                {
+                                    matrix.SetPosition(pInterface->Placeable.m_transform.m_translate);
+                                }
+                                else
+                                {
+                                    pInterface->Placeable.matrix->ConvertToMatrix(matrix);
+                                }
+                                pOut.push_back(std::pair<unsigned short, CMatrix>(pInterface->m_nModelIndex, matrix));
+                            }
+                        }
+                        // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
+                        // pInterface = pInterface->m_pLod;
+                    }
+                }
+            }
+        }
+    }
+
+    auto iteratorsBinary = m_pBinaryBuildings->begin();
+    std::multimap<unsigned short, sBuildingRemovalItem*>::const_iterator iterBinary = iteratorsBinary;
+    for (; iterBinary != m_pBinaryBuildings->end(); ++iterBinary)
+    {
+        sBuildingRemovalItem* pFindBinary = (*iterBinary).second;
+        if (pFindBinary)
+        {
+            // if the count is <= 0 and the interface is valid check the distance in case we found a removal (count is used to store if we have already removed
+            // this once)
+            if (pFindBinary->m_iCount <= 0 && pFindBinary->m_pInterface)
+            {
+                // Is it in range
+                if (pFindBinary->m_pInterface->m_areaCode == ucInterior || ucInterior == -1)
+                {
+                    CEntitySAInterface* pInterface = pFindBinary->m_pInterface;
+                    // while ( pInterface && pInterface != NULL )
+                    // if the interface is valid
+                    if (pInterface && pInterface != NULL)
+                    {
+                        // if the building type is dummy or building and it's not already being removed
+                        if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
+                            pInterface->bRemoveFromWorld != 1)
+                        {
+                            if ((DWORD)(pInterface->vtbl) != VTBL_CPlaceable)
+                            {
+                                CMatrix matrix;
+
+                                if (pInterface->Placeable.matrix == nullptr)
+                                {
+                                    matrix.SetPosition(pInterface->Placeable.m_transform.m_translate);
+                                }
+                                else
+                                {
+                                    pInterface->Placeable.matrix->ConvertToMatrix(matrix);
+                                }
+                                pOut.push_back(std::pair<unsigned short, CMatrix>(pInterface->m_nModelIndex, matrix));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 bool CWorldSA::CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd)
 {
     // get our position
