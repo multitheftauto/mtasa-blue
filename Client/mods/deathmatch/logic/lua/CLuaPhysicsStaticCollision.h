@@ -30,7 +30,7 @@ public:
     void InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotatio);
 
     void InitializeWithSphere(float fRadius);
-    void InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
+    void InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
 
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);

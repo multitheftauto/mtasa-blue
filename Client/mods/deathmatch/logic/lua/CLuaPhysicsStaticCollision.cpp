@@ -102,7 +102,7 @@ void CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
     m_pWorld->addCollisionObject(m_btCollisionObject);
 }
 
-void CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
+void CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position, CVector rotation)
 {
     btTriangleMesh* triangleMesh = new btTriangleMesh();
     for (int i = 0; i < vecIndices.size(); i += 3)
@@ -114,6 +114,13 @@ void CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::vector<CVector>
 
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(trimeshShape);
+    btTransform transform;
+    transform.setIdentity();
+    btQuaternion quaternion;
+    EulerToQuat(*(btVector3*)&rotation, quaternion);
+    transform.setRotation(quaternion);
+    transform.setOrigin(*(btVector3*)&position);
+    m_btCollisionObject->setWorldTransform(transform);
     m_pWorld->addCollisionObject(m_btCollisionObject);
 }
 

@@ -80,23 +80,25 @@ public:
     std::vector<CompressedVector> vertexList;
     std::vector<CColBoxSA>        boxList;
     std::vector<CColSphereSA>     sphereList;
+    std::vector<CColTriangleSA>   triangleList;
     GTACollisionData()
     {
         vertexList = std::vector<CompressedVector>();
         boxList = std::vector<CColBoxSA>();
         sphereList = std::vector<CColSphereSA>();
+        triangleList = std::vector<CColTriangleSA>();
     }
 };
 
 void QueryCollision(std::vector<GTACollisionData*>& pData, CVector vecPosition, float fRadius)
 {
-    CVector     vecElementPos;
-    int         i = 0;
-    CVector     elementPosition;
+    CVector vecElementPos;
+    int     i = 0;
+    CVector elementPosition;
 
-    CModelInfo*                                     pModelInfo;
-    CColModelSAInterface*                           pColModelInterface;
-    CColDataSA*                                     pColData;
+    CModelInfo*                                                         pModelInfo;
+    CColModelSAInterface*                                               pColModelInterface;
+    CColDataSA*                                                         pColData;
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
     QueryUserDefinedObjects(vecPosition, fRadius, pOut);
     QueryWorldObjects(vecPosition, fRadius, pOut);
@@ -133,6 +135,11 @@ void QueryCollision(std::vector<GTACollisionData*>& pData, CVector vecPosition, 
                     {
                         pCollisionData->vertexList.push_back(pColData->pVertices[i]);
                     }
+
+                    for (uint i = 0; pColData->numColTriangles > i; i++)
+                    {
+                        pCollisionData->triangleList.push_back(pColData->pColTriangles[i]);
+                    }
                 }
             }
             pData.push_back(pCollisionData);
@@ -142,18 +149,18 @@ void QueryCollision(std::vector<GTACollisionData*>& pData, CVector vecPosition, 
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 2, color, false);
 }
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 4, SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f),
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 2, SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f),
                                   false);
 }
 void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&b, 4, color, false);
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&b, *(CVector*)&c, 4, color, false);
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&c, 4, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&b, 2, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&b, *(CVector*)&c, 2, color, false);
+    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&c, 2, color, false);
 }
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
@@ -202,14 +209,27 @@ void CClientPhysics::BuildCollisionFromGTA()
     for (GTACollisionData* pCollisionData : pCollisionDataList)
     {
         std::vector<std::pair<CVector, CVector>> halfList;
-        CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
+        std::vector<CVector>                     indexList;
+        CLuaPhysicsStaticCollision*              pStaticCollision = CreateStaticCollision();
         for (CColBoxSA box : pCollisionData->boxList)
         {
             position = (box.max + box.min) / 2;
             halfSize = (box.max - box.min) * 0.5;
             halfList.push_back(std::pair<CVector, CVector>(halfSize, position));
         }
-        pStaticCollision->InitializeWithBoxes(halfList, pCollisionData->position, pCollisionData->rotation);
+        for (CColTriangleSA triangle : pCollisionData->triangleList)
+        {
+            indexList.push_back(pCollisionData->vertexList[triangle.vertex[0]].getVector());
+            indexList.push_back(pCollisionData->vertexList[triangle.vertex[1]].getVector());
+            indexList.push_back(pCollisionData->vertexList[triangle.vertex[2]].getVector());
+        }
+
+        if (halfList.size() > 0)
+            pStaticCollision->InitializeWithBoxes(halfList, pCollisionData->position, pCollisionData->rotation);
+        if (indexList.size() >= 3)
+            pStaticCollision->InitializeWithTriangleMesh(indexList, pCollisionData->position, pCollisionData->rotation);
+
+        g_pCore->GetConsole()->Printf("indexList.size() %i", indexList.size());
     }
 }
 
