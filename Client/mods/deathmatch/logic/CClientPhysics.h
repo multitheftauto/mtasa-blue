@@ -66,7 +66,7 @@ public:
     CLuaPhysicsRigidBody*       CreateRigidBody(CLuaMain* luaMain);
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaMain* luaMain);
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
-
+    void                        BuildCollisionFromGTA();
 
 private:
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;

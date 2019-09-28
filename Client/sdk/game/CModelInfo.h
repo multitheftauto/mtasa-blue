@@ -172,6 +172,7 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
+    virtual CColModelSAInterface* GetColData(void) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

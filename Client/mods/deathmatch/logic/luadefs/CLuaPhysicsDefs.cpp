@@ -21,6 +21,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetProperties", PhysicsSetProperties},
         {"physicsDrawDebug", PhysicsDrawDebug},
         {"physicsSetDebugMode", PhysicsSetDebugMode},
+        {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
     };
 
     // Add functions
@@ -44,6 +45,21 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
 {
     CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID);
     lua_pushelement(luaVM, pPhysics);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsBuildCollisionFromGTA(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    if (!argStream.HasErrors())
+    {
+        pPhysics->BuildCollisionFromGTA();
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, true);
     return 1;
 }
 

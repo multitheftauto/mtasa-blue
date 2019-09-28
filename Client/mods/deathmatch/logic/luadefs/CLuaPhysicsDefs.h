@@ -25,4 +25,5 @@ public:
     LUA_DECLARE(PhysicsCreateStaticCollision);
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsDrawDebug);
+    LUA_DECLARE(PhysicsBuildCollisionFromGTA);
 };
