@@ -33,8 +33,12 @@ typedef struct
 
 typedef struct
 {
-    CVector min;
-    CVector max;
+    CVector      min;
+    CVector      max;
+    uchar        material;
+    uchar        flags;
+    CColLighting lighting;
+    uchar        light;
 } CColBoxSA;
 
 typedef struct

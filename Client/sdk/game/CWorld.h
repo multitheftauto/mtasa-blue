@@ -349,5 +349,5 @@ public:
     virtual void              ResetAllSurfaceInfo() = 0;
     virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
 
-    virtual void GetWorldModels(unsigned char usInterior, std::vector<std::pair<unsigned short, CMatrix>>& pOut) = 0;
+    virtual void GetWorldModels(unsigned char usInterior, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut) = 0;
 };

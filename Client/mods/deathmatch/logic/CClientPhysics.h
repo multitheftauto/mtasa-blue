@@ -50,7 +50,7 @@ class CClientPhysics : public CClientEntity
 {
     DECLARE_CLASS(CClientPhysics, CClientEntity)
 public:
-    CClientPhysics(class CClientManager* pManager, ElementID ID);
+    CClientPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain);
     ~CClientPhysics(void);
 
     eClientEntityType GetType(void) const { return CCLIENTPHYSICS; }
@@ -63,8 +63,8 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
 
-    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaMain* luaMain);
-    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaMain* luaMain);
+    CLuaPhysicsRigidBody*       CreateRigidBody();
+    CLuaPhysicsStaticCollision* CreateStaticCollision();
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        BuildCollisionFromGTA();
 
@@ -78,6 +78,7 @@ private:
     CDebugDrawer* m_pDebugDrawer;
 
     bool m_bDrawDebugNextTime;
+    CLuaMain* m_pLuaMain;
 
     CClientPhysicsManager* m_pPhysicsManager;
 

@@ -12,20 +12,20 @@
 #include <list>
 #include "D:\mtablue\mtasa-blue\Client\game_sa\CColModelSA.h"
 
-void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, CMatrix>>& pOut)
+void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
 {
-    std::vector<std::pair<unsigned short, CMatrix>> pTemp;
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pTemp;
     g_pGame->GetWorld()->GetWorldModels(0, pTemp);
     for (const auto object : pTemp)
     {
-        if (DistanceBetweenPoints3D(vecPosition, object.second.GetPosition()) <= fRadius)
+        if (DistanceBetweenPoints3D(vecPosition, object.second.first) <= fRadius)
         {
             pOut.push_back(object);
         }
     }
 }
 
-void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, CMatrix>>& pOut)
+void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
 {
     CClientStreamer*                                 pObjectManager = g_pClientGame->GetManager()->GetObjectStreamer();
     std::list<CClientStreamElement*>::const_iterator iter = pObjectManager->ActiveElementsBegin();
@@ -37,11 +37,14 @@ void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std
         pElement = *iter;
         if (pElement->GetType() == CCLIENTOBJECT)
         {
-            pElement->GetMatrix(matrix);
+            pClientObject = static_cast<CClientObject*>(pElement);
+            CVector vecRotation, vecPosition;
+            pClientObject->GetRotationRadians(vecRotation);
+            pClientObject->GetPosition(vecPosition);
             if (DistanceBetweenPoints3D(vecPosition, matrix.GetPosition()) <= fRadius)
             {
-                pClientObject = static_cast<CClientObject*>(pElement);
-                pOut.push_back(std::pair<unsigned short, CMatrix>(pClientObject->GetModel(), matrix));
+                pOut.push_back(
+                    std::pair<unsigned short, std::pair<CVector, CVector>>(pClientObject->GetModel(), std::pair<CVector, CVector>(vecPosition, vecRotation)));
             }
         }
     }
@@ -69,63 +72,70 @@ CColModelSAInterface* GetModelCollisionInterface(ushort usModel)
     return nullptr;
 }
 
-void QueryCollision(std::vector<CompressedVector>& vertexList, std::vector<CColBoxSA>& boxList, std::vector<CColSphereSA>& sphereList, CVector vecPosition,
-                    float fRadius)
+class GTACollisionData
 {
-    CColDataSA* pCol;
+public:
+    CVector                       position;
+    CVector                       rotation;
+    std::vector<CompressedVector> vertexList;
+    std::vector<CColBoxSA>        boxList;
+    std::vector<CColSphereSA>     sphereList;
+    GTACollisionData()
+    {
+        vertexList = std::vector<CompressedVector>();
+        boxList = std::vector<CColBoxSA>();
+        sphereList = std::vector<CColSphereSA>();
+    }
+};
+
+void QueryCollision(std::vector<GTACollisionData*>& pData, CVector vecPosition, float fRadius)
+{
     CVector     vecElementPos;
     int         i = 0;
     CVector     elementPosition;
 
     CModelInfo*                                     pModelInfo;
     CColModelSAInterface*                           pColModelInterface;
-    std::vector<std::pair<unsigned short, CMatrix>> pOut;
+    CColDataSA*                                     pColData;
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
     QueryUserDefinedObjects(vecPosition, fRadius, pOut);
     QueryWorldObjects(vecPosition, fRadius, pOut);
 
+    CColSphereSA     pColSphere;
+    CColBoxSA        pColBox;
+    CompressedVector pColVertex;
+
     for (auto const& pair : pOut)
     {
-        vecElementPos = pair.second.GetPosition();
+        vecElementPos = pair.second.first;
         if (DistanceBetweenPoints3D(vecPosition, vecElementPos) <= fRadius)
         {
+            GTACollisionData* pCollisionData = new GTACollisionData();
+            pCollisionData->position = pair.second.first;
+            pCollisionData->rotation = pair.second.second;
             pColModelInterface = GetModelCollisionInterface(pair.first);
             if (pColModelInterface)
             {
-                pCol = pColModelInterface->pColData;
-                CColSphereSA pColSphere;
-                for (uint i = 0; pCol->numColSpheres > i; i++)
+                pColData = pColModelInterface->pColData;
+                if (pColData)
                 {
-                    pColSphere = pCol->pColSpheres[i];
-                    if (DistanceBetweenPoints3D(pColSphere.vecCenter + elementPosition, vecPosition) < pColSphere.fRadius + fRadius)
+                    for (uint i = 0; pColData->numColSpheres > i; i++)
                     {
-                        sphereList.push_back(pColSphere);
+                        pCollisionData->sphereList.push_back(pColData->pColSpheres[i]);
                     }
-                }
 
-                CColBoxSA pColBox;
-                for (uint i = 0; pCol->numColBoxes > i; i++)
-                {
-                    pColBox = pCol->pColBoxes[i];
-                    if (DistanceBetweenPoints3D(pColBox.min + elementPosition, vecPosition) < fRadius)
+                    for (uint i = 0; pColData->numColBoxes > i; i++)
                     {
-                        boxList.push_back(pColBox);
+                        pCollisionData->boxList.push_back(pColData->pColBoxes[i]);
                     }
-                    else if (DistanceBetweenPoints3D(pColBox.max + elementPosition, vecPosition) < fRadius)
-                    {
-                        boxList.push_back(pColBox);
-                    }
-                }
 
-                CompressedVector pColVertex;
-                for (uint i = 0; pCol->getNumVertices() > i; i++)
-                {
-                    pColVertex = pCol->pVertices[i];
-                    if (DistanceBetweenPoints3D(pColVertex.getVector() + elementPosition, vecPosition) < fRadius)
+                    for (uint i = 0; pColData->getNumVertices() > i; i++)
                     {
-                        vertexList.push_back(pColVertex);
+                        pCollisionData->vertexList.push_back(pColData->pVertices[i]);
                     }
                 }
             }
+            pData.push_back(pCollisionData);
         }
     }
 }
@@ -146,11 +156,12 @@ void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const bt
     m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&c, 4, color, false);
 }
 
-CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
+CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
     // Init
     m_pManager = pManager;
     m_pPhysicsManager = pManager->GetPhysicsManager();
+    m_pLuaMain = luaMain;
 
     SetTypeName("physics");
 
@@ -184,21 +195,33 @@ CClientPhysics::~CClientPhysics(void)
 
 void CClientPhysics::BuildCollisionFromGTA()
 {
-    std::vector<CompressedVector> vertexList;
-    std::vector<CColBoxSA>        boxList;
-    std::vector<CColSphereSA>     sphereList;
-    QueryCollision(vertexList, boxList, sphereList, CVector(0, 0, 0), 100);
+    std::vector<GTACollisionData*> pCollisionDataList;
+    QueryCollision(pCollisionDataList, CVector(0, 0, 0), 300);
+
+    CVector position, halfSize;
+    for (GTACollisionData* pCollisionData : pCollisionDataList)
+    {
+        std::vector<std::pair<CVector, CVector>> halfList;
+        CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
+        for (CColBoxSA box : pCollisionData->boxList)
+        {
+            position = (box.max + box.min) / 2;
+            halfSize = (box.max - box.min) * 0.5;
+            halfList.push_back(std::pair<CVector, CVector>(halfSize, position));
+        }
+        pStaticCollision->InitializeWithBoxes(halfList, pCollisionData->position, pCollisionData->rotation);
+    }
 }
 
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaMain* luaMain)
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody()
 {
-    CLuaPhysicsRigidBody* pRigidBody = luaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld);
+    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld);
     return pRigidBody;
 }
 
-CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaMain* luaMain)
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
 {
-    CLuaPhysicsStaticCollision* pRigidBody = luaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    CLuaPhysicsStaticCollision* pRigidBody = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
     return pRigidBody;
 }
 

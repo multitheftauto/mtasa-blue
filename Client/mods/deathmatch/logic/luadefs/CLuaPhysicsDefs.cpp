@@ -43,8 +43,14 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
 {
-    CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID);
-    lua_pushelement(luaVM, pPhysics);
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (luaMain)
+    {
+        CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
+        lua_pushelement(luaVM, pPhysics);
+        return 1;
+    }
+    lua_pushboolean(luaVM, true);
     return 1;
 }
 
@@ -111,32 +117,28 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody();
+        CVector               vector;
+        float                 fRadius;
+        switch (shapeType)
         {
-            CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody(luaMain);
-            CVector               vector;
-            float                 fRadius;
-            switch (shapeType)
-            {
-                case PHYSICS_SHAPE_BOX:
-                    argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->InitializeWithBox(vector);
-                    }
-                    break;
-                case PHYSICS_SHAPE_SPHERE:
-                    argStream.ReadNumber(fRadius);
-                    if (!argStream.HasErrors())
-                    {
-                        pRigidBody->InitializeWithSphere(fRadius);
-                    }
-                    break;
-            }
-            lua_pushrigidbody(luaVM, pRigidBody);
-            return 1;
+            case PHYSICS_SHAPE_BOX:
+                argStream.ReadVector3D(vector);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithBox(vector);
+                }
+                break;
+            case PHYSICS_SHAPE_SPHERE:
+                argStream.ReadNumber(fRadius);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithSphere(fRadius);
+                }
+                break;
         }
+        lua_pushrigidbody(luaVM, pRigidBody);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -156,44 +158,40 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision();
+        CVector                     vector;
+        float                       fRadius;
+        std::vector<CVector>        vecVector;
+        switch (shapeType)
         {
-            CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(luaMain);
-            CVector                     vector;
-            float                       fRadius;
-            std::vector<CVector>        vecVector;
-            switch (shapeType)
-            {
-                case PHYSICS_SHAPE_BOX:
+            case PHYSICS_SHAPE_BOX:
+                argStream.ReadVector3D(vector);
+                if (!argStream.HasErrors())
+                {
+                    pStaticCollision->InitializeWithBox(vector);
+                }
+                break;
+            case PHYSICS_SHAPE_SPHERE:
+                argStream.ReadNumber(fRadius);
+                if (!argStream.HasErrors())
+                {
+                    pStaticCollision->InitializeWithSphere(fRadius);
+                }
+                break;
+            case PHYSICS_SHAPE_TRIANGLE_MESH:
+                while (argStream.NextIsVector3D())
+                {
                     argStream.ReadVector3D(vector);
-                    if (!argStream.HasErrors())
+                    vecVector.push_back(vector);
+                }
+                if (!argStream.HasErrors())
+                {
+                    if (vecVector.size() % 3 == 0)
                     {
-                        pStaticCollision->InitializeWithBox(vector);
+                        pStaticCollision->InitializeWithTriangleMesh(vecVector);
                     }
-                    break;
-                case PHYSICS_SHAPE_SPHERE:
-                    argStream.ReadNumber(fRadius);
-                    if (!argStream.HasErrors())
-                    {
-                        pStaticCollision->InitializeWithSphere(fRadius);
-                    }
-                    break;
-                case PHYSICS_SHAPE_TRIANGLE_MESH:
-                    while (argStream.NextIsVector3D())
-                    {
-                        argStream.ReadVector3D(vector);
-                        vecVector.push_back(vector);
-                    }
-                    if (!argStream.HasErrors())
-                    {
-                        if (vecVector.size() % 3 == 0)
-                        {
-                            pStaticCollision->InitializeWithTriangleMesh(vecVector);
-                        }
-                    }
-                    break;
-            }
+                }
+                break;
             lua_pushstaticcollision(luaVM, pStaticCollision);
             return 1;
         }

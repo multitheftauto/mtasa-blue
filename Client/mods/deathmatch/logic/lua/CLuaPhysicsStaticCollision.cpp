@@ -47,6 +47,45 @@ void CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
     m_pWorld->addCollisionObject(m_btCollisionObject);
 }
 
+void EulerToQuat(btVector3 rotation, btQuaternion& result)
+{
+
+    btScalar cy = cos(.5f * rotation.getY()), sy = sin(.5f * rotation.getY()), cx = cos(.5f * rotation.getX()), sx = sin(.5f * rotation.getX()),
+             cz = cos(.5f * rotation.getZ()), sz = sin(.5f * rotation.getZ());
+
+    btScalar cycx = cy * cx, sysx = sy * sx, sxcy = sx * cy, cxsy = cx * sy;
+
+    result.setW(cycx * cz - sysx * sz);
+    result.setX(sxcy * cz - cxsy * sz);
+    result.setY(cxsy * cz + sxcy * sz);
+    result.setZ(cycx * sz + sysx * cz);
+}
+
+void CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotation)
+{
+    btCompoundShape* boxesCollisionShape = new btCompoundShape(true, halfList.size());
+
+    btTransform transform;
+    for (const auto pair : halfList)
+    {
+        transform.setIdentity();
+        transform.setOrigin(*(btVector3*)&pair.second);
+        btCollisionShape* boxCollisionShape = new btBoxShape(btVector3(pair.first.fX, pair.first.fY, pair.first.fZ));
+        boxesCollisionShape->addChildShape(transform, boxCollisionShape);
+    }
+
+    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject->setCollisionShape(boxesCollisionShape);
+
+    transform.setIdentity();
+    btQuaternion quaternion;
+    EulerToQuat(*(btVector3*)&rotation, quaternion);
+    transform.setRotation(quaternion);
+    transform.setOrigin(*(btVector3*)&position);
+    m_btCollisionObject->setWorldTransform(transform);
+    m_pWorld->addCollisionObject(m_btCollisionObject);
+}
+
 void CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
 {
     btSphereShape* sphereCollisionShape = new btSphereShape(fRadius);

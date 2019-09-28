@@ -27,6 +27,8 @@ public:
 
     // use only once
     void InitializeWithBox(CVector& vecHalf);
+    void InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotatio);
+
     void InitializeWithSphere(float fRadius);
     void InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
 
