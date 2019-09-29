@@ -67,6 +67,8 @@ public:
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        BuildCollisionFromGTA();
+    bool                        BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation);
+
 
 private:
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;

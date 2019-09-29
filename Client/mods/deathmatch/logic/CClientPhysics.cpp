@@ -11,6 +11,29 @@
 #include "StdInc.h"
 #include <list>
 #include "D:\mtablue\mtasa-blue\Client\game_sa\CColModelSA.h"
+#include "../Client/game_sa/CModelInfoSA.h"
+#include "../Client/game_sa/CColModelSA.h"
+
+#define ARRAY_ModelInfo 0xA9B0C8
+CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+
+class GTACollisionData
+{
+public:
+    CVector                       position;
+    CVector                       rotation;
+    std::vector<CompressedVector> vertexList;
+    std::vector<CColBoxSA>        boxList;
+    std::vector<CColSphereSA>     sphereList;
+    std::vector<CColTriangleSA>   triangleList;
+    GTACollisionData()
+    {
+        vertexList = std::vector<CompressedVector>();
+        boxList = std::vector<CColBoxSA>();
+        sphereList = std::vector<CColSphereSA>();
+        triangleList = std::vector<CColTriangleSA>();
+    }
+};
 
 void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
 {
@@ -50,11 +73,6 @@ void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std
     }
 }
 
-#include "../Client/game_sa/CModelInfoSA.h"
-#include "../Client/game_sa/CColModelSA.h"
-#define ARRAY_ModelInfo 0xA9B0C8
-CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-
 CColModelSAInterface* GetModelCollisionInterface(ushort usModel)
 {
     if (CClientObjectManager::IsValidModel(usModel))
@@ -70,81 +88,6 @@ CColModelSAInterface* GetModelCollisionInterface(ushort usModel)
         }
     }
     return nullptr;
-}
-
-class GTACollisionData
-{
-public:
-    CVector                       position;
-    CVector                       rotation;
-    std::vector<CompressedVector> vertexList;
-    std::vector<CColBoxSA>        boxList;
-    std::vector<CColSphereSA>     sphereList;
-    std::vector<CColTriangleSA>   triangleList;
-    GTACollisionData()
-    {
-        vertexList = std::vector<CompressedVector>();
-        boxList = std::vector<CColBoxSA>();
-        sphereList = std::vector<CColSphereSA>();
-        triangleList = std::vector<CColTriangleSA>();
-    }
-};
-
-void QueryCollision(std::vector<GTACollisionData*>& pData, CVector vecPosition, float fRadius)
-{
-    CVector vecElementPos;
-    int     i = 0;
-    CVector elementPosition;
-
-    CModelInfo*                                                         pModelInfo;
-    CColModelSAInterface*                                               pColModelInterface;
-    CColDataSA*                                                         pColData;
-    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
-    QueryUserDefinedObjects(vecPosition, fRadius, pOut);
-    QueryWorldObjects(vecPosition, fRadius, pOut);
-
-    CColSphereSA     pColSphere;
-    CColBoxSA        pColBox;
-    CompressedVector pColVertex;
-
-    for (auto const& pair : pOut)
-    {
-        vecElementPos = pair.second.first;
-        if (DistanceBetweenPoints3D(vecPosition, vecElementPos) <= fRadius)
-        {
-            GTACollisionData* pCollisionData = new GTACollisionData();
-            pCollisionData->position = pair.second.first;
-            pCollisionData->rotation = pair.second.second;
-            pColModelInterface = GetModelCollisionInterface(pair.first);
-            if (pColModelInterface)
-            {
-                pColData = pColModelInterface->pColData;
-                if (pColData)
-                {
-                    for (uint i = 0; pColData->numColSpheres > i; i++)
-                    {
-                        pCollisionData->sphereList.push_back(pColData->pColSpheres[i]);
-                    }
-
-                    for (uint i = 0; pColData->numColBoxes > i; i++)
-                    {
-                        pCollisionData->boxList.push_back(pColData->pColBoxes[i]);
-                    }
-
-                    for (uint i = 0; pColData->getNumVertices() > i; i++)
-                    {
-                        pCollisionData->vertexList.push_back(pColData->pVertices[i]);
-                    }
-
-                    for (uint i = 0; pColData->numColTriangles > i; i++)
-                    {
-                        pCollisionData->triangleList.push_back(pColData->pColTriangles[i]);
-                    }
-                }
-            }
-            pData.push_back(pCollisionData);
-        }
-    }
 }
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
@@ -200,36 +143,60 @@ CClientPhysics::~CClientPhysics(void)
     m_pPhysicsManager->RemoveFromList(this);
 }
 
+bool CClientPhysics::BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
+{
+    CColModelSAInterface* pColModelInterface = GetModelCollisionInterface(usModelId);
+    if (pColModelInterface == nullptr)
+        return false;
+
+    CColDataSA* pColData = pColModelInterface->pColData;
+    if (pColData == nullptr)
+        return false;
+
+    CColSphereSA   pColSphere;
+    CColBoxSA      pColBox;
+    CColTriangleSA pColTriangle;
+    CVector        position, halfSize;
+
+    std::vector<std::pair<CVector, CVector>> halfList;
+    std::vector<CVector>                     indexList;
+
+    for (uint i = 0; pColData->numColBoxes > i; i++)
+    {
+        pColBox = pColData->pColBoxes[i];
+        position = (pColBox.max + pColBox.min) / 2;
+        halfSize = (pColBox.max - pColBox.min) * 0.5;
+        halfList.push_back(std::pair<CVector, CVector>(halfSize, position));
+    }
+    for (uint i = 0; pColData->numColTriangles > i; i++)
+    {
+        pColTriangle = pColData->pColTriangles[i];
+        indexList.push_back(pColData->pVertices[pColTriangle.vertex[0]].getVector());
+        indexList.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
+        indexList.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
+    }
+
+    if (halfList.size() > 0)
+    {
+        CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
+        pStaticCollision->InitializeWithBoxes(halfList, vecPosition, vecRotation);
+    }
+    if (indexList.size() >= 3)
+    {
+        CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
+        pStaticCollision->InitializeWithTriangleMesh(indexList, vecPosition, vecRotation);
+    }
+}
+
 void CClientPhysics::BuildCollisionFromGTA()
 {
-    std::vector<GTACollisionData*> pCollisionDataList;
-    QueryCollision(pCollisionDataList, CVector(0, 0, 0), 300);
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
+    QueryWorldObjects(CVector(0, 0, 0), 300, pOut);
 
     CVector position, halfSize;
-    for (GTACollisionData* pCollisionData : pCollisionDataList)
+    for (std::pair<unsigned short, std::pair<CVector, CVector>> pObject : pOut)
     {
-        std::vector<std::pair<CVector, CVector>> halfList;
-        std::vector<CVector>                     indexList;
-        CLuaPhysicsStaticCollision*              pStaticCollision = CreateStaticCollision();
-        for (CColBoxSA box : pCollisionData->boxList)
-        {
-            position = (box.max + box.min) / 2;
-            halfSize = (box.max - box.min) * 0.5;
-            halfList.push_back(std::pair<CVector, CVector>(halfSize, position));
-        }
-        for (CColTriangleSA triangle : pCollisionData->triangleList)
-        {
-            indexList.push_back(pCollisionData->vertexList[triangle.vertex[0]].getVector());
-            indexList.push_back(pCollisionData->vertexList[triangle.vertex[1]].getVector());
-            indexList.push_back(pCollisionData->vertexList[triangle.vertex[2]].getVector());
-        }
-
-        if (halfList.size() > 0)
-            pStaticCollision->InitializeWithBoxes(halfList, pCollisionData->position, pCollisionData->rotation);
-        if (indexList.size() >= 3)
-            pStaticCollision->InitializeWithTriangleMesh(indexList, pCollisionData->position, pCollisionData->rotation);
-
-        g_pCore->GetConsole()->Printf("indexList.size() %i", indexList.size());
+        BuildStaticCollisionFromModel(pObject.first, pObject.second.first, pObject.second.second);
     }
 }
 

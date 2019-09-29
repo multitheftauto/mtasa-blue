@@ -26,14 +26,22 @@ public:
     void RemoveScriptID();
 
     // use only once
-    void InitializeWithBox(CVector& vecHalf);
-    void InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotatio);
+    btCollisionObject* InitializeWithBox(CVector& vecHalf);
+    btCollisionObject* InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotatio);
 
-    void InitializeWithSphere(float fRadius);
-    void InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
+    btCollisionObject* InitializeWithSphere(float fRadius);
+    btCollisionObject* InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
+
+    static void SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
+    static void SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
+
+    btBoxShape*             CreateBox(CVector half);
+    btSphereShape*          CreateSphere(float fRadius);
+    btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
+
 
     uint GetScriptID() const { return m_uiScriptID; }
 
