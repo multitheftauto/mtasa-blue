@@ -17,24 +17,6 @@
 #define ARRAY_ModelInfo 0xA9B0C8
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-class GTACollisionData
-{
-public:
-    CVector                       position;
-    CVector                       rotation;
-    std::vector<CompressedVector> vertexList;
-    std::vector<CColBoxSA>        boxList;
-    std::vector<CColSphereSA>     sphereList;
-    std::vector<CColTriangleSA>   triangleList;
-    GTACollisionData()
-    {
-        vertexList = std::vector<CompressedVector>();
-        boxList = std::vector<CColBoxSA>();
-        sphereList = std::vector<CColSphereSA>();
-        triangleList = std::vector<CColTriangleSA>();
-    }
-};
-
 void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
 {
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pTemp;
@@ -158,7 +140,7 @@ bool CClientPhysics::BuildStaticCollisionFromModel(unsigned short usModelId, CVe
     CColTriangleSA pColTriangle;
     CVector        position, halfSize;
 
-    std::vector<std::pair<CVector, CVector>> halfList;
+    std::vector<std::pair<CVector, std::pair<CVector, CVector>>> halfList;
     std::vector<CVector>                     indexList;
 
     for (uint i = 0; pColData->numColBoxes > i; i++)
@@ -166,7 +148,7 @@ bool CClientPhysics::BuildStaticCollisionFromModel(unsigned short usModelId, CVe
         pColBox = pColData->pColBoxes[i];
         position = (pColBox.max + pColBox.min) / 2;
         halfSize = (pColBox.max - pColBox.min) * 0.5;
-        halfList.push_back(std::pair<CVector, CVector>(halfSize, position));
+        halfList.push_back(std::pair<CVector, std::pair<CVector, CVector>>(halfSize, std::pair<CVector, CVector>(position, CVector())));
     }
     for (uint i = 0; pColData->numColTriangles > i; i++)
     {
@@ -242,7 +224,7 @@ void CClientPhysics::DoPulse()
     int iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
     m_LastTimeMs = tickCountNow;
 
-    m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f);
+    m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f, 5);
     if (m_bDrawDebugNextTime)
     {
         m_pDynamicsWorld->debugDrawWorld();

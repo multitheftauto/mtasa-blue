@@ -11,6 +11,8 @@
 
 #include <StdInc.h>
 
+#define MINIMUM_SHAPE_SIZE 0.003f // to small collisions are not recommended
+
 void EulerToQuat(btVector3 rotation, btQuaternion& result)
 {
     btScalar cy = cos(.5f * rotation.getY()), sy = sin(.5f * rotation.getY()), cx = cos(.5f * rotation.getX()), sx = sin(.5f * rotation.getX()),
@@ -44,17 +46,83 @@ void CLuaPhysicsStaticCollision::RemoveScriptID()
     }
 }
 
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<std::pair<CVector, CVector>>& halfList, CVector& position, CVector& rotation)
+void CLuaPhysicsStaticCollision::SetRotation(btTransform& transform, CVector& vecRotation)
 {
+    btQuaternion quaternion;
+    EulerToQuat(*(btVector3*)&vecRotation, quaternion);
+    transform.setRotation(quaternion);
+}
+
+void CLuaPhysicsStaticCollision::SetPosition(btTransform& transform, CVector& vecPosition)
+{
+    btQuaternion quaternion;
+    transform.setOrigin(*(btVector3*)&vecPosition);
+}
+
+void CLuaPhysicsStaticCollision::SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
+{
+    btTransform transform = pCollisionObject->getWorldTransform();
+    SetRotation(transform, vecRotation);
+    pCollisionObject->setWorldTransform(transform);
+}
+
+void CLuaPhysicsStaticCollision::SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
+{
+    btTransform transform = pCollisionObject->getWorldTransform();
+    SetPosition(transform, vecPosition);
+    pCollisionObject->setWorldTransform(transform);
+}
+
+void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
+{
+    SetPosition(m_btCollisionObject, vecPosition);
+}
+
+void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
+{
+    SetRotation(m_btCollisionObject, vecRotation);
+}
+
+btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
+{
+    if (m_btCollisionObject != nullptr)
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
+        return nullptr;
+
+    btCompoundShape* boxesCollisionShape = new btCompoundShape(true);
+    m_btCollisionObject->setCollisionShape(boxesCollisionShape);
+    m_pWorld->addCollisionObject(m_btCollisionObject);
+    return m_btCollisionObject;
+}
+
+btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList, CVector& position,
+                                                                   CVector& rotation)
+{
+    if (halfList.empty())
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr)
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
+        return nullptr;
+
     btCompoundShape* boxesCollisionShape = new btCompoundShape(true, halfList.size());
 
     btTransform transform;
-    for (const auto pair : halfList)
+    for (auto pair : halfList)
     {
-        transform.setIdentity();
-        transform.setOrigin(*(btVector3*)&pair.second);
-        btBoxShape* boxCollisionShape = CreateBox(pair.first);
-        boxesCollisionShape->addChildShape(transform, boxCollisionShape);
+        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
+        {
+            transform.setIdentity();
+            SetPosition(transform, pair.second.first);
+            SetRotation(transform, pair.second.second);
+            transform.setOrigin(*(btVector3*)&pair.second);
+            btBoxShape* boxCollisionShape = CreateBox(pair.first);
+            boxesCollisionShape->addChildShape(transform, boxCollisionShape);
+        }
     }
 
     m_btCollisionObject = new btCollisionObject();
@@ -66,34 +134,163 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<s
     return m_btCollisionObject;
 }
 
-btBoxShape* CLuaPhysicsStaticCollision::CreateBox(CVector half)
+bool CLuaPhysicsStaticCollision::AddBox(CVector& half, CVector& position, CVector& rotation)
 {
-    btBoxShape* pBoxShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
-    btTransform    transformZero;
-    transformZero.setIdentity();
-    transformZero.setOrigin(btVector3(0, 0, 0));
+    // too small will fail with collision testing anyway
+    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+        return false;
 
-    btVector3 localInertia(0, 0, 0);
-    pBoxShape->calculateLocalInertia(1.0f, localInertia);
+    if (m_btCollisionObject == nullptr)
+        return false;
+
+    btCollisionShape* pCollisionShape = m_btCollisionObject->getCollisionShape();
+    if (pCollisionShape == nullptr)
+        return false;
+
+    if (!pCollisionShape->isCompound())
+        return false;
+
+    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
+    btBoxShape*      boxCollisionShape = CreateBox(half);
+
+    btTransform transform;
+    transform.setIdentity();
+    SetPosition(transform, position);
+    SetRotation(transform, rotation);
+    pCompoundShape->addChildShape(transform, boxCollisionShape);
+
+    return true;
+}
+
+bool CLuaPhysicsStaticCollision::AddSphere(float fRadius, CVector& position, CVector& rotation)
+{
+    // too small will fail with collision testing anyway
+    if (fRadius < MINIMUM_SHAPE_SIZE)
+        return false;
+
+    if (m_btCollisionObject == nullptr)
+        return false;
+
+    btCollisionShape* pCollisionShape = m_btCollisionObject->getCollisionShape();
+    if (pCollisionShape == nullptr)
+        return false;
+
+    if (!pCollisionShape->isCompound())
+        return false;
+
+    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
+    btSphereShape*   pSphereCollisionShape = CreateSphere(fRadius);
+
+    btTransform transform;
+    transform.setIdentity();
+    SetPosition(transform, position);
+    SetRotation(transform, rotation);
+    pCompoundShape->addChildShape(transform, pSphereCollisionShape);
+
+    return true;
+}
+
+bool CLuaPhysicsStaticCollision::AddBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList)
+{
+    if (m_btCollisionObject == nullptr)
+        return false;
+
+    if (halfList.empty())
+        return false;
+
+    btCollisionShape* pCollisionShape = m_btCollisionObject->getCollisionShape();
+    if (pCollisionShape == nullptr)
+        return false;
+
+    if (!pCollisionShape->isCompound())
+        return false;
+
+    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
+    btBoxShape*      pBoxCollisionShape;
+    btTransform      transform;
+    for (std::pair<CVector, std::pair<CVector, CVector>> pair : halfList)
+    {
+        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
+        {
+            pBoxCollisionShape = CreateBox(pair.first);
+
+            transform.setIdentity();
+            SetPosition(transform, pair.second.first);
+            SetRotation(transform, pair.second.second);
+            pCompoundShape->addChildShape(transform, pBoxCollisionShape);
+        }
+    }
+
+    return true;
+}
+
+bool CLuaPhysicsStaticCollision::AddSpheres(std::vector<std::pair<float, std::pair<CVector, CVector>>>& spheresList)
+{
+    if (m_btCollisionObject == nullptr)
+        return false;
+
+    if (spheresList.empty())
+        return false;
+
+    btCollisionShape* pCollisionShape = m_btCollisionObject->getCollisionShape();
+    if (pCollisionShape == nullptr)
+        return false;
+
+    if (!pCollisionShape->isCompound())
+        return false;
+
+    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
+    btSphereShape*   pSphereCollisionShape;
+    btTransform      transform;
+    for (std::pair<float, std::pair<CVector, CVector>> pair : spheresList)
+    {
+        if (pair.first >= MINIMUM_SHAPE_SIZE)
+        {
+            btSphereShape* pSphereCollisionShape = CreateSphere(pair.first);
+
+            transform.setIdentity();
+            SetPosition(transform, pair.second.first);
+            SetRotation(transform, pair.second.second);
+            pCompoundShape->addChildShape(transform, pSphereCollisionShape);
+        }
+    }
+
+    return true;
+}
+
+btBoxShape* CLuaPhysicsStaticCollision::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
+{
+    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    btBoxShape* pBoxShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
+    btTransform transform;
+    transform.setIdentity();
+    SetPosition(transform, vecPosition);
+    SetPosition(transform, vecRotation);
 
     return pBoxShape;
 }
 
-btSphereShape* CLuaPhysicsStaticCollision::CreateSphere(float fRadius)
+btSphereShape* CLuaPhysicsStaticCollision::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
 {
-    btSphereShape* pSphereShape = new btSphereShape(fRadius);
-    btTransform    transformZero;
-    transformZero.setIdentity();
-    transformZero.setOrigin(btVector3(0, 0, 0));
+    if (fRadius < MINIMUM_SHAPE_SIZE)
+        return nullptr;
 
-    btVector3 localInertia(0, 0, 0);
-    pSphereShape->calculateLocalInertia(1.0f, localInertia);
+    btSphereShape* pSphereShape = new btSphereShape(fRadius);
+    btTransform    transform;
+    transform.setIdentity();
+    SetPosition(transform, vecPosition);
+    SetPosition(transform, vecRotation);
 
     return pSphereShape;
 }
 
 btBvhTriangleMeshShape* CLuaPhysicsStaticCollision::CreateTriangleMesh(std::vector<CVector>& vecIndices)
 {
+    if (vecIndices.size() % 3 != 0 || vecIndices.size() == 0)
+        return nullptr;
+
     btTriangleMesh* triangleMesh = new btTriangleMesh();
     for (int i = 0; i < vecIndices.size(); i += 3)
     {
@@ -106,6 +303,15 @@ btBvhTriangleMeshShape* CLuaPhysicsStaticCollision::CreateTriangleMesh(std::vect
 
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
 {
+    if (m_btCollisionObject != nullptr)
+        return nullptr;
+
+    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
+        return nullptr;
+
     btBoxShape* pBoxShape = CreateBox(half);
 
     m_btCollisionObject = new btCollisionObject();
@@ -116,6 +322,15 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
 
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
 {
+    if (m_btCollisionObject != nullptr)
+        return nullptr;
+
+    if (fRadius < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
+        return nullptr;
+
     btSphereShape* pSphereShape = CreateSphere(fRadius);
 
     m_btCollisionObject = new btCollisionObject();
@@ -126,38 +341,22 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
 
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position, CVector rotation)
 {
+    if (m_btCollisionObject != nullptr)
+        return nullptr;
+
+    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
+        return nullptr;
+
     btBvhTriangleMeshShape* trimeshShape = CreateTriangleMesh(vecIndices);
 
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(trimeshShape);
-    SetPosition(position);
-    SetRotation(rotation);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
-    return m_btCollisionObject;
-}
-
-void CLuaPhysicsStaticCollision::SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
-{
-    btTransform transform = pCollisionObject->getWorldTransform();
-    transform.setOrigin(*(btVector3*)&vecPosition);
-    pCollisionObject->setWorldTransform(transform);
-}
-
-void CLuaPhysicsStaticCollision::SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
-{
-    btTransform  transform = pCollisionObject->getWorldTransform();
-    btQuaternion quaternion;
-    EulerToQuat(*(btVector3*)&vecRotation, quaternion);
-    transform.setRotation(quaternion);
-    pCollisionObject->setWorldTransform(transform);
-
-}
-void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
-{
-    SetPosition(m_btCollisionObject, vecPosition);
-}
-
-void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
-{
-    SetRotation(m_btCollisionObject, vecRotation);
+    if (trimeshShape)
+    {
+        m_btCollisionObject = new btCollisionObject();
+        m_btCollisionObject->setCollisionShape(trimeshShape);
+        SetPosition(position);
+        SetRotation(rotation);
+        m_pWorld->addCollisionObject(m_btCollisionObject);
+        return m_btCollisionObject;
+    }
+    return nullptr;
 }
