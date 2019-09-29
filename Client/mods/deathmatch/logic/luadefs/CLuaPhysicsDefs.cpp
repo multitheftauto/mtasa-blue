@@ -16,9 +16,11 @@ void CLuaPhysicsDefs::LoadFunctions(void)
     std::map<const char*, lua_CFunction> functions{
         {"physicsCreateWorld", PhysicsCreateWorld},
         {"physicsCreateRigidBody", PhysicsCreateRigidBody},
+        {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
         {"physicsAddShape", PhysicsAddShape},
         {"physicsSetProperties", PhysicsSetProperties},
+        {"physicsGetProperties", PhysicsGetProperties},
         {"physicsDrawDebug", PhysicsDrawDebug},
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
@@ -137,6 +139,31 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 }
                 break;
         }
+        lua_pushrigidbody(luaVM, pRigidBody);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    unsigned short    usModel;
+    CVector           vecPosition;
+    CVector           vecRotation;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadNumber(usModel);
+    argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
+    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+
+    if (!argStream.HasErrors())
+    {
+        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBodyFromModel(usModel, vecPosition, vecRotation);
         lua_pushrigidbody(luaVM, pRigidBody);
         return 1;
     }
@@ -326,6 +353,56 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     }
                     break;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    ePhysicsProperty            eProperty;
+    CScriptArgReader            argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+
+    argStream.ReadEnumString(eProperty);
+    if (!argStream.HasErrors())
+    {
+        bool    boolean;
+        CVector vector;
+        float   floatNumber;
+
+        if (pRigidBody != nullptr)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_POSITION:
+                    pRigidBody->GetPosition(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_ROTATION:
+                    pRigidBody->GetRotation(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+            }
+        }
+        else if (pStaticCollision)
+        {
+
         }
     }
     else

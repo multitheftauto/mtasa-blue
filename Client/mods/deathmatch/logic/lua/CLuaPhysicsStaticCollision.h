@@ -37,7 +37,8 @@ public:
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
 
-    uint GetScriptID() const { return m_uiScriptID; }
+    uint               GetScriptID() const { return m_uiScriptID; }
+    btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
 
 private:
     btDiscreteDynamicsWorld* m_pWorld;

@@ -44,14 +44,9 @@ void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
 
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
 {
-    if (m_btCollisionObject != nullptr)
-        return nullptr;
-
-    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
-        return nullptr;
-
-    btCompoundShape* boxesCollisionShape = new btCompoundShape(true);
-    m_btCollisionObject->setCollisionShape(boxesCollisionShape);
+    m_btCollisionObject = new btCollisionObject();
+    btCompoundShape* pCompoundShape = new btCompoundShape(true);
+    m_btCollisionObject->setCollisionShape(pCompoundShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }

@@ -20,8 +20,10 @@ public:
 
     LUA_DECLARE(PhysicsCreateWorld);
     LUA_DECLARE(PhysicsCreateRigidBody);
+    LUA_DECLARE(PhysicsCreateRigidBodyFromModel);
     LUA_DECLARE(PhysicsAddShape);
     LUA_DECLARE(PhysicsSetProperties);
+    LUA_DECLARE(PhysicsGetProperties);
     LUA_DECLARE(PhysicsCreateStaticCollision);
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsDrawDebug);

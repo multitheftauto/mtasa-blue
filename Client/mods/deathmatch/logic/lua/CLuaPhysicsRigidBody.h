@@ -29,22 +29,24 @@ public:
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
 
-    void InitializeWithBox(CVector& vecHalf);
-    void InitializeWithSphere(float fRadius);
+    void               InitializeWithBox(CVector& vecHalf);
+    void               InitializeWithSphere(float fRadius);
+    btCompoundShape*   InitializeWithCompound();
 
     void SetStatic(bool bStatic);
     void SetMass(float fMass);
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecPosition);
+    void GetPosition(CVector& vecPosition);
+    void GetRotation(CVector& vecPosition);
 
     void SetLinearVelocity(CVector& vecVelocity);
 
-    uint GetScriptID() const { return m_uiScriptID; }
+    uint         GetScriptID() const { return m_uiScriptID; }
+    btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }
 
 private:
-    bool         bInitialized;
+    uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
-    uint m_uiScriptID;
-    btRigidBody* m_pBtRigidBody;
-
+    btRigidBody*             m_pBtRigidBody;
 };

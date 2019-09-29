@@ -1,6 +1,11 @@
 #include "StdInc.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "CLuaPhysicsSharedLogic.h"
+#include "../Client/game_sa/CModelInfoSA.h"
+#include "../Client/game_sa/CColModelSA.h"
+
+#define ARRAY_ModelInfo 0xA9B0C8
+CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 void CLuaPhysicsSharedLogic::EulerToQuat(btVector3 rotation, btQuaternion& result)
 {
@@ -14,7 +19,6 @@ void CLuaPhysicsSharedLogic::EulerToQuat(btVector3 rotation, btQuaternion& resul
     result.setY(cxsy * cz + sxcy * sz);
     result.setZ(cycx * sz + sysx * cz);
 }
-
 
 bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector& vecRotation)
 {
@@ -90,10 +94,8 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<C
     return trimeshShape;
 }
 
-
 bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position, CVector& rotation)
 {
-    // too small will fail with collision testing anyway
     if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
         return false;
 
@@ -121,7 +123,6 @@ bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector
 
 bool CLuaPhysicsSharedLogic::AddSphere(btCollisionObject* pCollisionObject, float fRadius, CVector& position, CVector& rotation)
 {
-    // too small will fail with collision testing anyway
     if (fRadius < MINIMUM_SHAPE_SIZE)
         return false;
 
@@ -147,6 +148,49 @@ bool CLuaPhysicsSharedLogic::AddSphere(btCollisionObject* pCollisionObject, floa
     return true;
 }
 
+bool CLuaPhysicsSharedLogic::AddTriangleMesh(btCollisionObject* pCollisionObject, std::vector<CVector>& vecIndices, CVector& position, CVector& rotation)
+{
+    if (pCollisionObject == nullptr)
+        return false;
+
+    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
+    if (pCollisionShape == nullptr)
+        return false;
+
+    if (!pCollisionShape->isCompound())
+        return false;
+
+    btCompoundShape*     pCompoundShape = (btCompoundShape*)pCollisionShape;
+    btTriangleMeshShape* pTriangleMeshShape = CreateTriangleMesh(vecIndices);
+
+    btTransform transform;
+    transform.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(transform, position);
+    CLuaPhysicsSharedLogic::SetRotation(transform, rotation);
+    pCompoundShape->addChildShape(transform, pTriangleMeshShape);
+
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::AddBoxes(btCompoundShape* pCompoundShape, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList)
+{
+    btBoxShape* pBoxCollisionShape;
+    btTransform transform;
+    for (std::pair<CVector, std::pair<CVector, CVector>> pair : halfList)
+    {
+        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
+        {
+            pBoxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(pair.first);
+
+            transform.setIdentity();
+            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
+            CLuaPhysicsSharedLogic::SetRotation(transform, pair.second.second);
+            pCompoundShape->addChildShape(transform, pBoxCollisionShape);
+        }
+    }
+    return true;
+}
+
 bool CLuaPhysicsSharedLogic::AddBoxes(btCollisionObject* pCollisionObject, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList)
 {
     if (pCollisionObject == nullptr)
@@ -163,22 +207,7 @@ bool CLuaPhysicsSharedLogic::AddBoxes(btCollisionObject* pCollisionObject, std::
         return false;
 
     btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
-    btBoxShape*      pBoxCollisionShape;
-    btTransform      transform;
-    for (std::pair<CVector, std::pair<CVector, CVector>> pair : halfList)
-    {
-        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
-        {
-            pBoxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(pair.first);
-
-            transform.setIdentity();
-            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
-            CLuaPhysicsSharedLogic::SetRotation(transform, pair.second.second);
-            pCompoundShape->addChildShape(transform, pBoxCollisionShape);
-        }
-    }
-
-    return true;
+    return AddBoxes(pCompoundShape, halfList);
 }
 
 bool CLuaPhysicsSharedLogic::AddSpheres(btCollisionObject* pCollisionObject, std::vector<std::pair<float, std::pair<CVector, CVector>>>& spheresList)
@@ -213,4 +242,60 @@ bool CLuaPhysicsSharedLogic::AddSpheres(btCollisionObject* pCollisionObject, std
     }
 
     return true;
+}
+
+void CLuaPhysicsSharedLogic::QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
+{
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pTemp;
+    g_pGame->GetWorld()->GetWorldModels(0, pTemp);
+    for (const auto object : pTemp)
+    {
+        if (DistanceBetweenPoints3D(vecPosition, object.second.first) <= fRadius)
+        {
+            pOut.push_back(object);
+        }
+    }
+}
+
+void CLuaPhysicsSharedLogic::QueryUserDefinedObjects(CVector vecPosition, float fRadius,
+                                                     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
+{
+    CClientStreamer*                                 pObjectManager = g_pClientGame->GetManager()->GetObjectStreamer();
+    std::list<CClientStreamElement*>::const_iterator iter = pObjectManager->ActiveElementsBegin();
+    CClientStreamElement*                            pElement;
+    CClientObject*                                   pClientObject;
+    CMatrix                                          matrix;
+    for (; iter != pObjectManager->ActiveElementsEnd(); ++iter)
+    {
+        pElement = *iter;
+        if (pElement->GetType() == CCLIENTOBJECT)
+        {
+            pClientObject = static_cast<CClientObject*>(pElement);
+            CVector vecRotation, vecPosition;
+            pClientObject->GetRotationRadians(vecRotation);
+            pClientObject->GetPosition(vecPosition);
+            if (DistanceBetweenPoints3D(vecPosition, matrix.GetPosition()) <= fRadius)
+            {
+                pOut.push_back(
+                    std::pair<unsigned short, std::pair<CVector, CVector>>(pClientObject->GetModel(), std::pair<CVector, CVector>(vecPosition, vecRotation)));
+            }
+        }
+    }
+}
+
+CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort usModel)
+{
+    if (CClientObjectManager::IsValidModel(usModel))
+    {
+        CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
+        if (pModelInfo != nullptr)
+        {
+            CColModelSAInterface* pColModelInterface = pModelInfo->pColModel;
+            if (pColModelInterface)
+            {
+                return pColModelInterface;
+            }
+        }
+    }
+    return nullptr;
 }

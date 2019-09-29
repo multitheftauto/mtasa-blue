@@ -15,7 +15,6 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld)
 {
     m_pWorld = pWorld;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RIGID_BODY);
-    bInitialized = false;
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
@@ -34,8 +33,6 @@ void CLuaPhysicsRigidBody::RemoveScriptID()
 
 void CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
 {
-    if (bInitialized)
-        return;
     btCollisionShape* boxCollisionShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
     btTransform       transformZero;
     transformZero.setIdentity();
@@ -49,13 +46,10 @@ void CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
     m_pBtRigidBody = new btRigidBody(rigidBodyCI);
 
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    bInitialized = true;
 }
 
 void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
 {
-    if (bInitialized)
-        return;
     btCollisionShape* sphereCollisionShape = new btSphereShape(btScalar(fRadius));
     btTransform       transformZero;
     transformZero.setIdentity();
@@ -69,23 +63,37 @@ void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pBtRigidBody = new btRigidBody(rigidBodyCI);
 
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    bInitialized = true;
 }
+
+
+btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound()
+{
+    btCompoundShape* pCompoundShape = new btCompoundShape(true);
+    btTransform       transform;
+    transform.setIdentity();
+    transform.setOrigin(btVector3(0, 0, 0));
+    btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
+
+    btVector3 localInertia(1, 1, 1);
+    // TODO, make it working line below
+    //pCompoundShape->calculateLocalInertia(1.0f, localInertia);
+
+    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, pCompoundShape, localInertia);
+    m_pBtRigidBody = new btRigidBody(rigidBodyCI);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+
+    return pCompoundShape;
+}
+
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
-    if (!bInitialized)
-        return;
-
     const btVector3 localInertia = m_pBtRigidBody->getLocalInertia();
     m_pBtRigidBody->setMassProps(fMass, localInertia);
 }
 
 void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
 {
-    if (!bInitialized)
-        return;
-
     // not working
     //if (bStatic)
     //{
@@ -102,30 +110,73 @@ void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
 
 void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 {
-    if (!bInitialized)
-        return;
-
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     transform.setOrigin(*(btVector3*)&vecPosition);
     m_pBtRigidBody->setWorldTransform(transform);
 }
 
-void CLuaPhysicsRigidBody::SetRotation(CVector& vecPosition)
+void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
 {
-    if (!bInitialized)
-        return;
+    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    vecPosition = *(CVector*)&transform.getOrigin();
+}
 
+void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
+{
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
-    quanternion.setEuler(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+    quanternion.setEuler(vecRotation.fX, vecRotation.fY, vecRotation.fZ);
     m_pBtRigidBody->setWorldTransform(transform);
+}
+
+
+float clip(float n, float lower, float upper)
+{
+    return std::max<float>(lower, std::min<float>(n, upper));
+}
+
+const btScalar  PI_ = btScalar(3.14159265f);
+const btScalar ToDegree = btScalar(180.f / PI_);
+void           QuatToEuler(btQuaternion rotation, btVector3& result)
+{
+    float fDouble = 2.f * rotation.getY() * rotation.getZ() - 2.f * rotation.getX() * rotation.getW();
+    if (fDouble >= 0.99999797344208f)
+    {
+        result.setX(-90.0f);
+        result.setY(atan2(clip(rotation.getY(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
+        result.setZ(-atan2(clip(rotation.getZ(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
+    }
+    else if (-fDouble >= 0.99999797344208f)
+    {
+        result.setX(90.0f);
+        result.setY(atan2(clip(rotation.getY(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
+        result.setZ(-atan2(clip(rotation.getZ(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
+    }
+    else
+    {
+        result.setX(-asin(clip(fDouble, -1.0f, 1.0f)) * ToDegree);
+        result.setY(atan2(clip(rotation.getX() * rotation.getZ() + rotation.getY() * rotation.getW(), -1.0f, 1.0f),
+                          clip(0.5f - rotation.getX() * rotation.getX() - rotation.getY() * rotation.getY(), -1.0f, 1.0f)) *
+                    ToDegree);
+        result.setZ(-atan2(clip(rotation.getX() * rotation.getY() + rotation.getZ() * rotation.getW(), -1.0f, 1.0f),
+                           clip(0.5f - rotation.getX() * rotation.getX() - rotation.getZ() * rotation.getZ(), -1.0f, 1.0f)) *
+                    ToDegree);
+    }
+}
+
+void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
+{
+    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    btQuaternion quanternion = transform.getRotation();
+    btVector3    rotation;
+    QuatToEuler(quanternion, rotation);
+    vecRotation.fX = rotation.getX();
+    vecRotation.fY = rotation.getY();
+    vecRotation.fZ = rotation.getZ();
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(CVector& vecVelocity)
 {
-    if (!bInitialized)
-        return;
-
     m_pBtRigidBody->setLinearVelocity(btVector3(vecVelocity.fZ, vecVelocity.fY, vecVelocity.fZ));
 }
 
