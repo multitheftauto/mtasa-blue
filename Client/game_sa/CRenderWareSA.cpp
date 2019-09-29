@@ -239,7 +239,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
     // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
@@ -250,12 +250,12 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // open the stream
     RwStream* streamModel;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    RwBuffer  streamBuffer;
+    if (!buffer.empty())
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
-        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
+        streamBuffer.ptr = (void*)buffer.data();
+        streamBuffer.size = buffer.size();
+        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
     }
     else
         streamModel = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);

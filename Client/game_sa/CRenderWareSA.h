@@ -42,7 +42,7 @@ public:
     RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions);
+    RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);

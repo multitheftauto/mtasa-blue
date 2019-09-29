@@ -540,18 +540,37 @@ public:
     void ReadString(SString& outValue, const char* defaultValue = NULL)
     {
         int iArgument = lua_type(m_luaVM, m_iIndex);
+
         if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
-            uint uiLength = lua_strlen(m_luaVM, m_iIndex);
-            outValue.assign(lua_tostring(m_luaVM, m_iIndex++), uiLength);
+            size_t length = lua_strlen(m_luaVM, m_iIndex);
+            
+            try
+            {
+                outValue.assign(lua_tostring(m_luaVM, m_iIndex++), length);
+            }
+            catch (const std::bad_alloc&)
+            {
+                SetCustomError("out of memory", "Memory allocation");
+            }
+
             return;
         }
         else if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
         {
             if (defaultValue)
             {
-                outValue = defaultValue;
                 m_iIndex++;
+
+                try
+                {
+                    outValue.assign(defaultValue);
+                }
+                catch (const std::bad_alloc&)
+                {
+                    SetCustomError("out of memory", "Memory allocation");
+                }
+
                 return;
             }
         }

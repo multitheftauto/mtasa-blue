@@ -55,7 +55,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
             if (g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
             {
                 g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strDffFilename, CBuffer());
-                info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, CBuffer(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
+                info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, SString(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
             }
         }
         else            // We have raw data
@@ -63,40 +63,28 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
             info.pClump = g_pGame->GetRenderWare()->ReadDFF(NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel(usModelId));
 
             // Remove raw data from memory (can only do one replace when using raw data)
-            m_RawDataBuffer = CBuffer();
+            SString().swap(m_RawDataBuffer);
         }
     }
 
     return info.pClump;
 }
 
-bool CClientDFF::LoadDFF(const SString& strFile, bool bIsRawData)
+bool CClientDFF::Load(bool isRaw, SString input)
 {
-    // Should only be called once, directly after construction
-    m_bIsRawData = bIsRawData;
-    if (!m_bIsRawData)            // If we have actual file
+    if (input.empty())
+        return false;
+
+    m_bIsRawData = isRaw;
+
+    if (isRaw)
     {
-        assert(m_strDffFilename.empty());
-
-        m_strDffFilename = strFile;
-        if (m_strDffFilename.empty())
-            return false;
-
-        if (!FileExists(m_strDffFilename))
-            return false;
-
-        if (!g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
-            return false;
+        return LoadFromBuffer(std::move(input));
     }
     else
     {
-        m_RawDataBuffer = CBuffer(strFile, strFile.length());
-        if (!g_pCore->GetNetwork()->CheckFile("dff", "", m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize()))
-            return false;
+        return LoadFromFile(std::move(input));
     }
-
-    // Do actual load later (in ReplaceModel)
-    return true;
 }
 
 void CClientDFF::UnloadDFF()
@@ -123,6 +111,27 @@ bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 
     SetApplicationSetting("diagnostics", "gta-model-fail", "");
     return bResult;
+}
+
+bool CClientDFF::LoadFromFile(SString filePath)
+{
+    if (!FileExists(filePath))
+        return false;
+
+    if (!g_pCore->GetNetwork()->CheckFile("dff", filePath))
+        return false;
+
+    m_strDffFilename = std::move(filePath);
+    return true;
+}
+
+bool CClientDFF::LoadFromBuffer(SString buffer)
+{
+    if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
+        return false;
+
+    m_RawDataBuffer = std::move(buffer);
+    return true;
 }
 
 bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
