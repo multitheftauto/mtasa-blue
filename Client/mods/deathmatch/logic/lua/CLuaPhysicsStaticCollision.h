@@ -34,23 +34,8 @@ public:
     btCollisionObject* InitializeWithSphere(float fRadius);
     btCollisionObject* InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
 
-    inline static void SetPosition(btTransform& transform, CVector& vecRotation);
-    inline static void SetRotation(btTransform& transform, CVector& vecRotation);
-
-    static void SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
-    static void SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
-
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
-
-    btBoxShape*             CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
-    btSphereShape*          CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
-    btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
-
-    bool AddBox(CVector& half, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
-    bool AddBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList);
-    bool AddSphere(float fRadius, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
-    bool AddSpheres(std::vector<std::pair<float, std::pair<CVector, CVector>>>& spheresList);
 
     uint GetScriptID() const { return m_uiScriptID; }
 
