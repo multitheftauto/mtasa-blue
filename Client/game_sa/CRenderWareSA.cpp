@@ -199,16 +199,16 @@ CRenderWareSA::~CRenderWareSA()
 }
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData)
+RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
     // open the stream
     RwStream* streamTexture;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    RwBuffer  streamBuffer;
+    if (!buffer.empty())
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
-        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
+        streamBuffer.ptr = (void*)buffer.data();
+        streamBuffer.size = buffer.size();
+        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
     }
     else
         streamTexture = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);

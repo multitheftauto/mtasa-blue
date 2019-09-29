@@ -31,7 +31,7 @@ public:
     CRenderWareSA(enum eGameVersion version);
     ~CRenderWareSA();
     void Initialize();
-    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled);
+    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ClothesAddReplacementTxd(char* pFileData, ushort usFileId);
@@ -39,7 +39,7 @@ public:
     bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
+    RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
     RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);

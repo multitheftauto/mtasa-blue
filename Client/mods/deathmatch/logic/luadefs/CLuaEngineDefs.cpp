@@ -257,11 +257,10 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 {
-    SString          strFile = "";
+    SString          input;
     bool             bFilteringEnabled = true;
     CScriptArgReader argStream(luaVM);
-    // Grab the TXD filename or data
-    argStream.ReadString(strFile);
+    argStream.ReadString(input);
     if (argStream.NextIsBool())            // Some scripts have a number here (in error)
         argStream.ReadBool(bFilteringEnabled, true);
 
@@ -275,10 +274,20 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool    bIsRawData = CClientTXD::IsTXDData(strFile);
-                SString strPath;
-                // Is this a legal filepath?
-                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                bool bIsRawData = CClientTXD::IsTXDData(input);
+
+                // Do not proceed if the file path length appears too long to be real
+                if (!bIsRawData && input.size() > 32767)
+                {
+                    argStream.SetCustomError("Corrupt TXD file data or file path too long", "Error loading TXD");
+                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                SString filePath;
+
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceTXDRoot();
@@ -287,7 +296,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     CClientTXD* pTXD = new CClientTXD(m_pManager, INVALID_ELEMENT_ID);
 
                     // Try to load the TXD file
-                    if (pTXD->LoadTXD(bIsRawData ? strFile : strPath, bFilteringEnabled, bIsRawData))
+                    if (pTXD->Load(bIsRawData, bIsRawData ? std::move(input) : std::move(filePath), bFilteringEnabled))
                     {
                         // Success loading the file. Set parent to TXD root
                         pTXD->SetParent(pRoot);
@@ -300,18 +309,20 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     {
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading TXD");
+                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading TXD");
                     }
                 }
                 else
-                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
             }
         }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // We failed
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
