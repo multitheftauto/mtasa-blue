@@ -151,6 +151,10 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         {
             return ReplaceVehicleModel(pClump, usModel, bAlphaTransparency);
         }
+        else if (CClientPlayerManager::IsValidModel(usModel))
+        {
+            return ReplacePedModel(pClump, usModel, bAlphaTransparency);
+        }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
             if (CVehicleUpgrades::IsUpgrade(usModel))
@@ -165,10 +169,6 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
                 return ReplaceWeaponModel(pClump, usModel, bAlphaTransparency);
             }
             return ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
-        }
-        else if (CClientPlayerManager::IsValidModel(usModel))
-        {
-            return ReplacePedModel(pClump, usModel, bAlphaTransparency);
         }
     }
 
@@ -224,7 +224,14 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
     }
-
+    // Is this an ped ID?
+    else if (CClientPlayerManager::IsValidModel(usModel))
+    {
+        // Stream the ped of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetPedManager()->RestreamPeds(usModel);
+    }
     // Is this an object ID?
     else if (CClientObjectManager::IsValidModel(usModel))
     {
@@ -241,14 +248,6 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager()->RestreamObjects(usModel);
         g_pGame->GetModelInfo(usModel)->RestreamIPL();
-    }
-    // Is this an ped ID?
-    else if (CClientPlayerManager::IsValidModel(usModel))
-    {
-        // Stream the ped of that model out so we have no
-        // loaded when we do the restore. The streamer will
-        // eventually stream them back in with async loading.
-        m_pManager->GetPedManager()->RestreamPeds(usModel);
     }
     else
         return;
