@@ -164,7 +164,10 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBodyFromModel(usModel, vecPosition, vecRotation);
-        lua_pushrigidbody(luaVM, pRigidBody);
+        if (pRigidBody != nullptr)
+            lua_pushrigidbody(luaVM, pRigidBody);
+        else
+            lua_pushboolean(luaVM, false);
         return 1;
     }
     else
