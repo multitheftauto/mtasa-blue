@@ -329,13 +329,13 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 {
-    SString strFile = "";
-    SString strBlockName = "";
+    SString input;
+    SString blockName;
 
     CScriptArgReader argStream(luaVM);
     // Grab the IFP filename or data
-    argStream.ReadString(strFile);
-    argStream.ReadString(strBlockName);
+    argStream.ReadString(input);
+    argStream.ReadString(blockName);
 
     if (!argStream.HasErrors())
     {
@@ -347,30 +347,48 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
-                SString strPath;
-                // Is this a legal filepath?
-                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                bool bIsRawData = CIFPEngine::IsIFPData(input);
+
+                // Do not proceed if the file path length appears too long to be real
+                if (!bIsRawData && input.size() > 32767)
                 {
-                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
-                    if (pIFP != nullptr)
+                    argStream.SetCustomError("Corrupt IFP file data or file path too long", "Error loading IFP");
+                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                SString filePath;
+
+                // Is this a legal filepath?
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
+                {
+                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::LoadIFP(pResource, m_pManager, std::move(blockName), bIsRawData, bIsRawData ? std::move(input) : std::move(filePath));
+
+                    if (pIFP)
                     {
                         // Return the IFP element
                         lua_pushelement(luaVM, pIFP.get());
                         return 1;
                     }
                     else
-                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading IFP");
+                    {
+                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading IFP");
+                    }
                 }
                 else
-                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
+                {
+                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                }
             }
         }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // We failed
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
