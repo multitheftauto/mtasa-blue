@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CLuaPhysicsSharedLogic.h"
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld)
 {
@@ -125,7 +126,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
-    quanternion.setEuler(vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pBtRigidBody->setWorldTransform(transform);
 }
 
@@ -135,7 +136,8 @@ float clip(float n, float lower, float upper)
     return std::max<float>(lower, std::min<float>(n, upper));
 }
 
-const btScalar  PI_ = btScalar(3.14159265f);
+
+const btScalar PI_ = btScalar(3.14159265f);
 const btScalar ToDegree = btScalar(180.f / PI_);
 void           QuatToEuler(btQuaternion rotation, btVector3& result)
 {
@@ -163,6 +165,7 @@ void           QuatToEuler(btQuaternion rotation, btVector3& result)
                     ToDegree);
     }
 }
+
 
 void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
 {
