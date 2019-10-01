@@ -130,49 +130,12 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
     m_pBtRigidBody->setWorldTransform(transform);
 }
 
-
-float clip(float n, float lower, float upper)
-{
-    return std::max<float>(lower, std::min<float>(n, upper));
-}
-
-
-const btScalar PI_ = btScalar(3.14159265f);
-const btScalar ToDegree = btScalar(180.f / PI_);
-void           QuatToEuler(btQuaternion rotation, btVector3& result)
-{
-    float fDouble = 2.f * rotation.getY() * rotation.getZ() - 2.f * rotation.getX() * rotation.getW();
-    if (fDouble >= 0.99999797344208f)
-    {
-        result.setX(-90.0f);
-        result.setY(atan2(clip(rotation.getY(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
-        result.setZ(-atan2(clip(rotation.getZ(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
-    }
-    else if (-fDouble >= 0.99999797344208f)
-    {
-        result.setX(90.0f);
-        result.setY(atan2(clip(rotation.getY(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
-        result.setZ(-atan2(clip(rotation.getZ(), -1.0f, 1.0f), clip(rotation.getW(), -1.0f, 1.0f)) * ToDegree);
-    }
-    else
-    {
-        result.setX(-asin(clip(fDouble, -1.0f, 1.0f)) * ToDegree);
-        result.setY(atan2(clip(rotation.getX() * rotation.getZ() + rotation.getY() * rotation.getW(), -1.0f, 1.0f),
-                          clip(0.5f - rotation.getX() * rotation.getX() - rotation.getY() * rotation.getY(), -1.0f, 1.0f)) *
-                    ToDegree);
-        result.setZ(-atan2(clip(rotation.getX() * rotation.getY() + rotation.getZ() * rotation.getW(), -1.0f, 1.0f),
-                           clip(0.5f - rotation.getX() * rotation.getX() - rotation.getZ() * rotation.getZ(), -1.0f, 1.0f)) *
-                    ToDegree);
-    }
-}
-
-
 void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
-    QuatToEuler(quanternion, rotation);
+    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
     vecRotation.fX = rotation.getX();
     vecRotation.fY = rotation.getY();
     vecRotation.fZ = rotation.getZ();

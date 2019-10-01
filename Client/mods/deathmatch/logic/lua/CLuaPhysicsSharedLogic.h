@@ -25,4 +25,6 @@ public:
     static void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static CColModelSAInterface* GetModelCollisionInterface(ushort usModel);
+
+    static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
 };

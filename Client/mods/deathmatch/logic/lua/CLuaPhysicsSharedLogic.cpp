@@ -299,3 +299,50 @@ CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort 
     }
     return nullptr;
 }
+
+
+void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3& result)
+{
+    rotation.setX(-rotation.getX());
+    rotation.setY(-rotation.getY());
+    rotation.setZ(-rotation.getZ());
+    rotation.normalize();
+
+    const double eps = 1e-7;
+    const double pi = 3.14159265358979323846;
+    double       x, y, z;
+    double       qw = rotation.getW(), qx = rotation.getX(), qy = rotation.getY(), qz = rotation.getZ();
+
+    double sqx = qx * qx, sqy = qy * qy, sqz = qz * qz;
+
+    double test = (2.0 * qy * qz) - (2.0 * qx * qw);
+    if (test >= 1 - eps)
+    {
+        x = pi / 2.0;
+        y = -atan2(qy, qw);
+        z = -atan2(qz, qw);
+    }
+    else if (-test >= 1 - eps)
+    {
+        x = -pi / 2.0;
+        y = -atan2(qy, qw);
+        z = -atan2(qz, qw);
+    }
+    else
+    {
+        x = asin(test);
+        y = -atan2((qx * qz) + (qy * qw), 0.5 - sqx - sqy);
+        z = -atan2((qx * qy) + (qz * qw), 0.5 - sqx - sqz);
+    }
+
+    x *= 180.0 / pi;
+    y *= 180.0 / pi;
+    z *= 180.0 / pi;
+
+#pragma warning(push)
+#pragma warning(disable : 4244)
+    result.setX(x);
+    result.setY(y);
+    result.setZ(z);
+#pragma warning(pop)
+}
