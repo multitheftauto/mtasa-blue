@@ -156,7 +156,6 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     }
     catch (const std::bad_alloc&)
     {
-        CloseHandle(handle);
         return false;
     }
 
