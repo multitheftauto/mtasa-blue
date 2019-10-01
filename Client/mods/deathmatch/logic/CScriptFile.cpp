@@ -207,7 +207,7 @@ void CScriptFile::DoResourceFileCheck()
         m_pFile->FSeek(lCurrentPos, SEEK_SET);
 
         // Check file content
-        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer);
+        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer.GetData(), buffer.GetSize());
     }
 }
 

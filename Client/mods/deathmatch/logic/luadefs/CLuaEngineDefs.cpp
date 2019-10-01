@@ -127,10 +127,10 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 {
-    SString          strFile = "";
+    SString          input;
     CScriptArgReader argStream(luaVM);
     // Grab the COL filename or data
-    argStream.ReadString(strFile);
+    argStream.ReadString(input);
 
     if (!argStream.HasErrors())
     {
@@ -142,10 +142,21 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool    bIsRawData = CClientColModel::IsCOLData(strFile);
-                SString strPath;
+                bool bIsRawData = CClientColModel::IsCOLData(input);
+
+                // Do not proceed if the file path length appears too long to be real
+                if (!bIsRawData && input.size() > 32767)
+                {
+                    argStream.SetCustomError("Corrupt COL file data or file path too long", "Error loading COL");
+                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                SString filePath;
+
                 // Is this a legal filepath?
-                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceCOLModelRoot();
@@ -154,7 +165,7 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                     CClientColModel* pCol = new CClientColModel(m_pManager, INVALID_ELEMENT_ID);
 
                     // Attempt loading the file
-                    if (pCol->LoadCol(bIsRawData ? strFile : strPath, bIsRawData))
+                    if (pCol->Load(bIsRawData, bIsRawData ? std::move(input) : std::move(filePath)))
                     {
                         // Success. Make it a child of the resource collision root
                         pCol->SetParent(pRoot);
@@ -167,18 +178,22 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                     {
                         // Delete it again. We failed
                         delete pCol;
-                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading COL");
+                        argStream.SetCustomError(bIsRawData ? "raw data" : input, "Error loading COL");
                     }
                 }
                 else
-                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
+                {
+                    argStream.SetCustomError(bIsRawData ? "raw data" : input, "Bad file path");
+                }
             }
         }
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // We failed for some reason
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

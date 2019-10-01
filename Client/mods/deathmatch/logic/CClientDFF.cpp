@@ -54,7 +54,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         {
             if (g_pCore->GetNetwork()->CheckFile("dff", m_strDffFilename))
             {
-                g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strDffFilename, CBuffer());
+                g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strDffFilename, nullptr, 0);
                 info.pClump = g_pGame->GetRenderWare()->ReadDFF(m_strDffFilename, SString(), usModelId, CClientVehicleManager::IsValidModel(usModelId));
             }
         }

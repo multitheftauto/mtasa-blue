@@ -173,7 +173,7 @@ void CClientTXD::Restream(unsigned short usModelID)
 // Return filename to use, or false if not valid
 bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
 {
-    g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, CBuffer());
+    g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, nullptr, 0);
     if (!g_pCore->GetNetwork()->CheckFile("txd", m_strFilename))
         return false;
 

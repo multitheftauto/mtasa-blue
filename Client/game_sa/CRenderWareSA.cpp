@@ -421,17 +421,17 @@ void CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
 }
 
 // Reads and parses a COL3 file
-CColModel* CRenderWareSA::ReadCOL(const CBuffer& fileData)
+CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 {
-    if (fileData.GetSize() < sizeof(ColModelFileHeader) + 16)
+    if (buffer.size() < sizeof(ColModelFileHeader) + 16)
         return NULL;
 
-    const ColModelFileHeader& header = *(ColModelFileHeader*)fileData.GetData();
+    const ColModelFileHeader& header = *(ColModelFileHeader*)buffer.data();
 
     // Load the col model
     if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
     {
-        unsigned char* pModelData = (unsigned char*)fileData.GetData() + sizeof(ColModelFileHeader);
+        unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
 
         // Create a new CColModel
         CColModelSA* pColModel = new CColModelSA();

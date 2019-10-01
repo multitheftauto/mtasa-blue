@@ -54,7 +54,7 @@ public:
     void DestroyTexture(RwTexture* pTex);
 
     // Reads and parses a COL3 file with an optional collision key name
-    CColModel* ReadCOL(const CBuffer& fileData);
+    CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void ReplaceCollisions(CColModel* pColModel, unsigned short usModelID);
