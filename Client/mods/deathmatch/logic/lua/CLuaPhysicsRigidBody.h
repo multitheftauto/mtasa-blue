@@ -41,6 +41,7 @@ public:
     void GetRotation(CVector& vecPosition);
 
     void SetLinearVelocity(CVector& vecVelocity);
+    void ApplyForce(CVector& vecFrom, CVector& vecTo);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }

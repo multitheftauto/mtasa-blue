@@ -66,18 +66,17 @@ void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pWorld->addRigidBody(m_pBtRigidBody);
 }
 
-
 btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound()
 {
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
-    btTransform       transform;
+    btTransform      transform;
     transform.setIdentity();
     transform.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
 
     btVector3 localInertia(1, 1, 1);
     // TODO, make it working line below
-    //pCompoundShape->calculateLocalInertia(1.0f, localInertia);
+    // pCompoundShape->calculateLocalInertia(1.0f, localInertia);
 
     btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, pCompoundShape, localInertia);
     m_pBtRigidBody = new btRigidBody(rigidBodyCI);
@@ -85,7 +84,6 @@ btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound()
 
     return pCompoundShape;
 }
-
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
@@ -96,13 +94,13 @@ void CLuaPhysicsRigidBody::SetMass(float fMass)
 void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
 {
     // not working
-    //if (bStatic)
+    // if (bStatic)
     //{
     //    m_pBtRigidBody->setLinearFactor(btVector3(0, 0, 0));
     //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
     //    m_pBtRigidBody->setActivationState(DISABLE_SIMULATION);
     //}
-    //else
+    // else
     //{
     //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
     //    m_pBtRigidBody->setActivationState(DISABLE_DEACTIVATION);
@@ -124,7 +122,7 @@ void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
 
 void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
 {
-    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    btTransform  transform = m_pBtRigidBody->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pBtRigidBody->setWorldTransform(transform);
@@ -132,7 +130,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
 
 void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
 {
-    btTransform transform = m_pBtRigidBody->getWorldTransform();
+    btTransform  transform = m_pBtRigidBody->getWorldTransform();
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
     CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
@@ -144,6 +142,13 @@ void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
 void CLuaPhysicsRigidBody::SetLinearVelocity(CVector& vecVelocity)
 {
     m_pBtRigidBody->setLinearVelocity(btVector3(vecVelocity.fZ, vecVelocity.fY, vecVelocity.fZ));
+}
+
+void CLuaPhysicsRigidBody::ApplyForce(CVector& vecFrom, CVector& vecTo)
+{
+    CVector rigidPosition;
+    GetPosition(rigidPosition);
+    m_pBtRigidBody->applyForce(*(btVector3*)&(vecTo - vecFrom), *(btVector3*)&(rigidPosition - vecFrom));
 }
 
 void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)

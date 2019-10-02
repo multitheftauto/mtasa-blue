@@ -24,6 +24,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsDrawDebug", PhysicsDrawDebug},
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
+        {"physicsApplyForce", PhysicsApplyForce},
     };
 
     // Add functions
@@ -263,6 +264,29 @@ int CLuaPhysicsDefs::PhysicsAddShape(lua_State* luaVM)
                 }
                 break;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsApplyForce(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody* pRigidBody;
+    CVector               from, to;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pRigidBody);
+    argStream.ReadVector3D(from);
+    argStream.ReadVector3D(to);
+
+    if (!argStream.HasErrors())
+    {
+        pRigidBody->ApplyForce(from, to);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
