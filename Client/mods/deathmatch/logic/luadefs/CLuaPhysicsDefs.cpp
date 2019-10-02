@@ -313,7 +313,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
     {
         bool    boolean;
         CVector vector;
-        float   floatNumber;
+        float   floatNumber[2];
 
         if (pRigidBody != nullptr)
         {
@@ -329,10 +329,10 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     }
                     break;
                 case PHYSICS_PROPERTY_MASS:
-                    argStream.ReadNumber(floatNumber);
+                    argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pRigidBody->SetMass(floatNumber);
+                        pRigidBody->SetMass(floatNumber[0]);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -351,6 +351,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     if (!argStream.HasErrors())
                     {
                         pRigidBody->SetRotation(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+                    argStream.ReadNumber(floatNumber[0]);
+                    argStream.ReadNumber(floatNumber[1]);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -407,7 +416,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
     {
         bool    boolean;
         CVector vector;
-        float   floatNumber;
+        float   floatNumber[2];
 
         if (pRigidBody != nullptr)
         {
@@ -425,6 +434,11 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     lua_pushnumber(luaVM, vector.fY);
                     lua_pushnumber(luaVM, vector.fZ);
                     return 3;
+                case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
+                    pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
+                    lua_pushnumber(luaVM, floatNumber[0]);
+                    lua_pushnumber(luaVM, floatNumber[1]);
+                    return 2;
             }
         }
         else if (pStaticCollision)

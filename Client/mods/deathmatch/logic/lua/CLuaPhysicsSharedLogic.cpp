@@ -79,6 +79,21 @@ btSphereShape* CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecP
     return pSphereShape;
 }
 
+btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)
+{
+    btTransform transformZero;
+    transformZero.setIdentity();
+    transformZero.setOrigin(btVector3(0, 0, 0));
+    btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
+
+    btVector3 localInertia(0, 0, 0);
+    pShape->calculateLocalInertia(fMass, localInertia);
+
+    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
+    btRigidBody* pRigidBody = new btRigidBody(rigidBodyCI);
+    return pRigidBody;
+}
+
 btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<CVector>& vecIndices)
 {
     if (vecIndices.size() % 3 != 0 || vecIndices.size() == 0)

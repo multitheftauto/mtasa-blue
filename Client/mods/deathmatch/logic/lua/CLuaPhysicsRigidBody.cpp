@@ -34,24 +34,14 @@ void CLuaPhysicsRigidBody::RemoveScriptID()
 
 void CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
 {
-    btCollisionShape* boxCollisionShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
-    btTransform       transformZero;
-    transformZero.setIdentity();
-    transformZero.setOrigin(btVector3(0, 0, 0));
-    btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
-
-    btVector3 localInertia(0, 0, 0);
-    boxCollisionShape->calculateLocalInertia(1.0f, localInertia);
-
-    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(1.0f, motionstate, boxCollisionShape, localInertia);
-    m_pBtRigidBody = new btRigidBody(rigidBodyCI);
-
+    btCollisionShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(boxCollisionShape, 1.0f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
 }
 
 void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
 {
-    btCollisionShape* sphereCollisionShape = new btSphereShape(btScalar(fRadius));
+    btCollisionShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
     btTransform       transformZero;
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
@@ -150,6 +140,21 @@ void CLuaPhysicsRigidBody::ApplyForce(CVector& vecFrom, CVector& vecTo)
     GetPosition(rigidPosition);
     m_pBtRigidBody->applyForce(reinterpret_cast<btVector3&>(vecTo - vecFrom), reinterpret_cast<btVector3&>(rigidPosition - vecFrom));
 }
+
+
+void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)
+{
+    m_fLinearSleepingThresholds = fLinear;
+    m_fAngularSleepingThresholds = fAngular;
+    m_pBtRigidBody->setSleepingThresholds(fLinear, fAngular);
+}
+
+void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular)
+{
+    fLinear = m_fLinearSleepingThresholds;
+    fAngular = m_fAngularSleepingThresholds;
+}
+
 
 void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)
 {

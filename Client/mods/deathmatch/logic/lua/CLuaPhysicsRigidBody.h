@@ -42,6 +42,9 @@ public:
 
     void SetLinearVelocity(CVector& vecVelocity);
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
+    void SetSleepingThresholds(float fLinear, float fAngular);
+    void GetSleepingThresholds(float& fLinear, float& fAngular);
+
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }
@@ -50,4 +53,8 @@ private:
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     btRigidBody*             m_pBtRigidBody;
+
+    // bullet doesn't provide function for that thats why it have to be cached here
+    float m_fLinearSleepingThresholds;
+    float m_fAngularSleepingThresholds;
 };
