@@ -22,6 +22,7 @@ class CDebugDrawer : public btIDebugDraw
     int m_debugMode;
     CGraphicsInterface* m_pGraphics;
     SColorARGB          color = SColorARGB(255, 255, 0, 0);
+    float               fLineWidth = 2.0f;
 
 public:
     CDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};

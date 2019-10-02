@@ -23,7 +23,7 @@ void CLuaPhysicsSharedLogic::EulerToQuat(btVector3 rotation, btQuaternion& resul
 bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector& vecRotation)
 {
     btQuaternion quaternion;
-    EulerToQuat(*(btVector3*)&vecRotation, quaternion);
+    EulerToQuat(reinterpret_cast<btVector3&>(vecRotation), quaternion);
     transform.setRotation(quaternion);
     return true;
 }
@@ -31,7 +31,7 @@ bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector& vecRot
 bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, CVector& vecPosition)
 {
     btQuaternion quaternion;
-    transform.setOrigin(*(btVector3*)&vecPosition);
+    transform.setOrigin(reinterpret_cast<btVector3&>(vecPosition));
     return true;
 }
 
@@ -87,7 +87,8 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<C
     btTriangleMesh* triangleMesh = new btTriangleMesh();
     for (int i = 0; i < vecIndices.size(); i += 3)
     {
-        triangleMesh->addTriangle(*(const btVector3*)&vecIndices[i], *(const btVector3*)&vecIndices[i + 1], *(const btVector3*)&vecIndices[i + 2]);
+        triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecIndices[i]), reinterpret_cast<btVector3&>(vecIndices[i + 1]),
+                                  reinterpret_cast<btVector3&>(vecIndices[i + 2]));
     }
     btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(triangleMesh, true);
 

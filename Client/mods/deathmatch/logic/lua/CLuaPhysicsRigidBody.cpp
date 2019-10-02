@@ -110,14 +110,14 @@ void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
 void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
-    transform.setOrigin(*(btVector3*)&vecPosition);
+    transform.setOrigin(reinterpret_cast<btVector3&>(vecPosition));
     m_pBtRigidBody->setWorldTransform(transform);
 }
 
 void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
-    vecPosition = *(CVector*)&transform.getOrigin();
+    vecPosition = reinterpret_cast<CVector&>(transform.getOrigin());
 }
 
 void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
@@ -148,7 +148,7 @@ void CLuaPhysicsRigidBody::ApplyForce(CVector& vecFrom, CVector& vecTo)
 {
     CVector rigidPosition;
     GetPosition(rigidPosition);
-    m_pBtRigidBody->applyForce(*(btVector3*)&(vecTo - vecFrom), *(btVector3*)&(rigidPosition - vecFrom));
+    m_pBtRigidBody->applyForce(reinterpret_cast<btVector3&>(vecTo - vecFrom), reinterpret_cast<btVector3&>(rigidPosition - vecFrom));
 }
 
 void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)

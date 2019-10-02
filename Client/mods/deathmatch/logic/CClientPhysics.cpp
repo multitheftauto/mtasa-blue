@@ -15,18 +15,19 @@
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 2, color, false);
+    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), fLineWidth, color, false);
 }
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&from, *(CVector*)&to, 2, SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f),
+    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), 2,
+                                  SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f),
                                   false);
 }
 void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
 {
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&b, 2, color, false);
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&b, *(CVector*)&c, 2, color, false);
-    m_pGraphics->DrawLine3DQueued(*(CVector*)&a, *(CVector*)&c, 2, color, false);
+    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(b), fLineWidth, color, false);
+    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(b), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
+    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
 }
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
