@@ -44,7 +44,8 @@ public:
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
     void SetSleepingThresholds(float fLinear, float fAngular);
     void GetSleepingThresholds(float& fLinear, float& fAngular);
-
+    void SetRestitution(float fRestitution);
+    void GetRestitution(float& fRestitution);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }

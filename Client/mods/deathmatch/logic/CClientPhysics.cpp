@@ -49,7 +49,6 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
-
     // Add us to Physics manager's list
     m_pPhysicsManager->AddToList(this);
 }
@@ -116,6 +115,10 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     //{
     //    CLuaPhysicsSharedLogic::AddTriangleMesh(pCollisionShape, indexList);
     //}
+
+    btVector3 localInertia(0, 0, 0);
+    pCompoundShape->calculateLocalInertia(1.0f, localInertia);
+    pRigidBody->GetBtRigidBody()->setMassProps(1.0f, localInertia);
     return pRigidBody;
 }
 
@@ -158,7 +161,6 @@ CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsign
 
     CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
     btCollisionObject* pCollisionObject = pStaticCollision->InitializeWithCompound();
-
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
     if (halfList.size() > 0)

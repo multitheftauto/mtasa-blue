@@ -90,7 +90,7 @@ btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, f
     pShape->calculateLocalInertia(fMass, localInertia);
 
     btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
-    btRigidBody* pRigidBody = new btRigidBody(rigidBodyCI);
+    btRigidBody*                             pRigidBody = new btRigidBody(rigidBodyCI);
     return pRigidBody;
 }
 

@@ -364,6 +364,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_RESTITUTION:
+                    argStream.ReadNumber(floatNumber[0]);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetRestitution(floatNumber[0]);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
             }
         }
         else if (pStaticCollision)
@@ -435,10 +444,14 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     lua_pushnumber(luaVM, vector.fZ);
                     return 3;
                 case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
-                    pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
+                    pRigidBody->GetSleepingThresholds(floatNumber[0], floatNumber[1]);
                     lua_pushnumber(luaVM, floatNumber[0]);
                     lua_pushnumber(luaVM, floatNumber[1]);
                     return 2;
+                case PHYSICS_PROPERTY_RESTITUTION:
+                    pRigidBody->GetRestitution(floatNumber[0]);
+                    lua_pushnumber(luaVM, floatNumber[0]);
+                    return 1;
             }
         }
         else if (pStaticCollision)
