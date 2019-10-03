@@ -123,6 +123,7 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
         CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody();
         CVector               vector;
         float                 fRadius;
+        float                 fHeight;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -137,6 +138,14 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 if (!argStream.HasErrors())
                 {
                     pRigidBody->InitializeWithSphere(fRadius);
+                }
+                break;
+            case PHYSICS_SHAPE_CAPSULE:
+                argStream.ReadNumber(fRadius);
+                argStream.ReadNumber(fHeight);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithCapsule(fRadius, fHeight);
                 }
                 break;
         }

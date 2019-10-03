@@ -48,6 +48,14 @@ void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pWorld->addRigidBody(m_pBtRigidBody);
 }
 
+void CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float fHeight)
+{
+    btCollisionShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
+    SetSleepingThresholds(0.05f, 0.05f);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+}
+
 btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound()
 {
     btCompoundShape* pCompoundShape = new btCompoundShape(true);

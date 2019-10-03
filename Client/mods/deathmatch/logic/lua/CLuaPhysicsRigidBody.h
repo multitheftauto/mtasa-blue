@@ -31,6 +31,7 @@ public:
 
     void               InitializeWithBox(CVector& vecHalf);
     void               InitializeWithSphere(float fRadius);
+    void               InitializeWithCapsule(float fRadius, float fHeight);
     btCompoundShape*   InitializeWithCompound();
 
     void SetStatic(bool bStatic);
