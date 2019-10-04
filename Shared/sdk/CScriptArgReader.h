@@ -1005,7 +1005,7 @@ public:
     // Reads a table of floating point numbers
     // Taken from CrosRoad95 dxDrawPrimitive pull request
     //
-    void ReadNumberTable(std::vector<float>& outList)
+    void ReadNumberTable(std::vector<float>& outList, int iLimit = 0x7FFFFFFF)
     {
         outList.clear();
         int iArgument = lua_type(m_luaVM, m_iIndex);
@@ -1018,6 +1018,9 @@ public:
                 {
                     outList.push_back(static_cast<float>(lua_tonumber(m_luaVM, -1)));
                 }
+                iLimit--;
+                if (iLimit <= 0)
+                    return;
             }
             m_iIndex++;
             return;

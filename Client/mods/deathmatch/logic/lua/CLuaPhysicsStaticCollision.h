@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 class CLuaPhysicsStaticCollision;
+class btHeightfieldTerrainShape;
+class heightfieldTerrainShape;
 
 #pragma once
 
@@ -34,6 +36,7 @@ public:
     btCollisionObject* InitializeWithSphere(float fRadius);
     btCollisionObject* InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
 
+    btCollisionObject* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, CVector vecScale, std::vector<float>& vecHeightData);
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
 
@@ -44,5 +47,6 @@ private:
     btDiscreteDynamicsWorld* m_pWorld;
     uint m_uiScriptID;
     btCollisionObject*       m_btCollisionObject;
+    heightfieldTerrainShape* m_pHeightfieldTerrain;
 
 };

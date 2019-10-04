@@ -45,7 +45,6 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pSolver = new btSequentialImpulseConstraintSolver();
     m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
-
     m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);

@@ -1,7 +1,14 @@
+#include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #define MINIMUM_SHAPE_SIZE 0.003f            // to small collisions are not recommended
 
-class CLuaPhysicsSharedLogic
+struct heightfieldTerrainShape
 {
+    btHeightfieldTerrainShape* pHeightfieldTerrainShape;
+    std::vector<float>         data;
+};
+
+class CLuaPhysicsSharedLogic
+    {
 public:
     static void EulerToQuat(btVector3 rotation, btQuaternion& result);
 
@@ -18,6 +25,7 @@ public:
     static btCylinderShape*        CreateCylinder(CVector& half);
 
     static btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
+    static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
     static btRigidBody* CreateRigidBody(btCollisionShape* pShape, float fMass);
 

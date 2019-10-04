@@ -144,6 +144,29 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<C
     return trimeshShape;
 }
 
+heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
+{
+    if (iSizeX * iSizeY != vecHeightData.size())
+        return nullptr;
+
+    bool                     flipQuadEdges = true;
+    heightfieldTerrainShape* heightfieldTerrain = new heightfieldTerrainShape();
+    heightfieldTerrain->data = std::vector<float>(vecHeightData);
+    float minHeight, maxHeight;
+
+    for(float height : vecHeightData)
+    {
+        minHeight = std::min(minHeight, height);
+        maxHeight = std::max(maxHeight, height);
+    }
+
+    btHeightfieldTerrainShape* pHeightfieldTerrain =
+        new btHeightfieldTerrainShape(iSizeX, iSizeY, heightfieldTerrain->data.data(), 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
+
+    heightfieldTerrain->pHeightfieldTerrainShape = pHeightfieldTerrain;
+    return heightfieldTerrain;
+}
+
 bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position, CVector& rotation)
 {
     if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
@@ -349,7 +372,6 @@ CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort 
     }
     return nullptr;
 }
-
 
 void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3& result)
 {

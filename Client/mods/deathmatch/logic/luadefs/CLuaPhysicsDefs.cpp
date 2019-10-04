@@ -184,11 +184,11 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
 }
 int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
 {
-    CClientPhysics*   pPhysics;
-    unsigned short    usModel;
-    CVector           vecPosition;
-    CVector           vecRotation;
-    CScriptArgReader  argStream(luaVM);
+    CClientPhysics*  pPhysics;
+    unsigned short   usModel;
+    CVector          vecPosition;
+    CVector          vecRotation;
+    CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPhysics);
     argStream.ReadNumber(usModel);
     argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
@@ -225,6 +225,9 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
         CVector                     vector;
         float                       fRadius;
         std::vector<CVector>        vecVector;
+        int                         iSizeX, iSizeY;
+        CVector                     vecScale;
+        std::vector<float>          vecHeightfieldData;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -255,11 +258,24 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
                     }
                 }
                 break;
-            lua_pushstaticcollision(luaVM, pStaticCollision);
-            return 1;
+            case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
+                argStream.ReadNumber(iSizeX);
+                argStream.ReadNumber(iSizeY);
+                argStream.ReadVector3D(vecScale);
+                argStream.ReadNumberTable(vecHeightfieldData, iSizeX * iSizeY);
+
+                if (!argStream.HasErrors())
+                {
+                    pStaticCollision->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecScale, vecHeightfieldData);
+                }
+                break;
         }
+        lua_pushstaticcollision(luaVM, pStaticCollision);
+        return 1;
+
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -488,7 +504,6 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
         }
         else if (pStaticCollision)
         {
-
         }
     }
     else
