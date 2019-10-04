@@ -34,6 +34,7 @@ public:
     btCapsuleShape*    InitializeWithCapsule(float fRadius, float fHeight);
     btCompoundShape*   InitializeWithCompound(int initialChildCapacity = 0);
     btConeShape*       InitializeWithCone(float fRadius, float fHeight);
+    btCylinderShape*   InitializeWithCylinder(CVector& half);
 
     void SetStatic(bool bStatic);
     void SetMass(float fMass);

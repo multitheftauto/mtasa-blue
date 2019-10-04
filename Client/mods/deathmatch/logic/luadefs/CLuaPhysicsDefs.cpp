@@ -157,6 +157,13 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                     pRigidBody->InitializeWithCone(fRadius, fHeight);
                 }
                 break;
+            case PHYSICS_SHAPE_CYLINDER:
+                argStream.ReadVector3D(vector);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithCylinder(vector);
+                }
+                break;
             case PHYSICS_SHAPE_COMPOUND:
                 argStream.ReadNumber(fInitialChildCapacity, 0);
                 if (!argStream.HasErrors())

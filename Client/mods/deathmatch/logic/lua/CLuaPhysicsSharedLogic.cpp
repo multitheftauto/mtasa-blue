@@ -56,7 +56,7 @@ btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPositio
     if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
         return nullptr;
 
-    btBoxShape* pBoxShape = new btBoxShape(btVector3(half.fX, half.fY, half.fZ));
+    btBoxShape* pBoxShape = new btBoxShape(reinterpret_cast<btVector3&>(half));
     btTransform transform;
     transform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
@@ -101,6 +101,16 @@ btConeShape* CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
 
     btConeShape* pConeShape = new btConeShape(fRadius, fHeight);
     return pConeShape;
+}
+
+btCylinderShape* CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
+{
+    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    btCylinderShape* pCylinderShape = new btCylinderShape(reinterpret_cast<btVector3&>(half));
+
+    return pCylinderShape;
 }
 
 btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)

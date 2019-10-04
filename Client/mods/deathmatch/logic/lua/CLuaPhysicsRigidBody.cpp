@@ -68,6 +68,15 @@ btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeig
     return coneCollisionShape;
 }
 
+btCylinderShape* CLuaPhysicsRigidBody::InitializeWithCylinder(CVector& half)
+{
+    btCylinderShape* cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(cylinderCollisionShape, 1.0f);
+    SetSleepingThresholds(0.05f, 0.05f);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    return cylinderCollisionShape;
+}
+
 btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCapacity)
 {
   

@@ -15,6 +15,7 @@ public:
     static btSphereShape*          CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
     static btCapsuleShape*         CreateCapsule(float fRadius, float fHeight);
     static btConeShape*            CreateCone(float fRadius, float fHeight);
+    static btCylinderShape*        CreateCylinder(CVector& half);
 
     static btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
 
