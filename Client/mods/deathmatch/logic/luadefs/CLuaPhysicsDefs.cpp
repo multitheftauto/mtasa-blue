@@ -124,6 +124,7 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
         CVector               vector;
         float                 fRadius;
         float                 fHeight;
+        float                 fInitialChildCapacity;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -146,6 +147,21 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 if (!argStream.HasErrors())
                 {
                     pRigidBody->InitializeWithCapsule(fRadius, fHeight);
+                }
+                break;
+            case PHYSICS_SHAPE_CONE:
+                argStream.ReadNumber(fRadius);
+                argStream.ReadNumber(fHeight);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithCone(fRadius, fHeight);
+                }
+                break;
+            case PHYSICS_SHAPE_COMPOUND:
+                argStream.ReadNumber(fInitialChildCapacity, 0);
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithCompound(fInitialChildCapacity);
                 }
                 break;
         }

@@ -32,32 +32,45 @@ void CLuaPhysicsRigidBody::RemoveScriptID()
     }
 }
 
-void CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
+btBoxShape* CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
 {
-    btCollisionShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
+    btBoxShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(boxCollisionShape, 1.0f);
     SetSleepingThresholds(0.05f, 0.05f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    return boxCollisionShape;
 }
 
-void CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
+btSphereShape* CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
 {
-    btCollisionShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
+    btSphereShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
     SetSleepingThresholds(0.05f, 0.05f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    return sphereCollisionShape;
 }
 
-void CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float fHeight)
+btCapsuleShape* CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float fHeight)
 {
-    btCollisionShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
+    btCapsuleShape* capsuleCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(capsuleCollisionShape, 1.0f);
     SetSleepingThresholds(0.05f, 0.05f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    return capsuleCollisionShape;
 }
 
-btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound()
+btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeight)
 {
+    btConeShape* coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(coneCollisionShape, 1.0f);
+    SetSleepingThresholds(0.05f, 0.05f);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    return coneCollisionShape;
+}
+
+btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCapacity)
+{
+  
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pCompoundShape, 1.0f);
     SetSleepingThresholds(0.05f, 0.05f);

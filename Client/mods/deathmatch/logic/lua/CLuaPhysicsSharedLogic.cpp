@@ -88,8 +88,19 @@ btCapsuleShape* CLuaPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeig
         return nullptr;
 
     btCapsuleShape* pSphereShape = new btCapsuleShape(fRadius, fHeight);
-
     return pSphereShape;
+}
+
+btConeShape* CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
+{
+    if (fRadius < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    if (fHeight < MINIMUM_SHAPE_SIZE)
+        return nullptr;
+
+    btConeShape* pConeShape = new btConeShape(fRadius, fHeight);
+    return pConeShape;
 }
 
 btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)

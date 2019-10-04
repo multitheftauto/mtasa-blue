@@ -29,10 +29,11 @@ public:
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
 
-    void               InitializeWithBox(CVector& vecHalf);
-    void               InitializeWithSphere(float fRadius);
-    void               InitializeWithCapsule(float fRadius, float fHeight);
-    btCompoundShape*   InitializeWithCompound();
+    btBoxShape*        InitializeWithBox(CVector& vecHalf);
+    btSphereShape*     InitializeWithSphere(float fRadius);
+    btCapsuleShape*    InitializeWithCapsule(float fRadius, float fHeight);
+    btCompoundShape*   InitializeWithCompound(int initialChildCapacity = 0);
+    btConeShape*       InitializeWithCone(float fRadius, float fHeight);
 
     void SetStatic(bool bStatic);
     void SetMass(float fMass);
