@@ -141,6 +141,9 @@ struct SAclRequest;
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 
+// has to be included before CLuaFunctionParseHelpers to prevent "invalid use of incomplete type ‘class CRemoteCalls´
+#include "CRemoteCalls.h"
+
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
@@ -252,7 +255,6 @@ struct SAclRequest;
 #include "CRegisteredCommands.h"
 #include "CRegistryManager.h"
 #include "CRegistry.h"
-#include "CRemoteCalls.h"
 #include "CResource.h"
 #include "CResourceChecker.h"
 #include "CResourceClientConfigItem.h"
