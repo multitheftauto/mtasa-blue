@@ -62,8 +62,4 @@ private:
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     btRigidBody*             m_pBtRigidBody;
-
-    // bullet doesn't provide function for that thats why it have to be cached here
-    float m_fLinearSleepingThresholds;
-    float m_fAngularSleepingThresholds;
 };

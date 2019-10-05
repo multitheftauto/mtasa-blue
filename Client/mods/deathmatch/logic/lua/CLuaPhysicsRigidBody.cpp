@@ -201,15 +201,13 @@ void CLuaPhysicsRigidBody::GetDebugColor(SColor& color)
 
 void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)
 {
-    m_fLinearSleepingThresholds = fLinear;
-    m_fAngularSleepingThresholds = fAngular;
     m_pBtRigidBody->setSleepingThresholds(fLinear, fAngular);
 }
 
 void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular)
 {
-    fLinear = m_fLinearSleepingThresholds;
-    fAngular = m_fAngularSleepingThresholds;
+    fLinear = m_pBtRigidBody->getLinearSleepingThreshold();
+    fAngular = m_pBtRigidBody->getLinearSleepingThreshold();
 }
 
 
