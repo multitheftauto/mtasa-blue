@@ -17,11 +17,22 @@ void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const bt
 {
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), fLineWidth, color, false);
 }
+
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), 2,
                                   SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f), false);
 }
+
+void CDebugDrawer::draw3dText(const btVector3& location, const char* textString)
+{
+    CVector vecScreen;
+    if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector)reinterpret_cast<const CVector&>(location), vecScreen, 50.0f, false))
+    {
+        m_pGraphics->DrawString(vecScreen.fX, vecScreen.fY, SColorARGB(255, 255, 255, 255), 2.0f, textString);
+    }
+}
+
 void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
 {
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(b), fLineWidth, color, false);

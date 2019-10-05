@@ -40,7 +40,7 @@ public:
 
     void reportErrorWarning(const char* warningString){};
 
-    void draw3dText(const btVector3& location, const char* textString){};
+    void draw3dText(const btVector3& location, const char* textString);
 
     void setDebugMode(int debugMode) { m_debugMode = debugMode; };
 

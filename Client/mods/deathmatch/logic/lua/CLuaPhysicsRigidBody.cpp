@@ -47,7 +47,6 @@ btSphereShape* CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return sphereCollisionShape;
 }
 
@@ -57,7 +56,6 @@ btCapsuleShape* CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(capsuleCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return capsuleCollisionShape;
 }
 
@@ -67,7 +65,6 @@ btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeig
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(coneCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return coneCollisionShape;
 }
 
@@ -77,7 +74,6 @@ btCylinderShape* CLuaPhysicsRigidBody::InitializeWithCylinder(CVector& half)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(cylinderCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return cylinderCollisionShape;
 }
 
@@ -87,7 +83,6 @@ btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCa
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pCompoundShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return pCompoundShape;
 }
 
@@ -98,7 +93,6 @@ btConvexHullShape* CLuaPhysicsRigidBody::InitializeWithConvexHull(std::vector<CV
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pConvexHull, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return pConvexHull;
 }
 
