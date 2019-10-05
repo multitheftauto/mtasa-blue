@@ -231,7 +231,7 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
 
 void CClientPhysics::DoPulse()
 {
-    if (m_pLuaMain->BeingDeleted())
+    if (!m_pLuaMain || m_pLuaMain->BeingDeleted())
         return;
 
     CTickCount tickCountNow = CTickCount::Now();

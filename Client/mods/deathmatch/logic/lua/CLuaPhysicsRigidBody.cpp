@@ -158,12 +158,40 @@ void CLuaPhysicsRigidBody::ApplyCentralForce(CVector& vecForce)
     m_pBtRigidBody->applyCentralForce(reinterpret_cast<btVector3&>(vecForce));
 }
 
+void CLuaPhysicsRigidBody::ApplyCentralImpulse(CVector& vecForce)
+{
+    m_pBtRigidBody->applyCentralImpulse(reinterpret_cast<btVector3&>(vecForce));
+}
+
+void CLuaPhysicsRigidBody::ApplyDamping(float fDamping)
+{
+    m_pBtRigidBody->applyDamping(fDamping);
+}
+
 void CLuaPhysicsRigidBody::ApplyForce(CVector& vecFrom, CVector& vecTo)
 {
     CVector rigidPosition;
     GetPosition(rigidPosition);
     m_pBtRigidBody->applyForce(reinterpret_cast<btVector3&>(vecTo - vecFrom), reinterpret_cast<btVector3&>(rigidPosition - vecFrom));
 }
+
+void CLuaPhysicsRigidBody::ApplyImpulse(CVector& vecFrom, CVector& vecTo)
+{
+    CVector rigidPosition;
+    GetPosition(rigidPosition);
+    m_pBtRigidBody->applyImpulse(reinterpret_cast<btVector3&>(vecTo - vecFrom), reinterpret_cast<btVector3&>(rigidPosition - vecFrom));
+}
+
+void CLuaPhysicsRigidBody::ApplyTorque(CVector& fTraque)
+{
+    m_pBtRigidBody->applyTorque(reinterpret_cast<btVector3&>(fTraque));
+}
+
+void CLuaPhysicsRigidBody::ApplyTorqueImpulse(CVector& fTraque)
+{
+    m_pBtRigidBody->applyTorqueImpulse(reinterpret_cast<btVector3&>(fTraque));
+}
+
 
 void CLuaPhysicsRigidBody::SetRestitution(float fRestitution)
 {

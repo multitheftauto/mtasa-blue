@@ -47,6 +47,11 @@ public:
     void SetLinearVelocity(CVector& vecVelocity);
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
     void ApplyCentralForce(CVector& vecForce);
+    void ApplyCentralImpulse(CVector& vecForce);
+    void ApplyDamping(float fDamping);
+    void ApplyImpulse(CVector& vecFrom, CVector& vecTo);
+    void ApplyTorque(CVector& fTraque);
+    void ApplyTorqueImpulse(CVector& fTraque);
 
     void SetSleepingThresholds(float fLinear, float fAngular);
     void GetSleepingThresholds(float& fLinear, float& fAngular);

@@ -30,4 +30,9 @@ public:
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsApplyForce);
     LUA_DECLARE(PhysicsApplyCentralForce);
+    LUA_DECLARE(PhysicsApplyCentralImpulse);
+    LUA_DECLARE(PhysicsApplyDamping);
+    LUA_DECLARE(PhysicsApplyImpulse);
+    LUA_DECLARE(PhysicsApplyTorque);
+    LUA_DECLARE(PhysicsApplyTorqueImpulse);
 };
