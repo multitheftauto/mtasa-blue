@@ -88,6 +88,17 @@ btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCa
     return pCompoundShape;
 }
 
+btConvexHullShape* CLuaPhysicsRigidBody::InitializeWithConvexHull(std::vector<CVector>& vecPoints)
+{
+    btConvexHullShape* pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
+
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pConvexHull, 1.0f);
+    SetSleepingThresholds(0.1f, 0.1f);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    return pConvexHull;
+}
+
+
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
     const btVector3 localInertia = m_pBtRigidBody->getLocalInertia();

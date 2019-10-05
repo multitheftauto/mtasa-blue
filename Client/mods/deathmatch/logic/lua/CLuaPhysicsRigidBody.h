@@ -35,6 +35,7 @@ public:
     btCompoundShape*   InitializeWithCompound(int initialChildCapacity = 0);
     btConeShape*       InitializeWithCone(float fRadius, float fHeight);
     btCylinderShape*   InitializeWithCylinder(CVector& half);
+    btConvexHullShape* InitializeWithConvexHull(std::vector<CVector>& vecPoints);
 
     void SetStatic(bool bStatic);
     void SetMass(float fMass);

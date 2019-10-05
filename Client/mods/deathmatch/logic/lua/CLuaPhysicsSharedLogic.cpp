@@ -167,6 +167,15 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
     return heightfieldTerrain;
 }
 
+btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>& vecPoints)
+{
+    if (vecPoints.size() < 3)
+        return nullptr;
+
+    btConvexHullShape*         pConvexHull = new btConvexHullShape(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
+    return pConvexHull;
+}
+
 bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position, CVector& rotation)
 {
     if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)

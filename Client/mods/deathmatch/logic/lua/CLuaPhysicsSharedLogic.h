@@ -26,6 +26,7 @@ public:
 
     static btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
     static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
+    static btConvexHullShape*       CreateConvexHull(std::vector<CVector>& vecPoints);
 
     static btRigidBody* CreateRigidBody(btCollisionShape* pShape, float fMass);
 

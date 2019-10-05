@@ -125,6 +125,7 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
         float                 fRadius;
         float                 fHeight;
         float                 fInitialChildCapacity;
+        std::vector<CVector>  vecList;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -169,6 +170,17 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 if (!argStream.HasErrors())
                 {
                     pRigidBody->InitializeWithCompound(fInitialChildCapacity);
+                }
+                break;
+            case PHYSICS_SHAPE_CONVEX_HULL:
+                while (argStream.NextIsVector3D())
+                {
+                    argStream.ReadVector3D(vector);
+                    vecList.push_back(vector);
+                }
+                if (!argStream.HasErrors())
+                {
+                    pRigidBody->InitializeWithConvexHull(vecList);
                 }
                 break;
         }
