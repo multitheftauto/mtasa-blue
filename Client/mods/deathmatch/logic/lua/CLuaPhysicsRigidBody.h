@@ -52,6 +52,8 @@ public:
     void GetRestitution(float& fRestitution);
     void SetScale(CVector& vecScale);
     void GetScale(CVector& vecScale);
+    void SetDebugColor(SColor color);
+    void GetDebugColor(SColor& color);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }

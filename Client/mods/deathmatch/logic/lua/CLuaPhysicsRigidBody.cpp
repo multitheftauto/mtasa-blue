@@ -176,7 +176,6 @@ void CLuaPhysicsRigidBody::GetRestitution(float& fRestitution)
 void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
 {
     CLuaPhysicsSharedLogic::SetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
-
     // prevents rigid from sleeping, otherwise it can overlap other collisions
     m_pBtRigidBody->forceActivationState(ACTIVE_TAG);
 }
@@ -184,6 +183,20 @@ void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
 void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)
 {
     CLuaPhysicsSharedLogic::GetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
+}
+
+void CLuaPhysicsRigidBody::SetDebugColor(SColor color)
+{
+    m_pBtRigidBody->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
+}
+
+void CLuaPhysicsRigidBody::GetDebugColor(SColor& color)
+{
+    btVector3 btColor;
+    m_pBtRigidBody->getCustomDebugColor(btColor);
+    color.R = btColor.getX() * 255;
+    color.G = btColor.getY() * 255;
+    color.B = btColor.getZ() * 255;
 }
 
 void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)

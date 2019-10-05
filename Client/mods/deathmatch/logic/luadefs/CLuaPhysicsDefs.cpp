@@ -374,6 +374,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         bool    boolean;
         CVector vector;
         float   floatNumber[2];
+        SColor  color;
 
         if (pRigidBody != nullptr)
         {
@@ -442,6 +443,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_DEBUG_COLOR:
+                    argStream.ReadColor(color);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetDebugColor(color);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
             }
         }
         else if (pStaticCollision)
@@ -475,6 +485,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_DEBUG_COLOR:
+                    argStream.ReadColor(color);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticCollision->SetDebugColor(color);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
             }
         }
     }
@@ -503,6 +522,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
     {
         bool    boolean;
         CVector vector;
+        SColor  color;
         float   floatNumber[2];
 
         if (pRigidBody != nullptr)
@@ -535,6 +555,12 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     lua_pushnumber(luaVM, vector.fX);
                     lua_pushnumber(luaVM, vector.fY);
                     lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_DEBUG_COLOR:
+                    pRigidBody->GetDebugColor(color);
+                    lua_pushnumber(luaVM, color.R);
+                    lua_pushnumber(luaVM, color.G);
+                    lua_pushnumber(luaVM, color.B);
                     return 3;
             }
         }
