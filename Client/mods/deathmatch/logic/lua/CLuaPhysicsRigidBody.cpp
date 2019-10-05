@@ -47,6 +47,7 @@ btSphereShape* CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return sphereCollisionShape;
 }
 
@@ -56,6 +57,7 @@ btCapsuleShape* CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(capsuleCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return capsuleCollisionShape;
 }
 
@@ -65,6 +67,7 @@ btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeig
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(coneCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return coneCollisionShape;
 }
 
@@ -74,17 +77,17 @@ btCylinderShape* CLuaPhysicsRigidBody::InitializeWithCylinder(CVector& half)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(cylinderCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return cylinderCollisionShape;
 }
 
 btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCapacity)
 {
-  
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pCompoundShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
-
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return pCompoundShape;
 }
 
@@ -95,9 +98,9 @@ btConvexHullShape* CLuaPhysicsRigidBody::InitializeWithConvexHull(std::vector<CV
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pConvexHull, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return pConvexHull;
 }
-
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
@@ -185,6 +188,34 @@ void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)
     CLuaPhysicsSharedLogic::GetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
 }
 
+void CLuaPhysicsRigidBody::SetFilterMask(short sIndex, bool bEnabled)
+{
+    if (bEnabled)
+    {
+        m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask |= 1UL << sIndex;
+    }
+    else
+    {
+        m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask &= ~(1UL << sIndex);
+    }
+    int a = m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask;
+}
+
+void CLuaPhysicsRigidBody::GetFilterMask(short sIndex, bool& bEnabled)
+{
+    bEnabled = (m_pBtRigidBody->getBroadphaseHandle()->m_collisionFilterMask >> sIndex) & 1U;
+}
+
+void CLuaPhysicsRigidBody::SetFilterGroup(int iGroup)
+{
+    m_pBtRigidBody->getBroadphaseProxy()->m_collisionFilterGroup = iGroup;
+}
+
+void CLuaPhysicsRigidBody::GetFilterGroup(int& iGroup)
+{
+    iGroup = m_pBtRigidBody->getBroadphaseProxy()->m_collisionFilterGroup;
+}
+
 void CLuaPhysicsRigidBody::SetDebugColor(SColor color)
 {
     m_pBtRigidBody->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
@@ -209,7 +240,6 @@ void CLuaPhysicsRigidBody::GetSleepingThresholds(float& fLinear, float& fAngular
     fLinear = m_pBtRigidBody->getLinearSleepingThreshold();
     fAngular = m_pBtRigidBody->getLinearSleepingThreshold();
 }
-
 
 void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)
 {

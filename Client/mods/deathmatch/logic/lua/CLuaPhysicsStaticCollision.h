@@ -47,6 +47,12 @@ public:
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
 
+    void SetFilterMask(short sIndex, bool bEnabled);
+    void GetFilterMask(short sIndex, bool& bEnabled);
+
+    void SetFilterGroup(int iGroup);
+    void GetFilterGroup(int& iGroup);
+
     uint               GetScriptID() const { return m_uiScriptID; }
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
 

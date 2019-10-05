@@ -284,7 +284,6 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
         }
         lua_pushstaticcollision(luaVM, pStaticCollision);
         return 1;
-
     }
 
     if (argStream.HasErrors())
@@ -374,6 +373,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         bool    boolean;
         CVector vector;
         float   floatNumber[2];
+        int     intNumber;
         SColor  color;
 
         if (pRigidBody != nullptr)
@@ -452,6 +452,31 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_FILTER_MASK:
+                    argStream.ReadNumber(intNumber);
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        if (intNumber > 0 && intNumber < 32)
+                        {
+                            pRigidBody->SetFilterMask((char)intNumber, boolean);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                    }
+                    break;
+                case PHYSICS_PROPERTY_FILTER_GROUP:
+                    argStream.ReadNumber(intNumber);
+                    if (!argStream.HasErrors())
+                    {
+                        if (intNumber > 0 && intNumber <= 32)
+                        {
+                            pRigidBody->SetFilterGroup(intNumber);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                    }
+                    break;
             }
         }
         else if (pStaticCollision)
@@ -490,6 +515,28 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     if (!argStream.HasErrors())
                     {
                         pStaticCollision->SetDebugColor(color);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_FILTER_MASK:
+                    argStream.ReadNumber(intNumber);
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        if (intNumber > 0 && intNumber < 32)
+                        {
+                            pStaticCollision->SetFilterMask((char)intNumber - 1, boolean);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                    }
+                    break;
+                case PHYSICS_PROPERTY_FILTER_GROUP:
+                    argStream.ReadNumber(intNumber);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticCollision->SetFilterGroup(intNumber);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }

@@ -79,6 +79,33 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
     return m_btCollisionObject;
 }
 
+void CLuaPhysicsStaticCollision::SetFilterMask(short sIndex, bool bEnabled)
+{
+    if (bEnabled)
+    {
+        m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask |= 1UL << sIndex;
+    }
+    else
+    {
+        m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask &= ~(1UL << sIndex);
+    }
+}
+
+void CLuaPhysicsStaticCollision::GetFilterMask(short sIndex, bool& bEnabled)
+{
+    bEnabled = (m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask >> sIndex) & 1U;
+}
+
+void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup)
+{
+    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup = iGroup;
+}
+
+void CLuaPhysicsStaticCollision::GetFilterGroup(int& iGroup)
+{
+    iGroup = m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup;
+}
+
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList, CVector& position,
                                                                    CVector& rotation)
 {
@@ -131,6 +158,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pBoxShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
+    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return m_btCollisionObject;
 }
 
@@ -150,6 +178,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pSphereShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
+    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return m_btCollisionObject;
 }
 
@@ -170,6 +199,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::v
         SetPosition(position);
         SetRotation(rotation);
         m_pWorld->addCollisionObject(m_btCollisionObject);
+        m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
         return m_btCollisionObject;
     }
     return nullptr;
@@ -191,5 +221,6 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithHeightfieldTerrain(
     m_btCollisionObject->setCollisionShape(pHeightfieldTerrain->pHeightfieldTerrainShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
     m_pHeightfieldTerrain = pHeightfieldTerrain;
+    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     return m_btCollisionObject;
 }

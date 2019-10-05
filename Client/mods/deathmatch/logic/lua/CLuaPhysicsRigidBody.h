@@ -54,6 +54,10 @@ public:
     void GetScale(CVector& vecScale);
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
+    void SetFilterMask(short sIndex, bool bEnabled);
+    void GetFilterMask(short sIndex, bool& bEnabled);
+    void SetFilterGroup(int sIndex);
+    void GetFilterGroup(int& sIndex);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }
