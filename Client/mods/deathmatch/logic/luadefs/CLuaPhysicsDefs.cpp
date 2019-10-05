@@ -25,6 +25,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyForce", PhysicsApplyForce},
+        {"physicsApplyCentralForce", PhysicsApplyCentralForce},
     };
 
     // Add functions
@@ -344,6 +345,27 @@ int CLuaPhysicsDefs::PhysicsApplyForce(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         pRigidBody->ApplyForce(from, to);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+int CLuaPhysicsDefs::PhysicsApplyCentralForce(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody* pRigidBody;
+    CVector               force;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pRigidBody);
+    argStream.ReadVector3D(force);
+
+    if (!argStream.HasErrors())
+    {
+        pRigidBody->ApplyCentralForce(force);
         lua_pushboolean(luaVM, true);
         return 1;
     }

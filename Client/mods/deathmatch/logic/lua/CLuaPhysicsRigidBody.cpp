@@ -153,6 +153,11 @@ void CLuaPhysicsRigidBody::SetLinearVelocity(CVector& vecVelocity)
     m_pBtRigidBody->setLinearVelocity(reinterpret_cast<btVector3&>(vecVelocity));
 }
 
+void CLuaPhysicsRigidBody::ApplyCentralForce(CVector& vecForce)
+{
+    m_pBtRigidBody->applyCentralForce(reinterpret_cast<btVector3&>(vecForce));
+}
+
 void CLuaPhysicsRigidBody::ApplyForce(CVector& vecFrom, CVector& vecTo)
 {
     CVector rigidPosition;

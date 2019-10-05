@@ -46,6 +46,8 @@ public:
 
     void SetLinearVelocity(CVector& vecVelocity);
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
+    void ApplyCentralForce(CVector& vecForce);
+
     void SetSleepingThresholds(float fLinear, float fAngular);
     void GetSleepingThresholds(float& fLinear, float& fAngular);
     void SetRestitution(float fRestitution);
