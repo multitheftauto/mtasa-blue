@@ -32,3 +32,14 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::AddStaticCollisio
     m_StaticCollisionList.push_back(pStaticCollision);
     return pStaticCollision;
 }
+
+CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape)
+{
+    for (CLuaPhysicsStaticCollision* pStaticCollision : m_StaticCollisionList)
+    {
+        if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
+            return pStaticCollision;
+    }
+
+    return nullptr;
+}

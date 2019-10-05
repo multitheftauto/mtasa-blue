@@ -20,8 +20,7 @@ void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const bt
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), 2,
-                                  SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f),
-                                  false);
+                                  SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f), false);
 }
 void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
 {
@@ -110,7 +109,7 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     {
         CLuaPhysicsSharedLogic::AddBoxes(pCompoundShape, halfList);
     }
-    //if (indexList.size() >= 3)
+    // if (indexList.size() >= 3)
     //{
     //    CLuaPhysicsSharedLogic::AddTriangleMesh(pCollisionShape, indexList);
     //}
@@ -120,7 +119,6 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     pRigidBody->GetBtRigidBody()->setMassProps(1.0f, localInertia);
     return pRigidBody;
 }
-
 
 CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
@@ -159,7 +157,7 @@ CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsign
         return nullptr;
 
     CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
-    btCollisionObject* pCollisionObject = pStaticCollision->InitializeWithCompound();
+    btCollisionObject*          pCollisionObject = pStaticCollision->InitializeWithCompound();
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
     if (halfList.size() > 0)
@@ -222,6 +220,9 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
 
 void CClientPhysics::DoPulse()
 {
+    if (m_pLuaMain->BeingDeleted())
+        return;
+
     CTickCount tickCountNow = CTickCount::Now();
 
     int iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
@@ -232,5 +233,81 @@ void CClientPhysics::DoPulse()
     {
         m_pDynamicsWorld->debugDrawWorld();
         m_bDrawDebugNextTime = false;
+    }
+    int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
+    CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
+    CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
+
+    const btCollisionObject*    objectA;
+    const btCollisionObject*    objectB;
+    CLuaPhysicsRigidBody*       pRigidA;
+    CLuaPhysicsRigidBody*       pRigidB;
+    CLuaPhysicsStaticCollision* pStaticCollisionA;
+    CLuaPhysicsStaticCollision* pStaticCollisionB;
+    btVector3                   ptA;
+    btVector3                   ptB;
+    for (int i = 0; i < numManifolds; i++)
+    {
+        btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+        int                   numContacts = contactManifold->getNumContacts();
+        if (numContacts == 0)
+            continue;
+
+        objectA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
+        objectB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
+        pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(objectA->getCollisionShape());
+        if (pRigidA == nullptr)
+        {
+            pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(objectA->getCollisionShape());
+            if (pStaticCollisionA == nullptr)
+                continue;
+        }
+
+        pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(objectB->getCollisionShape());
+        if (pRigidB == nullptr)
+        {
+            pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(objectB->getCollisionShape());
+            if (pStaticCollisionB == nullptr)
+                continue;
+        }
+        CLuaArguments Arguments;
+        CLuaArguments ContactA;
+        CLuaArguments ContactB;
+        if (pRigidA != nullptr)
+            Arguments.PushPhysicsRigidBody(pRigidA);
+        else
+            Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
+
+        if (pRigidB != nullptr)
+            Arguments.PushPhysicsRigidBody(pRigidB);
+        else
+            Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
+
+        for (int j = 0; j < numContacts; j++)
+        {
+            btManifoldPoint& pt = contactManifold->getContactPoint(j);
+            ptA = pt.getPositionWorldOnA();
+            ptB = pt.getPositionWorldOnB();
+
+            CLuaArguments pointA;
+            CLuaArguments pointB;
+            pointA.PushNumber(1);
+            pointA.PushNumber(ptA.getX());
+            pointA.PushNumber(2);
+            pointA.PushNumber(ptA.getX());
+            pointA.PushNumber(3);
+            pointA.PushNumber(ptA.getX());
+            ContactA.PushTable(&pointA);
+            pointB.PushNumber(1);
+            pointB.PushNumber(ptB.getX());
+            pointB.PushNumber(2);
+            pointB.PushNumber(ptB.getX());
+            pointB.PushNumber(3);
+            pointB.PushNumber(ptB.getX());
+            ContactB.PushTable(&pointB);
+        }
+        Arguments.PushArguments(ContactA);
+        Arguments.PushArguments(ContactB);
+        CallEvent("onPhysicsCollision", Arguments, true);
     }
 }

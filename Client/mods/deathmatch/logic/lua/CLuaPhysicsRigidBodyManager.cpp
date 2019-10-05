@@ -32,3 +32,14 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(btDiscreteDynami
     m_RigidBodyList.push_back(pRigidBody);
     return pRigidBody;
 }
+
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
+{
+    for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)
+    {
+        if (pRigidBody->GetBtRigidBody()->getCollisionShape() == pCollisionShape)
+            return pRigidBody;
+    }
+
+    return nullptr;
+}

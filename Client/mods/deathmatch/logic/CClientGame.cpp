@@ -2907,6 +2907,9 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
 
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
+
+    // Physics events
+    m_Events.AddEvent("onPhysicsCollision", "collisionA, collisionB, contactPointsA, contactPointsB", nullptr, false);
 }
 
 void CClientGame::DrawFPS()

@@ -28,7 +28,7 @@ public:
     CLuaPhysicsStaticCollision* AddStaticCollision(btDiscreteDynamicsWorld* pWorld);
     void                  RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     unsigned long               GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
-
+    CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape);
     CFastList<CLuaPhysicsStaticCollision*>::const_iterator IterBegin() { return m_StaticCollisionList.begin(); }
     CFastList<CLuaPhysicsStaticCollision*>::const_iterator IterEnd() { return m_StaticCollisionList.end(); }
 

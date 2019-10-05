@@ -27,6 +27,9 @@ public:
 
     CLuaPhysicsRigidBody* AddRigidBody(btDiscreteDynamicsWorld* pWorld);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pLuaTimer);
+    CLuaPhysicsRigidBody* GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
+
+
     unsigned long         GetRigidBodyCount() const { return m_RigidBodyList.size(); }
 
     CFastList<CLuaPhysicsRigidBody*>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
