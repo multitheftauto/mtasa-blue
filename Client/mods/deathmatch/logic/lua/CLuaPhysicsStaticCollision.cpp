@@ -44,6 +44,16 @@ void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
     CLuaPhysicsSharedLogic::SetRotation(m_btCollisionObject, vecRotation);
 }
 
+void CLuaPhysicsStaticCollision::SetScale(CVector& vecScale)
+{
+    CLuaPhysicsSharedLogic::SetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+}
+
+void CLuaPhysicsStaticCollision::GetScale(CVector& vecScale)
+{
+    CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+}
+
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
 {
     m_btCollisionObject = new btCollisionObject();

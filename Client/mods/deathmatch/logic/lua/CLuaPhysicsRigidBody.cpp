@@ -173,6 +173,19 @@ void CLuaPhysicsRigidBody::GetRestitution(float& fRestitution)
     fRestitution = m_pBtRigidBody->getRestitution();
 }
 
+void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
+{
+    CLuaPhysicsSharedLogic::SetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
+
+    // prevents rigid from sleeping, otherwise it can overlap other collisions
+    m_pBtRigidBody->forceActivationState(ACTIVE_TAG);
+}
+
+void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)
+{
+    CLuaPhysicsSharedLogic::GetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
+}
+
 void CLuaPhysicsRigidBody::SetSleepingThresholds(float fLinear, float fAngular)
 {
     m_fLinearSleepingThresholds = fLinear;

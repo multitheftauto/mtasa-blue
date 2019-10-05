@@ -41,6 +41,9 @@ public:
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
 
+    void SetScale(CVector& vecScale);
+    void GetScale(CVector& vecScale);
+
     uint               GetScriptID() const { return m_uiScriptID; }
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
 

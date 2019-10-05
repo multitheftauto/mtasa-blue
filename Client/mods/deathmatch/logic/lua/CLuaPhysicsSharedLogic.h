@@ -18,6 +18,9 @@ public:
     static bool SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static bool SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
 
+    static bool SetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
+    static bool GetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
+
     static btBoxShape*             CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
     static btSphereShape*          CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
     static btCapsuleShape*         CreateCapsule(float fRadius, float fHeight);

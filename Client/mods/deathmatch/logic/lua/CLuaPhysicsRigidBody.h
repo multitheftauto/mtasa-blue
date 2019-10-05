@@ -50,6 +50,8 @@ public:
     void GetSleepingThresholds(float& fLinear, float& fAngular);
     void SetRestitution(float fRestitution);
     void GetRestitution(float& fRestitution);
+    void SetScale(CVector& vecScale);
+    void GetScale(CVector& vecScale);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }

@@ -51,6 +51,18 @@ bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
+bool CLuaPhysicsSharedLogic::SetScale(btCollisionShape* pCollisionShape, CVector& vecScale)
+{
+    pCollisionShape->setLocalScaling(reinterpret_cast<btVector3&>(vecScale));
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetScale(btCollisionShape* pCollisionShape, CVector& vecScale)
+{
+    vecScale = reinterpret_cast<const CVector&>(pCollisionShape->getLocalScaling());
+    return true;
+}
+
 btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
 {
     if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)

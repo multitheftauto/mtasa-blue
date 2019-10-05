@@ -433,6 +433,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_SCALE:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetScale(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
             }
         }
         else if (pStaticCollision)
@@ -453,6 +462,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     if (!argStream.HasErrors())
                     {
                         pStaticCollision->SetRotation(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_SCALE:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticCollision->SetScale(vector);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -512,6 +530,12 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     pRigidBody->GetRestitution(floatNumber[0]);
                     lua_pushnumber(luaVM, floatNumber[0]);
                     return 1;
+                case PHYSICS_PROPERTY_SCALE:
+                    pRigidBody->GetScale(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
             }
         }
         else if (pStaticCollision)
