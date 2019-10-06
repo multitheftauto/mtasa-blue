@@ -138,6 +138,9 @@ CCore::~CCore()
     // and is not affected by the master volume setting.
     m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
+    // Remove input hook
+    CMessageLoopHook::GetSingleton().RemoveHook();
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
@@ -150,9 +153,6 @@ CCore::~CCore()
 
     // Remove global events
     g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
-
-    // Remove input hook
-    CMessageLoopHook::GetSingleton().RemoveHook();
 
     // Store core variables to cvars
     CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
