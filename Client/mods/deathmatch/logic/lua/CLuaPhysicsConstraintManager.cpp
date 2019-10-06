@@ -17,7 +17,7 @@ void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pLuaRi
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(uint uiScriptID)
 {
-    CLuaPhysicsConstraint* pLuaContraint = (CLuaPhysicsConstraint*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
+    CLuaPhysicsConstraint* pLuaContraint = (CLuaPhysicsConstraint*)CIdArray::FindEntry(uiScriptID, EIdClass::CONSTRAINT);
     if (!pLuaContraint)
         return NULL;
 

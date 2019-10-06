@@ -499,13 +499,17 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    ePhysicsProperty            eProperty;
-    CScriptArgReader            argStream(luaVM);
+    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
 
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
         argStream.ReadUserData(pRigidBody);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
         argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pStaticConstraint);
 
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
@@ -516,7 +520,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         int     intNumber;
         SColor  color;
 
-        if (pRigidBody != nullptr)
+        if (pRigidBody)
         {
             switch (eProperty)
             {
@@ -683,6 +687,24 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     break;
             }
         }
+        else if (pStaticConstraint)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_STIFFNESS:
+                    argStream.ReadNumber(intNumber);
+                    argStream.ReadNumber(floatNumber[0]);
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -766,12 +788,14 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
 int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
 {
     CClientPhysics*       pPhysics;
+    bool                  bDisableCollisionsBetweenLinkedBodies;
     CLuaPhysicsRigidBody* pRigidBodyA;
     CLuaPhysicsRigidBody* pRigidBodyB;
     ePhysicsConstraint    eConstraint;
     CScriptArgReader      argStream(luaVM);
     argStream.ReadUserData(pPhysics);
     argStream.ReadEnumString(eConstraint);
+    argStream.ReadBool(bDisableCollisionsBetweenLinkedBodies, true);
     argStream.ReadUserData(pRigidBodyA);
     argStream.ReadUserData(pRigidBodyB);
 
@@ -784,16 +808,29 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
             case PHYSICS_CONTRAINT_POINTTOPOINT:
                 argStream.ReadVector3D(vector[0]);
                 argStream.ReadVector3D(vector[1]);
-                pConstraint->CreatePointToPointConstraint(vector[0], vector[1]);
+                pConstraint->CreatePointToPointConstraint(vector[0], vector[1], bDisableCollisionsBetweenLinkedBodies);
                 break;
             case PHYSICS_CONTRAINT_HIDGE:
                 argStream.ReadVector3D(vector[0]);
                 argStream.ReadVector3D(vector[1]);
                 argStream.ReadVector3D(vector[2]);
                 argStream.ReadVector3D(vector[3]);
-                pConstraint->CreateHidgeConstraint(vector[0], vector[1], vector[2], vector[4]);
+                pConstraint->CreateHidgeConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
                 break;
-
+            case PHYSICS_CONTRAINT_FIXED:
+                argStream.ReadVector3D(vector[0]);
+                argStream.ReadVector3D(vector[1]);
+                argStream.ReadVector3D(vector[2]);
+                argStream.ReadVector3D(vector[3]);
+                pConstraint->CreateFixedConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
+                break;
+            case PHYSICS_CONTRAINT_SLIDER:
+                argStream.ReadVector3D(vector[0]);
+                argStream.ReadVector3D(vector[1]);
+                argStream.ReadVector3D(vector[2]);
+                argStream.ReadVector3D(vector[3]);
+                pConstraint->CreateSliderConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
+                break;
         }
         lua_pushconstraint(luaVM, pConstraint);
         return 1;
