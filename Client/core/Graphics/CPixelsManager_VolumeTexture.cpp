@@ -150,7 +150,17 @@ bool CPixelsManager::GetVolumePixels(IDirect3DVolume9* pD3DSurface, CPixels& out
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
-    outPixels.SetSize(ulPixelsPitch * uiPixelsHeight + SIZEOF_PLAIN_TAIL);
+
+    try
+    {
+        outPixels.SetSize(ulPixelsPitch * uiPixelsHeight + SIZEOF_PLAIN_TAIL);
+    }
+    catch (const std::bad_alloc&)
+    {
+        pD3DSurface->UnlockBox();
+        return false;
+    }
+
     memset(outPixels.GetData(), 0x81, outPixels.GetSize());
     char* pPixelsData = outPixels.GetData();
     pPixelsData += PixelsRect.left * XRGB_BYTES_PER_PIXEL;
