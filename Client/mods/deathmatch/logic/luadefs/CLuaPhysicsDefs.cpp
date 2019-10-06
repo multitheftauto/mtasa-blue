@@ -778,14 +778,21 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CLuaPhysicsConstraint* pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
-        CVector                vector[2];
+        CVector                vector[4];
         switch (eConstraint)
         {
             case PHYSICS_CONTRAINT_POINTTOPOINT:
                 argStream.ReadVector3D(vector[0]);
                 argStream.ReadVector3D(vector[1]);
                 pConstraint->CreatePointToPointConstraint(vector[0], vector[1]);
-                    break;
+                break;
+            case PHYSICS_CONTRAINT_HIDGE:
+                argStream.ReadVector3D(vector[0]);
+                argStream.ReadVector3D(vector[1]);
+                argStream.ReadVector3D(vector[2]);
+                argStream.ReadVector3D(vector[3]);
+                pConstraint->CreateHidgeConstraint(vector[0], vector[1], vector[2], vector[4]);
+                break;
 
         }
         lua_pushconstraint(luaVM, pConstraint);

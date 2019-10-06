@@ -157,6 +157,7 @@ DECLARE_ENUM(ePhysicsDebugMode);
 enum ePhysicsConstraint
 {
     PHYSICS_CONTRAINT_POINTTOPOINT,
+    PHYSICS_CONTRAINT_HIDGE,
 
 };
 DECLARE_ENUM(ePhysicsConstraint);

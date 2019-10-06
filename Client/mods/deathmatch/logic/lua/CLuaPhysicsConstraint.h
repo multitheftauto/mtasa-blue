@@ -26,13 +26,14 @@ public:
     void RemoveScriptID();
 
     void CreatePointToPointConstraint(CVector& anchorA, CVector& anchorB);
-
+    void CreateHidgeConstraint(CVector& pivotA, CVector& pivotB, CVector& axisA, CVector& axisB);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
 
 private:
+    btTypedConstraint*       m_pConstraint;
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     CLuaPhysicsRigidBody*    m_pRigidBodyA;

@@ -12,6 +12,16 @@
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
 
+/*
+// todo:
+btConeTwistConstraint, CbtContactConstraint, btFixedConstraint, btGearConstraint, btGeneric6DofConstraint, btHinge2Constraint,
+btMultiBodyConstraint, btMultiBodyFixedConstraint, btMultiBodyGearConstraint, btMultiBodyJointLimitConstraint, btMultiBodySliderConstraint,
+btSliderConstraint,btSolve2LinearConstraint, btSolverConstraint, btUniversalConstraint,
+
+
+// finished:
+btPoint2PointConstraint, btHingeConstraint
+*/
 CLuaPhysicsConstraint::CLuaPhysicsConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
 {
     m_pWorld = pWorld;
@@ -36,9 +46,18 @@ void CLuaPhysicsConstraint::RemoveScriptID()
 
 void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVector& anchorB)
 {
-    btPoint2PointConstraint* constraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
+    m_pConstraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
                                                                       reinterpret_cast<btVector3&>(anchorA), reinterpret_cast<btVector3&>(anchorB));
-    m_pWorld->addConstraint(constraint, false);
+    m_pWorld->addConstraint(m_pConstraint, false);
+    m_pRigidBodyA->GetBtRigidBody()->activate(true);
+    m_pRigidBodyB->GetBtRigidBody()->activate(true);
+}
+
+void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivotB, CVector& axisA, CVector& axisB)
+{
+    m_pConstraint = new btHingeConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA),
+                                          reinterpret_cast<btVector3&>(pivotB), reinterpret_cast<btVector3&>(axisA), reinterpret_cast<btVector3&>(axisB));
+    m_pWorld->addConstraint(m_pConstraint, false);
     m_pRigidBodyA->GetBtRigidBody()->activate(true);
     m_pRigidBodyB->GetBtRigidBody()->activate(true);
 }
