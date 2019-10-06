@@ -31,6 +31,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyImpulse", PhysicsApplyImpulse},
         {"physicsApplyTorque", PhysicsApplyTorque},
         {"physicsApplyTorqueImpulse", PhysicsApplyTorqueImpulse},
+        {"physicsCreateConstraint", PhysicsCreateConstraint},
     };
 
     // Add functions
@@ -753,6 +754,42 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
         else if (pStaticCollision)
         {
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
+{
+    CClientPhysics*       pPhysics;
+    CLuaPhysicsRigidBody* pRigidBodyA;
+    CLuaPhysicsRigidBody* pRigidBodyB;
+    ePhysicsConstraint    eConstraint;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(eConstraint);
+    argStream.ReadUserData(pRigidBodyA);
+    argStream.ReadUserData(pRigidBodyB);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaPhysicsConstraint* pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
+        CVector                vector[2];
+        switch (eConstraint)
+        {
+            case PHYSICS_CONTRAINT_POINTTOPOINT:
+                argStream.ReadVector3D(vector[0]);
+                argStream.ReadVector3D(vector[1]);
+                pConstraint->CreatePointToPointConstraint(vector[0], vector[1]);
+                    break;
+
+        }
+        lua_pushconstraint(luaVM, pConstraint);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

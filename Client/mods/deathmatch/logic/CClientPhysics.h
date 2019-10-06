@@ -16,6 +16,7 @@
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 
 enum ePhysicsDebugMode;
+class CLuaPhysicsConstraint;
 
 class CDebugDrawer : public btIDebugDraw
 {
@@ -66,6 +67,8 @@ public:
 
     CLuaPhysicsRigidBody*       CreateRigidBody();
     CLuaPhysicsStaticCollision* CreateStaticCollision();
+    CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
+
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        BuildCollisionFromGTA();
     CLuaPhysicsStaticCollision* BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation);

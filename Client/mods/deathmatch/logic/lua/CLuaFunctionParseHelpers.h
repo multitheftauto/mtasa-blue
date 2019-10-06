@@ -154,6 +154,13 @@ enum ePhysicsDebugMode
 };
 DECLARE_ENUM(ePhysicsDebugMode);
 
+enum ePhysicsConstraint
+{
+    PHYSICS_CONTRAINT_POINTTOPOINT,
+
+};
+DECLARE_ENUM(ePhysicsConstraint);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -435,6 +442,10 @@ inline SString GetClassTypeName(CLuaPhysicsStaticCollision*)
 {
     return "physics-static-collision";
 }
+inline SString GetClassTypeName(CLuaPhysicsConstraint*)
+{
+    return "physics-constraint";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -564,6 +575,20 @@ CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr,
     if (pLuaMain)
     {
         return pLuaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
+
+//
+// CLuaPhysicsContraint from userdata
+//
+template <class T>
+CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetPhysicsConstraintManager()->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }

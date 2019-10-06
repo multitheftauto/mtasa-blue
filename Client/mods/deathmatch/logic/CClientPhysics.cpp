@@ -27,7 +27,7 @@ void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const bt
 void CDebugDrawer::draw3dText(const btVector3& location, const char* textString)
 {
     CVector vecScreen;
-    if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector)reinterpret_cast<const CVector&>(location), vecScreen, 50.0f, false))
+    if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector) reinterpret_cast<const CVector&>(location), vecScreen, 50.0f, false))
     {
         m_pGraphics->DrawString(vecScreen.fX, vecScreen.fY, SColorARGB(255, 255, 255, 255), 2.0f, textString);
     }
@@ -227,6 +227,12 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
     m_pDebugDrawer->setDebugMode(debugMode);
 
     return true;
+}
+
+CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+{
+    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(m_pDynamicsWorld, pRigidBodyA, pRigidBodyB);
+    return pContraint;
 }
 
 void CClientPhysics::DoPulse()

@@ -35,4 +35,5 @@ public:
     LUA_DECLARE(PhysicsApplyImpulse);
     LUA_DECLARE(PhysicsApplyTorque);
     LUA_DECLARE(PhysicsApplyTorqueImpulse);
+    LUA_DECLARE(PhysicsCreateConstraint);
 };

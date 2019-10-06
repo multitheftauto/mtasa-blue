@@ -55,6 +55,7 @@ namespace EIdClass
         MATRIX,
         RIGID_BODY,
         STATIC_COLLISION,
+        CONSTRAINT,
     };
 };
 

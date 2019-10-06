@@ -55,6 +55,7 @@ public:
     CLuaTimerManager*                  GetTimerManager() const { return m_pLuaTimerManager; };
     CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
     CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
+    CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };
@@ -92,6 +93,7 @@ private:
     CLuaTimerManager*                  m_pLuaTimerManager;
     CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
     CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
+    CLuaPhysicsConstraintManager*      m_pLuaPhysicsContraintManager;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 

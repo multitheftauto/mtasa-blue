@@ -579,6 +579,10 @@ ADD_ENUM(PHYSICS_DEBUG_DrawNormals, "drawnormals")
 ADD_ENUM(PHYSICS_DEBUG_DrawFrames, "drawframes")
 IMPLEMENT_ENUM_END("physics-debug-mode")
 
+IMPLEMENT_ENUM_BEGIN(ePhysicsConstraint)
+ADD_ENUM(PHYSICS_CONTRAINT_POINTTOPOINT, "pointtopoint")
+IMPLEMENT_ENUM_END("physics-contraint")
+
 IMPLEMENT_ENUM_BEGIN(eCursorType)
 ADD_ENUM(CURSORTYPE_NONE, "none")                            // cursor has no image
 ADD_ENUM(CURSORTYPE_DEFAULT, "arrow")                        // default cursor
@@ -726,6 +730,8 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, ptr, luaVM))            // Try rigid body
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))   // Try static collision
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))            // Try static collision
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
