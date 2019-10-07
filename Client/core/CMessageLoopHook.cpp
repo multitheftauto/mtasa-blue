@@ -174,8 +174,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
         if (pCDS->dwData == URI_CONNECT)
         {
-            LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
-            CCommandFuncs::Connect(szConnectInfo);
+            // We can receive this message before we are ready to process it (e.g. trying to show a CEGUI message window before CEGUI is initialized).
+            // Ignore these messages until we are in the main menu (when CCore sets m_bFirstFrame to false)
+            if (!g_pCore->IsFirstFrame())
+            {
+                LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
+                CCommandFuncs::Connect(szConnectInfo);
+            }
         }
     }
 
