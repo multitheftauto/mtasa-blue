@@ -426,7 +426,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
 
             // Lead the message through the keybinds message processor
-            g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
+            if (!g_pCore->IsFirstFrame())
+            {
+                g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
+            }
 
             bool bProcessed = false, bClientProcessed = false;
 
@@ -434,7 +437,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             bProcessed = CLocalGUI::GetSingleton().ProcessMessage(hwnd, uMsg, wParam, lParam);
 
             // Check and see if the Core/mod should process this message
-            if (!CCore::GetSingleton().GetGame()->IsAtMenu())
+            if (g_pCore->GetGame() && !g_pCore->GetGame()->IsAtMenu())
             {
                 pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton().GetClientMessageProcessor();
                 if (pfnClientMessageProcessor)
