@@ -66,18 +66,24 @@ VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus)
             }
             else
             {
+                // Enable door damage before applying it
+                bool areDoorsUndamageable = m_vehicle->AreDoorsUndamageable();
+                m_vehicle->SetDoorsUndamageable(false);
+
                 // Call CAutomobile::SetDoorDamage to update the model
                 DWORD dwFunc = 0x6B1600;
                 DWORD dwThis = (DWORD)internalEntityInterface;
                 DWORD dwDoor = (DWORD)bDoor;
-                bool  bUnknown = false;
+                bool  bQuiet = false;
                 _asm
                 {
                     mov     ecx, dwThis
-                    push    bUnknown
+                    push    bQuiet
                     push    dwDoor
                     call    dwFunc
                 }
+
+                m_vehicle->SetDoorsUndamageable(areDoorsUndamageable);
             }
         }
     }

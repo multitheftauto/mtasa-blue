@@ -192,7 +192,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes or boats, but includes planes, helis etc)
-    this->damageManager = new CDamageManagerSA ( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    this->damageManager = new CDamageManagerSA ( this, m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
 
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
@@ -235,7 +235,7 @@ CVehicleSA::CVehicleSA(CVehicleSAInterface* pVehicleInterface)
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
-    this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    this->damageManager = new CDamageManagerSA( this, m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
 
@@ -267,7 +267,7 @@ void CVehicleSA::Init()
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
-    this->m_pDamageManager = new CDamageManagerSA(m_pInterface, (CDamageManagerSAInterface*)((DWORD)this->GetInterface() + 1440));
+    this->m_pDamageManager = new CDamageManagerSA(this, m_pInterface, (CDamageManagerSAInterface*)((DWORD)this->GetInterface() + 1440));
 
     this->m_pVehicleAudioEntity = new CAEVehicleAudioEntitySA(&GetVehicleInterface()->m_VehicleAudioEntity);
 
@@ -770,8 +770,9 @@ bool CVehicleSA::AreSwingingDoorsAllowed() const
 
 bool CVehicleSA::AreDoorsLocked()
 {
-    return (GetVehicleInterface()->ul_doorstate == 2 || GetVehicleInterface()->ul_doorstate == 5 || GetVehicleInterface()->ul_doorstate == 4 ||
-            GetVehicleInterface()->ul_doorstate == 7 || GetVehicleInterface()->ul_doorstate == 3);
+    return (GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED || GetVehicleInterface()->m_doorLock == DOOR_LOCK_COP_CAR || 
+            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED_PLAYER_INSIDE || GetVehicleInterface()->m_doorLock == DOOR_LOCK_SKIP_SHUT_DOORS || 
+            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKOUT_PLAYER_ONLY);
 }
 
 void CVehicleSA::LockDoors(bool bLocked)
@@ -782,42 +783,16 @@ void CVehicleSA::LockDoors(bool bLocked)
     if (bLocked && !bAreDoorsLocked)
     {
         if (bAreDoorsUndamageable)
-            GetVehicleInterface()->ul_doorstate = 7;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_SKIP_SHUT_DOORS;
         else
-            GetVehicleInterface()->ul_doorstate = 2;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_LOCKED;
     }
     else if (!bLocked && bAreDoorsLocked)
     {
         if (bAreDoorsUndamageable)
-            GetVehicleInterface()->ul_doorstate = 1;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_UNLOCKED;
         else
-            GetVehicleInterface()->ul_doorstate = 0;
-    }
-}
-
-bool CVehicleSA::AreDoorsUndamageable()
-{
-    return (GetVehicleInterface()->ul_doorstate == 1 || GetVehicleInterface()->ul_doorstate == 7);
-}
-
-void CVehicleSA::SetDoorsUndamageable(bool bUndamageable)
-{
-    bool bAreDoorsLocked = AreDoorsLocked();
-    bool bAreDoorsUndamageable = AreDoorsUndamageable();
-
-    if (bUndamageable && !bAreDoorsUndamageable)
-    {
-        if (bAreDoorsLocked)
-            GetVehicleInterface()->ul_doorstate = 7;
-        else
-            GetVehicleInterface()->ul_doorstate = 1;
-    }
-    else if (!bUndamageable && bAreDoorsUndamageable)
-    {
-        if (bAreDoorsLocked)
-            GetVehicleInterface()->ul_doorstate = 2;
-        else
-            GetVehicleInterface()->ul_doorstate = 0;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_NOT_USED;
     }
 }
 

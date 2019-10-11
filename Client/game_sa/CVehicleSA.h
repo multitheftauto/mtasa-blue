@@ -434,7 +434,7 @@ public:
     /*** END SECTION that was added by us ***/
 
     // 1272
-    unsigned long ul_doorstate;
+    eDoorLock m_doorLock;
 
     // 1276
     BYTE Padding210[24];
@@ -552,6 +552,7 @@ private:
     unsigned char                    m_ucVariant;
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount;
+    bool                             m_doorsUndamageable = false;
 
 public:
     CVehicleSA();
@@ -607,8 +608,8 @@ public:
     bool     AreSwingingDoorsAllowed() const;
     bool     AreDoorsLocked();
     void     LockDoors(bool bLocked);
-    bool     AreDoorsUndamageable();
-    void     SetDoorsUndamageable(bool bUndamageable);
+    bool     AreDoorsUndamageable() { return m_doorsUndamageable; }
+    void     SetDoorsUndamageable(bool bUndamageable) { m_doorsUndamageable = bUndamageable; }
 
     bool  CarHasRoof();
     void  ExtinguishCarFire();
