@@ -33,8 +33,6 @@
 #define MAX_DOORS                   6   // also in CAutomobile
 #define MAX_WHEELS                  4
 
-class CVehicleSA;
-
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
@@ -51,7 +49,6 @@ class CDamageManagerSA : public CDamageManager
 private:
     CDamageManagerSAInterface* internalInterface;
     class CEntitySAInterface*  internalEntityInterface;
-    CVehicleSA*                m_vehicle;
 
 public:
     BYTE          GetEngineStatus();
@@ -73,7 +70,7 @@ public:
 
     VOID FuckCarCompletely(BOOL bKeepWheels);
 
-    CDamageManagerSA(CVehicleSA* vehicle, class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface) : m_vehicle(vehicle)
+    CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {
         internalEntityInterface = intEntityInterface;
         internalInterface = intInterface;

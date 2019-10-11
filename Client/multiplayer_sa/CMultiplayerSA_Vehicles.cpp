@@ -10,58 +10,62 @@
 
 #include "StdInc.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// CAutomobile::SetDoorDamage
-//
-// This hook checks if our CVehicleSA instance prevents door damage
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-//     0x6B1602 | 68 78 81 84 00    | push    offset CAutomobile::SetDoorDamage @ 0x848178
-// >>> 0x6B1607 | 64 A1 00 00 00 00 | mov     eax, large fs:0
-//     0x6B160D | 50                | push    eax
-#define HOOKPOS_CAutomobile__SetDoorDamage         0x6B1607
-#define HOOKSIZE_CAutomobile__SetDoorDamage        6
-static DWORD CONTINUE_CAutomobile__SetDoorDamage = 0x6B160D;
-
-static bool __fastcall CUSTOM_CAutomobile__SetDoorDamage(CVehicleSAInterface* vehicle)
+static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
     SClientEntity<CVehicleSA>* pair = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
 
     if (!pair)
-        return true;
+        return false;
 
-    return !pair->pEntity->AreDoorsUndamageable();
+    return pair->pEntity->AreDoorsUndamageable();
 }
 
-static void _declspec(naked) HOOK_CAutomobile__SetDoorDamage()
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CDamageManager::ProgressDoorDamage
+//
+// This hook checks if our CVehicleSA instance prevents door damage
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6C2320 | 53             | push    ebx
+//     0x6C2321 | 56             | push    esi
+//     0x6C2322 | 0F B6 74 24 0C | movzx   esi, [esp + doorId]
+//     0x6C2327 | 85 F6          | test    esi, esi
+#define HOOKPOS_CDamageManager__ProgressDoorDamage         0x6C2320
+#define HOOKSIZE_CDamageManager__ProgressDoorDamage        7
+static DWORD CONTINUE_CDamageManager__ProgressDoorDamage = 0x6C2327;
+
+static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 {
     _asm
     {
         pushad
-        call    CUSTOM_CAutomobile__SetDoorDamage
+        mov     ecx, [esp + 08h]        // CAutomobileSAInterface*
+        call    AreVehicleDoorsUndamageable
         test    al, al
-        jne     continueGameCodeLocation
+        jz      continueGameCodeLocation
 
         popad
-        add     esp, 8
+        mov     al, 0
         retn    8
 
         continueGameCodeLocation:
         popad
-        mov     eax, fs:[0]
-        jmp     CONTINUE_CAutomobile__SetDoorDamage
+        push    ebx
+        push    esi
+        movzx   esi, [esp + 0Ch]
+        jmp     CONTINUE_CDamageManager__ProgressDoorDamage
     }
 }
 
- //////////////////////////////////////////////////////////////////////////////////////////
- //
- // CMultiplayerSA::InitHooks_Vehicles
- //
- // Setup hooks
- //
- //////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::InitHooks_Vehicles
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_Vehicles()
 {
-    EZHookInstall(CAutomobile__SetDoorDamage);
+    EZHookInstall(CDamageManager__ProgressDoorDamage);
 }

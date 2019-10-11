@@ -192,7 +192,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes or boats, but includes planes, helis etc)
-    this->damageManager = new CDamageManagerSA ( this, m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    this->damageManager = new CDamageManagerSA ( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
 
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
@@ -235,7 +235,7 @@ CVehicleSA::CVehicleSA(CVehicleSAInterface* pVehicleInterface)
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
-    this->damageManager = new CDamageManagerSA( this, m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
 
@@ -267,7 +267,7 @@ void CVehicleSA::Init()
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
-    this->m_pDamageManager = new CDamageManagerSA(this, m_pInterface, (CDamageManagerSAInterface*)((DWORD)this->GetInterface() + 1440));
+    this->m_pDamageManager = new CDamageManagerSA(m_pInterface, (CDamageManagerSAInterface*)((DWORD)this->GetInterface() + 1440));
 
     this->m_pVehicleAudioEntity = new CAEVehicleAudioEntitySA(&GetVehicleInterface()->m_VehicleAudioEntity);
 
