@@ -774,7 +774,9 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CResource* pResource = pRemoteCall->GetVM()->GetResource();
+        CResource* pResource = nullptr;
+        if (pRemoteCall->GetVM())
+            pResource = pRemoteCall->GetVM()->GetResource();
         
         bool bExtendedInfo = false;
         

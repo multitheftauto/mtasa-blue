@@ -44,6 +44,7 @@ public:
     static void DownloadFinishedCallback(const SHttpDownloadResult& result);
     bool        CancelDownload();
     const       SDownloadStatus& GetDownloadStatus();
+    void        OnLuaMainDestroy();
 
     CLuaMain*           GetVM() { return m_VM; }
     long long           GetStartTime() { return m_iStartTime; }
@@ -77,7 +78,7 @@ public:
     CRemoteCall* Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                       const SHttpRequestOptions& options);
 
-    void              Remove(CLuaMain* luaMain);
+    void              OnLuaMainDestroy(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
     bool              CallExists(CRemoteCall* call);
     void              ProcessQueuedFiles();

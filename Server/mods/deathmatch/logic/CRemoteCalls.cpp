@@ -59,23 +59,14 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments
     return pRemoteCall;
 }
 
-void CRemoteCalls::Remove(CLuaMain* lua)
+void CRemoteCalls::OnLuaMainDestroy(CLuaMain* lua)
 {
-    std::list<CRemoteCall*>           trash;
-    std::list<CRemoteCall*>::iterator iter = m_calls.begin();
-    for (; iter != m_calls.end(); iter++)
+    for (auto pRemoteCall : m_calls)
     {
-        if ((*iter)->GetVM() == lua)
+        if (pRemoteCall->GetVM() == lua)
         {
-            trash.push_back((*iter));
+            pRemoteCall->OnLuaMainDestroy();
         }
-    }
-
-    iter = trash.begin();
-    for (; iter != trash.end(); iter++)
-    {
-        m_calls.remove((*iter));
-        delete (*iter);
     }
 }
 
@@ -135,6 +126,23 @@ void CRemoteCalls::ProcessQueuedFiles()
             }
         }
         ++iter;
+    }
+
+    // Maybe abort downloads from resources which have been stopped/restarted
+    for (auto pRemoteCall : m_calls)
+    {
+        // Check remote call is no longer associated with a resource
+        if (pRemoteCall->GetVM() == nullptr)
+        {
+            const SDownloadStatus& status = pRemoteCall->GetDownloadStatus();
+            if (status.uiBytesReceived > 50000)
+            {
+                // Only abort after some data has been received so remote HTTP server has probably processed original request
+                pRemoteCall->CancelDownload();
+                Remove(pRemoteCall);
+                break;
+            }
+        }
     }
 }
 
@@ -270,7 +278,8 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
         for (uint i = 0; i < pCall->GetFetchArguments().Count(); i++)
             arguments.PushArgument(*(pCall->GetFetchArguments()[i]));
 
-    arguments.Call(pCall->m_VM, pCall->m_iFunction);
+    if (pCall->m_VM)
+        arguments.Call(pCall->m_VM, pCall->m_iFunction);
     g_pGame->GetRemoteCalls()->Remove(pCall);
 }
 
@@ -295,4 +304,10 @@ const SDownloadStatus& CRemoteCall::GetDownloadStatus()
         }
     }
     return m_lastDownloadStatus;
+}
+
+// Notification that the remote call is no longer associated with a resource
+void CRemoteCall::OnLuaMainDestroy()
+{
+    m_VM = nullptr;
 }
