@@ -32,28 +32,23 @@ private:
     SDownloadStatus     m_lastDownloadStatus;
 
 public:
-    CRemoteCall(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
-                const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    CRemoteCall(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
-                const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
     CRemoteCall(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                 const SHttpRequestOptions& options);
     ~CRemoteCall();
+
     void        MakeCall();
     static void DownloadFinishedCallback(const SHttpDownloadResult& result);
-    bool        CancelDownload(void);
+    bool        CancelDownload();
     const       SDownloadStatus& GetDownloadStatus();
 
-    CLuaMain*           GetVM() { return m_VM; };
-    long long           GetStartTime() { return m_iStartTime; };
-    SString             GetURL() { return m_strURL; };
-    SString             GetQueueName() { return m_strQueueName; };
+    CLuaMain*           GetVM() { return m_VM; }
+    long long           GetStartTime() { return m_iStartTime; }
+    SString             GetURL() { return m_strURL; }
+    SString             GetQueueName() { return m_strQueueName; }
     bool                IsFetch() { return m_bIsFetch; }
     bool                IsLegacy() { return m_options.bIsLegacy; }
     CLuaArguments&      GetFetchArguments() { return m_FetchArguments; }
-    SHttpRequestOptions GetOptions() { return m_options; };
+    SHttpRequestOptions GetOptions() { return m_options; }
 };
 
 /*
@@ -71,14 +66,9 @@ public:
     CRemoteCalls();
     ~CRemoteCalls();
 
-    CRemoteCall*      Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
-                           const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    CRemoteCall*      Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                           uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    CRemoteCall*      Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
-                           const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    CRemoteCall*      Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                           const SHttpRequestOptions& options);
+    CRemoteCall* Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+                      const SHttpRequestOptions& options);
+
     void              Remove(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
     bool              CallExists(CRemoteCall* call);

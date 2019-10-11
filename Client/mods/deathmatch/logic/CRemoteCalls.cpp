@@ -11,55 +11,18 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 CRemoteCalls::CRemoteCalls()
 {
 }
 
 CRemoteCalls::~CRemoteCalls()
 {
-    list<CRemoteCall*>::iterator iter = m_calls.begin();
-    for (; iter != m_calls.end(); iter++)
+    for (auto pRemoteCall : m_calls)
     {
-        delete (*iter);
+        delete pRemoteCall;
     }
 
     m_calls.clear();
-}
-
-CRemoteCall* CRemoteCalls::Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
-                        const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-{
-    CRemoteCall* pRemoteCall = new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-    
-    m_calls.push_back(pRemoteCall);
-    m_calls.back()->MakeCall();
-
-    return pRemoteCall;
-}
-
-CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                                uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-{
-    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-
-    m_calls.push_back(pRemoteCall);
-    m_calls.back()->MakeCall();
-
-    return pRemoteCall;
-}
-
-CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
-                                const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-{
-    CRemoteCall* pRemoteCall =
-        new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-
-    m_calls.push_back(pRemoteCall);
-    m_calls.back()->MakeCall();
-    
-    return nullptr;
 }
 
 CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction,
@@ -76,8 +39,8 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments
 
 void CRemoteCalls::Remove(CLuaMain* lua)
 {
-    list<CRemoteCall*>           trash;
-    list<CRemoteCall*>::iterator iter = m_calls.begin();
+    std::list<CRemoteCall*>           trash;
+    std::list<CRemoteCall*>::iterator iter = m_calls.begin();
     for (; iter != m_calls.end(); iter++)
     {
         if ((*iter)->GetVM() == lua)
@@ -102,13 +65,7 @@ void CRemoteCalls::Remove(CRemoteCall* call)
 
 bool CRemoteCalls::CallExists(CRemoteCall* call)
 {
-    list<CRemoteCall*>::iterator iter = m_calls.begin();
-    for (; iter != m_calls.end(); iter++)
-    {
-        if ((*iter) == call)
-            return true;
-    }
-    return false;
+    return ListContains(m_calls, call);
 }
 
 // Map queue index into download manager id
@@ -161,62 +118,7 @@ void CRemoteCalls::ProcessQueuedFiles()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
-                         const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-{
-    m_VM = luaMain;
-    m_iFunction = iFunction;
-
-    arguments->WriteToJSONString(m_options.strPostData, true);
-    m_options.bPostBinary = false;
-    m_options.bIsLegacy = true;
-    m_bIsFetch = false;
-
-    m_strURL = SString("http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
-    m_strQueueName = strQueueName;
-    m_options.uiConnectionAttempts = uiConnectionAttempts;
-    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
-}
-
-// arbitary URL version
-CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                         uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-{
-    m_VM = luaMain;
-    m_iFunction = iFunction;
-
-    arguments->WriteToJSONString(m_options.strPostData, true);
-    m_options.bPostBinary = false;
-    m_options.bIsLegacy = true;
-    m_bIsFetch = false;
-
-    m_strURL = szURL;
-    m_strQueueName = strQueueName;
-    m_options.uiConnectionAttempts = uiConnectionAttempts;
-    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
-}
-
 // Fetch version
-CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
-                         const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
-    : m_FetchArguments(*fetchArguments)
-{
-    m_VM = luaMain;
-    m_iFunction = iFunction;
-
-    m_options.strPostData = strPostData;
-    m_options.bPostBinary = bPostBinary;
-    m_options.bIsLegacy = true;
-    m_bIsFetch = true;
-
-    m_strURL = szURL;
-    m_strQueueName = strQueueName;
-    m_options.uiConnectionAttempts = uiConnectionAttempts;
-    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
-}
-
-// Fetch version #2
 CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                          const SHttpRequestOptions& options)
     : m_FetchArguments(*fetchArguments)
