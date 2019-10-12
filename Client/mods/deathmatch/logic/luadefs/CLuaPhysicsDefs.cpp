@@ -839,6 +839,29 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         }
                     }
                     break;
+                case PHYSICS_PROPERTY_SCALE:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
+                        {
+                            if (pShape->SetScale(vector))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            else
+                            {
+                                argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
+                            }
+                        }
+                        else
+                        {
+                            argStream.SetCustomError(
+                                SString("Minimum scale width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                        }
+                    }
+                    break;
             }
         }
     }

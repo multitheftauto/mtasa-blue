@@ -102,12 +102,7 @@ bool CLuaPhysicsShape::SetSize(CVector size)
     {
         btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
         pInternalShape->setImplicitShapeDimensions(reinterpret_cast<btVector3&>(size));
-        for (int i = 0; i < GetRigidBodyNum(); i++)
-        {
-            GetRigidBody(i)->UpdateAABB();
-            GetRigidBody(i)->Activate();
-            GetRigidBody(i)->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
-        }
+        UpdateRigids();
         return true;
     }
     return false;
@@ -118,13 +113,27 @@ bool CLuaPhysicsShape::GetSize(CVector& size)
     if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
     {
         btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
-        const btVector3 pSize = pInternalShape->getImplicitShapeDimensions();
+        const btVector3        pSize = pInternalShape->getImplicitShapeDimensions();
         size.fX = pSize.getX();
         size.fY = pSize.getY();
         size.fZ = pSize.getZ();
         return true;
     }
     return false;
+}
+
+bool CLuaPhysicsShape::SetScale(CVector scale)
+{
+    m_pBtShape->setLocalScaling(reinterpret_cast<btVector3&>(scale));
+    UpdateRigids();
+    return true;
+}
+
+bool CLuaPhysicsShape::GetScale(CVector& scale)
+{
+    btVector3 btScale = m_pBtShape->getLocalScaling();
+    scale = reinterpret_cast<CVector&>(btScale);
+    return true;
 }
 
 bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
@@ -153,4 +162,14 @@ bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
 const char* CLuaPhysicsShape::GetType()
 {
     return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);
+}
+
+void CLuaPhysicsShape::UpdateRigids()
+{
+    for (int i = 0; i < GetRigidBodyNum(); i++)
+    {
+        GetRigidBody(i)->UpdateAABB();
+        GetRigidBody(i)->Activate();
+        GetRigidBody(i)->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
+    }
 }

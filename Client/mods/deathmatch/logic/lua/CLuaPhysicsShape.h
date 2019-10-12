@@ -46,9 +46,12 @@ public:
 
     bool SetSize(CVector size);
     bool GetSize(CVector& size);
+    bool SetScale(CVector scale);
+    bool GetScale(CVector& scale);
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
     bool GetBoundingSphere(CVector& vecCenter, float& fRadius);
 
+    void UpdateRigids();
 
     const char* GetType();
 
