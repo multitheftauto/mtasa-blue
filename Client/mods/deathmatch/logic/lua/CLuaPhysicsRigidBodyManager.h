@@ -26,9 +26,8 @@ public:
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 
     CLuaPhysicsRigidBody* AddRigidBody(btDiscreteDynamicsWorld* pWorld);
-    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pLuaTimer);
     CLuaPhysicsRigidBody* GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
-
+    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
     unsigned long         GetRigidBodyCount() const { return m_RigidBodyList.size(); }
 

@@ -1,5 +1,27 @@
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
+#include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #define MINIMUM_SHAPE_SIZE 0.003f            // to small collisions are not recommended
+
+class RayCast_cb : public btTriangleRaycastCallback
+{
+public:
+    RayCast_cb(const btVector3& from, const btVector3& to) : btTriangleRaycastCallback(from, to, kF_None){};
+
+    ~RayCast_cb(void){};
+
+    btScalar reportHit(const btVector3& hitNormalLocal, btScalar hitFraction, int partId, int triangleIndex)
+    {
+        m_hitNormalLocal = hitNormalLocal;
+        m_hitFraction = hitFraction;
+        m_partId = partId;
+        m_triangleIndex = triangleIndex;
+        return (hitFraction < m_hitFraction ? hitFraction : m_hitFraction);
+    };
+    btVector3 m_hitNormalLocal;
+    btScalar  m_hitFraction;            // Distance between source and intersection
+    int       m_partId;
+    int       m_triangleIndex;
+};
 
 class btDistanceConstraint : public btPoint2PointConstraint
 {
@@ -55,6 +77,7 @@ struct heightfieldTerrainShape
 class CLuaPhysicsSharedLogic
     {
 public:
+        static const char* GetShapeName(btCollisionShape* pShape);
     static void EulerToQuat(btVector3 rotation, btQuaternion& result);
 
     static bool SetPosition(btTransform& transform, CVector& vecRotation);

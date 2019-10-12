@@ -7,6 +7,92 @@
 #define ARRAY_ModelInfo 0xA9B0C8
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
+const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
+{
+    BroadphaseNativeTypes eType = (BroadphaseNativeTypes)pShape->getShapeType();
+
+    switch (eType)
+    {
+        // polyhedral convex shapes
+        case BOX_SHAPE_PROXYTYPE:
+            return "box";
+        case TRIANGLE_SHAPE_PROXYTYPE:
+            return "triangle";
+        case TETRAHEDRAL_SHAPE_PROXYTYPE:
+            return "box";
+        case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE:
+            return "box";
+        case CONVEX_HULL_SHAPE_PROXYTYPE:
+            return "box";
+        case CONVEX_POINT_CLOUD_SHAPE_PROXYTYPE:
+            return "box";
+        case CUSTOM_POLYHEDRAL_SHAPE_TYPE:
+            return "box";
+        // implicit convex shapes
+        case IMPLICIT_CONVEX_SHAPES_START_HERE:
+            return "box";
+        case SPHERE_SHAPE_PROXYTYPE:
+            return "sphere";
+        case MULTI_SPHERE_SHAPE_PROXYTYPE:
+            return "multi-sphere";
+        case CAPSULE_SHAPE_PROXYTYPE:
+            return "capsule";
+        case CONE_SHAPE_PROXYTYPE:
+            return "cone";
+        case CONVEX_SHAPE_PROXYTYPE:
+            return "convex";
+        case CYLINDER_SHAPE_PROXYTYPE:
+            return "cylinder";
+        case UNIFORM_SCALING_SHAPE_PROXYTYPE:
+            return "box";
+        case MINKOWSKI_SUM_SHAPE_PROXYTYPE:
+            return "box";
+        case MINKOWSKI_DIFFERENCE_SHAPE_PROXYTYPE:
+            return "box";
+        case BOX_2D_SHAPE_PROXYTYPE:
+            return "box";
+        case CONVEX_2D_SHAPE_PROXYTYPE:
+            return "convex-2d";
+        case CUSTOM_CONVEX_SHAPE_TYPE:
+            return "";
+            // concave shapes
+            // keep all the convex shapetype below here, for the check IsConvexShape in broadphase proxy!
+        case TRIANGLE_MESH_SHAPE_PROXYTYPE:
+            return "triangle-mesh";
+        case SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE:
+            return "scaled-triangle-mesh";
+            /// used for demo integration FAST/Swift collision library and Bullet
+        case FAST_CONCAVE_MESH_PROXYTYPE:
+            return "fast-cancave";
+            // terrain
+        case TERRAIN_SHAPE_PROXYTYPE:
+            /// Used for GIMPACT Trimesh integration
+            return "terrain";
+        case GIMPACT_SHAPE_PROXYTYPE:
+            /// Multimaterial mesh
+            return "gimpact";
+        case MULTIMATERIAL_TRIANGLE_MESH_PROXYTYPE:
+            return "multimaterial-triangle-mesh";
+        case EMPTY_SHAPE_PROXYTYPE:
+            return "empty";
+        case STATIC_PLANE_PROXYTYPE:
+            return "plane";
+        case CUSTOM_CONCAVE_SHAPE_TYPE:
+            return "box";
+        case COMPOUND_SHAPE_PROXYTYPE:
+            return "compound";
+        case SOFTBODY_SHAPE_PROXYTYPE:
+            return "box";
+        case HFFLUID_SHAPE_PROXYTYPE:
+            return "box";
+        case HFFLUID_BUOYANT_CONVEX_SHAPE_PROXYTYPE:
+            return "box";
+        case INVALID_SHAPE_PROXYTYPE:
+            return "invalid";
+    }
+    return "unknown";
+}
+
 void CLuaPhysicsSharedLogic::EulerToQuat(btVector3 rotation, btQuaternion& result)
 {
     btScalar cy = cos(.5f * rotation.getY()), sy = sin(.5f * rotation.getY()), cx = cos(.5f * rotation.getX()), sx = sin(.5f * rotation.getX()),
@@ -166,7 +252,7 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
     heightfieldTerrain->data = std::vector<float>(vecHeightData);
     float minHeight, maxHeight;
 
-    for(float height : vecHeightData)
+    for (float height : vecHeightData)
     {
         minHeight = std::min(minHeight, height);
         maxHeight = std::max(maxHeight, height);
@@ -184,7 +270,7 @@ btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>
     if (vecPoints.size() < 3)
         return nullptr;
 
-    btConvexHullShape*         pConvexHull = new btConvexHullShape(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
+    btConvexHullShape* pConvexHull = new btConvexHullShape(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
     return pConvexHull;
 }
 

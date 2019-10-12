@@ -65,7 +65,15 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
 
-    CLuaPhysicsRigidBody*       CreateRigidBody();
+    CLuaPhysicsRigidBody*                      CreateRigidBody();
+    bool                                       RayCastIsClear(CVector from, CVector to);
+    btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
+    btCollisionWorld::ClosestRayResultCallback RayCastDetailed(lua_State *luaVM, CVector from, CVector to, bool bFilterBackfaces);
+    btCollisionWorld::AllHitsRayResultCallback RayCastMultiple(CVector from, CVector to);
+
+
+    //btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
+    void                        DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
@@ -76,6 +84,9 @@ public:
 
 
 private:
+    void ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionObject,
+                         btCollisionWorld::LocalRayResult* localRayResult = nullptr);
+
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
     btCollisionDispatcher*               m_pDispatcher;
     btBroadphaseInterface*               m_pOverlappingPairCache;

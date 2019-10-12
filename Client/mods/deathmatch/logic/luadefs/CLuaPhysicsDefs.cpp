@@ -11,10 +11,13 @@
 
 #include "StdInc.h"
 
+#define MINIMUM_SHAPE_SIZE 0.05f
+
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
         {"physicsCreateWorld", PhysicsCreateWorld},
+        {"physicsDestroy", PhysicsDestroy},
         {"physicsCreateRigidBody", PhysicsCreateRigidBody},
         {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
@@ -32,6 +35,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyTorque", PhysicsApplyTorque},
         {"physicsApplyTorqueImpulse", PhysicsApplyTorqueImpulse},
         {"physicsCreateConstraint", PhysicsCreateConstraint},
+        {"physicsRayCast", PhysicsRayCast},
     };
 
     // Add functions
@@ -52,6 +56,33 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 }
 
 int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pStaticConstraint);
+
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (luaMain)
+    {
+        CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
+        lua_pushelement(luaVM, pPhysics);
+        return 1;
+    }
+    lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
 {
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (luaMain)
@@ -131,22 +162,46 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
         CVector               vector;
         float                 fRadius;
         float                 fHeight;
+        float                 fHalf;
         float                 fInitialChildCapacity;
         std::vector<CVector>  vecList;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
-                argStream.ReadVector3D(vector);
+                if (argStream.NextIsVector3D())
+                {
+                    argStream.ReadVector3D(vector);
+                }
+                else
+                {
+                    argStream.ReadNumber(fHalf);
+                    vector = CVector(fHalf, fHalf, fHalf);
+                }
                 if (!argStream.HasErrors())
                 {
-                    pRigidBody->InitializeWithBox(vector);
+                    if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pRigidBody->InitializeWithBox(vector);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(
+                            SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_SPHERE:
                 argStream.ReadNumber(fRadius);
                 if (!argStream.HasErrors())
                 {
-                    pRigidBody->InitializeWithSphere(fRadius);
+                    if (fRadius >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pRigidBody->InitializeWithSphere(fRadius);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_CAPSULE:
@@ -154,7 +209,14 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 argStream.ReadNumber(fHeight);
                 if (!argStream.HasErrors())
                 {
-                    pRigidBody->InitializeWithCapsule(fRadius, fHeight);
+                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pRigidBody->InitializeWithCapsule(fRadius, fHeight);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_CONE:
@@ -162,7 +224,14 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 argStream.ReadNumber(fHeight);
                 if (!argStream.HasErrors())
                 {
-                    pRigidBody->InitializeWithCone(fRadius, fHeight);
+                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pRigidBody->InitializeWithCone(fRadius, fHeight);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_CYLINDER:
@@ -176,7 +245,14 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 argStream.ReadNumber(fInitialChildCapacity, 0);
                 if (!argStream.HasErrors())
                 {
-                    pRigidBody->InitializeWithCompound(fInitialChildCapacity);
+                    if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 1024)
+                    {
+                        pRigidBody->InitializeWithCompound(fInitialChildCapacity);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError("Initial capacity should be between 0 and 1024");
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_CONVEX_HULL:
@@ -191,11 +267,22 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
                 }
                 break;
         }
-        lua_pushrigidbody(luaVM, pRigidBody);
-        return 1;
+
+        if (argStream.HasErrors())
+        {
+            pPhysics->DestroyRigidBody(pRigidBody);
+        }
+        else
+        {
+            lua_pushrigidbody(luaVM, pRigidBody);
+            return 1;
+        }
     }
-    else
+
+    if (argStream.HasErrors())
+    {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
 
     // Failed
     lua_pushboolean(luaVM, false);
@@ -702,7 +789,6 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
-
             }
         }
     }
@@ -834,6 +920,127 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
         }
         lua_pushconstraint(luaVM, pConstraint);
         return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    ePhysicsRayType  eRayType;
+    CVector          from;
+    CVector          to;
+    bool             bFilterBackfaces;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(eRayType, PHYSICS_RAY_DEFAULT);
+    argStream.ReadVector3D(from);
+    argStream.ReadVector3D(to);
+    argStream.ReadBool(bFilterBackfaces, false);
+
+    if (!argStream.HasErrors())
+    {
+        if (eRayType == PHYSICS_RAY_IS_CLEAR)
+        {
+            bool bHasHit = pPhysics->RayCastIsClear(from, to);
+            lua_pushboolean(luaVM, bHasHit);
+            return 1;
+        }
+        else if (eRayType == PHYSICS_RAY_DEFAULT)
+        {
+            btCollisionWorld::ClosestRayResultCallback rayResult = pPhysics->RayCastDefault(from, to, bFilterBackfaces);
+            lua_newtable(luaVM);
+            lua_pushstring(luaVM, "hit");
+            lua_pushboolean(luaVM, rayResult.hasHit());
+            lua_settable(luaVM, -3);
+            if (rayResult.hasHit())
+            {
+                lua_pushstring(luaVM, "hitpoint");
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getX());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getY());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getZ());
+                lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
+
+                lua_pushstring(luaVM, "hitnormal");
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
+                lua_settable(luaVM, -3);
+            }
+            lua_settable(luaVM, -3);
+            return 1;
+        }
+        else if (eRayType == PHYSICS_RAY_DETAILED)
+        {
+            lua_newtable(luaVM);
+            btCollisionWorld::ClosestRayResultCallback rayResult = pPhysics->RayCastDetailed(luaVM, from, to, bFilterBackfaces);
+            lua_pushstring(luaVM, "hit");
+            lua_pushboolean(luaVM, rayResult.hasHit());
+            lua_settable(luaVM, -3);
+            if (rayResult.hasHit())
+            {
+                lua_pushstring(luaVM, "hitpoint");
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getX());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getY());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getZ());
+                lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
+
+                lua_pushstring(luaVM, "hitnormal");
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
+                lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
+
+                lua_pushstring(luaVM, "hitnormal");
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
+                lua_settable(luaVM, -3);
+            }
+            lua_settable(luaVM, -3);
+            return 1;
+        }
+        else if (eRayType == PHYSICS_RAY_MULTIPLE)
+        {
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

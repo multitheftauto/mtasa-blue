@@ -20,6 +20,8 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld)
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
+    m_pWorld->removeRigidBody(m_pBtRigidBody);
+    delete m_pBtRigidBody;
     RemoveScriptID();
 }
 
@@ -38,6 +40,8 @@ btBoxShape* CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(boxCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    boxCollisionShape->setUserPointer((void*)this);
+    boxCollisionShape->setUserIndex(2);
     return boxCollisionShape;
 }
 
@@ -47,6 +51,8 @@ btSphereShape* CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    sphereCollisionShape->setUserPointer((void*)this);
+    sphereCollisionShape->setUserIndex(2);
     return sphereCollisionShape;
 }
 
@@ -56,6 +62,8 @@ btCapsuleShape* CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(capsuleCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    capsuleCollisionShape->setUserPointer((void*)this);
+    capsuleCollisionShape->setUserIndex(2);
     return capsuleCollisionShape;
 }
 
@@ -65,6 +73,8 @@ btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeig
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(coneCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    coneCollisionShape->setUserPointer((void*)this);
+    coneCollisionShape->setUserIndex(2);
     return coneCollisionShape;
 }
 
@@ -74,6 +84,8 @@ btCylinderShape* CLuaPhysicsRigidBody::InitializeWithCylinder(CVector& half)
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(cylinderCollisionShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
     m_pWorld->addRigidBody(m_pBtRigidBody);
+    cylinderCollisionShape->setUserPointer((void*)this);
+    cylinderCollisionShape->setUserIndex(2);
     return cylinderCollisionShape;
 }
 
@@ -82,6 +94,8 @@ btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCa
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pCompoundShape, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
+    pCompoundShape->setUserPointer((void*)this);
+    pCompoundShape->setUserIndex(2);
     m_pWorld->addRigidBody(m_pBtRigidBody);
     return pCompoundShape;
 }
@@ -92,6 +106,8 @@ btConvexHullShape* CLuaPhysicsRigidBody::InitializeWithConvexHull(std::vector<CV
 
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pConvexHull, 1.0f);
     SetSleepingThresholds(0.1f, 0.1f);
+    pConvexHull->setUserPointer((void*)this);
+    pConvexHull->setUserIndex(2);
     m_pWorld->addRigidBody(m_pBtRigidBody);
     return pConvexHull;
 }
@@ -291,6 +307,8 @@ void CLuaPhysicsRigidBody::AddBox(CVector& vecHalf)
     defaultTransform.setOrigin(btVector3(0, 0, 0));
 
     pCompoundShape->addChildShape(defaultTransform, pBox);
+    pCompoundShape->setUserPointer((void*)this);
+    pCompoundShape->setUserIndex(2);
     m_pBtRigidBody->setCollisionShape(pBox);
     m_pBtRigidBody->setMassProps(100, btVector3(0, 0, 0));
     m_pBtRigidBody->setDamping(0, 0);
@@ -319,6 +337,8 @@ void CLuaPhysicsRigidBody::AddSphere(float fRadius)
     defaultTransform.setOrigin(btVector3(0, 0, 0));
 
     pCompoundShape->addChildShape(defaultTransform, pSphere);
+    pCompoundShape->setUserPointer((void*)this);
+    pCompoundShape->setUserIndex(2);
     m_pBtRigidBody->setCollisionShape(pCompoundShape);
     m_pBtRigidBody->setDamping(0, 0);
 }

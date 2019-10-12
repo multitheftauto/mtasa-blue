@@ -11,10 +11,6 @@
 
 #include <StdInc.h>
 
-void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
-{
-}
-
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint uiScriptID)
 {
     CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
@@ -33,6 +29,20 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(btDiscreteDynami
     return pRigidBody;
 }
 
+
+void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+{
+    assert(pRigidBody);
+
+    // Check if already removed
+    if (!ListContains(m_RigidBodyList, pRigidBody))
+        return;
+
+    // Remove all references
+    ListRemove(m_RigidBodyList, pRigidBody);
+
+    delete pRigidBody;
+}
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
     for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)

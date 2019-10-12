@@ -76,6 +76,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_btCollisionObject->setCollisionShape(pCompoundShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
+    pCompoundShape->setUserPointer((void*)this);
+    pCompoundShape->setUserIndex(1);
     return m_btCollisionObject;
 }
 
@@ -138,6 +140,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<s
 
     SetPosition(position);
     SetRotation(rotation);
+    boxesCollisionShape->setUserPointer((void*)this);
+    boxesCollisionShape->setUserIndex(1);
     m_pWorld->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
@@ -159,6 +163,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
     m_btCollisionObject->setCollisionShape(pBoxShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
+    pBoxShape->setUserPointer((void*)this);
+    pBoxShape->setUserIndex(1);
     return m_btCollisionObject;
 }
 
@@ -179,6 +185,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
     m_btCollisionObject->setCollisionShape(pSphereShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
+    pSphereShape->setUserPointer((void*)this);
+    pSphereShape->setUserIndex(1);
     return m_btCollisionObject;
 }
 
@@ -200,6 +208,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::v
         SetRotation(rotation);
         m_pWorld->addCollisionObject(m_btCollisionObject);
         m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
+        trimeshShape->setUserPointer((void*)this);
+        trimeshShape->setUserIndex(1);
         return m_btCollisionObject;
     }
     return nullptr;
@@ -222,5 +232,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithHeightfieldTerrain(
     m_pWorld->addCollisionObject(m_btCollisionObject);
     m_pHeightfieldTerrain = pHeightfieldTerrain;
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
+    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserPointer((void*)this);
+    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserIndex(1);
     return m_btCollisionObject;
 }

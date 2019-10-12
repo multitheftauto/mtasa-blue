@@ -167,6 +167,16 @@ enum ePhysicsConstraint
 };
 DECLARE_ENUM(ePhysicsConstraint);
 
+enum ePhysicsRayType
+{
+    PHYSICS_RAY_IS_CLEAR, // return only boolean, hit or not
+    PHYSICS_RAY_DEFAULT, // hit, hitpoint, hit normal
+    PHYSICS_RAY_DETAILED,
+    PHYSICS_RAY_MULTIPLE, // table of hits
+
+};
+DECLARE_ENUM(ePhysicsRayType);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {

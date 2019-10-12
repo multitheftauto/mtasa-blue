@@ -12,6 +12,8 @@
 #include <list>
 #include "D:\mtablue\mtasa-blue\Client\game_sa\CColModelSA.h"
 #include "lua/CLuaPhysicsSharedLogic.h"
+#include "lua/CLuaPhysicsRigidBody.h"
+#include "lua/CLuaPhysicsStaticCollision.h"
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
@@ -113,7 +115,7 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
 
     CLuaPhysicsRigidBody* pRigidBody = CreateRigidBody();
     btCompoundShape*      pCompoundShape = pRigidBody->InitializeWithCompound();
-
+    pCompoundShape->setUserPointer((void*)this);
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
     if (halfList.size() > 0)
@@ -179,13 +181,21 @@ CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsign
     {
         CLuaPhysicsSharedLogic::AddTriangleMesh(pCollisionObject, indexList);
     }
+    btCompoundShape*  pCompoundShape = (btCompoundShape*)pCollisionObject->getCollisionShape();
+    btCollisionShape* child;
+    for (int i = 0; i < pCompoundShape->getNumChildShapes(); i++)
+    {
+        child = pCompoundShape->getChildShape(i);
+        child->setUserPointer(pCompoundShape->getUserPointer());
+        child->setUserIndex(1);
+    }
     return pStaticCollision;
 }
 
 void CClientPhysics::BuildCollisionFromGTA()
 {
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
-    CLuaPhysicsSharedLogic::QueryWorldObjects(CVector(0, 0, 0), 300, pOut);
+    CLuaPhysicsSharedLogic::QueryWorldObjects(CVector(0, 0, 0), 500, pOut);
 
     CVector position, halfSize;
     for (std::pair<unsigned short, std::pair<CVector, CVector>> pObject : pOut)
@@ -198,6 +208,220 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody()
 {
     CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld);
     return pRigidBody;
+}
+
+bool CClientPhysics::RayCastIsClear(CVector from, CVector to)
+{
+    btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
+    return RayCallback.hasHit();
+}
+
+btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCastDefault(CVector from, CVector to, bool bFilterBackfaces)
+{
+    btCollisionWorld::ClosestRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    if (bFilterBackfaces)
+        RayCallback.m_flags = 1 << 0;
+    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
+    return RayCallback;
+}
+
+class GetInfoTriangleCallback : public btTriangleCallback
+{
+public:
+    int          m_triangleId = 0;
+    int          m_triangleIndex = 0;
+    virtual void processTriangle(btVector3* triangle, int partId, int triangleIndex)
+    {
+        if (triangleIndex == m_triangleIndex)
+        {
+            m_triangle[0] = btVector3(triangle[0].getX(), triangle[0].getY(), triangle[0].getZ());
+            m_triangle[1] = btVector3(triangle[1].getX(), triangle[1].getY(), triangle[1].getZ());
+            m_triangle[2] = btVector3(triangle[2].getX(), triangle[2].getY(), triangle[2].getZ());
+        }
+    }
+    btVector3 m_triangle[3];
+};
+void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionShape,
+                                     btCollisionWorld::LocalRayResult* localRayResult)
+{
+    const btCollisionShape* pShape;
+
+    if (pCollisionShape)
+    {
+        pShape = pCollisionShape;
+    }
+    else
+    {
+        pShape = rayResult.m_collisionObject->getCollisionShape();
+    }
+    if (!pShape)
+        return;
+
+    btCollisionWorld::LocalShapeInfo* shapeInfo = new btCollisionWorld::LocalShapeInfo();
+    btVector3                         hitNormal;
+    btCollisionWorld::LocalRayResult  localRay(rayResult.m_collisionObject, shapeInfo, hitNormal, rayResult.m_closestHitFraction);
+    rayResult.addSingleResult(localRay, true);
+
+    lua_pushstring(luaVM, "m_triangleIndex");
+    lua_pushnumber(luaVM, localRay.m_localShapeInfo->m_triangleIndex);
+    lua_settable(luaVM, -3);
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    btTransform                 pTransform;
+    btTransform                 pChildTransform;
+    pChildTransform.setIdentity();
+    pTransform.setIdentity();
+
+    int type = pShape->getUserIndex();
+    if (type == 1)
+    {
+        pStaticCollision = reinterpret_cast<CLuaPhysicsStaticCollision*>(pShape->getUserPointer());
+        pTransform = pStaticCollision->GetCollisionObject()->getWorldTransform();
+        if (pStaticCollision->GetCollisionObject()->getCollisionShape()->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+        {
+            btCompoundShape* pCompoundShape = (btCompoundShape*)pStaticCollision->GetCollisionObject()->getCollisionShape();
+            pChildTransform = pCompoundShape->getChildTransform(localRay.m_localShapeInfo->m_shapePart);
+        }
+        pTransform = pStaticCollision->GetCollisionObject()->getWorldTransform();
+    }
+    else if (type == 2)
+    {
+        pRigidBody = reinterpret_cast<CLuaPhysicsRigidBody*>(pShape->getUserPointer());
+        pTransform = pRigidBody->GetBtRigidBody()->getWorldTransform();
+    }
+
+    lua_pushstring(luaVM, "type");
+    lua_pushnumber(luaVM, type);
+    lua_settable(luaVM, -3);
+
+    lua_pushstring(luaVM, "localnormal");
+    lua_newtable(luaVM);
+    lua_pushnumber(luaVM, 1);
+    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getX());
+    lua_settable(luaVM, -3);
+    lua_pushnumber(luaVM, 2);
+    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getY());
+    lua_settable(luaVM, -3);
+    lua_pushnumber(luaVM, 3);
+    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getZ());
+    lua_settable(luaVM, -3);
+    lua_settable(luaVM, -3);
+
+    lua_pushstring(luaVM, "closesthitfraction");
+    lua_pushnumber(luaVM, localRay.m_hitFraction);
+    lua_settable(luaVM, -3);
+
+    if (pShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
+    {
+        btBoxShape* pBox = (btBoxShape*)pShape;
+    }
+    else if (pShape->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+    {
+        btCompoundShape*  pCompund = (btCompoundShape*)pShape;
+        btCollisionShape* pChildShape = pCompund->getChildShape(shapeInfo->m_shapePart);
+
+        lua_pushstring(luaVM, "child");
+        lua_newtable(luaVM);
+        if (pChildShape->getShapeType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            ContinueCasting(luaVM, rayResult, pChildShape);
+        }
+        lua_settable(luaVM, -3);
+    }
+    else if (pShape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
+    {
+        pTransform *= pChildTransform;
+        btVector3 btFrom = reinterpret_cast<btVector3&>(rayResult.m_rayFromWorld);
+        btVector3 btTo = reinterpret_cast<btVector3&>(rayResult.m_rayToWorld);
+        pTransform(btTo);
+        pTransform(btFrom);
+        btBvhTriangleMeshShape* pMesh = (btBvhTriangleMeshShape*)pCollisionShape;
+        RayCast_cb              pCallback(btFrom, btTo);
+
+        pMesh->performRaycast(&pCallback, btFrom, btTo);
+        g_pCore->GetGraphics()->DrawLine3DQueued(CVector(btFrom.getX(), btFrom.getY(), btFrom.getZ()), CVector(btTo.getX(), btTo.getY(), btTo.getZ()), 10,
+                                                 COLOR_ARGB(255, 255, 255, 255), false);
+
+        GetInfoTriangleCallback tmpCallback;
+        tmpCallback.m_triangleIndex = pCallback.m_triangleIndex;
+
+        btVector3 aabbMin(-10000, -10000, -10000);
+        btVector3 aabbMax(10000, 10000, 10000);
+        pMesh->processAllTriangles(&tmpCallback, aabbMin, aabbMax);
+
+        // pTransform.inverse()(tmpCallback.m_triangle[0]);
+        // pTransform.inverse()(tmpCallback.m_triangle[1]);
+        // pTransform.inverse()(tmpCallback.m_triangle[2]);
+
+        lua_pushstring(luaVM, "shapepart");
+        lua_pushnumber(luaVM, pCallback.m_partId);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "triangleindex");
+        lua_pushnumber(luaVM, pCallback.m_triangleIndex);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "vertex1");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getX());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getY());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getZ());
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+        lua_pushstring(luaVM, "vertex2");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getX());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getY());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getZ());
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+        lua_pushstring(luaVM, "vertex3");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getX());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getY());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getZ());
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+    }
+    delete shapeInfo;
+}
+
+btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
+{
+    btCollisionWorld::ClosestRayResultCallback rayResult = RayCastDefault(from, to, bFilterBackfaces);
+    if (rayResult.hasHit() && rayResult.m_collisionObject)
+    {
+        ContinueCasting(luaVM, rayResult, rayResult.m_collisionObject->getCollisionShape());
+    }
+    return rayResult;
+}
+
+btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastMultiple(CVector from, CVector to)
+{
+    btCollisionWorld::AllHitsRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
+    return RayCallback;
+}
+
+void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
+{
+    m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
 }
 
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()

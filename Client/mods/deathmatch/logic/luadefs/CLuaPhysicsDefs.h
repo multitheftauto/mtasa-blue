@@ -19,6 +19,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(PhysicsCreateWorld);
+    LUA_DECLARE(PhysicsDestroy);
     LUA_DECLARE(PhysicsCreateRigidBody);
     LUA_DECLARE(PhysicsCreateRigidBodyFromModel);
     LUA_DECLARE(PhysicsAddShape);
@@ -36,4 +37,5 @@ public:
     LUA_DECLARE(PhysicsApplyTorque);
     LUA_DECLARE(PhysicsApplyTorqueImpulse);
     LUA_DECLARE(PhysicsCreateConstraint);
+    LUA_DECLARE(PhysicsRayCast);
 };
