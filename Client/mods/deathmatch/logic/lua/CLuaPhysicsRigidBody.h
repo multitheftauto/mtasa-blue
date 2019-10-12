@@ -38,6 +38,11 @@ public:
     void GetPosition(CVector& vecPosition);
     void GetRotation(CVector& vecPosition);
 
+    void SetMotionThreshold(float fThreshold);
+    float GetMotionThreshold();
+    void SetSweptSphereRadius(float fSphereRadius);
+    float GetSweptSphereRadius();
+
     void SetLinearVelocity(CVector& vecVelocity);
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
     void ApplyCentralForce(CVector& vecForce);

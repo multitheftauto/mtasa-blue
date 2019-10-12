@@ -63,11 +63,37 @@ void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
     //    m_pBtRigidBody->setActivationState(DISABLE_DEACTIVATION);
     //}
 }
+/*
+bodyNP.node().setCcdMotionThreshold(1e-7)
+bodyNP.node().setCcdSweptSphereRadius(0.50)
+*/
+
+void CLuaPhysicsRigidBody::SetMotionThreshold(float fThreshold)
+{
+    m_pBtRigidBody->setCcdMotionThreshold(fThreshold);
+}
+
+float CLuaPhysicsRigidBody::GetMotionThreshold()
+{
+    return m_pBtRigidBody->getCcdMotionThreshold();
+}
+
+void CLuaPhysicsRigidBody::SetSweptSphereRadius(float fSphereRadius)
+{
+    m_pBtRigidBody->setCcdSweptSphereRadius(fSphereRadius);
+}
+
+float CLuaPhysicsRigidBody::GetSweptSphereRadius()
+{
+    return m_pBtRigidBody->getCcdSweptSphereRadius();
+}
 
 void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     transform.setOrigin(reinterpret_cast<btVector3&>(vecPosition));
+    m_pBtRigidBody->setCcdMotionThreshold(1e-7);
+    m_pBtRigidBody->setCcdSweptSphereRadius(0.5f);
     m_pBtRigidBody->setWorldTransform(transform);
 }
 

@@ -77,10 +77,23 @@ CClientPhysics::~CClientPhysics(void)
     m_pPhysicsManager->RemoveFromList(this);
 }
 
-bool CClientPhysics::SetGravity(CVector vecGravity)
+void CClientPhysics::SetGravity(CVector vecGravity)
 {
     m_pDynamicsWorld->setGravity(reinterpret_cast<btVector3&>(vecGravity));
-    return true;
+}
+void CClientPhysics::GetGravity(CVector& vecGravity)
+{
+    vecGravity = reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
+}
+
+bool CClientPhysics::GetUseContinous()
+{
+    return m_pDynamicsWorld->getDispatchInfo().m_useContinuous;
+}
+
+void CClientPhysics::SetUseContinous(bool bUse)
+{
+    m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
 CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
