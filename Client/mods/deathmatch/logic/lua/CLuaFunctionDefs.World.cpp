@@ -1996,19 +1996,18 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
             info.PushBoolean(false);
 
         info.PushString("start");
-        info.PushNumber(pRemoteCall->GetStartTime());
+        info.PushNumber(static_cast<double>(pRemoteCall->GetStartTime()));
 
         if (bExtendedInfo)
         {
             if (iPostDataLength == -1 || iPostDataLength > 0)
             {
-                SString sPostData = pRemoteCall->GetOptions().strPostData;
-
-                if (iPostDataLength > 0)
-                    sPostData = sPostData.SubStr(0, iPostDataLength);
-
                 info.PushString("postData");
-                info.PushString(sPostData);
+                const SString& sPostData = pRemoteCall->GetOptions().strPostData;
+                if (iPostDataLength > 0 && iPostDataLength < static_cast<int>(sPostData.length()))
+                    info.PushString(sPostData.SubStr(0, iPostDataLength));
+                else
+                    info.PushString(sPostData);
             }
 
             // requested headers

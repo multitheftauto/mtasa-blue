@@ -46,14 +46,14 @@ public:
     const       SDownloadStatus& GetDownloadStatus();
     void        OnLuaMainDestroy();
 
-    CLuaMain*           GetVM() { return m_VM; }
-    long long           GetStartTime() { return m_iStartTime; }
-    SString             GetURL() { return m_strURL; }
-    SString             GetQueueName() { return m_strQueueName; }
-    bool                IsFetch() { return m_bIsFetch; }
-    bool                IsLegacy() { return m_options.bIsLegacy; }
-    CLuaArguments&      GetFetchArguments() { return m_FetchArguments; }
-    SHttpRequestOptions GetOptions() { return m_options; }
+    CLuaMain*                  GetVM() { return m_VM; }
+    long long                  GetStartTime() { return m_iStartTime; }
+    const SString&             GetURL() { return m_strURL; }
+    const SString&             GetQueueName() { return m_strQueueName; }
+    bool                       IsFetch() { return m_bIsFetch; }
+    bool                       IsLegacy() { return m_options.bIsLegacy; }
+    const CLuaArguments&       GetFetchArguments() { return m_FetchArguments; }
+    const SHttpRequestOptions& GetOptions() { return m_options; }
 };
 
 /*
