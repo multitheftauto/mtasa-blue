@@ -127,6 +127,29 @@ bool CLuaPhysicsShape::GetSize(CVector& size)
     return false;
 }
 
+bool CLuaPhysicsShape::GetBoundingBox(CVector& vecMin, CVector& vecMax)
+{
+    btTransform transform;
+    transform.setIdentity();
+    btVector3 min, max;
+    m_pBtShape->getAabb(transform, min, max);
+    vecMin = reinterpret_cast<CVector&>(min);
+    vecMax = reinterpret_cast<CVector&>(max);
+    return true;
+}
+
+bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
+{
+    btTransform transform;
+    transform.setIdentity();
+    btVector3 center;
+    btScalar  radius;
+    m_pBtShape->getBoundingSphere(center, radius);
+    fRadius = radius;
+    vecCenter = reinterpret_cast<CVector&>(center);
+    return true;
+}
+
 const char* CLuaPhysicsShape::GetType()
 {
     return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);

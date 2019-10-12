@@ -874,7 +874,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         bool    boolean;
-        CVector vector;
+        CVector vector, vector2;
         SColor  color;
         float   floatNumber[2];
 
@@ -935,6 +935,36 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     else
                     {
                         argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+                    }
+                    break;
+                case PHYSICS_PROPERTY_BOUNDING_BOX:
+                    if (pShape->GetBoundingBox(vector, vector2))
+                    {
+                        lua_pushnumber(luaVM, vector.fX);
+                        lua_pushnumber(luaVM, vector.fY);
+                        lua_pushnumber(luaVM, vector.fZ);
+                        lua_pushnumber(luaVM, vector2.fX);
+                        lua_pushnumber(luaVM, vector2.fY);
+                        lua_pushnumber(luaVM, vector2.fZ);
+                        return 6;
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
+                    }
+                    break;
+                case PHYSICS_PROPERTY_BOUNDING_SPHERE:
+                    if (pShape->GetBoundingSphere(vector, floatNumber[0]))
+                    {
+                        lua_pushnumber(luaVM, vector.fX);
+                        lua_pushnumber(luaVM, vector.fY);
+                        lua_pushnumber(luaVM, vector.fZ);
+                        lua_pushnumber(luaVM, floatNumber[0]);
+                        return 4;
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
                     }
                     break;
             }
