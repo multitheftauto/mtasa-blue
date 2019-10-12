@@ -380,12 +380,10 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
             case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
                 argStream.ReadNumber(iSizeX);
                 argStream.ReadNumber(iSizeY);
-                argStream.ReadVector3D(vecScale);
                 argStream.ReadNumberTable(vecHeightfieldData, iSizeX * iSizeY);
-
                 if (!argStream.HasErrors())
                 {
-                    pStaticCollision->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecScale, vecHeightfieldData);
+                    pStaticCollision->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecHeightfieldData);
                 }
                 break;
         }

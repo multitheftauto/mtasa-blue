@@ -215,7 +215,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithTriangleMesh(std::v
     return nullptr;
 }
 
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, CVector vecScale,
+btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY,
                                                                                 std::vector<float>& vecHeightData)
 {
     if (m_btCollisionObject != nullptr)
@@ -226,7 +226,6 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithHeightfieldTerrain(
     heightfieldTerrainShape* pHeightfieldTerrain =
         CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);
 
-    pHeightfieldTerrain->pHeightfieldTerrainShape->setLocalScaling(reinterpret_cast<btVector3&>(vecScale));
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pHeightfieldTerrain->pHeightfieldTerrainShape);
     m_pWorld->addCollisionObject(m_btCollisionObject);

@@ -63,10 +63,6 @@ void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
     //    m_pBtRigidBody->setActivationState(DISABLE_DEACTIVATION);
     //}
 }
-/*
-bodyNP.node().setCcdMotionThreshold(1e-7)
-bodyNP.node().setCcdSweptSphereRadius(0.50)
-*/
 
 void CLuaPhysicsRigidBody::SetMotionThreshold(float fThreshold)
 {

@@ -36,7 +36,7 @@ public:
     btCollisionObject* InitializeWithSphere(float fRadius);
     btCollisionObject* InitializeWithTriangleMesh(std::vector<CVector>& vecIndices, CVector position = CVector(0, 0, 0), CVector rotation = CVector(0, 0, 0));
 
-    btCollisionObject* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, CVector vecScale, std::vector<float>& vecHeightData);
+    btCollisionObject* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecRotation);
