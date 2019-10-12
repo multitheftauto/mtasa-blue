@@ -19,15 +19,15 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
         case TRIANGLE_SHAPE_PROXYTYPE:
             return "triangle";
         case TETRAHEDRAL_SHAPE_PROXYTYPE:
-            return "box";
+            return "tetrahedral";
         case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE:
-            return "box";
+            return "convex-triangle-mesh";
         case CONVEX_HULL_SHAPE_PROXYTYPE:
-            return "box";
+            return "convex-hull";
         case CONVEX_POINT_CLOUD_SHAPE_PROXYTYPE:
-            return "box";
+            return "convex-point-could";
         case CUSTOM_POLYHEDRAL_SHAPE_TYPE:
-            return "box";
+            return "custom-polyhedral";
         // implicit convex shapes
         case IMPLICIT_CONVEX_SHAPES_START_HERE:
             return "box";
@@ -54,7 +54,7 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
         case CONVEX_2D_SHAPE_PROXYTYPE:
             return "convex-2d";
         case CUSTOM_CONVEX_SHAPE_TYPE:
-            return "";
+            return "custom-convex";
             // concave shapes
             // keep all the convex shapetype below here, for the check IsConvexShape in broadphase proxy!
         case TRIANGLE_MESH_SHAPE_PROXYTYPE:

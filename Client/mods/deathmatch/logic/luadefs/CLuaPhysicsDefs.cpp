@@ -597,6 +597,7 @@ int CLuaPhysicsDefs::PhysicsApplyCentralImpulse(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
 {
+    CClientPhysics*             pPhysics = nullptr;
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
     CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
@@ -605,7 +606,9 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
 
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    if (argStream.NextIsUserDataOfType<CClientPhysics>())
+        argStream.ReadUserData(pPhysics);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
         argStream.ReadUserData(pRigidBody);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
         argStream.ReadUserData(pStaticCollision);
@@ -623,7 +626,25 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         int     intNumber;
         SColor  color;
 
-        if (pRigidBody)
+        if (pPhysics)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_GRAVITY:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pPhysics->SetGravity(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
+                    break;
+            }
+        }
+        else if (pRigidBody)
         {
             switch (eProperty)
             {
@@ -724,6 +745,9 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         }
                     }
                     break;
+                default:
+                    argStream.SetCustomError(SString("Physics rigid body does not support %s property.", EnumToString(eProperty).c_str()));
+                    break;
             }
         }
         else if (pStaticCollision)
@@ -788,6 +812,9 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                default:
+                    argStream.SetCustomError(SString("Physics static collision does not support %s property.", EnumToString(eProperty).c_str()));
+                    break;
             }
         }
         else if (pStaticConstraint)
@@ -804,6 +831,9 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Physics constraint does not support %s property.", EnumToString(eProperty).c_str()));
                     break;
             }
         }
@@ -856,6 +886,9 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                                 SString("Minimum scale width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
                         }
                     }
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
                     break;
             }
         }
