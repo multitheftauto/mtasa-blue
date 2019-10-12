@@ -45,6 +45,7 @@ public:
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody) { ListRemove(m_pRigidBodyList, pRigidBody); }
 
     bool SetSize(CVector size);
+    bool GetSize(CVector& size);
     const char* GetType();
 
 private:

@@ -855,13 +855,20 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    ePhysicsProperty            eProperty;
-    CScriptArgReader            argStream(luaVM);
+    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+    CLuaPhysicsShape*           pShape = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
 
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
         argStream.ReadUserData(pRigidBody);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
         argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pStaticConstraint);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+        argStream.ReadUserData(pShape);
 
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
@@ -912,6 +919,25 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
         }
         else if (pStaticCollision)
         {
+        }
+        else if (pShape)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_SIZE:
+                    if (pShape->GetSize(vector))
+                    {
+                        lua_pushnumber(luaVM, vector.fX);
+                        lua_pushnumber(luaVM, vector.fY);
+                        lua_pushnumber(luaVM, vector.fZ);
+                        return 3;
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+                    }
+                    break;
+            }
         }
     }
     else

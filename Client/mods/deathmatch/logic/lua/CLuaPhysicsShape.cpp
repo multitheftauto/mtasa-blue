@@ -113,6 +113,20 @@ bool CLuaPhysicsShape::SetSize(CVector size)
     return false;
 }
 
+bool CLuaPhysicsShape::GetSize(CVector& size)
+{
+    if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
+    {
+        btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
+        const btVector3 pSize = pInternalShape->getImplicitShapeDimensions();
+        size.fX = pSize.getX();
+        size.fY = pSize.getY();
+        size.fZ = pSize.getZ();
+        return true;
+    }
+    return false;
+}
+
 const char* CLuaPhysicsShape::GetType()
 {
     return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);
