@@ -77,6 +77,11 @@ CClientPhysics::~CClientPhysics(void)
     m_pPhysicsManager->RemoveFromList(this);
 }
 
+bool CClientPhysics::SetGravity(CVector vecGravity)
+{
+    m_pDynamicsWorld->setGravity(reinterpret_cast<btVector3&>(vecGravity));
+}
+
 CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
     CColModelSAInterface* pColModelInterface = CLuaPhysicsSharedLogic::GetModelCollisionInterface(usModelId);

@@ -58,28 +58,23 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
 {
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
-
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
+    CVector          vecGravity;
+    argStream.ReadVector3D(vecGravity, CVector(0, 0, -9.81));
 
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-        argStream.ReadUserData(pRigidBody);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-        argStream.ReadUserData(pStaticCollision);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
-        argStream.ReadUserData(pStaticConstraint);
-
-    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (luaMain)
+    if (!argStream.HasErrors())
     {
-        CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
-        lua_pushelement(luaVM, pPhysics);
-        return 1;
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
+            pPhysics->SetGravity(vecGravity);
+            lua_pushelement(luaVM, pPhysics);
+            return 1;
+        }
     }
-    lua_pushboolean(luaVM, true);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -958,6 +953,19 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     else
                     {
                         argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+                    }
+                    break;
+                case PHYSICS_PROPERTY_SCALE:
+                    if (pShape->GetScale(vector))
+                    {
+                        lua_pushnumber(luaVM, vector.fX);
+                        lua_pushnumber(luaVM, vector.fY);
+                        lua_pushnumber(luaVM, vector.fZ);
+                        return 3;
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
                     }
                     break;
                 case PHYSICS_PROPERTY_BOUNDING_BOX:
