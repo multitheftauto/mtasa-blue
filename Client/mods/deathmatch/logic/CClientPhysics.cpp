@@ -80,6 +80,7 @@ CClientPhysics::~CClientPhysics(void)
 bool CClientPhysics::SetGravity(CVector vecGravity)
 {
     m_pDynamicsWorld->setGravity(reinterpret_cast<btVector3&>(vecGravity));
+    return true;
 }
 
 CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
