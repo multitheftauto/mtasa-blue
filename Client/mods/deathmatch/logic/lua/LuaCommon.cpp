@@ -118,6 +118,16 @@ void lua_pushconstraint(lua_State* luaVM, CLuaPhysicsConstraint* pConstraint)
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pConstraint->GetScriptID()));
 }
 
+void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
+{
+    const char* szClass = NULL;
+    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    //if (pLuaMain->IsOOPEnabled())
+    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
+
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pShape->GetScriptID()));
+}
+
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 {
     const char* szClass = NULL;

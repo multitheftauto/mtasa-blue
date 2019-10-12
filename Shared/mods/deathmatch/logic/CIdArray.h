@@ -54,6 +54,7 @@ namespace EIdClass
         VECTOR4,
         MATRIX,
         RIGID_BODY,
+        SHAPE,
         STATIC_COLLISION,
         CONSTRAINT,
     };

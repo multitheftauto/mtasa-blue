@@ -21,6 +21,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateRigidBody", PhysicsCreateRigidBody},
         {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
+        {"physicsCreateShape", PhysicsCreateShape},
         {"physicsAddShape", PhysicsAddShape},
         {"physicsSetProperties", PhysicsSetProperties},
         {"physicsGetProperties", PhysicsGetProperties},
@@ -79,6 +80,144 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
         return 1;
     }
     lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(shapeType);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaPhysicsShape*    pShape = pPhysics->CreateShape();
+        CVector              vector;
+        float                fRadius;
+        float                fHeight;
+        float                fHalf;
+        float                fInitialChildCapacity;
+        std::vector<CVector> vecList;
+        switch (shapeType)
+        {
+            case PHYSICS_SHAPE_BOX:
+                if (argStream.NextIsVector3D())
+                {
+                    argStream.ReadVector3D(vector);
+                }
+                else
+                {
+                    argStream.ReadNumber(fHalf);
+                    vector = CVector(fHalf, fHalf, fHalf);
+                }
+                if (!argStream.HasErrors())
+                {
+                    if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pShape->InitializeWithBox(vector);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(
+                            SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_SPHERE:
+                argStream.ReadNumber(fRadius);
+                if (!argStream.HasErrors())
+                {
+                    if (fRadius >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pShape->InitializeWithSphere(fRadius);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_CAPSULE:
+                argStream.ReadNumber(fRadius);
+                argStream.ReadNumber(fHeight);
+                if (!argStream.HasErrors())
+                {
+                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pShape->InitializeWithCapsule(fRadius, fHeight);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_CONE:
+                argStream.ReadNumber(fRadius);
+                argStream.ReadNumber(fHeight);
+                if (!argStream.HasErrors())
+                {
+                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
+                    {
+                        pShape->InitializeWithCone(fRadius, fHeight);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_CYLINDER:
+                argStream.ReadVector3D(vector);
+                if (!argStream.HasErrors())
+                {
+                    pShape->InitializeWithCylinder(vector);
+                }
+                break;
+            case PHYSICS_SHAPE_COMPOUND:
+                argStream.ReadNumber(fInitialChildCapacity, 0);
+                if (!argStream.HasErrors())
+                {
+                    if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 1024)
+                    {
+                        pShape->InitializeWithCompound(fInitialChildCapacity);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError("Initial capacity should be between 0 and 1024");
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_CONVEX_HULL:
+                while (argStream.NextIsVector3D())
+                {
+                    argStream.ReadVector3D(vector);
+                    vecList.push_back(vector);
+                }
+                if (!argStream.HasErrors())
+                {
+                    pShape->InitializeWithConvexHull(vecList);
+                }
+                break;
+        }
+
+        if (argStream.HasErrors())
+        {
+            pPhysics->DestroyShape(pShape);
+        }
+        else
+        {
+            lua_pushshape(luaVM, pShape);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -151,143 +290,22 @@ int CLuaPhysicsDefs::PhysicsDrawDebug(lua_State* luaVM)
 int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
 {
     CClientPhysics*   pPhysics;
-    ePhysicsShapeType shapeType;
+    CLuaPhysicsShape* pShape;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadUserData(pPhysics);
-    argStream.ReadEnumString(shapeType);
+    argStream.ReadUserData(pShape);
 
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody();
-        CVector               vector;
-        float                 fRadius;
-        float                 fHeight;
-        float                 fHalf;
-        float                 fInitialChildCapacity;
-        std::vector<CVector>  vecList;
-        switch (shapeType)
-        {
-            case PHYSICS_SHAPE_BOX:
-                if (argStream.NextIsVector3D())
-                {
-                    argStream.ReadVector3D(vector);
-                }
-                else
-                {
-                    argStream.ReadNumber(fHalf);
-                    vector = CVector(fHalf, fHalf, fHalf);
-                }
-                if (!argStream.HasErrors())
-                {
-                    if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
-                    {
-                        pRigidBody->InitializeWithBox(vector);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(
-                            SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_SPHERE:
-                argStream.ReadNumber(fRadius);
-                if (!argStream.HasErrors())
-                {
-                    if (fRadius >= MINIMUM_SHAPE_SIZE)
-                    {
-                        pRigidBody->InitializeWithSphere(fRadius);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Minimum radius must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_CAPSULE:
-                argStream.ReadNumber(fRadius);
-                argStream.ReadNumber(fHeight);
-                if (!argStream.HasErrors())
-                {
-                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
-                    {
-                        pRigidBody->InitializeWithCapsule(fRadius, fHeight);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_CONE:
-                argStream.ReadNumber(fRadius);
-                argStream.ReadNumber(fHeight);
-                if (!argStream.HasErrors())
-                {
-                    if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
-                    {
-                        pRigidBody->InitializeWithCone(fRadius, fHeight);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError(SString("Minimum radius and height must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_CYLINDER:
-                argStream.ReadVector3D(vector);
-                if (!argStream.HasErrors())
-                {
-                    pRigidBody->InitializeWithCylinder(vector);
-                }
-                break;
-            case PHYSICS_SHAPE_COMPOUND:
-                argStream.ReadNumber(fInitialChildCapacity, 0);
-                if (!argStream.HasErrors())
-                {
-                    if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 1024)
-                    {
-                        pRigidBody->InitializeWithCompound(fInitialChildCapacity);
-                    }
-                    else
-                    {
-                        argStream.SetCustomError("Initial capacity should be between 0 and 1024");
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_CONVEX_HULL:
-                while (argStream.NextIsVector3D())
-                {
-                    argStream.ReadVector3D(vector);
-                    vecList.push_back(vector);
-                }
-                if (!argStream.HasErrors())
-                {
-                    pRigidBody->InitializeWithConvexHull(vecList);
-                }
-                break;
-        }
-
-        if (argStream.HasErrors())
-        {
-            pPhysics->DestroyRigidBody(pRigidBody);
-        }
-        else
-        {
-            lua_pushrigidbody(luaVM, pRigidBody);
-            return 1;
-        }
+        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody(pShape);
+        lua_pushrigidbody(luaVM, pRigidBody);
+        return 1;
     }
-
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
 int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
 {
     CClientPhysics*  pPhysics;
@@ -587,6 +605,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
     CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+    CLuaPhysicsShape*           pShape = nullptr;
 
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
@@ -597,6 +616,8 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         argStream.ReadUserData(pStaticCollision);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
         argStream.ReadUserData(pStaticConstraint);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+        argStream.ReadUserData(pShape);
 
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
@@ -791,8 +812,38 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     break;
             }
         }
+        else if (pShape)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_SIZE:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
+                        {
+                            if (pShape->SetSize(vector))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            else
+                            {
+                                argStream.SetCustomError(SString("Shape '%s' does not support size property", pShape->GetType()));
+                            }
+                        }
+                        else
+                        {
+                            argStream.SetCustomError(
+                                SString("Minimum width, height and length must be equal or greater than %.02f units", MINIMUM_SHAPE_SIZE).c_str());
+                        }
+                    }
+                    break;
+            }
+        }
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed

@@ -56,6 +56,7 @@ public:
     CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
     CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
     CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
+    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };
@@ -94,6 +95,7 @@ private:
     CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
     CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
     CLuaPhysicsConstraintManager*      m_pLuaPhysicsContraintManager;
+    CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 

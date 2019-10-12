@@ -20,22 +20,16 @@ class CLuaPhysicsRigidBody;
 class CLuaPhysicsRigidBody
 {
 public:
-    CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld);
+    CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape);
     ~CLuaPhysicsRigidBody();
 
     void RemoveScriptID();
 
+    void Activate() { m_pBtRigidBody->activate(true); }
+    void UpdateAABB() { m_pWorld->updateSingleAabb(m_pBtRigidBody); }
     // for compound rigid bodies
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
-
-    btBoxShape*        InitializeWithBox(CVector& vecHalf);
-    btSphereShape*     InitializeWithSphere(float fRadius);
-    btCapsuleShape*    InitializeWithCapsule(float fRadius, float fHeight);
-    btCompoundShape*   InitializeWithCompound(int initialChildCapacity = 0);
-    btConeShape*       InitializeWithCone(float fRadius, float fHeight);
-    btCylinderShape*   InitializeWithCylinder(CVector& half);
-    btConvexHullShape* InitializeWithConvexHull(std::vector<CVector>& vecPoints);
 
     void SetStatic(bool bStatic);
     void SetMass(float fMass);
@@ -73,4 +67,5 @@ private:
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     btRigidBody*             m_pBtRigidBody;
+    CLuaPhysicsShape*        m_pPhysicsShape;
 };

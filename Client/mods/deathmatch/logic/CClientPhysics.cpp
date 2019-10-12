@@ -113,9 +113,9 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     if (halfList.size() == 0 && indexList.size() < 3)
         return nullptr;
 
-    CLuaPhysicsRigidBody* pRigidBody = CreateRigidBody();
-    btCompoundShape*      pCompoundShape = pRigidBody->InitializeWithCompound();
-    pCompoundShape->setUserPointer((void*)this);
+    CLuaPhysicsShape*     pShape = CreateShape();
+    btCompoundShape*      pCompoundShape = pShape->InitializeWithCompound();
+    CLuaPhysicsRigidBody* pRigidBody = CreateRigidBody(pShape);
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
     if (halfList.size() > 0)
@@ -204,9 +204,9 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody()
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
 {
-    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld);
+    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld, pShape);
     return pRigidBody;
 }
 
@@ -424,10 +424,21 @@ void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
     m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
 }
 
+void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
+{
+    m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
+}
+
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
 {
-    CLuaPhysicsStaticCollision* pRigidBody = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
-    return pRigidBody;
+    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    return pStaticCollision;
+}
+
+CLuaPhysicsShape* CClientPhysics::CreateShape()
+{
+    CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape();
+    return pShape;
 }
 
 bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)

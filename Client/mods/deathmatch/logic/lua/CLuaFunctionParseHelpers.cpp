@@ -558,6 +558,7 @@ ADD_ENUM(PHYSICS_PROPERTY_DEBUG_COLOR, "debugcolor")
 ADD_ENUM(PHYSICS_PROPERTY_FILTER_MASK, "filtermask")
 ADD_ENUM(PHYSICS_PROPERTY_FILTER_GROUP, "filtergroup")
 ADD_ENUM(PHYSICS_PROPERTY_STIFFNESS, "stiffness")
+ADD_ENUM(PHYSICS_PROPERTY_SIZE, "size")
 IMPLEMENT_ENUM_END("physics-shape-property")
 
 IMPLEMENT_ENUM_BEGIN(ePhysicsDebugMode)
@@ -742,7 +743,9 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, ptr, luaVM))   // Try static collision
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))            // Try static collision
+    if (auto* pVar = UserDataCast<CLuaPhysicsConstraint>((CLuaPhysicsConstraint*)NULL, ptr, luaVM))            // Try constraint
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, ptr, luaVM))            // Try collision shape
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);

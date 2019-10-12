@@ -37,6 +37,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_pLuaPhysicsRigidBodyManager = new CLuaPhysicsRigidBodyManager;
     m_pLuaPhysicsStaticCollisionManager = new CLuaPhysicsStaticCollisionManager;
     m_pLuaPhysicsContraintManager = new CLuaPhysicsConstraintManager;
+    m_pLuaPhysicsShapeManager = new CLuaPhysicsShapeManager;
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;

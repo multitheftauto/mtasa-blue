@@ -128,6 +128,7 @@ enum ePhysicsProperty
     PHYSICS_PROPERTY_DEBUG_COLOR,
     PHYSICS_PROPERTY_FILTER_MASK,
     PHYSICS_PROPERTY_FILTER_GROUP,
+    PHYSICS_PROPERTY_SIZE,
 
     // constraints properties
     PHYSICS_PROPERTY_STIFFNESS,
@@ -462,6 +463,10 @@ inline SString GetClassTypeName(CLuaPhysicsConstraint*)
 {
     return "physics-constraint";
 }
+inline SString GetClassTypeName(CLuaPhysicsShape*)
+{
+    return "physics-shape";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -605,6 +610,20 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
     if (pLuaMain)
     {
         return pLuaMain->GetPhysicsConstraintManager()->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
+
+//
+// CLuaPhysicsContraint from userdata
+//
+template <class T>
+CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetPhysicsShapeManager()->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }

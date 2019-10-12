@@ -12,10 +12,18 @@
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape)
 {
     m_pWorld = pWorld;
+    m_pPhysicsShape = pShape;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RIGID_BODY);
+
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), 1.0f);
+    m_pPhysicsShape->AddRigidBody(this);
+    SetSleepingThresholds(0.1f, 0.1f);
+    m_pWorld->addRigidBody(m_pBtRigidBody);
+    pShape->GetBtShape()->setUserPointer((void*)this);
+    pShape->GetBtShape()->setUserIndex(2);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
@@ -32,84 +40,6 @@ void CLuaPhysicsRigidBody::RemoveScriptID()
         CIdArray::PushUniqueId(this, EIdClass::RIGID_BODY, m_uiScriptID);
         m_uiScriptID = INVALID_ARRAY_ID;
     }
-}
-
-btBoxShape* CLuaPhysicsRigidBody::InitializeWithBox(CVector& half)
-{
-    btBoxShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(boxCollisionShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    boxCollisionShape->setUserPointer((void*)this);
-    boxCollisionShape->setUserIndex(2);
-    return boxCollisionShape;
-}
-
-btSphereShape* CLuaPhysicsRigidBody::InitializeWithSphere(float fRadius)
-{
-    btSphereShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(sphereCollisionShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    sphereCollisionShape->setUserPointer((void*)this);
-    sphereCollisionShape->setUserIndex(2);
-    return sphereCollisionShape;
-}
-
-btCapsuleShape* CLuaPhysicsRigidBody::InitializeWithCapsule(float fRadius, float fHeight)
-{
-    btCapsuleShape* capsuleCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(capsuleCollisionShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    capsuleCollisionShape->setUserPointer((void*)this);
-    capsuleCollisionShape->setUserIndex(2);
-    return capsuleCollisionShape;
-}
-
-btConeShape* CLuaPhysicsRigidBody::InitializeWithCone(float fRadius, float fHeight)
-{
-    btConeShape* coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(coneCollisionShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    coneCollisionShape->setUserPointer((void*)this);
-    coneCollisionShape->setUserIndex(2);
-    return coneCollisionShape;
-}
-
-btCylinderShape* CLuaPhysicsRigidBody::InitializeWithCylinder(CVector& half)
-{
-    btCylinderShape* cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(cylinderCollisionShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    cylinderCollisionShape->setUserPointer((void*)this);
-    cylinderCollisionShape->setUserIndex(2);
-    return cylinderCollisionShape;
-}
-
-btCompoundShape* CLuaPhysicsRigidBody::InitializeWithCompound(int initialChildCapacity)
-{
-    btCompoundShape* pCompoundShape = new btCompoundShape(true);
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pCompoundShape, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    pCompoundShape->setUserPointer((void*)this);
-    pCompoundShape->setUserIndex(2);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    return pCompoundShape;
-}
-
-btConvexHullShape* CLuaPhysicsRigidBody::InitializeWithConvexHull(std::vector<CVector>& vecPoints)
-{
-    btConvexHullShape* pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
-
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pConvexHull, 1.0f);
-    SetSleepingThresholds(0.1f, 0.1f);
-    pConvexHull->setUserPointer((void*)this);
-    pConvexHull->setUserIndex(2);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    return pConvexHull;
 }
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)

@@ -65,7 +65,7 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
 
-    CLuaPhysicsRigidBody*                      CreateRigidBody();
+    CLuaPhysicsRigidBody*                      CreateRigidBody(CLuaPhysicsShape* pShape);
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
     btCollisionWorld::ClosestRayResultCallback RayCastDetailed(lua_State *luaVM, CVector from, CVector to, bool bFilterBackfaces);
@@ -74,7 +74,10 @@ public:
 
     //btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
     void                        DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    void                        DestroyShape(CLuaPhysicsShape* pLuaShape);
+
     CLuaPhysicsStaticCollision* CreateStaticCollision();
+    CLuaPhysicsShape*           CreateShape();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);

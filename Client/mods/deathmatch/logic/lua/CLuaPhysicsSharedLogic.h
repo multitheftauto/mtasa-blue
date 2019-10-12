@@ -77,7 +77,7 @@ struct heightfieldTerrainShape
 class CLuaPhysicsSharedLogic
     {
 public:
-        static const char* GetShapeName(btCollisionShape* pShape);
+    static const char* GetShapeName(btCollisionShape* pShape);
     static void EulerToQuat(btVector3 rotation, btQuaternion& result);
 
     static bool SetPosition(btTransform& transform, CVector& vecRotation);

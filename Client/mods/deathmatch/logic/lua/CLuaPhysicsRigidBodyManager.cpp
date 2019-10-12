@@ -22,9 +22,9 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint
     return pLuaRigidBody;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(btDiscreteDynamicsWorld* pWorld)
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape)
 {
-    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pWorld);
+    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pWorld, pShape);
     m_RigidBodyList.push_back(pRigidBody);
     return pRigidBody;
 }

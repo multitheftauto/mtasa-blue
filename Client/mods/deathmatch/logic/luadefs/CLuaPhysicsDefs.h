@@ -22,6 +22,7 @@ public:
     LUA_DECLARE(PhysicsDestroy);
     LUA_DECLARE(PhysicsCreateRigidBody);
     LUA_DECLARE(PhysicsCreateRigidBodyFromModel);
+    LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsAddShape);
     LUA_DECLARE(PhysicsSetProperties);
     LUA_DECLARE(PhysicsGetProperties);

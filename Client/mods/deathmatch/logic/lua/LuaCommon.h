@@ -47,6 +47,7 @@ class CLuaTimer;
 class CLuaPhysicsRigidBody;
 class CLuaPhysicsStaticCollision;
 class CLuaPhysicsConstraint;
+class CLuaPhysicsShape;
 class CResource;
 class CXMLNode;
 
@@ -60,6 +61,7 @@ void lua_pushtimer(lua_State* luaVM, CLuaTimer* pElement);
 void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);
 void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pElement);
 void lua_pushconstraint(lua_State* luaVM, CLuaPhysicsConstraint* pConstraint);
+void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape);
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement);
 void lua_pushuserdata(lua_State* luaVM, void* pData);
 
