@@ -436,6 +436,15 @@ void CLuaPhysicsSharedLogic::QueryWorldObjects(CVector vecPosition, float fRadiu
         }
     }
 }
+void CLuaPhysicsSharedLogic::QueryAllWorldObjects(std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)
+{
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pTemp;
+    g_pGame->GetWorld()->GetWorldModels(0, pTemp);
+    for (const auto object : pTemp)
+    {
+        pOut.push_back(object);
+    }
+}
 
 void CLuaPhysicsSharedLogic::QueryUserDefinedObjects(CVector vecPosition, float fRadius,
                                                      std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)

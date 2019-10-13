@@ -241,7 +241,7 @@ int CLuaPhysicsDefs::PhysicsBuildCollisionFromGTA(lua_State* luaVM)
     argStream.ReadUserData(pPhysics);
     if (!argStream.HasErrors())
     {
-        pPhysics->BuildCollisionFromGTA();
+        pPhysics->StartBuildCollisionFromGTA();
         lua_pushboolean(luaVM, true);
         return 1;
     }

@@ -50,6 +50,7 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pManager = pManager;
     m_pPhysicsManager = pManager->GetPhysicsManager();
     m_pLuaMain = luaMain;
+    m_bBuildWorld = false;
 
     SetTypeName("physics");
 
@@ -158,11 +159,11 @@ CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsign
 {
     CColModelSAInterface* pColModelInterface = CLuaPhysicsSharedLogic::GetModelCollisionInterface(usModelId);
     if (pColModelInterface == nullptr)
-        return false;
+        return nullptr;
 
     CColDataSA* pColData = pColModelInterface->pColData;
     if (pColData == nullptr)
-        return false;
+        return nullptr;
 
     CColSphereSA   pColSphere;
     CColBoxSA      pColBox;
@@ -213,15 +214,26 @@ CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsign
     return pStaticCollision;
 }
 
+void CClientPhysics::StartBuildCollisionFromGTA()
+{
+    if (m_bBuildWorld)
+        return;
+
+    m_bBuildWorld = true;
+    CLuaPhysicsSharedLogic::QueryAllWorldObjects(pWorldObjects);
+}
+
 void CClientPhysics::BuildCollisionFromGTA()
 {
-    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pOut;
-    CLuaPhysicsSharedLogic::QueryWorldObjects(CVector(0, 0, 0), 500, pOut);
-
-    CVector position, halfSize;
-    for (std::pair<unsigned short, std::pair<CVector, CVector>> pObject : pOut)
+    if (pWorldObjects.size() > 0)
     {
-        BuildStaticCollisionFromModel(pObject.first, pObject.second.first, pObject.second.second);
+        for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
+        {
+            if (BuildStaticCollisionFromModel(it->first, it->second.first, it->second.second))
+            {
+                pWorldObjects.erase(it--);
+            }
+        }
     }
 }
 
@@ -504,6 +516,7 @@ void CClientPhysics::DoPulse()
     CTickCount tickCountNow = CTickCount::Now();
 
     int iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
+    int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
     m_LastTimeMs = tickCountNow;
 
     m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f, 5);
@@ -511,6 +524,12 @@ void CClientPhysics::DoPulse()
     {
         m_pDynamicsWorld->debugDrawWorld();
         m_bDrawDebugNextTime = false;
+    }
+
+    if (iDeltaTimeBuildWorld > 2000)
+    {
+        m_LastTimeBuildWorld = tickCountNow;
+        BuildCollisionFromGTA();
     }
     int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
     CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();

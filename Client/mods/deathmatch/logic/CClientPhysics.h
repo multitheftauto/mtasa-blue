@@ -82,6 +82,7 @@ public:
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
+    void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTA();
     CLuaPhysicsStaticCollision* BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation);
     CLuaPhysicsRigidBody* CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
@@ -109,5 +110,8 @@ private:
     CClientPhysicsManager* m_pPhysicsManager;
 
     CTickCount m_LastTimeMs;
+    CTickCount m_LastTimeBuildWorld;
+    bool       m_bBuildWorld;
 
+    std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
 };
