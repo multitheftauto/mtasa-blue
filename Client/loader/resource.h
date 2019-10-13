@@ -41,6 +41,8 @@
 #define IDC_OPTIMUS_TEXT3               1033
 #define IDC_NOAV_OPT_BOTNET             1034
 #define IDC_NOAV_OPT_SKIP               1035
+#define IDC_APPLY_AUTOMATIC_CHANGES     1036
+#define IDC_NO_ACTION                   1037
 
 // Next default values for new objects
 //

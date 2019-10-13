@@ -171,6 +171,17 @@ enum eAnimGroup
     TOTAL_ANIM_GROUPS = 139
 };
 
+class CAnimationStyleDescriptorSAInterface
+{
+public:
+    char groupName[16];
+    char blockName[16];
+    int field_20;
+    int animsCount;
+    void *animNames;
+    void *animDesc;
+};
+
 class CAnimBlendAssocGroupSAInterface
 {
 public:
@@ -194,11 +205,13 @@ public:
     int                               GetNumAnimations();
     CAnimBlock*                       GetAnimBlock();
     CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
-    AssocGroupId                      GetGroupID() { return m_pInterface->groupID; };
+    AssocGroupId                      GetGroupID();
     void                              CreateAssociations(const char* szBlockName);
 
     bool IsLoaded();
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
+
+    CAnimBlendAssocGroupSAInterface*  GetInterface() { return m_pInterface; }
 
 protected:
     void SetupAnimBlock();

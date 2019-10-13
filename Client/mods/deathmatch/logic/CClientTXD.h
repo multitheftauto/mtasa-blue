@@ -25,12 +25,15 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     eClientEntityType GetType() const { return CCLIENTTXD; }
-    bool              LoadTXD(const SString& strFile, bool bFilteringEnabled, bool bIsRawData);
+    bool              Load(bool isRaw, SString input, bool enableFiltering);
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
 
-protected:
+private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     void Restream(unsigned short usModel);
     bool GetFilenameToUse(SString& strOutFilename);
 
@@ -38,6 +41,6 @@ protected:
     bool                 m_bFilteringEnabled;
     bool                 m_bIsRawData;
     bool                 m_bUsingFileDataForClothes;
-    CBuffer              m_FileData;
+    SString              m_FileData;
     SReplacementTextures m_ReplacementTextures;
 };

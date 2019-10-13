@@ -236,9 +236,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
-    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
-    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
-
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -279,6 +276,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGamePlayerDestructHandler(CClientGame::StaticGamePlayerDestructHandler);
     g_pMultiplayer->SetGameProjectileDestructHandler(CClientGame::StaticGameProjectileDestructHandler);
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
@@ -348,6 +346,9 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
+
+    // Setup builtin Lua events
+    SetupGlobalLuaEvents();
 }
 
 CClientGame::~CClientGame()
@@ -442,6 +443,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGamePlayerDestructHandler(NULL);
     g_pMultiplayer->SetGameProjectileDestructHandler(NULL);
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
+    g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
@@ -2385,7 +2387,7 @@ bool CClientGame::CharacterKeyHandler(WPARAM wChar)
         if (wChar >= 32)
         {
             // Generate a null-terminating string for our character
-            wchar_t wUNICODE[2] = {wChar, '\0'};
+            wchar_t wUNICODE[2] = {static_cast<wchar_t>(wChar), '\0'};
 
             // Convert our UTF character into an ANSI string
             SString strANSI = UTF16ToMbUTF8(wUNICODE);
@@ -2832,6 +2834,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientGUIBlur", "", NULL, false);
     m_Events.AddEvent("onClientKey", "key, state", NULL, false);
     m_Events.AddEvent("onClientCharacter", "character", NULL, false);
+    m_Events.AddEvent("onClientPaste", "clipboardText", NULL, false);
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
@@ -3561,6 +3564,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
 
+    // Deallocate all custom models
+    m_pManager->GetModelManager()->RemoveAll();
+
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
 
@@ -3597,6 +3603,26 @@ void CClientGame::Event_OnIngameAndConnected()
 
     // Notify the server telling we're ingame
     m_pNetAPI->RPC(PLAYER_INGAME_NOTICE);
+}
+
+void CClientGame::SetupGlobalLuaEvents()
+{
+    // Setup onClientPaste event
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
+        // Don't trigger if main menu or console is open or the cursor is not visible
+        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+            return;
+
+        // Also don't trigger if remote web browser view is focused
+        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+            return;
+        
+        // Call event now
+        CLuaArguments args;
+        args.PushString(clipboardText);
+        m_pRootEntity->CallEvent("onClientPaste", args, false);
+    });
 }
 
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
@@ -3759,6 +3785,11 @@ void CClientGame::StaticGameProjectileDestructHandler(CEntitySAInterface* pProje
 void CClientGame::StaticGameModelRemoveHandler(ushort usModelId)
 {
     g_pClientGame->GameModelRemoveHandler(usModelId);
+}
+
+void CClientGame::StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    g_pClientGame->GameRunNamedAnimDestructorHandler(pTask);
 }
 
 void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
@@ -3990,28 +4021,71 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
-    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
-    auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
-    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
+
+    if ((DWORD)pAnimAssocGroupInterface < 0x250)
+    {
+        g_pCore->LogEvent(542, "AssocGroupCopyAnimationHandler", "Interface is corrupt",
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroupInterface, animID), 542);
+    }
+
+    auto pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
+
+    if ((DWORD)pAnimAssocGroup->GetInterface() < 0x250)
+    {
+        g_pCore->LogEvent(543, "AssocGroupCopyAnimationHandler", "GetAnimBlendAssocGroup corrupted the interface",
+                          SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
+    }
+
+    int iGroupID = pAnimAssocGroup->GetGroupID();
+
+    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    {
+        g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
+                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
+        return false;
+    }
+
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
     {
-        auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
-        if (pReplacedAnimation != nullptr)
+        std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
         {
-            std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
-            InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
+            // check for idle animation
+            if (animID == 3)
+            {
+                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                {
+                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
+                    isCustomAnimationToPlay = true;
+                }
+            }
+        }
+        else
+        {
+            auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
+            if (pReplacedAnimation != nullptr)
+            {
+                std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
+                InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
 
-            // Play our custom animation instead of default
-            auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
+                // Play our custom animation instead of default
+                pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
+                isCustomAnimationToPlay = true;
+            }
+        }
+        if (isCustomAnimationToPlay)
+        {
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
             pAnimAssociation->InitializeForCustomAnimation(pClump, pAnimHierarchy->GetInterface());
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
-            isCustomAnimationToPlay = true;
         }
     }
 
@@ -4210,13 +4284,20 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     CPools* pPools = g_pGame->GetPools();
 
     // Grab the damaged ped
-    CClientPed* pDamagedPed = NULL;
+    CClientPed* pDamagedPed = nullptr;
+
     if (pDamagePed)
     {
-        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDamagePed->GetInterface());
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed(reinterpret_cast<DWORD*>(pDamagePed->GetInterface()));
+
         if (pPedClientEntity)
         {
-            pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            // NOTE(botder): Don't use the damaged ped if the associated game entity doesn't exist to avoid a crash
+            //               in the function ApplyPedDamageFromGame
+            if (pPedClientEntity->pClientEntity && pPedClientEntity->pClientEntity->GetGameEntity() != nullptr)
+            {
+                pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            }
         }
     }
 
@@ -4777,7 +4858,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             {
                 return true;
             }
-            CLuaArguments  Arguments;
+            CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
@@ -4921,6 +5002,24 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
     // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+}
+
+void CClientGame::GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask)
+{
+    auto it = m_mapOfRunNamedAnimTasks.find(pTask);
+    if (it != m_mapOfRunNamedAnimTasks.end())
+    {
+        CClientPed* pPed = it->second;
+        if (pPed && pPed->IsTaskToBeRestoredOnAnimEnd())
+        {
+            if (pPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+            {
+                pPed->GetGamePlayer()->GetPedIntelligence()->SetTaskDuckSecondary(0);
+                pPed->SetTaskToBeRestoredOnAnimEnd(false);
+            }
+        }
+        m_mapOfRunNamedAnimTasks.erase(pTask);
+    }
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -5620,10 +5719,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistance();
+    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistance();
+    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();
@@ -6932,6 +7031,11 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed)
+{
+    m_mapOfRunNamedAnimTasks[pTask] = pPed;
 }
 
 void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)

@@ -90,6 +90,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
+    m_bTaskToBeRestoredOnAnimEnd = false;
+    m_eTaskTypeToBeRestoredOnAnimEnd = TASK_SIMPLE_PLAYER_ON_FOOT;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";
@@ -297,7 +299,7 @@ CClientPed::~CClientPed()
         CClientVehicle* pVehicle = GetOccupiedVehicle();
         if (m_pPlayerPed && pVehicle && GetOccupiedVehicleSeat() == 0)
         {
-            if (g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
+            if (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
             {
                 CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
                 if (pGameVehicle)
@@ -717,6 +719,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
         m_fHealth = GetMaxHealth();
         m_pPlayerPed->SetHealth(m_fHealth);
         m_bUsesCollision = true;
+        m_pPlayerPed->SetLanding(false);
     }
     else
     {
@@ -1383,6 +1386,8 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     if (m_pPlayerPed)
     {
+        m_pPlayerPed->SetLanding(false);
+
         // Fall tasks
         KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
         // Swim tasks
@@ -1431,7 +1436,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
             // Warp him in
             InternalWarpIntoVehicle(pGameVehicle);
 
-            if (m_bIsLocalPlayer || g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
+            if (m_bIsLocalPlayer || (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))
             {
                 // Tell vehicle audio we have driver
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
@@ -1563,7 +1568,7 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
             if (pVehicle != m_pOccupyingVehicle && pVehicle->GetOccupant())
             {
                 // Local player left vehicle or got abandoned by remote driver
-                if ((m_bIsLocalPlayer || (m_uiOccupiedVehicleSeat == 0 && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)))
+                if ((m_bIsLocalPlayer || (m_uiOccupiedVehicleSeat == 0 && (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))))
                 {
                     // Tell vehicle audio the driver left
                     pGameVehicle->GetVehicleAudioEntity()->JustGotOutOfVehicleAsDriver();
@@ -1848,6 +1853,8 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
             pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
 
+        m_pPlayerPed->SetLanding(false);
+
         // Make sure to remove the jetpack task before setting death tasks (Issue #7860)
         if (HasJetPack())
         {
@@ -1930,6 +1937,9 @@ void CClientPed::SetFrozen(bool bFrozen)
         {
             if (m_pTaskManager)
             {
+                // Fix #366: Can only run forward bug
+                m_pPlayerPed->SetLanding(false);
+
                 // Let them have a jetpack (#9522)
                 if (!HasJetPack())
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
@@ -2916,7 +2926,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
                 animId == ANIM_ID_STEALTH_AIM)
             {
                 // Are our knife anims loaded?
-                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
+                std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
                 if (pBlock->IsLoaded())
                 {
                     // Force the animation
@@ -3602,6 +3612,7 @@ void CClientPed::_CreateModel()
         }
 
         // Restore any settings
+        m_pPlayerPed->SetLanding(false);
         m_pPlayerPed->SetMatrix(&m_Matrix);
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
@@ -3715,6 +3726,8 @@ void CClientPed::_CreateLocalModel()
         {
             m_pPlayerPed->SetModelIndex(m_ulModel);
         }
+
+        m_pPlayerPed->SetLanding(false);
 
         // Give him the default fighting style
         m_pPlayerPed->SetFightingStyle(m_FightingStyle, 6);
@@ -4314,6 +4327,8 @@ void CClientPed::SetChoking(bool bChoking)
             // His not choking. Make him choke if that's what we're supposed to do.
             if (bChoking)
             {
+                m_pPlayerPed->SetLanding(false);
+
                 // Remove jetpack now so it doesn't stay on (#9522#c25612)
                 if (HasJetPack())
                     SetHasJetPack(false);
@@ -4360,7 +4375,7 @@ void CClientPed::SetWearingGoggles(bool bWearing, bool animationEnabled)
             // Are our goggle anims loaded?
             if (animationEnabled)
             {
-                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
+                std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
                 if (pBlock->IsLoaded())
                 {
                     BlendAnimation(ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f);
@@ -5081,7 +5096,7 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
@@ -5189,6 +5204,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
 
             m_pPlayerPed->Respawn(pvecPosition, bCameraCut);
             SetPosition(*pvecPosition);
+
+            m_pPlayerPed->SetLanding(false);
 
             if (bRestoreState)
             {
@@ -5567,52 +5584,54 @@ bool CClientPed::IsDoingGangDriveby()
 
 void CClientPed::SetDoingGangDriveby(bool bDriveby)
 {
-    if (m_pPlayerPed)
+    m_bDoingGangDriveby = bDriveby;
+
+    if (!m_pPlayerPed)
+        return;
+
+    CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+
+    if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
     {
-        CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
-        if (pTask && pTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+        if (!bDriveby)
         {
-            if (!bDriveby)
-            {
-                pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
-            }
-        }
-        else if (bDriveby)
-        {
-            char   cSeat = GetOccupiedVehicleSeat();
-            bool   bRight = (cSeat % 2 != 0);
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight);
-            if (pTask)
-            {
-                pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-            }
-
-            char cWindow = -1;
-            switch (cSeat)
-            {
-                case 0:
-                    cWindow = WINDOW_LEFT_FRONT;
-                    break;
-
-                case 1:
-                    cWindow = WINDOW_RIGHT_FRONT;
-                    break;
-
-                case 2:
-                    cWindow = WINDOW_LEFT_BACK;
-                    break;
-
-                case 3:
-                    cWindow = WINDOW_RIGHT_BACK;
-                    break;
-            }
-            if (cWindow != -1)
-            {
-                GetOccupiedVehicle()->SetWindowOpen(cWindow, true);
-            }
+            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
     }
-    m_bDoingGangDriveby = bDriveby;
+    else if (bDriveby)
+    {
+        unsigned int seat = GetOccupiedVehicleSeat();
+        bool         bRight = (seat % 2 != 0);
+
+        if (CTask* task = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight); task != nullptr)
+        {
+            task->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+        }
+
+        uchar ucWindow = -1;
+
+        switch (seat)
+        {
+            case 0:
+                ucWindow = WINDOW_LEFT_FRONT;
+                break;
+            case 1:
+                ucWindow = WINDOW_RIGHT_FRONT;
+                break;
+            case 2:
+                ucWindow = WINDOW_LEFT_BACK;
+                break;
+            case 3:
+                ucWindow = WINDOW_RIGHT_BACK;
+                break;
+        }
+
+        if (ucWindow != -1)
+        {
+            if (CClientVehicle* vehicle = GetOccupiedVehicle(); vehicle != nullptr)
+                vehicle->SetWindowOpen(ucWindow, true);
+        }
+    }
 }
 
 bool CClientPed::IsRunningAnimation()
@@ -5651,8 +5670,8 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
     }
 }
 
-void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
-                                   bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5669,6 +5688,9 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
 
         if (pBlock->IsLoaded())
         {
+            // Fix #366: Can only run forward bug
+            m_pPlayerPed->SetLanding(false);
+
             // Remove jetpack now so it doesn't stay on (#9522#c25612)
             if (HasJetPack())
                 SetHasJetPack(false);
@@ -5707,6 +5729,7 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
         else
@@ -5721,7 +5744,10 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
             */
         }
     }
-    m_pAnimationBlock = pBlock;
+    if (pBlock)
+    {
+        m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
+    }
     m_strAnimationName = szAnimName;
     m_iTimeAnimation = iTime;
     m_iBlendAnimation = iBlend;
@@ -5751,6 +5777,19 @@ void CClientPed::KillAnimation()
     m_strAnimationName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
+}
+
+std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
+{
+    if (m_pAnimationBlock)
+    {
+        return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
+    }
+    return nullptr;
+}
+const char* CClientPed::GetAnimationName()
+{
+    return m_strAnimationName;
 }
 
 void CClientPed::PostWeaponFire()
@@ -5936,7 +5975,10 @@ bool CClientPed::ReloadWeapon()
 
 bool CClientPed::IsReloadingWeapon()
 {
-    return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
+    if (CWeapon* weapon = GetWeapon(); weapon != nullptr)
+        return weapon->GetState() == WEAPONSTATE_RELOADING;
+    else
+        return false;
 }
 
 bool CClientPed::ShouldBeStealthAiming()
@@ -6063,18 +6105,24 @@ void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 
 void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
-    m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
-    CIFPEngine::EngineApplyAnimation(*this, pInternalAnimHierarchy->GetInterface());
+    CAnimBlendHierarchySAInterface* pInterface = pInternalAnimHierarchy->GetInterface();
+    CIFPEngine::EngineApplyAnimation(*this, pInterface, pInterface);
+    m_mapOfReplacedAnimations.erase(pInterface);
 }
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 {
-    for (auto const& x : m_mapOfReplacedAnimations)
+    for (auto iter = m_mapOfReplacedAnimations.cbegin(); iter != m_mapOfReplacedAnimations.cend(); /* manual increment */)
     {
-        if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
+        if (std::addressof(*IFP.get()) == std::addressof(*iter->second.pIFP.get()))
         {
-            m_mapOfReplacedAnimations.erase(x.first);
-            CIFPEngine::EngineApplyAnimation(*this, x.first);
+            auto pAnimHierarchy = g_pGame->GetAnimManager()->GetAnimBlendHierarchy(iter->first);
+            CIFPEngine::EngineApplyAnimation(*this, iter->first, iter->first);
+            iter = m_mapOfReplacedAnimations.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
 }
@@ -6086,14 +6134,13 @@ void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
     for (size_t i = 0; i < cAnimations; i++)
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
+        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
         m_mapOfReplacedAnimations.erase(pAnimHierarchyInterface);
-        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface);
     }
 }
 
 void CClientPed::RestoreAllAnimations()
 {
-    m_mapOfReplacedAnimations.clear();
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = GetClump();
     if (pClump)
@@ -6109,12 +6156,14 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    CIFPEngine::EngineApplyAnimation(*this, pAnimStaticAssociation->GetAnimHierachyInterface());
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }
             pAnimAssociation = std::move(pAnimNextAssociation);
         }
     }
+    m_mapOfReplacedAnimations.clear();
 }
 
 SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)
@@ -6124,6 +6173,44 @@ SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterf
     if (it != m_mapOfReplacedAnimations.end())
     {
         return &it->second;
+    }
+    return nullptr;
+}
+
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface)
+{
+    RpClump* pClump = GetClump();
+    if (!pClump)
+    {
+        return nullptr;
+    }
+
+    auto                            pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
+    CAnimBlendHierarchySAInterface* pReplacedInterface = nullptr;
+    if (pReplacedAnimation != nullptr)
+    {
+        pReplacedInterface = pReplacedAnimation->pAnimationHierarchy;
+    }
+
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    auto          pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+    while (pAnimAssociation)
+    {
+        auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
+        auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+        if (pAnimHierarchy)
+        {
+            CAnimBlendHierarchySAInterface* pInterface = pAnimHierarchy->GetInterface();
+            if (pInterface == pOriginalHierarchyInterface)
+            {
+                return pAnimAssociation;
+            }
+            if (pReplacedInterface && pInterface == pReplacedInterface)
+            {
+                return pAnimAssociation;
+            }
+        }
+        pAnimAssociation = std::move(pAnimNextAssociation);
     }
     return nullptr;
 }

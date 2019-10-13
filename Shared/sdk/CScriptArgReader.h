@@ -479,7 +479,7 @@ public:
         ReadNumber(color);
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //
@@ -491,7 +491,7 @@ public:
         ReadNumber(color, static_cast<lua_Number>(defaultValue));
 
         if (!m_bError)
-            outValue = static_cast<unsigned int>(color);
+            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
     }
 
     //
@@ -540,18 +540,37 @@ public:
     void ReadString(SString& outValue, const char* defaultValue = NULL)
     {
         int iArgument = lua_type(m_luaVM, m_iIndex);
+
         if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
-            uint uiLength = lua_strlen(m_luaVM, m_iIndex);
-            outValue.assign(lua_tostring(m_luaVM, m_iIndex++), uiLength);
+            size_t length = lua_strlen(m_luaVM, m_iIndex);
+            
+            try
+            {
+                outValue.assign(lua_tostring(m_luaVM, m_iIndex++), length);
+            }
+            catch (const std::bad_alloc&)
+            {
+                SetCustomError("out of memory", "Memory allocation");
+            }
+
             return;
         }
         else if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
         {
             if (defaultValue)
             {
-                outValue = defaultValue;
                 m_iIndex++;
+
+                try
+                {
+                    outValue.assign(defaultValue);
+                }
+                catch (const std::bad_alloc&)
+                {
+                    SetCustomError("out of memory", "Memory allocation");
+                }
+
                 return;
             }
         }
@@ -1040,7 +1059,8 @@ protected:
                 SStringMapValue value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
                 {
-                    value = (lua_tostring(m_luaVM, -1));
+                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    value.assign(lua_tostring(m_luaVM, -1), uiLength);
                 }
                 else if (valueType == LUA_TBOOLEAN)
                 {

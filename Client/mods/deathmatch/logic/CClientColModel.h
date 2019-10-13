@@ -25,10 +25,11 @@ public:
     eClientEntityType GetType() const { return CCLIENTCOL; }
 
     bool           LoadCol(const SString& strFile, bool bIsRawData);
-    bool           IsLoaded() const { return m_pColModel != nullptr; };
+    bool           Load(bool isRaw, SString input);
     unsigned short GetVerticesCount() const { return m_usVerticesCount; };
     void           SetCollisionHasChanged(bool bChanged) { b_hasChanged = bChanged; };
     bool           HasChanged() const { return b_hasChanged; };
+    bool           IsLoaded() { return m_pColModel != NULL; };
 
     bool Replace(unsigned short usModel);
     void Restore(unsigned short usModel);
@@ -92,6 +93,9 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
 private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     void InternalRestore(unsigned short usModel);
 
     class CClientColModelManager* m_pColModelManager;
