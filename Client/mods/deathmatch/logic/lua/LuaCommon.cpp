@@ -20,6 +20,11 @@
 
 #pragma message(__LOC__"Use RTTI/dynamic_casting here for safety?")
 
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
+
 CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
 {
     if (lua_type(luaVM, iArgument) == LUA_TLIGHTUSERDATA)

@@ -75,6 +75,7 @@ public:
     //btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
     void                        DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void                        DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void                        DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
 
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsShape*           CreateShape();

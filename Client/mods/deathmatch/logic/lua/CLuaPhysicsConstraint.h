@@ -36,6 +36,10 @@ public:
                                 bool bDisableCollisionsBetweenLinkedBodies);
 
     bool SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded);
+    bool SetPivotA(CVector& vecPivotA);
+    bool SetPivotB(CVector& vecPivotB);
+    bool SetLowerLinLimit(float fLength);
+    bool SetUpperLinLimit(float fLength);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }

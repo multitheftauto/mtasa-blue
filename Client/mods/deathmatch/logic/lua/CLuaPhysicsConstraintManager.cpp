@@ -10,9 +10,14 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
 
 void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pLuaRigidBody)
 {
+
 }
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(uint uiScriptID)

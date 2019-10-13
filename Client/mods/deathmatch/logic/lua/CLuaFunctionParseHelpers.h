@@ -138,6 +138,10 @@ enum ePhysicsProperty
 
     // constraints properties
     PHYSICS_PROPERTY_STIFFNESS,
+    PHYSICS_PROPERTY_PIVOT_A,
+    PHYSICS_PROPERTY_PIVOT_B,
+    PHYSICS_PROPERTY_LOWER_LIN_LIMIT,
+    PHYSICS_PROPERTY_UPPER_LIN_LIMIT,
 };
 DECLARE_ENUM(ePhysicsProperty);
 
@@ -176,10 +180,10 @@ DECLARE_ENUM(ePhysicsConstraint);
 
 enum ePhysicsRayType
 {
-    PHYSICS_RAY_IS_CLEAR, // return only boolean, hit or not
-    PHYSICS_RAY_DEFAULT, // hit, hitpoint, hit normal
+    PHYSICS_RAY_IS_CLEAR,            // return only boolean, hit or not
+    PHYSICS_RAY_DEFAULT,             // hit, hitpoint, hit normal
     PHYSICS_RAY_DETAILED,
-    PHYSICS_RAY_MULTIPLE, // table of hits
+    PHYSICS_RAY_MULTIPLE,            // table of hits
 
 };
 DECLARE_ENUM(ePhysicsRayType);
@@ -587,7 +591,7 @@ CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* 
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetRigidBodyFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }
@@ -601,7 +605,7 @@ CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr,
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetStaticCollisionFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }
@@ -615,11 +619,10 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsConstraintManager()->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetContraintFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }
-
 //
 // CLuaPhysicsContraint from userdata
 //
@@ -629,7 +632,7 @@ CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
     CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        return pLuaMain->GetPhysicsShapeManager()->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return pLuaMain->GetShapeFromScriptID(reinterpret_cast<unsigned long>(ptr));
     }
     return NULL;
 }

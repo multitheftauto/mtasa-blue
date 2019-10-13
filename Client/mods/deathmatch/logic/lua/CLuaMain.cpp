@@ -27,6 +27,12 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
+// i can not use forward declaration here
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
+
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
     // Initialise everything to be setup in the Start function
@@ -70,6 +76,26 @@ CLuaMain::~CLuaMain()
 bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
+}
+
+CLuaPhysicsConstraint* CLuaMain::GetContraintFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsContraintManager->GetContraintFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsRigidBody* CLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsRigidBodyManager->GetRigidBodyFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsStaticCollision* CLuaMain::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsStaticCollisionManager->GetStaticCollisionFromScriptID(uiScriptID);
+}
+
+CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
+{
+    return m_pLuaPhysicsShapeManager->GetShapeFromScriptID(uiScriptID);
 }
 
 void CLuaMain::ResetInstructionCount()

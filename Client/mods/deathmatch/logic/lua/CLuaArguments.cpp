@@ -12,6 +12,11 @@
 #define DECLARE_PROFILER_SECTION_CLuaArguments
 #include "profiler/SharedUtil.Profiler.h"
 
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
+
 using namespace std;
 
 #ifndef VERIFY_ENTITY

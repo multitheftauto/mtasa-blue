@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(uint uiScriptID)
 {

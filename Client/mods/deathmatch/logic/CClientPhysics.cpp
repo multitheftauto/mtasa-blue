@@ -12,8 +12,10 @@
 #include <list>
 #include "D:\mtablue\mtasa-blue\Client\game_sa\CColModelSA.h"
 #include "lua/CLuaPhysicsSharedLogic.h"
-#include "lua/CLuaPhysicsRigidBody.h"
-#include "lua/CLuaPhysicsStaticCollision.h"
+#include "lua/CLuaPhysicsRigidBodyManager.h"
+#include "lua/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/CLuaPhysicsConstraintManager.h"
+#include "lua/CLuaPhysicsShapeManager.h"
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
@@ -448,6 +450,11 @@ void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
     m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
 }
 
+void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
+{
+    m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
+}
+
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
 {
     CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
@@ -508,6 +515,12 @@ void CClientPhysics::DoPulse()
     int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
     CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
+
+    if (!pRigidBodyManager)
+        return;
+
+    if (!pStaticCollisionManager)
+        return;
 
     const btCollisionObject*    objectA;
     const btCollisionObject*    objectB;

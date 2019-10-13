@@ -27,6 +27,11 @@ class CLuaMain;
 
 #include <list>
 
+class CLuaPhysicsRigidBodyManager;
+class CLuaPhysicsStaticCollisionManager;
+class CLuaPhysicsConstraintManager;
+class CLuaPhysicsShapeManager;
+
 struct CRefInfo
 {
     unsigned long int ulUseCount;
@@ -57,6 +62,10 @@ public:
     CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
     CLuaPhysicsConstraintManager*      GetPhysicsConstraintManager() const { return m_pLuaPhysicsContraintManager; };
     CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
+    CLuaPhysicsConstraint*             GetContraintFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };

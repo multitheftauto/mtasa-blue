@@ -68,9 +68,13 @@ public:
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }
 
+    void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
+    void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
+
 private:
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     btRigidBody*             m_pBtRigidBody;
     CLuaPhysicsShape*        m_pPhysicsShape;
+    std::vector<CLuaPhysicsConstraint*> m_constraintList;
 };

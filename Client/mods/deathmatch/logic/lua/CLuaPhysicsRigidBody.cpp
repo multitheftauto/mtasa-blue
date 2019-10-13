@@ -11,6 +11,10 @@
 
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsStaticCollisionManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape)
 {
@@ -175,7 +179,7 @@ void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
 {
     CLuaPhysicsSharedLogic::SetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
     // prevents rigid from sleeping, otherwise it can overlap other collisions
-    m_pBtRigidBody->forceActivationState(ACTIVE_TAG);
+    m_pBtRigidBody->activate(true);
 }
 
 void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)

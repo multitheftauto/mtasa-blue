@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "lua/CLuaPhysicsSharedLogic.h"
+#include "lua/CLuaPhysicsRigidBodyManager.h"
+#include "lua/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/CLuaPhysicsConstraintManager.h"
+#include "lua/CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint uiScriptID)
 {
