@@ -373,8 +373,6 @@ void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::Closest
         RayCast_cb              pCallback(btFrom, btTo);
 
         pMesh->performRaycast(&pCallback, btFrom, btTo);
-        g_pCore->GetGraphics()->DrawLine3DQueued(CVector(btFrom.getX(), btFrom.getY(), btFrom.getZ()), CVector(btTo.getX(), btTo.getY(), btTo.getZ()), 10,
-                                                 COLOR_ARGB(255, 255, 255, 255), false);
 
         GetInfoTriangleCallback tmpCallback;
         tmpCallback.m_triangleIndex = pCallback.m_triangleIndex;
@@ -407,6 +405,7 @@ void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::Closest
         lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getZ());
         lua_settable(luaVM, -3);
         lua_settable(luaVM, -3);
+
         lua_pushstring(luaVM, "vertex2");
         lua_newtable(luaVM);
         lua_pushnumber(luaVM, 1);
@@ -419,6 +418,7 @@ void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::Closest
         lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getZ());
         lua_settable(luaVM, -3);
         lua_settable(luaVM, -3);
+
         lua_pushstring(luaVM, "vertex3");
         lua_newtable(luaVM);
         lua_pushnumber(luaVM, 1);

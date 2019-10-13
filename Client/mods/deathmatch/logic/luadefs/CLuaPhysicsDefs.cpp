@@ -1297,8 +1297,8 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                 lua_pushnumber(luaVM, 3);
                 lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
                 lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
             }
-            lua_settable(luaVM, -3);
             return 1;
         }
         else if (eRayType == PHYSICS_RAY_DETAILED)
@@ -1347,8 +1347,8 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                 lua_pushnumber(luaVM, 3);
                 lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
                 lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
             }
-            lua_settable(luaVM, -3);
             return 1;
         }
         else if (eRayType == PHYSICS_RAY_MULTIPLE)
