@@ -904,6 +904,24 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_LOWER_ANG_LIMIT:
+                    argStream.ReadNumber(floatNumber[0]);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticConstraint->SetLowerAngLimit(floatNumber[0]);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_UPPER_ANG_LIMIT:
+                    argStream.ReadNumber(floatNumber[0]);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticConstraint->SetUpperAngLimit(floatNumber[0]);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
                 default:
                     argStream.SetCustomError(SString("Physics constraint does not support %s property.", EnumToString(eProperty).c_str()));
                     break;

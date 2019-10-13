@@ -239,3 +239,25 @@ bool CLuaPhysicsConstraint::SetUpperLinLimit(float fLength)
     }
     return false;
 }
+
+bool CLuaPhysicsConstraint::SetLowerAngLimit(float lowerLimit)
+{
+    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
+    {
+        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
+        pConstraint->setLowerAngLimit(lowerLimit);
+        return true;
+    }
+    return false;
+}
+
+bool CLuaPhysicsConstraint::SetUpperAngLimit(float upperLimit)
+{
+    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
+    {
+        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
+        pConstraint->setUpperAngLimit(upperLimit);
+        return true;
+    }
+    return false;
+}

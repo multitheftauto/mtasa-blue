@@ -40,6 +40,8 @@ public:
     bool SetPivotB(CVector& vecPivotB);
     bool SetLowerLinLimit(float fLength);
     bool SetUpperLinLimit(float fLength);
+    bool SetLowerAngLimit(float lowerLimit);
+    bool SetUpperAngLimit(float upperLimit);
 
     uint         GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
