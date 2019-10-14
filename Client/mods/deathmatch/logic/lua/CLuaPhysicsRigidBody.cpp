@@ -88,6 +88,16 @@ float CLuaPhysicsRigidBody::GetSweptSphereRadius()
     return m_pBtRigidBody->getCcdSweptSphereRadius();
 }
 
+bool CLuaPhysicsRigidBody::IsSleeping()
+{
+    return !m_pBtRigidBody->isActive();
+}
+
+bool CLuaPhysicsRigidBody::WantsSleeping()
+{
+    return m_pBtRigidBody->wantsSleeping();
+}
+
 void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();

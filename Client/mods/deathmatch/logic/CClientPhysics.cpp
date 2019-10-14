@@ -103,11 +103,11 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
 {
     CColModelSAInterface* pColModelInterface = CLuaPhysicsSharedLogic::GetModelCollisionInterface(usModelId);
     if (pColModelInterface == nullptr)
-        return false;
+        return nullptr;
 
     CColDataSA* pColData = pColModelInterface->pColData;
     if (pColData == nullptr)
-        return false;
+        return nullptr;
 
     CColSphereSA   pColSphere;
     CColBoxSA      pColBox;
@@ -115,6 +115,7 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     CVector        position, halfSize;
 
     std::vector<std::pair<CVector, std::pair<CVector, CVector>>> halfList;
+    std::vector<std::pair<float, CVector>>                       sphereList;
     std::vector<CVector>                                         indexList;
 
     for (uint i = 0; pColData->numColBoxes > i; i++)
@@ -123,6 +124,11 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
         position = (pColBox.max + pColBox.min) / 2;
         halfSize = (pColBox.max - pColBox.min) * 0.5;
         halfList.push_back(std::pair<CVector, std::pair<CVector, CVector>>(halfSize, std::pair<CVector, CVector>(position, CVector())));
+    }
+    for (uint i = 0; pColData->numColSpheres > i; i++)
+    {
+        pColSphere = pColData->pColSpheres[i];
+        sphereList.push_back(std::pair<float, CVector>(pColSphere.fRadius, pColSphere.vecCenter));
     }
     for (uint i = 0; pColData->numColTriangles > i; i++)
     {
@@ -143,6 +149,10 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short us
     if (halfList.size() > 0)
     {
         CLuaPhysicsSharedLogic::AddBoxes(pCompoundShape, halfList);
+    }
+    if (sphereList.size() > 0)
+    {
+        CLuaPhysicsSharedLogic::AddSpheres(pCompoundShape, sphereList);
     }
     // if (indexList.size() >= 3)
     //{

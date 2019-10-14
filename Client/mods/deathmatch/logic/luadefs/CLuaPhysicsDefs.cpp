@@ -1086,6 +1086,14 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     floatNumber[0] = pRigidBody->GetSweptSphereRadius();
                     lua_pushnumber(luaVM, floatNumber[0]);
                     return 1;
+                case PHYSICS_PROPERTY_SLEEP:
+                    boolean = pRigidBody->IsSleeping();
+                    lua_pushboolean(luaVM, boolean);
+                    return 1;
+                case PHYSICS_PROPERTY_WANTS_SLEEPING:
+                    boolean = pRigidBody->WantsSleeping();
+                    lua_pushboolean(luaVM, boolean);
+                    return 1;
                 default:
                     argStream.SetCustomError(SString("Physics rigid body does not support %s property.", EnumToString(eProperty).c_str()));
                     break;

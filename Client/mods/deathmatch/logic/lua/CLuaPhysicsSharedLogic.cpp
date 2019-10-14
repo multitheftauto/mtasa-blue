@@ -390,15 +390,11 @@ bool CLuaPhysicsSharedLogic::AddBoxes(btCollisionObject* pCollisionObject, std::
     return AddBoxes(pCompoundShape, halfList);
 }
 
-bool CLuaPhysicsSharedLogic::AddSpheres(btCollisionObject* pCollisionObject, std::vector<std::pair<float, std::pair<CVector, CVector>>>& spheresList)
+bool CLuaPhysicsSharedLogic::AddSpheres(btCompoundShape* pCollisionShape, std::vector<std::pair<float, CVector>>& spheresList)
 {
-    if (pCollisionObject == nullptr)
-        return false;
-
     if (spheresList.empty())
         return false;
 
-    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
     if (pCollisionShape == nullptr)
         return false;
 
@@ -408,15 +404,14 @@ bool CLuaPhysicsSharedLogic::AddSpheres(btCollisionObject* pCollisionObject, std
     btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
     btSphereShape*   pSphereCollisionShape;
     btTransform      transform;
-    for (std::pair<float, std::pair<CVector, CVector>> pair : spheresList)
+    for (std::pair<float, CVector> pair : spheresList)
     {
         if (pair.first >= MINIMUM_SHAPE_SIZE)
         {
             btSphereShape* pSphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(pair.first);
 
             transform.setIdentity();
-            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
-            CLuaPhysicsSharedLogic::SetRotation(transform, pair.second.second);
+            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second);
             pCompoundShape->addChildShape(transform, pSphereCollisionShape);
         }
     }

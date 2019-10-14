@@ -64,6 +64,8 @@ public:
     void GetFilterMask(short sIndex, bool& bEnabled);
     void SetFilterGroup(int sIndex);
     void GetFilterGroup(int& sIndex);
+    bool IsSleeping();
+    bool WantsSleeping();
 
     uint         GetScriptID() const { return m_uiScriptID; }
     btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }

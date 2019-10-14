@@ -9,6 +9,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaPhysicsSharedLogic.h"
+#include "lua/CLuaPhysicsRigidBodyManager.h"
+#include "lua/CLuaPhysicsStaticCollisionManager.h"
+#include "lua/CLuaPhysicsConstraintManager.h"
+#include "lua/CLuaPhysicsShapeManager.h"
 
 //
 // enum values <-> script strings
@@ -560,6 +565,7 @@ ADD_ENUM(PHYSICS_PROPERTY_FILTER_GROUP, "filtergroup")
 ADD_ENUM(PHYSICS_PROPERTY_STIFFNESS, "stiffness")
 ADD_ENUM(PHYSICS_PROPERTY_SIZE, "size")
 ADD_ENUM(PHYSICS_PROPERTY_BOUNDING_BOX, "boundingbox")
+ADD_ENUM(PHYSICS_PROPERTY_BOUNDING_BOX, "boundingbox")
 ADD_ENUM(PHYSICS_PROPERTY_BOUNDING_SPHERE, "boundingsphere")
 ADD_ENUM(PHYSICS_PROPERTY_GRAVITY, "gravity")
 ADD_ENUM(PHYSICS_PROPERTY_USE_CONTINOUS, "usecontinuous")
@@ -571,6 +577,8 @@ ADD_ENUM(PHYSICS_PROPERTY_LOWER_LIN_LIMIT, "lowerlinlimit")
 ADD_ENUM(PHYSICS_PROPERTY_UPPER_LIN_LIMIT, "upperlinlimit")
 ADD_ENUM(PHYSICS_PROPERTY_LOWER_ANG_LIMIT, "loweranglimit")
 ADD_ENUM(PHYSICS_PROPERTY_UPPER_ANG_LIMIT, "upperanglimit")
+ADD_ENUM(PHYSICS_PROPERTY_SLEEP, "sleep")
+ADD_ENUM(PHYSICS_PROPERTY_WANTS_SLEEPING, "wantssleeping")
 IMPLEMENT_ENUM_END("physics-shape-property")
 
 IMPLEMENT_ENUM_BEGIN(ePhysicsDebugMode)
