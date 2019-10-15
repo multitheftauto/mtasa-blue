@@ -15,6 +15,21 @@ using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, C
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
 auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
+CFxSA::CFxSA(CFxSAInterface* pInterface)
+{
+    m_pInterface = pInterface;
+
+    RwTexture* pRwTexture;
+    for (int i = 0; i < SHADOW_COUNT; i++)
+    {
+        void* textureAddress;
+        memcpy(&textureAddress, (void*)(SHADOW_BASE_TEXTURE_OFFSET + i * 4), 4);
+        pRwTexture = reinterpret_cast<RwTexture*>((void*)textureAddress);
+        m_textureMap[(eShadowType)i] = pRwTexture;
+    }
+    m_textureMap[SHADOW_PLANE] = new RwTexture();
+}
+
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     CVector* pvecPosition = &vecPosition;
@@ -256,23 +271,14 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
 
     RwTexture* pTexture = nullptr;
     char       type = 1;
-    if (shadowType == SHADOW_NONE)
-    {
-        pTexture = EmptyTexture;
-    }
-    else
-    {
-        void* textureAddress;
-        memcpy(&textureAddress, (void*)(SHADOW_BASE_TEXTURE_OFFSET + shadowType * 4), 4);
-        pTexture = reinterpret_cast<RwTexture*>((void*)textureAddress);
+    pTexture = m_textureMap[shadowType];
 
-        switch (shadowType)
-        {
-            case SHADOW_HEADLIGHT1:
-            case SHADOW_HEADLIGHT2:
-            case SHADOW_EXPLOSION:
-                type = 2;
-        }
+    switch (shadowType)
+    {
+        case SHADOW_HEADLIGHT1:
+        case SHADOW_HEADLIGHT2:
+        case SHADOW_EXPLOSION:
+            type = 2;
     }
 
     StoreShadowToBeRendered(type, pTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,

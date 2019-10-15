@@ -43,7 +43,7 @@ public:
 class CFxSA : public CFx
 {
 public:
-    CFxSA(CFxSAInterface* pInterface) { m_pInterface = pInterface; }
+    CFxSA(CFxSAInterface* pInterface);
 
     void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
@@ -66,5 +66,5 @@ public:
     bool IsShadowsLimitReached();
 private:
     CFxSAInterface* m_pInterface;
-    RwTexture*      EmptyTexture = new RwTexture();
+    std::unordered_map<eShadowType, RwTexture*> m_textureMap;
 };

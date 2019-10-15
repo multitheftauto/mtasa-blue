@@ -1551,7 +1551,7 @@ enum eObjectProperty
 enum eShadowType
 {
     // use only color instead of texture
-    SHADOW_NONE = -1,
+    SHADOW_PLANE = -1,
     SHADOW_CAR,
     SHADOW_PED,
     SHADOW_HELI,
@@ -1564,4 +1564,5 @@ enum eShadowType
     SHADOW_HEADMAN,
     SHADOW_WINCRACK,
     SHADOW_LAMP,
+    SHADOW_COUNT,
 };

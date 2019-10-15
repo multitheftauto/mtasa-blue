@@ -502,7 +502,7 @@ int CLuaEffectDefs::fxAddFootSplash(lua_State* luaVM)
 int CLuaEffectDefs::FxAddShadow(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
-    eShadowType      shadowType = SHADOW_NONE;
+    eShadowType      shadowType;
     CVector          vecPosition;
     CVector2D        vecOffset1;
     CVector2D        vecOffset2;
@@ -512,8 +512,7 @@ int CLuaEffectDefs::FxAddShadow(lua_State* luaVM)
     bool   bDrawOnWater;
     bool   bDrawOnBuildings;
 
-    if (argStream.NextIsString())
-        argStream.ReadEnumString(shadowType);
+    argStream.ReadEnumString(shadowType);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadVector2D(vecOffset1);
     argStream.ReadVector2D(vecOffset2);
