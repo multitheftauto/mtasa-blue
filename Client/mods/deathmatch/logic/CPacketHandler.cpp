@@ -529,7 +529,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strErrorCode = _E("CD41");
             break;
         case ePlayerDisconnectType::ELEMENT_FAILURE:
-            strReason = _("Disconnected: Player Element Could not be created.");
+            strReason = _("Disconnected: Player element could not be created.");
             strErrorCode = _E("CD42");
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
@@ -1581,7 +1581,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
-                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
             }
             for (unsigned int i = 0; i < MAX_WHEELS; ++i)
             {
@@ -3216,7 +3216,7 @@ retry:
 
                     // Setup our damage model
                     for (int i = 0; i < MAX_DOORS; i++)
-                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
@@ -4807,7 +4807,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         bitStream.Read(usNoClientCacheScriptCount);
 
     // Read the declared min client version for this resource
-    SString strMinServerReq, strMinClientReq;
+    CMtaVersion strMinServerReq, strMinClientReq;
     if (bitStream.Version() >= 0x32)
     {
         bitStream.ReadString(strMinServerReq);
@@ -4831,6 +4831,12 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     // Get the resource dynamic entity
     CClientEntity* pResourceDynamicEntity = CElementIDs::GetElement(ResourceDynamicEntityID);
+
+    if (!pResourceEntity || !pResourceDynamicEntity)
+    {
+        RaiseProtocolError(70);
+        return;
+    }
 
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
                                                                   strMinClientReq, bEnableOOP);
@@ -4958,7 +4964,9 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         {
             // Load the resource now
             if (pResource->CanBeLoaded())
+            {
                 pResource->Load();
+            }
         }
     }
 

@@ -1,5 +1,5 @@
-#ifndef __CURL_URLAPI_H
-#define __CURL_URLAPI_H
+#ifndef CURLINC_URLAPI_H
+#define CURLINC_URLAPI_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -60,7 +60,8 @@ typedef enum {
   CURLUPART_PORT,
   CURLUPART_PATH,
   CURLUPART_QUERY,
-  CURLUPART_FRAGMENT
+  CURLUPART_FRAGMENT,
+  CURLUPART_ZONEID /* added in 7.65.0 */
 } CURLUPart;
 
 #define CURLU_DEFAULT_PORT (1<<0)       /* return default port number */
@@ -119,4 +120,4 @@ CURL_EXTERN CURLUcode curl_url_set(CURLU *handle, CURLUPart what,
 } /* end of extern "C" */
 #endif
 
-#endif
+#endif /* CURLINC_URLAPI_H */

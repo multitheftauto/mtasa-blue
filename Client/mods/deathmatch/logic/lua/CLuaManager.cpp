@@ -47,6 +47,9 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
+	// Close and remove LVM from memory
+	ProcessPendingDeleteList();
+
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
 }
@@ -386,12 +389,16 @@ void CLuaManager::LoadCFunctions()
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
         {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-
+        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
+        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
+        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
+        
         // Version functions
         {"getVersion", CLuaFunctionDefs::GetVersion},
 
         // Localization functions
         {"getLocalization", CLuaFunctionDefs::GetLocalization},
+        {"getKeyboardLayout", CLuaFunctionDefs::GetKeyboardLayout},
 
         // Voice functions
         {"isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled},

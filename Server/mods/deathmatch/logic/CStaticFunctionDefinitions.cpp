@@ -1857,11 +1857,19 @@ CAccount* CStaticFunctionDefinitions::GetPlayerAccount(CElement* pElement)
     return NULL;
 }
 
-const SString& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
+const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
 {
     assert(pPlayer);
 
     return pPlayer->GetPlayerVersion();
+}
+
+bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
+{
+    assert(pPlayer);
+
+    uiLevel = pPlayer->GetScriptDebugLevel();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* szName)
@@ -3050,8 +3058,6 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
 
 bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bool bVisible)
 {
-    // * Not used by scripts
-
     assert(pElement);
     RUN_CHILDREN(SetPlayerDebuggerVisible(*iter, bVisible))
 
@@ -3065,6 +3071,26 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bo
 
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel)
+{
+    assert(pElement);
+
+    if (uiLevel >= 0 && uiLevel <= 3)
+    {
+        RUN_CHILDREN(SetPlayerScriptDebugLevel(*iter, uiLevel));
+
+        if (IS_PLAYER(pElement))
+        {
+            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+            if (pPlayer->SetScriptDebugLevel(uiLevel))
+                return SetPlayerDebuggerVisible(pElement, uiLevel != 0);
+        }
+    }
+
     return false;
 }
 
@@ -6406,10 +6432,10 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CElement* pElement, unsign
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleDoorState(*iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(*iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(pElement))
     {
@@ -6448,6 +6474,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigne
                 BitStream.pBitStream->Write(ucObject);
                 BitStream.pBitStream->Write(ucDoor);
                 BitStream.pBitStream->Write(ucState);
+                BitStream.pBitStream->WriteBit(spawnFlyingComponent);
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_DAMAGE_STATE, *BitStream.pBitStream));
 
                 return true;
@@ -11235,7 +11262,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
-        
+
         if (pResponsible)
             Arguments.PushElement(pResponsible);
 
@@ -11408,10 +11435,10 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
-                
+
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                
+
                 // A script can call kickPlayer in the onPlayerBan event, which would
                 // show him the 'kicked' message instead of our 'banned' message.
                 const bool bLeavingServer = pPlayer->IsLeavingServer();
@@ -11910,7 +11937,7 @@ const char* CStaticFunctionDefinitions::GetVersionBuildTag()
     return MTA_DM_BUILDTAG_LONG;
 }
 
-SString CStaticFunctionDefinitions::GetVersionSortable()
+CMtaVersion CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }

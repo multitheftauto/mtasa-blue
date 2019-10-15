@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.h
  *  PURPOSE:     Header for static function definitions class
@@ -177,6 +177,7 @@ public:
     static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
+    static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
     static bool SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget);
     static bool SetPedHeadless(CClientEntity& Entity, bool bHeadless);
     static bool SetPedFrozen(CClientEntity& Entity, bool bFrozen);
@@ -188,6 +189,7 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
+    static bool SetPedArmor(CClientPed& Ped, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
@@ -240,7 +242,7 @@ public:
     static bool AddVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CClientEntity& Entity);
     static bool RemoveVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CClientEntity& Entity, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState);

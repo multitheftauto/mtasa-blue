@@ -144,14 +144,6 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
         }
         else
         {
-            // Parse the arguments (format <nick> <[pass]>)
-            char* szTemp = new char[strlen(szArguments) + 1];
-            strcpy(szTemp, szArguments);
-
-            // Split it up
-            char* szNick = strtok(szTemp, " ");
-            char* szPass = strtok(NULL, " ");
-
             // Are we supposed to launch the server and play locally?
             if (stricmp(szArguments, "local") == 0)
             {
@@ -173,18 +165,18 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
             }
             else
             {
+                InitializeArguments arguments = ExtractInitializeArguments(szArguments);
+
                 // Got the nickname?
-                if (szNick)
+                if (!arguments.nickname.empty())
                 {
-                    // Create clientgame
                     g_pClientGame = new CClientGame;
 
                     // Enable the packet recorder
                     // g_pClientGame->EnablePacketRecorder ( "log.rec" );
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
-                    // Start the game
-                    g_pClientGame->StartGame(szNick, szPass);
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str());
                 }
                 else
                 {
@@ -192,9 +184,6 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     g_pCore->GetModManager()->RequestUnload();
                 }
             }
-
-            // Delete the temp buffer
-            delete[] szTemp;
         }
     }
 
@@ -305,4 +294,44 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
             vPlayerNames.push_back(strPlayerName);
         }
     }
+}
+
+CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
+{
+    // Format: "nickname [password]"
+    // Examples: "GloriousToaster99 secret", "RandomPainter10"
+    std::string_view view(arguments);
+    using size_type = std::string_view::size_type;
+
+    InitializeArguments result;
+
+    // Search for the first non-whitespace character
+    if (size_t nicknameBegin = view.find_first_not_of(' '); nicknameBegin != std::string_view::npos)
+    {
+        // Search for the first whitespace delimiter character
+        if (size_t nicknameDelimiter = view.find_first_of(' ', nicknameBegin); nicknameDelimiter != std::string_view::npos)
+        {
+            result.nickname = view.substr(nicknameBegin, nicknameDelimiter - nicknameBegin);
+
+            // Search for the next non-whitespace character
+            if (nicknameDelimiter = view.find_first_not_of(' ', nicknameDelimiter); nicknameDelimiter != std::string_view::npos)
+            {
+                // Extract password from the string remainder
+                if (size_t passwordDelimiter = view.find_first_of(' ', nicknameDelimiter); passwordDelimiter != std::string_view::npos)
+                {
+                    result.password = view.substr(nicknameDelimiter, passwordDelimiter - nicknameDelimiter);
+                }
+                else
+                {
+                    result.password = view.substr(nicknameDelimiter);
+                }
+            }
+        }
+        else
+        {
+            result.nickname = view.substr(nicknameBegin);
+        }
+    }
+
+    return result;
 }

@@ -20,6 +20,7 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -249,10 +250,7 @@ BOOL CModelInfoSA::IsVehicle()
 
 bool CModelInfoSA::IsPlayerModel()
 {
-    return (m_dwModelID == 0 || m_dwModelID == 1 || m_dwModelID == 2 || m_dwModelID == 7 ||
-            (m_dwModelID >= 9 && m_dwModelID != 208 && m_dwModelID != 149 && m_dwModelID != 119 && m_dwModelID != 86 && m_dwModelID != 74 &&
-             m_dwModelID != 65 && m_dwModelID != 42 && m_dwModelID <= 272) ||
-            (m_dwModelID >= 274 && m_dwModelID <= 288) || (m_dwModelID >= 290 && m_dwModelID <= 312));
+    return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
 BOOL CModelInfoSA::IsUpgrade()
@@ -955,6 +953,8 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
         ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
+        // Increment this model references count, so we don't unload it before we have a chance to reset the positions
+        m_pInterface->usNumberOfRefs++;
     }
 
     if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
@@ -973,9 +973,13 @@ void CModelInfoSA::ResetAllVehicleDummies()
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
         for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
-            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+            // TODO: Find out why this is a nullptr, and fix underlying bug
+            if (pVehicleModel->pVisualInfo != nullptr)
+                pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }
         ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
+        // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
+        info.first->usNumberOfRefs--;
     }
     ms_ModelDefaultDummiesPosition.clear();
 }
@@ -1203,6 +1207,11 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::DeallocateModel(void)
+{
+    Remove();
+    ppModelInfo[m_dwModelID] = nullptr;
+}
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Hook for NodeNameStreamRead
@@ -1367,9 +1376,79 @@ void CModelInfoSA::ResetSupportedUpgrades()
     m_ModelSupportedUpgrades.Reset();
 }
 
+void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
+{
+    unsigned short usOrgGroup = GetObjectPropertiesGroup();
+    if (usOrgGroup == usNewGroup)
+        return;
+
+    if (!MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID))
+        MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, usOrgGroup);
+
+    GetInterface()->usDynamicIndex = usNewGroup;
+}
+
+unsigned short CModelInfoSA::GetObjectPropertiesGroup()
+{
+    unsigned short usGroup = GetInterface()->usDynamicIndex;
+    if (usGroup == 0xFFFF)
+        usGroup = 0;
+
+    return usGroup;
+}
+
+void CModelInfoSA::RestoreObjectPropertiesGroup()
+{
+    unsigned short* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    if (usGroupInMap)
+    {
+        GetInterface()->usDynamicIndex = *usGroupInMap;
+        MapRemove(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    }
+}
+
+void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
+{
+    for (const auto& pair : ms_OriginalObjectPropertiesGroups)
+    {
+        pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
+    }
+    ms_OriginalObjectPropertiesGroups.clear();
+}
+
 eModelInfoType CModelInfoSA::GetModelType()
 {
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+}
+
+bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
+{
+    bool isTowable = true;
+
+    const bool isTowTruck = towingModel->GetModel() == 525;
+    const bool isTractor = towingModel->GetModel() == 531;
+    
+    if (IsTrain() || towingModel->IsTrain())
+    {
+        // A train is never towing other vehicles. Trains are linked by other means
+        isTowable = false;
+    }
+    else if (isTowTruck || isTractor)
+    {
+        const bool isFarmTrailer = GetModel() == 610;
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (IsBoat() || IsBike() || IsBmx())
+        {
+            isTowable = false;
+        }
+        else if (IsTrailer() && !(isTractor && isFarmTrailer))
+        {
+            isTowable = false;
+        }
+    }
+
+    return isTowable;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

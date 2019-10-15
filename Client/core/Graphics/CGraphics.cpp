@@ -15,6 +15,8 @@
 #include "CMaterialLine3DBatcher.h"
 #include "CPrimitiveBatcher.h"
 #include "CPrimitiveMaterialBatcher.h"
+#include "CPrimitive3DBatcher.h"
+#include "CMaterialPrimitive3DBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -42,9 +44,6 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pGUI = pGUI;
     memset(m_pDXFonts, 0, sizeof(m_pDXFonts));
     memset(m_pBigDXFonts, 0, sizeof(m_pBigDXFonts));
-    m_pDevice = NULL;
-    m_pLineInterface = NULL;
-    m_pDXSprite = NULL;
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;
@@ -58,6 +57,10 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
+    m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
+    m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
+    m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
+    m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
 
@@ -84,6 +87,10 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
     SAFE_DELETE(m_pPrimitiveBatcher);
     SAFE_DELETE(m_pPrimitiveMaterialBatcher);
+    SAFE_DELETE(m_pPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitive3DBatcherPostGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -673,6 +680,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -680,13 +690,41 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
+        // Count the amount of space characters at the end
+        size_t       spaceCount = 0;
+        const size_t textLength = wcslen(wszText);
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
+        for (int i = textLength - 1; i >= 0; --i)
+        {
+            const wchar_t c = wszText[i];
 
-        return ((float)size.cx * fScale);
+            if (c == L' ')
+                ++spaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that to get the width of the ignored space characters
+        size_t trailingSpacePixels = 0;
+
+        if (spaceCount > 0)
+        {
+            SIZE size = {};
+            GetTextExtentPoint32W(pDXFont->GetDC(), L" ", 1, &size);
+            trailingSpacePixels = spaceCount * size.cx;
+        }
+
+        RECT rect = {};
+
+        if ((textLength - spaceCount) > 0)
+        {
+            pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        }
+
+        return static_cast<float>(rect.right - rect.left + trailingSpacePixels) * fScale;
     }
+
     return 0.0f;
 }
 
@@ -824,13 +862,13 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     fStartAngle = D3DXToRadian(fStartAngle);
     fStopAngle = D3DXToRadian(fStopAngle);
     // Calculate each segment angle
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments - 1);
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
 
     // Add center point
     pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
 
     // And calculate all other vertices
-    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    for (short siSeg = 0; siSeg <= siSegments; siSeg++)
     {
         PrimitiveVertice vert;
         float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
@@ -865,6 +903,44 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
     AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
+    else
+        m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
+}
+
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+    else
+        m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -1406,7 +1482,10 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1482,6 +1561,8 @@ void CGraphics::DrawPostGUIQueue()
     DrawQueue(m_PostGUIQueue);
     m_pLine3DBatcherPostGUI->Flush();
     m_pMaterialLine3DBatcherPostGUI->Flush();
+    m_pPrimitive3DBatcherPostGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPostGUI->Flush();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
@@ -1493,9 +1574,20 @@ void CGraphics::DrawLine3DPreGUIQueue()
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
-bool CGraphics::HasLine3DPreGUIQueueItems()
+void CGraphics::DrawPrimitive3DPreGUIQueue(void)
+{
+    m_pPrimitive3DBatcherPreGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+}
+
+bool CGraphics::HasLine3DPreGUIQueueItems(void)
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
+}
+
+bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
+{
+    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
