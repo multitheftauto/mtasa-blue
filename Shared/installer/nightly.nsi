@@ -602,6 +602,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
                     ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
                     ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+                    ${Case} "a2929a61e4d63dd3c15749b2b7ed74ae" #?? 1.01
                     ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
                     ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
                     ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00

@@ -529,7 +529,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strErrorCode = _E("CD41");
             break;
         case ePlayerDisconnectType::ELEMENT_FAILURE:
-            strReason = _("Disconnected: Player Element Could not be created.");
+            strReason = _("Disconnected: Player element could not be created.");
             strErrorCode = _E("CD42");
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
@@ -1581,7 +1581,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
-                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
             }
             for (unsigned int i = 0; i < MAX_WHEELS; ++i)
             {
@@ -3216,7 +3216,7 @@ retry:
 
                     // Setup our damage model
                     for (int i = 0; i < MAX_DOORS; i++)
-                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
@@ -4834,10 +4834,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     if (!pResourceEntity || !pResourceDynamicEntity)
     {
-        // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-        WriteDebugEvent(SString("Packet_ResourceStart() [1] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-        assert(false);
+        RaiseProtocolError(70);
         return;
     }
 
@@ -4845,15 +4842,6 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
-        if (!pResource->GetResourceEntity())
-        {
-            // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-            WriteDebugEvent(SString("Packet_ResourceStart() [2] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                    ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-            assert(false);
-            return;
-        }
-
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
 
@@ -4977,15 +4965,6 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             // Load the resource now
             if (pResource->CanBeLoaded())
             {
-                if (!pResource->GetResourceEntity())
-                {
-                    // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-                    WriteDebugEvent(SString("Packet_ResourceStart() [3] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                            ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-                    assert(false);
-                    return;
-                }
-
                 pResource->Load();
             }
         }

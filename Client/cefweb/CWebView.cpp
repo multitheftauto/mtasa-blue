@@ -451,8 +451,7 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
             if (aborted)
                 return;
 
-            m_pEventsInterface->Events_OnResourcePathCheck(strPath);
-            result = true;
+            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
     }, this);
 
     return result;
@@ -491,7 +490,17 @@ bool CWebView::ToggleDevTools(bool visible)
 
 bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    }, this);
+
+    return result;
 }
 
 bool CWebView::CanGoBack()

@@ -373,6 +373,9 @@ public:
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
 
+    // Vehicle towing functions
+    bool IsTowableBy(CModelInfo* towingModel) override;
+
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };

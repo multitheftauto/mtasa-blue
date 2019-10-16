@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2016-11-14 14:31+0000\n"
+"PO-Revision-Date: 2019-08-23 20:01+0000\n"
 "Last-Translator: SirTerning <omgsjokk@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: nb\n"
@@ -12,9 +12,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: SirTerning; Plugin; LilDollaTechZone; ccw; Geryha\n"
+"Translators: SirTerning; Plugin; LilDollaTechZone; ccw; qaisjp; Geryha\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1479133914.0\n"
+"X-POOTLE-MTIME: 1566590467.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Versjonen av MTA:SA som du har lastet ned støtter ikke Windows XP og Vista."
+"  Vennligst last ned en alternativ versjon fra www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Denne versjonen av MTA:SA er utviklet for eldre versjoner av Windows.  "
+"Vennligst last ned den nyeste versjonen fra www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -97,7 +101,7 @@ msgstr "Legg til i Windows Spill Utforsker (hvis den finnes)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Installer eller oppdater DirectX (om nødvendig)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -204,7 +208,7 @@ msgstr "Legg til i Spill Utforsker"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Installer DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
