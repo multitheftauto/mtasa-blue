@@ -23,9 +23,33 @@ void CFBXDebugging::Start()
     ResetScenesCounter();
 }
 
+bool GetScreenFromWorldPosition(CVector& vecWorld, CVector& vecScreen, float fEdgeTolerance, bool bRelative)
+{
+    g_pCore->GetGraphics()->CalcScreenCoors(&vecWorld, &vecScreen);
+
+    float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
+    float fResHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
+
+    // Calc relative values if required
+    float fToleranceX = bRelative ? fEdgeTolerance * fResWidth : fEdgeTolerance;
+    float fToleranceY = bRelative ? fEdgeTolerance * fResHeight : fEdgeTolerance;
+
+    // Keep within a reasonable range
+    fToleranceX = Clamp(0.f, fToleranceX, fResWidth * 10);
+    fToleranceY = Clamp(0.f, fToleranceY, fResHeight * 10);
+
+    if (vecScreen.fX >= -fToleranceX && vecScreen.fX <= fResWidth + fToleranceX && vecScreen.fY >= -fToleranceY && vecScreen.fY <= fResHeight + fToleranceY &&
+        vecScreen.fZ > 0.1f)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void CFBXDebugging::DrawBoundingBox(CFBXBoundingBox* pBoundingBox, CMatrix& matrix, SColorRGBA color, float fLineWidth)
 {
-    static CVector    vecCorner[8];
+    static CVector vecCorner[8];
 
     pBoundingBox->GetBoundingBoxCornersByMatrix(vecCorner, matrix);
 
@@ -52,6 +76,59 @@ void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
     static float      fLineWidth = 8.0f;
 
     DrawBoundingBox(pTemplate->GetBoundingBox(), matrix * *pTemplate->GetViewMatrix());
+}
+
+void CFBXDebugging::DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix)
+{
+    CMatrix templateMatrix = matrix * *pTemplate->GetViewMatrix();
+    CVector vecWorld = templateMatrix.GetPosition();
+    CVector vecScreen;
+    g_pCore->GetGraphics()->CalcScreenCoors(&vecWorld, &vecScreen);
+
+    if (GetScreenFromWorldPosition(vecWorld, vecScreen, 0, true))
+    {
+        SString strDebugInfo(
+            "Template id: %i\n"
+            "Draw distance: %.2f"
+            "",
+            pTemplate->m_uiTemplateId, pTemplate->GetDrawDistance());
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFFFF0000, strDebugInfo.c_str(), 1, 1, DT_NOCLIP,
+                                                 NULL, true);
+    }
+
+}
+void CFBXDebugging::DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject, CMatrix& matrix)
+{
+    CVector vecWorld = matrix.GetPosition();
+    CVector vecScreen;
+
+    g_pCore->GetGraphics()->CalcScreenCoors(&vecWorld, &vecScreen);
+
+    if (GetScreenFromWorldPosition(vecWorld, vecScreen, 0, true))
+    {
+        char szDebug[512] = "";
+        snprintf(szDebug, 512, "Object id: %lu\nIndex: %i\nDraw distance: %.2f", pTemplateObject->GetObjectId(), pTemplateObject->m_indexId,
+                 pTemplateObject->GetDrawDistance());
+
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1,
+                                                 DT_NOCLIP, NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFF00FF00, szDebug, 1, 1, DT_NOCLIP,
+                                                 NULL, true);
+    }
 }
 
 void CFBXBoundingBox::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix)
@@ -178,6 +255,7 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     CMatrix          pTemplateObjectMatrix;
     CVector          vecTemplatePosition;
     CVector          vecTemplateObjectPosition;
+    bool             bRenderDebug = g_pCore->GetFBX()->GetDevelopmentModeEnabled();
     m_pViewMatrix->GetBuffer((float*)m_pObjectMatrix);
     vecTemplatePosition = m_pViewMatrix->GetPosition();
 
@@ -251,12 +329,16 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
             pTemplateObjectMatrix = CMatrix(pTempMatrix);
 
-            object.second->GetDrawDistance(fDrawDistance);
+            fDrawDistance = object.second->GetDrawDistance();
             if ((pTemplateObjectMatrix.GetPosition() - vecCameraPosition).LengthSquared() < fDrawDistance * fDrawDistance)
             {
                 object.second->GetCullMode(cullMode);
                 pDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
-                CFBXDebugging::DrawBoundingBox(object.second->GetBoundingBox(), pTemplateObjectMatrix, SColorRGBA(0,255,0,255), 2.0f);
+                if (bRenderDebug)
+                {
+                    CFBXDebugging::DrawBoundingBox(object.second->GetBoundingBox(), pTemplateObjectMatrix, SColorRGBA(0, 255, 0, 255), 2.0f);
+                    CFBXDebugging::DrawDebuggingInformation(object.second, pTemplateObjectMatrix);
+                }
                 for (auto const& pBuffer : pObjectBuffer->m_bufferList)
                 {
                     if (pBuffer->m_ullMaterialId == 0)
@@ -333,6 +415,7 @@ unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 {
     m_objectMap[m_uiNextFreeObjectId] = pObject;
     UpdateBoundingBox();
+    pObject->m_indexId = m_uiNextFreeObjectId;
     return m_uiNextFreeObjectId++;
 }
 
@@ -635,6 +718,7 @@ unsigned int CFBXScene::CreateTemplate()
 {
     CFBXTemplate* pTemplate = new CFBXTemplate();
     unsigned int  uiTemplateId = AddTemplete(pTemplate);
+    pTemplate->m_uiTemplateId = uiTemplateId;
     return uiTemplateId;
 }
 
@@ -814,7 +898,7 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVecto
     CVector          vecPosition;
 
     pTemplate->GetPosition(vecTemplatePosition);
-    pTemplate->GetDrawDistance(fDrawDistance);
+    fDrawDistance = pTemplate->GetDrawDistance();
 
     matrix = *pMatrix * *pTemplate->GetViewMatrix();
 
@@ -830,6 +914,7 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVecto
                 if (bRenderDebug)
                 {
                     CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
+                    CFBXDebugging::DrawDebuggingInformation(pTemplate, matrix);
                 }
             }
             return true;
@@ -912,7 +997,7 @@ void CFBXScene::GetTemplateScale(unsigned int uiTemplateId, CVector& scale)
 void CFBXScene::GetTemplateDrawDistance(unsigned int uiTemplateId, float& drawDistance)
 {
     CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
-    pTemplate->GetDrawDistance(drawDistance);
+    drawDistance = pTemplate->GetDrawDistance();
 }
 
 void CFBXScene::SetTemplatePosition(unsigned int uiTemplateId, CVector& position)
@@ -964,7 +1049,7 @@ void CFBXScene::GetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned
 {
     CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
     CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
-    pTemplateObject->GetDrawDistance(fDrawDistance);
+    fDrawDistance = pTemplateObject->GetDrawDistance();
 }
 
 void CFBXScene::SetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position)

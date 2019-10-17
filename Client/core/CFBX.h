@@ -13,6 +13,7 @@
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 class CFBXTemplate;
+class CFBXTemplateObject;
 
 enum eVertexType
 {
@@ -26,6 +27,8 @@ static class CFBXDebugging
 public:
     static void DrawBoundingBox(CFBXBoundingBox* pBoundingBox, CMatrix& matrix, SColorRGBA color = SColorRGBA(255, 0, 0, 255), float fLineWidth = 2.0f);
     static void DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix);
+    static void DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix);
+    static void DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject, CMatrix& matrix);
     static void AddRenderedTemplate() { iRenderedTemplates++; };
     static void AddRenderedObject() { iRenderedObjects++; };
     static void AddRenderedScene() { iRenderedScenes++; };
@@ -141,7 +144,7 @@ public:
     void               GetPosition(CVector& position) { position = m_pViewMatrix->GetPosition(); };
     void               GetRotation(CVector& rotation) { rotation = m_pViewMatrix->GetRotation(); };
     void               GetScale(CVector& scale) { scale = m_pViewMatrix->GetScale(); };
-    void               GetDrawDistance(float& fDrawDistance) { fDrawDistance = this->m_fDrawDistance; };
+    float              GetDrawDistance() { return m_fDrawDistance; };
     void               GetCullMode(eCullMode& cullMode) { cullMode = this->m_eCullMode; };
     unsigned long long GetObjectId() { return m_ullObjectId; };
     void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
@@ -150,6 +153,9 @@ public:
     void               GetMaterialDiffuseColor(DWORD& pMaterial);
     CFBXBoundingBox*   GetBoundingBox() const { return m_pBoundingBox; }
     // void               GetLight(D3DLIGHT9*& pLight) const { pLight = m_pLight; };
+
+    // require better name
+    unsigned int m_indexId;
 
 private:
     void UpdateBoundingBox();
@@ -178,7 +184,7 @@ public:
     void GetPosition(CVector& position) const { position = m_pViewMatrix->GetPosition(); };
     void GetRotation(CVector& rotation) const { rotation = m_pViewMatrix->GetRotation(); };
     void GetScale(CVector& scale) const { scale = m_pViewMatrix->GetScale(); };
-    void GetDrawDistance(float& fDrawDistance) const { fDrawDistance = m_fDrawDistance; };
+    float GetDrawDistance() { return m_fDrawDistance; };
 
     CFBXTemplateObject* GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::unordered_map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
@@ -189,6 +195,7 @@ public:
     CFBXBoundingBox*                                      GetBoundingBox() const { return m_pBoundingBox; };
     void                                                  GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix);
 
+    unsigned int m_uiTemplateId;
 private:
     void UpdateBoundingBox();
 
