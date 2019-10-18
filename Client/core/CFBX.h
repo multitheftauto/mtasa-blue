@@ -180,6 +180,7 @@ public:
     ~CFBXTemplate();
     bool         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX& pOffsetMatrix);
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
+    bool         RemoveObject(unsigned int uiObject);
 
     void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
     void SetRotation(CVector& rotation) const { m_pViewMatrix->SetRotation(rotation); };
@@ -240,6 +241,7 @@ public:
     unsigned int     AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
     unsigned int     CreateTemplate();
     void             RemoveTemplate(unsigned int uiTemplateId);
+    bool             RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int uiObjectId);
 
     void GetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void GetTemplatePosition(unsigned int uiTemplateId, CVector& position);

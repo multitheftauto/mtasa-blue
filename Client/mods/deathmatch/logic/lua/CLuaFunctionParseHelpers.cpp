@@ -768,7 +768,7 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 // DxFont/string
 //
 void MixedReadDxFontString(CScriptArgReader& argStream, eFontType& outFontType, eFontType defaultFontType, CClientDxFont*& poutDxFontElement)
-{
+        {
     outFontType = FONT_DEFAULT;
     poutDxFontElement = NULL;
     if (argStream.NextIsNone())

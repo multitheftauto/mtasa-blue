@@ -164,7 +164,7 @@ FBXBuffer::~FBXBuffer()
 }
 
 template <typename T>
-    FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
+FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
 {
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
@@ -442,6 +442,17 @@ unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
     return m_uiNextFreeObjectId++;
 }
 
+bool CFBXTemplate::RemoveObject(unsigned int uiObject)
+{
+    if (!IsModelValid(uiObject))
+        return false;
+
+    delete m_objectMap[uiObject];
+    m_objectMap.erase(uiObject);
+    UpdateBoundingBox();
+    return true;
+}
+
 void CFBXTemplate::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix)
 {
     CFBXBoundingBox* pBoundingBox = GetBoundingBox();
@@ -622,6 +633,15 @@ unsigned int CFBXScene::AddMeshToTemplate(unsigned int uiTemplate, unsigned long
     CFBXTemplateObject* pTemplateObject = new CFBXTemplateObject(uiModelId, this);
     unsigned int        uiNewObjectId = pTemplate->AddTemplateObject(pTemplateObject);
     return uiNewObjectId;
+}
+
+bool CFBXScene::RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int uiObjectId)
+{
+    if (!IsTemplateModelValid(uiTemplate, uiObjectId))
+        return false;
+
+    CFBXTemplate*     pTemplate = m_templateMap[uiTemplate];
+    return pTemplate->RemoveObject(uiObjectId);
 }
 
 bool CFBXScene::GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius)
@@ -1157,7 +1177,6 @@ CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXI
 void CFBX::RemoveScene(CFBXScene* pScene)
 {
     ListRemove(m_sceneList, pScene);
-    delete pScene;
 }
 
 const char* CFBX::GetObjectType(const ofbx::Object const* pObject)

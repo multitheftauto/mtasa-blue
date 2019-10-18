@@ -60,8 +60,9 @@ public:
                                        eFBXTemplateModelProperty eProperty);
     bool LuaGetTemplateModelProperties(lua_State* luaVM, unsigned int uiId, unsigned int uiModelId, eFBXTemplateModelProperty eProperty);
 
-    bool AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned long long ullMesh, unsigned long long ullParentMesh, CVector vecPosition,
-                           unsigned int& uiObjectId);
+    bool  AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned long long ullMesh, unsigned long long ullParentMesh, CVector vecPosition,
+                            unsigned int& uiObjectId);
+    bool RemoveObjectToTemplate(unsigned int uiId, unsigned int& uiObjectId);
     bool AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId);
     void RemoveTemplate(unsigned int uiTemplateId);
     bool RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);

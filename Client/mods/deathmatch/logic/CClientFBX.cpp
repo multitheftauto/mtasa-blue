@@ -445,6 +445,14 @@ bool CClientFBX::AddMeshToTemplate(lua_State* luaVM, unsigned int uiId, unsigned
     return true;
 }
 
+bool CClientFBX::RemoveObjectToTemplate(unsigned int uiId, unsigned int& uiObjectId)
+{
+    if (!m_pFBXScene->IsTemplateValid(uiId))
+        return false;
+
+    return m_pFBXScene->RemoveObjectFromTemplate(uiId, uiObjectId);
+}
+
 bool CClientFBX::AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId)
 {
     if (uiCopyFromTemplateId != 0)

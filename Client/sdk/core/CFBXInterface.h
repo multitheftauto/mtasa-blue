@@ -87,6 +87,7 @@ public:
     virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
     virtual unsigned int               CreateTemplate() = 0;
     virtual void                       RemoveTemplate(unsigned int uiTemplateId) = 0;
+    virtual bool                       RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int uiObjectId) = 0;
     virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
     virtual bool                       GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius) = 0;
     virtual bool                       GetMeshName(long long int ulId, SString& strMeshName) = 0;
