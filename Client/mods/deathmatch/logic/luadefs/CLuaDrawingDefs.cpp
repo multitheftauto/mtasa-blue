@@ -1976,7 +1976,7 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawWiredSphere(lua_State* luaVM)
 {
-    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint density )
+    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint iterations )
     CVector          vecPosition;
     float            fRadius;
     SColorARGB       color(64, 255, 0, 0);
@@ -2002,7 +2002,7 @@ int CLuaDrawingDefs::DxDrawWiredSphere(lua_State* luaVM)
             return 1;
         }
 
-        argStream.SetCustomError("Density must be between 1 and 4");
+        argStream.SetCustomError("Iterations must be between 1 and 4");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
     else
