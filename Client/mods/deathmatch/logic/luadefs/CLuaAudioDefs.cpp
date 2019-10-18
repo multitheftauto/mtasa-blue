@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.x
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaAudioDefs.cpp
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaAudioDefs.cpp
  *  PURPOSE:     Lua audio definitions class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
