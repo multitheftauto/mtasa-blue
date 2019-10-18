@@ -1394,7 +1394,7 @@ namespace ofbx
         const IElement* getRootElement() const override { return m_root_element; }
         const Object*   getRoot() const override { return m_root; }
 
-        void destroy() override { delete this; }
+        void release() const override { delete this; }
 
         ~Scene()
         {

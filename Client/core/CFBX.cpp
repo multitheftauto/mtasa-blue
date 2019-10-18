@@ -103,7 +103,6 @@ void CFBXDebugging::DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& m
         g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFFFF0000, strDebugInfo.c_str(), 1, 1, DT_NOCLIP,
                                                  NULL, true);
     }
-
 }
 void CFBXDebugging::DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject, CMatrix& matrix)
 {
@@ -118,16 +117,15 @@ void CFBXDebugging::DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject
         snprintf(szDebug, 512, "Object id: %lu\nIndex: %i\nDraw distance: %.2f", pTemplateObject->GetObjectId(), pTemplateObject->m_indexId,
                  pTemplateObject->GetDrawDistance());
 
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFF00FF00, szDebug, 1, 1, DT_NOCLIP,
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
                                                  NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
+                                                 NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
+                                                 NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
+                                                 NULL, true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFF00FF00, szDebug, 1, 1, DT_NOCLIP, NULL, true);
     }
 }
 
@@ -141,10 +139,6 @@ void CFBXBoundingBox::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatri
     vecCorner[5] = matrix.TransformVector(CVector(min.fX, max.fY, max.fZ));
     vecCorner[6] = matrix.TransformVector(CVector(max.fX, min.fY, max.fZ));
     vecCorner[7] = matrix.TransformVector(CVector(max.fX, max.fY, max.fZ));
-}
-
-CFBXRenderItem::CFBXRenderItem(unsigned int uiTemplateId, CMatrix matrix) : m_uiTemplateId(uiTemplateId), m_matrix(matrix)
-{
 }
 
 FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMaterialId)
@@ -164,8 +158,13 @@ FBXBuffer::FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecI
     m_ullMaterialId = ullMaterialId;
 }
 
+FBXBuffer::~FBXBuffer()
+{
+    delete m_pFBXVertexBuffer;
+}
+
 template <typename T>
-FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
+    FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
 {
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;
@@ -177,6 +176,12 @@ FBXVertexBuffer::FBXVertexBuffer(std::vector<T> vector, int FVF)
     m_iBufferSize = vector.size();
     m_FVF = FVF;
     m_iTypeSize = sizeof(T);
+}
+
+FBXVertexBuffer::~FBXVertexBuffer()
+{
+    m_pBuffer->Release();
+    delete m_pBuffer;
 }
 
 void FBXVertexBuffer::Select(UINT StreamNumber)
@@ -244,8 +249,15 @@ FBXObjectBuffer::FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vect
     }
 }
 
+FBXObjectBuffer::~FBXObjectBuffer()
+{
+    delete m_pDiffuseBuffer;
+    for (auto const buffer : m_bufferList)
+        delete buffer;
+}
+
 // returns false if model wans't rendered due being out of screen, too far, something went wrong etc.
-bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix)
+bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX& pOffsetMatrix)
 {
     bool             bRenderedAtLeastOneMesh = false;
     FBXObjectBuffer* pObjectBuffer;
@@ -318,7 +330,7 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
         pDevice->SetTextureStageState(3, D3DTSS_COLORARG2, D3DTA_CONSTANT);
         pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, materialDiffuse);
 
-        pDevice->SetTransform(D3DTS_WORLDMATRIX(0), pOffsetMatrix);
+        pDevice->SetTransform(D3DTS_WORLDMATRIX(0), &pOffsetMatrix);
 
         pObjectBuffer = pScene->GetFBXBuffer(object.second->GetObjectId());
         if (pObjectBuffer != nullptr)
@@ -411,6 +423,17 @@ CFBXTemplate::CFBXTemplate()
     m_pBoundingBox = new CFBXBoundingBox();
 }
 
+CFBXTemplate::~CFBXTemplate()
+{
+    for (auto const pair : m_objectMap)
+        delete pair.second;
+
+    delete m_pViewMatrix;
+    delete m_pObjectMatrix;
+    delete m_pCameraMatrix;
+    delete m_pBoundingBox;
+}
+
 unsigned int CFBXTemplate::AddTemplateObject(CFBXTemplateObject* pObject)
 {
     m_objectMap[m_uiNextFreeObjectId] = pObject;
@@ -466,6 +489,13 @@ CFBXTemplateObject::CFBXTemplateObject(unsigned long long ullObjectId, CFBXScene
     m_pMaterial->Power = 5.0f;
 
     UpdateBoundingBox();
+}
+
+CFBXTemplateObject::~CFBXTemplateObject()
+{
+    delete m_pViewMatrix;
+    delete m_pMaterial;
+    delete m_pBoundingBox;
 }
 
 void CFBXTemplateObject::GetMaterialDiffuseColor(DWORD& color)
@@ -670,12 +700,30 @@ CFBXScene::CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterfa
     CacheBoundingBoxes();
 
     m_fUnitScaleFactor = 1 / (m_pScene->getGlobalSettings()->OriginalUnitScaleFactor / m_pScene->getGlobalSettings()->UnitScaleFactor);
-    m_pMatrix = new CMatrix();
-    m_pObjectMatrix = new D3DMATRIX();
-    m_pCameraMatrix = new CMatrix();
 
     CreateBaseTemplate();
     IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+}
+
+CFBXScene::~CFBXScene()
+{
+    for (auto const pair : m_templateMap)
+        delete pair.second;
+
+    for (auto const pair : m_geometryBoundingBox)
+        delete pair.second;
+
+    for (auto const pair : m_mapMeshBuffer)
+        delete pair.second;
+
+    for (auto const pair : m_mapMaterialTextureSet)
+        delete pair.second;
+
+    for (auto const pair : m_textureContentList)
+        delete pair.second;
+    m_pScene->release();
+
+    g_pCore->GetFBX()->RemoveScene(this);
 }
 
 // makes as much excact copy of scene as possible
@@ -732,7 +780,11 @@ void CFBXScene::AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition,
     matrix.SetPosition(vecPosition);
     matrix.SetRotation(vecRotation);
     matrix.SetScale(vecScale);
-    m_vecTemporaryRenderLoop.push_back(new CFBXRenderItem(uiTemplateId, matrix));
+
+    CFBXRenderItem renderItem;
+    renderItem.m_uiTemplateId = uiTemplateId;
+    renderItem.m_matrix = matrix;
+    m_vecTemporaryRenderLoop.push_back(renderItem);
 }
 
 void CFBXScene::CacheObjects()
@@ -887,7 +939,7 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
     return true;
 }
 
-bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVector& vecCameraPosition)
+bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition)
 {
     CVector          vecTemplatePosition;
     CVector          vecTemplateOffset;
@@ -900,16 +952,16 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVecto
     pTemplate->GetPosition(vecTemplatePosition);
     fDrawDistance = pTemplate->GetDrawDistance();
 
-    matrix = *pMatrix * *pTemplate->GetViewMatrix();
+    matrix = pMatrix * *pTemplate->GetViewMatrix();
 
-    vecPosition = pMatrix->GetPosition() + vecTemplatePosition;
+    vecPosition = pMatrix.GetPosition() + vecTemplatePosition;
     if ((vecPosition - vecCameraPosition).LengthSquared() < fDrawDistance * fDrawDistance)
     {
         pBoundingBox = pTemplate->GetBoundingBox();
         if (g_pCore->GetFBX()->CheckCulling(pBoundingBox, &matrix))
         {
-            matrix.GetBuffer((float*)m_pObjectMatrix);
-            if (pTemplate->Render(m_pDevice, this, m_pObjectMatrix))
+            matrix.GetBuffer(reinterpret_cast<float*>(&m_ObjectMatrix));
+            if (pTemplate->Render(m_pDevice, this, m_ObjectMatrix))
             {
                 if (bRenderDebug)
                 {
@@ -946,12 +998,12 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
 
     for (auto const& renderItem : m_vecTemporaryRenderLoop)
     {
-        if (!IsTemplateValid(renderItem->m_uiTemplateId))
+        if (!IsTemplateValid(renderItem.m_uiTemplateId))
             continue;
 
-        vecPosition = renderItem->m_matrix.GetPosition();
-        pTemplate = m_templateMap[renderItem->m_uiTemplateId];
-        if (RenderTemplate(pTemplate, &renderItem->m_matrix, vecCameraPosition))
+        vecPosition = renderItem.m_matrix.GetPosition();
+        pTemplate = m_templateMap[renderItem.m_uiTemplateId];
+        if (RenderTemplate(pTemplate, (CMatrix&)renderItem.m_matrix, vecCameraPosition))
         {
             CFBXDebugging::AddRenderedTemplate();
             renderedAtLeastOneTemplate = true;
@@ -965,7 +1017,7 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
         pTemplate = m_templateMap[pair.first];
         for (CMatrix matrix : pair.second)
         {
-            if (RenderTemplate(pTemplate, &matrix, vecCameraPosition))
+            if (RenderTemplate(pTemplate, matrix, vecCameraPosition))
             {
                 CFBXDebugging::AddRenderedTemplate();
                 renderedAtLeastOneTemplate = true;

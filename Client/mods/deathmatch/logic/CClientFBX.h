@@ -25,12 +25,12 @@ class CClientFBX : public CClientEntity, CClientFBXInterface
     DECLARE_CLASS(CClientFBX, CClientEntity)
 public:
     CClientFBX(class CClientManager* pManager, ElementID ID);
-    ~CClientFBX(void);
+    ~CClientFBX();
 
-    eClientEntityType GetType(void) const { return CCLIENTFBX; }
+    eClientEntityType GetType() const { return CCLIENTFBX; }
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 

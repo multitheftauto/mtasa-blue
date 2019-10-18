@@ -32,6 +32,13 @@ CClientFBX::~CClientFBX(void)
     if (m_pFBXScene != nullptr)
         g_pCore->GetFBX()->RemoveScene((CFBXScene*)m_pFBXScene);
 
+    delete pTempGeometry;
+    delete pLoadingState;
+    delete[] tempVertexPosition;
+
+    if (m_RawDataBuffer)
+        delete m_RawDataBuffer;
+
     m_pFBXManager->RemoveFromList(this);
 }
 
@@ -102,7 +109,9 @@ void CClientFBX::LoadScene()
         return;
     }
 
-    free(m_RawDataBuffer);
+    delete m_RawDataBuffer;
+    m_RawDataBuffer = nullptr;
+
     m_pFBXScene = (CFBXSceneInterface*)g_pCore->GetFBX()->AddScene(pScene, this);
 
     pLoadingState->Update(FBX_LOADING_FINISHED, "");

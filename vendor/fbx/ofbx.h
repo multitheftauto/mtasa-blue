@@ -449,7 +449,7 @@ namespace ofbx
 
     struct IScene
     {
-        virtual void                  destroy() = 0;
+        virtual void                  release() const = 0;
         virtual const IElement*       getRootElement() const = 0;
         virtual const Object*         getRoot() const = 0;
         virtual const TakeInfo*       getTakeInfo(const char* name) const = 0;

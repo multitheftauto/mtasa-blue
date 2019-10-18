@@ -55,7 +55,6 @@ struct CFBXRenderItem
 {
     unsigned int m_uiTemplateId;
     CMatrix      m_matrix;
-    CFBXRenderItem(unsigned int uiTemplateId, CMatrix matrix);
 };
 
 struct CFBXBoundingBox
@@ -91,6 +90,7 @@ class FBXVertexBuffer
 public:
     template <typename T>
     FBXVertexBuffer(std::vector<T> vector, int FVF);
+    ~FBXVertexBuffer();
     void Select(UINT StreamNumber);
 
 private:
@@ -104,6 +104,7 @@ class FBXBuffer
 {
 public:
     FBXBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, unsigned long long ullMterialId);
+    ~FBXBuffer();
 
     FBXVertexBuffer*        m_pFBXVertexBuffer;
     LPDIRECT3DINDEXBUFFER9  m_pIndexBuffer;
@@ -119,6 +120,7 @@ class FBXObjectBuffer
 {
 public:
     FBXObjectBuffer(std::vector<FBXVertex> vecVertexList, std::vector<int> vecIndexList, std::vector<int> vecMaterialList, const ofbx::Mesh* const* pMesh);
+    ~FBXObjectBuffer();
     std::vector<FBXBuffer*> m_bufferList;
     FBXVertexBuffer*        m_pDiffuseBuffer;
 };
@@ -127,6 +129,7 @@ class CFBXTemplateObject
 {
 public:
     CFBXTemplateObject(unsigned long long ullObjectId, CFBXScene* pScene);
+    CFBXTemplateObject::~CFBXTemplateObject();
 
     void SetPosition(CVector& position) { m_pViewMatrix->SetPosition(position); };
     void SetRotation(CVector& rotation)
@@ -174,7 +177,8 @@ class CFBXTemplate
 {
 public:
     CFBXTemplate();
-    bool         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX* pOffsetMatrix);
+    ~CFBXTemplate();
+    bool         Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRIX& pOffsetMatrix);
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
 
     void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
@@ -214,6 +218,7 @@ class CFBXScene : public CFBXSceneInterface
 {
 public:
     CFBXScene(ofbx::IScene* scene, CClientFBXInterface* pClientFBXInterface);
+    ~CFBXScene();
 
     const ofbx::Object* const* GetObjectById(long long int ulId) { return IsObjectValid(ulId) ? m_objectList[ulId] : nullptr; }
 
@@ -226,7 +231,7 @@ public:
     void             GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool             GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
     bool             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVector& vecCameraPosition);
-    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix* pMatrix, CVector& vecCameraPosition);
+    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition);
     FBXObjectBuffer* GetFBXBuffer(unsigned long long ullId);
     unsigned int     AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*    GetTexture(const ofbx::Texture* pTexture);
@@ -287,12 +292,14 @@ private:
     std::unordered_map<unsigned long long, CFBXTextureSet*>                   m_mapMaterialTextureSet;
     std::unordered_map<SString, CPixels*>                                     m_textureContentList;
     std::unordered_map<const ofbx::Mesh*, std::vector<const ofbx::Material*>> m_mapMeshMaterials;
-    std::vector<CFBXRenderItem*>                                              m_vecTemporaryRenderLoop;
-    CMatrix*                                                                  m_pMatrix;
-    D3DMATRIX*                                                                m_pObjectMatrix;
-    CMatrix*                                                                  m_pCameraMatrix;
-    bool                                                                      bRenderDebug;
+    std::vector<CFBXRenderItem>                                               m_vecTemporaryRenderLoop;
+    CMatrix                                                                   m_Matrix;
+    D3DMATRIX                                                                 m_ObjectMatrix;
+    CMatrix                                                                   m_CameraMatrix;
+
     IDirect3DDevice9*                                                         m_pDevice;
+
+    bool                                                                      bRenderDebug;
 };
 
 class CFBX : public CFBXInterface
