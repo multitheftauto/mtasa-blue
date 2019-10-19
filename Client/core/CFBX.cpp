@@ -342,7 +342,14 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             pTemplateObjectMatrix = CMatrix(pTempMatrix);
 
             fDrawDistance = object.second->GetDrawDistance();
-            if ((pTemplateObjectMatrix.GetPosition() - vecCameraPosition).LengthSquared() < fDrawDistance * fDrawDistance)
+            float fCameraDistance = (pTemplateObjectMatrix.GetPosition() - vecCameraPosition).Length();
+
+            pDevice->SetTextureStageState(3, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+            pDevice->SetTextureStageState(3, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
+            pDevice->SetTextureStageState(3, D3DTSS_ALPHAARG2, D3DTA_CONSTANT);
+            pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, D3DCOLOR_ARGB(object.second->GetOpacityFromDistance(fCameraDistance), 255,255,255));
+
+            if (fCameraDistance < fDrawDistance)
             {
                 object.second->GetCullMode(cullMode);
                 pDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
@@ -514,6 +521,18 @@ void CFBXTemplateObject::GetMaterialDiffuseColor(DWORD& color)
     color = D3DCOLOR_ARGB((DWORD)(m_pMaterial->Diffuse.a * 255), (DWORD)(m_pMaterial->Diffuse.r * 255), (DWORD)(m_pMaterial->Diffuse.g * 255),
                           (DWORD)(m_pMaterial->Diffuse.b * 255));
 }
+
+ushort CFBXTemplateObject::GetOpacityFromDistance(float fDistance)
+{
+    if (m_bUseCustomOpacity || fDistance == -1)
+        return m_usOpacity;
+
+    if (fDistance < m_fDrawDistance - m_fFadeDistance)
+        return 255;
+
+    return (m_fDrawDistance - fDistance) / m_fFadeDistance * 255;
+}
+
 void CFBXTemplateObject::UpdateBoundingBox()
 {
     CVector min;
@@ -640,7 +659,7 @@ bool CFBXScene::RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int u
     if (!IsTemplateModelValid(uiTemplate, uiObjectId))
         return false;
 
-    CFBXTemplate*     pTemplate = m_templateMap[uiTemplate];
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplate];
     return pTemplate->RemoveObject(uiObjectId);
 }
 
@@ -790,8 +809,14 @@ unsigned int CFBXScene::CreateTemplate()
     return uiTemplateId;
 }
 
-void CFBXScene::RemoveTemplate(unsigned int uiTemplateId)
+bool CFBXScene::RemoveTemplate(unsigned int uiTemplateId)
 {
+    if (!IsTemplateValid(uiTemplateId))
+        return false;
+
+    delete m_templateMap[uiTemplateId];
+    MapRemove(m_templateMap, uiTemplateId);
+    return true;
 }
 
 void CFBXScene::AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale)
@@ -1164,6 +1189,48 @@ void CFBXScene::GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int
     CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
     CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
     pTemplateObject->GetCullMode(cullMode);
+}
+
+void CFBXScene::SetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool bUseCustomOpacity)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetUseCustomOpacity(bUseCustomOpacity);
+}
+
+void CFBXScene::GetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool& bUseCustomOpacity)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetUseCustomOpacity(bUseCustomOpacity);
+}
+
+void CFBXScene::SetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort usOpacity)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetOpacity(usOpacity);
+}
+
+void CFBXScene::GetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort& usOpacity)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetOpacity(usOpacity);
+}
+
+void CFBXScene::SetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fFadeDistance)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->SetFadeDistance(fFadeDistance);
+}
+
+void CFBXScene::GetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fFadeDistance)
+{
+    CFBXTemplate*       pTemplate = m_templateMap[uiTemplateId];
+    CFBXTemplateObject* pTemplateObject = pTemplate->GetObjectById(uiModelId);
+    pTemplateObject->GetFadeDistance(fFadeDistance);
 }
 
 CFBXScene* CFBX::AddScene(ofbx::IScene* pScene, CClientFBXInterface* pClientFBXInterface)

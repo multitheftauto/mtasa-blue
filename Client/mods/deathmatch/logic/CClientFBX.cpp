@@ -352,6 +352,8 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
     CVector   vector;
     float     distance;
     eCullMode cullMode;
+    bool      boolean;
+    float     floatNumber;
     switch (eProperty)
     {
         case FBX_TEMPLATE_MODEL_PROPERTY_POSITION:
@@ -382,6 +384,21 @@ bool CClientFBX::LuaSetTemplateModelProperties(lua_State* luaVM, CScriptArgReade
             if (argStream.HasErrors())
                 return false;
             m_pFBXScene->SetTemplateModelCullMode(uiId, uiModelId, cullMode);
+        case FBX_TEMPLATE_MODEL_PROPERTY_USE_CUSTOM_OPACITY:
+            argStream.ReadBool(boolean);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelUseCustomOpacity(uiId, uiModelId, boolean);
+        case FBX_TEMPLATE_MODEL_PROPERTY_OPACITY:
+            argStream.ReadNumber(floatNumber);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelOpacity(uiId, uiModelId, floatNumber);
+        case FBX_TEMPLATE_MODEL_PROPERTY_FADE_DISTANCE:
+            argStream.ReadNumber(floatNumber);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateModelFadeDistance(uiId, uiModelId, floatNumber);
     }
     return true;
 }
@@ -465,8 +482,14 @@ bool CClientFBX::AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& ui
     return true;
 }
 
-void CClientFBX::RemoveTemplate(unsigned int uiTemplateId)
+bool CClientFBX::RemoveTemplate(unsigned int uiTemplateId)
 {
+    return m_pFBXScene->RemoveTemplate(uiTemplateId);
+}
+
+bool CClientFBX::IsTemplateValid(unsigned int uiTemplateId)
+{
+    return m_pFBXScene->IsTemplateValid(uiTemplateId);
 }
 
 void CClientFBX::LuaGetTextures(lua_State* luaVM)

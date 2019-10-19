@@ -143,17 +143,25 @@ public:
         UpdateBoundingBox();
     };
     void               SetDrawDistance(float fDrawDistance) { this->m_fDrawDistance = fDrawDistance; };
-    void               SetCullMode(eCullMode cullMode) { this->m_eCullMode = cullMode; };
     void               GetPosition(CVector& position) { position = m_pViewMatrix->GetPosition(); };
     void               GetRotation(CVector& rotation) { rotation = m_pViewMatrix->GetRotation(); };
     void               GetScale(CVector& scale) { scale = m_pViewMatrix->GetScale(); };
     float              GetDrawDistance() { return m_fDrawDistance; };
-    void               GetCullMode(eCullMode& cullMode) { cullMode = this->m_eCullMode; };
+    void               SetCullMode(eCullMode cullMode) { m_eCullMode = cullMode; };
+    void               GetCullMode(eCullMode& cullMode) { cullMode = m_eCullMode; };
+    void               SetUseCustomOpacity(bool bUseCustomOpacity) { m_bUseCustomOpacity = bUseCustomOpacity; };
+    void               GetUseCustomOpacity(bool& bUseCustomOpacity) { bUseCustomOpacity = this->m_bUseCustomOpacity; };
+    void               SetOpacity(ushort usOpacity) { m_usOpacity = usOpacity; };
+    void               GetOpacity(ushort& usOpacity) { usOpacity = m_usOpacity; };
+    void               SetFadeDistance(float fFadeDistance) { m_fFadeDistance = fFadeDistance; };
+    void               GetFadeDistance(float& fFadeDistance) { fFadeDistance = m_fFadeDistance; };
+
     unsigned long long GetObjectId() { return m_ullObjectId; };
     void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
     void               GetMatrix(CMatrix& pMatrix) { pMatrix = *m_pViewMatrix; };
     void               GetMaterial(D3DMATERIAL9*& pMaterial) const { pMaterial = m_pMaterial; };
     void               GetMaterialDiffuseColor(DWORD& pMaterial);
+    ushort             GetOpacityFromDistance(float fDistance);
     CFBXBoundingBox*   GetBoundingBox() const { return m_pBoundingBox; }
     // void               GetLight(D3DLIGHT9*& pLight) const { pLight = m_pLight; };
 
@@ -166,7 +174,10 @@ private:
     // D3DLIGHT9*         m_pLight;
     CMatrix*           m_pViewMatrix;
     D3DMATERIAL9*      m_pMaterial;
-    float              m_fDrawDistance = 50000.0f;
+    float              m_fDrawDistance = 500.0f;
+    float              m_fFadeDistance = 20.0f;
+    ushort             m_usOpacity = 255;
+    bool               m_bUseCustomOpacity = false;
     eCullMode          m_eCullMode = (eCullMode)2;
     unsigned long long m_ullObjectId;
     CFBXBoundingBox*   m_pBoundingBox;
@@ -240,7 +251,7 @@ public:
     bool             IsTemplateModelValid(unsigned int uiTemplate, unsigned int uiModelId);
     unsigned int     AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId);
     unsigned int     CreateTemplate();
-    void             RemoveTemplate(unsigned int uiTemplateId);
+    bool             RemoveTemplate(unsigned int uiTemplateId);
     bool             RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int uiObjectId);
 
     void GetTemplateScale(unsigned int uiTemplateId, CVector& scale);
@@ -263,6 +274,12 @@ public:
     void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance);
     void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode);
     void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode);
+    void SetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool bUseCustomOpacity);
+    void GetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool& bUseCustomOpacity);
+    void SetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort usOpacity);
+    void GetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort& usOpacity);
+    void SetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fFadeDistance);
+    void GetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fFadeDistance);
 
     float GetUnitScaleFactor() { return m_fUnitScaleFactor; }
 
@@ -325,7 +342,7 @@ public:
     D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
     IDirect3DVertexDeclaration9* GetVertexDeclaration(eVertexType index) { return m_pVertexDeclaration[index]; }
     void                         SetDevelopmentModeEnabled(bool bEnabled) { m_pDevelopmentModeEnabled = bEnabled; }
-    bool                         GetDevelopmentModeEnabled() { return m_pDevelopmentModeEnabled; }
+    bool                         GetDevelopmentModeEnabled() { return m_pDevelopmentModeEnabled && GetShowFBXEnabled(); }
     void                         SetShowFBXEnabled(bool bEnabled) { m_pShowFBX = bEnabled; }
     bool                         GetShowFBXEnabled() { return m_pShowFBX; }
     CTextureItem*                GetBlankTexture() { return m_pBlankTexture; }
@@ -338,8 +355,8 @@ private:
     float                        m_globalLighting;            // how bright are objects, 0.0f - 1.0f
     D3DXMATRIX*                  m_pMatrixUVFlip;
     CFrustum*                    m_pFrustum;
-    bool                         m_pShowFBX;
-    bool                         m_pDevelopmentModeEnabled;
+    bool                         m_pShowFBX = false;
+    bool                         m_pDevelopmentModeEnabled = false;
     CMatrix                      m_pCameraMatrix;
     IDirect3DVertexDeclaration9* m_pVertexDeclaration[eVertexType::COUNT];
     CTextureItem*                m_pBlankTexture;            // used if original doesn't exists and is enabled

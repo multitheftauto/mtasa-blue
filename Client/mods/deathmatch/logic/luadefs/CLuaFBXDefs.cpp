@@ -24,6 +24,7 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxSetTemplateProperties", FBXSetTemplateProperties},
         {"fbxGetTemplateModelProperties", FBXGetTemplateModelProperties},
         {"fbxSetTemplateModelProperties", FBXSetTemplateModelProperties},
+        {"fbxTemplateExists", FBXTemplateExists},
         {"fbxAddTemplate", FBXAddTemplate},
         {"fbxRemoveTemplate", FBXRemoveTemplate},
         {"fbxTemplateAddModel", FBXTemplateAddModel},
@@ -449,6 +450,33 @@ int CLuaFBXDefs::FBXTemplateAddModel(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFBXDefs::FBXTemplateExists(lua_State* luaVM)
+{
+    CClientFBX*      pFBX;
+    unsigned int     uiTemplate;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiTemplate);
+
+    if (!argStream.HasErrors())
+    {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        lua_pushboolean(luaVM, pFBX->IsTemplateValid(uiTemplate));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFBXDefs::FBXAddTemplate(lua_State* luaVM)
 {
     CClientFBX*      pFBX;
@@ -496,10 +524,10 @@ int CLuaFBXDefs::FBXRemoveTemplate(lua_State* luaVM)
             lua_pushboolean(luaVM, false);
             return 1;
         }
-        unsigned int uiTemplateId;
-        if (pFBX->AddTemplate(uiTemplate, uiTemplateId))
+
+        if (pFBX->RemoveTemplate(uiTemplate))
         {
-            lua_pushnumber(luaVM, uiTemplateId);
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
@@ -698,19 +726,25 @@ int CLuaFBXDefs::FBXRenderTemplate(lua_State* luaVM)
     argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
     argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
-
+    
     if (!argStream.HasErrors())
     {
-        if (!pFBX->IsLoaded())
+        if (pFBX->IsLoaded())
         {
-            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
-            lua_pushboolean(luaVM, false);
-            return 1;
+            if (pFBX->IsTemplateValid(uiTemplateId))
+            {
+                pFBX->RenderTemplate(uiTemplateId, vecPosition, vecRotation, vecScale);
+                lua_pushboolean(luaVM, true);
+            }
+            else
+                m_pScriptDebugging->LogCustom(luaVM, SString("Template id %i doesn't exists", uiTemplateId).c_str());
         }
-        pFBX->RenderTemplate(uiTemplateId, vecPosition, vecRotation, vecScale);
-        lua_pushboolean(luaVM, true);
+        else
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed

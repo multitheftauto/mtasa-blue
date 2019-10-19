@@ -64,7 +64,7 @@ public:
                             unsigned int& uiObjectId);
     bool RemoveObjectToTemplate(unsigned int uiId, unsigned int& uiObjectId);
     bool AddTemplate(unsigned int uiCopyFromTemplateId, unsigned int& uiNewTemplateId);
-    void RemoveTemplate(unsigned int uiTemplateId);
+    bool RemoveTemplate(unsigned int uiTemplateId);
     bool RenderTemplate(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale);
     bool ApplyTemplateToElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
     bool RemoveTemplateFromElement(unsigned int uiTemplateId, CDeathmatchObject* pElement);
@@ -78,6 +78,8 @@ public:
     void           GetTemplatesRenderingMatrix(std::unordered_map<unsigned long long, std::vector<CMatrix>>& templatesMatrix, unsigned char ucInterior,
                                                unsigned short usDimension);
     unsigned short                                               GetPlayerDimension();
+    bool           IsTemplateValid(unsigned int uiTemplateId);
+
     CBuffer* GetBuffer() { return m_RawDataBuffer; }
 
 private:

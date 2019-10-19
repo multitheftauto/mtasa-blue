@@ -80,13 +80,19 @@ public:
     virtual void SetTemplateModelDrawDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fDrawDistance) = 0;
     virtual void SetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode cullMode) = 0;
     virtual void GetTemplateModelCullMode(unsigned int uiTemplateId, unsigned int uiModelId, eCullMode& cullMode) = 0;
+    virtual void SetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool bUseCustomOpacity) = 0;
+    virtual void GetTemplateModelUseCustomOpacity(unsigned int uiTemplateId, unsigned int uiModelId, bool& bUseCustomOpacity) = 0;
+    virtual void SetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort usOpacity) = 0;
+    virtual void GetTemplateModelOpacity(unsigned int uiTemplateId, unsigned int uiModelId, ushort& usOpacity) = 0;
+    virtual void SetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float fFadeDistance) = 0;
+    virtual void GetTemplateModelFadeDistance(unsigned int uiTemplateId, unsigned int uiModelId, float& fFadeDistance) = 0;
 
     virtual float GetUnitScaleFactor() = 0;
 
     virtual const ofbx::Object* const* GetObjectById(long long int ulId) = 0;
     virtual unsigned int               AddMeshToTemplate(unsigned int uiTemplate, unsigned long long uiModelId) = 0;
     virtual unsigned int               CreateTemplate() = 0;
-    virtual void                       RemoveTemplate(unsigned int uiTemplateId) = 0;
+    virtual bool                       RemoveTemplate(unsigned int uiTemplateId) = 0;
     virtual bool                       RemoveObjectFromTemplate(unsigned int uiTemplate, unsigned int uiObjectId) = 0;
     virtual void                       AddToRenderQueue(unsigned int uiTemplateId, CVector vecPosition, CVector vecRotation, CVector vecScale) = 0;
     virtual bool                       GetBoundingBox(unsigned long long ullObjectId, CVector& min, CVector& max, float& fRadius) = 0;
