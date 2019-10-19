@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CVector.h"
-#include "d3d9types.h"
 
 /**
  * Contains full positional data for a point
@@ -27,15 +26,6 @@ public:
         vFront = CVector(0.0f, 1.0f, 0.0f);
         vUp = CVector(0.0f, 0.0f, 1.0f);
         vPos = CVector(0.0f, 0.0f, 0.0f);
-    }
-    
-    CMatrix(const D3DMATRIX& matrix)
-    {
-        // Load the identity matrix
-        vRight = CVector(matrix._11, matrix._12, matrix._13);
-        vFront = CVector(matrix._21, matrix._22, matrix._23);
-        vUp = CVector(matrix._31, matrix._32, matrix._33);
-        vPos = CVector(matrix._41, matrix._42, matrix._43);
     }
 
     CMatrix(float floats[16])

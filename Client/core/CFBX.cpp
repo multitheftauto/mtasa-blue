@@ -339,7 +339,7 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             pDevice->MultiplyTransform(D3DTS_WORLDMATRIX(0), m_pObjectMatrix);
             pDevice->GetTransform(D3DTS_WORLDMATRIX(0), &pTempMatrix);
 
-            pTemplateObjectMatrix = CMatrix(pTempMatrix);
+            pTemplateObjectMatrix = CMatrix((float*)&pTempMatrix.m);
 
             fDrawDistance = object.second->GetDrawDistance();
             float fCameraDistance = (pTemplateObjectMatrix.GetPosition() - vecCameraPosition).Length();
