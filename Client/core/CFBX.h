@@ -193,20 +193,28 @@ public:
     unsigned int AddTemplateObject(CFBXTemplateObject* pObject);
     bool         RemoveObject(unsigned int uiObject);
 
-    void SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
-    void SetRotation(CVector& rotation) const { m_pViewMatrix->SetRotation(rotation); };
-    void SetScale(CVector& scale) const { m_pViewMatrix->SetScale(scale); };
-    void SetDrawDistance(float fDrawDistance) { m_fDrawDistance = fDrawDistance; };
-    void GetPosition(CVector& position) const { position = m_pViewMatrix->GetPosition(); };
-    void GetRotation(CVector& rotation) const { rotation = m_pViewMatrix->GetRotation(); };
-    void GetScale(CVector& scale) const { scale = m_pViewMatrix->GetScale(); };
+    void  SetPosition(CVector& position) const { m_pViewMatrix->SetPosition(position); };
+    void  SetRotation(CVector& rotation) const { m_pViewMatrix->SetRotation(rotation); };
+    void  SetScale(CVector& scale) const { m_pViewMatrix->SetScale(scale); };
+    void  SetDrawDistance(float fDrawDistance) { m_fDrawDistance = fDrawDistance; };
+    void  GetPosition(CVector& position) const { position = m_pViewMatrix->GetPosition(); };
+    void  GetRotation(CVector& rotation) const { rotation = m_pViewMatrix->GetRotation(); };
+    void  SetVisibleInAllDimensions(bool bVisible) { m_bRenderInAllDimensions = bVisible; };
+    void  GetVisibleInAllDimensions(bool& bVisible) const { bVisible = m_bRenderInAllDimensions; };
+    void  SetVisibleInAllInteriors(bool bVisible) { m_bRenderInAllInteriors = bVisible; };
+    void  GetVisibleInAllInteriors(bool& bVisible) const { bVisible = m_bRenderInAllInteriors; };
+    void  SetVisibleInInteriors(std::vector<uchar>& interiorsList);
+    void  GetVisibleInInteriors(std::vector<uchar>& interiorsList);
+    void  SetVisibleInDimensions(std::vector<ushort>& dimensionsList);
+    void  GetVisibleInDimensions(std::vector<ushort>& dimensionsList);
+    void  GetScale(CVector& scale) const { scale = m_pViewMatrix->GetScale(); };
     float GetDrawDistance() { return m_fDrawDistance; };
 
     CFBXTemplateObject* GetObjectById(unsigned int uiModelId) { return IsModelValid(uiModelId) ? m_objectMap[uiModelId] : nullptr; }
     std::unordered_map<unsigned int, CFBXTemplateObject*> GetObjectsMap() { return m_objectMap; }
     bool                                                  IsModelValid(unsigned int uiModelId) { return m_objectMap.count(uiModelId) != 0; }
-    unsigned int                                          GetInterior() { return m_uiInterior; };
-    unsigned int                                          GetDimension() { return m_uiDimension; };
+    bool                                                  IsVisibleInInterior(uchar const ucInterior);
+    bool                                                  IsVisibleInDimension(ushort const ucDimension);
     CMatrix*                                              GetViewMatrix() const { return m_pViewMatrix; };
     CFBXBoundingBox*                                      GetBoundingBox() const { return m_pBoundingBox; };
     void                                                  GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix);
@@ -216,14 +224,16 @@ private:
     void UpdateBoundingBox();
 
     std::unordered_map<unsigned int, CFBXTemplateObject*> m_objectMap;
-    unsigned int                                          m_uiInterior = 0;
-    unsigned int                                          m_uiDimension = 0;
     float                                                 m_fDrawDistance = 10000.0f;
     unsigned int                                          m_uiNextFreeObjectId = 1;
     CMatrix*                                              m_pViewMatrix;
     D3DMATRIX*                                            m_pObjectMatrix;
     CMatrix*                                              m_pCameraMatrix;
     CFBXBoundingBox*                                      m_pBoundingBox;
+    std::unordered_set<ushort>                            m_DimensionSet;
+    std::unordered_set<uchar>                             m_InteriorSet;
+    bool                                                  m_bRenderInAllDimensions;
+    bool                                                  m_bRenderInAllInteriors;
 };
 
 class CFBXScene : public CFBXSceneInterface
@@ -260,6 +270,14 @@ public:
     void SetTemplateScale(unsigned int uiTemplateId, CVector& scale);
     void SetTemplatePosition(unsigned int uiTemplateId, CVector& position);
     void SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation);
+    void SetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool bVisible);
+    void GetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool& bVisible);
+    void SetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool bVisible);
+    void GetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool& bVisible);
+    void SetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList);
+    void GetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList);
+    void SetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList);
+    void GetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList);
     void GetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale);
     void GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position);
     void GetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation);

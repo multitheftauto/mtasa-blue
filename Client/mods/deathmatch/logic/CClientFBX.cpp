@@ -211,8 +211,12 @@ bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, e
         return false;
     }
 
-    CVector vector;
-    float   distance;
+    CVector             vector;
+    float               distance;
+    bool                boolean;
+    std::vector<ushort> dimensionList;
+    std::vector<uchar>  interiorList;
+    int                 i = 0;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -257,6 +261,34 @@ bool CClientFBX::LuaGetTemplateProperties(lua_State* luaVM, unsigned int uiId, e
         case FBX_TEMPLATE_PROPERTY_DRAW_DISTANCE:
             m_pFBXScene->GetTemplateDrawDistance(uiId, distance);
             lua_pushnumber(luaVM, distance);
+            break;
+        case FBX_TEMPLATE_PROPERTY_VISIBLE_IN_ALL_INTERIORS:
+            m_pFBXScene->GetTemplateVisibleInAllInteriors(uiId, boolean);
+            lua_pushboolean(luaVM, boolean);
+            break;
+        case FBX_TEMPLATE_PROPERTY_VISIBLE_IN_ALL_DIMENSIONS:
+            m_pFBXScene->GetTemplateVisibleInAllDimensions(uiId, boolean);
+            lua_pushboolean(luaVM, boolean);
+            break;
+        case FBX_TEMPLATE_PROPERTY_INTERIORS:
+            m_pFBXScene->GetTemplateVisibleInInteriors(uiId, interiorList);
+            lua_newtable(luaVM);
+            for (auto const& id : interiorList)
+            {
+                lua_pushnumber(luaVM, ++i);
+                lua_pushnumber(luaVM, id);
+                lua_settable(luaVM, -3);
+            }
+            break;
+        case FBX_TEMPLATE_PROPERTY_DIMENSIONS:
+            m_pFBXScene->GetTemplateVisibleInDimensions(uiId, dimensionList);
+            lua_newtable(luaVM);
+            for (auto const& id : dimensionList)
+            {
+                lua_pushnumber(luaVM, ++i);
+                lua_pushnumber(luaVM, id);
+                lua_settable(luaVM, -3);
+            }
             break;
     }
     return true;
@@ -410,8 +442,12 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
         return false;
     }
 
-    CVector vector;
-    float   fDrawDistance;
+    CVector             vector;
+    float               fDrawDistance;
+    bool                boolean;
+    int                 iNumber;
+    std::vector<ushort> dimensionList;
+    std::vector<uchar>  interiorList;
     switch (eProperty)
     {
         case FBX_TEMPLATE_PROPERTY_POSITION:
@@ -436,6 +472,53 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
             if (argStream.HasErrors())
                 return false;
             m_pFBXScene->SetTemplateDrawDistance(uiId, fDrawDistance);
+            break;
+        case FBX_TEMPLATE_PROPERTY_VISIBLE_IN_ALL_INTERIORS:
+            argStream.ReadBool(boolean);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateVisibleInAllInteriors(uiId, boolean);
+            break;
+
+        case FBX_TEMPLATE_PROPERTY_VISIBLE_IN_ALL_DIMENSIONS:
+            argStream.ReadNumber(boolean);
+            if (argStream.HasErrors())
+                return false;
+            m_pFBXScene->SetTemplateVisibleInAllDimensions(uiId, boolean);
+            break;
+
+        case FBX_TEMPLATE_PROPERTY_INTERIORS:
+            while (argStream.NextIsNumber())
+            {
+                argStream.ReadNumber(iNumber);
+                if (iNumber >= 0 && iNumber <= 255)
+                {
+                    interiorList.push_back((uchar)iNumber);
+                }
+                else
+                {
+                    argStream.SetCustomError(SString("Interior id %i is invalid", iNumber));
+                    return false;
+                }
+            }
+            m_pFBXScene->SetTemplateVisibleInInteriors(uiId, interiorList);
+            break;
+
+        case FBX_TEMPLATE_PROPERTY_DIMENSIONS:
+            while (argStream.NextIsNumber())
+            {
+                argStream.ReadNumber(iNumber);
+                if (iNumber >= 0 && iNumber <= 65535)
+                {
+                    dimensionList.push_back((ushort)iNumber);
+                }
+                else
+                {
+                    argStream.SetCustomError(SString("Interior id %i is invalid", iNumber));
+                    return false;
+                }
+            }
+            m_pFBXScene->SetTemplateVisibleInDimensions(uiId, dimensionList);
             break;
     }
     return true;
@@ -983,7 +1066,7 @@ bool CClientFBX::LuaRawGetVertices(lua_State* luaVM, const ofbx::Object* const* 
 {
     const ofbx::Mesh* const* pMesh = (const ofbx::Mesh* const*)pObject;
     const ofbx::Geometry*    pGeometry = (*pMesh)->getGeometry();
-    const CVector*        pVertex;
+    const CVector*           pVertex;
 
     lua_newtable(luaVM);
 
@@ -1057,8 +1140,8 @@ unsigned short CClientFBX::GetPlayerDimension()
 void CClientFBX::GetTemplatesRenderingMatrix(std::unordered_map<unsigned long long, std::vector<CMatrix>>& templatesMatrix, unsigned char ucInterior,
                                              unsigned short usDimension)
 {
-    CVector                                                      scale;
-    std::vector<CClientObject*>                                  vecObjects;
+    CVector                     scale;
+    std::vector<CClientObject*> vecObjects;
 
     for (const auto& pair : m_mapElementRenderLoop)
     {

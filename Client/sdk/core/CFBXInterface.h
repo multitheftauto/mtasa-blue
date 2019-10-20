@@ -68,6 +68,14 @@ public:
     virtual void SetTemplatePosition(unsigned int uiTemplateId, CVector& position) = 0;
     virtual void SetTemplateRotation(unsigned int uiTemplateId, CVector& rotation) = 0;
     virtual void SetTemplateScale(unsigned int uiTemplateId, CVector& scale) = 0;
+    virtual void SetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool bVisible) = 0;
+    virtual void GetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool& bVisible) = 0;
+    virtual void SetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool bVisible) = 0;
+    virtual void GetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool& bVisible) = 0;
+    virtual void SetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList) = 0;
+    virtual void GetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList) = 0;
+    virtual void SetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList) = 0;
+    virtual void GetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList) = 0;
     virtual void GetTemplateModelScale(unsigned int uiTemplateId, unsigned int uiModelId, CVector& scale) = 0;
     virtual void GetTemplateModelPosition(unsigned int uiTemplateId, unsigned int uiModelId, CVector& position) = 0;
     virtual void GetTemplateModelRotation(unsigned int uiTemplateId, unsigned int uiModelId, CVector& rotation) = 0;

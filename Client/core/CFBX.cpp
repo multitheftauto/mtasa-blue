@@ -347,7 +347,7 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             pDevice->SetTextureStageState(3, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
             pDevice->SetTextureStageState(3, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
             pDevice->SetTextureStageState(3, D3DTSS_ALPHAARG2, D3DTA_CONSTANT);
-            pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, D3DCOLOR_ARGB(object.second->GetOpacityFromDistance(fCameraDistance), 255,255,255));
+            pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, D3DCOLOR_ARGB(object.second->GetOpacityFromDistance(fCameraDistance), 255, 255, 255));
 
             if (fCameraDistance < fDrawDistance)
             {
@@ -428,6 +428,8 @@ CFBXTemplate::CFBXTemplate()
     m_pObjectMatrix = new D3DMATRIX();
     m_pCameraMatrix = new CMatrix();
     m_pBoundingBox = new CFBXBoundingBox();
+    m_DimensionSet.insert(0);
+    m_InteriorSet.insert(0);
 }
 
 CFBXTemplate::~CFBXTemplate()
@@ -464,6 +466,50 @@ void CFBXTemplate::GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& 
 {
     CFBXBoundingBox* pBoundingBox = GetBoundingBox();
     pBoundingBox->GetBoundingBoxCornersByMatrix(vecCorner, matrix);
+}
+
+bool CFBXTemplate::IsVisibleInInterior(uchar const ucInterior)
+{
+    if (m_bRenderInAllInteriors)
+        return true;
+
+    return m_DimensionSet.find(ucInterior) != m_DimensionSet.end();
+}
+
+bool CFBXTemplate::IsVisibleInDimension(ushort const ucDimension)
+{
+    if (m_bRenderInAllDimensions)
+        return true;
+
+    return m_InteriorSet.find(ucDimension) != m_InteriorSet.end();
+}
+
+void CFBXTemplate::SetVisibleInInteriors(std::vector<uchar>& interiorsList)
+{
+    m_InteriorSet.clear();
+    for (uchar id : interiorsList)
+        m_InteriorSet.insert(id);
+}
+
+void CFBXTemplate::GetVisibleInInteriors(std::vector<uchar>& interiorsList)
+{
+    interiorsList.clear();
+    for (const auto& elem : m_InteriorSet)
+        interiorsList.push_back(elem);
+}
+
+void CFBXTemplate::SetVisibleInDimensions(std::vector<ushort>& dimensionsList)
+{
+    m_DimensionSet.clear();
+    for (uchar id : dimensionsList)
+        m_DimensionSet.insert(id);
+}
+
+void CFBXTemplate::GetVisibleInDimensions(std::vector<ushort>& dimensionsList)
+{
+    dimensionsList.clear();
+    for (const auto& elem : m_DimensionSet)
+        dimensionsList.push_back(elem);
 }
 
 void CFBXTemplate::UpdateBoundingBox()
@@ -994,6 +1040,9 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVecto
     CMatrix          matrix;
     CVector          vecPosition;
 
+    unsigned short usDimension = m_pClientFBXInterface->GetPlayerDimension();
+    unsigned char  ucInterior = static_cast<unsigned char>(g_pCore->GetGame()->GetWorld()->GetCurrentArea());
+
     pTemplate->GetPosition(vecTemplatePosition);
     fDrawDistance = pTemplate->GetDrawDistance();
 
@@ -1002,19 +1051,22 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVecto
     vecPosition = pMatrix.GetPosition() + vecTemplatePosition;
     if ((vecPosition - vecCameraPosition).LengthSquared() < fDrawDistance * fDrawDistance)
     {
-        pBoundingBox = pTemplate->GetBoundingBox();
-        if (g_pCore->GetFBX()->CheckCulling(pBoundingBox, &matrix))
+        if (pTemplate->IsVisibleInDimension(usDimension) && pTemplate->IsVisibleInInterior(ucInterior))
         {
-            matrix.GetBuffer(reinterpret_cast<float*>(&m_ObjectMatrix));
-            if (pTemplate->Render(m_pDevice, this, m_ObjectMatrix))
+            pBoundingBox = pTemplate->GetBoundingBox();
+            if (g_pCore->GetFBX()->CheckCulling(pBoundingBox, &matrix))
             {
-                if (bRenderDebug)
+                matrix.GetBuffer(reinterpret_cast<float*>(&m_ObjectMatrix));
+                if (pTemplate->Render(m_pDevice, this, m_ObjectMatrix))
                 {
-                    CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
-                    CFBXDebugging::DrawDebuggingInformation(pTemplate, matrix);
+                    if (bRenderDebug)
+                    {
+                        CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
+                        CFBXDebugging::DrawDebuggingInformation(pTemplate, matrix);
+                    }
                 }
+                return true;
             }
-            return true;
         }
     }
     return false;
@@ -1071,6 +1123,54 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
     }
     ListClearAndReserve(m_vecTemporaryRenderLoop);
     return renderedAtLeastOneTemplate;
+}
+
+void CFBXScene::SetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool bVisible)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetVisibleInAllInteriors(bVisible);
+}
+
+void CFBXScene::GetTemplateVisibleInAllInteriors(unsigned int uiTemplateId, bool& bVisible)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetVisibleInAllInteriors(bVisible);
+}
+
+void CFBXScene::SetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool bVisible)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetVisibleInAllDimensions(bVisible);
+}
+
+void CFBXScene::GetTemplateVisibleInAllDimensions(unsigned int uiTemplateId, bool& bVisible)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetVisibleInAllDimensions(bVisible);
+}
+
+void CFBXScene::SetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetVisibleInInteriors(interiorsList);
+}
+
+void CFBXScene::GetTemplateVisibleInInteriors(unsigned int uiTemplateId, std::vector<uchar>& interiorsList)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetVisibleInInteriors(interiorsList);
+}
+
+void CFBXScene::SetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->SetVisibleInDimensions(dimensionsList);
+}
+
+void CFBXScene::GetTemplateVisibleInDimensions(unsigned int uiTemplateId, std::vector<ushort>& dimensionsList)
+{
+    CFBXTemplate* pTemplate = m_templateMap[uiTemplateId];
+    pTemplate->GetVisibleInDimensions(dimensionsList);
 }
 
 void CFBXScene::GetTemplatePosition(unsigned int uiTemplateId, CVector& position)
