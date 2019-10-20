@@ -110,6 +110,13 @@ enum eFBXDataType
 };
 DECLARE_ENUM(eFBXDataType);
 
+enum eFBXProperty
+{
+    FBX_PROPERTY_DIFFUSE,
+    FBX_DATA_TYPE_INDEX,
+};
+DECLARE_ENUM(eFBXDataType);
+
 enum eFBXTemplateProperty
 {
     FBX_TEMPLATE_PROPERTY_POSITION,

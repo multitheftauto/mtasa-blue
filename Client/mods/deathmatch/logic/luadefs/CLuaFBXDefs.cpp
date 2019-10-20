@@ -37,6 +37,10 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxGetAllTextures", FBXGetAllTextures},
         {"fbxGetObjectRawData", FBXGetObjectRawData},
 
+        
+        {"fbxGetGlobalProperties", FBXGetGlobalProperties},
+        {"fbxSetGlobalProperties", FBXSetGlobalProperties},
+
     };
 
     // Add functions
@@ -317,6 +321,58 @@ int CLuaFBXDefs::FBXGetTemplateProperties(lua_State* luaVM)
 }
 
 int CLuaFBXDefs::FBXSetTemplateProperties(lua_State* luaVM)
+{
+    CClientFBX*          pFBX;
+    unsigned int         uiId;
+    eFBXTemplateProperty eProperty;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadUserData(pFBX);
+    argStream.ReadNumber(uiId);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (!pFBX->IsLoaded())
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        if (pFBX->LuaSetTemplateProperties(luaVM, argStream, uiId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXSetGlobalProperties(lua_State* luaVM)
+{
+    eFBXTemplateProperty eProperty;
+    CScriptArgReader     argStream(luaVM);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pFBX(luaVM, uiId, eProperty))
+        {
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFBXDefs::FBXGetGlobalProperties(lua_State* luaVM)
 {
     CClientFBX*          pFBX;
     unsigned int         uiId;
