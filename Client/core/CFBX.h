@@ -22,12 +22,19 @@ enum eVertexType
     COUNT,
 };
 
+// how template got rendered
+enum eRenderType
+{
+    RENDER_TYPE_FREELY,             // by fbxRenderTemplate
+    RENDER_TYPE_APPLY,              // by fbxApplyTemplateToModel or Element
+};
+
 static class CFBXDebugging
 {
 public:
     static void DrawBoundingBox(CFBXBoundingBox* pBoundingBox, CMatrix& matrix, SColorRGBA color = SColorRGBA(255, 0, 0, 255), float fLineWidth = 2.0f);
     static void DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix);
-    static void DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix);
+    static void DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix, eRenderType renderType);
     static void DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject, CMatrix& matrix);
     static void AddRenderedTemplate() { iRenderedTemplates++; };
     static void AddRenderedObject() { iRenderedObjects++; };
@@ -42,6 +49,8 @@ public:
     static int iRenderedTemplates;
     static int iRenderedObjects;
     static int iRenderedScenes;
+
+    static char szDebug[512];
 };
 
 class CFBXTextureSet
@@ -142,19 +151,19 @@ public:
         m_pViewMatrix->SetScale(scale);
         UpdateBoundingBox();
     };
-    void               SetDrawDistance(float fDrawDistance) { this->m_fDrawDistance = fDrawDistance; };
-    void               GetPosition(CVector& position) { position = m_pViewMatrix->GetPosition(); };
-    void               GetRotation(CVector& rotation) { rotation = m_pViewMatrix->GetRotation(); };
-    void               GetScale(CVector& scale) { scale = m_pViewMatrix->GetScale(); };
-    float              GetDrawDistance() { return m_fDrawDistance; };
-    void               SetCullMode(eCullMode cullMode) { m_eCullMode = cullMode; };
-    void               GetCullMode(eCullMode& cullMode) { cullMode = m_eCullMode; };
-    void               SetUseCustomOpacity(bool bUseCustomOpacity) { m_bUseCustomOpacity = bUseCustomOpacity; };
-    void               GetUseCustomOpacity(bool& bUseCustomOpacity) { bUseCustomOpacity = this->m_bUseCustomOpacity; };
-    void               SetOpacity(ushort usOpacity) { m_usOpacity = usOpacity; };
-    void               GetOpacity(ushort& usOpacity) { usOpacity = m_usOpacity; };
-    void               SetFadeDistance(float fFadeDistance) { m_fFadeDistance = fFadeDistance; };
-    void               GetFadeDistance(float& fFadeDistance) { fFadeDistance = m_fFadeDistance; };
+    void  SetDrawDistance(float fDrawDistance) { this->m_fDrawDistance = fDrawDistance; };
+    void  GetPosition(CVector& position) { position = m_pViewMatrix->GetPosition(); };
+    void  GetRotation(CVector& rotation) { rotation = m_pViewMatrix->GetRotation(); };
+    void  GetScale(CVector& scale) { scale = m_pViewMatrix->GetScale(); };
+    float GetDrawDistance() { return m_fDrawDistance; };
+    void  SetCullMode(eCullMode cullMode) { m_eCullMode = cullMode; };
+    void  GetCullMode(eCullMode& cullMode) { cullMode = m_eCullMode; };
+    void  SetUseCustomOpacity(bool bUseCustomOpacity) { m_bUseCustomOpacity = bUseCustomOpacity; };
+    void  GetUseCustomOpacity(bool& bUseCustomOpacity) { bUseCustomOpacity = this->m_bUseCustomOpacity; };
+    void  SetOpacity(ushort usOpacity) { m_usOpacity = usOpacity; };
+    void  GetOpacity(ushort& usOpacity) { usOpacity = m_usOpacity; };
+    void  SetFadeDistance(float fFadeDistance) { m_fFadeDistance = fFadeDistance; };
+    void  GetFadeDistance(float& fFadeDistance) { fFadeDistance = m_fFadeDistance; };
 
     unsigned long long GetObjectId() { return m_ullObjectId; };
     void               GetMatrix(D3DMATRIX* pMatrix) { m_pViewMatrix->GetBuffer((float*)pMatrix); };
@@ -220,6 +229,7 @@ public:
     void                                                  GetBoundingBoxCornersByMatrix(CVector vecCorner[8], CMatrix& matrix);
 
     unsigned int m_uiTemplateId;
+
 private:
     void UpdateBoundingBox();
 
@@ -253,7 +263,7 @@ public:
     void             GetAllTemplatesIds(std::vector<unsigned int>& vecIds);
     bool             GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsigned int uiTemplateId);
     bool             RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVector& vecCameraPosition);
-    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition);
+    bool             RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition, eRenderType renderType);
     FBXObjectBuffer* GetFBXBuffer(unsigned long long ullId);
     unsigned int     AddTemplete(CFBXTemplate* pTemplate);
     CTextureItem*    GetTexture(const ofbx::Texture* pTexture);
@@ -334,9 +344,9 @@ private:
     D3DMATRIX                                                                 m_ObjectMatrix;
     CMatrix                                                                   m_CameraMatrix;
 
-    IDirect3DDevice9*                                                         m_pDevice;
+    IDirect3DDevice9* m_pDevice;
 
-    bool                                                                      bRenderDebug;
+    bool bRenderDebug;
 };
 
 class CFBX : public CFBXInterface

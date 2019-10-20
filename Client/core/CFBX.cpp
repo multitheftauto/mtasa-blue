@@ -12,9 +12,10 @@
 #include "StdInc.h"
 #include "d3dx9mesh.h"
 
-int CFBXDebugging::iRenderedTemplates = 0;
-int CFBXDebugging::iRenderedObjects = 0;
-int CFBXDebugging::iRenderedScenes = 0;
+int  CFBXDebugging::iRenderedTemplates = 0;
+int  CFBXDebugging::iRenderedObjects = 0;
+int  CFBXDebugging::iRenderedScenes = 0;
+char CFBXDebugging::szDebug[512] = "";
 
 void CFBXDebugging::Start()
 {
@@ -78,7 +79,7 @@ void CFBXDebugging::DrawBoundingBox(CFBXTemplate* pTemplate, CMatrix& matrix)
     DrawBoundingBox(pTemplate->GetBoundingBox(), matrix * *pTemplate->GetViewMatrix());
 }
 
-void CFBXDebugging::DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix)
+void CFBXDebugging::DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& matrix, eRenderType renderType)
 {
     CMatrix templateMatrix = matrix * *pTemplate->GetViewMatrix();
     CVector vecWorld = templateMatrix.GetPosition();
@@ -87,23 +88,25 @@ void CFBXDebugging::DrawDebuggingInformation(CFBXTemplate* pTemplate, CMatrix& m
 
     if (GetScreenFromWorldPosition(vecWorld, vecScreen, 0, true))
     {
-        SString strDebugInfo(
-            "Template id: %i\n"
-            "Draw distance: %.2f"
-            "",
-            pTemplate->m_uiTemplateId, pTemplate->GetDrawDistance());
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, strDebugInfo.c_str(), 1, 1,
-                                                 DT_NOCLIP, NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFFFF0000, strDebugInfo.c_str(), 1, 1, DT_NOCLIP,
-                                                 NULL, true);
+        const char* szRenderType;
+        switch (renderType)
+        {
+            case RENDER_TYPE_FREELY:
+                szRenderType = "free";
+                break;
+            case RENDER_TYPE_APPLY:
+                szRenderType = "apply";
+                break;
+        }
+        
+        snprintf(szDebug, 512, "T id: %i\nDDis: %.2f\nRender type: %s", pTemplate->m_uiTemplateId, pTemplate->GetDrawDistance(), szRenderType);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 2, vecScreen.fY + 2, vecScreen.fX + 2, vecScreen.fY + 2, 0xFF000000, szDebug, 1.5f, 1.5f, DT_NOCLIP,
+                                                 g_pCore->GetGraphics()->GetFont(FONT_SANS), false);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFFFF0000, szDebug, 1.5f, 1.5f, DT_NOCLIP,
+                                                 g_pCore->GetGraphics()->GetFont(FONT_SANS), false);
     }
 }
+
 void CFBXDebugging::DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject, CMatrix& matrix)
 {
     CVector vecWorld = matrix.GetPosition();
@@ -113,19 +116,13 @@ void CFBXDebugging::DrawDebuggingInformation(CFBXTemplateObject* pTemplateObject
 
     if (GetScreenFromWorldPosition(vecWorld, vecScreen, 0, true))
     {
-        char szDebug[512] = "";
-        snprintf(szDebug, 512, "Object id: %lu\nIndex: %i\nDraw distance: %.2f", pTemplateObject->GetObjectId(), pTemplateObject->m_indexId,
+        snprintf(szDebug, 512, "O id: %llu\nIndex: %i\nDDis: %.2f", pTemplateObject->GetObjectId(), pTemplateObject->m_indexId,
                  pTemplateObject->GetDrawDistance());
 
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY - 1, vecScreen.fX - 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
-                                                 NULL, true);
         g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY + 1, vecScreen.fX + 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
-                                                 NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX - 1, vecScreen.fY + 1, vecScreen.fX - 1, vecScreen.fY + 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
-                                                 NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX + 1, vecScreen.fY - 1, vecScreen.fX + 1, vecScreen.fY - 1, 0xFF000000, szDebug, 1, 1, DT_NOCLIP,
-                                                 NULL, true);
-        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFF00FF00, szDebug, 1, 1, DT_NOCLIP, NULL, true);
+                                                 g_pCore->GetGraphics()->GetFont(FONT_SANS), true);
+        g_pCore->GetGraphics()->DrawStringQueued(vecScreen.fX, vecScreen.fY, vecScreen.fX, vecScreen.fY, 0xFF00FF00, szDebug, 1, 1, DT_NOCLIP,
+                                                 g_pCore->GetGraphics()->GetFont(FONT_SANS), true);
     }
 }
 
@@ -262,7 +259,6 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     bool             bRenderedAtLeastOneMesh = false;
     FBXObjectBuffer* pObjectBuffer;
     CFBXTextureSet*  pTextureSet;
-    float            fDrawDistance;
     D3DMATRIX        pTempMatrix;
     CMatrix          pTemplateObjectMatrix;
     CVector          vecTemplatePosition;
@@ -341,7 +337,6 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
 
             pTemplateObjectMatrix = CMatrix((float*)&pTempMatrix.m);
 
-            fDrawDistance = object.second->GetDrawDistance();
             float fCameraDistance = (pTemplateObjectMatrix.GetPosition() - vecCameraPosition).Length();
 
             pDevice->SetTextureStageState(3, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
@@ -349,7 +344,7 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
             pDevice->SetTextureStageState(3, D3DTSS_ALPHAARG2, D3DTA_CONSTANT);
             pDevice->SetTextureStageState(3, D3DTSS_CONSTANT, D3DCOLOR_ARGB(object.second->GetOpacityFromDistance(fCameraDistance), 255, 255, 255));
 
-            if (fCameraDistance < fDrawDistance)
+            if (fCameraDistance < object.second->GetDrawDistance())
             {
                 object.second->GetCullMode(cullMode);
                 pDevice->SetRenderState(D3DRS_CULLMODE, cullMode);
@@ -1030,7 +1025,7 @@ bool CFBXScene::GetAllTemplatesModelsIds(std::vector<unsigned int>& vecIds, unsi
     return true;
 }
 
-bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition)
+bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVector& vecCameraPosition, eRenderType renderType)
 {
     CVector          vecTemplatePosition;
     CVector          vecTemplateOffset;
@@ -1062,7 +1057,7 @@ bool CFBXScene::RenderTemplate(CFBXTemplate* pTemplate, CMatrix& pMatrix, CVecto
                     if (bRenderDebug)
                     {
                         CFBXDebugging::DrawBoundingBox(pTemplate, matrix);
-                        CFBXDebugging::DrawDebuggingInformation(pTemplate, matrix);
+                        CFBXDebugging::DrawDebuggingInformation(pTemplate, matrix, renderType);
                     }
                 }
                 return true;
@@ -1100,7 +1095,7 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
 
         vecPosition = renderItem.m_matrix.GetPosition();
         pTemplate = m_templateMap[renderItem.m_uiTemplateId];
-        if (RenderTemplate(pTemplate, (CMatrix&)renderItem.m_matrix, vecCameraPosition))
+        if (RenderTemplate(pTemplate, (CMatrix&)renderItem.m_matrix, vecCameraPosition, RENDER_TYPE_FREELY))
         {
             CFBXDebugging::AddRenderedTemplate();
             renderedAtLeastOneTemplate = true;
@@ -1114,7 +1109,7 @@ bool CFBXScene::RenderScene(IDirect3DDevice9* pDevice, CFrustum* pFrustum, CVect
         pTemplate = m_templateMap[pair.first];
         for (CMatrix matrix : pair.second)
         {
-            if (RenderTemplate(pTemplate, matrix, vecCameraPosition))
+            if (RenderTemplate(pTemplate, matrix, vecCameraPosition, RENDER_TYPE_APPLY))
             {
                 CFBXDebugging::AddRenderedTemplate();
                 renderedAtLeastOneTemplate = true;
