@@ -501,6 +501,10 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
                     return false;
                 }
             }
+
+            std::sort(interiorList.begin(), interiorList.end());
+            interiorList.erase(std::unique(interiorList.begin(), interiorList.end()), interiorList.end());
+
             m_pFBXScene->SetTemplateVisibleInInteriors(uiId, interiorList);
             break;
 
@@ -518,6 +522,10 @@ bool CClientFBX::LuaSetTemplateProperties(lua_State* luaVM, CScriptArgReader arg
                     return false;
                 }
             }
+
+            std::sort(dimensionList.begin(), dimensionList.end());
+            dimensionList.erase(std::unique(dimensionList.begin(), dimensionList.end()), dimensionList.end());
+
             m_pFBXScene->SetTemplateVisibleInDimensions(uiId, dimensionList);
             break;
     }
