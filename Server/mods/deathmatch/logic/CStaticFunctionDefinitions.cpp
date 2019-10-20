@@ -983,6 +983,14 @@ bool CStaticFunctionDefinitions::GetElementPosition(CElement* pElement, CVector&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementOffsetPosition(CElement* pElement, const CVector& vecOffset, CVector& vecPosition)
+{
+    CMatrix matrix;
+    pElement->GetMatrix(matrix);
+    vecPosition = matrix.TransformVector(vecOffset);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector& vecRotation, eEulerRotationOrder desiredRotOrder)
 {
     assert(pElement);

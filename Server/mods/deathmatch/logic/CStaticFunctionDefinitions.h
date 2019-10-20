@@ -48,6 +48,7 @@ public:
     static CElement*      GetElementParent(CElement* pElement);
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);
     static bool           GetElementPosition(CElement* pElement, CVector& vecPosition);
+    static bool           GetElementOffsetPosition(CElement* pElement, const CVector& vecOffset, CVector& vecPosition);
     static bool           GetElementRotation(CElement* pElement, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CElement* pElement, CVector& vecVelocity);
     static bool           GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity);

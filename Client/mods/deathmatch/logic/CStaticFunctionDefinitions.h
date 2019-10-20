@@ -56,6 +56,7 @@ public:
     static CClientEntity* GetElementChild(CClientEntity& Entity, unsigned int uiIndex);
     static bool           GetElementMatrix(CClientEntity& Entity, CMatrix& matrix);
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
+    static bool           GetElementOffsetPosition(CClientEntity& Entity, CVector vecOffset, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
     static bool           GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity);

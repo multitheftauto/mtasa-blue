@@ -30,6 +30,7 @@ public:
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);
+    LUA_DECLARE_OOP(GetElementOffsetPosition);
     LUA_DECLARE_OOP(GetElementRotation);
     LUA_DECLARE_OOP(GetElementVelocity);
     LUA_DECLARE_OOP(GetElementTurnVelocity);

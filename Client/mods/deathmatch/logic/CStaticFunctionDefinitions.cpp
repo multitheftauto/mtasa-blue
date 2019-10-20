@@ -369,6 +369,14 @@ bool CStaticFunctionDefinitions::GetElementPosition(CClientEntity& Entity, CVect
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementOffsetPosition(CClientEntity& Entity, CVector vecOffset, CVector& vecPosition)
+{
+    CMatrix matrix;
+    Entity.GetMatrix(matrix);
+    vecPosition = matrix.TransformVector(vecOffset);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder desiredRotOrder)
 {
     int iType = Entity.GetType();

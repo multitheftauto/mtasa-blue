@@ -25,6 +25,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementData", GetElementData},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
+        {"getElementOffsetPosition", GetElementOffsetPosition},
         {"getElementRotation", GetElementRotation},
         {"getElementVelocity", GetElementVelocity},
         {"getElementAngularVelocity", GetElementTurnVelocity},
@@ -142,6 +143,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getParent", "getElementParent");
     lua_classfunction(luaVM, "getBoundingBox", OOP_GetElementBoundingBox);
     lua_classfunction(luaVM, "getPosition", OOP_GetElementPosition);
+    lua_classfunction(luaVM, "getOffsetPosition", OOP_GetElementOffsetPosition);
     lua_classfunction(luaVM, "getRotation", OOP_GetElementRotation);
     lua_classfunction(luaVM, "getMatrix", OOP_GetElementMatrix);
     lua_classfunction(luaVM, "getVelocity", OOP_GetElementVelocity);
@@ -488,6 +490,64 @@ int CLuaElementDefs::GetElementPosition(lua_State* luaVM)
             lua_pushnumber(luaVM, vecPosition.fY);
             lua_pushnumber(luaVM, vecPosition.fZ);
             return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::GetElementOffsetPosition(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientEntity*   pEntity = NULL;
+    CVector          vecOffset;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadVector3D(vecOffset);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the position
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetElementOffsetPosition(*pEntity, vecOffset, vecPosition))
+        {
+            // Return it
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementOffsetPosition(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientEntity*   pEntity = NULL;
+    CVector          vecOffset;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadVector3D(vecOffset);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the position
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetElementOffsetPosition(*pEntity, vecOffset, vecPosition))
+        {
+            // Return it
+            lua_pushvector(luaVM, vecPosition);
+            return 1;
         }
     }
     else
