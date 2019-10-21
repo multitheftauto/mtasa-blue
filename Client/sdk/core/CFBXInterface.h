@@ -39,8 +39,15 @@ public:
     virtual bool                         HasAnyFBXLoaded() = 0;
     virtual CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry) = 0;
     virtual const char*                  GetObjectType(const ofbx::Object const* pObject) = 0;
-    virtual D3DLIGHT9*                   GetGlobalLight() = 0;
-    virtual D3DXCOLOR*                   GetGlobalAmbient() = 0;
+    virtual D3DLIGHT9                    GetGlobalLight() = 0;
+    virtual SColor                       GetGlobalAmbient() = 0;
+    virtual void                         SetGlobalAmbient(SColor& globalAmbient) = 0;
+    virtual void                         SetLightDiffuseColor(SColor& color) = 0;
+    virtual void                         SetLightAmbientColor(SColor& color) = 0;
+    virtual void                         SetLightSpecularColor(SColor& color) = 0;
+    virtual SColor                       GetLightDiffuseColor() = 0;
+    virtual SColor                       GetLightAmbientColor() = 0;
+    virtual SColor                       GetLightSpecularColor() = 0;
     virtual float                        GetGlobalLighting() = 0;
     virtual D3DMATRIX*                   GetMatrixUVFlip() = 0;
     virtual IDirect3DVertexDeclaration9* GetVertexDeclaration(eVertexType index) = 0;

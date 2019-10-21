@@ -287,15 +287,15 @@ bool CFBXTemplate::Render(IDirect3DDevice9* pDevice, CFBXScene* pScene, D3DMATRI
     CVector vecCameraPosition = m_pCameraMatrix->GetPosition();
     pDevice->SetVertexDeclaration(g_pCore->GetFBX()->GetVertexDeclaration(VERTEX_TYPE_POS_NORMAL_TEXTURE_DIFFUSE));
 
-    pDevice->SetLight(7, g_pCore->GetFBX()->GetGlobalLight());
+    pDevice->SetLight(7, &g_pCore->GetFBX()->GetGlobalLight());
     pDevice->LightEnable(7, TRUE);
 
     DWORD         materialDiffuse;
     eCullMode     cullMode;
     D3DMATERIAL9* pMaterial;
-    D3DXCOLOR*    globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
+    SColor        globalAmbient = g_pCore->GetFBX()->GetGlobalAmbient();
     DWORD         colorGlobalAmbient =
-        D3DCOLOR_ARGB((DWORD)(globalAmbient->a * 255), (DWORD)(globalAmbient->r * 255), (DWORD)(globalAmbient->g * 255), (DWORD)(globalAmbient->b * 255));
+        D3DCOLOR_ARGB((DWORD)(globalAmbient.A * 255), (DWORD)(globalAmbient.R * 255), (DWORD)(globalAmbient.G * 255), (DWORD)(globalAmbient.B * 255));
 
     float    globalLighting = g_pCore->GetFBX()->GetGlobalLighting();
     D3DCOLOR d3GlobalLightingColor = (D3DCOLOR)D3DXCOLOR(globalLighting, globalLighting, globalLighting, 1.0f);
@@ -1351,6 +1351,65 @@ bool CFBX::HasAnyFBXLoaded()
     return m_sceneList.size() > 0;
 }
 
+void CFBX::SetLightDiffuseColor(SColor& color)
+{
+    D3DCOLORVALUE d3Color;
+    d3Color.r = (float)color.R / 255.0f;
+    d3Color.g = (float)color.G / 255.0f;
+    d3Color.b = (float)color.B / 255.0f;
+    d3Color.a = (float)color.A / 255.0f;
+    m_globalLight.Diffuse = d3Color;
+}
+
+void CFBX::SetLightAmbientColor(SColor& color)
+{
+    D3DCOLORVALUE d3Color;
+    d3Color.r = (float)color.R / 255.0f;
+    d3Color.g = (float)color.G / 255.0f;
+    d3Color.b = (float)color.B / 255.0f;
+    d3Color.a = (float)color.A / 255.0f;
+    m_globalLight.Ambient = d3Color;
+}
+
+void CFBX::SetLightSpecularColor(SColor& color){
+    D3DCOLORVALUE d3Color;
+    d3Color.r = (float)color.R / 255.0f;
+    d3Color.g = (float)color.G / 255.0f;
+    d3Color.b = (float)color.B / 255.0f;
+    d3Color.a = (float)color.A / 255.0f;
+    m_globalLight.Specular = d3Color;
+}
+
+SColor CFBX::GetLightDiffuseColor()
+{
+    SColor color;
+    color.R = (float)m_globalLight.Diffuse.r * 255.0f;
+    color.G = (float)m_globalLight.Diffuse.g * 255.0f;
+    color.B = (float)m_globalLight.Diffuse.b * 255.0f;
+    color.A = (float)m_globalLight.Diffuse.a * 255.0f;
+    return color;
+}
+
+SColor CFBX::GetLightAmbientColor()
+{
+    SColor        color;
+    color.R = (float)m_globalLight.Ambient.r * 255.0f;
+    color.G = (float)m_globalLight.Ambient.g * 255.0f;
+    color.B = (float)m_globalLight.Ambient.b * 255.0f;
+    color.A = (float)m_globalLight.Ambient.a * 255.0f;
+    return color;
+}
+
+SColor CFBX::GetLightSpecularColor()
+{
+    SColor        color;
+    color.R = (float)m_globalLight.Specular.r * 255.0f;
+    color.G = (float)m_globalLight.Specular.g * 255.0f;
+    color.B = (float)m_globalLight.Specular.b * 255.0f;
+    color.A = (float)m_globalLight.Specular.a * 255.0f;
+    return color;
+}
+
 CFBX::CFBX()
 {
     m_pDevice = nullptr;
@@ -1372,7 +1431,7 @@ CFBX::CFBX()
     m_globalLight.Attenuation2 = 0.2f;
     m_globalLight.Phi = 0.2f;
 
-    m_globalAmbient = new D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+    m_globalAmbient = SColor(COLOR_RGBA(200, 200, 200, 255));
     m_globalLighting = 0.8f;
 
     CMatrix* matrixFixInvertedUVs = new CMatrix();

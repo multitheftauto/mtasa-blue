@@ -364,8 +364,15 @@ public:
     bool                         HasAnyFBXLoaded();
     CFBXBoundingBox*             CalculateBoundingBox(const ofbx::Mesh* pGeometry);
     const char*                  GetObjectType(const ofbx::Object const* pObject);
-    D3DLIGHT9*                   GetGlobalLight() { return &m_globalLight; }
-    D3DXCOLOR*                   GetGlobalAmbient() { return m_globalAmbient; }
+    D3DLIGHT9                    GetGlobalLight() { return m_globalLight; }
+    SColor                       GetGlobalAmbient() { return m_globalAmbient; }
+    void                         SetGlobalAmbient(SColor& globalAmbient) { m_globalAmbient = globalAmbient; }
+    void                         SetLightDiffuseColor(SColor& color);
+    void                         SetLightAmbientColor(SColor& color);
+    void                         SetLightSpecularColor(SColor& color);
+    SColor                       GetLightDiffuseColor();
+    SColor                       GetLightAmbientColor();
+    SColor                       GetLightSpecularColor();
     float                        GetGlobalLighting() { return m_globalLighting; }
     D3DMATRIX*                   GetMatrixUVFlip() { return m_pMatrixUVFlip; }
     IDirect3DVertexDeclaration9* GetVertexDeclaration(eVertexType index) { return m_pVertexDeclaration[index]; }
@@ -379,7 +386,7 @@ private:
     std::vector<CFBXScene*>      m_sceneList;
     IDirect3DDevice9*            m_pDevice;
     D3DLIGHT9                    m_globalLight;
-    D3DXCOLOR*                   m_globalAmbient;
+    SColor                       m_globalAmbient;
     float                        m_globalLighting;            // how bright are objects, 0.0f - 1.0f
     D3DXMATRIX*                  m_pMatrixUVFlip;
     CFrustum*                    m_pFrustum;

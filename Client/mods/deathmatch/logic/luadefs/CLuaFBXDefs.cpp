@@ -37,7 +37,6 @@ void CLuaFBXDefs::LoadFunctions(void)
         {"fbxGetAllTextures", FBXGetAllTextures},
         {"fbxGetObjectRawData", FBXGetObjectRawData},
 
-        
         {"fbxGetGlobalProperties", FBXGetGlobalProperties},
         {"fbxSetGlobalProperties", FBXSetGlobalProperties},
 
@@ -353,18 +352,55 @@ int CLuaFBXDefs::FBXSetTemplateProperties(lua_State* luaVM)
 
 int CLuaFBXDefs::FBXSetGlobalProperties(lua_State* luaVM)
 {
-    eFBXTemplateProperty eProperty;
-    CScriptArgReader     argStream(luaVM);
+    eFBXProperty     eProperty;
+    SColor           color;
+    CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(eProperty);
 
     if (!argStream.HasErrors())
     {
-        if (pFBX(luaVM, uiId, eProperty))
+        switch (eProperty)
         {
-            return 1;
+            case FBX_PROPERTY_AMBIENT:
+                argStream.ReadColor(color);
+                if (!argStream.HasErrors())
+                {
+                    g_pCore->GetFBX()->SetGlobalAmbient(color);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            case FBX_PROPERTY_LIGHT_DIFFUSE:
+                argStream.ReadColor(color);
+                if (!argStream.HasErrors())
+                {
+                    g_pCore->GetFBX()->SetLightDiffuseColor(color);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            case FBX_PROPERTY_LIGHT_AMBIENT:
+                argStream.ReadColor(color);
+                if (!argStream.HasErrors())
+                {
+                    g_pCore->GetFBX()->SetLightAmbientColor(color);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            case FBX_PROPERTY_LIGHT_SPECULAR:
+                argStream.ReadColor(color);
+                if (!argStream.HasErrors())
+                {
+                    g_pCore->GetFBX()->SetLightSpecularColor(color);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
         }
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -374,28 +410,47 @@ int CLuaFBXDefs::FBXSetGlobalProperties(lua_State* luaVM)
 
 int CLuaFBXDefs::FBXGetGlobalProperties(lua_State* luaVM)
 {
-    CClientFBX*          pFBX;
-    unsigned int         uiId;
-    eFBXTemplateProperty eProperty;
-    CScriptArgReader     argStream(luaVM);
-    argStream.ReadUserData(pFBX);
-    argStream.ReadNumber(uiId);
+    eFBXProperty     eProperty;
+    SColor           color;
+    CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(eProperty);
 
     if (!argStream.HasErrors())
     {
-        if (!pFBX->IsLoaded())
+        switch (eProperty)
         {
-            m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-        if (pFBX->LuaSetTemplateProperties(luaVM, argStream, uiId, eProperty))
-        {
-            return 1;
+            case FBX_PROPERTY_AMBIENT:
+                color = g_pCore->GetFBX()->GetGlobalAmbient();
+                lua_pushnumber(luaVM, color.R);
+                lua_pushnumber(luaVM, color.G);
+                lua_pushnumber(luaVM, color.B);
+                lua_pushnumber(luaVM, color.A);
+                return 4;
+            case FBX_PROPERTY_LIGHT_DIFFUSE:
+                color = g_pCore->GetFBX()->GetLightDiffuseColor();
+                lua_pushnumber(luaVM, color.R);
+                lua_pushnumber(luaVM, color.G);
+                lua_pushnumber(luaVM, color.B);
+                lua_pushnumber(luaVM, color.A);
+                return 4;
+            case FBX_PROPERTY_LIGHT_AMBIENT:
+                color = g_pCore->GetFBX()->GetLightAmbientColor();
+                lua_pushnumber(luaVM, color.R);
+                lua_pushnumber(luaVM, color.G);
+                lua_pushnumber(luaVM, color.B);
+                lua_pushnumber(luaVM, color.A);
+                return 4;
+            case FBX_PROPERTY_LIGHT_SPECULAR:
+                color = g_pCore->GetFBX()->GetLightSpecularColor();
+                lua_pushnumber(luaVM, color.R);
+                lua_pushnumber(luaVM, color.G);
+                lua_pushnumber(luaVM, color.B);
+                lua_pushnumber(luaVM, color.A);
+                return 4;
         }
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -782,7 +837,7 @@ int CLuaFBXDefs::FBXRenderTemplate(lua_State* luaVM)
     argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
     argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
-    
+
     if (!argStream.HasErrors())
     {
         if (pFBX->IsLoaded())
@@ -797,7 +852,6 @@ int CLuaFBXDefs::FBXRenderTemplate(lua_State* luaVM)
         }
         else
             m_pScriptDebugging->LogCustom(luaVM, "FBX isn't loaded yet");
-
     }
 
     if (argStream.HasErrors())
