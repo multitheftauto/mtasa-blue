@@ -60,6 +60,8 @@ public:
     virtual void RemoveWebViewEvents(CWebView* pWebView) = 0;
     virtual void DoEventQueuePulse() = 0;
 
+    virtual void WaitForTask(std::function<void(bool)> task, CWebView* webView) = 0;
+
     virtual eURLState                    GetDomainState(const SString& strURL, bool bOutputDebug = false) = 0;
     virtual SString                      GetDomainFromURL(const SString& strURL) = 0;
     virtual void                         ResetFilter(bool bResetRequestsOnly = true) = 0;

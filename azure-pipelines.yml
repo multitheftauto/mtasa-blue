@@ -23,7 +23,7 @@ jobs:
 
 - job: windows
   pool:
-    vmImage: 'VS2017-Win2016'
+    vmImage: 'windows-2019'
   variables:
     solution: 'Build/MTASA.sln'
     buildConfiguration: 'Release'
