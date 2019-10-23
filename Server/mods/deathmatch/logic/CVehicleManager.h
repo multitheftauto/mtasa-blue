@@ -16,7 +16,6 @@ class CVehicleManager;
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
 #include <list>
-#include "lua/CLuaMain.h"
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
 #define VEHICLE_PASSENGERS_UNDEFINED    255
@@ -49,11 +48,11 @@ public:
     static bool         HasSmokeTrail(unsigned int uiVehicleModel);
     static bool         IsTrailer(unsigned int uiVehicleModel);
     static bool         HasDamageModel(unsigned short usModel);
-    static bool         HasDamageModel(enum eVehicleType Type);
+    static bool         HasDamageModel(eVehicleType Type);
     static bool         HasDoors(unsigned short usModel);
     static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
-    CVehicleColorManager* GetColorManager() { return &m_ColorManager; };
+    CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
     CVehicleColor         GetRandomColor(unsigned short usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
@@ -61,12 +60,13 @@ public:
     Container::size_type GetVehicleCount() { return m_List.size(); }
 
     Container&       GetVehicles() noexcept { return m_List; }
-    Container const& GetVehicles() const noexcept { return m_List; }
+    const Container& GetVehicles() const noexcept { return m_List; }
 
-    Container& GetRespawnEnabledVehicles() { return m_RespawnEnabledVehicles; };
+    Container&       GetRespawnEnabledVehicles() noexcept { return m_RespawnEnabledVehicles; }
+    const Container& GetRespawnEnabledVehicles() const noexcept { return m_RespawnEnabledVehicles; }
 
 private:
-    void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); };
+    void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); }
     void RemoveFromList(CVehicle* pVehicle);
 
     CVehicleColorManager m_ColorManager;
