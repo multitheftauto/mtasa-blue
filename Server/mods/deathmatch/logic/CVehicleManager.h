@@ -35,8 +35,7 @@ public:
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void      DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
-    bool         Exists(CVehicle* pVehicle);
+    bool Exists(CVehicle* pVehicle);
 
     static bool         IsValidModel(unsigned int uiVehicleModel);
     static eVehicleType GetVehicleType(unsigned short usModel);
@@ -58,6 +57,8 @@ public:
     CVehicleColor         GetRandomColor(unsigned short usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
+
+    Container::size_type GetVehicleCount() { return m_List.size(); }
 
     Container&       GetVehicles() noexcept { return m_List; }
     Container const& GetVehicles() const noexcept { return m_List; }
