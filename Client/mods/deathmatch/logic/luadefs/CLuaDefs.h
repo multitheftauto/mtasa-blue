@@ -26,6 +26,7 @@ class CClientPlayerManager;
 class CClientRadarMarkerManager;
 class CClientTeamManager;
 class CClientVehicleManager;
+class CClientPrimitiveBufferManager;
 class CElementDeleter;
 class CLuaManager;
 class CRegisteredCommands;
@@ -64,4 +65,5 @@ public:
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
+    static CClientPrimitiveBufferManager*       m_pPrimitiveBufferManager;
 };

@@ -90,6 +90,8 @@
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
 #include <CClientEffect.h>
+#include <CClientPrimitiveBuffer.h>
+#include <CClientPrimitiveBufferManager.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>
@@ -120,6 +122,7 @@
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
+#include <luadefs/CLuaPrimitiveBufferDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>

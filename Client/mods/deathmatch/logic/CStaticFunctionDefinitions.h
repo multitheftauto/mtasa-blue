@@ -749,6 +749,10 @@ public:
     static bool          SetSoundPan(CClientSound& Sound, float fPan);
     static bool          GetSoundPan(CClientSound& Sound, float& fPan);
 
+
+    // Primitive buffer funcs
+    static CClientPrimitiveBuffer* CreatePrimitiveBuffer(CResource& Resource);
+
     // Player Voice Sound Functions
 
     static bool   SetSoundPosition(CClientPlayer& Player, double dPosition);

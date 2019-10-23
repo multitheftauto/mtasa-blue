@@ -42,6 +42,7 @@ class CClientWater;
 class CClientWeapon;
 class CClientRadarArea;
 class CClientPointLights;
+class CClientPrimitiveBuffer;
 class CLuaTimer;
 class CResource;
 class CXMLNode;

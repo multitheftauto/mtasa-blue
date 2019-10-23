@@ -271,6 +271,7 @@ public:
     CScriptKeyBinds*              GetScriptKeyBinds() { return m_pScriptKeyBinds; }
     CScriptDebugging*             GetScriptDebugging() { return m_pScriptDebugging; }
     CRegisteredCommands*          GetRegisteredCommands() { return &m_RegisteredCommands; }
+    CClientPrimitiveBufferManager* GetPrimitiveBufferManager() { return m_pPrimitiveBufferManager; }
     CZoneNames*                   GetZoneNames() { return m_pZoneNames; };
     CNametags*                    GetNametags() { return m_pNametags; }
     CSyncDebug*                   GetSyncDebug() { return m_pSyncDebug; };
@@ -656,6 +657,7 @@ private:
     CClientPedManager*         m_pPedManager;
     CClientPointLightsManager* m_pPointLightsManager;
     CClientProjectileManager*  m_pProjectileManager;
+    CClientPrimitiveBufferManager*  m_pPrimitiveBufferManager;
     CRPCFunctions*             m_pRPCFunctions;
     CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync;
     CPedSync*                  m_pPedSync;
