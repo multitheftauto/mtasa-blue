@@ -60,10 +60,13 @@ void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer
 
 void CUnoccupiedVehicleSync::Update()
 {
-    for (auto iter = m_pVehicleManager->IterBegin(); iter != m_pVehicleManager->IterEnd(); /* manual increment */)
+    std::vector<CVehicle*> vehicles;
+    vehicles.reserve(m_pVehicleManager->GetVehicleCount());
+    std::copy(std::begin(m_pVehicleManager->GetVehicles()), std::end(m_pVehicleManager->GetVehicles()), std::back_inserter(vehicles));
+
+    for (CVehicle* vehicle : vehicles)
     {
-        std::list<CVehicle*>::const_iterator current = iter++;
-        UpdateVehicle(*current);
+        UpdateVehicle(vehicle);
     }
 }
 

@@ -26,6 +26,8 @@ class CVehicleManager
     friend class CVehicle;
 
 public:
+    using Container = std::list<CVehicle*>;
+
     CVehicleManager();
     ~CVehicleManager();
 
@@ -57,10 +59,13 @@ public:
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 
-    list<CVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
-    list<CVehicle*>::const_iterator IterEnd() { return m_List.end(); };
+    Container&       GetVehicles() noexcept { return m_List; }
+    Container const& GetVehicles() const noexcept { return m_List; }
 
-    list<CVehicle*>& GetRespawnEnabledVehicles() { return m_RespawnEnabledVehicles; };
+    Container::const_iterator IterBegin() { return m_List.begin(); };
+    Container::const_iterator IterEnd() { return m_List.end(); };
+
+    Container& GetRespawnEnabledVehicles() { return m_RespawnEnabledVehicles; };
 
 private:
     void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); };
@@ -68,6 +73,6 @@ private:
 
     CVehicleColorManager m_ColorManager;
 
-    list<CVehicle*> m_List;
-    list<CVehicle*> m_RespawnEnabledVehicles;
+    Container m_List;
+    Container m_RespawnEnabledVehicles;
 };
