@@ -63,9 +63,6 @@ public:
     Container&       GetVehicles() noexcept { return m_List; }
     Container const& GetVehicles() const noexcept { return m_List; }
 
-    Container::const_iterator IterBegin() { return m_List.begin(); };
-    Container::const_iterator IterEnd() { return m_List.end(); };
-
     Container& GetRespawnEnabledVehicles() { return m_RespawnEnabledVehicles; };
 
 private:

@@ -135,13 +135,11 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
 // Called when a player changes dimension
 void CUnoccupiedVehicleSync::ResyncForPlayer(CPlayer* pPlayer)
 {
-    list<CVehicle*>::const_iterator iter = m_pVehicleManager->IterBegin();
-    for (; iter != m_pVehicleManager->IterEnd(); ++iter)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* pVehicle = *iter;
-        if (pVehicle->GetDimension() == pPlayer->GetDimension() && !pVehicle->GetFirstOccupant() && pVehicle->IsUnoccupiedSyncable())
+        if (vehicle->GetDimension() == pPlayer->GetDimension() && !vehicle->GetFirstOccupant() && vehicle->IsUnoccupiedSyncable())
         {
-            pPlayer->Send(CVehicleResyncPacket(pVehicle));
+            pPlayer->Send(CVehicleResyncPacket(vehicle));
         }
     }
 }
