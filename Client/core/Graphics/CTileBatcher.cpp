@@ -130,10 +130,14 @@ void CTileBatcher::Flush()
         // TODO - Optimize all this
         //
 
+        // Save render states
+        IDirect3DStateBlock9* pSavedStateBlock = nullptr;
+        m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+
         if (m_bUseCustomMatrices && m_bZBufferDirty)
         {
             // Shaders with transforms will probably need a clear zbuffer
-            m_pDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
+            m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
             m_bZBufferDirty = false;
         }
 
@@ -141,6 +145,13 @@ void CTileBatcher::Flush()
         if (g_pDeviceState->AdapterState.bRequiresClipping)
             m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
         m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bUseCustomMatrices ? D3DZB_TRUE : D3DZB_FALSE);
+
+        m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+        m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
         if (m_bUseCustomMatrices)
         {
@@ -226,8 +237,8 @@ void CTileBatcher::Flush()
             // If we didn't get the effect to save the shader state, clear some things here
             if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
             {
-                m_pDevice->SetVertexShader(NULL);
-                m_pDevice->SetPixelShader(NULL);
+                m_pDevice->SetVertexShader(nullptr);
+                m_pDevice->SetPixelShader(nullptr);
             }
         }
 
@@ -235,13 +246,17 @@ void CTileBatcher::Flush()
         ListClearAndReserve(m_Indices);
         ListClearAndReserve(m_Vertices);
 
-        SetCurrentMaterial(NULL);
+        SetCurrentMaterial(nullptr);
         m_fCurrentRotation = 0;
         m_fCurrentRotCenX = 0;
         m_fCurrentRotCenY = 0;
 
-        if (g_pDeviceState->AdapterState.bRequiresClipping)
-            m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
+        // Restore render states
+        if (pSavedStateBlock)
+        {
+            pSavedStateBlock->Apply();
+            SAFE_RELEASE(pSavedStateBlock);
+        }
     }
 }
 
