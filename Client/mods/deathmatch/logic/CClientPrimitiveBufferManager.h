@@ -57,7 +57,6 @@ struct VertexXYZUVDiffuse
     int     diffuse;
 };
 
-
 class CClientPrimitiveBufferManager
 {
     friend class CClientPrimitiveBuffer;

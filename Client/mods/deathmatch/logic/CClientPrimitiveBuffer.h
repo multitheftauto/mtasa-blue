@@ -25,6 +25,10 @@ public:
 
     template <typename T>
     void CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF);
+    void CreateBuffer(std::vector<VertexXYZ>& vecVertexList, std::vector<int>& vecIndexList);
+    void CreateBuffer(std::vector<VertexXYZUV>& vecVertexList, std::vector<int>& vecIndexList);
+    void CreateBuffer(std::vector<VertexXYZDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
+    void CreateBuffer(std::vector<VertexXYZUVDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
 
 private:
     LPDIRECT3DINDEXBUFFER9  m_pIndexBuffer;

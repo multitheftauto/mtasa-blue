@@ -121,16 +121,16 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                     switch (primitiveFormat)
                     {
                         case PRIMITIVE_FORMAT_XYZ:
-                            pBuffer->CreateBuffer(vecXYZ, vecIndexList, primitiveFormat);
+                            pBuffer->CreateBuffer(vecXYZ, vecIndexList);
                             break;
                         case PRIMITIVE_FORMAT_XYZ_UV:
-                            //pBuffer->CreateBuffer(vecXYZUV, vecIndexList, primitiveFormat);
+                            pBuffer->CreateBuffer(vecXYZUV, vecIndexList);
                             break;
                         case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
-                            //pBuffer->CreateBuffer(vecXYZDiffuse, vecIndexList, primitiveFormat);
+                            pBuffer->CreateBuffer(vecXYZDiffuse, vecIndexList);
                             break;
                         case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
-                            //pBuffer->CreateBuffer(vecXYZUVDiffuse, vecIndexList, primitiveFormat);
+                            pBuffer->CreateBuffer(vecXYZUVDiffuse, vecIndexList);
                             break;
                     }
                     lua_pushelement(luaVM, pBuffer);
