@@ -654,6 +654,13 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
+IMPLEMENT_ENUM_BEGIN(ePrimitiveFormat)
+ADD_ENUM(PRIMITIVE_FORMAT_XYZ, "xyz")
+ADD_ENUM(PRIMITIVE_FORMAT_XYZ_UV, "xyzuv")
+ADD_ENUM(PRIMITIVE_FORMAT_XYZ_DIFFUSE, "xyzdiffuse")
+ADD_ENUM(PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV, "xyzdiffuseuv")
+IMPLEMENT_ENUM_END("primitive-format")
+
 //
 // Get best guess at name of userdata type
 //

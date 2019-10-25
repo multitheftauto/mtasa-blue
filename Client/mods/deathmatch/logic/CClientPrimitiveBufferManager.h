@@ -17,6 +17,47 @@ class CClientPrimitiveBufferManager;
 
 class CClientPrimitiveBuffer;
 
+enum ePrimitiveData
+{
+    PRIMITIVE_DATA_XYZ = 0x1,
+    PRIMITIVE_DATA_UV = 0x2,
+    PRIMITIVE_DATA_DIFFUSE = 0x4,
+};
+
+enum ePrimitiveFormat
+{
+    PRIMITIVE_FORMAT_XYZ = PRIMITIVE_DATA_XYZ,
+    PRIMITIVE_FORMAT_XYZ_UV = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_UV,
+    PRIMITIVE_FORMAT_XYZ_DIFFUSE = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_DIFFUSE,
+    PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_DIFFUSE | PRIMITIVE_DATA_UV
+};
+DECLARE_ENUM(ePrimitiveFormat);
+
+struct VertexXYZ
+{
+    CVector xyz;
+};
+
+struct VertexXYZUV
+{
+    CVector xyz;
+    float   u, v;
+};
+
+struct VertexXYZDiffuse
+{
+    CVector xyz;
+    int     diffuse;
+};
+
+struct VertexXYZUVDiffuse
+{
+    CVector xyz;
+    float   u, v;
+    int     diffuse;
+};
+
+
 class CClientPrimitiveBufferManager
 {
     friend class CClientPrimitiveBuffer;

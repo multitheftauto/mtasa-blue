@@ -15,16 +15,24 @@
 class CClientPrimitiveBuffer : public CClientEntity
 {
 public:
-
     CClientPrimitiveBuffer(class CClientManager* pManager, ElementID ID);
     virtual eClientEntityType GetType() const { return CCLIENTPRIMITIVEBUFFER; }
-
 
     // Sorta a hack that these are required by CClientEntity...
     void Unlink();
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
+    template <typename T>
+    void CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF);
+
 private:
-   // bool ReadPrimitiveBufferByVersion();
+    LPDIRECT3DINDEXBUFFER9  m_pIndexBuffer;
+    LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
+    int                     m_iBufferSize;
+    int                     m_iIndicesCount;
+    int                     m_iFacesCount;
+    int                     m_iVertexCount;
+    int                     m_FVF;
+    int                     m_iTypeSize;
 };

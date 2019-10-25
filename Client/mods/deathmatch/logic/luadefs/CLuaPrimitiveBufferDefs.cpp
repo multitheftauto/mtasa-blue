@@ -29,16 +29,76 @@ void CLuaPrimitiveBufferDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "Create", "primitiveBufferCreate");
-    //lua_classvariable(luaVM, "someVariable", nullptr, "functionName");
+    // lua_classvariable(luaVM, "someVariable", nullptr, "functionName");
 
     lua_registerclass(luaVM, "PrimitiveBuffer", "Element");
 }
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 {
-    CVector2D        vecPosition;
-    float            fRadius = 0.1f;
+    CVector2D                       vecPosition;
+    ePrimitiveFormat                primitiveFormat;
+    std::vector<VertexXYZUVDiffuse> vecXYZUVDiffuse;
+    std::vector<VertexXYZDiffuse>   vecXYZDiffuse;
+    std::vector<VertexXYZUV>        vecXYZUV;
+    std::vector<VertexXYZ>          vecXYZ;
+    std::vector<float>              vecTableContent;
+    std::vector<int>                vecIndexList;
+
     CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(primitiveFormat);
+
+    bool bBreak = false;
+    while (argStream.NextIsTable())
+    {
+        vecIndexList.emplace_back(vecIndexList.size()); // replacment of i++
+        bBreak = false;
+        vecTableContent.clear();
+        argStream.ReadNumberTable(vecTableContent);
+        switch (primitiveFormat)
+        {
+            case PRIMITIVE_FORMAT_XYZ:
+                if (vecTableContent.size() == 3)
+                    vecXYZ.push_back(VertexXYZ{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2])});
+                else
+                {
+                    bBreak = true;
+                    argStream.SetCustomError(SString("Primitive format xyz require 3 numbers, got %i", vecTableContent.size()).c_str());
+                }
+                break;
+            case PRIMITIVE_FORMAT_XYZ_UV:
+                if (vecTableContent.size() == 5)
+                    vecXYZUV.push_back(
+                        VertexXYZUV{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), vecTableContent[3], vecTableContent[4]});
+                else
+                {
+                    bBreak = true;
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 5 numbers, got %i", vecTableContent.size()).c_str());
+                }
+                break;
+            case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
+                if (vecTableContent.size() == 4)
+                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), (int)vecTableContent[3]});
+                else
+                {
+                    bBreak = true;
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i", vecTableContent.size()).c_str());
+                }
+                break;
+            case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
+                if (vecTableContent.size() == 6)
+                    vecXYZUVDiffuse.push_back(VertexXYZUVDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), vecTableContent[3],
+                                                                 vecTableContent[4], (int)vecTableContent[5]});
+                else
+                {
+                    bBreak = true;
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i",vecTableContent.size()).c_str());
+                }
+                break;
+        }
+        if (bBreak)
+            break;
+    }
 
     if (!argStream.HasErrors())
     {
@@ -56,6 +116,22 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                     if (pGroup)
                     {
                         pGroup->Add(pBuffer);
+                    }
+
+                    switch (primitiveFormat)
+                    {
+                        case PRIMITIVE_FORMAT_XYZ:
+                            pBuffer->CreateBuffer(vecXYZ, vecIndexList, primitiveFormat);
+                            break;
+                        case PRIMITIVE_FORMAT_XYZ_UV:
+                            //pBuffer->CreateBuffer(vecXYZUV, vecIndexList, primitiveFormat);
+                            break;
+                        case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
+                            //pBuffer->CreateBuffer(vecXYZDiffuse, vecIndexList, primitiveFormat);
+                            break;
+                        case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
+                            //pBuffer->CreateBuffer(vecXYZUVDiffuse, vecIndexList, primitiveFormat);
+                            break;
                     }
                     lua_pushelement(luaVM, pBuffer);
                     return 1;
