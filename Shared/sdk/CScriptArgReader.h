@@ -64,12 +64,18 @@ public:
             if (std::isnan(number))
             {
                 SetCustomError("Expected number, got NaN", "Bad argument");
+                outValue = 0;
                 return;
             }
 
-            if (checkSign && std::is_unsigned<T>() && number < -FLT_EPSILON)
+            if (std::is_unsigned<T>())
             {
-                SetCustomWarning("Expected positive value, got negative. This warning may be an error in future versions.");
+                if (checkSign && number < -FLT_EPSILON)
+                {
+                    SetCustomWarning("Expected positive value, got negative. This warning may be an error in future versions.");
+                }
+                outValue = static_cast<T>(static_cast<int64_t>(number));
+                return;
             }
 
             outValue = static_cast<T>(number);
@@ -102,6 +108,7 @@ public:
             if (std::isnan(number))
             {
                 SetCustomError("Expected number, got NaN", "Bad argument");
+                outValue = 0;
                 return;
             }
 
@@ -111,7 +118,6 @@ public:
             }
 
             outValue = static_cast<T>(number);
-
             return;
         }
         else if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
