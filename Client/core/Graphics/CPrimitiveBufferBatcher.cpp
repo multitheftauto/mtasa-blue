@@ -104,7 +104,7 @@ void CPrimitiveBufferBatcher::UpdateMatrices(float fViewportSizeX, float fViewpo
 void CPrimitiveBufferBatcher::SetDeviceStates()
 {
     // Set states
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
