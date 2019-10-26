@@ -15,6 +15,7 @@ void CLuaPrimitiveBufferDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"primitiveBufferCreate", PrimitiveBufferCreate},
+        {"primitiveBufferDraw", PrimitiveBufferDraw},
     };
 
     // Add functions
@@ -29,9 +30,42 @@ void CLuaPrimitiveBufferDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "Create", "primitiveBufferCreate");
+    lua_classfunction(luaVM, "Draw", "primitiveBufferDraw");
     // lua_classvariable(luaVM, "someVariable", nullptr, "functionName");
 
     lua_registerclass(luaVM, "PrimitiveBuffer", "Element");
+}
+
+int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
+{
+    CClientPrimitiveBuffer* pPrimitiveBuffer;
+    CVector                 vecPosition;
+    CVector                 vecRotation;
+    CVector                 vecScale;
+    bool                    bPostGui;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPrimitiveBuffer);
+    argStream.ReadVector3D(vecPosition);
+    argStream.ReadVector3D(vecRotation, CVector(0,0,0));
+    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
+    argStream.ReadBool(bPostGui, false);
+
+    if (!argStream.HasErrors())
+    {
+        ConvertDegreesToRadians(vecRotation);
+
+        CMatrix matrix;
+        matrix.SetPosition(vecPosition);
+        matrix.SetRotation(vecRotation);
+        matrix.SetScale(vecScale);
+        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), matrix, bPostGui);
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
@@ -51,10 +85,12 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
     bool bBreak = false;
     while (argStream.NextIsTable())
     {
-        vecIndexList.emplace_back(vecIndexList.size()); // replacment of i++
+        vecIndexList.emplace_back(vecIndexList.size());            // replacment of i++
         bBreak = false;
         vecTableContent.clear();
         argStream.ReadNumberTable(vecTableContent);
+
+        // table size due future compatibility such a xyz specular what is size == 4 as well
         switch (primitiveFormat)
         {
             case PRIMITIVE_FORMAT_XYZ:
@@ -63,7 +99,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 else
                 {
                     bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz require 3 numbers, got %i", vecTableContent.size()).c_str());
+                    argStream.SetCustomError(SString("Primitive format xyz require 3 numbers, got %i numbers.", vecTableContent.size()).c_str());
                 }
                 break;
             case PRIMITIVE_FORMAT_XYZ_UV:
@@ -73,26 +109,26 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 else
                 {
                     bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 5 numbers, got %i", vecTableContent.size()).c_str());
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 5 numbers, got %i numbers.", vecTableContent.size()).c_str());
                 }
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
                 if (vecTableContent.size() == 4)
-                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), (int)vecTableContent[3]});
+                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), static_cast<DWORD>(vecTableContent[3])});
                 else
                 {
                     bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i", vecTableContent.size()).c_str());
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i numbers.", vecTableContent.size()).c_str());
                 }
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
                 if (vecTableContent.size() == 6)
                     vecXYZUVDiffuse.push_back(VertexXYZUVDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), vecTableContent[3],
-                                                                 vecTableContent[4], (int)vecTableContent[5]});
+                                                                 vecTableContent[4], static_cast<DWORD>(vecTableContent[5])});
                 else
                 {
                     bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i",vecTableContent.size()).c_str());
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i numbers.", vecTableContent.size()).c_str());
                 }
                 break;
         }

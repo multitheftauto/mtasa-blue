@@ -33,30 +33,6 @@ enum ePrimitiveFormat
 };
 DECLARE_ENUM(ePrimitiveFormat);
 
-struct VertexXYZ
-{
-    CVector xyz;
-};
-
-struct VertexXYZUV
-{
-    CVector xyz;
-    float   u, v;
-};
-
-struct VertexXYZDiffuse
-{
-    CVector xyz;
-    int     diffuse;
-};
-
-struct VertexXYZUVDiffuse
-{
-    CVector xyz;
-    float   u, v;
-    int     diffuse;
-};
-
 class CClientPrimitiveBufferManager
 {
     friend class CClientPrimitiveBuffer;

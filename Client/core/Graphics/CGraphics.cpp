@@ -17,7 +17,11 @@
 #include "CPrimitiveMaterialBatcher.h"
 #include "CPrimitive3DBatcher.h"
 #include "CMaterialPrimitive3DBatcher.h"
+#include "CPrimitiveBufferBatcher.h"
 #include "CAspectRatioConverter.h"
+
+class CLuaPrimitiveBufferInterface;
+
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
 extern bool   g_bInMTAScene;
@@ -63,6 +67,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
+    m_pPrimitiveBufferBatcher = new CPrimitiveBufferBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -94,6 +99,7 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
+    SAFE_DELETE(m_pPrimitiveBufferBatcher);
 }
 
 void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY,
@@ -1293,6 +1299,19 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     }
 }
 
+void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        m_pPrimitiveBufferBatcher->ClearQueue();
+        return;
+    }
+
+    m_pPrimitiveBufferBatcher->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+}
+
+
 static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
                                       {"tahomabd", 15, FW_BOLD},
                                       {"verdana", 15, FW_NORMAL},
@@ -1489,6 +1508,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
+    m_pPrimitiveBufferBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_ProgressSpinnerTexture =
         GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\busy_spinner.png"), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP);
     CPixels rectEdge = {CBuffer(g_rectEdgePixelsData, sizeof(g_rectEdgePixelsData))};
@@ -1554,6 +1574,7 @@ void CGraphics::OnZBufferModified()
 void CGraphics::DrawPreGUIQueue()
 {
     DrawQueue(m_PreGUIQueue);
+    m_pPrimitiveBufferBatcher->Flush(false);
 }
 
 void CGraphics::DrawPostGUIQueue()
@@ -1563,6 +1584,7 @@ void CGraphics::DrawPostGUIQueue()
     m_pMaterialLine3DBatcherPostGUI->Flush();
     m_pPrimitive3DBatcherPostGUI->Flush();
     m_pMaterialPrimitive3DBatcherPostGUI->Flush();
+    m_pPrimitiveBufferBatcher->Flush(true);
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
@@ -1834,6 +1856,7 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBufferBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////

@@ -14,6 +14,9 @@
 #include "CVector.h"
 #include <d3d9.h>
 
+class CClientPrimitiveBufferInterface;
+struct CMatrix;
+
 // Vertex type used by the primitives batchers
 struct PrimitiveVertice
 {
@@ -170,6 +173,8 @@ public:
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
 
     virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
+
+    virtual void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI) = 0;
 
     virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
