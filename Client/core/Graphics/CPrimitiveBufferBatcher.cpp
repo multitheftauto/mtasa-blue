@@ -8,10 +8,11 @@
  *
  *
  *****************************************************************************/
+
 #include <StdInc.h>
-#include "d3d9.h"
 #include "../Client/mods/deathmatch/logic/CClientPrimitiveBufferInterface.h"
 #include "CPrimitiveBufferBatcher.h"
+
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitiveBufferBatcher::CPrimitiveBufferBatcher
@@ -106,7 +107,7 @@ void CPrimitiveBufferBatcher::SetDeviceStates()
     // Set states
     m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-    m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+    m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
     m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
     m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
