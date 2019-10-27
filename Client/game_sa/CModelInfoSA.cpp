@@ -1130,7 +1130,7 @@ void CModelInfoSA::RestoreColModel()
                 call    func
                 add     esp, 8
             }
-            #pragma message(__LOC__ "(IJs) Document this function some time.")
+            // (IJs) Document this function some time
         }
     }
 
