@@ -160,7 +160,8 @@ public:
                           short siSegments, float fRatio, bool bPostGUI);
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
-    void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d);
+    void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI);
+    void DrawPrimitiveBuffer3DQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI);
 
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);

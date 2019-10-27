@@ -93,6 +93,8 @@ enum eFieldOfViewMode
 };
 DECLARE_ENUM(eFieldOfViewMode);
 
+DECLARE_ENUM(ePrimitiveView);
+
 #include "json.h"
 // Prettify toJSON (see mantis #9210)
 enum eJSONPrettyType

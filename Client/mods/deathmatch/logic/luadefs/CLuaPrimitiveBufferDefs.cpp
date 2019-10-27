@@ -16,6 +16,7 @@ void CLuaPrimitiveBufferDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"primitiveBufferCreate", PrimitiveBufferCreate},
         {"primitiveBufferDraw", PrimitiveBufferDraw},
+        {"primitiveBufferDraw3D", PrimitiveBufferDraw3D},
     };
 
     // Add functions
@@ -31,6 +32,7 @@ void CLuaPrimitiveBufferDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "Create", "primitiveBufferCreate");
     lua_classfunction(luaVM, "Draw", "primitiveBufferDraw");
+    lua_classfunction(luaVM, "Draw3D", "primitiveBufferDraw");
     // lua_classvariable(luaVM, "someVariable", nullptr, "functionName");
 
     lua_registerclass(luaVM, "PrimitiveBuffer", "Element");
@@ -43,7 +45,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
     CVector                 vecRotation;
     CVector                 vecScale;
     bool                    bPostGui;
-    bool                    b3d;
+    ePrimitiveView          primitiveView;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
@@ -51,17 +53,58 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
     argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
     argStream.ReadBool(bPostGui, false);
-    argStream.ReadBool(b3d, false);
+    argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
 
     if (!argStream.HasErrors())
     {
         ConvertDegreesToRadians(vecRotation);
 
-        CMatrix matrix;
-        matrix.SetPosition(vecPosition);
-        matrix.SetRotation(vecRotation);
-        matrix.SetScale(vecScale);
-        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), matrix, bPostGui, b3d);
+        PrimitiveBufferSettings bufferSettings;
+        bufferSettings.matrix.SetPosition(vecPosition);
+        bufferSettings.matrix.SetRotation(vecRotation);
+        bufferSettings.matrix.SetScale(vecScale);
+        bufferSettings.eView = primitiveView;
+
+        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
+{
+    CClientPrimitiveBuffer* pPrimitiveBuffer;
+    CVector                 vecPosition;
+    CVector                 vecRotation;
+    CVector                 vecScale;
+    bool                    bPostGui;
+    ePrimitiveView          primitiveView;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPrimitiveBuffer);
+    argStream.ReadVector3D(vecPosition);
+    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
+    argStream.ReadBool(bPostGui, false);
+    argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
+
+    if (!argStream.HasErrors())
+    {
+        ConvertDegreesToRadians(vecRotation);
+
+        PrimitiveBufferSettings bufferSettings;
+        bufferSettings.matrix.SetPosition(vecPosition);
+        bufferSettings.matrix.SetRotation(vecRotation);
+        bufferSettings.matrix.SetScale(vecScale);
+        bufferSettings.eView = primitiveView;
+
+        g_pCore->GetGraphics()->DrawPrimitiveBuffer3DQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
 
         lua_pushboolean(luaVM, true);
         return 1;

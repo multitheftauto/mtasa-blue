@@ -12,6 +12,6 @@ class CClientPrimitiveBufferInterface
 {
 public:
     virtual void PreDraw() = 0;
-    virtual void Draw(CMatrix& matrix) = 0;
+    virtual void Draw(PrimitiveBufferSettings& settings) = 0;
 
 };

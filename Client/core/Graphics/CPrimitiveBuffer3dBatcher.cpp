@@ -14,8 +14,7 @@
 #include "CPrimitiveBuffer3DBatcher.h"
 #include "../Client/mods/deathmatch/logic/CClientPrimitiveBufferInterface.h"
 
-CPrimitiveBuffer3DBatcher::CPrimitiveBuffer3DBatcher(bool bPreGUI)
-    : m_bPreGUI(bPreGUI)
+CPrimitiveBuffer3DBatcher::CPrimitiveBuffer3DBatcher(bool bPreGUI) : m_bPreGUI(bPreGUI)
 {
 }
 
@@ -39,7 +38,6 @@ void CPrimitiveBuffer3DBatcher::Flush()
     D3DXMATRIX matViewInv;
     D3DXMatrixInverse(&matViewInv, NULL, &matView);
     const CVector vecCameraPos(matViewInv._41, matViewInv._42, matViewInv._43);
-
 
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
@@ -78,9 +76,9 @@ void CPrimitiveBuffer3DBatcher::Flush()
         if (primitive.first != nullptr && primitive.second.size() > 0)
         {
             primitive.first->PreDraw();
-            for (auto& matrix : primitive.second)
+            for (auto& settings : primitive.second)
             {
-                primitive.first->Draw(matrix);
+                primitive.first->Draw(settings);
             }
         }
     }
@@ -97,13 +95,12 @@ void CPrimitiveBuffer3DBatcher::Flush()
     }
 }
 
-void CPrimitiveBuffer3DBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix matrix)
+void CPrimitiveBuffer3DBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings)
 {
     if (m_primitiveBufferMap.find(pPrimitiveBuffer) == m_primitiveBufferMap.end())
-        m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<CMatrix>();
+        m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
 
-    m_primitiveBufferMap[pPrimitiveBuffer].push_back(matrix);
-
+    m_primitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
 }
 
 void CPrimitiveBuffer3DBatcher::ClearQueue()

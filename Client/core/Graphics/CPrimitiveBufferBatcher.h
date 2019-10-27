@@ -8,6 +8,12 @@
  *
  *****************************************************************************/
 
+enum ePrimitiveView
+{
+    PRIMITIVE_VIEW_PERSPECTIVE,
+    PRIMITIVE_VIEW_ORTHOGRAPHIC,
+};
+
 class CClientPrimitiveBufferInterface;
 
 class CPrimitiveBufferBatcher
@@ -21,15 +27,16 @@ public:
     void SetDeviceStates();
     void Flush();
     void ClearQueue();
-    void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix matrix);
+    void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings);
 
 protected:
-    CGraphics*                                                                 m_pGraphics;
-    IDirect3DDevice9*                                                          m_pDevice;
-    std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<CMatrix>> m_primitiveBufferMap;
-    float                                                                      m_fViewportSizeX;
-    float                                                                      m_fViewportSizeY;
-    D3DXMATRIX                                                                 m_MatWorld;
-    D3DXMATRIX                                                                 m_MatView;
-    D3DXMATRIX                                                                 m_MatProjection;
+    CGraphics*                                                                                 m_pGraphics;
+    IDirect3DDevice9*                                                                          m_pDevice;
+    std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_primitiveBufferMap;
+    float                                                                                      m_fViewportSizeX;
+    float                                                                                      m_fViewportSizeY;
+    D3DXMATRIX                                                                                 m_MatWorld;
+    D3DXMATRIX                                                                                 m_MatView;
+    D3DXMATRIX                                                                                 m_MatProjection;
+    D3DXMATRIX                                                                                 m_MatProjectionOrtho;
 };

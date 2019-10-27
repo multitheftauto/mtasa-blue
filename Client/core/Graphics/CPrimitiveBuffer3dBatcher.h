@@ -19,7 +19,7 @@ public:
     CPrimitiveBuffer3DBatcher(bool bPreGUI);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
-    void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix matrix);
+    void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings);
     bool HasItems() const { return !m_primitiveBufferMap.empty(); }
     void ClearQueue();
 
@@ -27,5 +27,5 @@ protected:
     bool m_bPreGUI;
     IDirect3DDevice9*         m_pDevice;
 
-    std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<CMatrix>> m_primitiveBufferMap;
+    std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_primitiveBufferMap;
 };

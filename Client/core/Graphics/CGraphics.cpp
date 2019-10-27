@@ -1307,7 +1307,7 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     }
 }
 
-void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d)
+void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -1321,25 +1321,33 @@ void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrim
 
     if (bPostGUI)
     {
-        if (b3d)
-        {
-            m_pPrimitiveBuffer3DBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
-        }
-        else
-        {
-            m_pPrimitiveBufferBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
-        }
+        m_pPrimitiveBufferBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
     }
     else
     {
-        if (b3d)
-        {
-            m_pPrimitiveBuffer3DBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
-        }
-        else
-        {
-            m_pPrimitiveBufferBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
-        }
+        m_pPrimitiveBufferBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
+    }
+}
+
+void CGraphics::DrawPrimitiveBuffer3DQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        m_pPrimitiveBufferBatcherPreGUI->ClearQueue();
+        m_pPrimitiveBufferBatcherPostGUI->ClearQueue();
+        m_pPrimitiveBuffer3DBatcherPreGUI->ClearQueue();
+        m_pPrimitiveBuffer3DBatcherPostGUI->ClearQueue();
+        return;
+    }
+
+    if (bPostGUI)
+    {
+        m_pPrimitiveBuffer3DBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
+    }
+    else
+    {
+        m_pPrimitiveBuffer3DBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
     }
 }
 

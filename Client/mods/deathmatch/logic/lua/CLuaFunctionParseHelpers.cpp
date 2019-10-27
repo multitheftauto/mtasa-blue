@@ -661,6 +661,11 @@ ADD_ENUM(PRIMITIVE_FORMAT_XYZ_DIFFUSE, "xyzdiffuse")
 ADD_ENUM(PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV, "xyzdiffuseuv")
 IMPLEMENT_ENUM_END("primitive-format")
 
+IMPLEMENT_ENUM_BEGIN(ePrimitiveView)
+ADD_ENUM((ePrimitiveView)0, "perspective")
+ADD_ENUM((ePrimitiveView)1, "orthographic")
+IMPLEMENT_ENUM_END("primitive-view")
+
 //
 // Get best guess at name of userdata type
 //

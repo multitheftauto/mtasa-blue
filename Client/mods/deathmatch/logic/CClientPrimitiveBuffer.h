@@ -56,7 +56,7 @@ public:
     void CreateBuffer(std::vector<VertexXYZUVDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
 
     void PreDraw();
-    void Draw(CMatrix& matrix);
+    void Draw(PrimitiveBufferSettings& settings);
 
 private:
     IDirect3DIndexBuffer9*       m_pIndexBuffer;

@@ -12,10 +12,11 @@
 #pragma once
 
 #include "CVector.h"
+#include "CMatrix.h"
 #include <d3d9.h>
 
 class CClientPrimitiveBufferInterface;
-struct CMatrix;
+enum ePrimitiveView;
 
 // Vertex type used by the primitives batchers
 struct PrimitiveVertice
@@ -73,12 +74,12 @@ enum eFontQuality
     FONT_QUALITY_DRAFT = DRAFT_QUALITY,
     FONT_QUALITY_PROOF = PROOF_QUALITY,
 
-#if( WINVER >= 0x0400 )
+#if (WINVER >= 0x0400)
     FONT_QUALITY_NONANTIALIASED = NONANTIALIASED_QUALITY,
     FONT_QUALITY_ANTIALIASED = ANTIALIASED_QUALITY,
 #endif
 
-#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
+#if (_WIN32_WINNT >= _WIN32_WINNT_WINXP)
     FONT_QUALITY_CLEARTYPE = CLEARTYPE_QUALITY,
     FONT_QUALITY_CLEARTYPE_NATURAL = CLEARTYPE_NATURAL_QUALITY,
 #endif
@@ -98,6 +99,12 @@ namespace EBlendMode
     };
 }
 using EBlendMode::EBlendModeType;
+
+struct PrimitiveBufferSettings
+{
+    CMatrix matrix;
+    ePrimitiveView eView;
+};
 
 class CGraphicsInterface
 {
@@ -164,19 +171,21 @@ public:
     virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                              bool bPostGUI) = 0;
-    
+
     virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                             bool bPostGUI) = 0;
+                                               bool bPostGUI) = 0;
 
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
 
     virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
 
-    virtual void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d) = 0;
+    
+    virtual void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI) = 0;
+    virtual void DrawPrimitiveBuffer3DQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings, bool bPostGUI) = 0;
 
-    virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
+    virtual bool IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager() = 0;

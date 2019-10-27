@@ -48,27 +48,13 @@ void CPrimitiveBufferBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fV
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
     D3DXMatrixIdentity(&m_MatWorld);
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::OnRenderTargetChange
-//
-//
-//
-////////////////////////////////////////////////////////////////
+
 void CPrimitiveBufferBatcher::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY)
 {
-    // Flush dx draws
     Flush();
-    // Make new projection transform
     UpdateMatrices(uiNewViewportSizeX, uiNewViewportSizeY);
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::UpdateMatrices
-//
-//
-//
-////////////////////////////////////////////////////////////////
+
 void CPrimitiveBufferBatcher::UpdateMatrices(float fViewportSizeX, float fViewportSizeY)
 {
     m_fViewportSizeX = fViewportSizeX;
@@ -93,14 +79,11 @@ void CPrimitiveBufferBatcher::UpdateMatrices(float fViewportSizeX, float fViewpo
     m_MatProjection.m[3][2] = -Q * fNearPlane;
     m_MatProjection.m[3][3] = 0;
     m_MatView.m[3][2] = fAdjustZFactor;
+
+    D3DXMatrixOrthoOffCenterLH(&m_MatProjectionOrtho, 0, fViewportSizeX, fViewportSizeY, 0,
+                               1.0f, 1000.0f);
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::SetDeviceStates
-//
-//
-//
-////////////////////////////////////////////////////////////////
+
 void CPrimitiveBufferBatcher::SetDeviceStates()
 {
     m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
@@ -124,13 +107,7 @@ void CPrimitiveBufferBatcher::SetDeviceStates()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::Flush
-//
-// Send all buffered vertices to D3D
-//
-////////////////////////////////////////////////////////////////
+
 void CPrimitiveBufferBatcher::Flush()
 {
     if (m_primitiveBufferMap.empty())
@@ -155,15 +132,25 @@ void CPrimitiveBufferBatcher::Flush()
         if (primitive.first != nullptr && primitive.second.size() > 0)
         {
             primitive.first->PreDraw();
-            for (auto& matrix : primitive.second)
+            for (auto& settings : primitive.second)
             {
-                primitive.first->Draw(matrix);
+                switch (settings.eView)
+                {
+                    case PRIMITIVE_VIEW_ORTHOGRAPHIC:
+                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjectionOrtho);
+                        break;
+                    case PRIMITIVE_VIEW_PERSPECTIVE:
+                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+                        break;
+                }
+                primitive.first->Draw(settings);
             }
         }
     }
 
     // Clean up
     ClearQueue();
+
     // Restore render states
     if (pSavedStateBlock)
     {
@@ -172,32 +159,18 @@ void CPrimitiveBufferBatcher::Flush()
     }
 }
 
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::ClearQueue
-//
-// Clears all primitives in current queue
-//
-////////////////////////////////////////////////////////////////
 void CPrimitiveBufferBatcher::ClearQueue()
 {
-    // Clean up
     for (auto& primitive : m_primitiveBufferMap)
     {
         primitive.second.clear();
     }
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::AddTriangle
-//
-// Add a new primitive to the list
-//
-////////////////////////////////////////////////////////////////
-void CPrimitiveBufferBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix matrix)
+
+void CPrimitiveBufferBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings)
 {
     if (m_primitiveBufferMap.find(pPrimitiveBuffer) == m_primitiveBufferMap.end())
-        m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<CMatrix>();
+        m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
 
-    m_primitiveBufferMap[pPrimitiveBuffer].push_back(matrix);
+    m_primitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
 }

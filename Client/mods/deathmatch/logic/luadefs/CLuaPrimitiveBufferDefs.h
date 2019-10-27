@@ -20,6 +20,7 @@ public:
 
     LUA_DECLARE(PrimitiveBufferCreate);
     LUA_DECLARE(PrimitiveBufferDraw);
+    LUA_DECLARE(PrimitiveBufferDraw3D);
 
 private:
     //static void AddPrimitiveBufferClass(lua_State* luaVM);
