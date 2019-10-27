@@ -18,6 +18,7 @@
 #include "CPrimitive3DBatcher.h"
 #include "CMaterialPrimitive3DBatcher.h"
 #include "CPrimitiveBufferBatcher.h"
+#include "CPrimitiveBuffer3DBatcher.h"
 #include "CAspectRatioConverter.h"
 
 class CLuaPrimitiveBufferInterface;
@@ -67,7 +68,10 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
-    m_pPrimitiveBufferBatcher = new CPrimitiveBufferBatcher(this);
+    m_pPrimitiveBufferBatcherPreGUI = new CPrimitiveBufferBatcher(this);
+    m_pPrimitiveBufferBatcherPostGUI = new CPrimitiveBufferBatcher(this);
+    m_pPrimitiveBuffer3DBatcherPreGUI = new CPrimitiveBuffer3DBatcher(this);
+    m_pPrimitiveBuffer3DBatcherPostGUI = new CPrimitiveBuffer3DBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -99,7 +103,10 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
-    SAFE_DELETE(m_pPrimitiveBufferBatcher);
+    SAFE_DELETE(m_pPrimitiveBufferBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitiveBufferBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitiveBuffer3DBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitiveBuffer3DBatcherPostGUI);
 }
 
 void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY,
@@ -927,7 +934,8 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
 }
 
-void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                              bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -1299,18 +1307,41 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     }
 }
 
-void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI)
+void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
     {
-        m_pPrimitiveBufferBatcher->ClearQueue();
+        m_pPrimitiveBufferBatcherPreGUI->ClearQueue();
+        m_pPrimitiveBufferBatcherPostGUI->ClearQueue();
+        m_pPrimitiveBuffer3DBatcherPreGUI->ClearQueue();
+        m_pPrimitiveBuffer3DBatcherPostGUI->ClearQueue();
         return;
     }
 
-    m_pPrimitiveBufferBatcher->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+    if (bPostGUI)
+    {
+        if (b3d)
+        {
+            m_pPrimitiveBuffer3DBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+        }
+        else
+        {
+            m_pPrimitiveBufferBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+        }
+    }
+    else
+    {
+        if (b3d)
+        {
+            m_pPrimitiveBuffer3DBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+        }
+        else
+        {
+            m_pPrimitiveBufferBatcherPreGUI->AddPrimitiveBuffer(pPrimitiveBuffer, matrix);
+        }
+    }
 }
-
 
 static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
                                       {"tahomabd", 15, FW_BOLD},
@@ -1505,10 +1536,15 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
-    m_pPrimitiveBufferBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBufferBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBufferBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBuffer3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBuffer3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_ProgressSpinnerTexture =
         GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\busy_spinner.png"), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP);
     CPixels rectEdge = {CBuffer(g_rectEdgePixelsData, sizeof(g_rectEdgePixelsData))};
@@ -1574,7 +1610,7 @@ void CGraphics::OnZBufferModified()
 void CGraphics::DrawPreGUIQueue()
 {
     DrawQueue(m_PreGUIQueue);
-    m_pPrimitiveBufferBatcher->Flush(false);
+    m_pPrimitiveBufferBatcherPreGUI->Flush();
 }
 
 void CGraphics::DrawPostGUIQueue()
@@ -1584,8 +1620,8 @@ void CGraphics::DrawPostGUIQueue()
     m_pMaterialLine3DBatcherPostGUI->Flush();
     m_pPrimitive3DBatcherPostGUI->Flush();
     m_pMaterialPrimitive3DBatcherPostGUI->Flush();
-    m_pPrimitiveBufferBatcher->Flush(true);
-
+    m_pPrimitiveBufferBatcherPostGUI->Flush();
+    m_pPrimitiveBuffer3DBatcherPostGUI->Flush();
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
 }
@@ -1600,6 +1636,7 @@ void CGraphics::DrawPrimitive3DPreGUIQueue(void)
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
     m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+    m_pPrimitiveBuffer3DBatcherPreGUI->Flush();
 }
 
 bool CGraphics::HasLine3DPreGUIQueueItems(void)
@@ -1609,7 +1646,7 @@ bool CGraphics::HasLine3DPreGUIQueueItems(void)
 
 bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 {
-    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
+    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitiveBuffer3DBatcherPreGUI->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
@@ -1856,7 +1893,8 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
-    m_pPrimitiveBufferBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBufferBatcherPreGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBufferBatcherPostGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////

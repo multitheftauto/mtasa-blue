@@ -174,7 +174,7 @@ public:
 
     virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
 
-    virtual void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI) = 0;
+    virtual void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d) = 0;
 
     virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 

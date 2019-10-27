@@ -31,6 +31,7 @@ class CPrimitiveMaterialBatcher;
 class CPrimitive3DBatcher;
 class CMaterialPrimitive3DBatcher;
 class CPrimitiveBufferBatcher;
+class CPrimitiveBuffer3DBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -159,7 +160,7 @@ public:
                           short siSegments, float fRatio, bool bPostGUI);
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
-    void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI);
+    void DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix& matrix, bool bPostGUI, bool b3d);
 
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
@@ -235,7 +236,10 @@ private:
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
-    CPrimitiveBufferBatcher*     m_pPrimitiveBufferBatcher = nullptr;
+    CPrimitiveBufferBatcher*     m_pPrimitiveBufferBatcherPreGUI = nullptr;
+    CPrimitiveBufferBatcher*     m_pPrimitiveBufferBatcherPostGUI = nullptr;
+    CPrimitiveBuffer3DBatcher*   m_pPrimitiveBuffer3DBatcherPreGUI = nullptr;
+    CPrimitiveBuffer3DBatcher*   m_pPrimitiveBuffer3DBatcherPostGUI = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
 
     // Fonts

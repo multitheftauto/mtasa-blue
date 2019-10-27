@@ -43,13 +43,15 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
     CVector                 vecRotation;
     CVector                 vecScale;
     bool                    bPostGui;
+    bool                    b3d;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
     argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector(0,0,0));
+    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
     argStream.ReadBool(bPostGui, false);
+    argStream.ReadBool(b3d, false);
 
     if (!argStream.HasErrors())
     {
@@ -59,11 +61,14 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
         matrix.SetPosition(vecPosition);
         matrix.SetRotation(vecRotation);
         matrix.SetScale(vecScale);
-        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), matrix, bPostGui);
+        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), matrix, bPostGui, b3d);
 
         lua_pushboolean(luaVM, true);
         return 1;
     }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -114,7 +119,8 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
                 if (vecTableContent.size() == 4)
-                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3]))});
+                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]),
+                                                             static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3]))});
                 else
                 {
                     bBreak = true;

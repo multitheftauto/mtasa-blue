@@ -22,7 +22,6 @@
 ////////////////////////////////////////////////////////////////
 CPrimitiveBufferBatcher::CPrimitiveBufferBatcher(CGraphics* graphics)
 {
-    D3DXMatrixIdentity(&m_MatWorld);
     m_pGraphics = graphics;
 }
 ////////////////////////////////////////////////////////////////
@@ -47,6 +46,7 @@ void CPrimitiveBufferBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fV
     m_pDevice = pDevice;
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
+    D3DXMatrixIdentity(&m_MatWorld);
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -58,8 +58,7 @@ void CPrimitiveBufferBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fV
 void CPrimitiveBufferBatcher::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY)
 {
     // Flush dx draws
-    Flush(true);
-    Flush(false);
+    Flush();
     // Make new projection transform
     UpdateMatrices(uiNewViewportSizeX, uiNewViewportSizeY);
 }
@@ -104,8 +103,9 @@ void CPrimitiveBufferBatcher::UpdateMatrices(float fViewportSizeX, float fViewpo
 ////////////////////////////////////////////////////////////////
 void CPrimitiveBufferBatcher::SetDeviceStates()
 {
+    m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
     // Set states
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_USEW);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -131,7 +131,7 @@ void CPrimitiveBufferBatcher::SetDeviceStates()
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveBufferBatcher::Flush(bool bPostGui)
+void CPrimitiveBufferBatcher::Flush()
 {
     if (m_primitiveBufferMap.empty())
         return;

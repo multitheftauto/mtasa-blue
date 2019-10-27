@@ -9,9 +9,7 @@
  *****************************************************************************/
 
 class CClientPrimitiveBufferInterface;
-    //
-// Batches primitives drawing
-//
+
 class CPrimitiveBufferBatcher
 {
 public:
@@ -21,7 +19,7 @@ public:
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
     void SetDeviceStates();
-    void Flush(bool bPostGui);
+    void Flush();
     void ClearQueue();
     void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, CMatrix matrix);
 

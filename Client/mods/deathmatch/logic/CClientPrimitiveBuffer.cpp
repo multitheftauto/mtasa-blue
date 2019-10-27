@@ -89,6 +89,6 @@ void CClientPrimitiveBuffer::PreDraw()
 void CClientPrimitiveBuffer::Draw(CMatrix& matrix)
 {
     matrix.GetBuffer(buffer);
-    g_pCore->GetGraphics()->GetDevice()->SetTransform(D3DTS_WORLDMATRIX(0), (const D3DMATRIX*)buffer);
+    g_pCore->GetGraphics()->GetDevice()->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)buffer);
     g_pCore->GetGraphics()->GetDevice()->DrawPrimitive(m_iPrimitiveType, 0, m_iFaceCount);
 }

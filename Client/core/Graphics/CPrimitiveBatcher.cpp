@@ -43,6 +43,7 @@ void CPrimitiveBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewpor
     m_pDevice = pDevice;
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
+    D3DXMatrixIdentity(&m_MatWorld);
 }
 ////////////////////////////////////////////////////////////////
 //
