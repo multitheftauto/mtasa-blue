@@ -322,6 +322,7 @@ float fWaterColorA = 0.0F;
 CStatsData  localStatsData;
 bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
+float       fDuckingHealthThreshold;
 
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
@@ -1488,7 +1489,6 @@ void CMultiplayerSA::InitHooks()
 
     
     // Allow crouching with 1HP
-    float fDuckingHealthThreshold;
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
     fDuckingHealthThreshold = 0;
 
