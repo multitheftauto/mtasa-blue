@@ -70,6 +70,8 @@ class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
     friend class CDirect3DEvents9;
     friend CPrimitiveMaterialBatcher;
     friend CMaterialPrimitive3DBatcher;
+    friend CPrimitiveBufferBatcher;
+    friend CPrimitiveBuffer3DBatcher;
 
 public:
     ZERO_ON_NEW

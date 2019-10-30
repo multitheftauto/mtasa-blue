@@ -45,11 +45,11 @@ void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZDiffuse>& vecVert
     g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
     CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_DIFFUSE);
 }
-void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZUVDiffuse>& vecVertexList, std::vector<int>& vecIndexList)
+void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZDiffuseUV>& vecVertexList, std::vector<int>& vecIndexList)
 {
     D3DVERTEXELEMENT9 dwVertexElement[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                        {0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-                                        {0, 18, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                           {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                           {0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
                                         D3DDECL_END()};
 
     g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
@@ -59,15 +59,15 @@ void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZUVDiffuse>& vecVe
 template <typename T>
 void CClientPrimitiveBuffer::CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF)
 {
-    IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+    m_pDevice = g_pCore->GetGraphics()->GetDevice();
     VOID*             pVoid;            // POINTER TO POINTER, remember forkerer
     VOID*             pIndexVoid;
-    pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_pVertexBuffer, NULL);
+    m_pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_pVertexBuffer, NULL);
     m_pVertexBuffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vecVertexList.data(), vecVertexList.size() * sizeof(T));
     m_pVertexBuffer->Unlock();
 
-    pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
+    m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(int), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
     m_pIndexBuffer->Lock(0, 0, (void**)&pIndexVoid, 0);
     memcpy(pIndexVoid, vecIndexList.data(), vecIndexList.size() * sizeof(int));
     m_pIndexBuffer->Unlock();
@@ -80,15 +80,15 @@ void CClientPrimitiveBuffer::CreateBuffer(std::vector<T>& vecVertexList, std::ve
 
 void CClientPrimitiveBuffer::PreDraw()
 {
-    g_pCore->GetGraphics()->GetDevice()->SetFVF(m_FVF);
-    g_pCore->GetGraphics()->GetDevice()->SetIndices(m_pIndexBuffer);
-    g_pCore->GetGraphics()->GetDevice()->SetStreamSource(0, m_pVertexBuffer, 0, m_iStrideSize);
-    g_pCore->GetGraphics()->GetDevice()->SetVertexDeclaration(m_pVertexDeclaration);
+    m_pDevice->SetFVF(m_FVF);
+    m_pDevice->SetIndices(m_pIndexBuffer);
+    m_pDevice -> SetStreamSource(0, m_pVertexBuffer, 0, m_iStrideSize);
+    m_pDevice->SetVertexDeclaration(m_pVertexDeclaration);
 }
 
 void CClientPrimitiveBuffer::Draw(PrimitiveBufferSettings& settings)
 {
     settings.matrix.GetBuffer(buffer);
-    g_pCore->GetGraphics()->GetDevice()->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)buffer);
-    g_pCore->GetGraphics()->GetDevice()->DrawPrimitive(m_iPrimitiveType, 0, m_iFaceCount);
+    m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)buffer);
+    m_pDevice->DrawPrimitive(m_iPrimitiveType, 0, m_iFaceCount);
 }

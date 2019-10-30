@@ -46,9 +46,11 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
     CVector                 vecScale;
     bool                    bPostGui;
     ePrimitiveView          primitiveView;
+    CClientMaterial*        pMaterialElement;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
+    MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
@@ -64,6 +66,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
         bufferSettings.matrix.SetRotation(vecRotation);
         bufferSettings.matrix.SetScale(vecScale);
         bufferSettings.eView = primitiveView;
+        bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
 
         g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
 
@@ -85,9 +88,11 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
     CVector                 vecScale;
     bool                    bPostGui;
     ePrimitiveView          primitiveView;
+    CClientMaterial*        pMaterialElement;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
+    MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
@@ -103,6 +108,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
         bufferSettings.matrix.SetRotation(vecRotation);
         bufferSettings.matrix.SetScale(vecScale);
         bufferSettings.eView = primitiveView;
+        bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
 
         g_pCore->GetGraphics()->DrawPrimitiveBuffer3DQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
 
@@ -120,7 +126,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 {
     CVector2D                       vecPosition;
     ePrimitiveFormat                primitiveFormat;
-    std::vector<VertexXYZUVDiffuse> vecXYZUVDiffuse;
+    std::vector<VertexXYZDiffuseUV> vecXYZUVDiffuse;
     std::vector<VertexXYZDiffuse>   vecXYZDiffuse;
     std::vector<VertexXYZUV>        vecXYZUV;
     std::vector<VertexXYZ>          vecXYZ;
@@ -167,13 +173,14 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 else
                 {
                     bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i numbers.", vecTableContent.size()).c_str());
+                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 4 numbers, got %i numbers.", vecTableContent.size()).c_str());
                 }
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
                 if (vecTableContent.size() == 6)
-                    vecXYZUVDiffuse.push_back(VertexXYZUVDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), vecTableContent[3],
-                                                                 vecTableContent[4], static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[5]))});
+                    vecXYZUVDiffuse.push_back(VertexXYZDiffuseUV{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]),
+                                                                 static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3])), vecTableContent[4],
+                                                                 vecTableContent[5]});
                 else
                 {
                     bBreak = true;

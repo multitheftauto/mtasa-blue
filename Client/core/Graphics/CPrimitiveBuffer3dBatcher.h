@@ -15,8 +15,10 @@ class CClientPrimitiveBufferInterface;
 
 class CPrimitiveBuffer3DBatcher
 {
+    friend CGraphics;
+
 public:
-    CPrimitiveBuffer3DBatcher(bool bPreGUI);
+    CPrimitiveBuffer3DBatcher(CGraphics* pGraphics, bool bPreGUI);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings);
@@ -25,7 +27,8 @@ public:
 
 protected:
     bool m_bPreGUI;
-    IDirect3DDevice9*         m_pDevice;
+    IDirect3DDevice9* m_pDevice;
+    CGraphics*        m_pGraphics;
 
     std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_primitiveBufferMap;
 };

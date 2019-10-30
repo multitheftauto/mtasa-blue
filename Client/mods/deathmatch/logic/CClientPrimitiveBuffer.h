@@ -28,11 +28,11 @@ struct VertexXYZDiffuse
     D3DCOLOR diffuse;
 };
 
-struct VertexXYZUVDiffuse
+struct VertexXYZDiffuseUV
 {
-    CVector  xyz;
-    float    u, v;
+    CVector  position;
     D3DCOLOR diffuse;
+    float    u, v;
 };
 
 #include "CClientEntity.h"
@@ -53,7 +53,7 @@ public:
     void CreateBuffer(std::vector<VertexXYZ>& vecVertexList, std::vector<int>& vecIndexList);
     void CreateBuffer(std::vector<VertexXYZUV>& vecVertexList, std::vector<int>& vecIndexList);
     void CreateBuffer(std::vector<VertexXYZDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
-    void CreateBuffer(std::vector<VertexXYZUVDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
+    void CreateBuffer(std::vector<VertexXYZDiffuseUV>& vecVertexList, std::vector<int>& vecIndexList);
 
     void PreDraw();
     void Draw(PrimitiveBufferSettings& settings);
@@ -63,6 +63,7 @@ private:
     IDirect3DVertexBuffer9*      m_pVertexBuffer;
     IDirect3DVertexDeclaration9* m_pVertexDeclaration;
     D3DPRIMITIVETYPE             m_iPrimitiveType = D3DPT_TRIANGLELIST;
+    IDirect3DDevice9*            m_pDevice;
     int                          m_iFaceCount;
     int                          m_iIndicesCount;
     int                          m_iVertexCount;

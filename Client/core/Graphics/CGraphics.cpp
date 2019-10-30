@@ -70,8 +70,8 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
     m_pPrimitiveBufferBatcherPreGUI = new CPrimitiveBufferBatcher(this);
     m_pPrimitiveBufferBatcherPostGUI = new CPrimitiveBufferBatcher(this);
-    m_pPrimitiveBuffer3DBatcherPreGUI = new CPrimitiveBuffer3DBatcher(this);
-    m_pPrimitiveBuffer3DBatcherPostGUI = new CPrimitiveBuffer3DBatcher(this);
+    m_pPrimitiveBuffer3DBatcherPreGUI = new CPrimitiveBuffer3DBatcher(this, true);
+    m_pPrimitiveBuffer3DBatcherPostGUI = new CPrimitiveBuffer3DBatcher(this, false);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -1319,7 +1319,19 @@ void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrim
         return;
     }
 
-    if (bPostGUI)
+    if (bufferSettings.pMaterial)
+    {
+        if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(bufferSettings.pMaterial))
+        {
+            // If material is a shader, use its current instance
+            bufferSettings.pMaterial = pShaderItem->m_pShaderInstance;
+        }
+
+        AddQueueRef(bufferSettings.pMaterial);
+    }
+
+    // Add it to the correct queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())            // Don't draw over the main menu.  Ever.
     {
         m_pPrimitiveBufferBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
     }
@@ -1341,7 +1353,19 @@ void CGraphics::DrawPrimitiveBuffer3DQueued(CClientPrimitiveBufferInterface* pPr
         return;
     }
 
-    if (bPostGUI)
+    if (bufferSettings.pMaterial)
+    {
+        if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(bufferSettings.pMaterial))
+        {
+            // If material is a shader, use its current instance
+            bufferSettings.pMaterial = pShaderItem->m_pShaderInstance;
+        }
+
+        AddQueueRef(bufferSettings.pMaterial);
+    }
+
+    // Add it to the correct queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())            // Don't draw over the main menu.  Ever.
     {
         m_pPrimitiveBuffer3DBatcherPostGUI->AddPrimitiveBuffer(pPrimitiveBuffer, bufferSettings);
     }
@@ -2424,7 +2448,6 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
     return true;
 }
 
-
 namespace
 {
     //
@@ -2541,7 +2564,7 @@ namespace
         }
         return wireModel;
     }
-}            // namespace WireShpere
+}            // namespace
 
 void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations)
 {

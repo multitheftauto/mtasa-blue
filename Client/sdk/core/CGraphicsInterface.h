@@ -102,8 +102,9 @@ using EBlendMode::EBlendModeType;
 
 struct PrimitiveBufferSettings
 {
-    CMatrix matrix;
+    CMatrix        matrix;
     ePrimitiveView eView;
+    CMaterialItem* pMaterial;
 };
 
 class CGraphicsInterface

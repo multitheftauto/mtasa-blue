@@ -18,6 +18,8 @@ class CClientPrimitiveBufferInterface;
 
 class CPrimitiveBufferBatcher
 {
+    friend CGraphics;
+
 public:
     CPrimitiveBufferBatcher(CGraphics* graphics);
     ~CPrimitiveBufferBatcher();
