@@ -104,8 +104,7 @@ enum eElementRPCFunctions
     TAKE_ALL_WEAPONS,
     SET_WEAPON_AMMO,
     SET_WEAPON_SLOT,
-    REMOTE_PLAYER_WEAPON_SWITCH,
-
+    
     DESTROY_ALL_BLIPS,
     SET_BLIP_ICON,
     SET_BLIP_SIZE,
@@ -263,6 +262,8 @@ enum eElementRPCFunctions
     SET_ELEMENT_ANGULAR_VELOCITY,
 
     SET_PED_ANIMATION_SPEED,
+
+    REMOTE_PLAYER_WEAPON_SWITCH,
 
     NUM_RPC_FUNCS // Add above this line
 };
