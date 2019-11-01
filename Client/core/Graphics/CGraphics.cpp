@@ -1314,8 +1314,6 @@ void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrim
     {
         m_pPrimitiveBufferBatcherPreGUI->ClearQueue();
         m_pPrimitiveBufferBatcherPostGUI->ClearQueue();
-        m_pPrimitiveBuffer3DBatcherPreGUI->ClearQueue();
-        m_pPrimitiveBuffer3DBatcherPostGUI->ClearQueue();
         return;
     }
 
@@ -1326,8 +1324,6 @@ void CGraphics::DrawPrimitiveBufferQueued(CClientPrimitiveBufferInterface* pPrim
             // If material is a shader, use its current instance
             bufferSettings.pMaterial = pShaderItem->m_pShaderInstance;
         }
-
-        AddQueueRef(bufferSettings.pMaterial);
     }
 
     // Add it to the correct queue
@@ -1346,22 +1342,18 @@ void CGraphics::DrawPrimitiveBuffer3DQueued(CClientPrimitiveBufferInterface* pPr
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
     {
-        m_pPrimitiveBufferBatcherPreGUI->ClearQueue();
-        m_pPrimitiveBufferBatcherPostGUI->ClearQueue();
         m_pPrimitiveBuffer3DBatcherPreGUI->ClearQueue();
         m_pPrimitiveBuffer3DBatcherPostGUI->ClearQueue();
         return;
     }
 
-    if (bufferSettings.pMaterial)
+    if (bufferSettings.pMaterial != nullptr)
     {
         if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(bufferSettings.pMaterial))
         {
             // If material is a shader, use its current instance
             bufferSettings.pMaterial = pShaderItem->m_pShaderInstance;
         }
-
-        AddQueueRef(bufferSettings.pMaterial);
     }
 
     // Add it to the correct queue

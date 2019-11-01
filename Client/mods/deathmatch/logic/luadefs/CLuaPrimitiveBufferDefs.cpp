@@ -149,7 +149,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
         {
             case PRIMITIVE_FORMAT_XYZ:
                 if (vecTableContent.size() == 3)
-                    vecXYZ.push_back(VertexXYZ{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2])});
+                    vecXYZ.push_back(VertexXYZ{vecTableContent[0], vecTableContent[1], vecTableContent[2]});
                 else
                 {
                     bBreak = true;
@@ -158,8 +158,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 break;
             case PRIMITIVE_FORMAT_XYZ_UV:
                 if (vecTableContent.size() == 5)
-                    vecXYZUV.push_back(
-                        VertexXYZUV{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]), vecTableContent[3], vecTableContent[4]});
+                    vecXYZUV.push_back(VertexXYZUV{vecTableContent[0], vecTableContent[1], vecTableContent[2], vecTableContent[3], vecTableContent[4]});
                 else
                 {
                     bBreak = true;
@@ -168,7 +167,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
                 if (vecTableContent.size() == 4)
-                    vecXYZDiffuse.push_back(VertexXYZDiffuse{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]),
+                    vecXYZDiffuse.push_back(VertexXYZDiffuse{vecTableContent[0], vecTableContent[1], vecTableContent[2],
                                                              static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3]))});
                 else
                 {
@@ -178,7 +177,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 break;
             case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
                 if (vecTableContent.size() == 6)
-                    vecXYZUVDiffuse.push_back(VertexXYZDiffuseUV{CVector(vecTableContent[0], vecTableContent[1], vecTableContent[2]),
+                    vecXYZUVDiffuse.push_back(VertexXYZDiffuseUV{vecTableContent[0], vecTableContent[1], vecTableContent[2],
                                                                  static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3])), vecTableContent[4],
                                                                  vecTableContent[5]});
                 else

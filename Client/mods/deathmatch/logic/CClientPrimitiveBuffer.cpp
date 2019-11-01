@@ -24,42 +24,39 @@ void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZ>& vecVertexList,
 {   
     D3DVERTEXELEMENT9 dwVertexElement[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()};
 
-    g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
-    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ);
+    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ, dwVertexElement);
 }
 void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZUV>& vecVertexList, std::vector<int>& vecIndexList)
 {
     D3DVERTEXELEMENT9 dwVertexElement[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                   {0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                           {0, 3 * sizeof(float), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
                                    D3DDECL_END()};
 
-    g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
-    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_TEX1);
+    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_TEX1, dwVertexElement);
 }
 void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZDiffuse>& vecVertexList, std::vector<int>& vecIndexList)
 {
     D3DVERTEXELEMENT9 dwVertexElement[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                           {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                           {0, 3 * sizeof(float), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
                                       D3DDECL_END()};
 
-    g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
-    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_DIFFUSE);
+    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_DIFFUSE, dwVertexElement);
 }
 void CClientPrimitiveBuffer::CreateBuffer(std::vector<VertexXYZDiffuseUV>& vecVertexList, std::vector<int>& vecIndexList)
 {
     D3DVERTEXELEMENT9 dwVertexElement[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-                                           {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-                                           {0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                           {0, 3 * sizeof(float), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                           {0, 3 * sizeof(float) + sizeof(DWORD), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
                                         D3DDECL_END()};
 
-    g_pCore->GetGraphics()->GetDevice()->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
-    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+    CreateBuffer(vecVertexList, vecIndexList, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, dwVertexElement);
 }
 
 template <typename T>
-void CClientPrimitiveBuffer::CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF)
+void CClientPrimitiveBuffer::CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF, D3DVERTEXELEMENT9 dwVertexElement[])
 {
     m_pDevice = g_pCore->GetGraphics()->GetDevice();
+    m_pDevice->CreateVertexDeclaration(dwVertexElement, &m_pVertexDeclaration);
     VOID*             pVoid;            // POINTER TO POINTER, remember forkerer
     VOID*             pIndexVoid;
     m_pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_pVertexBuffer, NULL);
@@ -81,9 +78,9 @@ void CClientPrimitiveBuffer::CreateBuffer(std::vector<T>& vecVertexList, std::ve
 void CClientPrimitiveBuffer::PreDraw()
 {
     m_pDevice->SetFVF(m_FVF);
-    m_pDevice->SetIndices(m_pIndexBuffer);
-    m_pDevice -> SetStreamSource(0, m_pVertexBuffer, 0, m_iStrideSize);
     m_pDevice->SetVertexDeclaration(m_pVertexDeclaration);
+    m_pDevice->SetStreamSource(0, m_pVertexBuffer, 0, m_iStrideSize);
+    m_pDevice->SetIndices(m_pIndexBuffer);
 }
 
 void CClientPrimitiveBuffer::Draw(PrimitiveBufferSettings& settings)

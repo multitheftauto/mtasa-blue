@@ -39,6 +39,11 @@ void CPrimitiveBuffer3DBatcher::Flush()
     D3DXMatrixInverse(&matViewInv, NULL, &matView);
     const CVector vecCameraPos(matViewInv._41, matViewInv._42, matViewInv._43);
 
+    // Set transforms
+    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
+    m_pDevice->SetTransform(D3DTS_VIEW, &matView);
+    m_pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
 
@@ -57,17 +62,15 @@ void CPrimitiveBuffer3DBatcher::Flush()
     m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
     m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
     m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-    m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
+    m_pDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-
-    // Set transforms
-    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
-    m_pDevice->SetTransform(D3DTS_VIEW, &matView);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
     // Draw
     m_pDevice->SetTexture(0, nullptr);
@@ -82,43 +85,43 @@ void CPrimitiveBuffer3DBatcher::Flush()
             primitive.first->PreDraw();
             for (auto& settings : primitive.second)
             {
-                CMaterialItem* pMaterial = settings.pMaterial;
-                if (pMaterial != nullptr)
-                {
-                    if (pMaterial != pLastMaterial)
-                    {
-                        // Set texture addressing mode
-                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
-                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
 
-                        if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
-                            m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
+                if (settings.pMaterial != nullptr)
+                {
+                    // Change texture addressing mode if required
+                    if (m_CurrentTextureAddress != settings.pMaterial->m_TextureAddress)
+                    {
+                        m_CurrentTextureAddress = settings.pMaterial->m_TextureAddress;
+                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, m_CurrentTextureAddress);
+                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, m_CurrentTextureAddress);
                     }
 
-                    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
+                    if (m_CurrentTextureAddress == TADDRESS_BORDER)
+                        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, settings.pMaterial->m_uiBorderColor);
+
+                    // Draw
+                    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(settings.pMaterial))
                     {
+                        // Draw using texture
                         m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
                         primitive.first->Draw(settings);
                     }
-                    else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
+                    else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(settings.pMaterial))
                     {
                         // Draw using shader
                         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-                        if (pMaterial != pLastMaterial)
-                        {
-                            // Apply custom parameters
-                            pShaderInstance->ApplyShaderParameters();
-                            // Apply common parameters
-                            pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-                            // Apply mapped parameters
-                            pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
-                        }
+                        // Apply custom parameters
+                        pShaderInstance->ApplyShaderParameters();
+                        // Apply common parameters
+                        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+                        // Apply mapped parameters
+                        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
 
                         // Do shader passes
-                        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
+                        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
                         uint  uiNumPasses = 0;
-                        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
+                        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
 
                         for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
                         {
@@ -135,8 +138,7 @@ void CPrimitiveBuffer3DBatcher::Flush()
                             m_pDevice->SetPixelShader(NULL);
                         }
                     }
-                    pLastMaterial = pMaterial;
-                    m_pGraphics->RemoveQueueRef(pMaterial);
+                    settings.pMaterial->Release();
                 }
                 else
                 {
@@ -163,6 +165,9 @@ void CPrimitiveBuffer3DBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterfa
 {
     if (m_primitiveBufferMap.find(pPrimitiveBuffer) == m_primitiveBufferMap.end())
         m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
+
+    if (bufferSettings.pMaterial)
+        bufferSettings.pMaterial->AddRef();
 
     m_primitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
 }

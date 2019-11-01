@@ -13,24 +13,24 @@
 
 struct VertexXYZ
 {
-    CVector xyz;
+    float x, y, z;
 };
 
 struct VertexXYZUV
 {
-    CVector xyz;
+    float x, y, z;
     float   u, v;
 };
 
 struct VertexXYZDiffuse
 {
-    CVector  xyz;
+    float  x,y,z;
     D3DCOLOR diffuse;
 };
 
 struct VertexXYZDiffuseUV
 {
-    CVector  position;
+    float  x,y,z;
     D3DCOLOR diffuse;
     float    u, v;
 };
@@ -49,7 +49,7 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     template <typename T>
-    void CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF);
+    void CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF, D3DVERTEXELEMENT9 dwVertexElement[]);
     void CreateBuffer(std::vector<VertexXYZ>& vecVertexList, std::vector<int>& vecIndexList);
     void CreateBuffer(std::vector<VertexXYZUV>& vecVertexList, std::vector<int>& vecIndexList);
     void CreateBuffer(std::vector<VertexXYZDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
@@ -59,15 +59,15 @@ public:
     void Draw(PrimitiveBufferSettings& settings);
 
 private:
-    IDirect3DIndexBuffer9*       m_pIndexBuffer;
-    IDirect3DVertexBuffer9*      m_pVertexBuffer;
-    IDirect3DVertexDeclaration9* m_pVertexDeclaration;
-    D3DPRIMITIVETYPE             m_iPrimitiveType = D3DPT_TRIANGLELIST;
-    IDirect3DDevice9*            m_pDevice;
-    int                          m_iFaceCount;
-    int                          m_iIndicesCount;
-    int                          m_iVertexCount;
-    int                          m_FVF;
-    int                          m_iStrideSize;
-    float                        buffer[24];
+    IDirect3DIndexBuffer9*        m_pIndexBuffer;
+    IDirect3DVertexBuffer9*       m_pVertexBuffer;
+    LPDIRECT3DVERTEXDECLARATION9  m_pVertexDeclaration;
+    D3DPRIMITIVETYPE              m_iPrimitiveType = D3DPT_TRIANGLELIST;
+    IDirect3DDevice9*             m_pDevice;
+    int                           m_iFaceCount;
+    int                           m_iIndicesCount;
+    int                           m_iVertexCount;
+    int                           m_FVF;
+    int                           m_iStrideSize;
+    float                         buffer[24];
 };

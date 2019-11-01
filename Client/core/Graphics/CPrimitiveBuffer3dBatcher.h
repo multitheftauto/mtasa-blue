@@ -31,4 +31,5 @@ protected:
     CGraphics*        m_pGraphics;
 
     std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_primitiveBufferMap;
+    ETextureAddress                                                                            m_CurrentTextureAddress;
 };

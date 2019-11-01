@@ -41,4 +41,5 @@ protected:
     D3DXMATRIX                                                                                 m_MatView;
     D3DXMATRIX                                                                                 m_MatProjection;
     D3DXMATRIX                                                                                 m_MatProjectionOrtho;
+    ETextureAddress                                                                            m_CurrentTextureAddress;
 };
