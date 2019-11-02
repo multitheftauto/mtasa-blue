@@ -602,6 +602,20 @@ void CModelInfoSA::SetLODDistance(float fDistance)
     }
 }
 
+void CModelInfoSA::ResetLODDistance()
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (m_pInterface)
+    {
+        float* fDistance = MapFind(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+        if (fDistance)
+        {
+            m_pInterface->fLodDistanceUnscaled = *fDistance;
+            MapRemove(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+        }
+    }
+}
+
 void CModelInfoSA::StaticResetLodDistances()
 {
     // Restore default values
@@ -1427,7 +1441,7 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
 
     const bool isTowTruck = towingModel->GetModel() == 525;
     const bool isTractor = towingModel->GetModel() == 531;
-    
+
     if (IsTrain() || towingModel->IsTrain())
     {
         // A train is never towing other vehicles. Trains are linked by other means
