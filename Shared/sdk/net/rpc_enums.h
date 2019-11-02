@@ -104,7 +104,6 @@ enum eElementRPCFunctions
     TAKE_ALL_WEAPONS,
     SET_WEAPON_AMMO,
     SET_WEAPON_SLOT,
-    
     DESTROY_ALL_BLIPS,
     SET_BLIP_ICON,
     SET_BLIP_SIZE,
