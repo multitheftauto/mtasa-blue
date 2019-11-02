@@ -361,6 +361,7 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
+    void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
@@ -371,6 +372,9 @@ public:
     unsigned short GetObjectPropertiesGroup();
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
+
+    // Vehicle towing functions
+    bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

@@ -389,7 +389,10 @@ void CLuaManager::LoadCFunctions()
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
         {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-
+        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
+        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
+        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
+        
         // Version functions
         {"getVersion", CLuaFunctionDefs::GetVersion},
 

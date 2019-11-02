@@ -86,8 +86,9 @@ void CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues()
     {
         pGame->GetObjectGroupPhysicalProperties(entry.first)->RestoreDefault();
         entry.second.reset();
-        MapRemove(ms_OriginalGroupProperties, entry.first);
     }
+
+    ms_OriginalGroupProperties.clear();
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetMass(float fMass)

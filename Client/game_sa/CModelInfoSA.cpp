@@ -250,10 +250,7 @@ BOOL CModelInfoSA::IsVehicle()
 
 bool CModelInfoSA::IsPlayerModel()
 {
-    return (m_dwModelID == 0 || m_dwModelID == 1 || m_dwModelID == 2 || m_dwModelID == 7 ||
-            (m_dwModelID >= 9 && m_dwModelID != 208 && m_dwModelID != 149 && m_dwModelID != 119 && m_dwModelID != 86 && m_dwModelID != 74 &&
-             m_dwModelID != 65 && m_dwModelID != 42 && m_dwModelID <= 272) ||
-            (m_dwModelID >= 274 && m_dwModelID <= 288) || (m_dwModelID >= 290 && m_dwModelID <= 312));
+    return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
 BOOL CModelInfoSA::IsUpgrade()
@@ -1133,7 +1130,7 @@ void CModelInfoSA::RestoreColModel()
                 call    func
                 add     esp, 8
             }
-            #pragma message(__LOC__ "(IJs) Document this function some time.")
+            // (IJs) Document this function some time
         }
     }
 
@@ -1210,6 +1207,11 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::DeallocateModel(void)
+{
+    Remove();
+    ppModelInfo[m_dwModelID] = nullptr;
+}
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Hook for NodeNameStreamRead
@@ -1417,6 +1419,36 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+}
+
+bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
+{
+    bool isTowable = true;
+
+    const bool isTowTruck = towingModel->GetModel() == 525;
+    const bool isTractor = towingModel->GetModel() == 531;
+    
+    if (IsTrain() || towingModel->IsTrain())
+    {
+        // A train is never towing other vehicles. Trains are linked by other means
+        isTowable = false;
+    }
+    else if (isTowTruck || isTractor)
+    {
+        const bool isFarmTrailer = GetModel() == 610;
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (IsBoat() || IsBike() || IsBmx())
+        {
+            isTowable = false;
+        }
+        else if (IsTrailer() && !(isTractor && isFarmTrailer))
+        {
+            isTowable = false;
+        }
+    }
+
+    return isTowable;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
