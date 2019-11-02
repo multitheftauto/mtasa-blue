@@ -794,16 +794,16 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     if (vTextureNames.size() > 0)
         bExcludeTextures = true;
 
-    for (std::vector<RwTexture*>::iterator iter = rwTextureList.begin(); iter != rwTextureList.end(); iter++)
+    for (RwTexture* pTexture : rwTextureList)
     {
-        SString strTextureName = (*iter)->name;
+        SString strTextureName = pTexture->name;
         bool    bValidTexture = false;
 
         if (bExcludeTextures)
         {
             for (const auto& str : vTextureNames)
             {
-                if (strTextureName == str)
+                if (WildcardMatchI(strTextureName, str))
                 {
                     bValidTexture = true;
                 }
@@ -814,7 +814,7 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
 
         if (bValidTexture)
         {
-            RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&(*iter)->raster->renderResource);
+            RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&pTexture->raster->renderResource);
             CPixels       texture;
             g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
             outTextureList.emplace_back(strTextureName, std::move(texture));      
