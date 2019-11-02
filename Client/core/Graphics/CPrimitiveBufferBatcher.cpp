@@ -86,7 +86,7 @@ void CPrimitiveBufferBatcher::UpdateMatrices(float fViewportSizeX, float fViewpo
 void CPrimitiveBufferBatcher::SetDeviceStates()
 {
     m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
-    // Set states
+
     m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_USEW);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -107,28 +107,121 @@ void CPrimitiveBufferBatcher::SetDeviceStates()
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 }
 
-void CPrimitiveBufferBatcher::Flush()
+void CPrimitiveBufferBatcher::SetDeviceMaterialStates()
 {
-    if (m_primitiveBufferMap.empty())
-        return;
+    m_pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
 
-    // Save render states
-    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
-    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+    if (g_pDeviceState->AdapterState.bRequiresClipping)
+        m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+    m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+    m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+    m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+    m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+    m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
+    m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+    m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+    m_pDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
 
-    // Set transformations
-    m_pDevice->SetTransform(D3DTS_WORLD, &m_MatWorld);
-    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CURRENT);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+}
 
-    // Set device states
+void CPrimitiveBufferBatcher::FlushMaterialPrimitives()
+{
+    SetDeviceMaterialStates();
+
+    // Cache last used material, so we don't set directx parameters needlessly
+    CMaterialItem* pLastMaterial = nullptr;
+
+    for (auto& primitive : m_materialPrimitiveBufferMap)
+    {
+        if (primitive.first != nullptr && primitive.second.size() > 0)
+        {
+            primitive.first->PreDraw();
+            for (auto& settings : primitive.second)
+            {
+                switch (settings.eView)
+                {
+                    case PRIMITIVE_VIEW_ORTHOGRAPHIC:
+                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjectionOrtho);
+                        break;
+                    case PRIMITIVE_VIEW_PERSPECTIVE:
+                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+                        break;
+                }
+
+                // Change texture addressing mode if required
+                if (m_CurrentTextureAddress != settings.pMaterial->m_TextureAddress)
+                {
+                    m_CurrentTextureAddress = settings.pMaterial->m_TextureAddress;
+                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, m_CurrentTextureAddress);
+                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, m_CurrentTextureAddress);
+                }
+
+                if (m_CurrentTextureAddress == TADDRESS_BORDER)
+                    m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, settings.pMaterial->m_uiBorderColor);
+
+                // Draw
+                if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(settings.pMaterial))
+                {
+                    // Draw using texture
+                    m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                    primitive.first->Draw(settings);
+                }
+                else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(settings.pMaterial))
+                {
+                    // Draw using shader
+                    ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+
+                    // Apply custom parameters
+                    pShaderInstance->ApplyShaderParameters();
+                    // Apply common parameters
+                    pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+                    // Apply mapped parameters
+                    pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+
+                    // Do shader passes
+                    DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+                    uint  uiNumPasses = 0;
+                    pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
+
+                    for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
+                    {
+                        pD3DEffect->BeginPass(uiPass);
+                        primitive.first->Draw(settings);
+                        pD3DEffect->EndPass();
+                    }
+                    pShaderInstance->m_pEffectWrap->End();
+
+                    // If we didn't get the effect to save the shader state, clear some things here
+                    if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
+                    {
+                        m_pDevice->SetVertexShader(NULL);
+                        m_pDevice->SetPixelShader(NULL);
+                    }
+                }
+                settings.pMaterial->Release();
+            }
+        }
+    }
+}
+void CPrimitiveBufferBatcher::FlushPrimitives()
+{
     SetDeviceStates();
 
     // Draw
     m_pDevice->SetTexture(0, nullptr);
-
-    // Cache last used material, so we don't set directx parameters needlessly
-    CMaterialItem* pLastMaterial = nullptr;
 
     for (auto& primitive : m_primitiveBufferMap)
     {
@@ -147,68 +240,29 @@ void CPrimitiveBufferBatcher::Flush()
                         break;
                 }
 
-                if (settings.pMaterial != nullptr)
-                {
-                    // Change texture addressing mode if required
-                    if (m_CurrentTextureAddress != settings.pMaterial->m_TextureAddress)
-                    {
-                        m_CurrentTextureAddress = settings.pMaterial->m_TextureAddress;
-                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, m_CurrentTextureAddress);
-                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, m_CurrentTextureAddress);
-                    }
-
-                    if (m_CurrentTextureAddress == TADDRESS_BORDER)
-                        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, settings.pMaterial->m_uiBorderColor);
-
-                    // Draw
-                    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(settings.pMaterial))
-                    {
-                        // Draw using texture
-                        m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-                        primitive.first->Draw(settings);
-                    }
-                    else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(settings.pMaterial))
-                    {
-                        // Draw using shader
-                        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-
-                        // Apply custom parameters
-                        pShaderInstance->ApplyShaderParameters();
-                        // Apply common parameters
-                        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-                        // Apply mapped parameters
-                        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
-
-                        // Do shader passes
-                        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
-                        uint  uiNumPasses = 0;
-                        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
-
-                        for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
-                        {
-                            pD3DEffect->BeginPass(uiPass);
-                            primitive.first->Draw(settings);
-                            pD3DEffect->EndPass();
-                        }
-                        pShaderInstance->m_pEffectWrap->End();
-
-                        // If we didn't get the effect to save the shader state, clear some things here
-                        if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
-                        {
-                            m_pDevice->SetVertexShader(NULL);
-                            m_pDevice->SetPixelShader(NULL);
-                        }
-                    }
-                    settings.pMaterial->Release();
-                }
-                else
-                {
-                    m_pDevice->SetTexture(0, nullptr);
-                    primitive.first->Draw(settings);
-                }
+                primitive.first->Draw(settings);
             }
         }
     }
+
+
+}
+void CPrimitiveBufferBatcher::Flush()
+{
+    if (m_primitiveBufferMap.empty())
+        return;
+
+    // Save render states
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
+    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+
+    // Set transformations
+    m_pDevice->SetTransform(D3DTS_WORLD, &m_MatWorld);
+    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
+    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+
+    FlushPrimitives();
+    FlushMaterialPrimitives();
 
     // Clean up
     ClearQueue();
@@ -227,15 +281,29 @@ void CPrimitiveBufferBatcher::ClearQueue()
     {
         primitive.second.clear();
     }
+
+    for (auto& primitive : m_materialPrimitiveBufferMap)
+    {
+        primitive.second.clear();
+    }
 }
 
 void CPrimitiveBufferBatcher::AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings)
 {
-    if (m_primitiveBufferMap.find(pPrimitiveBuffer) == m_primitiveBufferMap.end())
-        m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
-
     if (bufferSettings.pMaterial)
+    {
+        if (m_materialPrimitiveBufferMap.find(pPrimitiveBuffer) == m_materialPrimitiveBufferMap.end())
+            m_materialPrimitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
+
         bufferSettings.pMaterial->AddRef();
 
-    m_primitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
+        m_materialPrimitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
+    }
+    else
+    {
+        if (m_primitiveBufferMap.find(pPrimitiveBuffer) == m_primitiveBufferMap.end())
+            m_primitiveBufferMap[pPrimitiveBuffer] = std::vector<PrimitiveBufferSettings>();
+
+        m_primitiveBufferMap[pPrimitiveBuffer].push_back(bufferSettings);
+    }
 }

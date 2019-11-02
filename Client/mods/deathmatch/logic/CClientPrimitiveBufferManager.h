@@ -26,6 +26,7 @@ enum ePrimitiveData
     PRIMITIVE_DATA_INDICES16 = 1 << 29,
     PRIMITIVE_DATA_INDICES32 = 1 << 30,
 };
+DECLARE_ENUM(ePrimitiveData);
 
 static std::map<ePrimitiveData, size_t> primitiveDataSizeMap =
 {
@@ -34,16 +35,6 @@ static std::map<ePrimitiveData, size_t> primitiveDataSizeMap =
     {ePrimitiveData::PRIMITIVE_DATA_UV, 2},
     {ePrimitiveData::PRIMITIVE_DATA_DIFFUSE, 1},
 };
-
-enum ePrimitiveFormat
-{
-    PRIMITIVE_FORMAT_XYZ = PRIMITIVE_DATA_XYZ,
-    PRIMITIVE_FORMAT_XYZ_UV = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_UV,
-    PRIMITIVE_FORMAT_XYZ_DIFFUSE = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_DIFFUSE,
-    PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV = PRIMITIVE_DATA_XYZ | PRIMITIVE_DATA_DIFFUSE | PRIMITIVE_DATA_UV
-};
-DECLARE_ENUM(ePrimitiveFormat);
-DECLARE_ENUM(ePrimitiveData);
 
 class CClientPrimitiveBufferManager
 {

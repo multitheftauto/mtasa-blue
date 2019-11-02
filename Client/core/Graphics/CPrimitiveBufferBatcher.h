@@ -27,14 +27,19 @@ public:
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
     void SetDeviceStates();
+    void SetDeviceMaterialStates();
     void Flush();
     void ClearQueue();
     void AddPrimitiveBuffer(CClientPrimitiveBufferInterface* pPrimitiveBuffer, PrimitiveBufferSettings& bufferSettings);
 
 protected:
+    void FlushMaterialPrimitives();
+    void FlushPrimitives();
+
     CGraphics*                                                                                 m_pGraphics;
     IDirect3DDevice9*                                                                          m_pDevice;
     std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_primitiveBufferMap;
+    std::unordered_map<CClientPrimitiveBufferInterface*, std::vector<PrimitiveBufferSettings>> m_materialPrimitiveBufferMap;
     float                                                                                      m_fViewportSizeX;
     float                                                                                      m_fViewportSizeY;
     D3DXMATRIX                                                                                 m_MatWorld;

@@ -142,11 +142,10 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 {
-    // primitive-buffer primitiveBufferCreate( ePrimitiveFormat primitiveFormat, ePrimitiveType primitiveType, table/bool indices, table vertex1, table vertex2,
+    // primitive-buffer primitiveBufferCreate( ePrimitiveFormat primitiveFormat, ePrimitiveType primitiveType, [table indices, ] table vertex1, table vertex2,
     // table vertex3
     std::vector<float>          vecTableContent;
     std::vector<ePrimitiveData> primitiveDataList;
-    ePrimitiveFormat            primitiveFormat;
     D3DPRIMITIVETYPE            ePrimitiveType;
     CScriptArgReader            argStream(luaVM);
     argStream.ReadEnumStringList(primitiveDataList, 0);
@@ -295,16 +294,16 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
             iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_XYZ];
         }
 
-        if ((iPrimitiveDataMask & PRIMITIVE_DATA_UV) == PRIMITIVE_DATA_UV)
-        {
-            vecUV.emplace_back(vecTableContent[iTableOffset], vecTableContent[iTableOffset + 1]);
-            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_UV];
-        }
-
         if ((iPrimitiveDataMask & PRIMITIVE_DATA_DIFFUSE) == PRIMITIVE_DATA_DIFFUSE)
         {
             vecDiffuse.emplace_back(static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[iTableOffset])));
             iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_DIFFUSE];
+        }
+
+        if ((iPrimitiveDataMask & PRIMITIVE_DATA_UV) == PRIMITIVE_DATA_UV)
+        {
+            vecUV.emplace_back(vecTableContent[iTableOffset], vecTableContent[iTableOffset + 1]);
+            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_UV];
         }
     }
 

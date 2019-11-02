@@ -21,6 +21,7 @@ CClientPrimitiveBuffer::CClientPrimitiveBuffer(class CClientManager* pManager, E
     m_bUseIndexedPrimitives = false;
     m_pIndexBuffer = nullptr;
     m_bRequireMaterial = false;
+    m_memoryUsageInBytes = 0;
     std::fill(m_arrayVertexBuffer, m_arrayVertexBuffer + 8, nullptr);
     std::fill(m_iStrideSize, m_iStrideSize + 8, 0);
 }
@@ -32,12 +33,13 @@ void CClientPrimitiveBuffer::Unlink()
 void CClientPrimitiveBuffer::CreateIndexBuffer(std::vector<unsigned short>& vecIndexList)
 {
     void* pVoid;            // POINTER TO POINTER, remember forkerer
-    m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(short), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
+    m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(unsigned short), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
     m_pIndexBuffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(short));
+    memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(unsigned short));
     m_pIndexBuffer->Unlock();
     m_iIndicesCount = vecIndexList.size();
     m_bUseIndexedPrimitives = true;
+    m_memoryUsageInBytes += vecIndexList.size() * sizeof(unsigned short);
 }
 
 void CClientPrimitiveBuffer::CreateIndexBuffer(std::vector<int>& vecIndexList)
@@ -50,6 +52,7 @@ void CClientPrimitiveBuffer::CreateIndexBuffer(std::vector<int>& vecIndexList)
     m_iIndicesCount = vecIndexList.size();
     m_bUseIndexedPrimitives = true;
     m_iFaceCount = m_iIndicesCount / 3;
+    m_memoryUsageInBytes += vecIndexList.size() * sizeof(int);
 }
 
 void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<CVector>& vecVertexList, ePrimitiveData primitiveData)
@@ -83,6 +86,7 @@ void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<CVector>& vecVertexList
 
     m_iFaceCount = vecVertexList.size() / 3;
     m_iStrideSize[index] = sizeof(CVector);
+    m_memoryUsageInBytes += vecVertexList.size() * sizeof(CVector);
 }
 void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<CVector2D>& vecVertexList, ePrimitiveData primitiveData)
 {
@@ -115,8 +119,8 @@ void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<CVector2D>& vecVertexLi
 
     m_iFaceCount = vecVertexList.size() / 3;
     m_iStrideSize[index] = sizeof(CVector2D);
-    m_bUseIndexedPrimitives = true;
     m_bRequireMaterial = true;
+    m_memoryUsageInBytes += vecVertexList.size() * sizeof(CVector2D);
 }
 
 void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<D3DCOLOR>& vecVertexList, ePrimitiveData primitiveData)
@@ -150,6 +154,7 @@ void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<D3DCOLOR>& vecVertexLis
 
     m_iFaceCount = vecVertexList.size() / 3;
     m_iStrideSize[index] = sizeof(D3DCOLOR);
+    m_memoryUsageInBytes += vecVertexList.size() * sizeof(D3DCOLOR);
 }
 
 void CClientPrimitiveBuffer::Finalize()

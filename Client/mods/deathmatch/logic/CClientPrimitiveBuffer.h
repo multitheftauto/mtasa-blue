@@ -53,4 +53,5 @@ private:
     float                                             buffer[24];
     bool                                              m_bUseIndexedPrimitives;
     bool                                              m_bRequireMaterial;
+    size_t                                            m_memoryUsageInBytes;
 };
