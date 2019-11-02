@@ -10,31 +10,6 @@
 
 #pragma once
 #include "CClientPrimitiveBufferInterface.h"
-
-struct VertexXYZ
-{
-    float x, y, z;
-};
-
-struct VertexXYZUV
-{
-    float x, y, z;
-    float   u, v;
-};
-
-struct VertexXYZDiffuse
-{
-    float  x,y,z;
-    D3DCOLOR diffuse;
-};
-
-struct VertexXYZDiffuseUV
-{
-    float  x,y,z;
-    D3DCOLOR diffuse;
-    float    u, v;
-};
-
 #include "CClientEntity.h"
 
 class CClientPrimitiveBuffer : public CClientPrimitiveBufferInterface, public CClientEntity
@@ -48,26 +23,34 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    template <typename T>
-    void CreateBuffer(std::vector<T>& vecVertexList, std::vector<int>& vecIndexList, int FVF, D3DVERTEXELEMENT9 dwVertexElement[]);
-    void CreateBuffer(std::vector<VertexXYZ>& vecVertexList, std::vector<int>& vecIndexList);
-    void CreateBuffer(std::vector<VertexXYZUV>& vecVertexList, std::vector<int>& vecIndexList);
-    void CreateBuffer(std::vector<VertexXYZDiffuse>& vecVertexList, std::vector<int>& vecIndexList);
-    void CreateBuffer(std::vector<VertexXYZDiffuseUV>& vecVertexList, std::vector<int>& vecIndexList);
+    void CreateIndexBuffer(std::vector<int>& vecIndexList);
+    void CreateIndexBuffer(std::vector<unsigned short>& vecIndexList);
+
+    void AddVertexBuffer(std::vector<CVector>& vecVertexList, ePrimitiveData primitiveData);
+    void AddVertexBuffer(std::vector<CVector2D>& vecVertexList, ePrimitiveData primitiveData);
+    void AddVertexBuffer(std::vector<D3DCOLOR>& vecVertexList, ePrimitiveData primitiveData);
+
 
     void PreDraw();
     void Draw(PrimitiveBufferSettings& settings);
+    void SetPrimitiveType(D3DPRIMITIVETYPE ePrimitiveType) { m_ePrimitiveType = ePrimitiveType; }
+    void SetFVF(int FVF) { m_FVF = FVF; }
+    bool IsRequireMaterial() const { return m_bRequireMaterial; }
+    void Finalize();
 
 private:
-    IDirect3DIndexBuffer9*        m_pIndexBuffer;
-    IDirect3DVertexBuffer9*       m_pVertexBuffer;
-    LPDIRECT3DVERTEXDECLARATION9  m_pVertexDeclaration;
-    D3DPRIMITIVETYPE              m_iPrimitiveType = D3DPT_TRIANGLELIST;
-    IDirect3DDevice9*             m_pDevice;
-    int                           m_iFaceCount;
-    int                           m_iIndicesCount;
-    int                           m_iVertexCount;
-    int                           m_FVF;
-    int                           m_iStrideSize;
-    float                         buffer[24];
+    IDirect3DDevice9*                                 m_pDevice;
+    IDirect3DIndexBuffer9*                            m_pIndexBuffer;
+    IDirect3DVertexBuffer9*                           m_arrayVertexBuffer[8];
+    int                                               m_iStrideSize[8];
+    LPDIRECT3DVERTEXDECLARATION9                      m_pVertexDeclaration;
+    D3DPRIMITIVETYPE                                  m_ePrimitiveType;
+    std::vector<D3DVERTEXELEMENT9>                    m_vecVertexElements;
+    int                                               m_iFaceCount;
+    int                                               m_iIndicesCount;
+    int                                               m_iVertexCount;
+    int                                               m_FVF;
+    float                                             buffer[24];
+    bool                                              m_bUseIndexedPrimitives;
+    bool                                              m_bRequireMaterial;
 };

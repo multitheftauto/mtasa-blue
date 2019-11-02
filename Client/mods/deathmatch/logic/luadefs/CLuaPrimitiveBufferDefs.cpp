@@ -40,80 +40,98 @@ void CLuaPrimitiveBufferDefs::AddClass(lua_State* luaVM)
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw(lua_State* luaVM)
 {
+    // bool primitiveBufferDraw( primitive-buffer buffer, vector3 position, vector3 rotation, vector3 scale, bool postGui, primitive-view primitiveView, mixed
+    // material)
     CClientPrimitiveBuffer* pPrimitiveBuffer;
     CVector                 vecPosition;
     CVector                 vecRotation;
     CVector                 vecScale;
     bool                    bPostGui;
     ePrimitiveView          primitiveView;
-    CClientMaterial*        pMaterialElement;
+    CClientMaterial*        pMaterialElement = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
-    MixedReadMaterialString(argStream, pMaterialElement);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
-    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
-    argStream.ReadBool(bPostGui, false);
-    argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
-
     if (!argStream.HasErrors())
     {
-        ConvertDegreesToRadians(vecRotation);
+        if (pPrimitiveBuffer->IsRequireMaterial())
+            MixedReadMaterialString(argStream, pMaterialElement);
+        argStream.ReadVector3D(vecPosition);
+        argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+        argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
+        argStream.ReadBool(bPostGui, false);
+        argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
 
-        PrimitiveBufferSettings bufferSettings;
-        bufferSettings.matrix.SetPosition(vecPosition);
-        bufferSettings.matrix.SetRotation(vecRotation);
-        bufferSettings.matrix.SetScale(vecScale);
-        bufferSettings.eView = primitiveView;
-        bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
+        if (!argStream.HasErrors())
+        {
+            ConvertDegreesToRadians(vecRotation);
 
-        g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
+            PrimitiveBufferSettings bufferSettings;
+            bufferSettings.matrix.SetPosition(vecPosition);
+            bufferSettings.matrix.SetRotation(vecRotation);
+            bufferSettings.matrix.SetScale(vecScale);
+            bufferSettings.eView = primitiveView;
+            if (pMaterialElement)
+                bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
+            else
+                bufferSettings.pMaterial = nullptr;
 
-        lua_pushboolean(luaVM, true);
-        return 1;
+            g_pCore->GetGraphics()->DrawPrimitiveBufferQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
+
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        if (argStream.HasErrors())
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
     lua_pushboolean(luaVM, false);
     return 1;
 }
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
 {
+    // bool primitiveBufferDraw3D( primitive-buffer buffer, vector3 position, vector3 rotation, vector3 scale, bool postGui, primitive-view primitiveView, mixed
+    // material)
+
     CClientPrimitiveBuffer* pPrimitiveBuffer;
     CVector                 vecPosition;
     CVector                 vecRotation;
     CVector                 vecScale;
     bool                    bPostGui;
     ePrimitiveView          primitiveView;
-    CClientMaterial*        pMaterialElement;
+    CClientMaterial*        pMaterialElement = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPrimitiveBuffer);
-    MixedReadMaterialString(argStream, pMaterialElement);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
-    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
-    argStream.ReadBool(bPostGui, false);
-    argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
-
     if (!argStream.HasErrors())
     {
-        ConvertDegreesToRadians(vecRotation);
+        if (pPrimitiveBuffer->IsRequireMaterial())
+            MixedReadMaterialString(argStream, pMaterialElement);
+        argStream.ReadVector3D(vecPosition);
+        argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+        argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
+        argStream.ReadBool(bPostGui, false);
+        argStream.ReadEnumString(primitiveView, (ePrimitiveView)0);
 
-        PrimitiveBufferSettings bufferSettings;
-        bufferSettings.matrix.SetPosition(vecPosition);
-        bufferSettings.matrix.SetRotation(vecRotation);
-        bufferSettings.matrix.SetScale(vecScale);
-        bufferSettings.eView = primitiveView;
-        bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
+        if (!argStream.HasErrors())
+        {
+            ConvertDegreesToRadians(vecRotation);
 
-        g_pCore->GetGraphics()->DrawPrimitiveBuffer3DQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
+            PrimitiveBufferSettings bufferSettings;
+            bufferSettings.matrix.SetPosition(vecPosition);
+            bufferSettings.matrix.SetRotation(vecRotation);
+            bufferSettings.matrix.SetScale(vecScale);
+            bufferSettings.eView = primitiveView;
+            if (pMaterialElement)
+                bufferSettings.pMaterial = pMaterialElement->GetMaterialItem();
+            else
+                bufferSettings.pMaterial = nullptr;
 
-        lua_pushboolean(luaVM, true);
-        return 1;
+            g_pCore->GetGraphics()->DrawPrimitiveBuffer3DQueued(reinterpret_cast<CClientPrimitiveBufferInterface*>(pPrimitiveBuffer), bufferSettings, bPostGui);
+
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -124,71 +142,170 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferDraw3D(lua_State* luaVM)
 
 int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 {
-    CVector2D                       vecPosition;
-    ePrimitiveFormat                primitiveFormat;
-    std::vector<VertexXYZDiffuseUV> vecXYZUVDiffuse;
-    std::vector<VertexXYZDiffuse>   vecXYZDiffuse;
-    std::vector<VertexXYZUV>        vecXYZUV;
-    std::vector<VertexXYZ>          vecXYZ;
-    std::vector<float>              vecTableContent;
-    std::vector<int>                vecIndexList;
+    // primitive-buffer primitiveBufferCreate( ePrimitiveFormat primitiveFormat, ePrimitiveType primitiveType, table/bool indices, table vertex1, table vertex2,
+    // table vertex3
+    std::vector<float>          vecTableContent;
+    std::vector<ePrimitiveData> primitiveDataList;
+    ePrimitiveFormat            primitiveFormat;
+    D3DPRIMITIVETYPE            ePrimitiveType;
+    CScriptArgReader            argStream(luaVM);
+    argStream.ReadEnumStringList(primitiveDataList, 0);
+    argStream.ReadEnumString(ePrimitiveType);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(primitiveFormat);
+    int iPrimitiveDataMask = 0;
 
-    bool bBreak = false;
+    std::sort(primitiveDataList.begin(), primitiveDataList.end());
+    primitiveDataList.erase(unique(primitiveDataList.begin(), primitiveDataList.end()), primitiveDataList.end());
+
+    for (ePrimitiveData primitiveData : primitiveDataList)
+        iPrimitiveDataMask |= primitiveData;
+
+    if (iPrimitiveDataMask == 0)
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "Primitive data declaration can not be empty.");
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    bool containXY = (iPrimitiveDataMask & PRIMITIVE_DATA_XY) == PRIMITIVE_DATA_XY;
+    bool containXYZ = (iPrimitiveDataMask & PRIMITIVE_DATA_XYZ) == PRIMITIVE_DATA_XYZ;
+    if (!containXY && !containXYZ)
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "Primitive data must contain `xy` or `xyz` data declaration.");
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    if (containXY && containXYZ)
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "You can not use `xy` and `xyz` data declaration at once.");
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    bool contain16BitIndices = (iPrimitiveDataMask & PRIMITIVE_DATA_INDICES16) == PRIMITIVE_DATA_INDICES16;
+    bool contain32BitIndices = (iPrimitiveDataMask & PRIMITIVE_DATA_INDICES32) == PRIMITIVE_DATA_INDICES32;
+    if (containXY && containXYZ)
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "You can not use `16bitindices` and `32bitindices` data declaration at once.");
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    std::vector<unsigned short> vec16BitIndexList;
+    std::vector<int>            vec32BitIndexList;
+
+    if ((iPrimitiveDataMask & PRIMITIVE_DATA_INDICES16) == PRIMITIVE_DATA_INDICES16)
+    {
+        if (argStream.NextIsTable())
+        {
+            argStream.ReadNumberTable(vec16BitIndexList);
+
+            if (vec16BitIndexList.size() > 0xffff)
+            {
+                m_pScriptDebugging->LogCustom(luaVM, "You can not pass more than 65536 indices in 16 bit version, use 32 bit instead.");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (vec16BitIndexList.size() > 0 && vec16BitIndexList.size() % 3 == 0)
+            {
+                for (unsigned short index : vec16BitIndexList)
+                {
+                    if (index <= 0)
+                    {
+                        m_pScriptDebugging->LogCustom(luaVM, "Indices table can not contain negative numbers.");
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                }
+                std::transform(std::begin(vec16BitIndexList), std::end(vec16BitIndexList), std::begin(vec16BitIndexList), [](unsigned short x) { return x - 1; });
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom(luaVM, "Indices table must be divisible by 3 and contain at least 3 non negative numbers.");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+    }
+    if ((iPrimitiveDataMask & PRIMITIVE_DATA_INDICES32) == PRIMITIVE_DATA_INDICES32)
+    {
+        if (argStream.NextIsTable())
+        {
+            argStream.ReadNumberTable(vec32BitIndexList);
+
+            if (vec32BitIndexList.size() > 0 && vec32BitIndexList.size() % 3 == 0)
+            {
+                for (int index : vec32BitIndexList)
+                {
+                    if (index <= 0)
+                    {
+                        m_pScriptDebugging->LogCustom(luaVM, "Indices table can not contain negative numbers.");
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                }
+                std::transform(std::begin(vec32BitIndexList), std::end(vec32BitIndexList), std::begin(vec32BitIndexList), [](int x) { return x - 1; });
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom(luaVM, "Indices table must be divisible by 3 and contain at least 3 non negative numbers.");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+    }
+
+    std::vector<CVector>   vecXYZ;
+    std::vector<CVector2D> vecUV;
+    std::vector<D3DCOLOR>  vecDiffuse;
+
+    int iTableSize = 0;
+    for (ePrimitiveData primitiveData : primitiveDataList)
+        if (primitiveDataSizeMap.find(primitiveData) != primitiveDataSizeMap.end())
+            iTableSize += primitiveDataSizeMap[primitiveData];
+
+    int iTableOffset = 0;
+    int iVertexIndex = 0;
+
     while (argStream.NextIsTable())
     {
-        vecIndexList.emplace_back(vecIndexList.size());            // replacment of i++
-        bBreak = false;
+        iVertexIndex++;
+        iTableOffset = 0;
         vecTableContent.clear();
         argStream.ReadNumberTable(vecTableContent);
-
-        // table size due future compatibility such a xyz specular what is size == 4 as well
-        switch (primitiveFormat)
+        if (vecTableContent.size() != iTableSize)
         {
-            case PRIMITIVE_FORMAT_XYZ:
-                if (vecTableContent.size() == 3)
-                    vecXYZ.push_back(VertexXYZ{vecTableContent[0], vecTableContent[1], vecTableContent[2]});
-                else
-                {
-                    bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz require 3 numbers, got %i numbers.", vecTableContent.size()).c_str());
-                }
-                break;
-            case PRIMITIVE_FORMAT_XYZ_UV:
-                if (vecTableContent.size() == 5)
-                    vecXYZUV.push_back(VertexXYZUV{vecTableContent[0], vecTableContent[1], vecTableContent[2], vecTableContent[3], vecTableContent[4]});
-                else
-                {
-                    bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 5 numbers, got %i numbers.", vecTableContent.size()).c_str());
-                }
-                break;
-            case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
-                if (vecTableContent.size() == 4)
-                    vecXYZDiffuse.push_back(VertexXYZDiffuse{vecTableContent[0], vecTableContent[1], vecTableContent[2],
-                                                             static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3]))});
-                else
-                {
-                    bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 4 numbers, got %i numbers.", vecTableContent.size()).c_str());
-                }
-                break;
-            case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
-                if (vecTableContent.size() == 6)
-                    vecXYZUVDiffuse.push_back(VertexXYZDiffuseUV{vecTableContent[0], vecTableContent[1], vecTableContent[2],
-                                                                 static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[3])), vecTableContent[4],
-                                                                 vecTableContent[5]});
-                else
-                {
-                    bBreak = true;
-                    argStream.SetCustomError(SString("Primitive format xyz, uv, diffuse require 6 numbers, got %i numbers.", vecTableContent.size()).c_str());
-                }
-                break;
+            m_pScriptDebugging->LogCustom(
+                luaVM,
+                SString("Primitive vertex require %i number, got %i numbers, vertex index %i.", iTableSize, vecTableContent.size(), iVertexIndex).c_str());
+            lua_pushboolean(luaVM, false);
+            return 1;
         }
-        if (bBreak)
-            break;
+
+        if ((iPrimitiveDataMask & PRIMITIVE_DATA_XY) == PRIMITIVE_DATA_XY)
+        {
+            vecXYZ.emplace_back(vecTableContent[iTableOffset], vecTableContent[iTableOffset + 1], 0);
+            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_XY];
+        }
+
+        if ((iPrimitiveDataMask & PRIMITIVE_DATA_XYZ) == PRIMITIVE_DATA_XYZ)
+        {
+            vecXYZ.emplace_back(vecTableContent[iTableOffset], vecTableContent[iTableOffset + 1], vecTableContent[iTableOffset + 2]);
+            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_XYZ];
+        }
+
+        if ((iPrimitiveDataMask & PRIMITIVE_DATA_UV) == PRIMITIVE_DATA_UV)
+        {
+            vecUV.emplace_back(vecTableContent[iTableOffset], vecTableContent[iTableOffset + 1]);
+            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_UV];
+        }
+
+        if ((iPrimitiveDataMask & PRIMITIVE_DATA_DIFFUSE) == PRIMITIVE_DATA_DIFFUSE)
+        {
+            vecDiffuse.emplace_back(static_cast<unsigned long>(static_cast<int64_t>(vecTableContent[iTableOffset])));
+            iTableOffset += primitiveDataSizeMap[PRIMITIVE_DATA_DIFFUSE];
+        }
     }
 
     if (!argStream.HasErrors())
@@ -209,21 +326,34 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                         pGroup->Add(pBuffer);
                     }
 
-                    switch (primitiveFormat)
+                    pBuffer->SetPrimitiveType(ePrimitiveType);
+
+                    int FVF = D3DFVF_XYZ;
+                    pBuffer->AddVertexBuffer(vecXYZ, PRIMITIVE_DATA_XYZ);
+
+                    if (vecUV.size() > 0)
                     {
-                        case PRIMITIVE_FORMAT_XYZ:
-                            pBuffer->CreateBuffer(vecXYZ, vecIndexList);
-                            break;
-                        case PRIMITIVE_FORMAT_XYZ_UV:
-                            pBuffer->CreateBuffer(vecXYZUV, vecIndexList);
-                            break;
-                        case PRIMITIVE_FORMAT_XYZ_DIFFUSE:
-                            pBuffer->CreateBuffer(vecXYZDiffuse, vecIndexList);
-                            break;
-                        case PRIMITIVE_FORMAT_XYZ_DIFFUSE_UV:
-                            pBuffer->CreateBuffer(vecXYZUVDiffuse, vecIndexList);
-                            break;
+                        FVF |= D3DFVF_TEX1;
+                        pBuffer->AddVertexBuffer(vecUV, PRIMITIVE_DATA_UV);
                     }
+                    if (vecDiffuse.size() > 0)
+                    {
+                        FVF |= D3DFVF_DIFFUSE;
+                        pBuffer->AddVertexBuffer(vecDiffuse, PRIMITIVE_DATA_DIFFUSE);
+                    }
+
+                    if (vec16BitIndexList.size() > 0)
+                    {
+                        pBuffer->CreateIndexBuffer(vec16BitIndexList);
+                    }
+                    else if (vec32BitIndexList.size() > 0)
+                    {
+                        pBuffer->CreateIndexBuffer(vec32BitIndexList);
+                    }
+
+                    pBuffer->SetFVF(FVF);
+                    pBuffer->Finalize();
+
                     lua_pushelement(luaVM, pBuffer);
                     return 1;
                 }
