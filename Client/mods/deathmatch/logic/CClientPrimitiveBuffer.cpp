@@ -12,10 +12,10 @@
 
 enum ePrimitiveData;
 
-CClientPrimitiveBuffer::CClientPrimitiveBuffer(class CClientManager* pManager, ElementID ID) : CClientEntity(ID)
+CClientPrimitiveBuffer::CClientPrimitiveBuffer(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     m_pManager = pManager;
-    SetTypeName("primitiveBuffer");
+    SetTypeName("primitivebuffer");
     m_pDevice = g_pCore->GetGraphics()->GetDevice();
     m_iIndicesCount = 0;
     m_szMemoryUsageInBytes = 0;
@@ -26,10 +26,22 @@ CClientPrimitiveBuffer::CClientPrimitiveBuffer(class CClientManager* pManager, E
     m_bRequireMaterial = false;
     m_FVF = 0;
     m_ePrimitiveType = D3DPT_TRIANGLELIST;
+    g_pClientGame->GetPrimitiveBufferManager()->AddToList(this);
 }
 
 void CClientPrimitiveBuffer::Unlink()
 {
+    g_pClientGame->GetPrimitiveBufferManager()->Delete(this);
+}
+
+CClientPrimitiveBuffer::~CClientPrimitiveBuffer()
+{
+    delete m_pIndexBuffer;
+    for (int i = 0; i < 8; i++)
+        if (m_arrayVertexBuffer[i] != nullptr)
+            delete m_arrayVertexBuffer;
+
+    delete[] m_iStrideSize;
 }
 
 void CClientPrimitiveBuffer::Finalize()

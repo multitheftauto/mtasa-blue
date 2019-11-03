@@ -44,15 +44,23 @@ public:
     CClientPrimitiveBufferManager(CClientManager* pManager);
     ~CClientPrimitiveBufferManager();
 
-    unsigned int    Count() { return static_cast<unsigned int>(m_List.size()); };
-    CClientPrimitiveBuffer* Get(unsigned long ulID);
+    CClientPrimitiveBuffer* Create();
 
-    void AddToList(CClientPrimitiveBuffer* pPrimitiveBuffer);
-    void RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer);
-    void RemoveAll();
+    void Delete(CClientPrimitiveBuffer* pPrimitiveBuffer);
+    void DeleteAll();
+
+    std::list<CClientPrimitiveBuffer*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientPrimitiveBuffer*>::const_iterator IterEnd() { return m_List.end(); };
+
+    CClientPrimitiveBuffer* Get(unsigned long ulID);
+    static CClientPrimitiveBuffer* Get(ElementID ID);
 
 private:
+    void AddToList(CClientPrimitiveBuffer* pPrimitiveBuffer) { m_List.push_back(pPrimitiveBuffer); };
+    void RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer);
+
+private:
+    CClientManager* m_pManager;
+
     std::list<CClientPrimitiveBuffer*> m_List;
-    bool                               m_bCanRemoveFromList;
-    CClientManager*                    m_pManager;
 };

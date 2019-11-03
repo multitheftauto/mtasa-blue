@@ -19,7 +19,7 @@ CClientPrimitiveBufferManager::CClientPrimitiveBufferManager(CClientManager* pMa
 
 CClientPrimitiveBufferManager::~CClientPrimitiveBufferManager()
 {
-    RemoveAll();
+    DeleteAll();
 }
 
 CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Get(unsigned long ulID)
@@ -37,27 +37,22 @@ CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Get(unsigned long ulID)
     return NULL;
 }
 
-void CClientPrimitiveBufferManager::RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer)
+CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Create()
 {
-    if (m_bCanRemoveFromList)
-    {
-        if (!m_List.empty())
-        {
-            m_List.remove(pPrimitiveBuffer);
-        }
-    }
+    CClientPrimitiveBuffer* pPrimitiveBuffer = new CClientPrimitiveBuffer(m_pManager, INVALID_ELEMENT_ID);
+    AddToList(pPrimitiveBuffer);
+    return pPrimitiveBuffer;
 }
 
-void CClientPrimitiveBufferManager::AddToList(CClientPrimitiveBuffer* pPrimitiveBuffer)
+void CClientPrimitiveBufferManager::Delete(CClientPrimitiveBuffer* pPrimitiveBuffer)
 {
-    m_List.push_back(pPrimitiveBuffer);
+    RemoveFromList(pPrimitiveBuffer);
+    delete pPrimitiveBuffer;
 }
 
-void CClientPrimitiveBufferManager::RemoveAll()
+void CClientPrimitiveBufferManager::DeleteAll()
 {
-    // Delete all the items in the list
-    m_bCanRemoveFromList = false;
-    list<CClientPrimitiveBuffer*>::iterator iter = m_List.begin();
+    list<CClientPrimitiveBuffer*>::const_iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)
     {
         delete *iter;
@@ -65,5 +60,22 @@ void CClientPrimitiveBufferManager::RemoveAll()
 
     // Clear the list
     m_List.clear();
-    m_bCanRemoveFromList = true;
+}
+
+CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Get(ElementID ID)
+{
+    // Grab the element with the given id. Check its type.
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (pEntity && pEntity->GetType() == CCLIENTPRIMITIVEBUFFER)
+    {
+        return static_cast<CClientPrimitiveBuffer*>(pEntity);
+    }
+
+    return NULL;
+}
+
+void CClientPrimitiveBufferManager::RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer)
+{
+    if (!m_List.empty())
+        m_List.remove(pPrimitiveBuffer);
 }

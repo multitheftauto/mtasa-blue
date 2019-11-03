@@ -14,7 +14,10 @@
 
 class CClientPrimitiveBuffer : public CClientPrimitiveBufferInterface, public CClientEntity
 {
+    DECLARE_CLASS(CClientPrimitiveBuffer, CClientEntity);
+
 public:
+    ~CClientPrimitiveBuffer();
     CClientPrimitiveBuffer(class CClientManager* pManager, ElementID ID);
     virtual eClientEntityType GetType() const { return CCLIENTPRIMITIVEBUFFER; }
 
