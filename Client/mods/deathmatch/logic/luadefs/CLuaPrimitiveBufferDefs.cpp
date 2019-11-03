@@ -161,7 +161,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 
     if (iPrimitiveDataMask == 0)
     {
-        m_pScriptDebugging->LogCustom(luaVM, "Primitive data declaration can not be empty.");
+        m_pScriptDebugging->LogCustom(luaVM, "Primitive data declaration is empty or invalid.");
         lua_pushboolean(luaVM, false);
         return 1;
     }
@@ -184,7 +184,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
 
     bool contain16BitIndices = (iPrimitiveDataMask & PRIMITIVE_DATA_INDICES16) == PRIMITIVE_DATA_INDICES16;
     bool contain32BitIndices = (iPrimitiveDataMask & PRIMITIVE_DATA_INDICES32) == PRIMITIVE_DATA_INDICES32;
-    if (containXY && containXYZ)
+    if (contain16BitIndices && contain32BitIndices)
     {
         m_pScriptDebugging->LogCustom(luaVM, "You can not use `16bitindices` and `32bitindices` data declaration at once.");
         lua_pushboolean(luaVM, false);
@@ -335,6 +335,22 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                 return 1;
             }
         }
+    }
+
+    if (contain16BitIndices || contain32BitIndices)
+    {
+        if (vecXYZ.size() < 1)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, SString("You must add at least 1 vertex while using indices.", vecXYZ.size()).c_str());
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    else if (!g_pCore->GetGraphics()->IsValidPrimitiveSize(vecXYZ.size(), ePrimitiveType))
+    {
+        m_pScriptDebugging->LogCustom(luaVM, SString("Vertices amount %i is invalid selected vertices type", vecXYZ.size()).c_str());
+        lua_pushboolean(luaVM, false);
+        return 1;
     }
 
     if (!argStream.HasErrors())
