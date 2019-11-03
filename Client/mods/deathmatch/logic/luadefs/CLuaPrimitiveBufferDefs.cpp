@@ -217,7 +217,8 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                         return 1;
                     }
                 }
-                std::transform(std::begin(vec16BitIndexList), std::end(vec16BitIndexList), std::begin(vec16BitIndexList), [](unsigned short x) { return x - 1; });
+                std::transform(std::begin(vec16BitIndexList), std::end(vec16BitIndexList), std::begin(vec16BitIndexList),
+                               [](unsigned short x) { return x - 1; });
             }
             else
             {
@@ -307,6 +308,35 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
         }
     }
 
+    if (vec32BitIndexList.size() > 0)
+    {
+        int i = 0;
+        for (auto& index : vec32BitIndexList)
+        {
+            i++;
+            if (index > vecXYZ.size())
+            {
+                m_pScriptDebugging->LogCustom(luaVM, SString("Indices table contains index %i out of range at %i table index.", index, i).c_str());
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+    }
+    if (vec16BitIndexList.size() > 0)
+    {
+        int i = 0;
+        for (auto& index : vec16BitIndexList)
+        {
+            i++;
+            if (index > vecXYZ.size())
+            {
+                m_pScriptDebugging->LogCustom(luaVM, SString("Indices table contains index %i out of range at %i table index.", index, i).c_str());
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+    }
+
     if (!argStream.HasErrors())
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -333,6 +363,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                     if (vecUV.size() > 0)
                     {
                         FVF |= D3DFVF_TEX1;
+                        pBuffer->SetRequireMaterial(true);
                         pBuffer->AddVertexBuffer(vecUV, PRIMITIVE_DATA_UV);
                     }
                     if (vecDiffuse.size() > 0)
