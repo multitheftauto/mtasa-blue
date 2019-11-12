@@ -361,11 +361,18 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     StringEncryptFunction algorithm;
     SString               data;
     CStringMap            options;
+    CLuaFunctionRef       luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
+
+    if (argStream.NextIsFunction())
+    {
+        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunctionComplete();
+    }
 
     if (!argStream.HasErrors())
     {
@@ -382,9 +389,38 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                SString result;
-                SharedUtil::TeaEncode(data, key, &result);
-                lua_pushlstring(luaVM, result, result.length());
+                // Sync
+                if (luaFunctionRef == CLuaFunctionRef())
+                {
+                    SString result;
+                    SharedUtil::TeaEncode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                else            // Async
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key] {
+                                // Execute time-consuming task
+                                SString result;
+                                SharedUtil::TeaEncode(data, key, &result);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
                 return 1;
             }
             default:
@@ -407,11 +443,18 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     StringEncryptFunction algorithm;
     SString               data;
     CStringMap            options;
+    CLuaFunctionRef       luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
+
+    if (argStream.NextIsFunction())
+    {
+        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunctionComplete();
+    }
 
     if (!argStream.HasErrors())
     {
@@ -428,9 +471,38 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                SString result;
-                SharedUtil::TeaDecode(data, key, &result);
-                lua_pushlstring(luaVM, result, result.length());
+                // Sync
+                if (luaFunctionRef == CLuaFunctionRef())
+                {
+                    SString result;
+                    SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                else            // Async
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key] {
+                                // Execute time-consuming task
+                                SString result;
+                                SharedUtil::TeaDecode(data, key, &result);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
                 return 1;
             }
             default:
