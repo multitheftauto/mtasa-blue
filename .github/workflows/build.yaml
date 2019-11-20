@@ -28,6 +28,14 @@ jobs:
           DXSDK_DIR: './utils/DXFiles/'
           CI: 'true'
 
+      - name: Create build artifacts
+        run: utils\premake5 compose_files
+      
+      - uses: actions/upload-artifact@master
+        with:
+          name: InstallFiles
+          path: InstallFiles/
+
   macOS:
     name: Build on macOS
     runs-on: macOS-latest
