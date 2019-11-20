@@ -1,0 +1,53 @@
+# Trigger on push
+on: push
+
+jobs:
+  windows:
+    name: Build on Windows
+    runs-on: windows-2016
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+
+      - name: Download DirectX
+        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
+        shell: powershell
+
+      - name: Extract DirectX
+        run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
+        shell: powershell
+
+      - name: Install CEF
+        run: utils\premake5 install_cef
+
+      - name: Run Build
+        run: win-build.bat
+        shell: cmd
+        env:
+          DXSDK_DIR: './utils/DXFiles/'
+          CI: 'true'
+
+  macOS:
+    name: Build on macOS
+    runs-on: macOS-latest
+    steps:
+      - name: Install MySQL
+        run: brew install mysql
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+      - name: Run Build
+        run: ./linux-build.sh
+
+  linux:
+    name: Build on Linux
+    runs-on: ubuntu-16.04
+    container:
+      image: docker://sbx320/mtasa-blue-azure:latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+      - name: Run Build
+        run: ./linux-build.sh
