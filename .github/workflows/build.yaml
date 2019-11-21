@@ -10,11 +10,19 @@ jobs:
         with:
           fetch-depth: 10
 
+      - uses: actions/cache@v1
+        id: cache-dxfiles
+        with:
+          path: utils/DXFiles
+          key: dxfiles-0001
+
       - name: Download DirectX
+        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
         run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
         shell: powershell
 
       - name: Extract DirectX
+        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
         run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
         shell: powershell
 
@@ -30,7 +38,7 @@ jobs:
 
       - name: Create build artifacts
         run: utils\premake5 compose_files
-      
+
       - uses: actions/upload-artifact@master
         with:
           name: InstallFiles
