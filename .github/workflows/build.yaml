@@ -1,3 +1,5 @@
+name: Build
+
 # Trigger on push
 on: push
 
