@@ -553,6 +553,7 @@ int CLuaElementDefs::isElementData(lua_State* luaVM)
 
     if (argStream.HasErrors())
     {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
     
