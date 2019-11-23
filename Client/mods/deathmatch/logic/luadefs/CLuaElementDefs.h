@@ -49,6 +49,7 @@ public:
     LUA_DECLARE(GetAttachedElements);
     LUA_DECLARE(GetElementDistanceFromCentreOfMassToBaseOfModel);
     LUA_DECLARE(IsElementLocal);
+    LUA_DECLARE(IsElementData);
     LUA_DECLARE(GetElementAttachedOffsets);
     LUA_DECLARE(GetElementAlpha);
     LUA_DECLARE(IsElementOnScreen);

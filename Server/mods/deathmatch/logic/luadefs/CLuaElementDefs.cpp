@@ -69,6 +69,7 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", getElementData},
+        {"isElementData", isElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
 
@@ -160,6 +161,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getData", "getElementData");
+    lua_classfunction(luaVM, "isData", "isElementData");
     lua_classfunction(luaVM, "getPosition", "getElementPosition", OOP_getElementPosition);
     lua_classfunction(luaVM, "getRotation", "getElementRotation", OOP_getElementRotation);
     lua_classfunction(luaVM, "getMatrix", "getElementMatrix", OOP_getElementMatrix);
@@ -206,6 +208,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
+    // Don't know how this works, but don't forget to add isElementData if needed
     // lua_classvariable(luaVM, "data", "setElementData", "getElementData", OOP_setElementData, OOP_getElementData);
     // lua_classvariable(luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", OOP_setElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo); //
     // .visibility[john]=false
@@ -525,6 +528,52 @@ int CLuaElementDefs::getElementData(lua_State* luaVM)
             if (pVariable)
             {
                 pVariable->Push(luaVM);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::isElementData(lua_State* luaVM)
+{
+    //  bool isElementData ( element theElement, string key [, inherit = true] )
+    CElement* pElement;
+    SString   strKey;
+    bool      bInherit;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadBool(bInherit, true);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            {
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+            }
+
+            // Look for data with given key
+            CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
+            if (pVariable)
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
                 return 1;
             }
         }
@@ -1065,7 +1114,7 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
     {
         // Query the spatial database
         CElementResult result;
-        GetSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
         lua_newtable(luaVM);
         unsigned int index = 0;

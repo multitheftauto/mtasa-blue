@@ -69,6 +69,7 @@ public:
     // Element data
     LUA_DECLARE(getElementData);
     LUA_DECLARE(setElementData);
+    LUA_DECLARE(isElementData);
     LUA_DECLARE(removeElementData);
 
     // Attachement
