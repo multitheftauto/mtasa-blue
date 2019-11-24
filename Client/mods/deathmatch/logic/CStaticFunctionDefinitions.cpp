@@ -1638,7 +1638,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
         // Check it's Analog
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
             {
                 bState = fState > 0;
                 return true;
@@ -1660,7 +1660,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput)
 {
     if (Ped.GetType() == CCLIENTPLAYER)
     {
@@ -1668,9 +1668,13 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const
         Ped.GetControllerState(cs);
         bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
         unsigned int uiIndex;
+
+        if (bRawInput)
+            cs = Ped.m_rawControllerState;
+
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
-            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState);
+            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
         else
             fState = CClientPad::GetControlState(szControl, cs, bOnFoot) == true ? 1.0f : 0.0f;
 
@@ -6986,7 +6990,7 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
 
     float fState;
     // Analog
-    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState))
+    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState, false))
     {
         bState = fState > 0;
         return true;
@@ -7005,13 +7009,17 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState, bool bRawInput)
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
     pLocalPlayer->GetControllerState(cs);
     bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
-    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+
+    if (bRawInput)
+        cs = pLocalPlayer->m_rawControllerState;
+
+    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
         return true;
     }
