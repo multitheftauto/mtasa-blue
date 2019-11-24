@@ -868,9 +868,9 @@ struct SFullKeysyncSync : public ISyncStructure
         if (bitStream.Version() >= 0x06E)
         {
             bitStream.Read(ucButtonSquare);
-            data.sButtonSquare = static_cast<short>(ucButtonSquare);            // override SSmallKeysyncSync data with analog values
+            data.ucButtonSquare = ucButtonSquare;            // override SSmallKeysyncSync data with analog values
             bitStream.Read(ucButtonCross);
-            data.sButtonCross = static_cast<short>(ucButtonCross);              // override SSmallKeysyncSync data with analog values
+            data.ucButtonCross = ucButtonCross;              // override SSmallKeysyncSync data with analog values
         }
 
         bitStream.Read(cLeftStickX);
@@ -888,8 +888,8 @@ struct SFullKeysyncSync : public ISyncStructure
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Write(static_cast<unsigned char>(data.sButtonSquare));
-            bitStream.Write(static_cast<unsigned char>(data.sButtonCross));
+            bitStream.Write(data.ucButtonSquare);
+            bitStream.Write(data.ucButtonCross);
         }
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
@@ -900,18 +900,18 @@ struct SFullKeysyncSync : public ISyncStructure
 
     struct
     {
-        bool  bLeftShoulder1 : 1;
-        bool  bRightShoulder1 : 1;
-        bool  bButtonSquare : 1;
-        bool  bButtonCross : 1;
-        bool  bButtonCircle : 1;
-        bool  bButtonTriangle : 1;
-        bool  bShockButtonL : 1;
-        bool  bPedWalk : 1;
-        short sButtonSquare;
-        short sButtonCross;
-        short sLeftStickX;
-        short sLeftStickY;
+        bool          bLeftShoulder1 : 1;
+        bool          bRightShoulder1 : 1;
+        bool          bButtonSquare : 1;
+        bool          bButtonCross : 1;
+        bool          bButtonCircle : 1;
+        bool          bButtonTriangle : 1;
+        bool          bShockButtonL : 1;
+        bool          bPedWalk : 1;
+        unsigned char ucButtonSquare;
+        unsigned char ucButtonCross;
+        short         sLeftStickX;
+        short         sLeftStickY;
     } data;
 };
 
@@ -933,9 +933,9 @@ struct SSmallKeysyncSync : public ISyncStructure
         if (bitStream.Version() >= 0x06E)
         {
             bitStream.Read(ucButtonSquare);
-            data.sButtonSquare = static_cast<short>(ucButtonSquare);            // override SSmallKeysyncSync data with analog values
+            data.ucButtonSquare = ucButtonSquare;            // override SSmallKeysyncSync data with analog values
             bitStream.Read(ucButtonCross);
-            data.sButtonCross = static_cast<short>(ucButtonCross);              // override SSmallKeysyncSync data with analog values
+            data.ucButtonCross = ucButtonCross;              // override SSmallKeysyncSync data with analog values
         }
 
         bitStream.Read(cLeftStickX);
@@ -953,8 +953,8 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Write(static_cast<unsigned char>(data.sButtonSquare));
-            bitStream.Write(static_cast<unsigned char>(data.sButtonCross));
+            bitStream.Write(data.ucButtonSquare);
+            bitStream.Write(data.ucButtonCross);
         }
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
@@ -965,18 +965,18 @@ struct SSmallKeysyncSync : public ISyncStructure
 
     struct
     {
-        bool  bLeftShoulder1 : 1;
-        bool  bRightShoulder1 : 1;
-        bool  bButtonSquare : 1;
-        bool  bButtonCross : 1;
-        bool  bButtonCircle : 1;
-        bool  bButtonTriangle : 1;
-        bool  bShockButtonL : 1;
-        bool  bPedWalk : 1;
-        short sButtonCross;
-        short sButtonSquare;
-        short sLeftStickX;
-        short sLeftStickY;
+        bool          bLeftShoulder1 : 1;
+        bool          bRightShoulder1 : 1;
+        bool          bButtonSquare : 1;
+        bool          bButtonCross : 1;
+        bool          bButtonCircle : 1;
+        bool          bButtonTriangle : 1;
+        bool          bShockButtonL : 1;
+        bool          bPedWalk : 1;
+        unsigned char ucButtonCross;
+        unsigned char ucButtonSquare;
+        short         sLeftStickX;
+        short         sLeftStickY;
     } data;
 };
 
