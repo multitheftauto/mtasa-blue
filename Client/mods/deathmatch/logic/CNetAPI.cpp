@@ -1759,8 +1759,16 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
-    ControllerState.ButtonSquare = 255 * keys.data.bButtonSquare;
-    ControllerState.ButtonCross = 255 * keys.data.bButtonCross;
+    if (BitStream.Version() >= 0x06E)
+    {
+        ControllerState.ButtonSquare = keys.data.sButtonSquare;
+        ControllerState.ButtonCross = keys.data.sButtonCross;
+    }
+    else
+    {
+        ControllerState.ButtonSquare = 255 * keys.data.bButtonSquare;
+        ControllerState.ButtonCross = 255 * keys.data.bButtonCross;
+    }
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = 255 * keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = 255 * keys.data.bShockButtonL;
@@ -1781,6 +1789,8 @@ void CNetAPI::WriteSmallKeysync(const CControllerState& ControllerState, NetBitS
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);            // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                // Crouch / Horn
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                       // Walk / -
+    keys.data.sButtonSquare = ControllerState.ButtonSquare;                       // Jump / Reverse
+    keys.data.sButtonCross = ControllerState.ButtonCross;                         // Sprint / Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -1798,8 +1808,16 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = 255 * keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
-    ControllerState.ButtonSquare = 255 * keys.data.bButtonSquare;
-    ControllerState.ButtonCross = 255 * keys.data.bButtonCross;
+    if (BitStream.Version() >= 0x06E)
+    {
+        ControllerState.ButtonSquare = keys.data.sButtonSquare;
+        ControllerState.ButtonCross = keys.data.sButtonCross;
+    }
+    else
+    {
+        ControllerState.ButtonSquare = 255 * keys.data.bButtonSquare;
+        ControllerState.ButtonCross = 255 * keys.data.bButtonCross;
+    }
     ControllerState.ButtonCircle = 255 * keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = 255 * keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = 255 * keys.data.bShockButtonL;
@@ -1823,6 +1841,8 @@ void CNetAPI::WriteFullKeysync(const CControllerState& ControllerState, NetBitSt
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);
+    keys.data.sButtonSquare = ControllerState.ButtonSquare;
+    keys.data.sButtonCross = ControllerState.ButtonCross;
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 

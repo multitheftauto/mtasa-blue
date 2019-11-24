@@ -858,10 +858,21 @@ struct SFullKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read(NetBitStreamInterface& bitStream)
     {
-        char cLeftStickX;
-        char cLeftStickY;
+        char          cLeftStickX;
+        char          cLeftStickY;
+        unsigned char ucButtonSquare;
+        unsigned char ucButtonCross;
 
         bitStream.ReadBits((char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06E)
+        {
+            bitStream.Read(ucButtonSquare);
+            data.sButtonSquare = static_cast<short>(ucButtonSquare);            // override SSmallKeysyncSync data with analog values
+            bitStream.Read(ucButtonCross);
+            data.sButtonCross = static_cast<short>(ucButtonCross);              // override SSmallKeysyncSync data with analog values
+        }
+
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
         {
@@ -874,6 +885,13 @@ struct SFullKeysyncSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits((const char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06E)
+        {
+            bitStream.Write(static_cast<unsigned char>(data.sButtonSquare));
+            bitStream.Write(static_cast<unsigned char>(data.sButtonCross));
+        }
+
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
         char cLeftStickY = static_cast<char>((float)data.sLeftStickY * 127.0f / 128.0f);
@@ -890,6 +908,8 @@ struct SFullKeysyncSync : public ISyncStructure
         bool  bButtonTriangle : 1;
         bool  bShockButtonL : 1;
         bool  bPedWalk : 1;
+        short sButtonSquare;
+        short sButtonCross;
         short sLeftStickX;
         short sLeftStickY;
     } data;
@@ -903,10 +923,21 @@ struct SSmallKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read(NetBitStreamInterface& bitStream)
     {
-        char cLeftStickX;
-        char cLeftStickY;
-
+        char          cLeftStickX;
+        char          cLeftStickY;
+        unsigned char ucButtonSquare;
+        unsigned char ucButtonCross;
+        
         bitStream.ReadBits((char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06E)
+        {
+            bitStream.Read(ucButtonSquare);
+            data.sButtonSquare = static_cast<short>(ucButtonSquare);            // override SSmallKeysyncSync data with analog values
+            bitStream.Read(ucButtonCross);
+            data.sButtonCross = static_cast<short>(ucButtonCross);              // override SSmallKeysyncSync data with analog values
+        }
+
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
         {
@@ -919,6 +950,13 @@ struct SSmallKeysyncSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits((const char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06E)
+        {
+            bitStream.Write(static_cast<unsigned char>(data.sButtonSquare));
+            bitStream.Write(static_cast<unsigned char>(data.sButtonCross));
+        }
+
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
         char cLeftStickY = static_cast<char>((float)data.sLeftStickY * 127.0f / 128.0f);
@@ -935,6 +973,8 @@ struct SSmallKeysyncSync : public ISyncStructure
         bool  bButtonTriangle : 1;
         bool  bShockButtonL : 1;
         bool  bPedWalk : 1;
+        short sButtonCross;
+        short sButtonSquare;
         short sLeftStickX;
         short sLeftStickY;
     } data;
