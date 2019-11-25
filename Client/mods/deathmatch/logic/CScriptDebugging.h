@@ -39,7 +39,7 @@ public:
     CScriptDebugging(CLuaManager* pLuaManager);
     ~CScriptDebugging();
 
-    void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
+    void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bOmitDebugInfo, const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
     void LogWarning(lua_State* luaVM, const char* szFormat, ...);
     void LogError(lua_State* luaVM, const char* szFormat, ...);
@@ -65,7 +65,7 @@ public:
 private:
     SString ComposeErrorMessage(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage);
     void LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed = 255,
-                   unsigned char ucGreen = 255, unsigned char ucBlue = 255);
+                   unsigned char ucGreen = 255, unsigned char ucBlue = 255, bool bOmitDebugInfo = false);
     void PrintLog(const char* szText);
 
 public:

@@ -133,12 +133,14 @@ int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
     unsigned char    ucRed = 255;
     unsigned char    ucGreen = 255;
     unsigned char    ucBlue = 255;
+    bool             bOmitDebugInfo = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadAnyAsString(strText);
     argStream.ReadNumber(uiLevel, 3);
     argStream.ReadNumber(ucRed, 255);
     argStream.ReadNumber(ucGreen, 255);
     argStream.ReadNumber(ucBlue, 255);
+    argStream.ReadBool(bOmitDebugInfo, false);
 
     // Too big level?
     if (uiLevel > 3)
@@ -166,7 +168,7 @@ int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
             }
             else if (uiLevel == 0)
             {
-                m_pScriptDebugging->LogCustom(luaVM, ucRed, ucGreen, ucBlue, "%s", strText.c_str());
+                m_pScriptDebugging->LogCustom(luaVM, ucRed, ucGreen, ucBlue, bOmitDebugInfo, "%s", strText.c_str());
             }
 
             // Success

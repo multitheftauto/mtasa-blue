@@ -44,7 +44,8 @@ void CScriptDebugging::LogPCallError(lua_State* luaVM, const SString& strRes, bo
     }
 }
 
-void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
+void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bOmitDebugInfo, const char* szFormat,
+                                 ...)
 {
     assert(szFormat);
 
@@ -55,7 +56,7 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
-    LogString("", GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue);
+    LogString("", GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue, bOmitDebugInfo);
 }
 
 void CScriptDebugging::LogInformation(lua_State* luaVM, const char* szFormat, ...)
@@ -156,12 +157,12 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
 }
 
 void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
-                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bOmitDebugInfo)
 {
     SString strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
 
-    // Create a different message if type is "INFO"
-    if (uiMinimumDebugLevel > 2)
+    // Create a different message if type is "INFO" or it's a custom message with debug lines output omitted
+    if (uiMinimumDebugLevel > 2 || bOmitDebugInfo)
         strText = SString("%s%s", szPrePend, szMessage);
 
     switch (uiMinimumDebugLevel)
