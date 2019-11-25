@@ -858,19 +858,30 @@ struct SFullKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read(NetBitStreamInterface& bitStream)
     {
-        char          cLeftStickX;
-        char          cLeftStickY;
-        unsigned char ucButtonSquare;
-        unsigned char ucButtonCross;
+        char cLeftStickX;
+        char cLeftStickY;
 
         bitStream.ReadBits((char*)&data, 8);
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Read(ucButtonSquare);
-            data.ucButtonSquare = ucButtonSquare;            // override SSmallKeysyncSync data with analog values
-            bitStream.Read(ucButtonCross);
-            data.ucButtonCross = ucButtonCross;              // override SSmallKeysyncSync data with analog values
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonSquare;
+                bitStream.Read(ucButtonSquare);
+                data.ucButtonSquare = ucButtonSquare;
+            }
+            else
+                data.ucButtonSquare = 0;
+
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonCross;
+                bitStream.Read(ucButtonCross);
+                data.ucButtonCross = ucButtonCross;
+            }
+            else
+                data.ucButtonCross = 0;
         }
 
         bitStream.Read(cLeftStickX);
@@ -888,8 +899,21 @@ struct SFullKeysyncSync : public ISyncStructure
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Write(data.ucButtonSquare);
-            bitStream.Write(data.ucButtonCross);
+            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonSquare);
+            }
+            else
+                bitStream.WriteBit(false);
+
+            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonCross);
+            }
+            else
+                bitStream.WriteBit(false);
         }
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
@@ -923,19 +947,30 @@ struct SSmallKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read(NetBitStreamInterface& bitStream)
     {
-        char          cLeftStickX;
-        char          cLeftStickY;
-        unsigned char ucButtonSquare;
-        unsigned char ucButtonCross;
-        
+        char cLeftStickX;
+        char cLeftStickY;
+
         bitStream.ReadBits((char*)&data, 8);
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Read(ucButtonSquare);
-            data.ucButtonSquare = ucButtonSquare;            // override SSmallKeysyncSync data with analog values
-            bitStream.Read(ucButtonCross);
-            data.ucButtonCross = ucButtonCross;              // override SSmallKeysyncSync data with analog values
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonSquare;
+                bitStream.Read(ucButtonSquare);
+                data.ucButtonSquare = ucButtonSquare;
+            }
+            else
+                data.ucButtonSquare = 0;
+
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonCross;
+                bitStream.Read(ucButtonCross);
+                data.ucButtonCross = ucButtonCross;
+            }
+            else
+                data.ucButtonCross = 0;
         }
 
         bitStream.Read(cLeftStickX);
@@ -953,8 +988,21 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         if (bitStream.Version() >= 0x06E)
         {
-            bitStream.Write(data.ucButtonSquare);
-            bitStream.Write(data.ucButtonCross);
+            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonSquare);
+            }
+            else
+                bitStream.WriteBit(false);
+
+            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonCross);
+            }
+            else
+                bitStream.WriteBit(false);
         }
 
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);

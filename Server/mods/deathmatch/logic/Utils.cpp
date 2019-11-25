@@ -559,16 +559,18 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
     if (BitStream.Version() >= 0x06E)
     {
-        ControllerState.ButtonSquare = (signed short)keys.data.ucButtonSquare;            // override controller state with analog data if present
-        ControllerState.ButtonCross = (signed short)keys.data.ucButtonCross;              // override controller state with analog data if present
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
-    else
-    {
-        ControllerState.ButtonSquare = keys.data.bButtonSquare ? 255 : 0;
-        ControllerState.ButtonCross = keys.data.bButtonCross ? 255 : 0;
-    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = keys.data.bShockButtonL;
@@ -612,16 +614,18 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
     if (BitStream.Version() >= 0x06E)
     {
-        ControllerState.ButtonSquare = (signed short)keys.data.ucButtonSquare;            // override controller state with analog data if present
-        ControllerState.ButtonCross = (signed short)keys.data.ucButtonCross;              // override controller state with analog data if present
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
-    else
-    {
-        ControllerState.ButtonSquare = keys.data.bButtonSquare ? 255 : 0;
-        ControllerState.ButtonCross = keys.data.bButtonCross ? 255 : 0;
-    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = keys.data.bShockButtonL;
