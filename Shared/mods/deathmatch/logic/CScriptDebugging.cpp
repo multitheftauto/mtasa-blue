@@ -44,7 +44,7 @@ void CScriptDebugging::LogPCallError(lua_State* luaVM, const SString& strRes, bo
     }
 }
 
-void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bOmitDebugInfo, const char* szFormat,
+void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool omitDebugInfo, const char* szFormat,
                                  ...)
 {
     assert(szFormat);
@@ -56,7 +56,8 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
-    LogString("", GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue, bOmitDebugInfo);
+    // Send empty SLuaDebugInfo if omitDebugInfo is true
+    LogString("", omitDebugInfo ? SLuaDebugInfo() : GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue);
 }
 
 void CScriptDebugging::LogInformation(lua_State* luaVM, const char* szFormat, ...)
@@ -157,12 +158,14 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
 }
 
 void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
-                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bOmitDebugInfo)
+                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    SString strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
+    SString strText
 
-    // Create a different message if type is "INFO" or it's a custom message with debug lines output omitted
-    if (uiMinimumDebugLevel > 2 || bOmitDebugInfo)
+    // Compose an error message if the SLuaDebugInfo has valid data and message is neither of type 0 (custom) or 1 (info)
+    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel > 2)
+        strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
+    else
         strText = SString("%s%s", szPrePend, szMessage);
 
     switch (uiMinimumDebugLevel)

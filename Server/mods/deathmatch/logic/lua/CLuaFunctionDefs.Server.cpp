@@ -179,7 +179,7 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     SString       strMessage;
     unsigned int  uiLevel;
     unsigned char ucR, ucG, ucB;
-    bool          bOmitDebugInfo;
+    bool          omitDebugInfo;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadAnyAsString(strMessage);
@@ -190,7 +190,7 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         argStream.ReadNumber(ucR, 0xFF);
         argStream.ReadNumber(ucG, 0xFF);
         argStream.ReadNumber(ucB, 0xFF);
-        argStream.ReadBool(bOmitDebugInfo, false);
+        argStream.ReadBool(omitDebugInfo, false);
     }
 
     if (!argStream.HasErrors())
@@ -217,7 +217,7 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         }
         else if (uiLevel == 0)
         {
-            m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, bOmitDebugInfo, "%s", strMessage.c_str());
+            m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, omitDebugInfo, "%s", strMessage.c_str());
         }
         lua_pushboolean(luaVM, true);
         return 1;
