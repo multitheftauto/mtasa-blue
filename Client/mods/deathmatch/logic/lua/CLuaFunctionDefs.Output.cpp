@@ -137,10 +137,14 @@ int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadAnyAsString(strText);
     argStream.ReadNumber(uiLevel, 3);
-    argStream.ReadNumber(ucRed, 255);
-    argStream.ReadNumber(ucGreen, 255);
-    argStream.ReadNumber(ucBlue, 255);
-    argStream.ReadBool(omitDebugInfo, false);
+
+    if (uiLevel == 0)
+    {
+        argStream.ReadNumber(ucRed, 255);
+        argStream.ReadNumber(ucGreen, 255);
+        argStream.ReadNumber(ucBlue, 255);
+        argStream.ReadBool(omitDebugInfo, false);
+    }
 
     // Too big level?
     if (uiLevel > 3)
