@@ -23,6 +23,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementByID", GetElementByID},
         {"getElementByIndex", GetElementByIndex},
         {"getElementData", GetElementData},
+        {"hasElementData", HasElementData},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
@@ -163,6 +164,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAttachedTo", "getElementAttachedTo");
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getData", "getElementData");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
@@ -366,6 +368,43 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaElementDefs::HasElementData(lua_State* luaVM)
+{
+    //  var getElementData ( element theElement, string key [, inherit = true] )
+    CClientEntity* pEntity;
+    SString        strKey;
+    bool           bInherit;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadString(strKey);
+    argStream.ReadBool(bInherit, true);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            {
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                    *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+            }
+
+            lua_pushboolean(luaVM, pEntity->GetCustomData(strKey, bInherit) != NULL);
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {

@@ -68,6 +68,7 @@ public:
 
     // Element data
     LUA_DECLARE(getElementData);
+    LUA_DECLARE(hasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);
 

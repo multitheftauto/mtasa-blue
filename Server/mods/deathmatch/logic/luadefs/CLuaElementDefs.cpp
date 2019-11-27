@@ -69,6 +69,7 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", getElementData},
+        {"getElementData", hasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
 
@@ -160,6 +161,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getData", "getElementData");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "getPosition", "getElementPosition", OOP_getElementPosition);
     lua_classfunction(luaVM, "getRotation", "getElementRotation", OOP_getElementRotation);
     lua_classfunction(luaVM, "getMatrix", "getElementMatrix", OOP_getElementMatrix);
@@ -527,6 +529,41 @@ int CLuaElementDefs::getElementData(lua_State* luaVM)
                 pVariable->Push(luaVM);
                 return 1;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::getElementData(lua_State* luaVM)
+{
+    //  var getElementData ( element theElement, string key [, inherit = true] )
+    CElement* pElement;
+    SString   strKey;
+    bool      bInherit;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadBool(bInherit, true);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            {
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                    *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+            }
+
+            lua_pushboolean(luaVM, pElement->GetCustomData(strKey, bInherit) != NULL);
         }
     }
     else
