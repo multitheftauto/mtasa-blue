@@ -538,7 +538,7 @@ int CLuaElementDefs::getElementData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::getElementData(lua_State* luaVM)
+int CLuaElementDefs::hasElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )
     CElement* pElement;
