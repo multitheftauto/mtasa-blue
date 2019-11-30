@@ -5,7 +5,7 @@ on: push
 
 jobs:
   windows:
-    name: Build on Windows
+    name: windows
     runs-on: windows-2016
     steps:
       - uses: actions/checkout@v1
@@ -47,7 +47,7 @@ jobs:
           path: InstallFiles/
 
   macOS:
-    name: Build on macOS
+    name: macOS
     runs-on: macOS-latest
     steps:
       - name: Install MySQL
@@ -59,7 +59,7 @@ jobs:
         run: ./linux-build.sh
 
   linux:
-    name: Build on Linux
+    name: linux
     runs-on: ubuntu-16.04
     container:
       image: docker://sbx320/mtasa-blue-azure:latest
