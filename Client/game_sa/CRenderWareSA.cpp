@@ -199,16 +199,16 @@ CRenderWareSA::~CRenderWareSA()
 }
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffer& fileData)
+RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SString& buffer)
 {
     // open the stream
     RwStream* streamTexture;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    RwBuffer  streamBuffer;
+    if (!buffer.empty())
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
-        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
+        streamBuffer.ptr = (void*)buffer.data();
+        streamBuffer.size = buffer.size();
+        streamTexture = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
     }
     else
         streamTexture = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
@@ -239,7 +239,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const CBuffe
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
     // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
@@ -250,12 +250,12 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const CBuffer& fileD
 
     // open the stream
     RwStream* streamModel;
-    RwBuffer  buffer;
-    if (!fileData.IsEmpty())
+    RwBuffer  streamBuffer;
+    if (!buffer.empty())
     {
-        buffer.ptr = (void*)fileData.GetData();
-        buffer.size = fileData.GetSize();
-        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer);
+        streamBuffer.ptr = (void*)buffer.data();
+        streamBuffer.size = buffer.size();
+        streamModel = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
     }
     else
         streamModel = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename);
@@ -421,17 +421,17 @@ void CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
 }
 
 // Reads and parses a COL3 file
-CColModel* CRenderWareSA::ReadCOL(const CBuffer& fileData)
+CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 {
-    if (fileData.GetSize() < sizeof(ColModelFileHeader) + 16)
+    if (buffer.size() < sizeof(ColModelFileHeader) + 16)
         return NULL;
 
-    const ColModelFileHeader& header = *(ColModelFileHeader*)fileData.GetData();
+    const ColModelFileHeader& header = *(ColModelFileHeader*)buffer.data();
 
     // Load the col model
     if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
     {
-        unsigned char* pModelData = (unsigned char*)fileData.GetData() + sizeof(ColModelFileHeader);
+        unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
 
         // Create a new CColModel
         CColModelSA* pColModel = new CColModelSA();

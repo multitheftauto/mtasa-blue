@@ -1442,7 +1442,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = Ped.GetModel();
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
                 return false;
@@ -2974,9 +2974,9 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3006,7 +3006,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
                     break;
             }
 
-            Vehicle.SetDoorStatus(ucDoor, ucState);
+            Vehicle.SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
 
             return true;
         }

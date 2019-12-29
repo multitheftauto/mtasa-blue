@@ -64,6 +64,8 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 
+class CRemoteCall;
+
 enum eDXHorizontalAlign
 {
     DX_ALIGN_LEFT = DT_LEFT,
@@ -306,6 +308,10 @@ inline SString GetClassTypeName(CClientTeam*)
 inline SString GetClassTypeName(CClientPed*)
 {
     return "ped";
+}
+inline SString GetClassTypeName(CRemoteCall*)
+{
+    return "remotecall";
 }
 inline SString GetClassTypeName(CClientProjectile*)
 {
@@ -688,6 +694,20 @@ CClientEntity* UserDataCast(CClientEntity*, void* ptr, lua_State*)
     if (!pEntity || pEntity->IsBeingDeleted() || !pEntity->IsA(T::GetClassId()))
         return NULL;
     return pEntity;
+}
+
+//
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+    
+    if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+
+    return nullptr;
 }
 
 //

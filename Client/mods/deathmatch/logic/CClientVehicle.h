@@ -263,7 +263,7 @@ public:
 
     bool AreLightsOn();
 
-    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus);
+    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
     void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);

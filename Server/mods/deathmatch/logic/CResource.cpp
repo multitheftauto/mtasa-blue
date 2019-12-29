@@ -786,6 +786,36 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     m_pResourceDynamicElementRoot->SetTypeName("map");
     m_pResourceDynamicElementRoot->SetName("dynamic");
 
+    // Verify resource element id and dynamic element root id
+    if (m_pResourceElement->GetID() == INVALID_ELEMENT_ID || m_pResourceDynamicElementRoot->GetID() == INVALID_ELEMENT_ID)
+    {
+        // Destroy the dynamic element root
+        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        m_pResourceDynamicElementRoot = nullptr;
+
+        // Destroy the resource element
+        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
+        m_pResourceElement = nullptr;
+
+        // Remove the temporary XML storage node
+        if (m_pNodeStorage)
+        {
+            delete m_pNodeStorage;
+            m_pNodeStorage = nullptr;
+        }
+
+        m_pRootElement = nullptr;
+
+        // Destroy the element group attached directly to this resource
+        delete m_pDefaultElementGroup;
+        m_pDefaultElementGroup = nullptr;
+
+        m_eState = EResourceState::Loaded;
+        m_strFailureReason = SString("Start up of resource %s cancelled by element id starvation", m_strResourceName.c_str());
+        CLogger::LogPrintf("%s\n", m_strFailureReason.c_str());
+        return false;
+    }
+
     // Set the Resource Element name
     m_pResourceElement->SetName(m_strResourceName.c_str());
 

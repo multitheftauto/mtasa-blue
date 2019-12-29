@@ -770,8 +770,9 @@ bool CVehicleSA::AreSwingingDoorsAllowed() const
 
 bool CVehicleSA::AreDoorsLocked()
 {
-    return (GetVehicleInterface()->ul_doorstate == 2 || GetVehicleInterface()->ul_doorstate == 5 || GetVehicleInterface()->ul_doorstate == 4 ||
-            GetVehicleInterface()->ul_doorstate == 7 || GetVehicleInterface()->ul_doorstate == 3);
+    return (GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED || GetVehicleInterface()->m_doorLock == DOOR_LOCK_COP_CAR || 
+            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKED_PLAYER_INSIDE || GetVehicleInterface()->m_doorLock == DOOR_LOCK_SKIP_SHUT_DOORS || 
+            GetVehicleInterface()->m_doorLock == DOOR_LOCK_LOCKOUT_PLAYER_ONLY);
 }
 
 void CVehicleSA::LockDoors(bool bLocked)
@@ -782,42 +783,16 @@ void CVehicleSA::LockDoors(bool bLocked)
     if (bLocked && !bAreDoorsLocked)
     {
         if (bAreDoorsUndamageable)
-            GetVehicleInterface()->ul_doorstate = 7;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_SKIP_SHUT_DOORS;
         else
-            GetVehicleInterface()->ul_doorstate = 2;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_LOCKED;
     }
     else if (!bLocked && bAreDoorsLocked)
     {
         if (bAreDoorsUndamageable)
-            GetVehicleInterface()->ul_doorstate = 1;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_UNLOCKED;
         else
-            GetVehicleInterface()->ul_doorstate = 0;
-    }
-}
-
-bool CVehicleSA::AreDoorsUndamageable()
-{
-    return (GetVehicleInterface()->ul_doorstate == 1 || GetVehicleInterface()->ul_doorstate == 7);
-}
-
-void CVehicleSA::SetDoorsUndamageable(bool bUndamageable)
-{
-    bool bAreDoorsLocked = AreDoorsLocked();
-    bool bAreDoorsUndamageable = AreDoorsUndamageable();
-
-    if (bUndamageable && !bAreDoorsUndamageable)
-    {
-        if (bAreDoorsLocked)
-            GetVehicleInterface()->ul_doorstate = 7;
-        else
-            GetVehicleInterface()->ul_doorstate = 1;
-    }
-    else if (!bUndamageable && bAreDoorsUndamageable)
-    {
-        if (bAreDoorsLocked)
-            GetVehicleInterface()->ul_doorstate = 2;
-        else
-            GetVehicleInterface()->ul_doorstate = 0;
+            GetVehicleInterface()->m_doorLock = DOOR_LOCK_NOT_USED;
     }
 }
 

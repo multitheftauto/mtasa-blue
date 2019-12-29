@@ -242,7 +242,7 @@ public:
     static bool AddVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CClientEntity& Entity);
     static bool RemoveVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CClientEntity& Entity, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState);

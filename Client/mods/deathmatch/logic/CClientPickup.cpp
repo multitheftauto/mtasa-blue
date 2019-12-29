@@ -55,11 +55,7 @@ void CClientPickup::Unlink()
 
 void CClientPickup::GetPosition(CVector& vecPosition) const
 {
-    if (m_pObject)
-    {
-        vecPosition = *m_pObject->GetPosition();
-    }
-    else if (m_pAttachedToEntity)
+    if (m_pAttachedToEntity)
     {
         m_pAttachedToEntity->GetPosition(vecPosition);
         vecPosition += m_vecAttachedPosition;

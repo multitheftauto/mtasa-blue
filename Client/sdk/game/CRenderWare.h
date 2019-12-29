@@ -62,16 +62,16 @@ typedef void (*PFN_WATCH_CALLBACK)(CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNe
 class CRenderWare
 {
 public:
-    virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData,
+    virtual bool             ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer,
                                                       bool bFilteringEnabled) = 0;
     virtual bool             ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId) = 0;
     virtual void             ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures) = 0;
     virtual void             ClothesAddReplacementTxd(char* pFileData, ushort usFileId) = 0;
     virtual void             ClothesRemoveReplacementTxd(char* pFileData) = 0;
     virtual bool             HasClothesReplacementChanged() = 0;
-    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData) = 0;
-    virtual RpClump*         ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
-    virtual CColModel*       ReadCOL(const CBuffer& fileData) = 0;
+    virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
+    virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
+    virtual CColModel*       ReadCOL(const SString& buffer) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;

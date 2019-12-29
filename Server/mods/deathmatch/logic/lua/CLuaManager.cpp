@@ -267,6 +267,9 @@ void CLuaManager::LoadCFunctions()
 
         {"callRemote", CLuaFunctionDefs::CallRemote},
         {"fetchRemote", CLuaFunctionDefs::FetchRemote},
+        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
+        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
+        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
 
         // Misc funcs
         {"resetMapInfo", CLuaFunctionDefs::ResetMapInfo},
