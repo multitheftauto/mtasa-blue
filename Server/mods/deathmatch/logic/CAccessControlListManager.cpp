@@ -328,24 +328,19 @@ bool CAccessControlListManager::CanObjectUseRight(const char* szObjectName, CAcc
     if (m_bReadCacheDirty)
         ClearReadCache();
 
-    // If object is resource, try cache
-    if (eObjectType == CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE)
+    // Make unique key for this query
+    SString strKey("%s %s %d %d %d", szObjectName, szRightName, eObjectType, eRightType, bDefaultAccessRight);
+    // Check if this query has been done before
+    bool* pResult = MapFind(m_ReadCacheMap, strKey);
+    if (!pResult)
     {
-        // Make unique key for this query
-        SString strKey("%s %s %d %d", szObjectName, szRightName, eRightType, bDefaultAccessRight);
-        // Check if this query has been done before
-        bool* pResult = MapFind(m_ReadCacheMap, strKey);
-        if (!pResult)
-        {
-            // If not, do query now and add result to the cache
-            bool bResult = InternalCanObjectUseRight(szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight);
-            MapSet(m_ReadCacheMap, strKey, bResult);
-            pResult = MapFind(m_ReadCacheMap, strKey);
-        }
-        // Return cached result
-        return *pResult;
+        // If not, do query now and add result to the cache
+        bool bResult = InternalCanObjectUseRight(szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight);
+        MapSet(m_ReadCacheMap, strKey, bResult);
+        return bResult;
     }
-    return InternalCanObjectUseRight(szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight);
+    // Return cached result
+    return *pResult;
 }
 
 bool CAccessControlListManager::InternalCanObjectUseRight(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType,
