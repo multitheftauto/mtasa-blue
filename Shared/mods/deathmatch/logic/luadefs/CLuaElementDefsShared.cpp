@@ -2,7 +2,7 @@
 
 int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
-    //  var getElementData ( element theElement, string key [, inherit = true] )
+    // any someVal, bool ok = getElementData ( element theElement, string key [, inherit = true] )
 
 #ifdef MTA_CLIENT
     CClientEntity* pElement;
@@ -37,8 +37,9 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
 #endif
             if (pVariable)
             {
-                pVariable->Push(luaVM);
-                return 1;
+                pVariable->Push(luaVM);            // there is an associated warning here. read this function!
+                lua_pushboolean(luaVM, true);
+                return 2;
             }
         }
     }
@@ -47,5 +48,6 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
 
     // Failed
     lua_pushboolean(luaVM, false);
-    return 1;
+    lua_pushboolean(luaVM, false);
+    return 2;
 }
