@@ -6434,10 +6434,10 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CElement* pElement, unsign
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleDoorState(*iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(*iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(pElement))
     {
@@ -6476,6 +6476,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CElement* pElement, unsigne
                 BitStream.pBitStream->Write(ucObject);
                 BitStream.pBitStream->Write(ucDoor);
                 BitStream.pBitStream->Write(ucState);
+                BitStream.pBitStream->WriteBit(spawnFlyingComponent);
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_DAMAGE_STATE, *BitStream.pBitStream));
 
                 return true;

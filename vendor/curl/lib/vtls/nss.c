@@ -1734,20 +1734,16 @@ static CURLcode nss_init_sslver(SSLVersionRange *sslver,
   CURLcode result;
   const long min = SSL_CONN_CONFIG(version);
   const long max = SSL_CONN_CONFIG(version_max);
-
-  /* map CURL_SSLVERSION_DEFAULT to NSS default */
-  if(min == CURL_SSLVERSION_DEFAULT || max == CURL_SSLVERSION_MAX_DEFAULT) {
-    /* map CURL_SSLVERSION_DEFAULT to NSS default */
-    if(SSL_VersionRangeGetDefault(ssl_variant_stream, sslver) != SECSuccess)
-      return CURLE_SSL_CONNECT_ERROR;
-    /* ... but make sure we use at least TLSv1.0 according to libcurl API */
-    if(sslver->min < SSL_LIBRARY_VERSION_TLS_1_0)
-      sslver->min = SSL_LIBRARY_VERSION_TLS_1_0;
-  }
+  SSLVersionRange vrange;
 
   switch(min) {
   case CURL_SSLVERSION_TLSv1:
   case CURL_SSLVERSION_DEFAULT:
+    /* Bump our minimum TLS version if NSS has stricter requirements. */
+    if(SSL_VersionRangeGetDefault(ssl_variant_stream, &vrange) != SECSuccess)
+      return CURLE_SSL_CONNECT_ERROR;
+    if(sslver->min < vrange.min)
+      sslver->min = vrange.min;
     break;
   default:
     result = nss_sslver_from_curl(&sslver->min, min);
@@ -2131,7 +2127,7 @@ static CURLcode nss_do_connect(struct connectdata *conn, int sockindex)
 
 
   /* check timeout situation */
-  const time_t time_left = Curl_timeleft(data, NULL, TRUE);
+  const timediff_t time_left = Curl_timeleft(data, NULL, TRUE);
   if(time_left < 0) {
     failf(data, "timed out before SSL handshake");
     result = CURLE_OPERATION_TIMEDOUT;

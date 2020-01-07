@@ -824,7 +824,7 @@ void CClientVehicle::Fix()
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
     for (int i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i]);
+        SetDoorStatus(i, ucDoorStates[i], true);
     for (int i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0);
     for (int i = 0; i < MAX_LIGHTS; i++)
@@ -1485,13 +1485,13 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
     return 0;
 }
 
-void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus)
+void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent)
 {
     if (ucDoor < MAX_DOORS)
     {
         if (m_pVehicle && HasDamageModel())
         {
-            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus);
+            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus, spawnFlyingComponent);
         }
         m_ucDoorStates[ucDoor] = ucStatus;
     }
@@ -1757,7 +1757,7 @@ void CClientVehicle::PlaceProperlyOnGround()
         {
             m_pVehicle->PlaceBikeOnRoadProperly();
         }
-        else if (m_eVehicleType != CLIENTVEHICLE_BOAT)
+        else if (m_eVehicleType != CLIENTVEHICLE_BOAT && m_eVehicleType != CLIENTVEHICLE_TRAIN)
         {
             m_pVehicle->PlaceAutomobileOnRoadProperly();
         }
@@ -2227,7 +2227,7 @@ void CClientVehicle::StreamedInPulse()
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
                 for (int i = 0; i < MAX_DOORS; i++)
-                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i]);
+                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
                 for (int i = 0; i < MAX_PANELS; i++)
                     pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
                 for (int i = 0; i < MAX_LIGHTS; i++)
@@ -2742,23 +2742,48 @@ void CClientVehicle::Create()
         // Reattach a towed vehicle?
         if (m_pTowedVehicle)
         {
-            // Make sure that the trailer is streamed in
-            if (!m_pTowedVehicle->GetGameVehicle())
+            if (m_pTowedVehicle->IsTowableBy(this))
             {
-                m_pTowedVehicle->StreamIn(true);
-            }
+                // Make sure that the trailer is streamed in
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
 
-            // Attach him
-            if (m_pTowedVehicle->GetGameVehicle())
+                if (m_pTowedVehicle->GetGameVehicle())
+                {
+                    InternalSetTowLink(m_pTowedVehicle);
+                }
+            }
+            else
             {
-                InternalSetTowLink(m_pTowedVehicle);
+                m_pTowedVehicle->m_pTowedByVehicle = nullptr;
+
+                // Stream-in the old unlinked trailer
+                if (!m_pTowedVehicle->GetGameVehicle())
+                {
+                    m_pTowedVehicle->StreamIn(true);
+                }
+
+                m_pTowedVehicle = nullptr;
             }
         }
 
         // Reattach if we're being towed
-        if (m_pTowedByVehicle && m_pTowedByVehicle->GetGameVehicle())
+        if (m_pTowedByVehicle)
         {
-            m_pTowedByVehicle->InternalSetTowLink(this);
+            if (IsTowableBy(m_pTowedByVehicle))
+            {
+                if (m_pTowedByVehicle->GetGameVehicle())
+                {
+                    m_pTowedByVehicle->InternalSetTowLink(this);
+                }
+            }
+            else
+            {
+                m_pTowedByVehicle->m_pTowedVehicle = nullptr;
+                m_pTowedByVehicle = nullptr;
+            }
         }
 
         // Reattach to an entity + any entities attached to this
@@ -2989,6 +3014,11 @@ void CClientVehicle::Destroy()
             // Force the trailer to stream out
             GetTowedVehicle()->StreamOut();
         }
+        
+        if (m_pTowedByVehicle)
+        {
+            m_pVehicle->BreakTowLink();
+        }
 
         if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
         {
@@ -3139,7 +3169,7 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
 
         return true;
     }
-    else if (this->GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN))
+    else if (GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && !pVehicle->IsTowableBy(this)))
     {
         return false;
     }
@@ -3249,6 +3279,11 @@ bool CClientVehicle::InternalSetTowLink(CClientVehicle* pTrailer)
     pTrailer->PlaceProperlyOnGround();            // Probably not needed
 
     return true;
+}
+
+bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
+{
+    return GetModelInfo()->IsTowableBy(towingVehicle->GetModelInfo());
 }
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)

@@ -307,7 +307,15 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     unsigned char ucDoor, ucState;
                     if (bitStream.Read(ucDoor) && bitStream.Read(ucState))
                     {
-                        pVehicle->SetDoorStatus(ucDoor, ucState);
+                        bool spawnFlyingComponent = true;
+
+                        if (bitStream.Version() >= 0x06D)
+                        {
+                            if (!bitStream.ReadBit(spawnFlyingComponent))
+                                break;
+                        }
+
+                        pVehicle->SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
                     }
                     break;
                 }

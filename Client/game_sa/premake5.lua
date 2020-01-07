@@ -33,9 +33,6 @@ project "Game SA"
 		"**.cpp"
 	}
 
-	filter {"system:windows", "toolset:*_xp*"}
-		links { "Psapi.lib" }
-
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 

@@ -19,8 +19,20 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGro
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId)
 {
     pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId, *(DWORD*)0xb4ea34);
-    CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
 
+    // Fix #1109: Weapon Fire ancient crash with anim ID 224
+    if (*pAnimId == 224 && *pAnimGroup != ANIM_GROUP_GRENADE)
+    {
+        if (*pAnimGroup < ANIM_GROUP_PYTHON || *pAnimGroup > ANIM_GROUP_GOGGLES)
+        {
+            LogEvent(533, "CopyAnimation", "Incorrect Group ID", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 533);
+
+            // switch to python anim group as it has 224 anim
+            *pAnimGroup = ANIM_GROUP_PYTHON;
+        }
+    }
+
+    CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
     DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);
     if (pInterface < (DWORD*)0x250)
     {
