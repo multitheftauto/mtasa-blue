@@ -238,11 +238,19 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
 
                     CClientEntity* pEntity = pArgument->GetElement();
 
-                    if (!pEntity || !pEntity->IsLocalEntity())
+                    if (pEntity && !pEntity->IsLocalEntity())
                         continue;
 
                     // Extra arguments begin at argument 3
-                    m_pScriptDebugging->LogError(luaVM, "clientside element '%s' at argument %u @ 'triggerServerEvent'", pEntity->GetTypeName().c_str(), i + 3);
+                    if (pEntity)
+                    {
+                        m_pScriptDebugging->LogError(luaVM, "clientside element '%s' at argument %u @ 'triggerServerEvent'", 
+                                                     pEntity->GetTypeName().c_str(), i + 3);
+                    }
+                    else
+                    {
+                        m_pScriptDebugging->LogError(luaVM, "userdata at argument %u @ 'triggerServerEvent'", i + 3);
+                    }
                 }
             }
 

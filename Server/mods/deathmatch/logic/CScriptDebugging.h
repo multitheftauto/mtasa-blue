@@ -23,7 +23,7 @@ struct SLogLine
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-                  operator SString&() { return strText; }
+    void          operator+=(const char* szAppend) { strText += szAppend; }
     bool          operator==(const SLogLine& other) const
     {
         return strText == other.strText && uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed && ucGreen == other.ucGreen &&

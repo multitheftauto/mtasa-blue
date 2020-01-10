@@ -1,6 +1,11 @@
 #!/bin/bash
 
-PREMAKE5=utils/premake5
+# Find premake binary location
+if [ "$(uname)" == "Darwin" ]; then
+    PREMAKE5=utils/premake5-macos
+else
+    PREMAKE5=utils/premake5
+fi
 
 # Install data files
 $PREMAKE5 install_data

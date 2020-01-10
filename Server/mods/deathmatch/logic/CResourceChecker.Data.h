@@ -169,6 +169,46 @@ namespace
         {"isPedWearingJetpack", "1.5.5-9.13846"},
         {"setElementAngularVelocity", "1.5.5-9.14060"},
         {"getElementAngularVelocity", "1.5.5-9.14060"},
+        {"getObjectProperty", "1.5.6-9.14370"},
+        {"setObjectProperty", "1.5.6-9.14370"},
+        {"dxDrawMaterialPrimitive", "1.5.6-9.14370"},
+        {"dxDrawPrimitive", "1.5.6-9.14370"},
+        {"setVehicleModelDummyPosition", "1.5.6-9.14403"},
+        {"getVehicleModelDummyPosition", "1.5.6-9.14403"},
+        {"guiComboBoxGetItemCount", "1.5.6-9.14489"},
+        {"guiComboBoxIsOpen", "1.5.6-9.14489"},
+        {"guiComboBoxSetOpen", "1.5.6-9.14489"},
+        {"setVehicleComponentScale", "1.5.6-9.14489"},
+        {"getVehicleComponentScale", "1.5.6-9.14489"},
+        {"resetVehicleComponentScale", "1.5.6-9.14489"},
+        {"onClientWorldSound", "1.5.6-9.14652"},
+        {"onClientPedStep", "1.5.6-9.14735"},
+        {"onClientVehicleWeaponHit", "1.5.6-9.16074"},
+        {"guiGridListGetSelectionMode", "1.5.6-9.16204"},
+        {"guiGridListIsSortingEnabled", "1.5.6-9.16204"},
+        {"getSoundBufferLength", "1.5.6-9.16216"},
+        {"getCommandHandlers", "1.5.6-9.16256"},
+        {"guiBlur", "1.5.6-9.16361"},
+        {"guiFocus", "1.5.6-9.16361"},
+        {"getPedFightingStyle", "1.5.6-9.16362"},
+        {"onClientElementModelChange", "1.5.6-9.16404"},
+        {"setPedFightingStyle", "1.5.7-9.20157"},
+        {"setPedArmor", "1.5.7-9.20157"},
+        {"areVehicleLightsOn", "1.5.7-9.20157"},
+        {"dxDrawPrimitive3D", "1.5.7-9.20157"},
+        {"dxDrawMaterialPrimitive3D", "1.5.7-9.20157"},
+        {"engineGetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineRestoreModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineGetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineRestoreObjectGroupPhysicalProperties", "1.5.7-9.20157"},
+        {"engineRequestModel", "1.5.7-9.20157"},
+        {"engineFreeModel", "1.5.7-9.20157"},
+        {"xmlLoadString", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -249,6 +289,12 @@ namespace
         {"setPedWearingJetpack", "1.5.5-9.13846"},
         {"setElementAngularVelocity", "1.5.5-9.14060"},
         {"getElementAngularVelocity", "1.5.5-9.14060"},
+        {"xmlLoadString", "1.5.7-9.20157"},
+        {"getPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"setPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     //
@@ -269,8 +315,6 @@ namespace
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
-        // Client events
-        {true, "onClientElementHitByWaterCannon", "Use onClientVehicleWeaponHit instead"},
         // Client functions
         {false, "getPlayerRotation", "getPedRotation"},
         {false, "canPlayerBeKnockedOffBike", "canPedBeKnockedOffBike"},
@@ -286,7 +330,6 @@ namespace
         {false, "getPlayerTarget", "getPedTarget"},
         {false, "getPlayerTargetStart", "getPedTargetStart"},
         {false, "getPlayerTargetEnd", "getPedTargetEnd"},
-        {false, "getPlayerTargetRange", "getPedTargetRange"},
         {false, "getPlayerTargetCollision", "getPedTargetCollision"},
         {false, "getPlayerWeaponSlot", "getPedWeaponSlot"},
         {false, "getPlayerWeapon", "getPedWeapon"},

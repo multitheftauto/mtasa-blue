@@ -199,6 +199,57 @@ int CLuaFunctionDefs::GetLocalization(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
+{
+    const char* readingLayout = "ltr";
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+    DWORD readingLayoutValue = 0;
+
+    if (::GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IREADINGLAYOUT | LOCALE_RETURN_NUMBER, reinterpret_cast<LPWSTR>(&readingLayoutValue),
+                          sizeof(readingLayoutValue) / sizeof(WCHAR)) != 0)
+    {
+        switch (readingLayoutValue)
+        {
+            case 0: // Left to right (English)
+                readingLayout = "ltr";
+                break;
+            case 1: // Right to left (Arabic, Hebrew)
+                readingLayout = "rtl";
+                break;
+            case 2: // Vertical top to bottom with columns to the left and also left to right (Japanese)
+                readingLayout = "ttb-rtl-ltr";
+                break;
+            case 3: // Vertical top to bottom with columns proceeding to the right (Mongolian)
+                readingLayout = "ttb-ltr";
+                break;
+            default:
+                break;
+        }
+    }
+
+#else
+    HKL             keyboardLayout = ::GetKeyboardLayout(0 /* current thread*/);
+    LCID            locale = MAKELCID(LOWORD(keyboardLayout), SORT_DEFAULT);
+    LOCALESIGNATURE localeSignature = {};
+
+    if (GetLocaleInfoW(locale, LOCALE_FONTSIGNATURE, reinterpret_cast<LPWSTR>(&localeSignature), sizeof(localeSignature) / sizeof(WCHAR)) != 0)
+    {
+        if ((localeSignature.lsUsb[3] & 0x08000000) != 0)
+        {
+            readingLayout = "rtl";
+        }
+    }
+#endif
+
+    lua_createtable(luaVM, 0, 1);
+    lua_pushstring(luaVM, "readingLayout");
+    lua_pushstring(luaVM, readingLayout);
+    lua_settable(luaVM, -3);
+    
+    return 1;
+}
+
 int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
 {
     //  table getPerformanceStats ( string category, string options, string filter )

@@ -45,7 +45,7 @@ using ECheckerWhat::ECheckerWhatType;
 class CResourceChecker
 {
 public:
-    void LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, SString& strOutReqClientVersion, SString& strOutReqServerVersion,
+    void LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion, CMtaVersion& strOutReqServerVersion,
                             SString& strOutReqClientReason, SString& strOutReqServerReason);
     void ApplyUpgradeModifications(CResource* pResource, const string& strResourceZip);
 
@@ -65,7 +65,7 @@ protected:
     bool UpgradeLuaFunctionName(const string& strFunctionName, bool bClientScript, string& strOutUpgraded);
     void IssueLuaFunctionNameWarnings(const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript,
                                       unsigned long ulLineNumber);
-    ECheckerWhatType GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, string& strOutVersion);
+    ECheckerWhatType GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, CMtaVersion& strOutVersion);
     int              ReplaceFilesInZIP(const string& strOrigZip, const string& strTempZip, const vector<string>& pathInArchiveList,
                                        const vector<string>& upgradedFullPathList);
     bool             RenameBackupFile(const string& strOrigFilename, const string& strBakAppend);
@@ -74,10 +74,10 @@ protected:
     bool           m_bUpgradeScripts;
     unsigned long  m_ulDeprecatedWarningCount;
     vector<string> m_upgradedFullPathList;
-    SString        m_strMinClientReqFromMetaXml;
-    SString        m_strMinServerReqFromMetaXml;
-    SString        m_strReqClientVersion;
-    SString        m_strReqServerVersion;
+    CMtaVersion    m_strMinClientFromMetaXml;
+    CMtaVersion    m_strMinServerFromMetaXml;
+    CMtaVersion    m_strReqClientVersion;
+    CMtaVersion    m_strReqServerVersion;
     SString        m_strReqClientReason;
     SString        m_strReqServerReason;
 };

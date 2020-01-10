@@ -29,6 +29,9 @@ public:
     LUA_DECLARE(DxDrawImageSection);
     LUA_DECLARE(DxDrawPrimitive);
     LUA_DECLARE(DxDrawMaterialPrimitive);
+    LUA_DECLARE(DxDrawPrimitive3D);
+    LUA_DECLARE(DxDrawMaterialPrimitive3D);
+    LUA_DECLARE(DxDrawWiredSphere);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);

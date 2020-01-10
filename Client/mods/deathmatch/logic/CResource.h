@@ -49,7 +49,7 @@ class CResource
 {
 public:
     CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-              const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
+              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     ~CResource();
 
     unsigned short GetNetID() { return m_usNetID; };
@@ -102,8 +102,8 @@ public:
 
     void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
-    const SString& GetMinServerReq() const { return m_strMinServerReq; }
-    const SString& GetMinClientReq() const { return m_strMinClientReq; }
+    const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
+    const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
     bool           IsOOPEnabled() { return m_bOOPEnabled; }
     void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
     bool           IsWaitingForInitialDownloads();
@@ -129,8 +129,8 @@ private:
     class CClientEntity* m_pResourceIFPRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
-    SString              m_strMinServerReq;
-    SString              m_strMinClientReq;
+    CMtaVersion          m_strMinServerReq;
+    CMtaVersion          m_strMinClientReq;
     bool                 m_bOOPEnabled;
     int                  m_iDownloadPriorityGroup;
 

@@ -73,7 +73,7 @@ void CWebView::Initialise()
     CefWindowInfo windowInfo;
     windowInfo.SetAsWindowless(g_pCore->GetHookedWindow());
 
-    CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr);
+    CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr, nullptr);
 }
 
 void CWebView::CloseBrowser()
@@ -444,7 +444,17 @@ CVector2D CWebView::GetSize()
 
 bool CWebView::GetFullPathFromLocal(SString& strPath)
 {
-    return m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+    }, this);
+
+    return result;
 }
 
 bool CWebView::RegisterAjaxHandler(const SString& strURL)
@@ -478,9 +488,19 @@ bool CWebView::ToggleDevTools(bool visible)
     return CWebDevTools::Close(this);
 }
 
-bool CWebView::VerifyFile(const SString& strPath)
+bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck(strPath);
+    bool result = false;
+
+    g_pCore->GetWebCore()->WaitForTask(
+        [&](bool aborted) {
+            if (aborted)
+                return;
+
+            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+    }, this);
+
+    return result;
 }
 
 bool CWebView::CanGoBack()
@@ -545,7 +565,8 @@ void CWebView::Refresh(bool bIgnoreCache)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message)
+bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
+                                        CefRefPtr<CefProcessMessage> message)
 {
     CefRefPtr<CefListValue> argList = message->GetArgumentList();
     if (message->GetName() == "TriggerLuaEvent")
@@ -661,7 +682,11 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
         // Copy popup buffer
         if (paintType == PET_POPUP)
         {
-            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            if (m_RenderData.popupBuffer)
+            {
+                memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            }
+
             return;            // We don't have to wait as we've copied the buffer already
         }
 
@@ -808,7 +833,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
+CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
                                                               CefRefPtr<CefRequestCallback> callback)
 {
     // Mostly the same as CWebView::OnBeforeBrowse
@@ -903,7 +928,8 @@ void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
                              CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
-                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access)
+                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
+                             bool* no_javascript_access)
 {
     // ATTENTION: This method is called on the IO thread
 

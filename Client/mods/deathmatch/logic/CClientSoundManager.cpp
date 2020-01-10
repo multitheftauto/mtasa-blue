@@ -350,17 +350,18 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
     //  If the sound is more than 40 units away (or in another dimension), make sure it is deactivated
     //  If the sound is less than 20 units away, make sure it is activated
     //
-    for (std::set<CClientSound*>::iterator iter = considerMap.begin(); iter != considerMap.end(); ++iter)
+    for (CClientSound* pSound : considerMap)
     {
-        CClientSound* pSound = *iter;
-
         // Calculate distance to the edge of the sphere
         CSphere sphere = pSound->GetWorldBoundingSphere();
         float   fDistance = (vecListenerPosition - sphere.vecPosition).Length() - sphere.fRadius;
 
         if (fDistance > 40 || m_usDimension != pSound->GetDimension())
-            pSound->DistanceStreamOut();
-        else if (fDistance < 20)
+        {
+            if (MapContains(m_DistanceStreamedInMap, pSound))
+                pSound->DistanceStreamOut();
+        }
+        else if (fDistance < 20) 
             pSound->DistanceStreamIn();
     }
 }

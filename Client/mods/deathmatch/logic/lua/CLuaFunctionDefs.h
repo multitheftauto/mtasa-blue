@@ -51,7 +51,6 @@ public:
     LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
-    LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
     LUA_DECLARE(ClearChatBox);
 
@@ -178,6 +177,9 @@ public:
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
     LUA_DECLARE(FetchRemote);
+    LUA_DECLARE(GetRemoteRequests);
+    LUA_DECLARE(GetRemoteRequestInfo);
+    LUA_DECLARE(AbortRemoteRequest);
 
     // Input functions
     LUA_DECLARE(BindKey);
@@ -213,6 +215,7 @@ public:
 
     // L10n
     LUA_DECLARE(GetLocalization);
+    LUA_DECLARE(GetKeyboardLayout);
 
     // Voice functions
     LUA_DECLARE(IsVoiceEnabled);

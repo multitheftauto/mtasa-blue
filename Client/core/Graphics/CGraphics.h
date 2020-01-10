@@ -28,6 +28,8 @@ class CLine3DBatcher;
 class CMaterialLine3DBatcher;
 class CPrimitiveBatcher;
 class CPrimitiveMaterialBatcher;
+class CPrimitive3DBatcher;
+class CMaterialPrimitive3DBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -65,6 +67,7 @@ class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 {
     friend class CDirect3DEvents9;
     friend CPrimitiveMaterialBatcher;
+    friend CMaterialPrimitive3DBatcher;
 
 public:
     ZERO_ON_NEW
@@ -147,8 +150,15 @@ public:
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
+    
+    void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
+    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
+
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
+
+    void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
+
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
 
@@ -174,10 +184,12 @@ public:
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
 
     // To draw queued up drawings
-    void DrawPreGUIQueue();
-    void DrawPostGUIQueue();
-    void DrawLine3DPreGUIQueue();
-    bool HasLine3DPreGUIQueueItems();
+    void DrawPreGUIQueue(void);
+    void DrawPostGUIQueue(void);
+    void DrawLine3DPreGUIQueue(void);
+    bool HasLine3DPreGUIQueueItems(void);
+    void DrawPrimitive3DPreGUIQueue(void);
+    bool HasPrimitive3DPreGUIQueueItems(void);
 
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
@@ -203,21 +215,25 @@ private:
     EDrawModeType  m_CurDrawMode;
     EBlendModeType m_CurBlendMode;
 
-    LPD3DXSPRITE m_pDXSprite;
+    LPD3DXSPRITE m_pDXSprite = nullptr;
 
-    IDirect3DDevice9* m_pDevice;
+    IDirect3DDevice9* m_pDevice = nullptr;
 
-    CRenderItemManager*        m_pRenderItemManager;
-    CScreenGrabberInterface*   m_pScreenGrabber;
-    CPixelsManagerInterface*   m_pPixelsManager;
-    CTileBatcher*              m_pTileBatcher;
-    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
-    CPrimitiveBatcher*         m_pPrimitiveBatcher;
-    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
-    CAspectRatioConverter*     m_pAspectRatioConverter;
+    CRenderItemManager*          m_pRenderItemManager = nullptr;
+    CScreenGrabberInterface*     m_pScreenGrabber = nullptr;
+    CPixelsManagerInterface*     m_pPixelsManager = nullptr;
+    CTileBatcher*                m_pTileBatcher = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPreGUI = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPostGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI = nullptr;
+    CPrimitiveBatcher*           m_pPrimitiveBatcher = nullptr;
+    CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
+    CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
@@ -338,7 +354,7 @@ private:
     void RemoveQueueRef(IUnknown* pUnknown);
 
     // Drawing types
-    struct ID3DXLine* m_pLineInterface;
+    struct ID3DXLine* m_pLineInterface = nullptr;
 
     enum EMTARenderZone
     {
@@ -348,13 +364,13 @@ private:
     };
 
     EMTARenderZone                          m_MTARenderZone;
-    int                                     m_iOutsideZoneCount;
-    IDirect3DStateBlock9*                   m_pSavedStateBlock;
+    int                                     m_iOutsideZoneCount = 0;
+    IDirect3DStateBlock9*                   m_pSavedStateBlock = nullptr;
     CElapsedTime                            m_LastRenderedSceneTimer;
-    IDirect3DSurface9*                      m_pSavedFrontBufferData;
-    CRenderTargetItem*                      m_pTempBackBufferData;
-    CTextureItem*                           m_ProgressSpinnerTexture;
-    CTextureItem*                           m_RectangleEdgeTexture;
+    IDirect3DSurface9*                      m_pSavedFrontBufferData = nullptr;
+    CRenderTargetItem*                      m_pTempBackBufferData = nullptr;
+    CTextureItem*                           m_ProgressSpinnerTexture = nullptr;
+    CTextureItem*                           m_RectangleEdgeTexture = nullptr;
     SString                                 m_strProgressMessage;
     CElapsedTime                            m_FirstDrawnProgressTimer;
     CElapsedTime                            m_LastDrawnProgressTimer;

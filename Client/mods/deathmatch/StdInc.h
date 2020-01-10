@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -16,6 +15,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <vector>
 #include <cstdio>
@@ -93,6 +93,7 @@
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
+#include <CClientModelManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
 #include <CFileReader.h>

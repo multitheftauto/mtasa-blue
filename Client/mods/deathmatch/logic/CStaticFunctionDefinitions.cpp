@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
@@ -279,24 +279,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     // Close the clipboard
     CloseClipboard();
     return true;
-}
-
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
 }
 
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
@@ -1460,7 +1442,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = Ped.GetModel();
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
                 return false;
@@ -2160,7 +2142,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+            std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
@@ -2176,8 +2158,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
                     auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
@@ -2326,6 +2308,25 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
+{
+    RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
+    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.GetFightingStyle() != ucStyle)
+        {
+            // Is valid style
+            if (ucStyle >= 4 && ucStyle <= 16)
+            {
+                Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget)
 {
     RUN_CHILDREN(SetPedLookAt(**iter, vecPosition, iTime, iBlend, pTarget))
@@ -2446,6 +2447,17 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
         Ped.SetOnFire(bOnFire);
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedArmor(CClientPed& Ped, float fArmor)
+{
+    if (Ped.IsLocalEntity())
+    {
+        Ped.SetArmor(fArmor);
+        return true;
+    }
+
     return false;
 }
 
@@ -2962,9 +2974,9 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -2994,7 +3006,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
                     break;
             }
 
-            Vehicle.SetDoorStatus(ucDoor, ucState);
+            Vehicle.SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
 
             return true;
         }
@@ -5530,6 +5542,13 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMai
     CVector2D absoluteSize;
     pElement->GetSize(absoluteSize, false);
     auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+
+    if (!pGUIElement->GetBrowser())
+    {
+        delete pGUIElement;
+        return nullptr;
+    }
+
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // Load CEGUI element texture from webview
@@ -7949,8 +7968,7 @@ bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPanEnabled(CClientSound& Sound, bool bEnabled)
 {
-    Sound.SetPanEnabled(bEnabled);
-    return true;
+    return Sound.SetPanEnabled(bEnabled);
 }
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight)

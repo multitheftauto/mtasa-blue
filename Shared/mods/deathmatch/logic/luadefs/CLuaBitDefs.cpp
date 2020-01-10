@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-#define mask(n) (~((0xFFFFFFFF << 1) << ((n) - 1)))
+#define mask(n) ((1 << (n)) - 1)
 
 void CLuaBitDefs::LoadFunctions()
 {

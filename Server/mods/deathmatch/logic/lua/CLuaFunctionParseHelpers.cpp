@@ -371,7 +371,7 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         CResource* pResource = pLuaMain->GetResource();
         if (pResource)
         {
-            if (pResource->GetMinServerReqFromMetaXml() < szVersionReq)
+            if (pResource->GetMinServerRequirement() < szVersionReq)
             {
                 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);
