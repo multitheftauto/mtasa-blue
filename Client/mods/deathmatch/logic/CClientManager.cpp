@@ -178,6 +178,9 @@ CClientManager::~CClientManager()
 
     delete m_pModelManager;
     m_pModelManager = nullptr;
+
+    delete m_pPrimitiveBufferManager;
+    m_pPrimitiveBufferManager = nullptr;
 }
 
 //

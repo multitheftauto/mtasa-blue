@@ -22,60 +22,50 @@ CClientPrimitiveBufferManager::~CClientPrimitiveBufferManager()
     DeleteAll();
 }
 
-CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Get(unsigned long ulID)
+std::shared_ptr<CClientPrimitiveBuffer> CClientPrimitiveBufferManager::Get(unsigned long ulID)
 {
     // Find the PrimitiveBuffer with the given id
-    list<CClientPrimitiveBuffer*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    for (auto& iter : m_List)
     {
-        if ((*iter)->GetID() == ulID)
-        {
-            return *iter;
-        }
+        if (iter->GetID() == ulID)
+            return std::move(iter);
     }
 
-    return NULL;
+    return nullptr;
 }
 
-CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Create()
+std::shared_ptr<CClientPrimitiveBuffer> CClientPrimitiveBufferManager::Create()
 {
-    CClientPrimitiveBuffer* pPrimitiveBuffer = new CClientPrimitiveBuffer(m_pManager, INVALID_ELEMENT_ID);
+    std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer = std::make_unique<CClientPrimitiveBuffer>(m_pManager, INVALID_ELEMENT_ID);
     AddToList(pPrimitiveBuffer);
-    return pPrimitiveBuffer;
+    return std::move(pPrimitiveBuffer);
 }
 
-void CClientPrimitiveBufferManager::Delete(CClientPrimitiveBuffer* pPrimitiveBuffer)
+void CClientPrimitiveBufferManager::Delete(std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer)
 {
-    RemoveFromList(pPrimitiveBuffer);
-    delete pPrimitiveBuffer;
+    RemoveFromList(std::move(pPrimitiveBuffer));
 }
 
 void CClientPrimitiveBufferManager::DeleteAll()
 {
-    list<CClientPrimitiveBuffer*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
-    {
-        delete *iter;
-    }
-
     // Clear the list
     m_List.clear();
 }
 
-CClientPrimitiveBuffer* CClientPrimitiveBufferManager::Get(ElementID ID)
+std::shared_ptr<CClientPrimitiveBuffer> CClientPrimitiveBufferManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
     if (pEntity && pEntity->GetType() == CCLIENTPRIMITIVEBUFFER)
     {
-        return static_cast<CClientPrimitiveBuffer*>(pEntity);
+        return std::shared_ptr<CClientPrimitiveBuffer>(static_cast<CClientPrimitiveBuffer*>(pEntity));
     }
 
-    return NULL;
+    return nullptr;
 }
 
-void CClientPrimitiveBufferManager::RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer)
+void CClientPrimitiveBufferManager::RemoveFromList(std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer)
 {
     if (!m_List.empty())
-        m_List.remove(pPrimitiveBuffer);
+        m_List.remove(std::move(pPrimitiveBuffer));
 }

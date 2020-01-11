@@ -13,34 +13,15 @@
 #include "../Client/mods/deathmatch/logic/CClientPrimitiveBufferInterface.h"
 #include "CPrimitiveBufferBatcher.h"
 
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::CPrimitiveBufferBatcher
-//
-//
-//
-////////////////////////////////////////////////////////////////
 CPrimitiveBufferBatcher::CPrimitiveBufferBatcher(CGraphics* graphics)
 {
     m_pGraphics = graphics;
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::~CPrimitiveBufferBatcher
-//
-//
-//
-////////////////////////////////////////////////////////////////
+
 CPrimitiveBufferBatcher::~CPrimitiveBufferBatcher()
 {
 }
-////////////////////////////////////////////////////////////////
-//
-// CPrimitiveBufferBatcher::OnDeviceCreate
-//
-//
-//
-////////////////////////////////////////////////////////////////
+
 void CPrimitiveBufferBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
 {
     m_pDevice = pDevice;
@@ -224,28 +205,27 @@ void CPrimitiveBufferBatcher::FlushPrimitives()
 
     for (auto& primitive : m_primitiveBufferMap)
     {
-        if (primitive.first != nullptr && primitive.second.size() > 0)
-        {
-            primitive.first->PreDraw();
-            for (auto& settings : primitive.second)
-            {
-                switch (settings.eView)
-                {
-                    case PRIMITIVE_VIEW_ORTHOGRAPHIC:
-                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjectionOrtho);
-                        break;
-                    case PRIMITIVE_VIEW_PERSPECTIVE:
-                        m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
-                        break;
-                }
+        if (primitive.first == nullptr || primitive.second.size() == 0)
+            continue;
 
-                primitive.first->Draw(settings);
+        primitive.first->PreDraw();
+        for (auto& settings : primitive.second)
+        {
+            switch (settings.eView)
+            {
+                case PRIMITIVE_VIEW_ORTHOGRAPHIC:
+                    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjectionOrtho);
+                    break;
+                case PRIMITIVE_VIEW_PERSPECTIVE:
+                    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+                    break;
             }
+
+            primitive.first->Draw(settings);
         }
     }
-
-
 }
+
 void CPrimitiveBufferBatcher::Flush()
 {
     if (m_primitiveBufferMap.empty())

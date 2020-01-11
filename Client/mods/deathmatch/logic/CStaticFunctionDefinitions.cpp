@@ -9778,9 +9778,9 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
-CClientPrimitiveBuffer* CStaticFunctionDefinitions::CreatePrimitiveBuffer(CResource& Resource)
+std::shared_ptr<CClientPrimitiveBuffer> CStaticFunctionDefinitions::CreatePrimitiveBuffer(CResource& Resource)
 {
-    CClientPrimitiveBuffer* pPrimitiveBuffer = g_pClientGame->GetPrimitiveBufferManager()->Create();
+    std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer = g_pClientGame->GetPrimitiveBufferManager()->Create();
     pPrimitiveBuffer->SetParent(Resource.GetResourceDynamicEntity());
     return pPrimitiveBuffer;
 }

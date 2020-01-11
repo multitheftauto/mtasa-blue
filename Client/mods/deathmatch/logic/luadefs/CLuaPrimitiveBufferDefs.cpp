@@ -362,13 +362,13 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
             if (pResource)
             {
                 // Create it and return it
-                CClientPrimitiveBuffer* pBuffer = CStaticFunctionDefinitions::CreatePrimitiveBuffer(*pResource);
+                std::shared_ptr<CClientPrimitiveBuffer> pBuffer = CStaticFunctionDefinitions::CreatePrimitiveBuffer(*pResource);
                 if (pBuffer)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
                     if (pGroup)
                     {
-                        pGroup->Add(pBuffer);
+                        pGroup->Add(reinterpret_cast<CClientEntity*>(&pBuffer));
                     }
 
                     pBuffer->SetPrimitiveType(ePrimitiveType);
@@ -400,7 +400,7 @@ int CLuaPrimitiveBufferDefs::PrimitiveBufferCreate(lua_State* luaVM)
                     pBuffer->SetFVF(FVF);
                     pBuffer->Finalize();
 
-                    lua_pushelement(luaVM, pBuffer);
+                    lua_pushelement(luaVM, reinterpret_cast<CClientEntity*>(&pBuffer));
                     return 1;
                 }
             }

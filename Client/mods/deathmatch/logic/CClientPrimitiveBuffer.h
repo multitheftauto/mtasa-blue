@@ -104,7 +104,7 @@ void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<T>& vecVertexList, ePri
             break;
     }
 
-    VOID* pVoid;            // POINTER TO POINTER, remember forkerer
+    void* pVoid;            // POINTER TO POINTER, remember forkerer
     m_pDevice->CreateVertexBuffer(vecVertexList.size() * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_arrayVertexBuffer[index], NULL);
     m_arrayVertexBuffer[index]->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vecVertexList.data(), vecVertexList.size() * sizeof(T));
