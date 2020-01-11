@@ -501,6 +501,7 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
+
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -534,16 +535,11 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pLineInterface->Begin();
         }
-    }
 
-    // Blend mode changing?
-    if (bDrawModeChanging || bBlendModeChanging)
-    {
         SetBlendModeRenderStates(newBlendMode);
+        m_CurBlendMode = newBlendMode;
+        m_CurDrawMode = newDrawMode;
     }
-
-    m_CurDrawMode = newDrawMode;
-    m_CurBlendMode = newBlendMode;
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
@@ -913,6 +909,7 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
     AddQueueItem(Item, bPostGUI);
@@ -982,6 +979,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.blendMode = m_ActiveBlendMode;
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
@@ -1820,7 +1818,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 fU2 *= fUScale;
                 fV2 *= fVScale;
             }
-            CheckModes(EDrawMode::TILE_BATCHER);
+            CheckModes(EDrawMode::TILE_BATCHER, Item.blendMode);
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
@@ -1829,14 +1827,14 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_PRIMITIVE:
         {
             const sDrawQueuePrimitive primitive = Item.Primitive;
-            CheckModes(EDrawMode::PRIMITIVE);
+            CheckModes(EDrawMode::PRIMITIVE, Item.blendMode);
             m_pPrimitiveBatcher->AddPrimitive(primitive.eType, primitive.pVecVertices);
             break;
         }
         case QUEUE_PRIMITIVEMATERIAL:
         {
             const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
-            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL, Item.blendMode);
             m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }
