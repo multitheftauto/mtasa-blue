@@ -2909,7 +2909,11 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 
     // Physics events
+    m_Events.AddEvent("onPhysicsPreSimulation", "physics", nullptr, false);
+    m_Events.AddEvent("onPhysicsPostSimulation", "physics", nullptr, false);
     m_Events.AddEvent("onPhysicsCollision", "collisionA, collisionB, contactPointsA, contactPointsB", nullptr, false);
+
+    m_Events.AddEvent("onPhysicsRigidBodyFallOutsideWorld", "rigidBody", nullptr, false);
 }
 
 void CClientGame::DrawFPS()

@@ -55,11 +55,13 @@ public:
 
     uint               GetScriptID() const { return m_uiScriptID; }
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
+    void               SetCollisionHandler(const CLuaFunctionRef& iLuaFunction) { m_iLuaCollisionHandlerFunction = iLuaFunction; }
 
 private:
     btDiscreteDynamicsWorld* m_pWorld;
     uint m_uiScriptID;
     btCollisionObject*       m_btCollisionObject;
     heightfieldTerrainShape* m_pHeightfieldTerrain;
+    CLuaFunctionRef          m_iLuaCollisionHandlerFunction;
 
 };

@@ -48,6 +48,7 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
 
     delete pRigidBody;
 }
+
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
     for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)

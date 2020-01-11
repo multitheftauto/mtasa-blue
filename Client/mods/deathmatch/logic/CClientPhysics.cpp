@@ -230,7 +230,35 @@ void CClientPhysics::StartBuildCollisionFromGTA()
         return;
 
     m_bBuildWorld = true;
-    CLuaPhysicsSharedLogic::QueryAllWorldObjects(pWorldObjects);
+    if (!m_bObjectsCached)
+    {
+        CLuaPhysicsSharedLogic::CacheWorldObjects(pWorldObjects);
+        m_bObjectsCached = true;
+    }
+}
+
+#include "D:\mtablue\mtasa-blue\Client\mods\deathmatch\logic\Utils.h"
+void CClientPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadius)
+{
+    if (!m_bObjectsCached)
+    {
+        CLuaPhysicsSharedLogic::CacheWorldObjects(pWorldObjects);
+        m_bObjectsCached = true;
+    }
+
+    if (pWorldObjects.size() > 0)
+    {
+        for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
+        {
+            if (DistanceBetweenPoints3D(it->second.first, center) < fRadius)
+            {
+                if (BuildStaticCollisionFromModel(it->first, it->second.first, it->second.second))
+                {
+                    pWorldObjects.erase(it--);
+                }
+            }
+        }
+    }
 }
 
 void CClientPhysics::BuildCollisionFromGTA()
@@ -251,6 +279,12 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
 {
     CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(m_pDynamicsWorld, pShape);
     return pRigidBody;
+}
+
+void CClientPhysics::ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result)
+{
+    const btConvexShape* pShape = (btConvexShape*)pStaticCollision->GetCollisionObject()->getCollisionShape();
+    m_pDynamicsWorld->convexSweepTest(pShape, from, to, result, 0.0f);
 }
 
 bool CClientPhysics::RayCastIsClear(CVector from, CVector to)
@@ -518,29 +552,51 @@ CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pR
     return pContraint;
 }
 
-void CClientPhysics::DoPulse()
+void CClientPhysics::StepSimulation()
 {
-    if (!m_pLuaMain || m_pLuaMain->BeingDeleted())
+    if (!m_bSimulationEnabled)
         return;
 
-    CTickCount tickCountNow = CTickCount::Now();
+    CLuaArguments Arguments;
+    CallEvent("onPhysicsPreSimulation", Arguments, true);
 
-    int iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
-    int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
-    m_LastTimeMs = tickCountNow;
+    // CProfileManager::Start_Profile("internalSingleStepSimulation");
+    m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+    // CProfileManager::Stop_Profile();
+    // CProfileIterator* pIterator = CProfileManager::Get_Iterator();
+    // CProfileManager::Reset();
+    // Arguments.PushNumber(pIterator->Get_Current_Parent_Total_Time());
+    CallEvent("onPhysicsPostSimulation", Arguments, true);
+}
 
-    m_pDynamicsWorld->stepSimulation(((float)iDeltaTimeMs) / 1000.0f, 5);
-    if (m_bDrawDebugNextTime)
+void CClientPhysics::ClearOutsideWorldRigidBodies()
+{
+    CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
+    std::vector<CLuaPhysicsRigidBody*> vecRigidBodiesToRemove;
+    CVector                            vecRigidBody;
+    for (auto iter = pRigidBodyManager->IterBegin(); iter != pRigidBodyManager->IterEnd(); ++iter)
     {
-        m_pDynamicsWorld->debugDrawWorld();
-        m_bDrawDebugNextTime = false;
+        CLuaPhysicsRigidBody* pRigidBody = *iter;
+        if (!pRigidBody->IsSleeping())
+        {
+            pRigidBody->GetPosition(vecRigidBody);
+            if (vecRigidBody.fZ <= -m_vecWorldSize.fZ || vecRigidBody.fZ >= m_vecWorldSize.fZ)
+            {
+                vecRigidBodiesToRemove.push_back(pRigidBody);
+            }
+        }
     }
-
-    if (iDeltaTimeBuildWorld > 2000)
+    for (CLuaPhysicsRigidBody* pRigidBody : vecRigidBodiesToRemove)
     {
-        m_LastTimeBuildWorld = tickCountNow;
-        BuildCollisionFromGTA();
+        CLuaArguments Arguments;
+        Arguments.PushPhysicsRigidBody(pRigidBody);
+        if (!CallEvent("onPhysicsRigidBodyFallOutsideWorld", Arguments, true))
+            pRigidBodyManager->RemoveRigidBody(pRigidBody);
     }
+}
+
+void CClientPhysics::ProcessCollisions()
+{
     int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
     CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
@@ -553,12 +609,16 @@ void CClientPhysics::DoPulse()
 
     const btCollisionObject*    objectA;
     const btCollisionObject*    objectB;
+    const btCollisionShape*     shapeA;
+    const btCollisionShape*     shapeB;
     CLuaPhysicsRigidBody*       pRigidA;
     CLuaPhysicsRigidBody*       pRigidB;
     CLuaPhysicsStaticCollision* pStaticCollisionA;
     CLuaPhysicsStaticCollision* pStaticCollisionB;
     btVector3                   ptA;
     btVector3                   ptB;
+
+    std::vector<CLuaPhysicsRigidBody*> vecContactRigidBodies;
     for (int i = 0; i < numManifolds; i++)
     {
         btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
@@ -568,59 +628,129 @@ void CClientPhysics::DoPulse()
 
         objectA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
         objectB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
-        pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(objectA->getCollisionShape());
+        shapeA = objectA->getCollisionShape();
+        shapeB = objectA->getCollisionShape();
+        pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeA);
+
         if (pRigidA == nullptr)
         {
-            pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(objectA->getCollisionShape());
+            if (pRigidA->IsSleeping())
+                continue;
+        }
+        else
+        {
+            pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeA);
             if (pStaticCollisionA == nullptr)
                 continue;
         }
 
-        pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(objectB->getCollisionShape());
-        if (pRigidB == nullptr)
+        pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeB);
+
+        if (pRigidB)
         {
-            pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(objectB->getCollisionShape());
+            if (pRigidB->IsSleeping())
+                continue;
+        }
+        else
+        {
+            pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeB);
             if (pStaticCollisionB == nullptr)
                 continue;
         }
+
         CLuaArguments Arguments;
         CLuaArguments ContactA;
         CLuaArguments ContactB;
         if (pRigidA != nullptr)
+        {
+            pRigidA->AddContact(shapeB);
             Arguments.PushPhysicsRigidBody(pRigidA);
+            vecContactRigidBodies.push_back(pRigidA);
+        }
         else
+        {
             Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
+        }
 
         if (pRigidB != nullptr)
+        {
             Arguments.PushPhysicsRigidBody(pRigidB);
+            pRigidB->AddContact(shapeA);
+            vecContactRigidBodies.push_back(pRigidB);
+        }
         else
+        {
             Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
+        }
 
+        float impulse;
         for (int j = 0; j < numContacts; j++)
         {
             btManifoldPoint& pt = contactManifold->getContactPoint(j);
-            ptA = pt.getPositionWorldOnA();
-            ptB = pt.getPositionWorldOnB();
+            impulse = pt.getAppliedImpulse();
+            if (impulse < 0.01f)            // if hit is strong enough
+            {
+                ptA = pt.getPositionWorldOnA();
+                ptB = pt.getPositionWorldOnB();
 
-            CLuaArguments pointA;
-            CLuaArguments pointB;
-            pointA.PushNumber(1);
-            pointA.PushNumber(ptA.getX());
-            pointA.PushNumber(2);
-            pointA.PushNumber(ptA.getX());
-            pointA.PushNumber(3);
-            pointA.PushNumber(ptA.getX());
-            ContactA.PushTable(&pointA);
-            pointB.PushNumber(1);
-            pointB.PushNumber(ptB.getX());
-            pointB.PushNumber(2);
-            pointB.PushNumber(ptB.getX());
-            pointB.PushNumber(3);
-            pointB.PushNumber(ptB.getX());
-            ContactB.PushTable(&pointB);
+                CLuaArguments pointA;
+                CLuaArguments pointB;
+                pointA.PushNumber(1);
+                pointA.PushNumber(ptA.getX());
+                pointA.PushNumber(2);
+                pointA.PushNumber(ptA.getX());
+                pointA.PushNumber(3);
+                pointA.PushNumber(ptA.getX());
+                ContactA.PushTable(&pointA);
+                pointB.PushNumber(1);
+                pointB.PushNumber(ptB.getX());
+                pointB.PushNumber(2);
+                pointB.PushNumber(ptB.getX());
+                pointB.PushNumber(3);
+                pointB.PushNumber(ptB.getX());
+                ContactB.PushTable(&pointB);
+            }
         }
         Arguments.PushArguments(ContactA);
         Arguments.PushArguments(ContactB);
         CallEvent("onPhysicsCollision", Arguments, true);
     }
+    std::sort(vecContactRigidBodies.begin(), vecContactRigidBodies.end());
+    vecContactRigidBodies.erase(std::unique(vecContactRigidBodies.begin(), vecContactRigidBodies.end()), vecContactRigidBodies.end());
+    for (CLuaPhysicsRigidBody* pRigidBody : vecContactRigidBodies)
+    {
+        pRigidBody->FlushContacts();
+    }
+}
+
+void CClientPhysics::DoPulse()
+{
+    if (!m_pLuaMain || m_pLuaMain->BeingDeleted())
+        return;
+
+    CTickCount tickCountNow = CTickCount::Now();
+
+    m_iDeltaTimeMs = (int)(tickCountNow - m_LastTimeMs).ToLongLong();
+    int iDeltaTimeBuildWorld = (int)(tickCountNow - m_LastTimeBuildWorld).ToLongLong();
+    m_LastTimeMs = tickCountNow;
+
+    if (m_bBuildWorld)
+    {
+        if (iDeltaTimeBuildWorld > 1000)
+        {
+            m_LastTimeBuildWorld = tickCountNow;
+            BuildCollisionFromGTA();
+        }
+    }
+
+    StepSimulation();
+
+    if (m_bDrawDebugNextTime)
+    {
+        m_pDynamicsWorld->debugDrawWorld();
+        m_bDrawDebugNextTime = false;
+    }
+
+    ClearOutsideWorldRigidBodies();
+    ProcessCollisions();
 }

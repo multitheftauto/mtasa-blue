@@ -65,11 +65,16 @@ public:
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DoPulse();
 
+    void StepSimulation();
+    void ClearOutsideWorldRigidBodies();
+    void ProcessCollisions();
+
     CLuaPhysicsRigidBody*                      CreateRigidBody(CLuaPhysicsShape* pShape);
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
     btCollisionWorld::ClosestRayResultCallback RayCastDetailed(lua_State *luaVM, CVector from, CVector to, bool bFilterBackfaces);
     btCollisionWorld::AllHitsRayResultCallback RayCastMultiple(CVector from, CVector to);
+    void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 
 
     //btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
@@ -83,6 +88,7 @@ public:
 
     bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        StartBuildCollisionFromGTA();
+    void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
     CLuaPhysicsStaticCollision* BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation);
     CLuaPhysicsRigidBody* CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
@@ -91,6 +97,18 @@ public:
     void GetGravity(CVector& vecGravity);
     bool GetUseContinous();
     void SetUseContinous(bool bUse);
+    void SetSpeed(int iSubSteps) { m_fSpeed = iSubSteps; }
+    void SetSpeed(int& iSubSteps) const { iSubSteps = m_fSpeed; }
+    void SetSubSteps(int iSubSteps) { m_iSubSteps = iSubSteps; }
+    void GetSubSteps(int& iSubSteps) const { iSubSteps = m_iSubSteps; }
+    void SetSimulationEnabled(bool bSimulationEnabled) { m_bSimulationEnabled = bSimulationEnabled; }
+    void GetSimulationEnabled(bool& bSimulationEnabled) const { bSimulationEnabled = m_bSimulationEnabled; }
+    void SetTriggerEvents(bool bTriggerEvents) { m_bTriggerEvents = bTriggerEvents; }
+    void GetTriggerEvents(bool& bTriggerEvents) const { bTriggerEvents = m_bTriggerEvents; }
+    void SetTriggerCollisionEvents(bool bTriggerCollisionEvents) { m_bTriggerCollisionEvents = bTriggerCollisionEvents; }
+    void GetTriggerCollisionEvents(bool& bTriggerCollisionEvents) const { bTriggerCollisionEvents = m_bTriggerCollisionEvents; }
+    void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
+    void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
 
 private:
     void ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionObject,
@@ -104,6 +122,7 @@ private:
 
     CDebugDrawer* m_pDebugDrawer;
 
+    int       m_iDeltaTimeMs;
     bool m_bDrawDebugNextTime;
     CLuaMain* m_pLuaMain;
 
@@ -112,6 +131,13 @@ private:
     CTickCount m_LastTimeMs;
     CTickCount m_LastTimeBuildWorld;
     bool       m_bBuildWorld;
+    float      m_fSpeed = 1.0f;
+    int        m_iSubSteps = 10;
+    bool       m_bSimulationEnabled = true;
+    bool       m_bTriggerEvents = true;
+    bool       m_bTriggerCollisionEvents = false; // spam alert
+    CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f); // negative and positive
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
+    bool                                                                m_bObjectsCached = false;
 };

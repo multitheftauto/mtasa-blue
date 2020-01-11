@@ -20,7 +20,7 @@ CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
 
 CClientPhysicsManager::~CClientPhysicsManager(void)
 {
-    // Make sure all the lights are deleted
+    // Make sure all the physics worlds are deleted
     DeleteAll();
 }
 
@@ -36,10 +36,10 @@ void CClientPhysicsManager::DeleteAll(void)
     m_List.clear();
 }
 
-void CClientPhysicsManager::RemoveFromList(CClientPhysics* pLight)
+void CClientPhysicsManager::RemoveFromList(CClientPhysics* pPhysics)
 {
     if (!m_List.empty())
-        m_List.remove(pLight);
+        m_List.remove(pPhysics);
 }
 
 void CClientPhysicsManager::DoPulse(void)

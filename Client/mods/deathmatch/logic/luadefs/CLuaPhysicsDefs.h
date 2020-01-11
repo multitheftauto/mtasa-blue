@@ -39,4 +39,6 @@ public:
     LUA_DECLARE(PhysicsApplyTorqueImpulse);
     LUA_DECLARE(PhysicsCreateConstraint);
     LUA_DECLARE(PhysicsRayCast);
+    LUA_DECLARE(PhysicsShapeCast);
+    LUA_DECLARE(PhysicsSetCollisionHandler);
 };

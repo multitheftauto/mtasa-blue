@@ -73,10 +73,18 @@ public:
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
+    void AddContact(const btCollisionShape* pCollisionShape);
+    void FlushContacts();
+
+    void SetCollisionHandler(const CLuaFunctionRef& iLuaFunction) { m_iLuaCollisionHandlerFunction = iLuaFunction; }
+
 private:
     uint                     m_uiScriptID;
     btDiscreteDynamicsWorld* m_pWorld;
     btRigidBody*             m_pBtRigidBody;
     CLuaPhysicsShape*        m_pPhysicsShape;
     std::vector<CLuaPhysicsConstraint*> m_constraintList;
+    std::vector<const btCollisionShape*>      m_vecTempContacts;
+    std::vector<const btCollisionShape*>      m_vecContacts;
+    CLuaFunctionRef                           m_iLuaCollisionHandlerFunction;
 };

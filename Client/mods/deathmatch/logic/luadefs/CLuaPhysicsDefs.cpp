@@ -15,6 +15,7 @@
 #include "lua/CLuaPhysicsStaticCollisionManager.h"
 #include "lua/CLuaPhysicsConstraintManager.h"
 #include "lua/CLuaPhysicsShapeManager.h"
+#include "lua/CLuaPhysicsSharedLogic.h"
 
 #define MINIMUM_SHAPE_SIZE 0.05f
 
@@ -42,6 +43,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyTorqueImpulse", PhysicsApplyTorqueImpulse},
         {"physicsCreateConstraint", PhysicsCreateConstraint},
         {"physicsRayCast", PhysicsRayCast},
+        {"physicsShapeCast", PhysicsShapeCast},
+        {"physicsSetCollisionHandler", PhysicsSetCollisionHandler},
     };
 
     // Add functions
@@ -237,11 +240,28 @@ int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
 int CLuaPhysicsDefs::PhysicsBuildCollisionFromGTA(lua_State* luaVM)
 {
     CClientPhysics*  pPhysics;
+    bool             bBuildByRadius = false;
+    CVector          vecPosition;
+    float            fRadius;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPhysics);
+    if (argStream.NextIsVector4D())
+    {
+        argStream.ReadVector3D(vecPosition);
+        argStream.ReadNumber(fRadius);
+        bBuildByRadius = true;
+    }
+
     if (!argStream.HasErrors())
     {
-        pPhysics->StartBuildCollisionFromGTA();
+        if (bBuildByRadius)
+        {
+            pPhysics->BuildCollisionFromGTAInRadius(vecPosition, fRadius);
+        }
+        else
+        {
+            pPhysics->StartBuildCollisionFromGTA();
+        }
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -284,6 +304,78 @@ int CLuaPhysicsDefs::PhysicsDrawDebug(lua_State* luaVM)
     {
         pPhysics->DrawDebug();
     }
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    CLuaPhysicsStaticCollision* pStaticCollision;
+    CVector           vecStartPosition, vecStartRotation;
+    CVector           vecEndPosition, vecEndRotation;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadUserData(pStaticCollision);
+    argStream.ReadVector3D(vecStartPosition);
+    argStream.ReadVector3D(vecStartRotation);
+    argStream.ReadVector3D(vecEndPosition);
+    argStream.ReadVector3D(vecEndRotation);
+
+    if (!argStream.HasErrors())
+    {
+        btTransform startTransform;
+        btTransform endTransform;
+        startTransform.setIdentity();
+        endTransform.setIdentity();
+        CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
+        CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartPosition);
+        CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
+        CLuaPhysicsSharedLogic::SetRotation(endTransform, vecEndRotation);
+        btVector3                                     from = btVector3(vecStartPosition.fX, vecStartPosition.fY, vecStartPosition.fZ);
+        btVector3                                     to = btVector3(vecEndPosition.fX, vecEndPosition.fY, vecEndPosition.fZ);
+        btCollisionWorld::ClosestConvexResultCallback result(from, to);
+        pPhysics->ShapeCast(pStaticCollision, startTransform, endTransform, result);
+        lua_newtable(luaVM);
+        lua_pushstring(luaVM, "hit");
+        lua_pushboolean(luaVM, result.hasHit());
+        lua_settable(luaVM, -3);
+        if (result.hasHit())
+        {
+            lua_pushstring(luaVM, "closeshitfraction");
+            lua_pushnumber(luaVM, result.m_closestHitFraction);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "hitpoint");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, result.m_hitPointWorld.getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, result.m_hitPointWorld.getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, result.m_hitPointWorld.getZ());
+            lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "hitnormal");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, result.m_hitNormalWorld.getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, result.m_hitNormalWorld.getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, result.m_hitNormalWorld.getZ());
+            lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+        }
+
+        return 1;
+    }
+    // Failed
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -649,6 +741,81 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         pPhysics->SetUseContinous(boolean);
                         lua_pushboolean(luaVM, true);
                         return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_SPEED:
+                    argStream.ReadNumber(floatNumber[0]);
+                    if (!argStream.HasErrors())
+                    {
+                        if (floatNumber[0] >= 0 && floatNumber[0] <= 1000)
+                        {
+                            pPhysics->SetSpeed(floatNumber[0]);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Speed must be between 0 and 1000");
+                        }
+                    }
+                    break;
+                case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+                    argStream.ReadNumber(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        pPhysics->SetSimulationEnabled(boolean);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_SUBSTEPS:
+                    argStream.ReadNumber(intNumber);
+                    if (!argStream.HasErrors())
+                    {
+                        if (intNumber >= 1 && intNumber <= 256)
+                        {
+                            pPhysics->SetSubSteps(intNumber);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Substeps must be between 1 and 256");
+                        }
+                    }
+                    break;
+                case PHYSICS_PROPERTY_TRIGGEREVENTS:
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        pPhysics->SetTriggerEvents(boolean);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        pPhysics->SetTriggerCollisionEvents(boolean);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_WORLDSIZE:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        if (vector.fX >= 1 && vector.fY >= 1 && vector.fZ >= 1)
+                        {
+                            pPhysics->SetWorldSize(vector);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("World size can not be smaller than cube 1x1x1");
+                        }
                     }
                     break;
                 default:
@@ -1241,7 +1408,7 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
             return 1;
         }
     }
-    
+
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
@@ -1361,6 +1528,42 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
         }
         else if (eRayType == PHYSICS_RAY_MULTIPLE)
         {
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsSetCollisionHandler(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
+
+    CClientPhysics*  pPhysics;
+    CLuaFunctionRef  iLuaFunction;
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+    argStream.ReadFunction(iLuaFunction);
+    argStream.ReadFunctionComplete();
+
+    if (!argStream.HasErrors())
+    {
+        if (pRigidBody)
+        {
+            pRigidBody->SetCollisionHandler(iLuaFunction);
+        }
+        else if (pStaticCollision)
+        {
+            pStaticCollision->SetCollisionHandler(iLuaFunction);
         }
     }
     else
