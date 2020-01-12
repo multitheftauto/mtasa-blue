@@ -26,12 +26,11 @@ CClientPrimitiveBuffer::CClientPrimitiveBuffer(class CClientManager* pManager, E
     m_bRequireMaterial = false;
     m_FVF = 0;
     m_ePrimitiveType = D3DPT_TRIANGLELIST;
-    g_pClientGame->GetPrimitiveBufferManager()->AddToList(std::shared_ptr<CClientPrimitiveBuffer>(this));
 }
 
 void CClientPrimitiveBuffer::Unlink()
 {
-    g_pClientGame->GetPrimitiveBufferManager()->Delete(std::shared_ptr<CClientPrimitiveBuffer>(this));
+    g_pClientGame->GetPrimitiveBufferManager()->Delete(this);
 }
 
 CClientPrimitiveBuffer::~CClientPrimitiveBuffer()
@@ -39,7 +38,10 @@ CClientPrimitiveBuffer::~CClientPrimitiveBuffer()
     delete m_pIndexBuffer;
     for (int i = 0; i < 8; i++)
         if (m_arrayVertexBuffer[i] != nullptr)
-            delete m_arrayVertexBuffer;
+        {
+            m_arrayVertexBuffer[i]->Release();
+            delete m_arrayVertexBuffer[i];
+        }
 
     delete[] m_iStrideSize;
 }

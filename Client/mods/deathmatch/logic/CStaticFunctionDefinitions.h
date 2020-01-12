@@ -751,7 +751,7 @@ public:
 
 
     // Primitive buffer funcs
-    static std::shared_ptr<CClientPrimitiveBuffer> CreatePrimitiveBuffer(CResource& Resource);
+    static CClientPrimitiveBuffer* CreatePrimitiveBuffer(CResource& Resource);
 
     // Player Voice Sound Functions
 

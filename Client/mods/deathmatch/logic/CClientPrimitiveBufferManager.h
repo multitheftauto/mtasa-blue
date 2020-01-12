@@ -44,20 +44,21 @@ public:
     CClientPrimitiveBufferManager(CClientManager* pManager);
     ~CClientPrimitiveBufferManager();
 
-    std::shared_ptr<CClientPrimitiveBuffer> Create();
+    CClientPrimitiveBuffer* Create();
 
-    void Delete(std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer);
+    void Delete(CClientPrimitiveBuffer* pPrimitiveBuffer);
     void DeleteAll();
 
-    std::shared_ptr<CClientPrimitiveBuffer>        Get(unsigned long ulID);
-    static std::shared_ptr<CClientPrimitiveBuffer> Get(ElementID ID);
+    CClientPrimitiveBuffer*        Get(unsigned long ulID);
+    static CClientPrimitiveBuffer* Get(ElementID ID);
 
 private:
-    void AddToList(std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer) { m_List.push_back(pPrimitiveBuffer); };
-    void RemoveFromList(std::shared_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer);
+
+    void AddToList(std::unique_ptr<CClientPrimitiveBuffer> pPrimitiveBuffer) { m_List.push_back(std::move(pPrimitiveBuffer)); };
+    void RemoveFromList(CClientPrimitiveBuffer* pPrimitiveBuffer);
 
 private:
     CClientManager* m_pManager;
 
-    std::list<std::shared_ptr<CClientPrimitiveBuffer>> m_List;
+    std::list<std::unique_ptr<CClientPrimitiveBuffer>> m_List;
 };

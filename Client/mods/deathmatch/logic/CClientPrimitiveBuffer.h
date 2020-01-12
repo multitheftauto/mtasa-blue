@@ -60,7 +60,6 @@ private:
     size_t                                            m_szMemoryUsageInBytes;
 };
 
-
 template <typename T>
 void CClientPrimitiveBuffer::CreateIndexBuffer(std::vector<T>& vecIndexList)
 {
