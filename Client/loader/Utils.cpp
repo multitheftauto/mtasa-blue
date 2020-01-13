@@ -1525,8 +1525,8 @@ int GetFileAge(const SString& strPathFilename)
         FindClose(hFind);
         FILETIME ftNow;
         GetSystemTimeAsFileTime(&ftNow);
-        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime};
-        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, ftNow.dwHighDateTime};
+        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, static_cast<LONG>(findFileData.ftCreationTime.dwHighDateTime)};
+        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, static_cast<LONG>(ftNow.dwHighDateTime)};
         return static_cast<int>((timeNow.QuadPart - creationTime.QuadPart) / (LONGLONG)10000000);
     }
     return 0;
@@ -2153,7 +2153,7 @@ BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
     WINDOWINFO windowInfo;
     if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if (windowInfo.atomWindowType == (WORD)WC_DIALOG)
+        if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
             SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
             return false;

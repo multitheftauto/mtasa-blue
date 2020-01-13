@@ -133,10 +133,9 @@ void CMapManager::BroadcastMapInformation()
     }
 
     // Add the vehicles to the packet
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        EntityPacket.Add(*iterVehicles);
+        EntityPacket.Add(vehicle);
     }
 
     // Add the teams to the packet
@@ -216,10 +215,9 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("Pickups");
 
     // Add the vehicles to the packet
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        EntityPacket.Add(*iterVehicles);
+        EntityPacket.Add(vehicle);
     }
 
     marker.Set("Vehicles");
@@ -277,17 +275,13 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("SendPerPlayerEntities");
 
     // Send the trailer attachments
-    CVehicle* pVehicle;
-    CVehicle* pTowedVehicle;
-    iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        pVehicle = *iterVehicles;
-        pTowedVehicle = pVehicle->GetTowedVehicle();
+        CVehicle* towedVehicle = vehicle->GetTowedVehicle();
 
-        if (pTowedVehicle)
+        if (towedVehicle)
         {
-            CVehicleTrailerPacket AttachPacket(pVehicle, pTowedVehicle, true);
+            CVehicleTrailerPacket AttachPacket(vehicle, towedVehicle, true);
             Player.Send(AttachPacket);
         }
     }
@@ -952,17 +946,16 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
 void CMapManager::LinkupElements()
 {
     // * Link up all the attaching elements
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* pVehicle = *iterVehicles;
+        const char* szAttachToID = vehicle->GetAttachToID();
 
-        const char* szAttachToID = pVehicle->GetAttachToID();
         if (szAttachToID[0])
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
+
             if (pElement)
-                pVehicle->AttachTo(pElement);
+                vehicle->AttachTo(pElement);
         }
     }
 

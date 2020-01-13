@@ -1,5 +1,4 @@
 #ifdef WIN32
-#pragma message("Compiling precompiled header.\n")
 
 #include <winsock2.h>
 #include <windows.h>
