@@ -87,18 +87,18 @@ void CClientPrimitiveBuffer::AddVertexBuffer(std::vector<T>& vecVertexList, ePri
     switch (primitiveData)
     {
         case PRIMITIVE_DATA_XYZ:
-            m_vecVertexElements.push_back({0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0});
             index = 0;
+            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0});
             FVF = D3DFVF_XYZ;
             break;
         case PRIMITIVE_DATA_UV:
-            m_vecVertexElements.push_back({1, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0});
             index = 1;
+            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0});
             FVF = D3DFVF_TEX1;
             break;
         case PRIMITIVE_DATA_DIFFUSE:
-            m_vecVertexElements.push_back({2, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0});
             index = 2;
+            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0});
             FVF = D3DFVF_DIFFUSE;
             break;
     }
