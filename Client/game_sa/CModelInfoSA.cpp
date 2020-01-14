@@ -1476,7 +1476,7 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
 
     const bool isTowTruck = towingModel->GetModel() == 525;
     const bool isTractor = towingModel->GetModel() == 531;
-    
+
     if (IsTrain() || towingModel->IsTrain())
     {
         // A train is never towing other vehicles. Trains are linked by other means
