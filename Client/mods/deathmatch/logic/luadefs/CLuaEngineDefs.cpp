@@ -231,7 +231,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                 }
 
                 SString filePath;
-                
+
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
                     // Grab the resource root entity
@@ -1099,7 +1099,7 @@ int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);
@@ -1136,7 +1136,7 @@ int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);
@@ -1568,7 +1568,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1605,7 +1605,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1634,7 +1634,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1818,7 +1818,7 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
             }
         }
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
