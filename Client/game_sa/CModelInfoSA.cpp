@@ -566,37 +566,34 @@ float CModelInfoSA::GetLODDistance()
 bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-    {
-        TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
-        if (pTime)
-        {
-            if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
-            {
-                MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
-            }
-            pTime->m_nTimeOn = cHourOn;
-            pTime->m_nTimeOff = cHourOff;
-            return true;
-        }
-    }
-    return false;
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!pTime)
+        return false;
+
+    if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
+        MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
+
+    pTime->m_nTimeOn = cHourOn;
+    pTime->m_nTimeOff = cHourOff;
+    return true;
 }
 
 bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-    {
-        TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
-        if (time)
-        {
-            cHourOn = time->m_nTimeOn;
-            cHourOff = time->m_nTimeOff;
-            return true;
-        }
-    }
-    return false;
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!time)
+        return false;
+
+    cHourOn = time->m_nTimeOn;
+    cHourOff = time->m_nTimeOff;
+    return true;
 }
 
 void CModelInfoSA::StaticResetModelTimes()
