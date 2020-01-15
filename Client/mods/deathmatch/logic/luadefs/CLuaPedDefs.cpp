@@ -35,7 +35,6 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTarget", GetPedTarget},
         {"getPedTargetStart", GetPedTargetStart},
         {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetRange", GetPedTargetRange},
         {"getPedTargetCollision", GetPedTargetCollision},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"getPedWeapon", GetPedWeapon},
@@ -664,25 +663,6 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedTargetRange(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // TODO: getPedTargetRange
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
 {
     // Verify the argument
@@ -1132,14 +1112,16 @@ int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
     SString          strControlState = "";
     float            fState = 0.0f;
     CClientPed*      pPed = NULL;
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState))
+        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;
