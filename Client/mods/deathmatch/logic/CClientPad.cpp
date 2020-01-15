@@ -473,7 +473,7 @@ bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs,
     unsigned int uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
-        // Do we have a script override?
+        // If we are not ignoring overrides and have a script override
         if (!bIgnoreOverrides && m_sScriptedStates[uiIndex] != CS_NAN)
             switch (uiIndex)
             {

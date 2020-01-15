@@ -1665,12 +1665,13 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const
     if (Ped.GetType() == CCLIENTPLAYER)
     {
         CControllerState cs;
-        Ped.GetControllerState(cs);
         bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
         unsigned int uiIndex;
 
         if (bRawInput)
-            cs = Ped.m_rawControllerState;
+            cs = Ped.m_rawControllerState; // use the raw controller values without MTA glitch fixes modifying our raw inputs
+        else
+            Ped.GetControllerState(cs);
 
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
@@ -7013,11 +7014,12 @@ bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, fl
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
-    pLocalPlayer->GetControllerState(cs);
     bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
 
     if (bRawInput)
-        cs = pLocalPlayer->m_rawControllerState;
+        cs = pLocalPlayer->m_rawControllerState; // use the raw controller values without MTA glitch fixes modifying our raw inputs
+    else
+        pLocalPlayer->GetControllerState(cs);
 
     if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
