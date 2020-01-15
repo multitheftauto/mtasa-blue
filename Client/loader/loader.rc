@@ -148,7 +148,7 @@ BEGIN
     CTEXT           "Try each option and see what works:",IDC_OPTIMUS_TEXT2,14,34,207,10
     GROUPBOX        "",IDC_STATIC,22,50,195,119
     CTEXT           "If you get desperate, this might help:",IDC_OPTIMUS_TEXT3,58,173,131,10
-    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,183,100,10 
+    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,185,100,10 
     CTEXT           "If you have already selected an option that works, this might help:", IDC_OPTIMUS_TEXT3,27,205,180,20
     CONTROL         " Don't show again",IDC_CHECK_REMEMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,80,225,100,8
 END
