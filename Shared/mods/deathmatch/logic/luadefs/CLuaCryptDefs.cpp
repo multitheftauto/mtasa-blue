@@ -220,6 +220,13 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 
             if (!ss.fail())
             {
+                // Using custom salts are deprecated (Luxy.c)
+                // See: https://stackoverflow.com/questions/40993645/understanding-bcrypt-salt-as-used-by-php-password-hash
+                if (options["salt"].length() > 0)
+                {
+                    m_pScriptDebugging->LogWarning(luaVM, "Custom generated salts are deprecated and will be removed in the future.");
+                }
+
                 // Sync
                 if (luaFunctionRef == CLuaFunctionRef{})
                 {

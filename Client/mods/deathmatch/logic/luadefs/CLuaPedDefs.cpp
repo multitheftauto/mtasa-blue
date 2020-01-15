@@ -35,7 +35,6 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTarget", GetPedTarget},
         {"getPedTargetStart", GetPedTargetStart},
         {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetRange", GetPedTargetRange},
         {"getPedTargetCollision", GetPedTargetCollision},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"getPedWeapon", GetPedWeapon},
@@ -655,25 +654,6 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
         lua_pushnumber(luaVM, vecEnd.fY);
         lua_pushnumber(luaVM, vecEnd.fZ);
         return 3;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaPedDefs::GetPedTargetRange(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // TODO: getPedTargetRange
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

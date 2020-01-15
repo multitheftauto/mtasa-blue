@@ -1143,7 +1143,7 @@ void CModelInfoSA::RestoreColModel()
                 call    func
                 add     esp, 8
             }
-            #pragma message(__LOC__ "(IJs) Document this function some time.")
+            // (IJs) Document this function some time
         }
     }
 
@@ -1432,6 +1432,36 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+}
+
+bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
+{
+    bool isTowable = true;
+
+    const bool isTowTruck = towingModel->GetModel() == 525;
+    const bool isTractor = towingModel->GetModel() == 531;
+    
+    if (IsTrain() || towingModel->IsTrain())
+    {
+        // A train is never towing other vehicles. Trains are linked by other means
+        isTowable = false;
+    }
+    else if (isTowTruck || isTractor)
+    {
+        const bool isFarmTrailer = GetModel() == 610;
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (IsBoat() || IsBike() || IsBmx())
+        {
+            isTowable = false;
+        }
+        else if (IsTrailer() && !(isTractor && isFarmTrailer))
+        {
+            isTowable = false;
+        }
+    }
+
+    return isTowable;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

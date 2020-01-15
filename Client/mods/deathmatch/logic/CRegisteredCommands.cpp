@@ -71,7 +71,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
             // Delete it and remove it from our list
             if (m_bIteratingList)
             {
-                m_TrashCan.push_back(*iter);
+                m_TrashCan.emplace(*iter);
             }
             else
             {
@@ -254,13 +254,11 @@ void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain
 
 void CRegisteredCommands::TakeOutTheTrash()
 {
-    list<SCommand*>::iterator iter = m_TrashCan.begin();
-    for (; iter != m_TrashCan.end(); iter++)
+    for (SCommand* command : m_TrashCan)
     {
-        SCommand* pCommand = *iter;
-        if (!m_Commands.empty())
-            m_Commands.remove(pCommand);
-        delete pCommand;
+        m_Commands.remove(command);
+        delete command;
     }
+
     m_TrashCan.clear();
 }

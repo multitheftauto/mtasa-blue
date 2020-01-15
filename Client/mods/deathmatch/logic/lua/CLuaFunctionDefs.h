@@ -177,6 +177,9 @@ public:
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
     LUA_DECLARE(FetchRemote);
+    LUA_DECLARE(GetRemoteRequests);
+    LUA_DECLARE(GetRemoteRequestInfo);
+    LUA_DECLARE(AbortRemoteRequest);
 
     // Input functions
     LUA_DECLARE(BindKey);

@@ -206,6 +206,9 @@ namespace
         {"engineRequestModel", "1.5.7-9.20157"},
         {"engineFreeModel", "1.5.7-9.20157"},
         {"xmlLoadString", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -289,6 +292,9 @@ namespace
         {"xmlLoadString", "1.5.7-9.20157"},
         {"getPlayerScriptDebugLevel", "1.5.7-9.20157"},
         {"setPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     //
@@ -324,7 +330,6 @@ namespace
         {false, "getPlayerTarget", "getPedTarget"},
         {false, "getPlayerTargetStart", "getPedTargetStart"},
         {false, "getPlayerTargetEnd", "getPedTargetEnd"},
-        {false, "getPlayerTargetRange", "getPedTargetRange"},
         {false, "getPlayerTargetCollision", "getPedTargetCollision"},
         {false, "getPlayerWeaponSlot", "getPedWeaponSlot"},
         {false, "getPlayerWeapon", "getPedWeapon"},

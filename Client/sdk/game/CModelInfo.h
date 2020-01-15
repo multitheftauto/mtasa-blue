@@ -180,4 +180,7 @@ public:
     virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
     virtual unsigned short GetObjectPropertiesGroup() = 0;
     virtual void           RestoreObjectPropertiesGroup() = 0;
+
+    // Vehicle towing functions
+    virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 };
