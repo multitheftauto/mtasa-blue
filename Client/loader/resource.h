@@ -44,6 +44,7 @@
 #define IDC_APPLY_AUTOMATIC_CHANGES     1036
 #define IDC_NO_ACTION                   1037
 #define IDC_CHECK_REMEMBER              1038
+#define IDC_OPTIMUS_TEXT4               1039
 
 // Next default values for new objects
 //
