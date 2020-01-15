@@ -1112,14 +1112,16 @@ int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
     SString          strControlState = "";
     float            fState = 0.0f;
     CClientPed*      pPed = NULL;
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState))
+        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;

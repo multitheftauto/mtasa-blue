@@ -468,13 +468,13 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
 }
 
 // Get the analog control state directly from a pad state.  Use for players.
-bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState)
+bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides)
 {
     unsigned int uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
-        // Do we have a script override?
-        if (m_sScriptedStates[uiIndex] != CS_NAN)
+        // If we are not ignoring overrides and have a script override
+        if (!bIgnoreOverrides && m_sScriptedStates[uiIndex] != CS_NAN)
             switch (uiIndex)
             {
                 case 0:
