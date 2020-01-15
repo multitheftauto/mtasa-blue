@@ -80,16 +80,8 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
         strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
     }
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        // Check if data exists with the given key
-        bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
-        lua_pushboolean(luaVM, exists);
-        return 1;
-    }
-
-    // Failed
-    lua_pushnil(luaVM);
+    // Check if data exists with the given key
+    bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
+    lua_pushboolean(luaVM, exists);
     return 1;
 }
