@@ -515,7 +515,7 @@ int CLuaElementDefs::isElementData(lua_State* luaVM)
     {
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
-    
+
     if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Warn and truncate if key is too long
