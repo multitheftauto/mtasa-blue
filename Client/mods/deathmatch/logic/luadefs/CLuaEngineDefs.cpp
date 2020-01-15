@@ -771,24 +771,22 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModel);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    
+    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
     {
-        unsigned short usModelID = CModelNames::ResolveModelID(strModel);
-        CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            float fCurrentDistance = pModelInfo->GetLODDistance();
-            float fOriginalDistance = pModelInfo->GetOriginalLODDistance();
-            //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
-            if (fOriginalDistance > 0.0f && fOriginalDistance != fCurrentDistance) {
-                pModelInfo->SetLODDistance(fOriginalDistance, true);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        float fCurrentDistance = pModelInfo->GetLODDistance();
+        float fOriginalDistance = pModelInfo->GetOriginalLODDistance();
+        //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
+        if (fOriginalDistance > 0.0f && fOriginalDistance != fCurrentDistance) {
+            pModelInfo->SetLODDistance(fOriginalDistance, true);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
