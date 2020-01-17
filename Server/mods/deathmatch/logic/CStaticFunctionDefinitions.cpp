@@ -9847,10 +9847,7 @@ void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::ve
 {
     assert(szText);
 
-    for (const auto& pPlayer : sendList)
-    {
-        pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
-    }
+    CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
 bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
