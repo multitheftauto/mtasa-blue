@@ -9842,6 +9842,17 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     return false;
 }
 
+void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen,
+                                               unsigned char ucBlue, bool bColorCoded)
+{
+    assert(szText);
+
+    for (const auto& pPlayer : sendList)
+    {
+        pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
+    }
+}
+
 bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
 {
     assert(pElement);
