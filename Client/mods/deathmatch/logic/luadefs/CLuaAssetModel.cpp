@@ -59,18 +59,30 @@ const aiScene* loadModel(string path)
 
 int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
 {
-    //  asset-model loadAssetModel ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
-
     CScriptArgReader argStream(luaVM);
 
-    if (!argStream.HasErrors())
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        SString strFileInput;
+        bool    bReadOnly;
+
+        CScriptArgReader argStream(luaVM);
+        argStream.ReadString(strFileInput);
+
+        if (!argStream.HasErrors())
         {
-            const aiScene* scene = loadModel("box.obj");
-            lua_pushboolean(luaVM, true);
-            return 1;
+            SString    strPath;
+            CResource* pThisResource = pLuaMain->GetResource();
+            CResource* pOtherResource = pThisResource;
+
+            // Resolve other resource from name
+            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
+            {
+                const aiScene* scene = loadModel(strPath);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     if (argStream.HasErrors())
