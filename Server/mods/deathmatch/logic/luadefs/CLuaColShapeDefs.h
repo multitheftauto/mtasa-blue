@@ -25,6 +25,11 @@ public:
     LUA_DECLARE(CreateColRectangle);
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
+    
+    LUA_DECLARE(GetColShapeRadius);
+    LUA_DECLARE(SetColShapeRadius);
+    LUA_DECLARE(GetColShapeHeight);
+    LUA_DECLARE(SetColShapeHeight);
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);

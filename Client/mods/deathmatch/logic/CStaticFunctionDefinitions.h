@@ -665,6 +665,14 @@ public:
     static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
 
+    // Shape get functions
+    static bool GetColShapeRadius(CClientColShape* pColShape, float& fRadius);
+    static bool GetColShapeHeight(CClientColShape* pColShape, float& fHeight);
+
+    // Shape set functions
+    static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
+    static bool SetColShapeHeight(CClientColShape* pColShape, float fHeight);
+
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);
     static bool           GetWeaponIDFromName(const char* szName, unsigned char& ucID);

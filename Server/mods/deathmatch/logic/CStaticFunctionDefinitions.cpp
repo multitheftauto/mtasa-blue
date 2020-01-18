@@ -9331,6 +9331,120 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     return pColShape;
 }
 
+bool CStaticFunctionDefinitions::GetColShapeRadius(CColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.1f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    // Tell all players
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(fRadius);
+    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_RADIUS, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeHeight(CColShape* pColShape, float& fHeight)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+            fHeight = static_cast<CColRectangle*>(pColShape)->GetSize().fY;
+            break;
+        case COLSHAPE_CUBOID:
+            fHeight = static_cast<CColCuboid*>(pColShape)->GetSize().fZ;
+            break;
+        case COLSHAPE_TUBE:
+            fHeight = static_cast<CColTube*>(pColShape)->GetHeight();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeHeight(CColShape* pColShape, float fHeight)
+{
+    if (fHeight < 0.0f)
+        fHeight = 0.1f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            CColRectangle* pColRectangle = static_cast<CColRectangle*>(pColShape);
+            CVector2D      rectangleSize = pColRectangle->GetSize();
+
+            rectangleSize.fY = fHeight;
+            pColRectangle->SetSize(rectangleSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            CColCuboid* pColCuboid = static_cast<CColCuboid*>(pColShape);
+            CVector     cuboidSize = pColCuboid->GetSize();
+
+            cuboidSize.fZ = fHeight;
+            pColCuboid->SetSize(cuboidSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+            static_cast<CColTube*>(pColShape)->SetHeight(fHeight);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    // Tell all players
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(fHeight);
+    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_HEIGHT, *BitStream.pBitStream));
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
 {
     inside = pColShape->DoHitDetection(vecPosition);

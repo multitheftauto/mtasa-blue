@@ -21,6 +21,9 @@ void CLuaColShapeDefs::LoadFunctions()
         {"createColPolygon", CreateColPolygon},
         {"createColTube", CreateColTube},
 
+        {"getColShapeRadius", GetColShapeRadius},
+        {"setColShapeRadius", SetColShapeRadius},
+
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
     };
@@ -47,8 +50,12 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInside", "isInsideColShape");
     lua_classfunction(luaVM, "getShapeType", "getColShapeType");
 
+    lua_classfunction(luaVM, "getRadius", GetColShapeRadius);
+    lua_classfunction(luaVM, "setRadius", SetColShapeRadius);
+
     lua_classvariable(luaVM, "elementsWithin", nullptr, "getElementsWithinColShape");
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
+    lua_classvariable(luaVM, "radius", SetColShapeRadius, GetColShapeRadius);
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -378,6 +385,53 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
+{
+    CClientColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    float fRadius;
+    if (CStaticFunctionDefinitions::GetColShapeRadius(pColShape, fRadius))
+    {
+        lua_pushnumber(luaVM, fRadius);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
+{
+    CClientColShape* pColShape;
+    float            fRadius;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadNumber(fRadius);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius))
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
 
     lua_pushboolean(luaVM, false);
     return 1;

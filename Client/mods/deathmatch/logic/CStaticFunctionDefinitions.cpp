@@ -7211,6 +7211,108 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     return pShape;
 }
 
+bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CClientColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CClientColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CClientColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.1f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CClientColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CClientColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CClientColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeHeight(CClientColShape* pColShape, float& fHeight)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+            fHeight = static_cast<CClientColRectangle*>(pColShape)->GetSize().fY;
+            break;
+        case COLSHAPE_CUBOID:
+            fHeight = static_cast<CClientColCuboid*>(pColShape)->GetSize().fZ;
+            break;
+        case COLSHAPE_TUBE:
+            fHeight = static_cast<CClientColTube*>(pColShape)->GetHeight();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeHeight(CClientColShape* pColShape, float fHeight)
+{
+    if (fHeight < 0.0f)
+        fHeight = 0.1f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            CClientColRectangle* pColRectangle = static_cast<CClientColRectangle*>(pColShape);
+            CVector2D      rectangleSize = pColRectangle->GetSize();
+
+            rectangleSize.fY = fHeight;
+            pColRectangle->SetSize(rectangleSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            CClientColCuboid* pColCuboid = static_cast<CClientColCuboid*>(pColShape);
+            CVector     cuboidSize = pColCuboid->GetSize();
+
+            cuboidSize.fZ = fHeight;
+            pColCuboid->SetSize(cuboidSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+            static_cast<CClientColTube*>(pColShape)->SetHeight(fHeight);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColShape)
 {

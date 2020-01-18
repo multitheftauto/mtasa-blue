@@ -21,6 +21,11 @@ void CLuaColShapeDefs::LoadFunctions()
         {"createColPolygon", CreateColPolygon},
         {"createColTube", CreateColTube},
 
+        {"getColShapeRadius", GetColShapeRadius},
+        {"setColShapeRadius", SetColShapeRadius},
+        {"getColShapeHeight", GetColShapeHeight},
+        {"setColShapeHeight", SetColShapeHeight},
+
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
     };
@@ -45,9 +50,16 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
     lua_classfunction(luaVM, "isInside", "isInsideColShape");
-
     lua_classfunction(luaVM, "getShapeType", "getColShapeType");
+
+    lua_classfunction(luaVM, "getRadius", "getColShapeRadius", GetColShapeRadius);
+    lua_classfunction(luaVM, "setRadius", "setColShapeRadius", SetColShapeRadius);
+    lua_classfunction(luaVM, "getHeight", "getColShapeHeight", GetColShapeHeight);
+    lua_classfunction(luaVM, "setHeight", "setColShapeHeight", SetColShapeHeight);
+
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
+    lua_classvariable(luaVM, "radius", "setColShapeRadius", "getColShapeRadius", SetColShapeRadius, GetColShapeRadius);
+    lua_classvariable(luaVM, "height", "setColShapeHeight", "getColShapeHeight", SetColShapeHeight, GetColShapeHeight);
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -359,6 +371,100 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
+{
+    CColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    float fRadius;
+    if (CStaticFunctionDefinitions::GetColShapeRadius(pColShape, fRadius))
+    {
+        lua_pushnumber(luaVM, fRadius);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
+{
+    CColShape* pColShape;
+    float      fRadius;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadNumber(fRadius);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius))
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeHeight(lua_State* luaVM)
+{
+    CColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    float fHeight;
+    if (CStaticFunctionDefinitions::GetColShapeHeight(pColShape, fHeight))
+    {
+        lua_pushnumber(luaVM, fHeight);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::SetColShapeHeight(lua_State* luaVM)
+{
+    CColShape* pColShape;
+    float      fHeight;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadNumber(fHeight);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (CStaticFunctionDefinitions::SetColShapeHeight(pColShape, fHeight))
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
 
     lua_pushboolean(luaVM, false);
     return 1;
