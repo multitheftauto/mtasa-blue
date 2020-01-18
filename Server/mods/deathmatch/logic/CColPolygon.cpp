@@ -24,6 +24,8 @@ CElement* CColPolygon::Clone(bool* bAddEntity, CResource* pResource)
 {
     CColPolygon* pColPolygon = new CColPolygon(m_pManager, GetParentEntity(), m_vecPosition);
     pColPolygon->m_Points = m_Points;
+    pColPolygon->m_fRadius = m_fRadius;
+    pColPolygon->SizeChanged();
     return pColPolygon;
 }
 
