@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <assimp/include/assimp/scene.h>
-#include <assimp/include/assimp/Importer.hpp>
-#include <assimp/include/assimp/postprocess.h>
-using namespace Assimp;
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
@@ -79,9 +75,22 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
             // Resolve other resource from name
             if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
             {
-                const aiScene* scene = loadModel(strPath);
-                lua_pushboolean(luaVM, true);
-                return 1;
+                CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+
+                if (pResource)
+                {
+                    // const aiScene* scene = loadModel(strPath);
+                    auto pAssetModel = CStaticFunctionDefinitions::CreateAssetModel(*pResource);
+                    if (pAssetModel)
+                    {
+                        CElementGroup* pGroup = pResource->GetElementGroup();
+                        if (pGroup)
+                            pGroup->Add(pAssetModel);
+
+                        lua_pushelement(luaVM, pAssetModel);
+                        return 1;
+                    }
+                }
             }
         }
     }

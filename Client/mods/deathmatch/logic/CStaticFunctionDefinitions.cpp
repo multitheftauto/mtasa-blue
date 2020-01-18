@@ -9763,6 +9763,18 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     return nullptr;
 }
 
+CClientAssetModel* CStaticFunctionDefinitions::CreateAssetModel(CResource& Resource)
+{
+    auto pAssetModel = new CClientAssetModel(m_pManager, INVALID_ELEMENT_ID);
+    if (pAssetModel)
+    {
+        pAssetModel->SetParent(Resource.GetResourceDynamicEntity());
+        return pAssetModel;
+    }
+
+    return nullptr;
+}
+
 bool CStaticFunctionDefinitions::ResetAllSurfaceInfo()
 {
     g_pGame->GetWorld()->ResetAllSurfaceInfo();

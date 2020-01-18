@@ -88,12 +88,14 @@
 #include <CClientShader.h>
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
+#include <CClientAssetModel.h>
 #include <CClientEffect.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
 #include <CClientModelManager.h>
+#include <CClientAssetModelManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
 #include <CFileReader.h>

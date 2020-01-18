@@ -380,6 +380,8 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
             return "DxScreenSource";
         case CCLIENTRENDERTARGET:
             return "DxRenderTarget";
+        case CCLIENTASSETMODEL:
+            return "AssetModel";
         case CCLIENTBROWSER:
             return "Browser";
     }

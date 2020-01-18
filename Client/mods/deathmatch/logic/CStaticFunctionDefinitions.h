@@ -654,6 +654,9 @@ public:
     static CClientProjectile* CreateProjectile(CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce,
                                                CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel = 0);
 
+    // Asset model functions
+    static CClientAssetModel* CreateAssetModel(CResource& Resource);
+
     // Shape create funcs
     static CClientColCircle*    CreateColCircle(CResource& Resource, const CVector2D& vecPosition, float fRadius);
     static CClientColCuboid*    CreateColCuboid(CResource& Resource, const CVector& vecPosition, const CVector& vecSize);
