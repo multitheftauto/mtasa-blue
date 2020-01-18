@@ -19,6 +19,7 @@ class CColPolygon : public CColShape
 {
 public:
     CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     virtual CSphere GetWorldBoundingSphere();
 
