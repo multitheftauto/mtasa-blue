@@ -7234,7 +7234,7 @@ bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, f
 bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
 {
     if (fRadius < 0.0f)
-        fRadius = 0.1f;
+        fRadius = 0.0f;
 
     switch (pColShape->GetShapeType())
     {
@@ -7279,14 +7279,14 @@ bool CStaticFunctionDefinitions::GetColShapeHeight(CClientColShape* pColShape, f
 bool CStaticFunctionDefinitions::SetColShapeHeight(CClientColShape* pColShape, float fHeight)
 {
     if (fHeight < 0.0f)
-        fHeight = 0.1f;
+        fHeight = 0.0f;
 
     switch (pColShape->GetShapeType())
     {
         case COLSHAPE_RECTANGLE:
         {
             CClientColRectangle* pColRectangle = static_cast<CClientColRectangle*>(pColShape);
-            CVector2D      rectangleSize = pColRectangle->GetSize();
+            CVector2D            rectangleSize = pColRectangle->GetSize();
 
             rectangleSize.fY = fHeight;
             pColRectangle->SetSize(rectangleSize);
@@ -7295,7 +7295,7 @@ bool CStaticFunctionDefinitions::SetColShapeHeight(CClientColShape* pColShape, f
         case COLSHAPE_CUBOID:
         {
             CClientColCuboid* pColCuboid = static_cast<CClientColCuboid*>(pColShape);
-            CVector     cuboidSize = pColCuboid->GetSize();
+            CVector           cuboidSize = pColCuboid->GetSize();
 
             cuboidSize.fZ = fHeight;
             pColCuboid->SetSize(cuboidSize);
@@ -7304,6 +7304,41 @@ bool CStaticFunctionDefinitions::SetColShapeHeight(CClientColShape* pColShape, f
         case COLSHAPE_TUBE:
             static_cast<CClientColTube*>(pColShape)->SetHeight(fHeight);
             break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CClientColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CClientColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CClientColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
         default:
             return false;
     }

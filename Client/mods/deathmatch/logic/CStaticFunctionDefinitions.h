@@ -672,6 +672,7 @@ public:
     // Shape set functions
     static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
     static bool SetColShapeHeight(CClientColShape* pColShape, float fHeight);
+    static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);

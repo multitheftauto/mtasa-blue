@@ -16,6 +16,7 @@ void CColShapeRPCs::LoadFunctions(void)
 {
     AddHandler(SET_COLSHAPE_RADIUS, SetColShapeRadius, "SetColShapeRadius");
     AddHandler(SET_COLSHAPE_HEIGHT, SetColShapeHeight, "SetColShapeHeight");
+    AddHandler(SET_COLSHAPE_SIZE, SetColShapeSize, "SetColShapeSize");
 }
 
 void CColShapeRPCs::SetColShapeRadius(CClientEntity* pSource, NetBitStreamInterface& bitStream)
@@ -43,6 +44,21 @@ void CColShapeRPCs::SetColShapeHeight(CClientEntity* pSource, NetBitStreamInterf
         {
             CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
             CStaticFunctionDefinitions::SetColShapeHeight(pColShape, fHeight);
+            pSource->SetSyncTimeContext(ucTimeContext);
+        }
+    }
+}
+
+void CColShapeRPCs::SetColShapeSize(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    CVector       vecSize;
+    unsigned char ucTimeContext;
+    if (bitStream.ReadVector(vecSize.fX, vecSize.fY, vecSize.fZ) && bitStream.Read(ucTimeContext))
+    {
+        if (pSource)
+        {
+            CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
+            CStaticFunctionDefinitions::SetColShapeSize(pColShape, vecSize);
             pSource->SetSyncTimeContext(ucTimeContext);
         }
     }

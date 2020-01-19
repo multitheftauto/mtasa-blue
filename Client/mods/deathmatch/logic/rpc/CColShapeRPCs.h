@@ -20,4 +20,5 @@ public:
 
     DECLARE_ELEMENT_RPC(SetColShapeRadius);
     DECLARE_ELEMENT_RPC(SetColShapeHeight);
+    DECLARE_ELEMENT_RPC(SetColShapeSize);
 };

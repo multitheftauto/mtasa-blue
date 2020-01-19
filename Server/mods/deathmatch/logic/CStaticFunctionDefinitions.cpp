@@ -9354,7 +9354,7 @@ bool CStaticFunctionDefinitions::GetColShapeRadius(CColShape* pColShape, float& 
 bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float fRadius)
 {
     if (fRadius < 0.0f)
-        fRadius = 0.1f;
+        fRadius = 0.0f;
 
     switch (pColShape->GetShapeType())
     {
@@ -9405,7 +9405,7 @@ bool CStaticFunctionDefinitions::GetColShapeHeight(CColShape* pColShape, float& 
 bool CStaticFunctionDefinitions::SetColShapeHeight(CColShape* pColShape, float fHeight)
 {
     if (fHeight < 0.0f)
-        fHeight = 0.1f;
+        fHeight = 0.0f;
 
     switch (pColShape->GetShapeType())
     {
@@ -9441,6 +9441,46 @@ bool CStaticFunctionDefinitions::SetColShapeHeight(CColShape* pColShape, float f
     BitStream.pBitStream->Write(fHeight);
     BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_HEIGHT, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteVector(vecSize.fX, vecSize.fY, vecSize.fZ);
+    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_SIZE, *BitStream.pBitStream));
 
     return true;
 }

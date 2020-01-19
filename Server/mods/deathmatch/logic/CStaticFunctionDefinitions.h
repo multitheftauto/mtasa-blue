@@ -461,6 +461,7 @@ public:
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
     static bool SetColShapeHeight(CColShape* pColShape, float fHeight);
+    static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
 
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
