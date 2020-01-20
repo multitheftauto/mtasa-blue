@@ -531,22 +531,12 @@ int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
         }
         case COLSHAPE_CUBOID:
         {
-            CVector vecCuboidSize;
-            argStream.ReadVector3D(vecCuboidSize);
-
-            if (!argStream.HasErrors())
-                vecSize = vecCuboidSize;
-
+            argStream.ReadVector3D(vecSize);
             break;
         }
         case COLSHAPE_TUBE:
         {
-            float fHeight;
-            argStream.ReadNumber(fHeight);
-
-            if (!argStream.HasErrors())
-                vecSize.fX = fHeight;
-
+            argStream.ReadNumber(vecSize.fX);
             break;
         }
         default:
