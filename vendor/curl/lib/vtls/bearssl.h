@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MBEDTLS_H
-#define HEADER_CURL_MBEDTLS_H
+#ifndef HEADER_CURL_BEARSSL_H
+#define HEADER_CURL_BEARSSL_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,8 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
- * Copyright (C) 2010, Hoi-Ho Chan, <hoiho.chan@gmail.com>
+ * Copyright (C) 2019, Michael Forney, <mforney@mforney.org>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,11 +21,12 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
+
 #include "curl_setup.h"
 
-#ifdef USE_MBEDTLS
+#ifdef USE_BEARSSL
 
-extern const struct Curl_ssl Curl_ssl_mbedtls;
+extern const struct Curl_ssl Curl_ssl_bearssl;
 
-#endif /* USE_MBEDTLS */
-#endif /* HEADER_CURL_MBEDTLS_H */
+#endif /* USE_BEARSSL */
+#endif /* HEADER_CURL_BEARSSL_H */
