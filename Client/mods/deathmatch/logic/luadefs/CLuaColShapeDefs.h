@@ -27,8 +27,6 @@ public:
 
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE(GetColShapeHeight);
-    LUA_DECLARE(SetColShapeHeight);
     LUA_DECLARE(GetColShapeSize);
     LUA_DECLARE(SetColShapeSize);
 

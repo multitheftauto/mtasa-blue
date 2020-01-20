@@ -9382,69 +9382,6 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float f
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetColShapeHeight(CColShape* pColShape, float& fHeight)
-{
-    switch (pColShape->GetShapeType())
-    {
-        case COLSHAPE_RECTANGLE:
-            fHeight = static_cast<CColRectangle*>(pColShape)->GetSize().fY;
-            break;
-        case COLSHAPE_CUBOID:
-            fHeight = static_cast<CColCuboid*>(pColShape)->GetSize().fZ;
-            break;
-        case COLSHAPE_TUBE:
-            fHeight = static_cast<CColTube*>(pColShape)->GetHeight();
-            break;
-        default:
-            return false;
-    }
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetColShapeHeight(CColShape* pColShape, float fHeight)
-{
-    if (fHeight < 0.0f)
-        fHeight = 0.0f;
-
-    switch (pColShape->GetShapeType())
-    {
-        case COLSHAPE_RECTANGLE:
-        {
-            CColRectangle* pColRectangle = static_cast<CColRectangle*>(pColShape);
-            CVector2D      rectangleSize = pColRectangle->GetSize();
-
-            rectangleSize.fY = fHeight;
-            pColRectangle->SetSize(rectangleSize);
-            break;
-        }
-        case COLSHAPE_CUBOID:
-        {
-            CColCuboid* pColCuboid = static_cast<CColCuboid*>(pColShape);
-            CVector     cuboidSize = pColCuboid->GetSize();
-
-            cuboidSize.fZ = fHeight;
-            pColCuboid->SetSize(cuboidSize);
-            break;
-        }
-        case COLSHAPE_TUBE:
-            static_cast<CColTube*>(pColShape)->SetHeight(fHeight);
-            break;
-        default:
-            return false;
-    }
-
-    RefreshColShapeColliders(pColShape);
-
-    // Tell all players
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(fHeight);
-    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_HEIGHT, *BitStream.pBitStream));
-
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& vecSize)
 {
     if (vecSize.fX < 0.0f)

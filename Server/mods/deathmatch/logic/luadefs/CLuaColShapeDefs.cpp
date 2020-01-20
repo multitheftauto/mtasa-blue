@@ -23,8 +23,6 @@ void CLuaColShapeDefs::LoadFunctions()
 
         {"getColShapeRadius", GetColShapeRadius},
         {"setColShapeRadius", SetColShapeRadius},
-        {"getColShapeHeight", GetColShapeHeight},
-        {"setColShapeHeight", SetColShapeHeight},
         {"getColShapeSize", GetColShapeSize},
         {"setColShapeSize", SetColShapeSize},
 
@@ -56,15 +54,12 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getRadius", "getColShapeRadius", GetColShapeRadius);
     lua_classfunction(luaVM, "setRadius", "setColShapeRadius", SetColShapeRadius);
-    lua_classfunction(luaVM, "getHeight", "getColShapeHeight", GetColShapeHeight);
-    lua_classfunction(luaVM, "setHeight", "setColShapeHeight", SetColShapeHeight);
     lua_classfunction(luaVM, "getSize", "getColShapeSize", GetColShapeSize);
     lua_classfunction(luaVM, "setSize", "setColShapeSize", SetColShapeSize);
 
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
     lua_classvariable(luaVM, "radius", "setColShapeRadius", "getColShapeRadius", SetColShapeRadius, GetColShapeRadius);
-    lua_classvariable(luaVM, "height", "setColShapeHeight", "getColShapeHeight", SetColShapeHeight, GetColShapeHeight);
     lua_classvariable(luaVM, "size", "setColShapeSize", "getColShapeSize", SetColShapeSize, GetColShapeSize);
 
     lua_registerclass(luaVM, "ColShape", "Element");
@@ -422,49 +417,6 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
-}
-
-int CLuaColShapeDefs::GetColShapeHeight(lua_State* luaVM)
-{
-    CColShape* pColShape;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    float fHeight;
-    if (CStaticFunctionDefinitions::GetColShapeHeight(pColShape, fHeight))
-    {
-        lua_pushnumber(luaVM, fHeight);
-        return 1;
-    }
-
-    argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
-}
-
-int CLuaColShapeDefs::SetColShapeHeight(lua_State* luaVM)
-{
-    CColShape* pColShape;
-    float      fHeight;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(fHeight);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    if (CStaticFunctionDefinitions::SetColShapeHeight(pColShape, fHeight))
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-
-    argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 

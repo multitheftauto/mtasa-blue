@@ -456,11 +456,9 @@ public:
 
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
-    static bool GetColShapeHeight(CColShape* pColShape, float& fHeight);
     
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
-    static bool SetColShapeHeight(CColShape* pColShape, float fHeight);
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
 
     // Weapon funcs

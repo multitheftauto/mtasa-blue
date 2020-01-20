@@ -7256,63 +7256,6 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, f
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetColShapeHeight(CClientColShape* pColShape, float& fHeight)
-{
-    switch (pColShape->GetShapeType())
-    {
-        case COLSHAPE_RECTANGLE:
-            fHeight = static_cast<CClientColRectangle*>(pColShape)->GetSize().fY;
-            break;
-        case COLSHAPE_CUBOID:
-            fHeight = static_cast<CClientColCuboid*>(pColShape)->GetSize().fZ;
-            break;
-        case COLSHAPE_TUBE:
-            fHeight = static_cast<CClientColTube*>(pColShape)->GetHeight();
-            break;
-        default:
-            return false;
-    }
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetColShapeHeight(CClientColShape* pColShape, float fHeight)
-{
-    if (fHeight < 0.0f)
-        fHeight = 0.0f;
-
-    switch (pColShape->GetShapeType())
-    {
-        case COLSHAPE_RECTANGLE:
-        {
-            CClientColRectangle* pColRectangle = static_cast<CClientColRectangle*>(pColShape);
-            CVector2D            rectangleSize = pColRectangle->GetSize();
-
-            rectangleSize.fY = fHeight;
-            pColRectangle->SetSize(rectangleSize);
-            break;
-        }
-        case COLSHAPE_CUBOID:
-        {
-            CClientColCuboid* pColCuboid = static_cast<CClientColCuboid*>(pColShape);
-            CVector           cuboidSize = pColCuboid->GetSize();
-
-            cuboidSize.fZ = fHeight;
-            pColCuboid->SetSize(cuboidSize);
-            break;
-        }
-        case COLSHAPE_TUBE:
-            static_cast<CClientColTube*>(pColShape)->SetHeight(fHeight);
-            break;
-        default:
-            return false;
-    }
-
-    RefreshColShapeColliders(pColShape);
-
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
 {
     if (vecSize.fX < 0.0f)
