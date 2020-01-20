@@ -18,6 +18,9 @@
 // Prevent the warning issued when doing unsigned short -> void*
 #pragma warning(disable:4312)
 
+#include "CLuaAssetNode.h"
+#include "CLuaAssetMesh.h"
+
 CClientEntity* lua_toelement(lua_State* luaVM, int iArgument)
 {
     if (lua_type(luaVM, iArgument) == LUA_TLIGHTUSERDATA)
@@ -96,6 +99,26 @@ void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetID()));
 }
 
+void lua_pushassetnode(lua_State* luaVM, CLuaAssetNode* pElement)
+{
+    const char* szClass = NULL;
+    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    //if (pLuaMain->IsOOPEnabled())
+    //    szClass = CLuaClassDefs::GetXmlNodeClass(pElement);
+
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetScriptID()));
+}
+
+void lua_pushassetmesh(lua_State* luaVM, CLuaAssetMesh* pElement)
+{
+    const char* szClass = NULL;
+    CLuaMain*   pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    //if (pLuaMain->IsOOPEnabled())
+    //    szClass = CLuaClassDefs::GetXmlNodeClass(pElement);
+
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetScriptID()));
+}
+
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
     if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
@@ -114,6 +137,10 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
+    else if (CLuaAssetNode* pAssetNode = UserDataCast<CLuaAssetNode>((CLuaAssetNode*)NULL, pData, luaVM))
+        return lua_pushassetnode(luaVM, pAssetNode);
+    else if (CLuaAssetMesh* pAssetMesh = UserDataCast<CLuaAssetMesh>((CLuaAssetMesh*)NULL, pData, luaVM))
+        return lua_pushassetmesh(luaVM, pAssetMesh);
 
     lua_pushobject(luaVM, NULL, pData);
 }

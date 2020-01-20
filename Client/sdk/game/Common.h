@@ -1612,3 +1612,15 @@ namespace eObjectGroup
         SMASHABLE,
     };
 }
+
+enum eAssetProperty
+{
+    ASSET_ANIMATIONS_COUNT,
+    ASSET_CAMERAS_COUNT,
+    ASSET_LIGHTS_COUNT,
+    ASSET_MATERIALS_COUNT,
+    ASSET_MESHES_COUNT,
+    ASSET_TEXTURES_COUNT,
+    ASSET_NODES_COUNT,
+    ASSET_NAME,
+};

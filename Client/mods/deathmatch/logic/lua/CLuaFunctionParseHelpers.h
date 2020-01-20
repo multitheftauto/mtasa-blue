@@ -63,6 +63,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM(eAssetProperty);
 
 class CRemoteCall;
 
@@ -380,6 +381,15 @@ inline SString GetClassTypeName(CLuaTimer*)
 {
     return "lua-timer";
 }
+inline SString GetClassTypeName(CLuaAssetNode*)
+{
+    return "asset-node";
+}
+
+inline SString GetClassTypeName(CLuaAssetMesh*)
+{
+    return "asset-mesh";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -452,6 +462,10 @@ inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
 {
     return "objectgroup-breakmode";
 }
+inline SString GetClassByTypeName(eAssetProperty*)
+{
+    return "asset-property";
+}
 
 //
 // CResource from userdata
@@ -519,6 +533,24 @@ template <class T>
 CLuaMatrix* UserDataCast(CLuaMatrix*, void* ptr, lua_State* luaVM)
 {
     return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaAssetNode from userdata
+//
+template <class T>
+CLuaAssetNode* UserDataCast(CLuaAssetNode*, void* ptr, lua_State* luaVM)
+{
+    return CLuaAssetNode::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+//
+// CLuaAssetMesh from userdata
+//
+
+template <class T>
+CLuaAssetMesh* UserDataCast(CLuaAssetMesh*, void* ptr, lua_State* luaVM)
+{
+    return CLuaAssetMesh::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
 }
 
 //

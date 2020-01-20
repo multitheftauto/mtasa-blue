@@ -654,6 +654,17 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
+IMPLEMENT_ENUM_BEGIN(eAssetProperty)
+ADD_ENUM(ASSET_ANIMATIONS_COUNT, "animationscount")
+ADD_ENUM(ASSET_CAMERAS_COUNT, "camerascount")
+ADD_ENUM(ASSET_LIGHTS_COUNT, "lightscount")
+ADD_ENUM(ASSET_MATERIALS_COUNT, "materialscount")
+ADD_ENUM(ASSET_MESHES_COUNT, "meshescount")
+ADD_ENUM(ASSET_TEXTURES_COUNT, "texturescount")
+ADD_ENUM(ASSET_NODES_COUNT, "nodescount")
+ADD_ENUM(ASSET_NAME, "name")
+IMPLEMENT_ENUM_END("asset-property")
+
 //
 // Get best guess at name of userdata type
 //

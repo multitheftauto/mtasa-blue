@@ -35,9 +35,18 @@ public:
 
     void DoPulse();
 
+    bool LoadFromFile(std::string strPath);
+    void GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+
+    void GetLuaNode(lua_State* luaVM, const aiNode* pNode);
+
 protected:
+    void CacheNodes(const aiNode* pNode);
 
     CClientAssetModelManager* m_pAssetModelManager;
 
+    Assimp::Importer importer;
     CVector        m_vecPosition;
+    std::vector<const aiNode*> vecNodes;
+    const aiScene* m_pScene;
 };

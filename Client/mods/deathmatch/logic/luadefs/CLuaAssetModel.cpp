@@ -10,11 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../lua/CLuaAssetNode.h"
+#include "../lua/CLuaAssetMesh.h"
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},
+        {"getAssetProperties", GetAssetProperties},
+        {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
     };
 
     // Add functions
@@ -28,29 +32,16 @@ void CLuaAssetModelDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    //lua_classfunction(luaVM, "create", "setTimer");
-    //lua_classfunction(luaVM, "destroy", "killTimer");
-    //lua_classfunction(luaVM, "reset", "resetTimer");
-    //lua_classfunction(luaVM, "isValid", "isTimer");
+    // lua_classfunction(luaVM, "create", "setTimer");
+    // lua_classfunction(luaVM, "destroy", "killTimer");
+    // lua_classfunction(luaVM, "reset", "resetTimer");
+    // lua_classfunction(luaVM, "isValid", "isTimer");
 
-    //lua_classfunction(luaVM, "getDetails", "getTimerDetails");
+    // lua_classfunction(luaVM, "getDetails", "getTimerDetails");
 
-    //lua_classvariable(luaVM, "valid", NULL, "isTimer");
+    // lua_classvariable(luaVM, "valid", NULL, "isTimer");
 
     lua_registerclass(luaVM, "AssetModel");
-}
-
-const aiScene* loadModel(string path)
-{
-    Assimp::Importer import;
-
-    const aiScene*   scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure);
-
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        return nullptr;
-    }
-    return scene;
 }
 
 int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
@@ -87,6 +78,7 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                         if (pGroup)
                             pGroup->Add(pAssetModel);
 
+                        pAssetModel->LoadFromFile(strPath);
                         lua_pushelement(luaVM, pAssetModel);
                         return 1;
                     }
@@ -100,8 +92,67 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaAssetModelDefs::GetAssetProperties(lua_State* luaVM)
+{
+    //  float GetAssetProperties ( searchlight light )
+    CClientAssetModel* pAssetModel = nullptr;
+    CLuaAssetNode*     pAssetNode = nullptr;
+    CLuaAssetMesh*     pAssetMesh = nullptr;
+    eAssetProperty     eProperty;
+    CScriptArgReader   argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
+        argStream.ReadUserData(pAssetModel);
+    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
+        argStream.ReadUserData(pAssetNode);
+    else if (argStream.NextIsUserDataOfType<CLuaAssetMesh>())
+        argStream.ReadUserData(pAssetMesh);
+
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        if (pAssetModel != nullptr)
+            pAssetModel->GetProperties(luaVM, eProperty);
+        else if (pAssetNode != nullptr)
+            pAssetNode->GetProperties(luaVM, eProperty);
+        else if (pAssetMesh != nullptr)
+            pAssetMesh->GetProperties(luaVM, eProperty);
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
+{
+    CClientAssetModel* pAssetModel;
+    eAssetProperty     eProperty;
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData(pAssetModel);
+
+    if (!argStream.HasErrors())
+    {
+        if (pAssetModel != nullptr)
+        {
+            pAssetModel->GetLuaNode(luaVM, nullptr);
+            return 1;
+        }
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 //
-//int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
+// int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
 //{
 //    //  timer setTimer ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
 //    CLuaFunctionRef iLuaFunction;

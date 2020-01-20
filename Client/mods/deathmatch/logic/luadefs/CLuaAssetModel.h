@@ -19,4 +19,6 @@ public:
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(LoadAssetModel);
+    LUA_DECLARE(GetAssetProperties);
+    LUA_DECLARE(AssetGetChilldrenNodes);
 };
