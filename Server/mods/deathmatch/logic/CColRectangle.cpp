@@ -21,6 +21,12 @@ CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVe
     UpdateSpatialData();
 }
 
+CElement* CColRectangle::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColRectangle* pColRectangle = new CColRectangle(m_pManager, GetParentEntity(), m_vecPosition, m_vecSize);
+    return pColRectangle;
+}
+
 bool CColRectangle::DoHitDetection(const CVector& vecNowPosition)
 {
     // FIXME: What about radius?
