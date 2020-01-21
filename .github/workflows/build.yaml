@@ -52,6 +52,9 @@ jobs:
     steps:
       - name: Install MySQL
         run: brew install mysql
+        continue-on-error: true
+      - name: Link MySQL
+        run: brew link --overwrite mysql
       - uses: actions/checkout@v1
         with:
           fetch-depth: 10
