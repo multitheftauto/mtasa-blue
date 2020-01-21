@@ -667,10 +667,15 @@ public:
 
     // Shape get functions
     static bool GetColShapeRadius(CClientColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
 
     // Shape set functions
     static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint iPointIndex);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);

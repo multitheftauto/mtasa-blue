@@ -20,4 +20,7 @@ public:
 
     DECLARE_ELEMENT_RPC(SetColShapeRadius);
     DECLARE_ELEMENT_RPC(SetColShapeSize);
+    DECLARE_ELEMENT_RPC(UpdateColPolygonPoint);
+    DECLARE_ELEMENT_RPC(AddColPolygonPoint);
+    DECLARE_ELEMENT_RPC(RemoveColPolygonPoint);
 };

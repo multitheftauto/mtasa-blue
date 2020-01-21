@@ -9288,7 +9288,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
 CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList)
 {
     if (vecPointList.size() < 4)
-        return NULL;
+        return nullptr;
 
     CVector      vecPosition(vecPointList[0].fX, vecPointList[0].fY, 0);
     CColPolygon* pColShape = new CColPolygon(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition);
@@ -9420,6 +9420,75 @@ bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_SIZE, *BitStream.pBitStream));
 
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        pColPolygon->SetPointPosition(uiPointIndex, vecPoint);
+
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(uiPointIndex);
+        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, UPDATE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint)
+{
+    if (iPointIndex < static_cast<int>(pColPolygon->CountPoints()))
+    {
+        pColPolygon->AddPoint(vecPoint, iPointIndex);
+
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(iPointIndex);
+        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, ADD_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        pColPolygon->RemovePoint(uiPointIndex);
+
+        CBitStream      BitStream;
+        BitStream.pBitStream->Write(uiPointIndex);
+        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, REMOVE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)

@@ -7291,6 +7291,57 @@ bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVe
     return true;
 }
 
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        pColPolygon->SetPointPosition(uiPointIndex, vecPoint);
+
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint)
+{
+    if (iPointIndex < static_cast<int>(pColPolygon->CountPoints()))
+    {
+        pColPolygon->AddPoint(vecPoint, iPointIndex);
+
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        pColPolygon->RemovePoint(uiPointIndex);
+
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColShape)
 {

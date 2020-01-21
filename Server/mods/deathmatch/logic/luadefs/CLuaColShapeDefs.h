@@ -30,6 +30,11 @@ public:
     LUA_DECLARE(SetColShapeRadius);
     LUA_DECLARE(GetColShapeSize);
     LUA_DECLARE(SetColShapeSize);
+    LUA_DECLARE(GetColPolygonPoints);
+    LUA_DECLARE(GetColPolygonPointPosition);
+    LUA_DECLARE(SetColPolygonPointPosition);
+    LUA_DECLARE(AddColPolygonPoint);
+    LUA_DECLARE(RemoveColPolygonPoint);
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
