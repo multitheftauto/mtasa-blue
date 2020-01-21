@@ -9828,6 +9828,17 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
         pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
         return true;
     }
+    else if (IS_TEAM(pElement))
+    {
+        CTeam* pTeam = static_cast<CTeam*>(pElement);
+        list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
+        for (; iter != pTeam->PlayersEnd(); iter++)
+        {
+            CPlayer* pPlayer = *iter;
+            pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
+        }
+        return true;
+    }
 
     if (pElement == m_pMapManager->GetRootElement())
     {
@@ -9840,6 +9851,14 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     }
 
     return false;
+}
+
+void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen,
+                                               unsigned char ucBlue, bool bColorCoded)
+{
+    assert(szText);
+
+    CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
 bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)

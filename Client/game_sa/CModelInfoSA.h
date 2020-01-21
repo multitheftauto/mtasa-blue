@@ -314,7 +314,8 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
-    void           SetLODDistance(float fDistance);
+    float          GetOriginalLODDistance();
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
