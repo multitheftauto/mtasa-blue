@@ -27,12 +27,9 @@ void CColShapeRPCs::SetColShapeRadius(CClientEntity* pSource, NetBitStreamInterf
     unsigned char ucTimeContext;
     if (bitStream.Read(fRadius) && bitStream.Read(ucTimeContext))
     {
-        if (pSource)
-        {
-            CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
-            CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius);
-            pSource->SetSyncTimeContext(ucTimeContext);
-        }
+        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius);
+        pSource->SetSyncTimeContext(ucTimeContext);
     }
 }
 
@@ -42,12 +39,9 @@ void CColShapeRPCs::SetColShapeSize(CClientEntity* pSource, NetBitStreamInterfac
     unsigned char ucTimeContext;
     if (bitStream.ReadVector(vecSize.fX, vecSize.fY, vecSize.fZ) && bitStream.Read(ucTimeContext))
     {
-        if (pSource)
-        {
-            CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
-            CStaticFunctionDefinitions::SetColShapeSize(pColShape, vecSize);
-            pSource->SetSyncTimeContext(ucTimeContext);
-        }
+        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeSize(pColShape, vecSize);
+        pSource->SetSyncTimeContext(ucTimeContext);
     }
 }
 
@@ -59,12 +53,9 @@ void CColShapeRPCs::UpdateColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
     unsigned char   ucTimeContext;
     if (bitStream.Read(&size) && bitStream.Read(uiPointIndex) && bitStream.Read(ucTimeContext))
     {
-        if (pSource)
-        {
-            CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
-            CStaticFunctionDefinitions::SetColPolygonPointPosition(pColShape, uiPointIndex, size.data.vecPosition);
-            pSource->SetSyncTimeContext(ucTimeContext);
-        }
+        CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
+        CStaticFunctionDefinitions::SetColPolygonPointPosition(pColShape, uiPointIndex, size.data.vecPosition);
+        pSource->SetSyncTimeContext(ucTimeContext);
     }
 }
 
@@ -76,12 +67,9 @@ void CColShapeRPCs::AddColPolygonPoint(CClientEntity* pSource, NetBitStreamInter
     unsigned char ucTimeContext;
     if (bitStream.Read(&size) && bitStream.Read(iPointIndex) && bitStream.Read(ucTimeContext))
     {
-        if (pSource)
-        {
-            CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
-            CStaticFunctionDefinitions::AddColPolygonPoint(pColShape, iPointIndex, size.data.vecPosition);
-            pSource->SetSyncTimeContext(ucTimeContext);
-        }
+        CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
+        CStaticFunctionDefinitions::AddColPolygonPoint(pColShape, iPointIndex, size.data.vecPosition);
+        pSource->SetSyncTimeContext(ucTimeContext);
     }
 }
 
@@ -92,11 +80,8 @@ void CColShapeRPCs::RemoveColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
     unsigned char ucTimeContext;
     if (bitStream.Read(uiPointIndex) && bitStream.Read(ucTimeContext))
     {
-        if (pSource)
-        {
-            CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
-            CStaticFunctionDefinitions::RemoveColPolygonPoint(pColShape, uiPointIndex);
-            pSource->SetSyncTimeContext(ucTimeContext);
-        }
+        CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
+        CStaticFunctionDefinitions::RemoveColPolygonPoint(pColShape, uiPointIndex);
+        pSource->SetSyncTimeContext(ucTimeContext);
     }
 }
