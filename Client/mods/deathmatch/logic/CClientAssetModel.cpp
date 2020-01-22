@@ -102,7 +102,7 @@ bool CClientAssetModel::LoadFromFile(std::string strPath)
     }
 
     vecNodes.push_back(m_pScene->mRootNode);
-
+    bLoaded = true;
     return true;
 }
 

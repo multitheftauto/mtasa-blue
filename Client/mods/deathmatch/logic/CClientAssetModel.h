@@ -45,6 +45,7 @@ protected:
 
     CClientAssetModelManager* m_pAssetModelManager;
 
+    bool                       bLoaded = false;
     Assimp::Importer importer;
     CVector        m_vecPosition;
     std::vector<const aiNode*> vecNodes;

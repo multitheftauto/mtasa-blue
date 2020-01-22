@@ -52,10 +52,16 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
     if (pLuaMain)
     {
         SString strFileInput;
-        bool    bReadOnly;
+        bool            bReadOnly;
+        CLuaFunctionRef luaFunctionRef;
 
         CScriptArgReader argStream(luaVM);
         argStream.ReadString(strFileInput);
+        if (argStream.NextIsFunction())
+        {
+            argStream.ReadFunction(luaFunctionRef);
+            argStream.ReadFunctionComplete();
+        }
 
         if (!argStream.HasErrors())
         {
@@ -78,9 +84,31 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                         if (pGroup)
                             pGroup->Add(pAssetModel);
 
-                        pAssetModel->LoadFromFile(strPath);
-                        lua_pushelement(luaVM, pAssetModel);
-                        return 1;
+                        if (luaFunctionRef == CLuaFunctionRef{})
+                        {
+                            pAssetModel->LoadFromFile(strPath);
+                            lua_pushelement(luaVM, pAssetModel);
+                        }
+                        else
+                        {
+                            CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                                [strPath, pAssetModel] {
+                                    // Execute time-consuming task
+                                    return pAssetModel->LoadFromFile(strPath);
+                                },
+                                [luaFunctionRef](const bool& bReady) {
+                                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                    if (pLuaMain)
+                                    {
+                                        CLuaArguments arguments;
+                                        arguments.PushBoolean(bReady);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                });
+
+                            lua_pushelement(luaVM, pAssetModel);
+                            return 1;
+                        }
                     }
                 }
             }
