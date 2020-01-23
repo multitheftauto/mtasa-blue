@@ -9376,7 +9376,6 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float f
     // Tell all players
     CBitStream BitStream;
     BitStream.pBitStream->Write(fRadius);
-    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_RADIUS, *BitStream.pBitStream));
 
     return true;
@@ -9416,7 +9415,6 @@ bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& 
 
     CBitStream BitStream;
     BitStream.pBitStream->WriteVector(vecSize.fX, vecSize.fY, vecSize.fZ);
-    BitStream.pBitStream->Write(pColShape->GenerateSyncTimeContext());
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_SIZE, *BitStream.pBitStream));
 
     return true;
@@ -9446,7 +9444,6 @@ bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPol
         size.data.vecPosition = vecPoint;
         BitStream.pBitStream->Write(&size);
         BitStream.pBitStream->Write(uiPointIndex);
-        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, UPDATE_COLPOLYGON_POINT, *BitStream.pBitStream));
         return true;
     }
@@ -9467,7 +9464,6 @@ bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, in
         size.data.vecPosition = vecPoint;
         BitStream.pBitStream->Write(&size);
         BitStream.pBitStream->Write(iPointIndex);
-        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, ADD_COLPOLYGON_POINT, *BitStream.pBitStream));
         return true;
     }
@@ -9481,9 +9477,10 @@ bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CColPolygon* pColPolygon,
     {
         pColPolygon->RemovePoint(uiPointIndex);
 
+        RefreshColShapeColliders(pColPolygon);
+
         CBitStream      BitStream;
         BitStream.pBitStream->Write(uiPointIndex);
-        BitStream.pBitStream->Write(pColPolygon->GenerateSyncTimeContext());
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, REMOVE_COLPOLYGON_POINT, *BitStream.pBitStream));
         return true;
     }
