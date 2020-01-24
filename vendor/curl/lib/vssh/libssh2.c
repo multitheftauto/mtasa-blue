@@ -466,61 +466,95 @@ static CURLcode ssh_knownhost(struct connectdata *conn)
       struct curl_khkey *knownkeyp = NULL;
       struct curl_khkey foundkey;
 
-      keybit = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
-        LIBSSH2_KNOWNHOST_KEY_SSHRSA:LIBSSH2_KNOWNHOST_KEY_SSHDSS;
-
+      switch(keytype) {
+      case LIBSSH2_HOSTKEY_TYPE_RSA:
+        keybit = LIBSSH2_KNOWNHOST_KEY_SSHRSA;
+        break;
+      case LIBSSH2_HOSTKEY_TYPE_DSS:
+        keybit = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
+        break;
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_256
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_256:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_256;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_384
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_384:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_384;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_521
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_521:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_521;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ED25519
+      case LIBSSH2_HOSTKEY_TYPE_ED25519:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ED25519;
+        break;
+#endif
+      default:
+        infof(data, "unsupported key type, can't check knownhosts!\n");
+        keybit = 0;
+        break;
+      }
+      if(!keybit)
+        /* no check means failure! */
+        rc = CURLKHSTAT_REJECT;
+      else {
 #ifdef HAVE_LIBSSH2_KNOWNHOST_CHECKP
-      keycheck = libssh2_knownhost_checkp(sshc->kh,
-                                          conn->host.name,
-                                          (conn->remote_port != PORT_SSH)?
-                                          conn->remote_port:-1,
-                                          remotekey, keylen,
-                                          LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-                                          LIBSSH2_KNOWNHOST_KEYENC_RAW|
-                                          keybit,
-                                          &host);
+        keycheck = libssh2_knownhost_checkp(sshc->kh,
+                                            conn->host.name,
+                                            (conn->remote_port != PORT_SSH)?
+                                            conn->remote_port:-1,
+                                            remotekey, keylen,
+                                            LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+                                            LIBSSH2_KNOWNHOST_KEYENC_RAW|
+                                            keybit,
+                                            &host);
 #else
-      keycheck = libssh2_knownhost_check(sshc->kh,
-                                         conn->host.name,
-                                         remotekey, keylen,
-                                         LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-                                         LIBSSH2_KNOWNHOST_KEYENC_RAW|
-                                         keybit,
-                                         &host);
+        keycheck = libssh2_knownhost_check(sshc->kh,
+                                           conn->host.name,
+                                           remotekey, keylen,
+                                           LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+                                           LIBSSH2_KNOWNHOST_KEYENC_RAW|
+                                           keybit,
+                                           &host);
 #endif
 
-      infof(data, "SSH host check: %d, key: %s\n", keycheck,
-            (keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
-            host->key:"<none>");
+        infof(data, "SSH host check: %d, key: %s\n", keycheck,
+              (keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
+              host->key:"<none>");
 
-      /* setup 'knownkey' */
-      if(keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH) {
-        knownkey.key = host->key;
-        knownkey.len = 0;
-        knownkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
+        /* setup 'knownkey' */
+        if(keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH) {
+          knownkey.key = host->key;
+          knownkey.len = 0;
+          knownkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
+            CURLKHTYPE_RSA : CURLKHTYPE_DSS;
+          knownkeyp = &knownkey;
+        }
+
+        /* setup 'foundkey' */
+        foundkey.key = remotekey;
+        foundkey.len = keylen;
+        foundkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
           CURLKHTYPE_RSA : CURLKHTYPE_DSS;
-        knownkeyp = &knownkey;
+
+        /*
+         * if any of the LIBSSH2_KNOWNHOST_CHECK_* defines and the
+         * curl_khmatch enum are ever modified, we need to introduce a
+         * translation table here!
+         */
+        keymatch = (enum curl_khmatch)keycheck;
+
+        /* Ask the callback how to behave */
+        Curl_set_in_callback(data, true);
+        rc = func(data, knownkeyp, /* from the knownhosts file */
+                  &foundkey, /* from the remote host */
+                  keymatch, data->set.ssh_keyfunc_userp);
+        Curl_set_in_callback(data, false);
       }
-
-      /* setup 'foundkey' */
-      foundkey.key = remotekey;
-      foundkey.len = keylen;
-      foundkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
-        CURLKHTYPE_RSA : CURLKHTYPE_DSS;
-
-      /*
-       * if any of the LIBSSH2_KNOWNHOST_CHECK_* defines and the
-       * curl_khmatch enum are ever modified, we need to introduce a
-       * translation table here!
-       */
-      keymatch = (enum curl_khmatch)keycheck;
-
-      /* Ask the callback how to behave */
-      Curl_set_in_callback(data, true);
-      rc = func(data, knownkeyp, /* from the knownhosts file */
-                &foundkey, /* from the remote host */
-                keymatch, data->set.ssh_keyfunc_userp);
-      Curl_set_in_callback(data, false);
     }
     else
       /* no remotekey means failure! */
@@ -2811,7 +2845,7 @@ static CURLcode ssh_block_statemach(struct connectdata *conn,
     }
 
 #ifdef HAVE_LIBSSH2_SESSION_BLOCK_DIRECTION
-    if(!result && block) {
+    if(block) {
       int dir = libssh2_session_block_directions(sshc->ssh_session);
       curl_socket_t sock = conn->sock[FIRSTSOCKET];
       curl_socket_t fd_read = CURL_SOCKET_BAD;
@@ -2822,7 +2856,7 @@ static CURLcode ssh_block_statemach(struct connectdata *conn,
         fd_write = sock;
       /* wait for the socket to become ready */
       (void)Curl_socket_check(fd_read, CURL_SOCKET_BAD, fd_write,
-                              left>1000?1000:left); /* ignore result */
+                              left>1000?1000:(time_t)left);
     }
 #endif
 
