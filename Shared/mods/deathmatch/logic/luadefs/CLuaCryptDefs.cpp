@@ -377,7 +377,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 
     if (argStream.NextIsFunction())
     {
-        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
         argStream.ReadFunctionComplete();
     }
 
@@ -397,7 +397,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
 
                 // Sync
-                if (luaFunctionRef == CLuaFunctionRef())
+                if (VERIFY_FUNCTION(luaFunctionRef))
                 {
                     SString result;
                     SharedUtil::TeaEncode(data, key, &result);
@@ -459,7 +459,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
 
     if (argStream.NextIsFunction())
     {
-        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
         argStream.ReadFunctionComplete();
     }
 
@@ -479,7 +479,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 }
 
                 // Sync
-                if (luaFunctionRef == CLuaFunctionRef())
+                if (VERIFY_FUNCTION(luaFunctionRef))
                 {
                     SString result;
                     SharedUtil::TeaDecode(data, key, &result);
