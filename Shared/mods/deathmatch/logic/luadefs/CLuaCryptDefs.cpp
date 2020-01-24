@@ -375,11 +375,8 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
 
-    if (argStream.NextIsFunction())
-    {
-        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
-        argStream.ReadFunctionComplete();
-    }
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
@@ -396,14 +393,8 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                // Sync
+                // Async
                 if (VERIFY_FUNCTION(luaFunctionRef))
-                {
-                    SString result;
-                    SharedUtil::TeaEncode(data, key, &result);
-                    lua_pushlstring(luaVM, result, result.length());
-                }
-                else            // Async
                 {
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
@@ -427,6 +418,12 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 
                         lua_pushboolean(luaVM, true);
                     }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    SharedUtil::TeaEncode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;
             }
@@ -457,11 +454,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
 
-    if (argStream.NextIsFunction())
-    {
-        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
-        argStream.ReadFunctionComplete();
-    }
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
@@ -478,14 +472,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                // Sync
+                // Async
                 if (VERIFY_FUNCTION(luaFunctionRef))
-                {
-                    SString result;
-                    SharedUtil::TeaDecode(data, key, &result);
-                    lua_pushlstring(luaVM, result, result.length());
-                }
-                else            // Async
                 {
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
@@ -509,6 +497,12 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
 
                         lua_pushboolean(luaVM, true);
                     }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;
             }
