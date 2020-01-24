@@ -9837,21 +9837,6 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
         }
         return true;
     }
-    else if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        
-        for (int i = 0; i < MAX_VEHICLE_SEATS; ++i)
-        {
-            CPed* pPed = pVehicle->GetOccupant(i);
-            CPlayer* pPlayer = (pPed ? static_cast<CPlayer*>(pPed) : nullptr);
-
-            if (pPlayer)
-            {
-                pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
-            }
-        }
-    }
     else
     {
         // Fixes issue 1223: https://github.com/multitheftauto/mtasa-blue/issues/1223 (Luxy.c)
