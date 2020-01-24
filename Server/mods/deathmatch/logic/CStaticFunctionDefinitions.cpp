@@ -9819,9 +9819,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
 {
     assert(pElement);
     assert(szText);
-
-    RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-
+    
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
@@ -9838,6 +9836,11 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
             pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
         }
         return true;
+    }
+    else
+    {
+        // Fixes issue 1223: https://github.com/multitheftauto/mtasa-blue/issues/1223 (Luxy.c)
+        RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
     }
 
     if (pElement == m_pMapManager->GetRootElement())
