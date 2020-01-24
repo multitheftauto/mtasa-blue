@@ -8,5 +8,5 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
-[*.{h,hpp,c,cpp,sh}]
+[*.sh]
 end_of_line = lf
