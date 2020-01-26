@@ -9848,14 +9848,28 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
 {
     assert(pElement);
     assert(szText);
-
-    RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-
+    
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
         return true;
+    }
+    else if (IS_TEAM(pElement))
+    {
+        CTeam* pTeam = static_cast<CTeam*>(pElement);
+        list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
+        for (; iter != pTeam->PlayersEnd(); iter++)
+        {
+            CPlayer* pPlayer = *iter;
+            pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
+        }
+        return true;
+    }
+    else
+    {
+        // Fixes issue 1223: https://github.com/multitheftauto/mtasa-blue/issues/1223 (Luxy.c)
+        RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
     }
 
     if (pElement == m_pMapManager->GetRootElement())
@@ -9869,6 +9883,14 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     }
 
     return false;
+}
+
+void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen,
+                                               unsigned char ucBlue, bool bColorCoded)
+{
+    assert(szText);
+
+    CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
 bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)

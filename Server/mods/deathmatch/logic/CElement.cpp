@@ -138,6 +138,7 @@ bool CElement::IsCloneable()
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
         case CElement::PATH_NODE_UNUSED:
+        case CElement::COLSHAPE:
             return true;
         default:
             return false;

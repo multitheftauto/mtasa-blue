@@ -43,10 +43,11 @@ int CLuaFunctionDefs::SetMaxPlayers(lua_State* luaVM)
 
 int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 {
-    // bool outputChatBox ( string text [, element visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
-    SString   ssChat;
-    CElement* pElement;
-    bool      bColorCoded;
+    // bool outputChatBox ( string text [, element/table visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
+    SString               ssChat;
+    std::vector<CPlayer*> sendList;
+    CElement*             pElement = nullptr;
+    bool                  bColorCoded;
     // Default
     unsigned char ucRed = 231;
     unsigned char ucGreen = 217;
@@ -54,7 +55,15 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(ssChat);
-    argStream.ReadUserData(pElement, m_pRootElement);
+
+    if (argStream.NextIsTable())
+    {
+        argStream.ReadUserDataTable(sendList);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement, m_pRootElement);
+    }
 
     if (argStream.NextIsNumber() && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
     {
@@ -72,9 +81,18 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            if (pElement)
+            {
+                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+            else if (sendList.size() > 0)
+            {
+                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
@@ -733,7 +751,7 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
     if (pResource)
         pLuaMain = pResource->GetVirtualMachine();
 
-    if(!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
         lua_newtable(luaVM);
 

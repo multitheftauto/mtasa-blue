@@ -106,7 +106,7 @@ bool curl_win32_idn_to_ascii(const char *in, char **out);
 #include "http2.h"
 #include "file.h"
 #include "curl_ldap.h"
-#include "ssh.h"
+#include "vssh/ssh.h"
 #include "imap.h"
 #include "url.h"
 #include "connect.h"
@@ -403,9 +403,11 @@ CURLcode Curl_close(struct Curl_easy **datap)
     Curl_share_unlock(data, CURL_LOCK_DATA_SHARE);
   }
 
+#ifndef CURL_DISABLE_DOH
   free(data->req.doh.probe[0].serverdoh.memory);
   free(data->req.doh.probe[1].serverdoh.memory);
   curl_slist_free_all(data->req.doh.headers);
+#endif
 
   /* destruct wildcard structures if it is needed */
   Curl_wildcard_dtor(&data->wildcard);
@@ -672,7 +674,7 @@ static void conn_reset_all_postponed_data(struct connectdata *conn)
 }
 #else  /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 /* Use "do-nothing" macro instead of function when workaround not used */
-#define conn_reset_all_postponed_data(c) do {} WHILE_FALSE
+#define conn_reset_all_postponed_data(c) do {} while(0)
 #endif /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 
 
@@ -1080,16 +1082,15 @@ ConnectionExists(struct Curl_easy *data,
       check = curr->ptr;
       curr = curr->next;
 
-      if(check->bits.connect_only)
-        /* connect-only connections will not be reused */
+      if(check->bits.connect_only || check->bits.close)
+        /* connect-only or to-be-closed connections will not be reused */
         continue;
 
       multiplexed = CONN_INUSE(check) &&
         (bundle->multiuse == BUNDLE_MULTIPLEX);
 
       if(canmultiplex) {
-        if(check->bits.protoconnstart && check->bits.close)
-          continue;
+        ;
       }
       else {
         if(multiplexed) {
@@ -1109,12 +1110,9 @@ ConnectionExists(struct Curl_easy *data,
           }
         }
 
-        if((check->sock[FIRSTSOCKET] == CURL_SOCKET_BAD) ||
-           check->bits.close) {
-          if(!check->bits.close)
-            foundPendingCandidate = TRUE;
-          /* Don't pick a connection that hasn't connected yet or that is going
-             to get closed. */
+        if(check->sock[FIRSTSOCKET] == CURL_SOCKET_BAD) {
+          foundPendingCandidate = TRUE;
+          /* Don't pick a connection that hasn't connected yet */
           infof(data, "Connection #%ld isn't open enough, can't reuse\n",
                 check->connection_id);
           continue;
@@ -1192,8 +1190,7 @@ ConnectionExists(struct Curl_easy *data,
            already in use so we skip it */
         continue;
 
-      if(CONN_INUSE(check) && check->data &&
-         (check->data->multi != needle->data->multi))
+      if(check->data && (check->data->multi != needle->data->multi))
         /* this could be subject for multiplex use, but only if they belong to
          * the same multi handle */
         continue;
@@ -1641,6 +1638,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
      it may live on without (this specific) Curl_easy */
   conn->fclosesocket = data->set.fclosesocket;
   conn->closesocket_client = data->set.closesocket_client;
+  conn->lastused = Curl_now(); /* used now */
 
   return conn;
   error:
@@ -1987,8 +1985,11 @@ void Curl_free_request_state(struct Curl_easy *data)
 {
   Curl_safefree(data->req.protop);
   Curl_safefree(data->req.newurl);
+
+#ifndef CURL_DISABLE_DOH
   Curl_close(&data->req.doh.probe[0].easy);
   Curl_close(&data->req.doh.probe[1].easy);
+#endif
 }
 
 
@@ -3592,25 +3593,6 @@ static CURLcode create_conn(struct Curl_easy *data,
     reuse = FALSE;
   else
     reuse = ConnectionExists(data, conn, &conn_temp, &force_reuse, &waitpipe);
-
-  /* If we found a reusable connection that is now marked as in use, we may
-     still want to open a new connection if we are multiplexing. */
-  if(reuse && !force_reuse && IsMultiplexingPossible(data, conn_temp)) {
-    size_t multiplexed = CONN_INUSE(conn_temp);
-    if(multiplexed > 0) {
-      infof(data, "Found connection %ld, with %zu requests on it\n",
-            conn_temp->connection_id, multiplexed);
-
-      if(Curl_conncache_bundle_size(conn_temp) < max_host_connections &&
-         Curl_conncache_size(data) < max_total_connections) {
-        /* We want a new connection anyway */
-        reuse = FALSE;
-
-        infof(data, "We can reuse, but we want a new connection anyway\n");
-        Curl_conncache_return_conn(conn_temp);
-      }
-    }
-  }
 
   if(reuse) {
     /*

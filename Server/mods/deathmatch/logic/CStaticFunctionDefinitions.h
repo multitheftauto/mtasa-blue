@@ -547,6 +547,8 @@ public:
     static bool         SetMaxPlayers(unsigned int uiMax);
     static bool OutputChatBox(const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded,
                               CLuaMain* pLuaMain);
+    static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                              bool bColorCoded);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
     static bool ClearChatBox(CElement* pElement);
