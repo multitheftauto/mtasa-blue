@@ -836,7 +836,7 @@ struct IDiscordAchievementEvents {
 struct IDiscordAchievementManager {
     void (*set_user_achievement)(struct IDiscordAchievementManager* manager,
                                  DiscordSnowflake achievement_id,
-                                 int64_t percent_complete,
+                                 uint8_t percent_complete,
                                  void* callback_data,
                                  void (*callback)(void* callback_data, enum EDiscordResult result));
     void (*fetch_user_achievements)(struct IDiscordAchievementManager* manager,

@@ -9,7 +9,7 @@ public:
     ~AchievementManager() = default;
 
     void SetUserAchievement(Snowflake achievementId,
-                            std::int64_t percentComplete,
+                            std::uint8_t percentComplete,
                             std::function<void(Result)> callback);
     void FetchUserAchievements(std::function<void(Result)> callback);
     void CountUserAchievements(std::int32_t* count);
