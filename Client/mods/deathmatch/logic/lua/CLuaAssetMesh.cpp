@@ -43,7 +43,7 @@ CLuaAssetMesh* CLuaAssetMesh::GetFromScriptID(unsigned int uiScriptID)
     return pLuaMesh;
 }
 
-void CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
+int CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
 {
     switch (assetProperty)
     {
@@ -53,4 +53,5 @@ void CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty
         default:
             lua_pushboolean(luaVM, false);
     }
+    return 1;
 }

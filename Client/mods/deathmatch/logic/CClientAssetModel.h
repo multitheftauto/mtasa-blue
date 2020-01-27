@@ -14,9 +14,23 @@
 #include <assimp/include/assimp/scene.h>
 #include <assimp/include/assimp/Importer.hpp>
 #include <assimp/include/assimp/postprocess.h>
+#include <assimp/include/assimp/ProgressHandler.hpp>
+
 using namespace Assimp;
 
 class CClientAssetModelManager;
+class CLuaAssetNode;
+
+class AssetProgressHandler : public Assimp::ProgressHandler
+{
+public:
+    std::atomic<float> fProgressProcentage = 0;
+    bool Update(float percentage = -1.f)
+    {
+        fProgressProcentage = percentage;
+        return true;
+    }
+};
 
 class CClientAssetModel : public CClientEntity
 {
@@ -35,19 +49,26 @@ public:
 
     void DoPulse();
 
-    bool LoadFromFile(std::string strPath);
-    void GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    const char* LoadFromFile(std::string strPath);
+    int GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    int GetLoadingProgress(lua_State* luaVM);
 
-    void GetLuaNode(lua_State* luaVM, const aiNode* pNode);
+    CLuaAssetNode* GetNode(const aiNode* pNode = nullptr);
+
+    Assimp::Importer& GetImporter() { return importer; }
+    const aiScene*     GetScene() { return m_pScene; }
+    bool              IsLoaded() { return m_bModelLoaded || !m_progressHandler; }
 
 protected:
     void CacheNodes(const aiNode* pNode);
 
     CClientAssetModelManager* m_pAssetModelManager;
 
-    bool                       bLoaded = false;
     Assimp::Importer importer;
     CVector        m_vecPosition;
     std::vector<const aiNode*> vecNodes;
-    const aiScene* m_pScene;
+    const aiScene*             m_pScene;
+    std::vector<CLuaAssetNode*> m_vecAssetRootNode;
+    AssetProgressHandler*        m_progressHandler;
+    std::atomic<bool>                     m_bModelLoaded = false;
 };

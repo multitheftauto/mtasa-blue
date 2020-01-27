@@ -29,8 +29,10 @@ public:
     uint                 GetScriptID() const { return m_uiScriptID; }
 
     static CLuaAssetNode* GetFromScriptID(unsigned int uiScriptID);
-    void                  GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
-
+    int                  GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    aiAABB                GetBoundingBox();
+    const aiNode*         GetNode() const { return m_pNode; }
+    std::vector<CLuaAssetNode*> GetChildNodes();
 private:
     uint               m_uiScriptID;
     CClientAssetModel* m_pAssetModel;

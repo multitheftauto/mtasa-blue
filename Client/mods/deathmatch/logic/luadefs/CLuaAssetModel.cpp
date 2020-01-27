@@ -18,6 +18,7 @@ void CLuaAssetModelDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},
         {"getAssetProperties", GetAssetProperties},
+        {"getAssetLoadingProgress", GetAssetLoadingProgress},
         {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
     };
 
@@ -51,7 +52,7 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
     {
-        SString strFileInput;
+        SString         strFileInput;
         bool            bReadOnly;
         CLuaFunctionRef luaFunctionRef;
 
@@ -60,9 +61,18 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
         if (argStream.NextIsFunction())
         {
             argStream.ReadFunction(luaFunctionRef);
-            argStream.ReadFunctionComplete();
         }
 
+        float fGlobalScale = 1.0f;
+        if (argStream.NextIsTable())
+        {
+            CStringMap optionsMap;
+
+            argStream.ReadStringMap(optionsMap);
+            optionsMap.ReadNumber("globalScale", fGlobalScale, 1.0f);
+        }
+
+        argStream.ReadFunctionComplete();
         if (!argStream.HasErrors())
         {
             SString    strPath;
@@ -84,6 +94,8 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                         if (pGroup)
                             pGroup->Add(pAssetModel);
 
+                        Assimp::Importer& importer = pAssetModel->GetImporter();
+                        importer.SetPropertyFloat("GLOBAL_SCALE_FACTOR", fGlobalScale);
                         if (luaFunctionRef == CLuaFunctionRef{})
                         {
                             pAssetModel->LoadFromFile(strPath);
@@ -91,17 +103,25 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                         }
                         else
                         {
-                            CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                            CLuaShared::GetAsyncTaskScheduler()->PushTask<const char*>(
                                 [strPath, pAssetModel] {
                                     // Execute time-consuming task
                                     return pAssetModel->LoadFromFile(strPath);
                                 },
-                                [luaFunctionRef](const bool& bReady) {
+                                [luaFunctionRef](const char* errorMessage) {
                                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                     if (pLuaMain)
                                     {
                                         CLuaArguments arguments;
-                                        arguments.PushBoolean(bReady);
+                                        if (strcmp(errorMessage, "") == 0)
+                                        {
+                                            arguments.PushBoolean(true);
+                                        }
+                                        else
+                                        {
+                                            arguments.PushBoolean(false);
+                                        }
+                                        arguments.PushString(errorMessage);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                 });
@@ -115,6 +135,23 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
         }
     }
     if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::GetAssetLoadingProgress(lua_State* luaVM)
+{
+    CClientAssetModel* pAssetModel = nullptr;
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData(pAssetModel);
+
+    if (!argStream.HasErrors())
+    {
+        return pAssetModel->GetLoadingProgress(luaVM);
+    }
+    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -140,14 +177,22 @@ int CLuaAssetModelDefs::GetAssetProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        int i;
         if (pAssetModel != nullptr)
-            pAssetModel->GetProperties(luaVM, eProperty);
+        {
+            if (!pAssetModel->IsLoaded())
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            i = pAssetModel->GetProperties(luaVM, eProperty);
+        }
         else if (pAssetNode != nullptr)
-            pAssetNode->GetProperties(luaVM, eProperty);
+            i = pAssetNode->GetProperties(luaVM, eProperty);
         else if (pAssetMesh != nullptr)
-            pAssetMesh->GetProperties(luaVM, eProperty);
+            i = pAssetMesh->GetProperties(luaVM, eProperty);
 
-        return 1;
+        return i;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -158,16 +203,40 @@ int CLuaAssetModelDefs::GetAssetProperties(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
 {
-    CClientAssetModel* pAssetModel;
+    CClientAssetModel* pAssetModel = nullptr;
+    CLuaAssetNode*     pAssetNode = nullptr;
     eAssetProperty     eProperty;
     CScriptArgReader   argStream(luaVM);
-    argStream.ReadUserData(pAssetModel);
+    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
+        argStream.ReadUserData(pAssetModel);
+    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
+        argStream.ReadUserData(pAssetNode);
 
     if (!argStream.HasErrors())
     {
         if (pAssetModel != nullptr)
         {
-            pAssetModel->GetLuaNode(luaVM, nullptr);
+            if (!pAssetModel->IsLoaded())
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushassetnode(luaVM, pAssetModel->GetNode());
+            lua_settable(luaVM, -3);
+            return 1;
+        }
+        else
+        {
+            std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
+            lua_newtable(luaVM);
+            for (int i = 0; i < childNodes.size(); i++)
+            {
+                lua_pushnumber(luaVM, i + 1);
+                lua_pushassetnode(luaVM, childNodes[i]);
+                lua_settable(luaVM, -3);
+            }
             return 1;
         }
         lua_pushboolean(luaVM, false);

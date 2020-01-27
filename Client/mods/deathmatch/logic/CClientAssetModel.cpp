@@ -35,52 +35,65 @@ void CClientAssetModel::Unlink()
     m_pAssetModelManager->RemoveFromList(this);
 }
 
-void CClientAssetModel::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
+int CClientAssetModel::GetLoadingProgress(lua_State* luaVM)
+{
+    if (IsLoaded())
+        lua_pushboolean(luaVM, true);
+    else
+        lua_pushboolean(luaVM, false);
+
+    if (m_progressHandler)
+        lua_pushnumber(luaVM, m_progressHandler->fProgressProcentage);
+    else
+        lua_pushnumber(luaVM, 1);
+
+    return 2;
+}
+
+int CClientAssetModel::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
 {
     switch (assetProperty)
     {
         case ASSET_ANIMATIONS_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumAnimations);
-            break;
+            return 1;
         case ASSET_CAMERAS_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumCameras);
-            break;
+            return 1;
         case ASSET_LIGHTS_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumLights);
-            break;
+            return 1;
         case ASSET_MATERIALS_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumMaterials);
-            break;
+            return 1;
         case ASSET_MESHES_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumMeshes);
-            break;
+            return 1;
         case ASSET_TEXTURES_COUNT:
             lua_pushnumber(luaVM, m_pScene->mNumTextures);
-            break;
+            return 1;
         case ASSET_NODES_COUNT:
             lua_pushnumber(luaVM, vecNodes.size());
-            break;
+            return 1;
         default:
             lua_pushboolean(luaVM, false);
     }
 }
 
-void CClientAssetModel::GetLuaNode(lua_State* luaVM, const aiNode* pNode)
+CLuaAssetNode* CClientAssetModel::GetNode(const aiNode* pNode)
 {
-    lua_newtable(luaVM);
     if (pNode == nullptr)
+        pNode = m_pScene->mRootNode;
+
+    for (const auto& a : m_vecAssetRootNode)
     {
-        CLuaAssetNode* pAssetNode = new CLuaAssetNode(this, m_pScene->mRootNode);
-        lua_pushnumber(luaVM, 1);
-        lua_pushassetnode(luaVM, pAssetNode);
-        lua_settable(luaVM, -3);
-    }
-    else
-    {
-        for (int i = 0; i < pNode->mNumChildren; i++)
+        if (a->GetNode() == pNode)
         {
+            return a;
         }
     }
+
+    return nullptr;
 }
 
 void CClientAssetModel::CacheNodes(const aiNode* pNode)
@@ -90,20 +103,22 @@ void CClientAssetModel::CacheNodes(const aiNode* pNode)
         vecNodes.push_back(pNode->mChildren[i]);
         CacheNodes(pNode->mChildren[i]);
     }
+    m_vecAssetRootNode.push_back(new CLuaAssetNode(this, pNode));
 }
 
-bool CClientAssetModel::LoadFromFile(std::string strPath)
+const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
-    m_pScene = importer.ReadFile(strPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure);
-
+    m_progressHandler = new AssetProgressHandler();
+    importer.SetProgressHandler((ProgressHandler*)m_progressHandler);
+    m_pScene = importer.ReadFile(strPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes);
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
     {
-        return false;
+        return importer.GetErrorString();
     }
 
-    vecNodes.push_back(m_pScene->mRootNode);
-    bLoaded = true;
-    return true;
+    CacheNodes(m_pScene->mRootNode);
+    m_bModelLoaded = true;
+    return "";
 }
 
 void CClientAssetModel::DoPulse()

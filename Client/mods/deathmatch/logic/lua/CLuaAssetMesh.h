@@ -28,7 +28,7 @@ public:
 
     uint GetScriptID() const { return m_uiScriptID; }
     static CLuaAssetMesh* GetFromScriptID(unsigned int uiScriptID);
-    void GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    int GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
 
 private:
     CClientAssetModel* m_pAssetModel;

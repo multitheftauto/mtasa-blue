@@ -663,6 +663,12 @@ ADD_ENUM(ASSET_MESHES_COUNT, "meshescount")
 ADD_ENUM(ASSET_TEXTURES_COUNT, "texturescount")
 ADD_ENUM(ASSET_NODES_COUNT, "nodescount")
 ADD_ENUM(ASSET_NAME, "name")
+ADD_ENUM(ASSET_POSITION, "position")
+ADD_ENUM(ASSET_ROTATION, "rotation")
+ADD_ENUM(ASSET_SCALE, "scale")
+ADD_ENUM(ASSET_BOUNDING_BOX, "boundingbox")
+ADD_ENUM(ASSET_CHILD_NODES_COUNT, "childnodescount")
+ADD_ENUM(ASSET_PARENT_NODE, "parentnode")
 IMPLEMENT_ENUM_END("asset-property")
 
 //

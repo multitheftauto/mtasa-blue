@@ -44,14 +44,99 @@ CLuaAssetNode* CLuaAssetNode::GetFromScriptID(unsigned int uiScriptID)
     return pLuaNode;
 }
 
-void CLuaAssetNode::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
+CMatrix convertAiMatrixToCMatrix(const aiMatrix4x4& aiMatrix)
 {
+    CMatrix matrix;
+    float*  pBuffer = (float*)malloc(sizeof(float) * 16);
+    matrix.GetBuffer(pBuffer);
+    memcpy(pBuffer, &aiMatrix.a1, sizeof(float) * 16);
+    return matrix;
+}
+
+aiAABB CLuaAssetNode::GetBoundingBox()
+{
+    const aiScene* pScene = m_pAssetModel->GetScene();
+    aiAABB         NodeAABB;
+    aiAABB         AABB;
+    for (int i = 0; i < m_pNode->mNumMeshes; i++)
+    {
+        AABB = pScene->mMeshes[m_pNode->mMeshes[i]]->mAABB;
+        NodeAABB.mMin.x = std::min(NodeAABB.mMin.x, AABB.mMin.x);
+        NodeAABB.mMin.y = std::min(NodeAABB.mMin.y, AABB.mMin.y);
+        NodeAABB.mMin.z = std::min(NodeAABB.mMin.z, AABB.mMin.z);
+        NodeAABB.mMax.x = std::max(NodeAABB.mMax.x, AABB.mMax.x);
+        NodeAABB.mMax.y = std::max(NodeAABB.mMax.y, AABB.mMax.y);
+        NodeAABB.mMax.z = std::max(NodeAABB.mMax.z, AABB.mMax.z);
+    }
+    return NodeAABB;
+}
+
+std::vector<CLuaAssetNode*> CLuaAssetNode::GetChildNodes()
+{
+    std::vector<CLuaAssetNode*> vecChildNodes;
+
+    for (int i = 0; i < m_pNode->mNumChildren; i++)
+    {
+        vecChildNodes.push_back(m_pAssetModel->GetNode(m_pNode->mChildren[i]));
+    }
+
+    return vecChildNodes;
+}
+
+int CLuaAssetNode::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
+{
+    CVector vector;
+    aiAABB  AABB;
     switch (assetProperty)
     {
         case ASSET_NAME:
             lua_pushstring(luaVM, m_pNode->mName.C_Str());
-            break;
+            return 1;
+        case ASSET_POSITION:
+            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetPosition();
+            lua_pushnumber(luaVM, vector.fX);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_pushnumber(luaVM, vector.fZ);
+            return 3;
+        case ASSET_ROTATION:
+            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetRotation();
+            lua_pushnumber(luaVM, vector.fX);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_pushnumber(luaVM, vector.fZ);
+            return 3;
+        case ASSET_SCALE:
+            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetScale();
+            lua_pushnumber(luaVM, vector.fX);
+            lua_pushnumber(luaVM, vector.fY);
+            lua_pushnumber(luaVM, vector.fZ);
+            return 3;
+        case ASSET_MESHES_COUNT:
+            lua_pushnumber(luaVM, m_pNode->mNumMeshes);
+            return 1;
+        case ASSET_CHILD_NODES_COUNT:
+            lua_pushnumber(luaVM, m_pNode->mNumChildren);
+            return 1;
+        case ASSET_PARENT_NODE:
+            if (m_pNode->mParent != nullptr)
+            {
+                lua_pushassetnode(luaVM, m_pAssetModel->GetNode(m_pNode->mParent));
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+            }
+            return 1;
+        case ASSET_BOUNDING_BOX:
+            AABB = GetBoundingBox();
+            lua_pushnumber(luaVM, AABB.mMin.x);
+            lua_pushnumber(luaVM, AABB.mMin.y);
+            lua_pushnumber(luaVM, AABB.mMin.z);
+            lua_pushnumber(luaVM, AABB.mMax.x);
+            lua_pushnumber(luaVM, AABB.mMax.y);
+            lua_pushnumber(luaVM, AABB.mMax.z);
+            return 6;
         default:
             lua_pushboolean(luaVM, false);
+            return 1;
     }
 }
