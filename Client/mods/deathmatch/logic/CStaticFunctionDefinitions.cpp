@@ -7650,7 +7650,7 @@ CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, con
     return pFx;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
+CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bIsRawData, bLoop, bThrottle);
     if (pSound)
