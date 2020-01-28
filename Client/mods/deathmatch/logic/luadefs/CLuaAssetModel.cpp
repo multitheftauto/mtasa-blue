@@ -18,7 +18,6 @@ void CLuaAssetModelDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},
         {"getAssetProperties", GetAssetProperties},
-        {"getAssetLoadingProgress", GetAssetLoadingProgress},
         {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
     };
 
@@ -53,7 +52,6 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
     if (pLuaMain)
     {
         SString         strFileInput;
-        bool            bReadOnly;
         CLuaFunctionRef luaFunctionRef;
 
         CScriptArgReader argStream(luaVM);
@@ -64,29 +62,30 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
         }
 
         float fGlobalScale = 1.0f;
+        bool  bRawData = false;
+        SString strHint = "rawdata";
         if (argStream.NextIsTable())
         {
             CStringMap optionsMap;
 
             argStream.ReadStringMap(optionsMap);
+            optionsMap.ReadBool("rawdata", bRawData, false);
+            optionsMap.ReadString("hint", strHint, "rawdata");
             optionsMap.ReadNumber("globalScale", fGlobalScale, 1.0f);
         }
 
         argStream.ReadFunctionComplete();
         if (!argStream.HasErrors())
         {
-            SString    strPath;
-            CResource* pThisResource = pLuaMain->GetResource();
-            CResource* pOtherResource = pThisResource;
-
-            // Resolve other resource from name
-            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
+            if (bRawData)
             {
+                CResource* pThisResource = pLuaMain->GetResource();
+                CResource* pOtherResource = pThisResource;
+
                 CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
 
                 if (pResource)
                 {
-                    // const aiScene* scene = loadModel(strPath);
                     auto pAssetModel = CStaticFunctionDefinitions::CreateAssetModel(*pResource);
                     if (pAssetModel)
                     {
@@ -96,17 +95,18 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
 
                         Assimp::Importer& importer = pAssetModel->GetImporter();
                         importer.SetPropertyFloat("GLOBAL_SCALE_FACTOR", fGlobalScale);
+
                         if (luaFunctionRef == CLuaFunctionRef{})
                         {
-                            pAssetModel->LoadFromFile(strPath);
+                            pAssetModel->LoadFromRawData(strFileInput, strHint);
                             lua_pushelement(luaVM, pAssetModel);
                         }
                         else
                         {
                             CLuaShared::GetAsyncTaskScheduler()->PushTask<const char*>(
-                                [strPath, pAssetModel] {
+                                [strFileInput, pAssetModel, strHint] {
                                     // Execute time-consuming task
-                                    return pAssetModel->LoadFromFile(strPath);
+                                    return pAssetModel->LoadFromRawData(strFileInput, strHint);
                                 },
                                 [luaFunctionRef](const char* errorMessage) {
                                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
@@ -132,26 +132,68 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                     }
                 }
             }
+            else
+            {
+                SString    strPath;
+                CResource* pThisResource = pLuaMain->GetResource();
+                CResource* pOtherResource = pThisResource;
+
+                // Resolve other resource from name
+                if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, &strPath))
+                {
+                    CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+
+                    if (pResource)
+                    {
+                        auto pAssetModel = CStaticFunctionDefinitions::CreateAssetModel(*pResource);
+                        if (pAssetModel)
+                        {
+                            CElementGroup* pGroup = pResource->GetElementGroup();
+                            if (pGroup)
+                                pGroup->Add(pAssetModel);
+
+                            Assimp::Importer& importer = pAssetModel->GetImporter();
+                            importer.SetPropertyFloat("GLOBAL_SCALE_FACTOR", fGlobalScale);
+                            if (luaFunctionRef == CLuaFunctionRef{})
+                            {
+                                pAssetModel->LoadFromFile(strPath);
+                                lua_pushelement(luaVM, pAssetModel);
+                            }
+                            else
+                            {
+                                CLuaShared::GetAsyncTaskScheduler()->PushTask<const char*>(
+                                    [strPath, pAssetModel] {
+                                        // Execute time-consuming task
+                                        return pAssetModel->LoadFromFile(strPath);
+                                    },
+                                    [luaFunctionRef](const char* errorMessage) {
+                                        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                        if (pLuaMain)
+                                        {
+                                            CLuaArguments arguments;
+                                            if (strcmp(errorMessage, "") == 0)
+                                            {
+                                                arguments.PushBoolean(true);
+                                            }
+                                            else
+                                            {
+                                                arguments.PushBoolean(false);
+                                            }
+                                            arguments.PushString(errorMessage);
+                                            arguments.Call(pLuaMain, luaFunctionRef);
+                                        }
+                                    });
+
+                                lua_pushelement(luaVM, pAssetModel);
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAssetModelDefs::GetAssetLoadingProgress(lua_State* luaVM)
-{
-    CClientAssetModel* pAssetModel = nullptr;
-    CScriptArgReader   argStream(luaVM);
-    argStream.ReadUserData(pAssetModel);
-
-    if (!argStream.HasErrors())
-    {
-        return pAssetModel->GetLoadingProgress(luaVM);
-    }
-    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);

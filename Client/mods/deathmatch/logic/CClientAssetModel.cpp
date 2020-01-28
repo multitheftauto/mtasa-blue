@@ -20,6 +20,8 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
 
     SetTypeName("asset-model");
 
+    m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes;
+
     // Add us to the manager's list
     m_pAssetModelManager->AddToList(this);
 }
@@ -33,21 +35,6 @@ CClientAssetModel::~CClientAssetModel()
 void CClientAssetModel::Unlink()
 {
     m_pAssetModelManager->RemoveFromList(this);
-}
-
-int CClientAssetModel::GetLoadingProgress(lua_State* luaVM)
-{
-    if (IsLoaded())
-        lua_pushboolean(luaVM, true);
-    else
-        lua_pushboolean(luaVM, false);
-
-    if (m_progressHandler)
-        lua_pushnumber(luaVM, m_progressHandler->fProgressProcentage);
-    else
-        lua_pushnumber(luaVM, 1);
-
-    return 2;
 }
 
 int CClientAssetModel::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
@@ -106,11 +93,22 @@ void CClientAssetModel::CacheNodes(const aiNode* pNode)
     m_vecAssetRootNode.push_back(new CLuaAssetNode(this, pNode));
 }
 
+const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
+{
+    m_pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
+    if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
+    {
+        return importer.GetErrorString();
+    }
+
+    CacheNodes(m_pScene->mRootNode);
+    m_bModelLoaded = true;
+    return "";
+}
+
 const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
-    m_progressHandler = new AssetProgressHandler();
-    importer.SetProgressHandler((ProgressHandler*)m_progressHandler);
-    m_pScene = importer.ReadFile(strPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes);
+    m_pScene = importer.ReadFile(strPath, m_uiImportFlags);
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
     {
         return importer.GetErrorString();

@@ -21,5 +21,4 @@ public:
     LUA_DECLARE(LoadAssetModel);
     LUA_DECLARE(GetAssetProperties);
     LUA_DECLARE(AssetGetChilldrenNodes);
-    LUA_DECLARE(GetAssetLoadingProgress);
 };
