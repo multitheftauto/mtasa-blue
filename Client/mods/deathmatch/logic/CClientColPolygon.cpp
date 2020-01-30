@@ -69,7 +69,7 @@ void CClientColPolygon::SetPosition(const CVector& vecPosition)
     // Add queued collider refresh for v1.1
 }
 
-void CClientColPolygon::AddPoint(CVector2D vecPoint, int iPointIndex)
+bool CClientColPolygon::AddPoint(CVector2D vecPoint, int iPointIndex)
 {
     if (iPointIndex < 0)
     {
@@ -78,7 +78,7 @@ void CClientColPolygon::AddPoint(CVector2D vecPoint, int iPointIndex)
     else
     {
         if (iPointIndex >= m_Points.size())
-            return;
+            return false;
 
         m_Points.insert(m_Points.begin() + iPointIndex, vecPoint);
     }
@@ -91,12 +91,17 @@ void CClientColPolygon::AddPoint(CVector2D vecPoint, int iPointIndex)
         m_fRadius = fDistance;
         SizeChanged();
     }
+
+    return true;
 }
 
-void CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
+bool CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
 {
     if (m_Points.size() <= 3)
-        return;
+        return false;
+
+    if (uiPointIndex >= m_Points.size())
+        return false;
 
     m_Points.erase(m_Points.begin() + uiPointIndex);
 
@@ -111,12 +116,14 @@ void CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
     }
 
     SizeChanged();
+
+    return true;
 }
 
-void CClientColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint)
+bool CClientColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint)
 {
     if (uiPointIndex >= m_Points.size())
-        return;
+        return false;
 
     m_Points[uiPointIndex] = vecPoint;
 
@@ -131,6 +138,8 @@ void CClientColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVecto
     }
 
     SizeChanged();
+
+    return true;
 }
 
 bool CClientColPolygon::IsInBounds(CVector vecPoint)

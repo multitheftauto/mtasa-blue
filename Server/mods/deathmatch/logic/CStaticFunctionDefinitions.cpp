@@ -9433,10 +9433,8 @@ bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CColPolygon* pColPol
 
 bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
 {
-    if (uiPointIndex < pColPolygon->CountPoints())
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
     {
-        pColPolygon->SetPointPosition(uiPointIndex, vecPoint);
-
         RefreshColShapeColliders(pColPolygon);
 
         CBitStream BitStream;
@@ -9453,10 +9451,8 @@ bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPol
 
 bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint)
 {
-    if (iPointIndex < static_cast<int>(pColPolygon->CountPoints()))
+    if (pColPolygon->AddPoint(vecPoint, iPointIndex))
     {
-        pColPolygon->AddPoint(vecPoint, iPointIndex);
-
         RefreshColShapeColliders(pColPolygon);
 
         CBitStream      BitStream;
@@ -9473,10 +9469,8 @@ bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, in
 
 bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex)
 {
-    if (uiPointIndex < pColPolygon->CountPoints())
+    if (pColPolygon->RemovePoint(uiPointIndex))
     {
-        pColPolygon->RemovePoint(uiPointIndex);
-
         RefreshColShapeColliders(pColPolygon);
 
         CBitStream      BitStream;

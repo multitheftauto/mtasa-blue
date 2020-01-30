@@ -489,7 +489,7 @@ int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
 int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    CVector    vecSize;
+    CVector          vecSize;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -567,7 +567,7 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
 int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    uint       uiPointIndex;
+    uint             uiPointIndex;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -579,15 +579,17 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        CVector2D    vecPoint;
+        CVector2D          vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushvector(luaVM, vecPoint);
-            return 1;
         }
-
-        argStream.SetCustomError("Invalid point index");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+            lua_pushboolean(luaVM, false);
+        }
+        return 1;
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
@@ -597,8 +599,8 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
 int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    uint       uiPointIndex;
-    CVector2D  vecPoint;
+    uint             uiPointIndex;
+    CVector2D        vecPoint;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -614,11 +616,13 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::SetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushboolean(luaVM, true);
-            return 1;
         }
-
-        argStream.SetCustomError("Invalid point index");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+            lua_pushboolean(luaVM, false);
+        }
+        return 1;
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
@@ -628,8 +632,8 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
 int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    int        iPointIndex;
-    CVector2D  vecPoint;
+    int              iPointIndex;
+    CVector2D        vecPoint;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -645,11 +649,13 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
         if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, iPointIndex - 1, vecPoint))
         {
             lua_pushboolean(luaVM, true);
-            return 1;
         }
-
-        argStream.SetCustomError("Invalid point index");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+            lua_pushboolean(luaVM, false);
+        }
+        return 1;
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
@@ -659,7 +665,7 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
 int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    uint       uiPointIndex;
+    uint             uiPointIndex;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -673,18 +679,19 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
         if (pColPolygon->CountPoints() <= 3)
         {
-            argStream.SetCustomError("Can't remove the last 3 points");
-            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+            m_pScriptDebugging->LogWarning(luaVM, "Can't remove the last 3 points");
+            lua_pushboolean(luaVM, false);
         }
-
-        if (uiPointIndex > 0 && CStaticFunctionDefinitions::RemoveColPolygonPoint(pColPolygon, uiPointIndex - 1))
+        else if (uiPointIndex > 0 && CStaticFunctionDefinitions::RemoveColPolygonPoint(pColPolygon, uiPointIndex - 1))
         {
             lua_pushboolean(luaVM, true);
-            return 1;
         }
-
-        argStream.SetCustomError("Invalid point index");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+            lua_pushboolean(luaVM, false);
+        }
+        return 1;
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
