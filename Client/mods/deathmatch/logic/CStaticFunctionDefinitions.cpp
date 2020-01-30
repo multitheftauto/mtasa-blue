@@ -1441,7 +1441,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTPLAYER:
         {
             // Grab the model
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            CClientPed&          Ped = static_cast<CClientPed&>(Entity);
             const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
@@ -1458,7 +1458,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTVEHICLE:
         {
-            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
             const unsigned short usCurrentModel = Vehicle.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1478,7 +1478,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            CClientObject&       Object = static_cast<CClientObject&>(Entity);
             const unsigned short usCurrentModel = Object.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1497,7 +1497,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTPROJECTILE:
         {
-            CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
+            CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
             const unsigned short usCurrentModel = Projectile.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1665,11 +1665,11 @@ bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const
     if (Ped.GetType() == CCLIENTPLAYER)
     {
         CControllerState cs;
-        bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        unsigned int uiIndex;
+        bool             bOnFoot = (!Ped.GetRealOccupiedVehicle());
+        unsigned int     uiIndex;
 
         if (bRawInput)
-            cs = Ped.m_rawControllerState; // use the raw controller values without MTA glitch fixes modifying our raw inputs
+            cs = Ped.m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
         else
             Ped.GetControllerState(cs);
 
@@ -2165,7 +2165,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     // Play the gateway animation
                     const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
-                    auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
+                    auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
@@ -7014,10 +7014,10 @@ bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, fl
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
-    bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
+    bool             bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
 
     if (bRawInput)
-        cs = pLocalPlayer->m_rawControllerState; // use the raw controller values without MTA glitch fixes modifying our raw inputs
+        cs = pLocalPlayer->m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
     else
         pLocalPlayer->GetControllerState(cs);
 
