@@ -109,5 +109,5 @@ public:
     virtual void RegisterPlay(bool connected) = 0;
     virtual void Disconnect() = 0;
 
-    virtual SString GetJoinSecret();
+    virtual SString GetJoinSecret() = 0;
 };
