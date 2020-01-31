@@ -713,7 +713,7 @@ void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = m_pConnection->GetLastErrorMessage();
         pJobData->result.uiErrorCode = m_pConnection->GetLastErrorCode();
-        pJobData->result.bErrorSuppressed = MapContains(m_pConnection->m_SuppressedErrorCodes, pConnection->GetLastErrorCode());
+        pJobData->result.bErrorSuppressed = MapContains(m_pConnection->m_SuppressedErrorCodes, m_pConnection->GetLastErrorCode());
     }
     else
     {
