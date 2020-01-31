@@ -20,7 +20,8 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
 
     SetTypeName("asset-model");
 
-    m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes;
+    m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes | aiProcess_EmbedTextures |
+                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices;
 
     // Add us to the manager's list
     m_pAssetModelManager->AddToList(this);
@@ -64,6 +65,7 @@ int CClientAssetModel::GetProperties(lua_State* luaVM, eAssetProperty assetPrope
             return 1;
         default:
             lua_pushboolean(luaVM, false);
+            return 1;
     }
 }
 
@@ -72,15 +74,95 @@ CLuaAssetNode* CClientAssetModel::GetNode(const aiNode* pNode)
     if (pNode == nullptr)
         pNode = m_pScene->mRootNode;
 
-    for (const auto& a : m_vecAssetRootNode)
+    for (const auto& pAssetNode : m_vecAssetNodes)
+        if (pAssetNode->GetNode() == pNode)
+            return pAssetNode;
+
+    return nullptr;
+}
+
+void CClientAssetModel::GetMeshes(lua_State* luaVM)
+{
+    lua_newtable(luaVM);
+    for (int i = 0; i < m_vecAssetMeshes.size(); i++)
     {
-        if (a->GetNode() == pNode)
+        lua_pushnumber(luaVM, i + 1);
+        lua_pushassetmesh(luaVM, m_vecAssetMeshes[i]);
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CClientAssetModel::GetTextures(lua_State* luaVM)
+{
+    lua_newtable(luaVM);
+    for (int i = 0; i < m_vecAssetTextures.size(); i++)
+    {
+        lua_pushnumber(luaVM, i + 1);
+        lua_pushelement(luaVM, m_vecAssetTextures[i].pClientTexture);
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CClientAssetModel::CacheMeshes()
+{
+    m_vecAssetMeshes.reserve(m_pScene->mNumMeshes);
+    for (int i = 0; i < m_pScene->mNumMeshes; i++)
+    {
+        m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
+        CreateMeshBuffer(m_pScene->mMeshes[i]);
+    }
+}
+
+void CClientAssetModel::CreateMeshBuffer(aiMesh* pAssetMesh)
+{
+    int id = 0;
+    for (int i = 0; i < m_pScene->mNumMeshes; i++)
+    {
+        if (m_pScene->mMeshes[i] == pAssetMesh)
         {
-            return a;
+            id = i;
+            break;
         }
     }
 
-    return nullptr;
+    auto it = m_mapMeshes.find(id);
+
+    if (it == m_mapMeshes.end())
+        return;
+
+    CClientMeshBuffer* pMeshBuffer = new CClientMeshBuffer();
+    pMeshBuffer->AddVertexBuffer<int>(&pAssetMesh->mVertices[0].x, pAssetMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_INDICES32);
+}
+
+class CClientTexture;
+
+void CClientAssetModel::CacheTextures(CResource* pParentResource)
+{
+    m_vecAssetTextures.reserve(m_pScene->mNumTextures);
+    aiTexture* pAiTexture = nullptr;
+    for (int i = 0; i < m_pScene->mNumTextures; i++)
+    {
+        pAiTexture = m_pScene->mTextures[i];
+        CPixels pixels;
+        if (pAiTexture->mHeight > 0)
+        {
+            pixels.SetSize(pAiTexture->mHeight * pAiTexture->mWidth);
+        }
+        else
+        {
+            pixels.SetSize(pAiTexture->mWidth);
+        }
+        pixels.buffer = CBuffer(m_pScene->mTextures[i]->pcData, pixels.GetSize());
+        CClientTexture* pTexture =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &pixels, true, RDEFAULT, RDEFAULT, RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        m_vecAssetTextures.push_back(SAssetTexture(pAiTexture->mFilename.C_Str(), pTexture));
+        if (pTexture)
+        {
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        }
+        // m_pScene->mTextures[i]->pcData.
+    }
+    // m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
 }
 
 void CClientAssetModel::CacheNodes(const aiNode* pNode)
@@ -90,7 +172,7 @@ void CClientAssetModel::CacheNodes(const aiNode* pNode)
         vecNodes.push_back(pNode->mChildren[i]);
         CacheNodes(pNode->mChildren[i]);
     }
-    m_vecAssetRootNode.push_back(new CLuaAssetNode(this, pNode));
+    m_vecAssetNodes.push_back(new CLuaAssetNode(this, pNode));
 }
 
 const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
@@ -102,6 +184,7 @@ const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SSt
     }
 
     CacheNodes(m_pScene->mRootNode);
+    CacheMeshes();
     m_bModelLoaded = true;
     return "";
 }
@@ -115,6 +198,7 @@ const char* CClientAssetModel::LoadFromFile(std::string strPath)
     }
 
     CacheNodes(m_pScene->mRootNode);
+    CacheMeshes();
     m_bModelLoaded = true;
     return "";
 }

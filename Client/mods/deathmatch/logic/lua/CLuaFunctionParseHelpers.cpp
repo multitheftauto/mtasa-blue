@@ -669,6 +669,12 @@ ADD_ENUM(ASSET_SCALE, "scale")
 ADD_ENUM(ASSET_BOUNDING_BOX, "boundingbox")
 ADD_ENUM(ASSET_CHILD_NODES_COUNT, "childnodescount")
 ADD_ENUM(ASSET_PARENT_NODE, "parentnode")
+ADD_ENUM(ASSET_VERTICES_COUNT, "verticescount")
+ADD_ENUM(ASSET_FACES_COUNT, "facescount")
+ADD_ENUM(ASSET_UV_COMPONENTS_COUNT, "uvcomponents")
+ADD_ENUM(ASSET_COLOR_CHANNELS, "colorchannels")
+ADD_ENUM(ASSET_UV_CHANNELS, "uvchannels")
+ADD_ENUM(ASSET_BONES_COUNT, "bonescount")
 IMPLEMENT_ENUM_END("asset-property")
 
 //

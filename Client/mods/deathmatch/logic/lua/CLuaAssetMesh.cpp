@@ -47,11 +47,40 @@ int CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
 {
     switch (assetProperty)
     {
-        //case ASSET_NAME:
-        //    lua_pushstring(luaVM, m_pNode->mName.C_Str());
-        //    break;
+        case ASSET_VERTICES_COUNT:
+            lua_pushnumber(luaVM, m_pMesh->mNumVertices);
+            return 1;
+        case ASSET_FACES_COUNT:
+            lua_pushnumber(luaVM, m_pMesh->mNumFaces);
+            return 1;
+        case ASSET_UV_COMPONENTS_COUNT:
+             lua_newtable(luaVM);
+             for (int i = 0; i < 8; i++)
+            {
+                lua_pushnumber(luaVM, i + 1);
+                lua_pushnumber(luaVM, m_pMesh->mNumUVComponents[i]);
+                lua_settable(luaVM, -3);
+            } 
+            return 1;
+        case ASSET_UV_CHANNELS:
+            lua_pushnumber(luaVM, m_pMesh->GetNumUVChannels());
+            return 1;
+        case ASSET_COLOR_CHANNELS:
+            lua_pushnumber(luaVM, m_pMesh->GetNumColorChannels());
+            return 1;
+        case ASSET_BONES_COUNT:
+            lua_pushnumber(luaVM, m_pMesh->mNumBones);
+            return 1;
+        case ASSET_BOUNDING_BOX:
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.x);
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.y);
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.z);
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.x);
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.y);
+            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.z);
+            return 6;
         default:
             lua_pushboolean(luaVM, false);
+            return 1;
     }
-    return 1;
 }

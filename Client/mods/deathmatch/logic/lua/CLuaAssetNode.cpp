@@ -60,6 +60,7 @@ aiAABB CLuaAssetNode::GetBoundingBox()
     aiAABB         AABB;
     for (int i = 0; i < m_pNode->mNumMeshes; i++)
     {
+        // something wrong TODO
         AABB = pScene->mMeshes[m_pNode->mMeshes[i]]->mAABB;
         NodeAABB.mMin.x = std::min(NodeAABB.mMin.x, AABB.mMin.x);
         NodeAABB.mMin.y = std::min(NodeAABB.mMin.y, AABB.mMin.y);
