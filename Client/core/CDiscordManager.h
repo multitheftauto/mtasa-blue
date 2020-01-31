@@ -46,6 +46,8 @@ public:
     void SetDead() { m_Suicide = false; }
     void DisconnectNotification();
 
+    SString GetJoinSecret();
+
 private:
     void Restore();
 

@@ -34,6 +34,8 @@ public:
 
     static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
 
+    SString GetJoinSecret();
+
     std::string    m_strLastHost;
     unsigned short m_usLastPort;
     std::string    m_strLastPassword;

@@ -360,3 +360,8 @@ void CDiscordManager::DisconnectNotification()
     m_WaitingForServerName = false;            // No longer wait
     m_QueryReceiver.InvalidateSocket();
 }
+
+SString CDiscordManager::GetJoinSecret()
+{
+    return CCore::GetSingleton().GetConnectManager()->GetJoinSecret();
+}

@@ -40,7 +40,6 @@ private:
     {
         std::string nickname;
         std::string password;
-        std::string secret;
     };
 
     static InitializeArguments ExtractInitializeArguments(const char* arguments);

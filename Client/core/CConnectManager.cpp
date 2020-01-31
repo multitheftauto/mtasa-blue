@@ -370,7 +370,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             if (strModName != "")
             {
                 // Populate the arguments to pass it (-c host port nick)
-                SString strArguments("%s %s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str(), *g_pConnectManager->m_strDiscordSecretJoin);
+                SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
@@ -394,7 +394,6 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 g_pConnectManager->m_strNick = "";
                 g_pConnectManager->m_strHost = "";
                 g_pConnectManager->m_strPassword = "";
-                g_pConnectManager->m_strDiscordSecretJoin = "";
 
                 g_pConnectManager->m_Address.s_addr = 0;
                 g_pConnectManager->m_usPort = 0;
@@ -494,4 +493,11 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
+}
+
+SString CConnectManager::GetJoinSecret()
+{
+    SString dummy = m_strDiscordSecretJoin;
+    m_strDiscordSecretJoin.clear();
+    return dummy;
 }

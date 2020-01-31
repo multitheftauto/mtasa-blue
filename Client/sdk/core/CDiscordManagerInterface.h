@@ -108,4 +108,6 @@ public:
     virtual void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback) = 0;
     virtual void RegisterPlay(bool connected) = 0;
     virtual void Disconnect() = 0;
+
+    virtual SString GetJoinSecret();
 };
