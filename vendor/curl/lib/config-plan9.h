@@ -102,7 +102,6 @@
 #define HAVE_BASENAME 1
 #define HAVE_BOOL_T 1
 #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
-#define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
 #define HAVE_ERRNO_H 1
 #define HAVE_FCNTL 1
 #define HAVE_FCNTL_H 1
@@ -126,7 +125,6 @@
 #define HAVE_INTTYPES_H 1
 #define HAVE_IOCTL 1
 #define HAVE_LIBGEN_H 1
-#define HAVE_LIBSSL 1
 #define HAVE_LIBZ 1
 #define HAVE_LL 1
 #define HAVE_LOCALE_H 1

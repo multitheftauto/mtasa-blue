@@ -19,6 +19,12 @@ CColTube::CColTube(CColManager* pManager, CElement* pParent, const CVector& vecP
     UpdateSpatialData();
 }
 
+CElement* CColTube::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColTube* pColTube = new CColTube(m_pManager, GetParentEntity(), m_vecPosition, m_fRadius, m_fHeight);
+    return pColTube;
+}
+
 bool CColTube::DoHitDetection(const CVector& vecNowPosition)
 {
     // FIXME: What about radius in height?

@@ -573,6 +573,7 @@ public:
     CStatsData*                              m_stats;
     CControllerState*                        m_currentControllerState;
     CControllerState*                        m_lastControllerState;
+    CControllerState                         m_rawControllerState; // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;

@@ -214,6 +214,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage = NULL;
         m_shotSyncData = g_pMultiplayer->GetLocalShotSyncData();
         m_currentControllerState = NULL;
+        m_rawControllerState = CControllerState();
         m_lastControllerState = NULL;
         m_stats = NULL;
 
@@ -233,6 +234,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage->SetProcessPlayerWeapon(true);
         m_shotSyncData = m_remoteDataStorage->ShotSyncData();
         m_currentControllerState = m_remoteDataStorage->CurrentControllerState();
+        m_rawControllerState = CControllerState();
         m_lastControllerState = m_remoteDataStorage->LastControllerState();
         m_stats = m_remoteDataStorage->Stats();
         // ### remember if you want to set Int flags, subtract STATS_OFFSET from the enum ID ###
@@ -2652,6 +2654,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
             // ControllerState checks and fixes only
             CControllerState Current;
             GetControllerState(Current);
+            m_rawControllerState = Current;
 
             ApplyControllerStateFixes(Current);
 
@@ -2686,6 +2689,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         CControllerState Current;
         GetControllerState(Current);
+        m_rawControllerState = Current;
 
         if (bDoControllerStateFixPulse)
             ApplyControllerStateFixes(Current);

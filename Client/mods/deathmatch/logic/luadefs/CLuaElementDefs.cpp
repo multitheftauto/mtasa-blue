@@ -326,47 +326,6 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::GetElementData(lua_State* luaVM)
-{
-    //  var getElementData ( element theElement, string key [, inherit = true] )
-    CClientEntity* pEntity;
-    SString        strKey;
-    bool           bInherit;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
-    argStream.ReadBool(bInherit, true);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            CLuaArgument* pVariable = pEntity->GetCustomData(strKey, bInherit);
-            if (pVariable)
-            {
-                pVariable->Push(luaVM);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {
     CClientEntity* pEntity = NULL;
@@ -1092,7 +1051,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
                 lua_pushvector(luaVM, vecMin);
                 lua_pushvector(luaVM, vecMax);
                 return 2;
-            }           
+            }
         }
     }
     else
