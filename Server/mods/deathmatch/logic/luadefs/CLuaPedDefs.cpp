@@ -498,7 +498,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(pElement, strAnimName, fSpeed))
             {

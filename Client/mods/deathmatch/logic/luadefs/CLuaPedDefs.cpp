@@ -1112,14 +1112,16 @@ int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
     SString          strControlState = "";
     float            fState = 0.0f;
     CClientPed*      pPed = NULL;
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState))
+        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;
@@ -2078,7 +2080,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(*pEntity, strAnimName, fSpeed))
             {

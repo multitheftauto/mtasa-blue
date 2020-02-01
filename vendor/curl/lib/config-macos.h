@@ -837,7 +837,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin19.0.0"
+#define OS "x86_64-apple-darwin19.2.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -955,6 +955,9 @@
 
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
+
+/* if BearSSL is enabled */
+/* #undef USE_BEARSSL */
 
 /* if ESNI support is available */
 /* #undef USE_ESNI */
