@@ -75,8 +75,10 @@ CClientPhysics::~CClientPhysics(void)
     delete m_pOverlappingPairCache;
     delete m_pDispatcher;
     delete m_pCollisionConfiguration;
+}
 
-    // Remove us from Physics manager's list
+void CClientPhysics::Unlink()
+{
     m_pPhysicsManager->RemoveFromList(this);
 }
 
@@ -84,6 +86,7 @@ void CClientPhysics::SetGravity(CVector vecGravity)
 {
     m_pDynamicsWorld->setGravity(reinterpret_cast<btVector3&>(vecGravity));
 }
+
 void CClientPhysics::GetGravity(CVector& vecGravity)
 {
     vecGravity = reinterpret_cast<CVector&>(m_pDynamicsWorld->getGravity());
@@ -646,7 +649,7 @@ void CClientPhysics::ProcessCollisions()
         shapeB = objectA->getCollisionShape();
         pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeA);
 
-        if (pRigidA == nullptr)
+        if (pRigidA)
         {
             if (pRigidA->IsSleeping())
                 continue;

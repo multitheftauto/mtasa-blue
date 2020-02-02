@@ -30,6 +30,7 @@ public:
     void AddSphere(float fRadius);
 
     btBoxShape*        InitializeWithBox(CVector& vecHalf);
+    void               FinalizeInitialization(btCollisionShape* pShape);
     btSphereShape*     InitializeWithSphere(float fRadius);
     btCapsuleShape*    InitializeWithCapsule(float fRadius, float fHeight);
     btCompoundShape*   InitializeWithCompound(int initialChildCapacity = 0);

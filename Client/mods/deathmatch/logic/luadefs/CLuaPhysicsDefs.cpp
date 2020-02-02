@@ -73,13 +73,22 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
-            CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
-            pPhysics->SetGravity(vecGravity);
-            lua_pushelement(luaVM, pPhysics);
-            return 1;
+            CResource* pResource = pLuaMain->GetResource();
+            if (pResource)
+            {
+                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
+                CElementGroup*  pGroup = pResource->GetElementGroup();
+                if (pGroup)
+                {
+                    pGroup->Add((CClientEntity*)pPhysics);
+                }
+                pPhysics->SetGravity(vecGravity);
+                lua_pushelement(luaVM, pPhysics);
+                return 1;
+            }
         }
     }
     lua_pushboolean(luaVM, false);

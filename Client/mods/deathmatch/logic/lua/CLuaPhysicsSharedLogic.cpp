@@ -211,6 +211,13 @@ btCylinderShape* CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
     return pCylinderShape;
 }
 
+btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
+{
+    btCompoundShape* pCylinderShape = new btCompoundShape(true);
+
+    return pCylinderShape;
+}
+
 btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)
 {
     btTransform transformZero;
@@ -494,7 +501,6 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
     rotation.normalize();
 
     const double eps = 1e-7;
-    const double pi = 3.14159265358979323846;
     double       x, y, z;
     double       qw = rotation.getW(), qx = rotation.getX(), qy = rotation.getY(), qz = rotation.getZ();
 
@@ -503,13 +509,13 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
     double test = (2.0 * qy * qz) - (2.0 * qx * qw);
     if (test >= 1 - eps)
     {
-        x = pi / 2.0;
+        x = PI / 2.0;
         y = -atan2(qy, qw);
         z = -atan2(qz, qw);
     }
     else if (-test >= 1 - eps)
     {
-        x = -pi / 2.0;
+        x = -PI / 2.0;
         y = -atan2(qy, qw);
         z = -atan2(qz, qw);
     }
@@ -520,9 +526,9 @@ void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3&
         z = -atan2((qx * qy) + (qz * qw), 0.5 - sqx - sqz);
     }
 
-    x *= 180.0 / pi;
-    y *= 180.0 / pi;
-    z *= 180.0 / pi;
+    x *= 180.0 / PI;
+    y *= 180.0 / PI;
+    z *= 180.0 / PI;
 
 #pragma warning(push)
 #pragma warning(disable : 4244)

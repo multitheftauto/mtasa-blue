@@ -94,6 +94,7 @@ public:
     static btCapsuleShape*         CreateCapsule(float fRadius, float fHeight);
     static btConeShape*            CreateCone(float fRadius, float fHeight);
     static btCylinderShape*        CreateCylinder(CVector& half);
+    static btCompoundShape*        CreateCompound();
 
     static btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
     static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);

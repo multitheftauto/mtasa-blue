@@ -58,7 +58,7 @@ public:
     eClientEntityType GetType(void) const { return CCLIENTPHYSICS; }
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
+    void Unlink(void);
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 

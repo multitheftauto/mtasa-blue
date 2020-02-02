@@ -37,57 +37,53 @@ void CLuaPhysicsShape::RemoveScriptID()
     }
 }
 
+void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
+{
+    //assert(m_pBtShape == nullptr);
+    pShape->setUserPointer((void*)this);
+    pShape->setUserIndex(3);
+    m_pBtShape = pShape;
+}
+
 btBoxShape* CLuaPhysicsShape::InitializeWithBox(CVector& half)
 {
     btBoxShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
-    boxCollisionShape->setUserPointer((void*)this);
-    boxCollisionShape->setUserIndex(3);
-    m_pBtShape = boxCollisionShape;
+    FinalizeInitialization(boxCollisionShape);
     return boxCollisionShape;
 }
 
 btSphereShape* CLuaPhysicsShape::InitializeWithSphere(float fRadius)
 {
     btSphereShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-    sphereCollisionShape->setUserPointer((void*)this);
-    sphereCollisionShape->setUserIndex(3);
-    m_pBtShape = sphereCollisionShape;
+    FinalizeInitialization(sphereCollisionShape);
     return sphereCollisionShape;
 }
 
 btCapsuleShape* CLuaPhysicsShape::InitializeWithCapsule(float fRadius, float fHeight)
 {
     btCapsuleShape* capsuleCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
-    capsuleCollisionShape->setUserPointer((void*)this);
-    capsuleCollisionShape->setUserIndex(3);
-    m_pBtShape = capsuleCollisionShape;
+    FinalizeInitialization(capsuleCollisionShape);
     return capsuleCollisionShape;
 }
 
 btConeShape* CLuaPhysicsShape::InitializeWithCone(float fRadius, float fHeight)
 {
     btConeShape* coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
-    coneCollisionShape->setUserPointer((void*)this);
-    coneCollisionShape->setUserIndex(3);
-    m_pBtShape = coneCollisionShape;
+    FinalizeInitialization(coneCollisionShape);
     return coneCollisionShape;
 }
 
 btCylinderShape* CLuaPhysicsShape::InitializeWithCylinder(CVector& half)
 {
     btCylinderShape* cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
-    cylinderCollisionShape->setUserPointer((void*)this);
-    cylinderCollisionShape->setUserIndex(3);
-    m_pBtShape = cylinderCollisionShape;
+    FinalizeInitialization(cylinderCollisionShape);
     return cylinderCollisionShape;
 }
 
 btCompoundShape* CLuaPhysicsShape::InitializeWithCompound(int initialChildCapacity)
 {
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
-    pCompoundShape->setUserPointer((void*)this);
-    pCompoundShape->setUserIndex(3);
-    m_pBtShape = pCompoundShape;
+    FinalizeInitialization(pCompoundShape);
     return pCompoundShape;
 }
 
