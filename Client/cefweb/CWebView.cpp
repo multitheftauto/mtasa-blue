@@ -859,7 +859,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
             if (GetProperty("mobile", strPropertyValue) && strPropertyValue == "1")
                 iter->second = iter->second.ToString() + "; Mobile Android";
 
-            // Allow YouTube TV to work
+            // Allow YouTube TV to work (#1162)
             if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str).rfind("/tv", 0) == 0)
                 iter->second = iter->second.ToString() + "; SMART-TV; Tizen 4.0";
 
