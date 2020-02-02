@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <regex>
 
 void CLuaAudioDefs::LoadFunctions()
 {
@@ -157,10 +156,15 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                 bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
-                else if (std::regex_match(strSound, std::regex("^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$")))
-                    bIsURL = true;
                 else
-                    bIsRawData = true;
+                {
+                    SString signature = strSound.SubStr(0, 4).ToLower();
+                    if ((memcmp(signature, "http", 4) == 0 || memcmp(signature, "ftp", 3) == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
@@ -213,10 +217,15 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
                 bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
-                else if (std::regex_match(strSound, std::regex("^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$")))
-                    bIsURL = true;
                 else
-                    bIsRawData = true;
+                {
+                    SString signature = strSound.SubStr(0, 4).ToLower();
+                    if ((memcmp(signature, "http", 4) == 0 || memcmp(signature, "ftp", 3) == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
