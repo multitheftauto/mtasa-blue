@@ -431,59 +431,14 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
 {
     CClientPhysics*   pPhysics;
     ePhysicsShapeType shapeType;
+    CLuaPhysicsShape* pShape;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadUserData(pPhysics);
-    argStream.ReadEnumString(shapeType);
+    argStream.ReadUserData(pShape);
 
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision();
-        CVector                     vector;
-        float                       fRadius;
-        std::vector<CVector>        vecVector;
-        int                         iSizeX, iSizeY;
-        CVector                     vecScale;
-        std::vector<float>          vecHeightfieldData;
-        switch (shapeType)
-        {
-            case PHYSICS_SHAPE_BOX:
-                argStream.ReadVector3D(vector);
-                if (!argStream.HasErrors())
-                {
-                    pStaticCollision->InitializeWithBox(vector);
-                }
-                break;
-            case PHYSICS_SHAPE_SPHERE:
-                argStream.ReadNumber(fRadius);
-                if (!argStream.HasErrors())
-                {
-                    pStaticCollision->InitializeWithSphere(fRadius);
-                }
-                break;
-            case PHYSICS_SHAPE_TRIANGLE_MESH:
-                while (argStream.NextIsVector3D())
-                {
-                    argStream.ReadVector3D(vector);
-                    vecVector.push_back(vector);
-                }
-                if (!argStream.HasErrors())
-                {
-                    if (vecVector.size() % 3 == 0)
-                    {
-                        pStaticCollision->InitializeWithTriangleMesh(vecVector);
-                    }
-                }
-                break;
-            case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
-                argStream.ReadNumber(iSizeX);
-                argStream.ReadNumber(iSizeY);
-                argStream.ReadNumberTable(vecHeightfieldData, iSizeX * iSizeY);
-                if (!argStream.HasErrors())
-                {
-                    pStaticCollision->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecHeightfieldData);
-                }
-                break;
-        }
+        CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(pShape->GetBtShape());
         lua_pushstaticcollision(luaVM, pStaticCollision);
         return 1;
     }

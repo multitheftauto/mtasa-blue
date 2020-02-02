@@ -85,6 +85,17 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
     return m_btCollisionObject;
 }
 
+void CLuaPhysicsStaticCollision::SetCollisionShape(btCollisionShape* pShape)
+{
+    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject->setCollisionShape(pShape);
+    m_pWorld->addCollisionObject(m_btCollisionObject);
+    pShape->setUserPointer((void*)this);
+    pShape->setUserIndex(3);
+    m_btCollisionObject->setUserPointer((void*)this);
+    m_btCollisionObject->setUserIndex(3);
+}
+
 void CLuaPhysicsStaticCollision::SetFilterMask(short sIndex, bool bEnabled)
 {
     if (bEnabled)

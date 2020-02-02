@@ -517,6 +517,20 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
     return pStaticCollision;
 }
 
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionObject* pCollisionObject)
+{
+    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    pStaticCollision->SetCollisionShape(pStaticCollision->GetCollisionObject()->getCollisionShape());
+    return pStaticCollision;
+}
+
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionShape* pCollisionShape)
+{
+    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    pStaticCollision->SetCollisionShape(pCollisionShape);
+    return pStaticCollision;
+}
+
 CLuaPhysicsShape* CClientPhysics::CreateShape()
 {
     CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape();

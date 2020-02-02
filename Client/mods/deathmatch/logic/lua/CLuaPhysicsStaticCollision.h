@@ -28,6 +28,8 @@ public:
     void RemoveScriptID();
 
     // use only once
+
+    void               SetCollisionShape(btCollisionShape* pShape);
     btCollisionObject* InitializeWithCompound();
 
     btCollisionObject* InitializeWithBox(CVector& vecHalf);

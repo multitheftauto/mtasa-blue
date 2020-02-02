@@ -83,6 +83,8 @@ public:
     void                        DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
 
     CLuaPhysicsStaticCollision* CreateStaticCollision();
+    CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
+    CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionObject* pCollisionObject);
     CLuaPhysicsShape*           CreateShape();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
