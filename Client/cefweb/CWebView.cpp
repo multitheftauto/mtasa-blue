@@ -625,7 +625,7 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
         rect.height = 1;
         return;
     }
-    
+
     rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
     rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
 }
@@ -841,6 +841,8 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     if (!CefParseURL(request->GetURL(), urlParts))
         return RV_CANCEL;            // Cancel if invalid URL (this line will normally not be executed)
 
+    SString domain = UTF16ToMbUTF8(urlParts.host.str);
+
     // Add some information to the HTTP header
     {
         CefRequest::HeaderMap headerMap;
@@ -857,6 +859,10 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
             if (GetProperty("mobile", strPropertyValue) && strPropertyValue == "1")
                 iter->second = iter->second.ToString() + "; Mobile Android";
 
+            // Allow YouTube TV to work
+            if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str).rfind("/tv", 0) == 0)
+                iter->second = iter->second.ToString() + "; SMART-TV; Tizen 4.0";
+
             request->SetHeaderMap(headerMap);
         }
     }
@@ -864,7 +870,6 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     WString scheme = urlParts.scheme.str;
     if (scheme == L"http" || scheme == L"https")
     {
-        SString domain = UTF16ToMbUTF8(urlParts.host.str);
         if (domain != "mta")
         {
             if (IsLocal())
