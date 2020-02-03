@@ -96,6 +96,25 @@ btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVecto
     return pConvexHull;
 }
 
+
+btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
+{
+    btBvhTriangleMeshShape* trimeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
+    trimeshShape->setUserPointer((void*)this);
+    trimeshShape->setUserIndex(1);
+    return trimeshShape;
+}
+
+
+
+heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
+{
+    heightfieldTerrainShape* pHeightfieldTerrain = CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);
+    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserPointer((void*)this);
+    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserIndex(1);
+    return pHeightfieldTerrain;
+}
+
 bool CLuaPhysicsShape::SetSize(CVector size)
 {
     if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)

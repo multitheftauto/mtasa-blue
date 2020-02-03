@@ -24,7 +24,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
     std::map<const char*, lua_CFunction> functions{
         {"physicsCreateWorld", PhysicsCreateWorld},
         {"physicsDestroy", PhysicsDestroy},
-        {"physicsCreateRigidBody", PhysicsCreateRigidBody}, // finished
+        {"physicsCreateRigidBody", PhysicsCreateRigidBody},            // finished
         {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
         {"physicsCreateShape", PhysicsCreateShape},
@@ -110,7 +110,9 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
         float                fHeight;
         float                fHalf;
         float                fInitialChildCapacity;
+        int                  iSizeX, iSizeY;
         std::vector<CVector> vecList;
+        std::vector<float>   vecHeightfieldData;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -210,6 +212,55 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 if (!argStream.HasErrors())
                 {
                     pShape->InitializeWithConvexHull(vecList);
+                }
+                break;
+            case PHYSICS_SHAPE_TRIANGLE_MESH:
+                while (argStream.NextIsVector3D())
+                {
+                    argStream.ReadVector3D(vector);
+                    vecList.push_back(vector);
+                }
+                if (!argStream.HasErrors())
+                {
+                    if (vecList.size() % 3 == 0)
+                    {
+                        pShape->InitializeWithTriangleMesh(vecList);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
+                    }
+                }
+                break;
+            case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
+                argStream.ReadNumber(iSizeX);
+                argStream.ReadNumber(iSizeY);
+                if (argStream.NextIsTable())
+                    argStream.ReadNumberTable(vecHeightfieldData, iSizeX * iSizeY);
+                else            // fill with empty table
+                    for (int i = 0; i < iSizeX * iSizeY; i++)
+                        vecHeightfieldData.emplace_back(0);
+
+                if (!argStream.HasErrors())
+                {
+                    if (iSizeX >= 3 && iSizeY >= 3 && iSizeX <= 8192 && iSizeY <= 8192)
+                    {
+                        if (vecHeightfieldData.size() == iSizeX * iSizeY)
+                        {
+                            pShape->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecHeightfieldData);
+                        }
+                        else
+                        {
+                            argStream.SetCustomError(
+                                SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecHeightfieldData.size()).c_str());
+                        }
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(
+                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecHeightfieldData.size())
+                                .c_str());
+                    }
                 }
                 break;
         }
@@ -1293,6 +1344,38 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                         argStream.SetCustomError(SString("Shape '%s' does not support bounding box property", pShape->GetType()));
                     }
                     break;
+                case PHYSICS_PROPERTY_IS_COMPOUND:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isCompound());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_CONCAVE:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isConcave());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_CONVEX:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isConvex());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_CONVEX2D:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isConvex2d());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_INFINITE:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isInfinite());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_NON_MOVING:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isNonMoving());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_POLYHEDRAL:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isPolyhedral());
+                    return 1;
+                case PHYSICS_PROPERTY_IS_SOFT_BODY:
+                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    lua_pushboolean(luaVM, pBtShape->isSoftBody());
+                    return 1;
                 default:
                     argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
                     break;

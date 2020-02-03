@@ -25,9 +25,9 @@ public:
 
     void RemoveScriptID();
 
-    // for compound rigid bodies
-    void AddBox(CVector& vecHalf);
-    void AddSphere(float fRadius);
+    //// for compound rigid bodies
+    //void AddBox(CVector& vecHalf);
+    //void AddSphere(float fRadius);
 
     btBoxShape*        InitializeWithBox(CVector& vecHalf);
     void               FinalizeInitialization(btCollisionShape* pShape);
@@ -37,6 +37,8 @@ public:
     btConeShape*       InitializeWithCone(float fRadius, float fHeight);
     btCylinderShape*   InitializeWithCylinder(CVector& half);
     btConvexHullShape* InitializeWithConvexHull(std::vector<CVector>& vecPoints);
+    btBvhTriangleMeshShape* InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
+    heightfieldTerrainShape* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
     uint                  GetScriptID() const { return m_uiScriptID; }
     btCollisionShape*     GetBtShape() const { return m_pBtShape; }
