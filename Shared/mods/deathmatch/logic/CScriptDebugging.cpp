@@ -56,8 +56,12 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
-    // Send empty SLuaDebugInfo if omitDebugInfo is true
-    LogString("", omitDebugInfo ? SLuaDebugInfo() : GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue);
+    // Add debug info where necessary
+    SLuaDebugInfo debugInfo;
+    if (!omitDebugInfo)
+        debugInfo = GetLuaDebugInfo(luaVM);
+
+    LogString("", debugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
 }
 
 void CScriptDebugging::LogInformation(lua_State* luaVM, const char* szFormat, ...)
