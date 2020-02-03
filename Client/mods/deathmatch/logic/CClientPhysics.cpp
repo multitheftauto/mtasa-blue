@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 #include <list>
-#include "D:\mtablue\mtasa-blue\Client\game_sa\CColModelSA.h"
+#include "../Client/game_sa/CCameraSA.h"
 #include "lua/CLuaPhysicsSharedLogic.h"
 #include "lua/CLuaPhysicsRigidBodyManager.h"
 #include "lua/CLuaPhysicsStaticCollisionManager.h"
@@ -284,7 +284,8 @@ CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
     return pRigidBody;
 }
 
-void CClientPhysics::ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result)
+void CClientPhysics::ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to,
+                               btCollisionWorld::ClosestConvexResultCallback& result)
 {
     const btConvexShape* pShape = (btConvexShape*)pStaticCollision->GetCollisionObject()->getCollisionShape();
     m_pDynamicsWorld->convexSweepTest(pShape, from, to, result, 0.0f);
@@ -322,6 +323,7 @@ public:
     }
     btVector3 m_triangle[3];
 };
+
 void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionShape,
                                      btCollisionWorld::LocalRayResult* localRayResult)
 {
@@ -482,21 +484,101 @@ void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::Closest
     delete shapeInfo;
 }
 
-btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
+void CClientPhysics::RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
 {
     btCollisionWorld::ClosestRayResultCallback rayResult = RayCastDefault(from, to, bFilterBackfaces);
-    if (rayResult.hasHit() && rayResult.m_collisionObject)
+
+    lua_newtable(luaVM);
+    lua_pushstring(luaVM, "hit");
+    lua_pushboolean(luaVM, rayResult.hasHit());
+    lua_settable(luaVM, -3);
+    if (rayResult.hasHit())
     {
-        ContinueCasting(luaVM, rayResult, rayResult.m_collisionObject->getCollisionShape());
+        lua_pushstring(luaVM, "hitpoint");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getX());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getY());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getZ());
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "hitnormal");
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
+        lua_settable(luaVM, -3);
+        lua_settable(luaVM, -3);
+
+        btCollisionWorld::LocalShapeInfo* shapeInfo = new btCollisionWorld::LocalShapeInfo();
+        btVector3                         hitNormal;
+        btCollisionWorld::LocalRayResult  localRay(rayResult.m_collisionObject, shapeInfo, hitNormal, rayResult.m_closestHitFraction);
+        rayResult.addSingleResult(localRay, true);
+
+        lua_pushstring(luaVM, "hitnormal");
+        lua_pushnumber(luaVM, shapeInfo->m_shapePart);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "triangleindex");
+        lua_pushnumber(luaVM, shapeInfo->m_triangleIndex);
+        lua_settable(luaVM, -3);
     }
-    return rayResult;
 }
 
-btCollisionWorld::AllHitsRayResultCallback CClientPhysics::RayCastMultiple(CVector from, CVector to)
+void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
 {
-    btCollisionWorld::AllHitsRayResultCallback RayCallback(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
-    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
-    return RayCallback;
+    btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));
+    if (bFilterBackfaces)
+        rayResult.m_flags = 1 << 0;
+    m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), rayResult);
+
+    lua_newtable(luaVM);
+    if (rayResult.hasHit())
+    {
+        for (int i = 0; i < rayResult.m_hitPointWorld.size(); i++)
+        {
+            lua_pushnumber(luaVM, i + 1);
+            lua_newtable(luaVM);
+
+            lua_pushstring(luaVM, "hitpoint");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, rayResult.m_hitPointWorld[i].getZ());
+            lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "hitnormal");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, rayResult.m_hitNormalWorld[i].getZ());
+            lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+
+            lua_settable(luaVM, -3);
+        }
+    }
 }
 
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
@@ -579,6 +661,7 @@ void CClientPhysics::StepSimulation()
 
     // CProfileManager::Start_Profile("internalSingleStepSimulation");
     m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+    m_iSimulationCounter++;
     // CProfileManager::Stop_Profile();
     // CProfileIterator* pIterator = CProfileManager::Get_Iterator();
     // CProfileManager::Reset();
@@ -634,12 +717,15 @@ void CClientPhysics::ProcessCollisions()
     CLuaPhysicsStaticCollision* pStaticCollisionB;
     btVector3                   ptA;
     btVector3                   ptB;
+    bool                        bHasContacts;
 
-    std::vector<CLuaPhysicsRigidBody*> vecContactRigidBodies;
     for (int i = 0; i < numManifolds; i++)
     {
         btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-        int                   numContacts = contactManifold->getNumContacts();
+        if (contactManifold == nullptr)
+            continue;
+
+        int numContacts = contactManifold->getNumContacts();
         if (numContacts == 0)
             continue;
 
@@ -678,65 +764,142 @@ void CClientPhysics::ProcessCollisions()
         CLuaArguments Arguments;
         CLuaArguments ContactA;
         CLuaArguments ContactB;
-        if (pRigidA != nullptr)
-        {
-            pRigidA->AddContact(shapeB);
-            Arguments.PushPhysicsRigidBody(pRigidA);
-            vecContactRigidBodies.push_back(pRigidA);
-        }
-        else
-        {
-            Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
-        }
+        CLuaArguments ContactShared;
 
-        if (pRigidB != nullptr)
-        {
-            Arguments.PushPhysicsRigidBody(pRigidB);
-            pRigidB->AddContact(shapeA);
-            vecContactRigidBodies.push_back(pRigidB);
-        }
-        else
-        {
-            Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
-        }
+        bHasContacts = false;
 
-        float impulse;
         for (int j = 0; j < numContacts; j++)
         {
             btManifoldPoint& pt = contactManifold->getContactPoint(j);
-            impulse = pt.getAppliedImpulse();
-            if (impulse < 0.01f)            // if hit is strong enough
+            if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
             {
                 ptA = pt.getPositionWorldOnA();
                 ptB = pt.getPositionWorldOnB();
 
-                CLuaArguments pointA;
-                CLuaArguments pointB;
-                pointA.PushNumber(1);
-                pointA.PushNumber(ptA.getX());
-                pointA.PushNumber(2);
-                pointA.PushNumber(ptA.getX());
-                pointA.PushNumber(3);
-                pointA.PushNumber(ptA.getX());
-                ContactA.PushTable(&pointA);
-                pointB.PushNumber(1);
-                pointB.PushNumber(ptB.getX());
-                pointB.PushNumber(2);
-                pointB.PushNumber(ptB.getX());
-                pointB.PushNumber(3);
-                pointB.PushNumber(ptB.getX());
-                ContactB.PushTable(&pointB);
+                CLuaArguments singleContactA;
+                CLuaArguments singleContactB;
+                CLuaArguments sharedContactManifolds;
+
+                CLuaArguments worldContactPointA;
+                worldContactPointA.PushNumber(1);
+                worldContactPointA.PushNumber(ptA.getX());
+                worldContactPointA.PushNumber(2);
+                worldContactPointA.PushNumber(ptA.getY());
+                worldContactPointA.PushNumber(3);
+                worldContactPointA.PushNumber(ptA.getZ());
+                singleContactA.PushNumber(1);
+                singleContactA.PushTable(&worldContactPointA);
+
+                CLuaArguments worldContactPointB;
+                worldContactPointB.PushNumber(1);
+                worldContactPointB.PushNumber(ptB.getX());
+                worldContactPointB.PushNumber(2);
+                worldContactPointB.PushNumber(ptB.getY());
+                worldContactPointB.PushNumber(3);
+                worldContactPointB.PushNumber(ptB.getZ());
+                singleContactB.PushNumber(1);
+                singleContactB.PushTable(&worldContactPointB);
+
+                ptA = pt.m_localPointA;
+                ptB = pt.m_localPointB;
+
+                CLuaArguments localContactPointA;
+                localContactPointA.PushNumber(1);
+                localContactPointA.PushNumber(ptA.getX());
+                localContactPointA.PushNumber(2);
+                localContactPointA.PushNumber(ptA.getY());
+                localContactPointA.PushNumber(3);
+                localContactPointA.PushNumber(ptA.getZ());
+                singleContactA.PushNumber(2);
+                singleContactA.PushTable(&localContactPointA);
+
+                CLuaArguments localContactPointB;
+                localContactPointB.PushNumber(1);
+                localContactPointB.PushNumber(ptB.getX());
+                localContactPointB.PushNumber(2);
+                localContactPointB.PushNumber(ptB.getY());
+                localContactPointB.PushNumber(3);
+                localContactPointB.PushNumber(ptB.getZ());
+                singleContactB.PushNumber(2);
+                singleContactB.PushTable(&localContactPointB);
+
+                ptA = pt.m_lateralFrictionDir1;
+                ptB = pt.m_lateralFrictionDir2;
+
+                CLuaArguments contactDirA;
+                contactDirA.PushNumber(1);
+                contactDirA.PushNumber(ptA.getX());
+                contactDirA.PushNumber(2);
+                contactDirA.PushNumber(ptA.getY());
+                contactDirA.PushNumber(3);
+                contactDirA.PushNumber(ptA.getZ());
+                singleContactA.PushNumber(3);
+                singleContactA.PushTable(&contactDirA);
+
+                CLuaArguments contactDirB;
+                contactDirB.PushNumber(1);
+                contactDirB.PushNumber(ptB.getX());
+                contactDirB.PushNumber(2);
+                contactDirB.PushNumber(ptB.getY());
+                contactDirB.PushNumber(3);
+                contactDirB.PushNumber(ptB.getZ());
+                singleContactB.PushNumber(3);
+                singleContactB.PushTable(&contactDirB);
+
+                ptA = pt.m_normalWorldOnB;
+                CLuaArguments contactWorldNormal;
+
+                contactWorldNormal.PushNumber(1);
+                contactWorldNormal.PushNumber(ptB.getX());
+                contactWorldNormal.PushNumber(2);
+                contactWorldNormal.PushNumber(ptB.getY());
+                contactWorldNormal.PushNumber(3);
+                contactWorldNormal.PushNumber(ptB.getZ());
+
+                sharedContactManifolds.PushNumber(1);
+                sharedContactManifolds.PushTable(&contactWorldNormal);
+
+                ContactA.PushTable(&singleContactA);
+                ContactB.PushTable(&singleContactB);
+                ContactShared.PushTable(&sharedContactManifolds);
+                bHasContacts = true;
             }
         }
-        Arguments.PushArguments(ContactA);
-        Arguments.PushArguments(ContactB);
-        CallEvent("onPhysicsCollision", Arguments, true);
-    }
-    std::sort(vecContactRigidBodies.begin(), vecContactRigidBodies.end());
-    vecContactRigidBodies.erase(std::unique(vecContactRigidBodies.begin(), vecContactRigidBodies.end()), vecContactRigidBodies.end());
-    for (CLuaPhysicsRigidBody* pRigidBody : vecContactRigidBodies)
-    {
-        pRigidBody->FlushContacts();
+
+        if (bHasContacts)
+        {
+            if (pRigidA)
+            {
+                Arguments.PushPhysicsRigidBody(pRigidA);
+            }
+            else if (pStaticCollisionA)
+            {
+                Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
+            }
+            else
+            {
+                Arguments.PushBoolean(false);
+            }
+
+            if (pRigidB)
+            {
+                Arguments.PushPhysicsRigidBody(pRigidB);
+            }
+            else if (pStaticCollisionB)
+            {
+                Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
+            }
+            else
+            {
+                Arguments.PushBoolean(false);
+            }
+
+            Arguments.PushArguments(ContactA);
+            Arguments.PushArguments(ContactB);
+            Arguments.PushArguments(ContactShared);
+
+            CallEvent("onPhysicsCollision", Arguments, true);
+        }
     }
 }
 

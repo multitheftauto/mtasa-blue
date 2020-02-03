@@ -20,7 +20,7 @@ class CLuaPhysicsConstraint;
 
 class CDebugDrawer : public btIDebugDraw
 {
-    int m_debugMode;
+    int                 m_debugMode;
     CGraphicsInterface* m_pGraphics;
     SColorARGB          color = SColorARGB(255, 255, 0, 0);
     float               fLineWidth = 2.0f;
@@ -72,15 +72,14 @@ public:
     CLuaPhysicsRigidBody*                      CreateRigidBody(CLuaPhysicsShape* pShape);
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
-    btCollisionWorld::ClosestRayResultCallback RayCastDetailed(lua_State *luaVM, CVector from, CVector to, bool bFilterBackfaces);
-    btCollisionWorld::AllHitsRayResultCallback RayCastMultiple(CVector from, CVector to);
+    void RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
+    void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 
-
-    //btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
-    void                        DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void                        DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void                        DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    // btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
+    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
 
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
@@ -88,7 +87,7 @@ public:
     CLuaPhysicsShape*           CreateShape();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
-    bool SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
+    bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
@@ -111,6 +110,7 @@ public:
     void GetTriggerCollisionEvents(bool& bTriggerCollisionEvents) const { bTriggerCollisionEvents = m_bTriggerCollisionEvents; }
     void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
+    int  GetSimulationCounter() const { return m_iSimulationCounter; }
 
 private:
     void ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionObject,
@@ -125,7 +125,7 @@ private:
     CDebugDrawer* m_pDebugDrawer;
 
     int       m_iDeltaTimeMs;
-    bool m_bDrawDebugNextTime;
+    bool      m_bDrawDebugNextTime;
     CLuaMain* m_pLuaMain;
 
     CClientPhysicsManager* m_pPhysicsManager;
@@ -133,12 +133,14 @@ private:
     CTickCount m_LastTimeMs;
     CTickCount m_LastTimeBuildWorld;
     bool       m_bBuildWorld;
+    int        m_iSimulationCounter = 0;
     float      m_fSpeed = 1.0f;
     int        m_iSubSteps = 10;
+    float      m_fImpulseThreshold = 0.01f;
     bool       m_bSimulationEnabled = true;
     bool       m_bTriggerEvents = true;
-    bool       m_bTriggerCollisionEvents = false; // spam alert
-    CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f); // negative and positive
+    bool       m_bTriggerCollisionEvents = false;                              // spam alert
+    CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;

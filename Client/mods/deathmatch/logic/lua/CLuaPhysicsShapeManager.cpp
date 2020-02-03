@@ -33,6 +33,15 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::AddShape()
     return pShape;
 }
 
+CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShape(const btCollisionShape* pShape)
+{
+    for (CLuaPhysicsShape* pStaticCollision : m_ShapeList)
+        if (pStaticCollision->GetBtShape() == pShape)
+            return pStaticCollision;
+
+    return nullptr;
+}
+
 
 void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
 {
