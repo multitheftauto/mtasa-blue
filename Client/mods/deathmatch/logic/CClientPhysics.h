@@ -52,7 +52,7 @@ class CClientPhysics : public CClientEntity
 {
     DECLARE_CLASS(CClientPhysics, CClientEntity)
 public:
-    CClientPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain);
+    CClientPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain, unsigned long ulSeed);
     ~CClientPhysics(void);
 
     eClientEntityType GetType(void) const { return CCLIENTPHYSICS; }
@@ -108,6 +108,8 @@ public:
     void GetTriggerEvents(bool& bTriggerEvents) const { bTriggerEvents = m_bTriggerEvents; }
     void SetTriggerCollisionEvents(bool bTriggerCollisionEvents) { m_bTriggerCollisionEvents = bTriggerCollisionEvents; }
     void GetTriggerCollisionEvents(bool& bTriggerCollisionEvents) const { bTriggerCollisionEvents = m_bTriggerCollisionEvents; }
+    void SetTriggerConstraintEvents(bool bTriggerConstraintEvents) { m_bTriggerConstraintEvents = bTriggerConstraintEvents; }
+    void GetTriggerConstraintvents(bool& bTriggerConstraintEvents) const { bTriggerConstraintEvents = m_bTriggerConstraintEvents; }
     void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
@@ -140,6 +142,7 @@ private:
     bool       m_bSimulationEnabled = true;
     bool       m_bTriggerEvents = true;
     bool       m_bTriggerCollisionEvents = false;                              // spam alert
+    bool       m_bTriggerConstraintEvents = false;
     CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;

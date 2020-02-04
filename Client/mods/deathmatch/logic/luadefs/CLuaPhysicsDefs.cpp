@@ -68,7 +68,9 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
     CVector          vecGravity;
+    unsigned long    ulSeed;
     argStream.ReadVector3D(vecGravity, CVector(0, 0, -9.81));
+    argStream.ReadNumber(ulSeed, 0);
 
     if (!argStream.HasErrors())
     {
@@ -78,7 +80,7 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
+                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain, ulSeed);
                 CElementGroup*  pGroup = pResource->GetElementGroup();
                 if (pGroup)
                 {
@@ -251,8 +253,9 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                         }
                         else
                         {
-                            argStream.SetCustomError(
-                                SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecHeightfieldData.size()).c_str());
+                            argStream.SetCustomError(SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY,
+                                                             vecHeightfieldData.size())
+                                                         .c_str());
                         }
                     }
                     else
@@ -285,14 +288,30 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
 {
-    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (luaMain)
+    CClientPhysics*             pPhysics = nullptr;
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CLuaPhysicsConstraint*      pConstraint = nullptr;
+    CLuaPhysicsShape*           pShape = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CClientPhysics>())
+        argStream.ReadUserData(pPhysics);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pConstraint);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+        argStream.ReadUserData(pShape);
+
+    if (!argStream.HasErrors())
     {
-        CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, luaMain);
-        lua_pushelement(luaVM, pPhysics);
-        return 1;
     }
-    lua_pushboolean(luaVM, true);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -816,6 +835,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
+                case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+                    argStream.ReadBool(boolean);
+                    if (!argStream.HasErrors())
+                    {
+                        pPhysics->SetTriggerConstraintEvents(boolean);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                    break;
                 case PHYSICS_PROPERTY_WORLDSIZE:
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
@@ -1044,8 +1072,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadBool(boolean);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetStiffness(intNumber, floatNumber[0], boolean));
                         return 1;
                     }
                     break;
@@ -1053,8 +1080,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetPivotA(vector);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotA(vector));
                         return 1;
                     }
                     break;
@@ -1062,8 +1088,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetPivotB(vector);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetPivotB(vector));
                         return 1;
                     }
                     break;
@@ -1071,8 +1096,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetLowerLinLimit(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerLinLimit(floatNumber[0]));
                         return 1;
                     }
                     break;
@@ -1080,8 +1104,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetUpperLinLimit(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperLinLimit(floatNumber[0]));
                         return 1;
                     }
                     break;
@@ -1089,8 +1112,7 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetLowerAngLimit(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetLowerAngLimit(floatNumber[0]));
                         return 1;
                     }
                     break;
@@ -1098,7 +1120,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pStaticConstraint->SetUpperAngLimit(floatNumber[0]);
+                        lua_pushboolean(luaVM, pStaticConstraint->SetUpperAngLimit(floatNumber[0]));
+                        return 1;
+                    }
+                    break;
+                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+                    argStream.ReadNumber(floatNumber[0]);
+                    if (!argStream.HasErrors())
+                    {
+                        pStaticConstraint->SetBreakingImpulseThreshold(floatNumber[0]);
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
@@ -1178,7 +1208,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
     CClientPhysics*             pPhysics = nullptr;
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+    CLuaPhysicsConstraint*      pConstraint = nullptr;
     CLuaPhysicsShape*           pShape = nullptr;
 
     ePhysicsProperty eProperty;
@@ -1191,18 +1221,20 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
         argStream.ReadUserData(pStaticCollision);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
-        argStream.ReadUserData(pStaticConstraint);
+        argStream.ReadUserData(pConstraint);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
         argStream.ReadUserData(pShape);
 
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
     {
-        bool    boolean;
-        CVector vector, vector2;
-        SColor  color;
-        float   floatNumber[2];
-        int     i = 0;
+        bool             boolean;
+        CVector          vector, vector2;
+        SColor           color;
+        float            floatNumber[2];
+        btVector3        btVector;
+        int              i = 0;
+        btJointFeedback* pFeedback;
 
         if (pPhysics)
         {
@@ -1214,6 +1246,14 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     lua_pushnumber(luaVM, vector.fY);
                     lua_pushnumber(luaVM, vector.fZ);
                     return 3;
+                case PHYSICS_PROPERTY_TRIGGERCOLLISIONEVENTS:
+                    pPhysics->GetTriggerCollisionEvents(boolean);
+                    lua_pushboolean(luaVM, boolean);
+                    return 1;
+                case PHYSICS_PROPERTY_TRIGGERCONSTRAINTEVENTS:
+                    pPhysics->GetTriggerConstraintvents(boolean);
+                    lua_pushboolean(luaVM, boolean);
+                    return 1;
                 case PHYSICS_PROPERTY_USE_CONTINOUS:
                     boolean = pPhysics->GetUseContinous();
                     lua_pushboolean(luaVM, boolean);
@@ -1286,6 +1326,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
         }
         else if (pShape)
         {
+            btCollisionShape* pBtShape;
             switch (eProperty)
             {
                 case PHYSICS_PROPERTY_SIZE:
@@ -1345,39 +1386,118 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     }
                     break;
                 case PHYSICS_PROPERTY_IS_COMPOUND:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isCompound());
                     return 1;
                 case PHYSICS_PROPERTY_IS_CONCAVE:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isConcave());
                     return 1;
                 case PHYSICS_PROPERTY_IS_CONVEX:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isConvex());
                     return 1;
                 case PHYSICS_PROPERTY_IS_CONVEX2D:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isConvex2d());
                     return 1;
                 case PHYSICS_PROPERTY_IS_INFINITE:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isInfinite());
                     return 1;
                 case PHYSICS_PROPERTY_IS_NON_MOVING:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isNonMoving());
                     return 1;
                 case PHYSICS_PROPERTY_IS_POLYHEDRAL:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isPolyhedral());
                     return 1;
                 case PHYSICS_PROPERTY_IS_SOFT_BODY:
-                    btCollisionShape* pBtShape = pShape->GetBtShape();
+                    pBtShape = pShape->GetBtShape();
                     lua_pushboolean(luaVM, pBtShape->isSoftBody());
                     return 1;
                 default:
                     argStream.SetCustomError(SString("Physics shape does not support %s property.", EnumToString(eProperty).c_str()));
+                    break;
+            }
+        }
+        else if (pConstraint)
+        {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_BREAKING_IMPULSE_THRESHOLD:
+                    lua_pushnumber(luaVM, pConstraint->GetBreakingImpulseThreshold());
+                    return 1;
+                case PHYSICS_PROPERTY_APPLIED_IMPULSE:
+                    lua_pushnumber(luaVM, pConstraint->GetAppliedImpulse());
+                    return 1;
+                case PHYSICS_PROPERTY_JOINTS_FEEDBACK:
+                    pFeedback = pConstraint->GetJoinFeedback();
+                    btVector = pFeedback->m_appliedForceBodyA;
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, btVector.getX());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, btVector.getY());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, btVector.getZ());
+                    lua_settable(luaVM, -3);
+                    btVector = pFeedback->m_appliedTorqueBodyA;
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, btVector.getX());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, btVector.getY());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, btVector.getZ());
+                    lua_settable(luaVM, -3);
+                    btVector = pFeedback->m_appliedForceBodyB;
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, btVector.getX());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, btVector.getY());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, btVector.getZ());
+                    lua_settable(luaVM, -3);
+                    btVector = pFeedback->m_appliedTorqueBodyB;
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, 1);
+                    lua_pushnumber(luaVM, btVector.getX());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 2);
+                    lua_pushnumber(luaVM, btVector.getY());
+                    lua_settable(luaVM, -3);
+                    lua_pushnumber(luaVM, 3);
+                    lua_pushnumber(luaVM, btVector.getZ());
+                    lua_settable(luaVM, -3);
+                    return 4;
+                case PHYSICS_PROPERTY_RIGID_BODY_A:
+                    pRigidBody = pConstraint->GetRigidBodyA();
+                    if (pRigidBody)
+                        lua_pushrigidbody(luaVM, pRigidBody);
+                    else
+                        lua_pushboolean(luaVM, false);
+                    return 1;
+                case PHYSICS_PROPERTY_RIGID_BODY_B:
+                    pRigidBody = pConstraint->GetRigidBodyB();
+                    if (pRigidBody)
+                        lua_pushrigidbody(luaVM, pRigidBody);
+                    else
+                        lua_pushboolean(luaVM, false);
+                    return 1;
+                case PHYSICS_PROPERTY_CONSTRAINT_BROKEN:
+                    lua_pushboolean(luaVM, pConstraint->IsBroken());
+                    return 1;
+                default:
+                    argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
                     break;
             }
         }

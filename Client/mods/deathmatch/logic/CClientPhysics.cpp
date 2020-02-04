@@ -16,6 +16,7 @@
 #include "lua/CLuaPhysicsStaticCollisionManager.h"
 #include "lua/CLuaPhysicsConstraintManager.h"
 #include "lua/CLuaPhysicsShapeManager.h"
+#include "bulletphysics3d/LinearMath/btRandom.h"
 
 void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
 {
@@ -44,7 +45,7 @@ void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const bt
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
 }
 
-CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
+CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain, unsigned long ulSeed) : ClassInit(this), CClientEntity(ID)
 {
     // Init
     m_pManager = pManager;
@@ -58,6 +59,11 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pCollisionConfiguration = new btDefaultCollisionConfiguration();
     m_pDispatcher = new btCollisionDispatcher(m_pCollisionConfiguration);
     m_pSolver = new btSequentialImpulseConstraintSolver();
+
+    if (ulSeed != 0)
+        GEN_srand(ulSeed);
+     m_pSolver->setRandSeed(GEN_rand());
+
     m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
     m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
@@ -700,6 +706,7 @@ void CClientPhysics::ProcessCollisions()
     int                                numManifolds = m_pDynamicsWorld->getDispatcher()->getNumManifolds();
     CLuaPhysicsRigidBodyManager*       pRigidBodyManager = m_pLuaMain->GetPhysicsRigidBodyManager();
     CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = m_pLuaMain->GetPhysicsStaticCollisionManager();
+    CLuaPhysicsConstraintManager*      pConstraintManager = m_pLuaMain->GetPhysicsConstraintManager();
 
     if (!pRigidBodyManager)
         return;
@@ -707,198 +714,222 @@ void CClientPhysics::ProcessCollisions()
     if (!pStaticCollisionManager)
         return;
 
-    const btCollisionObject*    objectA;
-    const btCollisionObject*    objectB;
-    const btCollisionShape*     shapeA;
-    const btCollisionShape*     shapeB;
-    CLuaPhysicsRigidBody*       pRigidA;
-    CLuaPhysicsRigidBody*       pRigidB;
-    CLuaPhysicsStaticCollision* pStaticCollisionA;
-    CLuaPhysicsStaticCollision* pStaticCollisionB;
-    btVector3                   ptA;
-    btVector3                   ptB;
-    bool                        bHasContacts;
+    if (!pConstraintManager)
+        return;
 
-    for (int i = 0; i < numManifolds; i++)
+    if (m_bTriggerConstraintEvents)
     {
-        btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-        if (contactManifold == nullptr)
-            continue;
-
-        int numContacts = contactManifold->getNumContacts();
-        if (numContacts == 0)
-            continue;
-
-        objectA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
-        objectB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
-        shapeA = objectA->getCollisionShape();
-        shapeB = objectA->getCollisionShape();
-        pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeA);
-
-        if (pRigidA)
+        CFastList<CLuaPhysicsConstraint*>::const_iterator iter = pConstraintManager->IterBegin();
+        for (; iter != pConstraintManager->IterEnd(); iter++)
         {
-            if (pRigidA->IsSleeping())
-                continue;
-        }
-        else
-        {
-            pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeA);
-            if (pStaticCollisionA == nullptr)
-                continue;
-        }
-
-        pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeB);
-
-        if (pRigidB)
-        {
-            if (pRigidB->IsSleeping())
-                continue;
-        }
-        else
-        {
-            pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeB);
-            if (pStaticCollisionB == nullptr)
-                continue;
-        }
-
-        CLuaArguments Arguments;
-        CLuaArguments ContactA;
-        CLuaArguments ContactB;
-        CLuaArguments ContactShared;
-
-        bHasContacts = false;
-
-        for (int j = 0; j < numContacts; j++)
-        {
-            btManifoldPoint& pt = contactManifold->getContactPoint(j);
-            if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
+            if ((*iter)->BreakingStatusHasChanged())
             {
-                ptA = pt.getPositionWorldOnA();
-                ptB = pt.getPositionWorldOnB();
+                /* if ((*iter)->IsBroken())
+                 {*/
+                CLuaArguments Arguments;
+                Arguments.PushPhysicsConstraint(*iter);
 
-                CLuaArguments singleContactA;
-                CLuaArguments singleContactB;
-                CLuaArguments sharedContactManifolds;
-
-                CLuaArguments worldContactPointA;
-                worldContactPointA.PushNumber(1);
-                worldContactPointA.PushNumber(ptA.getX());
-                worldContactPointA.PushNumber(2);
-                worldContactPointA.PushNumber(ptA.getY());
-                worldContactPointA.PushNumber(3);
-                worldContactPointA.PushNumber(ptA.getZ());
-                singleContactA.PushNumber(1);
-                singleContactA.PushTable(&worldContactPointA);
-
-                CLuaArguments worldContactPointB;
-                worldContactPointB.PushNumber(1);
-                worldContactPointB.PushNumber(ptB.getX());
-                worldContactPointB.PushNumber(2);
-                worldContactPointB.PushNumber(ptB.getY());
-                worldContactPointB.PushNumber(3);
-                worldContactPointB.PushNumber(ptB.getZ());
-                singleContactB.PushNumber(1);
-                singleContactB.PushTable(&worldContactPointB);
-
-                ptA = pt.m_localPointA;
-                ptB = pt.m_localPointB;
-
-                CLuaArguments localContactPointA;
-                localContactPointA.PushNumber(1);
-                localContactPointA.PushNumber(ptA.getX());
-                localContactPointA.PushNumber(2);
-                localContactPointA.PushNumber(ptA.getY());
-                localContactPointA.PushNumber(3);
-                localContactPointA.PushNumber(ptA.getZ());
-                singleContactA.PushNumber(2);
-                singleContactA.PushTable(&localContactPointA);
-
-                CLuaArguments localContactPointB;
-                localContactPointB.PushNumber(1);
-                localContactPointB.PushNumber(ptB.getX());
-                localContactPointB.PushNumber(2);
-                localContactPointB.PushNumber(ptB.getY());
-                localContactPointB.PushNumber(3);
-                localContactPointB.PushNumber(ptB.getZ());
-                singleContactB.PushNumber(2);
-                singleContactB.PushTable(&localContactPointB);
-
-                ptA = pt.m_lateralFrictionDir1;
-                ptB = pt.m_lateralFrictionDir2;
-
-                CLuaArguments contactDirA;
-                contactDirA.PushNumber(1);
-                contactDirA.PushNumber(ptA.getX());
-                contactDirA.PushNumber(2);
-                contactDirA.PushNumber(ptA.getY());
-                contactDirA.PushNumber(3);
-                contactDirA.PushNumber(ptA.getZ());
-                singleContactA.PushNumber(3);
-                singleContactA.PushTable(&contactDirA);
-
-                CLuaArguments contactDirB;
-                contactDirB.PushNumber(1);
-                contactDirB.PushNumber(ptB.getX());
-                contactDirB.PushNumber(2);
-                contactDirB.PushNumber(ptB.getY());
-                contactDirB.PushNumber(3);
-                contactDirB.PushNumber(ptB.getZ());
-                singleContactB.PushNumber(3);
-                singleContactB.PushTable(&contactDirB);
-
-                ptA = pt.m_normalWorldOnB;
-                CLuaArguments contactWorldNormal;
-
-                contactWorldNormal.PushNumber(1);
-                contactWorldNormal.PushNumber(ptB.getX());
-                contactWorldNormal.PushNumber(2);
-                contactWorldNormal.PushNumber(ptB.getY());
-                contactWorldNormal.PushNumber(3);
-                contactWorldNormal.PushNumber(ptB.getZ());
-
-                sharedContactManifolds.PushNumber(1);
-                sharedContactManifolds.PushTable(&contactWorldNormal);
-
-                ContactA.PushTable(&singleContactA);
-                ContactB.PushTable(&singleContactB);
-                ContactShared.PushTable(&sharedContactManifolds);
-                bHasContacts = true;
+                CallEvent("onPhysicsConstraintBreak", Arguments, true);
+                //}
             }
         }
+    }
 
-        if (bHasContacts)
+    if (m_bTriggerCollisionEvents)
+    {
+        const btCollisionObject*    objectA;
+        const btCollisionObject*    objectB;
+        const btCollisionShape*     shapeA;
+        const btCollisionShape*     shapeB;
+        CLuaPhysicsRigidBody*       pRigidA;
+        CLuaPhysicsRigidBody*       pRigidB;
+        CLuaPhysicsStaticCollision* pStaticCollisionA;
+        CLuaPhysicsStaticCollision* pStaticCollisionB;
+        btVector3                   ptA;
+        btVector3                   ptB;
+        bool                        bHasContacts;
+
+        for (int i = 0; i < numManifolds; i++)
         {
+            btPersistentManifold* contactManifold = m_pDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+            if (contactManifold == nullptr)
+                continue;
+
+            int numContacts = contactManifold->getNumContacts();
+            if (numContacts == 0)
+                continue;
+
+            objectA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
+            objectB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
+            shapeA = objectA->getCollisionShape();
+            shapeB = objectA->getCollisionShape();
+            pRigidA = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeA);
+
             if (pRigidA)
             {
-                Arguments.PushPhysicsRigidBody(pRigidA);
-            }
-            else if (pStaticCollisionA)
-            {
-                Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
+                if (pRigidA->IsSleeping())
+                    continue;
             }
             else
             {
-                Arguments.PushBoolean(false);
+                pStaticCollisionA = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeA);
+                if (pStaticCollisionA == nullptr)
+                    continue;
             }
+
+            pRigidB = pRigidBodyManager->GetRigidBodyFromCollisionShape(shapeB);
 
             if (pRigidB)
             {
-                Arguments.PushPhysicsRigidBody(pRigidB);
-            }
-            else if (pStaticCollisionB)
-            {
-                Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
+                if (pRigidB->IsSleeping())
+                    continue;
             }
             else
             {
-                Arguments.PushBoolean(false);
+                pStaticCollisionB = pStaticCollisionManager->GetStaticCollisionFromCollisionShape(shapeB);
+                if (pStaticCollisionB == nullptr)
+                    continue;
             }
 
-            Arguments.PushArguments(ContactA);
-            Arguments.PushArguments(ContactB);
-            Arguments.PushArguments(ContactShared);
+            CLuaArguments Arguments;
+            CLuaArguments ContactA;
+            CLuaArguments ContactB;
+            CLuaArguments ContactShared;
 
-            CallEvent("onPhysicsCollision", Arguments, true);
+            bHasContacts = false;
+
+            for (int j = 0; j < numContacts; j++)
+            {
+                btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                if (pt.getAppliedImpulse() < m_fImpulseThreshold)            // if hit is strong enough
+                {
+                    ptA = pt.getPositionWorldOnA();
+                    ptB = pt.getPositionWorldOnB();
+
+                    CLuaArguments singleContactA;
+                    CLuaArguments singleContactB;
+                    CLuaArguments sharedContactManifolds;
+
+                    CLuaArguments worldContactPointA;
+                    worldContactPointA.PushNumber(1);
+                    worldContactPointA.PushNumber(ptA.getX());
+                    worldContactPointA.PushNumber(2);
+                    worldContactPointA.PushNumber(ptA.getY());
+                    worldContactPointA.PushNumber(3);
+                    worldContactPointA.PushNumber(ptA.getZ());
+                    singleContactA.PushNumber(1);
+                    singleContactA.PushTable(&worldContactPointA);
+
+                    CLuaArguments worldContactPointB;
+                    worldContactPointB.PushNumber(1);
+                    worldContactPointB.PushNumber(ptB.getX());
+                    worldContactPointB.PushNumber(2);
+                    worldContactPointB.PushNumber(ptB.getY());
+                    worldContactPointB.PushNumber(3);
+                    worldContactPointB.PushNumber(ptB.getZ());
+                    singleContactB.PushNumber(1);
+                    singleContactB.PushTable(&worldContactPointB);
+
+                    ptA = pt.m_localPointA;
+                    ptB = pt.m_localPointB;
+
+                    CLuaArguments localContactPointA;
+                    localContactPointA.PushNumber(1);
+                    localContactPointA.PushNumber(ptA.getX());
+                    localContactPointA.PushNumber(2);
+                    localContactPointA.PushNumber(ptA.getY());
+                    localContactPointA.PushNumber(3);
+                    localContactPointA.PushNumber(ptA.getZ());
+                    singleContactA.PushNumber(2);
+                    singleContactA.PushTable(&localContactPointA);
+
+                    CLuaArguments localContactPointB;
+                    localContactPointB.PushNumber(1);
+                    localContactPointB.PushNumber(ptB.getX());
+                    localContactPointB.PushNumber(2);
+                    localContactPointB.PushNumber(ptB.getY());
+                    localContactPointB.PushNumber(3);
+                    localContactPointB.PushNumber(ptB.getZ());
+                    singleContactB.PushNumber(2);
+                    singleContactB.PushTable(&localContactPointB);
+
+                    ptA = pt.m_lateralFrictionDir1;
+                    ptB = pt.m_lateralFrictionDir2;
+
+                    CLuaArguments contactDirA;
+                    contactDirA.PushNumber(1);
+                    contactDirA.PushNumber(ptA.getX());
+                    contactDirA.PushNumber(2);
+                    contactDirA.PushNumber(ptA.getY());
+                    contactDirA.PushNumber(3);
+                    contactDirA.PushNumber(ptA.getZ());
+                    singleContactA.PushNumber(3);
+                    singleContactA.PushTable(&contactDirA);
+
+                    CLuaArguments contactDirB;
+                    contactDirB.PushNumber(1);
+                    contactDirB.PushNumber(ptB.getX());
+                    contactDirB.PushNumber(2);
+                    contactDirB.PushNumber(ptB.getY());
+                    contactDirB.PushNumber(3);
+                    contactDirB.PushNumber(ptB.getZ());
+                    singleContactB.PushNumber(3);
+                    singleContactB.PushTable(&contactDirB);
+
+                    ptA = pt.m_normalWorldOnB;
+                    CLuaArguments contactWorldNormal;
+
+                    contactWorldNormal.PushNumber(1);
+                    contactWorldNormal.PushNumber(ptB.getX());
+                    contactWorldNormal.PushNumber(2);
+                    contactWorldNormal.PushNumber(ptB.getY());
+                    contactWorldNormal.PushNumber(3);
+                    contactWorldNormal.PushNumber(ptB.getZ());
+
+                    sharedContactManifolds.PushNumber(1);
+                    sharedContactManifolds.PushTable(&contactWorldNormal);
+
+                    ContactA.PushTable(&singleContactA);
+                    ContactB.PushTable(&singleContactB);
+                    ContactShared.PushTable(&sharedContactManifolds);
+                    bHasContacts = true;
+                }
+            }
+
+            if (bHasContacts)
+            {
+                if (pRigidA)
+                {
+                    Arguments.PushPhysicsRigidBody(pRigidA);
+                }
+                else if (pStaticCollisionA)
+                {
+                    Arguments.PushPhysicsStaticCollision(pStaticCollisionA);
+                }
+                else
+                {
+                    Arguments.PushBoolean(false);
+                }
+
+                if (pRigidB)
+                {
+                    Arguments.PushPhysicsRigidBody(pRigidB);
+                }
+                else if (pStaticCollisionB)
+                {
+                    Arguments.PushPhysicsStaticCollision(pStaticCollisionB);
+                }
+                else
+                {
+                    Arguments.PushBoolean(false);
+                }
+
+                Arguments.PushArguments(ContactA);
+                Arguments.PushArguments(ContactB);
+                Arguments.PushArguments(ContactShared);
+
+                CallEvent("onPhysicsCollision", Arguments, true);
+            }
         }
     }
 }

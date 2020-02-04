@@ -374,6 +374,14 @@ CLuaArgument* CLuaArguments::PushPhysicsStaticCollision(CLuaPhysicsStaticCollisi
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushPhysicsConstraint(CLuaPhysicsConstraint* pConstraint)
+{
+    CLuaArgument* pArgument = new CLuaArgument;
+    pArgument->ReadScriptID(pConstraint->GetScriptID());
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
 CLuaArgument* CLuaArguments::PushElement(CClientEntity* pElement)
 {
     CLuaArgument* pArgument = new CLuaArgument;

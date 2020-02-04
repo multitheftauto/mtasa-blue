@@ -32,7 +32,8 @@ CLuaPhysicsConstraint::CLuaPhysicsConstraint(btDiscreteDynamicsWorld* pWorld, CL
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::CONSTRAINT);
     m_pRigidBodyA = pRigidBodyA;
     m_pRigidBodyB = pRigidBodyB;
-
+    m_pJointFeedback = new btJointFeedback();
+    m_bLastBreakingStatus = false;
     m_pRigidBodyA->AddConstraint(this);
     if (m_pRigidBodyB)
         m_pRigidBodyB->AddConstraint(this);
@@ -44,6 +45,7 @@ CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
     if (m_pRigidBodyB)
         m_pRigidBodyB->RemoveConstraint(this);
 
+    free(m_pJointFeedback);
     RemoveScriptID();
 }
 
@@ -63,6 +65,8 @@ void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVect
     {
         btPoint2PointConstraint* pConstraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
                                                                            reinterpret_cast<btVector3&>(anchorA), reinterpret_cast<btVector3&>(anchorB));
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -71,6 +75,8 @@ void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVect
     else
     {
         btPoint2PointConstraint* pConstraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<btVector3&>(anchorA));
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -86,6 +92,8 @@ void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivo
             new btHingeConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA),
                                   reinterpret_cast<btVector3&>(pivotB), reinterpret_cast<btVector3&>(axisA), reinterpret_cast<btVector3&>(axisB));
 
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -96,6 +104,8 @@ void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivo
         btHingeConstraint* pConstraint =
             new btHingeConstraint(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA), reinterpret_cast<btVector3&>(axisA));
 
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -117,6 +127,8 @@ void CLuaPhysicsConstraint::CreateFixedConstraint(CVector& vecPositionA, CVector
     CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
     btFixedConstraint* pConstraint = new btFixedConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), transformA, transformB);
 
+    pConstraint->enableFeedback(true);
+    pConstraint->setJointFeedback(m_pJointFeedback);
     m_pConstraint = pConstraint;
     m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
     m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -144,6 +156,8 @@ void CLuaPhysicsConstraint::CreateSliderConstraint(CVector& vecPositionA, CVecto
         pConstraint->setUpperLinLimit(btScalar(0));
         pConstraint->setLowerAngLimit(btScalar(0));
         pConstraint->setUpperAngLimit(btScalar(0));
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -161,6 +175,8 @@ void CLuaPhysicsConstraint::CreateSliderConstraint(CVector& vecPositionA, CVecto
         pConstraint->setUpperLinLimit(btScalar(0));
         pConstraint->setLowerAngLimit(btScalar(0));
         pConstraint->setUpperAngLimit(btScalar(0));
+        pConstraint->enableFeedback(true);
+        pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
         m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
@@ -257,6 +273,36 @@ bool CLuaPhysicsConstraint::SetUpperAngLimit(float upperLimit)
     {
         btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
         pConstraint->setUpperAngLimit(upperLimit);
+        return true;
+    }
+    return false;
+}
+
+void CLuaPhysicsConstraint::SetBreakingImpulseThreshold(float fThreshold)
+{
+    m_pConstraint->setBreakingImpulseThreshold(fThreshold);
+}
+
+float CLuaPhysicsConstraint::GetBreakingImpulseThreshold()
+{
+    return m_pConstraint->getBreakingImpulseThreshold();
+}
+
+float CLuaPhysicsConstraint::GetAppliedImpulse()
+{
+    return m_pConstraint->getAppliedImpulse();
+}
+
+btJointFeedback* CLuaPhysicsConstraint::GetJoinFeedback()
+{
+    return m_pJointFeedback;
+}
+
+bool CLuaPhysicsConstraint::BreakingStatusHasChanged()
+{
+    if (m_bLastBreakingStatus != IsBroken())
+    {
+        m_bLastBreakingStatus = IsBroken();
         return true;
     }
     return false;

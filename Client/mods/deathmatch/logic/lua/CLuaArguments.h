@@ -61,6 +61,7 @@ public:
     CLuaArgument* PushResource(CResource* pResource);
     CLuaArgument* PushPhysicsRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     CLuaArgument* PushPhysicsStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    CLuaArgument* PushPhysicsConstraint(CLuaPhysicsConstraint* pConstraint);
     CLuaArgument* PushTable(CLuaArguments* table);
 
     void DeleteArguments();

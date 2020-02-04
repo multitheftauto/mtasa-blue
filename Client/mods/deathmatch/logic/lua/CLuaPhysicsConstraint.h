@@ -42,16 +42,23 @@ public:
     bool SetUpperLinLimit(float fLength);
     bool SetLowerAngLimit(float lowerLimit);
     bool SetUpperAngLimit(float upperLimit);
+    void SetBreakingImpulseThreshold(float fThreshold);
+    float GetBreakingImpulseThreshold();
+    float GetAppliedImpulse();
+    btJointFeedback* GetJoinFeedback();
 
-    uint         GetScriptID() const { return m_uiScriptID; }
+    uint                  GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
-
+    bool                  IsBroken() const { return !m_pConstraint->isEnabled(); }
+    bool                  BreakingStatusHasChanged();
 private:
     ePhysicsConstraint       m_eType;
     btTypedConstraint*       m_pConstraint;
     uint                     m_uiScriptID;
+    btJointFeedback*         m_pJointFeedback;
     btDiscreteDynamicsWorld* m_pWorld;
     CLuaPhysicsRigidBody*    m_pRigidBodyA;
     CLuaPhysicsRigidBody*    m_pRigidBodyB;
+    bool                     m_bLastBreakingStatus;
 };
