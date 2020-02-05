@@ -26,9 +26,9 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(uint uiScriptID)
     return pLuaShape;
 }
 
-CLuaPhysicsShape* CLuaPhysicsShapeManager::AddShape()
+CLuaPhysicsShape* CLuaPhysicsShapeManager::AddShape(CClientPhysics* pPhysics)
 {
-    CLuaPhysicsShape* pShape = new CLuaPhysicsShape();
+    CLuaPhysicsShape* pShape = new CLuaPhysicsShape(pPhysics);
     m_ShapeList.push_back(pShape);
     return pShape;
 }
@@ -41,7 +41,6 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShape(const btCollisionShape* pSha
 
     return nullptr;
 }
-
 
 void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
 {

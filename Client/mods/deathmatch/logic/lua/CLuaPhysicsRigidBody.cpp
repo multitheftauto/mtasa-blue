@@ -39,6 +39,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
         pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
     }
     m_pWorld->removeRigidBody(m_pBtRigidBody);
+    m_pPhysicsShape->RemoveRigidBody(this);
     delete m_pBtRigidBody;
     RemoveScriptID();
 }

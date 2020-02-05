@@ -20,10 +20,11 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint
 {
     CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
     if (!pLuaRigidBody)
-        return NULL;
+        return nullptr;
 
     if (!ListContains(m_RigidBodyList, pLuaRigidBody))
-        return NULL;
+        return nullptr;
+
     return pLuaRigidBody;
 }
 

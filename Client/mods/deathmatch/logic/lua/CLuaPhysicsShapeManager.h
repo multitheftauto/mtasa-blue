@@ -25,7 +25,7 @@ public:
 
     CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsShape*     AddShape();
+    CLuaPhysicsShape*     AddShape(CClientPhysics* pPhysics);
     void                  RemoveShape(CLuaPhysicsShape* pShape);
     CLuaPhysicsShape*     GetShape(const btCollisionShape* pShape);
     unsigned long         GetShapeCount() const { return m_ShapeList.size(); }

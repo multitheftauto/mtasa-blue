@@ -631,7 +631,7 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionSha
 
 CLuaPhysicsShape* CClientPhysics::CreateShape()
 {
-    CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape();
+    CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape(this);
     return pShape;
 }
 

@@ -20,7 +20,7 @@ class CLuaPhysicsShape;
 class CLuaPhysicsShape
 {
 public:
-    CLuaPhysicsShape();
+    CLuaPhysicsShape(CClientPhysics* pPhysics);
     ~CLuaPhysicsShape();
 
     void RemoveScriptID();
@@ -44,8 +44,8 @@ public:
     btCollisionShape*     GetBtShape() const { return m_pBtShape; }
     CLuaPhysicsRigidBody* GetRigidBody(int index) const { return m_pRigidBodyList[index]; }
     int                   GetRigidBodyNum() const { return m_pRigidBodyList.size(); }
-    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody) {m_pRigidBodyList.push_back(pRigidBody); }
-    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody) { ListRemove(m_pRigidBodyList, pRigidBody); }
+    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
     bool SetSize(CVector size);
     bool GetSize(CVector& size);
@@ -59,7 +59,8 @@ public:
     const char* GetType();
 
 private:
-    uint                     m_uiScriptID;
-    btCollisionShape*        m_pBtShape;
-    std::vector<CLuaPhysicsRigidBody*>    m_pRigidBodyList;
+    uint                               m_uiScriptID;
+    CClientPhysics*                    m_pPhysics;
+    btCollisionShape*                  m_pBtShape;
+    std::vector<CLuaPhysicsRigidBody*> m_pRigidBodyList;
 };

@@ -17,13 +17,18 @@
 #include "CLuaPhysicsShapeManager.h"
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 
-CLuaPhysicsShape::CLuaPhysicsShape()
+CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics)
 {
+    m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::SHAPE);
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
+    for (int i = m_pRigidBodyList.size() - 1; i >= 0; i--)
+    {
+        m_pPhysics->DestroyRigidBody(m_pRigidBodyList[i]);
+    }
     delete m_pBtShape;
     RemoveScriptID();
 }
@@ -39,7 +44,7 @@ void CLuaPhysicsShape::RemoveScriptID()
 
 void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
-    //assert(m_pBtShape == nullptr);
+    // assert(m_pBtShape == nullptr);
     pShape->setUserPointer((void*)this);
     pShape->setUserIndex(3);
     m_pBtShape = pShape;
@@ -96,7 +101,6 @@ btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVecto
     return pConvexHull;
 }
 
-
 btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
 {
     btBvhTriangleMeshShape* trimeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
@@ -111,6 +115,22 @@ heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int 
     pHeightfieldTerrain->pHeightfieldTerrainShape->setUserPointer((void*)this);
     pHeightfieldTerrain->pHeightfieldTerrainShape->setUserIndex(1);
     return pHeightfieldTerrain;
+}
+
+void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+{
+    if (ListContains(m_pRigidBodyList, pRigidBody))
+        return;
+
+    m_pRigidBodyList.push_back(pRigidBody);
+}
+
+void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
+{
+    if (!ListContains(m_pRigidBodyList, pRigidBody))
+        return;
+
+    ListRemove(m_pRigidBodyList, pRigidBody);
 }
 
 bool CLuaPhysicsShape::SetSize(CVector size)
@@ -183,10 +203,10 @@ const char* CLuaPhysicsShape::GetType()
 
 void CLuaPhysicsShape::UpdateRigids()
 {
-    for (int i = 0; i < GetRigidBodyNum(); i++)
+    for (auto const& rigidBody : m_pRigidBodyList)
     {
-        GetRigidBody(i)->UpdateAABB();
-        GetRigidBody(i)->Activate();
-        GetRigidBody(i)->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
+        rigidBody->UpdateAABB();
+        rigidBody->Activate();
+        rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
     }
 }
