@@ -10,6 +10,8 @@
 
 #pragma once
 
+class btDiscreteDynamicsWorld;
+
 class CClientPhysicsManager
 {
     friend class CClientManager;
@@ -22,7 +24,7 @@ public:
 
     std::list<CClientPhysics*>::const_iterator IterBegin(void) { return m_List.begin(); };
     std::list<CClientPhysics*>::const_iterator IterEnd(void) { return m_List.end(); };
-
+    CClientPhysics*                            GetPhysics(btDiscreteDynamicsWorld* pDynamicsWorld);
     void DoPulse();
 private:
     void AddToList(CClientPhysics* pPhysics) { m_List.push_back(pPhysics); };

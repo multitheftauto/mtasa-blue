@@ -32,6 +32,12 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLua
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
+    CClientPhysicsManager* pPhysicsManager = g_pClientGame->GetManager()->GetPhysicsManager();
+    CClientPhysics* pPhysics = pPhysicsManager->GetPhysics(m_pWorld);
+    for (int i = 0; i < m_pBtRigidBody->getNumConstraintRefs(); i++)
+    {
+        pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
+    }
     m_pWorld->removeRigidBody(m_pBtRigidBody);
     delete m_pBtRigidBody;
     RemoveScriptID();

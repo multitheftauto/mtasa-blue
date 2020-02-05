@@ -17,6 +17,7 @@
 
 void CLuaPhysicsStaticCollisionManager::RemoveStaticCollision(CLuaPhysicsStaticCollision* pLuaStaticCollision)
 {
+    //free(pLuaStaticCollision);
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
@@ -46,4 +47,16 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     }
 
     return nullptr;
+}
+
+std::vector<CLuaPhysicsStaticCollision*> CLuaPhysicsStaticCollisionManager::GetStaticCollisionsFromCollisionShape(const btCollisionShape* pCollisionShape)
+{
+    std::vector<CLuaPhysicsStaticCollision*> vecStaticCollisions;
+    for (CLuaPhysicsStaticCollision* pStaticCollision : m_StaticCollisionList)
+    {
+        if (pStaticCollision->GetCollisionObject()->getCollisionShape() == pCollisionShape)
+            vecStaticCollisions.push_back(pStaticCollision);
+    }
+
+    return vecStaticCollisions;
 }

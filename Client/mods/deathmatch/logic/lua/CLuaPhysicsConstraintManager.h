@@ -28,13 +28,13 @@ public:
     CLuaPhysicsConstraint* AddConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
     void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
+    CLuaPhysicsConstraint* GetContraint(btTypedConstraint* pConstraint);
 
+    unsigned long GetContraintCount() const { return m_List.size(); }
 
-    unsigned long GetContraintCount() const { return m_ContraintList.size(); }
-
-    CFastList<CLuaPhysicsConstraint*>::const_iterator IterBegin() { return m_ContraintList.begin(); }
-    CFastList<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_ContraintList.end(); }
+    CFastList<CLuaPhysicsConstraint*>::const_iterator IterBegin() { return m_List.begin(); }
+    CFastList<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
-    CFastList<CLuaPhysicsConstraint*> m_ContraintList;
+    CFastList<CLuaPhysicsConstraint*> m_List;
 };

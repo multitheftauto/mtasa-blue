@@ -24,6 +24,10 @@ public:
     LUA_DECLARE(PhysicsCreateRigidBodyFromModel);
     LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsAddShape);
+    LUA_DECLARE(PhysicsGetShapes);
+    LUA_DECLARE(PhysicsGetRigidBodies);
+    LUA_DECLARE(PhysicsGetStaticCollisions);
+    LUA_DECLARE(PhysicsGetConstraints);
     LUA_DECLARE(PhysicsSetProperties);
     LUA_DECLARE(PhysicsGetProperties);
     LUA_DECLARE(PhysicsCreateStaticCollision);

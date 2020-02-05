@@ -79,5 +79,5 @@ private:
     btRigidBody*                         m_pBtRigidBody;
     CLuaPhysicsShape*                    m_pPhysicsShape;
     std::vector<CLuaPhysicsConstraint*>  m_constraintList;
-    int                                         m_iLastSimulationCounter = 0;
+    int                                  m_iLastSimulationCounter = 0;
 };

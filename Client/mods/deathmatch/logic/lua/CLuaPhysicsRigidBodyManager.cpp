@@ -42,7 +42,7 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
     // Check if already removed
     if (!ListContains(m_RigidBodyList, pRigidBody))
         return;
-
+    
     // Remove all references
     ListRemove(m_RigidBodyList, pRigidBody);
 

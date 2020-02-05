@@ -105,8 +105,6 @@ btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector
     return trimeshShape;
 }
 
-
-
 heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
 {
     heightfieldTerrainShape* pHeightfieldTerrain = CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);

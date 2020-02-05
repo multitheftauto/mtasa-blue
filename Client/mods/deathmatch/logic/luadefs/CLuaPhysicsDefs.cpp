@@ -29,6 +29,10 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
         {"physicsCreateShape", PhysicsCreateShape},
         {"physicsAddShape", PhysicsAddShape},
+        {"physicsGetShapes", PhysicsGetShapes},
+        {"physicsGetRigidBodies", PhysicsGetRigidBodies},
+        {"physicsGetStaticCollisions", PhysicsGetStaticCollisions},
+        {"physicsGetConstraints", PhysicsGetConstraints},
         {"physicsSetProperties", PhysicsSetProperties},
         {"physicsGetProperties", PhysicsGetProperties},
         {"physicsDrawDebug", PhysicsDrawDebug},
@@ -288,7 +292,6 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
 {
-    CClientPhysics*             pPhysics = nullptr;
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
     CLuaPhysicsConstraint*      pConstraint = nullptr;
@@ -297,9 +300,7 @@ int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
 
-    if (argStream.NextIsUserDataOfType<CClientPhysics>())
-        argStream.ReadUserData(pPhysics);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
         argStream.ReadUserData(pRigidBody);
     else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
         argStream.ReadUserData(pStaticCollision);
@@ -310,6 +311,34 @@ int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            if (pRigidBody != nullptr)
+            {
+                pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pRigidBody);
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (pStaticCollision != nullptr)
+            {
+                pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (pConstraint != nullptr)
+            {
+                pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint);
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (pShape != nullptr)
+            {
+                pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape);
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
     }
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1681,6 +1710,148 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                 pPhysics->RayCastMultiple(luaVM, from, to, bFilterBackfaces);
                 return 1;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetShapes(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    ePhysicsRayType  eRayType;
+    CVector          from;
+    CVector          to;
+    bool             bFilterBackfaces;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CLuaPhysicsShapeManager* pShapeManager = luaMain->GetPhysicsShapeManager();
+
+            lua_newtable(luaVM);
+            int i = 1;
+            for (auto iter = pShapeManager->IterBegin(); iter != pShapeManager->IterEnd(); ++iter)
+            {
+                lua_pushnumber(luaVM, i++);
+                lua_pushshape(luaVM, (*iter));
+                lua_settable(luaVM, -3);
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetRigidBodies(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    ePhysicsRayType  eRayType;
+    CVector          from;
+    CVector          to;
+    bool             bFilterBackfaces;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CLuaPhysicsRigidBodyManager* pRigidBodyManager = luaMain->GetPhysicsRigidBodyManager();
+
+            lua_newtable(luaVM);
+            int i = 1;
+            for (auto iter = pRigidBodyManager->IterBegin(); iter != pRigidBodyManager->IterEnd(); ++iter)
+            {
+                lua_pushnumber(luaVM, i++);
+                lua_pushrigidbody(luaVM, (*iter));
+                lua_settable(luaVM, -3);
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetStaticCollisions(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    ePhysicsRayType  eRayType;
+    CVector          from;
+    CVector          to;
+    bool             bFilterBackfaces;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = luaMain->GetPhysicsStaticCollisionManager();
+            lua_newtable(luaVM);
+            int i = 1;
+            for (auto iter = pStaticCollisionManager->IterBegin(); iter != pStaticCollisionManager->IterEnd(); ++iter)
+            {
+                lua_pushnumber(luaVM, i++);
+                lua_pushstaticcollision(luaVM, (*iter));
+                lua_settable(luaVM, -3);
+            }
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetConstraints(lua_State* luaVM)
+{
+    CClientPhysics*  pPhysics;
+    ePhysicsRayType  eRayType;
+    CVector          from;
+    CVector          to;
+    bool             bFilterBackfaces;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            CLuaPhysicsConstraintManager* pConstraintManager = luaMain->GetPhysicsConstraintManager();
+            lua_newtable(luaVM);
+            int i = 1;
+            for (auto iter = pConstraintManager->IterBegin(); iter != pConstraintManager->IterEnd(); ++iter)
+            {
+                lua_pushnumber(luaVM, i++);
+                lua_pushconstraint(luaVM, (*iter));
+                lua_settable(luaVM, -3);
+            }
+            return 1;
         }
     }
     else

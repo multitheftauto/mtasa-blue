@@ -17,7 +17,16 @@
 
 void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pLuaRigidBody)
 {
+    assert(pLuaRigidBody);
 
+    // Check if already removed
+    if (!ListContains(m_List, pLuaRigidBody))
+        return;
+
+    // Remove all references
+    ListRemove(m_List, pLuaRigidBody);
+
+    delete pLuaRigidBody;
 }
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(uint uiScriptID)
@@ -26,15 +35,32 @@ CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(ui
     if (!pLuaContraint)
         return NULL;
 
-    if (!ListContains(m_ContraintList, pLuaContraint))
+    if (!ListContains(m_List, pLuaContraint))
         return NULL;
+
     return pLuaContraint;
+}
+
+CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraint(btTypedConstraint* pConstraint)
+{
+    if (m_List.empty())
+        return nullptr;
+
+    CFastList<CLuaPhysicsConstraint*>::const_iterator iter = IterBegin();
+    for (; iter != IterEnd(); iter++)
+    {
+        if ((*iter)->GetConstraint() == pConstraint)
+        {
+            return *iter;
+        }
+    }
+    return nullptr;
 }
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::AddConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA,
                                                                    CLuaPhysicsRigidBody* pRigidBodyB)
 {
     CLuaPhysicsConstraint* pContraint = new CLuaPhysicsConstraint(pWorld, pRigidBodyA, pRigidBodyB);
-    m_ContraintList.push_back(pContraint);
+    m_List.push_back(pContraint);
     return pContraint;
 }

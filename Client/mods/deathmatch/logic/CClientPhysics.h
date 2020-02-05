@@ -80,6 +80,7 @@ public:
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    void DestroyCostraint(btTypedConstraint* pConstraint);
 
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
@@ -113,6 +114,8 @@ public:
     void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
+
+    btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
     void ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionObject,

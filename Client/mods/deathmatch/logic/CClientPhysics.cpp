@@ -602,6 +602,13 @@ void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
     m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
 }
 
+void CClientPhysics::DestroyCostraint(btTypedConstraint* pConstraint)
+{
+    CLuaPhysicsConstraint* pLuaConstraint = m_pLuaMain->GetPhysicsConstraintManager()->GetContraint(pConstraint);
+    if (pLuaConstraint)
+        m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
+}
+
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
 {
     CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);

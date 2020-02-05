@@ -52,6 +52,8 @@ public:
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
     bool                  IsBroken() const { return !m_pConstraint->isEnabled(); }
     bool                  BreakingStatusHasChanged();
+    btTypedConstraint*    GetConstraint() const { return m_pConstraint; }
+
 private:
     ePhysicsConstraint       m_eType;
     btTypedConstraint*       m_pConstraint;
