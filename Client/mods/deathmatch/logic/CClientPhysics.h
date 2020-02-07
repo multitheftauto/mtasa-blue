@@ -52,13 +52,13 @@ class CClientPhysics : public CClientEntity
 {
     DECLARE_CLASS(CClientPhysics, CClientEntity)
 public:
-    CClientPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain, unsigned long ulSeed);
-    ~CClientPhysics(void);
+    CClientPhysics(class CClientManager* pManager, ElementID ID, CLuaMain* luaMain);
+    ~CClientPhysics();
 
-    eClientEntityType GetType(void) const { return CCLIENTPHYSICS; }
+    eClientEntityType GetType() const { return CCLIENTPHYSICS; }
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void);
+    void Unlink();
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 

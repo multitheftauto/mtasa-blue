@@ -60,6 +60,7 @@ public:
     void GetScale(CVector& vecScale);
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
+    void RemoveDebugColor();
     void SetFilterMask(short sIndex, bool bEnabled);
     void GetFilterMask(short sIndex, bool& bEnabled);
     void SetFilterGroup(int sIndex);

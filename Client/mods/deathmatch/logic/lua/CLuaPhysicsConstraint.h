@@ -22,7 +22,7 @@ enum ePhysicsConstraint;
 class CLuaPhysicsConstraint
 {
 public:
-    CLuaPhysicsConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
+    CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
     ~CLuaPhysicsConstraint();
 
     void RemoveScriptID();
@@ -59,7 +59,7 @@ private:
     btTypedConstraint*       m_pConstraint;
     uint                     m_uiScriptID;
     btJointFeedback*         m_pJointFeedback;
-    btDiscreteDynamicsWorld* m_pWorld;
+    CClientPhysics*          m_pPhysics;
     CLuaPhysicsRigidBody*    m_pRigidBodyA;
     CLuaPhysicsRigidBody*    m_pRigidBodyB;
     bool                     m_bLastBreakingStatus;

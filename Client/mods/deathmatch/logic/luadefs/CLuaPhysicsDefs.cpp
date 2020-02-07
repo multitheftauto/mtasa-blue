@@ -18,11 +18,12 @@
 #include "lua/CLuaPhysicsSharedLogic.h"
 
 #define MINIMUM_SHAPE_SIZE 0.05f
+#define MAXIMUM_SHAPE_SIZE 10000.0f
 
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        {"physicsCreateWorld", PhysicsCreateWorld},
+        {"physicsCreateWorld", PhysicsCreateWorld},            // finished
         {"physicsDestroy", PhysicsDestroy},
         {"physicsCreateRigidBody", PhysicsCreateRigidBody},            // finished
         {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
@@ -35,7 +36,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetConstraints", PhysicsGetConstraints},
         {"physicsSetProperties", PhysicsSetProperties},
         {"physicsGetProperties", PhysicsGetProperties},
-        {"physicsDrawDebug", PhysicsDrawDebug},
+        {"physicsDrawDebug", PhysicsDrawDebug},            // seems to be finished
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyForce", PhysicsApplyForce},
@@ -72,9 +73,7 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
     ePhysicsProperty eProperty;
     CScriptArgReader argStream(luaVM);
     CVector          vecGravity;
-    unsigned long    ulSeed;
     argStream.ReadVector3D(vecGravity, CVector(0, 0, -9.81));
-    argStream.ReadNumber(ulSeed, 0);
 
     if (!argStream.HasErrors())
     {
@@ -84,7 +83,7 @@ int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain, ulSeed);
+                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
                 CElementGroup*  pGroup = pResource->GetElementGroup();
                 if (pGroup)
                 {
@@ -110,7 +109,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsShape*    pShape = pPhysics->CreateShape();
+        CLuaPhysicsShape*    pShape;
         CVector              vector;
         float                fRadius;
         float                fHeight;
@@ -135,6 +134,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (vector.fX >= MINIMUM_SHAPE_SIZE && vector.fY >= MINIMUM_SHAPE_SIZE && vector.fZ >= MINIMUM_SHAPE_SIZE)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithBox(vector);
                     }
                     else
@@ -150,6 +150,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (fRadius >= MINIMUM_SHAPE_SIZE)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithSphere(fRadius);
                     }
                     else
@@ -165,6 +166,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithCapsule(fRadius, fHeight);
                     }
                     else
@@ -180,6 +182,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (fRadius >= MINIMUM_SHAPE_SIZE && fHeight >= MINIMUM_SHAPE_SIZE)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithCone(fRadius, fHeight);
                     }
                     else
@@ -192,6 +195,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 argStream.ReadVector3D(vector);
                 if (!argStream.HasErrors())
                 {
+                    pShape = pPhysics->CreateShape();
                     pShape->InitializeWithCylinder(vector);
                 }
                 break;
@@ -201,6 +205,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (fInitialChildCapacity >= 0 && fInitialChildCapacity <= 1024)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithCompound(fInitialChildCapacity);
                     }
                     else
@@ -217,6 +222,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 }
                 if (!argStream.HasErrors())
                 {
+                    pShape = pPhysics->CreateShape();
                     pShape->InitializeWithConvexHull(vecList);
                 }
                 break;
@@ -230,6 +236,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 {
                     if (vecList.size() % 3 == 0)
                     {
+                        pShape = pPhysics->CreateShape();
                         pShape->InitializeWithTriangleMesh(vecList);
                     }
                     else
@@ -253,6 +260,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                     {
                         if (vecHeightfieldData.size() == iSizeX * iSizeY)
                         {
+                            pShape = pPhysics->CreateShape();
                             pShape->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecHeightfieldData);
                         }
                         else
@@ -272,11 +280,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 break;
         }
 
-        if (argStream.HasErrors())
-        {
-            pPhysics->DestroyShape(pShape);
-        }
-        else
+        if (!argStream.HasErrors())
         {
             lua_pushshape(luaVM, pShape);
             return 1;
@@ -962,12 +966,23 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     }
                     break;
                 case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    argStream.ReadColor(color);
-                    if (!argStream.HasErrors())
+                    if (argStream.NextIsBool())
                     {
-                        pRigidBody->SetDebugColor(color);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        argStream.ReadBool(boolean);
+                        if (boolean == false)
+                        {
+                            pRigidBody->RemoveDebugColor();
+                        }
+                    }
+                    else
+                    {
+                        argStream.ReadColor(color);
+                        if (!argStream.HasErrors())
+                        {
+                            pRigidBody->SetDebugColor(color);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_FILTER_MASK:
@@ -1671,11 +1686,13 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                     lua_pushnumber(luaVM, 3);
                     lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
                     lua_settable(luaVM, -3);
+                    lua_settable(luaVM, -3);
                     const btCollisionObject* pCollisionObject = rayResult.m_collisionObject;
 
                     const btCollisionShape*     pShape = pCollisionObject->getCollisionShape();
                     CLuaPhysicsShape*           pLuaShape = luaMain->GetPhysicsShapeManager()->GetShape(pShape);
-                    CLuaPhysicsRigidBody*       pLuaRigidBody = luaMain->GetPhysicsRigidBodyManager()->GetRigidBodyFromCollisionShape(pShape);
+                    const btRigidBody*          pRigidBody = btRigidBody::upcast(pCollisionObject);
+                    CLuaPhysicsRigidBody*       pLuaRigidBody = luaMain->GetPhysicsRigidBodyManager()->GetRigidBody(pRigidBody);
                     CLuaPhysicsStaticCollision* pLuaStaticCollision = luaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromCollisionShape(pShape);
 
                     if (pLuaShape)
@@ -1696,7 +1713,6 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                         lua_pushstaticcollision(luaVM, pLuaStaticCollision);
                         lua_settable(luaVM, -3);
                     }
-                    lua_settable(luaVM, -3);
                 }
                 return 1;
             }

@@ -38,6 +38,12 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
     {
         pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
     }
+
+    if (m_pBtRigidBody && m_pBtRigidBody->getMotionState())
+    {
+        delete m_pBtRigidBody->getMotionState();
+    }
+
     m_pWorld->removeRigidBody(m_pBtRigidBody);
     m_pPhysicsShape->RemoveRigidBody(this);
     delete m_pBtRigidBody;
@@ -234,6 +240,11 @@ void CLuaPhysicsRigidBody::GetFilterGroup(int& iGroup)
 void CLuaPhysicsRigidBody::SetDebugColor(SColor color)
 {
     m_pBtRigidBody->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
+}
+
+void CLuaPhysicsRigidBody::RemoveDebugColor()
+{
+    m_pBtRigidBody->removeCustomDebugColor();
 }
 
 void CLuaPhysicsRigidBody::GetDebugColor(SColor& color)

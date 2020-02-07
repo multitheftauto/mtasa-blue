@@ -28,6 +28,7 @@ public:
     CLuaPhysicsRigidBody* AddRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape);
     CLuaPhysicsRigidBody* GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    CLuaPhysicsRigidBody* GetRigidBody(const btRigidBody* pBtRigidBody);
 
     unsigned long         GetRigidBodyCount() const { return m_RigidBodyList.size(); }
 

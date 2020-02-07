@@ -25,7 +25,7 @@ public:
 
     CLuaPhysicsConstraint* GetContraintFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsConstraint* AddConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
+    CLuaPhysicsConstraint* AddConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
     void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
     CLuaPhysicsConstraint* GetContraint(btTypedConstraint* pConstraint);

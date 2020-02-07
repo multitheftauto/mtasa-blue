@@ -45,7 +45,7 @@ void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const bt
     m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
 }
 
-CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain, unsigned long ulSeed) : ClassInit(this), CClientEntity(ID)
+CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
     // Init
     m_pManager = pManager;
@@ -60,10 +60,6 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pDispatcher = new btCollisionDispatcher(m_pCollisionConfiguration);
     m_pSolver = new btSequentialImpulseConstraintSolver();
 
-    if (ulSeed != 0)
-        GEN_srand(ulSeed);
-     m_pSolver->setRandSeed(GEN_rand());
-
     m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
     m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
@@ -73,7 +69,7 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
     m_pPhysicsManager->AddToList(this);
 }
 
-CClientPhysics::~CClientPhysics(void)
+CClientPhysics::~CClientPhysics()
 {
     // delete dynamics world
     delete m_pDynamicsWorld;
@@ -660,7 +656,7 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
 
 CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
 {
-    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(m_pDynamicsWorld, pRigidBodyA, pRigidBodyB);
+    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(this, pRigidBodyA, pRigidBodyB);
     return pContraint;
 }
 

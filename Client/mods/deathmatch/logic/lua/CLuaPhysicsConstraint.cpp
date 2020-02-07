@@ -26,14 +26,15 @@ btSolverConstraint, btUniversalConstraint, btSolve2LinearConstraint, btGearConst
 btPoint2PointConstraint, btHingeConstraint, btFixedConstraint, btSliderConstraint
 */
 
-CLuaPhysicsConstraint::CLuaPhysicsConstraint(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+CLuaPhysicsConstraint::CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
 {
-    m_pWorld = pWorld;
+    m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::CONSTRAINT);
     m_pRigidBodyA = pRigidBodyA;
     m_pRigidBodyB = pRigidBodyB;
     m_pJointFeedback = new btJointFeedback();
     m_bLastBreakingStatus = false;
+    m_pConstraint = nullptr;
     m_pRigidBodyA->AddConstraint(this);
     if (m_pRigidBodyB)
         m_pRigidBodyB->AddConstraint(this);
@@ -45,7 +46,13 @@ CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
     if (m_pRigidBodyB)
         m_pRigidBodyB->RemoveConstraint(this);
 
-    free(m_pJointFeedback);
+    if (m_pConstraint != nullptr)
+    {
+        m_pPhysics->GetDynamicsWorld()->removeConstraint(m_pConstraint);
+
+        delete m_pConstraint;
+    }
+    delete m_pJointFeedback;
     RemoveScriptID();
 }
 
@@ -68,7 +75,7 @@ void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVect
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
         m_pRigidBodyB->GetBtRigidBody()->activate(true);
     }
@@ -78,7 +85,7 @@ void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVect
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
     }
 }
@@ -95,7 +102,7 @@ void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivo
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
         m_pRigidBodyB->GetBtRigidBody()->activate(true);
     }
@@ -107,7 +114,7 @@ void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivo
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
     }
 }
@@ -130,7 +137,7 @@ void CLuaPhysicsConstraint::CreateFixedConstraint(CVector& vecPositionA, CVector
     pConstraint->enableFeedback(true);
     pConstraint->setJointFeedback(m_pJointFeedback);
     m_pConstraint = pConstraint;
-    m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+    m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
     m_pRigidBodyA->GetBtRigidBody()->activate(true);
     m_pRigidBodyB->GetBtRigidBody()->activate(true);
 }
@@ -159,7 +166,7 @@ void CLuaPhysicsConstraint::CreateSliderConstraint(CVector& vecPositionA, CVecto
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
         m_pRigidBodyB->GetBtRigidBody()->activate(true);
     }
@@ -178,7 +185,7 @@ void CLuaPhysicsConstraint::CreateSliderConstraint(CVector& vecPositionA, CVecto
         pConstraint->enableFeedback(true);
         pConstraint->setJointFeedback(m_pJointFeedback);
         m_pConstraint = pConstraint;
-        m_pWorld->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
+        m_pPhysics->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
         m_pRigidBodyA->GetBtRigidBody()->activate(true);
     }
 }

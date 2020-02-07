@@ -60,3 +60,14 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShap
 
     return nullptr;
 }
+
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBody(const btRigidBody* pBtRigidBody)
+{
+    for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)
+    {
+        if (pRigidBody->GetBtRigidBody() == pBtRigidBody)
+            return pRigidBody;
+    }
+
+    return nullptr;
+}
