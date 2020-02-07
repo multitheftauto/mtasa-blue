@@ -46,7 +46,6 @@ void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
     // assert(m_pBtShape == nullptr);
     pShape->setUserPointer((void*)this);
-    pShape->setUserIndex(3);
     m_pBtShape = pShape;
 }
 

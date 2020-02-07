@@ -20,13 +20,13 @@ class CLuaPhysicsRigidBody;
 class CLuaPhysicsRigidBody
 {
 public:
-    CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape);
+    CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape);
     ~CLuaPhysicsRigidBody();
 
     void RemoveScriptID();
 
     void Activate() { m_pBtRigidBody->activate(true); }
-    void UpdateAABB() { m_pWorld->updateSingleAabb(m_pBtRigidBody); }
+    void UpdateAABB() { m_pPhysics->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
     // for compound rigid bodies
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
@@ -76,7 +76,7 @@ public:
 
 private:
     uint                                 m_uiScriptID;
-    btDiscreteDynamicsWorld*             m_pWorld;
+    CClientPhysics*                      m_pPhysics;
     btRigidBody*                         m_pBtRigidBody;
     CLuaPhysicsShape*                    m_pPhysicsShape;
     std::vector<CLuaPhysicsConstraint*>  m_constraintList;

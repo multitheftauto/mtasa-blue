@@ -27,7 +27,6 @@ public:
 
     CLuaPhysicsShape*     AddShape(CClientPhysics* pPhysics);
     void                  RemoveShape(CLuaPhysicsShape* pShape);
-    CLuaPhysicsShape*     GetShape(const btCollisionShape* pShape);
     unsigned long         GetShapeCount() const { return m_ShapeList.size(); }
 
     CFastList<CLuaPhysicsShape*>::const_iterator IterBegin() { return m_ShapeList.begin(); }

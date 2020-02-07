@@ -28,9 +28,9 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint
     return pLuaRigidBody;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape)
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
 {
-    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pWorld, pShape);
+    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pPhysics, pShape);
     m_RigidBodyList.push_back(pRigidBody);
     return pRigidBody;
 }
@@ -61,13 +61,3 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShap
     return nullptr;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBody(const btRigidBody* pBtRigidBody)
-{
-    for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)
-    {
-        if (pRigidBody->GetBtRigidBody() == pBtRigidBody)
-            return pRigidBody;
-    }
-
-    return nullptr;
-}

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBody.cpp
  *  PURPOSE:     Lua timer class
@@ -16,27 +16,24 @@
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(btDiscreteDynamicsWorld* pWorld, CLuaPhysicsShape* pShape)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
 {
-    m_pWorld = pWorld;
+    m_pPhysics = pPhysics;
     m_pPhysicsShape = pShape;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RIGID_BODY);
 
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), 1.0f);
     m_pPhysicsShape->AddRigidBody(this);
     SetSleepingThresholds(0.1f, 0.1f);
-    m_pWorld->addRigidBody(m_pBtRigidBody);
-    pShape->GetBtShape()->setUserPointer((void*)this);
-    pShape->GetBtShape()->setUserIndex(2);
+    pPhysics->GetDynamicsWorld()->addRigidBody(m_pBtRigidBody);
+    m_pBtRigidBody->setUserPointer((void*)this);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
-    CClientPhysicsManager* pPhysicsManager = g_pClientGame->GetManager()->GetPhysicsManager();
-    CClientPhysics* pPhysics = pPhysicsManager->GetPhysics(m_pWorld);
     for (int i = 0; i < m_pBtRigidBody->getNumConstraintRefs(); i++)
     {
-        pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
+        m_pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
     }
 
     if (m_pBtRigidBody && m_pBtRigidBody->getMotionState())
@@ -44,7 +41,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
         delete m_pBtRigidBody->getMotionState();
     }
 
-    m_pWorld->removeRigidBody(m_pBtRigidBody);
+    m_pPhysics->GetDynamicsWorld()->removeRigidBody(m_pBtRigidBody);
     m_pPhysicsShape->RemoveRigidBody(this);
     delete m_pBtRigidBody;
     RemoveScriptID();

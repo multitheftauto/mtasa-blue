@@ -1687,32 +1687,49 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                     lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
                     lua_settable(luaVM, -3);
                     lua_settable(luaVM, -3);
+
                     const btCollisionObject* pCollisionObject = rayResult.m_collisionObject;
-
                     const btCollisionShape*     pShape = pCollisionObject->getCollisionShape();
-                    CLuaPhysicsShape*           pLuaShape = luaMain->GetPhysicsShapeManager()->GetShape(pShape);
                     const btRigidBody*          pRigidBody = btRigidBody::upcast(pCollisionObject);
-                    CLuaPhysicsRigidBody*       pLuaRigidBody = luaMain->GetPhysicsRigidBodyManager()->GetRigidBody(pRigidBody);
-                    CLuaPhysicsStaticCollision* pLuaStaticCollision = luaMain->GetPhysicsStaticCollisionManager()->GetStaticCollisionFromCollisionShape(pShape);
 
+                    CLuaPhysicsShape*           pLuaShape = nullptr;
+                    CLuaPhysicsRigidBody*       pLuaRigidBody = nullptr;
+                    CLuaPhysicsStaticCollision* pLuaStaticCollision = nullptr;
+
+                    if (pShape != nullptr)
+                    {
+                        pLuaShape = (CLuaPhysicsShape*)pShape->getUserPointer();
+                    }
+
+                    if (pRigidBody != nullptr)
+                    {
+                        pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+                    }
+                    else if (pCollisionObject != nullptr)
+                    {
+                        pLuaStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+                    }
+
+                    lua_pushstring(luaVM, "shape");
                     if (pLuaShape)
-                    {
-                        lua_pushstring(luaVM, "shape");
                         lua_pushshape(luaVM, pLuaShape);
-                        lua_settable(luaVM, -3);
-                    }
+                    else
+                        lua_pushboolean(luaVM, false);
+                    lua_settable(luaVM, -3);
+
+                    lua_pushstring(luaVM, "rigidbody");
                     if (pLuaRigidBody)
-                    {
-                        lua_pushstring(luaVM, "rigidbody");
                         lua_pushrigidbody(luaVM, pLuaRigidBody);
-                        lua_settable(luaVM, -3);
-                    }
+                    else
+                        lua_pushboolean(luaVM, false);
+                    lua_settable(luaVM, -3);
+
+                    lua_pushstring(luaVM, "staticcollision");
                     if (pLuaStaticCollision)
-                    {
-                        lua_pushstring(luaVM, "staticcollision");
                         lua_pushstaticcollision(luaVM, pLuaStaticCollision);
-                        lua_settable(luaVM, -3);
-                    }
+                    else
+                        lua_pushboolean(luaVM, false);
+                    lua_settable(luaVM, -3);
                 }
                 return 1;
             }
