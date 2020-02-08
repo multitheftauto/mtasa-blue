@@ -113,8 +113,9 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
         float                fHalf;
         float                fInitialChildCapacity;
         int                  iSizeX, iSizeY;
+        int                  index = 0;
         std::vector<CVector> vecList;
-        std::vector<float>   vecHeightfieldData;
+        std::vector<float>   vecFloat;
         switch (shapeType)
         {
             case PHYSICS_SHAPE_BOX:
@@ -177,7 +178,8 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                     }
                     if (fRadius > MAXIMUM_PRIMITIVE_SIZE || fHeight > MAXIMUM_PRIMITIVE_SIZE)
                     {
-                        argStream.SetCustomError(SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+                        argStream.SetCustomError(
+                            SString("Maximum radius and height must be equal or smaller than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
                         break;
                     }
                     pShape = pPhysics->CreateShape();
@@ -255,53 +257,74 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 }
                 break;
             case PHYSICS_SHAPE_TRIANGLE_MESH:
-                while (argStream.NextIsVector3D())
+                while (argStream.NextIsTable())
                 {
-                    argStream.ReadVector3D(vector);
-                    vecList.push_back(vector);
+                    vecFloat.clear();
+
+                    argStream.ReadNumberTable(vecFloat);
+                    index++;
+                    if (vecFloat.size() != 3)
+                    {
+                        argStream.SetCustomError(
+                            SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
+                        break;
+                    }
+
+                    if (std::abs(vecFloat[0]) > MAXIMUM_PRIMITIVE_SIZE || std::abs(vecFloat[1]) > MAXIMUM_PRIMITIVE_SIZE ||
+                        std::abs(vecFloat[2]) > MAXIMUM_PRIMITIVE_SIZE)
+                    {
+                        argStream.SetCustomError(
+                            SString("Triangle mesh vertex at index %i is outside maximum primivie size %.2f.", index, MAXIMUM_PRIMITIVE_SIZE).c_str());
+                        break;
+                    }
+
+                    vecList.emplace_back(vecFloat[0], vecFloat[1], vecFloat[2]);
                 }
                 if (!argStream.HasErrors())
                 {
-                    if (vecList.size() % 3 == 0)
+                    if (vecList.size() < 3)
                     {
-                        pShape = pPhysics->CreateShape();
-                        pShape->InitializeWithTriangleMesh(vecList);
+                        argStream.SetCustomError("Triangle mesh require at least 3 vertices");
+                        break;
                     }
-                    else
+                    if (vecList.size() % 3 != 0)
                     {
                         argStream.SetCustomError("Triangle mesh needs vertices count divisible by 3");
+                        break;
                     }
+                    pShape = pPhysics->CreateShape();
+                    pShape->InitializeWithTriangleMesh(vecList);
                 }
                 break;
             case PHYSICS_SHAPE_HEIGHTFIELD_TERRAIN:
                 argStream.ReadNumber(iSizeX);
                 argStream.ReadNumber(iSizeY);
                 if (argStream.NextIsTable())
-                    argStream.ReadNumberTable(vecHeightfieldData, iSizeX * iSizeY);
+                    argStream.ReadNumberTable(vecFloat, iSizeX * iSizeY);
                 else            // fill with empty table
                     for (int i = 0; i < iSizeX * iSizeY; i++)
-                        vecHeightfieldData.emplace_back(0);
+                        vecFloat.emplace_back(0);
 
                 if (!argStream.HasErrors())
                 {
                     if (iSizeX >= 3 && iSizeY >= 3 && iSizeX <= 8192 && iSizeY <= 8192)
                     {
-                        if (vecHeightfieldData.size() == iSizeX * iSizeY)
+                        if (vecFloat.size() == iSizeX * iSizeY)
                         {
                             pShape = pPhysics->CreateShape();
-                            pShape->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecHeightfieldData);
+                            pShape->InitializeWithHeightfieldTerrain(iSizeX, iSizeY, vecFloat);
                         }
                         else
                         {
-                            argStream.SetCustomError(SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY,
-                                                             vecHeightfieldData.size())
-                                                         .c_str());
+                            argStream.SetCustomError(
+                                SString("Heigthfield of size %ix%i require %i floats, got %i floats", iSizeX, iSizeY, iSizeX * iSizeY, vecFloat.size())
+                                    .c_str());
                         }
                     }
                     else
                     {
                         argStream.SetCustomError(
-                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecHeightfieldData.size())
+                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size())
                                 .c_str());
                     }
                 }
@@ -314,8 +337,10 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
             return 1;
         }
     }
-    else
+    if (argStream.HasErrors())
+    {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
 
     // Failed
     lua_pushboolean(luaVM, false);

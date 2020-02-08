@@ -21,6 +21,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics)
 {
     m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::SHAPE);
+    m_pBtShape = nullptr;
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
