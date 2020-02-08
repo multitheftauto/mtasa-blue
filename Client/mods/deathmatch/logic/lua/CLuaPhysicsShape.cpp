@@ -44,9 +44,11 @@ void CLuaPhysicsShape::RemoveScriptID()
 
 void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
-    // assert(m_pBtShape == nullptr);
-    pShape->setUserPointer((void*)this);
-    m_pBtShape = pShape;
+    if (pShape)
+    {
+        pShape->setUserPointer((void*)this);
+        m_pBtShape = pShape;
+    }
 }
 
 btBoxShape* CLuaPhysicsShape::InitializeWithBox(CVector& half)
@@ -132,30 +134,143 @@ void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
     ListRemove(m_pRigidBodyList, pRigidBody);
 }
 
-bool CLuaPhysicsShape::SetSize(CVector size)
+bool CLuaPhysicsShape::SetSize(CVector vecSize)
 {
     if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
     {
         btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
-        pInternalShape->setImplicitShapeDimensions(reinterpret_cast<btVector3&>(size));
+        vecSize.fX -= pInternalShape->getMargin();
+        vecSize.fY -= pInternalShape->getMargin();
+        vecSize.fZ -= pInternalShape->getMargin();
+        pInternalShape->setImplicitShapeDimensions(reinterpret_cast<btVector3&>(vecSize));
         UpdateRigids();
         return true;
     }
     return false;
 }
 
-bool CLuaPhysicsShape::GetSize(CVector& size)
+bool CLuaPhysicsShape::GetSize(CVector& vecSize)
 {
     if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
     {
         btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
         const btVector3        pSize = pInternalShape->getImplicitShapeDimensions();
-        size.fX = pSize.getX();
-        size.fY = pSize.getY();
-        size.fZ = pSize.getZ();
+        vecSize.fX = pSize.getX();
+        vecSize.fY = pSize.getY();
+        vecSize.fZ = pSize.getZ();
         return true;
     }
     return false;
+}
+
+bool CLuaPhysicsShape::SetRadius(float fRadius)
+{
+    float fHeight;
+    switch (m_pBtShape->getShapeType())
+    {
+        case SPHERE_SHAPE_PROXYTYPE:
+            ((btSphereShape*)m_pBtShape)->setUnscaledRadius(fRadius);
+            UpdateRigids();
+            return true;
+        case CAPSULE_SHAPE_PROXYTYPE:
+            GetHeight(fHeight);
+            ((btCapsuleShape*)m_pBtShape)->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
+            UpdateRigids();
+            return true;
+        case CONE_SHAPE_PROXYTYPE:
+            ((btConeShape*)m_pBtShape)->setRadius(fRadius);
+            UpdateRigids();
+            return true;
+        case CYLINDER_SHAPE_PROXYTYPE:
+            GetHeight(fHeight);
+            ((btCylinderShape*)m_pBtShape)->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
+            UpdateRigids();
+            return true;
+    }
+    return false;
+}
+
+bool CLuaPhysicsShape::GetRadius(float& fRadius)
+{
+    btVector3 implicityShapeDimension;
+    switch (m_pBtShape->getShapeType())
+    {
+        case SPHERE_SHAPE_PROXYTYPE:
+            fRadius = ((btSphereShape*)m_pBtShape)->getRadius();
+            return true;
+        case CAPSULE_SHAPE_PROXYTYPE:
+            implicityShapeDimension = ((btSphereShape*)m_pBtShape)->getImplicitShapeDimensions();
+            fRadius = implicityShapeDimension.getX();
+            return true;
+        case CONE_SHAPE_PROXYTYPE:
+            fRadius = ((btConeShape*)m_pBtShape)->getRadius();
+            return true;
+        case CYLINDER_SHAPE_PROXYTYPE:
+            fRadius = ((btCylinderShape*)m_pBtShape)->getRadius();
+            return true;
+    }
+    return false;
+}
+
+bool CLuaPhysicsShape::SetHeight(float fHeight)
+{
+    if (m_pBtShape->getShapeType() == CAPSULE_SHAPE_PROXYTYPE)
+    {
+        btCapsuleShape* pCapsule = (btCapsuleShape*)m_pBtShape;
+        float           fRadius;
+        GetRadius(fRadius);
+        fHeight /= 2;
+        pCapsule->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
+        UpdateRigids();
+        return true;
+    }
+    else if (m_pBtShape->getShapeType() == CONE_SHAPE_PROXYTYPE)
+    {
+        btConeShape* pCone = (btConeShape*)m_pBtShape;
+        pCone->setHeight(fHeight);
+        return true;
+    }
+    else if (m_pBtShape->getShapeType() == CYLINDER_SHAPE_PROXYTYPE)
+    {
+        btCylinderShape* pCylinder = (btCylinderShape*)m_pBtShape;
+        float            fRadius;
+        GetRadius(fRadius);
+        fRadius += pCylinder->getMargin();
+        fHeight -= pCylinder->getMargin();
+        pCylinder->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
+        return true;
+    }
+    return false;
+}
+
+bool CLuaPhysicsShape::GetHeight(float& fHeight)
+{
+    if (m_pBtShape->getShapeType() == CAPSULE_SHAPE_PROXYTYPE)
+    {
+        btCapsuleShape* pCapsule = (btCapsuleShape*)m_pBtShape;
+        fHeight = pCapsule->getHalfHeight();
+        fHeight *= 2;
+        return true;
+    }
+    else if (m_pBtShape->getShapeType() == CONE_SHAPE_PROXYTYPE)
+    {
+        btConeShape* pCone = (btConeShape*)m_pBtShape;
+        fHeight = pCone->getHeight();   
+        return true;
+    }
+    else if (m_pBtShape->getShapeType() == CYLINDER_SHAPE_PROXYTYPE)
+    {
+        btCylinderShape* pCylinder = (btCylinderShape*)m_pBtShape;
+        fHeight = pCylinder->getImplicitShapeDimensions().getY();
+        fHeight += pCylinder->getMargin();
+        return true;
+    }
+    return false;
+}
+
+void CLuaPhysicsShape::GetMargin(float& fMargin)
+{
+    fMargin = m_pBtShape->getMargin();
 }
 
 bool CLuaPhysicsShape::SetScale(CVector scale)

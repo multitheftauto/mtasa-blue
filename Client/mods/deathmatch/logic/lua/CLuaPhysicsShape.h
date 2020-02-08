@@ -47,12 +47,17 @@ public:
     void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
-    bool SetSize(CVector size);
-    bool GetSize(CVector& size);
+    bool SetSize(CVector vecSize);
+    bool GetSize(CVector& vecSize);
+    bool SetRadius(float fRadius);
+    bool GetRadius(float& fRadius);
+    bool SetHeight(float fHeight);
+    bool GetHeight(float& fHeight);
     bool SetScale(CVector scale);
     bool GetScale(CVector& scale);
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
     bool GetBoundingSphere(CVector& vecCenter, float& fRadius);
+    void GetMargin(float& fMargin);
 
     void UpdateRigids();
 

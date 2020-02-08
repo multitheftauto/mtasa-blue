@@ -136,7 +136,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<s
     btTransform transform;
     for (auto pair : halfList)
     {
-        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
+        if (pair.first.LengthSquared() >= MINIMUM_PRIMITIVE_SIZE)
         {
             transform.setIdentity();
             CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
@@ -161,7 +161,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
     if (m_btCollisionObject != nullptr)
         return nullptr;
 
-    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+    if (half.LengthSquared() < MINIMUM_PRIMITIVE_SIZE)
         return nullptr;
 
     if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
@@ -182,7 +182,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
     if (m_btCollisionObject != nullptr)
         return nullptr;
 
-    if (fRadius < MINIMUM_SHAPE_SIZE)
+    if (fRadius < MINIMUM_PRIMITIVE_SIZE)
         return nullptr;
 
     if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)

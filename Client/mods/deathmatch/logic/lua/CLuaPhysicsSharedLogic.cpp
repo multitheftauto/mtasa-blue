@@ -151,9 +151,6 @@ bool CLuaPhysicsSharedLogic::GetScale(btCollisionShape* pCollisionShape, CVector
 
 btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
 {
-    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
     btBoxShape* pBoxShape = new btBoxShape(reinterpret_cast<btVector3&>(half));
     btTransform transform;
     transform.setIdentity();
@@ -165,9 +162,6 @@ btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPositio
 
 btSphereShape* CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
 {
-    if (fRadius < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
     btSphereShape* pSphereShape = new btSphereShape(fRadius);
     btTransform    transform;
     transform.setIdentity();
@@ -179,33 +173,18 @@ btSphereShape* CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecP
 
 btCapsuleShape* CLuaPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeight)
 {
-    if (fRadius < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
-    if (fHeight < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
     btCapsuleShape* pSphereShape = new btCapsuleShape(fRadius, fHeight);
     return pSphereShape;
 }
 
 btConeShape* CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
 {
-    if (fRadius < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
-    if (fHeight < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
     btConeShape* pConeShape = new btConeShape(fRadius, fHeight);
     return pConeShape;
 }
 
 btCylinderShape* CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
 {
-    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
-        return nullptr;
-
     btCylinderShape* pCylinderShape = new btCylinderShape(reinterpret_cast<btVector3&>(half));
 
     return pCylinderShape;
@@ -283,7 +262,7 @@ btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>
 
 bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position, CVector& rotation)
 {
-    if (half.LengthSquared() < MINIMUM_SHAPE_SIZE)
+    if (half.LengthSquared() < MINIMUM_PRIMITIVE_SIZE)
         return false;
 
     if (pCollisionObject == nullptr)
@@ -310,7 +289,7 @@ bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector
 
 bool CLuaPhysicsSharedLogic::AddSphere(btCollisionObject* pCollisionObject, float fRadius, CVector& position, CVector& rotation)
 {
-    if (fRadius < MINIMUM_SHAPE_SIZE)
+    if (fRadius < MINIMUM_PRIMITIVE_SIZE)
         return false;
 
     if (pCollisionObject == nullptr)
@@ -365,7 +344,7 @@ bool CLuaPhysicsSharedLogic::AddBoxes(btCompoundShape* pCompoundShape, std::vect
     btTransform transform;
     for (std::pair<CVector, std::pair<CVector, CVector>> pair : halfList)
     {
-        if (pair.first.LengthSquared() >= MINIMUM_SHAPE_SIZE)
+        if (pair.first.LengthSquared() >= MINIMUM_PRIMITIVE_SIZE)
         {
             pBoxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(pair.first);
 
@@ -413,7 +392,7 @@ bool CLuaPhysicsSharedLogic::AddSpheres(btCompoundShape* pCollisionShape, std::v
     btTransform      transform;
     for (std::pair<float, CVector> pair : spheresList)
     {
-        if (pair.first >= MINIMUM_SHAPE_SIZE)
+        if (pair.first >= MINIMUM_PRIMITIVE_SIZE)
         {
             btSphereShape* pSphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(pair.first);
 

@@ -1,6 +1,7 @@
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
-#define MINIMUM_SHAPE_SIZE 0.003f            // to small collisions are not recommended
+#define MINIMUM_PRIMITIVE_SIZE 0.05f               // to small collisions are not recommended
+#define MAXIMUM_PRIMITIVE_SIZE 10000.0f            // to big collisions are not recommended too
 
 class RayCast_cb : public btTriangleRaycastCallback
 {
