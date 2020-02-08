@@ -194,6 +194,7 @@ enum ePhysicsDebugMode
     PHYSICS_DEBUG_FastWireframe,
     PHYSICS_DEBUG_DrawNormals,
     PHYSICS_DEBUG_DrawFrames,
+    PHYSICS_DEBUG_LINE_WIDTH,
     PHYSICS_DEBUG_MAX_DEBUG_DRAW_MODE
 };
 DECLARE_ENUM(ePhysicsDebugMode);

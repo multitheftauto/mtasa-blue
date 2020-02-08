@@ -265,8 +265,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                     index++;
                     if (vecFloat.size() != 3)
                     {
-                        argStream.SetCustomError(
-                            SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
+                        argStream.SetCustomError(SString("Triangle mesh vertex at index %i does not have 3 float numbers", index).c_str());
                         break;
                     }
 
@@ -324,8 +323,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                     else
                     {
                         argStream.SetCustomError(
-                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size())
-                                .c_str());
+                            SString("Size of heghtfield terrain must be between 3x3 and 8192x8192, got size %ix%i", iSizeX, iSizeY, vecFloat.size()).c_str());
                     }
                 }
                 break;
@@ -437,18 +435,34 @@ int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
 {
     CClientPhysics*   pPhysics;
     ePhysicsDebugMode eDebugMode;
-    bool              bEnabled;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadUserData(pPhysics);
     argStream.ReadEnumString(eDebugMode);
-    argStream.ReadBool(bEnabled);
-
     if (!argStream.HasErrors())
     {
-        if (pPhysics->SetDebugMode(eDebugMode, bEnabled))
+        if (eDebugMode == PHYSICS_DEBUG_LINE_WIDTH)
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+            float fWidth;
+            argStream.ReadNumber(fWidth);
+            if (!argStream.HasErrors())
+            {
+                pPhysics->SetDebugLineWidth(fWidth);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            bool bEnabled;
+            argStream.ReadBool(bEnabled);
+            if (!argStream.HasErrors())
+            {
+                if (pPhysics->SetDebugMode(eDebugMode, bEnabled))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
         }
     }
     else

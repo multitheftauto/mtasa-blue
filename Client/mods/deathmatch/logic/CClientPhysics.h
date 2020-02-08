@@ -17,36 +17,7 @@
 
 enum ePhysicsDebugMode;
 class CLuaPhysicsConstraint;
-
-class CDebugDrawer : public btIDebugDraw
-{
-    int                 m_debugMode;
-    CGraphicsInterface* m_pGraphics;
-    SColorARGB          color = SColorARGB(255, 255, 0, 0);
-    float               fLineWidth = 2.0f;
-
-public:
-    CDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};
-    ~CDebugDrawer(){};
-
-    void drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor);
-
-    void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
-
-    void drawSphere(const btVector3& p, btScalar radius, const btVector3& color){};
-
-    void drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& color, btScalar alpha);
-
-    void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color){};
-
-    void reportErrorWarning(const char* warningString){};
-
-    void draw3dText(const btVector3& location, const char* textString);
-
-    void setDebugMode(int debugMode) { m_debugMode = debugMode; };
-
-    int getDebugMode() const { return m_debugMode; }
-};
+class CPhysicsDebugDrawer;
 
 class CClientPhysics : public CClientEntity
 {
@@ -89,6 +60,7 @@ public:
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
+    void                        SetDebugLineWidth(float fWidth);
     void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
@@ -127,7 +99,7 @@ private:
     btSequentialImpulseConstraintSolver* m_pSolver;
     btDiscreteDynamicsWorld*             m_pDynamicsWorld;
 
-    CDebugDrawer* m_pDebugDrawer;
+    CPhysicsDebugDrawer* m_pDebugDrawer;
 
     int       m_iDeltaTimeMs;
     bool      m_bDrawDebugNextTime;

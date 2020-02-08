@@ -616,6 +616,7 @@ ADD_ENUM(PHYSICS_DEBUG_DrawConstraintLimits, "drawconstraintlimits")
 ADD_ENUM(PHYSICS_DEBUG_FastWireframe, "fastwireframe")
 ADD_ENUM(PHYSICS_DEBUG_DrawNormals, "drawnormals")
 ADD_ENUM(PHYSICS_DEBUG_DrawFrames, "drawframes")
+ADD_ENUM(PHYSICS_DEBUG_LINE_WIDTH, "linewidth")
 IMPLEMENT_ENUM_END("physics-debug-mode")
 
 IMPLEMENT_ENUM_BEGIN(ePhysicsConstraint)

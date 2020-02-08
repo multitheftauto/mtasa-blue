@@ -18,33 +18,7 @@
 #include "lua/CLuaPhysicsConstraintManager.h"
 #include "lua/CLuaPhysicsShapeManager.h"
 #include "bulletphysics3d/LinearMath/btRandom.h"
-
-void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor)
-{
-    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), fLineWidth, color, false);
-}
-
-void CDebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
-{
-    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(from), reinterpret_cast<const CVector&>(to), 2,
-                                  SColorARGB(255, lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f), false);
-}
-
-void CDebugDrawer::draw3dText(const btVector3& location, const char* textString)
-{
-    CVector vecScreen;
-    if (CStaticFunctionDefinitions::GetScreenFromWorldPosition((CVector) reinterpret_cast<const CVector&>(location), vecScreen, 50.0f, false))
-    {
-        m_pGraphics->DrawString(vecScreen.fX, vecScreen.fY, SColorARGB(255, 255, 255, 255), 2.0f, textString);
-    }
-}
-
-void CDebugDrawer::drawTriangle(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& lineColor, btScalar alpha)
-{
-    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(b), fLineWidth, color, false);
-    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(b), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
-    m_pGraphics->DrawLine3DQueued(reinterpret_cast<const CVector&>(a), reinterpret_cast<const CVector&>(c), fLineWidth, color, false);
-}
+#include "CPhysicsDebugDrawer.h"
 
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
@@ -63,7 +37,7 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
     m_pDynamicsWorld = new btDiscreteDynamicsWorld(m_pDispatcher, m_pOverlappingPairCache, m_pSolver, m_pCollisionConfiguration);
     m_pDynamicsWorld->setGravity(btVector3(0, 0, -9.81f));
-    m_pDebugDrawer = new CDebugDrawer(g_pCore->GetGraphics());
+    m_pDebugDrawer = new CPhysicsDebugDrawer(g_pCore->GetGraphics());
     m_pDebugDrawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer);
     // Add us to Physics manager's list
@@ -629,6 +603,11 @@ CLuaPhysicsShape* CClientPhysics::CreateShape()
 {
     CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape(this);
     return pShape;
+}
+
+void CClientPhysics::SetDebugLineWidth(float fWidth)
+{
+    m_pDebugDrawer->SetDebugLineWidth(fWidth);
 }
 
 bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)

@@ -194,7 +194,7 @@ btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
 {
     btCompoundShape* pCylinderShape = new btCompoundShape(true);
 
-    return pCylinderShape;
+    return pCylinderShape;  
 }
 
 btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)
