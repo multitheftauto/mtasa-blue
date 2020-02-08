@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <list>
 #include "../Client/game_sa/CCameraSA.h"
+#include "../mods/deathmatch/logic/Utils.h"
 #include "lua/CLuaPhysicsSharedLogic.h"
 #include "lua/CLuaPhysicsRigidBodyManager.h"
 #include "lua/CLuaPhysicsStaticCollisionManager.h"
@@ -242,7 +243,6 @@ void CClientPhysics::StartBuildCollisionFromGTA()
     }
 }
 
-#include "D:\mtablue\mtasa-blue\Client\mods\deathmatch\logic\Utils.h"
 void CClientPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadius)
 {
     if (!m_bObjectsCached)

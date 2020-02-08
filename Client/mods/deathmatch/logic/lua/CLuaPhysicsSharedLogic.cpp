@@ -203,7 +203,6 @@ btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, f
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
-
     btVector3 localInertia(0, 0, 0);
     pShape->calculateLocalInertia(fMass, localInertia);
 
