@@ -43,7 +43,6 @@ public:
     CLuaPhysicsRigidBody*                      CreateRigidBody(CLuaPhysicsShape* pShape);
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
-    void RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 

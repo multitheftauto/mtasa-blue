@@ -460,57 +460,6 @@ void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::Closest
     delete shapeInfo;
 }
 
-void CClientPhysics::RayCastDetailed(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
-{
-    btCollisionWorld::ClosestRayResultCallback rayResult = RayCastDefault(from, to, bFilterBackfaces);
-
-    lua_newtable(luaVM);
-    lua_pushstring(luaVM, "hit");
-    lua_pushboolean(luaVM, rayResult.hasHit());
-    lua_settable(luaVM, -3);
-    if (rayResult.hasHit())
-    {
-        lua_pushstring(luaVM, "hitpoint");
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getX());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getY());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, rayResult.m_hitPointWorld.getZ());
-        lua_settable(luaVM, -3);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "hitnormal");
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getX());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getY());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, rayResult.m_hitNormalWorld.getZ());
-        lua_settable(luaVM, -3);
-        lua_settable(luaVM, -3);
-
-        btCollisionWorld::LocalShapeInfo* shapeInfo = new btCollisionWorld::LocalShapeInfo();
-        btVector3                         hitNormal;
-        btCollisionWorld::LocalRayResult  localRay(rayResult.m_collisionObject, shapeInfo, hitNormal, rayResult.m_closestHitFraction);
-        rayResult.addSingleResult(localRay, true);
-
-        lua_pushstring(luaVM, "hitnormal");
-        lua_pushnumber(luaVM, shapeInfo->m_shapePart);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "triangleindex");
-        lua_pushnumber(luaVM, shapeInfo->m_triangleIndex);
-        lua_settable(luaVM, -3);
-    }
-}
-
 void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
 {
     btCollisionWorld::AllHitsRayResultCallback rayResult(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to));

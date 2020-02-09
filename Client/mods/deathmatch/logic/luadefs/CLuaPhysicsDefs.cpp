@@ -372,25 +372,25 @@ int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
             if (pRigidBody != nullptr)
             {
                 pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pRigidBody);
-                lua_pushboolean(luaVM, false);
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pStaticCollision != nullptr)
             {
                 pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
-                lua_pushboolean(luaVM, false);
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pConstraint != nullptr)
             {
                 pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint);
-                lua_pushboolean(luaVM, false);
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pShape != nullptr)
             {
                 pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape);
-                lua_pushboolean(luaVM, false);
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
@@ -471,6 +471,7 @@ int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
 int CLuaPhysicsDefs::PhysicsDrawDebug(lua_State* luaVM)
 {
     CClientPhysics*   pPhysics;
@@ -1879,11 +1880,6 @@ int CLuaPhysicsDefs::PhysicsRayCast(lua_State* luaVM)
                         lua_pushboolean(luaVM, false);
                     lua_settable(luaVM, -3);
                 }
-                return 1;
-            }
-            else if (eRayType == PHYSICS_RAY_DETAILED)
-            {
-                pPhysics->RayCastDetailed(luaVM, from, to, bFilterBackfaces);
                 return 1;
             }
             else if (eRayType == PHYSICS_RAY_MULTIPLE)

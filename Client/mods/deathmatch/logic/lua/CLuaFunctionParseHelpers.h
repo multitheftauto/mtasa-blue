@@ -213,7 +213,6 @@ enum ePhysicsRayType
 {
     PHYSICS_RAY_IS_CLEAR,            // return only boolean, hit or not
     PHYSICS_RAY_DEFAULT,             // hit, hitpoint, hit normal
-    PHYSICS_RAY_DETAILED,
     PHYSICS_RAY_MULTIPLE,            // table of hits
 
 };
