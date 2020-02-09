@@ -62,20 +62,13 @@ void CLuaPhysicsRigidBody::SetMass(float fMass)
     m_pBtRigidBody->setMassProps(fMass, localInertia);
 }
 
-void CLuaPhysicsRigidBody::SetStatic(bool bStatic)
+void CLuaPhysicsRigidBody::Activate()
 {
-    // not working
-    // if (bStatic)
-    //{
-    //    m_pBtRigidBody->setLinearFactor(btVector3(0, 0, 0));
-    //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-    //    m_pBtRigidBody->setActivationState(DISABLE_SIMULATION);
-    //}
-    // else
-    //{
-    //    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
-    //    m_pBtRigidBody->setActivationState(DISABLE_DEACTIVATION);
-    //}
+    m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+    m_pBtRigidBody->setActivationState(ACTIVE_TAG);
+    m_pBtRigidBody->activate(true);
+    m_pPhysics->GetDynamicsWorld()->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(m_pBtRigidBody->getBroadphaseHandle(),
+                                                                                                    m_pPhysics->GetDynamicsWorld()->getDispatcher());
 }
 
 void CLuaPhysicsRigidBody::SetMotionThreshold(float fThreshold)

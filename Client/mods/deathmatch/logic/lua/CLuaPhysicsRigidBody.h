@@ -25,13 +25,12 @@ public:
 
     void RemoveScriptID();
 
-    void Activate() { m_pBtRigidBody->activate(true); }
     void UpdateAABB() { m_pPhysics->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
     // for compound rigid bodies
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
 
-    void SetStatic(bool bStatic);
+    void Activate();
     void SetMass(float fMass);
     void SetPosition(CVector& vecPosition);
     void SetRotation(CVector& vecPosition);

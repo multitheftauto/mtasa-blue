@@ -970,13 +970,16 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
         {
             switch (eProperty)
             {
-                case PHYSICS_PROPERTY_STATIC:
+                case PHYSICS_PROPERTY_SLEEP:
                     argStream.ReadBool(boolean);
                     if (!argStream.HasErrors())
                     {
-                        pRigidBody->SetStatic(boolean);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        if (!boolean)
+                        {
+                            pRigidBody->Activate();
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_MASS:
