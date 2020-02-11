@@ -26,9 +26,13 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics)
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
-    for (int i = m_pRigidBodyList.size() - 1; i >= 0; i--)
+    for (int i = m_vecRigidBodyList.size() - 1; i >= 0; i--)
     {
-        m_pPhysics->DestroyRigidBody(m_pRigidBodyList[i]);
+        m_pPhysics->DestroyRigidBody(m_vecRigidBodyList[i]);
+    }
+    for (int i = m_vecStaticCollisions.size() - 1; i >= 0; i--)
+    {
+        m_pPhysics->DestroyStaticCollision(m_vecStaticCollisions[i]);
     }
     delete m_pBtShape;
     RemoveScriptID();
@@ -121,18 +125,34 @@ heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int 
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    if (ListContains(m_pRigidBodyList, pRigidBody))
+    if (ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
-    m_pRigidBodyList.push_back(pRigidBody);
+    m_vecRigidBodyList.push_back(pRigidBody);
 }
 
 void CLuaPhysicsShape::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    if (!ListContains(m_pRigidBodyList, pRigidBody))
+    if (!ListContains(m_vecRigidBodyList, pRigidBody))
         return;
 
-    ListRemove(m_pRigidBodyList, pRigidBody);
+    ListRemove(m_vecRigidBodyList, pRigidBody);
+}
+
+void CLuaPhysicsShape::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    if (ListContains(m_vecStaticCollisions, pStaticCollision))
+        return;
+
+    m_vecStaticCollisions.push_back(pStaticCollision);
+}
+
+void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    if (!ListContains(m_vecStaticCollisions, pStaticCollision))
+        return;
+
+    ListRemove(m_vecStaticCollisions, pStaticCollision);
 }
 
 bool CLuaPhysicsShape::SetSize(CVector vecSize)
@@ -318,7 +338,7 @@ const char* CLuaPhysicsShape::GetType()
 
 void CLuaPhysicsShape::UpdateRigids()
 {
-    for (auto const& rigidBody : m_pRigidBodyList)
+    for (auto const& rigidBody : m_vecRigidBodyList)
     {
         rigidBody->UpdateAABB();
         rigidBody->Activate();

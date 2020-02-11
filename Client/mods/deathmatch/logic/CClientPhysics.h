@@ -43,7 +43,7 @@ public:
     CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape);
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
-    CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionObject* pCollisionObject);
+    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
     CLuaPhysicsShape*           CreateShape();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 

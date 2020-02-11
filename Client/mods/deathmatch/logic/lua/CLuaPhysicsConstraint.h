@@ -47,6 +47,7 @@ public:
     float GetAppliedImpulse();
     btJointFeedback* GetJoinFeedback();
 
+    CClientPhysics*       GetPhysics() const { return m_pPhysics; }
     uint                  GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }

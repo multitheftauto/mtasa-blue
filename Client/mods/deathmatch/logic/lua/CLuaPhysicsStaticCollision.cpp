@@ -21,6 +21,7 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CClientPhysics* pPhysics)
     m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::STATIC_COLLISION);
     m_btCollisionObject = nullptr;
+    
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
@@ -91,6 +92,15 @@ void CLuaPhysicsStaticCollision::SetCollisionShape(btCollisionShape* pShape)
 {
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pShape);
+    m_btCollisionObject->setUserPointer((void*)this);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+}
+
+void CLuaPhysicsStaticCollision::SetCollisionShape(CLuaPhysicsShape* pShape)
+{
+    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
+    pShape->AddStaticCollision(this);
     m_btCollisionObject->setUserPointer((void*)this);
     m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
 }

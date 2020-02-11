@@ -67,8 +67,9 @@ public:
     bool IsSleeping();
     bool WantsSleeping();
 
-    uint         GetScriptID() const { return m_uiScriptID; }
-    btRigidBody* GetBtRigidBody() const { return m_pBtRigidBody; }
+    CClientPhysics* GetPhysics() const { return m_pPhysics; }
+    uint            GetScriptID() const { return m_uiScriptID; }
+    btRigidBody*    GetBtRigidBody() const { return m_pBtRigidBody; }
 
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }

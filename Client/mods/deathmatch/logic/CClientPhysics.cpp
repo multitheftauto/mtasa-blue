@@ -373,10 +373,10 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
     return pStaticCollision;
 }
 
-CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionObject* pCollisionObject)
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
 {
     CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
-    pStaticCollision->SetCollisionShape(pStaticCollision->GetCollisionObject()->getCollisionShape());
+    pStaticCollision->SetCollisionShape(pShape);
     return pStaticCollision;
 }
 

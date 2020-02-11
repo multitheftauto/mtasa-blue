@@ -30,6 +30,7 @@ public:
     // use only once
 
     void               SetCollisionShape(btCollisionShape* pShape);
+    void               SetCollisionShape(CLuaPhysicsShape* pShape);
     btCollisionObject* InitializeWithCompound();
 
     btCollisionObject* InitializeWithBox(CVector& vecHalf);
@@ -52,12 +53,12 @@ public:
     void SetFilterGroup(int iGroup);
     void GetFilterGroup(int& iGroup);
 
+    CClientPhysics*    GetPhysics() const { return m_pPhysics; }
     uint               GetScriptID() const { return m_uiScriptID; }
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
     void               SetCollisionHandler(const CLuaFunctionRef& iLuaFunction) { m_iLuaCollisionHandlerFunction = iLuaFunction; }
 
 private:
-    btDiscreteDynamicsWorld* m_pWorld;
     CClientPhysics*          m_pPhysics;
     uint m_uiScriptID;
     btCollisionObject*       m_btCollisionObject;

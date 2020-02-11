@@ -371,25 +371,25 @@ int CLuaPhysicsDefs::PhysicsDestroy(lua_State* luaVM)
         {
             if (pRigidBody != nullptr)
             {
-                pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pRigidBody);
+                pRigidBody->GetPhysics()->DestroyRigidBody(pRigidBody);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pStaticCollision != nullptr)
             {
-                pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
+                pStaticCollision->GetPhysics()->DestroyStaticCollision(pStaticCollision);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pConstraint != nullptr)
             {
-                pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint);
+                pConstraint->GetPhysics()->DestroyCostraint(pConstraint);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
             if (pShape != nullptr)
             {
-                pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape);
+                pShape->GetPhysics()->DestroyShape(pShape);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
@@ -617,7 +617,7 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(pShape->GetBtShape());
+        CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(pShape);
         lua_pushstaticcollision(luaVM, pStaticCollision);
         return 1;
     }
@@ -1727,15 +1727,23 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
         argStream.ReadUserData(pRigidBodyB);
 
+    if (pRigidBodyA && pRigidBodyB)
+    {
+        if (pRigidBodyA->GetPhysics() != pRigidBodyB->GetPhysics())
+        {
+            argStream.SetCustomError("Rigid bodies need to belong to the same physics world");
+        }
+    }
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsConstraint* pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
+        CLuaPhysicsConstraint* pConstraint = nullptr;
         CVector                vector[4];
         switch (eConstraint)
         {
             case PHYSICS_CONTRAINT_POINTTOPOINT:
                 argStream.ReadVector3D(vector[0], CVector(0, 0, 0));
                 argStream.ReadVector3D(vector[1], CVector(0, 0, 0));
+                pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
                 pConstraint->CreatePointToPointConstraint(vector[0], vector[1], bDisableCollisionsBetweenLinkedBodies);
                 break;
             case PHYSICS_CONTRAINT_HIDGE:
@@ -1743,6 +1751,7 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
                 argStream.ReadVector3D(vector[1]);
                 argStream.ReadVector3D(vector[2]);
                 argStream.ReadVector3D(vector[3]);
+                pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
                 pConstraint->CreateHidgeConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
                 break;
             case PHYSICS_CONTRAINT_FIXED:
@@ -1752,13 +1761,12 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
                     argStream.ReadVector3D(vector[1]);
                     argStream.ReadVector3D(vector[2]);
                     argStream.ReadVector3D(vector[3]);
+                    pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
                     pConstraint->CreateFixedConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
                 }
                 else
                 {
-                    pPhysics->DestroyCostraint(pConstraint);
-                    pConstraint = nullptr;
-                    argStream.SetCustomError("Physics fixed constraint requires both rigid bodies.");
+                    argStream.SetCustomError("Physics fixed constraint requires both rigid bodies");
                 }
                 break;
             case PHYSICS_CONTRAINT_SLIDER:
@@ -1766,6 +1774,7 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
                 argStream.ReadVector3D(vector[1]);
                 argStream.ReadVector3D(vector[2]);
                 argStream.ReadVector3D(vector[3]);
+                pConstraint = pPhysics->CreateConstraint(pRigidBodyA, pRigidBodyB);
                 pConstraint->CreateSliderConstraint(vector[0], vector[1], vector[2], vector[3], bDisableCollisionsBetweenLinkedBodies);
                 break;
         }
@@ -1961,6 +1970,7 @@ int CLuaPhysicsDefs::PhysicsGetRigidBodies(lua_State* luaVM)
                 lua_pushrigidbody(luaVM, iter);
                 lua_settable(luaVM, -3);
             }
+            return 1;
         }
     }
     else

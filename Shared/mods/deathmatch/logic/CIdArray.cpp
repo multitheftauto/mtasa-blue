@@ -212,6 +212,14 @@ static const char* GetIdClassTypeName(EIdClassType eClass)
             return "Vector4";
         case EIdClassType::MATRIX:
             return "Matrix";
+        case EIdClassType::SHAPE:
+            return "Shape";
+        case EIdClassType::STATIC_COLLISION:
+            return "Static Collision";
+        case EIdClassType::RIGID_BODY:
+            return "Rigid Body";
+        case EIdClassType::CONSTRAINT:
+            return "Constraint";
         default:
             return "None";
     }
