@@ -632,36 +632,48 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsAddShape(lua_State* luaVM)
 {
-    CLuaPhysicsRigidBody* pRigidBody;
-    ePhysicsShapeType     shapeType;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadEnumString(shapeType);
+    CLuaPhysicsShape* pCompoundShape;
+    CLuaPhysicsShape* pShape;
+    CVector           vecPosition;
+    CVector           vecRotation;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pCompoundShape);
+    argStream.ReadUserData(pShape);
+    argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
+    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
-        CVector vector;
-        float   fRadius;
-        switch (shapeType)
+        if (pCompoundShape && pShape)
         {
-            case PHYSICS_SHAPE_BOX:
-                argStream.ReadVector3D(vector);
-                if (!argStream.HasErrors())
-                {
-                    pRigidBody->AddBox(vector);
-                }
-                break;
-            case PHYSICS_SHAPE_SPHERE:
-                argStream.ReadNumber(fRadius);
-                if (!argStream.HasErrors())
-                {
-                    pRigidBody->AddSphere(fRadius);
-                }
-                break;
+            if (pCompoundShape->GetPhysics() != pShape->GetPhysics())
+            {
+                m_pScriptDebugging->LogCustom(luaVM, "Shapes need to belong to the same physics world");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
         }
+        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Target shape need to be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Shape can not be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        pCompoundShape->AddShape(pShape, vecPosition, vecRotation);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
-    else
+    if (argStream.HasErrors())
+    {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
 
     // Failed
     lua_pushboolean(luaVM, false);

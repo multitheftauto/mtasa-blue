@@ -47,6 +47,17 @@ void CLuaPhysicsShape::RemoveScriptID()
     }
 }
 
+void CLuaPhysicsShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
+{
+    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
+    btTransform      transform;
+    transform.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    pCompound->addChildShape(transform, pShape->GetBtShape());
+    pCompound->recalculateLocalAabb();
+}
+
 void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
     if (pShape)
@@ -331,7 +342,12 @@ bool CLuaPhysicsShape::GetBoundingSphere(CVector& vecCenter, float& fRadius)
     return true;
 }
 
-const char* CLuaPhysicsShape::GetType()
+BroadphaseNativeTypes CLuaPhysicsShape::GetType()
+{
+    return (BroadphaseNativeTypes)m_pBtShape->getShapeType();
+}
+
+const char* CLuaPhysicsShape::GetName()
 {
     return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);
 }

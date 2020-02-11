@@ -29,6 +29,8 @@ public:
     //void AddBox(CVector& vecHalf);
     //void AddSphere(float fRadius);
 
+    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation);
+
     btBoxShape*              InitializeWithBox(CVector& vecHalf);
     void                     FinalizeInitialization(btCollisionShape* pShape);
     btSphereShape*           InitializeWithSphere(float fRadius);
@@ -62,7 +64,8 @@ public:
 
     void UpdateRigids();
 
-    const char* GetType();
+    BroadphaseNativeTypes GetType();
+    const char* GetName();
 
 private:
     uint                               m_uiScriptID;
