@@ -3303,7 +3303,7 @@ bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, 
 {
     assert(pElement);
 
-    if (uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
+    if (uiPartyMax > m_pMainConfig->GetMaxPlayers() || uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
         return false;
 
     RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
