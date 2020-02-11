@@ -40,23 +40,24 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    CLuaPhysicsRigidBody*                      CreateRigidBody(CLuaPhysicsShape* pShape);
-    bool                                       RayCastIsClear(CVector from, CVector to);
-    btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
-    void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
-    void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
-
-    // btCollisionWorld::ClosestRayResultCallback RayCast(CVector from, CVector to);
-    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
-    void DestroyCostraint(btTypedConstraint* pConstraint);
-
+    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape);
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionObject* pCollisionObject);
     CLuaPhysicsShape*           CreateShape();
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
+
+    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    void DestroyCostraint(btTypedConstraint* pConstraint);
+    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+
+    bool                                       RayCastIsClear(CVector from, CVector to);
+    btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
+    void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
+    void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
+
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     void                        SetDebugLineWidth(float fWidth);
@@ -86,11 +87,13 @@ public:
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
 
+    std::vector<CLuaPhysicsShape*> GetShapes() const { return m_vecShapes; }
+    std::vector<CLuaPhysicsRigidBody*>  GetRigidBodies() const { return m_vecRigidBodies; }
+    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
+    std::vector<CLuaPhysicsConstraint*> GetConstraints() const { return m_vecConstraints; }
     btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
-    void ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionObject,
-                         btCollisionWorld::LocalRayResult* localRayResult = nullptr);
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
     btCollisionDispatcher*               m_pDispatcher;
@@ -111,6 +114,7 @@ private:
     bool       m_bBuildWorld;
     int        m_iSimulationCounter = 0;
     float      m_fSpeed = 1.0f;
+    bool       m_bDuringSimulation = false;
     int        m_iSubSteps = 10;
     float      m_fImpulseThreshold = 0.01f;
     bool       m_bSimulationEnabled = true;
@@ -121,4 +125,9 @@ private:
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
+
+    std::vector<CLuaPhysicsShape*>           m_vecShapes;
+    std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
+    std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
+    std::vector<CLuaPhysicsConstraint*>      m_vecConstraints;
 };

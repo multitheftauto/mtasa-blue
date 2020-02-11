@@ -46,6 +46,18 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
 CClientPhysics::~CClientPhysics()
 {
+    for (const auto& pConstraint : m_vecConstraints)
+        m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint);
+
+    for (const auto& pRigidBody : m_vecRigidBodies)
+        m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pRigidBody);
+
+    for (const auto& pStaticCollision : m_vecStaticCollisions)
+        m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
+
+    for (const auto& pShape : m_vecShapes)
+        m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape);
+
     // delete dynamics world
     delete m_pDynamicsWorld;
     delete m_pSolver;
@@ -254,12 +266,6 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
-{
-    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(this, pShape);
-    return pRigidBody;
-}
-
 void CClientPhysics::ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to,
                                btCollisionWorld::ClosestConvexResultCallback& result)
 {
@@ -281,183 +287,6 @@ btCollisionWorld::ClosestRayResultCallback CClientPhysics::RayCastDefault(CVecto
         RayCallback.m_flags = 1 << 0;
     m_pDynamicsWorld->rayTest(reinterpret_cast<btVector3&>(from), reinterpret_cast<btVector3&>(to), RayCallback);
     return RayCallback;
-}
-
-class GetInfoTriangleCallback : public btTriangleCallback
-{
-public:
-    int          m_triangleId = 0;
-    int          m_triangleIndex = 0;
-    virtual void processTriangle(btVector3* triangle, int partId, int triangleIndex)
-    {
-        if (triangleIndex == m_triangleIndex)
-        {
-            m_triangle[0] = btVector3(triangle[0].getX(), triangle[0].getY(), triangle[0].getZ());
-            m_triangle[1] = btVector3(triangle[1].getX(), triangle[1].getY(), triangle[1].getZ());
-            m_triangle[2] = btVector3(triangle[2].getX(), triangle[2].getY(), triangle[2].getZ());
-        }
-    }
-    btVector3 m_triangle[3];
-};
-
-void CClientPhysics::ContinueCasting(lua_State* luaVM, btCollisionWorld::ClosestRayResultCallback& rayResult, const btCollisionShape* pCollisionShape,
-                                     btCollisionWorld::LocalRayResult* localRayResult)
-{
-    const btCollisionShape* pShape;
-
-    if (pCollisionShape)
-    {
-        pShape = pCollisionShape;
-    }
-    else
-    {
-        pShape = rayResult.m_collisionObject->getCollisionShape();
-    }
-    if (!pShape)
-        return;
-
-    btCollisionWorld::LocalShapeInfo* shapeInfo = new btCollisionWorld::LocalShapeInfo();
-    btVector3                         hitNormal;
-    btCollisionWorld::LocalRayResult  localRay(rayResult.m_collisionObject, shapeInfo, hitNormal, rayResult.m_closestHitFraction);
-    rayResult.addSingleResult(localRay, true);
-
-    lua_pushstring(luaVM, "m_triangleIndex");
-    lua_pushnumber(luaVM, localRay.m_localShapeInfo->m_triangleIndex);
-    lua_settable(luaVM, -3);
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    btTransform                 pTransform;
-    btTransform                 pChildTransform;
-    pChildTransform.setIdentity();
-    pTransform.setIdentity();
-
-    int type = pShape->getUserIndex();
-    if (type == 1)
-    {
-        pStaticCollision = reinterpret_cast<CLuaPhysicsStaticCollision*>(pShape->getUserPointer());
-        pTransform = pStaticCollision->GetCollisionObject()->getWorldTransform();
-        if (pStaticCollision->GetCollisionObject()->getCollisionShape()->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
-        {
-            btCompoundShape* pCompoundShape = (btCompoundShape*)pStaticCollision->GetCollisionObject()->getCollisionShape();
-            pChildTransform = pCompoundShape->getChildTransform(localRay.m_localShapeInfo->m_shapePart);
-        }
-        pTransform = pStaticCollision->GetCollisionObject()->getWorldTransform();
-    }
-    else if (type == 2)
-    {
-        pRigidBody = reinterpret_cast<CLuaPhysicsRigidBody*>(pShape->getUserPointer());
-        pTransform = pRigidBody->GetBtRigidBody()->getWorldTransform();
-    }
-
-    lua_pushstring(luaVM, "type");
-    lua_pushnumber(luaVM, type);
-    lua_settable(luaVM, -3);
-
-    lua_pushstring(luaVM, "localnormal");
-    lua_newtable(luaVM);
-    lua_pushnumber(luaVM, 1);
-    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getX());
-    lua_settable(luaVM, -3);
-    lua_pushnumber(luaVM, 2);
-    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getY());
-    lua_settable(luaVM, -3);
-    lua_pushnumber(luaVM, 3);
-    lua_pushnumber(luaVM, localRay.m_hitNormalLocal.getZ());
-    lua_settable(luaVM, -3);
-    lua_settable(luaVM, -3);
-
-    lua_pushstring(luaVM, "closesthitfraction");
-    lua_pushnumber(luaVM, localRay.m_hitFraction);
-    lua_settable(luaVM, -3);
-
-    if (pShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
-    {
-        btBoxShape* pBox = (btBoxShape*)pShape;
-    }
-    else if (pShape->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
-    {
-        btCompoundShape*  pCompund = (btCompoundShape*)pShape;
-        btCollisionShape* pChildShape = pCompund->getChildShape(shapeInfo->m_shapePart);
-
-        lua_pushstring(luaVM, "child");
-        lua_newtable(luaVM);
-        if (pChildShape->getShapeType() != COMPOUND_SHAPE_PROXYTYPE)
-        {
-            ContinueCasting(luaVM, rayResult, pChildShape);
-        }
-        lua_settable(luaVM, -3);
-    }
-    else if (pShape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
-    {
-        pTransform *= pChildTransform;
-        btVector3 btFrom = reinterpret_cast<btVector3&>(rayResult.m_rayFromWorld);
-        btVector3 btTo = reinterpret_cast<btVector3&>(rayResult.m_rayToWorld);
-        pTransform(btTo);
-        pTransform(btFrom);
-        btBvhTriangleMeshShape* pMesh = (btBvhTriangleMeshShape*)pCollisionShape;
-        RayCast_cb              pCallback(btFrom, btTo);
-
-        pMesh->performRaycast(&pCallback, btFrom, btTo);
-
-        GetInfoTriangleCallback tmpCallback;
-        tmpCallback.m_triangleIndex = pCallback.m_triangleIndex;
-
-        btVector3 aabbMin(-10000, -10000, -10000);
-        btVector3 aabbMax(10000, 10000, 10000);
-        pMesh->processAllTriangles(&tmpCallback, aabbMin, aabbMax);
-
-        // pTransform.inverse()(tmpCallback.m_triangle[0]);
-        // pTransform.inverse()(tmpCallback.m_triangle[1]);
-        // pTransform.inverse()(tmpCallback.m_triangle[2]);
-
-        lua_pushstring(luaVM, "shapepart");
-        lua_pushnumber(luaVM, pCallback.m_partId);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "triangleindex");
-        lua_pushnumber(luaVM, pCallback.m_triangleIndex);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "vertex1");
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getX());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getY());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[0].getZ());
-        lua_settable(luaVM, -3);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "vertex2");
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getX());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getY());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[1].getZ());
-        lua_settable(luaVM, -3);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "vertex3");
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getX());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getY());
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, tmpCallback.m_triangle[2].getZ());
-        lua_settable(luaVM, -3);
-        lua_settable(luaVM, -3);
-    }
-    delete shapeInfo;
 }
 
 void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces)
@@ -508,16 +337,19 @@ void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to,
 
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
+    ListRemove(m_vecRigidBodies, pLuaRigidBody);
     m_pLuaMain->GetPhysicsRigidBodyManager()->RemoveRigidBody(pLuaRigidBody);
 }
 
 void CClientPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
+    ListRemove(m_vecShapes, pLuaShape);
     m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pLuaShape);
 }
 
 void CClientPhysics::DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint)
 {
+    ListRemove(m_vecConstraints, pLuaConstraint);
     m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
 }
 
@@ -525,25 +357,32 @@ void CClientPhysics::DestroyCostraint(btTypedConstraint* pConstraint)
 {
     CLuaPhysicsConstraint* pLuaConstraint = m_pLuaMain->GetPhysicsConstraintManager()->GetContraint(pConstraint);
     if (pLuaConstraint)
-        m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pLuaConstraint);
+        DestroyCostraint(pLuaConstraint);
+}
+
+void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
+{
+    ListRemove(m_vecStaticCollisions, pStaticCollision);
+    m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
 }
 
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(this);
+    m_vecStaticCollisions.push_back(pStaticCollision);
     return pStaticCollision;
 }
 
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionObject* pCollisionObject)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
     pStaticCollision->SetCollisionShape(pStaticCollision->GetCollisionObject()->getCollisionShape());
     return pStaticCollision;
 }
 
 CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionShape* pCollisionShape)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(m_pDynamicsWorld);
+    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
     pStaticCollision->SetCollisionShape(pCollisionShape);
     return pStaticCollision;
 }
@@ -551,7 +390,22 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionSha
 CLuaPhysicsShape* CClientPhysics::CreateShape()
 {
     CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape(this);
+    m_vecShapes.push_back(pShape);
     return pShape;
+}
+
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
+{
+    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(this, pShape);
+    m_vecRigidBodies.push_back(pRigidBody);
+    return pRigidBody;
+}
+
+CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+{
+    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(this, pRigidBodyA, pRigidBodyB);
+    m_vecConstraints.push_back(pContraint);
+    return pContraint;
 }
 
 void CClientPhysics::SetDebugLineWidth(float fWidth)
@@ -582,12 +436,6 @@ bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
     return true;
 }
 
-CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
-{
-    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(this, pRigidBodyA, pRigidBodyB);
-    return pContraint;
-}
-
 void CClientPhysics::StepSimulation()
 {
     if (!m_bSimulationEnabled)
@@ -596,13 +444,10 @@ void CClientPhysics::StepSimulation()
     CLuaArguments Arguments;
     CallEvent("onPhysicsPreSimulation", Arguments, true);
 
-    // CProfileManager::Start_Profile("internalSingleStepSimulation");
     m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
+
     m_iSimulationCounter++;
-    // CProfileManager::Stop_Profile();
-    // CProfileIterator* pIterator = CProfileManager::Get_Iterator();
-    // CProfileManager::Reset();
-    // Arguments.PushNumber(pIterator->Get_Current_Parent_Total_Time());
+
     CallEvent("onPhysicsPostSimulation", Arguments, true);
 }
 

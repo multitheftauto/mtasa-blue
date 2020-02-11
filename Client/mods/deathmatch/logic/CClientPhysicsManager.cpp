@@ -1,10 +1,10 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CClientPhysicsManager.cpp
- *  PURPOSE:     PointLights entity manager class
+ *  PURPOSE:     Physics manager class
  *
  *****************************************************************************/
 
@@ -18,13 +18,13 @@ CClientPhysicsManager::CClientPhysicsManager(CClientManager* pManager)
     m_pManager = pManager;
 }
 
-CClientPhysicsManager::~CClientPhysicsManager(void)
+CClientPhysicsManager::~CClientPhysicsManager()
 {
     // Make sure all the physics worlds are deleted
     DeleteAll();
 }
 
-void CClientPhysicsManager::DeleteAll(void)
+void CClientPhysicsManager::DeleteAll()
 {
     list<CClientPhysics*>::const_iterator iter = IterBegin();
     for (; iter != IterEnd(); iter++)

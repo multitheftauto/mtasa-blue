@@ -16,16 +16,21 @@
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(btDiscreteDynamicsWorld* pWorld)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CClientPhysics* pPhysics)
 {
-    m_pWorld = pWorld;
+    m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::STATIC_COLLISION);
     m_btCollisionObject = nullptr;
-    m_pHeightfieldTerrain = nullptr;
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
+    if (m_btCollisionObject)
+    {
+        m_pPhysics->GetDynamicsWorld()->removeCollisionObject(m_btCollisionObject);
+        delete m_btCollisionObject;
+    }
+
     RemoveScriptID();
 }
 
@@ -58,7 +63,6 @@ void CLuaPhysicsStaticCollision::GetScale(CVector& vecScale)
     CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), vecScale);
 }
 
-
 void CLuaPhysicsStaticCollision::SetDebugColor(SColor color)
 {
     m_btCollisionObject->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
@@ -73,14 +77,13 @@ void CLuaPhysicsStaticCollision::GetDebugColor(SColor& color)
     color.B = btColor.getZ() * 255;
 }
 
-
 btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
 {
     m_btCollisionObject = new btCollisionObject();
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_btCollisionObject->setCollisionShape(pCompoundShape);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->setUserPointer((void*)this);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -88,8 +91,8 @@ void CLuaPhysicsStaticCollision::SetCollisionShape(btCollisionShape* pShape)
 {
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pShape);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->setUserPointer((void*)this);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
 }
 
 void CLuaPhysicsStaticCollision::SetFilterMask(short sIndex, bool bEnabled)
@@ -152,7 +155,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<s
     SetPosition(position);
     SetRotation(rotation);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -171,9 +174,9 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
 
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pBoxShape);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     m_btCollisionObject->setUserPointer((void*)this);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -192,8 +195,8 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
 
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pSphereShape);
-    m_pWorld->addCollisionObject(m_btCollisionObject);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     m_btCollisionObject->setUserPointer((void*)this);
+    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }

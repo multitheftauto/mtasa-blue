@@ -22,7 +22,7 @@ class heightfieldTerrainShape;
 class CLuaPhysicsStaticCollision
 {
 public:
-    CLuaPhysicsStaticCollision(btDiscreteDynamicsWorld* pWorld);
+    CLuaPhysicsStaticCollision(CClientPhysics* pPhysics);
     ~CLuaPhysicsStaticCollision();
 
     void RemoveScriptID();
@@ -58,9 +58,9 @@ public:
 
 private:
     btDiscreteDynamicsWorld* m_pWorld;
+    CClientPhysics*          m_pPhysics;
     uint m_uiScriptID;
     btCollisionObject*       m_btCollisionObject;
-    heightfieldTerrainShape* m_pHeightfieldTerrain;
     CLuaFunctionRef          m_iLuaCollisionHandlerFunction;
 
 };

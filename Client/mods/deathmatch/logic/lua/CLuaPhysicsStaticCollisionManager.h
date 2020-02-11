@@ -25,7 +25,7 @@ public:
 
     CLuaPhysicsStaticCollision* GetStaticCollisionFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsStaticCollision* AddStaticCollision(btDiscreteDynamicsWorld* pWorld);
+    CLuaPhysicsStaticCollision*              AddStaticCollision(CClientPhysics* pPhysics);
     void                  RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     unsigned long               GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
     CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape);

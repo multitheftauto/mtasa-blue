@@ -186,6 +186,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     m_pGUIManager = m_pManager->GetGUIManager();
     m_pResourceManager = m_pManager->GetResourceManager();
     m_pProjectileManager = m_pManager->GetProjectileManager();
+    m_pPhysicsManager = m_pManager->GetPhysicsManager();
     m_pLocalServer = NULL;
 
     m_pLatentTransferManager = new CLatentTransferManager();
@@ -506,6 +507,9 @@ CClientGame::~CClientGame()
 
     // Packet handler
     SAFE_DELETE(m_pPacketHandler);
+
+    // Physics
+    SAFE_DELETE(m_pPhysicsManager);
 
     // Delete PerfStatManager
     delete CClientPerfStatManager::GetSingleton();
@@ -3943,6 +3947,7 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
+    m_pManager->GetPhysicsManager()->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
@@ -3950,7 +3955,6 @@ void CClientGame::PostWorldProcessHandler()
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
-    m_pManager->GetPhysicsManager()->DoPulse();
 
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();

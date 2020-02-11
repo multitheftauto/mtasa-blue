@@ -1427,6 +1427,10 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     pPhysics->GetTriggerConstraintvents(boolean);
                     lua_pushboolean(luaVM, boolean);
                     return 1;
+                case PHYSICS_PROPERTY_SIMULATION_ENABLED:
+                    pPhysics->GetSimulationEnabled(boolean);
+                    lua_pushboolean(luaVM, boolean);
+                    return 1;
                 case PHYSICS_PROPERTY_USE_CONTINOUS:
                     boolean = pPhysics->GetUseContinous();
                     lua_pushboolean(luaVM, boolean);
@@ -1915,14 +1919,12 @@ int CLuaPhysicsDefs::PhysicsGetShapes(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            CLuaPhysicsShapeManager* pShapeManager = luaMain->GetPhysicsShapeManager();
-
             lua_newtable(luaVM);
             int i = 1;
-            for (auto iter = pShapeManager->IterBegin(); iter != pShapeManager->IterEnd(); ++iter)
+            for (const auto& iter : pPhysics->GetShapes())
             {
                 lua_pushnumber(luaVM, i++);
-                lua_pushshape(luaVM, (*iter));
+                lua_pushshape(luaVM, iter);
                 lua_settable(luaVM, -3);
             }
             return 1;
@@ -1951,17 +1953,14 @@ int CLuaPhysicsDefs::PhysicsGetRigidBodies(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            CLuaPhysicsRigidBodyManager* pRigidBodyManager = luaMain->GetPhysicsRigidBodyManager();
-
             lua_newtable(luaVM);
             int i = 1;
-            for (auto iter = pRigidBodyManager->IterBegin(); iter != pRigidBodyManager->IterEnd(); ++iter)
+            for (const auto& iter : pPhysics->GetRigidBodies())
             {
                 lua_pushnumber(luaVM, i++);
-                lua_pushrigidbody(luaVM, (*iter));
+                lua_pushrigidbody(luaVM, iter);
                 lua_settable(luaVM, -3);
             }
-            return 1;
         }
     }
     else
@@ -1987,13 +1986,12 @@ int CLuaPhysicsDefs::PhysicsGetStaticCollisions(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            CLuaPhysicsStaticCollisionManager* pStaticCollisionManager = luaMain->GetPhysicsStaticCollisionManager();
             lua_newtable(luaVM);
             int i = 1;
-            for (auto iter = pStaticCollisionManager->IterBegin(); iter != pStaticCollisionManager->IterEnd(); ++iter)
+            for (const auto& iter : pPhysics->GetStaticCollisions())
             {
                 lua_pushnumber(luaVM, i++);
-                lua_pushstaticcollision(luaVM, (*iter));
+                lua_pushstaticcollision(luaVM, iter);
                 lua_settable(luaVM, -3);
             }
             return 1;
@@ -2022,13 +2020,12 @@ int CLuaPhysicsDefs::PhysicsGetConstraints(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            CLuaPhysicsConstraintManager* pConstraintManager = luaMain->GetPhysicsConstraintManager();
             lua_newtable(luaVM);
             int i = 1;
-            for (auto iter = pConstraintManager->IterBegin(); iter != pConstraintManager->IterEnd(); ++iter)
+            for (const auto& iter : pPhysics->GetConstraints())
             {
                 lua_pushnumber(luaVM, i++);
-                lua_pushconstraint(luaVM, (*iter));
+                lua_pushconstraint(luaVM, iter);
                 lua_settable(luaVM, -3);
             }
             return 1;

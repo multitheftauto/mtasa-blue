@@ -1,10 +1,10 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CClientPhysicsManager.h
- *  PURPOSE:     PointLights entity manager class header
+ *  PURPOSE:     Physics manager class
  *
  *****************************************************************************/
 
@@ -19,11 +19,11 @@ class CClientPhysicsManager
 
 public:
     CClientPhysicsManager(CClientManager* pManager);
-    ~CClientPhysicsManager(void);
+    ~CClientPhysicsManager();
 
 
-    std::list<CClientPhysics*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CClientPhysics*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CClientPhysics*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientPhysics*>::const_iterator IterEnd() { return m_List.end(); };
     CClientPhysics*                            GetPhysics(btDiscreteDynamicsWorld* pDynamicsWorld);
     void DoPulse();
 private:

@@ -17,7 +17,16 @@
 
 void CLuaPhysicsStaticCollisionManager::RemoveStaticCollision(CLuaPhysicsStaticCollision* pLuaStaticCollision)
 {
-    //free(pLuaStaticCollision);
+    assert(pLuaStaticCollision);
+
+    // Check if already removed
+    if (!ListContains(m_StaticCollisionList, pLuaStaticCollision))
+        return;
+
+    // Remove all references
+    ListRemove(m_StaticCollisionList, pLuaStaticCollision);
+
+    delete pLuaStaticCollision;
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromScriptID(unsigned int uiScriptID)
@@ -31,9 +40,9 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     return pLuaStaticCollision;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::AddStaticCollision(btDiscreteDynamicsWorld* pWorld)
+CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::AddStaticCollision(CClientPhysics* pPhysics)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pWorld);
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pPhysics);
     m_StaticCollisionList.push_back(pStaticCollision);
     return pStaticCollision;
 }
