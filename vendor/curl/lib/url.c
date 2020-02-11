@@ -106,7 +106,7 @@ bool curl_win32_idn_to_ascii(const char *in, char **out);
 #include "http2.h"
 #include "file.h"
 #include "curl_ldap.h"
-#include "ssh.h"
+#include "vssh/ssh.h"
 #include "imap.h"
 #include "url.h"
 #include "connect.h"
@@ -317,12 +317,16 @@ static void up_free(struct Curl_easy *data)
  * when curl_easy_perform() is invoked.
  */
 
-CURLcode Curl_close(struct Curl_easy *data)
+CURLcode Curl_close(struct Curl_easy **datap)
 {
   struct Curl_multi *m;
+  struct Curl_easy *data;
 
-  if(!data)
+  if(!datap || !*datap)
     return CURLE_OK;
+
+  data = *datap;
+  *datap = NULL;
 
   Curl_expire_clear(data); /* shut off timers */
 
@@ -374,7 +378,7 @@ CURLcode Curl_close(struct Curl_easy *data)
   Curl_safefree(data->state.buffer);
   Curl_safefree(data->state.headerbuff);
   Curl_safefree(data->state.ulbuf);
-  Curl_flush_cookies(data, 1);
+  Curl_flush_cookies(data, TRUE);
 #ifdef USE_ALTSVC
   Curl_altsvc_save(data->asi, data->set.str[STRING_ALTSVC]);
   Curl_altsvc_cleanup(data->asi);
@@ -398,6 +402,12 @@ CURLcode Curl_close(struct Curl_easy *data)
     data->share->dirty--;
     Curl_share_unlock(data, CURL_LOCK_DATA_SHARE);
   }
+
+#ifndef CURL_DISABLE_DOH
+  free(data->req.doh.probe[0].serverdoh.memory);
+  free(data->req.doh.probe[1].serverdoh.memory);
+  curl_slist_free_all(data->req.doh.headers);
+#endif
 
   /* destruct wildcard structures if it is needed */
   Curl_wildcard_dtor(&data->wildcard);
@@ -612,8 +622,6 @@ CURLcode Curl_open(struct Curl_easy **curl)
 
       data->progress.flags |= PGRS_HIDE;
       data->state.current_speed = -1; /* init to negative == impossible */
-
-      Curl_http2_init_state(&data->state);
     }
   }
 
@@ -666,7 +674,7 @@ static void conn_reset_all_postponed_data(struct connectdata *conn)
 }
 #else  /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 /* Use "do-nothing" macro instead of function when workaround not used */
-#define conn_reset_all_postponed_data(c) do {} WHILE_FALSE
+#define conn_reset_all_postponed_data(c) do {} while(0)
 #endif /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 
 
@@ -1041,7 +1049,7 @@ ConnectionExists(struct Curl_easy *data,
     /* We can't multiplex if we don't know anything about the server */
     if(canmultiplex) {
       if(bundle->multiuse == BUNDLE_UNKNOWN) {
-        if((bundle->multiuse == BUNDLE_UNKNOWN) && data->set.pipewait) {
+        if(data->set.pipewait) {
           infof(data, "Server doesn't support multiplex yet, wait\n");
           *waitpipe = TRUE;
           Curl_conncache_unlock(data);
@@ -1074,16 +1082,15 @@ ConnectionExists(struct Curl_easy *data,
       check = curr->ptr;
       curr = curr->next;
 
-      if(check->bits.connect_only)
-        /* connect-only connections will not be reused */
+      if(check->bits.connect_only || check->bits.close)
+        /* connect-only or to-be-closed connections will not be reused */
         continue;
 
       multiplexed = CONN_INUSE(check) &&
         (bundle->multiuse == BUNDLE_MULTIPLEX);
 
       if(canmultiplex) {
-        if(check->bits.protoconnstart && check->bits.close)
-          continue;
+        ;
       }
       else {
         if(multiplexed) {
@@ -1103,12 +1110,9 @@ ConnectionExists(struct Curl_easy *data,
           }
         }
 
-        if((check->sock[FIRSTSOCKET] == CURL_SOCKET_BAD) ||
-           check->bits.close) {
-          if(!check->bits.close)
-            foundPendingCandidate = TRUE;
-          /* Don't pick a connection that hasn't connected yet or that is going
-             to get closed. */
+        if(check->sock[FIRSTSOCKET] == CURL_SOCKET_BAD) {
+          foundPendingCandidate = TRUE;
+          /* Don't pick a connection that hasn't connected yet */
           infof(data, "Connection #%ld isn't open enough, can't reuse\n",
                 check->connection_id);
           continue;
@@ -1186,8 +1190,7 @@ ConnectionExists(struct Curl_easy *data,
            already in use so we skip it */
         continue;
 
-      if(CONN_INUSE(check) && check->data &&
-         (check->data->multi != needle->data->multi))
+      if(check->data && (check->data->multi != needle->data->multi))
         /* this could be subject for multiplex use, but only if they belong to
          * the same multi handle */
         continue;
@@ -1277,8 +1280,14 @@ ConnectionExists(struct Curl_easy *data,
            partway through a handshake!) */
         if(wantNTLMhttp) {
           if(strcmp(needle->user, check->user) ||
-             strcmp(needle->passwd, check->passwd))
+             strcmp(needle->passwd, check->passwd)) {
+
+            /* we prefer a credential match, but this is at least a connection
+               that can be reused and "upgraded" to NTLM */
+            if(check->http_ntlm_state == NTLMSTATE_NONE)
+              chosen = check;
             continue;
+          }
         }
         else if(check->http_ntlm_state != NTLMSTATE_NONE) {
           /* Connection is using NTLM auth but we don't want NTLM */
@@ -1629,6 +1638,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
      it may live on without (this specific) Curl_easy */
   conn->fclosesocket = data->set.fclosesocket;
   conn->closesocket_client = data->set.closesocket_client;
+  conn->lastused = Curl_now(); /* used now */
 
   return conn;
   error:
@@ -1787,6 +1797,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   }
 
   if(!data->set.uh) {
+    char *newurl;
     uc = curl_url_set(uh, CURLUPART_URL, data->change.url,
                     CURLU_GUESS_SCHEME |
                     CURLU_NON_SUPPORT_SCHEME |
@@ -1797,6 +1808,15 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
       DEBUGF(infof(data, "curl_url_set rejected %s\n", data->change.url));
       return Curl_uc_to_curlcode(uc);
     }
+
+    /* after it was parsed, get the generated normalized version */
+    uc = curl_url_get(uh, CURLUPART_URL, &newurl, 0);
+    if(uc)
+      return Curl_uc_to_curlcode(uc);
+    if(data->change.url_alloc)
+      free(data->change.url);
+    data->change.url = newurl;
+    data->change.url_alloc = TRUE;
   }
 
   uc = curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
@@ -1863,11 +1883,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   (void)curl_url_get(uh, CURLUPART_QUERY, &data->state.up.query, 0);
 
   hostname = data->state.up.hostname;
-  if(!hostname)
-    /* this is for file:// transfers, get a dummy made */
-    hostname = (char *)"";
-
-  if(hostname[0] == '[') {
+  if(hostname && hostname[0] == '[') {
     /* This looks like an IPv6 address literal. See if there is an address
        scope. */
     size_t hlen;
@@ -1881,7 +1897,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   }
 
   /* make sure the connect struct gets its own copy of the host name */
-  conn->host.rawalloc = strdup(hostname);
+  conn->host.rawalloc = strdup(hostname ? hostname : "");
   if(!conn->host.rawalloc)
     return CURLE_OUT_OF_MEMORY;
   conn->host.name = conn->host.rawalloc;
@@ -1969,6 +1985,11 @@ void Curl_free_request_state(struct Curl_easy *data)
 {
   Curl_safefree(data->req.protop);
   Curl_safefree(data->req.newurl);
+
+#ifndef CURL_DISABLE_DOH
+  Curl_close(&data->req.doh.probe[0].easy);
+  Curl_close(&data->req.doh.probe[1].easy);
+#endif
 }
 
 
@@ -2754,13 +2775,6 @@ static CURLcode set_login(struct connectdata *conn)
       result = CURLE_OUT_OF_MEMORY;
   }
 
-  /* if there's a user without password, consider password blank */
-  if(conn->user && !conn->passwd) {
-    conn->passwd = strdup("");
-    if(!conn->passwd)
-      result = CURLE_OUT_OF_MEMORY;
-  }
-
   return result;
 }
 
@@ -3519,6 +3533,10 @@ static CURLcode create_conn(struct Curl_easy *data,
     data->set.str[STRING_SSL_CIPHER13_LIST_ORIG];
   data->set.proxy_ssl.primary.cipher_list13 =
     data->set.str[STRING_SSL_CIPHER13_LIST_PROXY];
+  data->set.ssl.primary.pinned_key =
+    data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG];
+  data->set.proxy_ssl.primary.pinned_key =
+    data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY];
 
   data->set.ssl.CRLfile = data->set.str[STRING_SSL_CRLFILE_ORIG];
   data->set.proxy_ssl.CRLfile = data->set.str[STRING_SSL_CRLFILE_PROXY];
@@ -3575,25 +3593,6 @@ static CURLcode create_conn(struct Curl_easy *data,
     reuse = FALSE;
   else
     reuse = ConnectionExists(data, conn, &conn_temp, &force_reuse, &waitpipe);
-
-  /* If we found a reusable connection that is now marked as in use, we may
-     still want to open a new connection if we are multiplexing. */
-  if(reuse && !force_reuse && IsMultiplexingPossible(data, conn_temp)) {
-    size_t multiplexed = CONN_INUSE(conn_temp);
-    if(multiplexed > 0) {
-      infof(data, "Found connection %ld, with %zu requests on it\n",
-            conn_temp->connection_id, multiplexed);
-
-      if(Curl_conncache_bundle_size(conn_temp) < max_host_connections &&
-         Curl_conncache_size(data) < max_total_connections) {
-        /* We want a new connection anyway */
-        reuse = FALSE;
-
-        infof(data, "We can reuse, but we want a new connection anyway\n");
-        Curl_conncache_return_conn(conn_temp);
-      }
-    }
-  }
 
   if(reuse) {
     /*
@@ -3815,7 +3814,9 @@ CURLcode Curl_setup_conn(struct connectdata *conn,
   }
   else {
     Curl_pgrsTime(data, TIMER_CONNECT);    /* we're connected already */
-    Curl_pgrsTime(data, TIMER_APPCONNECT); /* we're connected already */
+    if(conn->ssl[FIRSTSOCKET].use ||
+       (conn->handler->protocol & PROTO_FAMILY_SSH))
+      Curl_pgrsTime(data, TIMER_APPCONNECT); /* we're connected already */
     conn->bits.tcpconnect[FIRSTSOCKET] = TRUE;
     *protocol_done = TRUE;
     Curl_updateconninfo(conn, conn->sock[FIRSTSOCKET]);

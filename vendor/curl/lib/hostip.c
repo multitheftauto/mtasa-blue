@@ -749,7 +749,7 @@ clean_up:
                                             conn->created) / 1000;
 
     /* the alarm period is counted in even number of seconds */
-    unsigned long alarm_set = prev_alarm - elapsed_secs;
+    unsigned long alarm_set = (unsigned long)(prev_alarm - elapsed_secs);
 
     if(!alarm_set ||
        ((alarm_set >= 0x80000000) && (prev_alarm < 0x80000000)) ) {
@@ -1021,6 +1021,10 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
 CURLcode Curl_resolv_check(struct connectdata *conn,
                            struct Curl_dns_entry **dns)
 {
+#if defined(CURL_DISABLE_DOH) && !defined(CURLRES_ASYNCH)
+  (void)dns;
+#endif
+
   if(conn->data->set.doh)
     return Curl_doh_is_resolved(conn, dns);
   return Curl_resolver_is_resolved(conn, dns);

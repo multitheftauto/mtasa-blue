@@ -330,7 +330,6 @@ namespace
         {false, "getPlayerTarget", "getPedTarget"},
         {false, "getPlayerTargetStart", "getPedTargetStart"},
         {false, "getPlayerTargetEnd", "getPedTargetEnd"},
-        {false, "getPlayerTargetRange", "getPedTargetRange"},
         {false, "getPlayerTargetCollision", "getPedTargetCollision"},
         {false, "getPlayerWeaponSlot", "getPedWeaponSlot"},
         {false, "getPlayerWeapon", "getPedWeapon"},

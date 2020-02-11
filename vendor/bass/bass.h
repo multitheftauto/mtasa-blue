@@ -19,7 +19,9 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef uint64_t QWORD;
-#ifndef __OBJC__
+#ifdef __OBJC__
+#include <objc/objc.h>
+#else
 typedef int BOOL;
 #endif
 #ifndef TRUE
@@ -70,6 +72,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_ERROR_START	9	// BASS_Start has not been successfully called
 #define BASS_ERROR_SSL		10	// SSL/HTTPS support isn't available
 #define BASS_ERROR_ALREADY	14	// already initialized/paused/whatever
+#define BASS_ERROR_NOTAUDIO	17	// file does not contain audio
 #define BASS_ERROR_NOCHAN	18	// can't get a free channel
 #define BASS_ERROR_ILLTYPE	19	// an illegal type was specified
 #define BASS_ERROR_ILLPARAM	20	// an illegal parameter was specified
@@ -94,6 +97,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_ERROR_CODEC	44	// codec is not available/supported
 #define BASS_ERROR_ENDED	45	// the channel/file has ended
 #define BASS_ERROR_BUSY		46	// the device is busy
+#define BASS_ERROR_UNSTREAMABLE	47	// unstreamable file
 #define BASS_ERROR_UNKNOWN	-1	// some other mystery problem
 
 // BASS_SetConfig options
@@ -119,6 +123,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_DEV_BUFFER		27
 #define BASS_CONFIG_REC_LOOPBACK	28
 #define BASS_CONFIG_VISTA_TRUEPOS	30
+#define BASS_CONFIG_IOS_SESSION		34
 #define BASS_CONFIG_IOS_MIXAUDIO	34
 #define BASS_CONFIG_DEV_DEFAULT		36
 #define BASS_CONFIG_NET_READTIMEOUT	37
@@ -142,14 +147,23 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_AM_DISABLE		58
 #define BASS_CONFIG_NET_PLAYLIST_DEPTH	59
 #define BASS_CONFIG_NET_PREBUF_WAIT	60
+#define BASS_CONFIG_ANDROID_SESSIONID	62
 #define BASS_CONFIG_WASAPI_PERSIST	65
 #define BASS_CONFIG_REC_WASAPI		66
+#define BASS_CONFIG_ANDROID_AAUDIO	67
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
 #define BASS_CONFIG_NET_PROXY		17
 #define BASS_CONFIG_IOS_NOTIFY		46
 #define BASS_CONFIG_LIBSSL			64
+
+// BASS_CONFIG_IOS_SESSION flags
+#define BASS_IOS_SESSION_MIX		1
+#define BASS_IOS_SESSION_DUCK		2
+#define BASS_IOS_SESSION_AMBIENT	4
+#define BASS_IOS_SESSION_SPEAKER	8
+#define BASS_IOS_SESSION_DISABLE	16
 
 // BASS_Init flags
 #define BASS_DEVICE_8BITS		1		// 8 bit
@@ -376,6 +390,7 @@ typedef struct {
 #define BASS_CTYPE_SAMPLE		1
 #define BASS_CTYPE_RECORD		2
 #define BASS_CTYPE_STREAM		0x10000
+#define BASS_CTYPE_STREAM_VORBIS	0x10002
 #define BASS_CTYPE_STREAM_OGG	0x10002
 #define BASS_CTYPE_STREAM_MP1	0x10003
 #define BASS_CTYPE_STREAM_MP2	0x10004
@@ -497,8 +512,7 @@ enum
 #define EAX_PRESET_PSYCHOTIC       EAX_ENVIRONMENT_PSYCHOTIC,0.486F,7.563F,0.806F
 
 typedef DWORD (CALLBACK STREAMPROC)(HSTREAM handle, void *buffer, DWORD length, void *user);
-/* User stream callback function. NOTE: A stream function should obviously be as quick
-as possible, other streams (and MOD musics) can't be mixed until it's finished.
+/* User stream callback function.
 handle : The stream that needs writing
 buffer : Buffer to write the samples in
 length : Number of bytes to write
@@ -568,23 +582,19 @@ user   : The 'user' parameter value given when calling BASS_StreamCreateURL */
 #define BASS_SYNC_OGG_CHANGE	12
 #define BASS_SYNC_DEV_FAIL		14
 #define BASS_SYNC_DEV_FORMAT	15
+#define BASS_SYNC_THREAD		0x20000000	// flag: call sync in other thread
 #define BASS_SYNC_MIXTIME		0x40000000	// flag: sync at mixtime, else at playtime
 #define BASS_SYNC_ONETIME		0x80000000	// flag: sync only once, else continuously
 
 typedef void (CALLBACK SYNCPROC)(HSYNC handle, DWORD channel, DWORD data, void *user);
-/* Sync callback function. NOTE: a sync callback function should be very
-quick as other syncs can't be processed until it has finished. If the sync
-is a "mixtime" sync, then other streams and MOD musics can't be mixed until
-it's finished either.
+/* Sync callback function.
 handle : The sync that has occured
 channel: Channel that the sync occured in
 data   : Additional data associated with the sync's occurance
 user   : The 'user' parameter given when calling BASS_ChannelSetSync */
 
 typedef void (CALLBACK DSPPROC)(HDSP handle, DWORD channel, void *buffer, DWORD length, void *user);
-/* DSP callback function. NOTE: A DSP function should obviously be as quick as
-possible... other DSP functions, streams and MOD musics can not be processed
-until it's finished.
+/* DSP callback function.
 handle : The DSP handle
 channel: Channel that the DSP is being applied to
 buffer : Buffer to apply the DSP to
@@ -620,6 +630,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_ATTRIB_NORAMP			11
 #define BASS_ATTRIB_BITRATE			12
 #define BASS_ATTRIB_BUFFER			13
+#define BASS_ATTRIB_GRANULE			14
 #define BASS_ATTRIB_MUSIC_AMPLIFY	0x100
 #define BASS_ATTRIB_MUSIC_PANSEP	0x101
 #define BASS_ATTRIB_MUSIC_PSCALER	0x102
