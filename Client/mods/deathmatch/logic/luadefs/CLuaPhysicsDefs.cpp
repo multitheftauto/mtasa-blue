@@ -26,7 +26,8 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
         {"physicsCreateShape", PhysicsCreateShape},
-        {"physicsAddShape", PhysicsAddShape},
+        {"physicsAddChildShape", PhysicsAddChildShape},
+        {"physicsGetChildShapes", PhysicsGetChildShapes},
         {"physicsGetShapes", PhysicsGetShapes},
         {"physicsGetRigidBodies", PhysicsGetRigidBodies},
         {"physicsGetStaticCollisions", PhysicsGetStaticCollisions},
@@ -630,7 +631,7 @@ int CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsAddShape(lua_State* luaVM)
+int CLuaPhysicsDefs::PhysicsAddChildShape(lua_State* luaVM)
 {
     CLuaPhysicsShape* pCompoundShape;
     CLuaPhysicsShape* pShape;
@@ -668,6 +669,42 @@ int CLuaPhysicsDefs::PhysicsAddShape(lua_State* luaVM)
         }
         pCompoundShape->AddShape(pShape, vecPosition, vecRotation);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetChildShapes(lua_State* luaVM)
+{
+    CLuaPhysicsShape* pCompoundShape;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pCompoundShape);
+
+    if (!argStream.HasErrors())
+    {
+        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Shape need to be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        lua_newtable(luaVM);
+        int i = 1;
+        for (const auto& pShape : pCompoundShape->GetChildShapes())
+        {
+            lua_pushnumber(luaVM, i++);
+            lua_pushshape(luaVM, pShape);
+            lua_settable(luaVM, -3);
+        }
         return 1;
     }
     if (argStream.HasErrors())

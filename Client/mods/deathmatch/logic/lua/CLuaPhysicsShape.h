@@ -49,6 +49,7 @@ public:
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                  AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void                  RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    std::vector<CLuaPhysicsShape*> GetChildShapes();
 
     bool SetSize(CVector vecSize);
     bool GetSize(CVector& vecSize);

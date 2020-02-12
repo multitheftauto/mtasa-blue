@@ -58,6 +58,19 @@ void CLuaPhysicsShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, C
     pCompound->recalculateLocalAabb();
 }
 
+std::vector<CLuaPhysicsShape*> CLuaPhysicsShape::GetChildShapes()
+{
+    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
+    std::vector<CLuaPhysicsShape*> vecChildShapes;
+    btCollisionShape*              pCollisionShape;
+    for (int i = 0; i < pCompound->getNumChildShapes(); i++)
+    {
+        pCollisionShape = pCompound->getChildShape(i);
+        vecChildShapes.push_back((CLuaPhysicsShape*)pCollisionShape->getUserPointer());
+    }
+    return vecChildShapes;
+}
+
 void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
     if (pShape)
@@ -287,7 +300,7 @@ bool CLuaPhysicsShape::GetHeight(float& fHeight)
     else if (m_pBtShape->getShapeType() == CONE_SHAPE_PROXYTYPE)
     {
         btConeShape* pCone = (btConeShape*)m_pBtShape;
-        fHeight = pCone->getHeight();   
+        fHeight = pCone->getHeight();
         return true;
     }
     else if (m_pBtShape->getShapeType() == CYLINDER_SHAPE_PROXYTYPE)
