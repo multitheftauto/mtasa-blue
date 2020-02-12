@@ -25,6 +25,7 @@ public:
     LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsAddChildShape);
     LUA_DECLARE(PhysicsGetChildShapes);
+    LUA_DECLARE(PhysicsGetChildShapeOffsets);
     LUA_DECLARE(PhysicsGetShapes);
     LUA_DECLARE(PhysicsGetRigidBodies);
     LUA_DECLARE(PhysicsGetStaticCollisions);

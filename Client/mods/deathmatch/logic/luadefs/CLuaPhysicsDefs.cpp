@@ -28,6 +28,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateShape", PhysicsCreateShape},
         {"physicsAddChildShape", PhysicsAddChildShape},
         {"physicsGetChildShapes", PhysicsGetChildShapes},
+        {"physicsGetChildShapeOffsets", PhysicsGetChildShapeOffsets},
         {"physicsGetShapes", PhysicsGetShapes},
         {"physicsGetRigidBodies", PhysicsGetRigidBodies},
         {"physicsGetStaticCollisions", PhysicsGetStaticCollisions},
@@ -706,6 +707,53 @@ int CLuaPhysicsDefs::PhysicsGetChildShapes(lua_State* luaVM)
             lua_settable(luaVM, -3);
         }
         return 1;
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetChildShapeOffsets(lua_State* luaVM)
+{
+    CLuaPhysicsShape* pCompoundShape;
+    int               iIndex;
+    ePhysicsShapeType shapeType;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pCompoundShape);
+    argStream.ReadNumber(iIndex);
+
+    if (!argStream.HasErrors())
+    {
+        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Shape need to be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        iIndex--;
+        CVector position, rotation;
+        if (pCompoundShape->GetChildShapeOffsets(iIndex, position, rotation))
+        {
+            lua_pushnumber(luaVM, position.fX);
+            lua_pushnumber(luaVM, position.fY);
+            lua_pushnumber(luaVM, position.fZ);
+            lua_pushnumber(luaVM, rotation.fX);
+            lua_pushnumber(luaVM, rotation.fY);
+            lua_pushnumber(luaVM, rotation.fZ);
+            return 6;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Invalid index");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     if (argStream.HasErrors())
     {

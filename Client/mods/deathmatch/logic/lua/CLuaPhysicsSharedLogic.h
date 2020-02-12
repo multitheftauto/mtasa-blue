@@ -79,10 +79,11 @@ class CLuaPhysicsSharedLogic
     {
 public:
     static const char* GetShapeName(btCollisionShape* pShape);
-    static void EulerToQuat(btVector3 rotation, btQuaternion& result);
 
     static bool SetPosition(btTransform& transform, CVector& vecRotation);
     static bool SetRotation(btTransform& transform, CVector& vecRotation);
+    static bool GetRotation(btTransform& transform, CVector& vecRotation);
+    static bool GetPosition(btTransform& transform, CVector& vecPosition);
 
     static bool SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition);
     static bool SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation);
@@ -115,5 +116,6 @@ public:
     static void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static CColModelSAInterface* GetModelCollisionInterface(ushort usModel);
 
+    static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
     static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
 };

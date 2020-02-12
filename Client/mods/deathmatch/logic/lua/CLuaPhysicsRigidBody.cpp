@@ -113,13 +113,12 @@ void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
-    vecPosition = reinterpret_cast<CVector&>(transform.getOrigin());
+    CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
 }
 
 void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
 {
     btTransform  transform = m_pBtRigidBody->getWorldTransform();
-    btQuaternion quanternion = transform.getRotation();
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pBtRigidBody->setWorldTransform(transform);
 }
@@ -127,10 +126,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
 void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
 {
     btTransform  transform = m_pBtRigidBody->getWorldTransform();
-    btQuaternion quanternion = transform.getRotation();
-    btVector3    rotation;
-    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
-    vecRotation = reinterpret_cast<CVector&>(rotation);
+    CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
 }
 
 void CLuaPhysicsRigidBody::SetLinearVelocity(CVector& vecVelocity)

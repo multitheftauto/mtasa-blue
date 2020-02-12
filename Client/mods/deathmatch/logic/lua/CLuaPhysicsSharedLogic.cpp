@@ -93,24 +93,26 @@ const char* CLuaPhysicsSharedLogic::GetShapeName(btCollisionShape* pShape)
     return "unknown";
 }
 
-void CLuaPhysicsSharedLogic::EulerToQuat(btVector3 rotation, btQuaternion& result)
-{
-    btScalar cy = cos(.5f * rotation.getY()), sy = sin(.5f * rotation.getY()), cx = cos(.5f * rotation.getX()), sx = sin(.5f * rotation.getX()),
-             cz = cos(.5f * rotation.getZ()), sz = sin(.5f * rotation.getZ());
-
-    btScalar cycx = cy * cx, sysx = sy * sx, sxcy = sx * cy, cxsy = cx * sy;
-
-    result.setW(cycx * cz - sysx * sz);
-    result.setX(sxcy * cz - cxsy * sz);
-    result.setY(cxsy * cz + sxcy * sz);
-    result.setZ(cycx * sz + sysx * cz);
-}
-
 bool CLuaPhysicsSharedLogic::SetRotation(btTransform& transform, CVector& vecRotation)
 {
-    btQuaternion quaternion;
-    EulerToQuat(reinterpret_cast<btVector3&>(vecRotation), quaternion);
+    btQuaternion quaternion = transform.getRotation();
+    EulerToQuaternion(reinterpret_cast<btVector3&>(vecRotation), quaternion);
     transform.setRotation(quaternion);
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetRotation(btTransform& transform, CVector& vecRotation)
+{
+    btQuaternion quanternion = transform.getRotation();
+    btVector3    rotation;
+    CLuaPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
+    vecRotation = reinterpret_cast<CVector&>(rotation);
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetPosition(btTransform& transform, CVector& vecPosition)
+{
+    vecPosition = reinterpret_cast<CVector&>(transform.getOrigin());
     return true;
 }
 
@@ -469,6 +471,25 @@ CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort 
         }
     }
     return nullptr;
+}
+
+void CLuaPhysicsSharedLogic::EulerToQuaternion(btVector3 rotation, btQuaternion& result)
+{
+    float c1 = cos(rotation.getX() / 2 * PI / 180);
+    float c2 = cos(rotation.getY() / 2 * PI / 180);
+    float c3 = cos(rotation.getZ() / 2 * PI / 180);
+    float s1 = sin(rotation.getX() / 2 * PI / 180);
+    float s2 = sin(rotation.getY() / 2 * PI / 180);
+    float s3 = sin(rotation.getZ() / 2 * PI / 180);
+    float x = s1 * c2 * c3 + c1 * s2 * s3;
+    float y = c1 * s2 * c3 - s1 * c2 * s3;
+    float z = c1 * c2 * s3 + s1 * s2 * c3;
+    float w = c1 * c2 * c3 - s1 * s2 * s3;
+
+    result.setW(w);
+    result.setX(x);
+    result.setY(y);
+    result.setZ(z);
 }
 
 void CLuaPhysicsSharedLogic::QuaternionToEuler(btQuaternion rotation, btVector3& result)

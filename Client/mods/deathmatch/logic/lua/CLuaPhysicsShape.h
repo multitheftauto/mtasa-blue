@@ -50,6 +50,7 @@ public:
     void                  AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void                  RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     std::vector<CLuaPhysicsShape*> GetChildShapes();
+    bool GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
 
     bool SetSize(CVector vecSize);
     bool GetSize(CVector& vecSize);
