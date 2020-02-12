@@ -1,8 +1,6 @@
 #include "StdInc.h"
 #include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "CLuaPhysicsSharedLogic.h"
-#include "../Client/game_sa/CModelInfoSA.h"
-#include "../Client/game_sa/CColModelSA.h"
 
 #define ARRAY_ModelInfo 0xA9B0C8
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -196,7 +194,7 @@ btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
 {
     btCompoundShape* pCylinderShape = new btCompoundShape(true);
 
-    return pCylinderShape;  
+    return pCylinderShape;
 }
 
 btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)
@@ -205,7 +203,7 @@ btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, f
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
-    btVector3 localInertia(0, 0, 0);
+    btVector3             localInertia(0, 0, 0);
     pShape->calculateLocalInertia(fMass, localInertia);
 
     btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
@@ -225,7 +223,6 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<C
                                   reinterpret_cast<btVector3&>(vecIndices[i + 2]));
     }
     btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(triangleMesh, true);
-
     return trimeshShape;
 }
 
@@ -456,7 +453,7 @@ void CLuaPhysicsSharedLogic::QueryUserDefinedObjects(CVector vecPosition, float 
     }
 }
 
-CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort usModel)
+CColDataSA* CLuaPhysicsSharedLogic::GetModelColData(ushort usModel)
 {
     if (CClientObjectManager::IsValidModel(usModel))
     {
@@ -466,7 +463,7 @@ CColModelSAInterface* CLuaPhysicsSharedLogic::GetModelCollisionInterface(ushort 
             CColModelSAInterface* pColModelInterface = pModelInfo->pColModel;
             if (pColModelInterface)
             {
-                return pColModelInterface;
+                return pColModelInterface->pColData;
             }
         }
     }

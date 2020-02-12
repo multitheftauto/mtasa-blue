@@ -91,129 +91,73 @@ void CClientPhysics::SetUseContinous(bool bUse)
     m_pDynamicsWorld->getDispatchInfo().m_useContinuous = bUse;
 }
 
+CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
+{
+    CLuaPhysicsShape* pShape = CreateShapeFromModel(usModelId);
+    if (pShape == nullptr)
+        return nullptr;
+
+    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision(pShape);
+    pStaticCollision->SetPosition(vecPosition);
+    pStaticCollision->SetRotation(vecRotation);
+    return pStaticCollision;
+}
+
 CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
-    CColModelSAInterface* pColModelInterface = CLuaPhysicsSharedLogic::GetModelCollisionInterface(usModelId);
-    if (pColModelInterface == nullptr)
+    CLuaPhysicsShape* pShape = CreateShapeFromModel(usModelId);
+    if (pShape == nullptr)
         return nullptr;
 
-    CColDataSA* pColData = pColModelInterface->pColData;
-    if (pColData == nullptr)
-        return nullptr;
-
-    CColSphereSA   pColSphere;
-    CColBoxSA      pColBox;
-    CColTriangleSA pColTriangle;
-    CVector        position, halfSize;
-
-    std::vector<std::pair<CVector, std::pair<CVector, CVector>>> halfList;
-    std::vector<std::pair<float, CVector>>                       sphereList;
-    std::vector<CVector>                                         indexList;
-
-    for (uint i = 0; pColData->numColBoxes > i; i++)
-    {
-        pColBox = pColData->pColBoxes[i];
-        position = (pColBox.max + pColBox.min) / 2;
-        halfSize = (pColBox.max - pColBox.min) * 0.5;
-        halfList.push_back(std::pair<CVector, std::pair<CVector, CVector>>(halfSize, std::pair<CVector, CVector>(position, CVector())));
-    }
-    for (uint i = 0; pColData->numColSpheres > i; i++)
-    {
-        pColSphere = pColData->pColSpheres[i];
-        sphereList.push_back(std::pair<float, CVector>(pColSphere.fRadius, pColSphere.vecCenter));
-    }
-    for (uint i = 0; pColData->numColTriangles > i; i++)
-    {
-        pColTriangle = pColData->pColTriangles[i];
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[0]].getVector());
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
-    }
-
-    if (halfList.size() == 0 && indexList.size() < 3)
-        return nullptr;
-
-    CLuaPhysicsShape*     pShape = CreateShape();
-    btCompoundShape*      pCompoundShape = pShape->InitializeWithCompound();
     CLuaPhysicsRigidBody* pRigidBody = CreateRigidBody(pShape);
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
-    if (halfList.size() > 0)
-    {
-        CLuaPhysicsSharedLogic::AddBoxes(pCompoundShape, halfList);
-    }
-    if (sphereList.size() > 0)
-    {
-        CLuaPhysicsSharedLogic::AddSpheres(pCompoundShape, sphereList);
-    }
-    // if (indexList.size() >= 3)
-    //{
-    //    CLuaPhysicsSharedLogic::AddTriangleMesh(pCollisionShape, indexList);
-    //}
-
-    btVector3 localInertia(0, 0, 0);
-    pCompoundShape->calculateLocalInertia(1.0f, localInertia);
-    pRigidBody->GetBtRigidBody()->setMassProps(1.0f, localInertia);
     return pRigidBody;
 }
 
-CLuaPhysicsStaticCollision* CClientPhysics::BuildStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
+CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
 {
-    CColModelSAInterface* pColModelInterface = CLuaPhysicsSharedLogic::GetModelCollisionInterface(usModelId);
-    if (pColModelInterface == nullptr)
-        return nullptr;
-
-    CColDataSA* pColData = pColModelInterface->pColData;
+    CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
     if (pColData == nullptr)
         return nullptr;
+
+    if ((pColData->numColBoxes == 0) && (pColData->pColTriangles == 0) && (pColData->numColSpheres == 0))
+        return nullptr; // don't create empty collisions
 
     CColSphereSA   pColSphere;
     CColBoxSA      pColBox;
     CColTriangleSA pColTriangle;
     CVector        position, halfSize;
 
-    std::vector<std::pair<CVector, std::pair<CVector, CVector>>> halfList;
-    std::vector<CVector>                                         indexList;
+    CLuaPhysicsShape* pCompoundShape = CreateShape();
+    btCompoundShape*  pCompound = pCompoundShape->InitializeWithCompound();
 
     for (uint i = 0; pColData->numColBoxes > i; i++)
     {
         pColBox = pColData->pColBoxes[i];
         position = (pColBox.max + pColBox.min) / 2;
         halfSize = (pColBox.max - pColBox.min) * 0.5;
-        halfList.push_back(std::pair<CVector, std::pair<CVector, CVector>>(halfSize, std::pair<CVector, CVector>(position, CVector())));
-    }
-    for (uint i = 0; pColData->numColTriangles > i; i++)
-    {
-        pColTriangle = pColData->pColTriangles[i];
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[0]].getVector());
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
-        indexList.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
+        CLuaPhysicsShape* pBoxShape = CreateShape();
+        pBoxShape->InitializeWithBox(halfSize);
+        pCompoundShape->AddShape(pBoxShape, position);
     }
 
-    if (halfList.size() == 0 && indexList.size() < 3)
-        return nullptr;
+    if (pColData->numColTriangles > 0)
+    {
+        CLuaPhysicsShape*    pTriangleMesh = CreateShape();
+        std::vector<CVector> vecIndices;
+        for (uint i = 0; pColData->numColTriangles > i; i++)
+        {
+            pColTriangle = pColData->pColTriangles[i];
+            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[0]].getVector());
+            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
+            vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
+        }
+        pTriangleMesh->InitializeWithTriangleMesh(vecIndices);
+        pCompoundShape->AddShape(pTriangleMesh, CVector(0, 0, 0));
+    }
 
-    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
-    btCollisionObject*          pCollisionObject = pStaticCollision->InitializeWithCompound();
-    pStaticCollision->SetPosition(vecPosition);
-    pStaticCollision->SetRotation(vecRotation);
-    if (halfList.size() > 0)
-    {
-        CLuaPhysicsSharedLogic::AddBoxes(pCollisionObject, halfList);
-    }
-    if (indexList.size() >= 3)
-    {
-        CLuaPhysicsSharedLogic::AddTriangleMesh(pCollisionObject, indexList);
-    }
-    btCompoundShape*  pCompoundShape = (btCompoundShape*)pCollisionObject->getCollisionShape();
-    btCollisionShape* child;
-    for (int i = 0; i < pCompoundShape->getNumChildShapes(); i++)
-    {
-        child = pCompoundShape->getChildShape(i);
-        child->setUserPointer(pCompoundShape->getUserPointer());
-        child->setUserIndex(1);
-    }
-    return pStaticCollision;
+    return pCompoundShape;
 }
 
 void CClientPhysics::StartBuildCollisionFromGTA()
@@ -243,10 +187,8 @@ void CClientPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadiu
         {
             if (DistanceBetweenPoints3D(it->second.first, center) < fRadius)
             {
-                if (BuildStaticCollisionFromModel(it->first, it->second.first, it->second.second))
-                {
-                    pWorldObjects.erase(it--);
-                }
+                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+                pWorldObjects.erase(it--);
             }
         }
     }
@@ -258,10 +200,8 @@ void CClientPhysics::BuildCollisionFromGTA()
     {
         for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
         {
-            if (BuildStaticCollisionFromModel(it->first, it->second.first, it->second.second))
-            {
-                pWorldObjects.erase(it--);
-            }
+            CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+            pWorldObjects.erase(it--);
         }
     }
 }

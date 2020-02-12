@@ -1,73 +1,9 @@
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "bulletphysics3d/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
+#include "../Client/game_sa/CModelInfoSA.h"
+#include "../Client/game_sa/CColModelSA.h"
 #define MINIMUM_PRIMITIVE_SIZE 0.05f               // to small collisions are not recommended
 #define MAXIMUM_PRIMITIVE_SIZE 10000.0f            // to big collisions are not recommended too
-
-class RayCast_cb : public btTriangleRaycastCallback
-{
-public:
-    RayCast_cb(const btVector3& from, const btVector3& to) : btTriangleRaycastCallback(from, to, kF_None){};
-
-    ~RayCast_cb(void){};
-
-    btScalar reportHit(const btVector3& hitNormalLocal, btScalar hitFraction, int partId, int triangleIndex)
-    {
-        m_hitNormalLocal = hitNormalLocal;
-        m_hitFraction = hitFraction;
-        m_partId = partId;
-        m_triangleIndex = triangleIndex;
-        return (hitFraction < m_hitFraction ? hitFraction : m_hitFraction);
-    };
-    btVector3 m_hitNormalLocal;
-    btScalar  m_hitFraction;            // Distance between source and intersection
-    int       m_partId;
-    int       m_triangleIndex;
-};
-
-class btDistanceConstraint : public btPoint2PointConstraint
-{
-protected:
-    btScalar m_distance;
-
-public:
-    btDistanceConstraint(btRigidBody& rbA, btRigidBody& rbB, const btVector3& pivotInA, const btVector3& pivotInB, btScalar dist)
-        : btPoint2PointConstraint(rbA, rbB, pivotInA, pivotInB)
-    {
-        m_distance = dist;
-    }
-    virtual void getInfo1(btConstraintInfo1* info)
-    {
-        info->m_numConstraintRows = 1;
-        info->nub = 5;
-    }
-    virtual void getInfo2(btConstraintInfo2* info)
-    {
-        btVector3 relA = m_rbA.getCenterOfMassTransform().getBasis() * getPivotInA();
-        btVector3 relB = m_rbB.getCenterOfMassTransform().getBasis() * getPivotInB();
-        btVector3 posA = m_rbA.getCenterOfMassTransform().getOrigin() + relA;
-        btVector3 posB = m_rbB.getCenterOfMassTransform().getOrigin() + relB;
-        btVector3 del = posB - posA;
-        btScalar  currDist = btSqrt(del.dot(del));
-        btVector3 ortho = del / currDist;
-        info->m_J1linearAxis[0] = ortho[0];
-        info->m_J1linearAxis[1] = ortho[1];
-        info->m_J1linearAxis[2] = ortho[2];
-        btVector3 p, q;
-        p = relA.cross(ortho);
-        q = relB.cross(ortho);
-        info->m_J1angularAxis[0] = p[0];
-        info->m_J1angularAxis[1] = p[1];
-        info->m_J1angularAxis[2] = p[2];
-        info->m_J2angularAxis[0] = -q[0];
-        info->m_J2angularAxis[1] = -q[1];
-        info->m_J2angularAxis[2] = -q[2];
-        btScalar rhs = (currDist - m_distance) * info->fps * info->erp;
-        info->m_constraintError[0] = rhs;
-        info->cfm[0] = btScalar(0.f);
-        info->m_lowerLimit[0] = -SIMD_INFINITY;
-        info->m_upperLimit[0] = SIMD_INFINITY;
-    }
-};
 
 struct heightfieldTerrainShape
 {
@@ -114,7 +50,7 @@ public:
     static void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static void CacheWorldObjects(std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static void QueryUserDefinedObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
-    static CColModelSAInterface* GetModelCollisionInterface(ushort usModel);
+    static CColDataSA* GetModelColData(ushort usModel);
 
     static void EulerToQuaternion(btVector3 rotation, btQuaternion& result);
     static void QuaternionToEuler(btQuaternion rotation, btVector3& result);

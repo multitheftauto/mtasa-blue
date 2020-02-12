@@ -29,7 +29,7 @@ public:
     //void AddBox(CVector& vecHalf);
     //void AddSphere(float fRadius);
 
-    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation);
+    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0,0,0));
 
     btBoxShape*              InitializeWithBox(CVector& vecHalf);
     void                     FinalizeInitialization(btCollisionShape* pShape);

@@ -164,18 +164,15 @@ btCompoundShape* CLuaPhysicsShape::InitializeWithCompound(int initialChildCapaci
 btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVector>& vecPoints)
 {
     btConvexHullShape* pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
-    pConvexHull->setUserPointer((void*)this);
-    pConvexHull->setUserIndex(3);
-    m_pBtShape = pConvexHull;
+    FinalizeInitialization(pConvexHull);
     return pConvexHull;
 }
 
 btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
 {
-    btBvhTriangleMeshShape* trimeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
-    trimeshShape->setUserPointer((void*)this);
-    trimeshShape->setUserIndex(1);
-    return trimeshShape;
+    btBvhTriangleMeshShape* pTriangleMeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
+    FinalizeInitialization(pTriangleMeshShape);
+    return pTriangleMeshShape;
 }
 
 heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
