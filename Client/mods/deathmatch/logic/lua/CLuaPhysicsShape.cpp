@@ -77,8 +77,8 @@ bool CLuaPhysicsShape::GetChildShapeOffsets(int index, CVector& vecPosition, CVe
     if (index >= 0 && index < pCompound->getNumChildShapes())
     {
         btTransform transform = pCompound->getChildTransform(index);
-        CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
         CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
+        CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
         return true;
     }
     return false;
@@ -91,8 +91,18 @@ bool CLuaPhysicsShape::SetChildShapeOffsets(int index, CVector& vecPosition, CVe
     {
         btTransform transform;
         transform.setIdentity();
-        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        if (vecPosition.Length() == 0)
+        {
+            btTransform compoundTransform = pCompound->getChildTransform(index);
+            CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
+        }
+        if (vecRotation.Length() == 0)
+        {
+            btTransform compoundTransform = pCompound->getChildTransform(index);
+            CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
+        }
         CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
         pCompound->updateChildTransform(index, transform);
         UpdateRigids();
         return true;
@@ -400,6 +410,6 @@ void CLuaPhysicsShape::UpdateRigids()
     {
         rigidBody->UpdateAABB();
         rigidBody->Activate();
-        //rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
+        // rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
     }
 }
