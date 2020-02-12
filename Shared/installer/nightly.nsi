@@ -725,6 +725,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\basswma.dll"
         File "${FILES_ROOT}\mta\tags.dll"
 
+        File "${FILES_ROOT}\mta\discord_game_sdk.dll"
+
         SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
