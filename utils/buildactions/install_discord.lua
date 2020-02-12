@@ -20,19 +20,16 @@ newaction {
 		if os.host() ~= "windows" then return end
 
 		-- Check md5
-		local download_discord = true
 		local archive_path = DISCORD_VENDOR.."/"..DISCORD_FILENAME
 		if os.isfile(archive_path) and os.md5_file(archive_path) == DISCORD_MD5 then
 			print("Discord Game SDK is up to date.")
-			download_discord = false
+			return
 		end
 
 		-- Download Discord
-		if download_discord then
-			print("Downloading Discord Game SDK...")
-			if not http.download_print_errors(DISCORD_BASEURL..DISCORD_TAG.."/"..DISCORD_FILENAME, archive_path) then
-				return
-			end
+		print("Downloading Discord Game SDK...")
+		if not http.download_print_errors(DISCORD_BASEURL..DISCORD_TAG.."/"..DISCORD_FILENAME, archive_path) then
+			return
 		end
 
 		-- Delete old stuff
