@@ -29,6 +29,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsAddChildShape", PhysicsAddChildShape},
         {"physicsGetChildShapes", PhysicsGetChildShapes},
         {"physicsGetChildShapeOffsets", PhysicsGetChildShapeOffsets},
+        {"physicsSetChildShapeOffsets", PhysicsSetChildShapeOffsets},
         {"physicsGetShapes", PhysicsGetShapes},
         {"physicsGetRigidBodies", PhysicsGetRigidBodies},
         {"physicsGetStaticCollisions", PhysicsGetStaticCollisions},
@@ -722,7 +723,6 @@ int CLuaPhysicsDefs::PhysicsGetChildShapeOffsets(lua_State* luaVM)
 {
     CLuaPhysicsShape* pCompoundShape;
     int               iIndex;
-    ePhysicsShapeType shapeType;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadUserData(pCompoundShape);
     argStream.ReadNumber(iIndex);
@@ -747,6 +747,49 @@ int CLuaPhysicsDefs::PhysicsGetChildShapeOffsets(lua_State* luaVM)
             lua_pushnumber(luaVM, rotation.fY);
             lua_pushnumber(luaVM, rotation.fZ);
             return 6;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Invalid index");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(lua_State* luaVM)
+{
+    CLuaPhysicsShape* pCompoundShape;
+    int               iIndex;
+    CVector           position, rotation;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pCompoundShape);
+    argStream.ReadNumber(iIndex);
+    argStream.ReadVector3D(position);
+    argStream.ReadVector3D(rotation, CVector(0,0,0));
+
+    if (!argStream.HasErrors())
+    {
+        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Shape need to be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        iIndex--;
+        if (pCompoundShape->SetChildShapeOffsets(iIndex, position, rotation))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
         {

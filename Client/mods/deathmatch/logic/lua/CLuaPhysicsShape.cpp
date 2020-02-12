@@ -54,8 +54,6 @@ void CLuaPhysicsShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, C
     transform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    CVector vecRotationb;
-    CLuaPhysicsSharedLogic::GetRotation(transform, vecRotationb);
     pCompound->addChildShape(transform, pShape->GetBtShape());
     pCompound->recalculateLocalAabb();
 }
@@ -81,6 +79,22 @@ bool CLuaPhysicsShape::GetChildShapeOffsets(int index, CVector& vecPosition, CVe
         btTransform transform = pCompound->getChildTransform(index);
         CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
         CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
+        return true;
+    }
+    return false;
+}
+
+bool CLuaPhysicsShape::SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation)
+{
+    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
+    if (index >= 0 && index < pCompound->getNumChildShapes())
+    {
+        btTransform transform;
+        transform.setIdentity();
+        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+        pCompound->updateChildTransform(index, transform);
+        UpdateRigids();
         return true;
     }
     return false;
@@ -386,6 +400,6 @@ void CLuaPhysicsShape::UpdateRigids()
     {
         rigidBody->UpdateAABB();
         rigidBody->Activate();
-        rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
+        //rigidBody->ApplyForce(CVector(0, 0, 0), CVector(0, 0, 0.01));
     }
 }
