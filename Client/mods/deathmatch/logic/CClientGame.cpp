@@ -1276,7 +1276,7 @@ void CClientGame::DoPulses()
         UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        // UpdateTrailers (); // Test: Does it always work without this check?
+        UpdateTrailers (); // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
