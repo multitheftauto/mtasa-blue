@@ -1101,12 +1101,13 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
 {
-    //  table engineGetModelTextures ( string modelName, string/table textureNames )
-    SString              strModelName;
-    std::vector<SString> vTextureNames;
+    //  table engineGetModelTextures ( string/int modelName/modelID, string/table textureNames )
+    SString                                       strModelName;
+    std::vector<SString>                          vTextureNames;
+    std::vector<std::tuple<std::string, CPixels>> textureList;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelName, "");
+    argStream.ReadString(strModelName);
 
     if (argStream.NextIsString())
     {
@@ -1117,18 +1118,16 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     else if (argStream.NextIsTable())
         argStream.ReadStringTable(vTextureNames);
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
     ushort usModelID = CModelNames::ResolveModelID(strModelName);
-    if (usModelID == INVALID_MODEL_ID)
+
+    if (usModelID == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames))
     {
+        argStream.SetCustomError("Invalid model ID");
         lua_pushboolean(luaVM, false);
-        return 1;
     }
 
-    std::vector<std::tuple<std::string, CPixels>> textureList;
-    g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames);
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
@@ -1139,6 +1138,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
         lua_pushelement(luaVM, pTexture);
         lua_settable(luaVM, -3);
     }
+
     return 1;
 }
 

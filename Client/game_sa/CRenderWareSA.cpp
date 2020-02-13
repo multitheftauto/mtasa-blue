@@ -764,14 +764,14 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
 // Will try to load the model if needed
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId, std::vector<SString> vTextureNames)
+bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId, std::vector<SString> vTextureNames)
 {
     outTextureList.clear();
 
     ushort usTxdId = GetTXDIDForModelID(usModelId);
 
     if (usTxdId == 0)
-        return;
+        return false;
 
     // Get the TXD corresponding to this ID
     RwTexDictionary* pTXD = CTxdStore_GetTxd(usTxdId);
@@ -788,7 +788,7 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
-    //If any texture names specified in vTextureNames, we should only return these
+    // If any texture names specified in vTextureNames, we should only return these
     bool bExcludeTextures = false;
 
     if (vTextureNames.size() > 0)
@@ -817,12 +817,14 @@ void CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
             RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&pTexture->raster->renderResource);
             CPixels       texture;
             g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
-            outTextureList.emplace_back(strTextureName, std::move(texture));      
+            outTextureList.emplace_back(strTextureName, std::move(texture));
         }
     }
 
     if (bLoadedModel)
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////
