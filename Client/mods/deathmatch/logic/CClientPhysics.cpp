@@ -122,7 +122,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
         return nullptr;
 
     if ((pColData->numColBoxes == 0) && (pColData->pColTriangles == 0) && (pColData->numColSpheres == 0))
-        return nullptr; // don't create empty collisions
+        return nullptr;            // don't create empty collisions
 
     CColSphereSA   pColSphere;
     CColBoxSA      pColBox;
@@ -140,6 +140,14 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
         CLuaPhysicsShape* pBoxShape = CreateShape();
         pBoxShape->InitializeWithBox(halfSize);
         pCompoundShape->AddShape(pBoxShape, position);
+    }
+    
+    for (uint i = 0; pColData->numColSpheres > i; i++)
+    {
+        pColSphere = pColData->pColSpheres[i];
+        CLuaPhysicsShape* pShpereShape = CreateShape();
+        pShpereShape->InitializeWithSphere(pColSphere.fRadius);
+        pCompoundShape->AddShape(pShpereShape, pColSphere.vecCenter);
     }
 
     if (pColData->numColTriangles > 0)
@@ -187,8 +195,11 @@ void CClientPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadiu
         {
             if (DistanceBetweenPoints3D(it->second.first, center) < fRadius)
             {
-                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
-                pWorldObjects.erase(it--);
+                if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
+                {
+                    CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+                    pWorldObjects.erase(it--);
+                }
             }
         }
     }
@@ -200,8 +211,11 @@ void CClientPhysics::BuildCollisionFromGTA()
     {
         for (auto it = pWorldObjects.begin(); it != pWorldObjects.end(); it++)
         {
-            CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
-            pWorldObjects.erase(it--);
+            if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
+            {
+                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+                pWorldObjects.erase(it--);
+            }
         }
     }
 }

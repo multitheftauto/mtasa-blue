@@ -20,12 +20,13 @@
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        {"physicsCreateWorld", PhysicsCreateWorld},            // finished
+        {"physicsCreateWorld", PhysicsCreateWorld},
         {"physicsDestroy", PhysicsDestroy},
-        {"physicsCreateRigidBody", PhysicsCreateRigidBody},            // finished
-        {"physicsCreateRigidBodyFromModel", PhysicsCreateRigidBodyFromModel},
+        {"physicsCreateRigidBody", PhysicsCreateRigidBody},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
+        {"physicsCreateConstraint", PhysicsCreateConstraint},
         {"physicsCreateShape", PhysicsCreateShape},
+        {"physicsCreateShapeFromModel", PhysicsCreateShapeFromModel},
         {"physicsAddChildShape", PhysicsAddChildShape},
         {"physicsGetChildShapes", PhysicsGetChildShapes},
         {"physicsGetChildShapeOffsets", PhysicsGetChildShapeOffsets},
@@ -46,7 +47,6 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyImpulse", PhysicsApplyImpulse},
         {"physicsApplyTorque", PhysicsApplyTorque},
         {"physicsApplyTorqueImpulse", PhysicsApplyTorqueImpulse},
-        {"physicsCreateConstraint", PhysicsCreateConstraint},
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
     };
@@ -580,7 +580,7 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
+int CLuaPhysicsDefs::PhysicsCreateShapeFromModel(lua_State* luaVM)
 {
     CClientPhysics*  pPhysics;
     unsigned short   usModel;
@@ -589,14 +589,12 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBodyFromModel(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPhysics);
     argStream.ReadNumber(usModel);
-    argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
-    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
-        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBodyFromModel(usModel, vecPosition, vecRotation);
-        if (pRigidBody != nullptr)
-            lua_pushrigidbody(luaVM, pRigidBody);
+        CLuaPhysicsShape* pShape = pPhysics->CreateShapeFromModel(usModel);
+        if (pShape)
+            lua_pushshape(luaVM, pShape);
         else
             lua_pushboolean(luaVM, false);
         return 1;
