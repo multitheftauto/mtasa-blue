@@ -9288,7 +9288,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
 CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList)
 {
     if (vecPointList.size() < 4)
-        return NULL;
+        return nullptr;
 
     CVector      vecPosition(vecPointList[0].fX, vecPointList[0].fY, 0);
     CColPolygon* pColShape = new CColPolygon(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition);
@@ -9329,6 +9329,157 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     }
 
     return pColShape;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeRadius(CColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    // Tell all players
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(fRadius);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_RADIUS, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteVector(vecSize.fX, vecSize.fY, vecSize.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_SIZE, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(uiPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, UPDATE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, iPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(iPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, ADD_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (pColPolygon->RemovePoint(uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        BitStream.pBitStream->Write(uiPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, REMOVE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
@@ -9819,28 +9970,14 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
 {
     assert(pElement);
     assert(szText);
+
+    RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
     
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
         return true;
-    }
-    else if (IS_TEAM(pElement))
-    {
-        CTeam* pTeam = static_cast<CTeam*>(pElement);
-        list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
-        for (; iter != pTeam->PlayersEnd(); iter++)
-        {
-            CPlayer* pPlayer = *iter;
-            pPlayer->Send(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded));
-        }
-        return true;
-    }
-    else
-    {
-        // Fixes issue 1223: https://github.com/multitheftauto/mtasa-blue/issues/1223 (Luxy.c)
-        RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
     }
 
     if (pElement == m_pMapManager->GetRootElement())

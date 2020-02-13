@@ -83,11 +83,23 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
         {
             if (pElement)
             {
-                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-                lua_pushboolean(luaVM, true);
-                return 1;
+                if (IS_TEAM(pElement))
+                {
+                    CTeam* pTeam = static_cast<CTeam*>(pElement);
+                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
+                    {
+                        sendList.push_back(*iter);
+                    }
+                }
+                else
+                {
+                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
             }
-            else if (sendList.size() > 0)
+
+            if (sendList.size() > 0)
             {
                 CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
                 lua_pushboolean(luaVM, true);
