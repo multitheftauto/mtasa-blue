@@ -56,7 +56,7 @@ public:
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
     void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
-    void ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
+    void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
@@ -65,7 +65,7 @@ public:
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
     CLuaPhysicsShape*           CreateShapeFromModel(unsigned short usModelId);
-    CLuaPhysicsRigidBody* CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
+    CLuaPhysicsRigidBody*       CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
     CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
 
     void SetGravity(CVector vecGravity);

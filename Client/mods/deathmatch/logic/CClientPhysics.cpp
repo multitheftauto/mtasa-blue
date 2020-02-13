@@ -220,11 +220,10 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-void CClientPhysics::ShapeCast(CLuaPhysicsStaticCollision* pStaticCollision, btTransform& from, btTransform& to,
+void CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to,
                                btCollisionWorld::ClosestConvexResultCallback& result)
 {
-    const btConvexShape* pShape = (btConvexShape*)pStaticCollision->GetCollisionObject()->getCollisionShape();
-    m_pDynamicsWorld->convexSweepTest(pShape, from, to, result, 0.0f);
+    m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
 }
 
 bool CClientPhysics::RayCastIsClear(CVector from, CVector to)

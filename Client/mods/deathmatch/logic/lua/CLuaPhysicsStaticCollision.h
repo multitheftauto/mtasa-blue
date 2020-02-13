@@ -44,6 +44,7 @@ public:
     void SetScale(CVector& vecScale);
     void GetScale(CVector& vecScale);
 
+    void RemoveDebugColor();
     void SetDebugColor(SColor color);
     void GetDebugColor(SColor& color);
 

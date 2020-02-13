@@ -491,40 +491,82 @@ int CLuaPhysicsDefs::PhysicsDrawDebug(lua_State* luaVM)
 
 int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
 {
-    CClientPhysics*             pPhysics;
-    CLuaPhysicsStaticCollision* pStaticCollision;
-    CVector                     vecStartPosition, vecStartRotation;
-    CVector                     vecEndPosition, vecEndRotation;
-    CScriptArgReader            argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
-    argStream.ReadUserData(pStaticCollision);
+    CLuaPhysicsShape* pShape;
+    CVector           vecStartPosition, vecStartRotation;
+    CVector           vecEndPosition, vecEndRotation;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pShape);
     argStream.ReadVector3D(vecStartPosition);
-    argStream.ReadVector3D(vecStartRotation);
     argStream.ReadVector3D(vecEndPosition);
-    argStream.ReadVector3D(vecEndRotation);
+    argStream.ReadVector3D(vecStartRotation, CVector(0, 0, 0));
+    argStream.ReadVector3D(vecEndRotation, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
-        btTransform startTransform;
-        btTransform endTransform;
+        switch (pShape->GetType())
+        {
+            case BOX_SHAPE_PROXYTYPE:
+            case SPHERE_SHAPE_PROXYTYPE:
+            case CONE_SHAPE_PROXYTYPE:
+            case CYLINDER_SHAPE_PROXYTYPE:
+                break;
+            default:
+                m_pScriptDebugging->LogCustom(luaVM, SString("Shape casting does not support %s shape type.", pShape->GetName()).c_str());
+                lua_pushboolean(luaVM, false);
+                return 1;
+        }
+        CClientPhysics* pPhysics = pShape->GetPhysics();
+        btTransform     startTransform;
+        btTransform     endTransform;
         startTransform.setIdentity();
         endTransform.setIdentity();
         CLuaPhysicsSharedLogic::SetPosition(startTransform, vecStartPosition);
-        CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartPosition);
+        CLuaPhysicsSharedLogic::SetRotation(startTransform, vecStartRotation);
         CLuaPhysicsSharedLogic::SetPosition(endTransform, vecEndPosition);
         CLuaPhysicsSharedLogic::SetRotation(endTransform, vecEndRotation);
-        btVector3                                     from = btVector3(vecStartPosition.fX, vecStartPosition.fY, vecStartPosition.fZ);
-        btVector3                                     to = btVector3(vecEndPosition.fX, vecEndPosition.fY, vecEndPosition.fZ);
+
+        btVector3              from = btVector3(vecStartPosition.fX, vecStartPosition.fY, vecStartPosition.fZ);
+        btVector3              to = btVector3(vecEndPosition.fX, vecEndPosition.fY, vecEndPosition.fZ);
         btCollisionWorld::ClosestConvexResultCallback result(from, to);
-        pPhysics->ShapeCast(pStaticCollision, startTransform, endTransform, result);
+        pPhysics->ShapeCast(pShape, startTransform, endTransform, result);
         lua_newtable(luaVM);
         lua_pushstring(luaVM, "hit");
         lua_pushboolean(luaVM, result.hasHit());
         lua_settable(luaVM, -3);
         if (result.hasHit())
         {
-            lua_pushstring(luaVM, "closeshitfraction");
-            lua_pushnumber(luaVM, result.m_closestHitFraction);
+            btVector3    vecShapePosition = from.lerp(to, result.m_closestHitFraction);
+            btQuaternion startQuaternion = startTransform.getRotation();
+            btQuaternion endQuaternion = endTransform.getRotation();
+            btQuaternion shapeQuaternion = startQuaternion.slerp(endQuaternion, result.m_closestHitFraction);
+
+            btVector3 vecShapeRotation;
+            CLuaPhysicsSharedLogic::QuaternionToEuler(shapeQuaternion, vecShapeRotation);
+
+            lua_pushstring(luaVM, "shapeposition");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vecShapePosition.getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vecShapePosition.getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vecShapePosition.getZ());
+            lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "shaperotation");
+            lua_newtable(luaVM);
+            lua_pushnumber(luaVM, 1);
+            lua_pushnumber(luaVM, vecShapeRotation.getX());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 2);
+            lua_pushnumber(luaVM, vecShapeRotation.getY());
+            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, 3);
+            lua_pushnumber(luaVM, vecShapeRotation.getZ());
+            lua_settable(luaVM, -3);
             lua_settable(luaVM, -3);
 
             lua_pushstring(luaVM, "hitpoint");
@@ -551,6 +593,49 @@ int CLuaPhysicsDefs::PhysicsShapeCast(lua_State* luaVM)
             lua_pushnumber(luaVM, 3);
             lua_pushnumber(luaVM, result.m_hitNormalWorld.getZ());
             lua_settable(luaVM, -3);
+            lua_settable(luaVM, -3);
+
+            const btCollisionObject* pCollisionObject = result.m_hitCollisionObject;
+            const btCollisionShape*  pShape = pCollisionObject->getCollisionShape();
+            const btRigidBody*       pRigidBody = btRigidBody::upcast(pCollisionObject);
+
+            CLuaPhysicsShape*           pLuaShape = nullptr;
+            CLuaPhysicsRigidBody*       pLuaRigidBody = nullptr;
+            CLuaPhysicsStaticCollision* pLuaStaticCollision = nullptr;
+
+            if (pShape != nullptr)
+            {
+                pLuaShape = (CLuaPhysicsShape*)pShape->getUserPointer();
+            }
+
+            if (pRigidBody != nullptr)
+            {
+                pLuaRigidBody = (CLuaPhysicsRigidBody*)pRigidBody->getUserPointer();
+            }
+            else if (pCollisionObject != nullptr)
+            {
+                pLuaStaticCollision = (CLuaPhysicsStaticCollision*)pCollisionObject->getUserPointer();
+            }
+
+            lua_pushstring(luaVM, "shape");
+            if (pLuaShape)
+                lua_pushshape(luaVM, pLuaShape);
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "rigidbody");
+            if (pLuaRigidBody)
+                lua_pushrigidbody(luaVM, pLuaRigidBody);
+            else
+                lua_pushboolean(luaVM, false);
+            lua_settable(luaVM, -3);
+
+            lua_pushstring(luaVM, "staticcollision");
+            if (pLuaStaticCollision)
+                lua_pushstaticcollision(luaVM, pLuaStaticCollision);
+            else
+                lua_pushboolean(luaVM, false);
             lua_settable(luaVM, -3);
         }
 
@@ -772,7 +857,7 @@ int CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(lua_State* luaVM)
     argStream.ReadUserData(pCompoundShape);
     argStream.ReadNumber(iIndex);
     argStream.ReadVector3D(position);
-    argStream.ReadVector3D(rotation, CVector(0,0,0));
+    argStream.ReadVector3D(rotation, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
@@ -1280,12 +1365,23 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     }
                     break;
                 case PHYSICS_PROPERTY_DEBUG_COLOR:
-                    argStream.ReadColor(color);
-                    if (!argStream.HasErrors())
+                    if (argStream.NextIsBool())
                     {
-                        pStaticCollision->SetDebugColor(color);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        argStream.ReadBool(boolean);
+                        if (boolean == false)
+                        {
+                            pStaticCollision->RemoveDebugColor();
+                        }
+                    }
+                    else
+                    {
+                        argStream.ReadColor(color);
+                        if (!argStream.HasErrors())
+                        {
+                            pStaticCollision->SetDebugColor(color);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_FILTER_MASK:

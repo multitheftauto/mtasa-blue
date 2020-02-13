@@ -64,6 +64,11 @@ void CLuaPhysicsStaticCollision::GetScale(CVector& vecScale)
     CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), vecScale);
 }
 
+void CLuaPhysicsStaticCollision::RemoveDebugColor()
+{
+    m_btCollisionObject->removeCustomDebugColor();
+}
+
 void CLuaPhysicsStaticCollision::SetDebugColor(SColor color)
 {
     m_btCollisionObject->setCustomDebugColor(btVector3((float)color.R / 255, (float)color.G / 255, (float)color.B / 255));
