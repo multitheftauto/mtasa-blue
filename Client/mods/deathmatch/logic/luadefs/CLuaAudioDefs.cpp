@@ -158,8 +158,7 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                     strSound = strFilename;
                 else
                 {
-                    SString signature = strSound.SubStr(0, 4).ToLower();
-                    if ((memcmp(signature, "http", 4) == 0 || memcmp(signature, "ftp", 3) == 0)
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
                         && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
                         bIsURL = true;
                     else
@@ -219,8 +218,7 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
                     strSound = strFilename;
                 else
                 {
-                    SString signature = strSound.SubStr(0, 4).ToLower();
-                    if ((memcmp(signature, "http", 4) == 0 || memcmp(signature, "ftp", 3) == 0)
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
                         && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
                         bIsURL = true;
                     else
