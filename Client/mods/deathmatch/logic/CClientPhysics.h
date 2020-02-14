@@ -40,7 +40,7 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape);
+    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     CLuaPhysicsStaticCollision* CreateStaticCollision();
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
@@ -65,7 +65,6 @@ public:
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
     CLuaPhysicsShape*           CreateShapeFromModel(unsigned short usModelId);
-    CLuaPhysicsRigidBody*       CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
     CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
 
     void SetGravity(CVector vecGravity);

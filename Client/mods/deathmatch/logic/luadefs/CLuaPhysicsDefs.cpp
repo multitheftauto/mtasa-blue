@@ -40,11 +40,11 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsDrawDebug", PhysicsDrawDebug},            // seems to be finished
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
-        {"physicsApplyForce", PhysicsApplyForce},
+        {"physicsApplyVelocityForce", PhysicsApplyVelocityForce},
         {"physicsApplyVelocity", PhysicsApplyVelocity},
+        {"physicsApplyAngularVelocity", PhysicsApplyAngularVelocity},
+        {"physicsApplyAngularVelocityForce", PhysicsApplyAngularVelocityForce},
         {"physicsApplyDamping", PhysicsApplyDamping},
-        {"physicsApplyTorque", PhysicsApplyTorque},
-        {"physicsApplyTorqueImpulse", PhysicsApplyTorqueImpulse},
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
     };
@@ -648,13 +648,25 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
 {
     CClientPhysics*   pPhysics;
     CLuaPhysicsShape* pShape;
+    float             fMass;
+    CVector           vecLocalInertia;
+    CVector           vecCenterOfMass;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadUserData(pShape);
+    argStream.ReadNumber(fMass, 1);
+    argStream.ReadVector3D(vecLocalInertia, CVector(0, 0, 0));
+    argStream.ReadVector3D(vecCenterOfMass, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
+        if (fMass <= 0)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Mass must bet greater than 0");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
         pPhysics = pShape->GetPhysics();
-        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody(pShape);
+        CLuaPhysicsRigidBody* pRigidBody = pPhysics->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
         lua_pushrigidbody(luaVM, pRigidBody);
         return 1;
     }
@@ -889,55 +901,6 @@ int CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyForce(lua_State* luaVM)
-{
-    CLuaPhysicsRigidBody* pRigidBody;
-    CVector               vecVelocity, vecRelative;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(vecVelocity);
-    argStream.ReadVector3D(vecRelative, CVector(0, 0, 0));
-
-    if (!argStream.HasErrors())
-    {
-        if (vecRelative.LengthSquared() == 0)
-            pRigidBody->ApplyCentralForce(vecVelocity);
-        else
-            pRigidBody->ApplyForce(vecVelocity, vecRelative);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-
-int CLuaPhysicsDefs::PhysicsApplyDamping(lua_State* luaVM)
-{
-    CLuaPhysicsRigidBody* pRigidBody;
-    float                 fDamping;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadNumber(fDamping);
-
-    if (!argStream.HasErrors())
-    {
-        pRigidBody->ApplyDamping(fDamping);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaPhysicsDefs::PhysicsApplyVelocity(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody* pRigidBody;
@@ -964,17 +927,21 @@ int CLuaPhysicsDefs::PhysicsApplyVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyTorque(lua_State* luaVM)
+int CLuaPhysicsDefs::PhysicsApplyVelocityForce(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody* pRigidBody;
-    CVector               force;
+    CVector               vecVelocity, vecRelative;
     CScriptArgReader      argStream(luaVM);
     argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(force);
+    argStream.ReadVector3D(vecVelocity);
+    argStream.ReadVector3D(vecRelative, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
-        pRigidBody->ApplyTorque(force);
+        if (vecRelative.LengthSquared() == 0)
+            pRigidBody->ApplyCentralForce(vecVelocity);
+        else
+            pRigidBody->ApplyForce(vecVelocity, vecRelative);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -986,17 +953,61 @@ int CLuaPhysicsDefs::PhysicsApplyTorque(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyTorqueImpulse(lua_State* luaVM)
+int CLuaPhysicsDefs::PhysicsApplyDamping(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody* pRigidBody;
-    CVector               force;
+    float                 fDamping;
     CScriptArgReader      argStream(luaVM);
     argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(force);
+    argStream.ReadNumber(fDamping);
 
     if (!argStream.HasErrors())
     {
-        pRigidBody->ApplyTorqueImpulse(force);
+        pRigidBody->ApplyDamping(fDamping);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsApplyAngularVelocityForce(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody* pRigidBody;
+    CVector               vecVelocity;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pRigidBody);
+    argStream.ReadVector3D(vecVelocity);
+
+    if (!argStream.HasErrors())
+    {
+        pRigidBody->ApplyTorque(vecVelocity);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsApplyAngularVelocity(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody* pRigidBody;
+    CVector               vecAngularVelocity;
+    CScriptArgReader      argStream(luaVM);
+    argStream.ReadUserData(pRigidBody);
+    argStream.ReadVector3D(vecAngularVelocity);
+
+    if (!argStream.HasErrors())
+    {
+        pRigidBody->ApplyTorqueImpulse(vecAngularVelocity);
         lua_pushboolean(luaVM, true);
         return 1;
     }

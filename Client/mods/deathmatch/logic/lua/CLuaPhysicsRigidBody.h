@@ -20,7 +20,7 @@ class CLuaPhysicsRigidBody;
 class CLuaPhysicsRigidBody
 {
 public:
-    CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape);
+    CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
     void RemoveScriptID();

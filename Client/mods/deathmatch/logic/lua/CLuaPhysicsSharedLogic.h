@@ -38,7 +38,7 @@ public:
     static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
     static btConvexHullShape*       CreateConvexHull(std::vector<CVector>& vecPoints);
 
-    static btRigidBody* CreateRigidBody(btCollisionShape* pShape, float fMass);
+    static btRigidBody* CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
     static bool AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
     static bool AddBoxes(btCompoundShape* pCompoundShape, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList);

@@ -16,13 +16,13 @@
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     m_pPhysics = pPhysics;
     m_pPhysicsShape = pShape;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RIGID_BODY);
 
-    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), 1.0f);
+    m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), fMass, vecLocalInertia, vecCenterOfMass);
     m_pPhysicsShape->AddRigidBody(this);
     m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);

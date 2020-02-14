@@ -25,7 +25,7 @@ public:
 
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsRigidBody* AddRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape);
+    CLuaPhysicsRigidBody* AddRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     CLuaPhysicsRigidBody* GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 

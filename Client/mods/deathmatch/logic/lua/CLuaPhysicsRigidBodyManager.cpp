@@ -28,9 +28,10 @@ CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint
     return pLuaRigidBody;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::AddRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia,
+                                                                CVector vecCenterOfMass)
 {
-    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pPhysics, pShape);
+    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pPhysics, pShape, fMass, vecLocalInertia, vecCenterOfMass);
     m_RigidBodyList.push_back(pRigidBody);
     return pRigidBody;
 }

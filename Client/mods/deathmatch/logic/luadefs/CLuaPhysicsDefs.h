@@ -38,10 +38,10 @@ public:
     LUA_DECLARE(PhysicsDrawDebug);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsApplyVelocity);
-    LUA_DECLARE(PhysicsApplyForce);
+    LUA_DECLARE(PhysicsApplyVelocityForce);
+    LUA_DECLARE(PhysicsApplyAngularVelocityForce);
+    LUA_DECLARE(PhysicsApplyAngularVelocity);
     LUA_DECLARE(PhysicsApplyDamping);
-    LUA_DECLARE(PhysicsApplyTorque);
-    LUA_DECLARE(PhysicsApplyTorqueImpulse);
     LUA_DECLARE(PhysicsCreateConstraint);
     LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);

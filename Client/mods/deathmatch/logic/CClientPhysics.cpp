@@ -103,18 +103,6 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollisionFromModel(unsig
     return pStaticCollision;
 }
 
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBodyFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
-{
-    CLuaPhysicsShape* pShape = CreateShapeFromModel(usModelId);
-    if (pShape == nullptr)
-        return nullptr;
-
-    CLuaPhysicsRigidBody* pRigidBody = CreateRigidBody(pShape);
-    pRigidBody->SetPosition(vecPosition);
-    pRigidBody->SetRotation(vecRotation);
-    return pRigidBody;
-}
-
 CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
 {
     CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
@@ -347,9 +335,9 @@ CLuaPhysicsShape* CClientPhysics::CreateShape()
     return pShape;
 }
 
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape)
+CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
-    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(this, pShape);
+    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(this, pShape, fMass, vecLocalInertia, vecCenterOfMass);
     m_vecRigidBodies.push_back(pRigidBody);
     return pRigidBody;
 }

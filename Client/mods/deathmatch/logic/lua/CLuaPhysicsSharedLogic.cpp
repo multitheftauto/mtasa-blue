@@ -197,13 +197,15 @@ btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
     return pCylinderShape;
 }
 
-btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass)
+btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     btTransform transformZero;
     transformZero.setIdentity();
     transformZero.setOrigin(btVector3(0, 0, 0));
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
-    btVector3             localInertia(0, 0, 0);
+    motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
+
+    btVector3             localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);
     pShape->calculateLocalInertia(fMass, localInertia);
 
     btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
