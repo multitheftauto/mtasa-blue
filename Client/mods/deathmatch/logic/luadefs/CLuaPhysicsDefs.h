@@ -37,9 +37,8 @@ public:
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsDrawDebug);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
-    LUA_DECLARE(PhysicsApplyForce);
-    LUA_DECLARE(PhysicsApplyCentralForce);
     LUA_DECLARE(PhysicsApplyVelocity);
+    LUA_DECLARE(PhysicsApplyForce);
     LUA_DECLARE(PhysicsApplyDamping);
     LUA_DECLARE(PhysicsApplyTorque);
     LUA_DECLARE(PhysicsApplyTorqueImpulse);

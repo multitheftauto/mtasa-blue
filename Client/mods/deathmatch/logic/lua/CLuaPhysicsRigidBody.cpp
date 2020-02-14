@@ -24,6 +24,7 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysics
 
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), 1.0f);
     m_pPhysicsShape->AddRigidBody(this);
+    m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);
     pPhysics->GetDynamicsWorld()->addRigidBody(m_pBtRigidBody);
     m_pBtRigidBody->setUserPointer((void*)this);

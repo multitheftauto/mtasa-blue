@@ -41,7 +41,6 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyForce", PhysicsApplyForce},
-        {"physicsApplyCentralForce", PhysicsApplyCentralForce},
         {"physicsApplyVelocity", PhysicsApplyVelocity},
         {"physicsApplyDamping", PhysicsApplyDamping},
         {"physicsApplyTorque", PhysicsApplyTorque},
@@ -893,15 +892,18 @@ int CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(lua_State* luaVM)
 int CLuaPhysicsDefs::PhysicsApplyForce(lua_State* luaVM)
 {
     CLuaPhysicsRigidBody* pRigidBody;
-    CVector               from, to;
+    CVector               vecVelocity, vecRelative;
     CScriptArgReader      argStream(luaVM);
     argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(from);
-    argStream.ReadVector3D(to);
+    argStream.ReadVector3D(vecVelocity);
+    argStream.ReadVector3D(vecRelative, CVector(0, 0, 0));
 
     if (!argStream.HasErrors())
     {
-        pRigidBody->ApplyForce(from, to);
+        if (vecRelative.LengthSquared() == 0)
+            pRigidBody->ApplyCentralForce(vecVelocity);
+        else
+            pRigidBody->ApplyForce(vecVelocity, vecRelative);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -913,27 +915,6 @@ int CLuaPhysicsDefs::PhysicsApplyForce(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyCentralForce(lua_State* luaVM)
-{
-    CLuaPhysicsRigidBody* pRigidBody;
-    CVector               force;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(force);
-
-    if (!argStream.HasErrors())
-    {
-        pRigidBody->ApplyCentralForce(force);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
 
 int CLuaPhysicsDefs::PhysicsApplyDamping(lua_State* luaVM)
 {
@@ -968,7 +949,7 @@ int CLuaPhysicsDefs::PhysicsApplyVelocity(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (vecRelative.Length() == 0)
+        if (vecRelative.LengthSquared() == 0)
             pRigidBody->ApplyCentralImpulse(vecVelocity);
         else
             pRigidBody->ApplyImpulse(vecVelocity, vecRelative);
