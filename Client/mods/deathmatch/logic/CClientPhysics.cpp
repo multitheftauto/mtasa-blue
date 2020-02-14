@@ -46,6 +46,16 @@ CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain*
 
 CClientPhysics::~CClientPhysics()
 {
+    // delete dynamics world
+    delete m_pDynamicsWorld;
+    delete m_pSolver;
+    delete m_pOverlappingPairCache;
+    delete m_pDispatcher;
+    delete m_pCollisionConfiguration;
+}
+
+void CClientPhysics::Unlink()
+{
     for (const auto& pConstraint : m_vecConstraints)
         m_pLuaMain->GetPhysicsConstraintManager()->RemoveContraint(pConstraint);
 
@@ -58,16 +68,6 @@ CClientPhysics::~CClientPhysics()
     for (const auto& pShape : m_vecShapes)
         m_pLuaMain->GetPhysicsShapeManager()->RemoveShape(pShape);
 
-    // delete dynamics world
-    delete m_pDynamicsWorld;
-    delete m_pSolver;
-    delete m_pOverlappingPairCache;
-    delete m_pDispatcher;
-    delete m_pCollisionConfiguration;
-}
-
-void CClientPhysics::Unlink()
-{
     m_pPhysicsManager->RemoveFromList(this);
 }
 
@@ -197,7 +197,7 @@ void CClientPhysics::BuildCollisionFromGTAInRadius(CVector& center, float fRadiu
             {
                 if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
                 {
-                    CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+                    CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second);
                     pWorldObjects.erase(it--);
                 }
             }
@@ -213,7 +213,7 @@ void CClientPhysics::BuildCollisionFromGTA()
         {
             if (CLuaPhysicsSharedLogic::GetModelColData(it->first))
             {
-                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second * 180 / PI);
+                CreateStaticCollisionFromModel(it->first, it->second.first, it->second.second / 180 / PI);
                 pWorldObjects.erase(it--);
             }
         }
