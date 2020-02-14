@@ -28,6 +28,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateShape", PhysicsCreateShape},
         {"physicsCreateShapeFromModel", PhysicsCreateShapeFromModel},
         {"physicsAddChildShape", PhysicsAddChildShape},
+        {"physicsRemoveChildShape", PhysicsRemoveChildShape},
         {"physicsGetChildShapes", PhysicsGetChildShapes},
         {"physicsGetChildShapeOffsets", PhysicsGetChildShapeOffsets},
         {"physicsSetChildShapeOffsets", PhysicsSetChildShapeOffsets},
@@ -801,6 +802,46 @@ int CLuaPhysicsDefs::PhysicsGetChildShapes(lua_State* luaVM)
             lua_settable(luaVM, -3);
         }
         return 1;
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsRemoveChildShape(lua_State* luaVM)
+{
+    CLuaPhysicsShape* pCompoundShape;
+    int               iIndex;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pCompoundShape);
+    argStream.ReadNumber(iIndex);
+
+    if (!argStream.HasErrors())
+    {
+        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Shape need to be compound");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        iIndex--;
+        if (pCompoundShape->RemoveChildShape(iIndex))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Invalid index");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     if (argStream.HasErrors())
     {

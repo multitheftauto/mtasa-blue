@@ -24,6 +24,7 @@ public:
     LUA_DECLARE(PhysicsCreateShapeFromModel);
     LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsAddChildShape);
+    LUA_DECLARE(PhysicsRemoveChildShape);
     LUA_DECLARE(PhysicsGetChildShapes);
     LUA_DECLARE(PhysicsGetChildShapeOffsets);
     LUA_DECLARE(PhysicsSetChildShapeOffsets);

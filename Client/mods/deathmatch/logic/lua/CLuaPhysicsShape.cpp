@@ -71,6 +71,18 @@ std::vector<CLuaPhysicsShape*> CLuaPhysicsShape::GetChildShapes()
     return vecChildShapes;
 }
 
+bool CLuaPhysicsShape::RemoveChildShape(int index)
+{
+    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
+    if (index >= 0 && index < pCompound->getNumChildShapes())
+    {
+        pCompound->removeChildShapeByIndex(index);
+        UpdateRigids();
+        return true;
+    }
+    return false;
+}
+
 bool CLuaPhysicsShape::GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation)
 {
     btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
