@@ -40,6 +40,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetProperties", PhysicsGetProperties},
         {"physicsDrawDebug", PhysicsDrawDebug},            // seems to be finished
         {"physicsSetDebugMode", PhysicsSetDebugMode},
+        {"physicsGetDebugMode", PhysicsGetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
         {"physicsApplyVelocityForce", PhysicsApplyVelocityForce},
         {"physicsApplyVelocity", PhysicsApplyVelocity},
@@ -465,6 +466,33 @@ int CLuaPhysicsDefs::PhysicsSetDebugMode(lua_State* luaVM)
                     return 1;
                 }
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetDebugMode(lua_State* luaVM)
+{
+    CClientPhysics*   pPhysics;
+    ePhysicsDebugMode eDebugMode;
+    CScriptArgReader  argStream(luaVM);
+    argStream.ReadUserData(pPhysics);
+    argStream.ReadEnumString(eDebugMode);
+    if (!argStream.HasErrors())
+    {
+        if (eDebugMode == PHYSICS_DEBUG_LINE_WIDTH)
+        {
+            lua_pushnumber(luaVM, pPhysics->GetDebugLineWidth());
+            return 1;
+        }
+        else
+        {
+            lua_pushboolean(luaVM, pPhysics->GetDebugMode(eDebugMode));
+            return 1;
         }
     }
     else

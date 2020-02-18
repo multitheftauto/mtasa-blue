@@ -11,19 +11,21 @@
 #pragma once
 
 #include <list>
+#include <bitset>
 
 class CPhysicsDebugDrawer : public btIDebugDraw
 {
-    int                 m_debugMode;
+    std::bitset<32>     m_debugMode = 0;
     CGraphicsInterface* m_pGraphics;
     SColorARGB          color = SColorARGB(255, 255, 0, 0);
-    float               fLineWidth = 2.0f;
+    float               m_fLineWidth = 2.0f;
 
 public:
     CPhysicsDebugDrawer(CGraphicsInterface* pGraphics) : m_pGraphics(pGraphics){};
     ~CPhysicsDebugDrawer(){};
 
-    void SetDebugLineWidth(float fWidth) { fLineWidth = fWidth; }
+    void  SetDebugLineWidth(float fWidth) { m_fLineWidth = fWidth; }
+    float GetDebugLineWidth() const { return m_fLineWidth; }
 
     void drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor);
 
@@ -39,7 +41,11 @@ public:
 
     void draw3dText(const btVector3& location, const char* textString);
 
+    void setDebugMode(byte bit, bool bEnabled) { m_debugMode.set(bit, bEnabled); };
     void setDebugMode(int debugMode) { m_debugMode = debugMode; };
 
-    int getDebugMode() const { return m_debugMode; }
+    void reset() { m_debugMode = 0; };
+
+    int getDebugMode() const { return m_debugMode.to_ulong(); }
+    int getDebugMode(byte bit) const { return m_debugMode.test(bit); }
 };

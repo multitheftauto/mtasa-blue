@@ -129,7 +129,7 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
         pBoxShape->InitializeWithBox(halfSize);
         pCompoundShape->AddShape(pBoxShape, position);
     }
-    
+
     for (uint i = 0; pColData->numColSpheres > i; i++)
     {
         pColSphere = pColData->pColSpheres[i];
@@ -208,8 +208,7 @@ void CClientPhysics::BuildCollisionFromGTA()
     }
 }
 
-void CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to,
-                               btCollisionWorld::ClosestConvexResultCallback& result)
+void CClientPhysics::ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result)
 {
     m_pDynamicsWorld->convexSweepTest((btConvexShape*)(pShape->GetBtShape()), from, to, result, 0.0f);
 }
@@ -354,27 +353,35 @@ void CClientPhysics::SetDebugLineWidth(float fWidth)
     m_pDebugDrawer->SetDebugLineWidth(fWidth);
 }
 
+float CClientPhysics::GetDebugLineWidth()
+{
+    return m_pDebugDrawer->GetDebugLineWidth();
+}
+
 bool CClientPhysics::SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled)
 {
-    if (eDebugMode == PHYSICS_DEBUG_NoDebug && bEnabled)
+    if (eDebugMode == PHYSICS_DEBUG_NoDebug)
     {
-        m_pDebugDrawer->setDebugMode(0);
-        return true;
+        if (bEnabled)
+        {
+            m_pDebugDrawer->reset();
+            return true;
+        }
+        return false;
     }
 
-    int debugMode = m_pDebugDrawer->getDebugMode();
-
-    if (bEnabled)
-    {
-        debugMode |= 1UL << (int)eDebugMode;
-    }
-    else
-    {
-        debugMode &= ~(1UL << (int)eDebugMode);
-    }
-    m_pDebugDrawer->setDebugMode(debugMode);
+    m_pDebugDrawer->setDebugMode(eDebugMode, bEnabled);
 
     return true;
+}
+bool CClientPhysics::GetDebugMode(ePhysicsDebugMode eDebugMode)
+{
+    if (eDebugMode == PHYSICS_DEBUG_NoDebug)
+    {
+        return m_pDebugDrawer->getDebugMode() == 0;
+    }
+
+    return m_pDebugDrawer->getDebugMode(eDebugMode);
 }
 
 void CClientPhysics::StepSimulation()
@@ -382,14 +389,9 @@ void CClientPhysics::StepSimulation()
     if (!m_bSimulationEnabled)
         return;
 
-    CLuaArguments Arguments;
-    CallEvent("onPhysicsPreSimulation", Arguments, true);
-
     m_pDynamicsWorld->stepSimulation(((float)m_iDeltaTimeMs) / 1000.0f * m_fSpeed, m_iSubSteps);
 
     m_iSimulationCounter++;
-
-    CallEvent("onPhysicsPostSimulation", Arguments, true);
 }
 
 void CClientPhysics::ClearOutsideWorldRigidBodies()

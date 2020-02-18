@@ -60,7 +60,9 @@ public:
 
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
+    bool                        GetDebugMode(ePhysicsDebugMode eDebugMode);
     void                        SetDebugLineWidth(float fWidth);
+    float                       GetDebugLineWidth();
     void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();

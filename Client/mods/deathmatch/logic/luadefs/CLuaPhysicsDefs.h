@@ -36,6 +36,7 @@ public:
     LUA_DECLARE(PhysicsGetProperties);
     LUA_DECLARE(PhysicsCreateStaticCollision);
     LUA_DECLARE(PhysicsSetDebugMode);
+    LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsDrawDebug);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
     LUA_DECLARE(PhysicsApplyVelocity);
