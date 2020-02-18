@@ -255,8 +255,16 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 }
                 if (!argStream.HasErrors())
                 {
-                    pShape = pPhysics->CreateShape();
-                    pShape->InitializeWithConvexHull(vecList);
+                    if (vecList.size() >= 3)
+                    {
+                        pShape = pPhysics->CreateShape();
+                        pShape->InitializeWithConvexHull(vecList);
+                    }
+                    else
+                    {
+                        argStream.SetCustomError("Convex hull shape require at least 3 vertices");
+                        break;
+                    }
                 }
                 break;
             case PHYSICS_SHAPE_TRIANGLE_MESH:
@@ -688,6 +696,13 @@ int CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (pShape->GetType() == BroadphaseNativeTypes::TERRAIN_SHAPE_PROXYTYPE)
+        {
+            m_pScriptDebugging->LogCustom(luaVM, "Terrain shape is not supported");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         if (fMass <= 0)
         {
             m_pScriptDebugging->LogCustom(luaVM, "Mass must bet greater than 0");

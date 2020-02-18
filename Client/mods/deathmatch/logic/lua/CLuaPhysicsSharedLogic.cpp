@@ -236,7 +236,8 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
     bool                     flipQuadEdges = true;
     heightfieldTerrainShape* heightfieldTerrain = new heightfieldTerrainShape();
     heightfieldTerrain->data = std::vector<float>(vecHeightData);
-    float minHeight, maxHeight;
+    float minHeight = 0;
+    float maxHeight = 0;
 
     for (float height : vecHeightData)
     {
@@ -245,7 +246,7 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
     }
 
     btHeightfieldTerrainShape* pHeightfieldTerrain =
-        new btHeightfieldTerrainShape(iSizeX, iSizeY, heightfieldTerrain->data.data(), 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
+        new btHeightfieldTerrainShape(iSizeX, iSizeY, &heightfieldTerrain->data[0], 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
 
     heightfieldTerrain->pHeightfieldTerrainShape = pHeightfieldTerrain;
     return heightfieldTerrain;

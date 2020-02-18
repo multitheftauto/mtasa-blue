@@ -40,7 +40,7 @@ public:
     btCylinderShape*         InitializeWithCylinder(CVector& half);
     btConvexHullShape*       InitializeWithConvexHull(std::vector<CVector>& vecPoints);
     btBvhTriangleMeshShape*  InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
-    heightfieldTerrainShape* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
+    btHeightfieldTerrainShape* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
     CClientPhysics*       GetPhysics() const { return m_pPhysics; }
     uint                  GetScriptID() const { return m_uiScriptID; }
@@ -72,9 +72,10 @@ public:
     const char* GetName();
 
 private:
-    uint                               m_uiScriptID;
-    CClientPhysics*                    m_pPhysics;
-    btCollisionShape*                  m_pBtShape;
+    uint               m_uiScriptID;
+    CClientPhysics*    m_pPhysics;
+    btCollisionShape*  m_pBtShape;
+    heightfieldTerrainShape* m_heightfieldTerrainData = nullptr;
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;

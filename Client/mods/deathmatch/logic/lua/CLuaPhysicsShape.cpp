@@ -183,16 +183,16 @@ btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVecto
 btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
 {
     btBvhTriangleMeshShape* pTriangleMeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
-    FinalizeInitialization(pTriangleMeshShape);
+
     return pTriangleMeshShape;
 }
 
-heightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
+btHeightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
 {
     heightfieldTerrainShape* pHeightfieldTerrain = CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);
-    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserPointer((void*)this);
-    pHeightfieldTerrain->pHeightfieldTerrainShape->setUserIndex(1);
-    return pHeightfieldTerrain;
+    FinalizeInitialization(pHeightfieldTerrain->pHeightfieldTerrainShape);
+    m_heightfieldTerrainData = pHeightfieldTerrain;
+    return pHeightfieldTerrain->pHeightfieldTerrainShape;
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
