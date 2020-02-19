@@ -48,4 +48,5 @@ public:
     LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);
     LUA_DECLARE(PhysicsGetElementType);
+    LUA_DECLARE(PhysicsIsElement);
 };

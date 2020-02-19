@@ -50,6 +50,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
         {"physicsGetElementType", PhysicsGetElementType},
+        {"physicsIsElement", PhysicsIsElement},
     };
 
     // Add functions
@@ -2407,6 +2408,37 @@ int CLuaPhysicsDefs::PhysicsGetElementType(lua_State* luaVM)
         else if (pShape != nullptr)
         {
             lua_pushstring(luaVM, "shape");
+            return 1;
+        }
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsIsElement(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+    CLuaPhysicsShape*           pShape = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pStaticConstraint);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+        argStream.ReadUserData(pShape);
+
+    if (!argStream.HasErrors())
+    {
+        if (pRigidBody != nullptr || pStaticCollision != nullptr || pStaticConstraint != nullptr || pShape != nullptr)
+        {
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
