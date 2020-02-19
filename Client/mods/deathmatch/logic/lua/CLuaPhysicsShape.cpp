@@ -183,7 +183,7 @@ btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVecto
 btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
 {
     btBvhTriangleMeshShape* pTriangleMeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
-
+    FinalizeInitialization(pTriangleMeshShape);
     return pTriangleMeshShape;
 }
 
