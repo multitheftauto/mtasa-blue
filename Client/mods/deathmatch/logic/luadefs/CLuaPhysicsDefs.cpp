@@ -2008,7 +2008,6 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
     CLuaPhysicsRigidBody* pRigidBodyB = nullptr;
     ePhysicsConstraint    eConstraint;
     CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pPhysics);
     argStream.ReadEnumString(eConstraint);
     if (argStream.NextIsBool())
         argStream.ReadBool(bDisableCollisionsBetweenLinkedBodies, true);
@@ -2026,6 +2025,7 @@ int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
     }
     if (!argStream.HasErrors())
     {
+        pPhysics = pRigidBodyA->GetPhysics();
         CLuaPhysicsConstraint* pConstraint = nullptr;
         CVector                vector[4];
         switch (eConstraint)
