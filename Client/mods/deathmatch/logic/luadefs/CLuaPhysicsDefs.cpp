@@ -1287,6 +1287,22 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         lua_pushboolean(luaVM, true);
                         return 1;
                     }
+                case PHYSICS_PROPERTY_VELOCITY:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetLinearVelocity(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
+                    argStream.ReadVector3D(vector);
+                    if (!argStream.HasErrors())
+                    {
+                        pRigidBody->SetAngularVelocity(vector);
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
                 case PHYSICS_PROPERTY_SLEEPING_THRESHOLDS:
                     argStream.ReadNumber(floatNumber[0]);
                     argStream.ReadNumber(floatNumber[1]);
@@ -1742,6 +1758,18 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                     return 3;
                 case PHYSICS_PROPERTY_ROTATION:
                     pRigidBody->GetRotation(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_VELOCITY:
+                    pRigidBody->GetAngularVelocity(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_ANGULAR_VELOCITY:
+                    pRigidBody->GetAngularVelocity(vector);
                     lua_pushnumber(luaVM, vector.fX);
                     lua_pushnumber(luaVM, vector.fY);
                     lua_pushnumber(luaVM, vector.fZ);

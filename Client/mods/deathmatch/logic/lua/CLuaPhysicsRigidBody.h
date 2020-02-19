@@ -42,7 +42,10 @@ public:
     void SetSweptSphereRadius(float fSphereRadius);
     float GetSweptSphereRadius();
 
-    void SetLinearVelocity(CVector& vecVelocity);
+    void SetLinearVelocity(CVector vecVelocity);
+    void GetLinearVelocity(CVector& vecVelocity);
+    void SetAngularVelocity(CVector vecVelocity);
+    void GetAngularVelocity(CVector& vecVelocity);
     void ApplyForce(CVector& vecFrom, CVector& vecTo);
     void ApplyCentralForce(CVector& vecForce);
     void ApplyCentralImpulse(CVector& vecForce);
