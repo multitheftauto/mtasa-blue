@@ -1267,9 +1267,16 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[0]);
                     if (!argStream.HasErrors())
                     {
-                        pRigidBody->SetMass(floatNumber[0]);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        if (floatNumber[0] >= 0)
+                        {
+                            pRigidBody->SetMass(floatNumber[0]);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Mass can not be negative");
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_POSITION:
@@ -1812,6 +1819,10 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                 case PHYSICS_PROPERTY_WANTS_SLEEPING:
                     boolean = pRigidBody->WantsSleeping();
                     lua_pushboolean(luaVM, boolean);
+                    return 1;
+                case PHYSICS_PROPERTY_MASS:
+                    floatNumber[0] = pRigidBody->GetMass();
+                    lua_pushnumber(luaVM, floatNumber[0]);
                     return 1;
                 default:
                     argStream.SetCustomError(SString("Physics rigid body does not support %s property.", EnumToString(eProperty).c_str()));

@@ -69,6 +69,7 @@ public:
     void GetFilterGroup(int& sIndex);
     bool IsSleeping();
     bool WantsSleeping();
+    float GetMass();
 
     CClientPhysics* GetPhysics() const { return m_pPhysics; }
     uint            GetScriptID() const { return m_uiScriptID; }

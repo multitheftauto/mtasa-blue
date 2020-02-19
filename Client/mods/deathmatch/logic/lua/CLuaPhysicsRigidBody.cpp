@@ -102,6 +102,11 @@ bool CLuaPhysicsRigidBody::WantsSleeping()
     return m_pBtRigidBody->wantsSleeping();
 }
 
+float CLuaPhysicsRigidBody::GetMass()
+{
+    return m_pBtRigidBody->getMass();
+}
+
 void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
 {
     btTransform transform = m_pBtRigidBody->getWorldTransform();
