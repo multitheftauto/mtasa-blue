@@ -47,4 +47,5 @@ public:
     LUA_DECLARE(PhysicsCreateConstraint);
     LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);
+    LUA_DECLARE(PhysicsGetElementType);
 };

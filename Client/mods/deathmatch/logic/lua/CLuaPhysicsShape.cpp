@@ -22,6 +22,7 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics)
     m_pPhysics = pPhysics;
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::SHAPE);
     m_pBtShape = nullptr;
+    m_heightfieldTerrainData = nullptr;
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
@@ -35,6 +36,10 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
         m_pPhysics->DestroyStaticCollision(m_vecStaticCollisions[i]);
     }
     delete m_pBtShape;
+
+    if (m_heightfieldTerrainData != nullptr)
+        delete m_heightfieldTerrainData;
+
     RemoveScriptID();
 }
 

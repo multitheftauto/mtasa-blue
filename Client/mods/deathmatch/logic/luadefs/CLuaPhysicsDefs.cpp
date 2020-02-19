@@ -49,6 +49,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsApplyDamping", PhysicsApplyDamping},
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
+        {"physicsGetElementType", PhysicsGetElementType},
     };
 
     // Add functions
@@ -2031,7 +2032,7 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
 int CLuaPhysicsDefs::PhysicsCreateConstraint(lua_State* luaVM)
 {
     CClientPhysics*       pPhysics;
-    bool                  bDisableCollisionsBetweenLinkedBodies;
+    bool                  bDisableCollisionsBetweenLinkedBodies = true;
     CLuaPhysicsRigidBody* pRigidBodyA;
     CLuaPhysicsRigidBody* pRigidBodyB = nullptr;
     ePhysicsConstraint    eConstraint;
@@ -2363,6 +2364,52 @@ int CLuaPhysicsDefs::PhysicsGetConstraints(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPhysicsDefs::PhysicsGetElementType(lua_State* luaVM)
+{
+    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
+    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
+    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
+    CLuaPhysicsShape*           pShape = nullptr;
+
+    ePhysicsProperty eProperty;
+    CScriptArgReader argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+        argStream.ReadUserData(pRigidBody);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
+        argStream.ReadUserData(pStaticCollision);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
+        argStream.ReadUserData(pStaticConstraint);
+    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
+        argStream.ReadUserData(pShape);
+
+    if (!argStream.HasErrors())
+    {
+        if (pRigidBody != nullptr)
+        {
+            lua_pushstring(luaVM, "rigidbody");
+            return 1;
+        }
+        else if (pStaticCollision != nullptr)
+        {
+            lua_pushstring(luaVM, "staticcollision");
+            return 1;
+        }
+        else if (pStaticConstraint != nullptr)
+        {
+            lua_pushstring(luaVM, "constraint");
+            return 1;
+        }
+        else if (pShape != nullptr)
+        {
+            lua_pushstring(luaVM, "shape");
+            return 1;
+        }
+    }
     lua_pushboolean(luaVM, false);
     return 1;
 }
