@@ -73,8 +73,6 @@ public:
     void GetGravity(CVector& vecGravity);
     bool GetUseContinous();
     void SetUseContinous(bool bUse);
-    void SetSpeed(int iSubSteps) { m_fSpeed = iSubSteps; }
-    void SetSpeed(int& iSubSteps) const { iSubSteps = m_fSpeed; }
     void SetSubSteps(int iSubSteps) { m_iSubSteps = iSubSteps; }
     void GetSubSteps(int& iSubSteps) const { iSubSteps = m_iSubSteps; }
     void SetSimulationEnabled(bool bSimulationEnabled) { m_bSimulationEnabled = bSimulationEnabled; }

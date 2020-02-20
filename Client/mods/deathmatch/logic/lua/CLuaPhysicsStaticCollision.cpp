@@ -44,24 +44,34 @@ void CLuaPhysicsStaticCollision::RemoveScriptID()
     }
 }
 
-void CLuaPhysicsStaticCollision::SetPosition(CVector& vecPosition)
+void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
 {
     CLuaPhysicsSharedLogic::SetPosition(m_btCollisionObject, vecPosition);
 }
 
-void CLuaPhysicsStaticCollision::SetRotation(CVector& vecRotation)
+void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation)
 {
     CLuaPhysicsSharedLogic::SetRotation(m_btCollisionObject, vecRotation);
 }
 
-void CLuaPhysicsStaticCollision::SetScale(CVector& vecScale)
+void CLuaPhysicsStaticCollision::GetPosition(CVector& vecPosition)
 {
-    CLuaPhysicsSharedLogic::SetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+    CLuaPhysicsSharedLogic::GetPosition(m_btCollisionObject, vecPosition);
 }
 
-void CLuaPhysicsStaticCollision::GetScale(CVector& vecScale)
+void CLuaPhysicsStaticCollision::GetRotation(CVector& vecRotation)
 {
-    CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+    CLuaPhysicsSharedLogic::GetRotation(m_btCollisionObject, vecRotation);
+}
+
+bool CLuaPhysicsStaticCollision::SetScale(CVector& vecScale)
+{
+    return CLuaPhysicsSharedLogic::SetScale(m_btCollisionObject->getCollisionShape(), vecScale);
+}
+
+bool CLuaPhysicsStaticCollision::GetScale(CVector& vecScale)
+{
+    return CLuaPhysicsSharedLogic::GetScale(m_btCollisionObject->getCollisionShape(), vecScale);
 }
 
 void CLuaPhysicsStaticCollision::RemoveDebugColor()

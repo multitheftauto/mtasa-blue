@@ -38,11 +38,13 @@ public:
 
     btCollisionObject* InitializeWithSphere(float fRadius);
 
-    void SetPosition(CVector& vecPosition);
-    void SetRotation(CVector& vecRotation);
+    void SetPosition(CVector vecPosition);
+    void GetPosition(CVector& vecPosition);
+    void SetRotation(CVector vecRotation);
+    void GetRotation(CVector& vecRotation);
 
-    void SetScale(CVector& vecScale);
-    void GetScale(CVector& vecScale);
+    bool SetScale(CVector& vecScale);
+    bool GetScale(CVector& vecScale);
 
     void RemoveDebugColor();
     void SetDebugColor(SColor color);

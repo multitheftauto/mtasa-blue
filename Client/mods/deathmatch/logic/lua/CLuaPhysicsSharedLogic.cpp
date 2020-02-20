@@ -121,7 +121,7 @@ bool CLuaPhysicsSharedLogic::SetPosition(btTransform& transform, CVector& vecPos
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
+bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CVector vecRotation)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetRotation(transform, vecRotation);
@@ -129,11 +129,24 @@ bool CLuaPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, CV
     return true;
 }
 
-bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
+bool CLuaPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, CVector vecPosition)
 {
     btTransform transform = pCollisionObject->getWorldTransform();
     SetPosition(transform, vecPosition);
     pCollisionObject->setWorldTransform(transform);
+    return true;
+}
+bool CLuaPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject, CVector& vecRotation)
+{
+    btTransform transform = pCollisionObject->getWorldTransform();
+    GetRotation(transform, vecRotation);
+    return true;
+}
+
+bool CLuaPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject, CVector& vecPosition)
+{
+    btTransform transform = pCollisionObject->getWorldTransform();
+    GetPosition(transform, vecPosition);
     return true;
 }
 

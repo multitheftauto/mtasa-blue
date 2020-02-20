@@ -1158,24 +1158,8 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                         return 1;
                     }
                     break;
-                case PHYSICS_PROPERTY_SPEED:
-                    argStream.ReadNumber(floatNumber[0]);
-                    if (!argStream.HasErrors())
-                    {
-                        if (floatNumber[0] >= 0 && floatNumber[0] <= 1000)
-                        {
-                            pPhysics->SetSpeed(floatNumber[0]);
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        else
-                        {
-                            argStream.SetCustomError("Speed must be between 0 and 1000");
-                        }
-                    }
-                    break;
                 case PHYSICS_PROPERTY_SIMULATION_ENABLED:
-                    argStream.ReadNumber(boolean);
+                    argStream.ReadBool(boolean);
                     if (!argStream.HasErrors())
                     {
                         pPhysics->SetSimulationEnabled(boolean);
@@ -1317,9 +1301,16 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadNumber(floatNumber[1]);
                     if (!argStream.HasErrors())
                     {
-                        pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        if (floatNumber[0] >= 0 && floatNumber[1] >= 0)
+                        {
+                            pRigidBody->SetSleepingThresholds(floatNumber[0], floatNumber[1]);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Sleeping thresholds can not be negative");
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_RESTITUTION:
@@ -1335,9 +1326,16 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
                     {
-                        pRigidBody->SetScale(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
+                        {
+                            pRigidBody->SetScale(vector);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Scale can not be negative");
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_DEBUG_COLOR:
@@ -1440,9 +1438,16 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
                     {
-                        pStaticCollision->SetScale(vector);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
+                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
+                        {
+                            pStaticCollision->SetScale(vector);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        else
+                        {
+                            argStream.SetCustomError("Scale can not be negative");
+                        }
                     }
                     break;
                 case PHYSICS_PROPERTY_DEBUG_COLOR:
@@ -1657,22 +1662,15 @@ int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
                     argStream.ReadVector3D(vector);
                     if (!argStream.HasErrors())
                     {
-                        if (vector.fX >= MINIMUM_PRIMITIVE_SIZE && vector.fY >= MINIMUM_PRIMITIVE_SIZE && vector.fZ >= MINIMUM_PRIMITIVE_SIZE)
+                        if (vector.fX >= 0 && vector.fY >= 0 && vector.fZ >= 0)
                         {
-                            if (pShape->SetScale(vector))
-                            {
-                                lua_pushboolean(luaVM, true);
-                                return 1;
-                            }
-                            else
-                            {
-                                argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
-                            }
+                            pShape->SetScale(vector);
+                            lua_pushboolean(luaVM, true);
+                            return 1;
                         }
                         else
                         {
-                            argStream.SetCustomError(
-                                SString("Minimum scale width, height and length must be equal or greater than %.02f units", MINIMUM_PRIMITIVE_SIZE).c_str());
+                            argStream.SetCustomError("Scale can not be negative");
                         }
                     }
                     break;
@@ -1749,6 +1747,10 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
                 case PHYSICS_PROPERTY_USE_CONTINOUS:
                     boolean = pPhysics->GetUseContinous();
                     lua_pushboolean(luaVM, boolean);
+                    return 1;
+                case PHYSICS_PROPERTY_SUBSTEPS:
+                    pPhysics->GetSubSteps(i);
+                    lua_pushnumber(luaVM, i);
                     return 1;
                 default:
                     argStream.SetCustomError(SString("Physics element does not support %s property.", EnumToString(eProperty).c_str()));
@@ -1831,6 +1833,43 @@ int CLuaPhysicsDefs::PhysicsGetProperties(lua_State* luaVM)
         }
         else if (pStaticCollision)
         {
+            switch (eProperty)
+            {
+                case PHYSICS_PROPERTY_DEBUG_COLOR:
+                    pRigidBody->GetDebugColor(color);
+                    lua_pushnumber(luaVM, color.R);
+                    lua_pushnumber(luaVM, color.G);
+                    lua_pushnumber(luaVM, color.B);
+                    return 3;
+                case PHYSICS_PROPERTY_POSITION:
+                    pStaticCollision->GetPosition(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_ROTATION:
+                    pStaticCollision->GetRotation(vector);
+                    lua_pushnumber(luaVM, vector.fX);
+                    lua_pushnumber(luaVM, vector.fY);
+                    lua_pushnumber(luaVM, vector.fZ);
+                    return 3;
+                case PHYSICS_PROPERTY_SCALE:
+                    if (pStaticCollision->GetScale(vector))
+                    {
+                        lua_pushnumber(luaVM, vector.fX);
+                        lua_pushnumber(luaVM, vector.fY);
+                        lua_pushnumber(luaVM, vector.fZ);
+                        return 3;
+                    }
+                    else
+                    {
+                        argStream.SetCustomError(SString("Shape '%s' does not support scale property", pShape->GetType()));
+                    }
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Physics static collision does not support %s property.", EnumToString(eProperty).c_str()));
+                    break;
+            }
         }
         else if (pShape)
         {

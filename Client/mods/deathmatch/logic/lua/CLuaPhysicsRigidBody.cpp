@@ -114,6 +114,7 @@ void CLuaPhysicsRigidBody::SetPosition(CVector& vecPosition)
     m_pBtRigidBody->setCcdMotionThreshold(1e-7);
     m_pBtRigidBody->setCcdSweptSphereRadius(0.5f);
     m_pBtRigidBody->setWorldTransform(transform);
+    Activate();
 }
 
 void CLuaPhysicsRigidBody::GetPosition(CVector& vecPosition)
@@ -127,6 +128,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector& vecRotation)
     btTransform transform = m_pBtRigidBody->getWorldTransform();
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pBtRigidBody->setWorldTransform(transform);
+    Activate();
 }
 
 void CLuaPhysicsRigidBody::GetRotation(CVector& vecRotation)
@@ -148,6 +150,7 @@ void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
 {
     m_pBtRigidBody->setAngularVelocity(reinterpret_cast<btVector3&>(vecVelocity));
 }
+
 void CLuaPhysicsRigidBody::GetAngularVelocity(CVector& vecVelocity)
 {
     vecVelocity = reinterpret_cast<const CVector&>(m_pBtRigidBody->getAngularVelocity());
@@ -206,7 +209,7 @@ void CLuaPhysicsRigidBody::SetScale(CVector& vecScale)
 {
     CLuaPhysicsSharedLogic::SetScale(m_pBtRigidBody->getCollisionShape(), vecScale);
     // prevents rigid from sleeping, otherwise it can overlap other collisions
-    m_pBtRigidBody->activate(true);
+    Activate();
 }
 
 void CLuaPhysicsRigidBody::GetScale(CVector& vecScale)
