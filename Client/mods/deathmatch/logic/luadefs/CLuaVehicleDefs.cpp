@@ -1692,13 +1692,13 @@ int CLuaVehicleDefs::SetVehicleColor(lua_State* luaVM)
         if (i == 4)
         {
             // 4 args mean palette colours
-            color.SetPaletteColors(ucParams[0], ucParams[1], ucParams[2], ucParams[3], true);
+            color.SetPaletteColors(ucParams[0], ucParams[1], ucParams[2], ucParams[3]);
         }
         else if (i == 3 || i == 6 || i == 9 || i == 12)
         {
             // 3,6,9 or 12 args mean rgb colours
             color.SetRGBColors(SColorRGBA(ucParams[0], ucParams[1], ucParams[2], 0), SColorRGBA(ucParams[3], ucParams[4], ucParams[5], 0),
-                               SColorRGBA(ucParams[6], ucParams[7], ucParams[8], 0), SColorRGBA(ucParams[9], ucParams[10], ucParams[11], 0), true);
+                               SColorRGBA(ucParams[6], ucParams[7], ucParams[8], 0), SColorRGBA(ucParams[9], ucParams[10], ucParams[11], 0));
         }
         else
             argStream.SetCustomError("Incorrect number of color arguments");
