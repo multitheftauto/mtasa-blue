@@ -4,13 +4,15 @@
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CClientAssetModel.h
- *  PURPOSE:     PointLights entity class header
+ *  PURPOSE:     ASset model class header
  *
  *****************************************************************************/
 
 #pragma once
 
+#include "CClientMeshBuffer.h"
 #include "CClientEntity.h"
+#include "..\Client\mods\deathmatch\logic\lua\CLuaAssetMesh.h"
 #include <assimp/include/assimp/scene.h>
 #include <assimp/include/assimp/Importer.hpp>
 #include <assimp/include/assimp/postprocess.h>
@@ -21,16 +23,6 @@ class CClientAssetModelManager;
 class CLuaAssetNode;
 class CLuaAssetMesh;
 class CClientMeshBuffer;
-
-enum ePrimitiveData
-{
-    PRIMITIVE_DATA_XYZ = 1 << 0,
-    PRIMITIVE_DATA_XY = 1 << 1,
-    PRIMITIVE_DATA_UV = 1 << 2,
-    PRIMITIVE_DATA_DIFFUSE = 1 << 3,
-    PRIMITIVE_DATA_INDICES16 = 1 << 29,
-    PRIMITIVE_DATA_INDICES32 = 1 << 30,
-};
 
 struct SRenderingSettings
 {
@@ -80,7 +72,9 @@ public:
 
     void           CacheTextures(CResource* pParentResource);
     void           Render(SRenderingSettings* settings);
-    CLuaAssetMesh* GetMesh(int idx) { return m_vecAssetMeshes[idx]; }
+    CClientMeshBuffer* GetMeshBuffer(int idx) { return m_vecAssetMeshes[idx]->GetMeshBuffer(); }
+    size_t GetMeshNum() { return m_vecAssetMeshes.size(); }
+    SAssetTexture& GetTexture(int idx) { return m_vecAssetTextures[idx]; }
 
 protected:
     void CacheNodes(const aiNode* pNode);
@@ -98,85 +92,3 @@ protected:
     std::vector<SAssetTexture>        m_vecAssetTextures;
     std::atomic<bool>                 m_bModelLoaded = false;
 };
-
-class CClientMeshBuffer
-{
-public:
-    CClientMeshBuffer() { m_pDevice = g_pCore->GetGraphics()->GetDevice(); }
-    ~CClientMeshBuffer();
-    // only int and unsigned short are allowed
-    template <typename T>
-    void CreateIndexBuffer(std::vector<T>& vecIndexList);
-
-    template <typename T>
-    void AddVertexBuffer(void* pData, size_t size, ePrimitiveData primitiveData);
-
-public:
-    IDirect3DDevice9*              m_pDevice;
-    IDirect3DIndexBuffer9*         m_pIndexBuffer;
-    IDirect3DVertexBuffer9*        m_arrayVertexBuffer[8] = {nullptr};
-    int                            m_iStrideSize[8] = {0};
-    LPDIRECT3DVERTEXDECLARATION9   m_pVertexDeclaration;
-    D3DPRIMITIVETYPE               m_ePrimitiveType;
-    std::vector<D3DVERTEXELEMENT9> m_vecVertexElements;
-    int                            m_iFaceCount;
-    int                            m_iIndicesCount;
-    int                            m_iVertexCount;
-    int                            m_FVF;
-    float                          m_fBuffer[24] = {0};
-    bool                           m_bUseIndexedPrimitives;
-    bool                           m_bRequireMaterial;
-    size_t                         m_szMemoryUsageInBytes;
-};
-
-template <typename T>
-void CClientMeshBuffer::CreateIndexBuffer(std::vector<T>& vecIndexList)
-{
-    void* pVoid;
-
-    if (std::is_same<T, int>::value)
-        m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(T), 0, D3DFMT_INDEX32, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
-    else
-        m_pDevice->CreateIndexBuffer(vecIndexList.size() * sizeof(T), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, NULL);
-
-    m_pIndexBuffer->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, vecIndexList.data(), vecIndexList.size() * sizeof(T));
-    m_pIndexBuffer->Unlock();
-    m_iIndicesCount = vecIndexList.size();
-    m_bUseIndexedPrimitives = true;
-    m_szMemoryUsageInBytes += vecIndexList.size() * sizeof(T);
-}
-
-template <typename T>
-void CClientMeshBuffer::AddVertexBuffer(void* pData, size_t size, ePrimitiveData primitiveData)
-{
-    int index = 0;
-    int FVF = 0;
-    switch (primitiveData)
-    {
-        case PRIMITIVE_DATA_XYZ:
-            index = 0;
-            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0});
-            FVF = D3DFVF_XYZ;
-            break;
-        case PRIMITIVE_DATA_UV:
-            index = 1;
-            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0});
-            FVF = D3DFVF_TEX1;
-            break;
-        case PRIMITIVE_DATA_DIFFUSE:
-            index = 2;
-            m_vecVertexElements.push_back({(WORD)index, 0, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0});
-            FVF = D3DFVF_DIFFUSE;
-            break;
-    }
-
-    void* pVoid;            // POINTER TO POINTER, remember forkerer
-    m_pDevice->CreateVertexBuffer(size * sizeof(T), D3DUSAGE_WRITEONLY, FVF, D3DPOOL_MANAGED, &m_arrayVertexBuffer[index], NULL);
-    m_arrayVertexBuffer[index]->Lock(0, 0, (void**)&pVoid, 0);
-    memcpy(pVoid, pData, size * sizeof(T));
-    m_arrayVertexBuffer[index]->Unlock();
-    
-    m_iStrideSize[index] = sizeof(T);
-    m_szMemoryUsageInBytes += size * sizeof(T);
-}

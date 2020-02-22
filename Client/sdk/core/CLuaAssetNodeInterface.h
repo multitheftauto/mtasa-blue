@@ -10,8 +10,11 @@
 
 #pragma once
 
+class CClientMeshBuffer;
 class CLuaAssetNodeInterface
 {
 public:
-    virtual void Render(SRenderingSettings& settings) = 0;
+    virtual CClientMeshBuffer* GetMeshBuffer(int idx) = 0;
+    virtual CMaterialItem*     GetTexture(int idx) = 0;
+    virtual size_t             GetMeshNum() = 0;
 };

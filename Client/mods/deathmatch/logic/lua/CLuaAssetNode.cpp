@@ -18,7 +18,6 @@ using namespace Assimp;
 #include "CLuaAssetNode.h"
 #include "CLuaAssetMesh.h"
 
-
 CLuaAssetNode::CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETNODE);
@@ -46,29 +45,37 @@ void CLuaAssetNode::AddToRenderQueue(SRenderingSettings& settings)
     g_pCore->GetGraphics()->DrawAssetNode(settings);
 }
 
-void CLuaAssetNode::Render(SRenderingSettings& settings)
+CMaterialItem* pLastMaterial;
+
+CClientMeshBuffer* CLuaAssetNode::GetMeshBuffer(int idx)
 {
-    CClientMeshBuffer* pMeshBuffer;
-    CLuaAssetMesh* pLuaMesh;
-    IDirect3DDevice9*  device = g_pCore->GetGraphics()->GetDevice();
-
-    float m_fBuffer[24] = {0};
-    for (int i = 0; i < m_pNode->mNumMeshes; i++)
-    {
-        settings.matrix.GetBuffer(m_fBuffer);
-        device->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-        pLuaMesh = m_pAssetModel->GetMesh(m_pNode->mMeshes[i]);
-        pMeshBuffer = pLuaMesh->GetMeshBuffer();
-
-        //device->SetVertexDeclaration(pMeshBuffer->m_pVertexDeclaration);
-        for (int i = 0; i < 8; i++)
-            if (pMeshBuffer->m_arrayVertexBuffer[i] != nullptr)
-                device->SetStreamSource(i, pMeshBuffer->m_arrayVertexBuffer[i], 0, pMeshBuffer->m_iStrideSize[i]);
-        device->SetIndices(pMeshBuffer->m_pIndexBuffer);
-        device->SetFVF(pMeshBuffer->m_FVF);
-        device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    }
+    return  m_pAssetModel->GetMeshBuffer(m_pNode->mMeshes[idx]);
 }
+
+CMaterialItem* CLuaAssetNode::GetTexture(int idx)
+{
+    return m_pAssetModel->GetTexture(idx).pClientTexture->GetMaterialItem();
+}
+
+size_t CLuaAssetNode::GetMeshNum()
+{
+    return m_pNode->mNumMeshes;
+}
+
+//void CLuaAssetNode::Render(SRenderingSettings& settings)
+//{
+//    CClientMeshBuffer* pMeshBuffer;
+//    CLuaAssetMesh*     pLuaMesh;
+//    IDirect3DDevice9*  device = g_pCore->GetGraphics()->GetDevice();
+//
+//    // for (int i = 0; i < m_pNode->mNumMeshes; i++)
+//    //{
+//    //    pLuaMesh = m_pAssetModel->GetMesh(m_pNode->mMeshes[i]);
+//    //    }
+//    //    else
+//    //        device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+//    //}
+//}
 
 CLuaAssetNode* CLuaAssetNode::GetFromScriptID(unsigned int uiScriptID)
 {

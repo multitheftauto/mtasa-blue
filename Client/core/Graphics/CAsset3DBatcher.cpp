@@ -12,9 +12,9 @@
 #include <StdInc.h>
 #include "CAsset3DBatcher.h"
 #include "core/CLuaAssetNodeInterface.h"
+#include "../Client\mods\deathmatch\logic\CClientMeshBuffer.h"
 
-CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics)
-    : m_pGraphics(pGraphics)
+CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
 {
 }
 
@@ -44,71 +44,91 @@ void CAsset3DBatcher::Flush()
     m_pDevice->SetTransform(D3DTS_VIEW, &matView);
     m_pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
-
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
 
     m_pDevice->SetTexture(0, nullptr);
 
+    float m_fBuffer[24] = {0};
+
+    CClientMeshBuffer* pMeshBuffer;
+    CMaterialItem*     pLastMaterial = nullptr;
     for (SRenderingSettings& renderSetting : m_vecRenderList)
     {
-        renderSetting.assetNode->Render(renderSetting);
-        //const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
-        //size_t iCollectionSize = primitive.pVecVertices->size();
+        renderSetting.matrix.GetBuffer(m_fBuffer);
+        m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
+        for (int i = 0; i < renderSetting.assetNode->GetMeshNum(); i++)
+        {
+            pMeshBuffer = renderSetting.assetNode->GetMeshBuffer(i);
 
-        //CMaterialItem* pMaterial = primitive.pMaterial;
-        //if (pMaterial != pLastMaterial)
-        //{
-        //    // Set texture addressing mode
-        //    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
-        //    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
+            for (int i = 0; i < 8; i++)
+                if (pMeshBuffer->m_arrayVertexBuffer[i] != nullptr)
+                    m_pDevice->SetStreamSource(i, pMeshBuffer->m_arrayVertexBuffer[i], 0, pMeshBuffer->m_iStrideSize[i]);
+            m_pDevice->SetIndices(pMeshBuffer->m_pIndexBuffer);
+            m_pDevice->SetFVF(pMeshBuffer->m_FVF);
+            m_pDevice->SetVertexDeclaration(pMeshBuffer->m_pVertexDeclaration);
 
-        //    if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
-        //        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
-        //}
+            if (pMeshBuffer->m_uiMaterialIndex >= 0)
+            {
+                CMaterialItem* pMaterial = renderSetting.assetNode->GetTexture(pMeshBuffer->m_uiMaterialIndex);
+                if (pMaterial != pLastMaterial)
+                {
+                    // Set texture addressing mode
+                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
+                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
 
-        //if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
-        //{
-        //    m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-        //    DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
-        //}
-        //else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
-        //{
-        //    // Draw using shader
-        //    ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+                    if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
+                        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
+                }
 
-        //    if (pMaterial != pLastMaterial)
-        //    {
-        //        // Apply custom parameters
-        //        pShaderInstance->ApplyShaderParameters();
-        //        // Apply common parameters
-        //        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-        //        // Apply mapped parameters
-        //        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
-        //    }
+                if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
+                {
+                    m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+                    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                }
+                else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
+                {
+                    // Draw using shader
+                    ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-        //    // Do shader passes
-        //    DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
-        //    uint  uiNumPasses = 0;
-        //    pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
+                    if (pMaterial != pLastMaterial)
+                    {
+                        // Apply custom parameters
+                        pShaderInstance->ApplyShaderParameters();
+                        // Apply common parameters
+                        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+                        // Apply mapped parameters
+                        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+                    }
 
-        //    for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
-        //    {
-        //        pD3DEffect->BeginPass(uiPass);
-        //        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
-        //        pD3DEffect->EndPass();
-        //    }
-        //    pShaderInstance->m_pEffectWrap->End();
+                    // Do shader passes
+                    DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
+                    uint  uiNumPasses = 0;
+                    pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
 
-        //    // If we didn't get the effect to save the shader state, clear some things here
-        //    if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
-        //    {
-        //        m_pDevice->SetVertexShader(NULL);
-        //        m_pDevice->SetPixelShader(NULL);
-        //    }
-        //}
-        //pLastMaterial = pMaterial;
-        //pMaterial->Release();
+                    for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
+                    {
+                        pD3DEffect->BeginPass(uiPass);
+                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                        pD3DEffect->EndPass();
+                    }
+                    pShaderInstance->m_pEffectWrap->End();
+
+                    // If we didn't get the effect to save the shader state, clear some things here
+                    if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
+                    {
+                        m_pDevice->SetVertexShader(NULL);
+                        m_pDevice->SetPixelShader(NULL);
+                    }
+                }
+                pLastMaterial = pMaterial;
+                // pMaterial->Release();
+            }
+            else
+            {
+                m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+            }
+        }
     }
 
     // Clean up
@@ -131,22 +151,22 @@ void CAsset3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSi
     int iSize = 1;
     switch (eType)
     {
-    case D3DPT_POINTLIST:
-        iSize = iCollectionSize;
-        break;
-    case D3DPT_LINELIST:
-        iSize = iCollectionSize / 2;
-        break;
-    case D3DPT_LINESTRIP:
-        iSize = iCollectionSize - 1;
-        break;
-    case D3DPT_TRIANGLEFAN:
-    case D3DPT_TRIANGLESTRIP:
-        iSize = iCollectionSize - 2;
-        break;
-    case D3DPT_TRIANGLELIST:
-        iSize = iCollectionSize / 3;
-        break;
+        case D3DPT_POINTLIST:
+            iSize = iCollectionSize;
+            break;
+        case D3DPT_LINELIST:
+            iSize = iCollectionSize / 2;
+            break;
+        case D3DPT_LINESTRIP:
+            iSize = iCollectionSize - 1;
+            break;
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            iSize = iCollectionSize - 2;
+            break;
+        case D3DPT_TRIANGLELIST:
+            iSize = iCollectionSize / 3;
+            break;
     }
     m_pDevice->DrawPrimitiveUP(eType, iSize, pDataAddr, uiVertexStride);
 }

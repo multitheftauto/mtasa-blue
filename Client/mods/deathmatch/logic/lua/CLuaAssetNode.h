@@ -33,8 +33,10 @@ public:
     aiAABB                      GetBoundingBox();
     const aiNode*               GetNode() const { return m_pNode; }
     void                        AddToRenderQueue(SRenderingSettings& settings);
-    void                        Render(SRenderingSettings& settings);
     std::vector<CLuaAssetNode*> GetChildNodes();
+    CClientMeshBuffer*          GetMeshBuffer(int idx);
+    CMaterialItem*              GetTexture(int idx);
+    size_t                      GetMeshNum();
 
 private:
     uint               m_uiScriptID;

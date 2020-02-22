@@ -11,17 +11,18 @@
 #include <assimp/include/assimp/scene.h>
 #include <assimp/include/assimp/Importer.hpp>
 #include <assimp/include/assimp/postprocess.h>
+#include "CClientMeshBuffer.h"
 using namespace Assimp;
 
 #include "StdInc.h"
 #include "CLuaAssetMesh.h"
 
+
 CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh)
-{
+    {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETMESH);
     m_pAssetModel = pAssetModel;
     m_pMesh = pMesh;
-
     std::vector<int> indices;
     aiFace*          face;
     for (int i = 0; i < m_pMesh->mNumFaces; i++)
@@ -34,8 +35,18 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
     }
 
     m_pMeshBuffer = new CClientMeshBuffer();
-    m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_INDICES32);
-    m_pMeshBuffer->CreateIndexBuffer(indices);
+    m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_XYZ);
+    if (m_pMesh->HasTextureCoords(0))
+    {
+        m_pMeshBuffer->AddVertexBuffer<CVector>(m_pMesh->mTextureCoords[0], m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_UV);
+        m_pMeshBuffer->m_uiMaterialIndex = m_pMesh->mMaterialIndex;
+    }
+    else
+    {
+        m_pMeshBuffer->m_uiMaterialIndex = -1;
+    }
+    m_pMeshBuffer->Finalize();
+    m_pMeshBuffer->CreateIndexBuffer<int>(indices);
     m_pMeshBuffer->m_iFaceCount = m_pMesh->mNumFaces;
     m_pMeshBuffer->m_iVertexCount = m_pMesh->mNumVertices;
 }
