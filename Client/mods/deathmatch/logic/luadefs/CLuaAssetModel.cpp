@@ -404,6 +404,7 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     {
         SRenderingSettings settings;
         settings.matrix.SetPosition(vecPosition);
+        ConvertDegreesToRadiansNoWrap(vecRotation);
         settings.matrix.SetRotation(vecRotation);
         settings.matrix.SetScale(vecScale);
         settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
