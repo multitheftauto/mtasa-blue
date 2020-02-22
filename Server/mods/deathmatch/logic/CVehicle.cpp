@@ -321,11 +321,11 @@ bool CVehicle::ReadSpecialData(const int iLine)
         if (i == 3 || i == 6 || i == 9 || i == 12)
         {
             m_Color.SetRGBColors(SColorRGBA(ucValues[0], ucValues[1], ucValues[2], 0), SColorRGBA(ucValues[3], ucValues[4], ucValues[5], 0),
-                                 SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0), true);
+                                 SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0));
         }
         else
         {
-            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
+            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3]);
         }
     }
 
