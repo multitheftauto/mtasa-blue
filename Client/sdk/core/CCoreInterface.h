@@ -22,6 +22,7 @@
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
+#include "CLuaAssetNodeInterface.h"
 #include "CChatInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>

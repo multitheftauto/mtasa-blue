@@ -30,9 +30,14 @@ class CPrimitiveBatcher;
 class CPrimitiveMaterialBatcher;
 class CPrimitive3DBatcher;
 class CMaterialPrimitive3DBatcher;
+class CAsset3DBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
+
+class CLuaAssetNode;
+struct SRenderingSettings;
+
 
 namespace EDrawMode
 {
@@ -158,6 +163,7 @@ public:
                           short siSegments, float fRatio, bool bPostGUI);
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
+    void DrawAssetNode(SRenderingSettings& settings);
 
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
@@ -233,6 +239,7 @@ private:
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
+    CAsset3DBatcher*             m_pAssetBatcher = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
 
     // Fonts

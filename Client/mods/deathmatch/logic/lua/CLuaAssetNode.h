@@ -18,7 +18,7 @@ class CClientAssetModel;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-class CLuaAssetNode
+class CLuaAssetNode : public CLuaAssetNodeInterface
 {
 public:
     CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode);
@@ -28,11 +28,14 @@ public:
 
     uint                 GetScriptID() const { return m_uiScriptID; }
 
-    static CLuaAssetNode* GetFromScriptID(unsigned int uiScriptID);
-    int                  GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
-    aiAABB                GetBoundingBox();
-    const aiNode*         GetNode() const { return m_pNode; }
+    static CLuaAssetNode*       GetFromScriptID(unsigned int uiScriptID);
+    int                         GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    aiAABB                      GetBoundingBox();
+    const aiNode*               GetNode() const { return m_pNode; }
+    void                        AddToRenderQueue(SRenderingSettings& settings);
+    void                        Render(SRenderingSettings& settings);
     std::vector<CLuaAssetNode*> GetChildNodes();
+
 private:
     uint               m_uiScriptID;
     CClientAssetModel* m_pAssetModel;

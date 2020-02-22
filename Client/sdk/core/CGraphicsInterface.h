@@ -14,6 +14,8 @@
 #include "CVector.h"
 #include <d3d9.h>
 
+struct SRenderingSettings;
+
 // Vertex type used by the primitives batchers
 struct PrimitiveVertice
 {
@@ -170,6 +172,7 @@ public:
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
 
     virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
+    virtual void DrawAssetNode(SRenderingSettings& settings) = 0;
 
     virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 

@@ -21,11 +21,29 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETMESH);
     m_pAssetModel = pAssetModel;
     m_pMesh = pMesh;
+
+    std::vector<int> indices;
+    aiFace*          face;
+    for (int i = 0; i < m_pMesh->mNumFaces; i++)
+    {
+        face = &m_pMesh->mFaces[i];
+        for (int idx = 0; idx < face->mNumIndices; idx++)
+        {
+            indices.push_back(face->mIndices[idx]);
+        }
+    }
+
+    m_pMeshBuffer = new CClientMeshBuffer();
+    m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_INDICES32);
+    m_pMeshBuffer->CreateIndexBuffer(indices);
+    m_pMeshBuffer->m_iFaceCount = m_pMesh->mNumFaces;
+    m_pMeshBuffer->m_iVertexCount = m_pMesh->mNumVertices;
 }
 
 CLuaAssetMesh::~CLuaAssetMesh()
 {
     RemoveScriptID();
+    delete m_pMeshBuffer;
 }
 
 void CLuaAssetMesh::RemoveScriptID()
@@ -54,13 +72,13 @@ int CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
             lua_pushnumber(luaVM, m_pMesh->mNumFaces);
             return 1;
         case ASSET_UV_COMPONENTS_COUNT:
-             lua_newtable(luaVM);
-             for (int i = 0; i < 8; i++)
+            lua_newtable(luaVM);
+            for (int i = 0; i < 8; i++)
             {
                 lua_pushnumber(luaVM, i + 1);
                 lua_pushnumber(luaVM, m_pMesh->mNumUVComponents[i]);
                 lua_settable(luaVM, -3);
-            } 
+            }
             return 1;
         case ASSET_UV_CHANNELS:
             lua_pushnumber(luaVM, m_pMesh->GetNumUVChannels());

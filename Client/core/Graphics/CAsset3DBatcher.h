@@ -11,12 +11,10 @@
 
 #pragma once
 
-// Vertex type used by the primitives 3d batcher
-struct sPrimitiveMaterial3D
+struct SRenderingSettings
 {
-    D3DPRIMITIVETYPE                       eType;
-    CMaterialItem*                         pMaterial;
-    std::vector<PrimitiveMaterialVertice>* pVecVertices;
+    CMatrix                 matrix;
+    CLuaAssetNodeInterface* assetNode;
 };
 
 //
@@ -25,17 +23,16 @@ struct sPrimitiveMaterial3D
 class CAsset3DBatcher
 {
 public:
-    CAsset3DBatcher(bool bPreGUI, CGraphics* pGraphics);
+    CAsset3DBatcher(CGraphics* pGraphics);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
-    void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);
+    void AddAsset(SRenderingSettings& settings);
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride);
-    bool HasItems() const { return !m_primitiveList.empty(); }
+    bool HasItems() const { return !m_vecRenderList.empty(); }
     void ClearQueue();
 
 protected:
-    bool m_bPreGUI;
     IDirect3DDevice9*                     m_pDevice;
     CGraphics*                            m_pGraphics;
-    std::vector<sPrimitiveMaterial3D>     m_primitiveList;
+    std::vector<SRenderingSettings>       m_vecRenderList;
 };

@@ -12,6 +12,19 @@
 #include "../logic/lua/CLuaAssetNode.h"
 #include "../logic/lua/CLuaAssetMesh.h"
 
+class CClientTexture;
+
+CClientMeshBuffer::~CClientMeshBuffer()
+{
+    m_pIndexBuffer->Release();
+    delete m_pIndexBuffer;
+    for (int i = 0; i < 8; i++)
+    {
+        m_arrayVertexBuffer[i]->Release();
+    }
+    delete[] m_arrayVertexBuffer;
+}
+
 CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -109,32 +122,8 @@ void CClientAssetModel::CacheMeshes()
     for (int i = 0; i < m_pScene->mNumMeshes; i++)
     {
         m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
-        CreateMeshBuffer(m_pScene->mMeshes[i]);
     }
 }
-
-void CClientAssetModel::CreateMeshBuffer(aiMesh* pAssetMesh)
-{
-    int id = 0;
-    for (int i = 0; i < m_pScene->mNumMeshes; i++)
-    {
-        if (m_pScene->mMeshes[i] == pAssetMesh)
-        {
-            id = i;
-            break;
-        }
-    }
-
-    auto it = m_mapMeshes.find(id);
-
-    if (it == m_mapMeshes.end())
-        return;
-
-    CClientMeshBuffer* pMeshBuffer = new CClientMeshBuffer();
-    pMeshBuffer->AddVertexBuffer<int>(&pAssetMesh->mVertices[0].x, pAssetMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_INDICES32);
-}
-
-class CClientTexture;
 
 void CClientAssetModel::CacheTextures(CResource* pParentResource)
 {
@@ -201,6 +190,11 @@ const char* CClientAssetModel::LoadFromFile(std::string strPath)
     CacheMeshes();
     m_bModelLoaded = true;
     return "";
+}
+
+void CClientAssetModel::Render(SRenderingSettings* settings)
+{
+
 }
 
 void CClientAssetModel::DoPulse()

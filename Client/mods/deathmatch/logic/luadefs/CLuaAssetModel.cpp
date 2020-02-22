@@ -12,15 +12,13 @@
 #include "StdInc.h"
 #include "../lua/CLuaAssetNode.h"
 #include "../lua/CLuaAssetMesh.h"
+#include "core/CLuaAssetNodeInterface.h"
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
-        {"loadAssetModel", LoadAssetModel},
-        {"getAssetProperties", GetAssetProperties},
-        {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
-        {"assetGetNodeMeshes", AssetGetNodeMeshes},
-        {"assetGetTextures", AssetGetTextures},
+        {"loadAssetModel", LoadAssetModel},         {"getAssetProperties", GetAssetProperties}, {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
+        {"assetGetNodeMeshes", AssetGetNodeMeshes}, {"assetGetTextures", AssetGetTextures},     {"assetRender", AssetRender},
     };
 
     // Add functions
@@ -63,8 +61,8 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
             argStream.ReadFunction(luaFunctionRef);
         }
 
-        float fGlobalScale = 1.0f;
-        bool  bRawData = false;
+        float   fGlobalScale = 1.0f;
+        bool    bRawData = false;
         SString strHint = "rawdata";
         if (argStream.NextIsTable())
         {
@@ -271,9 +269,9 @@ int CLuaAssetModelDefs::AssetGetNodeMeshes(lua_State* luaVM)
         }
         else
         {
-            //std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
-            //lua_newtable(luaVM);
-            //for (int i = 0; i < childNodes.size(); i++)
+            // std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
+            // lua_newtable(luaVM);
+            // for (int i = 0; i < childNodes.size(); i++)
             //{
             //    lua_pushnumber(luaVM, i + 1);
             //    lua_pushassetnode(luaVM, childNodes[i]);
@@ -316,9 +314,9 @@ int CLuaAssetModelDefs::AssetGetTextures(lua_State* luaVM)
         }
         else
         {
-            //std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
-            //lua_newtable(luaVM);
-            //for (int i = 0; i < childNodes.size(); i++)
+            // std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
+            // lua_newtable(luaVM);
+            // for (int i = 0; i < childNodes.size(); i++)
             //{
             //    lua_pushnumber(luaVM, i + 1);
             //    lua_pushassetnode(luaVM, childNodes[i]);
@@ -362,7 +360,7 @@ int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
             lua_settable(luaVM, -3);
             return 1;
         }
-        else
+        else if (pAssetNode != nullptr)
         {
             std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
             lua_newtable(luaVM);
@@ -384,50 +382,38 @@ int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
     return 1;
 }
 
+int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
+{
+    //  bool assetRender ( asset-node theAssetNode, position, rotation, scale, options  )
+    CLuaAssetNode*   pAssetNode = nullptr;
+    CStringMap       optionsMap;
+    CVector          vecPosition;
+    CVector          vecRotation;
+    CVector          vecScale = CVector(1, 1, 1);
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pAssetNode);
+    argStream.ReadVector3D(vecPosition);
+    if(argStream.NextIsVector3D())
+        argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+    if (argStream.NextIsVector3D())
+    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
 
-//
-// int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
-//{
-//    //  timer setTimer ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
-//    CLuaFunctionRef iLuaFunction;
-//    double          dTimeInterval;
-//    uint            uiTimesToExecute;
-//    CLuaArguments   Arguments;
-//
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadFunction(iLuaFunction);
-//    argStream.ReadNumber(dTimeInterval);
-//    argStream.ReadNumber(uiTimesToExecute);
-//    argStream.ReadLuaArguments(Arguments);
-//    argStream.ReadFunctionComplete();
-//
-//    if (!argStream.HasErrors())
-//    {
-//        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-//        if (luaMain)
-//        {
-//            // Check for the minimum interval
-//            if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
-//            {
-//                argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
-//            }
-//            else
-//            {
-//                CLuaTimer* pLuaTimer = luaMain->GetTimerManager()->AddTimer(iLuaFunction, CTickCount(dTimeInterval), uiTimesToExecute, Arguments);
-//                if (pLuaTimer)
-//                {
-//                    // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
-//                    pLuaTimer->SetLuaDebugInfo(g_pClientGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
-//
-//                    lua_pushtimer(luaVM, pLuaTimer);
-//                    return 1;
-//                }
-//            }
-//        }
-//    }
-//    if (argStream.HasErrors())
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
+    argStream.ReadStringMap(optionsMap);
+
+    if (!argStream.HasErrors())
+    {
+        SRenderingSettings settings;
+        settings.matrix.SetPosition(vecPosition);
+        settings.matrix.SetRotation(vecRotation);
+        settings.matrix.SetScale(vecScale);
+        settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
+        g_pCore->GetGraphics()->DrawAssetNode(settings);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

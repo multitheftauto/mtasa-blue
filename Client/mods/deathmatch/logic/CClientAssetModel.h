@@ -32,6 +32,12 @@ enum ePrimitiveData
     PRIMITIVE_DATA_INDICES32 = 1 << 30,
 };
 
+struct SRenderingSettings
+{
+    CMatrix                 matrix;
+    CLuaAssetNodeInterface* assetNode;
+};
+
 struct SAssetTexture
 {
     const char*     fileName;
@@ -72,32 +78,32 @@ public:
     const aiScene*    GetScene() { return m_pScene; }
     bool              IsLoaded() { return m_bModelLoaded; }
 
-    void CacheTextures(CResource* pParentResource);
+    void           CacheTextures(CResource* pParentResource);
+    void           Render(SRenderingSettings* settings);
+    CLuaAssetMesh* GetMesh(int idx) { return m_vecAssetMeshes[idx]; }
 
 protected:
     void CacheNodes(const aiNode* pNode);
     void CacheMeshes();
-    void CreateMeshBuffer(aiMesh* pAssetMesh);
 
     CClientAssetModelManager* m_pAssetModelManager;
 
-    unsigned int                m_uiImportFlags;
-    Assimp::Importer            importer;
-    CVector                     m_vecPosition;
-    std::vector<const aiNode*>  vecNodes;
-    const aiScene*              m_pScene;
-    std::vector<CLuaAssetNode*> m_vecAssetNodes;
-    std::vector<CLuaAssetMesh*> m_vecAssetMeshes;
-    std::vector<SAssetTexture>  m_vecAssetTextures;
-    std::atomic<bool>           m_bModelLoaded = false;
-    std::map<int, CClientMeshBuffer*> m_mapMeshes;
+    unsigned int                      m_uiImportFlags;
+    Assimp::Importer                  importer;
+    CVector                           m_vecPosition;
+    std::vector<const aiNode*>        vecNodes;
+    const aiScene*                    m_pScene;
+    std::vector<CLuaAssetNode*>       m_vecAssetNodes;
+    std::vector<CLuaAssetMesh*>       m_vecAssetMeshes;
+    std::vector<SAssetTexture>        m_vecAssetTextures;
+    std::atomic<bool>                 m_bModelLoaded = false;
 };
 
 class CClientMeshBuffer
 {
 public:
     CClientMeshBuffer() { m_pDevice = g_pCore->GetGraphics()->GetDevice(); }
-    ~CClientMeshBuffer() {}
+    ~CClientMeshBuffer();
     // only int and unsigned short are allowed
     template <typename T>
     void CreateIndexBuffer(std::vector<T>& vecIndexList);
@@ -105,7 +111,7 @@ public:
     template <typename T>
     void AddVertexBuffer(void* pData, size_t size, ePrimitiveData primitiveData);
 
-private:
+public:
     IDirect3DDevice9*              m_pDevice;
     IDirect3DIndexBuffer9*         m_pIndexBuffer;
     IDirect3DVertexBuffer9*        m_arrayVertexBuffer[8] = {nullptr};
@@ -121,7 +127,6 @@ private:
     bool                           m_bUseIndexedPrimitives;
     bool                           m_bRequireMaterial;
     size_t                         m_szMemoryUsageInBytes;
-
 };
 
 template <typename T>
@@ -171,8 +176,7 @@ void CClientMeshBuffer::AddVertexBuffer(void* pData, size_t size, ePrimitiveData
     m_arrayVertexBuffer[index]->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, pData, size * sizeof(T));
     m_arrayVertexBuffer[index]->Unlock();
-
-    m_iFaceCount = size / 3;
+    
     m_iStrideSize[index] = sizeof(T);
     m_szMemoryUsageInBytes += size * sizeof(T);
 }

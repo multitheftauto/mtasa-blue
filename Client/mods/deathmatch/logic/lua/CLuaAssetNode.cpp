@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaAssetNode.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua asset node class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -16,6 +16,8 @@ using namespace Assimp;
 
 #include "StdInc.h"
 #include "CLuaAssetNode.h"
+#include "CLuaAssetMesh.h"
+
 
 CLuaAssetNode::CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode)
 {
@@ -35,6 +37,36 @@ void CLuaAssetNode::RemoveScriptID()
     {
         CIdArray::PushUniqueId(this, EIdClass::ASSETNODE, m_uiScriptID);
         m_uiScriptID = INVALID_ARRAY_ID;
+    }
+}
+
+void CLuaAssetNode::AddToRenderQueue(SRenderingSettings& settings)
+{
+    // m_vecRender.push_back(std::move(settings));
+    g_pCore->GetGraphics()->DrawAssetNode(settings);
+}
+
+void CLuaAssetNode::Render(SRenderingSettings& settings)
+{
+    CClientMeshBuffer* pMeshBuffer;
+    CLuaAssetMesh* pLuaMesh;
+    IDirect3DDevice9*  device = g_pCore->GetGraphics()->GetDevice();
+
+    float m_fBuffer[24] = {0};
+    for (int i = 0; i < m_pNode->mNumMeshes; i++)
+    {
+        settings.matrix.GetBuffer(m_fBuffer);
+        device->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
+        pLuaMesh = m_pAssetModel->GetMesh(m_pNode->mMeshes[i]);
+        pMeshBuffer = pLuaMesh->GetMeshBuffer();
+
+        //device->SetVertexDeclaration(pMeshBuffer->m_pVertexDeclaration);
+        for (int i = 0; i < 8; i++)
+            if (pMeshBuffer->m_arrayVertexBuffer[i] != nullptr)
+                device->SetStreamSource(i, pMeshBuffer->m_arrayVertexBuffer[i], 0, pMeshBuffer->m_iStrideSize[i]);
+        device->SetIndices(pMeshBuffer->m_pIndexBuffer);
+        device->SetFVF(pMeshBuffer->m_FVF);
+        device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
     }
 }
 

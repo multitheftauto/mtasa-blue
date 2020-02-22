@@ -26,12 +26,14 @@ public:
 
     void RemoveScriptID();
 
-    uint GetScriptID() const { return m_uiScriptID; }
+    uint                  GetScriptID() const { return m_uiScriptID; }
+    CClientMeshBuffer*    GetMeshBuffer() const { return m_pMeshBuffer; }
     static CLuaAssetMesh* GetFromScriptID(unsigned int uiScriptID);
-    int GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    int                   GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
 
 private:
     CClientAssetModel* m_pAssetModel;
     const aiMesh* m_pMesh;
     uint m_uiScriptID;
+    CClientMeshBuffer* m_pMeshBuffer;
 };

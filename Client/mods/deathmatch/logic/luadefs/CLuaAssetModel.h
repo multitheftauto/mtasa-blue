@@ -23,4 +23,5 @@ public:
     LUA_DECLARE(AssetGetChilldrenNodes);
     LUA_DECLARE(AssetGetNodeMeshes);
     LUA_DECLARE(AssetGetTextures);
+    LUA_DECLARE(AssetRender);
 };

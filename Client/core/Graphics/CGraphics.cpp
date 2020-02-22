@@ -17,7 +17,9 @@
 #include "CPrimitiveMaterialBatcher.h"
 #include "CPrimitive3DBatcher.h"
 #include "CMaterialPrimitive3DBatcher.h"
+#include "CAsset3DBatcher.h"
 #include "CAspectRatioConverter.h"
+
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
 extern bool   g_bInMTAScene;
@@ -63,6 +65,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
+    m_pAssetBatcher = new CAsset3DBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -93,6 +96,7 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
+    SAFE_DELETE(m_pAssetBatcher);
     SAFE_DELETE(m_pAspectRatioConverter);
 }
 
@@ -794,6 +798,14 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     AddQueueItem(Item, bPostGUI);
 }
 
+void CGraphics::DrawAssetNode(SRenderingSettings& settings)
+{
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    m_pAssetBatcher->AddAsset(settings);
+}
+
 void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
@@ -1485,6 +1497,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pAssetBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
     m_ProgressSpinnerTexture =
@@ -1576,6 +1589,7 @@ void CGraphics::DrawPrimitive3DPreGUIQueue(void)
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
     m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+    m_pAssetBatcher->Flush();
 }
 
 bool CGraphics::HasLine3DPreGUIQueueItems(void)
@@ -1585,7 +1599,7 @@ bool CGraphics::HasLine3DPreGUIQueueItems(void)
 
 bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 {
-    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
+    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems() || m_pAssetBatcher->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
