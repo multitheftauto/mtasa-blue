@@ -313,7 +313,8 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
-    void           SetLODDistance(float fDistance);
+    float          GetOriginalLODDistance();
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
@@ -361,6 +362,7 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
+    void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
@@ -371,6 +373,9 @@ public:
     unsigned short GetObjectPropertiesGroup();
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
+
+    // Vehicle towing functions
+    bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

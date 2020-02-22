@@ -1272,7 +1272,7 @@ void CClientGame::DoPulses()
         UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        // UpdateTrailers (); // Test: Does it always work without this check?
+        UpdateTrailers (); // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
@@ -3564,6 +3564,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
 
+    // Deallocate all custom models
+    m_pManager->GetModelManager()->RemoveAll();
+
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
 
@@ -4033,7 +4036,15 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                           SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
-    int  iGroupID = pAnimAssocGroup->GetGroupID();
+    int iGroupID = pAnimAssocGroup->GetGroupID();
+
+    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    {
+        g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
+                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
+        return false;
+    }
+
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
     auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
     auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
@@ -4273,13 +4284,20 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     CPools* pPools = g_pGame->GetPools();
 
     // Grab the damaged ped
-    CClientPed* pDamagedPed = NULL;
+    CClientPed* pDamagedPed = nullptr;
+
     if (pDamagePed)
     {
-        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDamagePed->GetInterface());
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed(reinterpret_cast<DWORD*>(pDamagePed->GetInterface()));
+
         if (pPedClientEntity)
         {
-            pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            // NOTE(botder): Don't use the damaged ped if the associated game entity doesn't exist to avoid a crash
+            //               in the function ApplyPedDamageFromGame
+            if (pPedClientEntity->pClientEntity && pPedClientEntity->pClientEntity->GetGameEntity() != nullptr)
+            {
+                pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            }
         }
     }
 
@@ -4415,24 +4433,6 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                          CEventDamage* pEvent)
 {
-    if (pDamagedPed->GetGamePlayer() == nullptr)
-    {
-        // Shouldn't happen, but it does anyway. Log some information about the damaged ped and the ped pool; and then crash optionally
-        auto          entityType = static_cast<int>(pDamagedPed->GetType());
-        bool          isInVehicle = pDamagedPed->IsInVehicle();
-        bool          isDead = pDamagedPed->IsDead();
-        bool          isLocalPlayer = pDamagedPed->IsLocalPlayer();
-        unsigned long pedCount = g_pGame->GetPools()->GetPedCount();
-        
-        WriteDebugEvent(
-            SString("CClientGame::ApplyPedDamageFromGame: GetGamePlayer() == nullptr (type: %d, inVehicle: %d, isDead: %d, isLocalPlayer: %d, pedCount: %lu)",
-                    entityType, isInVehicle, isDead, isLocalPlayer, pedCount));
-
-        // Crash on purpose to gather crash information for this offset and not somewhere else
-        assert(false);
-        return false;
-    }
-
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
     float fPreviousArmor = pDamagedPed->m_fArmor;

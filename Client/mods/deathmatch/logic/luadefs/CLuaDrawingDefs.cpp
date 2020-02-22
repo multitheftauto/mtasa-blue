@@ -29,6 +29,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawPrimitive3D", DxDrawPrimitive3D},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
+        {"dxDrawWiredSphere", DxDrawWiredSphere},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
@@ -1969,6 +1970,45 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawWiredSphere(lua_State* luaVM)
+{
+    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint iterations )
+    CVector          vecPosition;
+    float            fRadius;
+    SColorARGB       color(64, 255, 0, 0);
+    float            fLineWidth = 1;
+    uint             uiIterations = 1;
+    CScriptArgReader argStream(luaVM);
+
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+
+    argStream.ReadVector3D(vecPosition);
+    argStream.ReadNumber(fRadius);
+    argStream.ReadColor(color, SColorARGB(64, 255, 0, 0));
+    argStream.ReadNumber(fLineWidth, 1);
+    argStream.ReadNumber(uiIterations, 1);
+
+    if (!argStream.HasErrors())
+    {
+        // Greater than 4, crash the game
+        if (uiIterations >= 1 && uiIterations <= 4)
+        {
+            pGraphics->DrawWiredSphere(vecPosition, fRadius, color, fLineWidth, uiIterations);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+
+        argStream.SetCustomError("Iterations must be between 1 and 4");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

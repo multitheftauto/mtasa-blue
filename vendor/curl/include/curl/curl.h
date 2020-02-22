@@ -1,5 +1,5 @@
-#ifndef __CURL_CURL_H
-#define __CURL_CURL_H
+#ifndef CURLINC_CURL_H
+#define CURLINC_CURL_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -154,7 +154,8 @@ typedef enum {
   CURLSSLBACKEND_SECURETRANSPORT = 9,
   CURLSSLBACKEND_AXTLS = 10, /* never used since 7.63.0 */
   CURLSSLBACKEND_MBEDTLS = 11,
-  CURLSSLBACKEND_MESALINK = 12
+  CURLSSLBACKEND_MESALINK = 12,
+  CURLSSLBACKEND_BEARSSL = 13
 } curl_sslbackend;
 
 /* aliases for library clones and renames */
@@ -208,6 +209,11 @@ struct curl_httppost {
                                        field. Used if CURL_HTTPPOST_LARGE is
                                        set. Added in 7.46.0 */
 };
+
+
+/* This is a return code for the progress callback that, when returned, will
+   signal libcurl to continue executing the default progress function */
+#define CURL_PROGRESSFUNC_CONTINUE 0x10000001
 
 /* This is the CURLOPT_PROGRESSFUNCTION callback prototype. It is now
    considered deprecated but was the only choice up until 7.31.0 */
@@ -284,10 +290,7 @@ typedef enum {
 #define CURLFINFOFLAG_KNOWN_SIZE        (1<<6)
 #define CURLFINFOFLAG_KNOWN_HLINKCOUNT  (1<<7)
 
-/* Content of this structure depends on information which is known and is
-   achievable (e.g. by FTP LIST parsing). Please see the url_easy_setopt(3) man
-   page for callbacks returning this structure -- some fields are mandatory,
-   some others are optional. The FLAG field has special meaning. */
+/* Information about a single file, used when doing FTP wildcard matching */
 struct curl_fileinfo {
   char *filename;
   curlfiletype filetype;
@@ -603,6 +606,9 @@ typedef enum {
                                     */
   CURLE_RECURSIVE_API_CALL,      /* 93 - an api function was called from
                                     inside a callback */
+  CURLE_AUTH_ERROR,              /* 94 - an authentication function returned an
+                                    error */
+  CURLE_HTTP3,                   /* 95 - An HTTP/3 layer problem */
   CURL_LAST /* never use! */
 } CURLcode;
 
@@ -822,6 +828,10 @@ typedef enum {
    SSL backends where such behavior is present. */
 #define CURLSSLOPT_NO_REVOKE (1<<1)
 
+/* - NO_PARTIALCHAIN tells libcurl to *NOT* accept a partial certificate chain
+   if possible. The OpenSSL backend has this ability. */
+#define CURLSSLOPT_NO_PARTIALCHAIN (1<<2)
+
 /* The default connection attempt delay in milliseconds for happy eyeballs.
    CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3 and happy-eyeballs-timeout-ms.d document
    this value, keep them in sync. */
@@ -886,7 +896,7 @@ typedef enum {
 
 /* CURLALTSVC_* are bits for the CURLOPT_ALTSVC_CTRL option */
 #define CURLALTSVC_IMMEDIATELY  (1<<0)
-#define CURLALTSVC_ALTUSED      (1<<1)
+
 #define CURLALTSVC_READONLYFILE (1<<2)
 #define CURLALTSVC_H1           (1<<3)
 #define CURLALTSVC_H2           (1<<4)
@@ -946,6 +956,8 @@ typedef enum {
 /* The macro "##" is ISO C, we assume pre-ISO C doesn't support it. */
 #define LONG          CURLOPTTYPE_LONG
 #define OBJECTPOINT   CURLOPTTYPE_OBJECTPOINT
+#define STRINGPOINT   CURLOPTTYPE_OBJECTPOINT
+#define SLISTPOINT    CURLOPTTYPE_OBJECTPOINT
 #define FUNCTIONPOINT CURLOPTTYPE_FUNCTIONPOINT
 #define OFF_T         CURLOPTTYPE_OFF_T
 #define CINIT(name,type,number) CURLOPT_/**/name = type + number
@@ -1925,6 +1937,9 @@ typedef enum {
   /* maximum age of a connection to consider it for reuse (in seconds) */
   CINIT(MAXAGE_CONN, LONG, 288),
 
+  /* SASL authorisation identity */
+  CINIT(SASL_AUTHZID, STRINGPOINT, 289),
+
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;
 
@@ -1978,7 +1993,8 @@ enum {
   CURL_HTTP_VERSION_2TLS, /* use version 2 for HTTPS, version 1.1 for HTTP */
   CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE,  /* please use HTTP 2 without HTTP/1.1
                                            Upgrade */
-
+  CURL_HTTP_VERSION_3 = 30, /* Makes use of explicit HTTP/3 without fallback.
+                               Use CURLOPT_ALTSVC to enable HTTP/3 upgrade */
   CURL_HTTP_VERSION_LAST /* *ILLEGAL* http version */
 };
 
@@ -2614,8 +2630,9 @@ typedef enum {
   CURLINFO_STARTTRANSFER_TIME_T = CURLINFO_OFF_T + 54,
   CURLINFO_REDIRECT_TIME_T  = CURLINFO_OFF_T + 55,
   CURLINFO_APPCONNECT_TIME_T = CURLINFO_OFF_T + 56,
+  CURLINFO_RETRY_AFTER      = CURLINFO_OFF_T + 57,
 
-  CURLINFO_LASTONE          = 56
+  CURLINFO_LASTONE          = 57
 } CURLINFO;
 
 /* CURLINFO_RESPONSE_CODE is the new name for the option previously known as
@@ -2714,6 +2731,7 @@ typedef enum {
   CURLVERSION_THIRD,
   CURLVERSION_FOURTH,
   CURLVERSION_FIFTH,
+  CURLVERSION_SIXTH,
   CURLVERSION_LAST /* never actually use this */
 } CURLversion;
 
@@ -2722,7 +2740,7 @@ typedef enum {
    meant to be a built-in version number for what kind of struct the caller
    expects. If the struct ever changes, we redefine the NOW to another enum
    from above. */
-#define CURLVERSION_NOW CURLVERSION_FIFTH
+#define CURLVERSION_NOW CURLVERSION_SIXTH
 
 typedef struct {
   CURLversion age;          /* age of the returned struct */
@@ -2751,11 +2769,16 @@ typedef struct {
   const char *libssh_version; /* human readable string */
 
   /* These fields were added in CURLVERSION_FIFTH */
-
   unsigned int brotli_ver_num; /* Numeric Brotli version
                                   (MAJOR << 24) | (MINOR << 12) | PATCH */
   const char *brotli_version; /* human readable string. */
 
+  /* These fields were added in CURLVERSION_SIXTH */
+  unsigned int nghttp2_ver_num; /* Numeric nghttp2 version
+                                   (MAJOR << 16) | (MINOR << 8) | PATCH */
+  const char *nghttp2_version; /* human readable string. */
+  const char *quic_version;    /* human readable quic (+ HTTP/3) library +
+                                  version or NULL */
 } curl_version_info_data;
 
 #define CURL_VERSION_IPV6         (1<<0)  /* IPv6-enabled */
@@ -2788,6 +2811,9 @@ typedef struct {
 #define CURL_VERSION_MULTI_SSL    (1<<22) /* Multiple SSL backends available */
 #define CURL_VERSION_BROTLI       (1<<23) /* Brotli features are present. */
 #define CURL_VERSION_ALTSVC       (1<<24) /* Alt-Svc handling built-in */
+#define CURL_VERSION_HTTP3        (1<<25) /* HTTP3 support built-in */
+
+#define CURL_VERSION_ESNI         (1<<26) /* ESNI support */
 
  /*
  * NAME curl_version_info()
@@ -2868,4 +2894,4 @@ CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);
 #endif /* __STDC__ >= 1 */
 #endif /* gcc >= 4.3 && !__cplusplus */
 
-#endif /* __CURL_CURL_H */
+#endif /* CURLINC_CURL_H */

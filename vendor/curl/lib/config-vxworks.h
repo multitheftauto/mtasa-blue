@@ -143,9 +143,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
-/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-#define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
-
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
@@ -374,9 +371,6 @@
 
 /* Define to 1 if you have the `libssh2_version' function. */
 /* #undef HAVE_LIBSSH2_VERSION */
-
-/* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
 
 /* if zlib is available */
 #define HAVE_LIBZ 1

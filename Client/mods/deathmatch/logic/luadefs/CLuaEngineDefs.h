@@ -27,6 +27,8 @@ public:
     LUA_DECLARE(EngineRestoreCOL);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
+    LUA_DECLARE(EngineRequestModel);
+    LUA_DECLARE(EngineFreeModel);
     LUA_DECLARE(EngineReplaceAnimation);
     LUA_DECLARE(EngineRestoreAnimation);
     LUA_DECLARE(EngineReplaceMatchingAtomics);
@@ -37,6 +39,7 @@ public:
     LUA_DECLARE(EngineReplaceVehiclePart);
     LUA_DECLARE(EngineGetModelLODDistance);
     LUA_DECLARE(EngineSetModelLODDistance);
+    LUA_DECLARE(EngineResetModelLODDistance);
     LUA_DECLARE(EngineSetAsynchronousLoading);
     LUA_DECLARE(EngineApplyShaderToWorldTexture);
     LUA_DECLARE(EngineRemoveShaderFromWorldTexture);

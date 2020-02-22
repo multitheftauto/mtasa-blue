@@ -33,7 +33,7 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTDFF; }
 
-    bool LoadDFF(const SString& strFile, bool bIsRawData);
+    bool Load(bool isRaw, SString input);
 
     bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
 
@@ -49,7 +49,10 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-protected:
+private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
     void UnloadDFF();
     void InternalRestoreModel(unsigned short usModel);
@@ -64,8 +67,8 @@ protected:
     class CClientDFFManager* m_pDFFManager;
 
     SString                            m_strDffFilename;
-    CBuffer                            m_RawDataBuffer;
-    bool                               m_bIsRawData;
+    SString                            m_RawDataBuffer;
+    bool                               m_bIsRawData = false;
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
