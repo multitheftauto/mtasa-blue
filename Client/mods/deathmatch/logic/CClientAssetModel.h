@@ -16,12 +16,14 @@
 #include <assimp/include/assimp/scene.h>
 #include <assimp/include/assimp/Importer.hpp>
 #include <assimp/include/assimp/postprocess.h>
+#include "assimp/ProgressHandler.hpp"
 
 using namespace Assimp;
 
 class CClientAssetModelManager;
 class CLuaAssetNode;
 class CLuaAssetMesh;
+class CClientMaterial;
 class CClientMeshBuffer;
 
 struct SRenderingSettings
@@ -34,11 +36,26 @@ struct SAssetTexture
 {
     const char*     fileName;
     CClientTexture* pClientTexture;
+    CClientMaterial* pMaterialElement = nullptr;
     SAssetTexture(const char* name, CClientTexture* pTexture)
     {
         fileName = name;
         pClientTexture = pTexture;
     }
+};
+
+class CAssetProgressHandler : public ProgressHandler
+{
+public:
+    bool bLoad = true;
+    CAssetProgressHandler() {}
+    ~CAssetProgressHandler() {}
+
+private:
+    bool Update(float percentage = -1.f) { return bLoad; }
+    void UpdateFileRead(int currentStep, int numberOfSteps) {}
+    void UpdatePostProcess(int currentStep, int numberOfSteps) {}
+    void UpdateFileWrite(int currentStep, int numberOfSteps) {}
 };
 
 class CClientAssetModel : public CClientEntity
@@ -71,10 +88,11 @@ public:
     bool              IsLoaded() { return m_bModelLoaded; }
 
     void           CacheTextures(CResource* pParentResource);
-    void           Render(SRenderingSettings* settings);
+    void           Cache();
     CClientMeshBuffer* GetMeshBuffer(int idx) { return m_vecAssetMeshes[idx]->GetMeshBuffer(); }
     size_t GetMeshNum() { return m_vecAssetMeshes.size(); }
     SAssetTexture& GetTexture(int idx) { return m_vecAssetTextures[idx]; }
+    bool               SetTexture(int idx, CClientMaterial* pMaterial);
 
 protected:
     void CacheNodes(const aiNode* pNode);
@@ -83,6 +101,7 @@ protected:
     CClientAssetModelManager* m_pAssetModelManager;
 
     unsigned int                      m_uiImportFlags;
+    CAssetProgressHandler*            m_pProgressHandler;
     Assimp::Importer                  importer;
     CVector                           m_vecPosition;
     std::vector<const aiNode*>        vecNodes;

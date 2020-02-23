@@ -24,4 +24,5 @@ public:
     LUA_DECLARE(AssetGetNodeMeshes);
     LUA_DECLARE(AssetGetTextures);
     LUA_DECLARE(AssetRender);
+    LUA_DECLARE(AssetSetTexture);
 };

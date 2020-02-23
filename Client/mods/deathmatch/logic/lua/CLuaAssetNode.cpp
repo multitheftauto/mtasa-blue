@@ -49,12 +49,21 @@ CMaterialItem* pLastMaterial;
 
 CClientMeshBuffer* CLuaAssetNode::GetMeshBuffer(int idx)
 {
-    return  m_pAssetModel->GetMeshBuffer(m_pNode->mMeshes[idx]);
+    return m_pAssetModel->GetMeshBuffer(m_pNode->mMeshes[idx]);
 }
 
 CMaterialItem* CLuaAssetNode::GetTexture(int idx)
 {
-    return m_pAssetModel->GetTexture(idx).pClientTexture->GetMaterialItem();
+    SAssetTexture& pAssetTexture = m_pAssetModel->GetTexture(idx);
+    if (pAssetTexture.pMaterialElement != nullptr)
+    {
+        return pAssetTexture.pMaterialElement->GetMaterialItem();
+    }
+    if (pAssetTexture.pClientTexture != nullptr)
+    {
+        return pAssetTexture.pClientTexture->GetMaterialItem();
+    }
+    return nullptr;
 }
 
 size_t CLuaAssetNode::GetMeshNum()
@@ -62,7 +71,7 @@ size_t CLuaAssetNode::GetMeshNum()
     return m_pNode->mNumMeshes;
 }
 
-//void CLuaAssetNode::Render(SRenderingSettings& settings)
+// void CLuaAssetNode::Render(SRenderingSettings& settings)
 //{
 //    CClientMeshBuffer* pMeshBuffer;
 //    CLuaAssetMesh*     pLuaMesh;

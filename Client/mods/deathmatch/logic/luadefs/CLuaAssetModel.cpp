@@ -19,6 +19,7 @@ void CLuaAssetModelDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},         {"getAssetProperties", GetAssetProperties}, {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
         {"assetGetNodeMeshes", AssetGetNodeMeshes}, {"assetGetTextures", AssetGetTextures},     {"assetRender", AssetRender},
+        {"assetSetTexture", AssetSetTexture},
     };
 
     // Add functions
@@ -108,7 +109,7 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                                     // Execute time-consuming task
                                     return pAssetModel->LoadFromRawData(strFileInput, strHint);
                                 },
-                                [luaFunctionRef](const char* errorMessage) {
+                                [luaFunctionRef, pAssetModel, pResource](const char* errorMessage) {
                                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                     if (pLuaMain)
                                     {
@@ -120,6 +121,8 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                                         else
                                         {
                                             arguments.PushBoolean(false);
+                                            pAssetModel->Cache();
+                                            pAssetModel->CacheTextures(pResource);
                                         }
                                         arguments.PushString(errorMessage);
                                         arguments.Call(pLuaMain, luaFunctionRef);
@@ -174,6 +177,7 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
                                             if (strcmp(errorMessage, "") == 0)
                                             {
                                                 arguments.PushBoolean(true);
+                                                pAssetModel->Cache();
                                                 pAssetModel->CacheTextures(pResource);
                                             }
                                             else
@@ -393,10 +397,10 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pAssetNode);
     argStream.ReadVector3D(vecPosition);
-    if(argStream.NextIsVector3D())
+    if (argStream.NextIsVector3D())
         argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     if (argStream.NextIsVector3D())
-    argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
+        argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
 
     argStream.ReadStringMap(optionsMap);
 
@@ -410,6 +414,55 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
         settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
         g_pCore->GetGraphics()->DrawAssetNode(settings);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetSetTexture(lua_State* luaVM)
+{
+    CClientAssetModel* pAssetModel;
+    CClientMaterial*   pMaterialElement;
+    int                iIndex;
+    bool               bResetTexture = false;
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData(pAssetModel);
+    argStream.ReadNumber(iIndex);
+    if (argStream.NextIsBool())
+        argStream.ReadBool(bResetTexture);
+    else
+        MixedReadMaterialString(argStream, pMaterialElement);
+
+    if (!argStream.HasErrors())
+    {
+        if (pAssetModel != nullptr)
+        {
+            if (!pAssetModel->IsLoaded())
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+
+            iIndex--;
+            if (bResetTexture)
+            {
+                lua_pushboolean(luaVM, pAssetModel->SetTexture(iIndex, nullptr));
+                return 1;
+            }
+            else
+            {
+                if (pMaterialElement)
+                {
+                    lua_pushboolean(luaVM, pAssetModel->SetTexture(iIndex, pMaterialElement));
+                    return 1;
+                }
+            }
+        }
+        lua_pushboolean(luaVM, false);
         return 1;
     }
     else

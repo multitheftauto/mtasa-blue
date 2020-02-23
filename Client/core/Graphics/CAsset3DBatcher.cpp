@@ -49,11 +49,20 @@ void CAsset3DBatcher::Flush()
 
     m_pDevice->SetTexture(0, nullptr);
 
-        if (g_pDeviceState->AdapterState.bRequiresClipping)
+    if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
     m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+    SColor color(0xBBBBBBFF);
+    DWORD  colorGlobalAmbient = D3DCOLOR_ARGB((DWORD)(color.A * 255), (DWORD)(color.R * 255), (DWORD)(color.G * 255), (DWORD)(color.B * 255));
+
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, colorGlobalAmbient);
+
+    // m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -85,58 +94,65 @@ void CAsset3DBatcher::Flush()
             if (pMeshBuffer->m_uiMaterialIndex >= 0)
             {
                 CMaterialItem* pMaterial = renderSetting.assetNode->GetTexture(pMeshBuffer->m_uiMaterialIndex);
-                if (pMaterial != pLastMaterial)
+                if (pMaterial)
                 {
-                    // Set texture addressing mode
-                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
-                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
-
-                    if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
-                        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
-                }
-
-                if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
-                {
-                    m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-                    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-                }
-                else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
-                {
-                    // Draw using shader
-                    ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-
                     if (pMaterial != pLastMaterial)
                     {
-                        // Apply custom parameters
-                        pShaderInstance->ApplyShaderParameters();
-                        // Apply common parameters
-                        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-                        // Apply mapped parameters
-                        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+                        // Set texture addressing mode
+                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
+                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
+
+                        if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
+                            m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
                     }
 
-                    // Do shader passes
-                    DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
-                    uint  uiNumPasses = 0;
-                    pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
-
-                    for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
+                    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
                     {
-                        pD3DEffect->BeginPass(uiPass);
+                        m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
                         m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-                        pD3DEffect->EndPass();
                     }
-                    pShaderInstance->m_pEffectWrap->End();
-
-                    // If we didn't get the effect to save the shader state, clear some things here
-                    if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
+                    else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
                     {
-                        m_pDevice->SetVertexShader(NULL);
-                        m_pDevice->SetPixelShader(NULL);
+                        // Draw using shader
+                        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+
+                        if (pMaterial != pLastMaterial)
+                        {
+                            // Apply custom parameters
+                            pShaderInstance->ApplyShaderParameters();
+                            // Apply common parameters
+                            pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
+                            // Apply mapped parameters
+                            pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
+                        }
+
+                        // Do shader passes
+                        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
+                        uint  uiNumPasses = 0;
+                        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
+
+                        for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
+                        {
+                            pD3DEffect->BeginPass(uiPass);
+                            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                            pD3DEffect->EndPass();
+                        }
+                        pShaderInstance->m_pEffectWrap->End();
+
+                        // If we didn't get the effect to save the shader state, clear some things here
+                        if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
+                        {
+                            m_pDevice->SetVertexShader(NULL);
+                            m_pDevice->SetPixelShader(NULL);
+                        }
                     }
+                    pLastMaterial = pMaterial;
+                    // pMaterial->Release();
                 }
-                pLastMaterial = pMaterial;
-                // pMaterial->Release();
+                else
+                {
+                    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                }
             }
             else
             {

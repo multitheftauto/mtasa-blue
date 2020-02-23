@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CClientAssetModel.h"
 #include "../logic/lua/CLuaAssetNode.h"
 #include "../logic/lua/CLuaAssetMesh.h"
 
@@ -30,7 +31,7 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
     // Init
     m_pManager = pManager;
     m_pAssetModelManager = pManager->GetAssetModelManager();
-
+    m_pProgressHandler = new CAssetProgressHandler();
     SetTypeName("asset-model");
 
     m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes | aiProcess_EmbedTextures |
@@ -42,12 +43,12 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
 
 CClientAssetModel::~CClientAssetModel()
 {
-    // Remove us from the manager's list
-    Unlink();
 }
 
 void CClientAssetModel::Unlink()
 {
+    if (m_pProgressHandler != nullptr)
+        m_pProgressHandler->bLoad = false;
     m_pAssetModelManager->RemoveFromList(this);
 }
 
@@ -166,35 +167,43 @@ void CClientAssetModel::CacheNodes(const aiNode* pNode)
 
 const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
 {
+    importer.SetProgressHandler(m_pProgressHandler);
     m_pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
     {
         return importer.GetErrorString();
     }
 
-    CacheNodes(m_pScene->mRootNode);
-    CacheMeshes();
     m_bModelLoaded = true;
     return "";
 }
 
 const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
+    importer.SetProgressHandler(m_pProgressHandler);
     m_pScene = importer.ReadFile(strPath, m_uiImportFlags);
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
     {
         return importer.GetErrorString();
     }
 
-    CacheNodes(m_pScene->mRootNode);
-    CacheMeshes();
     m_bModelLoaded = true;
     return "";
 }
 
-void CClientAssetModel::Render(SRenderingSettings* settings)
+bool CClientAssetModel::SetTexture(int idx, CClientMaterial* pMaterial)
 {
+    if (idx >= 0 && idx < m_vecAssetTextures.size())
+    {
+        m_vecAssetTextures[idx].pMaterialElement = pMaterial;
+    }
+    return false;
+}
 
+void CClientAssetModel::Cache()
+{
+    CacheNodes(m_pScene->mRootNode);
+    CacheMeshes();
 }
 
 void CClientAssetModel::DoPulse()
