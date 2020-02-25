@@ -903,24 +903,23 @@ void CheckDataFiles()
 void CheckLibVersions()
 {
 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-
+#ifndef MTA_DEBUG
     const char* moduleList[] = {"MTA\\loader.dll",
                                 "MTA\\cgui.dll",
+                                "MTA\\cefweb.dll",
                                 "MTA\\core.dll",
                                 "MTA\\game_sa.dll",
                                 "MTA\\multiplayer_sa.dll",
                                 "MTA\\netc.dll",
+                                "MTA\\pthread.dll",
+                                "MTA\\winmm.dll",
                                 "MTA\\xmll.dll",
-                                "MTA\\game_sa.dll",
                                 "mods\\deathmatch\\client.dll",
                                 "mods\\deathmatch\\pcre3.dll"};
     SString     strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
-#ifdef MTA_DEBUG
-        strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
-#endif
         SLibVersionInfo fileInfo;
         if (FileExists(CalcMTASAPath(strFilename)))
         {
@@ -949,6 +948,7 @@ void CheckLibVersions()
         }
     }
 
+#endif
 #endif
 
     if (GetSystemMetrics(SM_CLEANBOOT) != 0)
