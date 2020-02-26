@@ -145,6 +145,16 @@ void CInstallManager::InitSequencer()
         CR " "                                                                     //
         CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
         CR " "                                                                     //
+        CR "winmm_check: "                                                         ////// Start of 'winmm checks' //////
+        CR "            CALL ProcessWinmmChecks "                                  // Make changes to comply with winmm requirements
+        CR "            IF LastResult == ok GOTO winmm_end: "                      //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO winmm_check: "                    //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "winmm_end: "                                                           ////// End of 'winmm checks' //////
+        CR " "                                                                     //
         CR "            CALL ChangeFromAdmin "                                     //
         CR "            CALL InstallNewsItems "                                    // Install pending news
         CR "            GOTO launch: "                                             //
@@ -170,6 +180,7 @@ void CInstallManager::InitSequencer()
     m_pSequencer->AddFunction("ProcessExePatchChecks", &CInstallManager::_ProcessExePatchChecks);
     m_pSequencer->AddFunction("ProcessServiceChecks", &CInstallManager::_ProcessServiceChecks);
     m_pSequencer->AddFunction("ProcessAppCompatChecks", &CInstallManager::_ProcessAppCompatChecks);
+    m_pSequencer->AddFunction("ProcessWinmmChecks", &CInstallManager::_ProcessWinmmChecks);
     m_pSequencer->AddFunction("ChangeFromAdmin", &CInstallManager::_ChangeFromAdmin);
     m_pSequencer->AddFunction("InstallNewsItems", &CInstallManager::_InstallNewsItems);
     m_pSequencer->AddFunction("Quit", &CInstallManager::_Quit);
@@ -768,7 +779,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
         // See if exe copy seems usable
         SString strHTAEXEPath = PathJoin(strGTAPath, MTA_HTAEXE_NAME);
         uint64  uiStdFileSize = FileSize(strGTAEXEPath);
-        if (uiStdFileSize && uiStdFileSize == FileSize(strHTAEXEPath))
+        if (uiStdFileSize && FileSize(strHTAEXEPath) > 10 * 1024 * 1024)
             strGTAEXEPath = strHTAEXEPath;
     }
 
@@ -884,6 +895,13 @@ SString CInstallManager::_ProcessAppCompatChecks()
     removeList.push_back(L"DISABLEDWM");
     removeList.push_back(L"HIGHDPIAWARE");
 
+    // Fix for GitHub issue #983 "crash on join server"
+#ifdef DEBUG
+    removeList.push_back(L"IgnoreFreeLibrary<client_d.dll>");
+#else
+    removeList.push_back(L"IgnoreFreeLibrary<client.dll>");
+#endif
+
     // Remove potential performance hit
     removeList.push_back(L"FaultTolerantHeap");
 
@@ -941,12 +959,51 @@ SString CInstallManager::_ProcessAppCompatChecks()
                 bTryAdmin = true;
     }
 
+    // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
+    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+    WString strUrlItem = L"Games";
+    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+    if (!strUrlValue.empty())
+    {
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
+        {
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
+            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                bTryAdmin = true;
+        }
+    }
+
     // Handle admin requirement
     if (bTryAdmin)
     {
         if (!IsUserAdmin())
         {
             m_strAdminReason = _("Update compatibility settings");
+            return "fail";
+        }
+    }
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessWinmmChecks
+//
+// Ensure winmm.dll does not exist in the gta directory
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessWinmmChecks()
+{
+    SString filePath = PathJoin(GetGTAPath(), "winmm.dll");
+    if (FileExists(filePath))
+    {
+        SString filePathBak = PathJoin(GetGTAPath(), "winmm_bak.dll");
+        FileDelete(filePathBak);
+        FileRename(filePath, filePathBak);
+        if (FileExists(filePath))
+        {
+            m_strAdminReason = _("Move incompatible files");
             return "fail";
         }
     }

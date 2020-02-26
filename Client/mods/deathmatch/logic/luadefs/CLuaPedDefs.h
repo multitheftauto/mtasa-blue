@@ -26,7 +26,6 @@ public:
     LUA_DECLARE(GetPedTarget);
     LUA_DECLARE(GetPedTargetStart);
     LUA_DECLARE(GetPedTargetEnd);
-    LUA_DECLARE(GetPedTargetRange);
     LUA_DECLARE(GetPedTargetCollision);
     LUA_DECLARE(GetPedWeaponSlot);
     LUA_DECLARE(GetPedWeapon);
@@ -74,6 +73,7 @@ public:
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
+    LUA_DECLARE(SetPedArmor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
     LUA_DECLARE(IsPedReloadingWeapon);
@@ -82,6 +82,7 @@ public:
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
+    LUA_DECLARE(SetPedFightingStyle);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);

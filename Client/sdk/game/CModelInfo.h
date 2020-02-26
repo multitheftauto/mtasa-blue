@@ -102,6 +102,7 @@ public:
     virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
     virtual DWORD GetModel() = 0;
+    virtual bool  IsPlayerModel() = 0;
     virtual BOOL  IsBoat() = 0;
     virtual BOOL  IsCar() = 0;
     virtual BOOL  IsTrain() = 0;
@@ -125,13 +126,15 @@ public:
     virtual bool           IsValid() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
-    virtual void           SetLODDistance(float fDistance) = 0;
+    virtual float          GetOriginalLODDistance() = 0;
+    virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
     virtual void           RestreamIPL() = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
     virtual int  GetRefCount() = 0;
     virtual bool ForceUnload() = 0;
+    virtual void DeallocateModel() = 0;
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
 
@@ -169,7 +172,15 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
+    virtual void      MakePedModel(char* szTexture) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
+
+    virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
+    virtual unsigned short GetObjectPropertiesGroup() = 0;
+    virtual void           RestoreObjectPropertiesGroup() = 0;
+
+    // Vehicle towing functions
+    virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 };

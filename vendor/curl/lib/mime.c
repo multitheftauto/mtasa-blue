@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -29,8 +29,8 @@
 #include "urldata.h"
 #include "sendf.h"
 
-#if !defined(CURL_DISABLE_HTTP) || !defined(CURL_DISABLE_SMTP) || \
-    !defined(CURL_DISABLE_IMAP)
+#if (!defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_MIME)) || \
+  !defined(CURL_DISABLE_SMTP) || !defined(CURL_DISABLE_IMAP)
 
 #if defined(HAVE_LIBGEN_H) && defined(HAVE_BASENAME)
 #include <libgen.h>
@@ -821,8 +821,10 @@ static size_t readback_part(curl_mimepart *part,
     struct curl_slist *hdr = (struct curl_slist *) part->state.ptr;
     switch(part->state.state) {
     case MIMESTATE_BEGIN:
-      mimesetstate(&part->state, part->flags & MIME_BODY_ONLY? MIMESTATE_BODY:
-                                 MIMESTATE_CURLHEADERS, part->curlheaders);
+      mimesetstate(&part->state,
+                   (part->flags & MIME_BODY_ONLY)?
+                     MIMESTATE_BODY: MIMESTATE_CURLHEADERS,
+                   part->curlheaders);
       break;
     case MIMESTATE_USERHEADERS:
       if(!hdr) {
@@ -1122,8 +1124,6 @@ void curl_mime_free(curl_mime *mime)
       Curl_mime_cleanpart(part);
       free(part);
     }
-
-    free(mime->boundary);
     free(mime);
   }
 }
@@ -1134,6 +1134,8 @@ CURLcode Curl_mime_duppart(curl_mimepart *dst, const curl_mimepart *src)
   curl_mimepart *d;
   const curl_mimepart *s;
   CURLcode res = CURLE_OK;
+
+  DEBUGASSERT(dst);
 
   /* Duplicate content. */
   switch(src->kind) {
@@ -1184,20 +1186,18 @@ CURLcode Curl_mime_duppart(curl_mimepart *dst, const curl_mimepart *src)
     }
   }
 
-  /* Duplicate other fields. */
-  if(dst != NULL)
+  if(!res) {
+    /* Duplicate other fields. */
     dst->encoder = src->encoder;
-  else
-    res = CURLE_WRITE_ERROR;
-  if(!res)
     res = curl_mime_type(dst, src->mimetype);
+  }
   if(!res)
     res = curl_mime_name(dst, src->name);
   if(!res)
     res = curl_mime_filename(dst, src->filename);
 
   /* If an error occurred, rollback. */
-  if(res && dst)
+  if(res)
     Curl_mime_cleanpart(dst);
 
   return res;
@@ -1220,18 +1220,10 @@ curl_mime *curl_mime_init(struct Curl_easy *easy)
     mime->firstpart = NULL;
     mime->lastpart = NULL;
 
-    /* Get a part boundary. */
-    mime->boundary = malloc(24 + MIME_RAND_BOUNDARY_CHARS + 1);
-    if(!mime->boundary) {
-      free(mime);
-      return NULL;
-    }
-
     memset(mime->boundary, '-', 24);
-    if(Curl_rand_hex(easy, (unsigned char *) mime->boundary + 24,
+    if(Curl_rand_hex(easy, (unsigned char *) &mime->boundary[24],
                      MIME_RAND_BOUNDARY_CHARS + 1)) {
       /* failed to get random separator, bail out */
-      free(mime->boundary);
       free(mime);
       return NULL;
     }
@@ -1909,72 +1901,11 @@ CURLcode curl_mime_headers(curl_mimepart *part,
   return CURLE_NOT_BUILT_IN;
 }
 
-void Curl_mime_initpart(curl_mimepart *part, struct Curl_easy *easy)
-{
-  (void) part;
-  (void) easy;
-}
-
-void Curl_mime_cleanpart(curl_mimepart *part)
-{
-  (void) part;
-}
-
-CURLcode Curl_mime_duppart(curl_mimepart *dst, const curl_mimepart *src)
-{
-  (void) dst;
-  (void) src;
-  return CURLE_OK;    /* Nothing to duplicate: always succeed. */
-}
-
-CURLcode Curl_mime_set_subparts(curl_mimepart *part,
-                                curl_mime *subparts, int take_ownership)
-{
-  (void) part;
-  (void) subparts;
-  (void) take_ownership;
-  return CURLE_NOT_BUILT_IN;
-}
-
-CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
-                                   const char *contenttype,
-                                   const char *disposition,
-                                   enum mimestrategy strategy)
-{
-  (void) part;
-  (void) contenttype;
-  (void) disposition;
-  (void) strategy;
-  return CURLE_NOT_BUILT_IN;
-}
-
-curl_off_t Curl_mime_size(curl_mimepart *part)
-{
-  (void) part;
-  return (curl_off_t) -1;
-}
-
-size_t Curl_mime_read(char *buffer, size_t size, size_t nitems, void *instream)
-{
-  (void) buffer;
-  (void) size;
-  (void) nitems;
-  (void) instream;
-  return 0;
-}
-
-CURLcode Curl_mime_rewind(curl_mimepart *part)
-{
-  (void) part;
-  return CURLE_NOT_BUILT_IN;
-}
-
-/* VARARGS2 */
 CURLcode Curl_mime_add_header(struct curl_slist **slp, const char *fmt, ...)
 {
-  (void) slp;
-  (void) fmt;
+  (void)slp;
+  (void)fmt;
   return CURLE_NOT_BUILT_IN;
 }
 
-#endif /* !CURL_DISABLE_HTTP || !CURL_DISABLE_SMTP || !CURL_DISABLE_IMAP */
+#endif /* if disabled */

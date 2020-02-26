@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
@@ -14,11 +14,11 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS 3
+#define CORE_SETTINGS_HEADER_SPACER " "
+#define CORE_SETTINGS_NO_KEY " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -376,6 +376,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAllowExternalSounds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow external sounds"), true));
+    m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -619,6 +624,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxWindowed = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Windowed"), true));
     m_pCheckBoxWindowed->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
     m_pCheckBoxWindowed->AutoSize(NULL, 20.0f);
+    m_pCheckBoxWindowed->GetPosition(vecTemp, false);
+    m_pCheckBoxWindowed->GetSize(vecSize);
+
+    m_pCheckBoxDPIAware = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("DPI aware"), false));
+    m_pCheckBoxDPIAware->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY));
+    m_pCheckBoxDPIAware->AutoSize(NULL, 20.0f);
 
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);            // Restore our label position
 
@@ -662,7 +673,7 @@ void CSettings::CreateGUI()
 
     vecTemp.fX = 11;
     m_pDrawDistanceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Draw Distance:")));
-    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pDrawDistanceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pDrawDistanceLabel->GetPosition(vecTemp, false);
     m_pDrawDistanceLabel->AutoSize();
 
@@ -680,7 +691,7 @@ void CSettings::CreateGUI()
     vecTemp.fX = 11;
 
     m_pBrightnessLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Brightness:")));
-    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pBrightnessLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pBrightnessLabel->GetPosition(vecTemp, false);
     m_pBrightnessLabel->AutoSize();
 
@@ -698,7 +709,7 @@ void CSettings::CreateGUI()
     vecTemp.fX = 11;
 
     m_pFXQualityLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("FX Quality:")));
-    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pFXQualityLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pFXQualityLabel->GetPosition(vecTemp, false);
     m_pFXQualityLabel->AutoSize();
 
@@ -712,7 +723,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetReadOnly(true);
 
     m_pAnisotropicLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Anisotropic filtering:")));
-    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
+    m_pAnisotropicLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pAnisotropicLabel->GetPosition(vecTemp, false);
     m_pAnisotropicLabel->AutoSize();
 
@@ -753,7 +764,7 @@ void CSettings::CreateGUI()
     m_pComboAntiAliasing->SetReadOnly(true);
 
     m_pAspectRatioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabVideo, _("Aspect Ratio:")));
-    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pAspectRatioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 26.0f));
     m_pAspectRatioLabel->GetPosition(vecTemp, false);
     m_pAspectRatioLabel->AutoSize();
 
@@ -769,7 +780,7 @@ void CSettings::CreateGUI()
     m_pComboAspectRatio->SetReadOnly(true);
 
     m_pCheckBoxHudMatchAspectRatio = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("HUD Match Aspect Ratio"), true));
-    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
+    m_pCheckBoxHudMatchAspectRatio->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 4.0f));
     m_pCheckBoxHudMatchAspectRatio->AutoSize(NULL, 20.0f);
 
     vecTemp.fX = 11;
@@ -793,6 +804,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
     m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
     m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -1091,7 +1106,7 @@ void CSettings::CreateGUI()
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG   // Don't hide when debugging
+#ifndef MTA_DEBUG            // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1203,8 +1218,10 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
+    m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -1425,6 +1442,11 @@ void CSettings::UpdateVideoTab()
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);
     m_pBrightness->SetScrollPosition((float)gameSettings->GetBrightness() / 384);
 
+    // DPI aware
+    bool processDPIAware = false;
+    CVARS_GET("process_dpi_aware", processDPIAware);
+    m_pCheckBoxDPIAware->SetSelected(processDPIAware);
+
     // FieldOfView
     int iFieldOfView;
     CVARS_GET("fov", iFieldOfView);
@@ -1490,6 +1512,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
 
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -1514,6 +1541,11 @@ void CSettings::UpdateVideoTab()
     bool bHighDetailVehicles;
     CVARS_GET("high_detail_vehicles", bHighDetailVehicles);
     m_pCheckBoxHighDetailVehicles->SetSelected(bHighDetailVehicles);
+
+    // High detail peds
+    bool bHighDetailPeds;
+    CVARS_GET("high_detail_peds", bHighDetailPeds);
+    m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
     PopulateResolutionComboBox();
 
@@ -1738,11 +1770,14 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("heat_haze", true);
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
+    CVARS_SET("high_detail_peds", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
     gameSettings->SetFXQuality(2);
     gameSettings->SetAntiAliasing(1, true);
+    gameSettings->ResetVehiclesLODDistance(false);
+    gameSettings->ResetPedsLODDistance(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -2302,7 +2337,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned char>(m_pBindsList->GetItemData(i, m_hBind));
+        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -2976,13 +3011,16 @@ void CSettings::LoadData()
     // Skins
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    uiIndex = 0;
-    std::string strItemText = m_pInterfaceSkinSelector->GetItemText(uiIndex);
-    while (strItemText != currentSkin)
+
+    for (size_t i = 0; i < m_pInterfaceSkinSelector->GetItemCount(); i++)
     {
-        strItemText = m_pInterfaceSkinSelector->GetItemText(++uiIndex);
+        std::string strItemText = m_pInterfaceSkinSelector->GetItemText(i);
+        if (currentSkin == strItemText)
+        {
+            m_pInterfaceSkinSelector->SetSelectedItemByIndex(i);
+            break;
+        }
     }
-    m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
     // Process priority
     int iVar;
@@ -3253,6 +3291,15 @@ void CSettings::SaveData()
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
     SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
 
+    // Process DPI awareness
+    bool previousProcessDPIAware = false;
+    CVARS_GET("process_dpi_aware", previousProcessDPIAware);
+
+    const bool processsDPIAwareChanged = (m_pCheckBoxDPIAware->GetSelected() != previousProcessDPIAware);
+
+    if (processsDPIAwareChanged)
+        CVARS_SET("process_dpi_aware", !previousProcessDPIAware);
+
     // iFieldOfView
     int iFieldOfView = std::min<int>(4, (m_pFieldOfView->GetScrollPosition()) * (4 + 1)) * 5 + 70;
     CVARS_SET("fov", iFieldOfView);
@@ -3297,6 +3344,10 @@ void CSettings::SaveData()
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
+    CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3312,9 +3363,15 @@ void CSettings::SaveData()
     CVARS_SET("tyre_smoke_enabled", bTyreSmokeEnabled);
     g_pCore->GetMultiplayer()->SetTyreSmokeEnabled(bTyreSmokeEnabled);
 
-    // High detail vehicles (just set cvar, real change occur on next connect)
+    // High detail vehicles
     bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected();
     CVARS_SET("high_detail_vehicles", bHighDetailVehicles);
+    gameSettings->ResetVehiclesLODDistance(false);
+
+    // High detail peds
+    bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
+    CVARS_SET("high_detail_peds", bHighDetailPeds);
+    gameSettings->ResetPedsLODDistance(false);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -3506,7 +3563,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4295,6 +4352,24 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
 }
 
 //
+// AllowExternalSounds
+//
+bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxAllowExternalSounds->GetSelected() && !m_bShownAllowExternalSoundsMessage)
+    {
+        m_bShownAllowExternalSoundsMessage = true;
+        SString strMessage;
+        strMessage +=
+            _("Some scripts may play sounds, such as radio, from the internet."
+              "\n\nDisabling this setting may decrease network"
+              "\nbandwidth consumption.\n");
+        CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+    }
+    return true;
+}
+
+//
 // CustomizedSAFiles
 //
 void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
@@ -4343,6 +4418,48 @@ bool CSettings::OnWindowedClick(CGUIElement* pElement)
 {
     UpdateFullScreenComboBoxEnabled();
     return true;
+}
+
+//
+// OnDPIAwareClick
+//
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton);
+
+bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
+{
+    static bool shownWarning = false;
+
+    if (m_pCheckBoxDPIAware->GetSelected() && !shownWarning)
+    {
+        shownWarning = true;
+
+        SStringX strMessage(
+            _("Enabling DPI awareness is an experimental feature and\n"
+              "we only recommend it when you play MTA:SA on a scaled monitor.\n"
+              "You may experience graphical issues if you enable this option."
+              "\n\nAre you sure you want to enable this option?"));
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
+        pQuestionBox->SetMessage(strMessage);
+        pQuestionBox->SetButton(0, _("No"));
+        pQuestionBox->SetButton(1, _("Yes"));
+        pQuestionBox->SetCallback(DPIAwareQuestionCallBack, m_pCheckBoxDPIAware);
+        pQuestionBox->Show();
+    }
+
+    return true;
+}
+
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    if (uiButton == 0)
+    {
+        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
+        checkBox->SetSelected(false);
+    }
 }
 
 bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)

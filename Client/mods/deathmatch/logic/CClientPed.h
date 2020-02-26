@@ -556,8 +556,11 @@ public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
-    void SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
-    bool IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
+
+    void      SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
+    bool      IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
+    void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
+    eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
 
     CClientVehicle* GetTargetVehicle() { return m_pEnteringVehicle; }
     unsigned char GetTargetDoor() { return m_ucEnteringDoor; }
@@ -589,6 +592,7 @@ public:
     CStatsData*                              m_stats;
     CControllerState*                        m_currentControllerState;
     CControllerState*                        m_lastControllerState;
+    CControllerState                         m_rawControllerState; // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
@@ -738,4 +742,5 @@ public:
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
     bool              m_bTaskToBeRestoredOnAnimEnd;
+    eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
 };

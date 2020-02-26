@@ -5,7 +5,7 @@
  *                | (__| |_| |  _ <| |___
  *                 \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -112,11 +112,17 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp);
   #define LDAP_TRACE(x)   do { \
                             _ldap_trace("%u: ", __LINE__); \
                             _ldap_trace x; \
-                          } WHILE_FALSE
+                          } while(0)
 
   static void _ldap_trace(const char *fmt, ...);
 #else
   #define LDAP_TRACE(x)   Curl_nop_stmt
+#endif
+
+#if defined(USE_WIN32_LDAP) && defined(ldap_err2string)
+/* Use ansi error strings in UNICODE builds */
+#undef ldap_err2string
+#define ldap_err2string ldap_err2stringA
 #endif
 
 
@@ -744,7 +750,7 @@ quit:
 #endif
 
   /* no data to transfer */
-  Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+  Curl_setup_transfer(data, -1, -1, FALSE, -1);
   connclose(conn, "LDAP connection always disable re-use");
 
   return result;
@@ -838,10 +844,10 @@ static bool split_str(char *str, char ***out, size_t *count)
 static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
 {
   int rc = LDAP_SUCCESS;
-  char *path;
-  char *query;
   char *p;
-  char *q;
+  char *path;
+  char *q = NULL;
+  char *query = NULL;
   size_t i;
 
   if(!conn->data ||
@@ -859,11 +865,13 @@ static int _ldap_url_parse2(const struct connectdata *conn, LDAPURLDesc *ludp)
   if(!path)
     return LDAP_NO_MEMORY;
 
-  /* Duplicate the query */
-  q = query = strdup(conn->data->state.up.query);
-  if(!query) {
-    free(path);
-    return LDAP_NO_MEMORY;
+  /* Duplicate the query if present */
+  if(conn->data->state.up.query) {
+    q = query = strdup(conn->data->state.up.query);
+    if(!query) {
+      free(path);
+      return LDAP_NO_MEMORY;
+    }
   }
 
   /* Parse the DN (Distinguished Name) */
@@ -1069,8 +1077,6 @@ static int _ldap_url_parse(const struct connectdata *conn,
 
 static void _ldap_free_urldesc(LDAPURLDesc *ludp)
 {
-  size_t i;
-
   if(!ludp)
     return;
 
@@ -1078,6 +1084,7 @@ static void _ldap_free_urldesc(LDAPURLDesc *ludp)
   free(ludp->lud_filter);
 
   if(ludp->lud_attrs) {
+    size_t i;
     for(i = 0; i < ludp->lud_attrs_dups; i++)
       free(ludp->lud_attrs[i]);
     free(ludp->lud_attrs);

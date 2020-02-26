@@ -35,7 +35,6 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTarget", GetPedTarget},
         {"getPedTargetStart", GetPedTargetStart},
         {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetRange", GetPedTargetRange},
         {"getPedTargetCollision", GetPedTargetCollision},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"getPedWeapon", GetPedWeapon},
@@ -78,6 +77,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
+        {"setPedFightingStyle", SetPedFightingStyle},
         {"setPedLookAt", SetPedLookAt},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
@@ -88,6 +88,7 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
+        {"setPedArmor", SetPedArmor},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
         {"setPedExitVehicle", SetPedExitVehicle},
@@ -173,8 +174,10 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setControlState", "setPedControlState");
     lua_classfunction(luaVM, "warpIntoVehicle", "warpPedIntoVehicle");
     lua_classfunction(luaVM, "setOxygenLevel", "setPedOxygenLevel");
+    lua_classfunction(luaVM, "setArmor", "setPedArmor");
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setDoingGangDriveby", "setPedDoingGangDriveby");
+    lua_classfunction(luaVM, "setFightingStyle", "setPedFightingStyle");
     lua_classfunction(luaVM, "setHeadless", "setPedHeadless");
     lua_classfunction(luaVM, "setOnFire", "setPedOnFire");
     lua_classfunction(luaVM, "setTargetingMarkerEnabled", "setPedTargetingMarkerEnabled");
@@ -195,8 +198,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
     lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
-    lua_classvariable(luaVM, "armor", NULL, "getPedArmor");
-    lua_classvariable(luaVM, "fightingStyle", NULL, "getPedFightingStyle");
+    lua_classvariable(luaVM, "armor", "setPedArmor", "getPedArmor");
+    lua_classvariable(luaVM, "fightingStyle", "setPedFightingStyle", "getPedFightingStyle");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
     lua_classvariable(luaVM, "moveState", NULL, "getPedMoveState");
@@ -770,25 +773,6 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedTargetRange(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // TODO: getPedTargetRange
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
 {
     // Verify the argument
@@ -1238,14 +1222,16 @@ int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
     SString          strControlState = "";
     float            fState = 0.0f;
     CClientPed*      pPed = NULL;
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState))
+        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;
@@ -1818,6 +1804,21 @@ int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
     return 1;
 }
 
+int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    unsigned char    ucStyle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadNumber(ucStyle);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle));
+    return 1;
+}
+
 int CLuaPedDefs::SetPedLookAt(lua_State* luaVM)
 {
     // Verify the argument
@@ -2134,7 +2135,11 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
                                                         bFreezeLastFrame))
         {
             CClientPed* pPed = static_cast<CClientPed*>(pEntity);
-            if (!pPed->IsDucked())
+            if (pPed->IsDucked())
+            {
+                pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
+            }
+            else
             {
                 bTaskToBeRestoredOnAnimEnd = false;
             }
@@ -2193,7 +2198,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(*pEntity, strAnimName, fSpeed))
             {
@@ -2232,6 +2237,23 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
     // Failed
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+{
+    CClientPed*      pPed;
+    float            fArmor;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    argStream.ReadNumber(fArmor);
+
+    if (argStream.HasErrors())
+    {
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
     return 1;
 }
 

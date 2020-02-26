@@ -31,7 +31,7 @@ public:
     CRenderWareSA(enum eGameVersion version);
     ~CRenderWareSA();
     void Initialize();
-    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled);
+    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ClothesAddReplacementTxd(char* pFileData, ushort usFileId);
@@ -39,10 +39,10 @@ public:
     bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
+    RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions);
+    RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
@@ -54,7 +54,7 @@ public:
     void DestroyTexture(RwTexture* pTex);
 
     // Reads and parses a COL3 file with an optional collision key name
-    CColModel* ReadCOL(const CBuffer& fileData);
+    CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void ReplaceCollisions(CColModel* pColModel, unsigned short usModelID);

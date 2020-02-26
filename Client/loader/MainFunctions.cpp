@@ -314,6 +314,10 @@ void HandleResetSettings()
             FileDelete(strSettingsFilenameBak);
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
+
+            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
+
             if (!FileExists(strSettingsFilename))
             {
                 AddReportLog(4053, "Deleted gta_sa.set");
@@ -662,10 +666,7 @@ void CheckAntiVirusStatus()
 
     // Get status from WSC
     WSC_SECURITY_PROVIDER_HEALTH health = (WSC_SECURITY_PROVIDER_HEALTH)-1;
-    if (_WscGetSecurityProviderHealth)
-    {
-        _WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
-    }
+    WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
 
     // Dump results
     SString strStatus("AV health: %s (%d)", *EnumToString(health), health);
@@ -834,13 +835,21 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"329BE376559DB1F51A02B3246F103300", "bass.dll"},     {"5068A49A706BCACA9D98C3533734195D", "bass_aac.dll"},
-                              {"3935396799611AD3FDE5A66832D69DD6", "bass_ac3.dll"}, {"9CA432745025427D6FF6C2B38F63A89F", "bass_fx.dll"},
-                              {"FCD2410EA754C38C26F99AEB99C59138", "bassflac.dll"}, {"76044062E21176F47E329BDB64240BE7", "bassmidi.dll"},
-                              {"39613507057827F338CFA4519ACCA7A9", "bassmix.dll"},  {"A535CBD18D342A628954D8A42A7B0438", "basswma.dll"},
-                              {"12E4FA4DF33BB7D6AEF6DC0EAA53BB10", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+    } integrityCheckList[] = {{"B15F1875F447DBB2A849050E5FD6125D", "bass.dll"},
+                              {"853933A2518EBF8E966C04C2EAA95391", "bass_aac.dll"},
+                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
+                              {"C176D670BF5440A6C704B55A21B01FEF", "bass_fx.dll"},
+                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
+                              {"8BF45CFAC7219673DEC8BB0ED54D0365", "bassmidi.dll"},
+                              {"5387D7484E6CAA959144DFE524BB3B05", "bassmix.dll"},
+                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
+                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
+                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
+                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
+                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
@@ -865,9 +874,12 @@ void CheckDataFiles()
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
-    if (FileExists(PathJoin(strGTAPath, "d3d9.dll")))
+    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
-        ShowD3dDllDialog(g_hInstance, PathJoin(strGTAPath, "d3d9.dll"));
+        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+
+        ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
     }
 
@@ -891,24 +903,23 @@ void CheckDataFiles()
 void CheckLibVersions()
 {
 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-
+#ifndef MTA_DEBUG
     const char* moduleList[] = {"MTA\\loader.dll",
                                 "MTA\\cgui.dll",
+                                "MTA\\cefweb.dll",
                                 "MTA\\core.dll",
                                 "MTA\\game_sa.dll",
                                 "MTA\\multiplayer_sa.dll",
                                 "MTA\\netc.dll",
+                                "MTA\\pthread.dll",
+                                "MTA\\winmm.dll",
                                 "MTA\\xmll.dll",
-                                "MTA\\game_sa.dll",
                                 "mods\\deathmatch\\client.dll",
                                 "mods\\deathmatch\\pcre3.dll"};
     SString     strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
     {
         SString strFilename = moduleList[i];
-#ifdef MTA_DEBUG
-        strFilename = ExtractBeforeExtension(strFilename) + "_d." + ExtractExtension(strFilename);
-#endif
         SLibVersionInfo fileInfo;
         if (FileExists(CalcMTASAPath(strFilename)))
         {
@@ -938,6 +949,7 @@ void CheckLibVersions()
     }
 
 #endif
+#endif
 
     if (GetSystemMetrics(SM_CLEANBOOT) != 0)
     {
@@ -950,110 +962,61 @@ void CheckLibVersions()
 
 //////////////////////////////////////////////////////////
 //
-// CreateProcessWithMitigationPolicy
+// StartGtaProcess
 //
-// Create process with extra security stuff
+// Start GTA as an independent process
 //
 //////////////////////////////////////////////////////////
-BOOL CreateProcessWithMitigationPolicy(LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                                       LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment,
-                                       LPCWSTR lpCurrentDirectory, LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
+BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandLine, const SString& lpCurrentDirectory,
+                                       LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
 {
-    DWORD64        MitigationPolicy = 0;
-    STARTUPINFOEXW StartupInfoEx = {0};
-    StartupInfoEx.StartupInfo.cb = sizeof(StartupInfoEx.StartupInfo);
-
-#ifdef PANIC_OVER
-    if (IsWindows7OrGreater())
-    {
-        // We can use extended startup info for Vista and up
-        // however mitigation policies are not available until Windows 7
-        StartupInfoEx.StartupInfo.cb = sizeof(StartupInfoEx);
-        dwCreationFlags |= EXTENDED_STARTUPINFO_PRESENT;
-
-        // Win7 32 bit can only handle DWORD MitigationPolicy
-        size_t MitigationPolicySize = sizeof(DWORD);
-        MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_DEP_ENABLE | PROCESS_CREATION_MITIGATION_POLICY_DEP_ATL_THUNK_ENABLE |
-                            PROCESS_CREATION_MITIGATION_POLICY_SEHOP_ENABLE;
-
-        if (IsWindows8OrGreater())
-        {
-            // We can use more bigger MitigationPolicy for Win8 and up
-            MitigationPolicySize = sizeof(DWORD64);
-            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON;
-        }
-
-        if (IsWindows10Threshold2OrGreater())
-        {
-            // Win 10 build something
-            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_NO_REMOTE_ALWAYS_ON;
-        }
-
-        #if 0   // TODO
-        if ( IsWindows10FoamybananaOrGreater () )
-        {
-            // Win 10 build something else
-            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON;
-        }
-        #endif
-
-        // Create AttributeList for mitigation policy application system
-        SIZE_T AttributeListSize;
-        if (_InitializeProcThreadAttributeList(nullptr, 1, 0, &AttributeListSize) == FALSE)
-        {
-            dwOutError = GetLastError();
-            if (dwOutError != ERROR_INSUFFICIENT_BUFFER)
-            {
-                strOutErrorContext = "InitializeProcThreadAttributeList #1";
-                return false;
-            }
-        }
-        else
-        {
-            dwOutError = ERROR_SUCCESS;
-            strOutErrorContext = "InitializeProcThreadAttributeList #1 expected error";
-            return false;
-        }
-
-        StartupInfoEx.lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, AttributeListSize);
-
-        if (_InitializeProcThreadAttributeList(StartupInfoEx.lpAttributeList, 1, 0, &AttributeListSize) == FALSE)
-        {
-            dwOutError = GetLastError();
-            strOutErrorContext = "InitializeProcThreadAttributeList #2";
-            HeapFree(GetProcessHeap(), 0, (LPVOID)StartupInfoEx.lpAttributeList);
-            return false;
-        }
-
-        if (_UpdateProcThreadAttribute(StartupInfoEx.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, &MitigationPolicy, MitigationPolicySize,
-                                       nullptr, nullptr) == FALSE)
-        {
-            dwOutError = GetLastError();
-            strOutErrorContext = "UpdateProcThreadAttribute";
-            _DeleteProcThreadAttributeList(StartupInfoEx.lpAttributeList);
-            HeapFree(GetProcessHeap(), 0, (LPVOID)StartupInfoEx.lpAttributeList);
-            return false;
-        }
-    }
-#endif
+    std::vector<DWORD> processIdListBefore = GetGTAProcessList();
     // Start GTA
-    BOOL bResult = _CreateProcessW(lpApplicationName, lpCommandLine, lpProcessAttributes, lpThreadAttributes, bInheritHandles, dwCreationFlags, nullptr,
-                                   lpCurrentDirectory, (LPSTARTUPINFOW)&StartupInfoEx, lpProcessInformation);
+    BOOL bResult = ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory);
 
     if (bResult == FALSE)
     {
         dwOutError = GetLastError();
-        strOutErrorContext = "CreateProcess";
+        strOutErrorContext = "ShellExecute";
+    }
+    else
+    {
+        // Determine pid of new gta process
+        for (uint i = 0; i < 10; i++)
+        {
+            std::vector<DWORD> processIdList = GetGTAProcessList();
+            for (DWORD pid : processIdList)
+            {
+                if (ListContains(processIdListBefore, pid))
+                {
+                    continue;
+                }
+                lpProcessInformation->dwProcessId = pid;
+                lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE|PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE, FALSE, pid);
+                break;
+            }
+            if (lpProcessInformation->dwProcessId)
+                break;
+            Sleep(500);
+        }
+
+        if (lpProcessInformation->dwProcessId == 0)
+        {
+            // Unable to get pid
+            dwOutError = ERROR_INVALID_FUNCTION;
+            strOutErrorContext = "FindPID";
+            bResult = false;
+        }
+        else
+        if (lpProcessInformation->hProcess == nullptr)
+        {
+            // Unable to OpenProcess
+            dwOutError = ERROR_ELEVATION_REQUIRED;
+            strOutErrorContext = "OpenProcess";
+            bResult = false;
+        }
     }
 
-#ifdef PANIC_OVER
-    if (IsWindows7OrGreater())
-    {
-        // Clean up
-        _DeleteProcThreadAttributeList(StartupInfoEx.lpAttributeList);
-        HeapFree(GetProcessHeap(), 0, (LPVOID)StartupInfoEx.lpAttributeList);
-    }
-#endif
     return bResult;
 }
 
@@ -1102,17 +1065,13 @@ int LaunchGame(SString strCmdLine)
     if (!strPostUpdateConnect.empty() && strCmdLine.empty())
         strCmdLine = SString("mtasa://%s", *strPostUpdateConnect);
 
-    WString wstrCmdLine = FromUTF8(strCmdLine);
-
     //
-    // Launch GTA using CreateProcess
+    // Launch GTA
     //
     PROCESS_INFORMATION piLoadee = {0};
     DWORD               dwError;
     SString             strErrorContext;
-    if (FALSE == CreateProcessWithMitigationPolicy(FromUTF8(strGTAEXEPath), (LPWSTR)*wstrCmdLine, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL,
-                                                   FromUTF8(strMtaDir),            //    strMTASAPath\mta is used so pthreadVC2.dll can be found
-                                                   &piLoadee, dwError, strErrorContext))
+    if (FALSE == StartGtaProcess(strGTAEXEPath, strCmdLine, strMtaDir, &piLoadee, dwError, strErrorContext))
     {
         WriteDebugEvent(SString("Loader - Process not created[%d (%s)]: %s", dwError, *strErrorContext, *strGTAEXEPath));
 
@@ -1136,23 +1095,14 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
-
-    // Inject the core into GTA
-    SetDllDirectory(strMtaDir);
-    SString strCoreDLL = PathJoin(strMTASAPath, "mta", MTA_DLL_NAME);
-    RemoteLoadLibrary(piLoadee.hProcess, FromUTF8(strCoreDLL));
-    WriteDebugEvent(SString("Loader - Core injected: %s", *strCoreDLL));
-    AddReportLog(7103, "Loader - Core injected");
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Clear previous on quit commands
     SetOnQuitCommand("");
 
     ShowSplash(g_hInstance);            // Bring splash to the front
 
-    // Resume execution for the game.
-    ResumeThread(piLoadee.hThread);
-
-    if (piLoadee.hThread)
+    if (piLoadee.hProcess)
     {
         WriteDebugEvent("Loader - Waiting for L3 to close");
 
@@ -1174,7 +1124,7 @@ int LaunchGame(SString strCmdLine)
 
             // Skip stuck process warning if DeviceSelection dialog is still open after 4 seconds
             if (i >= 4)
-                bShownDeviceSelectionDialog |= IsDeviceSelectionDialogOpen(piLoadee.dwThreadId);
+                bShownDeviceSelectionDialog |= IsDeviceSelectionDialogOpen(piLoadee.dwProcessId);
         }
 
         // Actually hide the splash
@@ -1245,7 +1195,6 @@ int LaunchGame(SString strCmdLine)
     //
     // Cleanup and exit.
     CloseHandle(piLoadee.hProcess);
-    CloseHandle(piLoadee.hThread);
     ReleaseSingleInstanceMutex();
 
     // Success, maybe

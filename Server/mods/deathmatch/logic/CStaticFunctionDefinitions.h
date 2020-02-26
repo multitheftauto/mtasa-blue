@@ -123,7 +123,8 @@ public:
     static bool               GetPlayerName(CElement* pElement, SString& strOutName);
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
-    static const SString&     GetPlayerVersion(CPlayer* pPlayer);
+    static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
+    static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -132,6 +133,7 @@ public:
     static bool TakePlayerMoney(CElement* pElement, long lMoney);
     static bool ShowPlayerHudComponent(CElement* pElement, eHudComponent component, bool bShow);
     static bool SetPlayerDebuggerVisible(CElement* pElement, bool bVisible);
+    static bool SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel);
     static bool SetPlayerWantedLevel(CElement* pElement, unsigned int iLevel);
     static bool ForcePlayerMap(CElement* pElement, bool bVisible);
     static bool SetPlayerNametagText(CElement* pElement, const char* szText);
@@ -298,7 +300,7 @@ public:
     static bool AddVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
@@ -452,6 +454,18 @@ public:
     static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
 
+    // Shape get functions
+    static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+    
+    // Shape set functions
+    static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint iPointIndex);
+
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
     static bool           GetWeaponNameFromID(unsigned char ucID, char* szName);
@@ -544,6 +558,8 @@ public:
     static bool         SetMaxPlayers(unsigned int uiMax);
     static bool OutputChatBox(const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded,
                               CLuaMain* pLuaMain);
+    static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                              bool bColorCoded);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
     static bool ClearChatBox(CElement* pElement);
@@ -730,5 +746,5 @@ public:
     static unsigned long GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
-    static SString       GetVersionSortable();
+    static CMtaVersion   GetVersionSortable();
 };

@@ -2085,15 +2085,17 @@ int CLuaVehicleDefs::SetVehicleDoorState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucDoor;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucDoor);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleDoorState(pElement, ucDoor, ucState))
+        if (CStaticFunctionDefinitions::SetVehicleDoorState(pElement, ucDoor, ucState, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;

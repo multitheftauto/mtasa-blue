@@ -15,6 +15,8 @@
 #include "CMaterialLine3DBatcher.h"
 #include "CPrimitiveBatcher.h"
 #include "CPrimitiveMaterialBatcher.h"
+#include "CPrimitive3DBatcher.h"
+#include "CMaterialPrimitive3DBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -42,9 +44,6 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pGUI = pGUI;
     memset(m_pDXFonts, 0, sizeof(m_pDXFonts));
     memset(m_pBigDXFonts, 0, sizeof(m_pBigDXFonts));
-    m_pDevice = NULL;
-    m_pLineInterface = NULL;
-    m_pDXSprite = NULL;
 
     m_iDebugQueueRefs = 0;
     m_iDrawBatchRefCount = 0;
@@ -58,6 +57,10 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
+    m_pPrimitive3DBatcherPreGUI = new CPrimitive3DBatcher(true);
+    m_pPrimitive3DBatcherPostGUI = new CPrimitive3DBatcher(false);
+    m_pMaterialPrimitive3DBatcherPreGUI = new CMaterialPrimitive3DBatcher(true, this);
+    m_pMaterialPrimitive3DBatcherPostGUI = new CMaterialPrimitive3DBatcher(false, this);
     m_pPrimitiveBatcher = new CPrimitiveBatcher();
     m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
 
@@ -84,6 +87,10 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
     SAFE_DELETE(m_pPrimitiveBatcher);
     SAFE_DELETE(m_pPrimitiveMaterialBatcher);
+    SAFE_DELETE(m_pPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitive3DBatcherPostGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -481,6 +488,7 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
+
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -514,16 +522,11 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pLineInterface->Begin();
         }
-    }
 
-    // Blend mode changing?
-    if (bDrawModeChanging || bBlendModeChanging)
-    {
         SetBlendModeRenderStates(newBlendMode);
+        m_CurBlendMode = newBlendMode;
+        m_CurDrawMode = newDrawMode;
     }
-
-    m_CurDrawMode = newDrawMode;
-    m_CurBlendMode = newBlendMode;
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
@@ -673,6 +676,9 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
 
 float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFONT pDXFont)
 {
+    if (*wszText == L'\0')
+        return 0.0f;
+
     if (!pDXFont)
         pDXFont = GetFont();
 
@@ -680,13 +686,41 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
 
     if (pDXFont)
     {
-        HDC  dc = pDXFont->GetDC();
-        SIZE size;
+        // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
+        // Count the amount of space characters at the end
+        size_t       spaceCount = 0;
+        const size_t textLength = wcslen(wszText);
 
-        GetTextExtentPoint32W(dc, wszText, wcslen(wszText), &size);
+        for (int i = textLength - 1; i >= 0; --i)
+        {
+            const wchar_t c = wszText[i];
 
-        return ((float)size.cx * fScale);
+            if (c == L' ')
+                ++spaceCount;
+            else
+                break;
+        }
+
+        // Compute the size of a single space and use that to get the width of the ignored space characters
+        size_t trailingSpacePixels = 0;
+
+        if (spaceCount > 0)
+        {
+            SIZE size = {};
+            GetTextExtentPoint32W(pDXFont->GetDC(), L" ", 1, &size);
+            trailingSpacePixels = spaceCount * size.cx;
+        }
+
+        RECT rect = {};
+
+        if ((textLength - spaceCount) > 0)
+        {
+            pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        }
+
+        return static_cast<float>(rect.right - rect.left + trailingSpacePixels) * fScale;
     }
+
     return 0.0f;
 }
 
@@ -824,13 +858,13 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     fStartAngle = D3DXToRadian(fStartAngle);
     fStopAngle = D3DXToRadian(fStopAngle);
     // Calculate each segment angle
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments - 1);
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
 
     // Add center point
     pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
 
     // And calculate all other vertices
-    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    for (short siSeg = 0; siSeg <= siSegments; siSeg++)
     {
         PrimitiveVertice vert;
         float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
@@ -862,9 +896,48 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
     AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
+    else
+        m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
+}
+
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        return;
+    }
+
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+        m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+    else
+        m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
 }
 
 void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -892,6 +965,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.blendMode = m_ActiveBlendMode;
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
@@ -1406,7 +1480,10 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1482,6 +1559,8 @@ void CGraphics::DrawPostGUIQueue()
     DrawQueue(m_PostGUIQueue);
     m_pLine3DBatcherPostGUI->Flush();
     m_pMaterialLine3DBatcherPostGUI->Flush();
+    m_pPrimitive3DBatcherPostGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPostGUI->Flush();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
@@ -1493,9 +1572,20 @@ void CGraphics::DrawLine3DPreGUIQueue()
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
-bool CGraphics::HasLine3DPreGUIQueueItems()
+void CGraphics::DrawPrimitive3DPreGUIQueue(void)
+{
+    m_pPrimitive3DBatcherPreGUI->Flush();
+    m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+}
+
+bool CGraphics::HasLine3DPreGUIQueueItems(void)
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
+}
+
+bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
+{
+    return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
@@ -1645,7 +1735,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 fU2 *= fUScale;
                 fV2 *= fVScale;
             }
-            CheckModes(EDrawMode::TILE_BATCHER);
+            CheckModes(EDrawMode::TILE_BATCHER, Item.blendMode);
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
@@ -1654,14 +1744,14 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_PRIMITIVE:
         {
             const sDrawQueuePrimitive primitive = Item.Primitive;
-            CheckModes(EDrawMode::PRIMITIVE);
+            CheckModes(EDrawMode::PRIMITIVE, Item.blendMode);
             m_pPrimitiveBatcher->AddPrimitive(primitive.eType, primitive.pVecVertices);
             break;
         }
         case QUEUE_PRIMITIVEMATERIAL:
         {
             const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
-            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL, Item.blendMode);
             m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }
@@ -2261,4 +2351,135 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
         return false;
 
     return true;
+}
+
+
+namespace
+{
+    //
+    // CClientColSphere helpers
+    //
+
+    // Used in CreateSphereFaces
+    struct SFace
+    {
+        SFace(const CVector& a, const CVector& b, const CVector& c) : a(a), b(b), c(c) {}
+        CVector a, b, c;
+    };
+
+    //
+    // Create faces for a sphere
+    //
+    void CreateSphereFaces(std::vector<SFace>& faceList, int iIterations)
+    {
+        int numFaces = (int)(pow(4.0, iIterations) * 8);
+        faceList.clear();
+        faceList.reserve(numFaces);
+
+        // Initial octahedron
+        static SFixedArray<CVector, 6>     vecPoints = {CVector(0, 0, 1),  CVector(0, 0, -1), CVector(-1, -1, 0),
+                                                    CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
+        static const SFixedArray<WORD, 24> indices = {0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2};
+
+        for (uint i = 0; i < NUMELMS(vecPoints); i++)
+            vecPoints[i].Normalize();
+
+        for (uint i = 0; i < NUMELMS(indices); i += 3)
+            faceList.push_back(SFace(vecPoints[indices[i]], vecPoints[indices[i + 1]], vecPoints[indices[i + 2]]));
+
+        // For each iteration
+        while (iIterations--)
+        {
+            // Divide each face into 4
+            for (int i = faceList.size() - 1; i >= 0; i--)
+            {
+                // Get the three face points
+                CVector a = faceList[i].a;
+                CVector b = faceList[i].b;
+                CVector c = faceList[i].c;
+
+                // Make three inner points
+                CVector a2 = (a + b) * 0.5f;
+                CVector b2 = (b + c) * 0.5f;
+                CVector c2 = (c + a) * 0.5f;
+
+                // Keep points to the edge of the unit sphere
+                a2.Normalize();
+                b2.Normalize();
+                c2.Normalize();
+
+                // Replace the original face with the first sub-face
+                faceList[i] = SFace(a2, b2, c2);
+
+                // Add the three other sub-faces to the end of the list
+                faceList.push_back(SFace(a, a2, c2));
+                faceList.push_back(SFace(b, a2, b2));
+                faceList.push_back(SFace(c, b2, c2));
+            }
+        }
+    }
+
+    //
+    // For holding the lines of an optimized wireframe sphere
+    //
+    struct SWireModel
+    {
+        std::vector<CVector> vertexList;
+
+        // Add a line if it is unique
+        void AddLine(const CVector& from, const CVector& to)
+        {
+            // Conform order
+            if (from.fX > to.fX || (from.fX == to.fX && from.fY > to.fY || (from.fY == to.fY && from.fZ > to.fZ)))
+                return AddLine(to, from);
+
+            // Find existing line
+            for (int i = 0; i < (int)vertexList.size() - 1; i += 2)
+                if ((from - vertexList[i]).LengthSquared() < 0.00001f)
+                    if ((to - vertexList[i + 1]).LengthSquared() < 0.00001f)
+                        return;            // Duplicated
+
+            // Add new line
+            vertexList.push_back(from);
+            vertexList.push_back(to);
+        }
+    };
+
+    const SWireModel& GetSphereWireModel(int iterations)
+    {
+        static std::map<uint, SWireModel> wireModelMap;
+
+        // Find existing
+        SWireModel* pWireModel = MapFind(wireModelMap, iterations);
+        if (pWireModel)
+            return *pWireModel;
+
+        // Add new
+        MapSet(wireModelMap, iterations, SWireModel());
+        SWireModel& wireModel = *MapFind(wireModelMap, iterations);
+
+        std::vector<SFace> faceList;
+        CreateSphereFaces(faceList, iterations);
+
+        // Create big vertex/line list
+        for (uint i = 0; i < faceList.size(); i++)
+        {
+            wireModel.AddLine(faceList[i].a, faceList[i].b);
+            wireModel.AddLine(faceList[i].b, faceList[i].c);
+            wireModel.AddLine(faceList[i].c, faceList[i].a);
+        }
+        return wireModel;
+    }
+}            // namespace WireShpere
+
+void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations)
+{
+    const SWireModel& model = GetSphereWireModel(iterations);
+
+    for (uint i = 0; i < model.vertexList.size(); i += 2)
+    {
+        const CVector& vecBegin = model.vertexList[i] * fRadius + vecPosition;
+        const CVector& vecEnd = model.vertexList[i + 1] * fRadius + vecPosition;
+        DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+    }
 }

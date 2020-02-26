@@ -30,6 +30,10 @@
     #endif
 #endif
 
+#ifdef __APPLE__
+    #include "cpuid.h"
+#endif
+
 CCriticalSection     CRefCountable::ms_CS;
 std::map<uint, uint> ms_ReportAmountMap;
 SString              ms_strProductRegistryPath;
@@ -40,7 +44,7 @@ struct SReportLine
 {
     SString strText;
     uint    uiId;
-            operator SString&() { return strText; }
+    void    operator+=(const char* szAppend) { strText += szAppend; }
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
@@ -609,6 +613,25 @@ void SharedUtil::SetClipboardText(const SString& strText)
     }
 }
 
+SString SharedUtil::GetClipboardText()
+{
+    SString data;
+
+    if (OpenClipboard(NULL))
+    {
+        // Get the clipboard's data
+        HANDLE clipboardData = GetClipboardData(CF_UNICODETEXT);
+        void*  lockedData = GlobalLock(clipboardData);
+        if (lockedData)
+            data = UTF16ToMbUTF8(static_cast<wchar_t*>(lockedData));
+
+        GlobalUnlock(clipboardData);
+        CloseClipboard();
+    }
+
+    return data;
+}
+
 //
 // Direct players to info about trouble
 //
@@ -951,7 +974,7 @@ static bool MyShellExecute(bool bBlocking, const SString& strAction, const SStri
     SString strFile = strInFile;
     SString strParameters = strInParameters;
 
-    if (strAction == "open" && strFile.BeginsWithI("http://") && strParameters.empty())
+    if (strAction == "open" && (strFile.BeginsWithI("http://") || strFile.BeginsWithI("https://")) && strParameters.empty())
     {
         strParameters = "url.dll,FileProtocolHandler " + strFile;
         strFile = "rundll32.exe";
@@ -1179,59 +1202,124 @@ void SharedUtil::RandomizeRandomSeed()
     srand(rand() + GetTickCount32());
 }
 
-void* SharedUtil::GetMainThread()
-{
 #ifdef WIN32
-    static void* pMainThread = nullptr;
-    DWORD        dwMainThreadID = 0;
-    if (pMainThread == nullptr)
+static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength,
+                                         PULONG ReturnLength)
+{
+    using FunctionPointer = LONG(__stdcall*)(HANDLE, INT /*= THREADINFOCLASS*/, PVOID, ULONG, PULONG);
+
+    struct FunctionLookup
     {
+        FunctionPointer function;
+        bool            once;
+    };
+
+    static FunctionLookup lookup = {};
+
+    if (!lookup.once)
+    {
+        lookup.once = true;
+
+        HMODULE ntdll = LoadLibraryA("ntdll.dll");
+
+        if (ntdll)
+            lookup.function = reinterpret_cast<FunctionPointer>(GetProcAddress(ntdll, "NtQueryInformationThread"));
+        else
+            return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
+    }
+
+    if (lookup.function)
+        return lookup.function(ThreadHandle, ThreadInformationClass, ThreadInformation, ThreadInformationLength, ReturnLength);
+    else
+        return 0xC00000BBL;            // STATUS_NOT_SUPPORTED
+}
+
+bool SharedUtil::QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress)
+{
+    return SafeNtQueryInformationThread(thread, 9 /*ThreadQuerySetWin32StartAddress*/, entryPointAddress, sizeof(DWORD), nullptr) == 0;
+}
+
+DWORD SharedUtil::GetMainThreadId()
+{
+    static DWORD dwMainThreadID = 0;
+
+    if (dwMainThreadID == 0)
+    {
+        // Get the module information for the currently running process
+        DWORD      processEntryPointAddress = 0;
+        MODULEINFO moduleInfo = {};
+        
+        if (GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &moduleInfo, sizeof(MODULEINFO)) != 0)
+        {
+            processEntryPointAddress = reinterpret_cast<DWORD>(moduleInfo.EntryPoint);
+        }
+
         // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+
         if (hThreadSnap != INVALID_HANDLE_VALUE)
         {
-            ULONGLONG     ullMinCreateTime = ULLONG_MAX;
-            THREADENTRY32 th32;
+            ULONGLONG ullMinCreateTime = ULLONG_MAX;
+
+            DWORD currentProcessID = GetCurrentProcessId();
+
+            THREADENTRY32 th32 = {};
             th32.dwSize = sizeof(THREADENTRY32);
+
             for (BOOL bOK = Thread32First(hThreadSnap, &th32); bOK; bOK = Thread32Next(hThreadSnap, &th32))
             {
-                if (th32.th32OwnerProcessID == GetCurrentProcessId())
+                if (th32.th32OwnerProcessID == currentProcessID)
                 {
                     HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION, TRUE, th32.th32ThreadID);
+
                     if (hThread)
                     {
-                        FILETIME afTimes[4] = {0};
+                        // Check the thread by entry point first
+                        if (processEntryPointAddress != 0)
+                        {
+                            DWORD entryPointAddress = 0;
+
+                            if (QueryThreadEntryPointAddress(hThread, &entryPointAddress) && entryPointAddress == processEntryPointAddress)
+                            {
+                                dwMainThreadID = th32.th32ThreadID;
+                                CloseHandle(hThread);
+                                CloseHandle(hThreadSnap);
+                                return dwMainThreadID;
+                            }
+                        }
+
+                        // If entry point check failed, find the oldest thread in the system
+                        FILETIME afTimes[4] = {};
+
                         if (GetThreadTimes(hThread, &afTimes[0], &afTimes[1], &afTimes[2], &afTimes[3]))
                         {
                             ULONGLONG ullTest = (ULONGLONG(afTimes[0].dwHighDateTime) << 32) + afTimes[0].dwLowDateTime;
+
                             if (ullTest && ullTest < ullMinCreateTime)
                             {
                                 ullMinCreateTime = ullTest;
                                 dwMainThreadID = th32.th32ThreadID;
                             }
                         }
+
                         CloseHandle(hThread);
                     }
                 }
             }
+
             CloseHandle(hThreadSnap);
+        }
+
+        // Fallback
+        if (dwMainThreadID == 0)
+        {
+            dwMainThreadID = GetCurrentThreadId();
         }
     }
 
-    if (pMainThread)
-    {
-        return pMainThread;
-    }
-
-    if (dwMainThreadID == 0)
-    {
-        pMainThread = GetCurrentThread();
-        return pMainThread;
-    }
-    pMainThread = OpenThread(THREAD_ALL_ACCESS, true, dwMainThreadID);
-    return pMainThread;
-#endif
+    return dwMainThreadID;
 }
+#endif
 
 //
 // Return true if currently executing the main thread.
@@ -1240,13 +1328,9 @@ void* SharedUtil::GetMainThread()
 bool SharedUtil::IsMainThread()
 {
 #ifdef WIN32
-    static DWORD dwMainThreadID = 0;
-    if (dwMainThreadID == 0)
-    {
-        dwMainThreadID = GetThreadId(GetMainThread());
-    }
-
-    return dwMainThreadID == GetCurrentThreadId();
+    DWORD mainThreadID = GetMainThreadId();
+    DWORD currentThreadID = GetCurrentThreadId();
+    return mainThreadID == currentThreadID;
 #else
     static pthread_t dwMainThread = pthread_self();
     return pthread_equal(pthread_self(), dwMainThread) != 0;
@@ -1378,7 +1462,7 @@ bool SharedUtil::IsColorCodeW(const wchar_t* wszColorCode)
 }
 
 // Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
-std::wstring SharedUtil::MbUTF8ToUTF16(const std::string& input)
+std::wstring SharedUtil::MbUTF8ToUTF16(const SString& input)
 {
     return utf8_mbstowcs(input);
 }
@@ -1389,6 +1473,13 @@ std::string SharedUtil::UTF16ToMbUTF8(const std::wstring& input)
     return utf8_wcstombs(input);
 }
 
+std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
+{
+    if (input == nullptr)
+        return "";
+    return utf8_wcstombs(input);
+}
+
 // Get UTF8 confidence
 int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 {
@@ -1396,7 +1487,7 @@ int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 }
 
 // Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
-std::wstring SharedUtil::ANSIToUTF16(const std::string& input)
+std::wstring SharedUtil::ANSIToUTF16(const SString& input)
 {
     size_t len = mbstowcs(NULL, input.c_str(), input.length());
     if (len == (size_t)-1)
@@ -1715,6 +1806,23 @@ namespace SharedUtil
             return pfn();
 
         return _GetCurrentProcessorNumberXP();
+#elif defined(__APPLE__)
+        // Hacked from https://stackoverflow.com/a/40398183/1517394
+        unsigned long cpu;
+
+        uint32_t CPUInfo[4];
+        __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+
+        /* CPUInfo[1] is EBX, bits 24-31 are APIC ID */
+        if ((CPUInfo[3] & (1 << 9)) == 0)
+            cpu = -1; /* no APIC on chip */
+        else
+            cpu = (unsigned)CPUInfo[1] >> 24;
+
+        if (cpu < 0)
+            cpu = 0;
+
+        return cpu;
 #else
         // This should work on Linux
         return sched_getcpu();

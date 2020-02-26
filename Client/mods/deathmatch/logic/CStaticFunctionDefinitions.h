@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.h
  *  PURPOSE:     Header for static function definitions class
@@ -42,7 +42,6 @@ public:
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
     static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
-    static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
 
@@ -132,39 +131,40 @@ public:
     static CClientPed* CreatePed(CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation);
     static bool        KillPed(CClientEntity& Entity, CClientEntity* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth);
 
-    static CClientEntity*   GetPedTarget(CClientPed& Ped);
-    static bool             GetPedTargetCollision(CClientPed& Ped, CVector& vecOrigin);
-    static bool             GetPedTask(CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector<SString>& outTaskHierarchy);
-    static const char*      GetPedSimplestTask(CClientPed& Ped);
-    static bool             IsPedDoingTask(CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask);
-    static bool             GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
-    static bool             GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
-    static bool             GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
-    static bool             GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState);
-    static bool             IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
-    static bool             GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
-    static bool             GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
-    static bool             GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
-    static bool             GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
-    static bool             IsPedHeadless(CClientPed& Ped, bool& bHeadless);
-    static bool             IsPedFrozen(CClientPed& Ped, bool& bFrozen);
-    static bool             GetPedOccupiedVehicleSeat(CClientPed& Ped, uint& uiSeat);
-    static CClientVehicle*  GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors, unsigned int& uiEntryPoint, CVector& vecClosestDoorPosition);
-    static CClientVehicle*  GetPedEnterVehicleTarget(CClientPed& pPed, unsigned int& uiSeat, unsigned int& uiEntryPoint);
-    static bool             IsPedFootBloodEnabled(CClientPed& Ped, bool& bHasFootBlood);
-    static bool             GetPedCameraRotation(CClientPed& Ped, float& fRotation);
-    static bool             GetPedWeaponMuzzlePosition(CClientPed& Ped, CVector& vecPosition);
-    static bool             IsPedOnFire(CClientPed& Ped, bool& bOnFire);
-    static bool             IsPedInVehicle(CClientPed& Ped, bool& bInVehicle);
-    static bool             GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData);
-    static bool             GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData);
-    static bool             GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData);
-    static bool             GetWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
-    static bool             GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData);
-    static bool             GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData);
-    static bool             GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData);
-    static bool             GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
-    static bool             GetPedOxygenLevel(CClientPed& Ped, float& fOxygen);
+    static CClientEntity* GetPedTarget(CClientPed& Ped);
+    static bool           GetPedTargetCollision(CClientPed& Ped, CVector& vecOrigin);
+    static bool           GetPedTask(CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector<SString>& outTaskHierarchy);
+    static const char*    GetPedSimplestTask(CClientPed& Ped);
+    static bool           IsPedDoingTask(CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask);
+    static bool           GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
+    static bool           GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
+    static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
+    static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
+    static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
+    static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
+    static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
+    static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
+    static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
+    static bool           IsPedHeadless(CClientPed& Ped, bool& bHeadless);
+    static bool           IsPedFrozen(CClientPed& Ped, bool& bFrozen);
+    static bool           GetPedOccupiedVehicleSeat(CClientPed& Ped, uint& uiSeat);
+    static CClientVehicle* GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors, 
+                                                          unsigned int& uiEntryPoint, CVector& vecClosestDoorPosition);
+    static CClientVehicle* GetPedEnterVehicleTarget(CClientPed& pPed, unsigned int& uiSeat, unsigned int& uiEntryPoint);
+    static bool           IsPedFootBloodEnabled(CClientPed& Ped, bool& bHasFootBlood);
+    static bool           GetPedCameraRotation(CClientPed& Ped, float& fRotation);
+    static bool           GetPedWeaponMuzzlePosition(CClientPed& Ped, CVector& vecPosition);
+    static bool           IsPedOnFire(CClientPed& Ped, bool& bOnFire);
+    static bool           IsPedInVehicle(CClientPed& Ped, bool& bInVehicle);
+    static bool           GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData);
+    static bool           GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData);
+    static bool           GetWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData);
+    static bool           GetWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
+    static bool           GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData);
+    static bool           GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData);
+    static bool           GetOriginalWeaponProperty(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData);
+    static bool           GetOriginalWeaponPropertyFlag(eWeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable);
+    static bool           GetPedOxygenLevel(CClientPed& Ped, float& fOxygen);
 
     static bool SetPedWeaponSlot(CClientEntity& Entity, int iSlot);
     static bool GivePedWeapon(CClientEntity& Entity, uchar ucWeaponID, ushort usWeaponAmmo, bool bSetAsCurrent);
@@ -180,6 +180,7 @@ public:
     static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
+    static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
     static bool SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget);
     static bool SetPedHeadless(CClientEntity& Entity, bool bHeadless);
     static bool SetPedFrozen(CClientEntity& Entity, bool bFrozen);
@@ -194,6 +195,7 @@ public:
     static bool SetPedExitVehicle(CClientPed& pPed);
     static bool SetPedEnterVehicle(CClientPed& pPed, CClientVehicle& pVehicle, unsigned int uiSeat);
     static bool CancelPedEnterVehicle(CClientPed& pPed);
+    static bool SetPedArmor(CClientPed& Ped, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
@@ -246,7 +248,7 @@ public:
     static bool AddVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CClientEntity& Entity);
     static bool RemoveVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CClientEntity& Entity, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CClientEntity& Entity, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CClientEntity& Entity, unsigned char ucPanel, unsigned char ucState);
@@ -647,7 +649,7 @@ public:
     static bool UnbindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource);
     static bool GetKeyState(const char* szKey, bool& bState);
     static bool GetControlState(const char* szControl, bool& bState);
-    static bool GetAnalogControlState(const char* szControl, float& fState);
+    static bool GetAnalogControlState(const char* szControl, float& fState, bool bRawInput);
     static bool IsControlEnabled(const char* szControl, bool& bEnabled);
 
     static bool SetControlState(const char* szControl, bool bState);
@@ -668,6 +670,18 @@ public:
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
     static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
+
+    // Shape get functions
+    static bool GetColShapeRadius(CClientColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+
+    // Shape set functions
+    static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint iPointIndex);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);

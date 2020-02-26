@@ -68,7 +68,7 @@
 #ifdef DEBUG_HTTP2
 #define H2BUGF(x) x
 #else
-#define H2BUGF(x) do { } WHILE_FALSE
+#define H2BUGF(x) do { } while(0)
 #endif
 
 
@@ -100,19 +100,12 @@ void Curl_http2_init_userset(struct UserDefined *set)
 }
 
 static int http2_perform_getsock(const struct connectdata *conn,
-                                 curl_socket_t *sock, /* points to
-                                                         numsocks
-                                                         number of
-                                                         sockets */
-                                 int numsocks)
+                                 curl_socket_t *sock)
 {
   const struct http_conn *c = &conn->proto.httpc;
   struct SingleRequest *k = &conn->data->req;
   int bitmap = GETSOCK_BLANK;
-  (void)numsocks;
 
-  /* TODO We should check underlying socket state if it is SSL socket
-     because of renegotiation. */
   sock[0] = conn->sock[FIRSTSOCKET];
 
   /* in a HTTP/2 connection we can basically always get a frame so we should
@@ -128,11 +121,9 @@ static int http2_perform_getsock(const struct connectdata *conn,
 }
 
 static int http2_getsock(struct connectdata *conn,
-                         curl_socket_t *sock, /* points to numsocks
-                                                 number of sockets */
-                         int numsocks)
+                         curl_socket_t *socks)
 {
-  return http2_perform_getsock(conn, sock, numsocks);
+  return http2_perform_getsock(conn, socks);
 }
 
 /*
@@ -242,7 +233,7 @@ static unsigned int http2_conncheck(struct connectdata *check,
 
   if(checks_to_perform & CONNCHECK_KEEPALIVE) {
     struct curltime now = Curl_now();
-    time_t elapsed = Curl_timediff(now, check->keepalive);
+    timediff_t elapsed = Curl_timediff(now, check->keepalive);
 
     if(elapsed > check->upkeep_interval_ms) {
       /* Perform an HTTP/2 PING */
@@ -271,7 +262,7 @@ static unsigned int http2_conncheck(struct connectdata *check,
   return ret_val;
 }
 
-/* called from Curl_http_setup_conn */
+/* called from http_setup_conn */
 void Curl_http2_setup_req(struct Curl_easy *data)
 {
   struct HTTP *http = data->req.protop;
@@ -288,7 +279,7 @@ void Curl_http2_setup_req(struct Curl_easy *data)
   http->memlen = 0;
 }
 
-/* called from Curl_http_setup_conn */
+/* called from http_setup_conn */
 void Curl_http2_setup_conn(struct connectdata *conn)
 {
   conn->proto.httpc.settings.max_concurrent_streams =
@@ -357,7 +348,7 @@ int Curl_http2_ver(char *p, size_t len)
 https://tools.ietf.org/html/rfc7540#page-77
 nghttp2_error_code enums are identical.
 */
-const char *Curl_http2_strerror(uint32_t err)
+static const char *http2_strerror(uint32_t err)
 {
 #ifndef NGHTTP2_HAS_HTTP2_STRERROR
   const char *str[] = {
@@ -505,16 +496,14 @@ static struct Curl_easy *duphandle(struct Curl_easy *data)
     /* setup the request struct */
     struct HTTP *http = calloc(1, sizeof(struct HTTP));
     if(!http) {
-      (void)Curl_close(second);
-      second = NULL;
+      (void)Curl_close(&second);
     }
     else {
       second->req.protop = http;
       http->header_recvbuf = Curl_add_buffer_init();
       if(!http->header_recvbuf) {
         free(http);
-        (void)Curl_close(second);
-        second = NULL;
+        (void)Curl_close(&second);
       }
       else {
         Curl_http2_setup_req(second);
@@ -556,7 +545,7 @@ static int push_promise(struct Curl_easy *data,
     stream = data->req.protop;
     if(!stream) {
       failf(data, "Internal NULL stream!\n");
-      (void)Curl_close(newhandle);
+      (void)Curl_close(&newhandle);
       rv = 1;
       goto fail;
     }
@@ -578,7 +567,7 @@ static int push_promise(struct Curl_easy *data,
       /* denied, kill off the new handle again */
       http2_stream_free(newhandle->req.protop);
       newhandle->req.protop = NULL;
-      (void)Curl_close(newhandle);
+      (void)Curl_close(&newhandle);
       goto fail;
     }
 
@@ -594,7 +583,7 @@ static int push_promise(struct Curl_easy *data,
       infof(data, "failed to add handle to multi\n");
       http2_stream_free(newhandle->req.protop);
       newhandle->req.protop = NULL;
-      Curl_close(newhandle);
+      Curl_close(&newhandle);
       rv = 1;
       goto fail;
     }
@@ -616,6 +605,18 @@ static int push_promise(struct Curl_easy *data,
   }
   fail:
   return rv;
+}
+
+/*
+ * multi_connchanged() is called to tell that there is a connection in
+ * this multi handle that has changed state (multiplexing become possible, the
+ * number of allowed streams changed or similar), and a subsequent use of this
+ * multi handle should move CONNECT_PEND handles back to CONNECT to have them
+ * retry.
+ */
+static void multi_connchanged(struct Curl_multi *multi)
+{
+  multi->recheckstate = TRUE;
 }
 
 static int on_frame_recv(nghttp2_session *session, const nghttp2_frame *frame,
@@ -650,7 +651,7 @@ static int on_frame_recv(nghttp2_session *session, const nghttp2_frame *frame,
         infof(conn->data,
               "Connection state changed (MAX_CONCURRENT_STREAMS == %u)!\n",
               httpc->settings.max_concurrent_streams);
-        Curl_multi_connchanged(conn->data->multi);
+        multi_connchanged(conn->data->multi);
       }
     }
     return 0;
@@ -837,7 +838,7 @@ static int on_stream_close(nghttp2_session *session, int32_t stream_id,
       return 0;
     }
     H2BUGF(infof(data_s, "on_stream_close(), %s (err %d), stream %u\n",
-                 Curl_http2_strerror(error_code), error_code, stream_id));
+                 http2_strerror(error_code), error_code, stream_id));
     stream = data_s->req.protop;
     if(!stream)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
@@ -845,6 +846,7 @@ static int on_stream_close(nghttp2_session *session, int32_t stream_id,
     stream->closed = TRUE;
     httpc = &conn->proto.httpc;
     drain_this(data_s, httpc);
+    Curl_expire(data_s, 0, EXPIRE_RUN_NOW);
     httpc->error_code = error_code;
 
     /* remove the entry from the hash as the stream is now gone */
@@ -956,6 +958,30 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
      PUSH_PROMISE callback comes */
   if(frame->hd.type == NGHTTP2_PUSH_PROMISE) {
     char *h;
+
+    if(!strcmp(":authority", (const char *)name)) {
+      /* pseudo headers are lower case */
+      int rc = 0;
+      char *check = aprintf("%s:%d", conn->host.name, conn->remote_port);
+      if(!check)
+        /* no memory */
+        return NGHTTP2_ERR_CALLBACK_FAILURE;
+      if(!Curl_strcasecompare(check, (const char *)value) &&
+         ((conn->remote_port != conn->given->defport) ||
+          !Curl_strcasecompare(conn->host.name, (const char *)value))) {
+        /* This is push is not for the same authority that was asked for in
+         * the URL. RFC 7540 section 8.2 says: "A client MUST treat a
+         * PUSH_PROMISE for which the server is not authoritative as a stream
+         * error of type PROTOCOL_ERROR."
+         */
+        (void)nghttp2_submit_rst_stream(session, NGHTTP2_FLAG_NONE,
+                                        stream_id, NGHTTP2_PROTOCOL_ERROR);
+        rc = NGHTTP2_ERR_CALLBACK_FAILURE;
+      }
+      free(check);
+      if(rc)
+        return rc;
+    }
 
     if(!stream->push_headers) {
       stream->push_headers_alloc = 10;
@@ -1132,7 +1158,7 @@ static void populate_settings(struct connectdata *conn,
   nghttp2_settings_entry *iv = httpc->local_settings;
 
   iv[0].settings_id = NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS;
-  iv[0].value = 100;
+  iv[0].value = (uint32_t)Curl_multi_max_concurrent_streams(conn->data->multi);
 
   iv[1].settings_id = NGHTTP2_SETTINGS_INITIAL_WINDOW_SIZE;
   iv[1].value = HTTP2_HUGE_WINDOW_SIZE;
@@ -1143,11 +1169,10 @@ static void populate_settings(struct connectdata *conn,
   httpc->local_settings_num = 3;
 }
 
-void Curl_http2_done(struct connectdata *conn, bool premature)
+void Curl_http2_done(struct Curl_easy *data, bool premature)
 {
-  struct Curl_easy *data = conn->data;
   struct HTTP *http = data->req.protop;
-  struct http_conn *httpc = &conn->proto.httpc;
+  struct http_conn *httpc = &data->conn->proto.httpc;
 
   /* there might be allocated resources done before this got the 'h2' pointer
      setup */
@@ -1167,9 +1192,6 @@ void Curl_http2_done(struct connectdata *conn, bool premature)
   if(!httpc->h2) /* not HTTP/2 ? */
     return;
 
-  if(data->state.drain)
-    drained_transfer(data, httpc);
-
   if(premature) {
     /* RST_STREAM */
     if(!nghttp2_submit_rst_stream(httpc->h2, NGHTTP2_FLAG_NONE,
@@ -1181,6 +1203,10 @@ void Curl_http2_done(struct connectdata *conn, bool premature)
       httpc->pause_stream_id = 0;
     }
   }
+
+  if(data->state.drain)
+    drained_transfer(data, httpc);
+
   /* -1 means unassigned and 0 means cleared */
   if(http->stream_id > 0) {
     int rv = nghttp2_session_set_stream_user_data(httpc->h2,
@@ -1197,7 +1223,7 @@ void Curl_http2_done(struct connectdata *conn, bool premature)
 /*
  * Initialize nghttp2 for a Curl connection
  */
-CURLcode Curl_http2_init(struct connectdata *conn)
+static CURLcode http2_init(struct connectdata *conn)
 {
   if(!conn->proto.httpc.h2) {
     int rc;
@@ -1431,7 +1457,7 @@ static ssize_t http2_handle_stream_close(struct connectdata *conn,
   }
   else if(httpc->error_code != NGHTTP2_NO_ERROR) {
     failf(data, "HTTP/2 stream %d was not closed cleanly: %s (err %u)",
-          stream->stream_id, Curl_http2_strerror(httpc->error_code),
+          stream->stream_id, http2_strerror(httpc->error_code),
           httpc->error_code);
     *err = CURLE_HTTP2_STREAM;
     return -1;
@@ -1509,6 +1535,7 @@ static int h2_session_send(struct Curl_easy *data,
 
     H2BUGF(infof(data, "Queuing PRIORITY on stream %u (easy %p)\n",
                  stream->stream_id, data));
+    DEBUGASSERT(stream->stream_id != -1);
     rv = nghttp2_submit_priority(h2, NGHTTP2_FLAG_NONE, stream->stream_id,
                                  &pri_spec);
     if(rv)
@@ -1533,6 +1560,11 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
   if(should_close_session(httpc)) {
     H2BUGF(infof(data,
                  "http2_recv: nothing to do in this session\n"));
+    if(conn->bits.close) {
+      /* already marked for closure, return OK and we're done */
+      *err = CURLE_OK;
+      return 0;
+    }
     *err = CURLE_HTTP2;
     return -1;
   }
@@ -1628,6 +1660,9 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
        socket is not read.  But it seems that usually streams are
        notified with its drain property, and socket is read again
        quickly. */
+    if(stream->closed)
+      /* closed overrides paused */
+      return 0;
     H2BUGF(infof(data, "stream %x is paused, pause id: %x\n",
                  stream->stream_id, httpc->pause_stream_id));
     *err = CURLE_AGAIN;
@@ -1722,14 +1757,16 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
     else if(!stream->closed) {
       drained_transfer(data, httpc);
     }
+    else
+      /* this stream is closed, trigger a another read ASAP to detect that */
+      Curl_expire(data, 0, EXPIRE_RUN_NOW);
 
     return retlen;
   }
-  /* If stream is closed, return 0 to signal the http routine to close
+  /* If this stream is closed, return 0 to signal the http routine to close
      the connection */
-  if(stream->closed) {
-    return http2_handle_stream_close(conn, data, stream, err);
-  }
+  if(stream->closed)
+    return 0;
   *err = CURLE_AGAIN;
   H2BUGF(infof(data, "http2_recv returns AGAIN for stream %u\n",
                stream->stream_id));
@@ -1740,8 +1777,9 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
    field list. */
 #define AUTHORITY_DST_IDX 3
 
+/* USHRT_MAX is 65535 == 0xffff */
 #define HEADER_OVERFLOW(x) \
-  (x.namelen > (uint16_t)-1 || x.valuelen > (uint16_t)-1 - x.namelen)
+  (x.namelen > 0xffff || x.valuelen > 0xffff - x.namelen)
 
 /*
  * Check header memory for the token "trailers".
@@ -1813,9 +1851,9 @@ static ssize_t http2_send(struct connectdata *conn, int sockindex,
                           const void *mem, size_t len, CURLcode *err)
 {
   /*
-   * BIG TODO: Currently, we send request in this function, but this
-   * function is also used to send request body. It would be nice to
-   * add dedicated function for request.
+   * Currently, we send request in this function, but this function is also
+   * used to send request body. It would be nice to add dedicated function for
+   * request.
    */
   int rv;
   struct http_conn *httpc = &conn->proto.httpc;
@@ -1848,7 +1886,11 @@ static ssize_t http2_send(struct connectdata *conn, int sockindex,
        are going to send or sending request body in DATA frame */
     stream->upload_mem = mem;
     stream->upload_len = len;
-    nghttp2_session_resume_data(h2, stream->stream_id);
+    rv = nghttp2_session_resume_data(h2, stream->stream_id);
+    if(nghttp2_is_fatal(rv)) {
+      *err = CURLE_SEND_ERROR;
+      return -1;
+    }
     rv = h2_session_send(conn->data, h2);
     if(nghttp2_is_fatal(rv)) {
       *err = CURLE_SEND_ERROR;
@@ -1987,8 +2029,10 @@ static ssize_t http2_send(struct connectdata *conn, int sockindex,
       nva[i].namelen = strlen((char *)nva[i].name);
     }
     else {
-      nva[i].name = (unsigned char *)hdbuf;
       nva[i].namelen = (size_t)(end - hdbuf);
+      /* Lower case the header name for HTTP/2 */
+      Curl_strntolower((char *)hdbuf, hdbuf, nva[i].namelen);
+      nva[i].name = (unsigned char *)hdbuf;
     }
     hdbuf = end + 1;
     while(*hdbuf == ' ' || *hdbuf == '\t')
@@ -2098,17 +2142,14 @@ static ssize_t http2_send(struct connectdata *conn, int sockindex,
     return -1;
   }
 
-  if(stream->stream_id != -1) {
-    /* If whole HEADERS frame was sent off to the underlying socket,
-       the nghttp2 library calls data_source_read_callback. But only
-       it found that no data available, so it deferred the DATA
-       transmission. Which means that nghttp2_session_want_write()
-       returns 0 on http2_perform_getsock(), which results that no
-       writable socket check is performed. To workaround this, we
-       issue nghttp2_session_resume_data() here to bring back DATA
-       transmission from deferred state. */
-    nghttp2_session_resume_data(h2, stream->stream_id);
-  }
+  /* If whole HEADERS frame was sent off to the underlying socket, the nghttp2
+     library calls data_source_read_callback. But only it found that no data
+     available, so it deferred the DATA transmission. Which means that
+     nghttp2_session_want_write() returns 0 on http2_perform_getsock(), which
+     results that no writable socket check is performed. To workaround this,
+     we issue nghttp2_session_resume_data() here to bring back DATA
+     transmission from deferred state. */
+  nghttp2_session_resume_data(h2, stream->stream_id);
 
   return len;
 
@@ -2141,7 +2182,7 @@ CURLcode Curl_http2_setup(struct connectdata *conn)
   else
     conn->handler = &Curl_handler_http2;
 
-  result = Curl_http2_init(conn);
+  result = http2_init(conn);
   if(result) {
     Curl_add_buffer_free(&stream->header_recvbuf);
     return result;
@@ -2163,7 +2204,7 @@ CURLcode Curl_http2_setup(struct connectdata *conn)
   conn->bundle->multiuse = BUNDLE_MULTIPLEX;
 
   infof(conn->data, "Connection state changed (HTTP/2 confirmed)\n");
-  Curl_multi_connchanged(conn->data->multi);
+  multi_connchanged(conn->data->multi);
 
   return CURLE_OK;
 }
@@ -2382,8 +2423,6 @@ bool Curl_h2_http_1_1_error(struct connectdata *conn)
 #else /* !USE_NGHTTP2 */
 
 /* Satisfy external references even if http2 is not compiled in. */
-
-#define CURL_DISABLE_TYPECHECK
 #include <curl/curl.h>
 
 char *curl_pushheader_bynum(struct curl_pushheaders *h, size_t num)
