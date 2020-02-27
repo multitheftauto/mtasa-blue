@@ -712,6 +712,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
+        File "${FILES_ROOT}\mta\winmm.dll"
         File "${FILES_ROOT}\mta\wow64_helper.exe"
 
         File "${FILES_ROOT}\mta\bass.dll"

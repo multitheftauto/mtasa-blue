@@ -2301,7 +2301,7 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
 
-                if (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed())
+                if (!m_pTowedByVehicle && (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed()))
                 {
                     m_pVehicle->SetMatrix(&m_matFrozen);
                     CVector vec(0.0f, 0.0f, 0.0f);
