@@ -205,3 +205,19 @@ SConnectionHandle CDatabaseJobQueueManager::GetNextConnectionHandle()
 
     return m_ConnectionHandleCounter;
 }
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueManager::GetQueueSizeFromConnection
+//
+// Return count elements in queue
+//
+///////////////////////////////////////////////////////////////
+int CDatabaseJobQueueManager::GetQueueSizeFromConnection(SConnectionHandle connectionHandle)
+{
+    CDatabaseJobQueue* pJobQueue = FindQueueFromConnection(connectionHandle);
+    if (!pJobQueue)
+        return -1;
+
+    return pJobQueue->GetQueueSize();
+}

@@ -27,7 +27,7 @@ public:
     virtual bool        FreeCommand(CDbJobData* pJobData) = 0;
     virtual CDbJobData* FindCommandFromId(SDbJobId id) = 0;
     virtual void        IgnoreConnectionResults(SConnectionHandle connectionHandle) = 0;
-    virtual bool        IsConnectionClose() = 0;
+    virtual bool        IsConnectionClosed() = 0;
     virtual int         GetQueueSize() = 0;
 };
 

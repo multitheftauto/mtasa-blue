@@ -36,7 +36,7 @@ public:
     virtual bool        FreeCommand(CDbJobData* pJobData);
     virtual CDbJobData* FindCommandFromId(SDbJobId id);
     virtual void        IgnoreConnectionResults(SConnectionHandle connectionHandle);
-    virtual bool        IsConnectionClose();
+    virtual bool        IsConnectionClosed();
     virtual int         GetQueueSize();
 
 protected:
@@ -67,13 +67,12 @@ protected:
     uint                            m_uiJobCount10sMin;
     CElapsedTime                    m_JobCountElpasedTime;
     std::set<SConnectionHandle>     m_PendingFlushMap;
-    CDatabaseConnection*            m_pConnection;
+    CDatabaseConnection*            m_pConnection = nullptr;
     SConnectionHandle               m_connectionHandle;
     bool                            m_bConnectionClosed = true;
 
     // Other thread variables
     std::map<SString, CDatabaseType*> m_DatabaseTypeMap;
-    uint                              m_uiConnectionCountWarnThresh;
     EJobLogLevelType                  m_LogLevel;
     SString                           m_strLogFilename;
 
@@ -103,7 +102,7 @@ CDatabaseJobQueue* NewDatabaseJobQueue()
 // Init known database types and start the job service thread
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200), m_uiConnectionCountWarnThresh(20)
+CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200)
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite();
@@ -505,7 +504,7 @@ void CDatabaseJobQueueImpl::IgnoreJobResults(CDbJobData* pJobData)
 // Return true if connection was closed 
 // 
 /////////////////////////////////////////////////////////////// 
-bool CDatabaseJobQueueImpl::IsConnectionClose()
+bool CDatabaseJobQueueImpl::IsConnectionClosed()
 {
     return m_bConnectionClosed || !m_pConnection;
 }
@@ -674,7 +673,7 @@ void CDatabaseJobQueueImpl::ProcessConnect(CDbJobData* pJobData)
 void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
 {
     // Check connection active
-    if (IsConnectionClose())
+    if (IsConnectionClosed())
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -700,7 +699,7 @@ void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
 void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
 {
     // Check connection active
-    if (IsConnectionClose())
+    if (IsConnectionClosed())
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -733,7 +732,7 @@ void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::ProcessFlush(CDbJobData* pJobData)
 {
-    if (IsConnectionClose())
+    if (IsConnectionClosed())
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -773,7 +772,7 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
         return;
 
     // Check logging status of connection
-    if (IsConnectionClose() || !m_pConnection->m_bLoggingEnabled)
+    if (IsConnectionClosed() || !m_pConnection->m_bLoggingEnabled)
         return;
 
     if (pJobData->result.status == EJobResult::SUCCESS)
