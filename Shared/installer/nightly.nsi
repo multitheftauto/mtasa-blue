@@ -612,6 +612,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
                     ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
                     ${Case} "c29d96e0c063cd4568d977bcf273215f" #?? ?.?? 5,719,552 bytes
+		    ${Case} "aaf404281f9adf74cbdc494c44ba7386" #?? ?.?? 14,386,176 bytes
                         # Copy to gta_sa.exe.bak and patch to gta_sa.exe
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         StrCpy $PATCH_TARGET "$GTA_DIR\gta_sa.exe"
