@@ -666,7 +666,10 @@ void CheckAntiVirusStatus()
 
     // Get status from WSC
     WSC_SECURITY_PROVIDER_HEALTH health = (WSC_SECURITY_PROVIDER_HEALTH)-1;
-    WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
+    if (_WscGetSecurityProviderHealth)
+    {
+        _WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
+    }
 
     // Dump results
     SString strStatus("AV health: %s (%d)", *EnumToString(health), health);

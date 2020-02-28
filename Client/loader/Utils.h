@@ -210,6 +210,8 @@ void* LoadFunction(const char* szLibName, const char* szFunctionName);
 
 #define DEFFUNCTION( lib, name )    _DEFFUNCTION( lib, name )
 
+#define _WscGetSecurityProviderHealth       __WscGetSecurityProviderHealth()
 #define _NtQuerySystemInformation           __NtQuerySystemInformation()
 
+DEFFUNCTION("Wscapi", WscGetSecurityProviderHealth)
 DEFFUNCTION("ntdll", NtQuerySystemInformation)
