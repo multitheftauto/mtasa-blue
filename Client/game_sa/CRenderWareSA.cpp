@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
+#include <game/RenderWareD3D.h>
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
@@ -753,6 +754,77 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
 
     if (bLoadedModel)
         ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetModelTextures
+//
+// Get textures associated with the model
+// Will try to load the model if needed
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelId, std::vector<SString> vTextureNames)
+{
+    outTextureList.clear();
+
+    ushort usTxdId = GetTXDIDForModelID(usModelId);
+
+    if (usTxdId == 0)
+        return false;
+
+    // Get the TXD corresponding to this ID
+    RwTexDictionary* pTXD = CTxdStore_GetTxd(usTxdId);
+
+    bool bLoadedModel = false;
+    if (!pTXD)
+    {
+        // Try model load
+        bLoadedModel = true;
+        pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
+        pTXD = CTxdStore_GetTxd(usTxdId);
+    }
+
+    std::vector<RwTexture*> rwTextureList;
+    GetTxdTextures(rwTextureList, pTXD);
+
+    // If any texture names specified in vTextureNames, we should only return these
+    bool bExcludeTextures = false;
+
+    if (vTextureNames.size() > 0)
+        bExcludeTextures = true;
+
+    for (RwTexture* pTexture : rwTextureList)
+    {
+        SString strTextureName = pTexture->name;
+        bool    bValidTexture = false;
+
+        if (bExcludeTextures)
+        {
+            for (const auto& str : vTextureNames)
+            {
+                if (WildcardMatchI(strTextureName, str))
+                {
+                    bValidTexture = true;
+                }
+            }
+        }
+        else
+            bValidTexture = true;
+
+        if (bValidTexture)
+        {
+            RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&pTexture->raster->renderResource);
+            CPixels       texture;
+            g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pD3DRaster->texture, texture);
+            outTextureList.emplace_back(strTextureName, std::move(texture));
+        }
+    }
+
+    if (bLoadedModel)
+        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////
