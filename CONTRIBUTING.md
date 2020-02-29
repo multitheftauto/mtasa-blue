@@ -11,6 +11,8 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Nightly Builds](https://nightly.mtasa.com/)
 * [Issue Tracker](https://github.com/multitheftauto/mtasa-blue/issues)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap) <!--TODO: this page is mostly useless now -->
+* Patches can be submitted using [GitHub's pull request
+system](https://github.com/multitheftauto/mtasa-blue/pull/new)
 
 ## Directory Structure
 
@@ -51,6 +53,7 @@ It feels out of place. -->
 
 Generally, developers should try to only send pull requests that resolve existing
 [issues](https://github.com/multitheftauto/mtasa-blue/issues).
+This requires you to fork our repository and make commits to your own branch.
 
 If you're looking for something to work on, take a look at:
 - our ["good first issue"] label, and
@@ -117,22 +120,16 @@ Since you can only react to comments, not commits, feel free to create
 the initial \"+1\" comment in response to a commit. However, future
 reactions to a commit should be to the first response comment.
 
-
 ## Gaining and losing commit access
 
-Commit access is granted after pull requests have been submitted, and the
-coder has proven themselves to be competent. The subject matter of the patches does
-not matter, we are more interested in whether if you are granted commit
-access, you will be capable of maintaining a high standard of code and
-remaining cohesive with other project collaborators.
+We grant commit access after you have proven yourself to be competent,
+this is generally after 3-5 pull requests, but it's not fixed and depends
+on the extent of your contributions.
 
-Patches can be submitted using [GitHub's pull request
-system](https://github.com/multitheftauto/mtasa-blue/pull/new). Usually
-commit access is gained after 2-3 pull requests, but this is not fixed and
-depends on the extent of the contributions. This requires you to fork
-our repository and make commits to your own branch first.
+The subject matter of the patches do not matter—we are more interested in,
+once granted commit access, whether you are capable of maintaining
+a high standard of code and remaining cohesive with other project collaborators.
 
-After gaining commit access, if the contributor's commits are of a
-consistently low standard, or the user fails to stick to the rules,
-their commit access will be stripped and will be required to submit pull
-requests again.
+After gaining commit access, if your commits are of a consistently low standard,
+or the user fails to stick to the rules, their commit access will be stripped
+and will be required to submit pull requests again.
