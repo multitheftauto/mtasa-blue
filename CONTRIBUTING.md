@@ -10,65 +10,66 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Issue Tracker](https://github.com/multitheftauto/mtasa-blue/issues)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
-# Coding Guidelines
+# Overview
 
-Introduction
-============
+## Directory Structure
 
-Code repository {#code_repository}
-===============
-
-Structure
----------
-
-Our code repository uses Git and is structured into number of different
-directories, which serve different purposes:
+Our project is organised into a number of different
+directories which serve different purposes:
 
 -   **Client**
 -   **Server**
 -   **Shared**: contains code shared between both the client and the
     server
--   **irc**: bot code for the Multi Theft Auto IRC channels
--   **m4**
 -   **utils**: utilities used to automate certain tasks
 -   **vendor**: unmodified third-party code and libraries (optionally
     linked to the appropriate third-party Git repository through Git
     submodules).
 
 Our branches contain groundbreaking research, radical ideas and other
-work-in-progress that is meant to be merged into the trunk at a later
-point, but also contains project milestones:
+work-in-progress changes that are meant to be merged into `master` at
+a later point in time.
 
--   The master branch is the main development branch (containing the
-    latest, bleeding-edge code)
--   Project milestones are kept away from the trunk for stability
-    reasons, but the latest version branch can be used by any regular
-    player who has enabled nightly builds. Make sure that only well
-    tested code is added to the latest version branch.
+The master branch is the main development branch containing the
+latest, bleeding-edge code.
 
-Gaining and Losing Commit access {#gaining_and_losing_commit_access}
---------------------------------
+Additional information can befound on our "[Coding info]" page,
+including stuff like:
 
-Commit access is granted after patches have been submitted, and the
-coder has proven to be competent. The subject matter of the patches does
+- individual projects (modules) within the above folders
+- simplification of data types
+- debug commands
+- more
+
+<!-- TODO: consider moving 'Coding info' to GitHub wiki.
+Also, the above directory structure should just be merged into the 'Coding info' page.
+It feels out of place. -->
+
+[Coding info]: https://wiki.multitheftauto.com/wiki/Coding_info
+
+## Gaining and losing commit access
+
+Commit access is granted after pull requests have been submitted, and the
+coder has proven themselves to be competent. The subject matter of the patches does
 not matter, we are more interested in whether if you are granted commit
 access, you will be capable of maintaining a high standard of code and
-remaining cohesive with other project contributors.
+remaining cohesive with other project collaborators.
 
-Patches can be submitted using [GitHub\'s pull request
+Patches can be submitted using [GitHub's pull request
 system](https://github.com/multitheftauto/mtasa-blue/pull/new). Usually
-commit access is gained after 2-3 patches, but this is not fixed and
+commit access is gained after 2-3 pull requests, but this is not fixed and
 depends on the extent of the contributions. This requires you to fork
 our repository and make commits to your own branch first.
 
-After gaining commit access, if the contributor\'s commits are of a
+After gaining commit access, if the contributor's commits are of a
 consistently low standard, or the user fails to stick to the rules,
 their commit access will be stripped and will be required to submit pull
 requests again.
 
-Committing code {#committing_code}
----------------
+## Committing code
 
+<!-- TODO: below clashes a bit with the 'What to code' section -->
+<!-- oh and it's also referring to mantis which we don't use -->
 Keep in mind that your commits should initially be fixing or
 implementing existing issues on our [bug
 tracker](http://bugs.mtasa.com). The
@@ -95,8 +96,9 @@ Please follow these guidelines for all your contributions:
     message. Doing this will help identify related commits if they are
     viewed at a later date.
 
-Ratings and comments {#ratings_and_comments}
---------------------
+## Ratings and comments
+
+<!-- TODO: needs review guide -->
 
 Ratings and comments are open for the public to review code and provide
 feedback. Please be mature and civilised when posting comments.
@@ -111,17 +113,31 @@ Since you can only react to comments, not commits, feel free to create
 the initial \"+1\" comment in response to a commit. However, future
 reactions to a commit should be to the first response comment.
 
-What to code {#what_to_code}
-------------
+## What to code
 
-Generally, developers should try to stick to the
-[roadmap](http://bugs.mtasa.com/roadmap_page.php) when coding. This
-lists the issues required to be resolved for the next release. Of
-course, if you\'re interested in something else, feel free to experiment
+Generally, developers should try to only send pull requests that resolve existing
+[issues](https://github.com/multitheftauto/mtasa-blue/issues).
+
+If you're looking for something to work on, take a look at:
+- our ["good first issue"] label, and
+- our [milestones]
+
+["good first issue"]: https://github.com/multitheftauto/mtasa-blue/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22
+[milestones]: https://github.com/multitheftauto/mtasa-blue/milestones?direction=asc&sort=due_date
+
+<!-- TODO: below may need to be rephrased -->
+Of course, if you're interested in something else, feel free to experiment
 and submit it.
 
-Style
------
+## Style
+
+<!--
+
+TODO: talk about editorconfig.
+
+Also, consider moving this to its own document on the wiki? It seems too long.
+
+-->
 
 -   We use 4 spaces instead of tabs.
 -   Hungarian notation for variable names.
@@ -205,14 +221,3 @@ Style
 -   Tip: In Visual Studio go to Tools -\> Options -\> Text Editor -\>
     C/C++ -\> Formatting -\> Spacing and you can configure it to
     automatically apply the right spacing.
-
-Coding info {#coding_info}
------------
-
-Check out the [Coding info](Coding_info "wikilink") page and feel free
-to add more coding info to it.
-
-[hu:HU/Coding guidelines](hu:HU/Coding_guidelines "wikilink")
-
-[Category: Development](Category:_Development "wikilink")
-
