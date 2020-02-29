@@ -10,9 +10,11 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Nightly Builds](https://nightly.mtasa.com/)
 * [Issue Tracker](https://github.com/multitheftauto/mtasa-blue/issues)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap) <!--TODO: this page is mostly useless now -->
+* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 * Patches can be submitted using [GitHub's pull request
 system](https://github.com/multitheftauto/mtasa-blue/pull/new)
+
+**TODO: wiki roadmap page is mostly useless now**
 
 ## Directory Structure
 
@@ -43,9 +45,9 @@ including stuff like:
 - debug commands
 - more
 
-<!-- TODO: consider moving 'Coding info' to GitHub wiki.
+**TODO: consider moving 'Coding info' to GitHub wiki.
 Also, the above directory structure should just be merged into the 'Coding info' page.
-It feels out of place. -->
+It feels out of place.**
 
 [Coding info]: https://wiki.multitheftauto.com/wiki/Coding_info
 
@@ -62,7 +64,8 @@ If you're looking for something to work on, take a look at:
 ["good first issue"]: https://github.com/multitheftauto/mtasa-blue/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22
 [milestones]: https://github.com/multitheftauto/mtasa-blue/milestones?direction=asc&sort=due_date
 
-<!-- TODO: below may need to be rephrased -->
+**TODO: below may need to be rephrased**
+
 Of course, if you're interested in something else, feel free to experiment
 and submit it.
 
@@ -91,13 +94,7 @@ Please follow these guidelines for all your contributions:
 
 ## Ratings and comments
 
-<!-- TODO: needs review guide
-
-needs content from:
-- https://github.com/thoughtbot/guides/tree/master/code-review
-- https://gist.github.com/mrsasha/8d511770ad9b282f3a5d0f5c8acdd10e
-
--->
+**TODO: needs review guide, needs content from: https://github.com/thoughtbot/guides/tree/master/code-review and https://gist.github.com/mrsasha/8d511770ad9b282f3a5d0f5c8acdd10e**
 
 Ratings and comments are open for the public to review code and provide
 feedback. Please be mature and civilised when posting comments.
