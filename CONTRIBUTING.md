@@ -202,11 +202,11 @@ Also, consider moving this to its own document on the wiki? It seems too long.
     /*****************************************************************************
     \
     *
-    *  PROJECT:     Multi Theft Auto`\
-    *  LICENSE:     See LICENSE in the top level directory`\
-    *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h`\
+    *  PROJECT:     Multi Theft Auto
+    *  LICENSE:     See LICENSE in the top level directory
+    *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h
     *
-    *  Multi Theft Auto is available from http://www.multitheftauto.com/`\
+    *  Multi Theft Auto is available from http://www.multitheftauto.com/
     *
     *****************************************************************************/
 
