@@ -8,7 +8,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Nightly Builds](https://nightly.mtasa.com/)
 * [Issue Tracker](https://github.com/multitheftauto/mtasa-blue/issues)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
+* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap) <!--TODO: this page is mostly useless now -->
 
 # Overview
 
@@ -142,82 +142,87 @@ Also, consider moving this to its own document on the wiki? It seems too long.
 -   We use 4 spaces instead of tabs.
 -   Hungarian notation for variable names.
 
-`float         fValue;               // Local variable`\
-`unsigned char m_ucValue;            // Class member variable`\
-`char          ms_cValue;            // Class static variable`\
-`bool          g_bCrashTwiceAnHour;  // Global variable`\
-`char*         szUsername;           // Zero terminated string`\
-`SString       strUsername;          // String`\
-`CVector       vecPosition;          // 3D Vector`
+    ```cpp
+    float         fValue;               // Local variable
+    unsigned char m_ucValue;            // Class member variable
+    char          ms_cValue;            // Class static variable
+    bool          g_bCrashTwiceAnHour;  // Global variable
+    char*         szUsername;           // Zero terminated string
+    SString       strUsername;          // String
+    CVector       vecPosition;          // 3D Vector
+    ```
 
 -   Lower camel case for variable names of types like custom structs and
     enums:
 
-`SSomeStruct   valueOne;`\
-`ESomeEnum     m_valueTwo;`
+    ```cpp
+    SSomeStruct   valueOne;
+    ESomeEnum     m_valueTwo;
+    ```
 
 -   Function names use UpperCamelCase:
 
-`void UpperCamelCase()`
+    ```cpp
+    void UpperCamelCase()
+    ```
 
 -   Functions with no arguments are declared and defined with (), and
     called with ()
 
-`void MyTest();`\
-`void MyTest() { return; }`\
-`MyTest();`
+    ```cpp
+    void MyTest();
+    void MyTest() { return; }
+    MyTest();
+    ```
 
 -   Do not use nested structures without braces:
 
-`// This is disallowed:`\
-`for (dont)`\
-`    for (do)`\
-`        for (this)`\
-`            ...`\
-\
-`// Either of these are allowed`\
-`if (x) {`\
-`    y;`\
-`}`\
-\
-`if (x)`\
-`    y;`
+    ```cpp
+    // This is disallowed:
+    for (dont)
+        for (do)
+            for (this)
+                ...
 
--   Put *\#pragma once* preprocessor directive next to the copyright
+    // Either of these are allowed
+    if (x) {
+        y;
+    }
+
+    if (x)
+        y;
+    ```
+
+-   Put `#pragma once` preprocessor directive next to the copyright
     comment for new header files and the ones you are modifying for the
     pull request. Make sure to remove include guard if you are using
-    *\#pragma once*:
+    `#pragma once`:
 
-` /*****************************************************************************`\
-``\
-` *`\
-` *  PROJECT:     Multi Theft Auto`\
-` *  LICENSE:     See LICENSE in the top level directory`\
-` *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h`\
-` *`\
-` *  Multi Theft Auto is available from http://www.multitheftauto.com/`\
-` *`\
-` *****************************************************************************/`\
-``\
-` #pragma once`
+    ```cpp
+    /*****************************************************************************
+    \
+    *
+    *  PROJECT:     Multi Theft Auto`\
+    *  LICENSE:     See LICENSE in the top level directory`\
+    *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h`\
+    *
+    *  Multi Theft Auto is available from http://www.multitheftauto.com/`\
+    *
+    *****************************************************************************/
 
--   Once you\'re done writing code, and you\'re about to create a pull
+    #pragma once
+    ```
+
+-   Once you're done writing code, and you're about to create a pull
     request, apply clang formatting:
     -   Download
         [clang-format-r325576.exe](http://prereleases.llvm.org/win-snapshots/clang-format-r325576.exe),
         and move it to **utils** folder.
     -   Download [fnr.zip](http://findandreplace.io/downloads/fnr.zip),
         extract fnr.exe to **utils** folder.
-    -   Run **utils\\win-apply-clang-format.bat**.
+    -   Run `utils/win-apply-clang-format.bat` <!-- TODO: this updates all files. we shouldn't recommend this. -->
 
-```{=html}
-<!-- -->
-```
 -   For anything else, follow the style of the code that already exists.
 
-```{=html}
-<!-- -->
-```
--   Tip: In Visual Studio go to Tools -\> Options -\> Text Editor -\>
-    C/C++ -\> Formatting -\> Spacing and you can configure it to
-    automatically apply the right spacing.
+-   Tip: In Visual Studio go to `Tools -> Options -> Text Editor -> C/C++ -> Formatting -> Spacing`
+    and you can configure it to automatically apply the right spacing.
