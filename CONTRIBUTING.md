@@ -68,14 +68,6 @@ and submit it.
 
 ## Committing code
 
-<!-- TODO: below clashes a bit with the 'What to code' section -->
-<!-- oh and it's also referring to mantis which we don't use -->
-Keep in mind that your commits should initially be fixing or
-implementing existing issues on our [bug
-tracker](http://bugs.mtasa.com). The
-[roadmap](http://bugs.mtasa.com/roadmap_page.php) is particularly
-important since it allows contributors to track down priority issues.
-
 Please follow these guidelines for all your contributions:
 
 -   Commits should be thoroughly tested when added to master. Commits
