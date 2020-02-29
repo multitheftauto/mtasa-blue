@@ -47,24 +47,21 @@ It feels out of place. -->
 
 [Coding info]: https://wiki.multitheftauto.com/wiki/Coding_info
 
-## Gaining and losing commit access
+## What to code
 
-Commit access is granted after pull requests have been submitted, and the
-coder has proven themselves to be competent. The subject matter of the patches does
-not matter, we are more interested in whether if you are granted commit
-access, you will be capable of maintaining a high standard of code and
-remaining cohesive with other project collaborators.
+Generally, developers should try to only send pull requests that resolve existing
+[issues](https://github.com/multitheftauto/mtasa-blue/issues).
 
-Patches can be submitted using [GitHub's pull request
-system](https://github.com/multitheftauto/mtasa-blue/pull/new). Usually
-commit access is gained after 2-3 pull requests, but this is not fixed and
-depends on the extent of the contributions. This requires you to fork
-our repository and make commits to your own branch first.
+If you're looking for something to work on, take a look at:
+- our ["good first issue"] label, and
+- our [milestones]
 
-After gaining commit access, if the contributor's commits are of a
-consistently low standard, or the user fails to stick to the rules,
-their commit access will be stripped and will be required to submit pull
-requests again.
+["good first issue"]: https://github.com/multitheftauto/mtasa-blue/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22
+[milestones]: https://github.com/multitheftauto/mtasa-blue/milestones?direction=asc&sort=due_date
+
+<!-- TODO: below may need to be rephrased -->
+Of course, if you're interested in something else, feel free to experiment
+and submit it.
 
 ## Committing code
 
@@ -99,7 +96,13 @@ Please follow these guidelines for all your contributions:
 
 ## Ratings and comments
 
-<!-- TODO: needs review guide -->
+<!-- TODO: needs review guide
+
+needs content from:
+- https://github.com/thoughtbot/guides/tree/master/code-review
+- https://gist.github.com/mrsasha/8d511770ad9b282f3a5d0f5c8acdd10e
+
+-->
 
 Ratings and comments are open for the public to review code and provide
 feedback. Please be mature and civilised when posting comments.
@@ -114,18 +117,22 @@ Since you can only react to comments, not commits, feel free to create
 the initial \"+1\" comment in response to a commit. However, future
 reactions to a commit should be to the first response comment.
 
-## What to code
 
-Generally, developers should try to only send pull requests that resolve existing
-[issues](https://github.com/multitheftauto/mtasa-blue/issues).
+## Gaining and losing commit access
 
-If you're looking for something to work on, take a look at:
-- our ["good first issue"] label, and
-- our [milestones]
+Commit access is granted after pull requests have been submitted, and the
+coder has proven themselves to be competent. The subject matter of the patches does
+not matter, we are more interested in whether if you are granted commit
+access, you will be capable of maintaining a high standard of code and
+remaining cohesive with other project collaborators.
 
-["good first issue"]: https://github.com/multitheftauto/mtasa-blue/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22
-[milestones]: https://github.com/multitheftauto/mtasa-blue/milestones?direction=asc&sort=due_date
+Patches can be submitted using [GitHub's pull request
+system](https://github.com/multitheftauto/mtasa-blue/pull/new). Usually
+commit access is gained after 2-3 pull requests, but this is not fixed and
+depends on the extent of the contributions. This requires you to fork
+our repository and make commits to your own branch first.
 
-<!-- TODO: below may need to be rephrased -->
-Of course, if you're interested in something else, feel free to experiment
-and submit it.
+After gaining commit access, if the contributor's commits are of a
+consistently low standard, or the user fails to stick to the rules,
+their commit access will be stripped and will be required to submit pull
+requests again.
