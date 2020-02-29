@@ -120,16 +120,19 @@ Since you can only react to comments, not commits, feel free to create
 the initial \"+1\" comment in response to a commit. However, future
 reactions to a commit should be to the first response comment.
 
-## Gaining and losing commit access
+## Gaining and losing merge rights
 
-We grant commit access after you have proven yourself to be competent,
+Merge rights allow you to merge your own approved pull requests and 
+review other people's pull requests.
+
+We grant merge rights after you have proven yourself to be competent,
 this is generally after 3-5 pull requests, but it's not fixed and depends
 on the extent of your contributions.
 
-The subject matter of the patches do not matter—we are more interested in,
-once granted commit access, whether you are capable of maintaining
+The subject matter of your PRs do not matter—we are more interested in,
+once granted merge rights, whether you are capable of maintaining
 a high standard of code and remaining cohesive with other project collaborators.
 
-After gaining commit access, if your commits are of a consistently low standard,
-or the user fails to stick to the rules, their commit access will be stripped
-and will be required to submit pull requests again.
+After gaining merge rights, if your contributions are of a consistently low standard,
+or you fail to stick to the rules, your permissions will be stripped and will no longer
+be able to merge submitted pull requests or create your own branches.
