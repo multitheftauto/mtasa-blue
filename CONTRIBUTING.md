@@ -16,46 +16,36 @@ system](https://github.com/multitheftauto/mtasa-blue/pull/new)
 
 **TODO: wiki roadmap page is mostly useless now**
 
-## Directory Structure
+## How to code
 
-Our project is organised into a number of different
-directories which serve different purposes:
-
--   **Client**
--   **Server**
--   **Shared**: contains code shared between both the client and the
-    server
--   **utils**: utilities used to automate certain tasks
--   **vendor**: unmodified third-party code and libraries (optionally
-    linked to the appropriate third-party Git repository through Git
-    submodules).
-
-Our branches contain groundbreaking research, radical ideas and other
-work-in-progress changes that are meant to be merged into `master` at
-a later point in time.
-
-The master branch is the main development branch containing the
-latest, bleeding-edge code.
-
-Additional information can befound on our "[Coding info]" page,
+Starter coding information can be found on our "[Coding info]" page,
 including stuff like:
 
+- folder explanation
 - individual projects (modules) within the above folders
 - simplification of data types
 - debug commands
 - more
 
-**TODO: consider moving 'Coding info' to GitHub wiki.
-Also, the above directory structure should just be merged into the 'Coding info' page.
-It feels out of place.**
-
 [Coding info]: https://wiki.multitheftauto.com/wiki/Coding_info
+
+## Where to code
+
+As a new potential contributor, you will need to fork our repository and make
+commits to your own "branch". Then you can send us a pull request.
+
+Our _`master`_ branch is the main development branch containing the
+latest, bleeding-edge code.
+
+
+Our _other_ branches contain groundbreaking research, radical ideas and other
+work-in-progress changes that are meant to be merged into `master` at
+a later point in time.
 
 ## What to code
 
-Generally, developers should try to only send pull requests that resolve existing
+Generally, developers should try to only submit pull requests that resolve existing
 [issues](https://github.com/multitheftauto/mtasa-blue/issues).
-This requires you to fork our repository and make commits to your own branch.
 
 If you're looking for something to work on, take a look at:
 - our ["good first issue"] label, and
@@ -92,7 +82,7 @@ Please follow these guidelines for all your contributions:
     viewed at a later date.
 -   Follow the [Style Guide](https://github.com/multitheftauto/mtasa-blue/wiki/Style-Guide)
 
-## Ratings and comments
+## Reviewing code
 
 **TODO: needs review guide, needs content from: https://github.com/thoughtbot/guides/tree/master/code-review and https://gist.github.com/mrsasha/8d511770ad9b282f3a5d0f5c8acdd10e**
 
