@@ -17,6 +17,7 @@
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
+#include "CFileLoaderSA.h"
 
 extern CGameSA* pGame;
 
@@ -478,8 +479,13 @@ typedef struct
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
-    ((void (*)(RpAtomic*, void*))FUNC_AtomicsReplacer)(pAtomic, pData->pClump);
-    // The above function adds a reference to the model's TXD. Remove it again.
+    SRelatedModelInfo relatedModelInfo;
+    relatedModelInfo.pClump = pData->pClump;
+    relatedModelInfo.bDeleteOldRwObject = true;
+    CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
+
+    // The above function adds a reference to the model's TXD by either 
+    // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
     return true;
 }

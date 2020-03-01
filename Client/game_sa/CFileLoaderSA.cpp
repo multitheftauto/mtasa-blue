@@ -14,6 +14,7 @@ CFileLoaderSA::~CFileLoaderSA()
 
 void CFileLoaderSA::InstallHooks()
 {
+    HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
 }
 
@@ -58,13 +59,70 @@ static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id) {
     return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
 }
 
-static RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, RpClump* clump)
+static void CVehicleModelInfo_UseCommonVehicleTexDicationary()
 {
-    static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-    static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
+    ((void(__cdecl*)())0x4C75A0)();
+}
 
+static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
+{
+    ((void(__cdecl*)())0x4C75C0)();
+}
+
+static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
+
+bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId) 
+{
+    CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
+    auto pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
+
+    bool bUseCommonVehicleTexDictionary = false;
+    if (pAtomicModelInfo && pBaseModelInfo->bWetRoadReflection)
+    {
+        bUseCommonVehicleTexDictionary = true;
+        CVehicleModelInfo_UseCommonVehicleTexDicationary();
+    }
+
+    const unsigned int rwID_CLUMP = 16;
+    if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
+    {
+        RpClump* pReadClump = RpClumpStreamRead(stream);
+        if (!pReadClump)
+        {
+            if (bUseCommonVehicleTexDictionary)
+            {
+                CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
+            }
+            return false;
+        }
+
+        gAtomicModelId = modelId;
+        SRelatedModelInfo relatedModelInfo;
+        relatedModelInfo.pClump = pReadClump;
+        relatedModelInfo.bDeleteOldRwObject = false;
+
+        RpClumpForAllAtomics(pReadClump, (RpClumpForAllAtomicsCB_t)CFileLoader_SetRelatedModelInfoCB, &relatedModelInfo);
+        RpClumpDestroy(pReadClump);
+    }
+
+    if (!pBaseModelInfo->pRwObject)
+    {
+        return false;
+    }
+
+    if (bUseCommonVehicleTexDictionary)
+    {
+        CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
+    }
+    return true;
+}
+
+RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo)
+{
     char name[24];
-    auto pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(CModelInfo_ms_modelInfoPtrs[gAtomicModelId]);
+    CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
+    auto pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
     char* frameNodeName = GetFrameNodeName((RwFrame*)atomic->object.object.parent);
     bool bDamage = false;
     GetNameAndDamage(frameNodeName, (char*)&name, bDamage);
@@ -72,7 +130,14 @@ static RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, RpClump* cl
 
     // Fix #359: engineReplaceModel memory leak
     // Delete the current atomic before setting a new one.
-    pAtomicModelInfo->DeleteRwObject();
+    if (pRelatedModelInfo->bDeleteOldRwObject && pBaseModelInfo->pRwObject)
+    {
+        // DeleteRwObject will decrement the reference count. 
+        // We don't want the texture to get unloaded, so let's increment it.
+        CTxdStore_AddRef(pBaseModelInfo->usTextureDictionary);
+        pAtomicModelInfo->DeleteRwObject();
+    }
+
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
@@ -82,7 +147,7 @@ static RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, RpClump* cl
     {
         pAtomicModelInfo->SetAtomic(atomic);
     }
-    RpClumpRemoveAtomic(clump, atomic);
+    RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
