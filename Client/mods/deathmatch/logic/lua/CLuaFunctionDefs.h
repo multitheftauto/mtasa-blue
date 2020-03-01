@@ -100,7 +100,6 @@ public:
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
     LUA_DECLARE(IsWorldSpecialPropertyEnabled);
-    LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
     LUA_DECLARE(GetJetpackMaxHeight);
@@ -124,6 +123,8 @@ public:
     LUA_DECLARE(SetGarageOpen);
     LUA_DECLARE(SetWorldSpecialPropertyEnabled);
     LUA_DECLARE(SetBlurLevel);
+    LUA_DECLARE(GetBlurLevel);
+    LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
     LUA_DECLARE(SetCloudsEnabled);
     LUA_DECLARE(GetCloudsEnabled);
