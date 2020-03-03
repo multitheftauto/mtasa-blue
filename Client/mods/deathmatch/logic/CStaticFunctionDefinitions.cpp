@@ -6976,14 +6976,12 @@ bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
 
     if (pKey)
         keyCode = pKey->ulCode;
-    else if (strcmp(szKey, "capslock") == 0)
-        keyCode = VK_CAPITAL;
     else if (strcmp(szKey, "numlock") == 0)
         keyCode = VK_NUMLOCK;
     
     if (g_pCore->IsFocused() && keyCode > 0)
     {
-        DWORD dwFlags = (keyCode == VK_CAPITAL || keyCode == VK_NUMLOCK) ? 0x0001 : 0x8000;
+        DWORD dwFlags = (pKey && keyCode != VK_CAPITAL) ? 0x8000 : 0x1;
         bState = (::GetKeyState(keyCode) & dwFlags) ? true : false;
         return true;
     }
