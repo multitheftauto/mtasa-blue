@@ -6972,16 +6972,22 @@ bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey(szKey);
+    unsigned long keyCode = 0;
+
     if (pKey)
+        keyCode = pKey->ulCode;
+    else if (strcmp(szKey, "capslock") == 0)
+        keyCode = VK_CAPITAL;
+    else if (strcmp(szKey, "numlock") == 0)
+        keyCode = VK_NUMLOCK;
+    
+    if (g_pCore->IsFocused() && keyCode > 0)
     {
-        if (g_pCore->IsFocused())
-        {
-            bState = (::GetKeyState(pKey->ulCode) & 0x8000) ? true : false;
-
-            return true;
-        }
+        DWORD dwFlags = (keyCode == VK_CAPITAL || keyCode == VK_NUMLOCK) ? 0x0001 : 0x8000;
+        bState = (::GetKeyState(keyCode) & dwFlags) ? true : false;
+        return true;
     }
-
+    
     return false;
 }
 
