@@ -6987,7 +6987,6 @@ bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
         bState = (::GetKeyState(keyCode) & dwFlags) ? true : false;
         return true;
     }
-    
     return false;
 }
 
