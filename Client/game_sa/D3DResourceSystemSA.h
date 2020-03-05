@@ -25,6 +25,7 @@ class D3DResourceSystemSA
 {
 public:
     D3DResourceSystemSA();
+    static void StaticSetHooks();
 };
 
 void D3DResourceSystem_Init();

@@ -4,7 +4,6 @@
 
 CFileLoaderSA::CFileLoaderSA()
 {
-    InstallHooks();
 }
 
 CFileLoaderSA::~CFileLoaderSA()
@@ -12,7 +11,7 @@ CFileLoaderSA::~CFileLoaderSA()
 
 }
 
-void CFileLoaderSA::InstallHooks()
+void CFileLoaderSA::StaticSetHooks()
 {
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
