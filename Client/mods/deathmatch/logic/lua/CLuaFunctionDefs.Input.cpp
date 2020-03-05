@@ -256,13 +256,15 @@ int CLuaFunctionDefs::UnbindKey(lua_State* luaVM)
 int CLuaFunctionDefs::GetKeyState(lua_State* luaVM)
 {
     SString          strKey = "";
+    bool             bCheckToggleState = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strKey);
+    argStream.ReadBool(bCheckToggleState, false);
 
     if (!argStream.HasErrors())
     {
         bool bState;
-        if (CStaticFunctionDefinitions::GetKeyState(strKey, bState))
+        if (CStaticFunctionDefinitions::GetKeyState(strKey, bState, bCheckToggleState))
         {
             lua_pushboolean(luaVM, bState);
             return 1;

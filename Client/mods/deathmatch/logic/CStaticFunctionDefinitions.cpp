@@ -6966,7 +6966,7 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
     return bSuccess;
 }
 
-bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
+bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState, bool bCheckToggleState)
 {
     assert(szKey);
 
@@ -6978,10 +6978,15 @@ bool CStaticFunctionDefinitions::GetKeyState(const char* szKey, bool& bState)
         keyCode = pKey->ulCode;
     else if (strcmp(szKey, "numlock") == 0)
         keyCode = VK_NUMLOCK;
-    
+
     if (g_pCore->IsFocused() && keyCode > 0)
     {
-        DWORD dwFlags = (pKey && keyCode != VK_CAPITAL) ? 0x8000 : 0x1;
+        DWORD dwFlags = 0x8000;
+        
+        // check for capslock, numlock & scroll only
+        if (bCheckToggleState && (keyCode == VK_NUMLOCK || keyCode == VK_CAPITAL || keyCode == VK_SCROLL))
+            dwFlags = 0x1;
+
         bState = (::GetKeyState(keyCode) & dwFlags) ? true : false;
         return true;
     }

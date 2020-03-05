@@ -641,7 +641,7 @@ public:
     static bool BindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource);
     static bool UnbindKey(const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
     static bool UnbindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource);
-    static bool GetKeyState(const char* szKey, bool& bState);
+    static bool GetKeyState(const char* szKey, bool& bState, bool bCheckToggleState = false);
     static bool GetControlState(const char* szControl, bool& bState);
     static bool GetAnalogControlState(const char* szControl, float& fState, bool bRawInput);
     static bool IsControlEnabled(const char* szControl, bool& bEnabled);
