@@ -85,7 +85,7 @@ public:
 
     void ReplacePedModel(RpClump* pNew, unsigned short usModelID);
 
-    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwFunc);
+    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
