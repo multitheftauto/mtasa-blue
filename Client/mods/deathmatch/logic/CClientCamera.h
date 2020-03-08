@@ -49,6 +49,7 @@ public:
     void  GetFixedTarget(CVector& vecTarget, float* pfRoll = NULL) const;
     void  SetFixedTarget(const CVector& vecPosition, float fRoll = 0);
     float GetFOV() { return m_fFOV; }
+    float GetRealtimeFOV() { return m_pCamera->GetCam(m_pCamera->GetActiveCam())->GetFOV(); }
     void  SetFOV(float fFOV) { m_fFOV = fFOV; }
     void  SetOrbitTarget(const CVector& vecPosition);
     void  AttachTo(CClientEntity* pElement);
