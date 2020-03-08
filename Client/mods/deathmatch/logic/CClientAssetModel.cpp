@@ -125,6 +125,36 @@ void CClientAssetModel::CacheMeshes()
         m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
     }
 }
+void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialIndex)
+{
+    if (iMaterialIndex >= 0 && iMaterialIndex < m_pScene->mNumMaterials)
+    {
+        lua_newtable(luaVM);
+        aiMaterial* pMaterial = m_pScene->mMaterials[iMaterialIndex];
+        for (int i = 0; i < pMaterial->mNumProperties; i++)
+        {
+            aiMaterialProperty* pProperties = pMaterial->mProperties[i];
+            lua_pushstring(luaVM, pProperties->mKey.C_Str());
+            switch (pProperties->mType)
+            {
+                case aiPTI_Float:
+                    lua_pushnumber(luaVM, strtof(pProperties->mData, NULL));
+                    break;
+                case aiPTI_Double:
+                    lua_pushnumber(luaVM, atof(pProperties->mData));
+                    break;
+                case aiPTI_String:
+                case aiPTI_Buffer:
+                    lua_pushlstring(luaVM, pProperties->mData, pProperties->mDataLength - 1);
+                    break;
+                case aiPTI_Integer:
+                    lua_pushnumber(luaVM, atoi(pProperties->mData));
+                    break;
+            }
+            lua_settable(luaVM, -3);
+        }
+    }
+}
 
 void CClientAssetModel::CacheTextures(CResource* pParentResource)
 {
@@ -189,6 +219,13 @@ const char* CClientAssetModel::LoadFromFile(std::string strPath)
 
     m_bModelLoaded = true;
     return "";
+}
+
+SAssetTexture* CClientAssetModel::GetTexture(int idx)
+{
+    if (idx >= 0 && idx < m_vecAssetTextures.size())
+        return &m_vecAssetTextures[idx];
+    return nullptr;
 }
 
 bool CClientAssetModel::SetTexture(int idx, CClientMaterial* pMaterial)

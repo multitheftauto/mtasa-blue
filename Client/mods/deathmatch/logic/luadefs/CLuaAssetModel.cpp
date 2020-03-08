@@ -20,6 +20,7 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"loadAssetModel", LoadAssetModel},         {"getAssetProperties", GetAssetProperties}, {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
         {"assetGetNodeMeshes", AssetGetNodeMeshes}, {"assetGetTextures", AssetGetTextures},     {"assetRender", AssetRender},
         {"assetSetTexture", AssetSetTexture},
+        {"assetGetMaterialProperties", AssetGetMaterialProperties},
     };
 
     // Add functions
@@ -461,6 +462,37 @@ int CLuaAssetModelDefs::AssetSetTexture(lua_State* luaVM)
                     return 1;
                 }
             }
+        }
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetGetMaterialProperties(lua_State* luaVM)
+{
+    CClientAssetModel* pAssetModel;
+    int                iIndex;
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData(pAssetModel);
+    argStream.ReadNumber(iIndex);
+    if (!argStream.HasErrors())
+    {
+        if (pAssetModel != nullptr)
+        {
+            if (!pAssetModel->IsLoaded())
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+
+            iIndex--;
+            pAssetModel->GetMaterialProperties(luaVM, iIndex);
+            return 1;
         }
         lua_pushboolean(luaVM, false);
         return 1;

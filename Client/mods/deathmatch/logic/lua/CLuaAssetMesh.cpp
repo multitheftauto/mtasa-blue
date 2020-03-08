@@ -17,9 +17,8 @@ using namespace Assimp;
 #include "StdInc.h"
 #include "CLuaAssetMesh.h"
 
-
 CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh)
-    {
+{
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETMESH);
     m_pAssetModel = pAssetModel;
     m_pMesh = pMesh;
@@ -36,7 +35,7 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
 
     m_pMeshBuffer = new CClientMeshBuffer();
     m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_XYZ);
-    if (m_pMesh->HasTextureCoords(0))
+    if (m_pMesh->GetNumUVChannels() > 0 && m_pMesh->HasTextureCoords(0))
     {
         m_pMeshBuffer->AddVertexBuffer<CVector>(m_pMesh->mTextureCoords[0], m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_UV);
         m_pMeshBuffer->m_uiMaterialIndex = m_pMesh->mMaterialIndex;

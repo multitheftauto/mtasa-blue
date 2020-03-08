@@ -54,14 +54,17 @@ CClientMeshBuffer* CLuaAssetNode::GetMeshBuffer(int idx)
 
 CMaterialItem* CLuaAssetNode::GetTexture(int idx)
 {
-    SAssetTexture& pAssetTexture = m_pAssetModel->GetTexture(idx);
-    if (pAssetTexture.pMaterialElement != nullptr)
+    SAssetTexture* pAssetTexture = m_pAssetModel->GetTexture(idx);
+    if (pAssetTexture)
     {
-        return pAssetTexture.pMaterialElement->GetMaterialItem();
-    }
-    if (pAssetTexture.pClientTexture != nullptr)
-    {
-        return pAssetTexture.pClientTexture->GetMaterialItem();
+        if (pAssetTexture->pMaterialElement)
+        {
+            return pAssetTexture->pMaterialElement->GetMaterialItem();
+        }
+        if (pAssetTexture->pClientTexture)
+        {
+            return pAssetTexture->pClientTexture->GetMaterialItem();
+        }
     }
     return nullptr;
 }

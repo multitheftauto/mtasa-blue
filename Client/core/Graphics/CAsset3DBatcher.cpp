@@ -54,23 +54,19 @@ void CAsset3DBatcher::Flush()
     m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-    SColor color(0xBBBBBBFF);
-    DWORD  colorGlobalAmbient = D3DCOLOR_ARGB((DWORD)(color.A * 255), (DWORD)(color.R * 255), (DWORD)(color.G * 255), (DWORD)(color.B * 255));
 
-    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
-    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
-    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, colorGlobalAmbient);
-
-    // m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, g_pCore->GetAssetsControl()->GetAmbientColor());
 
     float m_fBuffer[24] = {0};
 

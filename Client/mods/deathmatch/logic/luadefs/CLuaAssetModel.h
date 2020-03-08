@@ -25,4 +25,5 @@ public:
     LUA_DECLARE(AssetGetTextures);
     LUA_DECLARE(AssetRender);
     LUA_DECLARE(AssetSetTexture);
+    LUA_DECLARE(AssetGetMaterialProperties);
 };

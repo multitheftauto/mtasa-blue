@@ -40,6 +40,7 @@ class CCore;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
+#include "CAssetsControl.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -102,6 +103,7 @@ public:
     CLocalizationInterface* GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore();
     CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
+    CAssetsControl*         GetAssetsControl() { return m_pAssets; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -295,6 +297,7 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
+    CAssetsControl*    m_pAssets;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
