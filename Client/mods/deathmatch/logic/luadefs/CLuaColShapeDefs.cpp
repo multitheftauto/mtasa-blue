@@ -646,14 +646,21 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, iPointIndex - 1, vecPoint))
+        if (iPointIndex == 0)
         {
-            lua_pushboolean(luaVM, true);
+            lua_pushboolean(luaVM, CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, vecPoint));
         }
         else
         {
-            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
-            lua_pushboolean(luaVM, false);
+            if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, iPointIndex - 1, vecPoint))
+            {
+                lua_pushboolean(luaVM, true);
+            }
+            else
+            {
+                m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+                lua_pushboolean(luaVM, false);
+            }
         }
         return 1;
     }
