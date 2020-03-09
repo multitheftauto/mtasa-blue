@@ -1458,6 +1458,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTVEHICLE:
         {
+            // Skimmer is disabled due to no collision bug.
+            if (usModel == VT_SKIMMER)
+            {
+                return false;
+            }
+
             CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
             const unsigned short usCurrentModel = Vehicle.GetModel();
 

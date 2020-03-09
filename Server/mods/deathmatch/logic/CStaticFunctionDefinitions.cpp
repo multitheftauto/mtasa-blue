@@ -1589,6 +1589,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
         }
         case CElement::VEHICLE:
         {
+            // Skimmer is disabled due to no collision bug.
+            if (usModel == VT_SKIMMER)
+            {
+                return false;
+            }
+
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             if (pVehicle->GetModel() == usModel)
                 return false;
