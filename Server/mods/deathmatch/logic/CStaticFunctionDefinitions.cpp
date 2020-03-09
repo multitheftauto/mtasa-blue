@@ -4686,6 +4686,12 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
                                                     const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
 {
+    // Skimmer is disabled due to no collision bug.
+    if (usModel == VT_SKIMMER)
+    {
+        return nullptr;
+    }
+
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
 

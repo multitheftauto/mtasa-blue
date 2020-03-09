@@ -2709,6 +2709,12 @@ bool CStaticFunctionDefinitions::IsTrainChainEngine(CClientVehicle& Vehicle, boo
 CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
                                                           const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
 {
+    // Skimmer is disabled due to no collision bug.
+    if (usModel == VT_SKIMMER)
+    {
+        return nullptr;
+    }
+
     if (CClientVehicleManager::IsValidModel(usModel) && (ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
     {
         unsigned char ucVariation = ucVariant;
