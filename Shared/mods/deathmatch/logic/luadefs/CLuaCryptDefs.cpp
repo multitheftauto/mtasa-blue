@@ -79,41 +79,28 @@ std::string CLuaCryptDefs::Base64decode(std::string str)
     return SharedUtil::Base64decode(str);
 }
 
-std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, std::string password, PasswordHashFunction algorithm,
-                                                            std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> luaFunctionRef)
+int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 {
     //  string password_hash(string password, string algorithm, table options = {} [, function callback])
-    if (algorithm != PasswordHashFunction::Bcrypt)
+    SString              password;
+    PasswordHashFunction algorithm;
+    CStringMap           options;
+    CLuaFunctionRef      luaFunctionRef;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(password);
+    argStream.ReadEnumString(algorithm);
+    argStream.ReadStringMap(options);
+
+    if (argStream.NextIsFunction())
     {
-        throw std::invalid_argument("Invalid algorithm");
+        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunctionComplete();
     }
 
-    // Set default value to 10
-    if (options["cost"].empty())
-        options["cost"] = "10";
-
-    std::stringstream ss(options["cost"]);
-    std::size_t       cost;
-    ss >> cost;
-
-    if (ss.fail())
-        throw std::invalid_argument("Invalid value for field 'cost'");
-
-    // Sync
-    if (!luaFunctionRef.has_value())
+    if (!argStream.HasErrors())
     {
-        SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
-        if (!hash.empty())
-        {
-            return hash;
-        }
-        else
-            throw std::invalid_argument("Invalid value for field 'salt'");
-    }
-    else            // Async
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        if (algorithm == PasswordHashFunction::Bcrypt)
         {
             // Set default value to 10
             if (options["cost"].empty())
@@ -149,25 +136,45 @@ std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, st
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaArguments arguments;
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [password, salt = options["salt"], cost] {
+                                // Execute time-consuming task
+                                return SharedUtil::BcryptHash(password, salt, cost);
+                            },
+                            [luaFunctionRef](const SString& hash) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
 
-                        if (hash.empty())
-                        {
-                            m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
-                            arguments.PushBoolean(false);
-                        }
-                        else
-                            arguments.PushString(hash);
+                                    if (hash.empty())
+                                    {
+                                        m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
+                                        arguments.PushBoolean(false);
+                                    }
+                                    else
+                                        arguments.PushString(hash);
 
-                        arguments.Call(pLuaMain, luaFunctionRef.value());
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                        return 1;
                     }
-                });
-
-            return true;
+                }
+            }
+            else
+                m_pScriptDebugging->LogWarning(luaVM, "Invalid value for field 'cost'");
         }
-        return false;
     }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
+
 
 int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 {
