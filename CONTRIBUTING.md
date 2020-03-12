@@ -61,14 +61,14 @@ the mod will be reverted other than in exceptional circumstances.
 - be consistent
 - always give a clear indication of what has been changed without having to look at the code
 - include issue numbers, using [GitHub keywords](https://help.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword) where necessary
-- [follow the seven rules identified here](http://chris.beams.io/posts/git-commit/).
+- [follow the seven rules identified here](http://chris.beams.io/posts/git-commit/)
     
-    The most important has been copied below, but please read the article.
-        
-    1. Separate subject from body with a blank line
-    2. Limit the subject line to 50 characters
-    3. Use the imperative mood in the subject line
-    4. Use the body to explain what and why vs. how
+The most important of the [seven rules](http://chris.beams.io/posts/git-commit/) has been copied below, but please read the article:
+
+1. Separate subject from body with a blank line
+2. Limit the subject line to 50 characters
+3. Use the imperative mood in the subject line
+4. Use the body to explain what and why vs. how
 
 **Follow up commits should refer to the previous commit.** Do this by 
 including the previous commit SHA and a summarised commit message in
