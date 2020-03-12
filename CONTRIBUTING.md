@@ -1,20 +1,16 @@
 # Contributors Guide
 
 So you've decided to become a contributor to our project. Excellent!
+
+We are always looking for new developers, so if you're new,
+please check out our Getting Started guide.
+
 But before we can start accepting your code, there are a couple of
-things you should know about how we work. These are mostly guidelines
-and rules as to how your code should be structured and how it can be
-committed without upsetting any fellow contributors.
+things you should know about how we work. 
 
-Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
-
-* [Nightly Builds](https://nightly.mtasa.com/)
-* [Issue Tracker](https://github.com/multitheftauto/mtasa-blue/issues)
-* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
-* Patches can be submitted using [GitHub's pull request
-system](https://github.com/multitheftauto/mtasa-blue/pull/new)
-
-**TODO: wiki roadmap page is mostly useless now**
+This document mostly contains guidelines and rules as to how your
+code should be structured and how it can be committed without
+upsetting any fellow contributors.
 
 ## How to code
 
@@ -36,7 +32,6 @@ commits to your own "branch". Then you can send us a pull request.
 
 Our _`master`_ branch is the main development branch containing the
 latest, bleeding-edge code.
-
 
 Our _other_ branches contain groundbreaking research, radical ideas and other
 work-in-progress changes that are meant to be merged into `master` at
@@ -64,18 +59,19 @@ and submit it.
 Please follow these guidelines for all your contributions:
 
 -   Commits should be thoroughly tested when added to master. Commits
-    that \'need to be fixed later\' which directly affect the state of
+    that 'need to be fixed later' which directly affect the state of
     the mod will be reverted other than in exceptional circumstances.
 -   If writing unstable or experimental code, a private branch should be
-    added in your own fork. Branches should not be \"personal\" to each
+    added in your own fork. Branches should not be "personal" to each
     user. This means that a branch should be created for a new feature,
     not for a user specific playground.
 -   Commit messages should always give a clear indication of the content
     of the change, without having to look at the code at all. Where
-    appropriate, include the Mantis Issue number in your log message and
-    keep your log messages consistent, e.g. **Fix \#1234: description
-    and notes here**. [Follow the seven rules identified
-    here.](http://chris.beams.io/posts/git-commit/)
+    appropriate, include the issue number in your log message and
+    keep your log messages consistent, e.g. **Fix #1234: description
+    and notes here**.
+-   Don't forget to use [GitHub keywords](https://help.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword).
+-   [Follow the seven rules identified here.](http://chris.beams.io/posts/git-commit/)
 -   When committing updates to previous commits, include the previous
     commit SHA (and a summarised commit message) in the new commit
     message. Doing this will help identify related commits if they are
