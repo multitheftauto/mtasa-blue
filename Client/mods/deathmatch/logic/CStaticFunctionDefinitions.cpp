@@ -7313,9 +7313,20 @@ bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* p
     return false;
 }
 
-bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint)
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint)
 {
-    if (pColPolygon->AddPoint(vecPoint, iPointIndex))
+    if (pColPolygon->AddPoint(vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, uiPointIndex))
     {
         RefreshColShapeColliders(pColPolygon);
         return true;
