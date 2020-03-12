@@ -70,7 +70,7 @@ The most important of the [seven rules](http://chris.beams.io/posts/git-commit/)
 3. Use the imperative mood in the subject line
 4. Use the body to explain what and why vs. how
 
-**Follow up commits should refer to the previous commit.** Do this by 
+**Follow up (addendum) commits should refer to the previous commit.** Do this by 
 including the previous commit SHA and a summarised commit message in
 the new commit message. Doing this will help identify related commits
 if they are viewed at a later date.
