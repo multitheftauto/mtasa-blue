@@ -77,20 +77,28 @@ if they are viewed at a later date.
 
 ## Reviewing code
 
-**TODO: needs review guide, needs content from: https://github.com/thoughtbot/guides/tree/master/code-review and https://gist.github.com/mrsasha/8d511770ad9b282f3a5d0f5c8acdd10e**
+Contributors should try to review other contributor's commits and provide
+feedback as much as possible.
+
+Please read our ["Code Review'](https://github.com/multitheftauto/mtasa-blue/wiki/Code-Review)
+article for information on how to review code effectively.
+
+<!--
+
+TODO: this should be part of a code of conduct instead
 
 Ratings and comments are open for the public to review code and provide
 feedback. Please be mature and civilised when posting comments.
-Developers should try to review other contributor\'s commits and provide
-feedback as much as possible.
 
 Make sure you make appropriate use of the GitHub Reactions feature to
 rate commits or express agreement/disagreement to a comment. This avoids
-spammy comments such as \"+1\", \"-1\", \"Nice one!\", etc.
+spammy comments such as "+1", "-1", "Nice one!", etc.
 
 Since you can only react to comments, not commits, feel free to create
-the initial \"+1\" comment in response to a commit. However, future
-reactions to a commit should be to the first response comment.
+the initial "+1" comment in response to a commit. However, future
+similar reactions to a commit should be to the first response comment.
+
+-->
 
 ## Gaining and losing merge rights
 
