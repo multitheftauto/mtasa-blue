@@ -106,7 +106,6 @@ private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
     CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
-
 public:
     ZERO_ON_NEW
 
@@ -309,7 +308,7 @@ public:
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*                     GetModelInfo(DWORD dwModelID);
+    CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()

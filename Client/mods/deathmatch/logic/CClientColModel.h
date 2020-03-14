@@ -23,6 +23,8 @@ public:
     eClientEntityType GetType() const { return CCLIENTCOL; }
 
     bool LoadCol(const SString& strFile, bool bIsRawData);
+    bool Load(bool isRaw, SString input);
+
     bool IsLoaded() { return m_pColModel != NULL; };
 
     bool Replace(unsigned short usModel);
@@ -38,6 +40,9 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
 private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     void InternalRestore(unsigned short usModel);
 
     class CClientColModelManager* m_pColModelManager;

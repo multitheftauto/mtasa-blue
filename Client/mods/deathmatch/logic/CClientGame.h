@@ -282,9 +282,12 @@ public:
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CClientPlayer*         GetLocalPlayer() { return m_pLocalPlayer; };
     CRadarMap*             GetRadarMap() { return m_pRadarMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
+
+    CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
+    const CClientPlayer* GetLocalPlayer() const { return m_pLocalPlayer; }
+    void                 ResetLocalPlayer() { m_pLocalPlayer = nullptr; }
 
     CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
     CPedSync*               GetPedSync() { return m_pPedSync; }

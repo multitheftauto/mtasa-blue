@@ -51,6 +51,8 @@ public:
     void OnDistanceStreamIn(CClientSound* pSound);
     void OnDistanceStreamOut(CClientSound* pSound);
 
+    bool IsDistanceStreamedIn(CClientSound* pSound) { return MapContains(m_DistanceStreamedInMap, pSound); };
+
     bool IsMinimizeMuted() { return m_bMinimizeMuted; };
     void SetMinimizeMuted(bool bMute) { m_bMinimizeMuted = bMute; };
 

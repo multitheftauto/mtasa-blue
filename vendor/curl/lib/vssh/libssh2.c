@@ -125,17 +125,9 @@ static
 CURLcode sftp_perform(struct connectdata *conn,
                       bool *connected,
                       bool *dophase_done);
-
-static int ssh_getsock(struct connectdata *conn,
-                       curl_socket_t *sock, /* points to numsocks number
-                                               of sockets */
-                       int numsocks);
-
+static int ssh_getsock(struct connectdata *conn, curl_socket_t *sock);
 static int ssh_perform_getsock(const struct connectdata *conn,
-                               curl_socket_t *sock, /* points to numsocks
-                                                       number of sockets */
-                               int numsocks);
-
+                               curl_socket_t *sock);
 static CURLcode ssh_setup_connection(struct connectdata *conn);
 
 /*
@@ -474,61 +466,95 @@ static CURLcode ssh_knownhost(struct connectdata *conn)
       struct curl_khkey *knownkeyp = NULL;
       struct curl_khkey foundkey;
 
-      keybit = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
-        LIBSSH2_KNOWNHOST_KEY_SSHRSA:LIBSSH2_KNOWNHOST_KEY_SSHDSS;
-
+      switch(keytype) {
+      case LIBSSH2_HOSTKEY_TYPE_RSA:
+        keybit = LIBSSH2_KNOWNHOST_KEY_SSHRSA;
+        break;
+      case LIBSSH2_HOSTKEY_TYPE_DSS:
+        keybit = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
+        break;
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_256
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_256:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_256;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_384
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_384:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_384;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ECDSA_521
+      case LIBSSH2_HOSTKEY_TYPE_ECDSA_521:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ECDSA_521;
+        break;
+#endif
+#ifdef LIBSSH2_HOSTKEY_TYPE_ED25519
+      case LIBSSH2_HOSTKEY_TYPE_ED25519:
+        keybit = LIBSSH2_KNOWNHOST_KEY_ED25519;
+        break;
+#endif
+      default:
+        infof(data, "unsupported key type, can't check knownhosts!\n");
+        keybit = 0;
+        break;
+      }
+      if(!keybit)
+        /* no check means failure! */
+        rc = CURLKHSTAT_REJECT;
+      else {
 #ifdef HAVE_LIBSSH2_KNOWNHOST_CHECKP
-      keycheck = libssh2_knownhost_checkp(sshc->kh,
-                                          conn->host.name,
-                                          (conn->remote_port != PORT_SSH)?
-                                          conn->remote_port:-1,
-                                          remotekey, keylen,
-                                          LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-                                          LIBSSH2_KNOWNHOST_KEYENC_RAW|
-                                          keybit,
-                                          &host);
+        keycheck = libssh2_knownhost_checkp(sshc->kh,
+                                            conn->host.name,
+                                            (conn->remote_port != PORT_SSH)?
+                                            conn->remote_port:-1,
+                                            remotekey, keylen,
+                                            LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+                                            LIBSSH2_KNOWNHOST_KEYENC_RAW|
+                                            keybit,
+                                            &host);
 #else
-      keycheck = libssh2_knownhost_check(sshc->kh,
-                                         conn->host.name,
-                                         remotekey, keylen,
-                                         LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-                                         LIBSSH2_KNOWNHOST_KEYENC_RAW|
-                                         keybit,
-                                         &host);
+        keycheck = libssh2_knownhost_check(sshc->kh,
+                                           conn->host.name,
+                                           remotekey, keylen,
+                                           LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+                                           LIBSSH2_KNOWNHOST_KEYENC_RAW|
+                                           keybit,
+                                           &host);
 #endif
 
-      infof(data, "SSH host check: %d, key: %s\n", keycheck,
-            (keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
-            host->key:"<none>");
+        infof(data, "SSH host check: %d, key: %s\n", keycheck,
+              (keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
+              host->key:"<none>");
 
-      /* setup 'knownkey' */
-      if(keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH) {
-        knownkey.key = host->key;
-        knownkey.len = 0;
-        knownkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
+        /* setup 'knownkey' */
+        if(keycheck <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH) {
+          knownkey.key = host->key;
+          knownkey.len = 0;
+          knownkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
+            CURLKHTYPE_RSA : CURLKHTYPE_DSS;
+          knownkeyp = &knownkey;
+        }
+
+        /* setup 'foundkey' */
+        foundkey.key = remotekey;
+        foundkey.len = keylen;
+        foundkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
           CURLKHTYPE_RSA : CURLKHTYPE_DSS;
-        knownkeyp = &knownkey;
+
+        /*
+         * if any of the LIBSSH2_KNOWNHOST_CHECK_* defines and the
+         * curl_khmatch enum are ever modified, we need to introduce a
+         * translation table here!
+         */
+        keymatch = (enum curl_khmatch)keycheck;
+
+        /* Ask the callback how to behave */
+        Curl_set_in_callback(data, true);
+        rc = func(data, knownkeyp, /* from the knownhosts file */
+                  &foundkey, /* from the remote host */
+                  keymatch, data->set.ssh_keyfunc_userp);
+        Curl_set_in_callback(data, false);
       }
-
-      /* setup 'foundkey' */
-      foundkey.key = remotekey;
-      foundkey.len = keylen;
-      foundkey.keytype = (keytype == LIBSSH2_HOSTKEY_TYPE_RSA)?
-        CURLKHTYPE_RSA : CURLKHTYPE_DSS;
-
-      /*
-       * if any of the LIBSSH2_KNOWNHOST_CHECK_* defines and the
-       * curl_khmatch enum are ever modified, we need to introduce a
-       * translation table here!
-       */
-      keymatch = (enum curl_khmatch)keycheck;
-
-      /* Ask the callback how to behave */
-      Curl_set_in_callback(data, true);
-      rc = func(data, knownkeyp, /* from the knownhosts file */
-                &foundkey, /* from the remote host */
-                keymatch, data->set.ssh_keyfunc_userp);
-      Curl_set_in_callback(data, false);
     }
     else
       /* no remotekey means failure! */
@@ -2700,13 +2726,10 @@ static CURLcode ssh_statemach_act(struct connectdata *conn, bool *block)
 /* called by the multi interface to figure out what socket(s) to wait for and
    for what actions in the DO_DONE, PERFORM and WAITPERFORM states */
 static int ssh_perform_getsock(const struct connectdata *conn,
-                               curl_socket_t *sock, /* points to numsocks
-                                                       number of sockets */
-                               int numsocks)
+                               curl_socket_t *sock)
 {
 #ifdef HAVE_LIBSSH2_SESSION_BLOCK_DIRECTION
   int bitmap = GETSOCK_BLANK;
-  (void)numsocks;
 
   sock[0] = conn->sock[FIRSTSOCKET];
 
@@ -2720,28 +2743,25 @@ static int ssh_perform_getsock(const struct connectdata *conn,
 #else
   /* if we don't know the direction we can use the generic *_getsock()
      function even for the protocol_connect and doing states */
-  return Curl_single_getsock(conn, sock, numsocks);
+  return Curl_single_getsock(conn, sock);
 #endif
 }
 
 /* Generic function called by the multi interface to figure out what socket(s)
    to wait for and for what actions during the DOING and PROTOCONNECT states*/
 static int ssh_getsock(struct connectdata *conn,
-                       curl_socket_t *sock, /* points to numsocks number
-                                               of sockets */
-                       int numsocks)
+                       curl_socket_t *sock)
 {
 #ifndef HAVE_LIBSSH2_SESSION_BLOCK_DIRECTION
   (void)conn;
   (void)sock;
-  (void)numsocks;
   /* if we don't know any direction we can just play along as we used to and
      not provide any sensible info */
   return GETSOCK_BLANK;
 #else
   /* if we know the direction we can use the generic *_getsock() function even
      for the protocol_connect and doing states */
-  return ssh_perform_getsock(conn, sock, numsocks);
+  return ssh_perform_getsock(conn, sock);
 #endif
 }
 
@@ -2825,7 +2845,7 @@ static CURLcode ssh_block_statemach(struct connectdata *conn,
     }
 
 #ifdef HAVE_LIBSSH2_SESSION_BLOCK_DIRECTION
-    if(!result && block) {
+    if(block) {
       int dir = libssh2_session_block_directions(sshc->ssh_session);
       curl_socket_t sock = conn->sock[FIRSTSOCKET];
       curl_socket_t fd_read = CURL_SOCKET_BAD;
@@ -2836,7 +2856,7 @@ static CURLcode ssh_block_statemach(struct connectdata *conn,
         fd_write = sock;
       /* wait for the socket to become ready */
       (void)Curl_socket_check(fd_read, CURL_SOCKET_BAD, fd_write,
-                              left>1000?1000:left); /* ignore result */
+                              left>1000?1000:(time_t)left);
     }
 #endif
 
@@ -3332,6 +3352,29 @@ static const char *sftp_libssh2_strerror(int err)
       return "Link points to itself";
   }
   return "Unknown error in libssh2";
+}
+
+CURLcode Curl_ssh_init(void)
+{
+#ifdef HAVE_LIBSSH2_INIT
+  if(libssh2_init(0)) {
+    DEBUGF(fprintf(stderr, "Error: libssh2_init failed\n"));
+    return CURLE_FAILED_INIT;
+  }
+#endif
+  return CURLE_OK;
+}
+
+void Curl_ssh_cleanup(void)
+{
+#ifdef HAVE_LIBSSH2_EXIT
+  (void)libssh2_exit();
+#endif
+}
+
+size_t Curl_ssh_version(char *buffer, size_t buflen)
+{
+  return msnprintf(buffer, buflen, "libssh2/%s", LIBSSH2_VERSION);
 }
 
 #endif /* USE_LIBSSH2 */

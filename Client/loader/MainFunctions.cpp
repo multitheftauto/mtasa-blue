@@ -314,6 +314,10 @@ void HandleResetSettings()
             FileDelete(strSettingsFilenameBak);
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
+
+            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
+
             if (!FileExists(strSettingsFilename))
             {
                 AddReportLog(4053, "Deleted gta_sa.set");
@@ -834,15 +838,15 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"9946320CE991CEC2DB1D78726B87BCA0", "bass.dll"},
-                              {"FFFEC557DC0FC8696D4E0248C619860C", "bass_aac.dll"},
+    } integrityCheckList[] = {{"B15F1875F447DBB2A849050E5FD6125D", "bass.dll"},
+                              {"853933A2518EBF8E966C04C2EAA95391", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"8B17186F19002C9D30A18D39FC8FEFA7", "bass_fx.dll"},
-                              {"6673527EF2AE564A57DA6AED4A230819", "bassflac.dll"},
-                              {"DD1AFB287DACC48C0C08CDB603D234AE", "bassmidi.dll"},
-                              {"BA59B11522793EBC1D75C777CC598737", "bassmix.dll"},
+                              {"C176D670BF5440A6C704B55A21B01FEF", "bass_fx.dll"},
+                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
+                              {"8BF45CFAC7219673DEC8BB0ED54D0365", "bassmidi.dll"},
+                              {"5387D7484E6CAA959144DFE524BB3B05", "bassmix.dll"},
                               {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
-                              {"07252BFB4B9A943B5B42809579536BE0", "basswma.dll"},
+                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
                               {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
                               {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
@@ -873,9 +877,12 @@ void CheckDataFiles()
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
-    if (FileExists(PathJoin(strGTAPath, "d3d9.dll")))
+    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
-        ShowD3dDllDialog(g_hInstance, PathJoin(strGTAPath, "d3d9.dll"));
+        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+
+        ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
     }
 

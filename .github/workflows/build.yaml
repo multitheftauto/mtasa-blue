@@ -1,0 +1,74 @@
+name: Build
+
+# Trigger the workflow on push or pull request
+on: [push, pull_request]
+
+jobs:
+  windows:
+    name: windows
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+
+      - uses: actions/cache@v1
+        id: cache-dxfiles
+        with:
+          path: utils/DXFiles
+          key: dxfiles-0001
+
+      - name: Download DirectX
+        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
+        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
+        shell: powershell
+
+      - name: Extract DirectX
+        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
+        run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
+        shell: powershell
+
+      - name: Install CEF
+        run: utils\premake5 install_cef
+
+      - name: Run Build
+        run: win-build.bat
+        shell: cmd
+        env:
+          DXSDK_DIR: './utils/DXFiles/'
+          CI: 'true'
+
+      - name: Create build artifacts
+        run: utils\premake5 compose_files
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: InstallFiles
+          path: InstallFiles/
+
+  macOS:
+    name: macOS
+    runs-on: macOS-latest
+    steps:
+      - name: Install MySQL
+        run: brew install mysql
+        continue-on-error: true
+      - name: Link MySQL
+        run: brew link --overwrite mysql
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+      - name: Run Build
+        run: ./linux-build.sh
+
+  linux:
+    name: linux
+    runs-on: ubuntu-16.04
+    container:
+      image: docker://sbx320/mtasa-blue-azure:latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 10
+      - name: Run Build
+        run: ./linux-build.sh

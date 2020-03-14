@@ -704,18 +704,24 @@ int CLuaFileDefs::fileRead(lua_State* luaVM)
         }
 
         // Allocate a buffer to read the stuff into and read some :~ into it
-        CBuffer buffer;
-
+        SString buffer;
         long lBytesRead = pFile->Read(ulCount, buffer);
-        if (lBytesRead != -1)
+
+        if (lBytesRead >= 0)
         {
             // Push the string onto the Lua stack. Use pushlstring so we are binary
             // compatible. Normal push string takes zero terminated strings.
-            lua_pushlstring(luaVM, buffer.GetData(), lBytesRead);
+            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
             return 1;
         }
-
-        m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        else if (lBytesRead == -2)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

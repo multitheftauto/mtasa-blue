@@ -1441,8 +1441,8 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTPLAYER:
         {
             // Grab the model
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = Ped.GetModel();
+            CClientPed&          Ped = static_cast<CClientPed&>(Entity);
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
                 return false;
@@ -1458,7 +1458,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTVEHICLE:
         {
-            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
             const unsigned short usCurrentModel = Vehicle.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1478,7 +1478,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            CClientObject&       Object = static_cast<CClientObject&>(Entity);
             const unsigned short usCurrentModel = Object.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1497,7 +1497,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTPROJECTILE:
         {
-            CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
+            CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
             const unsigned short usCurrentModel = Projectile.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1638,7 +1638,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
         // Check it's Analog
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
             {
                 bState = fState > 0;
                 return true;
@@ -1660,17 +1660,22 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput)
 {
     if (Ped.GetType() == CCLIENTPLAYER)
     {
         CControllerState cs;
-        Ped.GetControllerState(cs);
-        bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        unsigned int uiIndex;
+        bool             bOnFoot = (!Ped.GetRealOccupiedVehicle());
+        unsigned int     uiIndex;
+
+        if (bRawInput)
+            cs = Ped.m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+        else
+            Ped.GetControllerState(cs);
+
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
-            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState);
+            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
         else
             fState = CClientPad::GetControlState(szControl, cs, bOnFoot) == true ? 1.0f : 0.0f;
 
@@ -2160,7 +2165,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     // Play the gateway animation
                     const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
-                    auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
+                    auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
@@ -2974,9 +2979,9 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -3006,7 +3011,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
                     break;
             }
 
-            Vehicle.SetDoorStatus(ucDoor, ucState);
+            Vehicle.SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
 
             return true;
         }
@@ -5542,6 +5547,13 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMai
     CVector2D absoluteSize;
     pElement->GetSize(absoluteSize, false);
     auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+
+    if (!pGUIElement->GetBrowser())
+    {
+        delete pGUIElement;
+        return nullptr;
+    }
+
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // Load CEGUI element texture from webview
@@ -6979,7 +6991,7 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
 
     float fState;
     // Analog
-    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState))
+    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState, false))
     {
         bState = fState > 0;
         return true;
@@ -6998,13 +7010,18 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState, bool bRawInput)
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
-    pLocalPlayer->GetControllerState(cs);
-    bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
-    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+    bool             bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
+
+    if (bRawInput)
+        cs = pLocalPlayer->m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+    else
+        pLocalPlayer->GetControllerState(cs);
+
+    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
         return true;
     }
@@ -7192,6 +7209,141 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CClientColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CClientColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CClientColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CClientColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CClientColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CClientColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CClientColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CClientColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CClientColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (pColPolygon->RemovePoint(uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
 }
 
 // Make sure all colliders for a colshape are up to date

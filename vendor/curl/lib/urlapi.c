@@ -29,6 +29,7 @@
 #include "url.h"
 #include "escape.h"
 #include "curl_ctype.h"
+#include "inet_pton.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -63,6 +64,7 @@ struct Curl_URL {
   char *fragment;
 
   char *scratch; /* temporary scratch area */
+  char *temppath; /* temporary path pointer */
   long portnum; /* the numerical version */
 };
 
@@ -81,6 +83,7 @@ static void free_urlhandle(struct Curl_URL *u)
   free(u->query);
   free(u->fragment);
   free(u->scratch);
+  free(u->temppath);
 }
 
 /* move the full contents of one handle onto another and
@@ -350,7 +353,7 @@ static char *concat_url(const char *base, const char *relurl)
   else {
     /* We got a new absolute path for this server */
 
-    if((relurl[0] == '/') && (relurl[1] == '/')) {
+    if(relurl[1] == '/') {
       /* the new URL starts with //, just keep the protocol part from the
          original one */
       *protsep = 0;
@@ -591,20 +594,26 @@ static CURLUcode junkscan(char *part)
 
 static CURLUcode hostname_check(struct Curl_URL *u, char *hostname)
 {
-  const char *l = NULL; /* accepted characters */
   size_t len;
   size_t hlen = strlen(hostname);
 
   if(hostname[0] == '[') {
+#ifdef ENABLE_IPV6
+    char dest[16]; /* fits a binary IPv6 address */
+#endif
+    const char *l = "0123456789abcdefABCDEF:.";
+    if(hlen < 5) /* '[::1]' is the shortest possible valid string */
+      return CURLUE_MALFORMED_INPUT;
     hostname++;
-    l = "0123456789abcdefABCDEF::.";
     hlen -= 2;
-  }
 
-  if(l) {
+    if(hostname[hlen] != ']')
+      return CURLUE_MALFORMED_INPUT;
+
     /* only valid letters are ok */
     len = strspn(hostname, l);
     if(hlen != len) {
+      hlen = len;
       if(hostname[len] == '%') {
         /* this could now be '%[zone id]' */
         char zoneid[16];
@@ -628,6 +637,12 @@ static CURLUcode hostname_check(struct Curl_URL *u, char *hostname)
         return CURLUE_MALFORMED_INPUT;
       /* hostname is fine */
     }
+#ifdef ENABLE_IPV6
+    hostname[hlen] = 0; /* end the address there */
+    if(1 != Curl_inet_pton(AF_INET6, hostname, dest))
+      return CURLUE_MALFORMED_INPUT;
+    hostname[hlen] = ']'; /* restore ending bracket */
+#endif
   }
   else {
     /* letters from the second string is not ok */
@@ -775,6 +790,7 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
 
       if(junkscan(schemep))
         return CURLUE_MALFORMED_INPUT;
+
     }
     else {
       /* no scheme! */
@@ -795,11 +811,14 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
       p++;
 
     len = p - hostp;
-    if(!len)
-      return CURLUE_MALFORMED_INPUT;
-
-    memcpy(hostname, hostp, len);
-    hostname[len] = 0;
+    if(len) {
+      memcpy(hostname, hostp, len);
+      hostname[len] = 0;
+    }
+    else {
+      if(!(flags & CURLU_NO_AUTHORITY))
+        return CURLUE_MALFORMED_INPUT;
+    }
 
     if((flags & CURLU_GUESS_SCHEME) && !schemep) {
       /* legacy curl-style guess based on host name */
@@ -834,35 +853,60 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
   if(junkscan(path))
     return CURLUE_MALFORMED_INPUT;
 
-  query = strchr(path, '?');
-  if(query)
-    *query++ = 0;
-
-  fragment = strchr(query?query:path, '#');
-  if(fragment)
-    *fragment++ = 0;
-
-  if(!path[0])
-    /* if there's no path set, unset */
-    path = NULL;
-  else if(!(flags & CURLU_PATH_AS_IS)) {
-    /* sanitise paths and remove ../ and ./ sequences according to RFC3986 */
-    char *newp = Curl_dedotdotify(path);
+  if((flags & CURLU_URLENCODE) && path[0]) {
+    /* worst case output length is 3x the original! */
+    char *newp = malloc(strlen(path) * 3);
     if(!newp)
       return CURLUE_OUT_OF_MEMORY;
-
-    if(strcmp(newp, path)) {
-      /* if we got a new version */
-      path = newp;
-      path_alloced = TRUE;
-    }
-    else
-      free(newp);
+    path_alloced = TRUE;
+    strcpy_url(newp, path, TRUE); /* consider it relative */
+    u->temppath = path = newp;
   }
-  if(path) {
+
+  fragment = strchr(path, '#');
+  if(fragment) {
+    *fragment++ = 0;
+    if(fragment[0]) {
+      u->fragment = strdup(fragment);
+      if(!u->fragment)
+        return CURLUE_OUT_OF_MEMORY;
+    }
+  }
+
+  query = strchr(path, '?');
+  if(query) {
+    *query++ = 0;
+    /* done even if the query part is a blank string */
+    u->query = strdup(query);
+    if(!u->query)
+      return CURLUE_OUT_OF_MEMORY;
+  }
+
+  if(!path[0])
+    /* if there's no path left set, unset */
+    path = NULL;
+  else {
+    if(!(flags & CURLU_PATH_AS_IS)) {
+      /* remove ../ and ./ sequences according to RFC3986 */
+      char *newp = Curl_dedotdotify(path);
+      if(!newp)
+        return CURLUE_OUT_OF_MEMORY;
+
+      if(strcmp(newp, path)) {
+        /* if we got a new version */
+        if(path_alloced)
+          Curl_safefree(u->temppath);
+        u->temppath = path = newp;
+        path_alloced = TRUE;
+      }
+      else
+        free(newp);
+    }
+
     u->path = path_alloced?path:strdup(path);
     if(!u->path)
       return CURLUE_OUT_OF_MEMORY;
+    u->temppath = NULL; /* used now */
   }
 
   if(hostname) {
@@ -880,28 +924,22 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
     if(result)
       return result;
 
-    result = hostname_check(u, hostname);
-    if(result)
-      return result;
+    if(0 == strlen(hostname) && (flags & CURLU_NO_AUTHORITY)) {
+      /* Skip hostname check, it's allowed to be empty. */
+    }
+    else {
+      result = hostname_check(u, hostname);
+      if(result)
+        return result;
+    }
 
     u->host = strdup(hostname);
     if(!u->host)
       return CURLUE_OUT_OF_MEMORY;
   }
 
-  if(query) {
-    u->query = strdup(query);
-    if(!u->query)
-      return CURLUE_OUT_OF_MEMORY;
-  }
-  if(fragment && fragment[0]) {
-    u->fragment = strdup(fragment);
-    if(!u->fragment)
-      return CURLUE_OUT_OF_MEMORY;
-  }
-
-  free(u->scratch);
-  u->scratch = NULL;
+  Curl_safefree(u->scratch);
+  Curl_safefree(u->temppath);
 
   return CURLUE_OK;
 }
@@ -1066,24 +1104,23 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
       else
         return CURLUE_NO_SCHEME;
 
-      if(scheme) {
-        h = Curl_builtin_scheme(scheme);
-        if(!port && (flags & CURLU_DEFAULT_PORT)) {
-          /* there's no stored port number, but asked to deliver
-             a default one for the scheme */
-          if(h) {
-            msnprintf(portbuf, sizeof(portbuf), "%ld", h->defport);
-            port = portbuf;
-          }
-        }
-        else if(port) {
-          /* there is a stored port number, but asked to inhibit if it matches
-             the default one for the scheme */
-          if(h && (h->defport == u->portnum) &&
-             (flags & CURLU_NO_DEFAULT_PORT))
-            port = NULL;
+      h = Curl_builtin_scheme(scheme);
+      if(!port && (flags & CURLU_DEFAULT_PORT)) {
+        /* there's no stored port number, but asked to deliver
+           a default one for the scheme */
+        if(h) {
+          msnprintf(portbuf, sizeof(portbuf), "%ld", h->defport);
+          port = portbuf;
         }
       }
+      else if(port) {
+        /* there is a stored port number, but asked to inhibit if it matches
+           the default one for the scheme */
+        if(h && (h->defport == u->portnum) &&
+           (flags & CURLU_NO_DEFAULT_PORT))
+          port = NULL;
+      }
+
       if(h && !(h->flags & PROTOPT_URLOPTIONS))
         options = NULL;
 
@@ -1331,7 +1368,8 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
   default:
     return CURLUE_UNKNOWN_PART;
   }
-  if(storep) {
+  DEBUGASSERT(storep);
+  {
     const char *newp = part;
     size_t nalloc = strlen(part);
 
@@ -1423,9 +1461,14 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
     }
 
     if(what == CURLUPART_HOST) {
-      if(hostname_check(u, (char *)newp)) {
-        free((char *)newp);
-        return CURLUE_MALFORMED_INPUT;
+      if(0 == strlen(newp) && (flags & CURLU_NO_AUTHORITY)) {
+        /* Skip hostname check, it's allowed to be empty. */
+      }
+      else {
+        if(hostname_check(u, (char *)newp)) {
+          free((char *)newp);
+          return CURLUE_MALFORMED_INPUT;
+        }
       }
     }
 
