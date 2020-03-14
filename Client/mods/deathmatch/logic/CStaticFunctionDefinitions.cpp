@@ -2424,6 +2424,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsInVehicle())
         {
             // Driveby aim animation
+            // 0 = forwards, 1 = left, 2 = back, 3 = right
             unsigned char cInVehicleAimAnim = 0;
 
             // Ped rotation
