@@ -89,7 +89,7 @@ feedback as much as possible.
 
 Please read our ["Code Review"] article for information on how to review code effectively.
 
-["Code Review"]: (https://github.com/multitheftauto/mtasa-blue/wiki/Code-Review)
+["Code Review"]: https://github.com/multitheftauto/mtasa-blue/wiki/Code-Review
 
 <!--
 
