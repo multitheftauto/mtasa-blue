@@ -2444,23 +2444,31 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
                 fRotDiff = fRotDiff + PI * 2;
             }
 
-            // Find the aim anim and correct fArmX/fArmY (if not default anim)
+            // Find the aim anim and correct fArmX/fArmY
             if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
             {
+                // Facing left
                 cInVehicleAimAnim = 1;
                 fArmX = fArmX - PI / 2;
                 fArmY = -fArmY;
             }
             else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
             {
+                // Facing backwards
                 cInVehicleAimAnim = 2;
                 fArmX = fArmX + PI;
                 fArmY = -fArmY;
             }
             else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
             {
+                // Facing right
                 cInVehicleAimAnim = 3;
                 fArmX = fArmX + PI / 2;
+            }
+            else
+            {
+                // Facing forwards
+                // Do nothing, initial values are fine
             }
 
             // Set aim and target data without interpolation
