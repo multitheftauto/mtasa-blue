@@ -75,13 +75,21 @@ including the previous commit SHA and a summarised commit message in
 the new commit message. Doing this will help identify related commits
 if they are viewed at a later date.
 
+**Try to keep PRs small — they should be about one thing.** you do multiple things
+in one PR, it's hard to review. If you're fixing stuff as you go, you might want
+to make atomic commits and then cherry-pick those commits into separate branches,
+leaving the PR clean.
+
+**Read the ["Code Review"] guide** for more guidelines about the code review process.
+
 ## Reviewing code
 
 Contributors should try to review other contributor's commits and provide
 feedback as much as possible.
 
-Please read our ["Code Review'](https://github.com/multitheftauto/mtasa-blue/wiki/Code-Review)
-article for information on how to review code effectively.
+Please read our ["Code Review"] article for information on how to review code effectively.
+
+["Code Review"]: (https://github.com/multitheftauto/mtasa-blue/wiki/Code-Review)
 
 <!--
 
