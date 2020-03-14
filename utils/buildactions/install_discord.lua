@@ -3,7 +3,7 @@ require 'utils'
 premake.modules.install_discord = {}
 
 -- Config variables
-local DISCORD_BASEURL = "https://github.com/qaisjp/discord_game_sdk/releases/download/"
+local DISCORD_BASEURL = "https://github.com/multitheftauto/discord_game_sdk/releases/download/"
 local DISCORD_FILENAME = "cpp_x86.zip"
 local DISCORD_VENDOR = "vendor/discordgsdk"
 
