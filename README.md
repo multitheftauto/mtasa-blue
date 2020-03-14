@@ -1,4 +1,4 @@
-## Multi Theft Auto: San Andreas [![Build Status](https://img.shields.io/azure-devops/build/multitheftauto/6e1b4536-589e-4de8-abc5-f53ff8539687/1/master.svg?label=Azure%3Amaster&logo=azuredevops&style=flat-square)](https://dev.azure.com/multitheftauto/mtasa-blue/_build?definitionId=1)
+## Multi Theft Auto: San Andreas [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush)
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
 

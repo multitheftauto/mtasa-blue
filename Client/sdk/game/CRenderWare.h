@@ -17,6 +17,7 @@
 class CD3DDUMMY;
 class CClientEntityBase;
 class CShaderItem;
+class CPixels;
 typedef CShaderItem CSHADERDUMMY;
 
 // A list of custom textures to add to a model's txd
@@ -88,6 +89,7 @@ public:
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
     virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;
+    virtual bool             GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames) = 0;
     virtual const char*      GetTextureName(CD3DDUMMY* pD3DData) = 0;
 
     virtual void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask) = 0;
