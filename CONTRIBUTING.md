@@ -116,3 +116,12 @@ a high standard of code and remaining cohesive with other project collaborators.
 After gaining merge rights, if your contributions are of a consistently low standard,
 or you fail to stick to the rules, your permissions will be stripped and will no longer
 be able to merge submitted pull requests or create your own branches.
+
+## Merging pull requests
+
+Before merging, pull requests require:
+- Linux and Windows status checks to pass
+- 1 pull request review
+
+If the pull request is large, requiring at least 2 pull request reviews.
+This isn't enforced via GitHub's interface, but you should try and stick to this convention.
