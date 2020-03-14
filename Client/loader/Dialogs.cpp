@@ -86,7 +86,9 @@ const SDialogItemInfo g_OptimusDialogItems[] = {
     {IDC_RADIO7, 1, _td("G - Standard Intel with exe rename")},
     {IDC_RADIO8, 1, _td("H - Alternate Intel with exe rename")},
     {IDC_OPTIMUS_TEXT3, 0, _td("If you get desperate, this might help:")},
+    {IDC_OPTIMUS_TEXT4, 0, _td("If you have already selected an option that works, this might help:")},
     {IDC_CHECK_FORCE_WINDOWED, 1, _td("Force windowed mode")},
+    {IDC_CHECK_REMEMBER, 1, _td("Don't show again")},
     {IDC_BUTTON_HELP, 0, dialogStringsHelp},
     {IDOK, 0, dialogStringsOk},
     {-1},
@@ -520,6 +522,11 @@ void HideD3dDllDialog()
 ///////////////////////////////////////////////////////////////
 void ShowOptimusDialog(HINSTANCE hInstance)
 {
+    if (GetApplicationSettingInt("nvhacks", "optimus-remember-option"))
+    {
+        return;
+    }
+
     if (GetApplicationSettingInt("nvhacks", "optimus-dialog-skip"))
     {
         SetApplicationSettingInt("nvhacks", "optimus-dialog-skip", 0);
@@ -575,11 +582,14 @@ void ShowOptimusDialog(HINSTANCE hInstance)
     }
     uint uiForceWindowed = (IsDlgButtonChecked(hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED) == BST_CHECKED) ? 1 : 0;
 
+    uint uiRememberOption = (IsDlgButtonChecked(hwndOptimusDialog, IDC_CHECK_REMEMBER) == BST_CHECKED) ? 1 : 0;
+
     SetApplicationSettingInt("nvhacks", "optimus-startup-option", uiStartupOption);
     SetApplicationSettingInt("nvhacks", "optimus-alt-startup", (uiStartupOption & 1) ? 1 : 0);
     SetApplicationSettingInt("nvhacks", "optimus-rename-exe", (uiStartupOption & 2) ? 1 : 0);
     SetApplicationSettingInt("nvhacks", "optimus-export-enablement", (uiStartupOption & 4) ? 0 : 1);
     SetApplicationSettingInt("nvhacks", "optimus-force-windowed", uiForceWindowed);
+    SetApplicationSettingInt("nvhacks", "optimus-remember-option", uiRememberOption);
 
     if (!GetInstallManager()->UpdateOptimusSymbolExport())
     {

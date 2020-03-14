@@ -200,10 +200,21 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
     lua_pushobject(luaVM, NULL, pData);
 }
 
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject)
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache)
 {
-    if (szClass)
+    if (szClass == nullptr)
     {
+        lua_pushlightuserdata(luaVM, pObject);
+        return;
+    }
+
+    if (bSkipCache)
+    {
+        *(void**)lua_newuserdata(luaVM, sizeof(void*)) = pObject;
+    }
+    else
+    {
+        // Lookup the userdata in the cache table
         lua_pushstring(luaVM, "ud");
         lua_rawget(luaVM, LUA_REGISTRYINDEX);
 
@@ -228,40 +239,38 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject)
 
         // userdata is already on the stack, just remove the table
         lua_remove(luaVM, -2);
-
-        // Assign the class metatable
-        lua_getclass(luaVM, szClass);
-        lua_setmetatable(luaVM, -2);            // element
-        return;
     }
-    lua_pushlightuserdata(luaVM, pObject);
+
+    // Assign the class metatable
+    lua_getclass(luaVM, szClass);
+    lua_setmetatable(luaVM, -2);            // element
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
 {
     CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()));
+    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector& vector)
 {
     CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()));
+    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
 {
     CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()));
+    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
 {
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()));
+    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 

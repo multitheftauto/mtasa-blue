@@ -54,6 +54,7 @@ void InitRwFunctions(eGameVersion version)
             RpGeometryLock = (RpGeometryLock_t)0x0074C820;
             RpAtomicCreate = (RpAtomicCreate_t)0x00749CA0;
             RwFrameCreate = (RwFrameCreate_t)0x007F0450;
+            RwFrameDestroy = (RwFrameDestroy_t)0x007F05E0;
             RpGeometryTransform = (RpGeometryTransform_t)0x0074C030;
             RwFrameSetIdentity = (RwFrameSetIdentity_t)0x007F10F0;
             RwMatrixCreate = (RwMatrixCreate_t)0x007F2A90;
@@ -144,6 +145,7 @@ void InitRwFunctions(eGameVersion version)
             RpGeometryLock = (RpGeometryLock_t)0x0074C7D0;
             RpAtomicCreate = (RpAtomicCreate_t)0x00749C50;
             RwFrameCreate = (RwFrameCreate_t)0x007F0410;
+            RwFrameDestroy = (RwFrameDestroy_t)0x007F05A0;
             RpGeometryTransform = (RpGeometryTransform_t)0x0074BFE0;
             RwFrameSetIdentity = (RwFrameSetIdentity_t)0x007F10B0;
             RwMatrixCreate = (RwMatrixCreate_t)0x007F2A50;

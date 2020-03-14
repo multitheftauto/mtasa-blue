@@ -103,6 +103,7 @@ void CLuaDrawingDefs::AddDxFontClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "dxCreateFont");
+    lua_classfunction(luaVM, "destroy", "destroyElement");
 
     lua_classfunction(luaVM, "getHeight", OOP_DxGetFontHeight);
     lua_classfunction(luaVM, "getTextWidth", OOP_DxGetTextWidth);

@@ -43,11 +43,13 @@
 #include "memdebug.h"
 
 /* #define DEBUG_NGTCP2 */
+#ifdef CURLDEBUG
 #define DEBUG_HTTP3
+#endif
 #ifdef DEBUG_HTTP3
 #define H3BUGF(x) x
 #else
-#define H3BUGF(x) do { } WHILE_FALSE
+#define H3BUGF(x) do { } while(0)
 #endif
 
 /*
@@ -138,13 +140,13 @@ static void quic_settings(ngtcp2_settings *s,
   s->log_printf = NULL;
 #endif
   s->initial_ts = timestamp();
-  s->max_stream_data_bidi_local = stream_buffer_size;
-  s->max_stream_data_bidi_remote = QUIC_MAX_STREAMS;
-  s->max_stream_data_uni = QUIC_MAX_STREAMS;
-  s->max_data = QUIC_MAX_DATA;
-  s->max_streams_bidi = 1;
-  s->max_streams_uni = 3;
-  s->idle_timeout = QUIC_IDLE_TIMEOUT;
+  s->transport_params.initial_max_stream_data_bidi_local = stream_buffer_size;
+  s->transport_params.initial_max_stream_data_bidi_remote = QUIC_MAX_STREAMS;
+  s->transport_params.initial_max_stream_data_uni = QUIC_MAX_STREAMS;
+  s->transport_params.initial_max_data = QUIC_MAX_DATA;
+  s->transport_params.initial_max_streams_bidi = 1;
+  s->transport_params.initial_max_streams_uni = 3;
+  s->transport_params.idle_timeout = QUIC_IDLE_TIMEOUT;
 }
 
 static FILE *keylog_file; /* not thread-safe */
@@ -172,8 +174,10 @@ static int quic_set_encryption_secrets(SSL *ssl,
          tx_secret, secretlen, NGTCP2_CRYPTO_SIDE_CLIENT) != 0)
     return 0;
 
-  if(level == NGTCP2_CRYPTO_LEVEL_APP && init_ngh3_conn(qs) != CURLE_OK)
-    return 0;
+  if(level == NGTCP2_CRYPTO_LEVEL_APP) {
+    if(init_ngh3_conn(qs) != CURLE_OK)
+      return 0;
+  }
 
   return 1;
 }
@@ -186,11 +190,12 @@ static int quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL ossl_level,
   ngtcp2_crypto_level level = quic_from_ossl_level(ossl_level);
   int rv;
 
-  crypto_data = &qs->client_crypto_data[level];
+  crypto_data = &qs->crypto_data[level];
   if(crypto_data->buf == NULL) {
     crypto_data->buf = malloc(4096);
+    if(!crypto_data->buf)
+      return 0;
     crypto_data->alloclen = 4096;
-    /* TODO Explode if malloc failed */
   }
 
   /* TODO Just pretend that handshake does not grow more than 4KiB for
@@ -201,10 +206,10 @@ static int quic_add_handshake_data(SSL *ssl, OSSL_ENCRYPTION_LEVEL ossl_level,
   crypto_data->len += len;
 
   rv = ngtcp2_conn_submit_crypto_data(
-      qs->qconn, level, (uint8_t *)(&crypto_data->buf[crypto_data->len] - len),
-      len);
+    qs->qconn, level, (uint8_t *)(&crypto_data->buf[crypto_data->len] - len),
+    len);
   if(rv) {
-    fprintf(stderr, "write_client_handshake failed\n");
+    H3BUGF(fprintf(stderr, "write_client_handshake failed\n"));
   }
   assert(0 == rv);
 
@@ -242,8 +247,9 @@ static SSL_CTX *quic_ssl_ctx(struct Curl_easy *data)
   SSL_CTX_set_default_verify_paths(ssl_ctx);
 
   if(SSL_CTX_set_ciphersuites(ssl_ctx, QUIC_CIPHERS) != 1) {
-    failf(data, "SSL_CTX_set_ciphersuites: %s",
-          ERR_error_string(ERR_get_error(), NULL));
+    char error_buffer[256];
+    ERR_error_string_n(ERR_get_error(), error_buffer, sizeof(error_buffer));
+    failf(data, "SSL_CTX_set_ciphersuites: %s", error_buffer);
     return NULL;
   }
 
@@ -303,7 +309,7 @@ static int cb_initial(ngtcp2_conn *quic, void *user_data)
   struct quicsocket *qs = (struct quicsocket *)user_data;
 
   if(ngtcp2_crypto_read_write_crypto_data(
-         quic, qs->ssl, NGTCP2_CRYPTO_LEVEL_INITIAL, NULL, 0) != 0)
+       quic, qs->ssl, NGTCP2_CRYPTO_LEVEL_INITIAL, NULL, 0) != 0)
     return NGTCP2_ERR_CALLBACK_FAILURE;
 
   return 0;
@@ -334,6 +340,16 @@ static int cb_handshake_completed(ngtcp2_conn *tconn, void *user_data)
   return 0;
 }
 
+static void extend_stream_window(ngtcp2_conn *tconn,
+                                 struct HTTP *stream)
+{
+  size_t thismuch = stream->unacked_window;
+  ngtcp2_conn_extend_max_stream_offset(tconn, stream->stream3_id, thismuch);
+  ngtcp2_conn_extend_max_offset(tconn, thismuch);
+  stream->unacked_window = 0;
+}
+
+
 static int cb_recv_stream_data(ngtcp2_conn *tconn, int64_t stream_id,
                                int fin, uint64_t offset,
                                const uint8_t *buf, size_t buflen,
@@ -344,9 +360,6 @@ static int cb_recv_stream_data(ngtcp2_conn *tconn, int64_t stream_id,
   (void)offset;
   (void)stream_user_data;
 
-  infof(qs->conn->data, "Received %ld bytes data on stream %u\n",
-        buflen, stream_id);
-
   nconsumed =
     nghttp3_conn_read_stream(qs->h3conn, stream_id, buf, buflen, fin);
   if(nconsumed < 0) {
@@ -355,6 +368,9 @@ static int cb_recv_stream_data(ngtcp2_conn *tconn, int64_t stream_id,
     return NGTCP2_ERR_CALLBACK_FAILURE;
   }
 
+  /* number of bytes inside buflen which consists of framing overhead
+   * including QPACK HEADERS. In other words, it does not consume payload of
+   * DATA frame. */
   ngtcp2_conn_extend_max_stream_offset(tconn, stream_id, nconsumed);
   ngtcp2_conn_extend_max_offset(tconn, nconsumed);
 
@@ -512,7 +528,7 @@ static ngtcp2_conn_callbacks ng_callbacks = {
   NULL, /* rand  */
   cb_get_new_connection_id,
   NULL, /* remove_connection_id */
-  NULL, /* update_key */
+  ngtcp2_crypto_update_key_cb, /* update_key */
   NULL, /* path_validation */
   NULL, /* select_preferred_addr */
   cb_stream_reset,
@@ -548,7 +564,7 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
   if(!Curl_addr2string((struct sockaddr*)addr, addrlen, ipbuf, &port)) {
     char buffer[STRERROR_LEN];
     failf(data, "ssrem inet_ntop() failed with errno %d: %s",
-          errno, Curl_strerror(errno, buffer, sizeof(buffer)));
+          SOCKERRNO, Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
     return CURLE_BAD_FUNCTION_ARGUMENT;
   }
 
@@ -597,12 +613,11 @@ CURLcode Curl_quic_connect(struct connectdata *conn,
 
   ngtcp2_conn_get_local_transport_params(qs->qconn, &params);
   nwrite = ngtcp2_encode_transport_params(
-      paramsbuf, sizeof(paramsbuf), NGTCP2_TRANSPORT_PARAMS_TYPE_CLIENT_HELLO,
-      &params);
+    paramsbuf, sizeof(paramsbuf), NGTCP2_TRANSPORT_PARAMS_TYPE_CLIENT_HELLO,
+    &params);
   if(nwrite < 0) {
-    fprintf(stderr, "ngtcp2_encode_transport_params: %s\n",
-            ngtcp2_strerror((int)nwrite));
-
+    failf(data, "ngtcp2_encode_transport_params: %s\n",
+          ngtcp2_strerror((int)nwrite));
     return CURLE_FAILED_INIT;
   }
 
@@ -655,8 +670,16 @@ static int ng_perform_getsock(const struct connectdata *conn,
 static CURLcode ng_disconnect(struct connectdata *conn,
                               bool dead_connection)
 {
-  (void)conn;
+  int i;
+  struct quicsocket *qs = &conn->hequic[0];
   (void)dead_connection;
+  if(qs->ssl)
+    SSL_free(qs->ssl);
+  for(i = 0; i < 3; i++)
+    free(qs->crypto_data[i].buf);
+  nghttp3_conn_del(qs->h3conn);
+  ngtcp2_conn_del(qs->qconn);
+  SSL_CTX_free(qs->sslctx);
   return CURLE_OK;
 }
 
@@ -699,46 +722,125 @@ static int cb_h3_stream_close(nghttp3_conn *conn, int64_t stream_id,
   (void)stream_id;
   (void)app_error_code;
   (void)user_data;
-  fprintf(stderr, "cb_h3_stream_close CALLED\n");
+  H3BUGF(infof(data, "cb_h3_stream_close CALLED\n"));
 
   stream->closed = TRUE;
   Curl_expire(data, 0, EXPIRE_QUIC);
+  /* make sure that ngh3_stream_recv is called again to complete the transfer
+     even if there are no more packets to be received from the server. */
+  data->state.drain = 1;
   return 0;
+}
+
+/* Minimum size of the overflow buffer */
+#define OVERFLOWSIZE 1024
+
+/*
+ * allocate_overflow() ensures that there is room for incoming data in the
+ * overflow buffer, growing it to accommodate the new data if necessary. We
+ * may need to use the overflow buffer because we can't precisely limit the
+ * amount of HTTP/3 header data we receive using QUIC flow control mechanisms.
+ */
+static CURLcode allocate_overflow(struct Curl_easy *data,
+                                  struct HTTP *stream,
+                                  size_t length)
+{
+  size_t maxleft;
+  size_t newsize;
+  /* length can be arbitrarily large, so take care not to overflow newsize */
+  maxleft = CURL_MAX_READ_SIZE - stream->overflow_buflen;
+  if(length > maxleft) {
+    /* The reason to have a max limit for this is to avoid the risk of a bad
+       server feeding libcurl with a highly compressed list of headers that
+       will cause our overflow buffer to grow too large */
+    failf(data, "Rejected %zu bytes of overflow data (max is %d)!",
+          stream->overflow_buflen + length, CURL_MAX_READ_SIZE);
+    return CURLE_OUT_OF_MEMORY;
+  }
+  newsize = stream->overflow_buflen + length;
+  if(newsize > stream->overflow_bufsize) {
+    /* We enlarge the overflow buffer as it is too small */
+    char *newbuff;
+    newsize = CURLMAX(newsize * 3 / 2, stream->overflow_bufsize*2);
+    newsize = CURLMIN(CURLMAX(OVERFLOWSIZE, newsize), CURL_MAX_READ_SIZE);
+    newbuff = realloc(stream->overflow_buf, newsize);
+    if(!newbuff) {
+      failf(data, "Failed to alloc memory for overflow buffer!");
+      return CURLE_OUT_OF_MEMORY;
+    }
+    stream->overflow_buf = newbuff;
+    stream->overflow_bufsize = newsize;
+    infof(data, "Grew HTTP/3 overflow buffer to %zu bytes\n", newsize);
+  }
+  return CURLE_OK;
+}
+
+/*
+ * write_data() copies data to the stream's receive buffer. If not enough
+ * space is available in the receive buffer, it copies the rest to the
+ * stream's overflow buffer.
+ */
+static CURLcode write_data(struct Curl_easy *data,
+                           struct HTTP *stream,
+                           const void *mem, size_t memlen)
+{
+  CURLcode result = CURLE_OK;
+  const char *buf = mem;
+  size_t ncopy = memlen;
+  /* copy as much as possible to the receive buffer */
+  if(stream->len) {
+    size_t len = CURLMIN(ncopy, stream->len);
+#if 0 /* extra debugging of incoming h3 data */
+    fprintf(stderr, "!! Copies %zd bytes to %p (total %zd)\n",
+            len, stream->mem, stream->memlen);
+#endif
+    memcpy(stream->mem, buf, len);
+    stream->len -= len;
+    stream->memlen += len;
+    stream->mem += len;
+    buf += len;
+    ncopy -= len;
+  }
+  /* copy the rest to the overflow buffer */
+  if(ncopy) {
+    result = allocate_overflow(data, stream, ncopy);
+    if(result) {
+      return result;
+    }
+#if 0 /* extra debugging of incoming h3 data */
+    fprintf(stderr, "!! Copies %zd overflow bytes to %p (total %zd)\n",
+            ncopy, stream->overflow_buf, stream->overflow_buflen);
+#endif
+    memcpy(stream->overflow_buf + stream->overflow_buflen, buf, ncopy);
+    stream->overflow_buflen += ncopy;
+  }
+#if 0 /* extra debugging of incoming h3 data */
+  {
+    size_t i;
+    for(i = 0; i < memlen; i++) {
+      fprintf(stderr, "!! data[%d]: %02x '%c'\n", i, buf[i], buf[i]);
+    }
+  }
+#endif
+  return result;
 }
 
 static int cb_h3_recv_data(nghttp3_conn *conn, int64_t stream_id,
                            const uint8_t *buf, size_t buflen,
                            void *user_data, void *stream_user_data)
 {
-  struct quicsocket *qs = user_data;
-  size_t ncopy;
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.protop;
+  CURLcode result = CURLE_OK;
   (void)conn;
-  fprintf(stderr, "cb_h3_recv_data CALLED with %d bytes\n", buflen);
 
-  /* TODO: this needs to be handled properly */
-  DEBUGASSERT(buflen <= stream->len);
-
-  ncopy = CURLMIN(stream->len, buflen);
-  memcpy(stream->mem, buf, ncopy);
-  stream->len -= ncopy;
-  stream->memlen += ncopy;
-#if 0 /* extra debugging of incoming h3 data */
-  fprintf(stderr, "!! Copies %zd bytes to %p (total %zd)\n",
-          ncopy, stream->mem, stream->memlen);
-  {
-    size_t i;
-    for(i = 0; i < ncopy; i++) {
-      fprintf(stderr, "!! data[%d]: %02x '%c'\n", i, buf[i], buf[i]);
-    }
+  result = write_data(data, stream, buf, buflen);
+  if(result) {
+    return -1;
   }
-#endif
-  stream->mem += ncopy;
-
-  ngtcp2_conn_extend_max_stream_offset(qs->qconn, stream_id, buflen);
-  ngtcp2_conn_extend_max_offset(qs->qconn, buflen);
-
+  stream->unacked_window += buflen;
+  (void)stream_id;
+  (void)user_data;
   return 0;
 }
 
@@ -749,11 +851,10 @@ static int cb_h3_deferred_consume(nghttp3_conn *conn, int64_t stream_id,
   struct quicsocket *qs = user_data;
   (void)conn;
   (void)stream_user_data;
-  fprintf(stderr, "cb_h3_deferred_consume CALLED\n");
+  (void)stream_id;
 
   ngtcp2_conn_extend_max_stream_offset(qs->qconn, stream_id, consumed);
   ngtcp2_conn_extend_max_offset(qs->qconn, consumed);
-
   return 0;
 }
 
@@ -789,15 +890,17 @@ static int cb_h3_end_headers(nghttp3_conn *conn, int64_t stream_id,
 {
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.protop;
+  CURLcode result = CURLE_OK;
   (void)conn;
   (void)stream_id;
   (void)user_data;
 
-  if(stream->memlen >= 2) {
-    memcpy(stream->mem, "\r\n", 2);
-    stream->len -= 2;
-    stream->memlen += 2;
-    stream->mem += 2;
+  /* add a CRLF only if we've received some headers */
+  if(stream->firstheader) {
+    result = write_data(data, stream, "\r\n", 2);
+    if(result) {
+      return -1;
+    }
   }
   return 0;
 }
@@ -811,31 +914,46 @@ static int cb_h3_recv_header(nghttp3_conn *conn, int64_t stream_id,
   nghttp3_vec h3val = nghttp3_rcbuf_get_buf(value);
   struct Curl_easy *data = stream_user_data;
   struct HTTP *stream = data->req.protop;
-  size_t ncopy;
+  CURLcode result = CURLE_OK;
   (void)conn;
   (void)stream_id;
   (void)token;
   (void)flags;
   (void)user_data;
 
-  fprintf(stderr, "cb_h3_recv_header called!\n");
-
   if(h3name.len == sizeof(":status") - 1 &&
      !memcmp(":status", h3name.base, h3name.len)) {
+    char line[14]; /* status line is always 13 characters long */
+    size_t ncopy;
     int status = decode_status_code(h3val.base, h3val.len);
     DEBUGASSERT(status != -1);
-    msnprintf(stream->mem, stream->len, "HTTP/3 %03d \r\n", status);
+    ncopy = msnprintf(line, sizeof(line), "HTTP/3 %03d \r\n", status);
+    result = write_data(data, stream, line, ncopy);
+    if(result) {
+      return -1;
+    }
   }
   else {
     /* store as a HTTP1-style header */
-    msnprintf(stream->mem, stream->len, "%.*s: %.*s\n",
-              h3name.len, h3name.base, h3val.len, h3val.base);
+    result = write_data(data, stream, h3name.base, h3name.len);
+    if(result) {
+      return -1;
+    }
+    result = write_data(data, stream, ": ", 2);
+    if(result) {
+      return -1;
+    }
+    result = write_data(data, stream, h3val.base, h3val.len);
+    if(result) {
+      return -1;
+    }
+    result = write_data(data, stream, "\r\n", 2);
+    if(result) {
+      return -1;
+    }
   }
 
-  ncopy = strlen(stream->mem);
-  stream->len -= ncopy;
-  stream->memlen += ncopy;
-  stream->mem += ncopy;
+  stream->firstheader = TRUE;
   return 0;
 }
 
@@ -849,7 +967,6 @@ static int cb_h3_send_stop_sending(nghttp3_conn *conn, int64_t stream_id,
   (void)app_error_code;
   (void)user_data;
   (void)stream_user_data;
-  fprintf(stderr, "cb_h3_send_stop_sending CALLED\n");
   return 0;
 }
 
@@ -936,6 +1053,21 @@ static int init_ngh3_conn(struct quicsocket *qs)
 static Curl_recv ngh3_stream_recv;
 static Curl_send ngh3_stream_send;
 
+static size_t drain_overflow_buffer(struct HTTP *stream)
+{
+  size_t ncopy = CURLMIN(stream->overflow_buflen, stream->len);
+  if(ncopy > 0) {
+    memcpy(stream->mem, stream->overflow_buf, ncopy);
+    stream->len -= ncopy;
+    stream->mem += ncopy;
+    stream->memlen += ncopy;
+    stream->overflow_buflen -= ncopy;
+    memmove(stream->overflow_buf, stream->overflow_buf + ncopy,
+            stream->overflow_buflen);
+  }
+  return ncopy;
+}
+
 /* incoming data frames on the h3 stream */
 static ssize_t ngh3_stream_recv(struct connectdata *conn,
                                 int sockindex,
@@ -947,9 +1079,6 @@ static ssize_t ngh3_stream_recv(struct connectdata *conn,
   struct HTTP *stream = conn->data->req.protop;
   struct quicsocket *qs = conn->quic;
 
-  fprintf(stderr, "ngh3_stream_recv CALLED (easy %p, socket %d)\n",
-          conn->data, sockfd);
-
   if(!stream->memlen) {
     /* remember where to store incoming data for this stream and how big the
        buffer is */
@@ -957,6 +1086,10 @@ static ssize_t ngh3_stream_recv(struct connectdata *conn,
     stream->len = buffersize;
   }
   /* else, there's data in the buffer already */
+
+  /* if there's data in the overflow buffer from a previous call, copy as much
+     as possible to the receive buffer before receiving more */
+  drain_overflow_buffer(stream);
 
   if(ng_process_ingress(conn, sockfd, qs)) {
     *curlcode = CURLE_RECV_ERROR;
@@ -975,8 +1108,13 @@ static ssize_t ngh3_stream_recv(struct connectdata *conn,
     stream->memlen = 0;
     stream->mem = buf;
     stream->len = buffersize;
-    H3BUGF(infof(conn->data, "!! ngh3_stream_recv returns %zd bytes at %p\n",
-                 memlen, buf));
+    /* extend the stream window with the data we're consuming and send out
+       any additional packets to tell the server that we can receive more */
+    extend_stream_window(qs->qconn, stream);
+    if(ng_flush_egress(conn, sockfd, qs)) {
+      *curlcode = CURLE_SEND_ERROR;
+      return -1;
+    }
     return memlen;
   }
 
@@ -1003,17 +1141,18 @@ static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
 
   if(!data->set.postfields) {
     stream->h3out->used -= datalen;
-    fprintf(stderr, "cb_h3_acked_stream_data, %zd bytes, %zd left unacked\n",
-            datalen, stream->h3out->used);
+    H3BUGF(infof(data,
+                 "cb_h3_acked_stream_data, %zd bytes, %zd left unacked\n",
+                 datalen, stream->h3out->used));
     DEBUGASSERT(stream->h3out->used < H3_SEND_SIZE);
   }
   return 0;
 }
 
-static int cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
-                              const uint8_t **pdata,
-                              size_t *pdatalen, uint32_t *pflags,
-                              void *user_data, void *stream_user_data)
+static ssize_t cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
+                                  nghttp3_vec *vec, size_t veccnt,
+                                  uint32_t *pflags, void *user_data,
+                                  void *stream_user_data)
 {
   struct Curl_easy *data = stream_user_data;
   size_t nread;
@@ -1021,12 +1160,13 @@ static int cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
   (void)conn;
   (void)stream_id;
   (void)user_data;
+  (void)veccnt;
 
   if(data->set.postfields) {
-    *pdata = data->set.postfields;
-    *pdatalen = data->state.infilesize;
+    vec[0].base = data->set.postfields;
+    vec[0].len = data->state.infilesize;
     *pflags = NGHTTP3_DATA_FLAG_EOF;
-    return 0;
+    return 1;
   }
 
   nread = CURLMIN(stream->upload_len, H3_SEND_SIZE - stream->h3out->used);
@@ -1044,8 +1184,8 @@ static int cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
     out->used += nread;
 
     /* that's the chunk we return to nghttp3 */
-    *pdata = &out->buf[out->windex];
-    *pdatalen = nread;
+    vec[0].base = &out->buf[out->windex];
+    vec[0].len = nread;
 
     if(out->windex == H3_SEND_SIZE)
       out->windex = 0; /* wrap */
@@ -1056,22 +1196,20 @@ static int cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
       if(!stream->upload_left)
         *pflags = NGHTTP3_DATA_FLAG_EOF;
     }
-    fprintf(stderr, "cb_h3_readfunction %zd bytes%s (at %zd unacked)\n",
-            nread, *pflags == NGHTTP3_DATA_FLAG_EOF?" EOF":"",
-            out->used);
+    H3BUGF(infof(data, "cb_h3_readfunction %zd bytes%s (at %zd unacked)\n",
+                 nread, *pflags == NGHTTP3_DATA_FLAG_EOF?" EOF":"",
+                 out->used));
   }
   if(stream->upload_done && !stream->upload_len &&
      (stream->upload_left <= 0)) {
     H3BUGF(infof(data, "!!!!!!!!! cb_h3_readfunction sets EOF\n"));
-    *pdata = NULL;
-    *pdatalen = 0;
     *pflags = NGHTTP3_DATA_FLAG_EOF;
+    return 0;
   }
   else if(!nread) {
-    *pdatalen = 0;
     return NGHTTP3_ERR_WOULDBLOCK;
   }
-  return 0;
+  return 1;
 }
 
 /* Index where :authority header field will appear in request header
@@ -1202,8 +1340,10 @@ static CURLcode http_request(struct connectdata *conn, const void *mem,
       nva[i].namelen = strlen((char *)nva[i].name);
     }
     else {
-      nva[i].name = (unsigned char *)hdbuf;
       nva[i].namelen = (size_t)(end - hdbuf);
+      /* Lower case the header name for HTTP/3 */
+      Curl_strntolower((char *)hdbuf, hdbuf, nva[i].namelen);
+      nva[i].name = (unsigned char *)hdbuf;
     }
     nva[i].flags = NGHTTP3_NV_FLAG_NONE;
     hdbuf = end + 1;
@@ -1332,7 +1472,8 @@ static ssize_t ngh3_stream_send(struct connectdata *conn,
     sent = len;
   }
   else {
-    fprintf(stderr, "ngh3_stream_send() wants to send %zd bytes\n", len);
+    H3BUGF(infof(conn->data, "ngh3_stream_send() wants to send %zd bytes\n",
+                 len));
     if(!stream->upload_len) {
       stream->upload_mem = mem;
       stream->upload_len = len;
@@ -1407,13 +1548,13 @@ static CURLcode ng_process_ingress(struct connectdata *conn, int sockfd,
 
   for(;;) {
     remote_addrlen = sizeof(remote_addr);
-    while((recvd = recvfrom(sockfd, buf, bufsize, MSG_DONTWAIT,
+    while((recvd = recvfrom(sockfd, buf, bufsize, 0,
                             (struct sockaddr *)&remote_addr,
                             &remote_addrlen)) == -1 &&
-          errno == EINTR)
+          SOCKERRNO == EINTR)
       ;
     if(recvd == -1) {
-      if(errno == EAGAIN || errno == EWOULDBLOCK)
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK)
         break;
 
       failf(conn->data, "ngtcp2: recvfrom() unexpectedly returned %d", recvd);
@@ -1524,7 +1665,7 @@ static CURLcode ng_flush_egress(struct connectdata *conn, int sockfd,
             return CURLE_SEND_ERROR;
           }
         }
-        else if(ndatalen > 0) {
+        else if(ndatalen >= 0) {
           rv = nghttp3_conn_add_write_offset(qs->h3conn, stream_id, ndatalen);
           if(rv != 0) {
             failf(conn->data,
@@ -1547,19 +1688,17 @@ static CURLcode ng_flush_egress(struct connectdata *conn, int sockfd,
     }
 
     memcpy(&remote_addr, ps.path.remote.addr, ps.path.remote.addrlen);
-    while((sent = sendto(sockfd, out, outlen, MSG_DONTWAIT,
-                         (struct sockaddr *)&remote_addr,
-                         (socklen_t)ps.path.remote.addrlen)) == -1 &&
-          errno == EINTR)
+    while((sent = send(sockfd, out, outlen, 0)) == -1 &&
+          SOCKERRNO == EINTR)
       ;
 
     if(sent == -1) {
-      if(errno == EAGAIN || errno == EWOULDBLOCK) {
+      if(SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK) {
         /* TODO Cache packet */
         break;
       }
       else {
-        failf(conn->data, "sendto() returned %zd (errno %d)\n", sent,
+        failf(conn->data, "send() returned %zd (errno %d)\n", sent,
               SOCKERRNO);
         return CURLE_SEND_ERROR;
       }
@@ -1589,12 +1728,38 @@ CURLcode Curl_quic_done_sending(struct connectdata *conn)
     /* only for HTTP/3 transfers */
     struct HTTP *stream = conn->data->req.protop;
     struct quicsocket *qs = conn->quic;
-    fprintf(stderr, "!!! Curl_quic_done_sending stream %zu\n",
-            stream->stream3_id);
     stream->upload_done = TRUE;
     (void)nghttp3_conn_resume_stream(qs->h3conn, stream->stream3_id);
   }
 
   return CURLE_OK;
 }
+
+/*
+ * Called from http.c:Curl_http_done when a request completes.
+ */
+void Curl_quic_done(struct Curl_easy *data, bool premature)
+{
+  (void)premature;
+  if(data->conn->handler == &Curl_handler_http3) {
+    /* only for HTTP/3 transfers */
+    struct HTTP *stream = data->req.protop;
+    Curl_safefree(stream->overflow_buf);
+  }
+}
+
+/*
+ * Called from transfer.c:data_pending to know if we should keep looping
+ * to receive more data from the connection.
+ */
+bool Curl_quic_data_pending(const struct Curl_easy *data)
+{
+  /* We may have received more data than we're able to hold in the receive
+     buffer and allocated an overflow buffer. Since it's possible that
+     there's no more data coming on the socket, we need to keep reading
+     until the overflow buffer is empty. */
+  const struct HTTP *stream = data->req.protop;
+  return stream->overflow_buflen > 0;
+}
+
 #endif
