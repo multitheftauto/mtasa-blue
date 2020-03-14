@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -665,7 +665,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
 #endif
 #if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
     case AF_UNIX:
-      if(salen > sizeof(sa_family_t)) {
+      if(salen > (curl_socklen_t)sizeof(sa_family_t)) {
         su = (struct sockaddr_un*)sa;
         msnprintf(addr, MAX_IPADR_LEN, "%s", su->sun_path);
       }
@@ -932,9 +932,11 @@ CURLcode Curl_is_connected(struct connectdata *conn,
       SET_SOCKERRNO(error);
       if(conn->tempaddr[i]) {
         CURLcode status;
+#ifndef CURL_DISABLE_VERBOSE_STRINGS
         char ipaddress[MAX_IPADR_LEN];
         char buffer[STRERROR_LEN];
         Curl_printable_address(conn->tempaddr[i], ipaddress, MAX_IPADR_LEN);
+#endif
         infof(data, "connect to %s port %ld failed: %s\n",
               ipaddress, conn->port,
               Curl_strerror(error, buffer, sizeof(buffer)));
@@ -976,6 +978,14 @@ CURLcode Curl_is_connected(struct connectdata *conn,
     failf(data, "Failed to connect to %s port %ld: %s",
           hostname, conn->port,
           Curl_strerror(error, buffer, sizeof(buffer)));
+
+#ifdef WSAETIMEDOUT
+    if(WSAETIMEDOUT == data->state.os_errno)
+      result = CURLE_OPERATION_TIMEDOUT;
+#elif defined(ETIMEDOUT)
+    if(ETIMEDOUT == data->state.os_errno)
+      result = CURLE_OPERATION_TIMEDOUT;
+#endif
   }
 
   return result;
@@ -984,14 +994,12 @@ CURLcode Curl_is_connected(struct connectdata *conn,
 static void tcpnodelay(struct connectdata *conn, curl_socket_t sockfd)
 {
 #if defined(TCP_NODELAY)
-#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
-  struct Curl_easy *data = conn->data;
-#endif
   curl_socklen_t onoff = (curl_socklen_t) 1;
   int level = IPPROTO_TCP;
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
+  struct Curl_easy *data = conn->data;
   char buffer[STRERROR_LEN];
-
-#if defined(CURL_DISABLE_VERBOSE_STRINGS)
+#else
   (void) conn;
 #endif
 
@@ -1507,6 +1515,11 @@ CURLcode Curl_socket(struct connectdata *conn,
   if(*sockfd == CURL_SOCKET_BAD)
     /* no socket, no connection */
     return CURLE_COULDNT_CONNECT;
+
+  if(conn->transport == TRNSPRT_QUIC) {
+    /* QUIC sockets need to be nonblocking */
+    (void)curlx_nonblock(*sockfd, TRUE);
+  }
 
 #if defined(ENABLE_IPV6) && defined(HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID)
   if(conn->scope_id && (addr->family == AF_INET6)) {
