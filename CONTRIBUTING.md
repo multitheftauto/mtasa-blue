@@ -125,3 +125,5 @@ Before merging, pull requests require:
 
 If the pull request is large, requiring at least 2 pull request reviews.
 This isn't enforced via GitHub's interface, but you should try and stick to this convention.
+
+Pull requests are required from anyone who is not a member of the MTA Team.
