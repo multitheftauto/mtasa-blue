@@ -674,8 +674,9 @@ public:
     static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
     static bool SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
 
-    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, int iPointIndex, const CVector2D& vecPoint);
-    static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint iPointIndex);
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);
