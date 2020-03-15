@@ -103,11 +103,12 @@ CURLcode Curl_none_md5sum(unsigned char *input, size_t inputlen,
 #include "nssg.h"           /* NSS versions */
 #include "gskit.h"          /* Global Secure ToolKit versions */
 #include "polarssl.h"       /* PolarSSL versions */
-#include "cyassl.h"         /* CyaSSL versions */
+#include "wolfssl.h"        /* wolfSSL versions */
 #include "schannel.h"       /* Schannel SSPI version */
 #include "sectransp.h"      /* SecureTransport (Darwin) version */
 #include "mbedtls.h"        /* mbedTLS versions */
 #include "mesalink.h"       /* MesaLink versions */
+#include "bearssl.h"        /* BearSSL versions */
 
 #ifndef MAX_PINNED_PUBKEY_SIZE
 #define MAX_PINNED_PUBKEY_SIZE 1048576 /* 1MB */
@@ -143,8 +144,7 @@ bool Curl_ssl_config_matches(struct ssl_primary_config* data,
 bool Curl_clone_primary_ssl_config(struct ssl_primary_config *source,
                                    struct ssl_primary_config *dest);
 void Curl_free_primary_ssl_config(struct ssl_primary_config* sslc);
-int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks,
-                     int numsocks);
+int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks);
 
 int Curl_ssl_backend(void);
 

@@ -26,7 +26,8 @@
 #include "urldata.h"
 #include "vtls/vtls.h"
 #include "http2.h"
-#include "ssh.h"
+#include "vssh/ssh.h"
+#include "quic.h"
 #include "curl_printf.h"
 
 #ifdef USE_ARES
@@ -51,18 +52,6 @@
 
 #ifdef USE_LIBRTMP
 #include <librtmp/rtmp.h>
-#endif
-
-#ifdef USE_LIBSSH2
-#include <libssh2.h>
-#endif
-
-#ifdef HAVE_LIBSSH2_VERSION
-/* get it run-time if possible */
-#define CURL_LIBSSH2_VERSION libssh2_version(0)
-#else
-/* use build-time if run-time not possible */
-#define CURL_LIBSSH2_VERSION LIBSSH2_VERSION
 #endif
 
 #ifdef HAVE_ZLIB_H
@@ -102,7 +91,7 @@ static size_t brotli_version(char *buf, size_t bufsz)
 char *curl_version(void)
 {
   static bool initialized;
-  static char version[200];
+  static char version[250];
   char *ptr = version;
   size_t len;
   size_t left = sizeof(version);
@@ -115,14 +104,12 @@ char *curl_version(void)
   left -= len;
   ptr += len;
 
-  if(left > 1) {
-    len = Curl_ssl_version(ptr + 1, left - 1);
+  len = Curl_ssl_version(ptr + 1, left - 1);
 
-    if(len > 0) {
-      *ptr = ' ';
-      left -= ++len;
-      ptr += len;
-    }
+  if(len > 0) {
+    *ptr = ' ';
+    left -= ++len;
+    ptr += len;
   }
 
 #ifdef HAVE_LIBZ
@@ -172,18 +159,22 @@ char *curl_version(void)
   left -= len;
   ptr += len;
 #endif
-#ifdef USE_LIBSSH2
-  len = msnprintf(ptr, left, " libssh2/%s", CURL_LIBSSH2_VERSION);
-  left -= len;
-  ptr += len;
-#endif
-#ifdef USE_LIBSSH
-  len = msnprintf(ptr, left, " libssh/%s", CURL_LIBSSH_VERSION);
+#ifdef USE_SSH
+  if(left) {
+    *ptr++=' ';
+    left--;
+  }
+  len = Curl_ssh_version(ptr, left);
   left -= len;
   ptr += len;
 #endif
 #ifdef USE_NGHTTP2
   len = Curl_http2_ver(ptr, left);
+  left -= len;
+  ptr += len;
+#endif
+#ifdef ENABLE_QUIC
+  len = Curl_quic_ver(ptr, left);
   left -= len;
   ptr += len;
 #endif
@@ -358,6 +349,9 @@ static curl_version_info_data version_info = {
 #if defined(USE_NGHTTP2)
   | CURL_VERSION_HTTP2
 #endif
+#if defined(ENABLE_QUIC)
+  | CURL_VERSION_HTTP3
+#endif
 #if defined(USE_UNIX_SOCKETS)
   | CURL_VERSION_UNIX_SOCKETS
 #endif
@@ -373,6 +367,9 @@ static curl_version_info_data version_info = {
 #if defined(USE_ALTSVC)
   | CURL_VERSION_ALTSVC
 #endif
+#ifdef USE_ESNI
+  | CURL_VERSION_ESNI
+#endif
   ,
   NULL, /* ssl_version */
   0,    /* ssl_version_num, this is kept at zero */
@@ -385,6 +382,9 @@ static curl_version_info_data version_info = {
   NULL, /* ssh lib version */
   0,    /* brotli_ver_num */
   NULL, /* brotli version */
+  0,    /* nghttp2 version number */
+  NULL, /* nghttp2 version string */
+  NULL  /* quic library string */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
@@ -446,11 +446,8 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
 #endif /* _LIBICONV_VERSION */
 #endif
 
-#if defined(USE_LIBSSH2)
-  msnprintf(ssh_buffer, sizeof(ssh_buffer), "libssh2/%s", LIBSSH2_VERSION);
-  version_info.libssh_version = ssh_buffer;
-#elif defined(USE_LIBSSH)
-  msnprintf(ssh_buffer, sizeof(ssh_buffer), "libssh/%s", CURL_LIBSSH_VERSION);
+#if defined(USE_SSH)
+  Curl_ssh_version(ssh_buffer, sizeof(ssh_buffer));
   version_info.libssh_version = ssh_buffer;
 #endif
 
@@ -458,6 +455,22 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   version_info.brotli_ver_num = BrotliDecoderVersion();
   brotli_version(brotli_buffer, sizeof(brotli_buffer));
   version_info.brotli_version = brotli_buffer;
+#endif
+
+#ifdef USE_NGHTTP2
+  {
+    nghttp2_info *h2 = nghttp2_version(0);
+    version_info.nghttp2_ver_num = h2->version_num;
+    version_info.nghttp2_version = h2->version_str;
+  }
+#endif
+
+#ifdef ENABLE_QUIC
+  {
+    static char quicbuffer[80];
+    Curl_quic_ver(quicbuffer, sizeof(quicbuffer));
+    version_info.quic_version = quicbuffer;
+  }
 #endif
 
   (void)stamp; /* avoid compiler warnings, we don't use this */

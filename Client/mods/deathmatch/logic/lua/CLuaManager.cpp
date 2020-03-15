@@ -47,6 +47,9 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
+	// Close and remove LVM from memory
+	ProcessPendingDeleteList();
+
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
 }
@@ -166,7 +169,6 @@ void CLuaManager::LoadCFunctions()
         {"getPlayerTarget", CLuaPedDefs::GetPedTarget},
         {"getPlayerTargetStart", CLuaPedDefs::GetPedTargetStart},
         {"getPlayerTargetEnd", CLuaPedDefs::GetPedTargetEnd},
-        {"getPlayerTargetRange", CLuaPedDefs::GetPedTargetRange},
         {"getPlayerTargetCollision", CLuaPedDefs::GetPedTargetCollision},
         {"getPlayerWeaponSlot", CLuaPedDefs::GetPedWeaponSlot},
         {"getPlayerWeapon", CLuaPedDefs::GetPedWeapon},
@@ -207,7 +209,7 @@ void CLuaManager::LoadCFunctions()
         {"setControlState", CLuaPedDefs::SetPedControlState},
         {"getControlState", CLuaPedDefs::GetPedControlState},
         // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-        
+
         // Event funcs
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
@@ -386,12 +388,16 @@ void CLuaManager::LoadCFunctions()
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
         {"fetchRemote", CLuaFunctionDefs::FetchRemote},
+        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
+        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
+        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
 
         // Version functions
         {"getVersion", CLuaFunctionDefs::GetVersion},
 
         // Localization functions
         {"getLocalization", CLuaFunctionDefs::GetLocalization},
+        {"getKeyboardLayout", CLuaFunctionDefs::GetKeyboardLayout},
 
         // Voice functions
         {"isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled},

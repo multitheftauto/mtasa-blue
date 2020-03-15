@@ -85,13 +85,10 @@ workspace "MTASA"
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
-	filter {"system:windows", "toolset:*_xp*"}
-		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
-
 	filter "system:windows"
-		toolset "v141"
+		toolset "v142"
 		staticruntime "On"
-		defines { "WIN32", "_WIN32" }
+		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}

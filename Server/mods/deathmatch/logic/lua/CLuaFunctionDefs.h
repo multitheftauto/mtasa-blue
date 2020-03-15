@@ -27,6 +27,7 @@ class CAccessControlListManager;
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM );
 
+
 extern CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
 
 class CLuaFunctionDefs
@@ -36,6 +37,9 @@ public:
 
     LUA_DECLARE(CallRemote);
     LUA_DECLARE(FetchRemote);
+    LUA_DECLARE(GetRemoteRequests);
+    LUA_DECLARE(GetRemoteRequestInfo);
+    LUA_DECLARE(AbortRemoteRequest);
 
     // Event functions
     LUA_DECLARE(AddEvent);

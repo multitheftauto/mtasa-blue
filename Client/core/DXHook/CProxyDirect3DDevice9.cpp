@@ -18,7 +18,7 @@ CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
 
     // Set our wrapped device.
     m_pDevice = pDevice;

@@ -121,18 +121,19 @@ BEGIN
     EDITTEXT        IDC_EDIT_D3DDLL_PATH,31,46,310,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
     CTEXT           "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename d3d9.dll",IDC_D3DDLL_TEXT2,14,81,345,33
     GROUPBOX        "",IDC_STATIC,7,7,359,122
-    GROUPBOX        "",IDC_STATIC,25,142,324,43
-    CONTROL         " Do not tell me about this d3d9.dll again",IDC_CHECK_NOT_AGAIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,161,228,10
+    GROUPBOX        "",IDC_STATIC,7,142,359,43
+    CONTROL         " Use this d3d9.dll, but also show this warning on next start",IDC_NO_ACTION,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,151,228,10
+    CONTROL         " Do not tell me about this d3d9.dll again",IDC_CHECK_NOT_AGAIN,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,161,228,10
+    CONTROL         " Rename this d3d9.dll to d3d9.dll.bak",IDC_APPLY_AUTOMATIC_CHANGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,171,228,10
     PUSHBUTTON      "Show me the file",IDC_BUTTON_SHOW_DIR,61,209,67,14
 END
 
-IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 240
+IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 260
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "MTA: San Andreas - Confusing options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,171,219,50,14
+    DEFPUSHBUTTON   "OK",IDOK,171,239,50,14
     CTEXT           "NVidia Optimus detected!",IDC_OPTIMUS_TEXT1,19,19,196,9,WS_DISABLED
     CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,60,151,10
     CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,58,73,151,10
@@ -143,11 +144,13 @@ BEGIN
     CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,58,126,151,10
     CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,58,139,153,10
     CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,58,152,156,10
-    PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,219,50,14
+    PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,239,50,14
     CTEXT           "Try each option and see what works:",IDC_OPTIMUS_TEXT2,14,34,207,10
     GROUPBOX        "",IDC_STATIC,22,50,195,119
-    CTEXT           "If you get desperate, this might help:",IDC_OPTIMUS_TEXT3,38,180,163,8
-    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,193,131,10
+    CTEXT           "If you get desperate, this might help:",IDC_OPTIMUS_TEXT3,58,173,131,10
+    CONTROL         " Force windowed mode",IDC_CHECK_FORCE_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,185,100,10 
+    CTEXT           "If you have already selected an option that works, this might help:", IDC_OPTIMUS_TEXT4,27,205,180,20
+    CONTROL         " Don't show again",IDC_CHECK_REMEMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,80,225,100,8
 END
 
 IDD_NOAV_DIALOG DIALOGEX 0, 0, 316, 183

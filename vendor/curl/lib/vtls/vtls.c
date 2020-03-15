@@ -97,7 +97,8 @@ Curl_ssl_config_matches(struct ssl_primary_config* data,
      Curl_safe_strcasecompare(data->random_file, needle->random_file) &&
      Curl_safe_strcasecompare(data->egdsocket, needle->egdsocket) &&
      Curl_safe_strcasecompare(data->cipher_list, needle->cipher_list) &&
-     Curl_safe_strcasecompare(data->cipher_list13, needle->cipher_list13))
+     Curl_safe_strcasecompare(data->cipher_list13, needle->cipher_list13) &&
+     Curl_safe_strcasecompare(data->pinned_key, needle->pinned_key))
     return TRUE;
 
   return FALSE;
@@ -121,6 +122,7 @@ Curl_clone_primary_ssl_config(struct ssl_primary_config *source,
   CLONE_STRING(egdsocket);
   CLONE_STRING(cipher_list);
   CLONE_STRING(cipher_list13);
+  CLONE_STRING(pinned_key);
 
   return TRUE;
 }
@@ -134,6 +136,7 @@ void Curl_free_primary_ssl_config(struct ssl_primary_config* sslc)
   Curl_safefree(sslc->egdsocket);
   Curl_safefree(sslc->cipher_list);
   Curl_safefree(sslc->cipher_list13);
+  Curl_safefree(sslc->pinned_key);
 }
 
 #ifdef USE_SSL
@@ -514,14 +517,10 @@ void Curl_ssl_close_all(struct Curl_easy *data)
 
 #if defined(USE_OPENSSL) || defined(USE_GNUTLS) || defined(USE_SCHANNEL) || \
   defined(USE_SECTRANSP) || defined(USE_POLARSSL) || defined(USE_NSS) || \
-  defined(USE_MBEDTLS) || defined(USE_CYASSL)
-int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks,
-                     int numsocks)
+  defined(USE_MBEDTLS) || defined(USE_WOLFSSL) || defined(USE_BEARSSL)
+int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks)
 {
   struct ssl_connect_data *connssl = &conn->ssl[FIRSTSOCKET];
-
-  if(!numsocks)
-    return GETSOCK_BLANK;
 
   if(connssl->connecting_state == ssl_connect_2_writing) {
     /* write mode */
@@ -538,12 +537,10 @@ int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks,
 }
 #else
 int Curl_ssl_getsock(struct connectdata *conn,
-                     curl_socket_t *socks,
-                     int numsocks)
+                     curl_socket_t *socks)
 {
   (void)conn;
   (void)socks;
-  (void)numsocks;
   return GETSOCK_BLANK;
 }
 /* USE_OPENSSL || USE_GNUTLS || USE_SCHANNEL || USE_SECTRANSP || USE_NSS */
@@ -1172,8 +1169,8 @@ static const struct Curl_ssl Curl_ssl_multi = {
 const struct Curl_ssl *Curl_ssl =
 #if defined(CURL_WITH_MULTI_SSL)
   &Curl_ssl_multi;
-#elif defined(USE_CYASSL)
-  &Curl_ssl_cyassl;
+#elif defined(USE_WOLFSSL)
+  &Curl_ssl_wolfssl;
 #elif defined(USE_SECTRANSP)
   &Curl_ssl_sectransp;
 #elif defined(USE_GNUTLS)
@@ -1192,13 +1189,15 @@ const struct Curl_ssl *Curl_ssl =
   &Curl_ssl_schannel;
 #elif defined(USE_MESALINK)
   &Curl_ssl_mesalink;
+#elif defined(USE_BEARSSL)
+  &Curl_ssl_bearssl;
 #else
 #error "Missing struct Curl_ssl for selected SSL backend"
 #endif
 
 static const struct Curl_ssl *available_backends[] = {
-#if defined(USE_CYASSL)
-  &Curl_ssl_cyassl,
+#if defined(USE_WOLFSSL)
+  &Curl_ssl_wolfssl,
 #endif
 #if defined(USE_SECTRANSP)
   &Curl_ssl_sectransp,
@@ -1226,6 +1225,9 @@ static const struct Curl_ssl *available_backends[] = {
 #endif
 #if defined(USE_MESALINK)
   &Curl_ssl_mesalink,
+#endif
+#if defined(USE_BEARSSL)
+  &Curl_ssl_bearssl,
 #endif
   NULL
 };
