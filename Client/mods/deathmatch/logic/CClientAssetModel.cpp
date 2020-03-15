@@ -156,6 +156,65 @@ void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialInd
     }
 }
 
+void CClientAssetModel::GetMetaData(lua_State* luaVM)
+{
+    lua_newtable(luaVM);
+    for (int i = 0; i < m_pScene->mMetaData->mNumProperties; i++)
+    {
+        aiString* pKeyName = &m_pScene->mMetaData->mKeys[i];
+        aiMetadataEntry* pValue = &m_pScene->mMetaData->mValues[i];
+        lua_pushstring(luaVM, pKeyName->C_Str());
+        bool       boolValue;
+        float      floatValue;
+        uint64_t   longValue;
+        double     doubleValue;
+        aiString   stringValue;
+        int        intValue;
+        aiVector3D vector3Value;
+        switch (pValue->mType)
+        {
+            case AI_BOOL:
+                m_pScene->mMetaData->Get<bool>(*pKeyName, boolValue);
+                lua_pushboolean(luaVM, boolValue);
+                break;
+            case AI_INT32:
+                m_pScene->mMetaData->Get<int>(*pKeyName, intValue);
+                lua_pushnumber(luaVM, intValue);
+                break;
+            case AI_UINT64:
+                m_pScene->mMetaData->Get<uint64_t>(*pKeyName, longValue);
+                lua_pushnumber(luaVM, longValue);
+                break;
+            case AI_FLOAT:
+                m_pScene->mMetaData->Get<float>(*pKeyName, floatValue);
+                lua_pushnumber(luaVM, floatValue);
+                break;
+            case AI_DOUBLE:
+                m_pScene->mMetaData->Get<double>(*pKeyName, doubleValue);
+                lua_pushnumber(luaVM, doubleValue);
+                break;
+            case AI_AISTRING:
+                m_pScene->mMetaData->Get<aiString>(*pKeyName, stringValue);
+                lua_pushstring(luaVM, stringValue.C_Str());
+                break;
+            case AI_AIVECTOR3D:
+                m_pScene->mMetaData->Get<aiVector3D>(*pKeyName, vector3Value);
+                lua_newtable(luaVM);
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, vector3Value.x);
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, vector3Value.y);
+                lua_settable(luaVM, -3);
+                lua_pushnumber(luaVM, 3);
+                lua_pushnumber(luaVM, vector3Value.z);
+                lua_settable(luaVM, -3);
+                break;
+        }
+        lua_settable(luaVM, -3);
+    }
+}
+
 void CClientAssetModel::CacheTextures(CResource* pParentResource)
 {
     m_vecAssetTextures.reserve(m_pScene->mNumTextures);

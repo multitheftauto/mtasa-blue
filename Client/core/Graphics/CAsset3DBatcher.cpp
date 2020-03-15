@@ -147,11 +147,13 @@ void CAsset3DBatcher::Flush()
                 }
                 else
                 {
+                    m_pDevice->SetTexture(0, nullptr);
                     m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
                 }
             }
             else
             {
+                m_pDevice->SetTexture(0, nullptr);
                 m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
             }
         }

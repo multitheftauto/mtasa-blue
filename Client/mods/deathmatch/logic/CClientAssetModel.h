@@ -90,6 +90,7 @@ public:
     void           CacheTextures(CResource* pParentResource);
     void           Cache();
     void               GetMaterialProperties(lua_State* luaVM, int iMaterialIndex);
+    void               GetMetaData(lua_State* luaVM);
     CClientMeshBuffer* GetMeshBuffer(int idx) { return m_vecAssetMeshes[idx]->GetMeshBuffer(); }
     size_t GetMeshNum() { return m_vecAssetMeshes.size(); }
     SAssetTexture*     GetTexture(int idx);

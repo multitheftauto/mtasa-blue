@@ -17,10 +17,15 @@
 void CLuaAssetModelDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
-        {"loadAssetModel", LoadAssetModel},         {"getAssetProperties", GetAssetProperties}, {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
-        {"assetGetNodeMeshes", AssetGetNodeMeshes}, {"assetGetTextures", AssetGetTextures},     {"assetRender", AssetRender},
+        {"loadAssetModel", LoadAssetModel},
+        {"getAssetProperties", GetAssetProperties},
+        {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
+        {"assetGetNodeMeshes", AssetGetNodeMeshes},
+        {"assetGetTextures", AssetGetTextures},
+        {"assetRender", AssetRender},
         {"assetSetTexture", AssetSetTexture},
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
+        {"assetGetMetaData", AssetGetMetaData},
     };
 
     // Add functions
@@ -492,6 +497,34 @@ int CLuaAssetModelDefs::AssetGetMaterialProperties(lua_State* luaVM)
 
             iIndex--;
             pAssetModel->GetMaterialProperties(luaVM, iIndex);
+            return 1;
+        }
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
+{
+    CClientAssetModel* pAssetModel;
+    CScriptArgReader   argStream(luaVM);
+    argStream.ReadUserData(pAssetModel);
+    if (!argStream.HasErrors())
+    {
+        if (pAssetModel != nullptr)
+        {
+            if (!pAssetModel->IsLoaded())
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+
+            pAssetModel->GetMetaData(luaVM);
             return 1;
         }
         lua_pushboolean(luaVM, false);
