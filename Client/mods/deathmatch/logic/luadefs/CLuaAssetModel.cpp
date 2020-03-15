@@ -511,9 +511,14 @@ int CLuaAssetModelDefs::AssetGetMaterialProperties(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
 {
-    CClientAssetModel* pAssetModel;
+    CClientAssetModel* pAssetModel = nullptr;
+    CLuaAssetNode*     pAssetNode = nullptr;
+    eAssetProperty     eProperty;
     CScriptArgReader   argStream(luaVM);
-    argStream.ReadUserData(pAssetModel);
+    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
+        argStream.ReadUserData(pAssetModel);
+    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
+        argStream.ReadUserData(pAssetNode);
     if (!argStream.HasErrors())
     {
         if (pAssetModel != nullptr)
@@ -525,6 +530,11 @@ int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
             }
 
             pAssetModel->GetMetaData(luaVM);
+            return 1;
+        }
+        else if (pAssetNode != nullptr)
+        {
+            pAssetNode->GetMetaData(luaVM);
             return 1;
         }
         lua_pushboolean(luaVM, false);

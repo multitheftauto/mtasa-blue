@@ -30,6 +30,7 @@ public:
 
     static CLuaAssetNode*       GetFromScriptID(unsigned int uiScriptID);
     int                         GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    void                        GetMetaData(lua_State* luaVM);
     aiAABB                      GetBoundingBox();
     const aiNode*               GetNode() const { return m_pNode; }
     void                        AddToRenderQueue(SRenderingSettings& settings);

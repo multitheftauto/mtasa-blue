@@ -159,6 +159,10 @@ void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialInd
 void CClientAssetModel::GetMetaData(lua_State* luaVM)
 {
     lua_newtable(luaVM);
+    if (m_pScene->mMetaData == nullptr)
+    {
+        return;
+    }
     for (int i = 0; i < m_pScene->mMetaData->mNumProperties; i++)
     {
         aiString* pKeyName = &m_pScene->mMetaData->mKeys[i];
