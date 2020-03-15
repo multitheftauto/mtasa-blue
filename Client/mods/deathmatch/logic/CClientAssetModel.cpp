@@ -133,22 +133,29 @@ void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialInd
         aiMaterial* pMaterial = m_pScene->mMaterials[iMaterialIndex];
         for (int i = 0; i < pMaterial->mNumProperties; i++)
         {
-            aiMaterialProperty* pProperties = pMaterial->mProperties[i];
-            lua_pushstring(luaVM, pProperties->mKey.C_Str());
-            switch (pProperties->mType)
+            aiMaterialProperty* pProperty = pMaterial->mProperties[i];
+            lua_pushstring(luaVM, pProperty->mKey.C_Str());
+            aiString*   str = new aiString();
+            const char* pChar;
+            switch (pProperty->mType)
             {
                 case aiPTI_Float:
-                    lua_pushnumber(luaVM, strtof(pProperties->mData, NULL));
+                    lua_pushnumber(luaVM, strtof(pProperty->mData, NULL));
                     break;
                 case aiPTI_Double:
-                    lua_pushnumber(luaVM, atof(pProperties->mData));
+                    lua_pushnumber(luaVM, atof(pProperty->mData));
                     break;
                 case aiPTI_String:
+                    str = (aiString*)malloc(pProperty->mDataLength);
+                    memcpy(str, pProperty->mData, pProperty->mDataLength);
+                    pChar = str->C_Str();
+                    lua_pushstring(luaVM, str->C_Str());
+                    break;
                 case aiPTI_Buffer:
-                    lua_pushlstring(luaVM, pProperties->mData, pProperties->mDataLength - 1);
+                    lua_pushlstring(luaVM, pProperty->mData, pProperty->mDataLength - 1);
                     break;
                 case aiPTI_Integer:
-                    lua_pushnumber(luaVM, atoi(pProperties->mData));
+                    lua_pushnumber(luaVM, atoi(pProperty->mData));
                     break;
             }
             lua_settable(luaVM, -3);
@@ -165,7 +172,7 @@ void CClientAssetModel::GetMetaData(lua_State* luaVM)
     }
     for (int i = 0; i < m_pScene->mMetaData->mNumProperties; i++)
     {
-        aiString* pKeyName = &m_pScene->mMetaData->mKeys[i];
+        aiString*        pKeyName = &m_pScene->mMetaData->mKeys[i];
         aiMetadataEntry* pValue = &m_pScene->mMetaData->mValues[i];
         lua_pushstring(luaVM, pKeyName->C_Str());
         bool       boolValue;
