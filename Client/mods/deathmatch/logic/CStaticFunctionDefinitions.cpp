@@ -2402,21 +2402,83 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsLocalPlayer())
             return false;
 
-        CVector vecOrigin;
-        Ped.GetPosition(vecOrigin);
-
-        // Move origin out a bit to avoid hitting ped collision
-        CVector vecDir = vecTarget - vecOrigin;
-        vecDir.Normalize();
-        vecOrigin += vecDir * 0.9f;
+        // Grab the gun muzzle position
+        CWeapon* pWeapon = Ped.GetWeapon(Ped.GetCurrentWeaponSlot());
+        CVector  vecOrigin;
+        if (!pWeapon)
+        {
+            Ped.GetPosition(vecOrigin);
+        }
+        else
+        {
+            CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), 1000.0f);
+            CVector      vecFireOffset = *pCurrentWeaponInfo->GetFireOffset();
+            vecOrigin = vecFireOffset;
+            Ped.GetTransformedBonePosition(BONE_RIGHTWRIST, vecOrigin);
+        }
 
         // Arm direction
         float fArmX = -atan2(vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY),
               fArmY = -atan2(vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D(vecTarget, vecOrigin));
 
-        // TODO: use gun muzzle for origin
-        Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
-        Ped.SetAim(fArmX, fArmY, 0);
+        if (Ped.IsInVehicle())
+        {
+            // Driveby aim animation
+            // 0 = forwards, 1 = left, 2 = back, 3 = right
+            unsigned char cInVehicleAimAnim = 0;
+
+            // Ped rotation
+            CVector vecRot;
+            Ped.GetRotationRadians(vecRot);
+            float fRotZ = -vecRot.fZ;            // Counter-clockwise
+            fRotZ = (fRotZ > PI) ? fRotZ - PI * 2 : fRotZ;
+
+            // Rotation difference
+            float fRotDiff = fArmX - fRotZ;
+            if (fRotDiff > PI)
+            {
+                fRotDiff = -(PI - (fRotDiff - PI));
+            }
+            else if (fRotDiff < -PI)
+            {
+                fRotDiff = fRotDiff + PI * 2;
+            }
+
+            // Find the aim anim and correct fArmX/fArmY
+            if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
+            {
+                // Facing left
+                cInVehicleAimAnim = 1;
+                fArmX = fArmX - PI / 2;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
+            {
+                // Facing backwards
+                cInVehicleAimAnim = 2;
+                fArmX = fArmX + PI;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
+            {
+                // Facing right
+                cInVehicleAimAnim = 3;
+                fArmX = fArmX + PI / 2;
+            }
+            else
+            {
+                // Facing forwards
+                // Do nothing, initial values are fine
+            }
+
+            // Set aim and target data without interpolation
+            Ped.SetAimingData(TICK_RATE, vecTarget, fArmX, fArmY, cInVehicleAimAnim, &vecOrigin, false);
+        }
+        else
+        {
+            Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
+            Ped.SetAim(fArmX, fArmY, 0);
+        }
 
         return true;
     }
