@@ -1715,35 +1715,6 @@ bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned c
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName, int& iTime, bool& bLoop, bool& bUpdatePosition, 
-    bool& bInterruptable, bool& bFreezeOnLastFrame, int& iBlendTime, bool& bRestoreTaskOnAnimEnd)
-{
-    if (Ped.IsRunningAnimation())
-    {
-        const SAnimation* SAnimData = Ped.GetAnimationData();
-        if (Ped.IsCustomAnimationPlaying())
-        {
-            strBlockName = Ped.GetNextAnimationCustomBlockName();
-            strAnimName = Ped.GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = SAnimData->strName;
-        }
-        iTime = SAnimData->iTime;
-        bLoop = SAnimData->bLoop;
-        bUpdatePosition = SAnimData->bUpdatePosition;
-        bInterruptable = SAnimData->bInterruptable;
-        bFreezeOnLastFrame = SAnimData->bFreezeLastFrame;
-        iBlendTime = SAnimData->iBlend;
-        bRestoreTaskOnAnimEnd = Ped.IsTaskToBeRestoredOnAnimEnd();
-
-        return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim)
 {
     iMoveAnim = (unsigned int)Ped.GetMoveAnim();
