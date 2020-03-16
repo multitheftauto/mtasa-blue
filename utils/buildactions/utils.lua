@@ -77,18 +77,18 @@ end
 function os.expanddir_wildcard(from, to)
 	local dir = os.matchdirs(from)[1]
 	if not dir then return end
-	
+
 	-- TODO: Optimize this
 	os.copydir(dir, to)
 	os.rmdir(dir)
 end
 
-function os.md5_file(path)
+function os.sha1_file(path)
 	if os.host() == "windows" then
-		local s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
-		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+		local s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA1).Hash", path))
+		return (errc == 0) and s or ""
 	else
-		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
+		return os.outputof(string.format("sha1sum \"%s\" | awk '{ print $1 }'", path))
 	end
 end
 
