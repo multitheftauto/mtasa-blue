@@ -551,7 +551,7 @@ int CLuaFunctionDefs::SetBlurLevel(lua_State* luaVM)
 
 int CLuaFunctionDefs::ResetBlurLevel(lua_State* luaVM)
 {
-    g_pGame->SetBlurLevel(static_cast<unsigned char>(36));
+    g_pGame->SetBlurLevel(36);
     lua_pushboolean(luaVM, true);
     return 1;
 }
