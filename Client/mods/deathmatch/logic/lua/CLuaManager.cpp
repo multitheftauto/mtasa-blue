@@ -317,7 +317,6 @@ void CLuaManager::LoadCFunctions()
         {"setBlurLevel", CLuaFunctionDefs::SetBlurLevel},
         {"getBlurLevel", CLuaFunctionDefs::GetBlurLevel},
         {"resetBlurLevel", CLuaFunctionDefs::ResetBlurLevel},
-        {"resetPlayerBlurLevel", CLuaFunctionDefs::ResetBlurLevel},
         {"setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight},
         {"setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled},
         {"setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState},
