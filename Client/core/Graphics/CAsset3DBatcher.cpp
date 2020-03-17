@@ -13,6 +13,7 @@
 #include "CAsset3DBatcher.h"
 #include "core/CLuaAssetNodeInterface.h"
 #include "../Client\mods\deathmatch\logic\CClientMeshBuffer.h"
+#include "CAssetsRenderGroup.h"
 
 CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
 {
@@ -72,8 +73,10 @@ void CAsset3DBatcher::Flush()
 
     CClientMeshBuffer* pMeshBuffer;
     CMaterialItem*     pLastMaterial = nullptr;
+    CAssetsRenderGroup* pGroup;
     for (SRenderingSettings& renderSetting : m_vecRenderList)
     {
+        pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(renderSetting.uiGroup);
         renderSetting.matrix.GetBuffer(m_fBuffer);
         m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
         for (int i = 0; i < renderSetting.assetNode->GetMeshNum(); i++)

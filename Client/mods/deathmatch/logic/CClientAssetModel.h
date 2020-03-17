@@ -29,6 +29,7 @@ class CClientMeshBuffer;
 struct SRenderingSettings
 {
     CMatrix                 matrix;
+    unsigned int            uiGroup;
     CLuaAssetNodeInterface* assetNode;
 };
 

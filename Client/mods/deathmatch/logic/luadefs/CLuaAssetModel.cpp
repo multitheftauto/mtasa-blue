@@ -399,7 +399,7 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
 {
     //  bool assetRender ( asset-node theAssetNode, position, rotation, scale, options  )
     CLuaAssetNode*   pAssetNode = nullptr;
-    CStringMap       optionsMap;
+    unsigned int     uiGroup;
     CVector          vecPosition;
     CVector          vecRotation;
     CVector          vecScale = CVector(1, 1, 1);
@@ -411,17 +411,24 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     if (argStream.NextIsVector3D())
         argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
 
-    argStream.ReadStringMap(optionsMap);
+    argStream.ReadNumber(uiGroup, 0);
 
     if (!argStream.HasErrors())
     {
-        SRenderingSettings settings;
-        settings.matrix.SetPosition(vecPosition);
-        ConvertDegreesToRadiansNoWrap(vecRotation);
-        settings.matrix.SetRotation(vecRotation);
-        settings.matrix.SetScale(vecScale);
-        settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
-        g_pCore->GetGraphics()->DrawAssetNode(settings);
+        CVector cameraPosition;
+        m_pManager->GetCamera()->GetPosition(cameraPosition);
+        CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+        if (pGroup->GetEffectiveDrawDistance() >= DistanceBetweenPoints3D(cameraPosition, vecPosition))
+        {
+            SRenderingSettings settings;
+            settings.matrix.SetPosition(vecPosition);
+            ConvertDegreesToRadiansNoWrap(vecRotation);
+            settings.matrix.SetRotation(vecRotation);
+            settings.matrix.SetScale(vecScale);
+            settings.uiGroup = uiGroup;
+            settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
+            g_pCore->GetGraphics()->DrawAssetNode(settings);
+        }
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -593,15 +600,36 @@ int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
         CVector vector;
         if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_BOOL)
         {
-            argStream.ReadBool(booleanValue);
+            if (!argStream.NextIsBool())
+            {
+                argStream.SetCustomError(SString("Rendering property %s require boolean value", EnumToString(eProperty).c_str()).c_str());
+            }
+            else
+            {
+                argStream.ReadBool(booleanValue);
+            }
         }
         else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
         {
-            argStream.ReadNumber(floatValue);
+            if (!argStream.NextIsNumber())
+            {
+                argStream.SetCustomError(SString("Rendering property %s require float value", EnumToString(eProperty).c_str()).c_str());
+            }
+            else
+            {
+                argStream.ReadNumber(floatValue);
+            }
         }
         else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
         {
-            argStream.ReadVector3D(vector);
+            if (!argStream.NextIsVector3D())
+            {
+                argStream.SetCustomError(SString("Rendering property %s require vector3 value", EnumToString(eProperty).c_str()).c_str());
+            }
+            else
+            {
+                argStream.ReadVector3D(vector);
+            }
         }
 
         if (!argStream.HasErrors())

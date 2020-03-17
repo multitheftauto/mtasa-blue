@@ -16,6 +16,7 @@ public:
     CAssetsRenderGroup();
     ~CAssetsRenderGroup();
 
+    float GetEffectiveDrawDistance() const { return m_fDrawDistance; } // combined all draw distance properties
     float GetDrawDistance() const { return m_fDrawDistance; }
     void  SetDrawDistance(float fDrawDistance) { m_fDrawDistance = fDrawDistance; }
 
