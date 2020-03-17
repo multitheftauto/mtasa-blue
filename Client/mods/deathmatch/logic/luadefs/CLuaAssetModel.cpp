@@ -13,6 +13,7 @@
 #include "../lua/CLuaAssetNode.h"
 #include "../lua/CLuaAssetMesh.h"
 #include "core/CLuaAssetNodeInterface.h"
+#include "../core/CAssetsRenderGroup.h"
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
@@ -27,6 +28,7 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
         {"assetGetMetaData", AssetGetMetaData},
         {"assetGetRenderGroupProperties", AssetGetRenderGroupProperties},
+        {"assetSetRenderGroupProperties", AssetSetRenderGroupProperties},
     };
 
     // Add functions
@@ -558,6 +560,34 @@ int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
     {
+        CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+
+        switch (eProperty)
+        {
+            case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
+            {
+                lua_pushnumber(luaVM, pGroup->GetDrawDistance());
+                return 1;
+            }
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
+{
+    unsigned int uiGroup;
+    eAssetRenderingProperty eProperty;
+    CScriptArgReader   argStream(luaVM);
+
+    argStream.ReadNumber(uiGroup);
+    argStream.ReadEnumString(eProperty);
+    if (!argStream.HasErrors())
+    {
         bool booleanValue;
         float floatValue;
         CVector vector;
@@ -576,14 +606,19 @@ int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
+            CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+
             switch (eProperty)
             {
                 case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
                 {
-                    //g_pCore->GetAssetControl
+                    pGroup->SetDrawDistance(floatValue);
                     break;
                 }
             }
+            
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     if (argStream.HasErrors())
