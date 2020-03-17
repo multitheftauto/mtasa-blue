@@ -677,6 +677,10 @@ ADD_ENUM(ASSET_UV_CHANNELS, "uvchannels")
 ADD_ENUM(ASSET_BONES_COUNT, "bonescount")
 IMPLEMENT_ENUM_END("asset-property")
 
+IMPLEMENT_ENUM_BEGIN(eAssetRenderingProperty)
+ADD_ENUM(ASSET_REDNERING_PROPERTY_DRAW_DISTANCE, "drawdistance")
+IMPLEMENT_ENUM_END("asset-rendering-property")
+
 //
 // Get best guess at name of userdata type
 //

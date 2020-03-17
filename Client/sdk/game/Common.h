@@ -1636,3 +1636,14 @@ enum eAssetProperty
     ASSET_UV_CHANNELS,
     ASSET_BONES_COUNT,
 };
+
+enum eAssetRenderingPropertyType
+{
+    ASSET_RENDERING_PROPERTY_TYPE_BOOL = (unsigned int)1 << 30,
+    ASSET_RENDERING_PROPERTY_TYPE_FLOAT = (unsigned int)1 << 29,
+    ASSET_RENDERING_PROPERTY_TYPE_VECTOR = (unsigned int)1 << 28,
+};
+enum eAssetRenderingProperty
+{
+    ASSET_REDNERING_PROPERTY_DRAW_DISTANCE = ASSET_RENDERING_PROPERTY_TYPE_FLOAT + 1,
+};

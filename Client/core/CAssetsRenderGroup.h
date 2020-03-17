@@ -10,16 +10,15 @@
  *****************************************************************************/
 #pragma once
 
-class CAssetsControl
+class CAssetsRenderGroup
 {
 public:
-    CAssetsControl();
-    ~CAssetsControl();
-    DWORD GetAmbientColor();
-    bool                RenderGroupExists(unsigned int idx) { return m_renderingGroups.find(idx) != m_renderingGroups.end(); }
-    CAssetsRenderGroup* GetRenderGroup(unsigned int idx);
+    CAssetsRenderGroup();
+    ~CAssetsRenderGroup();
+
+    float GetDrawDistance() const { return m_fDrawDistance; }
+    void  SetDrawDistance(float fDrawDistance) { m_fDrawDistance = fDrawDistance; }
 
 private:
-    DWORD ambientColor;            // argb ambient color
-    std::unordered_map<unsigned int, CAssetsRenderGroup*> m_renderingGroups;
+    float m_fDrawDistance = 200;
 };

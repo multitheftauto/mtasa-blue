@@ -26,6 +26,7 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"assetSetTexture", AssetSetTexture},
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
         {"assetGetMetaData", AssetGetMetaData},
+        {"assetGetRenderGroupProperties", AssetGetRenderGroupProperties},
     };
 
     // Add functions
@@ -541,6 +542,50 @@ int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
         return 1;
     }
     else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
+{
+    unsigned int uiGroup;
+    eAssetRenderingProperty eProperty;
+    CScriptArgReader   argStream(luaVM);
+
+    argStream.ReadNumber(uiGroup);
+    argStream.ReadEnumString(eProperty);
+    if (!argStream.HasErrors())
+    {
+        bool booleanValue;
+        float floatValue;
+        CVector vector;
+        if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_BOOL)
+        {
+            argStream.ReadBool(booleanValue);
+        }
+        else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
+        {
+            argStream.ReadNumber(floatValue);
+        }
+        else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
+        {
+            argStream.ReadVector3D(vector);
+        }
+
+        if (!argStream.HasErrors())
+        {
+            switch (eProperty)
+            {
+                case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
+                {
+                    break;
+                }
+            }
+        }
+    }
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
