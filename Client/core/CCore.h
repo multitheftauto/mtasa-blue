@@ -103,7 +103,7 @@ public:
     CLocalizationInterface* GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore();
     CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
-    CAssetsControl*         GetAssetsControl() { return m_pAssets; };
+    CAssetControlInterface* GetAssetsControl() { return m_pAssets; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 

@@ -9,14 +9,15 @@
  *
  *****************************************************************************/
 #pragma once
+#include <core/CAssetControlInterface.h>
 
-class CAssetsControl
+class CAssetsControl : public CAssetControlInterface
 {
 public:
     CAssetsControl();
     ~CAssetsControl();
     DWORD GetAmbientColor();
-    bool                RenderGroupExists(unsigned int idx) { return m_renderingGroups.find(idx) != m_renderingGroups.end(); }
+    bool                RenderGroupExists(unsigned int idx) const { return m_renderingGroups.find(idx) != m_renderingGroups.end(); }
     CAssetsRenderGroup* GetRenderGroup(unsigned int idx);
 
 private:

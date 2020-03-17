@@ -64,6 +64,7 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM(eAssetProperty);
+DECLARE_ENUM(eAssetRenderingProperty);
 
 class CRemoteCall;
 

@@ -580,6 +580,7 @@ int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
             {
                 case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
                 {
+                    //g_pCore->GetAssetControl
                     break;
                 }
             }
