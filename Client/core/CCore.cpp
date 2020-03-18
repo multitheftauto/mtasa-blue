@@ -101,7 +101,7 @@ CCore::CCore()
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
     m_pSetCursorPosHook = new CSetCursorPosHook();
-    m_pAssets = new CAssetsControl();
+    m_pAssets = new CAssetsManager();
 
     // Register internal commands.
     RegisterCommands();

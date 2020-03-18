@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/CAssetsControl.cpp
+ *  FILE:        core/CAssetsManager.cpp
  *  PURPOSE:     Asset control class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,26 +11,26 @@
 
 #include "StdInc.h"
 
-CAssetsControl::CAssetsControl()
+CAssetsManager::CAssetsManager()
 {
     ambientColor = D3DCOLOR_ARGB(255, 150, 150, 150);
 
 }
 
-CAssetsControl::~CAssetsControl()
+CAssetsManager::~CAssetsManager()
 {
 }
 
-CAssetsRenderGroup* CAssetsControl::GetRenderGroup(unsigned int idx)
+CAssetInstance* CAssetsManager::GetRenderGroup(unsigned int idx)
 {
     if (!RenderGroupExists(idx))
     {
-        m_renderingGroups.insert({idx, new CAssetsRenderGroup()});
+        m_renderingGroups.insert({idx, new CAssetInstance()});
     }
     return m_renderingGroups.at(idx);
 }
 
-DWORD CAssetsControl::GetAmbientColor()
+DWORD CAssetsManager::GetAmbientColor()
 {
     return ambientColor;
 }

@@ -13,7 +13,7 @@
 #include "../lua/CLuaAssetNode.h"
 #include "../lua/CLuaAssetMesh.h"
 #include "core/CLuaAssetNodeInterface.h"
-#include "../core/CAssetsRenderGroup.h"
+#include "../core/CAssetInstance.h"
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
@@ -27,6 +27,7 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"assetSetTexture", AssetSetTexture},
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
         {"assetGetMetaData", AssetGetMetaData},
+        {"assetCreateInstance", AssetCreateInstance},
         {"assetGetRenderGroupProperties", AssetGetRenderGroupProperties},
         {"assetSetRenderGroupProperties", AssetSetRenderGroupProperties},
     };
@@ -417,18 +418,18 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     {
         CVector cameraPosition;
         m_pManager->GetCamera()->GetPosition(cameraPosition);
-        CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
-        if (pGroup->GetEffectiveDrawDistance() >= DistanceBetweenPoints3D(cameraPosition, vecPosition))
-        {
-            SRenderingSettings settings;
-            settings.matrix.SetPosition(vecPosition);
-            ConvertDegreesToRadiansNoWrap(vecRotation);
-            settings.matrix.SetRotation(vecRotation);
-            settings.matrix.SetScale(vecScale);
-            settings.uiGroup = uiGroup;
-            settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
-            g_pCore->GetGraphics()->DrawAssetNode(settings);
-        }
+        //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+        //if (pGroup->GetEffectiveDrawDistance() >= DistanceBetweenPoints3D(cameraPosition, vecPosition))
+        //{
+        //    SRenderingSettings settings;
+        //    settings.matrix.SetPosition(vecPosition);
+        //    ConvertDegreesToRadiansNoWrap(vecRotation);
+        //    settings.matrix.SetRotation(vecRotation);
+        //    settings.matrix.SetScale(vecScale);
+        //    settings.uiGroup = uiGroup;
+        //    settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
+        //    g_pCore->GetGraphics()->DrawAssetNode(settings);
+        //}
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -557,6 +558,26 @@ int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
     return 1;
 }
 
+int CLuaAssetModelDefs::AssetCreateInstance(lua_State* luaVM)
+{
+    CLuaAssetNode*     pAssetNode = nullptr;
+    eAssetProperty     eProperty;
+    CScriptArgReader   argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
+        argStream.ReadUserData(pAssetNode);
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
 {
     unsigned int uiGroup;
@@ -567,13 +588,13 @@ int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
     {
-        CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+        //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
 
         switch (eProperty)
         {
             case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
             {
-                lua_pushnumber(luaVM, pGroup->GetDrawDistance());
+                //lua_pushnumber(luaVM, pGroup->GetDrawDistance());
                 return 1;
             }
         }
@@ -634,13 +655,13 @@ int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            CAssetsRenderGroup* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+            //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
 
             switch (eProperty)
             {
                 case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
                 {
-                    pGroup->SetDrawDistance(floatValue);
+                    //pGroup->SetDrawDistance(floatValue);
                     break;
                 }
             }

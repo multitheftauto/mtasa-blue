@@ -13,7 +13,7 @@
 #include "CAsset3DBatcher.h"
 #include "core/CLuaAssetNodeInterface.h"
 #include "../Client\mods\deathmatch\logic\CClientMeshBuffer.h"
-#include "CAssetsRenderGroup.h"
+#include "CAssetInstance.h"
 
 CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
 {
@@ -67,16 +67,15 @@ void CAsset3DBatcher::Flush()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
-    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, g_pCore->GetAssetsControl()->GetAmbientColor());
+    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, g_pCore->GetAssetsManager()->GetAmbientColor());
 
     float m_fBuffer[24] = {0};
 
     CClientMeshBuffer* pMeshBuffer;
     CMaterialItem*     pLastMaterial = nullptr;
-    CAssetsRenderGroup* pGroup;
     for (SRenderingSettings& renderSetting : m_vecRenderList)
     {
-        pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(renderSetting.uiGroup);
+        //pGroup = g_pCore->GetAssetsManager()->GetRenderGroup(renderSetting.uiGroup);
         renderSetting.matrix.GetBuffer(m_fBuffer);
         m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
         for (int i = 0; i < renderSetting.assetNode->GetMeshNum(); i++)

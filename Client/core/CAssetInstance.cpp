@@ -11,12 +11,12 @@
 
 #include "StdInc.h"
 
-CAssetsRenderGroup::CAssetsRenderGroup()
+CAssetInstance::CAssetInstance()
 {
 
 }
 
-CAssetsRenderGroup::~CAssetsRenderGroup()
+CAssetInstance::~CAssetInstance()
 {
 }
 
