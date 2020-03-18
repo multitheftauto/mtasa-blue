@@ -89,6 +89,7 @@
 #include <CClientWebBrowser.h>
 #include <CClientSearchLight.h>
 #include <CClientAssetModel.h>
+#include <CClientAssetInstance.h>
 #include <CClientEffect.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
@@ -96,6 +97,7 @@
 #include <CMapEventManager.h>
 #include <CClientModelManager.h>
 #include <CClientAssetModelManager.h>
+#include <CClientAssetInstanceManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
 #include <CFileReader.h>

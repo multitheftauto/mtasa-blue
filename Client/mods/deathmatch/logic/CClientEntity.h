@@ -78,6 +78,7 @@ enum eClientEntityType
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
     CCLIENTASSETMODEL,
+    CCLIENTASSETINSTANCE,
     CCLIENTUNKNOWN,
 };
 
@@ -144,6 +145,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientPointLights,
     CLASS_CClientSearchLight,
     CLASS_CClientAssetModel,
+    CLASS_CClientAssetInstance,
 };
 
 class CClientEntity : public CClientEntityBase
