@@ -93,7 +93,7 @@ Please read our ["Code Review"] article for information on how to review code ef
 
 <!--
 
-TODO: this should be part of a code of conduct instead
+TODO(qaisjp): the below content should be part of a code of conduct instead
 
 Ratings and comments are open for the public to review code and provide
 feedback. Please be mature and civilised when posting comments.
@@ -114,24 +114,28 @@ Merge rights allow you to merge your own approved pull requests and
 review other people's pull requests.
 
 We grant merge rights after you have proven yourself to be competent,
-this is generally after 3-5 pull requests, but it's not fixed and depends
-on the extent of your contributions.
+which is generally after 3-5 pull requests. This is not fixed and depends
+on the extent of your contributions, community status and other factors.
 
 The subject matter of your PRs do not matter—we are more interested in,
 once granted merge rights, whether you are capable of maintaining
 a high standard of code and remaining cohesive with other project collaborators.
 
 After gaining merge rights, if your contributions are of a consistently low standard,
-or you fail to stick to the rules, your permissions will be stripped and will no longer
-be able to merge submitted pull requests or create your own branches.
+or you fail to stick to the rules, your permissions will be stripped.
 
 ## Merging pull requests
 
-Before merging, pull requests require:
+Before merging, enforced by GitHub's branch protection, pull requests **require**:
 - Linux and Windows status checks to pass
 - 1 pull request review
 
-If the pull request is large, requiring at least 2 pull request reviews.
-This isn't enforced via GitHub's interface, but you should try and stick to this convention.
+If the pull request is large, try and only merge if there at least 2 pull request reviews.
+This isn't enforced via branch protection, but please try and stick to this convention
+(... unless nobody else is reviewing your PR).
 
-Pull requests are required from anyone who is not a member of the MTA Team.
+Branch protection is **not enforced** for repository administrators (a subset of [forum admins]),
+and those people are therefore not required to send pull requests. Individual repo admins may,
+for the greater good, pledge to submit pull requests despite this lack of enforcement.
+
+[forum admins]: https://forum.mtasa.com/staff/
