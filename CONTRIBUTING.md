@@ -134,8 +134,11 @@ If the pull request is large, try and only merge if there at least 2 pull reques
 This isn't enforced via branch protection, but please try and stick to this convention
 (... unless nobody else is reviewing your PR).
 
-Branch protection is **not enforced** for repository administrators (a subset of [forum admins]),
+Branch protection is **not enforced** for repository administrators,
 and those people are therefore not required to send pull requests. Individual repo admins may,
 for the greater good, pledge to submit pull requests despite this lack of enforcement.
+
+For informational purposes, the current repository administrators are a _subset of_ [forum admins].
+It is not an authoritative list.
 
 [forum admins]: https://forum.mtasa.com/staff/
