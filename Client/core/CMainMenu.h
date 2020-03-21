@@ -81,7 +81,7 @@ private:
 
     bool OnMenuEnter(CGUIElement* pElement);
     bool OnMenuExit(CGUIElement* pElement);
-    bool OnMenuClick(CGUIElement* pElement);
+    bool OnMenuClick(CGUIMouseEventArgs Args);
     bool OnQuickConnectButtonClick(CGUIElement* pElement);
     bool OnResumeButtonClick(CGUIElement* pElement);
     bool OnBrowseServersButtonClick(CGUIElement* pElement);

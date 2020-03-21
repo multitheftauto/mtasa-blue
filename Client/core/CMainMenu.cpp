@@ -205,7 +205,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetSize(CVector2D(m_menuBX - m_menuAX, m_menuBY - m_menuAY) + BODGE_FACTOR_6, false);
     m_pMenuArea->SetAlpha(0);
     m_pMenuArea->SetZOrderingEnabled(false);
-    m_pMenuArea->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnMenuClick, this));
+    m_pMenuArea->SetClickHandler(GUI_CALLBACK_MOUSE(&CMainMenu::OnMenuClick, this));
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
@@ -792,8 +792,10 @@ bool CMainMenu::OnMenuExit(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnMenuClick(CGUIElement* pElement)
+bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
 {
+    CGUIElement* pElement = Args.pWindow;
+
     // Handle all our clicks to the menu from here
     if (m_pHoveredItem)
     {
