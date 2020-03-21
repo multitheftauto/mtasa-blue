@@ -8,9 +8,7 @@ jobs:
     name: windows
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v2
 
       - uses: actions/cache@v1
         id: cache-dxfiles
@@ -55,9 +53,7 @@ jobs:
         continue-on-error: true
       - name: Link MySQL
         run: brew link --overwrite mysql
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v2
       - name: Run Build
         run: ./linux-build.sh
 
@@ -67,8 +63,6 @@ jobs:
     container:
       image: docker://sbx320/mtasa-blue-azure:latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v2
       - name: Run Build
         run: ./linux-build.sh
