@@ -27,7 +27,7 @@ a later point in time.
 If you're a collaborator, it's your choice whether to push branches to this
 repository or to your own fork.
 
-**Branches are "topical" and snd should not be "personal" to each
+**Branches are "topical" and should not be "personal" to each
 user.** This means that a branch should be created for a new feature,
 not for a user specific playground.
 
@@ -71,14 +71,14 @@ The most important of the [seven rules](http://chris.beams.io/posts/git-commit/)
 4. Use the body to explain what and why vs. how
 
 **Follow up (addendum) commits should refer to the previous commit.** Do this by 
-including the previous commit SHA and a summarised commit message in
+including the previous commit-identifier SHA and a summarised commit message in
 the new commit message. Doing this will help identify related commits
 if they are viewed at a later date.
 
-**Try to keep PRs small — they should be about one thing.** you do multiple things
-in one PR, it's hard to review. If you're fixing stuff as you go, you might want
+**Try to keep pull requests small — they should be about one thing.** you do multiple things
+in one pull request, it's hard to review. If you're fixing stuff as you go, you might want
 to make atomic commits and then cherry-pick those commits into separate branches,
-leaving the PR clean.
+leaving the pull request clean.
 
 **Read the ["Code Review"] guide** for more guidelines about the code review process.
 
@@ -117,12 +117,12 @@ We grant merge rights after you have proven yourself to be competent,
 which is generally after 3-5 pull requests. This is not fixed and depends
 on the extent of your contributions, community status and other factors.
 
-The subject matter of your PRs do not matter—we are more interested in,
+The subject matter of your pull requests do not matter — we are more interested in,
 once granted merge rights, whether you are capable of maintaining
 a high standard of code and remaining cohesive with other project collaborators.
 
 After gaining merge rights, if your contributions are of a consistently low standard,
-or you fail to stick to the rules, your permissions will be stripped.
+or you fail to stick to the rules, your permissions will be revoked.
 
 ## Merging pull requests
 
@@ -135,7 +135,7 @@ This isn't enforced via branch protection, but please try and stick to this conv
 (... unless nobody else is reviewing your PR).
 
 Branch protection is **not enforced** for repository administrators,
-and those people are therefore not required to send pull requests. Individual repo admins may,
+and those people are therefore not required to send pull requests. Individual repository admins may,
 for the greater good, pledge to submit pull requests despite this lack of enforcement.
 
 For informational purposes, the current repository administrators are a _subset of_
