@@ -75,7 +75,7 @@ including the previous commit-identifier SHA and a summarised commit message in
 the new commit message. Doing this will help identify related commits
 if they are viewed at a later date.
 
-**Try to keep pull requests small — they should be about one thing.** you do multiple things
+**Try to keep pull requests small — they should be about one thing.** When you do multiple things
 in one pull request, it's hard to review. If you're fixing stuff as you go, you might want
 to make atomic commits and then cherry-pick those commits into separate branches,
 leaving the pull request clean.
