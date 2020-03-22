@@ -44,7 +44,7 @@ label, or our [milestones].
 
 Of course, if you're interested in something else, feel free to experiment
 and submit it. But discussing the feature beforehand, in an issue, will
-make your PR more likely to be merged in a timely fashion.
+make your pull request more likely to be merged in a timely fashion.
 
 ## Committing code
 
@@ -118,7 +118,7 @@ leaving the pull request clean.
     ```
 
 4.  There was no specific issue being fixed here, but GitHub's squash-merge feature automatically appended `(#1177)`,
-    telling us which PR created this commit. There's no description.
+    telling us which pull request created this commit. There's no description.
     ```
     Add "remember this option" checkbox to NVidia Optimus dialog (#1177)
     ```
