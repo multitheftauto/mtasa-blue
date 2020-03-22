@@ -71,7 +71,7 @@ The most important of the [seven rules](http://chris.beams.io/posts/git-commit/)
 4. Use the body to explain what and why vs. how
 
 **Follow up (addendum) commits should refer to the previous commit.** Do this by 
-including the previous commit-identifier SHA and a summarised commit message in
+including the previous commit-identifier SHA and, if there's space, a summarised commit message in
 the new commit message. Doing this will help identify related commits
 if they are viewed at a later date.
 
@@ -81,6 +81,52 @@ to make atomic commits and then cherry-pick those commits into separate branches
 leaving the pull request clean.
 
 **Read the ["Code Review"] guide** for more guidelines about the code review process.
+
+**Examples**. Here are some examples of commit messages with a short and descriptive title in the imperative mood.
+
+1.  Here we also have a description that explains the content of the commit.
+    ```
+    Fix vehicle model memory leaks in engineReplaceModel
+    
+    Fixed 3 memory leaks:
+    - clump model leak
+    - vehicle visual data (dummies) leak
+    - engineReplaceModel added extra references to TXD, and this was not getting unloaded at times
+    ```
+
+2.  Here we have a longer description that explains how to use the feature. The body is wrapped at 72 characters.
+    ```
+    Add "beta" CVAR "_beta_qc_rightclick_command"
+    
+    This variable lets you execute a command of your choice when you right
+    click the "quick connect" button.
+    
+    By default this CVAR is set to "reconnect", but you can set it to
+    anything - "connect orange.mtasa.com" or "nick timw0w".
+    
+    In the console, type "_beta_qc_rightclick_command" and press enter. This
+    will tell you the current value of the CVAR.
+    
+    You can do "_beta_qc_rightclick_command=nick timw0w" to change the
+    value of the CVAR.
+    ```
+
+
+3.  Here we say `Fix #1115` so that GitHub automatically closes issue #1115. There's no description.
+    ```
+    Fix #1115: add async encode/decodeString
+    ```
+
+4.  There was no specific issue being fixed here, but GitHub's squash-merge feature automatically appended `(#1177)`,
+    telling us which PR created this commit. There's no description.
+    ```
+    Add "remember this option" checkbox to NVidia Optimus dialog (#1177)
+    ```
+
+5.  Here we refer to a previous commit.
+    ```
+    Addendum to a80f8d6: fix Windows build error
+    ```
 
 ## Reviewing code
 
