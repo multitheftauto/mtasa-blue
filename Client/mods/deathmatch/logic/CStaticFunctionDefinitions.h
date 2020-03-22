@@ -142,7 +142,6 @@ public:
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
-    static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
     static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
     static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
     static bool           IsPedHeadless(CClientPed& Ped, bool& bHeadless);

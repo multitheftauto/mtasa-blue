@@ -103,6 +103,7 @@ public:
     void SetMovedHandler(GUI_CALLBACK Callback);
     void SetSizedHandler(GUI_CALLBACK Callback);
     void SetClickHandler(GUI_CALLBACK Callback);
+    void SetClickHandler(const GUI_CALLBACK_MOUSE& Callback);
     void SetDoubleClickHandler(GUI_CALLBACK Callback);
     void SetMouseEnterHandler(GUI_CALLBACK Callback);
     void SetMouseLeaveHandler(GUI_CALLBACK Callback);
@@ -113,7 +114,7 @@ public:
     void SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback);
     void SetEnterKeyHandler(GUI_CALLBACK Callback);
 
-    bool Event_OnClick();
+    bool Event_OnClick(const CEGUI::EventArgs& e);
     bool Event_OnDoubleClick();
     bool Event_OnMouseEnter();
     bool Event_OnMouseLeave();
@@ -143,16 +144,18 @@ protected:
 
     std::list<CGUIProperty*> m_Properties;
 
-    GUI_CALLBACK     m_OnClick;
-    GUI_CALLBACK     m_OnDoubleClick;
-    GUI_CALLBACK     m_OnMoved;
-    GUI_CALLBACK     m_OnSized;
-    GUI_CALLBACK     m_OnMouseEnter;
-    GUI_CALLBACK     m_OnMouseLeave;
-    GUI_CALLBACK     m_OnMouseDown;
-    GUI_CALLBACK     m_OnActivate;
-    GUI_CALLBACK     m_OnDeactivate;
-    GUI_CALLBACK     m_OnKeyDown;
-    GUI_CALLBACK     m_OnEnter;
-    GUI_CALLBACK_KEY m_OnKeyDownWithArgs;
+    GUI_CALLBACK m_OnClick;
+    GUI_CALLBACK m_OnDoubleClick;
+    GUI_CALLBACK m_OnMoved;
+    GUI_CALLBACK m_OnSized;
+    GUI_CALLBACK m_OnMouseEnter;
+    GUI_CALLBACK m_OnMouseLeave;
+    GUI_CALLBACK m_OnMouseDown;
+    GUI_CALLBACK m_OnActivate;
+    GUI_CALLBACK m_OnDeactivate;
+    GUI_CALLBACK m_OnKeyDown;
+    GUI_CALLBACK m_OnEnter;
+
+    GUI_CALLBACK_MOUSE m_OnClickWithArgs;
+    GUI_CALLBACK_KEY   m_OnKeyDownWithArgs;
 };

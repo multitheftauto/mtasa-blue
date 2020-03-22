@@ -2155,7 +2155,8 @@ BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
     {
         if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
-            SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            // Ensure dialog is not hidden by other applications
+            SetForegroundWindow(hwnd);
             return false;
         }
     }

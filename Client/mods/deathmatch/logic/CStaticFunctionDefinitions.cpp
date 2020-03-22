@@ -1715,25 +1715,6 @@ bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned c
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
-{
-    if (Ped.IsRunningAnimation())
-    {
-        if (Ped.IsCustomAnimationPlaying())
-        {
-            strBlockName = Ped.GetNextAnimationCustomBlockName();
-            strAnimName = Ped.GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = Ped.GetAnimationName();
-        }
-        return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim)
 {
     iMoveAnim = (unsigned int)Ped.GetMoveAnim();
