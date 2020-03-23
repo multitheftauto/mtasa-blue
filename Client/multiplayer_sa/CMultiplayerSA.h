@@ -67,6 +67,7 @@ public:
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
     void                InitHooks_VehicleLights();
@@ -94,7 +95,6 @@ public:
     void           DisableQuickReload(bool bDisable);
     void           DisableCloseRangeDamage(bool bDisable);
     void           DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
-    void           DisableUnloadingIFPBlocks();
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);
@@ -118,7 +118,6 @@ public:
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
     void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler);
     void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler);
-    void SetBlendAnimationHandler(BlendAnimationHandler* pHandler);
     void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler);
     void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler);
     void SetVehicleDamageHandler(VehicleDamageHandler* pHandler);
@@ -289,11 +288,10 @@ public:
     DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
-    CVector                            m_vecAkimboTarget;
-    bool                               m_bAkimboTargetUp;
-    static char*                       ms_PlayerImgCachePtr;
-    static std::array<unsigned int, 3> arrGroupsToProtect;
-    bool                               m_bBadDrivebyHitboxesDisabled;
+    CVector      m_vecAkimboTarget;
+    bool         m_bAkimboTargetUp;
+    static char* ms_PlayerImgCachePtr;
+    bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
     bool                m_bSuspensionEnabled;

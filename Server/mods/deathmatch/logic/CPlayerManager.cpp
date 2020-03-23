@@ -82,17 +82,7 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     }
 
     // Create the new player
-    CPlayer* pPlayer = new CPlayer(this, m_pScriptDebugging, PlayerSocket);
-
-    // Invalid id?
-    if (pPlayer->GetID() == INVALID_ELEMENT_ID)
-    {
-        delete pPlayer;
-        return NULL;
-    }
-
-    // Return the created player
-    return pPlayer;
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
 }
 
 unsigned int CPlayerManager::CountJoined()

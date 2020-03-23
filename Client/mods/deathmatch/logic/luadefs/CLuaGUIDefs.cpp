@@ -385,6 +385,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
@@ -794,9 +795,19 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             SString    strPath;
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
+                if (FileExists(strPath))
+                {
+                    CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
+                    if (pGUIElement != nullptr)
+                    {
+                        lua_pushelement(luaVM, pGUIElement);
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(path, "Failed to create static image");
+                }
+                else 
+                    argStream.SetCustomError(path, "File not found");
             }
             else
                 argStream.SetCustomError(path, "Bad file path");

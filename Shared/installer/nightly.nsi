@@ -32,6 +32,7 @@ Var CUSTOM_INSTDIR
 Var WhichRadio
 Var ShowLastUsed
 Var PermissionsGroup
+Var PATCH_TARGET
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -48,7 +49,7 @@ Var PermissionsGroup
 ; ###########################################################################################################
 !ifndef FILES_ROOT
     !define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-    !define FILES_ROOT "../../InstallFiles"
+    !define FILES_ROOT "../../Bin"
     !define SERVER_FILES_ROOT "${FILES_ROOT}/server"
     !define FILES_MODULE_SDK "${FILES_ROOT}/development/publicsdk"
     !define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
@@ -601,6 +602,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
                     ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
                     ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+                    ${Case} "a2929a61e4d63dd3c15749b2b7ed74ae" #?? 1.01
                     ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
                     ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
                     ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
@@ -610,8 +612,25 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
                     ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
                     ${Case} "c29d96e0c063cd4568d977bcf273215f" #?? ?.?? 5,719,552 bytes
-                        #Copy to gta_sa.exe and commence patching process
+                        # Copy to gta_sa.exe.bak and patch to gta_sa.exe
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
+                        StrCpy $PATCH_TARGET "$GTA_DIR\gta_sa.exe"
+                        Call InstallPatch
+                        ${If} $PatchInstalled == "1"
+                            Goto CompletePatchProc
+                        ${EndIf}
+                        Goto TryNextExe
+                        ${Break}
+
+                    ${Case} "6687a315558935b3fc80cdbff04437a4" #?? ?.?? 5,685,688 bytes (RS Launcher 2019-08-29)
+                        # Don't patch if proxy_sa is already present (and is over 10MB)
+                        ${GetSize} "$GTA_DIR" "/M=proxy_sa.exe /S=0M /G=0" $0 $3 $4
+                        ${If} $0 > 10
+                            Goto CompletePatchProc
+                        ${EndIf}
+                        # Copy to gta_sa.exe.bak and patch to proxy_sa.exe
+                        CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
+                        StrCpy $PATCH_TARGET "$GTA_DIR\proxy_sa.exe"
                         Call InstallPatch
                         ${If} $PatchInstalled == "1"
                             Goto CompletePatchProc
@@ -712,7 +731,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\icudtl.dat"
         File "${FILES_ROOT}\mta\libEGL.dll"
         File "${FILES_ROOT}\mta\libGLESv2.dll"
-        File "${FILES_ROOT}\mta\natives_blob.bin"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
         
@@ -1190,7 +1208,7 @@ Function InstallPatch
         StrCpy $PatchInstalled "0"
     ${Else}
         DetailPrint "Patch download successful.  Installing patch..."
-        vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" "$GTA_DIR\gta_sa.exe"
+        vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" $PATCH_TARGET
         Pop $R0
         ${If} $R0 == "OK"
             StrCpy $PatchInstalled "1"
