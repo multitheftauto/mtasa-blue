@@ -9,6 +9,7 @@ local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
 local CEF_VERSION = "80.0.4+g74f7b0c+chromium-80.0.3987.122"
+local CEF_SHA256 = "8FD8E24AF196F00FEAAA1553496BAE99D8196BA023D0DD0FE44EFEEE93B04DFC"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -22,16 +23,9 @@ newaction {
 		-- Only execute on Windows
 		if os.host() ~= "windows" then return end
 
-		-- Download md5
-		local correct_checksum, result_string = http.get(make_cef_download_url()..".sha1")
-		if result_string ~= "OK" and result_string then
-			print("Could not check CEF checksum: "..result_string)
-			return -- Do nothing and rely on earlier installed files (to allow working offline)
-		end
-
-		-- Check md5
+		-- Check file hash
 		local archive_path = CEF_PATH.."temp.tar.bz2"
-		if os.isfile(archive_path) and os.sha1_file(archive_path):lower() == correct_checksum then
+		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_SHA256 then
 			print("CEF consistency checks succeeded")
 			return
 		end

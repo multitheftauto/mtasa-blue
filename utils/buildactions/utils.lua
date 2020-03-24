@@ -83,12 +83,12 @@ function os.expanddir_wildcard(from, to)
 	os.rmdir(dir)
 end
 
-function os.sha1_file(path)
+function os.sha256_file(path)
 	if os.host() == "windows" then
-		local s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA1).Hash", path))
+		local s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA256).Hash", path))
 		return (errc == 0) and s or ""
 	else
-		return os.outputof(string.format("sha1sum \"%s\" | awk '{ print $1 }'", path))
+		return os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
 end
 
