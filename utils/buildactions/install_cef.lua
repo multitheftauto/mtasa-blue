@@ -32,7 +32,15 @@ newaction {
 
 		-- Download CEF
 		print("Downloading CEF...")
-		http.download(make_cef_download_url(), archive_path)
+		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
+		if result_str ~= "OK" and response_code ~= 200 then
+			term.pushColor(term.red)
+			io.write(("Could not download CEF with status code %d: "):format(response_code))
+			term.setTextColor(term.purple)
+			print(result_str)
+			term.popColor()
+			return
+		end
 
 		-- Delete old CEF files
 		-- TODO: It might be better to download the files into a new folder and delete this folder at once
