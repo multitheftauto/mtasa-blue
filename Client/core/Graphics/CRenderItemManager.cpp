@@ -26,7 +26,7 @@ struct SRTVertex
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::CRenderItemManager(void)
+CRenderItemManager::CRenderItemManager()
 {
     m_pEffectCloner = new CEffectCloner(this);
 }
@@ -38,7 +38,7 @@ CRenderItemManager::CRenderItemManager(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::~CRenderItemManager(void)
+CRenderItemManager::~CRenderItemManager()
 {
     SAFE_DELETE(m_pEffectCloner);
 }
@@ -91,7 +91,7 @@ void CRenderItemManager::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewpo
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnLostDevice(void)
+void CRenderItemManager::OnLostDevice()
 {
     for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
         (*iter)->OnLostDevice();
@@ -111,7 +111,7 @@ void CRenderItemManager::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnResetDevice(void)
+void CRenderItemManager::OnResetDevice()
 {
     for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
         (*iter)->OnResetDevice();
@@ -231,7 +231,7 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority,
+CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                               float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
 {
     if (!CanCreateRenderItem(CShaderItem::GetClassId()))
@@ -240,7 +240,7 @@ CShaderItem* CRenderItemManager::CreateShader(const SString& strFullFilePath, co
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem();
-    pShaderItem->PostConstruct(this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
+    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
 
     if (!pShaderItem->IsValid())
     {
@@ -352,7 +352,7 @@ void CRenderItemManager::NotifyDestructRenderItem(CRenderItem* pItem)
 // Update stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DoPulse(void)
+void CRenderItemManager::DoPulse()
 {
     m_pRenderWare->PulseWorldTextureWatch();
 
@@ -371,7 +371,7 @@ void CRenderItemManager::DoPulse(void)
 // Save back buffer pixels in our special place
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopy(void)
+void CRenderItemManager::UpdateBackBufferCopy()
 {
     if (m_bBackBufferCopyMaybeNeedsResize)
         UpdateBackBufferCopySize();
@@ -446,7 +446,7 @@ void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem
 // Create/resize/destroy back buffer copy depending on what is required
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopySize(void)
+void CRenderItemManager::UpdateBackBufferCopySize()
 {
     m_bBackBufferCopyMaybeNeedsResize = false;
 
@@ -501,7 +501,7 @@ bool CRenderItemManager::SetRenderTarget(CRenderTargetItem* pItem, bool bClear)
 // See if in enabled zones for old versions
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsSetRenderTargetEnabledOldVer(void)
+bool CRenderItemManager::IsSetRenderTargetEnabledOldVer()
 {
     return m_bSetRenderTargetEnabledOldVer;
 }
@@ -525,7 +525,7 @@ void CRenderItemManager::EnableSetRenderTargetOldVer(bool bEnable)
 // Save current render target as the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SaveDefaultRenderTarget(void)
+bool CRenderItemManager::SaveDefaultRenderTarget()
 {
     // Make sure any special depth buffer has been removed
     SaveReadableDepthBuffer();
@@ -555,7 +555,7 @@ bool CRenderItemManager::SaveDefaultRenderTarget(void)
 // Set render target back to the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::RestoreDefaultRenderTarget(void)
+bool CRenderItemManager::RestoreDefaultRenderTarget()
 {
     // Only need to change if we have info
     if (m_pDefaultD3DRenderTarget)
@@ -577,7 +577,7 @@ bool CRenderItemManager::RestoreDefaultRenderTarget(void)
 // Check if currently drawing to the default render target
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsUsingDefaultRenderTarget(void)
+bool CRenderItemManager::IsUsingDefaultRenderTarget()
 {
     // If this is NULL, it means we haven't saved it, so aren't using another render target
     return m_pDefaultD3DRenderTarget == NULL;
@@ -682,7 +682,7 @@ void CRenderItemManager::SetTestMode(eDxTestMode testMode)
 // Should be called when a render item is created/destroyed or changes
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateMemoryUsage(void)
+void CRenderItemManager::UpdateMemoryUsage()
 {
     m_iTextureMemoryKBUsed = 0;
     m_iRenderTargetMemoryKBUsed = 0;
@@ -755,6 +755,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
+    outStatus.settings.bHighDetailPeds = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -765,6 +766,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio);
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
+    CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
 
     if (outStatus.settings.iFXQuality == 0)
     {
@@ -1031,7 +1033,7 @@ void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* 
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::PreDrawWorld(void)
+void CRenderItemManager::PreDrawWorld()
 {
     // Save scene matrices
     g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
@@ -1133,7 +1135,7 @@ void CRenderItemManager::PreDrawWorld(void)
 // Ensure our readable depth buffer is no longer being used
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::SaveReadableDepthBuffer(void)
+void CRenderItemManager::SaveReadableDepthBuffer()
 {
     if (m_bUsingReadableDepthBuffer)
     {
@@ -1164,7 +1166,7 @@ void CRenderItemManager::SaveReadableDepthBuffer(void)
 // If using AA hacks, change everything back
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::FlushNonAARenderTarget(void)
+void CRenderItemManager::FlushNonAARenderTarget()
 {
     if (m_pSavedSceneDepthSurface)
     {
@@ -1200,7 +1202,6 @@ void CRenderItemManager::FlushNonAARenderTarget(void)
                 float fV2 = 1;
 
                 const SRTVertex vertices[] = {{fX1, fY1, 0, 1, fU1, fV1}, {fX2, fY1, 0, 1, fU2, fV1}, {fX1, fY2, 0, 1, fU1, fV2},
-
                                               {fX2, fY1, 0, 1, fU2, fV1}, {fX2, fY2, 0, 1, fU2, fV2}, {fX1, fY2, 0, 1, fU1, fV2}};
 
                 // Set vertex stream

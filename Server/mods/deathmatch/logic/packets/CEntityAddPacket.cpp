@@ -887,8 +887,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
                         if (pClothing)
                         {
-                            unsigned char ucTextureLength = strlen(pClothing->szTexture);
-                            unsigned char ucModelLength = strlen(pClothing->szModel);
+                            unsigned char ucTextureLength = static_cast<uchar>(strlen(pClothing->szTexture));
+                            unsigned char ucModelLength = static_cast<uchar>(strlen(pClothing->szModel));
 
                             BitStream.Write(ucTextureLength);
                             BitStream.Write(pClothing->szTexture, ucTextureLength);
@@ -1050,6 +1050,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write((short)vecVertex.fY);
                         BitStream.Write(vecVertex.fZ);
                     }
+                    if (BitStream.Version() >= 0x06C)
+                        BitStream.WriteBit(pWater->IsWaterShallow());
                     break;
                 }
 

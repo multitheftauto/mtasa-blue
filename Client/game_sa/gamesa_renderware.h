@@ -6,12 +6,11 @@
  *  PURPOSE:     RenderWare interface mappings to Grand Theft Auto: San Andreas
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *  RenderWare is © Criterion Software
+ *  RenderWare is Â© Criterion Software
  *
  *****************************************************************************/
 
-#ifndef __GAMESA_RENDERWARE
-#define __GAMESA_RENDERWARE
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -30,7 +29,7 @@ class CColModelSAInterface;
 #define RpSetFrame(__c,__f)        ((((RwObject *)(__c))->parent) = (void *)(__f))
 
 /* RenderWare function defines */
-typedef RpAtomic*(__cdecl* RpAtomicCreate_t)(void);
+typedef RpAtomic*(__cdecl* RpAtomicCreate_t)();
 typedef RpAtomic*(__cdecl* RpAtomicClone_t)(RpAtomic* atomic);
 typedef int(__cdecl* RpAtomicDestroy_t)(RpAtomic* atomic);
 typedef RpAtomic*(__cdecl* RpAtomicSetGeometry_t)(RpAtomic* atomic, RpGeometry* geometry, unsigned int flags);
@@ -44,7 +43,8 @@ typedef RwFrame*(__cdecl* RwFrameRemoveChild_t)(RwFrame* child);
 typedef RwFrame*(__cdecl* RwFrameForAllObjects_t)(RwFrame* frame, void* callback, void* data);
 typedef RwFrame*(__cdecl* RwFrameTranslate_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
 typedef RwFrame*(__cdecl* RwFrameScale_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
-typedef RwFrame*(__cdecl* RwFrameCreate_t)(void);
+typedef RwFrame*(__cdecl* RwFrameCreate_t)();
+typedef int(__cdecl* RwFrameDestroy_t)(RwFrame* frame);
 typedef RwFrame*(__cdecl* RwFrameSetIdentity_t)(RwFrame* frame);
 typedef RpGeometry*(__cdecl* RpGeometryCreate_t)(int numverts, int numtriangles, unsigned int format);
 typedef const RpGeometry*(__cdecl* RpGeometryTriangleSetVertexIndices_t)(const RpGeometry* geo, RpTriangle* tri, unsigned short v1, unsigned short v2,
@@ -56,20 +56,20 @@ typedef RpGeometry*(__cdecl* RpGeometryTriangleSetMaterial_t)(RpGeometry* geo, R
 typedef int(__cdecl* RpGeometryDestroy_t)(RpGeometry* geo);
 typedef void*(__cdecl* RwIm3DTransform_t)(RwVertex* pVerts, unsigned int numVerts, RwMatrix* ltm, unsigned int flags);
 typedef int(__cdecl* RwIm3DRenderIndexedPrimitive_t)(RwPrimitiveType primType, unsigned short* indices, int numIndices);
-typedef int(__cdecl* RwIm3DEnd_t)(void);
+typedef int(__cdecl* RwIm3DEnd_t)();
 typedef RpLight*(__cdecl* RpLightCreate_t)(int type);
 typedef RpLight*(__cdecl* RpLightSetRadius_t)(RpLight* light, float radius);
 typedef RpLight*(__cdecl* RpLightSetColor_t)(RpLight* light, const RwColorFloat* color);
-typedef RwMatrix*(__cdecl* RwMatrixCreate_t)(void);
+typedef RwMatrix*(__cdecl* RwMatrixCreate_t)();
 typedef RwMatrix*(__cdecl* RwMatrixInvert_t)(RwMatrix* dst, const RwMatrix* src);
 typedef RwMatrix*(__cdecl* RwMatrixTranslate_t)(RwMatrix* matrix, const RwV3d* translation, RwTransformOrder order);
 typedef RwMatrix*(__cdecl* RwMatrixScale_t)(RwMatrix* matrix, const RwV3d* translation, RwTransformOrder order);
-typedef RpMaterial*(__cdecl* RpMaterialCreate_t)(void);
+typedef RpMaterial*(__cdecl* RpMaterialCreate_t)();
 typedef int(__cdecl* RpMaterialDestroy_t)(RpMaterial* mat);
 typedef RwTexDictionary*(__cdecl* RwTexDictionarySetCurrent_t)(RwTexDictionary* dict);
 typedef const RwTexDictionary*(__cdecl* RwTexDictionaryForAllTextures_t)(const RwTexDictionary* dict, void* callback, void* data);
 typedef RwTexture*(__cdecl* RwTexDictionaryAddTexture_t)(RwTexDictionary* dict, RwTexture* texture);
-typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)(void);
+typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
 typedef void(__cdecl* RpPrtStdGlobalDataSetStreamEmbedded_t)(void* value);
 typedef RpWorld*(__cdecl* RpWorldAddAtomic_t)(RpWorld* world, RpAtomic* atomic);
@@ -150,6 +150,7 @@ RWFUNC(RpGeometryUnlock_t RpGeometryUnlock, (RpGeometryUnlock_t)0xDEAD)
 RWFUNC(RpGeometryLock_t RpGeometryLock, (RpGeometryLock_t)0xDEAD)
 RWFUNC(RpAtomicCreate_t RpAtomicCreate, (RpAtomicCreate_t)0xDEAD)
 RWFUNC(RwFrameCreate_t RwFrameCreate, (RwFrameCreate_t)0xDEAD)
+RWFUNC(RwFrameDestroy_t RwFrameDestroy, (RwFrameDestroy_t)0xDEAD)
 RWFUNC(RpGeometryTransform_t RpGeometryTransform, (RpGeometryTransform_t)0xDEAD)
 RWFUNC(RwFrameSetIdentity_t RwFrameSetIdentity, (RwFrameSetIdentity_t)0xDEAD)
 RWFUNC(RwMatrixCreate_t RwMatrixCreate, (RwMatrixCreate_t)0xDEAD)
@@ -253,5 +254,3 @@ inline RwFrame* RwFrameFindFrame(RwFrame* parent, const char* name)
     }
     return NULL;
 }
-
-#endif

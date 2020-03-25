@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector4D_H
-#define __CVector4D_H
+#pragma once
 
 #include <cmath>
 #include "CVector.h"
@@ -21,7 +20,7 @@
 class CVector4D
 {
 public:
-    CVector4D(void)
+    CVector4D()
     {
         fX = 0;
         fY = 0;
@@ -58,9 +57,9 @@ public:
 
     float Length() const { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
 
-    float LengthSquared(void) const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
+    float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
 
-    void Normalize(void)
+    void Normalize()
     {
         float fLength = Length();
         if (fLength > 0.0f)
@@ -149,7 +148,7 @@ public:
         fX /= vecRight.fX;
         fY /= vecRight.fY;
         fZ /= vecRight.fZ;
-        fW /= vecRight.fZ;
+        fW /= vecRight.fW;
     }
 
     bool operator==(const CVector4D& param) const
@@ -169,5 +168,3 @@ public:
     float fZ;
     float fW;
 };
-
-#endif

@@ -34,7 +34,7 @@ class CLuaManager
 public:
     CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager, CBlipManager* pBlipManager,
                 CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents);
-    ~CLuaManager(void);
+    ~CLuaManager();
 
     CLuaMain*  CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP);
     bool       RemoveVirtualMachine(CLuaMain* vm);
@@ -43,14 +43,14 @@ public:
     void       OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void       OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
-    CLuaModuleManager* GetLuaModuleManager(void) const { return m_pLuaModuleManager; };
+    CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; };
 
-    list<CLuaMain*>::const_iterator IterBegin(void) { return m_virtualMachines.begin(); };
-    list<CLuaMain*>::const_iterator IterEnd(void) { return m_virtualMachines.end(); };
+    list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
+    list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void LoadCFunctions(void);
+    void LoadCFunctions();
 
 private:
     CBlipManager*              m_pBlipManager;

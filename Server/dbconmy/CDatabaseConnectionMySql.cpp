@@ -27,23 +27,23 @@ public:
     ZERO_ON_NEW
     CDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword,
                              const SString& strOptions);
-    virtual ~CDatabaseConnectionMySql(void);
+    virtual ~CDatabaseConnectionMySql();
 
     // CDatabaseConnection
-    virtual bool           IsValid(void);
-    virtual const SString& GetLastErrorMessage(void);
-    virtual uint           GetLastErrorCode(void);
-    virtual void           AddRef(void);
-    virtual void           Release(void);
+    virtual bool           IsValid();
+    virtual const SString& GetLastErrorMessage();
+    virtual uint           GetLastErrorCode();
+    virtual void           AddRef();
+    virtual void           Release();
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
-    virtual void           Flush(void);
-    virtual int            GetShareCount(void) { return m_iRefCount; }
+    virtual void           Flush();
+    virtual int            GetShareCount() { return m_iRefCount; }
 
     // CDatabaseConnectionMySql
     void SetLastError(uint uiCode, const SString& strMessage);
     bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
-    void BeginAutomaticTransaction(void);
-    void EndAutomaticTransaction(void);
+    void BeginAutomaticTransaction();
+    void EndAutomaticTransaction();
     int  ConvertToSqliteType(enum_field_types type);
 
     int            m_iRefCount;
@@ -105,7 +105,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     m_handle = mysql_init(NULL);
     if (m_handle)
     {
-        my_bool reconnect = m_bAutomaticReconnect;
+        bool reconnect = m_bAutomaticReconnect;
         mysql_options(m_handle, MYSQL_OPT_RECONNECT, &reconnect);
         if (!strCharset.empty())
             mysql_options(m_handle, MYSQL_SET_CHARSET_NAME, strCharset);
@@ -128,7 +128,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseConnectionMySql::~CDatabaseConnectionMySql(void)
+CDatabaseConnectionMySql::~CDatabaseConnectionMySql()
 {
     Flush();
 
@@ -149,7 +149,7 @@ CDatabaseConnectionMySql::~CDatabaseConnectionMySql(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::AddRef(void)
+void CDatabaseConnectionMySql::AddRef()
 {
     m_iRefCount++;
 }
@@ -161,7 +161,7 @@ void CDatabaseConnectionMySql::AddRef(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::Release(void)
+void CDatabaseConnectionMySql::Release()
 {
     if (--m_iRefCount > 0)
     {
@@ -180,7 +180,7 @@ void CDatabaseConnectionMySql::Release(void)
 // Returns false if connection created all wrong
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionMySql::IsValid(void)
+bool CDatabaseConnectionMySql::IsValid()
 {
     return m_bOpened;
 }
@@ -192,7 +192,7 @@ bool CDatabaseConnectionMySql::IsValid(void)
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-const SString& CDatabaseConnectionMySql::GetLastErrorMessage(void)
+const SString& CDatabaseConnectionMySql::GetLastErrorMessage()
 {
     return m_strLastErrorMessage;
 }
@@ -204,7 +204,7 @@ const SString& CDatabaseConnectionMySql::GetLastErrorMessage(void)
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionMySql::GetLastErrorCode(void)
+uint CDatabaseConnectionMySql::GetLastErrorCode()
 {
     return m_uiLastErrorCode;
 }
@@ -355,7 +355,7 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::BeginAutomaticTransaction(void)
+void CDatabaseConnectionMySql::BeginAutomaticTransaction()
 {
     if (m_bInAutomaticTransaction)
     {
@@ -379,7 +379,7 @@ void CDatabaseConnectionMySql::BeginAutomaticTransaction(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::EndAutomaticTransaction(void)
+void CDatabaseConnectionMySql::EndAutomaticTransaction()
 {
     if (m_bInAutomaticTransaction)
     {
@@ -396,7 +396,7 @@ void CDatabaseConnectionMySql::EndAutomaticTransaction(void)
 // Flush caches
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::Flush(void)
+void CDatabaseConnectionMySql::Flush()
 {
     EndAutomaticTransaction();
 }

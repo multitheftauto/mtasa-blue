@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CPlayerRPCs_H
-#define __CPlayerRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CPlayerRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetPlayerMoney);
     DECLARE_RPC(ShowPlayerHudComponent);
@@ -29,5 +28,3 @@ public:
     DECLARE_ELEMENT_RPC(SetPlayerTeam);
     DECLARE_RPC(TakePlayerScreenShot);
 };
-
-#endif

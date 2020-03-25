@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTGROUPS_H
-#define __CCLIENTGROUPS_H
+#pragma once
 
 #include "CClientDummy.h"
 #include "CClientEntity.h"
@@ -20,10 +19,10 @@ class CClientGroups
     friend class CClientDummy;
 
 public:
-    CClientGroups(void) { m_bDontRemoveFromList = false; };
-    ~CClientGroups(void) { DeleteAll(); };
+    CClientGroups() { m_bDontRemoveFromList = false; };
+    ~CClientGroups() { DeleteAll(); };
 
-    void DeleteAll(void);
+    void DeleteAll();
 
 private:
     void AddToList(CClientDummy* pDummy) { m_List.push_back(pDummy); };
@@ -32,5 +31,3 @@ private:
     std::list<CClientDummy*> m_List;
     bool                     m_bDontRemoveFromList;
 };
-
-#endif

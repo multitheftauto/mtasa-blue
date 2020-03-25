@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLEINTERFACE_H
-#define __CCONSOLEINTERFACE_H
+#pragma once
 
 class CConsoleInterface
 {
@@ -19,17 +18,15 @@ public:
     virtual void Print(const char* szText) = 0;
     virtual void Printf(const char* szFormat, ...) = 0;
 
-    virtual void Clear(void) = 0;
+    virtual void Clear() = 0;
 
-    virtual bool IsEnabled(void) = 0;
+    virtual bool IsEnabled() = 0;
     virtual void SetEnabled(bool bEnabled) = 0;
 
-    virtual bool IsVisible(void) = 0;
+    virtual bool IsVisible() = 0;
     virtual void SetVisible(bool bVisible) = 0;
-    virtual void Show(void) = 0;
-    virtual void Hide(void) = 0;
-    virtual bool IsInputActive(void) = 0;
-    virtual void ActivateInput(void) = 0;
+    virtual void Show() = 0;
+    virtual void Hide() = 0;
+    virtual bool IsInputActive() = 0;
+    virtual void ActivateInput() = 0;
 };
-
-#endif

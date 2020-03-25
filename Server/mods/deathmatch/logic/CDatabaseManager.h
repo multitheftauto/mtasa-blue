@@ -75,7 +75,7 @@ typedef void (*PFN_DBRESULT)(CDbJobData* pJobData, void* pContext);
 class CDbOptionsMap : public CArgMap
 {
 public:
-    CDbOptionsMap(void) : CArgMap("=", ";") {}
+    CDbOptionsMap() : CArgMap("=", ";") {}
 };
 
 //
@@ -86,15 +86,15 @@ class CDbJobData
 public:
     ZERO_ON_NEW
 
-    CDbJobData(void);
-    ~CDbJobData(void);
-    SDbJobId           GetId(void) { return id; }
+    CDbJobData();
+    ~CDbJobData();
+    SDbJobId           GetId() { return id; }
     bool               SetCallback(PFN_DBRESULT pfnDbResult, void* pContext);
-    bool               HasCallback(void);
-    void               ProcessCallback(void);
+    bool               HasCallback();
+    void               ProcessCallback();
     void               SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
-    CDatabaseJobQueue* GetQueue(void) { return command.pJobQueue; }
-    SString            GetCommandStringForLog(void);
+    CDatabaseJobQueue* GetQueue() { return command.pJobQueue; }
+    SString            GetCommandStringForLog();
 
     EJobStageType stage;
     SDbJobId      id;
@@ -143,9 +143,9 @@ public:
 class CDatabaseManager
 {
 public:
-    virtual ~CDatabaseManager(void) {}
+    virtual ~CDatabaseManager() {}
 
-    virtual void              DoPulse(void) = 0;
+    virtual void              DoPulse() = 0;
     virtual SConnectionHandle Connect(const SString& strType, const SString& strHost, const SString& strUsername = "", const SString& strPassword = "",
                                       const SString& strOptions = "") = 0;
     virtual bool              Disconnect(SConnectionHandle hConnection) = 0;
@@ -158,8 +158,8 @@ public:
     virtual bool              QueryPoll(CDbJobData* pJobData, uint ulTimeout) = 0;
     virtual bool              QueryFree(CDbJobData* pJobData) = 0;
     virtual CDbJobData*       GetQueryFromId(SDbJobId id) = 0;
-    virtual const SString&    GetLastErrorMessage(void) = 0;
-    virtual bool              IsLastErrorSuppressed(void) = 0;
+    virtual const SString&    GetLastErrorMessage() = 0;
+    virtual bool              IsLastErrorSuppressed() = 0;
     virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ...) = 0;
     virtual bool              QueryWithCallback(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery,
                                                 CLuaArguments* pArgs = nullptr) = 0;
@@ -167,7 +167,7 @@ public:
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename) = 0;
 };
 
-CDatabaseManager* NewDatabaseManager(void);
+CDatabaseManager* NewDatabaseManager();
 
 ///////////////////////////////////////////////////////////////
 //
@@ -186,14 +186,16 @@ public:
         SetTypeName("db-connection");
     }
 
-    virtual ~CDatabaseConnectionElement(void) {}
+    virtual ~CDatabaseConnectionElement() {}
 
     // CElement
-    virtual void Unlink(void) { g_pGame->GetDatabaseManager()->Disconnect(m_Connection); }
-    virtual bool ReadSpecialData(void) { return false; }
+    virtual void Unlink() { g_pGame->GetDatabaseManager()->Disconnect(m_Connection); }
 
     // CDatabaseConnectionElement
-    SConnectionHandle GetConnectionHandle(void) { return m_Connection; }
+    SConnectionHandle GetConnectionHandle() { return m_Connection; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override { return false; }
 
 protected:
     SConnectionHandle m_Connection;

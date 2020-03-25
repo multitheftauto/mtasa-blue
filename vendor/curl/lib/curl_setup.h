@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -27,6 +27,14 @@
 #endif
 
 /*
+ * Disable Visual Studio warnings:
+ * 4127 "conditional expression is constant"
+ */
+#ifdef _MSC_VER
+#pragma warning(disable:4127)
+#endif
+
+/*
  * Define WIN32 when build target is Win32 API
  */
 
@@ -43,6 +51,9 @@
  */
 #  ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN
+#  endif
+#  ifndef NOGDI
+#    define NOGDI
 #  endif
 #endif
 
@@ -93,16 +104,8 @@
 #  include "config-vxworks.h"
 #endif
 
-#ifdef __linux__
-#  include "config-linux.h"
-#endif
-
-#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-#  include "config-linux.h"
-#endif
-
-#ifdef __APPLE__ && __MACH__
-#  include "config-osx.h"
+#ifdef __PLAN9__
+#  include "config-plan9.h"
 #endif
 
 #endif /* HAVE_CONFIG_H */
@@ -229,7 +232,7 @@
 
 /*
  * Use getaddrinfo to resolve the IPv4 address literal. If the current network
- * interface doesn’t support IPv4, but supports IPv6, NAT64, and DNS64,
+ * interface doesn't support IPv4, but supports IPv6, NAT64, and DNS64,
  * performing this task will result in a synthesized IPv6 address.
  */
 #ifdef  __APPLE__
@@ -254,6 +257,7 @@
 #  if defined(_UNICODE) && !defined(UNICODE)
 #    define UNICODE
 #  endif
+#  include <winerror.h>
 #  include <windows.h>
 #  ifdef HAVE_WINSOCK2_H
 #    include <winsock2.h>
@@ -318,11 +322,12 @@
 #endif
 
 #ifdef __AMIGA__
-#  ifndef __ixemul__
-#    include <exec/types.h>
-#    include <exec/execbase.h>
-#    include <proto/exec.h>
-#    include <proto/dos.h>
+#  include <exec/types.h>
+#  include <exec/execbase.h>
+#  include <proto/exec.h>
+#  include <proto/dos.h>
+#  ifdef HAVE_PROTO_BSDSOCKET_H
+#    include <proto/bsdsocket.h> /* ensure bsdsocket.library use */
 #    define select(a,b,c,d,e) WaitSelect(a,b,c,d,e,0)
 #  endif
 #endif
@@ -459,6 +464,15 @@
 #  endif
 #endif
 
+#ifndef SIZE_T_MAX
+/* some limits.h headers have this defined, some don't */
+#if defined(SIZEOF_SIZE_T) && (SIZEOF_SIZE_T > 4)
+#define SIZE_T_MAX 18446744073709551615U
+#else
+#define SIZE_T_MAX 4294967295U
+#endif
+#endif
+
 /*
  * Arg 2 type for gethostname in case it hasn't been defined in config file.
  */
@@ -480,7 +494,6 @@
 #ifdef WIN32
 
 #  define DIR_CHAR      "\\"
-#  define DOT_CHAR      "_"
 
 #else /* WIN32 */
 
@@ -506,14 +519,6 @@
 #  endif
 
 #  define DIR_CHAR      "/"
-#  ifndef DOT_CHAR
-#    define DOT_CHAR      "."
-#  endif
-
-#  ifdef MSDOS
-#    undef DOT_CHAR
-#    define DOT_CHAR      "_"
-#  endif
 
 #  ifndef fileno /* sunos 4 have this as a macro! */
      int fileno(FILE *stream);
@@ -566,6 +571,12 @@
  * Mutually exclusive CURLRES_* definitions.
  */
 
+#if defined(ENABLE_IPV6) && defined(HAVE_GETADDRINFO)
+#  define CURLRES_IPV6
+#else
+#  define CURLRES_IPV4
+#endif
+
 #ifdef USE_ARES
 #  define CURLRES_ASYNCH
 #  define CURLRES_ARES
@@ -578,12 +589,6 @@
 #  define CURLRES_THREADED
 #else
 #  define CURLRES_SYNCH
-#endif
-
-#ifdef ENABLE_IPV6
-#  define CURLRES_IPV6
-#else
-#  define CURLRES_IPV4
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -645,9 +650,10 @@ int netware_init(void);
 #define LIBIDN_REQUIRED_VERSION "0.4.1"
 
 #if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_NSS) || \
-    defined(USE_POLARSSL) || defined(USE_AXTLS) || defined(USE_MBEDTLS) || \
-    defined(USE_CYASSL) || defined(USE_SCHANNEL) || \
-    defined(USE_DARWINSSL) || defined(USE_GSKIT)
+    defined(USE_MBEDTLS) || \
+    defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
+    defined(USE_SECTRANSP) || defined(USE_GSKIT) || defined(USE_MESALINK) || \
+    defined(USE_BEARSSL)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
@@ -666,7 +672,7 @@ int netware_init(void);
 /* Single point where USE_NTLM definition might be defined */
 #if !defined(CURL_DISABLE_NTLM) && !defined(CURL_DISABLE_CRYPTO_AUTH)
 #if defined(USE_OPENSSL) || defined(USE_WINDOWS_SSPI) || \
-    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_DARWINSSL) || \
+    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_SECTRANSP) || \
     defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) || \
     defined(USE_MBEDTLS)
 
@@ -682,6 +688,10 @@ int netware_init(void);
 
 #ifdef CURL_WANTS_CA_BUNDLE_ENV
 #error "No longer supported. Set CURLOPT_CAINFO at runtime instead."
+#endif
+
+#if defined(USE_LIBSSH2) || defined(USE_LIBSSH) || defined(USE_WOLFSSH)
+#define USE_SSH
 #endif
 
 /*
@@ -712,7 +722,7 @@ int netware_init(void);
  */
 
 #ifndef Curl_nop_stmt
-#  define Curl_nop_stmt do { } WHILE_FALSE
+#  define Curl_nop_stmt do { } while(0)
 #endif
 
 /*
@@ -797,5 +807,32 @@ endings either CRLF or LF so 't' is appropriate.
 #    define CURL_WINDOWS_APP
 #  endif
 # endif
+
+/* for systems that don't detect this in configure, use a sensible default */
+#ifndef CURL_SA_FAMILY_T
+#define CURL_SA_FAMILY_T unsigned short
+#endif
+
+/* Some convenience macros to get the larger/smaller value out of two given.
+   We prefix with CURL to prevent name collisions. */
+#define CURLMAX(x,y) ((x)>(y)?(x):(y))
+#define CURLMIN(x,y) ((x)<(y)?(x):(y))
+
+/* Some versions of the Android SDK is missing the declaration */
+#if defined(HAVE_GETPWUID_R) && defined(HAVE_DECL_GETPWUID_R_MISSING)
+struct passwd;
+int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
+               size_t buflen, struct passwd **result);
+#endif
+
+#ifdef DEBUGBUILD
+#define UNITTEST
+#else
+#define UNITTEST static
+#endif
+
+#if defined(USE_NGTCP2) || defined(USE_QUICHE)
+#define ENABLE_QUIC
+#endif
 
 #endif /* HEADER_CURL_SETUP_H */

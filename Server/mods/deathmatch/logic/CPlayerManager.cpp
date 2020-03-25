@@ -12,19 +12,19 @@
 #include "StdInc.h"
 #include "net/SimHeaders.h"
 
-CPlayerManager::CPlayerManager(void)
+CPlayerManager::CPlayerManager()
 {
     // Init
     m_pScriptDebugging = NULL;
     m_ZombieCheckTimer.SetUseModuleTickCount(true);
 }
 
-CPlayerManager::~CPlayerManager(void)
+CPlayerManager::~CPlayerManager()
 {
     DeleteAll();
 }
 
-void CPlayerManager::DoPulse(void)
+void CPlayerManager::DoPulse()
 {
     PulseZombieCheck();
 
@@ -35,7 +35,7 @@ void CPlayerManager::DoPulse(void)
     }
 }
 
-void CPlayerManager::PulseZombieCheck(void)
+void CPlayerManager::PulseZombieCheck()
 {
     // Only check once a second
     if (m_ZombieCheckTimer.Get() < 1000)
@@ -82,20 +82,10 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     }
 
     // Create the new player
-    CPlayer* pPlayer = new CPlayer(this, m_pScriptDebugging, PlayerSocket);
-
-    // Invalid id?
-    if (pPlayer->GetID() == INVALID_ELEMENT_ID)
-    {
-        delete pPlayer;
-        return NULL;
-    }
-
-    // Return the created player
-    return pPlayer;
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
 }
 
-unsigned int CPlayerManager::CountJoined(void)
+unsigned int CPlayerManager::CountJoined()
 {
     // Count each ingame player
     unsigned int                   uiCount = 0;
@@ -145,7 +135,7 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive)
     return NULL;
 }
 
-void CPlayerManager::DeleteAll(void)
+void CPlayerManager::DeleteAll()
 {
     // Delete all the items in the list
     while (!m_Players.empty())
@@ -319,7 +309,7 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
             (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
 }
 
-void CPlayerManager::ResetAll(void)
+void CPlayerManager::ResetAll()
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

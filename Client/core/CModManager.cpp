@@ -19,7 +19,7 @@ using SharedUtil::CalcMTASAPath;
 template <>
 CModManager* CSingleton<CModManager>::m_pSingleton = NULL;
 
-CModManager::CModManager(void)
+CModManager::CModManager()
 {
     // Init
     m_hClientDLL = NULL;
@@ -33,7 +33,7 @@ CModManager::CModManager(void)
     InitializeModList(CalcMTASAPath("mods\\"));
 }
 
-CModManager::~CModManager(void)
+CModManager::~CModManager()
 {
     // Unload the current loaded mod (if loaded)
     Unload();
@@ -66,13 +66,13 @@ void CModManager::RequestLoadDefault(const char* szArguments)
     RequestLoad(m_strDefaultModName.c_str(), szArguments);
 }
 
-void CModManager::RequestUnload(void)
+void CModManager::RequestUnload()
 {
     RequestLoad(NULL, NULL);
     CCore::GetSingletonPtr()->OnModUnload();
 }
 
-void CModManager::ClearRequest(void)
+void CModManager::ClearRequest()
 {
     // Free the old mod name
     m_strRequestedMod = "";
@@ -84,7 +84,7 @@ void CModManager::ClearRequest(void)
     m_bUnloadRequested = false;
 }
 
-bool CModManager::IsLoaded(void)
+bool CModManager::IsLoaded()
 {
     return (m_hClientDLL != NULL);
 }
@@ -135,13 +135,14 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     }
 
     // Get the address of InitClient
-    typedef CClientBase*(__cdecl pfnClientInitializer)(void); /* FIXME: Should probably not be here */
+    typedef CClientBase*(__cdecl pfnClientInitializer)(); /* FIXME: Should probably not be here */
 
     pfnClientInitializer* pClientInitializer = reinterpret_cast<pfnClientInitializer*>(GetProcAddress(m_hClientDLL, "InitClient"));
     if (pClientInitializer == NULL)
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
+        m_hClientDLL = nullptr;
         return NULL;
     }
 
@@ -153,6 +154,8 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unable to init, bad version?)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
+        m_pClientBase = nullptr;
+        m_hClientDLL = nullptr;
         return NULL;
     }
 
@@ -169,7 +172,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     return m_pClientBase;
 }
 
-void CModManager::Unload(void)
+void CModManager::Unload()
 {
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
 
@@ -232,7 +235,7 @@ void CModManager::Unload(void)
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(true);
 }
 
-void CModManager::DoPulsePreFrame(void)
+void CModManager::DoPulsePreFrame()
 {
     if (m_pClientBase)
     {
@@ -248,7 +251,7 @@ void CModManager::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     }
 }
 
-void CModManager::DoPulsePostFrame(void)
+void CModManager::DoPulsePostFrame()
 {
     // Load/unload requested?
     if (m_bUnloadRequested)
@@ -299,12 +302,12 @@ void CModManager::DoPulsePostFrame(void)
     }
 }
 
-CClientBase* CModManager::GetCurrentMod(void)
+CClientBase* CModManager::GetCurrentMod()
 {
     return m_pClientBase;
 }
 
-void CModManager::RefreshMods(void)
+void CModManager::RefreshMods()
 {
     // Clear the list, and load it again
     Clear();
@@ -347,7 +350,7 @@ void CModManager::InitializeModList(const char* szModFolderPath)
     filePathTranslator.UnSetCurrentWorkingDirectory();
 }
 
-void CModManager::Clear(void)
+void CModManager::Clear()
 {
     // Clear the list
     m_ModDLLFiles.clear();

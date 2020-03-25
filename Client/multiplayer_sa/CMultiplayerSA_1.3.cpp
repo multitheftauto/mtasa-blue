@@ -141,13 +141,13 @@ void HOOK_CBoat_ApplyDamage();
 void HOOK_CProjectile_FixTearGasCrash();
 void HOOK_CProjectile_FixExplosionLocation();
 
-void CMultiplayerSA::Init_13(void)
+void CMultiplayerSA::Init_13()
 {
     InitHooks_13();
     InitMemoryCopies_13();
 }
 
-void CMultiplayerSA::InitHooks_13(void)
+void CMultiplayerSA::InitHooks_13()
 {
     // HookInstalls go here
     HookInstall(HOOKPOS_CEventHitByWaterCannon, (DWORD)HOOK_CEventHitByWaterCannon, 9);
@@ -205,10 +205,13 @@ void CMultiplayerSA::InitHooks_13(void)
     InitHooks_ClothesCache();
     InitHooks_Files();
     InitHooks_Weapons();
+    InitHooks_Peds();
+    InitHooks_VehicleCollision();
+    InitHooks_Vehicles();
     InitHooks_Rendering();
 }
 
-void CMultiplayerSA::InitMemoryCopies_13(void)
+void CMultiplayerSA::InitMemoryCopies_13()
 {
     // Memory based fixes go here
     // MemSet ( (void*)0x6AB35A, 0x90, 12 ); // Ignore some retarded R* if statement that checks if the model is the buffalo and jumps the siren code even
@@ -290,7 +293,8 @@ void GetVehicleSirenType()
     if (pVehicleWithTheSiren)
     {
         // Grab the CVehicle
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Valid ? I see a pattern here!
         if (pVehicle)
         {
@@ -395,7 +399,8 @@ bool ProcessVehicleSirenPosition()
     if (pVehicleWithTheSiren)
     {
         // Grab our vehicle from the interface
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Valid - Wait this seems familiar
         if (pVehicle)
         {
@@ -769,7 +774,8 @@ bool TestVehicleForSiren()
     if (pVehicleWithTheSiren)
     {
         // Grab our vehicle
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Is it valid and it doesn't have a siren by default
         if (pVehicle)
         {
@@ -818,12 +824,16 @@ bool SirenCheckCameraPosition()
     // Default SA sirens we don't bother processing
     // if ( DoesVehicleHaveSiren ( ) == false )
     {
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        // Do we have sirens given by us and is the 360 flag set?
-        if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        if (pVehicle)
         {
-            // Do 360 code
-            return true;
+            // Do we have sirens given by us and is the 360 flag set?
+            if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
+            {
+                // Do 360 code
+                return true;
+            }
         }
     }
     // Only visible from the front
@@ -866,7 +876,8 @@ bool DisableVehicleSiren()
 {
     if (pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL)
     {
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         if (pVehicle && (pVehicle->IsSirenSilentEffectEnabled() || pVehicle->GetModelIndex() == 420 || pVehicle->GetModelIndex() == 438))
         {
             return true;
@@ -1316,7 +1327,8 @@ CVector             vecObjectScale;
 CObjectSAInterface* pCurrentObject;
 bool                CObject_GetScale()
 {
-    CObject* pObject = pGameInterface->GetPools()->GetObjectA((DWORD*)pCurrentObject);
+    SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObjectA((DWORD*)pCurrentObject);
+    CObject*                  pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
     if (pObject)
     {
         vecObjectScale = *pObject->GetScale();
@@ -1361,7 +1373,8 @@ void _declspec(naked) HOOK_CObject_PreRender()
 CPedSAInterface* pFallingPedInterface;
 bool             CWorld_Remove_FallenPedsCheck()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)pFallingPedInterface);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pFallingPedInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed && pPed->GetVehicle() != NULL)
     {
         // Disallow
@@ -1406,7 +1419,8 @@ void CMultiplayerSA::SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandle
 CVehicleSAInterface* pFallingVehicleInterface;
 bool                 CWorld_Remove_FallenVehiclesCheck()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pFallingVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pFallingVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle && m_pVehicleFellThroughMapHandler(pFallingVehicleInterface))
     {
         // Disallow
@@ -1461,7 +1475,7 @@ void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
     }
 }
 
-bool CMultiplayerSA::IsPedTargetingMarkerEnabled(void)
+bool CMultiplayerSA::IsPedTargetingMarkerEnabled()
 {
     uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
     return *(uint8*)dwFunc != 0xC3;
@@ -1575,7 +1589,8 @@ CPedSAInterface* pTyreSmokePed = NULL;
 
 bool IsPlayerPedLocal()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)pTyreSmokePed);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pTyreSmokePed);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);

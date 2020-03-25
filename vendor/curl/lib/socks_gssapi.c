@@ -5,8 +5,8 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+ * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2009, Markus Moeller, <markus_moeller@compuserve.com>
- * Copyright (C) 2012 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -151,8 +151,8 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
       return CURLE_OUT_OF_MEMORY;
     service.length = serviceptr_length +
       strlen(conn->socks_proxy.host.name) + 1;
-    snprintf(service.value, service.length + 1, "%s@%s",
-             serviceptr, conn->socks_proxy.host.name);
+    msnprintf(service.value, service.length + 1, "%s@%s",
+              serviceptr, conn->socks_proxy.host.name);
 
     gss_major_status = gss_import_name(&gss_minor_status, &service,
                                        GSS_C_NT_HOSTBASED_SERVICE, &server);
@@ -166,6 +166,8 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     gss_release_name(&gss_status, &server);
     return CURLE_COULDNT_CONNECT;
   }
+
+  (void)curlx_nonblock(sock, FALSE);
 
   /* As long as we need to keep sending some context info, and there's no  */
   /* errors, keep sending it...                                            */
@@ -512,6 +514,8 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
     memcpy(socksreq, gss_recv_token.value, gss_recv_token.length);
     gss_release_buffer(&gss_status, &gss_recv_token);
   }
+
+  (void)curlx_nonblock(sock, TRUE);
 
   infof(data, "SOCKS5 access with%s protection granted.\n",
         (socksreq[0] == 0)?"out GSS-API data":

@@ -15,7 +15,7 @@
 class CLuaHandlingDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // Set
     LUA_DECLARE(SetVehicleHandling);

@@ -25,7 +25,7 @@ CResourceConfigItem::CResourceConfigItem(CResource* resource, const char* szShor
     m_pXMLRootNode = NULL;
 }
 
-CResourceConfigItem::~CResourceConfigItem(void)
+CResourceConfigItem::~CResourceConfigItem()
 {
     if (m_pXMLFile)
     {
@@ -34,7 +34,7 @@ CResourceConfigItem::~CResourceConfigItem(void)
     }
 }
 
-bool CResourceConfigItem::Start(void)
+bool CResourceConfigItem::Start()
 {
     // Does the file even exist?
     if (FileExists(GetName()))
@@ -81,7 +81,7 @@ bool CResourceConfigItem::Start(void)
     return false;
 }
 
-bool CResourceConfigItem::Stop(void)
+bool CResourceConfigItem::Stop()
 {
     if (m_pXMLFile)
     {

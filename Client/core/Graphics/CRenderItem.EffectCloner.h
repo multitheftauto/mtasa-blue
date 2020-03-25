@@ -18,8 +18,8 @@ class CEffectCloner
 {
 public:
     CEffectCloner(CRenderItemManager* pManager);
-    void         DoPulse(void);
-    CEffectWrap* CreateD3DEffect(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
+    void         DoPulse();
+    CEffectWrap* CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
     void         ReleaseD3DEffect(CEffectWrap* pD3DEffect);
     void         MaybeTidyUp(bool bForceDrasticMeasures = false);
 

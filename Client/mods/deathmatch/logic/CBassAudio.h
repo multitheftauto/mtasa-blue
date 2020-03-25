@@ -48,15 +48,16 @@ public:
     ZERO_ON_NEW
     CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D);
     CBassAudio(void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D);
-    ~CBassAudio(void);
-    void Destroy(void);
+    ~CBassAudio();
+    void Destroy();
 
-    bool BeginLoadingMedia(void);
+    bool BeginLoadingMedia();
 
     void   SetPaused(bool bPaused);
-    void   SetPlayPosition(double dPosition);
-    double GetPlayPosition(void);
-    double GetLength(void);
+    bool   SetPlayPosition(double dPosition);
+    double GetPlayPosition();
+    double GetLength();
+    double GetBufferLength();
     void   SetVolume(float fVolume);
     void   SetPlaybackSpeed(float fSpeed);
     void   SetPosition(const CVector& vecPosition);
@@ -72,13 +73,13 @@ public:
         bReverse = m_bReversed;
     };
     void    SetReversed(bool bReversed) { m_bReversed = bReversed; };
-    bool    GetPanEnabled(void) { return m_bPan; };
+    bool    GetPanEnabled() { return m_bPan; };
     void    SetPanEnabled(bool bPan) { m_bPan = bPan; };
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
     SString GetMetaTags(const SString& strFormat);
-    uint    GetReachedEndCount(void);
-    bool    IsFreed(void);
-    float   GetPan(void);
+    uint    GetReachedEndCount();
+    bool    IsFreed();
+    float   GetPan();
     void    SetPan(float fPan);
 
     void   DoPulse(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
@@ -87,17 +88,17 @@ public:
     void   ParseShoutcastMeta(const SString& strMeta);
     float* GetFFTData(int iLength);
     float* GetWaveData(int iLength);
-    DWORD  GetLevelData(void);
-    float  GetSoundBPM(void);
+    DWORD  GetLevelData();
+    float  GetSoundBPM();
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
 protected:
-    HSTREAM     ConvertFileToMono(const SString& strPath);
-    static void PlayStreamIntern(void* arguments);
-    void        CompleteStreamConnect(HSTREAM pSound);
-    void        ApplyFxEffects(void);
-    void        ServiceVars(void);
-    void        SetFinishedCallbacks(void);
+    HSTREAM             ConvertFileToMono(const SString& strPath);
+    static DWORD WINAPI PlayStreamIntern(LPVOID argument);
+    void                CompleteStreamConnect(HSTREAM pSound);
+    void                ApplyFxEffects();
+    void                ServiceVars();
+    void                SetFinishedCallbacks();
 
     void Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
 

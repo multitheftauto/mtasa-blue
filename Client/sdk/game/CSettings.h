@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_SETTINGS
-#define __CGAME_SETTINGS
+#pragma once
 
 #if (!defined(RWFORCEENUMSIZEINT))
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
@@ -91,77 +90,81 @@ enum eRadarMode
 class CGameSettings
 {
 public:
-    virtual bool          IsWideScreenEnabled(void) = 0;
+    virtual bool          IsWideScreenEnabled() = 0;
     virtual void          SetWideScreenEnabled(bool bEnabled) = 0;
-    virtual unsigned int  GetNumVideoModes(void) = 0;
+    virtual unsigned int  GetNumVideoModes() = 0;
     virtual VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex) = 0;
-    virtual unsigned int  GetCurrentVideoMode(void) = 0;
+    virtual unsigned int  GetCurrentVideoMode() = 0;
     virtual void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart) = 0;
-    virtual unsigned int  GetNumAdapters(void) = 0;
-    virtual unsigned int  GetCurrentAdapter(void) = 0;
-    virtual bool          HasUnsafeResolutions(void) = 0;
+    virtual unsigned int  GetNumAdapters() = 0;
+    virtual unsigned int  GetCurrentAdapter() = 0;
+    virtual bool          HasUnsafeResolutions() = 0;
     virtual bool          IsUnsafeResolution(int iWidth, int iHeight) = 0;
     virtual void          SetAdapter(unsigned int uiAdapterIndex) = 0;
-    virtual unsigned char GetRadioVolume(void) = 0;
+    virtual unsigned char GetRadioVolume() = 0;
     virtual void          SetRadioVolume(unsigned char ucVolume) = 0;
-    virtual unsigned char GetSFXVolume(void) = 0;
+    virtual unsigned char GetSFXVolume() = 0;
     virtual void          SetSFXVolume(unsigned char ucVolume) = 0;
-    virtual unsigned int  GetUsertrackMode(void) = 0;
+    virtual unsigned int  GetUsertrackMode() = 0;
     virtual void          SetUsertrackMode(unsigned int uiMode) = 0;
-    virtual bool          IsUsertrackAutoScan(void) = 0;
+    virtual bool          IsUsertrackAutoScan() = 0;
     virtual void          SetUsertrackAutoScan(bool bEnable) = 0;
-    virtual bool          IsRadioEqualizerEnabled(void) = 0;
+    virtual bool          IsRadioEqualizerEnabled() = 0;
     virtual void          SetRadioEqualizerEnabled(bool bEnable) = 0;
-    virtual bool          IsRadioAutotuneEnabled(void) = 0;
+    virtual bool          IsRadioAutotuneEnabled() = 0;
     virtual void          SetRadioAutotuneEnabled(bool bEnable) = 0;
 
-    virtual float GetDrawDistance(void) = 0;
+    virtual float GetDrawDistance() = 0;
     virtual void  SetDrawDistance(float fDrawDistance) = 0;
 
-    virtual unsigned int GetBrightness(void) = 0;
+    virtual unsigned int GetBrightness() = 0;
     virtual void         SetBrightness(unsigned int uiBrightness) = 0;
 
-    virtual unsigned int GetFXQuality(void) = 0;
+    virtual unsigned int GetFXQuality() = 0;
     virtual void         SetFXQuality(unsigned int fxQualityId) = 0;
 
-    virtual float GetMouseSensitivity(void) = 0;
+    virtual float GetMouseSensitivity() = 0;
     virtual void  SetMouseSensitivity(float fSensitivity) = 0;
 
-    virtual unsigned int GetAntiAliasing(void) = 0;
+    virtual unsigned int GetAntiAliasing() = 0;
     virtual void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart) = 0;
 
-    virtual bool IsMipMappingEnabled(void) = 0;
+    virtual bool IsMipMappingEnabled() = 0;
     virtual void SetMipMappingEnabled(bool bEnable) = 0;
 
-    virtual bool IsVolumetricShadowsEnabled(void) = 0;
+    virtual bool IsVolumetricShadowsEnabled() = 0;
     virtual void SetVolumetricShadowsEnabled(bool bEnable) = 0;
     virtual void SetVolumetricShadowsSuspended(bool bSuspended) = 0;
 
-    virtual float        GetAspectRatioValue(void) = 0;
-    virtual eAspectRatio GetAspectRatio(void) = 0;
+    virtual float        GetAspectRatioValue() = 0;
+    virtual eAspectRatio GetAspectRatio() = 0;
     virtual void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true) = 0;
 
-    virtual bool IsGrassEnabled(void) = 0;
+    virtual bool IsGrassEnabled() = 0;
     virtual void SetGrassEnabled(bool bEnable) = 0;
 
-    virtual eRadarMode GetRadarMode(void) = 0;
+    virtual eRadarMode GetRadarMode() = 0;
     virtual void       SetRadarMode(eRadarMode hudMode) = 0;
 
-    virtual void UpdateFieldOfViewFromSettings(void) = 0;
-    virtual void ResetFieldOfViewFromScript(void) = 0;
+    virtual void UpdateFieldOfViewFromSettings() = 0;
+    virtual void ResetFieldOfViewFromScript() = 0;
     virtual void SetFieldOfViewPlayer(float fAngle, bool bFromScript) = 0;
     virtual void SetFieldOfViewVehicle(float fAngle, bool bFromScript) = 0;
     virtual void SetFieldOfViewVehicleMax(float fAngle, bool bFromScript) = 0;
 
-    virtual float GetFieldOfViewPlayer(void) = 0;
-    virtual float GetFieldOfViewVehicle(void) = 0;
-    virtual float GetFieldOfViewVehicleMax(void) = 0;
+    virtual float GetFieldOfViewPlayer() = 0;
+    virtual float GetFieldOfViewVehicle() = 0;
+    virtual float GetFieldOfViewVehicleMax() = 0;
 
-    virtual void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance) = 0;
-    virtual void ResetVehiclesLODDistance(void) = 0;
+    virtual void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript) = 0;
+    virtual void ResetVehiclesLODDistance(bool bFromScript) = 0;
+    virtual void ResetVehiclesLODDistanceFromScript() = 0;
     virtual void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance) = 0;
 
-    virtual void Save(void) = 0;
-};
+    virtual void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript) = 0;
+    virtual void  ResetPedsLODDistance(bool bFromScript) = 0;
+    virtual void  ResetPedsLODDistanceFromScript() = 0;
+    virtual float GetPedsLODDistance() = 0;
 
-#endif
+    virtual void Save() = 0;
+};

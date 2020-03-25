@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CDOWNLOADABLERESOURCE_H
-#define CDOWNLOADABLERESOURCE_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -39,29 +38,30 @@ public:
 public:
     CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
                           CChecksum serverChecksum, bool bAutoDownload);
-    virtual ~CDownloadableResource(void);
+    virtual ~CDownloadableResource();
 
-    bool DoesClientAndServerChecksumMatch(void);
+    bool DoesClientAndServerChecksumMatch();
 
-    eResourceType GetResourceType(void) { return m_resourceType; };
-    const char*   GetName(void) { return m_strName; };
-    const char*   GetShortName(void) { return m_strNameShort; };
-    CResource*    GetResource(void) { return m_pResource; }
-    int           GetDownloadPriorityGroup(void);
-    uint          GetDownloadSize(void) { return m_uiDownloadSize; }
-    uint          GetHttpServerIndex(void) { return m_uiHttpServerIndex; }
+    eResourceType GetResourceType() { return m_resourceType; };
+    const char*   GetName() { return m_strName; };
+    const char*   GetShortName() { return m_strNameShort; };
+    CResource*    GetResource() { return m_pResource; }
+    int           GetDownloadPriorityGroup();
+    uint          GetDownloadSize() { return m_uiDownloadSize; }
+    uint          GetHttpServerIndex() { return m_uiHttpServerIndex; }
     void          SetHttpServerIndex(uint uiHttpServerIndex) { m_uiHttpServerIndex = uiHttpServerIndex; }
 
-    CChecksum GenerateClientChecksum(void);
-    CChecksum GetServerChecksum(void);
+    CChecksum GenerateClientChecksum();
+    CChecksum GenerateClientChecksum(CBuffer& outFileData);
+    CChecksum GetServerChecksum();
 
-    bool IsAutoDownload(void) { return m_bAutoDownload; };
-    void SetDownloaded(void) { m_bDownloaded = true; };
-    bool IsDownloaded(void) { return m_bDownloaded; };
+    bool IsAutoDownload() { return m_bAutoDownload; };
+    void SetDownloaded() { m_bDownloaded = true; };
+    bool IsDownloaded() { return m_bDownloaded; };
     void SetIsWaitingForDownload(bool bInDownloadQueue) { m_bInDownloadQueue = bInDownloadQueue; };
-    bool IsWaitingForDownload(void) { return m_bInDownloadQueue; };
+    bool IsWaitingForDownload() { return m_bInDownloadQueue; };
     void SetModifedByScript(bool bModifedByScript) { m_bModifedByScript = bModifedByScript; };
-    bool IsModifedByScript(void) { return m_bModifedByScript; };
+    bool IsModifedByScript() { return m_bModifedByScript; };
 
 protected:
     CResource*    m_pResource;
@@ -80,5 +80,3 @@ protected:
     uint m_uiHttpServerIndex;
     bool m_bModifedByScript;
 };
-
-#endif

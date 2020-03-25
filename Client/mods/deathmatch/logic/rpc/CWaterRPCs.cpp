@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CWaterRPCs.h"
 
-void CWaterRPCs::LoadFunctions(void)
+void CWaterRPCs::LoadFunctions()
 {
     AddHandler(SET_WORLD_WATER_LEVEL, SetWorldWaterLevel, "SetWorldWaterLevel");
     AddHandler(RESET_WORLD_WATER_LEVEL, ResetWorldWaterLevel, "ResetWorldWaterLevel");

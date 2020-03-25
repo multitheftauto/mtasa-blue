@@ -20,8 +20,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSINGLETON_H
-#define __CSINGLETON_H
+#pragma once
 
 template <typename T>
 class CSingleton
@@ -30,21 +29,19 @@ protected:
     static T* m_pSingleton;
 
 public:
-    CSingleton(void)
+    CSingleton()
     {
         assert(!m_pSingleton);
         m_pSingleton = static_cast<T*>(this);
     }
 
-    ~CSingleton(void) { m_pSingleton = 0; }
+    ~CSingleton() { m_pSingleton = 0; }
 
-    static T& GetSingleton(void)
+    static T& GetSingleton()
     {
         assert(m_pSingleton);
         return (*m_pSingleton);
     }
 
-    static T* GetSingletonPtr(void) { return m_pSingleton; }
+    static T* GetSingletonPtr() { return m_pSingleton; }
 };
-
-#endif

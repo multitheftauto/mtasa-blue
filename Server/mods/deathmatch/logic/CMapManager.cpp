@@ -37,7 +37,7 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
-    m_pRootElement = new CDummy(NULL, NULL, NULL);
+    m_pRootElement = new CDummy(nullptr, nullptr);
     m_pRootElement->SetTypeName("root");
 
     m_llLastRespawnTime = 0;
@@ -46,7 +46,7 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pBlendedWeather = new CBlendedWeather(m_pServerClock);
 }
 
-CMapManager::~CMapManager(void)
+CMapManager::~CMapManager()
 {
     // Delete the weather manager
     delete m_pBlendedWeather;
@@ -54,7 +54,7 @@ CMapManager::~CMapManager(void)
     delete m_pRootElement;
 }
 
-void CMapManager::DoPulse(void)
+void CMapManager::DoPulse()
 {
     // Do the respawning checks
     DoRespawning();
@@ -101,7 +101,7 @@ CElement* CMapManager::LoadMapData(CResource& Loader, CElement& Parent, CXMLNode
     return NULL;
 }
 
-void CMapManager::BroadcastMapInformation(void)
+void CMapManager::BroadcastMapInformation()
 {
     // Start an entity list packet
     CEntityAddPacket EntityPacket;
@@ -133,10 +133,9 @@ void CMapManager::BroadcastMapInformation(void)
     }
 
     // Add the vehicles to the packet
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        EntityPacket.Add(*iterVehicles);
+        EntityPacket.Add(vehicle);
     }
 
     // Add the teams to the packet
@@ -216,10 +215,9 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("Pickups");
 
     // Add the vehicles to the packet
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        EntityPacket.Add(*iterVehicles);
+        EntityPacket.Add(vehicle);
     }
 
     marker.Set("Vehicles");
@@ -277,17 +275,13 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("SendPerPlayerEntities");
 
     // Send the trailer attachments
-    CVehicle* pVehicle;
-    CVehicle* pTowedVehicle;
-    iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        pVehicle = *iterVehicles;
-        pTowedVehicle = pVehicle->GetTowedVehicle();
+        CVehicle* towedVehicle = vehicle->GetTowedVehicle();
 
-        if (pTowedVehicle)
+        if (towedVehicle)
         {
-            CVehicleTrailerPacket AttachPacket(pVehicle, pTowedVehicle, true);
+            CVehicleTrailerPacket AttachPacket(vehicle, towedVehicle, true);
             Player.Send(AttachPacket);
         }
     }
@@ -618,7 +612,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     Player.CallEvent("onPlayerSpawn", OnPlayerSpawnArguments);
 }
 
-void CMapManager::DoRespawning(void)
+void CMapManager::DoRespawning()
 {
     // Time to do the next search for respawnable things?
     if (SharedUtil::GetModuleTickCount64() >= m_llLastRespawnTime + 1000)
@@ -632,7 +626,7 @@ void CMapManager::DoRespawning(void)
     }
 }
 
-void CMapManager::DoPickupRespawning(void)
+void CMapManager::DoPickupRespawning()
 {
     // Grab the current time
     CTickCount currentTime = CTickCount::Now();
@@ -746,7 +740,7 @@ bool CMapManager::ParseVisibleToData(CPerPlayerEntity& Entity, char* szData)
     return bAnyReferences;
 }
 
-void CMapManager::DoVehicleRespawning(void)
+void CMapManager::DoVehicleRespawning()
 {
     CVehicleSpawnPacket VehicleSpawnPacket;
 
@@ -949,20 +943,19 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     return false;
 }
 
-void CMapManager::LinkupElements(void)
+void CMapManager::LinkupElements()
 {
     // * Link up all the attaching elements
-    list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();
-    for (; iterVehicles != m_pVehicleManager->IterEnd(); iterVehicles++)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* pVehicle = *iterVehicles;
+        const char* szAttachToID = vehicle->GetAttachToID();
 
-        const char* szAttachToID = pVehicle->GetAttachToID();
         if (szAttachToID[0])
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
+
             if (pElement)
-                pVehicle->AttachTo(pElement);
+                vehicle->AttachTo(pElement);
         }
     }
 

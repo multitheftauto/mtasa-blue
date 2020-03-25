@@ -14,7 +14,7 @@ char szUpgradeNameEmpty[] = "";
 
 struct SUpgradeName
 {
-    const char* szName;
+    const char* const szName;
 };
 
 static const SFixedArray<SUpgradeName, 17> UpgradeNames = {{{"Hood"},
@@ -572,7 +572,7 @@ bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade, bool bAddedLocally)
     return false;
 }
 
-void CVehicleUpgrades::AddAllUpgrades(void)
+void CVehicleUpgrades::AddAllUpgrades()
 {
     if (m_pVehicle)
     {
@@ -671,7 +671,7 @@ unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
     return 0;
 }
 
-void CVehicleUpgrades::ReAddAll(void)
+void CVehicleUpgrades::ReAddAll()
 {
     unsigned char ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)

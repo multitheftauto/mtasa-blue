@@ -11,13 +11,6 @@
 
 #include "StdInc.h"
 
-// These includes have to be fixed!
-#include "..\game_sa\CCameraSA.h"
-#include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CBuildingSA.h"
-#include "..\game_sa\CPedSA.h"
-#include "..\game_sa\common.h"
-
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
@@ -125,6 +118,9 @@ DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
 #define HOOKPOS_ApplyCarBlowHop                             0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
+#define HOOKPOS_CVehicle_ApplyBoatWaterResistance           0x6D2771
+DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
+
 #define HOOKPOS_CPhysical_ApplyGravity                      0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
@@ -148,8 +144,10 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
+#define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
+#define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
-#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
+#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation           0x4CE130
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
@@ -180,6 +178,8 @@ DWORD RETURN_VehColCB = 0x04C83AA;
 #define HOOKPOS_VehCol                                      0x06D6603
 DWORD RETURN_VehCol = 0x06D660C;
 
+#define HOOKPOS_Transmission_CalculateDriveAcceleration 0x6D05E0
+DWORD RETURN_Transmission_CalculateDriveAcceleration = 0x6D05E6;
 // Handling fix - driveType is per model
 #define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
 DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
@@ -240,15 +240,6 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 #define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
-#define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
-DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
-DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Bike               0x6B8EC6
-DWORD JMP_CEventVehicleDamageCollision_Bike_RETN = 0x6B8ECC;
-
 #define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb = 0x5A837F;
@@ -291,6 +282,9 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
+#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
+DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -328,6 +322,7 @@ float fWaterColorA = 0.0F;
 CStatsData  localStatsData;
 bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
+float       fDuckingHealthThreshold;
 
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
@@ -352,7 +347,6 @@ IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*    m_pProcessCollisionHandler = NULL;
-VehicleCollisionHandler*    m_pVehicleCollisionHandler = NULL;
 HeliKillHandler*            m_pHeliKillHandler = NULL;
 ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
@@ -362,96 +356,99 @@ DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
-void HOOK_FindPlayerCoors();
-void HOOK_FindPlayerCentreOfWorld();
-void HOOK_FindPlayerHeading();
-void HOOK_CStreaming_Update_Caller();
-void HOOK_CHud_Draw_Caller();
-void HOOK_CRunningScript_Process();
-void HOOK_CExplosion_AddExplosion();
-void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
-void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
-void HOOK_Trailer_BreakTowLink();
-void HOOK_CRadar__DrawRadarGangOverlay();
-void HOOK_CTaskComplexJump__CreateSubTask();
-void HOOK_FxManager_CreateFxSystem();
-void HOOK_FxManager_DestroyFxSystem();
-void HOOK_CCam_ProcessFixed();
-void HOOK_Render3DStuff();
-void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
-void HOOK_CPed_IsPlayer();
-void HOOK_CTrain_ProcessControl_Derail();
-void HOOK_CVehicle_SetupRender();
-void HOOK_CVehicle_ResetAfterRender();
-void HOOK_CObject_Render();
-void HOOK_EndWorldColors();
-void HOOK_CWorld_ProcessVerticalLineSectorList();
-void HOOK_ComputeDamageResponse_StartChoking();
-void HOOK_CollisionStreamRead();
-void HOOK_CPhysical_ApplyGravity();
-void HOOK_VehicleCamStart();
-void HOOK_VehicleCamTargetZTweak();
-void HOOK_VehicleCamLookDir1();
-void HOOK_VehicleCamLookDir2();
-void HOOK_VehicleCamHistory();
-void HOOK_VehicleCamUp();
-void HOOK_VehicleCamEnd();
-void HOOK_VehicleLookBehind();
-void HOOK_VehicleLookAside();
-void HOOK_OccupiedVehicleBurnCheck();
-void HOOK_UnoccupiedVehicleBurnCheck();
-void HOOK_ApplyCarBlowHop();
-void HOOK_CWorld_SetWorldOnFire();
-void HOOK_CTaskSimplePlayerOnFire_ProcessPed();
-void HOOK_CFire_ProcessFire();
-void HOOK_CExplosion_Update();
-void HOOK_CWeapon_FireAreaEffect();
-void HOOK_CGame_Process();
-void HOOK_Idle();
-void HOOK_RenderScene_Plants();
-void HOOK_RenderScene_end();
-void HOOK_CPlantMgr_Render();
-void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CAnimBlendAssoc_Hierarchy_Constructor();
-void HOOK_CAnimBlendAssoc_destructor();
-void HOOK_CAnimManager_AddAnimation();
-void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimBlendAssocGroup_CopyAnimation();
-void HOOK_CAnimManager_BlendAnimation_Hierarchy();
-void HOOK_CPed_GetWeaponSkill();
-void HOOK_CPed_AddGogglesModel();
-void HOOK_CPhysical_ProcessCollisionSectorList();
-void HOOK_CrashFix_Misc1();
-void HOOK_CrashFix_Misc2();
-void HOOK_CrashFix_Misc3();
-void HOOK_CrashFix_Misc4();
-void HOOK_CrashFix_Misc5();
-void HOOK_CrashFix_Misc6();
-void HOOK_CrashFix_Misc7();
-void HOOK_CrashFix_Misc8();
-void HOOK_CrashFix_Misc9();
-void HOOK_CrashFix_Misc10();
-void HOOK_CrashFix_Misc11();
-void HOOK_CrashFix_Misc12();
-void HOOK_CrashFix_Misc13();
-void HOOK_CrashFix_Misc14();
-void HOOK_FreezeFix_Misc15();
-void HOOK_CrashFix_Misc16();
-void HOOK_CrashFix_Misc17();
-void HOOK_CrashFix_Misc18();
-void HOOK_CrashFix_Misc19();
-void HOOK_CrashFix_Misc20();
-void HOOK_CrashFix_Misc21();
-void HOOK_CrashFix_Misc22();
-void HOOK_CrashFix_Misc23();
-void HOOK_CrashFix_Misc24();
-void HOOK_CheckAnimMatrix();
-void HOOK_VehColCB();
-void HOOK_VehCol();
-void HOOK_isVehDriveTypeNotRWD();
-void HOOK_isVehDriveTypeNotFWD();
-void HOOK_PreFxRender();
-void HOOK_PreHUDRender();
+HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
+void   HOOK_FindPlayerCoors();
+void   HOOK_FindPlayerCentreOfWorld();
+void   HOOK_FindPlayerHeading();
+void   HOOK_CStreaming_Update_Caller();
+void   HOOK_CHud_Draw_Caller();
+void   HOOK_CRunningScript_Process();
+void   HOOK_CExplosion_AddExplosion();
+void   HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
+void   HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
+void   HOOK_Trailer_BreakTowLink();
+void   HOOK_CRadar__DrawRadarGangOverlay();
+void   HOOK_CTaskComplexJump__CreateSubTask();
+void   HOOK_FxManager_CreateFxSystem();
+void   HOOK_FxManager_DestroyFxSystem();
+void   HOOK_CCam_ProcessFixed();
+void   HOOK_Render3DStuff();
+void   HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
+void   HOOK_CPed_IsPlayer();
+void   HOOK_CTrain_ProcessControl_Derail();
+void   HOOK_CVehicle_SetupRender();
+void   HOOK_CVehicle_ResetAfterRender();
+void   HOOK_CObject_Render();
+void   HOOK_EndWorldColors();
+void   HOOK_CWorld_ProcessVerticalLineSectorList();
+void   HOOK_ComputeDamageResponse_StartChoking();
+void   HOOK_CollisionStreamRead();
+void   HOOK_CVehicle_ApplyBoatWaterResistance();
+void   HOOK_CPhysical_ApplyGravity();
+void   HOOK_VehicleCamStart();
+void   HOOK_VehicleCamTargetZTweak();
+void   HOOK_VehicleCamLookDir1();
+void   HOOK_VehicleCamLookDir2();
+void   HOOK_VehicleCamHistory();
+void   HOOK_VehicleCamUp();
+void   HOOK_VehicleCamEnd();
+void   HOOK_VehicleLookBehind();
+void   HOOK_VehicleLookAside();
+void   HOOK_OccupiedVehicleBurnCheck();
+void   HOOK_UnoccupiedVehicleBurnCheck();
+void   HOOK_ApplyCarBlowHop();
+void   HOOK_CWorld_SetWorldOnFire();
+void   HOOK_CTaskSimplePlayerOnFire_ProcessPed();
+void   HOOK_CFire_ProcessFire();
+void   HOOK_CExplosion_Update();
+void   HOOK_CWeapon_FireAreaEffect();
+void   HOOK_CGame_Process();
+void   HOOK_Idle();
+void   HOOK_RenderScene_Plants();
+void   HOOK_RenderScene_end();
+void   HOOK_CPlantMgr_Render();
+void   HOOK_CEventHandler_ComputeKnockOffBikeResponse();
+void   HOOK_CAnimBlendAssociation_SetCurrentTime();
+void   HOOK_RpAnimBlendClumpUpdateAnimations();
+void   HOOK_CAnimBlendAssoc_destructor();
+void   HOOK_CAnimManager_AddAnimation();
+void   HOOK_CAnimManager_AddAnimationAndSync();
+void   HOOK_CAnimManager_BlendAnimation_Hierarchy();
+void   HOOK_CPed_GetWeaponSkill();
+void   HOOK_CPed_AddGogglesModel();
+void   HOOK_CPhysical_ProcessCollisionSectorList();
+void   HOOK_CrashFix_Misc1();
+void   HOOK_CrashFix_Misc2();
+void   HOOK_CrashFix_Misc3();
+void   HOOK_CrashFix_Misc4();
+void   HOOK_CrashFix_Misc5();
+void   HOOK_CrashFix_Misc6();
+void   HOOK_CrashFix_Misc7();
+void   HOOK_CrashFix_Misc8();
+void   HOOK_CrashFix_Misc9();
+void   HOOK_CrashFix_Misc10();
+void   HOOK_CrashFix_Misc11();
+void   HOOK_CrashFix_Misc12();
+void   HOOK_CrashFix_Misc13();
+void   HOOK_CrashFix_Misc14();
+void   HOOK_FreezeFix_Misc15();
+void   HOOK_CrashFix_Misc16();
+void   HOOK_CrashFix_Misc17();
+void   HOOK_CrashFix_Misc18();
+void   HOOK_CrashFix_Misc19();
+void   HOOK_CrashFix_Misc20();
+void   HOOK_CrashFix_Misc21();
+void   HOOK_CrashFix_Misc22();
+void   HOOK_CrashFix_Misc23();
+void   HOOK_CrashFix_Misc24();
+void   HOOK_CheckAnimMatrix();
+void   HOOK_VehColCB();
+void   HOOK_VehCol();
+void   HOOK_Transmission_CalculateDriveAcceleration();
+void   HOOK_isVehDriveTypeNotRWD();
+void   HOOK_isVehDriveTypeNotFWD();
+void   HOOK_PreFxRender();
+void   HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState();
 void HOOK_CTrafficLights_GetSecondaryLightState();
@@ -483,12 +480,6 @@ void Hook_CObject_DTR();
 
 void HOOK_CEntity_IsOnScreen_FixObjectScale();
 
-void HOOK_CEventVehicleDamageCollision();
-
-void HOOK_CEventVehicleDamageCollision_Plane();
-
-void HOOK_CEventVehicleDamageCollision_Bike();
-
 void HOOK_CClothes_RebuildPlayer();
 
 void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle();
@@ -509,6 +500,8 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
+
+void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -558,6 +551,8 @@ CMultiplayerSA::CMultiplayerSA()
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
     m_fMaddDoggPoolLevel = 1082.73f;
+    m_dwLastStaticAnimGroupID = 0;
+    m_dwLastStaticAnimID = 0;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -619,6 +614,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
+    HookInstall(HOOKPOS_CVehicle_ApplyBoatWaterResistance, (DWORD)HOOK_CVehicle_ApplyBoatWaterResistance, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
@@ -631,11 +627,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
+    HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
+    HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
@@ -657,6 +651,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
+
+    HookInstall(HOOKPOS_Transmission_CalculateDriveAcceleration, (DWORD)HOOK_Transmission_CalculateDriveAcceleration, 5);
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7);
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7);
@@ -696,14 +692,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6);
     // End of building removal hooks
 
-    // Vehicle Collision Event Hooks
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Bike, (DWORD)HOOK_CEventVehicleDamageCollision_Bike, 6);
-    // End of Vehicle Collision Event Hooks
-
     // Spider CJ fix
     HookInstall(HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8);
 
@@ -735,6 +723,13 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
+
+    // Fix GTA:SA swimming speed problem on higher fps
+    HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -785,7 +780,7 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x62AEEC, 0x90 );
     */
 
-    // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges(void) (special DJ banter)
+    // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges() (special DJ banter)
     MemPut<BYTE>(0x4E8410, 0xC3);
 
     // DISABLE CPopulation__AddToPopulation
@@ -1381,8 +1376,27 @@ void CMultiplayerSA::InitHooks()
 
     // Clip camera also outside the world bounds.
     MemSet((void*)0x41AD12, 0x90, 2);
+    MemSet((void*)0x41AD5E, 0x90, 2);
     MemSet((void*)0x41ADA7, 0x90, 2);
     MemSet((void*)0x41ADF3, 0x90, 2);
+
+    // Fix melee doesn't work outside the world bounds.
+    MemSet((void*)0x5FFAEE, 0x90, 2);
+    MemSet((void*)0x5FFB4B, 0x90, 2);
+    MemSet((void*)0x5FFBA5, 0x90, 2);
+    MemSet((void*)0x5FFC03, 0x90, 2);
+
+    // Fix shooting sniper doesn't work outside the world bounds (for local player).
+    MemSet((void*)0x7361BF, 0x90, 6);
+    MemSet((void*)0x7361D4, 0x90, 6);
+    MemSet((void*)0x7361E9, 0x90, 6);
+    MemSet((void*)0x7361FE, 0x90, 6);
+
+    // Fix heli blades lacks collision outside the world bounds.
+    MemSet((void*)0x6E2FBC, 0x90, 2);
+    MemSet((void*)0x6E301C, 0x90, 2);
+    MemSet((void*)0x6E3075, 0x90, 2);
+    MemSet((void*)0x6E30D6, 0x90, 2);
 
     // Allow Player Garages to shut with players inside.
     MemSet((void*)0x44C6FA, 0x90, 4);
@@ -1466,6 +1480,18 @@ void CMultiplayerSA::InitHooks()
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
 
+    // Allow to switch weapons while glued
+    MemSetFast((void*)0x60D861, 0x90, 14);
+
+    // Allow water cannon to hit objects and players visually
+    MemSet((void*)0x72925D, 0x1, 1);            // objects
+    MemSet((void*)0x729263, 0x1, 1);            // players
+
+
+    // Allow crouching with 1HP
+    MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
+    fDuckingHealthThreshold = 0;
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1475,6 +1501,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_FixLineOfSightArgs();
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
+    InitHooks_VehicleWeapons();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -1530,7 +1557,7 @@ void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
     CRemoteDataSA::RemoveRemoteDataStorage(pPed);
 }
 
-CPed* CMultiplayerSA::GetContextSwitchedPed(void)
+CPed* CMultiplayerSA::GetContextSwitchedPed()
 {
     return pContextSwitchedPed;
 }
@@ -1618,7 +1645,7 @@ void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
     ApplyHeatHazeEnabled();
 }
 
-void CMultiplayerSA::ResetHeatHaze(void)
+void CMultiplayerSA::ResetHeatHaze()
 {
     SHeatHazeSettings settings;
     settings.ucIntensity = 0x50;
@@ -1643,7 +1670,7 @@ void CMultiplayerSA::SetHeatHazeEnabled(bool bEnabled)
     ApplyHeatHazeEnabled();
 }
 
-void CMultiplayerSA::ApplyHeatHazeEnabled(void)
+void CMultiplayerSA::ApplyHeatHazeEnabled()
 {
     // Enable heat haze if user allows it or scripts have customized it
     if (m_bHeatHazeEnabled || m_bHeatHazeCustomized)
@@ -1792,7 +1819,7 @@ void CMultiplayerSA::GetWindVelocity(float& fX, float& fY, float& fZ)
     fZ = *(float*)0xC813E8;
 }
 
-void CMultiplayerSA::RestoreWindVelocity(void)
+void CMultiplayerSA::RestoreWindVelocity()
 {
     MemPut<WORD>(0x72C616, 0x1DD9);
     MemPut<DWORD>(0x72C616 + 2, 0x00C813E0);
@@ -1844,7 +1871,7 @@ void CMultiplayerSA::RestoreFarClipDistance()
     }
 }
 
-float CMultiplayerSA::GetNearClipDistance(void)
+float CMultiplayerSA::GetNearClipDistance()
 {
     return m_fNearClipDistance;
 }
@@ -1854,7 +1881,7 @@ void CMultiplayerSA::SetNearClipDistance(float fDistance)
     m_fNearClipDistance = Clamp(0.1f, fDistance, 20.f);
 }
 
-void CMultiplayerSA::RestoreNearClipDistance(void)
+void CMultiplayerSA::RestoreNearClipDistance()
 {
     m_fNearClipDistance = DEFAULT_NEAR_CLIP_DISTANCE;
 }
@@ -1957,24 +1984,35 @@ void CMultiplayerSA::ResetSunSize()
     MemPut<BYTE>(0x55FA9F, 0x3C);
 }
 
-void CMultiplayerSA::SetCloudsEnabled(bool bDisabled)
+void CMultiplayerSA::SetCloudsEnabled(bool bEnabled)
 {
     // volumetric clouds
-    if (bDisabled)
+    if (bEnabled)
         MemPut<BYTE>(0x716380, 0xA1);
     else
         MemPut<BYTE>(0x716380, 0xC3);
 
-    // normal clouds
-    // 0071395A     90             NOP
-    if (bDisabled)
-        MemPut<BYTE>(0x713950, 0x83);
+    // bottom clouds
+    if (bEnabled)
+        MemPut<BYTE>(0x7154B0, 0x83);
     else
-        MemPut<BYTE>(0x713950, 0xC3);
+        MemPut<BYTE>(0x7154B0, 0xC3);
+
+    // skyline clouds
+    if (bEnabled)
+    {
+        MemPut<BYTE>(0x71411A, 0xD9);
+        MemPut<BYTE>(0x71411B, 0x41);
+        MemPut<BYTE>(0x71411C, 0x08);
+    }
+    else
+    {
+        MemSet((void*)0x71411A, 0x90, 3);
+    }
 
     // plane trails (not really clouds, but they're sort of vapour)
 
-    if (bDisabled)
+    if (bEnabled)
     {
         MemPut<BYTE>(0x717180, 0x83);
         MemPut<BYTE>(0x717181, 0xEC);
@@ -2030,7 +2068,7 @@ void CMultiplayerSA::SetSkyColor(unsigned char TopRed, unsigned char TopGreen, u
     ucSkyGradientBottomB = BottomBlue;
 }
 
-void CMultiplayerSA::ResetSky(void)
+void CMultiplayerSA::ResetSky()
 {
     bUsingCustomSkyGradient = false;
 }
@@ -2092,7 +2130,7 @@ void CMultiplayerSA::SetWaterColor(float fWaterRed, float fWaterGreen, float fWa
     MemPut<BYTE>(0x7051D7, 255 - (BYTE)fWaterAlpha);
 }
 
-void CMultiplayerSA::ResetWater(void)
+void CMultiplayerSA::ResetWater()
 {
     bUsingCustomWaterColor = false;
     MemPutFast<DWORD>(0x8D5140, 0x40404040);
@@ -2101,7 +2139,7 @@ void CMultiplayerSA::ResetWater(void)
     MemPut<BYTE>(0x7051D7, 184);
 }
 
-bool CMultiplayerSA::GetExplosionsDisabled(void)
+bool CMultiplayerSA::GetExplosionsDisabled()
 {
     return m_bExplosionsDisabled;
 }
@@ -2196,11 +2234,6 @@ void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandle
     m_pProcessCollisionHandler = pHandler;
 }
 
-void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler)
-{
-    m_pVehicleCollisionHandler = pHandler;
-}
-
 void CMultiplayerSA::SetHeliKillHandler(HeliKillHandler* pHandler)
 {
     m_pHeliKillHandler = pHandler;
@@ -2227,7 +2260,7 @@ void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandle
 }
 
 // What we do here is check if the idle handler has been set
-bool CMultiplayerSA::IsConnected(void)
+bool CMultiplayerSA::IsConnected()
 {
     return m_pIdleHandler != NULL;
 }
@@ -2557,7 +2590,8 @@ no_render:
 
 bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle && m_pBreakTowLinkHandler)
     {
         return m_pBreakTowLinkHandler(pVehicle);
@@ -2620,7 +2654,7 @@ CVector        vecExplosionLocation;
 DWORD          explosionCreator = 0;
 DWORD          explosionEntity = 0;
 
-bool CallExplosionHandler(void)
+bool CallExplosionHandler()
 {
     // Find out who the creator is
     CEntity*            pExplosionCreator = NULL;
@@ -2630,58 +2664,23 @@ bool CallExplosionHandler(void)
 
     if (pInterface)
     {
-        // See what type it is and grab the SA interface depending on type
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-            {
-                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD*)pInterface);
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
-                if (!pVehicle->GetWillExplode())
-                    return false;
-                pExplosionCreator = pVehicle;
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD*)pInterface);
-                break;
-            }
+        if (pInterface->nType == ENTITY_TYPE_VEHICLE) {
+            CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface)->pEntity;
+            if (!pVehicle->GetWillExplode())
+                return false;
         }
+        pExplosionCreator = pGameInterface->GetPools()->GetEntity((DWORD*)pInterface);
     }
 
     if (pExplodingEntityInterface)
     {
-        // See what type it is and grab the SA interface depending on type
-        switch (pExplodingEntityInterface->nType)
+        if (pExplodingEntityInterface->nType == ENTITY_TYPE_VEHICLE)
         {
-            case ENTITY_TYPE_PED:
-            {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetPed((DWORD*)pExplodingEntityInterface));
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface);
-                if (!pVehicle->GetWillExplode())
-                    return false;
-                pExplodingEntity = dynamic_cast<CEntity*>(pVehicle);
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD*)pExplodingEntityInterface);
-                break;
-            }
+            CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface)->pEntity;
+            if (!pVehicle->GetWillExplode())
+                return false;
         }
+        pExplodingEntity = pGameInterface->GetPools()->GetEntity((DWORD*)pExplodingEntityInterface);
     }
 
     return m_pExplosionHandler(pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType);
@@ -2996,7 +2995,8 @@ bool             ProcessPlayerWeapon()
     if (IsLocalPlayer(pProcessPlayerWeaponPed))
         return true;
 
-    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed));
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed);
+    CPlayerPed*            pPed = pPedClientEntity ? dynamic_cast<CPlayerPed*>(pPedClientEntity->pEntity) : nullptr;
     if (pPed)
     {
         CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
@@ -3081,7 +3081,7 @@ void _declspec(naked) HOOK_CPed_IsPlayer()
     }
 }
 
-void CRunningScript_Process(void)
+void CRunningScript_Process()
 {
     if (!bHasProcessedScript)
     {
@@ -3418,7 +3418,8 @@ static void SetObjectAlpha()
 
     if (dwAlphaEntity)
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        CObject*                  pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
         if (pObject)
         {
             if (pObject->IsAGangTag())
@@ -3754,7 +3755,7 @@ void CMultiplayerSA::SetBulletFireHandler(BulletFireHandler* pHandler)
     m_pBulletFireHandler = pHandler;
 }
 
-void CMultiplayerSA::Reset(void)
+void CMultiplayerSA::Reset()
 {
     bHideRadar = false;
     m_pExplosionHandler = NULL;
@@ -3848,7 +3849,7 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
 
-void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3858,9 +3859,18 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
     {
         MemPutFast<BYTE>(0xC402B8, 0);
     }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
+        MemCpy((void*)0x704EE8, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704EE8, 0x90, 5);
+    }
 }
 
-void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3869,6 +3879,15 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
     else
     {
         MemPutFast<BYTE>(0xC402B9, 0);
+    }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
+        MemCpy((void*)0x704F59, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704F59, 0x90, 5);
     }
 }
 
@@ -3882,7 +3901,7 @@ bool CMultiplayerSA::IsThermalVisionEnabled()
     return (*(BYTE*)0xC402B9 == 1);
 }
 
-float CMultiplayerSA::GetGlobalGravity(void)
+float CMultiplayerSA::GetGlobalGravity()
 {
     return fGlobalGravity;
 }
@@ -3892,7 +3911,7 @@ void CMultiplayerSA::SetGlobalGravity(float fGravity)
     fGlobalGravity = fGravity;
 }
 
-float CMultiplayerSA::GetLocalPlayerGravity(void)
+float CMultiplayerSA::GetLocalPlayerGravity()
 {
     return fLocalPlayerGravity;
 }
@@ -3931,7 +3950,7 @@ void CMultiplayerSA::SetLocalCameraRotation(float fRotation)
     fLocalPlayerCameraRotation = fRotation;
 }
 
-bool CMultiplayerSA::IsCustomCameraRotationEnabled(void)
+bool CMultiplayerSA::IsCustomCameraRotationEnabled()
 {
     return bCustomCameraRotation;
 }
@@ -4053,6 +4072,40 @@ void                        GetVehicleDriveType()
     ucDriveType = static_cast<unsigned char>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
 }
 
+static CTransmission* pCurTransmission = nullptr;
+static ::byte*        pCurGear = nullptr;
+
+void CheckVehicleMaxGear()
+{
+    if (*pCurGear > pCurTransmission->numOfGears)
+    {
+        *pCurGear = pCurTransmission->numOfGears;
+    }
+}
+
+void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
+{
+    _asm
+    {
+        push eax
+        mov pCurTransmission, ecx
+        mov eax, [esp+0xC]
+        mov pCurGear, eax
+        pop eax
+        pushad
+    }
+
+    CheckVehicleMaxGear();
+
+    _asm
+    {
+        popad
+        mov eax, [esp+0x10]
+        mov edx, [eax]
+        jmp RETURN_Transmission_CalculateDriveAcceleration
+    }
+}
+
 void _declspec(naked) HOOK_isVehDriveTypeNotRWD()
 {
     // Get the Vehicle interface from esi
@@ -4155,7 +4208,8 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     if (dwType == 2)
     {
         // It's a vehicle, use the gravity vector
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         if (!pVehicle)
             return;
 
@@ -4169,6 +4223,18 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     {
         // It's something else, apply regular downward gravity (+0x4C == m_vecMoveSpeed.fZ)
         MemSubFast<float>(dwThis + 0x4C, fTimeStep * fGravity);
+    }
+}
+
+const float kfTimeStepOrg = 5.0f / 3.0f;
+void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
+{
+    _asm
+    {
+        fmul    ds : 0x871DDC   // Original constant used in code
+        fmul    ds : 0xB7CB5C   // Multiply by current timestep
+        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
+        jmp     RETURN_CVehicle_ApplyBoatWaterResistance
     }
 }
 
@@ -4229,7 +4295,8 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     // This way SA's gravity-goes-downward assumptive code can calculate the camera
     // spherical coords correctly. Of course we restore these after the camera function
     // completes.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return false;
 
@@ -4437,7 +4504,8 @@ docustom:
 void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return;
 
@@ -4528,7 +4596,8 @@ float _cdecl VehicleBurnCheck(DWORD pVehicleInterface)
     // To check if a vehicle is lying upside down on its roof, SA checks if the z coordinate
     // of the vehicle's up vector is negative. We replace this z by the dot product of the up vector
     // and the negated gravity vector.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return 1.0f;
 
@@ -4570,7 +4639,8 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
 {
     // Custom application of the little jump that vehicles make when they blow up,
     // taking into account custom gravity
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return;
 
@@ -4621,6 +4691,7 @@ void _declspec(naked) HOOK_CGame_Process()
     }
 
     if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
+
     TIMING_CHECKPOINT("-CWorld_Process");
 
     _asm
@@ -4628,6 +4699,19 @@ void _declspec(naked) HOOK_CGame_Process()
         popad
         jmp     RETURN_CGame_Process;
     }
+}
+
+void __cdecl HandleIdle()
+{
+    static bool bAnimGroupArrayAddressLogged = false;
+    if (!bAnimGroupArrayAddressLogged)
+    {
+        bAnimGroupArrayAddressLogged = true;
+        DWORD dwAnimGroupArrayAddress = 0xb4ea34;
+        LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
+                 SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
+    }
+    m_pIdleHandler();
 }
 
 DWORD CALL_CGame_Process = 0x53BEE0;
@@ -4644,7 +4728,7 @@ void _declspec(naked) HOOK_Idle()
 
     TIMING_CHECKPOINT("+Idle");
     if (m_pIdleHandler)
-        m_pIdleHandler();
+        HandleIdle();
     TIMING_CHECKPOINT("-Idle");
 
     _asm
@@ -4701,7 +4785,7 @@ void _declspec(naked) HOOK_PreHUDRender()
 #if !ENABLE_VEHICLE_HEADLIGHT_COLOR
 
 // Dummy stub
-void vehicle_lights_init(void)
+void vehicle_lights_init()
 {
 }
 
@@ -4736,7 +4820,7 @@ void HOOK_CVehicle_DoHeadLightEffect_2();
 void HOOK_CVehicle_DoHeadLightReflectionTwin();
 void HOOK_CVehicle_DoHeadLightReflectionSingle();
 
-void vehicle_lights_init(void)
+void vehicle_lights_init()
 {
     HookInstall(HOOKPOS_CVehicle_DoVehicleLights, (DWORD)HOOK_CVehicle_DoVehicleLights, 8);
     HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam_1, (DWORD)HOOK_CVehicle_DoHeadLightBeam_1, 6);
@@ -4768,8 +4852,9 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
-    SColor    color = SColorRGBA(255, 255, 255, 255);
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    SColor                     color = SColorRGBA(255, 255, 255, 255);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle)
     {
         color = pVehicle->GetHeadLightColor();
@@ -5082,12 +5167,12 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
 //
 // Notify core when rendering grass so we can do optimal things
 //
-void CPlantMgr_Render_Pre(void)
+void CPlantMgr_Render_Pre()
 {
     g_pCore->NotifyRenderingGrass(true);
 }
 
-void CPlantMgr_Render_Post(void)
+void CPlantMgr_Render_Post()
 {
     g_pCore->NotifyRenderingGrass(false);
 }
@@ -5205,8 +5290,9 @@ CPedSAInterface*         pBikePedInterface;
 float                    fBikeDamage;
 void                     CEventHandler_ComputeKnockOffBikeResponse()
 {
-    CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
-    CPed*         pPed = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CEventDamage*          pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pEvent && pPed)
     {
         CPedDamageResponse* pResponse = pEvent->GetDamageResponse();
@@ -5246,7 +5332,8 @@ eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
 bool             CPed_GetWeaponSkill()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
@@ -5258,19 +5345,22 @@ bool             CPed_GetWeaponSkill()
                 if (playerPed)
                 {
                     CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
-                    float                 stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
+                    if (data)
+                    {
+                        float stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
 
-                    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
+                        CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
+                        CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
+                        CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
 
-                    if (stat >= pPro->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_PRO;
-                    else if (stat >= pStd->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_STD;
-                    else
-                        weaponSkill = WEAPONSKILL_POOR;
-                    return true;
+                        if (stat >= pPro->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_PRO;
+                        else if (stat >= pStd->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_STD;
+                        else
+                            weaponSkill = WEAPONSKILL_POOR;
+                        return true;
+                    }
                 }
             }
         }
@@ -5314,7 +5404,9 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
 // applying the visual effect
 bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
 {
-    return pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface) == pGameInterface->GetPools()->GetPedFromRef(1);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+    return pPed == pGameInterface->GetPools()->GetPedFromRef(1);
 }
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel()
@@ -5519,7 +5611,8 @@ static SColor vehColors[4];
 
 void _cdecl SaveVehColors(DWORD dwThis)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
@@ -5576,7 +5669,8 @@ static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
 static bool        AllowSwingingDoors()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed())
         return true;
     else
@@ -5628,7 +5722,7 @@ void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensio
 DWORD                dwSuspensionChangedJump = 0x4185C0;
 bool                 bSuspensionChanged = false;
 CVehicleSAInterface* pSuspensionInterface = NULL;
-bool                 CheckHasSuspensionChanged(void)
+bool                 CheckHasSuspensionChanged()
 {
     // Make sure we have a valid suspension interface
     if (pSuspensionInterface)
@@ -6112,109 +6206,7 @@ IsOnScreen_IsObject:
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
     }
 }
-CVehicleSAInterface* pCollisionVehicle = NULL;
-void                 TriggerVehicleCollisionEvent()
-{
-    if (pCollisionVehicle)
-    {
-        CEntitySAInterface* pEntity = pCollisionVehicle->m_pCollidedEntity;
-        if (pEntity)
-        {
-            // Not handled because it triggers too much
-            // if ( pEntity->nType != ENTITY_TYPE_BUILDING )
-            {
-                if (m_pVehicleCollisionHandler)
-                {
-                    TIMING_CHECKPOINT("+TriggerVehColEvent");
-                    if (pEntity->nType == ENTITY_TYPE_VEHICLE)
-                    {
-                        CVehicleSAInterface* pInterface = static_cast<CVehicleSAInterface*>(pEntity);
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
-                                                   pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType,
-                                                   pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    else
-                    {
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
-                                                   pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition,
-                                                   pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    TIMING_CHECKPOINT("-TriggerVehColEvent");
-                }
-            }
-        }
-    }
-}
 
-void _declspec(naked) HOOK_CEventVehicleDamageCollision()
-{
-    // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
-    // .006A765D 50                                      push    eax < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, fs:0
-        jmp JMP_CEventVehicleDamageCollision_RETN
-    }
-}
-
-DWORD dwPlaneDamageThreadshold = 0x8D33E4;
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane()
-{
-    // .006CC4B3 A1 E4 33 8D 00                            mov     eax, ds:?PLANE_DAMAGE_THRESHHOLD@@3MA
-    //  006CC4B8 53                                        push    ebx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, DWORD PTR DS:[8D33E4h]
-        jmp JMP_CEventVehicleDamageCollision_Plane_RETN
-    }
-}
-
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike()
-{
-    // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
-    //  006B8ECC 8B F1                                   mov     esi, ecx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        fcomp DWORD PTR DS:[859EF8h]
-        jmp JMP_CEventVehicleDamageCollision_Bike_RETN
-    }
-}
 //////////////////////////////////////////////////////////////////////////////////////////
 // Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
 // hooked at 5A82C0 8 bytes
@@ -6577,7 +6569,7 @@ eRadioStationID dwStationID = UNKNOWN;
 BYTE            bTrackID = 0;
 DWORD           dwNumberOfTracks = 0;
 
-DWORD pTrackNumbers[] = {
+const DWORD pTrackNumbers[] = {
     0x2,             // radio off, somewhere 2 is subtracted from this so that's why it's 2
     0xB,             // playback fm
     0xF,             // k-rose
@@ -6807,5 +6799,38 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
+    }
+}
+
+const float kfTimeStepOriginal = 1.66f;
+void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
+{
+    _asm
+    {
+        fsub    st, st(1)
+
+        fld     dword ptr[esp + 16]
+        lea     eax, [esi + 44h]
+        mov     ecx, eax
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 28]
+
+        fld     dword ptr[esp + 20]
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 32]
+        fmul    dword ptr[esp + 24]
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
@@ -39,13 +39,13 @@ static CClientProjectileManager* m_pProjectileManager;
 static CClientSoundManager*      m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( Entity.CountChildren () && Entity.IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (Entity.CountChildren() && Entity.IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = Entity.GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -78,7 +78,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pSoundManager = pManager->GetSoundManager();
 }
 
-CStaticFunctionDefinitions::~CStaticFunctionDefinitions(void)
+CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
@@ -208,7 +208,7 @@ bool CStaticFunctionDefinitions::CancelEvent(bool bCancel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::WasEventCancelled(void)
+bool CStaticFunctionDefinitions::WasEventCancelled()
 {
     return m_pEvents->WasEventCancelled();
 }
@@ -230,6 +230,12 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
 bool CStaticFunctionDefinitions::OutputConsole(const char* szText)
 {
     m_pCore->GetConsole()->Print(szText);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ClearChatBox()
+{
+    m_pCore->ClearChat();
     return true;
 }
 
@@ -275,24 +281,6 @@ bool CStaticFunctionDefinitions::SetClipboard(SString& strText)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetClipboard(SString& strText)
-{
-    OpenClipboard(NULL);
-
-    // Get the clipboard's data and put it into a char array
-    const wchar_t* szBuffer = reinterpret_cast<const wchar_t*>(GetClipboardData(CF_UNICODETEXT));
-
-    CloseClipboard();
-
-    if (szBuffer)
-    {
-        strText = UTF16ToMbUTF8(szBuffer);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::ShowChat(bool bShow)
 {
     g_pCore->SetChatVisible(bShow);
@@ -326,12 +314,12 @@ bool CStaticFunctionDefinitions::CreateTrayNotification(SString strText, eTrayIc
     return g_pCore->GetTrayIcon()->CreateTrayBallon(strText, eType, useSound);
 }
 
-bool CStaticFunctionDefinitions::IsTrayNotificationEnabled(void)
+bool CStaticFunctionDefinitions::IsTrayNotificationEnabled()
 {
     return g_pCore->GetCVars()->GetValue<bool>("allow_tray_notifications", true);
 }
 
-CClientEntity* CStaticFunctionDefinitions::GetRootElement(void)
+CClientEntity* CStaticFunctionDefinitions::GetRootElement()
 {
     return m_pRootEntity;
 }
@@ -482,6 +470,38 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVect
         {
             CClientSound& Sound = static_cast<CClientSound&>(Entity);
             Sound.GetVelocity(vecVelocity);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity)
+{
+    int iType = Entity.GetType();
+    switch (iType)
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.GetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            Vehicle.GetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            Object.GetTurnSpeed(vecTurnVelocity);
             break;
         }
         default:
@@ -1043,7 +1063,6 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             {
                 Vehicle.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX));
             }
-
             break;
         }
         case CCLIENTOBJECT:
@@ -1121,6 +1140,40 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
             break;
         }
 
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
+{
+    RUN_CHILDREN(SetElementAngularVelocity(**iter, vecTurnVelocity))
+
+    int iType = Entity.GetType();
+    switch (iType)
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            Vehicle.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            Object.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
         default:
             return false;
     }
@@ -1388,43 +1441,77 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTPLAYER:
         {
             // Grab the model
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (Ped.GetModel() == usModel)
+            CClientPed&          Ped = static_cast<CClientPed&>(Entity);
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
+
+            if (usCurrentModel == usModel)
                 return false;
-            if (!CClientPlayerManager::IsValidModel(usModel))
+
+            if (!Ped.SetModel(usModel))
                 return false;
-            Ped.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Ped.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTVEHICLE:
         {
-            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            if (Vehicle.GetModel() == usModel)
+            CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
+            const unsigned short usCurrentModel = Vehicle.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientVehicleManager::IsValidModel(usModel))
                 return false;
+
             Vehicle.SetModelBlocking(usModel, 255, 255);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
-            if (Object.GetModel() == usModel)
+            CClientObject&       Object = static_cast<CClientObject&>(Entity);
+            const unsigned short usCurrentModel = Object.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Object.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Object.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTPROJECTILE:
         {
-            CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
-            if (Projectile.GetGameEntity() && Projectile.GetGameEntity()->GetModelIndex() == usModel)
+            CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
+            const unsigned short usCurrentModel = Projectile.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Projectile.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         default:
@@ -1444,7 +1531,7 @@ bool CStaticFunctionDefinitions::GetRadioChannel(unsigned char& ucChannel)
     return true;
 }
 
-CClientPlayer* CStaticFunctionDefinitions::GetLocalPlayer(void)
+CClientPlayer* CStaticFunctionDefinitions::GetLocalPlayer()
 {
     return m_pPlayerManager->GetLocalPlayer();
 }
@@ -1470,8 +1557,8 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        pCollisionEntity = m_pManager->FindEntity(pCollisionGameEntity);
-
+        CPools* pPools = g_pGame->GetPools();
+        pCollisionEntity = pPools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
         return pCollisionEntity;
     }
 
@@ -1551,7 +1638,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
         // Check it's Analog
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
             {
                 bState = fState > 0;
                 return true;
@@ -1573,17 +1660,22 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput)
 {
     if (Ped.GetType() == CCLIENTPLAYER)
     {
         CControllerState cs;
-        Ped.GetControllerState(cs);
-        bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        unsigned int uiIndex;
+        bool             bOnFoot = (!Ped.GetRealOccupiedVehicle());
+        unsigned int     uiIndex;
+
+        if (bRawInput)
+            cs = Ped.m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+        else
+            Ped.GetControllerState(cs);
+
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
-            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState);
+            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
         else
             fState = CClientPad::GetControlState(szControl, cs, bOnFoot) == true ? 1.0f : 0.0f;
 
@@ -1617,23 +1709,10 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby(CClientPed& Ped, bool& bD
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
+bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle)
 {
-    if (Ped.IsRunningAnimation())
-    {
-        if (Ped.IsCustomAnimationPlaying())
-        {
-            strBlockName = Ped.GetNextAnimationCustomBlockName();
-            strAnimName = Ped.GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = Ped.GetAnimationName();
-        }
-        return true;
-    }
-    return false;
+    ucStyle = Ped.GetFightingStyle();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim)
@@ -2049,7 +2128,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+            std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
@@ -2065,9 +2144,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
-                    auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
+                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
@@ -2098,11 +2177,10 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (!strAnimName.empty())
         {
-            CAnimBlendAssociation* pA = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-
-            if (pA)
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                pA->SetCurrentProgress(fProgress);
+                pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
         }
@@ -2110,6 +2188,27 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         {
             Ped.KillAnimation();
             return true;
+        }
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)
+{
+    RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
+
+    if (IS_PED(&Entity))
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (!strAnimName.empty())
+        {
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
+            {
+                pAnimAssociation->SetCurrentSpeed(fSpeed);
+                return true;
+            }
         }
     }
 
@@ -2195,6 +2294,25 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
+{
+    RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
+    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.GetFightingStyle() != ucStyle)
+        {
+            // Is valid style
+            if (ucStyle >= 4 && ucStyle <= 16)
+            {
+                Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget)
 {
     RUN_CHILDREN(SetPedLookAt(**iter, vecPosition, iTime, iBlend, pTarget))
@@ -2265,21 +2383,83 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsLocalPlayer())
             return false;
 
-        CVector vecOrigin;
-        Ped.GetPosition(vecOrigin);
-
-        // Move origin out a bit to avoid hitting ped collision
-        CVector vecDir = vecTarget - vecOrigin;
-        vecDir.Normalize();
-        vecOrigin += vecDir * 0.9f;
+        // Grab the gun muzzle position
+        CWeapon* pWeapon = Ped.GetWeapon(Ped.GetCurrentWeaponSlot());
+        CVector  vecOrigin;
+        if (!pWeapon)
+        {
+            Ped.GetPosition(vecOrigin);
+        }
+        else
+        {
+            CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), 1000.0f);
+            CVector      vecFireOffset = *pCurrentWeaponInfo->GetFireOffset();
+            vecOrigin = vecFireOffset;
+            Ped.GetTransformedBonePosition(BONE_RIGHTWRIST, vecOrigin);
+        }
 
         // Arm direction
         float fArmX = -atan2(vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY),
               fArmY = -atan2(vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D(vecTarget, vecOrigin));
 
-        // TODO: use gun muzzle for origin
-        Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
-        Ped.SetAim(fArmX, fArmY, 0);
+        if (Ped.IsInVehicle())
+        {
+            // Driveby aim animation
+            // 0 = forwards, 1 = left, 2 = back, 3 = right
+            unsigned char cInVehicleAimAnim = 0;
+
+            // Ped rotation
+            CVector vecRot;
+            Ped.GetRotationRadians(vecRot);
+            float fRotZ = -vecRot.fZ;            // Counter-clockwise
+            fRotZ = (fRotZ > PI) ? fRotZ - PI * 2 : fRotZ;
+
+            // Rotation difference
+            float fRotDiff = fArmX - fRotZ;
+            if (fRotDiff > PI)
+            {
+                fRotDiff = -(PI - (fRotDiff - PI));
+            }
+            else if (fRotDiff < -PI)
+            {
+                fRotDiff = fRotDiff + PI * 2;
+            }
+
+            // Find the aim anim and correct fArmX/fArmY
+            if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
+            {
+                // Facing left
+                cInVehicleAimAnim = 1;
+                fArmX = fArmX - PI / 2;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
+            {
+                // Facing backwards
+                cInVehicleAimAnim = 2;
+                fArmX = fArmX + PI;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
+            {
+                // Facing right
+                cInVehicleAimAnim = 3;
+                fArmX = fArmX + PI / 2;
+            }
+            else
+            {
+                // Facing forwards
+                // Do nothing, initial values are fine
+            }
+
+            // Set aim and target data without interpolation
+            Ped.SetAimingData(TICK_RATE, vecTarget, fArmX, fArmY, cInVehicleAimAnim, &vecOrigin, false);
+        }
+        else
+        {
+            Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
+            Ped.SetAim(fArmX, fArmY, 0);
+        }
 
         return true;
     }
@@ -2315,6 +2495,17 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
         Ped.SetOnFire(bOnFire);
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedArmor(CClientPed& Ped, float fArmor)
+{
+    if (Ped.IsLocalEntity())
+    {
+        Ped.SetArmor(fArmor);
+        return true;
+    }
+
     return false;
 }
 
@@ -2470,7 +2661,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgr
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
@@ -2569,20 +2760,18 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
             CClientVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
         CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2);
-        if (pVehicle)
-        {
-            pVehicle->SetParent(Resource.GetResourceDynamicEntity());
-            pVehicle->SetPosition(vecPosition);
 
-            pVehicle->SetRotationDegrees(vecRotation);
-            if (szRegPlate)
-                pVehicle->SetRegPlate(szRegPlate);
+        pVehicle->SetParent(Resource.GetResourceDynamicEntity());
+        pVehicle->SetPosition(vecPosition);
 
-            return pVehicle;
-        }
+        pVehicle->SetRotationDegrees(vecRotation);
+        if (szRegPlate)
+            pVehicle->SetRegPlate(szRegPlate);
+
+        return pVehicle;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::FixVehicle(CClientEntity& Entity)
@@ -2834,9 +3023,9 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -2866,7 +3055,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
                     break;
             }
 
-            Vehicle.SetDoorStatus(ucDoor, ucState);
+            Vehicle.SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
 
             return true;
         }
@@ -3416,6 +3605,62 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleDummyPosition(eDummies, vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleExhaustFumesPosition(vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleExhaustFumesPosition();
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled)
 {
     switch (Entity.GetType())
@@ -3619,17 +3864,15 @@ CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, uns
 #else
         CClientObject* pObject = new CDeathmatchObject(m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID, bLowLod);
 #endif
-        if (pObject)
-        {
-            pObject->SetParent(Resource.GetResourceDynamicEntity());
-            pObject->SetPosition(vecPosition);
-            pObject->SetRotationDegrees(vecRotation);
 
-            return pObject;
-        }
+        pObject->SetParent(Resource.GetResourceDynamicEntity());
+        pObject->SetPosition(vecPosition);
+        pObject->SetRotationDegrees(vecRotation);
+
+        return pObject;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::GetObjectScale(CClientObject& Object, CVector& vecScale)
@@ -3647,6 +3890,36 @@ bool CStaticFunctionDefinitions::IsObjectBreakable(CClientObject& Object, bool& 
 bool CStaticFunctionDefinitions::GetObjectMass(CClientObject& Object, float& fMass)
 {
     fMass = Object.GetMass();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectTurnMass(CClientObject& Object, float& fTurnMass)
+{
+    fTurnMass = Object.GetTurnMass();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectAirResistance(CClientObject& Object, float& fAirResistance)
+{
+    fAirResistance = Object.GetAirResistance();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectElasticity(CClientObject& Object, float& fElasticity)
+{
+    fElasticity = Object.GetElasticity();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant)
+{
+    fBuoyancyConstant = Object.GetBuoyancyConstant();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass)
+{
+    Object.GetCenterOfMass(vecCenterOfMass);
     return true;
 }
 
@@ -3820,6 +4093,75 @@ bool CStaticFunctionDefinitions::SetObjectMass(CClientEntity& Entity, float fMas
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectTurnMass(CClientEntity& Entity, float fTurnMass)
+{
+    if (fTurnMass >= 0.0f)
+    {
+        RUN_CHILDREN(SetObjectTurnMass(**iter, fTurnMass))
+
+        if (IS_OBJECT(&Entity))
+        {
+            CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+            Object.SetTurnMass(fTurnMass);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectAirResistance(CClientEntity& Entity, float fAirResistance)
+{
+    RUN_CHILDREN(SetObjectAirResistance(**iter, fAirResistance))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetAirResistance(fAirResistance);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectElasticity(CClientEntity& Entity, float fElasticity)
+{
+    RUN_CHILDREN(SetObjectElasticity(**iter, fElasticity))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetElasticity(fElasticity);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant)
+{
+    RUN_CHILDREN(SetObjectBuoyancyConstant(**iter, fBuoyancyConstant))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetBuoyancyConstant(fBuoyancyConstant);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass)
+{
+    RUN_CHILDREN(SetObjectCenterOfMass(**iter, vecCenterOfMass))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetCenterOfMass(vecCenterOfMass);
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension)
 {
     RUN_CHILDREN(SetObjectVisibleInAllDimensions(**iter, bVisible, usNewDimension))
@@ -3850,17 +4192,13 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resourc
 {
     // Create it
     CClientRadarArea* pRadarArea = new CClientRadarArea(m_pManager, INVALID_ELEMENT_ID);
-    if (pRadarArea)
-    {
-        pRadarArea->SetParent(Resource.GetResourceDynamicEntity());
-        pRadarArea->SetPosition(vecPosition2D);
-        pRadarArea->SetSize(vecSize);
-        pRadarArea->SetColor(color);
 
-        return pRadarArea;
-    }
+    pRadarArea->SetParent(Resource.GetResourceDynamicEntity());
+    pRadarArea->SetPosition(vecPosition2D);
+    pRadarArea->SetSize(vecSize);
+    pRadarArea->SetColor(color);
 
-    return NULL;
+    return pRadarArea;
 }
 
 bool CStaticFunctionDefinitions::GetRadarAreaColor(CClientRadarArea* RadarArea, SColor& outColor)
@@ -4085,7 +4423,7 @@ bool CStaticFunctionDefinitions::CreateExplosion(CVector& vecPosition, unsigned 
     return true;
 }
 
-bool CStaticFunctionDefinitions::DetonateSatchels(void)
+bool CStaticFunctionDefinitions::DetonateSatchels()
 {
     CClientPlayer* pLocalPlayer = GetLocalPlayer();
     // does the local player exist and if so does he have any projectiles to destroy?
@@ -4107,6 +4445,18 @@ bool CStaticFunctionDefinitions::CreateFire(CVector& vecPosition, float fSize)
     return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
 }
 
+bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)
+{
+    g_pGame->GetFireManager()->ExtinguishPoint(vecPosition, fRadius);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ExtinguishAllFires()
+{
+    g_pGame->GetFireManager()->ExtinguishAllFires();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd(unsigned char ucSound)
 {
     g_pGame->GetAudioEngine()->PlayFrontEndSound(ucSound);
@@ -4125,7 +4475,7 @@ bool CStaticFunctionDefinitions::IsAmbientSoundEnabled(eAmbientSoundType eType, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetAmbientSounds(void)
+bool CStaticFunctionDefinitions::ResetAmbientSounds()
 {
     g_pGame->GetAudioEngine()->ResetAmbientSounds();
     return true;
@@ -4133,19 +4483,19 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds(void)
 
 bool CStaticFunctionDefinitions::SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate)
 {
-    g_pGame->GetAudio()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
+    g_pGame->GetAudioEngine()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute)
 {
-    bOutMute = g_pGame->GetAudio()->IsWorldSoundEnabled(uiGroup, uiIndex);
+    bOutMute = g_pGame->GetAudioEngine()->IsWorldSoundEnabled(uiGroup, uiIndex);
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWorldSounds(void)
+bool CStaticFunctionDefinitions::ResetWorldSounds()
 {
-    g_pGame->GetAudio()->ResetWorldSounds();
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
     return true;
 }
 
@@ -4186,43 +4536,57 @@ bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex, 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize,
                                                            const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+
         pBlip->SetParent(Resource.GetResourceDynamicEntity());
         pBlip->SetPosition(vecPosition);
         pBlip->SetSprite(ucIcon);
         pBlip->SetScale(ucSize);
         pBlip->SetColor(color);
+
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize,
                                                                      const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    assert(&Entity);
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+
         pBlip->SetParent(Resource.GetResourceDynamicEntity());
         pBlip->AttachTo(&Entity);
         pBlip->SetSprite(ucIcon);
         pBlip->SetScale(ucSize);
         pBlip->SetColor(color);
+
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned char ucIcon)
 {
-    RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
-
-    if (IS_RADARMARKER(&Entity))
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
 
-        Marker.SetSprite(ucIcon);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetSprite(ucIcon);
+            return true;
+        }
     }
 
     return false;
@@ -4230,14 +4594,17 @@ bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned cha
 
 bool CStaticFunctionDefinitions::SetBlipSize(CClientEntity& Entity, unsigned char ucSize)
 {
-    RUN_CHILDREN(SetBlipSize(**iter, ucSize))
-
-    if (IS_RADARMARKER(&Entity))
+    if (ucSize <= 25)
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipSize(**iter, ucSize))
 
-        Marker.SetScale(ucSize);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetScale(ucSize);
+            return true;
+        }
     }
 
     return false;
@@ -4448,7 +4815,7 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
     return true;
 }
 
-CClientEntity* CStaticFunctionDefinitions::GetCameraTarget(void)
+CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 {
     if (!m_pCamera->IsInFixedMode())
         return m_pCamera->GetTargetEntity();
@@ -4623,7 +4990,7 @@ bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
     return false;
 }
 
-bool CStaticFunctionDefinitions::GUIGetInputEnabled(void)
+bool CStaticFunctionDefinitions::GUIGetInputEnabled()
 {            // can't inline because statics are defined in .cpp not .h
     return m_pGUI->GetGUIInputEnabled();
 }
@@ -4633,12 +5000,12 @@ void CStaticFunctionDefinitions::GUISetInputMode(eInputMode inputMode)
     m_pGUI->SetGUIInputMode(inputMode);
 }
 
-eInputMode CStaticFunctionDefinitions::GUIGetInputMode(void)
+eInputMode CStaticFunctionDefinitions::GUIGetInputMode()
 {
     return m_pGUI->GetGUIInputMode();
 }
 
-eCursorType CStaticFunctionDefinitions::GUIGetCursorType(void)
+eCursorType CStaticFunctionDefinitions::GUIGetCursorType()
 {
     return m_pGUI->GetCursorType();
 }
@@ -5151,6 +5518,68 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, i
     return false;
 }
 
+int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
+{
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            // Call getItemCount
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
+        }
+    }
+
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool state)
+{
+    RUN_CHILDREN(GUIComboBoxSetOpen(**iter, state))
+
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            if (state)
+            {
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
+            }
+            else if (!state)
+            {
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
+{
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
+        }
+    }
+
+    return false;
+}
+
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
                                                                 bool bIsTransparent, bool bRelative, CClientGUIElement* pParent)
 {
@@ -5162,6 +5591,13 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMai
     CVector2D absoluteSize;
     pElement->GetSize(absoluteSize, false);
     auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+
+    if (!pGUIElement->GetBrowser())
+    {
+        delete pGUIElement;
+        return nullptr;
+    }
+
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // Load CEGUI element texture from webview
@@ -5322,6 +5758,30 @@ void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
         if (bConsoleHadInputFocus)
             g_pCore->GetConsole()->ActivateInput();
     }
+}
+
+bool CStaticFunctionDefinitions::GUIBlur(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Deactivate();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIFocus(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Activate();
+        return true;
+    }
+    return false;
 }
 
 void CStaticFunctionDefinitions::GUICheckBoxSetSelected(CClientEntity& Entity, bool bFlag)
@@ -5559,6 +6019,24 @@ void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, uns
     }
 }
 
+void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+{
+    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
+
+    // Are we a GUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a memo?
+        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+        {
+            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
+        }
+    }
+}
+
 void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Entity, bool bEnabled)
 {
     RUN_CHILDREN(GUIGridListSetSortingEnabled(**iter, bEnabled))
@@ -5572,7 +6050,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Ent
         if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
         {
             // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSorting(bEnabled);
+            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
         }
     }
 }
@@ -5802,8 +6280,8 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    *pColEntity = m_pManager->FindEntity(pColGameEntity);
-
+    CPools* pPools = g_pGame->GetPools();
+    *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
     return true;
 }
 
@@ -5872,7 +6350,7 @@ bool CStaticFunctionDefinitions::SetAllElementWaterLevel(float fLevel, void* pCh
     return g_pClientGame->GetManager()->GetWaterManager()->SetAllElementWaterLevel(fLevel, pChangeSource);
 }
 
-bool CStaticFunctionDefinitions::ResetWorldWaterLevel(void)
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel()
 {
     g_pClientGame->GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     return true;
@@ -6095,7 +6573,7 @@ bool CStaticFunctionDefinitions::SetWindVelocity(float fX, float fY, float fZ)
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWindVelocity(void)
+bool CStaticFunctionDefinitions::RestoreWindVelocity()
 {
     g_pMultiplayer->RestoreWindVelocity();
     return true;
@@ -6158,7 +6636,7 @@ bool CStaticFunctionDefinitions::SetSkyGradient(unsigned char ucTopRed, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetSkyGradient(void)
+bool CStaticFunctionDefinitions::ResetSkyGradient()
 {
     g_pMultiplayer->ResetSky();
     return true;
@@ -6176,7 +6654,7 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetHeatHaze(void)
+bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pMultiplayer->ResetHeatHaze();
     return true;
@@ -6195,7 +6673,7 @@ bool CStaticFunctionDefinitions::SetWaterColor(float fWaterRed, float fWaterGree
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWaterColor(void)
+bool CStaticFunctionDefinitions::ResetWaterColor()
 {
     g_pMultiplayer->ResetWater();
     return true;
@@ -6329,7 +6807,7 @@ bool CStaticFunctionDefinitions::SetBirdsEnabled(bool bEnabled)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetBirdsEnabled(void)
+bool CStaticFunctionDefinitions::GetBirdsEnabled()
 {
     return g_pClientGame->GetBirdsEnabled();
 }
@@ -6421,28 +6899,32 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     if (bKey)
     {
         bool bHitState = true;
-        // Activate all keys for this command
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
         // Check if its binded already (dont rebind)
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            // Activate all keys for this command
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
 
         bHitState = false;
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
     }
@@ -6512,16 +6994,16 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             }
         }
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
         bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
     }
@@ -6553,7 +7035,7 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
 
     float fState;
     // Analog
-    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState))
+    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState, false))
     {
         bState = fState > 0;
         return true;
@@ -6572,13 +7054,18 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState, bool bRawInput)
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
-    pLocalPlayer->GetControllerState(cs);
-    bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
-    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+    bool             bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
+
+    if (bRawInput)
+        cs = pLocalPlayer->m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+    else
+        pLocalPlayer->GetControllerState(cs);
+
+    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
         return true;
     }
@@ -6768,6 +7255,141 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     return pShape;
 }
 
+bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CClientColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CClientColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CClientColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CClientColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CClientColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CClientColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CClientColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CClientColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CClientColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (pColPolygon->RemovePoint(uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColShape)
 {
@@ -6791,6 +7413,13 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* p
             break;
     }
     return pColShape;
+}
+
+bool CStaticFunctionDefinitions::IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition, 0);
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, SString& strOutName)
@@ -7200,18 +7829,18 @@ CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, con
     return pFx;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
+CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bIsRawData, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop,
+CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
                                                       bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, vecPosition, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;
@@ -7229,8 +7858,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
-    Sound.SetPlayPosition(dPosition);
-    return true;
+    return Sound.SetPlayPosition(dPosition);
 }
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double dPosition)
@@ -7275,6 +7903,16 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     if (pVoice != NULL)
     {
         dLength = pVoice->GetLength();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    if (Sound.IsSoundStream())
+    {
+        dBufferLength = Sound.GetBufferLength();
         return true;
     }
     return false;
@@ -7519,8 +8157,7 @@ bool CStaticFunctionDefinitions::IsSoundPanEnabled(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPanEnabled(CClientSound& Sound, bool bEnabled)
 {
-    Sound.SetPanEnabled(bEnabled);
-    return true;
+    return Sound.SetPanEnabled(bEnabled);
 }
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight)
@@ -9216,19 +9853,15 @@ CClientPointLights* CStaticFunctionDefinitions::CreateLight(CResource& Resource,
 {
     // Create it
     CClientPointLights* pLight = new CClientPointLights(m_pManager, INVALID_ELEMENT_ID);
-    if (pLight)
-    {
-        pLight->SetParent(Resource.GetResourceDynamicEntity());
-        pLight->SetMode(iMode);
-        pLight->SetPosition(vecPosition);
-        pLight->SetRadius(fRadius);
-        pLight->SetColor(color);
-        pLight->SetDirection(vecDirection);
 
-        return pLight;
-    }
+    pLight->SetParent(Resource.GetResourceDynamicEntity());
+    pLight->SetMode(iMode);
+    pLight->SetPosition(vecPosition);
+    pLight->SetRadius(fRadius);
+    pLight->SetColor(color);
+    pLight->SetDirection(vecDirection);
 
-    return NULL;
+    return pLight;
 }
 
 bool CStaticFunctionDefinitions::GetLightType(CClientPointLights* pLight, int& iMode)
@@ -9317,4 +9950,19 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     }
 
     return nullptr;
+}
+
+bool CStaticFunctionDefinitions::ResetAllSurfaceInfo()
+{
+    g_pGame->GetWorld()->ResetAllSurfaceInfo();
+    return true;
+}
+bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
+    {
+        g_pGame->GetWorld()->ResetSurfaceInfo(sSurfaceID);
+        return true;
+    }
+    return false;
 }

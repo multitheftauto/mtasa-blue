@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -26,10 +26,8 @@
 #include <curl/curl.h> /* for curl_socket_t */
 #endif
 
-#define CURLX_POINTER_TO_INTEGER_CAST(p) \
-  ((char *)(p) - (char *)NULL)
-#define CURLX_INTEGER_TO_POINTER_CAST(i) \
-  ((void *)((char *)NULL + (i)))
+#define CURLX_FUNCTION_CAST(target_type, func) \
+  (target_type)(void (*) (void))(func)
 
 unsigned short curlx_ultous(unsigned long ulnum);
 
@@ -58,10 +56,6 @@ size_t curlx_sotouz(curl_off_t sonum);
 int curlx_sztosi(ssize_t sznum);
 
 unsigned short curlx_uitous(unsigned int uinum);
-
-unsigned char curlx_uitouc(unsigned int uinum);
-
-int curlx_uitosi(unsigned int uinum);
 
 size_t curlx_sitouz(int sinum);
 

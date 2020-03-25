@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIWINDOW_IMPL_H
-#define __CGUIWINDOW_IMPL_H
+#pragma once
 
 #include <gui/CGUIWindow.h>
 #include "CGUIElement_Impl.h"
@@ -19,22 +18,22 @@ class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl, public CGUIT
 {
 public:
     CGUIWindow_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", const SString& strLayoutFile = "");
-    ~CGUIWindow_Impl(void);
+    ~CGUIWindow_Impl();
 
     void SetMovable(bool bMovable);
-    bool IsMovable(void);
+    bool IsMovable();
     void SetSizingEnabled(bool bResizeEnabled);
-    bool IsSizingEnabled(void);
+    bool IsSizingEnabled();
     void SetFrameEnabled(bool bFrameEnabled);
-    bool IsFrameEnabled(void);
+    bool IsFrameEnabled();
     void SetCloseButtonEnabled(bool bCloseButtonEnabled);
-    bool IsCloseButtonEnabled(void);
+    bool IsCloseButtonEnabled();
     void SetTitlebarEnabled(bool bTitlebarEnabled);
-    bool IsTitlebarEnabled(void);
+    bool IsTitlebarEnabled();
 
     void SetCloseClickHandler(GUI_CALLBACK Callback);
 
-    eCGUIType GetType(void) { return CGUI_WINDOW; };
+    eCGUIType GetType() { return CGUI_WINDOW; };
 
     #include "CGUIElement_Inc.h"
 
@@ -43,5 +42,3 @@ protected:
 
     GUI_CALLBACK m_OnCloseClick;
 };
-
-#endif

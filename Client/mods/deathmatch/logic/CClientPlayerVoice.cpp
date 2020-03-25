@@ -35,6 +35,7 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     // Get initial voice volume
     m_fVolume = 1.0f;
     g_pCore->GetCVars()->Get("voicevolume", m_fVolumeScale);
+    m_fVolumeScale *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
 
     m_fVolume = m_fVolume * m_fVolumeScale;
 
@@ -45,7 +46,7 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     m_fPlaybackSpeed = 1.0f;
     Init();
 }
-CClientPlayerVoice::~CClientPlayerVoice(void)
+CClientPlayerVoice::~CClientPlayerVoice()
 {
     DeInit();
 }
@@ -55,22 +56,18 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
     if (data == 0)
     {
         CClientPlayerVoice* pVoice = static_cast<CClientPlayerVoice*>(user);
-        pVoice->m_CS.Lock();
+        std::lock_guard<std::mutex> lock(pVoice->m_Mutex);
 
         if (pVoice->m_bVoiceActive)
         {
             pVoice->m_EventQueue.push_back("onClientPlayerVoiceStop");
             pVoice->m_bVoiceActive = false;
         }
-
-        pVoice->m_CS.Unlock();
     }
 }
 
-void CClientPlayerVoice::Init(void)
+void CClientPlayerVoice::Init()
 {
-    m_CS.Lock();
-
     // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
     unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
@@ -89,11 +86,9 @@ void CClientPlayerVoice::Init(void)
     // Initialize our speex decoder
     speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
     speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &ucQuality);
-
-    m_CS.Unlock();
 }
 
-void CClientPlayerVoice::DeInit(void)
+void CClientPlayerVoice::DeInit()
 {
     BASS_ChannelStop(m_pBassPlaybackStream);
     BASS_StreamFree(m_pBassPlaybackStream);
@@ -106,15 +101,14 @@ void CClientPlayerVoice::DeInit(void)
     m_SampleRate = SAMPLERATE_WIDEBAND;
 }
 
-void CClientPlayerVoice::DoPulse(void)
+void CClientPlayerVoice::DoPulse()
 {
     // Dispatch queued events
     ServiceEventQueue();
 
-    m_CS.Lock();
     float fPreviousVolume = 0.0f;
     g_pCore->GetCVars()->Get("voicevolume", fPreviousVolume);
-    m_CS.Unlock();
+    fPreviousVolume *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
 
     if (fPreviousVolume != m_fVolumeScale && m_pPlayer->IsLocalPlayer() == false)
     {
@@ -126,17 +120,23 @@ void CClientPlayerVoice::DoPulse(void)
 
 void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
 {
-    m_CS.Lock();
-    CLuaArguments Arguments;
+    m_Mutex.lock();
+
     if (!m_bVoiceActive)
     {
-        m_CS.Unlock();
+        m_Mutex.unlock();
+
         ServiceEventQueue();
+
+        CLuaArguments Arguments;
         if (!m_pPlayer->CallEvent("onClientPlayerVoiceStart", Arguments, true))
             return;
 
-        m_CS.Lock();
         m_bVoiceActive = true;
+    }
+    else
+    {
+        m_Mutex.unlock();
     }
 
     char      pTempBuffer[2048];
@@ -151,26 +151,21 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
     unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
     BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
-
-    m_CS.Unlock();
 }
 
-void CClientPlayerVoice::ServiceEventQueue(void)
+void CClientPlayerVoice::ServiceEventQueue()
 {
-    m_CS.Lock();
-    while (!m_EventQueue.empty())
+    std::list<SString> eventQueue;
     {
-        SString strEvent = m_EventQueue.front();
-        m_EventQueue.pop_front();
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        std::swap(eventQueue, m_EventQueue);
+    }
 
-        m_CS.Unlock();
-
+    for (const SString& strEvent : eventQueue)
+    {
         CLuaArguments Arguments;
         m_pPlayer->CallEvent(strEvent, Arguments, true);
-
-        m_CS.Lock();
     }
-    m_CS.Unlock();
 }
 
 ////////////////////////////////////////////////////////////
@@ -192,7 +187,7 @@ void CClientPlayerVoice::SetPlayPosition(double dPosition)
     }
 }
 
-double CClientPlayerVoice::GetPlayPosition(void)
+double CClientPlayerVoice::GetPlayPosition()
 {
     if (m_pBassPlaybackStream)
     {
@@ -214,7 +209,7 @@ double CClientPlayerVoice::GetLength(bool bAvoidLoad)
     return 0;
 }
 
-float CClientPlayerVoice::GetVolume(void)
+float CClientPlayerVoice::GetVolume()
 {
     return m_fVolume;
 }
@@ -230,7 +225,7 @@ void CClientPlayerVoice::SetVolume(float fVolume, bool bStore)
     }
 }
 
-float CClientPlayerVoice::GetPlaybackSpeed(void)
+float CClientPlayerVoice::GetPlaybackSpeed()
 {
     return m_fPlaybackSpeed;
 }
@@ -336,7 +331,7 @@ float* CClientPlayerVoice::GetWaveData(int iLength)
     return NULL;
 }
 
-DWORD CClientPlayerVoice::GetLevelData(void)
+DWORD CClientPlayerVoice::GetLevelData()
 {
     if (m_pBassPlaybackStream)
     {
@@ -371,7 +366,7 @@ bool CClientPlayerVoice::SetFxEffect(uint uiFxEffect, bool bEnable)
 //
 // Copy state stored in m_EnabledEffects to actual BASS sound
 //
-void CClientPlayerVoice::ApplyFxEffects(void)
+void CClientPlayerVoice::ApplyFxEffects()
 {
     for (uint i = 0; i < NUMELMS(m_FxEffects) && NUMELMS(m_EnabledEffects); i++)
     {
@@ -457,7 +452,7 @@ void CClientPlayerVoice::SetPaused(bool bPaused)
     }
 }
 
-bool CClientPlayerVoice::IsPaused(void)
+bool CClientPlayerVoice::IsPaused()
 {
     return m_bPaused;
 }

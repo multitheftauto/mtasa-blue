@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1999 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1999 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -104,7 +104,7 @@ static const char upper_digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       done++; \
     else \
      return done; /* return immediately on failure */ \
-  } WHILE_FALSE
+  } while(0)
 
 /* Data type to read from the arglist */
 typedef enum {
@@ -835,7 +835,7 @@ static int dprintf_formatf(
           while(width-- > 0)
             OUTCHAR(' ');
 
-        while((len-- > 0) && *str)
+        for(; len && *str; len--)
           OUTCHAR(*str++);
         if(p->flags&FLAGS_LEFT)
           while(width-- > 0)

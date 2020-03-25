@@ -16,11 +16,11 @@
 // CEffectTemplate instantiation
 //
 ///////////////////////////////////////////////////////////////
-CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug,
+CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
                                    HRESULT& outHResult)
 {
     CEffectTemplate* pEffectTemplate = new CEffectTemplate();
-    pEffectTemplate->PostConstruct(pManager, strFilename, strRootPath, strOutStatus, bDebug);
+    pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
 
     outHResult = pEffectTemplate->m_CreateHResult;
     if (!pEffectTemplate->IsValid())
@@ -35,7 +35,7 @@ namespace
 {
     ////////////////////////////////////////////////////////////////////////////////////
     //
-    // Helper class for D3DXCreateEffectFromFile() to ensure includes are correctly found and don't go outside the resource directory
+    // Helper class for D3DXCreateEffect functions to ensure includes are correctly found and don't go outside the resource directory
     //
     ////////////////////////////////////////////////////////////////////////////////////
     class CIncludeManager : public ID3DXInclude
@@ -121,12 +121,12 @@ namespace
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
 {
     Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData(strFilename, strRootPath, strOutStatus, bDebug);
+    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString&
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::PreDestruct(void)
+void CEffectTemplate::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -149,7 +149,7 @@ void CEffectTemplate::PreDestruct(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-int CEffectTemplate::GetTicksSinceLastUsed(void)
+int CEffectTemplate::GetTicksSinceLastUsed()
 {
     if (m_uiCloneCount != 0)
         return 0;            // Used right now
@@ -165,7 +165,7 @@ int CEffectTemplate::GetTicksSinceLastUsed(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplate::IsValid(void)
+bool CEffectTemplate::IsValid()
 {
     return m_pD3DEffect != NULL;
 }
@@ -177,7 +177,7 @@ bool CEffectTemplate::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::OnLostDevice(void)
+void CEffectTemplate::OnLostDevice()
 {
     m_pD3DEffect->OnLostDevice();
 }
@@ -189,7 +189,7 @@ void CEffectTemplate::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::OnResetDevice(void)
+void CEffectTemplate::OnResetDevice()
 {
     m_pD3DEffect->OnResetDevice();
 }
@@ -201,7 +201,7 @@ void CEffectTemplate::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
 {
     assert(!m_pD3DEffect);
 
@@ -223,11 +223,13 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SSt
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    SString         strMetaPath = strFilename.Right(strFilename.length() - strRootPath.length());
+    SString         strMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length());
     CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
-    m_CreateHResult =
-        MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+    if (bIsRawData)
+        m_CreateHResult = MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+    else
+        m_CreateHResult = MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";
@@ -342,7 +344,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SSt
             {
                 SString strDisassemblyContents;
                 strDisassemblyContents.assign((const char*)pData, Size - 1);
-                FileSave(strFilename + ".dis", strDisassemblyContents);
+                FileSave(bIsRawData ? strRootPath + "raw_data.dis" : strFile + ".dis", strDisassemblyContents);
             }
 
             SAFE_RELEASE(pDisassembly);
@@ -399,7 +401,7 @@ bool CEffectTemplate::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& s
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::ReleaseUnderlyingData(void)
+void CEffectTemplate::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DEffect);
 }
@@ -445,7 +447,7 @@ void CEffectTemplate::UnCloneD3DEffect(CEffectWrap* pEffectWrap)
 // Recheck MD5's to see if the content has changed
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplate::HaveFilesChanged(void)
+bool CEffectTemplate::HaveFilesChanged()
 {
     if (!m_bHaveFilesChanged)
     {

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTDELETER_H
-#define __CELEMENTDELETER_H
+#pragma once
 
 #include <memory>
 #include <list>
@@ -18,29 +17,20 @@
 class CElementDeleter
 {
 public:
-    CElementDeleter(void);
-    ~CElementDeleter(void) { DoDeleteAll(); };
+    CElementDeleter();
+    ~CElementDeleter() { DoDeleteAll(); };
 
     void Delete(class CClientEntity* pElement);
     void DeleteRecursive(class CClientEntity* pElement);
-    bool DeleteElementSpecial(CClientEntity* pElement);
-    void DeleteIFP(CClientEntity* pElement);
-
-    void DoDeleteAll(void);
-    bool OnClientSpecialElementDestroy(CClientEntity* pElement);
-    void OnClientIFPElementDestroy(CClientEntity* pElement);
+    void DoDeleteAll();
     bool IsBeingDeleted(class CClientEntity* pElement);
-
     void Unreference(class CClientEntity* pElement);
-
     void CleanUpForVM(CLuaMain* pLuaMain);
 
 private:
-    CMappedList<class CClientEntity*> m_List;
-    // We are using shared_ptr for CClientIFP, and we must keep a reference
-    // somewhere, so this is it.
-    std::vector<std::shared_ptr<class CClientIFP> > m_vecIFPElements;
-    bool                                            m_bAllowUnreference;
-};
+    void DoDeleteAllSmartPointers();
 
-#endif
+    CMappedList<class CClientEntity*> m_List;
+    bool                              m_bAllowUnreference;
+    CMappedList<class CClientEntity*> m_ListRawSmartPointer;
+};

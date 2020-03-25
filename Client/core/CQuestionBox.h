@@ -12,8 +12,7 @@
 
 class CQuestionBox;
 
-#ifndef __CQUESTIONBOX_H
-#define __CQUESTIONBOX_H
+#pragma once
 
 #include "CMainMenu.h"
 
@@ -23,12 +22,12 @@ typedef void (*pfnQuestionEditCallback)(void*, unsigned int, std::string);
 class CQuestionBox
 {
 public:
-    CQuestionBox(void);
-    ~CQuestionBox(void);
+    CQuestionBox();
+    ~CQuestionBox();
 
-    void         Hide(void);
-    void         Show(void);
-    void         Reset(void);
+    void         Hide();
+    void         Show();
+    void         Reset();
     void         SetTitle(const SString& strTitle);
     void         SetMessage(const SString& strMsg);
     void         AppendMessage(const SString& strMsg);
@@ -37,10 +36,10 @@ public:
     void         SetCallback(pfnQuestionCallback callback, void* ptr = NULL);
     void         SetCallbackEdit(pfnQuestionEditCallback callback, void* ptr = NULL);
     void         SetOnLineHelpOption(const SString& strTroubleType);
-    unsigned int PollButtons(void);
-    bool         IsVisible(void);
+    unsigned int PollButtons();
+    bool         IsVisible();
     void         SetAutoCloseOnConnect(bool bEnable);
-    void         OnConnect(void);
+    void         OnConnect();
 
 private:
     bool OnButtonClick(CGUIElement* pElement);
@@ -58,5 +57,3 @@ private:
     SString                  m_strMsg;
     bool                     m_bAutoCloseOnConnect;
 };
-
-#endif

@@ -4,20 +4,20 @@ project "portaudio"
 	targetname "portaudio"
 
 	disablewarnings { "4996" }
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.c"
 	}
-	
+
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

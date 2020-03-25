@@ -2411,7 +2411,8 @@ struct
     330,   "Phone",
     331,   "Brass_Knuckles",
     333,   "Golf_Club",
-    334,   "Night_Strick",
+    334,   "Night_Strick",            // typo here retained for BC
+    334,   "Night_Stick",
     335,   "Knife",
     336,   "Baseball_Bat",
     337,   "Shovel",
@@ -10018,7 +10019,7 @@ struct
     10012, "cables4",
 };
 
-static const char* playerClothesModel[] = {
+static const char* const playerClothesModel[] = {
     "afro",        "afrobeard",    "afrotash",     "balaclava",   "bandana",      "bandknots",   "bandmask",       "barefeet",    "baseball",     "bask1",
     "baskball",    "bbjack",       "beret",        "biker",       "bikerhelmet",  "boater",      "bowler",         "boxingcap",   "boxingshoe",   "boxingshort",
     "cap",         "capandband",   "capback",      "capknit",     "capover",      "capovereye",  "cappolice",      "caprimup",    "capside",      "captruck",
@@ -10036,7 +10037,7 @@ static const char* playerClothesModel[] = {
     "trilby",      "tshirt",       "tshirt2",      "valet",       "vest",         "watch",       "watch_hoody",    "wcoat",       "wedge",        "worktr",
     "worktrboot",  "zorromask"};
 
-static const char* playerClothesTex[] = {
+static const char* const playerClothesTex[] = {
     "10ls",
     "10ls2",
     "10ls3",
@@ -10518,7 +10519,7 @@ ushort CModelNames::ResolveClothesTexID(const SString& strTexNameOrNumber)
 //
 // Initialize id <-> name maps
 //
-void CModelNames::InitializeMaps(void)
+void CModelNames::InitializeMaps()
 {
     if (!ms_ModelIDNameMap.empty())
         return;

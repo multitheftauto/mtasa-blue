@@ -10,8 +10,7 @@
 
 // ## TODO ## : Make it possible to delete the local player without crashin ( m_pLocalPlayer not NULL-ed )
 
-#ifndef __CCLIENTPLAYERMANAGER_H
-#define __CCLIENTPLAYERMANAGER_H
+#pragma once
 
 #include <list>
 
@@ -25,31 +24,31 @@ class CClientPlayerManager
     friend class CClientPlayer;
 
 public:
-    CClientPlayer* GetLocalPlayer(void) { return m_pLocalPlayer; };
+    CClientPlayer* GetLocalPlayer() { return m_pLocalPlayer; };
     void           SetLocalPlayer(CClientPlayer* pPlayer) { m_pLocalPlayer = pPlayer; };
 
-    void DoPulse(void);
-    void DeleteAll(void);
+    void DoPulse();
+    void DeleteAll();
 
-    unsigned int          Count(void) { return static_cast<unsigned int>(m_Players.size()); };
+    unsigned int          Count() { return static_cast<unsigned int>(m_Players.size()); };
     static CClientPlayer* Get(ElementID ID);
     CClientPlayer*        Get(const char* szNick, bool bCaseSensitive = false);
     CClientPlayer*        Get(CPlayerPed* pPlayer, bool bValidatePointer);
 
     bool Exists(CClientPlayer* pPlayer);
 
-    static bool IsPlayerLimitReached(void);
+    static bool IsPlayerLimitReached();
 
-    std::vector<CClientPlayer*>::const_iterator IterBegin(void) { return m_Players.begin(); };
-    std::vector<CClientPlayer*>::const_iterator IterEnd(void) { return m_Players.end(); };
+    std::vector<CClientPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
+    std::vector<CClientPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
     static bool IsValidModel(unsigned long ulModel);
 
-    void ResetAll(void);
+    void ResetAll();
 
 private:
     CClientPlayerManager(CClientManager* pManager);
-    ~CClientPlayerManager(void);
+    ~CClientPlayerManager();
 
     void AddToList(CClientPlayer* pPlayer) { m_Players.push_back(pPlayer); };
     void RemoveFromList(CClientPlayer* pPlayer);
@@ -59,5 +58,3 @@ private:
     CMappedArray<CClientPlayer*> m_Players;
     CClientPlayer*               m_pLocalPlayer;
 };
-
-#endif

@@ -29,7 +29,7 @@ Returns 0 on error, char *ASEQuery_error contains the error message.
 
 2. The worker function
 
-extern int ASEQuery_check(void);
+extern int ASEQuery_check();
 
 Ideally this should be called every millisecond. The simplest implementation
 would be to call this every "frame". Longer delays cause bigger ping
@@ -40,9 +40,9 @@ Returns 0 on error, char *ASEQuery_error contains the error message.
 
 3. Functions that the _game_ has to implement
 
-void ASEQuery_wantstatus(void);
-void ASEQuery_wantrules(void);
-void ASEQuery_wantplayers(void);
+void ASEQuery_wantstatus();
+void ASEQuery_wantrules();
+void ASEQuery_wantplayers();
 
 These are called when the SDK needs information about the game state.
 In each of these functions, the game must call back to the SDK providing
@@ -64,7 +64,7 @@ apply can be passed as NULL.
 
 5. Shutting down
 
-extern void ASEQuery_shutdown(void);
+extern void ASEQuery_shutdown();
 
 
 6. How to link
@@ -109,20 +109,20 @@ actual .h stuff follows
 */
 extern "C"
 {
-    extern int ASEQuery_initialize(int hostport, int internet, char *address);
+    extern int ASEQuery_initialize(int hostport, int internet, char* address);
 
-    extern void ASEQuery_shutdown(void);
+    extern void ASEQuery_shutdown();
 
-    extern int ASEQuery_check(void);
+    extern int ASEQuery_check();
 
-    void ASEQuery_wantstatus(void);
-    void ASEQuery_wantrules(void);
-    void ASEQuery_wantplayers(void);
+    void ASEQuery_wantstatus();
+    void ASEQuery_wantrules();
+    void ASEQuery_wantplayers();
 
-    extern void ASEQuery_status(const char *hostname, const char *gametype, const char *mapname, const char *gamever, int password, int numplayers,
+    extern void ASEQuery_status(const char* hostname, const char* gametype, const char* mapname, const char* gamever, int password, int numplayers,
                                 int maxplayers);
-    extern void ASEQuery_addrule(const char *key, const char *value);
-    extern void ASEQuery_addplayer(const char *name, const char *team, const char *skin, const char *score, const char *ping, const char *time);
+    extern void ASEQuery_addrule(const char* key, const char* value);
+    extern void ASEQuery_addplayer(const char* name, const char* team, const char* skin, const char* score, const char* ping, const char* time);
 
-    extern char *ASEQuery_error;
+    extern char* ASEQuery_error;
 }

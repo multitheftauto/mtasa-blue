@@ -463,6 +463,12 @@ void CWaterManagerSA::InstallHooks()
     MemPut<BYTE>(0x6EFCB7, 0x14);
 }
 
+CWaterZoneSA* CWaterManagerSA::GetZone(int iCol, int iRow)
+{
+    int zoneID = 12 * iCol + iRow;
+    return &m_Zones[zoneID];
+}
+
 CWaterZoneSA* CWaterManagerSA::GetZoneContaining(float fX, float fY)
 {
     if (fX < -3000.0f || fX > 3000.0f || fY < -3000.0f || fY > 3000.0f)
@@ -505,6 +511,71 @@ void CWaterManagerSA::GetZonesContaining(const CVector& v1, const CVector& v2, c
             fRowBottom += 500.0f;
         }
         fColumnLeft += 500.0f;
+    }
+}
+
+// Uses http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVector& endPos, std::vector<CWaterZoneSA*>& vecOut)
+{
+    vecOut.clear();
+    float minX = Clamp<float>(-3000.0f, std::min<float>(startPos.fX, endPos.fX), 3000.0f);
+    float maxX = Clamp<float>(-3000.0f, std::max<float>(startPos.fX, endPos.fX), 3000.0f);
+    float minY = Clamp<float>(-3000.0f, std::min<float>(startPos.fY, endPos.fY), 3000.0f);
+    float maxY = Clamp<float>(-3000.0f, std::max<float>(startPos.fY, endPos.fY), 3000.0f);
+
+    int lowXZone = Clamp<int>(0, static_cast<int>((minX + 3000.0f) / 500.0f), 11);
+    int lowYZone = Clamp<int>(0, static_cast<int>((minY + 3000.0f) / 500.0f), 11);
+    int highXZone = Clamp<int>(0, static_cast<int>((maxX + 3000.0f) / 500.0f), 11);
+    int highYZone = Clamp<int>(0, static_cast<int>((maxY + 3000.0f) / 500.0f), 11);
+
+    if (lowXZone == highXZone)
+    {
+        for (int i = lowYZone; i <= highYZone; i++)
+        {
+            vecOut.push_back(GetZone(lowXZone, i));
+        }
+        return;
+    }
+    if (lowYZone == highYZone)
+    {
+        for (int i = lowXZone; i <= highXZone; i++)
+        {
+            vecOut.push_back(GetZone(i, lowYZone));
+        }
+        return;
+    }
+
+    float dX = fabs(maxX - minX);
+    float dY = fabs(maxY - minY);
+    float dist;
+    int n = 1;
+    int xZone = lowXZone;
+    int yZone = lowYZone;
+
+    n += highXZone - lowXZone;
+    n += highYZone - lowYZone;
+    dist = (floor(minX) + 1 - minX) * dY;
+    dist -= (floor(minY) + 1 - minY) * dX;
+
+    for (; n > 0; --n)
+    {
+        // A bound check here fixes client crash (https://github.com/multitheftauto/mtasa-blue/issues/835)
+        // See PR https://github.com/multitheftauto/mtasa-blue/pull/836
+        if (Between<int>(lowXZone, xZone, highXZone) &&
+            Between<int>(lowYZone, yZone, highYZone))
+        {
+            vecOut.push_back(GetZone(xZone, yZone));
+        }
+        if (dist > 0)
+        {
+            yZone++;
+            dist -= dX;
+        }
+        else
+        {
+            xZone++;
+            dist += dY;
+        }
     }
 }
 
@@ -738,9 +809,89 @@ void CWaterManagerSA::SetWaveLevel(float fWaveLevel)
     }
 }
 
+bool CWaterManagerSA::IsPointOutsideOfGameArea(const CVector& vecPos)
+{
+    return vecPos.fX < -3000 || vecPos.fX > 3000 || vecPos.fY < -3000 || vecPos.fY > 3000;
+}
+
 bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision)
 {
-    return ((TestLineAgainstWater_t)FUNC_TestLineAgainstWater)(vecEnd.fX, vecEnd.fY, vecEnd.fZ, vecStart.fX, vecStart.fY, vecStart.fZ, vecCollision);
+    CVector rayDir = vecEnd - vecStart;
+
+    // Check if we're outside of map area.
+    CVector zeroPoint;
+    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    {
+        *vecCollision = zeroPoint;
+        return true;
+    }
+
+    // Early out in case of both points being out of map
+    if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
+    {
+        // Check if both points are on the same side of the map, in case of some mad person
+        // trying to testLineAgainstWater over entire SA landmass, which is still a valid option.
+        if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) ||
+            (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
+            (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
+            (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
+        {
+            return false;
+        }
+    }
+
+    std::vector<CWaterZoneSA*> vecZones;
+    GetZonesIntersecting(vecStart, vecEnd, vecZones);
+
+    if (vecZones.empty())
+    {
+        return false;
+    }
+   
+    std::deque<CVector> vecVertices;
+    for (auto& zone : vecZones)
+    {
+        CWaterZoneSA::iterator iter;
+        for (iter = zone->begin(); iter != zone->end(); ++iter)
+        {
+            auto poly = *iter;
+            int iNumVertices = poly->GetNumVertices();
+            if (iNumVertices < 3) continue;
+
+            vecVertices.clear();
+
+            CVector vecTemp;
+            poly->GetVertex(0)->GetPosition(vecTemp);
+            vecVertices.push_back(vecTemp);
+            poly->GetVertex(1)->GetPosition(vecTemp);
+            vecVertices.push_back(vecTemp);
+            poly->GetVertex(2)->GetPosition(vecTemp);
+            vecVertices.push_back(vecTemp);
+
+            if (vecStart.IntersectsSegmentTriangle(rayDir, vecVertices[0], vecVertices[1], vecVertices[2], vecCollision))
+            {
+                return true;
+            }
+
+            if (iNumVertices < 4) continue;
+
+            for (int i = 3; i < iNumVertices; i++)
+            {
+                vecVertices.pop_front();
+                poly->GetVertex(i)->GetPosition(vecTemp);
+                vecVertices.push_back(vecTemp);
+
+                if (vecStart.IntersectsSegmentTriangle(rayDir, vecVertices[0], vecVertices[1], vecVertices[2], vecCollision))
+                {
+                    return true;
+                }
+            }
+            
+        }
+    }
+
+    return false;
+
 }
 
 void CWaterManagerSA::AddChange(void* pChangeSource, void* pChangedObject, CWaterChange* pChange)
@@ -828,7 +979,7 @@ void CWaterManagerSA::Reset()
 }
 
 // Dynamically hook/unhook water rendering when required
-void CWaterManagerSA::UpdateRenderOrderRequirement(void)
+void CWaterManagerSA::UpdateRenderOrderRequirement()
 {
     bool bAltRenderOrderRequired = ms_iNumNonDefaultAndNonZeroVertices != 0 || m_iActivePolyCount > 0 || m_bWaterDrawnLast;
     if (m_bAltRenderOrder != bAltRenderOrderRequired)
@@ -847,7 +998,7 @@ void CWaterManagerSA::SetWaterDrawnLast(bool bEnable)
     UpdateRenderOrderRequirement();
 }
 
-bool CWaterManagerSA::IsWaterDrawnLast(void)
+bool CWaterManagerSA::IsWaterDrawnLast()
 {
     return m_bWaterDrawnLast;
 }

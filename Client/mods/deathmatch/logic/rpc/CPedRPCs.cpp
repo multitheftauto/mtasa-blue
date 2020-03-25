@@ -15,7 +15,7 @@
 
 class CLuaArguments;
 
-void CPedRPCs::LoadFunctions(void)
+void CPedRPCs::LoadFunctions()
 {
     AddHandler(SET_PED_ARMOR, SetPedArmor, "SetPedArmor");
     AddHandler(SET_PED_ROTATION, SetPedRotation, "SetPedRotation");
@@ -31,6 +31,7 @@ void CPedRPCs::LoadFunctions(void)
     AddHandler(SET_PED_DOING_GANG_DRIVEBY, SetPedDoingGangDriveby, "SetPedDoingGangDriveby");
     AddHandler(SET_PED_ANIMATION, SetPedAnimation, "SetPedAnimation");
     AddHandler(SET_PED_ANIMATION_PROGRESS, SetPedAnimationProgress, "SetPedAnimationProgress");
+    AddHandler(SET_PED_ANIMATION_SPEED, SetPedAnimationSpeed, "SetPedAnimationSpeed");
     AddHandler(SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire");
     AddHandler(SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless");
     AddHandler(SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen");
@@ -240,36 +241,40 @@ void CPedRPCs::SetPedDoingGangDriveby(CClientEntity* pSource, NetBitStreamInterf
 
 void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    char          szBlockName[64], szAnimName[64];
-    unsigned char ucBlockSize, ucAnimSize;
-    int           iTime;
-    int           iBlend = 250;
-    bool          bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+    std::string blockName;
 
-    if (bitStream.Read(ucBlockSize))
+    if (bitStream.ReadString<unsigned char>(blockName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed)
         {
-            if (ucBlockSize > 0)
+            if (!blockName.empty())
             {
-                if (bitStream.Read(szBlockName, ucBlockSize) && bitStream.Read(ucAnimSize))
+                std::string animName;
+                int         iTime;
+                int         iBlend = 250;
+                bool        bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
+
+                if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
+                    bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
                 {
-                    szBlockName[ucBlockSize] = 0;
-                    if (bitStream.Read(szAnimName, ucAnimSize) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
-                        bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
+                    if (bitStream.Version() >= 0x065)
                     {
-                        if (bitStream.Version() >= 0x065)
-                            bitStream.Read(iBlend);
-
-                        szAnimName[ucAnimSize] = 0;
-
-                        CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(szBlockName);
-                        if (pBlock)
+                        bitStream.Read(iBlend);
+                        bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
+                        if (!pPed->IsDucked())
                         {
-                            pPed->RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                            bTaskToBeRestoredOnAnimEnd = false;
                         }
+                    }
+
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
+                    if (pBlock)
+                    {
+                        pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+                        pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
                     }
                 }
             }
@@ -284,34 +289,51 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
 void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the player and vehicle id
-    char          szAnimName[64];
-    unsigned char ucAnimSize;
-    float         fProgress;
+    std::string animName;
+    float       fProgress;
 
-    if (bitStream.Read(ucAnimSize))
+    if (bitStream.ReadString<unsigned char>(animName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed)
         {
-            if (ucAnimSize > 0)
+            if (!animName.empty())
             {
-                if (bitStream.Read(szAnimName, ucAnimSize))
+                if (bitStream.Read(fProgress))
                 {
-                    szAnimName[ucAnimSize] = 0;
-                    if (bitStream.Read(fProgress))
+                    auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
+                    if (pAnimAssociation)
                     {
-                        CAnimBlendAssociation* pA = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
-                        if (pA)
-                        {
-                            pA->SetCurrentProgress(fProgress);
-                        }
+                        pAnimAssociation->SetCurrentProgress(fProgress);
                     }
                 }
             }
             else
             {
                 pPed->KillAnimation();
+            }
+        }
+    }
+}
+
+void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    std::string animName;
+    float       fSpeed;
+
+    if (bitStream.ReadString<unsigned char>(animName))
+    {
+        CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
+        if (pPed && !animName.empty())
+        {
+            if (bitStream.Read(fSpeed))
+            {
+                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
+                if (pAnimAssociation)
+                {
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                }
             }
         }
     }

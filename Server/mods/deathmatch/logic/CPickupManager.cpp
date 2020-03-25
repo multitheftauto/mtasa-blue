@@ -27,37 +27,31 @@ CPickupManager::CPickupManager(CColManager* pColManager)
 
 CPickup* CPickupManager::Create(CElement* pParent)
 {
-    // Create the pickup
-    CPickup* pPickup = new CPickup(pParent, NULL, this, m_pColManager);
+    CPickup* const pPickup = new CPickup(pParent, this, m_pColManager);
 
-    // Delete it if it's invalid
     if (pPickup->GetID() == INVALID_ELEMENT_ID)
     {
         delete pPickup;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the pickup
     return pPickup;
 }
 
 CPickup* CPickupManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the pickup
-    CPickup* pPickup = new CPickup(pParent, &Node, this, m_pColManager);
+    CPickup* const pPickup = new CPickup(pParent, this, m_pColManager);
 
-    // Delete it if it's invalid
-    if (pPickup->GetID() == INVALID_ELEMENT_ID || !pPickup->LoadFromCustomData(pEvents))
+    if (pPickup->GetID() == INVALID_ELEMENT_ID || !pPickup->LoadFromCustomData(pEvents, Node))
     {
         delete pPickup;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the pickup
     return pPickup;
 }
 
-void CPickupManager::DeleteAll(void)
+void CPickupManager::DeleteAll()
 {
     DeletePointersAndClearList(m_List);
 }

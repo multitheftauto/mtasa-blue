@@ -226,7 +226,7 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
     return false;
 }
 
-void CNetAPI::ResetReturnPosition(void)
+void CNetAPI::ResetReturnPosition()
 {
     m_bStoredReturnSync = false;
 
@@ -276,7 +276,7 @@ bool CNetAPI::IsDriveByWeapon(unsigned char ucID)
     return ((ucID >= 22 && ucID <= 33) || ucID == 38);
 }
 
-void CNetAPI::DoPulse(void)
+void CNetAPI::DoPulse()
 {
     m_bIsNetworkTrouble = false;
 
@@ -516,7 +516,7 @@ bool CNetAPI::IsSmallKeySyncNeeded(CClientPed* pPlayerModel)
     return false;
 }
 
-bool CNetAPI::IsPureSyncNeeded(void)
+bool CNetAPI::IsPureSyncNeeded()
 {
     unsigned long ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastPuresyncTime + TICK_RATE)
@@ -2189,7 +2189,7 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 
     if (damage.data.bSyncDoors)
         for (unsigned int i = 0; i < MAX_DOORS; ++i)
-            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i]);
+            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], true);
 
     if (damage.data.bSyncWheels)
         for (unsigned int i = 0; i < MAX_WHEELS; ++i)

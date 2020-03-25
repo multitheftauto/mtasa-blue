@@ -10,8 +10,7 @@
 
 class CClientPickup;
 
-#ifndef __CCLIENTPICKUP_H
-#define __CCLIENTPICKUP_H
+#pragma once
 
 #include "CClientPickupManager.h"
 #include "CClientEntity.h"
@@ -90,40 +89,41 @@ public:
     };
 
     CClientPickup(class CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition = CVector(0, 0, 0));
-    ~CClientPickup(void);
+    ~CClientPickup();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTPICKUP; };
+    eClientEntityType GetType() const { return CCLIENTPICKUP; };
 
-    unsigned short GetModel(void) { return m_usModel; };
+    unsigned short GetModel() { return m_usModel; };
 
-    CPickup*       GetGamePickup(void) { return m_pPickup; };
-    CObject*       GetGameObject(void) { return m_pObject; }
-    CEntity*       GetGameEntity(void) { return m_pObject; }
-    const CEntity* GetGameEntity(void) const { return m_pObject; }
+    CPickup*       GetGamePickup() { return m_pPickup; };
+    CObject*       GetGameObject() { return m_pObject; }
+    CEntity*       GetGameEntity() { return m_pObject; }
+    const CEntity* GetGameEntity() const { return m_pObject; }
 
-    const CVector& GetPosition(void) { return m_vecPosition; };
-    void           GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
+    void           GetPosition(CVector& vecPosition) const override;
     void           SetPosition(const CVector& vecPosition);
     void           SetModel(unsigned short usModel);
 
-    bool IsVisible(void) { return m_bVisible; };
+    void AttachTo(CClientEntity* pEntity) override;
+
+    bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);
 
-    CClientColShape* GetColShape(void) { return m_pCollision; }
+    CClientColShape* GetColShape() { return m_pCollision; }
 
     void Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity);
     void Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity);
 
 protected:
     void StreamIn(bool bInstantly);
-    void StreamOut(void);
+    void StreamOut();
 
 private:
-    void Create(void);
-    void Destroy(void);
-    void ReCreate(void);
+    void Create();
+    void Destroy();
+    void ReCreate();
 
     CClientPickupManager* m_pPickupManager;
 
@@ -141,5 +141,3 @@ public:
     float          m_fAmount;
     unsigned short m_usAmmo;
 };
-
-#endif

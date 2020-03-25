@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMAPEVENTMANAGER_H
-#define __CMAPEVENTMANAGER_H
+#pragma once
 
 #include "lua/CLuaArguments.h"
 #include "CMapEvent.h"
@@ -18,21 +17,21 @@
 class CMapEventManager
 {
 public:
-    CMapEventManager(void);
-    ~CMapEventManager(void);
+    CMapEventManager();
+    ~CMapEventManager();
 
     bool Add(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
              float fPriorityMod);
     bool Delete(CLuaMain* pLuaMain, const char* szName = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-    void DeleteAll(void);
+    void DeleteAll();
     bool HandleExists(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
-    bool HasEvents(void) const { return m_bHasEvents; }
+    bool HasEvents() const { return m_bHasEvents; }
     void GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
 
     bool Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis);
 
 private:
-    void TakeOutTheTrash(void);
+    void TakeOutTheTrash();
     void AddInternal(CMapEvent* pEvent);
 
     bool                               m_bHasEvents;
@@ -45,5 +44,3 @@ private:
     typedef std::multimap<SString, CMapEvent*>::iterator       EventsIter;
     typedef std::pair<EventsIter, EventsIter>                  EventsIterPair;
 };
-
-#endif

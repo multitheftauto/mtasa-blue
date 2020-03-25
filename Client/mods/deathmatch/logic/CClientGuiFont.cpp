@@ -30,7 +30,7 @@ CClientGuiFont::CClientGuiFont(CClientManager* pManager, ElementID ID, CGuiFontI
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientGuiFont::~CClientGuiFont(void)
+CClientGuiFont::~CClientGuiFont()
 {
     Unlink();
 }
@@ -42,7 +42,7 @@ CClientGuiFont::~CClientGuiFont(void)
 // Remove from manager lists
 //
 ////////////////////////////////////////////////////////////////
-void CClientGuiFont::Unlink(void)
+void CClientGuiFont::Unlink()
 {
     // Make sure GUI elements are not using us
     while (m_GUIElementUserList.size())
@@ -58,7 +58,7 @@ void CClientGuiFont::Unlink(void)
 // Get name CEGUI uses for this custom font
 //
 ////////////////////////////////////////////////////////////////
-const SString& CClientGuiFont::GetCEGUIFontName(void)
+const SString& CClientGuiFont::GetCEGUIFontName()
 {
     return GetGuiFontItem()->m_strCEGUIFontName;
 }

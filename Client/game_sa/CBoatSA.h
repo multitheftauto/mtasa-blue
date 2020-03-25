@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BOAT
-#define __CGAMESA_BOAT
+#pragma once
 
 #include <game/CBoat.h>
 #include "CVehicleSA.h"
@@ -44,7 +43,5 @@ public:
     CBoatSA(CBoatSAInterface* boat);
     CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CBoatSA(void){};
+    virtual ~CBoatSA(){};
 };
-
-#endif

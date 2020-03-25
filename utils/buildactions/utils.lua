@@ -85,7 +85,7 @@ end
 
 function os.md5_file(path)
 	if os.host() == "windows" then
-		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
+		local s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
 		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
 	else
 		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))

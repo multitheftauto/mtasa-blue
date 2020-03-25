@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
+#include "CLanguageSelector.h"
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -204,7 +205,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetSize(CVector2D(m_menuBX - m_menuAX, m_menuBY - m_menuAY) + BODGE_FACTOR_6, false);
     m_pMenuArea->SetAlpha(0);
     m_pMenuArea->SetZOrderingEnabled(false);
-    m_pMenuArea->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnMenuClick, this));
+    m_pMenuArea->SetClickHandler(GUI_CALLBACK_MOUSE(&CMainMenu::OnMenuClick, this));
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
@@ -275,12 +276,12 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->MoveToBack();
 
     // Submenus
-    m_QuickConnect.SetVisible(false);
     m_ServerBrowser.SetVisible(false);
     m_ServerInfo.Hide();
     m_Settings.SetVisible(false);
     m_Credits.SetVisible(false);
     m_pNewsBrowser->SetVisible(false);
+    m_pLanguageSelector = new CLanguageSelector(m_pCanvas);
 
     // We're not ingame
     SetIsIngame(false);
@@ -318,9 +319,27 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
     m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 #endif
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+    // Add annonying alert
+    m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
+    std::int32_t buffer = 0xFFFF0000;
+    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
+
+    m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
+    m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
+    m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
+
+    #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
+    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
+    m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
+    m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
+    m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+#endif
 }
 
-CMainMenu::~CMainMenu(void)
+CMainMenu::~CMainMenu()
 {
     // Destroy GUI items
     delete m_pBackground;
@@ -348,6 +367,7 @@ CMainMenu::~CMainMenu(void)
 
     delete m_pDisconnect->image;
     delete m_pDisconnect;
+    delete m_pLanguageSelector;
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -392,7 +412,7 @@ void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
     }
 }
 
-void CMainMenu::Update(void)
+void CMainMenu::Update()
 {
     if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::JOYSTICK_0000)
     {
@@ -621,6 +641,13 @@ void CMainMenu::Update(void)
         if (WaitForMenu == 275)
             GetVersionUpdater()->EnableChecking(true);
 
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+        if (WaitForMenu == 275)
+        {
+            CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
+        }
+#endif
+
         if (WaitForMenu < 300)
             WaitForMenu++;
     }
@@ -652,6 +679,7 @@ void CMainMenu::Update(void)
     // Call subdialog pulses
     m_ServerBrowser.Update();
     m_ServerInfo.DoPulse();
+    m_pLanguageSelector->DoPulse();
 }
 
 void CMainMenu::Show(bool bOverlay)
@@ -659,13 +687,13 @@ void CMainMenu::Show(bool bOverlay)
     SetVisible(true, bOverlay);
 }
 
-void CMainMenu::Hide(void)
+void CMainMenu::Hide()
 {
     SetVisible(false);
 }
 
 // When escape key pressed and not connected, hide these windows
-void CMainMenu::OnEscapePressedOffLine(void)
+void CMainMenu::OnEscapePressedOffLine()
 {
     m_ServerBrowser.SetVisible(false);
     m_Credits.SetVisible(false);
@@ -691,7 +719,6 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     {
         m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered();
-        m_QuickConnect.SetVisible(false);
         m_ServerBrowser.SetVisible(false);
         m_Settings.SetVisible(false);
         m_Credits.SetVisible(false);
@@ -712,7 +739,7 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     m_bHideGame = !bOverlay;
 }
 
-bool CMainMenu::IsVisible(void)
+bool CMainMenu::IsVisible()
 {
     return m_bIsVisible;
 }
@@ -748,7 +775,7 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
     }
 }
 
-bool CMainMenu::GetIsIngame(void)
+bool CMainMenu::GetIsIngame()
 {
     return m_bIsIngame;
 }
@@ -765,76 +792,84 @@ bool CMainMenu::OnMenuExit(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnMenuClick(CGUIElement* pElement)
+bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
 {
-    // Handle all our clicks to the menu from here
-    if (m_pHoveredItem)
+    CGUIElement* pElement = Args.pWindow;
+
+    // Only handle all our clicks to the menu from here
+    if (!m_pHoveredItem)
+        return true;
+
+    if (Args.button != LeftButton && m_pHoveredItem->menuType != MENU_ITEM_QUICK_CONNECT)
+        return true;
+
+    // For detecting startup problems
+    WatchDogUserDidInteractWithMenu();
+
+    // Possible disconnect question for user
+    if (g_pCore->IsConnected())
     {
-        // For detecting startup problems
-        WatchDogUserDidInteractWithMenu();
-
-        // Possible disconnect question for user
-        if (g_pCore->IsConnected())
-        {
-            switch (m_pHoveredItem->menuType)
-            {
-                case MENU_ITEM_HOST_GAME:
-                case MENU_ITEM_MAP_EDITOR:
-                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
-                    return true;
-                default:
-                    break;
-            }
-        }
-
         switch (m_pHoveredItem->menuType)
         {
-            case MENU_ITEM_DISCONNECT:
-                OnDisconnectButtonClick(pElement);
-                break;
-            case MENU_ITEM_QUICK_CONNECT:
-                OnQuickConnectButtonClick(pElement);
-                break;
-            case MENU_ITEM_BROWSE_SERVERS:
-                OnBrowseServersButtonClick(pElement);
-                break;
             case MENU_ITEM_HOST_GAME:
-                OnHostGameButtonClick();
-                break;
             case MENU_ITEM_MAP_EDITOR:
-                OnEditorButtonClick();
-                break;
-            case MENU_ITEM_SETTINGS:
-                OnSettingsButtonClick(pElement);
-                break;
-            case MENU_ITEM_ABOUT:
-                OnAboutButtonClick(pElement);
-                break;
-            case MENU_ITEM_QUIT:
-                OnQuitButtonClick(pElement);
-                break;
+                AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                return true;
             default:
                 break;
         }
     }
+
+    switch (m_pHoveredItem->menuType)
+    {
+        case MENU_ITEM_DISCONNECT:
+            OnDisconnectButtonClick(pElement);
+            break;
+        case MENU_ITEM_QUICK_CONNECT:
+            OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
+            break;
+        case MENU_ITEM_BROWSE_SERVERS:
+            OnBrowseServersButtonClick(pElement);
+            break;
+        case MENU_ITEM_HOST_GAME:
+            OnHostGameButtonClick();
+            break;
+        case MENU_ITEM_MAP_EDITOR:
+            OnEditorButtonClick();
+            break;
+        case MENU_ITEM_SETTINGS:
+            OnSettingsButtonClick(pElement);
+            break;
+        case MENU_ITEM_ABOUT:
+            OnAboutButtonClick(pElement);
+            break;
+        case MENU_ITEM_QUIT:
+            OnQuitButtonClick(pElement);
+            break;
+        default:
+            break;
+    }
+
     return true;
 }
 
-bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
+    // If we're right clicking, execute special command
+    if (!left)
+    {
+        std::string command;
+        CVARS_GET("_beta_qc_rightclick_command", command);
+        g_pCore->GetCommands()->Execute(command.data());
+        return true;
+    }
+
     m_ServerBrowser.SetVisible(true);
     m_ServerBrowser.OnQuickConnectButtonClick();
-    /*
-    //    if ( !m_bIsInSubWindow )
-        {
-            m_QuickConnect.SetVisible ( true );
-    //        m_bIsInSubWindow = true;
-        }
-    */
     return true;
 }
 
@@ -863,7 +898,7 @@ bool CMainMenu::OnBrowseServersButtonClick(CGUIElement* pElement)
     return true;
 }
 
-void CMainMenu::HideServerInfo(void)
+void CMainMenu::HideServerInfo()
 {
     m_ServerInfo.Hide();
 }
@@ -880,7 +915,7 @@ bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnHostGameButtonClick(void)
+bool CMainMenu::OnHostGameButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -892,7 +927,7 @@ bool CMainMenu::OnHostGameButtonClick(void)
     return true;
 }
 
-bool CMainMenu::OnEditorButtonClick(void)
+bool CMainMenu::OnEditorButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -1083,6 +1118,14 @@ void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SS
     CGUILabel* pNewLabel = m_pNewsItemNEWLabels[iIndex];
     pNewLabel->SetVisible(bIsNew);
     pNewLabel->SetPosition(CVector2D(pItem->GetPosition().fX + 4, pItem->GetPosition().fY - 4));
+}
+
+void CMainMenu::ReloadNews()
+{
+    delete m_pNewsBrowser;
+    m_pNewsBrowser = new CNewsBrowser();
+    m_pNewsBrowser->CreateHeadlines();
+    m_pNewsBrowser->SetVisible(true);
 }
 
 /////////////////////////////////////////////////////////////

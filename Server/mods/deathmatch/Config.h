@@ -94,21 +94,18 @@ public:
 
 // Max kick string length that can be sent
 #define MIN_KICK_REASON_LENGTH      1
-#define MAX_KICK_REASON_LENGTH      64
+#define MAX_KICK_REASON_LENGTH      128
 #define MAX_KICK_RESPONSIBLE_LENGTH 30
 
 // Max ban string length that can be sent
 #define MIN_BAN_REASON_LENGTH      1
-#define MAX_BAN_REASON_LENGTH      64
+#define MAX_BAN_REASON_LENGTH      128
 #define MAX_BAN_RESPONSIBLE_LENGTH 30
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
     #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
-
-// Defines how long the whowas list can be
-#define MAX_WHOWAS_LENGTH 1024
 
 // Max valid weather id
 #define MAX_VALID_WEATHER 255

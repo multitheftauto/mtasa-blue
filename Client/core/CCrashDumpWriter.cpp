@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <multiplayer/CMultiplayer.h>
 
 #define LOG_EVENT_SIZE 200
 
@@ -27,7 +28,7 @@ struct SLogEventLine
     SString strBody;
     SString strType;
     SString strContext;
-            operator SString&(void) { return strBody; }
+    void    operator+=(const char* szAppend) { strBody += szAppend; }
     bool    operator==(const SLogEventLine& other) const { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
 };
 
@@ -40,6 +41,8 @@ struct SCrashAvertedInfo
 static std::list<SLogEventInfo>            ms_LogEventList;
 static CDuplicateLineFilter<SLogEventLine> ms_LogEventFilter;
 static std::map<int, SCrashAvertedInfo>    ms_CrashAvertedMap;
+// Hardware Breakpoint Addresses
+static std::set<DWORD>                     ms_setOfHWBPAddresses;
 static uint                                ms_uiTickCountBase = 0;
 static void*                               ms_pReservedMemory = NULL;
 static uint                                ms_uiInCrashZone = 0;
@@ -115,11 +118,12 @@ void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const
 // Static function. Initialize handlers for crash situations
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::SetHandlers(void)
+void CCrashDumpWriter::SetHandlers()
 {
 #ifndef MTA_DEBUG
     _set_invalid_parameter_handler(CCrashDumpWriter::HandleInvalidParameter);
     SetCrashHandlerFilter(CCrashDumpWriter::HandleExceptionGlobal);
+    AddVectoredExceptionHandler(TRUE, CCrashDumpWriter::HandleExceptionHardWareBreakPoint);
     CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(500);
 #endif
 }
@@ -131,7 +135,7 @@ void CCrashDumpWriter::SetHandlers(void)
 // Static function. Called every so often, you know
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::UpdateCounters(void)
+void CCrashDumpWriter::UpdateCounters()
 {
     if (ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10)
     {
@@ -153,6 +157,12 @@ void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const w
     ms_uiInvalidParameterCount++;
 }
 
+HANDLE CCrashDumpWriter::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
+{
+    ms_setOfHWBPAddresses.insert(dwAddress);
+    return SetHardwareBreakpoint(hThread, Type, Size, (void*)dwAddress);
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing
@@ -167,7 +177,7 @@ void CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB)
     ms_pReservedMemory = malloc(uiMemoryKB * 1024);
 }
 
-void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing(void)
+void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
 {
     if (ms_pReservedMemory)
     {
@@ -237,6 +247,54 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     RunErrorTool(pExceptionInformation);
     TerminateProcess(GetCurrentProcess(), 1);
     return EXCEPTION_CONTINUE_SEARCH;
+}
+
+LONG WINAPI CCrashDumpWriter::HandleExceptionHardWareBreakPoint(PEXCEPTION_POINTERS ExceptionInfo)
+{
+    PEXCEPTION_RECORD ExceptionRecord = ExceptionInfo->ExceptionRecord;
+    PCONTEXT ContextRecord = ExceptionInfo->ContextRecord;
+    if (ExceptionRecord->ExceptionCode == EXCEPTION_SINGLE_STEP || ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT)
+    {
+        DWORD dwBreakPointAddress = 0;
+        if (GetHardWareBreakPointAddress(ContextRecord, dwBreakPointAddress))
+        {
+            for (auto & address : ms_setOfHWBPAddresses)
+            {
+                if (address == dwBreakPointAddress)
+                {
+                    LogEvent( "\n\nHandleExceptionHardWareBreakPoint", "Hardware Breakpoint HIT",
+                    SString("Exception Address: %p | Breakpoint Address: %p\n\n", ExceptionRecord->ExceptionAddress, dwBreakPointAddress));
+                    return EXCEPTION_CONTINUE_EXECUTION;
+                }
+            }
+        }
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+bool CCrashDumpWriter::GetHardWareBreakPointAddress(PCONTEXT ContextRecord, DWORD& dwAddress)
+{
+    if (ContextRecord->Dr6 & 0x1)
+    {
+        dwAddress = ContextRecord->Dr0;
+        return true;
+    }
+    else if (ContextRecord->Dr6 & 0x2)
+    {
+        dwAddress = ContextRecord->Dr1;
+        return true;
+    }
+    else if (ContextRecord->Dr6 & 0x4)
+    {
+        dwAddress = ContextRecord->Dr2;
+        return true;
+    }
+    else if (ContextRecord->Dr6 & 0x8)
+    {
+        dwAddress = ContextRecord->Dr3;
+        return true;
+    }
+    return false;
 }
 
 void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
@@ -472,6 +530,13 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 reportLogContent.LoadFromFile(PathJoin(GetMTADataPath(), "report.log"));
                 AppendToDumpFile(strPathFilename, reportLogContent, 'REPs', 'REPe');
                 SetApplicationSetting("diagnostics", "last-dump-extra", "added-report");
+
+                // Try to append current animation and task to dump file
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-anim-task");
+                CBuffer currentAnimTaskInfo;
+                GetCurrentAnimTaskInfo(currentAnimTaskInfo);
+                AppendToDumpFile(strPathFilename, currentAnimTaskInfo, 'CATs', 'CATe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-anim-task");
             }
         }
 
@@ -1009,6 +1074,23 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
     for (int i = 0; i < iNumLines; i++)
     {
         stream.Write(memStatsNow.modelInfo.uiArray[i]);
+    }
+}
+
+void CCrashDumpWriter::GetCurrentAnimTaskInfo(CBuffer& buffer)
+{
+    CBufferWriteStream stream(buffer);
+
+    // Write info version
+    stream.Write(1);
+    stream.WriteString("-- ** Current Animation Task Info -- **\n\n");
+
+    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
+    if (pMultiplayer)
+    {
+        stream.WriteString(SString("Last Animation Added: group ID = %u, animation ID = %u, CAnimManager::ms_aAnimAssocGroups = %#.8x\n",
+                                   pMultiplayer->GetLastStaticAnimationGroupID(), pMultiplayer->GetLastStaticAnimationID(),
+                                   pMultiplayer->GetLastAnimArrayAddress()));
     }
 }
 

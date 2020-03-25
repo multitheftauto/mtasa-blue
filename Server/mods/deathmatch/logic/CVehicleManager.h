@@ -16,7 +16,6 @@ class CVehicleManager;
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
 #include <list>
-#include "lua/CLuaMain.h"
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
 #define VEHICLE_PASSENGERS_UNDEFINED    255
@@ -26,15 +25,16 @@ class CVehicleManager
     friend class CVehicle;
 
 public:
-    CVehicleManager(void);
-    ~CVehicleManager(void);
+    using Container = std::list<CVehicle*>;
 
-    CVehicle* Create(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL);
+    CVehicleManager();
+    ~CVehicleManager();
+
+    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
-    void      DeleteAll(void);
+    void      DeleteAll();
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); };
-    bool         Exists(CVehicle* pVehicle);
+    bool Exists(CVehicle* pVehicle);
 
     static bool         IsValidModel(unsigned int uiVehicleModel);
     static eVehicleType GetVehicleType(unsigned short usModel);
@@ -48,26 +48,29 @@ public:
     static bool         HasSmokeTrail(unsigned int uiVehicleModel);
     static bool         IsTrailer(unsigned int uiVehicleModel);
     static bool         HasDamageModel(unsigned short usModel);
-    static bool         HasDamageModel(enum eVehicleType Type);
+    static bool         HasDamageModel(eVehicleType Type);
     static bool         HasDoors(unsigned short usModel);
     static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
-    CVehicleColorManager* GetColorManager(void) { return &m_ColorManager; };
+    CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
     CVehicleColor         GetRandomColor(unsigned short usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 
-    list<CVehicle*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    list<CVehicle*>::const_iterator IterEnd(void) { return m_List.end(); };
+    Container::size_type GetVehicleCount() { return m_List.size(); }
 
-    list<CVehicle*>& GetRespawnEnabledVehicles(void) { return m_RespawnEnabledVehicles; };
+    Container&       GetVehicles() noexcept { return m_List; }
+    const Container& GetVehicles() const noexcept { return m_List; }
+
+    Container&       GetRespawnEnabledVehicles() noexcept { return m_RespawnEnabledVehicles; }
+    const Container& GetRespawnEnabledVehicles() const noexcept { return m_RespawnEnabledVehicles; }
 
 private:
-    void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); };
+    void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); }
     void RemoveFromList(CVehicle* pVehicle);
 
     CVehicleColorManager m_ColorManager;
 
-    list<CVehicle*> m_List;
-    list<CVehicle*> m_RespawnEnabledVehicles;
+    Container m_List;
+    Container m_RespawnEnabledVehicles;
 };

@@ -9,18 +9,18 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_FIREMANAGER
-#define __CGAMESA_FIREMANAGER
+#pragma once
 
 #include <game/CFireManager.h>
 #include "Common.h"
 #include "CFireSA.h"
 
-#define FUNC_ExtinguishPoint            0x48E520
+#define FUNC_ExtinguishPoint            0x539450
+
 #define FUNC_StartFire                  0x48EC30
 #define FUNC_StartFire_Vec              0x539F00 // ##SA##
 
-#define ARRAY_CFire             VAR_CFireCount + 4
+#define ARRAY_CFire             (VAR_CFireCount + 4)
 
 #define CLASS_CFireManager      0xB71F80 //##SA##
 
@@ -36,7 +36,7 @@ private:
 public:
     // constructor
     CFireManagerSA();
-    ~CFireManagerSA(void);
+    ~CFireManagerSA();
 
     VOID   ExtinguishPoint(CVector& vecPosition, float fRadius);
     CFire* StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize);
@@ -47,5 +47,3 @@ public:
     CFire* FindFreeFire();
     CFire* GetFire(CFireSAInterface* fire);
 };
-
-#endif

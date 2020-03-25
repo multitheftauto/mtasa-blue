@@ -23,7 +23,7 @@ using std::list;
 #define MAX_ALPHA                   180.0f // max value is 255
 
 #define DEFAULT_VIEW_RANGE          45.0f
-#define DEFAULT_VIEW_RANGE_EXP      DEFAULT_VIEW_RANGE*DEFAULT_VIEW_RANGE
+#define DEFAULT_VIEW_RANGE_EXP      ((DEFAULT_VIEW_RANGE)*(DEFAULT_VIEW_RANGE))
 
 CNametags::CNametags(CClientManager* pManager)
 {
@@ -38,12 +38,12 @@ CNametags::CNametags(CClientManager* pManager)
         g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\16-message-warn.png"), NULL, false);
 }
 
-CNametags::~CNametags(void)
+CNametags::~CNametags()
 {
     SAFE_RELEASE(m_pConnectionTroubleIcon);
 }
 
-void CNametags::DoPulse(void)
+void CNametags::DoPulse()
 {
     if (m_bVisible)
     {
@@ -54,7 +54,7 @@ void CNametags::DoPulse(void)
     }
 }
 
-void CNametags::DrawFromAim(void)
+void CNametags::DrawFromAim()
 {
     unsigned long ulCurrentTime = CClientTime::GetTime();
 
@@ -254,7 +254,7 @@ void CNametags::DrawFromAim(void)
     }
 }
 
-void CNametags::DrawDefault(void)
+void CNametags::DrawDefault()
 {
     // Grab the resolution width and height
     static float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
