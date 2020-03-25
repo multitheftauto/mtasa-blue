@@ -552,7 +552,8 @@ private:
     unsigned char                    m_ucVariant;
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount;
-    bool                             m_bExplode;
+    bool                             m_bExplode = true;
+
     bool                             m_doorsUndamageable = false;
 
 public:
