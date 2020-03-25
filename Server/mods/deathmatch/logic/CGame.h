@@ -495,6 +495,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
+    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
