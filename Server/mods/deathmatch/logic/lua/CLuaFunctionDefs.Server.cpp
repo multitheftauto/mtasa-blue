@@ -214,7 +214,7 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     argStream.ReadAnyAsString(strMessage);
     argStream.ReadNumber(uiLevel, 3);
 
-    if (uiLevel == 0 | uiLevel == 4)
+    if (uiLevel == 0 || uiLevel == 4)
     {
         argStream.ReadNumber(ucR, 255);
         argStream.ReadNumber(ucG, 255);
