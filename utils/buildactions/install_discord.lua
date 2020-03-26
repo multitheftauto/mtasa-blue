@@ -9,7 +9,7 @@ local DISCORD_VENDOR = "vendor/discordgsdk"
 
 -- Change these to update the version
 local DISCORD_TAG = "v2020-11-02_21-48-56"
-local DISCORD_MD5 = "3d7b86f7fee560d85de3d6e9bac1efbb"
+local DISCORD_HASH = "4CCEEED0D8B41BDC67C44A6DDCCCF42288AF933E1F7284C591327178C391AA39"
 
 newaction {
 	trigger = "install_discord",
@@ -19,9 +19,9 @@ newaction {
 		-- Only execute on Windows
 		if os.host() ~= "windows" then return end
 
-		-- Check md5
+		-- Check file hash
 		local archive_path = DISCORD_VENDOR.."/"..DISCORD_FILENAME
-		if os.isfile(archive_path) and os.md5_file(archive_path) == DISCORD_MD5 then
+		if os.isfile(archive_path) and os.sha256_file(archive_path) == DISCORD_HASH then
 			print("Discord Game SDK is up to date.")
 			return
 		end

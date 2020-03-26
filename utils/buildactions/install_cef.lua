@@ -9,7 +9,7 @@ local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
 local CEF_VERSION = "80.0.4+g74f7b0c+chromium-80.0.3987.122"
-local CEF_SHA256 = "8FD8E24AF196F00FEAAA1553496BAE99D8196BA023D0DD0FE44EFEEE93B04DFC"
+local CEF_HASH = "8FD8E24AF196F00FEAAA1553496BAE99D8196BA023D0DD0FE44EFEEE93B04DFC"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -25,7 +25,7 @@ newaction {
 
 		-- Check file hash
 		local archive_path = CEF_PATH.."temp.tar.bz2"
-		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_SHA256 then
+		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH then
 			print("CEF consistency checks succeeded")
 			return
 		end
