@@ -316,6 +316,7 @@ void CLuaManager::LoadCFunctions()
         {"setGarageOpen", CLuaFunctionDefs::SetGarageOpen},
         {"setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled},
         {"setBlurLevel", CLuaFunctionDefs::SetBlurLevel},
+        {"resetBlurLevel", CLuaFunctionDefs::ResetBlurLevel},
         {"setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight},
         {"setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled},
         {"setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState},

@@ -87,15 +87,17 @@ public:
     const char* GetNick() { return m_strNick; };
     void        SetNick(const char* szNick);
 
-    int            GetGameVersion() { return m_iGameVersion; };
-    void           SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
-    unsigned short GetMTAVersion() { return m_usMTAVersion; };
-    void           SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
-    unsigned short GetBitStreamVersion() { return m_usBitStreamVersion; };
-    void           SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
+    int                GetGameVersion() { return m_iGameVersion; };
+    void               SetGameVersion(int iGameVersion) { m_iGameVersion = iGameVersion; };
+    unsigned short     GetMTAVersion() { return m_usMTAVersion; };
+    void               SetMTAVersion(unsigned short usMTAVersion) { m_usMTAVersion = usMTAVersion; };
+    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
+    void               SetBitStreamVersion(unsigned short usBitStreamVersion) { m_usBitStreamVersion = usBitStreamVersion; };
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
+    void               SetDiscordJoinSecret(const SString& joinSecret) { m_strDiscordJoinSecret = joinSecret; }
+    SString            GetDiscordJoinSecret() const { return m_strDiscordJoinSecret; }
 
     bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
@@ -356,6 +358,7 @@ private:
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
+    SString        m_strDiscordJoinSecret;
 
     bool m_bNametagColorOverridden;
 
