@@ -220,6 +220,13 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 
             if (!ss.fail())
             {
+                // Using custom salts are deprecated (Luxy.c)
+                // See: https://stackoverflow.com/questions/40993645/understanding-bcrypt-salt-as-used-by-php-password-hash
+                if (options["salt"].length() > 0)
+                {
+                    m_pScriptDebugging->LogWarning(luaVM, "Custom generated salts are deprecated and will be removed in the future.");
+                }
+
                 // Sync
                 if (luaFunctionRef == CLuaFunctionRef{})
                 {
@@ -361,11 +368,15 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     StringEncryptFunction algorithm;
     SString               data;
     CStringMap            options;
+    CLuaFunctionRef       luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
+
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
@@ -382,9 +393,38 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                SString result;
-                SharedUtil::TeaEncode(data, key, &result);
-                lua_pushlstring(luaVM, result, result.length());
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key] {
+                                // Execute time-consuming task
+                                SString result;
+                                SharedUtil::TeaEncode(data, key, &result);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    SharedUtil::TeaEncode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
                 return 1;
             }
             default:
@@ -407,11 +447,15 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     StringEncryptFunction algorithm;
     SString               data;
     CStringMap            options;
+    CLuaFunctionRef       luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
     argStream.ReadStringMap(options);
+
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
@@ -428,9 +472,38 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     return 1;
                 }
 
-                SString result;
-                SharedUtil::TeaDecode(data, key, &result);
-                lua_pushlstring(luaVM, result, result.length());
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key] {
+                                // Execute time-consuming task
+                                SString result;
+                                SharedUtil::TeaDecode(data, key, &result);
+                                return result;
+                            },
+                            [luaFunctionRef](const SString& result) {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    arguments.PushString(result);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    SharedUtil::TeaDecode(data, key, &result);
+                    lua_pushlstring(luaVM, result, result.length());
+                }
                 return 1;
             }
             default:

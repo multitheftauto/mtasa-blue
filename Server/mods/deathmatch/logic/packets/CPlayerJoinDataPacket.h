@@ -29,8 +29,8 @@ public:
     void SetNetVersion(unsigned short usNetVersion) { m_usNetVersion = usNetVersion; };
     void SetGameVersion(unsigned char ucGameVersion) { m_ucGameVersion = ucGameVersion; };
 
-    unsigned short GetMTAVersion() { return m_usMTAVersion; };
-    unsigned short GetBitStreamVersion() { return m_usBitStreamVersion; };
+    unsigned short     GetMTAVersion() { return m_usMTAVersion; };
+    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
 
     const char* GetNick() { return m_strNick; };
@@ -41,6 +41,8 @@ public:
 
     const char* GetSerialUser() { return m_strSerialUser; }
     void        SetSerialUser(const char* szSerialUser) { m_strSerialUser.AssignLeft(szSerialUser, MAX_SERIAL_LENGTH); }
+
+    const char* GetDiscordJoinSecret() const { return (m_strDiscordSecret.length() > 64 ? "" : m_strDiscordSecret); }
 
     bool IsOptionalUpdateInfoRequired() { return m_bOptionalUpdateInfoRequired; }
 
@@ -54,4 +56,5 @@ private:
     MD5            m_Password;
     SString        m_strSerialUser;
     CMtaVersion    m_strPlayerVersion;
+    SString        m_strDiscordSecret;
 };

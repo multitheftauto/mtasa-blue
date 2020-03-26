@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -140,10 +140,6 @@
 #ifndef LIBRESSL_VERSION_NUMBER
 #define OpenSSL_version_num() SSLeay()
 #endif
-#endif
-
-#ifdef LIBRESSL_VERSION_NUMBER
-#define OpenSSL_version_num() LIBRESSL_VERSION_NUMBER
 #endif
 
 #if (OPENSSL_VERSION_NUMBER >= 0x1000200fL) && /* 1.0.2 or later */ \
@@ -2216,7 +2212,6 @@ set_ssl_version_min_max(SSL_CTX *ctx, struct connectdata *conn)
   curl_ssl_version_max = SSL_CONN_CONFIG(version_max);
 
   /* convert cURL max SSL version option to OpenSSL constant */
-  ossl_ssl_version_max = 0;
   switch(curl_ssl_version_max) {
     case CURL_SSLVERSION_MAX_TLSv1_0:
       ossl_ssl_version_max = TLS1_VERSION;
@@ -2777,19 +2772,29 @@ static CURLcode ossl_connect_step1(struct connectdata *conn, int sockindex)
     infof(data, "  CRLfile: %s\n", ssl_crlfile);
   }
 
-  /* Try building a chain using issuers in the trusted store first to avoid
-     problems with server-sent legacy intermediates.  Newer versions of
-     OpenSSL do alternate chain checking by default which gives us the same
-     fix without as much of a performance hit (slight), so we prefer that if
-     available.
-     https://rt.openssl.org/Ticket/Display.html?id=3621&user=guest&pass=guest
-  */
-#if defined(X509_V_FLAG_TRUSTED_FIRST) && !defined(X509_V_FLAG_NO_ALT_CHAINS)
   if(verifypeer) {
+    /* Try building a chain using issuers in the trusted store first to avoid
+       problems with server-sent legacy intermediates.  Newer versions of
+       OpenSSL do alternate chain checking by default which gives us the same
+       fix without as much of a performance hit (slight), so we prefer that if
+       available.
+       https://rt.openssl.org/Ticket/Display.html?id=3621&user=guest&pass=guest
+    */
+#if defined(X509_V_FLAG_TRUSTED_FIRST) && !defined(X509_V_FLAG_NO_ALT_CHAINS)
     X509_STORE_set_flags(SSL_CTX_get_cert_store(BACKEND->ctx),
                          X509_V_FLAG_TRUSTED_FIRST);
-  }
 #endif
+#ifdef X509_V_FLAG_PARTIAL_CHAIN
+    if(!SSL_SET_OPTION(no_partialchain)) {
+      /* Have intermediate certificates in the trust store be treated as
+         trust-anchors, in the same way as self-signed root CA certificates
+         are. This allows users to verify servers using the intermediate cert
+         only, instead of needing the whole chain. */
+      X509_STORE_set_flags(SSL_CTX_get_cert_store(BACKEND->ctx),
+                           X509_V_FLAG_PARTIAL_CHAIN);
+    }
+#endif
+  }
 
   /* SSL always tries to verify the peer, this only says whether it should
    * fail to connect if the verification fails, or if it should continue
@@ -2815,8 +2820,10 @@ static CURLcode ossl_connect_step1(struct connectdata *conn, int sockindex)
 
   /* give application a chance to interfere with SSL set up. */
   if(data->set.ssl.fsslctx) {
+    Curl_set_in_callback(data, true);
     result = (*data->set.ssl.fsslctx)(data, BACKEND->ctx,
                                       data->set.ssl.fsslctxp);
+    Curl_set_in_callback(data, false);
     if(result) {
       failf(data, "error signaled by ssl ctx callback");
       return result;
@@ -2997,8 +3004,13 @@ static CURLcode ossl_connect_step2(struct connectdata *conn, int sockindex)
         const char * const hostname = SSL_IS_PROXY() ?
           conn->http_proxy.host.name : conn->host.name;
         const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
+        char extramsg[80]="";
+        int sockerr = SOCKERRNO;
+        if(sockerr && detail == SSL_ERROR_SYSCALL)
+          Curl_strerror(sockerr, extramsg, sizeof(extramsg));
         failf(data, OSSL_PACKAGE " SSL_connect: %s in connection to %s:%ld ",
-              SSL_ERROR_to_str(detail), hostname, port);
+              extramsg[0] ? extramsg : SSL_ERROR_to_str(detail),
+              hostname, port);
         return result;
       }
 
@@ -3074,7 +3086,7 @@ do {                              \
   Curl_ssl_push_certinfo_len(data, _num, _label, ptr, info_len); \
   if(1 != BIO_reset(mem))                                        \
     break;                                                       \
-} WHILE_FALSE
+} while(0)
 
 static void pubkey_show(struct Curl_easy *data,
                         BIO *mem,
@@ -3106,31 +3118,28 @@ do {                              \
   if(_type->_name) { \
     pubkey_show(data, mem, _num, #_type, #_name, _type->_name); \
   } \
-} WHILE_FALSE
+} while(0)
 #endif
 
-static int X509V3_ext(struct Curl_easy *data,
+static void X509V3_ext(struct Curl_easy *data,
                       int certnum,
                       CONST_EXTS STACK_OF(X509_EXTENSION) *exts)
 {
   int i;
-  size_t j;
 
   if((int)sk_X509_EXTENSION_num(exts) <= 0)
     /* no extensions, bail out */
-    return 1;
+    return;
 
   for(i = 0; i < (int)sk_X509_EXTENSION_num(exts); i++) {
     ASN1_OBJECT *obj;
     X509_EXTENSION *ext = sk_X509_EXTENSION_value(exts, i);
     BUF_MEM *biomem;
-    char buf[512];
-    char *ptr = buf;
     char namebuf[128];
     BIO *bio_out = BIO_new(BIO_s_mem());
 
     if(!bio_out)
-      return 1;
+      return;
 
     obj = X509_EXTENSION_get_object(ext);
 
@@ -3140,26 +3149,10 @@ static int X509V3_ext(struct Curl_easy *data,
       ASN1_STRING_print(bio_out, (ASN1_STRING *)X509_EXTENSION_get_data(ext));
 
     BIO_get_mem_ptr(bio_out, &biomem);
-
-    for(j = 0; j < (size_t)biomem->length; j++) {
-      const char *sep = "";
-      if(biomem->data[j] == '\n') {
-        sep = ", ";
-        j++; /* skip the newline */
-      };
-      while((j<(size_t)biomem->length) && (biomem->data[j] == ' '))
-        j++;
-      if(j<(size_t)biomem->length)
-        ptr += msnprintf(ptr, sizeof(buf)-(ptr-buf), "%s%c", sep,
-                         biomem->data[j]);
-    }
-
-    Curl_ssl_push_certinfo(data, certnum, namebuf, buf);
-
+    Curl_ssl_push_certinfo_len(data, certnum, namebuf, biomem->data,
+                               biomem->length);
     BIO_free(bio_out);
-
   }
-  return 0; /* all is fine */
 }
 
 #ifdef OPENSSL_IS_BORINGSSL
@@ -3941,6 +3934,7 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
          SSL_ERROR_SYSCALL. For example a server may have closed the connection
          abruptly without a close_notify alert. For compatibility with older
          peers we don't do this by default. #4624
+
          We can use this to gauge how many users may be affected, and
          if it goes ok eventually transition to allow in dev and release with
          the newest OpenSSL: #if (OPENSSL_VERSION_NUMBER >= 0x10101000L) */
@@ -3967,13 +3961,35 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
 
 static size_t Curl_ossl_version(char *buffer, size_t size)
 {
-#ifdef OPENSSL_IS_BORINGSSL
+#ifdef LIBRESSL_VERSION_NUMBER
+#if LIBRESSL_VERSION_NUMBER < 0x2070100fL
+  return msnprintf(buffer, size, "%s/%lx.%lx.%lx",
+                   OSSL_PACKAGE,
+                   (LIBRESSL_VERSION_NUMBER>>28)&0xf,
+                   (LIBRESSL_VERSION_NUMBER>>20)&0xff,
+                   (LIBRESSL_VERSION_NUMBER>>12)&0xff);
+#else /* OpenSSL_version() first appeared in LibreSSL 2.7.1 */
+  char *p;
+  int count;
+  const char *ver = OpenSSL_version(OPENSSL_VERSION);
+  const char expected[] = OSSL_PACKAGE " "; /* ie "LibreSSL " */
+  if(Curl_strncasecompare(ver, expected, sizeof(expected) - 1)) {
+    ver += sizeof(expected) - 1;
+  }
+  count = msnprintf(buffer, size, "%s/%s", OSSL_PACKAGE, ver);
+  for(p = buffer; *p; ++p) {
+    if(ISSPACE(*p))
+      *p = '_';
+  }
+  return count;
+#endif
+#elif defined(OPENSSL_IS_BORINGSSL)
   return msnprintf(buffer, size, OSSL_PACKAGE);
 #elif defined(HAVE_OPENSSL_VERSION) && defined(OPENSSL_VERSION_STRING)
   return msnprintf(buffer, size, "%s/%s",
                    OSSL_PACKAGE, OpenSSL_version(OPENSSL_VERSION_STRING));
 #else
-  /* not BoringSSL and not using OpenSSL_version */
+  /* not LibreSSL, BoringSSL and not using OpenSSL_version */
 
   char sub[3];
   unsigned long ssleay_value;

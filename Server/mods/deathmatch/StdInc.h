@@ -110,6 +110,8 @@ struct SAclRequest;
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
+#include "packets/CDiscordJoinPacket.h"
 
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
