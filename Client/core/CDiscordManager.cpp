@@ -53,10 +53,11 @@ void CDiscordManager::Reconnect(bool bOnInitialization)
         res = discord::Core::Create(DISCORD_CLIENT_ID, DiscordCreateFlags_NoRequireDiscord, &m_DiscordCore);
     }
 
-    if (!m_DiscordCore && bOnInitialization)
+    if (!m_DiscordCore)
     {
         // Output error only when trying to connect on initialization
-        WriteErrorEvent(SString("[DISCORD]: Failed to instantiate core, error code: %i", static_cast<int>(res)));
+        if (bOnInitialization)
+            WriteErrorEvent(SString("[DISCORD]: Failed to instantiate core, error code: %i", static_cast<int>(res)));
         return;
     }
 
