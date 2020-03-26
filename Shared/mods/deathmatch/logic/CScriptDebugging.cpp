@@ -44,8 +44,7 @@ void CScriptDebugging::LogPCallError(lua_State* luaVM, const SString& strRes, bo
     }
 }
 
-void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool omitDebugInfo, const char* szFormat,
-                                 ...)
+void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
 {
     assert(szFormat);
 
@@ -56,12 +55,22 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
-    // Add debug info where necessary
-    SLuaDebugInfo debugInfo;
-    if (!omitDebugInfo)
-        debugInfo = GetLuaDebugInfo(luaVM);
+    SLuaDebugInfo luaDebugInfo;
+    LogString("", luaDebugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
+}
 
-    LogString("", debugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
+void CScriptDebugging::LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
+{
+    assert(szFormat);
+
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    va_list marker;
+    va_start(marker, szFormat);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    va_end(marker);
+
+    LogString("", GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue);
 }
 
 void CScriptDebugging::LogInformation(lua_State* luaVM, const char* szFormat, ...)
@@ -164,13 +173,10 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
 void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
                                  unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    SString strText;
+    SString strText = SString("%s%s", szPrePend, szMessage);
 
-    // Compose an error message if the SLuaDebugInfo has valid data and message is neither of type 0 (custom) or 1 (info)
-    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel > 2)
+    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel <= 2)
         strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
-    else
-        strText = SString("%s%s", szPrePend, szMessage);
 
     switch (uiMinimumDebugLevel)
     {
