@@ -1410,7 +1410,7 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
         if (IS_COLSHAPE(pElement))
         {
             CColShape* pColShape = static_cast<CColShape*>(pElement);
-            CVector   pVector = pAttachedToElement->GetPosition();
+            CVector    pVector = pAttachedToElement->GetPosition();
 
             pColShape->SetPosition(pVector + vecPosition);
         }
