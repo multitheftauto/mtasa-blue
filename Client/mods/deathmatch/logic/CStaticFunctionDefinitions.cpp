@@ -1317,6 +1317,16 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
         Entity.SetAttachedOffsets(vecPosition, vecRotation);
         Entity.AttachTo(&AttachedToEntity);
 
+        // Fix #1317
+        if (IS_COLSHAPE(&Entity))
+        {
+            CClientColShape* pColShape = static_cast<CClientColShape*>(&Entity);
+            CVector          pVector;
+
+            AttachedToEntity.GetPosition(pVector);
+            pColShape->SetPosition(pVector + vecPosition);
+        }
+
         return true;
     }
 
