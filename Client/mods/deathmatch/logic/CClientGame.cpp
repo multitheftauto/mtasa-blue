@@ -631,7 +631,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
-            if (g_pNet->GetServerBitStreamVersion() >= 0x06D)
+            if (g_pNet->GetServerBitStreamVersion() >= 0x06E)
             {
                 SString joinSecret = SStringX(szSecret);
                 pBitStream->WriteString<uchar>(joinSecret);
@@ -6954,7 +6954,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::TriggerDiscordJoin(SString strSecret)
 {
-    if (g_pNet->GetServerBitStreamVersion() < 0x06D)
+    if (g_pNet->GetServerBitStreamVersion() < 0x06E)
         return;
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -7108,7 +7108,7 @@ void CClientGame::UpdateDiscordState()
     uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
     SString state(std::to_string(playerCount));
 
-    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06D)
+    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06E)
         state += "/" + std::to_string(playerSlot);
 
     state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");

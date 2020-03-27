@@ -3312,7 +3312,7 @@ bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, 
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        if (pPlayer->GetBitStreamVersion() < 0x06D)
+        if (pPlayer->GetBitStreamVersion() < 0x06E)
             return false;
 
         CBitStream bitStream;

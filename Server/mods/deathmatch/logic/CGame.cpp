@@ -1238,7 +1238,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06D)
+    if (Player.GetBitStreamVersion() >= 0x06E)
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
