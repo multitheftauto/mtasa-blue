@@ -9,7 +9,7 @@ local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
 local CEF_VERSION = "80.0.4+g74f7b0c+chromium-80.0.3987.122"
-local CEF_HASH = "8FD8E24AF196F00FEAAA1553496BAE99D8196BA023D0DD0FE44EFEEE93B04DFC"
+local CEF_HASH = "8fd8e24af196f00feaaa1553496bae99d8196ba023d0dd0fe44efeee93b04dfc"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX

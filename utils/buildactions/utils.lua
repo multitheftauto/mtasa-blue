@@ -84,12 +84,17 @@ function os.expanddir_wildcard(from, to)
 end
 
 function os.sha256_file(path)
+	local s, errc
 	if os.host() == "windows" then
-		local s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA256).Hash", path))
-		return (errc == 0) and s or ""
+		s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA256).Hash", path))
 	else
-		return os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
+		s, errc = os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
+	if errc ~= 0 then
+		print("Error os.sha256_file: ", errc)
+		return ""
+	end
+	return s:lower()
 end
 
 function os.extract_archive(archive_path, target_path, override)
