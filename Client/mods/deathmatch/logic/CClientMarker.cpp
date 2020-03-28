@@ -89,6 +89,18 @@ void CClientMarker::SetPosition(const CVector& vecPosition)
     UpdateStreamPosition(vecPosition);
 }
 
+void CClientMarker::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+    if (m_pAttachedToEntity)
+    {
+        CVector pVector;
+
+        pEntity->GetPosition(pVector);
+        SetPosition(pVector + m_vecAttachedPosition);
+    }
+}
+
 bool CClientMarker::SetMatrix(const CMatrix& matrix)
 {
     if (m_pMarker)

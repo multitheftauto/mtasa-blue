@@ -1406,23 +1406,6 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
         ConvertDegreesToRadians(vecRotation);
         pElement->AttachTo(pAttachedToElement);
 
-        // Fix #1317
-        if (IS_COLSHAPE(pElement))
-        {
-            CColShape* pColShape = static_cast<CColShape*>(pElement);
-            CVector    pVector = pAttachedToElement->GetPosition();
-
-            pColShape->SetPosition(pVector + vecPosition);
-        }
-
-        if (IS_MARKER(pElement))
-        {
-            CMarker* pMarker = static_cast<CMarker*>(pElement);
-            CVector  pVector = pAttachedToElement->GetPosition();
-
-            pMarker->SetPosition(pVector + vecPosition);
-        }
-
         CBitStream BitStream;
         BitStream.pBitStream->Write(pAttachedToElement->GetID());
         BitStream.pBitStream->Write(vecPosition.fX);

@@ -41,6 +41,8 @@ public:
     const CVector& GetPosition();
     virtual void   SetPosition(const CVector& vecPosition);
 
+    void AttachTo(CElement* pElement);
+
     void                CallHitCallback(CElement& Element);
     void                CallLeaveCallback(CElement& Element);
     class CColCallback* SetCallback(class CColCallback* pCallback) { return (m_pCallback = pCallback); };

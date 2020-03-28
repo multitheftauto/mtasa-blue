@@ -170,6 +170,16 @@ void CMarker::SetPosition(const CVector& vecPosition)
     }
 }
 
+void CMarker::AttachTo(CElement* pElement)
+{
+    CElement::AttachTo(pElement);
+    if (m_pAttachedTo)
+    {
+        CVector pVector = pElement->GetPosition();
+        SetPosition(pVector + m_vecAttachedPosition);
+    }
+}
+
 void CMarker::SetTarget(const CVector* pTargetVector)
 {
     // Got a target vector?

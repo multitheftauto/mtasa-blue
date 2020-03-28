@@ -57,6 +57,17 @@ void CColShape::SetPosition(const CVector& vecPosition)
     CStaticFunctionDefinitions::RefreshColShapeColliders(this);
 }
 
+void CColShape::AttachTo(CElement* pElement)
+{
+    CElement::AttachTo(pElement);
+    if (m_pAttachedTo)
+    {
+        CVector pVector = pElement->GetPosition();
+
+        SetPosition(pVector + m_vecAttachedPosition);
+    }
+}
+
 void CColShape::CallHitCallback(CElement& Element)
 {
     // Call the callback with us as the shape if it exists
