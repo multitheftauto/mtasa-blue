@@ -63,7 +63,6 @@ void CColShape::AttachTo(CElement* pElement)
     if (m_pAttachedTo)
     {
         CVector pVector = pElement->GetPosition();
-
         SetPosition(pVector + m_vecAttachedPosition);
     }
 }
