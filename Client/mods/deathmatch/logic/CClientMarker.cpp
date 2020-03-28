@@ -92,12 +92,15 @@ void CClientMarker::SetPosition(const CVector& vecPosition)
 void CClientMarker::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pAttachedToEntity)
-    {
-        CVector pVector;
+    m_pCollision->AttachTo(pEntity);
+}
 
-        pEntity->GetPosition(pVector);
-        SetPosition(pVector + m_vecAttachedPosition);
+void CClientMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
+{
+    CClientEntity::SetAttachedOffsets(vecPosition, vecRotation);
+    if (m_pCollision)
+    {
+        m_pCollision->SetAttachedOffsets(vecPosition, vecRotation);
     }
 }
 

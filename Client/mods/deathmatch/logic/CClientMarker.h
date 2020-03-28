@@ -47,6 +47,7 @@ public:
     bool SetMatrix(const CMatrix& matrix);
 
     void AttachTo(CClientEntity* pEntity) override;
+    void SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation) override;
 
     void DoPulse();
 

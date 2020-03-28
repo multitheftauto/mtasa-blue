@@ -173,10 +173,15 @@ void CMarker::SetPosition(const CVector& vecPosition)
 void CMarker::AttachTo(CElement* pElement)
 {
     CElement::AttachTo(pElement);
-    if (m_pAttachedTo)
+    m_pCollision->AttachTo(pElement);
+}
+
+void CMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
+{
+    CElement::SetAttachedOffsets(vecPosition, vecRotation);
+    if (m_pCollision)
     {
-        CVector pVector = pElement->GetPosition();
-        SetPosition(pVector + m_vecAttachedPosition);
+        m_pCollision->SetAttachedOffsets(vecPosition, vecRotation);
     }
 }
 
