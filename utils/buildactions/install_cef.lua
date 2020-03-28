@@ -27,6 +27,23 @@ function errormsg(title, message)
 	term.popColor()
 end
 
+function update_install_cef(version, hash)
+	local filename = "utils/buildactions/install_cef.lua"
+	local f = io.open(filename)
+	local text = f:read("*all")
+	f:close()
+
+	-- Replace version and hash lines
+	local version_line = 'local CEF_VERSION = "' .. version .. '"'
+	local hash_line = 'local CEF_HASH = "' .. hash .. '"'
+	text = text:gsub('local CEF_VERSION = ".-"', version_line, 1)
+	text = text:gsub('local CEF_HASH = ".-"', hash_line, 1)
+
+	local f = io.open(filename, "w")
+	f:write(text)
+	f:close()
+end
+
 newaction {
 	trigger = "install_cef",
 	description = "Downloads and installs CEF",
@@ -91,7 +108,13 @@ newaction {
 		if upgrade then
 			local downloaded_hash = os.sha256_file(archive_path)
 			print("New CEF hash is:", downloaded_hash)
-			return
+			CEF_HASH = downloaded_hash
+
+			io.write(("Update `install_cef.lua` file? (Y/n) "):format(version))
+			local input = io.read():lower()
+			if (input == "y" or input == "yes") then
+				update_install_cef(CEF_VERSION, downloaded_hash)
+			end
 		end
 
 		-- Seriously abort now if we're not using Windows
