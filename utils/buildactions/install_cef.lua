@@ -15,13 +15,63 @@ function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
 end
 
+function errormsg(title, message)
+	term.pushColor(term.red)
+	io.write(title)
+	if message then
+		term.setTextColor(term.purple)
+		print(" " .. message)
+	else
+		print()
+	end
+	term.popColor()
+end
+
 newaction {
 	trigger = "install_cef",
 	description = "Downloads and installs CEF",
 
-	execute = function()
-		-- Only execute on Windows
-		if os.host() ~= "windows" then return end
+	execute = function(...)
+		local upgrade = #_ARGS == 1 and _ARGS[1] == "upgrade"
+		if upgrade then
+			print("Checking opensource.spotify.com for an update...")
+			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.html")
+			if result_str ~= "OK" or result_code ~= 200 then
+				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
+				return
+			end
+
+			local _, index = resource:find('Windows 32%-bit Builds.-data%-version="')
+			if not index then
+				errormsg("Could not find version string index.")
+				return
+			end
+
+			local version = resource:match("(.-)\">", index+1)
+			if not version then
+				errormsg("Could not get version string from index.")
+			end
+
+			if version == CEF_VERSION then
+				print(("CEF is already up to date (%s)"):format(version))
+				return
+			end
+
+			io.write(("Does version '%s' look OK to you? (Y/n) "):format(version))
+			local input = io.read():lower()
+			if not (input == "y" or input == "yes") then
+				errormsg("Aborting due to user request.")
+				return
+			end
+
+			CEF_VERSION = version
+			CEF_HASH = ""
+		end
+
+		-- Only execute on Windows in normal scenarios
+		if os.host() ~= "windows" and not upgrade then
+			return
+		end
 
 		-- Check file hash
 		local archive_path = CEF_PATH.."temp.tar.bz2"
@@ -33,12 +83,19 @@ newaction {
 		-- Download CEF
 		print("Downloading CEF...")
 		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
-		if result_str ~= "OK" and response_code ~= 200 then
-			term.pushColor(term.red)
-			io.write(("Could not download CEF with status code %d: "):format(response_code))
-			term.setTextColor(term.purple)
-			print(result_str)
-			term.popColor()
+		if result_str ~= "OK" or response_code ~= 200 then
+			errormsg(("Could not download CEF with status code %s: "):format(response_code), result_str)
+			return
+		end
+
+		if upgrade then
+			local downloaded_hash = os.sha256_file(archive_path)
+			print("New CEF hash is:", downloaded_hash)
+			return
+		end
+
+		-- Seriously abort now if we're not using Windows
+		if os.host() ~= "windows" then
 			return
 		end
 
