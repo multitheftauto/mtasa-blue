@@ -1327,6 +1327,15 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
             pColShape->SetPosition(pVector + vecPosition);
         }
 
+        if (IS_MARKER(&Entity))
+        {
+            CClientMarker* pMarker = static_cast<CClientMarker*>(&Entity);
+            CVector        pVector;
+
+            AttachedToEntity.GetPosition(pVector);
+            pMarker->SetPosition(pVector + vecPosition);
+        }
+
         return true;
     }
 
