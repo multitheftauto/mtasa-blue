@@ -490,7 +490,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
             args.PushString(pAttribute->GetValue().c_str());
 
         // Don't trigger onElementDataChanged event
-        ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::SYNC_BROADCAST : ESyncType::SYNC_LOCAL;
+        ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
         SetCustomData(pAttribute->GetName().c_str(), *args[0], syncType, NULL, false);
     }
 }
@@ -753,7 +753,7 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
         const std::string& strName = iter->first;
         const SCustomData& customData = iter->second;
 
-        if (customData.syncType == ESyncType::SYNC_LOCAL)
+        if (customData.syncType == ESyncType::LOCAL)
             continue;
 
         // Tell our clients to update their data
@@ -763,7 +763,7 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
         BitStream.pBitStream->Write(strName.c_str(), usNameLength);
         customData.Variable.WriteToBitStream(*BitStream.pBitStream);
 
-        if (customData.syncType == ESyncType::SYNC_BROADCAST || pPlayer->IsSubscribed(this, strName))
+        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
     }
 }

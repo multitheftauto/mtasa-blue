@@ -58,7 +58,7 @@ bool CCustomData::DeleteSynced(const char* szName)
 
 void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
-    if (syncType == ESyncType::SYNC_BROADCAST)
+    if (syncType == ESyncType::BROADCAST)
     {
         SCustomData* pDataSynced = GetSynced(szName);
         if (pDataSynced)

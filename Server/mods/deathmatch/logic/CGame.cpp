@@ -2479,10 +2479,10 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 return;
             }
 
-            ESyncType lastSyncType = ESyncType::SYNC_BROADCAST;
+            ESyncType lastSyncType = ESyncType::BROADCAST;
             pElement->GetCustomData(szName, false, &lastSyncType);
 
-            if (lastSyncType != ESyncType::SYNC_LOCAL)
+            if (lastSyncType != ESyncType::LOCAL)
             {
                 // Tell our clients to update their data. Send to everyone but the one we got this packet from.
                 unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
@@ -2490,7 +2490,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 BitStream.pBitStream->WriteCompressed(usNameLength);
                 BitStream.pBitStream->Write(szName, usNameLength);
                 Value.WriteToBitStream(*BitStream.pBitStream);
-                if (lastSyncType == ESyncType::SYNC_BROADCAST)
+                if (lastSyncType == ESyncType::BROADCAST)
                     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
                 else
                     m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,

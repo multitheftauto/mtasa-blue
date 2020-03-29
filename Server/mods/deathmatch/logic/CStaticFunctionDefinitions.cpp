@@ -876,12 +876,12 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    ESyncType     lastSyncType = ESyncType::SYNC_BROADCAST;
+    ESyncType     lastSyncType = ESyncType::BROADCAST;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
-        if (syncType != ESyncType::SYNC_LOCAL)
+        if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
             unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
@@ -890,7 +890,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             BitStream.pBitStream->Write(szName, usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
-            if (syncType == ESyncType::SYNC_BROADCAST)
+            if (syncType == ESyncType::BROADCAST)
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
             else
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
@@ -899,7 +899,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
                                                                                  BitStream.pBitStream->GetNumberOfBytesUsed());
 
             // Unsubscribe all the players
-            if (lastSyncType == ESyncType::SYNC_SUBSCRIBE && syncType != ESyncType::SYNC_SUBSCRIBE)
+            if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
             {
                 m_pPlayerManager->ClearElementData(pElement, szName);
             }
@@ -950,7 +950,7 @@ bool CStaticFunctionDefinitions::SubscribeElementData(CElement* pElement, const 
     ESyncType     lastSyncType;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
 
-    if (lastSyncType == ESyncType::SYNC_SUBSCRIBE)
+    if (lastSyncType == ESyncType::SUBSCRIBE)
     {
         if (!pPlayer->SubscribeElementData(pElement, szName))
             return false;

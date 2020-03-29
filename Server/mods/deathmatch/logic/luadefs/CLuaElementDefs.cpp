@@ -1565,7 +1565,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     CElement*    pElement;
     SString      strKey;
     CLuaArgument value;
-    ESyncType    syncType = ESyncType::SYNC_BROADCAST;
+    ESyncType    syncType = ESyncType::BROADCAST;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1577,10 +1577,10 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
         bool bSynchronize;
         argStream.ReadBool(bSynchronize, true);
 
-        syncType = bSynchronize ? ESyncType::SYNC_BROADCAST : ESyncType::SYNC_LOCAL;
+        syncType = bSynchronize ? ESyncType::BROADCAST : ESyncType::LOCAL;
     }
     else
-        argStream.ReadEnumString(syncType, ESyncType::SYNC_BROADCAST);
+        argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
     if (!argStream.HasErrors())
     {

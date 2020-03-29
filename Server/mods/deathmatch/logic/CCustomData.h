@@ -18,11 +18,11 @@
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
-enum ESyncType
+enum class ESyncType
 {
-    SYNC_LOCAL,
-    SYNC_BROADCAST,    
-    SYNC_SUBSCRIBE
+    LOCAL,
+    BROADCAST,
+    SUBSCRIBE,
 };
 
 struct SCustomData
@@ -38,7 +38,7 @@ public:
 
     SCustomData* Get(const char* szName);
     SCustomData* GetSynced(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::SYNC_BROADCAST);
+    void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
 
     bool Delete(const char* szName);
 
