@@ -32,4 +32,15 @@ public:
 
     bool HandleException(CExceptionInformation* pExceptionInformation);
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
+
+    void TriggerDiscordJoin(SString strSecret);
+
+private:
+    struct InitializeArguments
+    {
+        std::string nickname;
+        std::string password;
+    };
+
+    static InitializeArguments ExtractInitializeArguments(const char* arguments);
 };

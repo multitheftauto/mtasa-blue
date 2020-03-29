@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CChat.cpp
  *  PURPOSE:     In-game chat box user interface implementation
@@ -60,6 +60,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
+    m_iSelectedInputHistoryEntry = -1;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage();
@@ -97,6 +98,7 @@ CChat::~CChat()
     SAFE_DELETE(m_pBackgroundTexture);
     SAFE_DELETE(m_pInput);
     SAFE_DELETE(m_pInputTexture);
+    SAFE_DELETE(m_pInputHistory);
 
     if (g_pChat == this)
         g_pChat = NULL;
@@ -252,18 +254,17 @@ void CChat::DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffs
     CVector2D chatTopLeft(drawList.renderBounds.fX1, drawList.renderBounds.fY1);
     CVector2D chatBotRight(drawList.renderBounds.fX2, drawList.renderBounds.fY2);
     CVector2D chatSize = chatBotRight - chatTopLeft;
-    CRect2D   chatBounds(0, 0, chatSize.fX, chatSize.fY);
 
-    chatBounds.fX1 += topLeftOffset.fX;
-    chatBounds.fY1 += topLeftOffset.fY;
-    chatBounds.fX2 += topLeftOffset.fX;
-    chatBounds.fY2 += topLeftOffset.fY;
+    float fRight = topLeftOffset.fX + chatSize.fX;
+    float fLineHeight = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
 
     CGraphics::GetSingleton().BeginDrawBatch();
 
     for (const auto& item : drawList.lineItemList)
     {
-        m_Lines[item.uiLine].Draw(item.vecPosition - chatTopLeft + topLeftOffset, item.ucAlpha, drawList.bShadow, drawList.bOutline, chatBounds);
+        CVector2D vecPosition = item.vecPosition - chatTopLeft + topLeftOffset;
+        CRect2D   chatBounds(vecPosition.fX, vecPosition.fY, fRight, vecPosition.fY + fLineHeight);
+        m_Lines[item.uiLine].Draw(vecPosition, item.ucAlpha, drawList.bShadow, drawList.bOutline, chatBounds);
     }
 
     CGraphics::GetSingleton().EndDrawBatch();
@@ -548,154 +549,225 @@ void CChat::ScrollDown()
     }
 }
 
+void CChat::ResetHistoryChanges()
+{
+    // Reset history selection, any history changes and our saved input
+    m_iSelectedInputHistoryEntry = -1;
+    m_pInputHistory->ResetChanges();
+    m_strSavedInputText.clear();
+}
+
+void CChat::SelectInputHistoryEntry(int iEntry)
+{
+    int iPreviouslySelectedInputHistoryEntry = m_iSelectedInputHistoryEntry;
+
+    // Check if we're in bounds, otherwise clear selection
+    if (!m_pInputHistory->Empty() && iEntry >= 0 && iEntry < m_pInputHistory->Size())
+        m_iSelectedInputHistoryEntry = iEntry;
+    else
+        m_iSelectedInputHistoryEntry = -1;
+
+    // Save current input as a temporary input value
+    if (iPreviouslySelectedInputHistoryEntry == -1)
+        m_strSavedInputText = m_strInputText;
+    else
+        m_pInputHistory->Get(iPreviouslySelectedInputHistoryEntry)->temp = m_strInputText;
+
+    // Clear input
+    ClearInput();
+
+    // If we haven't selected any history entry, use our saved input text
+    if (m_iSelectedInputHistoryEntry == -1)
+        SetInputText(m_strSavedInputText.c_str());
+    else
+    {
+        SString& strSelectedInputHistoryEntry = m_pInputHistory->Get(m_iSelectedInputHistoryEntry)->temp;
+        // If the selected entry isn't empty, fill it in
+        if (!strSelectedInputHistoryEntry.empty())
+            SetInputText(strSelectedInputHistoryEntry.c_str());
+    }
+}
+
+bool CChat::SetNextHistoryText()
+{
+    // If we can't take input or we're at the end of the list, stop here
+    if (!CanTakeInput() || m_iSelectedInputHistoryEntry >= m_pInputHistory->Size() - 1)
+        return false;
+
+    // Select the previous entry
+    SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
+
+    return true;
+}
+
+bool CChat::SetPreviousHistoryText()
+{
+    // If we can't take input, stop here
+    if (!CanTakeInput())
+        return false;
+
+    // Select the next entry, or the default entry
+    if (m_pInputHistory->Size() > 0 && m_iSelectedInputHistoryEntry > 0)
+        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
+    else
+        SelectInputHistoryEntry(-1);
+
+    return true;
+}
+
 bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 {
-    // If we can take input
-    if (!CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible())
+    if (!CanTakeInput())
+        return false;
+
+    // Check if it's a special key like enter and backspace, if not, add it as a character to the message
+    switch (KeyboardArgs.codepoint)
     {
-        // Check if it's a special key like enter and backspace, if not, add it as a character to the message
-        switch (KeyboardArgs.codepoint)
+        case VK_BACK:
         {
-            case VK_BACK:
+            if (m_strInputText.size() > 0)
             {
-                if (m_strInputText.size() > 0)
-                {
-                    // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring strText = MbUTF8ToUTF16(m_strInputText);
-                    strText.resize(strText.size() - 1);
-                    SetInputText(UTF16ToMbUTF8(strText).c_str());
-                }
-                break;
+                // Convert our string to UTF8 before resizing, then back to ANSI.
+                std::wstring strText = MbUTF8ToUTF16(m_strInputText);
+                strText.resize(strText.size() - 1);
+                SetInputText(UTF16ToMbUTF8(strText).c_str());
             }
+            break;
+        }
 
-            case VK_RETURN:
+        case VK_RETURN:
+        {
+            // Empty the chat and hide the input stuff
+            // If theres a command to call, call it
+            if (!m_strCommand.empty() && !m_strInputText.empty())
+                CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
+
+            // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
+            if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
+                m_pInputHistory->Add(m_strInputText);
+
+            SetInputVisible(false);
+
+            m_fSmoothScrollResetTime = GetSecondCount();
+
+            ResetHistoryChanges();
+            break;
+        }
+
+        case VK_TAB:
+        {
+            if (m_bNickCompletion && m_strInputText.size() > 0)
             {
-                // Empty the chat and hide the input stuff
-                // If theres a command to call, call it
-                if (!m_strCommand.empty() && !m_strInputText.empty())
-                    CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
+                bool bSuccess = false;
 
-                SetInputVisible(false);
+                SString strCurrentInput = GetInputText();
+                size_t  iFound;
+                iFound = strCurrentInput.find_last_of(" ");
+                if (iFound == std::string::npos)
+                    iFound = 0;
+                else
+                    ++iFound;
 
-                m_fSmoothScrollResetTime = GetSecondCount();
-                break;
-            }
-            case VK_TAB:
-            {
-                if (m_bNickCompletion && m_strInputText.size() > 0)
+                SString strPlayerNamePart = strCurrentInput.substr(iFound);
+
+                CModManager* pModManager = CModManager::GetSingletonPtr();
+                if (pModManager && pModManager->GetCurrentMod())
                 {
-                    bool bSuccess = false;
+                    // Create vector and get playernames from deathmatch module
+                    std::vector<SString> vPlayerNames;
+                    pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
 
-                    SString strCurrentInput = GetInputText();
-                    size_t  iFound;
-                    iFound = strCurrentInput.find_last_of(" ");
-                    if (iFound == std::string::npos)
-                        iFound = 0;
-                    else
-                        ++iFound;
-
-                    SString strPlayerNamePart = strCurrentInput.substr(iFound);
-
-                    CModManager* pModManager = CModManager::GetSingletonPtr();
-                    if (pModManager && pModManager->GetCurrentMod())
+                    for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
                     {
-                        // Create vector and get playernames from deathmatch module
-                        std::vector<SString> vPlayerNames;
-                        pModManager->GetCurrentMod()->GetPlayerNames(vPlayerNames);
+                        SString strPlayerName = *iter;
 
-                        for (std::vector<SString>::iterator iter = vPlayerNames.begin(); iter != vPlayerNames.end(); ++iter)
+                        // Check if there is another player after our last result
+                        if (m_strLastPlayerName.size() != 0)
                         {
-                            SString strPlayerName = *iter;
-
-                            // Check if there is another player after our last result
-                            if (m_strLastPlayerName.size() != 0)
+                            if (strPlayerName.CompareI(m_strLastPlayerName))
                             {
-                                if (strPlayerName.CompareI(m_strLastPlayerName))
+                                m_strLastPlayerName.clear();
+                                if (*iter == vPlayerNames.back())
                                 {
-                                    m_strLastPlayerName.clear();
-                                    if (*iter == vPlayerNames.back())
-                                    {
-                                        CharacterKeyHandler(KeyboardArgs);
-                                        return true;
-                                    }
+                                    CharacterKeyHandler(KeyboardArgs);
+                                    return true;
                                 }
-                                continue;
                             }
-
-                            // Already a part?
-                            if (m_strLastPlayerNamePart.size() != 0)
-                            {
-                                strPlayerNamePart = m_strLastPlayerNamePart;
-                            }
-
-                            // Check namepart
-                            if (!RemoveColorCodes(strPlayerName).BeginsWith(strPlayerNamePart))
-                                continue;
-                            else
-                            {
-                                // Check size if it's ok, then output
-                                SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
-                                if (MbUTF8ToUTF16(strOutput).size() < CHAT_MAX_CHAT_LENGTH)
-                                {
-                                    bSuccess = true;
-                                    m_strLastPlayerNamePart = strPlayerNamePart;
-                                    m_strLastPlayerName = strPlayerName;
-                                    SetInputText(strOutput);
-                                }
-
-                                break;
-                            }
+                            continue;
                         }
 
-                        // No success? Try again!
-                        if (!bSuccess)
-                            m_strLastPlayerName.clear();
-                    }
-                }
-                break;
-            }
-
-            default:
-            {
-                // Clear last namepart when pressing letter
-                if (m_strLastPlayerNamePart.size() != 0)
-                    m_strLastPlayerNamePart.clear();
-
-                // Clear last name when pressing letter
-                if (m_strLastPlayerName.size() != 0)
-                    m_strLastPlayerName.clear();
-
-                // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-                if (MbUTF8ToUTF16(m_strInputText).size() < CHAT_MAX_CHAT_LENGTH)
-                {
-                    if (KeyboardArgs.codepoint >= 32)
-                    {
-                        unsigned int uiCharacter = KeyboardArgs.codepoint;
-                        if (uiCharacter < 127)            // we have any char from ASCII
+                        // Already a part?
+                        if (m_strLastPlayerNamePart.size() != 0)
                         {
-                            // injecting as is
-                            m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
-                            SetInputText(m_strInputText.c_str());
+                            strPlayerNamePart = m_strLastPlayerNamePart;
                         }
-                        else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+
+                        // Check namepart
+                        if (!RemoveColorCodes(strPlayerName).BeginsWith(strPlayerNamePart))
+                            continue;
+                        else
                         {
-                            // Generate a null-terminating string for our character
-                            wchar_t wUNICODE[2] = {uiCharacter, '\0'};
+                            // Check size if it's ok, then output
+                            SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
+                            if (MbUTF8ToUTF16(strOutput).size() < CHAT_MAX_CHAT_LENGTH)
+                            {
+                                bSuccess = true;
+                                m_strLastPlayerNamePart = strPlayerNamePart;
+                                m_strLastPlayerName = strPlayerName;
+                                SetInputText(strOutput);
+                            }
 
-                            // Convert our UTF character into an ANSI string
-                            std::string strANSI = UTF16ToMbUTF8(wUNICODE);
-
-                            // Append the ANSI string, and update
-                            m_strInputText.append(strANSI);
-                            SetInputText(m_strInputText.c_str());
+                            break;
                         }
                     }
+
+                    // No success? Try again!
+                    if (!bSuccess)
+                        m_strLastPlayerName.clear();
                 }
-                break;
             }
+            break;
+        }
+
+        default:
+        {
+            // Clear last namepart when pressing letter
+            if (m_strLastPlayerNamePart.size() != 0)
+                m_strLastPlayerNamePart.clear();
+
+            // Clear last name when pressing letter
+            if (m_strLastPlayerName.size() != 0)
+                m_strLastPlayerName.clear();
+
+            // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
+            if (MbUTF8ToUTF16(m_strInputText).size() < CHAT_MAX_CHAT_LENGTH)
+            {
+                if (KeyboardArgs.codepoint >= 32)
+                {
+                    unsigned int uiCharacter = KeyboardArgs.codepoint;
+                    if (uiCharacter < 127)            // we have any char from ASCII
+                    {
+                        // injecting as is
+                        m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
+                        SetInputText(m_strInputText.c_str());
+                    }
+                    else            // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+                    {
+                        // Generate a null-terminating string for our character
+                        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
+
+                        // Convert our UTF character into an ANSI string
+                        std::string strANSI = UTF16ToMbUTF8(wUNICODE);
+
+                        // Append the ANSI string, and update
+                        m_strInputText.append(strANSI);
+                        SetInputText(m_strInputText.c_str());
+                    }
+                }
+            }
+            break;
         }
     }
-
     return true;
 }
 
@@ -715,6 +787,7 @@ void CChat::SetInputVisible(bool bVisible)
     if (!bVisible)
     {
         ClearInput();
+        ResetHistoryChanges();
     }
 
     m_bInputVisible = bVisible;
@@ -975,14 +1048,14 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
         fScaleX *= g_pChat->m_fRcpUsingDxFontScale;
         fScaleY *= g_pChat->m_fRcpUsingDxFontScale;
 
-        if (DrawArea.fY1 < RenderBounds.fY1)
+        if (DrawArea.fY1 <= RenderBounds.fY1)
         {
             // Clip text at the top
             if (DrawArea.fY1 + fLineHeight - RenderBounds.fY1 > 1)
                 g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)RenderBounds.fY1, (int)DrawArea.fX2, (int)DrawArea.fY1 + fLineHeight, ulColor,
                                                    szText, fScaleX, fScaleY, DT_LEFT | DT_BOTTOM | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
         }
-        else if (DrawArea.fY1 + fLineHeight > RenderBounds.fY2)
+        else if (DrawArea.fY1 + fLineHeight >= RenderBounds.fY2)
         {
             // Clip text at the bottom
             if (RenderBounds.fY2 - DrawArea.fY1 > 1)

@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientSound.cpp
+ *  FILE:        mods/deathmatch/logic/CClientSound.cpp
  *  PURPOSE:     Sound entity class
  *
  *****************************************************************************/
@@ -63,12 +62,15 @@ void CClientSound::DistanceStreamIn()
 {
     if (!m_pAudio)
     {
-        Create();
-        m_pSoundManager->OnDistanceStreamIn(this);
+        // If the sound was successfully created, we stream it in
+        if (Create())
+        {
+            m_pSoundManager->OnDistanceStreamIn(this);
 
-        // Call Stream In event
-        CLuaArguments Arguments;
-        CallEvent("onClientElementStreamIn", Arguments, true);
+            // Call Stream In event
+            CLuaArguments Arguments;
+            CallEvent("onClientElementStreamIn", Arguments, true);
+        }
     }
 }
 
@@ -103,6 +105,11 @@ bool CClientSound::Create()
 {
     if (m_pAudio)
         return false;
+
+    // If we're not allowed to play a stream, stop here
+    if (m_bStream)
+        if (!g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
+            return false;
 
     // Initial state
     if (!m_pBuffer)
@@ -642,6 +649,36 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
             UpdateSpatialData();
         }
     }
+
+    // If this is a stream
+    if (m_bStream)
+    {
+        // Check if we're allowed to play streams, otherwise just destroy the stream
+        // This way we can start the stream without the need to handle this edge case in scripting
+        if (g_pCore->GetCVars()->GetValue("allow_external_sounds", true))
+        {
+            if (!m_pAudio)
+            {
+                if (m_pSoundManager->IsDistanceStreamedIn(this))
+                {
+                    if (Create())
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushString("enabled");            // Reason
+                        CallEvent("onClientSoundStarted", Arguments, false);
+                    }
+                }
+            }
+        }
+        else if (m_pAudio)
+        {
+            Destroy();
+            CLuaArguments Arguments;
+            Arguments.PushString("disabled");            // Reason
+            CallEvent("onClientSoundStopped", Arguments, false);
+        }
+    }
+
     // If the sound isn't active, we don't need to process it
     // Moved after 3D updating as the streamer didn't know the position changed if a sound isn't streamed in when attached.
     if (!m_pAudio)

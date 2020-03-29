@@ -3,33 +3,37 @@ project "GUI"
 	kind "SharedLib"
 	targetname "cgui"
 	targetdir(buildpath("mta"))
-	
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
-	
+
 	filter {}
-		includedirs { 
+		includedirs {
 			"../sdk",
 			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/sparsehash/src/"
 		}
-	 
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
-	
+
+	defines {
+		"_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING"
+	}
+
 	links {
 		"CEGUI", "DirectX9GUIRenderer", "Falagard",
 		"../../vendor/cegui-0.4.0-custom/lib/freetype2412ST.lib", -- Todo: Select Debug variant, also move freetype to vendor
-		"d3dx9.lib", 
+		"d3dx9.lib",
 		"dxerr.lib"
 	}
-	
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
@@ -37,7 +41,7 @@ project "GUI"
 	}
 	
 	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
-		
+		flags { "ExcludeFromBuild" }
+
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

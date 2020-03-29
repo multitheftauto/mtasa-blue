@@ -139,16 +139,7 @@ public:
     unsigned char  ucNumOf2DEffects : 8;            // +13
     unsigned short usUnknown : 16;                  // +14     Something with 2d effects
 
-    unsigned char ucDynamicIndex : 8;            // +16
-
-    unsigned char dwUnknownFlag9 : 1;            // +17
-    unsigned char dwUnknownFlag10 : 1;
-    unsigned char dwUnknownFlag11 : 1;
-    unsigned char dwUnknownFlag12 : 1;
-    unsigned char dwUnknownFlag13 : 1;
-    unsigned char dwUnknownFlag14 : 1;
-    unsigned char dwUnknownFlag15 : 1;
-    unsigned char dwUnknownFlag16 : 1;
+    unsigned short usDynamicIndex : 16;            // +16
 
     // Flags used by CBaseModelInfo
     unsigned char bHasBeenPreRendered : 1;            // +18
@@ -277,6 +268,7 @@ protected:
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::unordered_map<DWORD, unsigned short>                                             ms_OriginalObjectPropertiesGroups;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
@@ -321,7 +313,8 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
-    void           SetLODDistance(float fDistance);
+    float          GetOriginalLODDistance();
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
@@ -369,11 +362,20 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
+    void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
 
     void InitialiseSupportedUpgrades(RpClump* pClump);
     void ResetSupportedUpgrades();
+
+    void           SetObjectPropertiesGroup(unsigned short usObjectGroup);
+    unsigned short GetObjectPropertiesGroup();
+    void           RestoreObjectPropertiesGroup();
+    static void    RestoreAllObjectsPropertiesGroups();
+
+    // Vehicle towing functions
+    bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

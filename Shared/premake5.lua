@@ -1,13 +1,18 @@
+-- Workaround for `kind "None"` only being supported for Visual Studio.
+if _ACTION == "gmake" then
+	return
+end
+
 project "Shared"
 	language "C++"
-	kind "StaticLib"
+	kind "None"
 	targetname "shared"
-		
-	vpaths { 
+
+	vpaths {
 		["Headers/*"] = { "**.h", "**.hpp" },
 		["*"] = "premake5.lua",
 	}
-		
+
 	files {
 		"premake5.lua",
 		"**.h",
@@ -20,4 +25,4 @@ project "Shared"
 		"XML/**",
 	}
 
-	flags { "ExcludeFromBuild" } 
+	flags { "ExcludeFromBuild" }

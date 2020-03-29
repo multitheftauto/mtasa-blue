@@ -174,8 +174,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
         if (pCDS->dwData == URI_CONNECT)
         {
-            LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
-            CCommandFuncs::Connect(szConnectInfo);
+            // We can receive this message before we are ready to process it (e.g. trying to show a CEGUI message window before CEGUI is initialized).
+            // Ignore these messages until we are in the main menu (when CCore sets m_bFirstFrame to false)
+            if (!g_pCore->IsFirstFrame())
+            {
+                LPSTR szConnectInfo = (LPSTR)pCDS->lpData;
+                CCommandFuncs::Connect(szConnectInfo);
+            }
         }
     }
 
@@ -369,6 +374,23 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                             }
                         }
                     }
+                    // If the chat is accepting input, and we pressed down/up, scroll the console history
+                    //                          or if we pressed tab, step through possible autocomplete matches
+                    else if (CLocalGUI::GetSingleton().GetChat()->IsInputVisible())
+                    {
+                        if (uMsg == WM_KEYDOWN)
+                        {
+                            if (wParam == VK_DOWN)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetPreviousHistoryText();
+                            }
+
+                            if (wParam == VK_UP)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetNextHistoryText();
+                            }
+                        }
+                    }
                     else if (uMsg == WM_KEYDOWN && CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->IsAddressBarAwaitingInput())
                     {
                         if (wParam == VK_DOWN)
@@ -404,7 +426,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
 
             // Lead the message through the keybinds message processor
-            g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
+            if (!g_pCore->IsFirstFrame())
+            {
+                g_pCore->GetKeyBinds()->ProcessMessage(hwnd, uMsg, wParam, lParam);
+            }
 
             bool bProcessed = false, bClientProcessed = false;
 
@@ -412,7 +437,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             bProcessed = CLocalGUI::GetSingleton().ProcessMessage(hwnd, uMsg, wParam, lParam);
 
             // Check and see if the Core/mod should process this message
-            if (!CCore::GetSingleton().GetGame()->IsAtMenu())
+            if (g_pCore->GetGame() && !g_pCore->GetGame()->IsAtMenu())
             {
                 pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton().GetClientMessageProcessor();
                 if (pfnClientMessageProcessor)

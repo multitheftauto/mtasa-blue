@@ -104,6 +104,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : m_HasSchemeLoaded(false), m_fC
 
 CGUI_Impl::~CGUI_Impl()
 {
+    delete CEGUI::System::getSingletonPtr();
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -1040,7 +1041,7 @@ bool CGUI_Impl::Event_MouseClick(const CEGUI::EventArgs& Args)
 
     // Call global and object handlers
     if (pElement)
-        pElement->Event_OnClick();
+        pElement->Event_OnClick(Args);
 
     if (m_MouseClickHandlers[m_Channel])
     {

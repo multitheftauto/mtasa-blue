@@ -31,7 +31,7 @@ public:
     CRenderWareSA(enum eGameVersion version);
     ~CRenderWareSA();
     void Initialize();
-    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled);
+    bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ClothesAddReplacementTxd(char* pFileData, ushort usFileId);
@@ -39,10 +39,10 @@ public:
     bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
+    RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions);
+    RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
@@ -54,7 +54,7 @@ public:
     void DestroyTexture(RwTexture* pTex);
 
     // Reads and parses a COL3 file with an optional collision key name
-    CColModel* ReadCOL(const CBuffer& fileData);
+    CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void ReplaceCollisions(CColModel* pColModel, unsigned short usModelID);
@@ -85,7 +85,7 @@ public:
 
     void ReplacePedModel(RpClump* pNew, unsigned short usModelID);
 
-    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwFunc);
+    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
@@ -94,6 +94,7 @@ public:
     ushort             GetTXDIDForModelID(ushort usModelID);
     void               PulseWorldTextureWatch();
     void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
+    bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);

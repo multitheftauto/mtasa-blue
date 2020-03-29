@@ -371,29 +371,20 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
     }
     else
     {
-        // Poll the socket
-        sockaddr_in clntAddr;
-        int         addrLen = sizeof(clntAddr);
-        int         len = recvfrom(m_Socket, szBuffer, SERVER_LIST_QUERY_BUFFER, MSG_PARTIAL, (sockaddr*)&clntAddr, &addrLen);
-        int         error = WSAGetLastError();
-        if (len >= 0)
+        // Poll the socket and parse the packet
+        if (ParseQuery())
         {
-            // Parse data
-            if (ParseQuery(szBuffer, len))
-            {
-                CloseSocket();
-                bMaybeOffline = false;
-                SetDataQuality(SERVER_INFO_QUERY);
-                uiCacheNoReplyCount = 0;
-                uiRevision++;                                           // To flag browser gui update
-                GetServerCache()->SetServerCachedInfo(this);            // Save parsed info in the cache
-                return "ParsedQuery";
-            }
+            bMaybeOffline = false;
+            SetDataQuality(SERVER_INFO_QUERY);
+            uiCacheNoReplyCount = 0;
+            uiRevision++;                                           // To flag browser gui update
+            GetServerCache()->SetServerCachedInfo(this);            // Save parsed info in the cache
+            return "ParsedQuery";
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////
         // TCP send to servers that the master server can see, but this client can't
-        uint uiQueryAge = (uint)m_ElapsedTime.Get();
+        uint uiQueryAge = queryReceiver.GetElapsedTimeSinceLastQuery();
         if (uiQueryAge > 2000)
         {
             if (!m_bDoneTcpSend && GetMaxRetries() > 0)
@@ -443,7 +434,7 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
             else
             {
                 // Give up
-                CloseSocket();
+                queryReceiver.InvalidateSocket();
                 uiRevision++;            // To flag browser gui update
 
                 if (bRemoveNonResponding)
@@ -475,184 +466,33 @@ unsigned short CServerListItem::GetQueryPort()
 
 void CServerListItem::Query()
 {            // Performs a query according to ASE protocol
-    sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr = Address;
-    addr.sin_port = htons(GetQueryPort());
 
-    // Initialize socket on demand
-    if (m_Socket == INVALID_SOCKET)
-    {
-        m_Socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-        u_long flag = 1;
-        ioctlsocket(m_Socket, FIONBIO, &flag);
-    }
-
-    // Trailing data to work around 1 byte UDP packet filtering
-    g_pCore->GetNetwork()->SendTo(m_Socket, "r mtasa", 1, 0, (sockaddr*)&addr, sizeof(addr));
-    m_ElapsedTime.Reset();
+    queryReceiver.RequestQuery(Address, GetQueryPort());
 }
 
-bool ReadString(std::string& strRead, const char* szBuffer, unsigned int& i, unsigned int nLength)
+bool CServerListItem::ParseQuery()
 {
-    if (i <= nLength)
-    {
-        unsigned char len = szBuffer[i];
-        if (i + len <= nLength && len > 0)
-        {
-            const char* ptr = &szBuffer[i + 1];
-            i += len;
-            strRead = std::string(ptr, len - 1);
-            return true;
-        }
-        i++;
-    }
-    return false;
-}
-
-bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
-{
-    // Check length
-    if (nLength < 15)
-        return false;
-
-    // Check header
-    if (strncmp(szBuffer, "EYE2", 4) != 0)
+    SQueryInfo info = queryReceiver.GetServerResponse(uiMasterServerSaysRestrictions);
+    if (!info.containingInfo)
         return false;
 
     // Get IP as string
-    const char* szIP = inet_ntoa(Address);
+    strHost = inet_ntoa(Address);
 
-    // Calculate the ping/latency
-    nPing = m_ElapsedTime.Get();
-
-    // Parse relevant data
-    SString      strTemp;
-    SString      strMapTemp;
-    unsigned int i = 4;
-
-    // IP
-    strHost = szIP;
-
-    // Game
-    if (!ReadString(strTemp, szBuffer, i, nLength))
-        return false;
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_NAME) == false)
-        strGameName = strTemp;
-
-    // Port (Ignore result as we must already have the correct value)
-    if (!ReadString(strTemp, szBuffer, i, nLength))
-        return false;
-
-    // Server name
-    if (!ReadString(strTemp, szBuffer, i, nLength))
-        return false;
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_NAME) == false)
-        strName = strTemp;
-
-    // Game type
-    if (!ReadString(strTemp, szBuffer, i, nLength))
-        return false;
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_MODE) == false)
-        strGameMode = strTemp;
-
-    // Map name
-    if (!ReadString(strMapTemp, szBuffer, i, nLength))
-        return false;
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAP_NAME) == false)
-        strMap = strMapTemp;
-
-    // Version
-    if (!ReadString(strTemp, szBuffer, i, nLength))
-        return false;
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_VERSION) == false)
-        strVersion = strTemp;
-
-    // Got space for password, serial verification, player count, players max?
-    if (i + 4 > nLength)
-    {
-        return false;
-    }
-
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_PASSWORDED_FLAG) == false)
-        bPassworded = (szBuffer[i] == 1);
-    i++;
-
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERIALS_FLAG) == false)
-        bSerials = (szBuffer[i] == 1);
-    i++;
-
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
-        nPlayers = (unsigned char)szBuffer[i];
-    i++;
-
-    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
-        nMaxPlayers = (unsigned char)szBuffer[i];
-    i++;
-
-    // Recover large player count if present
-    const SString strPlayerCount = strMapTemp.Right(strMapTemp.length() - strlen(strMapTemp) - 1);
-    if (!strPlayerCount.empty())
-    {
-        SString strJoinedPlayers, strMaxPlayers;
-        if (strPlayerCount.Split("/", &strJoinedPlayers, &strMaxPlayers))
-        {
-            if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
-                nPlayers = atoi(strJoinedPlayers);
-            if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
-                nMaxPlayers = atoi(strMaxPlayers);
-        }
-    }
-
-    // Recover server build type if present
-    const SString strBuildType = strPlayerCount.Right(strPlayerCount.length() - strlen(strPlayerCount) - 1);
-    if (!strBuildType.empty())
-        m_iBuildType = atoi(strBuildType);
-    else
-        m_iBuildType = 1;
-
-    // Recover server build number if present
-    const SString strBuildNumber = strBuildType.Right(strBuildType.length() - strlen(strBuildType) - 1);
-    if (!strBuildNumber.empty())
-        m_iBuildNumber = atoi(strBuildNumber);
-    else
-        m_iBuildNumber = 0;
-
-    // Recover server ping status if present
-    const SString strPingStatus = strBuildNumber.Right(strBuildNumber.length() - strlen(strBuildNumber) - 1);
-    CCore::GetSingleton().GetNetwork()->UpdatePingStatus(*strPingStatus, nPlayers);
-
-    // Recover server http port if present
-    const SString strNetRoute = strPingStatus.Right(strPingStatus.length() - strlen(strPingStatus) - 1);
-    const SString strUpTime = strNetRoute.Right(strNetRoute.length() - strlen(strNetRoute) - 1);
-    const SString strHttpPort = strUpTime.Right(strUpTime.length() - strlen(strUpTime) - 1);
-    if (!strHttpPort.empty())
-        m_usHttpPort = atoi(strHttpPort);
-
-    // Get player nicks
-    vecPlayers.clear();
-    while (i < nLength)
-    {
-        std::string strPlayer;
-        try
-        {
-            if (ReadString(strPlayer, szBuffer, i, nLength))
-            {
-                // Remove color code, unless that results in an empty string
-                SString strResult = RemoveColorCodes(strPlayer.c_str());
-                if (strResult.length() == 0)
-                    strResult = strPlayer;
-                if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
-                    vecPlayers.push_back(strResult);
-            }
-        }
-        catch (...)
-        {
-            // yeah that's what I thought.
-            return false;
-        }
-    }
+    nPing = info.pingTime;
+    strGameName = info.gameName;
+    strName = info.serverName;
+    strGameMode = info.gameType;
+    strMap = info.mapName;
+    strVersion = info.versionText;
+    bPassworded = info.isPassworded;
+    bSerials = info.serials;
+    nPlayers = info.players;
+    nMaxPlayers = info.playerSlot;
+    m_iBuildType = info.buildType;
+    m_iBuildNumber = info.buildNum;
+    m_usHttpPort = info.httpPort;
+    vecPlayers = info.playersPool;
 
     bScanned = true;
 
@@ -823,15 +663,13 @@ CServerListItem::~CServerListItem()
         m_pItemList->RemoveItem(this);
     }
     MapRemove(ms_ValidServerListItemMap, this);
-    CloseSocket();
 }
 
 void CServerListItem::ResetForRefresh()
 {
-    CloseSocket();
+    queryReceiver.InvalidateSocket();
     bScanned = false;
     bSkipped = false;
-    m_ElapsedTime.Reset();
     uiQueryRetryCount = 0;
 
     if (m_iDataQuality >= SERVER_INFO_QUERY)

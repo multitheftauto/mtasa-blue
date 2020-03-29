@@ -180,6 +180,13 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
     // Create our object.
     hResult = m_pDevice->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
 
+    // Check if the result is correct (a custom d3d9.dll could return D3D_OK with a null pointer)
+    if (hResult == D3D_OK && *ppReturnedDeviceInterface == nullptr)
+    {
+        WriteDebugEvent("CProxyDirect3D9::CreateDevice: CreateDevice succeeded, but IDirect3DDevice9* is a nullptr");
+        hResult = D3DERR_INVALIDDEVICE;
+    }
+
     // Store the rendering window in the direct 3d data
     CDirect3DData::GetSingleton().StoreDeviceWindow(pPresentationParameters->hDeviceWindow);
 
@@ -305,6 +312,14 @@ HRESULT CreateDeviceInsist(uint uiMinTries, uint uiTimeout, IDirect3D9* pDirect3
     {
         ms_uiCreationAttempts++;
         hResult = pDirect3D->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+
+        // Check if the result is correct (a custom d3d9.dll could return D3D_OK with a null pointer)
+        if (hResult == D3D_OK && *ppReturnedDeviceInterface == nullptr)
+        {
+            WriteDebugEvent("CreateDeviceInsist: CreateDevice succeeded, but IDirect3DDevice9* is a nullptr");
+            hResult = D3DERR_INVALIDDEVICE;
+        }
+
         if (hResult == D3D_OK)
         {
             WriteDebugEvent(SString("   -- CreateDeviceInsist succeeded on try #%d", uiRetryCount + 1));
@@ -711,6 +726,13 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
         // Try create device again
         hResult = DoCreateDevice(pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
 
+        // Check if the result is correct (a custom d3d9.dll could return D3D_OK with a null pointer)
+        if (hResult == D3D_OK && *ppReturnedDeviceInterface == nullptr)
+        {
+            WriteDebugEvent("HandleCreateDeviceResult: DoCreateDevice succeeded, but IDirect3DDevice9* is a nullptr");
+            hResult = D3DERR_INVALIDDEVICE;
+        }
+
         // Handle retry result
         if (hResult != D3D_OK)
         {
@@ -898,6 +920,13 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
 
     hResult = CreateDeviceInsist(2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+
+    // Check if the result is correct (a custom d3d9.dll could return D3D_OK with a null pointer)
+    if (hResult == D3D_OK && *ppReturnedDeviceInterface == nullptr)
+    {
+        WriteDebugEvent("CCore::OnPostCreateDevice: CreateDeviceInsist succeeded, but IDirect3DDevice9* is a nullptr");
+        hResult = D3DERR_INVALIDDEVICE;
+    }
 
     if (hResult != D3D_OK)
         WriteDebugEvent(SString("MTA CreateDevice failed: %08x", hResult));
