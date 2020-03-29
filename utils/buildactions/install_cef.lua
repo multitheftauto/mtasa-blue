@@ -105,8 +105,8 @@ newaction {
 			return
 		end
 
+		local downloaded_hash = os.sha256_file(archive_path)
 		if upgrade then
-			local downloaded_hash = os.sha256_file(archive_path)
 			print("New CEF hash is:", downloaded_hash)
 			CEF_HASH = downloaded_hash
 
@@ -115,6 +115,14 @@ newaction {
 			if (input == "y" or input == "yes") then
 				update_install_cef(CEF_VERSION, downloaded_hash)
 			end
+		end
+
+		if downloaded_hash == CEF_HASH then
+			print("CEF consistency checks succeeded")
+		else
+			errormsg("CEF consistency checks failed.", ("Expected %s, got %s"):format(CEF_HASH, downloaded_hash))
+			os.exit(1)
+			return
 		end
 
 		-- Seriously abort now if we're not using Windows
