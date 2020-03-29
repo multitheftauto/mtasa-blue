@@ -172,17 +172,9 @@ or you fail to stick to the rules, your permissions will be revoked.
 
 ## Merging pull requests
 
-Before merging, enforced by GitHub's branch protection, pull requests **require**:
-- Linux and Windows status checks to pass
-- 1 pull request review
+Before merging, pull requests _should_ have:
+- Linux and Windows status checks passing, and
+- 1 pull request review, or 2 reviews for large pull requests
 
-If the pull request is large, try and only merge if there at least 2 pull request reviews.
-This isn't enforced via branch protection, but please try and stick to this convention
-(... unless nobody else is reviewing your PR).
-
-Branch protection is **not enforced** for repository administrators,
-and those people are therefore not required to send pull requests. Individual repository admins may,
-for the greater good, pledge to submit pull requests despite this lack of enforcement.
-
-For informational purposes, the current repository administrators are a _subset of_
-[those listed here](https://forum.mtasa.com/staff/)—it is not an authoritative list.
+These rules are not enforced via branch protection but, for the greater good,
+please try and stick to this convention (... unless nobody is reviewing your PR).
