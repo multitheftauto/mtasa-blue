@@ -870,7 +870,7 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bAutoSyncType, ESyncType syncType)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(pElement);
     assert(szName);
@@ -878,9 +878,6 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
 
     ESyncType     lastSyncType = ESyncType::SYNC_BROADCAST;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
-
-    if (bAutoSyncType)
-        syncType = lastSyncType;
 
     if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {

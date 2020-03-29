@@ -1565,7 +1565,6 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     CElement*    pElement;
     SString      strKey;
     CLuaArgument value;
-    bool         bAutoSyncType = false;
     ESyncType    syncType = ESyncType::SYNC_BROADCAST;
 
     CScriptArgReader argStream(luaVM);
@@ -1573,9 +1572,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
     argStream.ReadString(strKey);
     argStream.ReadLuaArgument(value);
 
-    if (argStream.NextIsNil() || argStream.NextIsNone()) 
-        bAutoSyncType = true;
-    else if (argStream.NextIsBool())
+    if (argStream.NextIsBool())
     {
         bool bSynchronize;
         argStream.ReadBool(bSynchronize, true);
@@ -1600,7 +1597,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, bAutoSyncType, syncType))
+            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
