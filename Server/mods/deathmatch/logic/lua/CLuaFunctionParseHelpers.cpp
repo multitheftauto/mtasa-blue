@@ -275,7 +275,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(ESyncType)
 ADD_ENUM(ESyncType::BROADCAST, "broadcast")
 ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
-IMPLEMENT_ENUM_CLASS_END("sync-type")
+IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
 //
 // Get best guess at name of userdata type

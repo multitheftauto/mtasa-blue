@@ -340,10 +340,8 @@ void CPlayerManager::ClearElementData(CElement* pElement, const std::string& nam
 
 void CPlayerManager::ClearElementData(CElement* pElement)
 {
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
+    for (auto pPlayer : m_Players)
     {
-        CPlayer* pPlayer = *iter;
         pPlayer->UnsubscribeElementData(pElement);
     }
 }

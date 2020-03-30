@@ -981,6 +981,15 @@ bool CStaticFunctionDefinitions::UnsubscribeElementData(CElement* pElement, cons
     return pPlayer->UnsubscribeElementData(pElement, szName);
 }
 
+bool CStaticFunctionDefinitions::IsElementSubscribed(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    return pPlayer->IsSubscribed(pElement, szName);
+}
+
 bool CStaticFunctionDefinitions::SetElementParent(CElement* pElement, CElement* pParent)
 {
     assert(pElement);

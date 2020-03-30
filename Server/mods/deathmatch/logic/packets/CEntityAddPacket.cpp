@@ -162,7 +162,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             {
                 const char*         szName = iter->first.c_str();
                 const CLuaArgument* pArgument = &iter->second.Variable;
-                ESyncType           syncType = iter->second.syncType;
 
                 unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
                 BitStream.Write(ucNameLength);

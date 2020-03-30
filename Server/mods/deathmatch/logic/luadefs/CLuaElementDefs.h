@@ -73,6 +73,7 @@ public:
     LUA_DECLARE(removeElementData);
     LUA_DECLARE(subscribeElementData);
     LUA_DECLARE(unsubscribeElementData);
+    LUA_DECLARE(isElementSubscribed);
 
     // Attachement
     LUA_DECLARE(attachElements);
