@@ -941,7 +941,7 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
     return false;
 }
 
-bool CStaticFunctionDefinitions::SubscribeElementData(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
 {
     assert(pElement);
     assert(szName);
@@ -972,7 +972,7 @@ bool CStaticFunctionDefinitions::SubscribeElementData(CElement* pElement, const 
     return false;
 }
 
-bool CStaticFunctionDefinitions::UnsubscribeElementData(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
 {
     assert(pElement);
     assert(szName);
@@ -981,7 +981,7 @@ bool CStaticFunctionDefinitions::UnsubscribeElementData(CElement* pElement, cons
     return pPlayer->UnsubscribeElementData(pElement, szName);
 }
 
-bool CStaticFunctionDefinitions::IsElementSubscribed(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
 {
     assert(pElement);
     assert(szName);

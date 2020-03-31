@@ -71,9 +71,9 @@ public:
     LUA_DECLARE(HasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);
-    LUA_DECLARE(subscribeElementData);
-    LUA_DECLARE(unsubscribeElementData);
-    LUA_DECLARE(isElementSubscribed);
+    LUA_DECLARE(addElementDataSubscriber);
+    LUA_DECLARE(removeElementDataSubscriber);
+    LUA_DECLARE(hasElementDataSubscriber);
 
     // Attachement
     LUA_DECLARE(attachElements);

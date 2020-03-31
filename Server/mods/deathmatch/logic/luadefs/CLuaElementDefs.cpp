@@ -72,9 +72,9 @@ void CLuaElementDefs::LoadFunctions()
         {"hasElementData", HasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
-        {"subscribeElementData", subscribeElementData},
-        {"unsubscribeElementData", unsubscribeElementData},
-        {"isElementSubscribed", isElementSubscribed},
+        {"addElementDataSubscriber", addElementDataSubscriber},
+        {"removeElementDataSubscriber", removeElementDataSubscriber},
+        {"hasElementDataSubscriber", hasElementDataSubscriber},
 
         // Set
         {"setElementID", setElementID},
@@ -123,8 +123,9 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
     lua_classfunction(luaVM, "removeData", "removeElementData");
-    lua_classfunction(luaVM, "subscribeData", "subscribeElementData");
-    lua_classfunction(luaVM, "unsubscribeData", "unsubscribeElementData");
+    lua_classfunction(luaVM, "addDataSubscriber", "addElementDataSubscriber");
+    lua_classfunction(luaVM, "removeDataSubscriber", "removeElementDataSubscriber");
+    lua_classfunction(luaVM, "hasDataSubscriber", "hasElementDataSubscriber");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
@@ -1643,9 +1644,9 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::subscribeElementData(lua_State* luaVM)
+int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
 {
-    //  bool subscribeElementData ( element theElement, string key, player thePlayer )
+    //  bool addElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
     SString   strKey;
     CPlayer*  pPlayer;
@@ -1659,7 +1660,7 @@ int CLuaElementDefs::subscribeElementData(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (CStaticFunctionDefinitions::SubscribeElementData(pElement, strKey, pPlayer))
+        if (CStaticFunctionDefinitions::AddElementDataSubscriber(pElement, strKey, pPlayer))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1672,9 +1673,9 @@ int CLuaElementDefs::subscribeElementData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::unsubscribeElementData(lua_State* luaVM)
+int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
 {
-    //  bool unsubscribeElementData ( element theElement, string key, player thePlayer )
+    //  bool removeElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
     SString   strKey;
     CPlayer*  pPlayer;
@@ -1688,7 +1689,7 @@ int CLuaElementDefs::unsubscribeElementData(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
   
-        if (CStaticFunctionDefinitions::UnsubscribeElementData(pElement, strKey, pPlayer))
+        if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1701,9 +1702,9 @@ int CLuaElementDefs::unsubscribeElementData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::isElementSubscribed(lua_State* luaVM)
+int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
 {
-    //  bool isElementSubscribed ( element theElement, string key, player thePlayer )
+    //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
     SString   strKey;
     CPlayer* pPlayer;
@@ -1717,7 +1718,7 @@ int CLuaElementDefs::isElementSubscribed(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        bool bResult = CStaticFunctionDefinitions::IsElementSubscribed(pElement, strKey, pPlayer);
+        bool bResult = CStaticFunctionDefinitions::HasElementDataSubscriber(pElement, strKey, pPlayer);
         lua_pushboolean(luaVM, bResult);
         return 1;
     }
