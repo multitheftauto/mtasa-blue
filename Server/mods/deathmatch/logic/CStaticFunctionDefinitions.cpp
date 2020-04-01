@@ -896,14 +896,12 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
-
-            // Unsubscribe all the players
-            if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
-            {
-                m_pPlayerManager->ClearElementData(pElement, szName);
-            }
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
         }
+
+        // Unsubscribe all the players
+        if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
+            m_pPlayerManager->ClearElementData(pElement, szName);
 
         // Set its custom data
         pElement->SetCustomData(szName, Variable, syncType);
@@ -962,9 +960,9 @@ bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, co
         BitStream.pBitStream->Write(szName, usNameLength);
         pCurrentVariable->WriteToBitStream(*BitStream.pBitStream);
 
-        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
+        pPlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
 
-        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed());
+        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, 1, BitStream.pBitStream->GetNumberOfBytesUsed());
 
         return true;
     }
