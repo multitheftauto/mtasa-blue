@@ -14,11 +14,11 @@ class CServerInfo;
 #pragma once
 
 // Update interval for the full server (in milliseconds)
-#define SERVER_UPDATE_INTERVAL        2500
+#define SERVER_UPDATE_INTERVAL 2500
 
 // Dimensions for our window
-#define INFO_WINDOW_DEFAULTWIDTH        370.0f
-#define INFO_WINDOW_DEFAULTHEIGHT       400.0f
+#define INFO_WINDOW_DEFAULTWIDTH 370.0f
+#define INFO_WINDOW_DEFAULTHEIGHT 400.0f
 
 #define INFO_WINDOW_HSPACING 20
 #define INFO_LABEL_VSPACING 0

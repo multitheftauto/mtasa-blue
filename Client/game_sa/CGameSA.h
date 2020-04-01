@@ -106,7 +106,6 @@ private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
     CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
-
 public:
     ZERO_ON_NEW
 

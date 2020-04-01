@@ -49,6 +49,7 @@ public:
     LUA_DECLARE(EngineGetVisibleTextureNames);
     LUA_DECLARE(EngineSetModelVisibleTime);
     LUA_DECLARE(EngineGetModelVisibleTime);
+    LUA_DECLARE(EngineGetModelTextures);
     LUA_DECLARE(EngineSetSurfaceProperties);
     LUA_DECLARE(EngineGetSurfaceProperties);
     LUA_DECLARE(EngineResetSurfaceProperties);

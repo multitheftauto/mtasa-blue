@@ -147,6 +147,8 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 
+	File "${FILES_ROOT}\MTA San Andreas\mta\discord_game_sdk.dll"
+
 	SetOutPath "$INSTDIR\MTA\config"
 	File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
 

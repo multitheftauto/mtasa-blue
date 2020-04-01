@@ -119,6 +119,27 @@ struct SReplacedAnimation
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
 };
 
+struct SAnimationCache
+{
+    SString strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+
+    SAnimationCache()
+    {
+        iTime = -1;
+        bLoop = false;
+        bUpdatePosition = false;
+        bInterruptable = false;
+        bFreezeLastFrame = true;
+        iBlend = 250;
+    }
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -418,6 +439,7 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
+    bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
     void RunAnimation(AssocGroupId animGroup, AnimationId animID);
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
@@ -425,7 +447,7 @@ public:
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
-    const char*                 GetAnimationName();
+    const SAnimationCache&      GetAnimationCache() { return m_AnimationCache; }
 
     bool IsUsingGun();
 
@@ -471,11 +493,11 @@ public:
 
     void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP() { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_bLoopAnimation) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
+    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_AnimationCache.bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
     void SetCustomAnimationUntriggerable()
     {
         m_bRequestedAnimation = false;
-        m_bLoopAnimation = false;
+        m_AnimationCache.bLoop = false;
     }
     bool            IsNextAnimationCustom() { return m_bisNextAnimationCustom; }
     void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
@@ -646,14 +668,8 @@ public:
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
-    SString                                  m_strAnimationName;
     bool                                     m_bRequestedAnimation;
-    int                                      m_iTimeAnimation;
-    int                                      m_iBlendAnimation;
-    bool                                     m_bLoopAnimation;
-    bool                                     m_bUpdatePositionAnimation;
-    bool                                     m_bInterruptableAnimation;
-    bool                                     m_bFreezeLastFrameAnimation;
+    SAnimationCache                          m_AnimationCache;
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;

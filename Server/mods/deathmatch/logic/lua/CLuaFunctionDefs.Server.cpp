@@ -83,11 +83,23 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
         {
             if (pElement)
             {
-                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-                lua_pushboolean(luaVM, true);
-                return 1;
+                if (IS_TEAM(pElement))
+                {
+                    CTeam* pTeam = static_cast<CTeam*>(pElement);
+                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
+                    {
+                        sendList.push_back(*iter);
+                    }
+                }
+                else
+                {
+                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
             }
-            else if (sendList.size() > 0)
+
+            if (sendList.size() > 0)
             {
                 CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
                 lua_pushboolean(luaVM, true);
@@ -202,18 +214,18 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     argStream.ReadAnyAsString(strMessage);
     argStream.ReadNumber(uiLevel, 3);
 
-    if (uiLevel == 0)
+    if (uiLevel == 0 || uiLevel == 4)
     {
-        argStream.ReadNumber(ucR, 0xFF);
-        argStream.ReadNumber(ucG, 0xFF);
-        argStream.ReadNumber(ucB, 0xFF);
+        argStream.ReadNumber(ucR, 255);
+        argStream.ReadNumber(ucG, 255);
+        argStream.ReadNumber(ucB, 255);
     }
 
     if (!argStream.HasErrors())
     {
-        if (uiLevel > 3)
+        if (uiLevel > 4)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-3)", lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-4)", lua_tostring(luaVM, lua_upvalueindex(1)));
 
             lua_pushboolean(luaVM, false);
             return 1;
@@ -231,9 +243,13 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         {
             m_pScriptDebugging->LogInformation(luaVM, "%s", strMessage.c_str());
         }
-        else if (uiLevel == 0)
+        else if (uiLevel == 4)
         {
             m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
+        }
+        else if (uiLevel == 0)
+        {
+            m_pScriptDebugging->LogDebug(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
         }
         lua_pushboolean(luaVM, true);
         return 1;

@@ -205,7 +205,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetSize(CVector2D(m_menuBX - m_menuAX, m_menuBY - m_menuAY) + BODGE_FACTOR_6, false);
     m_pMenuArea->SetAlpha(0);
     m_pMenuArea->SetZOrderingEnabled(false);
-    m_pMenuArea->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnMenuClick, this));
+    m_pMenuArea->SetClickHandler(GUI_CALLBACK_MOUSE(&CMainMenu::OnMenuClick, this));
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
@@ -792,76 +792,84 @@ bool CMainMenu::OnMenuExit(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnMenuClick(CGUIElement* pElement)
+bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
 {
-    // Handle all our clicks to the menu from here
-    if (m_pHoveredItem)
+    CGUIElement* pElement = Args.pWindow;
+
+    // Only handle all our clicks to the menu from here
+    if (!m_pHoveredItem)
+        return true;
+
+    if (Args.button != LeftButton && m_pHoveredItem->menuType != MENU_ITEM_QUICK_CONNECT)
+        return true;
+
+    // For detecting startup problems
+    WatchDogUserDidInteractWithMenu();
+
+    // Possible disconnect question for user
+    if (g_pCore->IsConnected())
     {
-        // For detecting startup problems
-        WatchDogUserDidInteractWithMenu();
-
-        // Possible disconnect question for user
-        if (g_pCore->IsConnected())
-        {
-            switch (m_pHoveredItem->menuType)
-            {
-                case MENU_ITEM_HOST_GAME:
-                case MENU_ITEM_MAP_EDITOR:
-                    AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
-                    return true;
-                default:
-                    break;
-            }
-        }
-
         switch (m_pHoveredItem->menuType)
         {
-            case MENU_ITEM_DISCONNECT:
-                OnDisconnectButtonClick(pElement);
-                break;
-            case MENU_ITEM_QUICK_CONNECT:
-                OnQuickConnectButtonClick(pElement);
-                break;
-            case MENU_ITEM_BROWSE_SERVERS:
-                OnBrowseServersButtonClick(pElement);
-                break;
             case MENU_ITEM_HOST_GAME:
-                OnHostGameButtonClick();
-                break;
             case MENU_ITEM_MAP_EDITOR:
-                OnEditorButtonClick();
-                break;
-            case MENU_ITEM_SETTINGS:
-                OnSettingsButtonClick(pElement);
-                break;
-            case MENU_ITEM_ABOUT:
-                OnAboutButtonClick(pElement);
-                break;
-            case MENU_ITEM_QUIT:
-                OnQuitButtonClick(pElement);
-                break;
+                AskUserIfHeWantsToDisconnect(m_pHoveredItem->menuType);
+                return true;
             default:
                 break;
         }
     }
+
+    switch (m_pHoveredItem->menuType)
+    {
+        case MENU_ITEM_DISCONNECT:
+            OnDisconnectButtonClick(pElement);
+            break;
+        case MENU_ITEM_QUICK_CONNECT:
+            OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
+            break;
+        case MENU_ITEM_BROWSE_SERVERS:
+            OnBrowseServersButtonClick(pElement);
+            break;
+        case MENU_ITEM_HOST_GAME:
+            OnHostGameButtonClick();
+            break;
+        case MENU_ITEM_MAP_EDITOR:
+            OnEditorButtonClick();
+            break;
+        case MENU_ITEM_SETTINGS:
+            OnSettingsButtonClick(pElement);
+            break;
+        case MENU_ITEM_ABOUT:
+            OnAboutButtonClick(pElement);
+            break;
+        case MENU_ITEM_QUIT:
+            OnQuitButtonClick(pElement);
+            break;
+        default:
+            break;
+    }
+
     return true;
 }
 
-bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement)
+bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
+    // If we're right clicking, execute special command
+    if (!left)
+    {
+        std::string command;
+        CVARS_GET("_beta_qc_rightclick_command", command);
+        g_pCore->GetCommands()->Execute(command.data());
+        return true;
+    }
+
     m_ServerBrowser.SetVisible(true);
     m_ServerBrowser.OnQuickConnectButtonClick();
-    /*
-    //    if ( !m_bIsInSubWindow )
-        {
-            m_QuickConnect.SetVisible ( true );
-    //        m_bIsInSubWindow = true;
-        }
-    */
     return true;
 }
 
