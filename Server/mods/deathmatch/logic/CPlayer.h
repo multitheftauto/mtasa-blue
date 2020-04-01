@@ -104,6 +104,11 @@ public:
     bool IsJoined() { return m_bIsJoined; }
     void SetJoined() { m_bIsJoined = true; }
 
+    bool SubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement, const std::string& strName);
+    bool UnsubscribeElementData(CElement* pElement);
+    bool IsSubscribed(CElement* pElement, const std::string& strName) const;
+
     float GetCameraRotation() { return m_fCameraRotation; };
     void  SetCameraRotation(float fRotation) { m_fCameraRotation = fRotation; };
 
@@ -431,6 +436,8 @@ private:
     CElapsedTime m_LastReceivedSyncTimer;
 
     std::map<std::string, std::string> m_AnnounceValues;
+
+    std::set<std::pair<CElement*, std::string>> m_DataSubscriptions;
 
     uint m_uiWeaponIncorrectCount;
 
