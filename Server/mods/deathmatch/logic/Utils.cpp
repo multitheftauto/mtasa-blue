@@ -584,6 +584,7 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
                 if (!bPreviousWasHex && uiRGBAIndex != 0)
                 {
                     vecColors.push_back(color);
+                    ucCount += ucLength - uiRGBAIndex;
                     color = defaultColor;
                 }
 
@@ -599,6 +600,21 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
             }
             else
                 return false;
+        }
+        // It looks like we have an empty value, let's skip the value but treat it as RGB
+        else if (strValue.empty())
+        {
+            if (bPreviousWasHex || uiRGBAIndex % ucLength == 0)
+            {
+                bPreviousWasHex = false;
+                uiRGBAIndex = 0;
+            }
+
+            uiRGBAIndex++;
+            ucCount++;
+
+            if (uiRGBAIndex % ucLength != 0 && ss.good())
+                continue;
         }
         // It looks like a plain number so let's treat it as a RGBA value
         else if (strValue.find_first_not_of("0123456789") == std::string::npos)
