@@ -1175,7 +1175,6 @@ int LaunchGame(SString strCmdLine)
         BsodDetectionOnGameBegin();
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
-        bool  bShownDeviceSelectionDialog = false;
         for (uint i = 0; i < 20; i++)
         {
             status = WaitForSingleObject(piLoadee.hProcess, 1000);
@@ -1188,16 +1187,18 @@ int LaunchGame(SString strCmdLine)
                 break;
             }
 
-            // Skip stuck process warning if DeviceSelection dialog is still open after 4 seconds
-            if (i >= 4)
-                bShownDeviceSelectionDialog |= IsDeviceSelectionDialogOpen(piLoadee.dwThreadId);
+            // Keep showing splash if the device selection dialog is open
+            if (IsDeviceSelectionDialogOpen(piLoadee.dwThreadId))
+            {
+                i--;
+            }
         }
 
         // Actually hide the splash
         HideSplash();
 
         // If hasn't shown the loading screen and gta_sa.exe process memory usage is not changing, give user option to terminate
-        if (status == WAIT_TIMEOUT && !bShownDeviceSelectionDialog)
+        if (status == WAIT_TIMEOUT)
         {
             CStuckProcessDetector stuckProcessDetector(piLoadee.hProcess, 5000);
             while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown

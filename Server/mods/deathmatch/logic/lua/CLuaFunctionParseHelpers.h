@@ -26,6 +26,7 @@ DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
+DECLARE_ENUM_CLASS(ESyncType);
 
 enum eHudComponent
 {

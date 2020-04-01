@@ -106,7 +106,6 @@ private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
     CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
-
 public:
     ZERO_ON_NEW
 
@@ -418,6 +417,7 @@ public:
     void         ResetModelLodDistances();
     void         ResetAlphaTransparencies();
     void         DisableVSync();
+    void         ResetModelTimes();
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();

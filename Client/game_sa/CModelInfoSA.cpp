@@ -20,6 +20,7 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::map<TimeInfo*, TimeInfo*>                                                        CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
 CModelInfoSA::CModelInfoSA()
@@ -560,6 +561,51 @@ float CModelInfoSA::GetLODDistance()
         return m_pInterface->fLodDistanceUnscaled;
 
     return 0.0f;
+}
+
+bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!pTime)
+        return false;
+
+    if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
+        MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
+
+    pTime->m_nTimeOn = cHourOn;
+    pTime->m_nTimeOff = cHourOff;
+    return true;
+}
+
+bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!time)
+        return false;
+
+    cHourOn = time->m_nTimeOn;
+    cHourOff = time->m_nTimeOff;
+    return true;
+}
+
+void CModelInfoSA::StaticResetModelTimes()
+{
+    // Restore default values
+    for (std::map<TimeInfo*, TimeInfo*>::const_iterator iter = ms_ModelDefaultModelTimeInfo.begin(); iter != ms_ModelDefaultModelTimeInfo.end(); ++iter)
+    {
+        iter->first->m_nTimeOn = iter->second->m_nTimeOn;
+        iter->first->m_nTimeOff = iter->second->m_nTimeOff;
+    }
+
+    ms_ModelDefaultModelTimeInfo.clear();
 }
 
 float CModelInfoSA::GetOriginalLODDistance()
@@ -1440,7 +1486,7 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
 
     const bool isTowTruck = towingModel->GetModel() == 525;
     const bool isTractor = towingModel->GetModel() == 531;
-    
+
     if (IsTrain() || towingModel->IsTrain())
     {
         // A train is never towing other vehicles. Trains are linked by other means
