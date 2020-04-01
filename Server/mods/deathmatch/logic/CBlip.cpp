@@ -21,6 +21,7 @@ CBlip::CBlip(CElement* pParent, CBlipManager* pBlipManager) : CPerPlayerEntity(p
     m_ucIcon = 0;
     m_sOrdering = 0;
     m_usVisibleDistance = 16383;
+    m_Color = SColorRGBA(0, 0, 255, 255);
 
     // Add us to manager's list
     m_pBlipManager->m_List.push_back(this);
@@ -83,18 +84,28 @@ bool CBlip::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("icon", iTemp, true))
     {
         if (CBlipManager::IsValidIcon(iTemp))
-        {
             m_ucIcon = static_cast<unsigned char>(iTemp);
-        }
         else
         {
-            CLogger::ErrorPrintf("Bad 'icon' id specified in <blip> (line %d)\n", iLine);
+            CLogger::ErrorPrintf("Bad 'icon' (%d) id specified in <blip> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
     else
-    {
         m_ucIcon = 0;
+
+    // Grab the "size" data
+    if (GetCustomDataInt("size", iTemp, true))
+    {
+        if (iTemp >= 0 && iTemp <= 25)
+        {
+            m_ucSize = static_cast<unsigned char>(iTemp);
+        }
+        else
+        {
+            CLogger::ErrorPrintf("Bad 'size' value specified in <blip> (line %d)\n", iLine);
+            return false;
+        }
     }
 
     // Grab the "color" data
@@ -108,11 +119,8 @@ bool CBlip::ReadSpecialData(const int iLine)
             return false;
         }
     }
-    else
-    {
-        m_Color = SColorRGBA(0, 0, 255, 255);
-    }
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
@@ -134,6 +142,20 @@ bool CBlip::ReadSpecialData(const int iLine)
         m_sOrdering = 0;
     }
 
+    // Grab the "visibleDistance" data
+    if (GetCustomDataInt("visibleDistance", iTemp, true))
+    {
+        if (iTemp >= 0 && iTemp <= 65535)
+        {
+            m_usVisibleDistance = static_cast<unsigned short>(iTemp);
+        }
+        else
+        {
+            CLogger::ErrorPrintf("Bad 'visibleDistance' value specified in <blip> (line %d)\n", iLine);
+            return false;
+        }
+    }
+    
     return true;
 }
 
