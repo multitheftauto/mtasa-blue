@@ -632,13 +632,13 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
 int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
 {
     CClientColShape* pColShape;
-    int              iPointIndex;
+    uint             uiPointIndex;
     CVector2D        vecPoint;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
     argStream.ReadVector2D(vecPoint);
-    argStream.ReadNumber(iPointIndex, 0);
+    argStream.ReadNumber(uiPointIndex, 0);
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
@@ -646,7 +646,11 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, iPointIndex - 1, vecPoint))
+        if (uiPointIndex == 0)
+        {
+            lua_pushboolean(luaVM, CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, vecPoint));
+        }
+        else if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushboolean(luaVM, true);
         }

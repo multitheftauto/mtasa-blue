@@ -436,6 +436,9 @@
 /* Define to 1 if you have the `ssl' library (-lssl). */
 /* #undef HAVE_LIBSSL */
 
+/* Define to 1 if you have the `wolfssh' library (-lwolfssh). */
+/* #undef HAVE_LIBWOLFSSH */
+
 /* if zlib is available */
 #define HAVE_LIBZ 1
 
@@ -788,6 +791,9 @@
 /* Define to 1 if you have the winsock.h header file. */
 /* #undef HAVE_WINSOCK_H */
 
+/* Define to 1 if you have the <wolfssh/ssh.h> header file. */
+/* #undef HAVE_WOLFSSH_SSH_H */
+
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
@@ -837,7 +843,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin19.2.0"
+#define OS "x86_64-apple-darwin19.3.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -1050,6 +1056,9 @@
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
+
+/* if wolfSSH is in use */
+/* #undef USE_WOLFSSH */
 
 /* if wolfSSL is enabled */
 /* #undef USE_WOLFSSL */

@@ -13,6 +13,8 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
+#include "D3DResourceSystemSA.h"
+#include "CFileLoaderSA.h"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -206,6 +208,8 @@ CGameSA::CGameSA()
     CPedSA::StaticSetHooks();
     CSettingsSA::StaticSetHooks();
     CFxSystemSA::StaticSetHooks();
+    CFileLoaderSA::StaticSetHooks();
+    D3DResourceSystemSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -830,6 +834,11 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 void CGameSA::ResetModelLodDistances()
 {
     CModelInfoSA::StaticResetLodDistances();
+}
+
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
 }
 
 void CGameSA::ResetAlphaTransparencies()

@@ -48,6 +48,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getAttachedElements", GetAttachedElements},
         {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
         {"isElementLocal", IsElementLocal},
+        {"hasElementData", HasElementData},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"isElementOnScreen", IsElementOnScreen},
@@ -134,6 +135,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isStreamedIn", "isElementStreamedIn");
     lua_classfunction(luaVM, "isStreamable", "isElementStreamable");
     lua_classfunction(luaVM, "isLocal", "isElementLocal");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "isSyncer", "isElementSyncer");
     lua_classfunction(luaVM, "getChildren", "getElementChildren");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -969,7 +971,7 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
     {
         // Query the spatial database
         CClientEntityResult result;
-        GetClientSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+        GetClientSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
         lua_newtable(luaVM);
         unsigned int index = 0;

@@ -14,7 +14,7 @@
 extern CGame* g_pGame;
 
 #if defined(_MSC_VER)
-#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#pragma warning(disable : 4355)            // warning C4355: 'this' : used in base member initializer list
 #endif
 
 CElement::CElement(CElement* pParent)
@@ -490,11 +490,12 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
             args.PushString(pAttribute->GetValue().c_str());
 
         // Don't trigger onElementDataChanged event
-        SetCustomData(pAttribute->GetName().c_str(), *args[0], g_pGame->GetConfig()->GetSyncMapElementData(), NULL, false);
+        ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
+        SetCustomData(pAttribute->GetName().c_str(), *args[0], syncType, NULL, false);
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced)
+CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType)
 {
     assert(szName);
 
@@ -502,15 +503,15 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, boo
     SCustomData* pData = m_pCustomData->Get(szName);
     if (pData)
     {
-        if (pbIsSynced)
-            *pbIsSynced = pData->bSynchronized;
+        if (pSyncType)
+            *pSyncType = pData->syncType;
         return &pData->Variable;
     }
 
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pbIsSynced);
+        return m_pParent->GetCustomData(szName, true, pSyncType);
     }
 
     // None available
@@ -691,7 +692,7 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent)
+void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
@@ -710,7 +711,7 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, b
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
+    m_pCustomData->Set(szName, Variable, syncType);
 
     if (bTriggerEvent)
     {
@@ -751,16 +752,19 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
     {
         const std::string& strName = iter->first;
         const SCustomData& customData = iter->second;
-        if (customData.bSynchronized)
-        {
-            // Tell our clients to update their data
-            unsigned short usNameLength = static_cast<unsigned short>(strName.length());
-            CBitStream     BitStream;
-            BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(strName.c_str(), usNameLength);
-            customData.Variable.WriteToBitStream(*BitStream.pBitStream);
+
+        if (customData.syncType == ESyncType::LOCAL)
+            continue;
+
+        // Tell our clients to update their data
+        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        CBitStream     BitStream;
+        BitStream.pBitStream->WriteCompressed(usNameLength);
+        BitStream.pBitStream->Write(strName.c_str(), usNameLength);
+        customData.Variable.WriteToBitStream(*BitStream.pBitStream);
+
+        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
-        }
     }
 }
 
@@ -1195,12 +1199,12 @@ unsigned char CElement::GenerateSyncTimeContext()
     // Increment the sync time index
     ++m_ucSyncTimeContext;
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     if (GetType() == EElementType::PLAYER)
     {
         CLogger::LogPrintf("Sync Context Updated from %i to %i.\n", m_ucSyncTimeContext - 1, m_ucSyncTimeContext);
     }
-    #endif
+#endif
     // It can't be 0 because that will make it not work when wraps around
     if (m_ucSyncTimeContext == 0)
         ++m_ucSyncTimeContext;

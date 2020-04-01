@@ -159,14 +159,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
-    m_iTimeAnimation = -1;
-    m_iBlendAnimation = 250;
-    m_bLoopAnimation = false;
-    m_bUpdatePositionAnimation = false;
-    m_bInterruptableAnimation = false;
-    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -2836,10 +2831,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
         }
 
@@ -3676,17 +3671,17 @@ void CClientPed::_CreateModel()
         }
 
         // Are we still playing a looped animation?
-        if (m_bLoopAnimation && m_pAnimationBlock)
+        if (m_AnimationCache.bLoop && m_pAnimationBlock)
         {
             if (m_bisCurrentAnimationCustom)
             {
                 m_bisNextAnimationCustom = true;
             }
             // Copy our anim name incase it gets deleted
-            SString strAnimName = m_strAnimationName;
+            SString strAnimName = m_AnimationCache.strName;
             // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                              m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
         }
 
         // Set the voice that corresponds to our model
@@ -3968,7 +3963,7 @@ void CClientPed::_ChangeModel()
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if (m_bLoopAnimation && m_pAnimationBlock)
+            if (m_AnimationCache.bLoop && m_pAnimationBlock)
             {
                 if (m_bisCurrentAnimationCustom)
                 {
@@ -3976,10 +3971,10 @@ void CClientPed::_ChangeModel()
                 }
 
                 // Copy our anim name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
 
             // Set the voice that corresponds to the new model
@@ -5638,6 +5633,25 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     }
 }
 
+bool CClientPed::GetRunningAnimationName(SString& strBlockName, SString& strAnimName)
+{
+    if (IsRunningAnimation())
+    {
+        if (IsCustomAnimationPlaying())
+        {
+            strBlockName = GetNextAnimationCustomBlockName();
+            strAnimName = GetNextAnimationCustomName();
+        }
+        else
+        {
+            strBlockName = GetAnimationBlock()->GetName();
+            strAnimName = m_AnimationCache.strName;
+        }
+        return true;
+    }
+    return false;
+}
+
 bool CClientPed::IsRunningAnimation()
 {
     if (m_pPlayerPed)
@@ -5649,7 +5663,7 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_bLoopAnimation && m_pAnimationBlock);
+    return (m_AnimationCache.bLoop && m_pAnimationBlock);
 }
 
 void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
@@ -5752,13 +5766,13 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
-    m_strAnimationName = szAnimName;
-    m_iTimeAnimation = iTime;
-    m_iBlendAnimation = iBlend;
-    m_bLoopAnimation = bLoop;
-    m_bUpdatePositionAnimation = bUpdatePosition;
-    m_bInterruptableAnimation = bInterruptable;
-    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
+    m_AnimationCache.strName = szAnimName;
+    m_AnimationCache.iTime = iTime;
+    m_AnimationCache.iBlend = iBlend;
+    m_AnimationCache.bLoop = bLoop;
+    m_AnimationCache.bUpdatePosition = bUpdatePosition;
+    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
 void CClientPed::KillAnimation()
@@ -5778,7 +5792,7 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_strAnimationName = "";
+    m_AnimationCache.strName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -5790,10 +5804,6 @@ std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
     return nullptr;
-}
-const char* CClientPed::GetAnimationName()
-{
-    return m_strAnimationName;
 }
 
 void CClientPed::PostWeaponFire()

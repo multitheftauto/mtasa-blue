@@ -42,6 +42,7 @@ public:
     void ClearPlayers();
 
     void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
+    void LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
     void LogWarning(lua_State* luaVM, const char* szFormat, ...);
     void LogError(lua_State* luaVM, const char* szFormat, ...);
