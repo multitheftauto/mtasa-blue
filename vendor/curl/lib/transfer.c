@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -484,8 +484,9 @@ CURLcode Curl_readrewind(struct connectdata *conn)
   return CURLE_OK;
 }
 
-static int data_pending(const struct connectdata *conn)
+static int data_pending(const struct Curl_easy *data)
 {
+  struct connectdata *conn = data->conn;
   /* in the case of libssh2, we can never be really sure that we have emptied
      its internal buffers so we MUST always try until we get EAGAIN back */
   return conn->handler->protocol&(CURLPROTO_SCP|CURLPROTO_SFTP) ||
@@ -499,6 +500,8 @@ static int data_pending(const struct connectdata *conn)
        be called and we cannot signal the HTTP/2 stream has closed. As
        a workaround, we return nonzero here to call http2_recv. */
     ((conn->handler->protocol&PROTO_FAMILY_HTTP) && conn->httpversion >= 20);
+#elif defined(ENABLE_QUIC)
+    Curl_ssl_data_pending(conn, FIRSTSOCKET) || Curl_quic_data_pending(data);
 #else
     Curl_ssl_data_pending(conn, FIRSTSOCKET);
 #endif
@@ -887,7 +890,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
 
     } /* if(!header and data to read) */
 
-    if(conn->handler->readwrite && excess && !conn->bits.stream_was_rewound) {
+    if(conn->handler->readwrite && excess) {
       /* Parse the excess data */
       k->str += nread;
 
@@ -918,7 +921,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       break;
     }
 
-  } while(data_pending(conn) && maxloops--);
+  } while(data_pending(data) && maxloops--);
 
   if(maxloops <= 0) {
     /* we mark it as read-again-please */
@@ -1174,7 +1177,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
     }
 
 
-  } WHILE_FALSE; /* just to break out from! */
+  } while(0); /* just to break out from! */
 
   return CURLE_OK;
 }
@@ -1231,9 +1234,7 @@ CURLcode Curl_readwrite(struct connectdata *conn,
   /* We go ahead and do a read if we have a readable socket or if
      the stream was rewound (in which case we have data in a
      buffer) */
-  if((k->keepon & KEEP_RECV) &&
-     ((select_res & CURL_CSELECT_IN) || conn->bits.stream_was_rewound)) {
-
+  if((k->keepon & KEEP_RECV) && (select_res & CURL_CSELECT_IN)) {
     result = readwrite_data(data, conn, k, &didwhat, done, comeback);
     if(result || *done)
       return result;

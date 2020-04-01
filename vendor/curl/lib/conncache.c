@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012 - 2016, Linus Nielsen Feltzing, <linus@haxx.se>
- * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,27 +39,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
-#ifdef CURLDEBUG
-/* the debug versions of these macros make extra certain that the lock is
-   never doubly locked or unlocked */
-#define CONN_LOCK(x) if((x)->share) {                                   \
-    Curl_share_lock((x), CURL_LOCK_DATA_CONNECT, CURL_LOCK_ACCESS_SINGLE); \
-    DEBUGASSERT(!(x)->state.conncache_lock);                            \
-    (x)->state.conncache_lock = TRUE;                                   \
-  }
-
-#define CONN_UNLOCK(x) if((x)->share) {                                 \
-    DEBUGASSERT((x)->state.conncache_lock);                             \
-    (x)->state.conncache_lock = FALSE;                                  \
-    Curl_share_unlock((x), CURL_LOCK_DATA_CONNECT);                     \
-  }
-#else
-#define CONN_LOCK(x) if((x)->share)                                     \
-    Curl_share_lock((x), CURL_LOCK_DATA_CONNECT, CURL_LOCK_ACCESS_SINGLE)
-#define CONN_UNLOCK(x) if((x)->share)                   \
-    Curl_share_unlock((x), CURL_LOCK_DATA_CONNECT)
-#endif
 
 #define HASHKEY_SIZE 128
 
@@ -122,6 +101,7 @@ static int bundle_remove_conn(struct connectbundle *cb_ptr,
     }
     curr = curr->next;
   }
+  DEBUGASSERT(0);
   return 0;
 }
 
@@ -196,18 +176,6 @@ size_t Curl_conncache_size(struct Curl_easy *data)
   CONN_LOCK(data);
   num = data->state.conn_cache->num_conn;
   CONN_UNLOCK(data);
-  return num;
-}
-
-/* Returns number of connections currently held in the connections's bundle
-   Locks/unlocks the cache itself!
-*/
-size_t Curl_conncache_bundle_size(struct connectdata *conn)
-{
-  size_t num;
-  CONN_LOCK(conn->data);
-  num = conn->bundle->num_connections;
-  CONN_UNLOCK(conn->data);
   return num;
 }
 
@@ -428,17 +396,15 @@ conncache_find_first_connection(struct conncache *connc)
  *
  * Return TRUE if stored, FALSE if closed.
  */
-bool Curl_conncache_return_conn(struct connectdata *conn)
+bool Curl_conncache_return_conn(struct Curl_easy *data,
+                                struct connectdata *conn)
 {
-  struct Curl_easy *data = conn->data;
-
   /* data->multi->maxconnects can be negative, deal with it. */
   size_t maxconnects =
     (data->multi->maxconnects < 0) ? data->multi->num_easy * 4:
     data->multi->maxconnects;
   struct connectdata *conn_candidate = NULL;
 
-  conn->data = NULL; /* no owner anymore */
   conn->lastused = Curl_now(); /* it was used up until now */
   if(maxconnects > 0 &&
      Curl_conncache_size(data) > maxconnects) {
@@ -541,7 +507,8 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
     while(curr) {
       conn = curr->ptr;
 
-      if(!CONN_INUSE(conn) && !conn->data) {
+      if(!CONN_INUSE(conn) && !conn->data && !conn->bits.close &&
+         !conn->bits.connect_only) {
         /* Set higher score for the age passed since the connection was used */
         score = Curl_timediff(now, conn->lastused);
 

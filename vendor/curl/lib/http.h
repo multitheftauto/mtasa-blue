@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -116,7 +116,7 @@ CURLcode Curl_http_auth_act(struct connectdata *conn);
  *
  */
 #ifndef EXPECT_100_THRESHOLD
-#define EXPECT_100_THRESHOLD 1024
+#define EXPECT_100_THRESHOLD (1024*1024)
 #endif
 
 #endif /* CURL_DISABLE_HTTP */
@@ -193,12 +193,17 @@ struct HTTP {
 #ifdef ENABLE_QUIC
   /*********** for HTTP/3 we store stream-local data here *************/
   int64_t stream3_id; /* stream we are interested in */
+  bool firstheader;  /* FALSE until headers arrive */
   bool firstbody;  /* FALSE until body arrives */
   bool h3req;    /* FALSE until request is issued */
   bool upload_done;
 #endif
 #ifdef USE_NGHTTP3
+  size_t unacked_window;
   struct h3out *h3out; /* per-stream buffers for upload */
+  char *overflow_buf; /* excess data received during a single Curl_read */
+  size_t overflow_buflen; /* amount of data currently in overflow_buf */
+  size_t overflow_bufsize; /* size of the overflow_buf allocation */
 #endif
 };
 

@@ -644,30 +644,10 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
         // DT_CALCRECT may not take space characters at the end of a line
         // into consideration for the rect size.
         // Count the amount of space characters at the end
-        int iSpaceCount = 0;
-        for (auto c = strText.rbegin(); c != strText.rend(); ++c)
-        {
-            if (*c == ' ')
-                ++iSpaceCount;
-            else
-                break;
-        }
-
-        // Compute the size of a single space and use that
-        // to get the width of the ignored space characters
-        int iAdditionalPixels = 0;
-        if (iSpaceCount > 0)
-        {
-            HDC  dc = pDXFont->GetDC();
-            SIZE size;
-            GetTextExtentPoint32W(dc, L" ", 1, &size);
-            iAdditionalPixels = iSpaceCount * size.cx;
-            // Remove trailing spaces from the text
-            strText = strText.Left(strText.length() - iSpaceCount);
-        }
+        int iAdditionalPixels = GetTrailingSpacesWidth(pDXFont, strText);
 
         // Compute the size of the text itself
-        pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
         return ((float)(rect.right - rect.left + iAdditionalPixels) * fScale);
     }
@@ -722,6 +702,63 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
     }
 
     return 0.0f;
+}
+
+void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth, float fScaleX, float fScaleY, LPD3DXFONT pDXFont, bool bWordBreak,
+                              bool bColorCoded)
+{
+    if (*szText == '\0')
+        return;
+
+    if (!pDXFont)
+        pDXFont = GetFont();
+
+    pDXFont = MaybeGetBigFont(pDXFont, fScaleX, fScaleY);
+
+    if (pDXFont)
+    {
+        WString strText = MbUTF8ToUTF16(szText);
+
+        if (bColorCoded)
+            RemoveColorCodesInPlaceW(strText);
+
+        ulong ulFormat = DT_CALCRECT;
+        if (bWordBreak)
+            ulFormat |= DT_WORDBREAK;
+
+        // Calculate the size of the text
+        RECT rect = {0, 0, fWidth / fScaleX, 0};
+        pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
+
+        vecSize.fX = (rect.right - rect.left) * fScaleX;
+        vecSize.fY = (rect.bottom - rect.top) * fScaleY;
+    }
+}
+
+int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
+{
+    // Count the amount of space characters at the end
+    int iSpaceCount = 0;
+    for (auto c = strText.rbegin(); c != strText.rend(); ++c)
+    {
+        if (*c == ' ')
+            ++iSpaceCount;
+        else
+            break;
+    }
+
+    // Compute the size of a single space and use that
+    // to get the width of the ignored space characters
+    int iSpacesWidth = 0;
+    if (iSpaceCount > 0)
+    {
+        HDC  dc = pDXFont->GetDC();
+        SIZE size;
+        GetTextExtentPoint32W(dc, L" ", 1, &size);
+        iSpacesWidth = iSpaceCount * size.cx;
+    }
+
+    return iSpacesWidth;
 }
 
 ID3DXFont* CGraphics::GetFont(eFontType fontType, float* pfOutScaleUsed, float fRequestedScale, const char* szCustomScaleUser)

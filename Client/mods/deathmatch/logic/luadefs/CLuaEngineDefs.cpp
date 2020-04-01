@@ -29,6 +29,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRequestModel", EngineRequestModel},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineResetModelLODDistance", EngineResetModelLODDistance},
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
@@ -36,6 +37,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
@@ -69,10 +71,12 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "restoreModel", "engineRestoreModel");
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
+    lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
+    lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
@@ -516,6 +520,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
         ushort usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
+            m_pDFFManager->RestoreModel(usModelID);
             if (pDFF->ReplaceModel(usModelID, bAlphaTransparency))
             {
                 lua_pushboolean(luaVM, true);
@@ -758,6 +763,33 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
+{
+    SString          strModel = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModel);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    
+    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        float fCurrentDistance = pModelInfo->GetLODDistance();
+        float fOriginalDistance = pModelInfo->GetOriginalLODDistance();
+        //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
+        if (fOriginalDistance > 0.0f && fOriginalDistance != fCurrentDistance) {
+            pModelInfo->SetLODDistance(fOriginalDistance, true);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1065,6 +1097,49 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
     // We failed
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
+{
+    //  table engineGetModelTextures ( string/int modelName/modelID, string/table textureNames )
+    SString                                       strModelName;
+    std::vector<SString>                          vTextureNames;
+    std::vector<std::tuple<std::string, CPixels>> textureList;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelName);
+
+    if (argStream.NextIsString())
+    {
+        SString strTextureName;
+        argStream.ReadString(strTextureName, "");
+        vTextureNames.push_back(strTextureName);
+    }
+    else if (argStream.NextIsTable())
+        argStream.ReadStringTable(vTextureNames);
+
+    ushort usModelID = CModelNames::ResolveModelID(strModelName);
+
+    if (usModelID == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames))
+    {
+        argStream.SetCustomError("Invalid model ID");
+        lua_pushboolean(luaVM, false);
+    }
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_newtable(luaVM);
+    for (const auto& pair : textureList)
+    {
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
+                                                                                                         RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        lua_pushstring(luaVM, std::get<0>(pair).c_str());
+        lua_pushelement(luaVM, pTexture);
+        lua_settable(luaVM, -3);
+    }
+
     return 1;
 }
 

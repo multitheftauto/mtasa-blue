@@ -153,16 +153,23 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
             {
                 SString strFilename;
                 bool    bIsURL = false;
+                bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
                 else
-                    bIsURL = true;
+                {
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
                 if (pResource)
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSound, bIsURL, bLoop, bThrottle);
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSound, bIsURL, bIsRawData, bLoop, bThrottle);
                     if (pSound)
                     {
                         // call onClientSoundStarted
@@ -206,16 +213,23 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
             {
                 SString strFilename;
                 bool    bIsURL = false;
+                bool    bIsRawData = false;
                 if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
                     strSound = strFilename;
                 else
-                    bIsURL = true;
+                {
+                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0)
+                        && (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
+                        bIsURL = true;
+                    else
+                        bIsRawData = true;
+                }
 
                 // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
                 // ) Fixes #6507 - Caz
                 if (pResource)
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSound, bIsURL, vecPosition, bLoop, bThrottle);
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
                     if (pSound)
                     {
                         // call onClientSoundStarted
