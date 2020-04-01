@@ -3554,6 +3554,7 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
+    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);

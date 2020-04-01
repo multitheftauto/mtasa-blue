@@ -424,3 +424,10 @@ struct RwError
 {
     int err1, err2;
 };
+
+struct TimeInfo {
+    TimeInfo(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel) {};
+    char m_nTimeOn;
+    char m_nTimeOff;
+    short m_wOtherTimeModel;
+};
