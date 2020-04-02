@@ -27,7 +27,7 @@ CFxSA::CFxSA(CFxSAInterface* pInterface)
         pRwTexture = reinterpret_cast<RwTexture*>((void*)textureAddress);
         m_textureMap[(eShadowType)i] = pRwTexture;
     }
-    m_textureMap[SHADOW_PLANE] = new RwTexture();
+    m_textureMap[eShadowType::PLANE] = new RwTexture();
 }
 
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
