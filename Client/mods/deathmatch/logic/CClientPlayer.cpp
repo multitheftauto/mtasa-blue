@@ -89,6 +89,17 @@ CClientPlayer::CClientPlayer(CClientManager* pManager, ElementID ID, bool bIsLoc
 
 CClientPlayer::~CClientPlayer()
 {
+    if (m_bIsLocalPlayer)
+    {
+        CClientPlayerManager* playerManager = m_pManager->GetPlayerManager();
+
+        if (playerManager->GetLocalPlayer() == this)
+        {
+            playerManager->SetLocalPlayer(nullptr);
+            g_pClientGame->ResetLocalPlayer();
+        }
+    }
+
     // Remove us from the team
     if (m_pTeam)
         m_pTeam->RemovePlayer(this);

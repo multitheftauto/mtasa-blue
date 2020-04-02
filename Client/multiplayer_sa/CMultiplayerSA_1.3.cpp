@@ -207,6 +207,7 @@ void CMultiplayerSA::InitHooks_13()
     InitHooks_Weapons();
     InitHooks_Peds();
     InitHooks_VehicleCollision();
+    InitHooks_Vehicles();
     InitHooks_Rendering();
 }
 

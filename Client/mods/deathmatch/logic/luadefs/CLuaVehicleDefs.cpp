@@ -36,6 +36,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
+        {"areVehicleLightsOn", AreVehicleLightsOn},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
         {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
         {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
@@ -200,6 +201,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEngineState", "getVehicleEngineState");
     lua_classfunction(luaVM, "getLightState", "getVehicleLightState");
     lua_classfunction(luaVM, "getAdjustableProperty", "getVehicleAdjustableProperty");
+    lua_classfunction(luaVM, "areLightsOn", "areVehicleLightsOn");
     lua_classfunction(luaVM, "getOverrideLights", "getVehicleOverrideLights");
     lua_classfunction(luaVM, "getPanelState", "getVehiclePanelState");
     lua_classfunction(luaVM, "getTurnVelocity", OOP_GetVehicleTurnVelocity);
@@ -298,6 +300,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable");
     lua_classvariable(luaVM, "engineState", "setVehicleEngineState", "getVehicleEngineState");
     lua_classvariable(luaVM, "landingGearDown", "setVehicleLandingGearDown", "getVehicleLandingGearDown");
+    lua_classvariable(luaVM, "lightsOn", NULL, "areVehicleLightsOn");
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "undamageableDoors", "setVehicleDoorsUndamageable", NULL);
     lua_classvariable(luaVM, "taxiLight", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn");
@@ -1005,6 +1008,20 @@ int CLuaVehicleDefs::GetVehiclePanelState(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::AreVehicleLightsOn(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
+    lua_pushboolean(luaVM, bLightsOn);
     return 1;
 }
 
@@ -1872,14 +1889,16 @@ int CLuaVehicleDefs::SetVehicleDoorState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
     unsigned char    ucDoor = 0, ucState = 0;
+    bool             spawnFlyingComponent;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucDoor);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleDoorState(*pEntity, ucDoor, ucState))
+        if (CStaticFunctionDefinitions::SetVehicleDoorState(*pEntity, ucDoor, ucState, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;

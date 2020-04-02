@@ -495,6 +495,11 @@ void CGUIElement_Impl::SetClickHandler(GUI_CALLBACK Callback)
     m_OnClick = Callback;
 }
 
+void CGUIElement_Impl::SetClickHandler(const GUI_CALLBACK_MOUSE& Callback)
+{
+    m_OnClickWithArgs = Callback;
+}
+
 void CGUIElement_Impl::SetDoubleClickHandler(GUI_CALLBACK Callback)
 {
     m_OnDoubleClick = Callback;
@@ -565,10 +570,29 @@ bool CGUIElement_Impl::Event_OnSized(const CEGUI::EventArgs& e)
     return true;
 }
 
-bool CGUIElement_Impl::Event_OnClick()
+bool CGUIElement_Impl::Event_OnClick(const CEGUI::EventArgs& eBase)
 {
+    const CEGUI::MouseEventArgs& e = reinterpret_cast<const CEGUI::MouseEventArgs&>(eBase);
+    CGUIElement*               pElement = reinterpret_cast<CGUIElement*>(this);
+
     if (m_OnClick)
-        m_OnClick(reinterpret_cast<CGUIElement*>(this));
+        m_OnClick(pElement);
+
+    if (m_OnClickWithArgs)
+    {
+        CGUIMouseEventArgs NewArgs;
+
+        // copy the variables
+        NewArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
+        NewArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
+        NewArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
+        NewArgs.sysKeys = e.sysKeys;
+        NewArgs.wheelChange = e.wheelChange;
+        NewArgs.pWindow = pElement;
+
+        m_OnClickWithArgs(NewArgs);
+    }
+
     return true;
 }
 
