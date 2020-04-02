@@ -22,11 +22,8 @@ Windows XP and Windows Vista.
 Before disclosing a security vulnerability, please try to confirm
 that they work with the latest version of Multi Theft Auto.
 
-Please submit your security vulnerabilities to [@ccw] on forum.mtasa.com.
+Please submit your security vulnerabilities and cheats to our [private bugtracker].
 
-Cheats can also be submitted to [@ccw] or [@Dutchman101] on forum.mtasa.com.
+Please do not submit vulnerabilities and cheats publicly, on GitHub or anywhere else.
 
-Do not submit them publicly, on GitHub or anywhere else.
-
-[@ccw]: https://forum.mtasa.com/profile/7264-ccw/
-[@Dutchman101]: https://forum.mtasa.com/profile/38052-dutchman101/
+[private bugtracker]: https://forum.mtasa.com/forum/156-private-bugs/

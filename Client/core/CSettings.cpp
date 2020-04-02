@@ -376,6 +376,16 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAllowExternalSounds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow external sounds"), true));
+    m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
+
+    m_pDiscordCheck = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Enable Discord Rich Presence"), true));
+    m_pDiscordCheck->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pDiscordCheck->GetPosition(vecTemp, false);
+    m_pDiscordCheck->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1213,6 +1223,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -1505,6 +1516,16 @@ void CSettings::UpdateVideoTab()
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Enable Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    m_pDiscordCheck->SetSelected(discordRichPresence);
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -2326,7 +2347,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned char>(m_pBindsList->GetItemData(i, m_hBind));
+        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -3333,6 +3354,19 @@ void CSettings::SaveData()
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
+    // Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    if (discordRichPresence != m_pDiscordCheck->GetSelected())
+    {
+        CVARS_SET("discord_rich_presence", m_pDiscordCheck->GetSelected());
+        g_pCore->GetDiscordManager()->Disconnect();
+    }
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
+    CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -4332,6 +4366,24 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
             _("Screen upload is required by some servers for anti-cheat purposes."
               "\n\n(The chat box and GUI is excluded from the upload)\n");
         CCore::GetSingleton().ShowMessageBox(_("SCREEN UPLOAD INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+    }
+    return true;
+}
+
+//
+// AllowExternalSounds
+//
+bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxAllowExternalSounds->GetSelected() && !m_bShownAllowExternalSoundsMessage)
+    {
+        m_bShownAllowExternalSoundsMessage = true;
+        SString strMessage;
+        strMessage +=
+            _("Some scripts may play sounds, such as radio, from the internet."
+              "\n\nDisabling this setting may decrease network"
+              "\nbandwidth consumption.\n");
+        CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
 }

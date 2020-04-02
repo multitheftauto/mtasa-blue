@@ -199,17 +199,16 @@ void CResourceMapItem::LinkupElements()
 {
     CDummy* const pRootElement = g_pGame->GetMapManager()->GetRootElement();
 
-    for (auto iter = m_pVehicleManager->IterBegin(); iter != m_pVehicleManager->IterEnd(); ++iter)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* const pVehicle = *iter;
-        const char*     szAttachToID = pVehicle->GetAttachToID();
+        const char* szAttachToID = vehicle->GetAttachToID();
 
         if (szAttachToID[0])
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
             if (pElement)
-                pVehicle->AttachTo(pElement);
+                vehicle->AttachTo(pElement);
         }
     }
 

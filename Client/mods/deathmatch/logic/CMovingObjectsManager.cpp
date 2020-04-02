@@ -1,36 +1,35 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CMovingObjectsManager.cpp
  *  PURPOSE:     Manager for moving objects
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-
-using std::list;
+#include "CDeathmatchObject.h"
 
 void CMovingObjectsManager::DoPulse()
 {
-    // Pulse all the objects we're moving
-    bool                               bRemoved = false;
-    CDeathmatchObject*                 pObject;
-    list<CDeathmatchObject*>::iterator iter = m_List.begin();
-    while (iter != m_List.end())
-    {
-        pObject = *iter;
-        pObject->UpdateMovement();
+    using Iterator = std::list<CDeathmatchObject*>::iterator;
 
-        // Remove it if it has stopped moving
-        if (!pObject->IsMoving())
+    for (Iterator iter = m_List.begin(); iter != m_List.end(); /* manual increment */)
+    {
+        // Use a copy of the iterator to avoid an iterator invalidation crash
+        Iterator current = iter++;
+
+        CDeathmatchObject* const object = *current;
+        m_currentPulseObject = object;
+        object->UpdateMovement();
+
+        if (m_currentPulseObject && !object->IsMoving())
         {
-            // Remove from list
-            iter = m_List.erase(iter);
+            m_List.erase(current);
         }
-        else
-            ++iter;
     }
+
+    m_currentPulseObject = nullptr;
 }

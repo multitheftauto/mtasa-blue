@@ -31,6 +31,18 @@ enum eWinchType
     WINCH_SMALL_MAGNET = 3
 };
 
+enum eDoorLock : int32_t
+{
+    DOOR_LOCK_NOT_USED,
+    DOOR_LOCK_UNLOCKED,
+    DOOR_LOCK_LOCKED,
+    DOOR_LOCK_LOCKOUT_PLAYER_ONLY,
+    DOOR_LOCK_LOCKED_PLAYER_INSIDE,
+    DOOR_LOCK_COP_CAR,
+    DOOR_LOCK_FORCE_SHUT_DOORS,
+    DOOR_LOCK_SKIP_SHUT_DOORS,
+};
+
 // forward declaration, avoid compile error
 class CPed;
 class CObject;

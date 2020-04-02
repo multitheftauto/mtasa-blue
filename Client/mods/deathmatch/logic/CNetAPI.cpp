@@ -2189,7 +2189,7 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 
     if (damage.data.bSyncDoors)
         for (unsigned int i = 0; i < MAX_DOORS; ++i)
-            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i]);
+            pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], true);
 
     if (damage.data.bSyncWheels)
         for (unsigned int i = 0; i < MAX_WHEELS; ++i)
