@@ -103,9 +103,15 @@ void InitLocalization(bool bShowErrors)
     {
         if (!bShowErrors)
             return;
+#ifdef MTA_DEBUG
+        DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
+                                "the latest DirectX is correctly installed and you executed win-install-data.bat"),
+                               _E("CL24"), "core-not-loadable");
+#else
         DisplayErrorMessageBox(("Loading core failed.  Please ensure that \n"
                                 "the latest DirectX is correctly installed."),
                                _E("CL24"), "core-not-loadable");
+#endif
         return ExitProcess(EXIT_ERROR);
     }
 
