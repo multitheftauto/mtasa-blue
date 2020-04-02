@@ -121,6 +121,8 @@ public:
     float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL);
     float GetDXTextExtent(const char* szText, float fScale = 1.0f, ID3DXFont* pDXFont = NULL, bool bColorCoded = false);
     float GetDXTextExtentW(const wchar_t* wszText, float fScale = 1.0f, LPD3DXFONT pDXFont = NULL);
+    void  GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, LPD3DXFONT pDXFont = nullptr,
+                        bool bWordBreak = false, bool bColorCoded = false);
 
     // Textures
     void DrawTexture(CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f,
@@ -206,6 +208,7 @@ private:
     void       DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,
                                       unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
                                       float fRotationCenterY);
+    int        GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText);
 
     CLocalGUI* m_pGUI;
 
