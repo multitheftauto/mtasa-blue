@@ -274,9 +274,9 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
 
     switch (shadowType)
     {
-        case SHADOW_HEADLIGHT1:
-        case SHADOW_HEADLIGHT2:
-        case SHADOW_EXPLOSION:
+        case eShadowType::HEADLIGHT1:
+        case eShadowType::HEADLIGHT2:
+        case eShadowType::EXPLOSION:
             type = 2;
     }
 
