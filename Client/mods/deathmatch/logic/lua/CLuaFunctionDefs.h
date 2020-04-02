@@ -124,6 +124,7 @@ public:
     LUA_DECLARE(SetGarageOpen);
     LUA_DECLARE(SetWorldSpecialPropertyEnabled);
     LUA_DECLARE(SetBlurLevel);
+    LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
     LUA_DECLARE(SetCloudsEnabled);
     LUA_DECLARE(GetCloudsEnabled);

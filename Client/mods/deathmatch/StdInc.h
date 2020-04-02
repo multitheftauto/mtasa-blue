@@ -26,6 +26,7 @@
 // SDK includes
 #include <core/CLocalizationInterface.h>
 #include <core/CTrayIconInterface.h>
+#include <core/CDiscordManagerInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

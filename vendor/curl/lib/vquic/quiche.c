@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -45,7 +45,7 @@
 #ifdef DEBUG_HTTP3
 #define H3BUGF(x) x
 #else
-#define H3BUGF(x) do { } WHILE_FALSE
+#define H3BUGF(x) do { } while(0)
 #endif
 
 #define QUIC_MAX_STREAMS (256*1024)
@@ -171,7 +171,7 @@ CURLcode Curl_quic_connect(struct connectdata *conn, curl_socket_t sockfd,
     return CURLE_FAILED_INIT;
   }
 
-  quiche_config_set_idle_timeout(qs->cfg, QUIC_IDLE_TIMEOUT);
+  quiche_config_set_max_idle_timeout(qs->cfg, QUIC_IDLE_TIMEOUT);
   quiche_config_set_initial_max_data(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_local(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_remote(qs->cfg,
@@ -379,6 +379,9 @@ static int cb_each_header(uint8_t *name, size_t name_len,
               headers->destlen, "HTTP/3 %.*s\n",
               (int) value_len, value);
   }
+  else if(!headers->nlen) {
+    return CURLE_HTTP3;
+  }
   else {
     msnprintf(headers->dest,
               headers->destlen, "%.*s: %.*s\n",
@@ -433,7 +436,9 @@ static ssize_t h3_stream_recv(struct connectdata *conn,
     case QUICHE_H3_EVENT_HEADERS:
       rc = quiche_h3_event_for_each_header(ev, cb_each_header, &headers);
       if(rc) {
-        /* what do we do about this? */
+        *curlcode = rc;
+        failf(data, "Error in HTTP/3 response header");
+        break;
       }
       recvd = headers.nlen;
       break;
@@ -527,7 +532,7 @@ static ssize_t h3_stream_send(struct connectdata *conn,
  */
 int Curl_quic_ver(char *p, size_t len)
 {
-  return msnprintf(p, len, " quiche/%s", quiche_version());
+  return msnprintf(p, len, "quiche/%s", quiche_version());
 }
 
 /* Index where :authority header field will appear in request header
@@ -778,6 +783,25 @@ CURLcode Curl_quic_done_sending(struct connectdata *conn)
   }
 
   return CURLE_OK;
+}
+
+/*
+ * Called from http.c:Curl_http_done when a request completes.
+ */
+void Curl_quic_done(struct Curl_easy *data, bool premature)
+{
+  (void)data;
+  (void)premature;
+}
+
+/*
+ * Called from transfer.c:data_pending to know if we should keep looping
+ * to receive more data from the connection.
+ */
+bool Curl_quic_data_pending(const struct Curl_easy *data)
+{
+  (void)data;
+  return FALSE;
 }
 
 #endif
