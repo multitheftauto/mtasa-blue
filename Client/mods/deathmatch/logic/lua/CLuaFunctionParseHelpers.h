@@ -63,7 +63,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
-DECLARE_ENUM(eShadowType);
+DECLARE_ENUM_CLASS(eShadowType);
 
 class CRemoteCall;
 
