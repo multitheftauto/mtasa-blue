@@ -265,102 +265,84 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the variant data
     if (GetCustomDataInt("variant1", iTemp, true))
-    {
         m_ucVariant = static_cast<unsigned char>(iTemp);
-    }
     if (GetCustomDataInt("variant2", iTemp, true))
-    {
         m_ucVariant2 = static_cast<unsigned char>(iTemp);
-    }
     if (m_ucVariant == 254 && m_ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
     // Grab the "turretX" data
     if (GetCustomDataFloat("turretX", m_fTurretPositionX, true))
-    {
         m_fTurretPositionX = ConvertDegreesToRadians(m_fTurretPositionX);
-    }
 
     // Grab the "turretY" data
     if (GetCustomDataFloat("turretY", m_fTurretPositionY, true))
-    {
         m_fTurretPositionY = ConvertDegreesToRadians(m_fTurretPositionY);
-    }
 
     // Grab the "health" data
     if (GetCustomDataFloat("health", m_fHealth, true))
-    {
         if (m_fHealth < 0.0f)
             m_fHealth = 0.0f;
-    }
 
-    // Grab the "Sirens" data
-    if (!GetCustomDataBool("sirens", m_bSirenActive, true))
-    {
-        m_bSirenActive = false;
-    }
+    // Grab the "sirens" data
+    GetCustomDataBool("sirens", m_bSirenActive, true);
 
     // Grab the "landingGearDown" data
     if (!GetCustomDataBool("landingGearDown", m_bLandingGearDown, true))
-    {
         m_bLandingGearDown = true;
-    }
 
-    if (!GetCustomDataBool("locked", m_bLocked, true))
-    {
-        m_bLocked = false;
-    }
+    // Grab the "locked" data
+    GetCustomDataBool("locked", m_bLocked, true);
 
     // Grab the "specialState" data
     if (GetCustomDataInt("specialState", iTemp, true))
-    {
         m_usAdjustableProperty = static_cast<unsigned short>(iTemp);
-    }
     else
-    {
         m_usAdjustableProperty = 0;
-    }
 
     // Grab the "color" data
     char szTemp[256];
     if (GetCustomDataString("color", szTemp, 256, true))
     {
-        uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        char* sz1 = strtok(szTemp, ", ");
-        if (sz1)
-            ucValues[0] = atoi(sz1);
+        std::vector<SColorRGBA> vecColors;
+        unsigned char           ucCount;
 
-        int i;
-        for (i = 1; i < 12; i++)
+        if (ColorStringToRGB(szTemp, SColorRGBA(0, 0, 0, 0), vecColors, ucCount))
         {
-            char* szn = strtok(NULL, ", ");
-            if (!szn)
-                break;
-            ucValues[i] = atoi(szn);
-        }
-
-        if (i == 3 || i == 6 || i == 9 || i == 12)
-        {
-            m_Color.SetRGBColors(SColorRGBA(ucValues[0], ucValues[1], ucValues[2], 0), SColorRGBA(ucValues[3], ucValues[4], ucValues[5], 0),
-                                 SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0));
+            if (ucCount % 3 == 0)
+                m_Color.SetRGBColors(vecColors[0], vecColors[1], vecColors[2], vecColors[3]);
+            else
+                m_Color.SetPaletteColors(vecColors[0].R, vecColors[0].G, vecColors[0].B, vecColors[1].R);
         }
         else
         {
-            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3]);
+            CLogger::ErrorPrintf("Bad 'color' value specified in <vehicle> (line %u)\n", iLine);
+            return false;
         }
     }
 
+    // Grab the "headLightColor" data
+    if (GetCustomDataString("headLightColor", szTemp, 64, true))
+    {
+        // Convert it to RGBA
+        if (!XMLColorToInt(szTemp, m_HeadLightColor.R, m_HeadLightColor.G, m_HeadLightColor.B, m_HeadLightColor.A))
+        {
+            CLogger::ErrorPrintf("Bad 'headLightColor' value specified in <vehicle> (line %u)\n", iLine);
+            return false;
+        }
+    }
+
+    // Grab the "paintjob" data
     if (GetCustomDataInt("paintjob", iTemp, true))
         m_ucPaintjob = static_cast<unsigned char>(iTemp);
 
+    // Grab the "upgrades" data
     if (GetCustomDataString("upgrades", szTemp, 256, true))
     {
         if (m_pUpgrades)
         {
-            if (strcmp(szTemp, "all") == 0)
-            {
+            if (stricmp(szTemp, "all") == 0)
                 m_pUpgrades->AddAllUpgrades();
-            }
             else
             {
                 bool bTemp = true;
@@ -369,32 +351,69 @@ bool CVehicle::ReadSpecialData(const int iLine)
                     bTemp = false;
                     unsigned short usUpgrade = static_cast<unsigned short>(atoi(token));
                     if (CVehicleUpgrades::IsValidUpgrade(usUpgrade))
-                    {
                         m_pUpgrades->AddUpgrade(usUpgrade);
-                    }
                 }
             }
         }
     }
 
+    // Grab the "plate" data
     if (GetCustomDataString("plate", szTemp, 9, true))
         SetRegPlate(szTemp);
 
+    // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
+    // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
+    // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bIsFrozen = bFrozen;
+    // Grab the "frozen" data
+    GetCustomDataBool("frozen", m_bIsFrozen, true);
+
+    // Grab the "taxiLightOn" data
+    GetCustomDataBool("taxiLightOn", m_bTaxiLightState, true);
+
+    // Grab the "engineOn" data
+    GetCustomDataBool("engineOn", m_bEngineOn, true);
+
+    // Grab the "lightsOn" data
+    bool bLightsOn;
+    if (GetCustomDataBool("lightsOn", bLightsOn, true))
+        m_ucOverrideLights = bLightsOn ? 2 : 1;
+
+    // Grab the "damageProof" data
+    GetCustomDataBool("damageProof", m_bDamageProof, true);
+
+    // Grab the "explodableFuelTank" data
+    GetCustomDataBool("explodableFuelTank", m_bFuelTankExplodable, true);
+
+    // Grab the "toggleRespawn" data
+    bool bRespawnOn;
+    if (GetCustomDataBool("toggleRespawn", bRespawnOn, true))
+        SetRespawnEnabled(bRespawnOn);
+
+    // Grab the "respawnDelay" data
+    int iRespawnDelay;
+    if (GetCustomDataInt("respawnDelay", iRespawnDelay, true))
+        m_ulIdleRespawnInterval = iRespawnDelay;
+
+    // Grab the respawn position and rotation data
+    GetCustomDataFloat("respawnPosX", m_vecRespawnPosition.fX, true);
+    GetCustomDataFloat("respawnPosY", m_vecRespawnPosition.fY, true);
+    GetCustomDataFloat("respawnPosZ", m_vecRespawnPosition.fZ, true);
+    GetCustomDataFloat("respawnRotX", m_vecRespawnRotationDegrees.fX, true);
+    GetCustomDataFloat("respawnRotY", m_vecRespawnRotationDegrees.fY, true);
+    GetCustomDataFloat("respawnRotZ", m_vecRespawnRotationDegrees.fZ, true);
 
     return true;
 }
@@ -777,32 +796,11 @@ void CVehicle::SetPaintjob(unsigned char ucPaintjob)
 
 void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
-    {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
 
-            // Keep the bonet and boot intact
-            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-            break;
-        default:
-            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
-    }
+    // Keep the bonet and boot intact
+    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
 }
 
 void CVehicle::GenerateHandlingData()

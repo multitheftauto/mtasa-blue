@@ -42,6 +42,8 @@ inspect ={
 }
 local mta_type
 local tostring = tostring
+local table_concat = table.concat
+local select = select
 
 inspect.KEY       = setmetatable({}, {__tostring = function() return 'inspect.KEY' end})
 inspect.METATABLE = setmetatable({}, {__tostring = function() return 'inspect.METATABLE' end})
@@ -401,14 +403,10 @@ end
 
 function iprint(...)
     local arg = {...}
-    local s = ""
-    for i,arg in ipairs(arg) do
-        if i > 1 then
-            s = s .. "    "
-        end
-        s = s .. inspect(arg)
+    for i = 1, select("#",...) do
+        arg[i] = inspect(arg[i])
     end
-    outputDebugString(s,3,180,180,180)
+    outputDebugString(table_concat(arg,"    "),3,180,180,180)
 end
 
 -------------------------------------------------------------------

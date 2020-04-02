@@ -436,6 +436,9 @@
 /* Define to 1 if you have the `ssl' library (-lssl). */
 /* #undef HAVE_LIBSSL */
 
+/* Define to 1 if you have the `wolfssh' library (-lwolfssh). */
+/* #undef HAVE_LIBWOLFSSH */
+
 /* if zlib is available */
 #define HAVE_LIBZ 1
 
@@ -486,6 +489,15 @@
 
 /* Define to 1 if you have the <nghttp2/nghttp2.h> header file. */
 /* #undef HAVE_NGHTTP2_NGHTTP2_H */
+
+/* Define to 1 if you have the <nghttp3/nghttp3.h> header file. */
+/* #undef HAVE_NGHTTP3_NGHTTP3_H */
+
+/* Define to 1 if you have the <ngtcp2/ngtcp2_crypto.h> header file. */
+/* #undef HAVE_NGTCP2_NGTCP2_CRYPTO_H */
+
+/* Define to 1 if you have the <ngtcp2/ngtcp2.h> header file. */
+/* #undef HAVE_NGTCP2_NGTCP2_H */
 
 /* if you have an old MIT Kerberos version, lacking GSS_C_NT_HOSTBASED_SERVICE
    */
@@ -544,6 +556,9 @@
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
+
+/* Define to 1 if you have the <quiche.h> header file. */
+/* #undef HAVE_QUICHE_H */
 
 /* Define to 1 if you have the `RAND_egd' function. */
 /* #undef HAVE_RAND_EGD */
@@ -616,6 +631,9 @@
 
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
+
+/* Define to 1 if you have the `SSL_get_esni_status' function. */
+/* #undef HAVE_SSL_GET_ESNI_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -740,6 +758,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* Define to 1 if you have the `usleep' function. */
+#define HAVE_USLEEP 1
+
 /* Define to 1 if you have the `utime' function. */
 #define HAVE_UTIME 1
 
@@ -769,6 +790,9 @@
 
 /* Define to 1 if you have the winsock.h header file. */
 /* #undef HAVE_WINSOCK_H */
+
+/* Define to 1 if you have the <wolfssh/ssh.h> header file. */
+/* #undef HAVE_WOLFSSH_SSH_H */
 
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
@@ -938,6 +962,12 @@
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
 
+/* if BearSSL is enabled */
+/* #undef USE_BEARSSL */
+
+/* if ESNI support is available */
+/* #undef USE_ESNI */
+
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
@@ -971,6 +1001,15 @@
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */
 
+/* if nghttp3 is in use */
+/* #undef USE_NGHTTP3 */
+
+/* if ngtcp2 is in use */
+/* #undef USE_NGTCP2 */
+
+/* if ngtcp2_crypto_openssl is in use */
+/* #undef USE_NGTCP2_CRYPTO_OPENSSL */
+
 /* if NSS is enabled */
 /* #undef USE_NSS */
 
@@ -979,6 +1018,9 @@
 
 /* if OpenSSL is in use */
 /* #undef USE_OPENSSL */
+
+/* if quiche is in use */
+/* #undef USE_QUICHE */
 
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
@@ -1014,6 +1056,9 @@
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
+
+/* if wolfSSH is in use */
+/* #undef USE_WOLFSSH */
 
 /* if wolfSSL is enabled */
 /* #undef USE_WOLFSSL */

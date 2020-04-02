@@ -44,6 +44,7 @@ public:
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleLightState);
     LUA_DECLARE(GetVehiclePanelState);
+    LUA_DECLARE(AreVehicleLightsOn);
     LUA_DECLARE(GetVehicleOverrideLights);
     LUA_DECLARE(GetVehicleTowedByVehicle);
     LUA_DECLARE(GetVehicleTowingVehicle);

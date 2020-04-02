@@ -21,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -34,7 +35,7 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-CCore::CCore()
+CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -138,6 +139,9 @@ CCore::~CCore()
     // and is not affected by the master volume setting.
     m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
+    // Remove input hook
+    CMessageLoopHook::GetSingleton().RemoveHook();
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
@@ -150,9 +154,6 @@ CCore::~CCore()
 
     // Remove global events
     g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
-
-    // Remove input hook
-    CMessageLoopHook::GetSingleton().RemoveHook();
 
     // Store core variables to cvars
     CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
@@ -565,6 +566,9 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (bConnected) m_DiscordManager->RegisterPlay(true);
+    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -779,6 +783,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1858,6 +1863,10 @@ void CCore::OnDeviceRestore()
 void CCore::OnPreFxRender()
 {
     // Don't do nothing if nothing won't be drawn
+
+    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
+
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
@@ -1974,6 +1983,28 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
+}
+
+//
+// ResetDiscordRichPresence
+//
+void CCore::ResetDiscordRichPresence()
+{
+    time_t currentTime;
+    time(&currentTime);
+
+    // Set default parameters
+    SDiscordActivity activity;
+    activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
+    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+        if (res == DiscordRes_Ok)
+            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else
+            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+    });
+    m_DiscordManager->RegisterPlay(false);
 }
 
 //

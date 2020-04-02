@@ -15,6 +15,7 @@
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
 #include <windowsx.h>
+#include "CServerInfo.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -51,7 +52,7 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
-CClientGame::CClientGame(bool bLocalPlay)
+CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
@@ -558,7 +559,7 @@ void CClientGame::StartPlayback()
     }
 }
 
-bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type)
+bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type, const char* szSecret)
 {
     m_ServerType = Type;
     // int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
@@ -629,6 +630,12 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             // Append community information (Removed)
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
+
+            if (g_pNet->GetServerBitStreamVersion() >= 0x06E)
+            {
+                SString joinSecret = SStringX(szSecret);
+                pBitStream->WriteString<uchar>(joinSecret);
+            }
 
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -1272,7 +1279,7 @@ void CClientGame::DoPulses()
         UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        // UpdateTrailers (); // Test: Does it always work without this check?
+        UpdateTrailers (); // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
@@ -3547,6 +3554,7 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
+    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
@@ -3563,6 +3571,9 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWaterManager()->Reset();            // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
+
+    // Deallocate all custom models
+    m_pManager->GetModelManager()->RemoveAll();
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
@@ -4033,7 +4044,15 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                           SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
-    int  iGroupID = pAnimAssocGroup->GetGroupID();
+    int iGroupID = pAnimAssocGroup->GetGroupID();
+
+    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    {
+        g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
+                          SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
+        return false;
+    }
+
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
     auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
     auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
@@ -4273,13 +4292,20 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     CPools* pPools = g_pGame->GetPools();
 
     // Grab the damaged ped
-    CClientPed* pDamagedPed = NULL;
+    CClientPed* pDamagedPed = nullptr;
+
     if (pDamagePed)
     {
-        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDamagePed->GetInterface());
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed(reinterpret_cast<DWORD*>(pDamagePed->GetInterface()));
+
         if (pPedClientEntity)
         {
-            pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            // NOTE(botder): Don't use the damaged ped if the associated game entity doesn't exist to avoid a crash
+            //               in the function ApplyPedDamageFromGame
+            if (pPedClientEntity->pClientEntity && pPedClientEntity->pClientEntity->GetGameEntity() != nullptr)
+            {
+                pDamagedPed = reinterpret_cast<CClientPed*>(pPedClientEntity->pClientEntity);
+            }
         }
     }
 
@@ -4415,24 +4441,6 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                          CEventDamage* pEvent)
 {
-    if (pDamagedPed->GetGamePlayer() == nullptr)
-    {
-        // Shouldn't happen, but it does anyway. Log some information about the damaged ped and the ped pool; and then crash optionally
-        auto          entityType = static_cast<int>(pDamagedPed->GetType());
-        bool          isInVehicle = pDamagedPed->IsInVehicle();
-        bool          isDead = pDamagedPed->IsDead();
-        bool          isLocalPlayer = pDamagedPed->IsLocalPlayer();
-        unsigned long pedCount = g_pGame->GetPools()->GetPedCount();
-        
-        WriteDebugEvent(
-            SString("CClientGame::ApplyPedDamageFromGame: GetGamePlayer() == nullptr (type: %d, inVehicle: %d, isDead: %d, isLocalPlayer: %d, pedCount: %lu)",
-                    entityType, isInVehicle, isDead, isLocalPlayer, pedCount));
-
-        // Crash on purpose to gather crash information for this offset and not somewhere else
-        assert(false);
-        return false;
-    }
-
     float fPreviousHealth = pDamagedPed->m_fHealth;
     float fCurrentHealth = pDamagedPed->GetGamePlayer()->GetHealth();
     float fPreviousArmor = pDamagedPed->m_fArmor;
@@ -6945,6 +6953,17 @@ void CClientGame::RestreamModel(unsigned short usModel)
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
+void CClientGame::TriggerDiscordJoin(SString strSecret)
+{
+    if (g_pNet->GetServerBitStreamVersion() < 0x06E)
+        return;
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    pBitStream->WriteString<uchar>(strSecret);
+    g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
+    g_pNet->DeallocateNetBitStream(pBitStream);
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
@@ -7081,4 +7100,18 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     arguments.PushNumber(event.iModel);
     arguments.PushNumber(event.iColSurface);
     pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
+}
+
+void CClientGame::UpdateDiscordState()
+{
+    // Set discord state to players[/slot] count
+    uint playerCount = g_pClientGame->GetPlayerManager()->Count();
+    uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
+    SString state(std::to_string(playerCount));
+
+    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06E)
+        state += "/" + std::to_string(playerSlot);
+
+    state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
+    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
 }

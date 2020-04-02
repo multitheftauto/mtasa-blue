@@ -19,6 +19,12 @@ CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& 
     UpdateSpatialData();
 }
 
+CElement* CColCuboid::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColCuboid* pColCuboid = new CColCuboid(m_pManager, GetParentEntity(), m_vecPosition, m_vecSize);
+    return pColCuboid;
+}
+
 bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
 {
     // FIXME: What about radius?
