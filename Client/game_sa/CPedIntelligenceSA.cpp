@@ -94,3 +94,9 @@ CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun()
 
     return pTaskUseGun;
 }
+
+CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
+{
+    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
+    return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
+}

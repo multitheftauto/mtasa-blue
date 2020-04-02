@@ -19,7 +19,6 @@ DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock = 0x4CEA50;
 DWORD FUNC_UncompressAnimation = 0x4D41C0;
 DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
-DWORD RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW = 0x4CFC55;
 DWORD RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW = 0x4CEA88;
 DWORD RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW = 0x4D34F8;
 DWORD RETURN_CAnimManager_AddAnimation_NORMAL_FLOW = 0x4D3AAA;
@@ -65,35 +64,16 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
     bDisableCallsToCAnimBlendNode = bDisableCalls;
 }
 
-CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
+CAnimationStyleDescriptorSAInterface* getAnimStyleDescriptorInterface(AssocGroupId animGroup)
 {
-    DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
-    return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
+    auto pAnimAssocDefinitionsArray = (CAnimationStyleDescriptorSAInterface*)0x8AA5A8;
+    return &pAnimAssocDefinitionsArray[animGroup];
 }
 
-void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
 {
-    _asm
-    {
-        pushad
-    }
-
-    if (bDisableCallsToCAnimBlendNode)
-    {
-        _asm
-        {
-            popad
-            retn 8
-        }
-    }
-
-    _asm
-    {
-        popad
-        sub     esp, 18h
-        xor     eax, eax
-        jmp     RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW
-    }
+    auto pAnimGroupArray = reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(*(DWORD*)0xb4ea34);
+    return &pAnimGroupArray[animGroup];
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
@@ -155,7 +135,13 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
     if (pAnimAssociationInterface)
     {
-        auto* pAnimAssocGroupInterface = getAnimAssocGroupInterface(u32AnimGroupID);
+        auto pAnimAssocGroupInterface = getAnimAssocGroupInterface(u32AnimGroupID);
+        if (!pAnimAssocGroupInterface->pAnimBlock || pAnimAssocGroupInterface->groupID == -1)
+        {
+            auto pAnimStyleDescriptorInterface = getAnimStyleDescriptorInterface(u32AnimGroupID);
+            auto pAnimBlock = pGameInterface->GetAnimManager()->GetAnimationBlock(pAnimStyleDescriptorInterface->blockName);
+            pAnimBlock->Request(BLOCKING, true);
+        }
         m_pAssocGroupCopyAnimationHandler(pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
     }
     return pAnimAssociationInterface;

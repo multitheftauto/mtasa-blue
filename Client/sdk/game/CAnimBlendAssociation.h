@@ -37,6 +37,7 @@ public:
     virtual float GetBlendAmount() = 0;
     virtual void  SetBlendAmount(float fAmount) = 0;
     virtual void  SetCurrentProgress(float fProgress) = 0;
+    virtual float GetCurrentSpeed() = 0;
     virtual void  SetCurrentSpeed(float fSpeed) = 0;
     virtual void  SetAnimID(short sAnimID) = 0;
     virtual void  SetAnimGroup(short sAnimGroup) = 0;

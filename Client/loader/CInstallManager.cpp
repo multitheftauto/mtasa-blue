@@ -768,7 +768,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
         // See if exe copy seems usable
         SString strHTAEXEPath = PathJoin(strGTAPath, MTA_HTAEXE_NAME);
         uint64  uiStdFileSize = FileSize(strGTAEXEPath);
-        if (uiStdFileSize && uiStdFileSize == FileSize(strHTAEXEPath))
+        if (uiStdFileSize && FileSize(strHTAEXEPath) > 10 * 1024 * 1024)
             strGTAEXEPath = strHTAEXEPath;
     }
 
@@ -884,6 +884,13 @@ SString CInstallManager::_ProcessAppCompatChecks()
     removeList.push_back(L"DISABLEDWM");
     removeList.push_back(L"HIGHDPIAWARE");
 
+    // Fix for GitHub issue #983 "crash on join server"
+#ifdef DEBUG
+    removeList.push_back(L"IgnoreFreeLibrary<client_d.dll>");
+#else
+    removeList.push_back(L"IgnoreFreeLibrary<client.dll>");
+#endif
+
     // Remove potential performance hit
     removeList.push_back(L"FaultTolerantHeap");
 
@@ -939,6 +946,21 @@ SString CInstallManager::_ProcessAppCompatChecks()
         if (strNewValue != strValue)
             if (!WriteCompatibilityEntries(items[i].strProgName, strCompatModeRegKey, items[i].hKeyRoot, items[i].uiFlags, strNewValue))
                 bTryAdmin = true;
+    }
+
+    // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
+    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+    WString strUrlItem = L"Games";
+    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+    if (!strUrlValue.empty())
+    {
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
+        {
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
+            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                bTryAdmin = true;
+        }
     }
 
     // Handle admin requirement

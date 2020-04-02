@@ -12,6 +12,7 @@
 #include <queue>
 #include <future>
 #include <vector>
+#include <algorithm>
 
 namespace SharedUtil
 {
@@ -26,8 +27,9 @@ namespace SharedUtil
                 m_vecThreads.emplace_back([this] {
                     while (true)
                     {
-                        std::pair<void*, std::packaged_task<void()>> task;
+                        std::packaged_task<void(bool)> task;
                         {
+                            // Wait until either exit is signalled or a new task arrives
                             std::unique_lock<std::mutex> lock(m_mutex);
                             m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
                             if (m_exit && m_tasks.empty())
@@ -35,8 +37,8 @@ namespace SharedUtil
                             task = std::move(m_tasks.front());
                             m_tasks.pop();
                         }
-                        task.second();
-                        delete task.first;
+                        // Run the task
+                        task(false);
                     }
                 });
             }
@@ -45,19 +47,23 @@ namespace SharedUtil
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
-            // todo: use the commented line once we have c++17...
-            // using ReturnT = std::invoke_result_t<Func, Args...>;
-            using ReturnT = std::result_of_t<Func(Args...)>;
-            auto                       ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
-            auto*                      task = new std::packaged_task<ReturnT()>(ff);
-            std::packaged_task<void()> resultTask([task] { (*task)(); });
+            using ReturnT = std::invoke_result_t<Func, Args...>;
+            auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
+            auto* task = new std::packaged_task<ReturnT()>(ff);
 
+            // Package the task in a wrapper with a common void result
+            // plus a skip flag for destruction without running the task
+            std::packaged_task<void(bool)> resultTask([task](bool skip) {
+                if (!skip)
+                    (*task)();
+                delete task;
+            });
+
+            // Add task to queue and return future
             std::future<ReturnT> res = task->get_future();
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
-                // Note: hacky casting required, as msvc does not allow conversion of
-                // std::packaged_task<T()> to std::packaged_task<void()>
-                m_tasks.emplace((void*)task, std::move(resultTask));
+                m_tasks.emplace(std::move(resultTask));
             }
             m_cv.notify_one();
             return res;
@@ -78,20 +84,22 @@ namespace SharedUtil
             {
                 if (m_tasks.empty())
                     break;
-                auto pair = std::move(m_tasks.front());
-                delete pair.first;
+                // Run each task but skip execution of the actual 
+                // function (-> just delete the task)
+                auto task = std::move(m_tasks.front());
+                task(true);
             } while (true);
         }
 
         static CThreadPool& getDefaultThreadPool()
         { 
-            static CThreadPool DefaultThreadPool(std::thread::hardware_concurrency());
+            static CThreadPool DefaultThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
             return DefaultThreadPool;
         }
 
     private:
         std::vector<std::thread>                                 m_vecThreads;
-        std::queue<std::pair<void*, std::packaged_task<void()>>> m_tasks;
+        std::queue<std::packaged_task<void(bool)>>               m_tasks;
         std::mutex                                               m_mutex;
         std::condition_variable                                  m_cv;
         bool                                                     m_exit = false;

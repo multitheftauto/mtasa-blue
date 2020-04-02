@@ -119,6 +119,27 @@ struct SReplacedAnimation
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
 };
 
+struct SAnimationCache
+{
+    SString strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+
+    SAnimationCache()
+    {
+        iTime = -1;
+        bLoop = false;
+        bUpdatePosition = false;
+        bInterruptable = false;
+        bFreezeLastFrame = true;
+        iBlend = 250;
+    }
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -418,14 +439,15 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
-    bool        IsRunningAnimation();
-    void        RunAnimation(AssocGroupId animGroup, AnimationId animID);
-    void        RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true,
-                                  bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false,
-                                  bool bHoldLastFrame = false);
-    void        KillAnimation();
-    CAnimBlock* GetAnimationBlock() { return m_pAnimationBlock; }
-    const char* GetAnimationName() { return m_strAnimationName; }
+    bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
+    bool IsRunningAnimation();
+    void RunAnimation(AssocGroupId animGroup, AnimationId animID);
+    void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
+                           bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
+                           bool bOffsetPed = false, bool bHoldLastFrame = false);
+    void KillAnimation();
+    std::unique_ptr<CAnimBlock> GetAnimationBlock();
+    const SAnimationCache&      GetAnimationCache() { return m_AnimationCache; }
 
     bool IsUsingGun();
 
@@ -471,11 +493,11 @@ public:
 
     void                        DereferenceCustomAnimationBlock() { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP() { return m_pCustomAnimationIFP; }
-    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_bLoopAnimation) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
+    bool IsCustomAnimationPlaying() { return ((m_bRequestedAnimation || m_AnimationCache.bLoop) && m_pAnimationBlock && m_bisCurrentAnimationCustom); }
     void SetCustomAnimationUntriggerable()
     {
         m_bRequestedAnimation = false;
-        m_bLoopAnimation = false;
+        m_AnimationCache.bLoop = false;
     }
     bool            IsNextAnimationCustom() { return m_bisNextAnimationCustom; }
     void            SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
@@ -499,6 +521,8 @@ public:
     void                RestoreAnimations(CAnimBlock& animationBlock);
     void                RestoreAllAnimations();
     SReplacedAnimation* GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface);
+
+    std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -540,6 +564,11 @@ public:
 
     void Respawn(CVector* pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false);
 
+    void      SetTaskToBeRestoredOnAnimEnd(bool bSetOnEnd) { m_bTaskToBeRestoredOnAnimEnd = bSetOnEnd; }
+    bool      IsTaskToBeRestoredOnAnimEnd() { return m_bTaskToBeRestoredOnAnimEnd; }
+    void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
+    eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
+
     void NotifyCreate();
     void NotifyDestroy();
 
@@ -566,6 +595,7 @@ public:
     CStatsData*                              m_stats;
     CControllerState*                        m_currentControllerState;
     CControllerState*                        m_lastControllerState;
+    CControllerState                         m_rawControllerState; // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
@@ -637,15 +667,9 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
-    CAnimBlock*                              m_pAnimationBlock;
-    SString                                  m_strAnimationName;
+    std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
-    int                                      m_iTimeAnimation;
-    int                                      m_iBlendAnimation;
-    bool                                     m_bLoopAnimation;
-    bool                                     m_bUpdatePositionAnimation;
-    bool                                     m_bInterruptableAnimation;
-    bool                                     m_bFreezeLastFrameAnimation;
+    SAnimationCache                          m_AnimationCache;
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;
@@ -707,4 +731,6 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
+    bool              m_bTaskToBeRestoredOnAnimEnd;
+    eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
 };

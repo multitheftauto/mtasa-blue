@@ -278,13 +278,15 @@ int CLuaFunctionDefs::GetKeyState(lua_State* luaVM)
 int CLuaFunctionDefs::GetAnalogControlState(lua_State* luaVM)
 {
     SString          strControlState = "";
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetAnalogControlState(strControlState, fState))
+        if (CStaticFunctionDefinitions::GetAnalogControlState(strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;
