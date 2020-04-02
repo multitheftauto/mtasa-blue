@@ -19,7 +19,8 @@ CFxSA::CFxSA(CFxSAInterface* pInterface) : m_pInterface(pInterface)
 {
 
     RwTexture* pRwTexture;
-    for (int i = 0; i < eShadowType::_COUNT; i++)
+    auto shadowTypeCount = static_cast<std::underlying_type_t<eShadowType>>(eShadowType::_COUNT);
+    for (auto i = 0; i < shadowTypeCount; i++)
     {
         auto textureAddressPtr = (void*)(SHADOW_BASE_TEXTURE_OFFSET + i * 4);
         void* textureAddress = *textureAddressPtr;
