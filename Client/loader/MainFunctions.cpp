@@ -26,11 +26,11 @@ public:
     virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
     virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
 
-    virtual std::map<SString, SString> GetAvailableLanguages(void) { return std::map<SString, SString>(); }
-    virtual bool                       IsLocalized(void) { return false; }
-    virtual SString                    GetLanguageDirectory(void) { return ""; }
-    virtual SString                    GetLanguageCode(void) { return "en_US"; }
-    virtual SString                    GetLanguageName(void) { return "English"; }
+    virtual std::vector<SString> GetAvailableLocales() { return std::vector<SString>(); }
+    virtual bool                 IsLocalized() { return false; }
+    virtual SString              GetLanguageDirectory() { return ""; }
+    virtual SString              GetLanguageCode() { return "en_US"; }
+    virtual SString              GetLanguageName() { return "English"; }
 };
 
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
@@ -149,7 +149,7 @@ void InitLocalization(bool bShowErrors)
 // Check and handle commands (from the installer)
 //
 //////////////////////////////////////////////////////////
-void HandleSpecialLaunchOptions(void)
+void HandleSpecialLaunchOptions()
 {
     // Handle service install request from the installer
     if (CommandLineContains("/kdinstall"))
@@ -185,7 +185,7 @@ void HandleSpecialLaunchOptions(void)
 // Handle duplicate launching, or running from mtasa:// URI ?
 //
 //////////////////////////////////////////////////////////
-void HandleDuplicateLaunching(void)
+void HandleDuplicateLaunching()
 {
     LPSTR lpCmdLine = GetCommandLine();
 
@@ -272,7 +272,7 @@ void HandleDuplicateLaunching(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleTrouble(void)
+void HandleTrouble()
 {
     if (CheckAndShowFileOpenFailureMessage())
         return;
@@ -292,7 +292,7 @@ void HandleTrouble(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleResetSettings(void)
+void HandleResetSettings()
 {
     if (CheckAndShowFileOpenFailureMessage())
         return;
@@ -314,6 +314,10 @@ void HandleResetSettings(void)
             FileDelete(strSettingsFilenameBak);
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
+
+            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
+
             if (!FileExists(strSettingsFilename))
             {
                 AddReportLog(4053, "Deleted gta_sa.set");
@@ -347,7 +351,7 @@ void HandleResetSettings(void)
 // If fullscreen, then maybe change fullscreen mode
 //
 //////////////////////////////////////////////////////////
-void HandleNotUsedMainMenu(void)
+void HandleNotUsedMainMenu()
 {
     AddReportLog(9310, "Loader - HandleNotUsedMainMenu");
     {
@@ -428,7 +432,7 @@ void HandleNotUsedMainMenu(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleCustomStartMessage(void)
+void HandleCustomStartMessage()
 {
     SString strStartMessage = GetApplicationSetting("diagnostics", "start-message");
     SString strTrouble = GetApplicationSetting("diagnostics", "start-message-trouble");
@@ -459,7 +463,7 @@ void HandleCustomStartMessage(void)
 //
 //
 //////////////////////////////////////////////////////////
-void PreLaunchWatchDogs(void)
+void PreLaunchWatchDogs()
 {
     assert(!CreateSingleInstanceMutex());
 
@@ -575,7 +579,7 @@ void PostRunWatchDogs(int iReturnCode)
 // Check for and maybe stop a running GTA process
 //
 //////////////////////////////////////////////////////////
-void HandleIfGTAIsAlreadyRunning(void)
+void HandleIfGTAIsAlreadyRunning()
 {
     if (IsGTARunning())
     {
@@ -604,7 +608,7 @@ void HandleIfGTAIsAlreadyRunning(void)
 // Check GTA path looks good
 //
 //////////////////////////////////////////////////////////
-void ValidateGTAPath(void)
+void ValidateGTAPath()
 {
     // Get path to GTA
     ePathResult iResult = DiscoverGTAPath(true);
@@ -653,7 +657,7 @@ void ValidateGTAPath(void)
 // Maybe warn user if no anti-virus running
 //
 //////////////////////////////////////////////////////////
-void CheckAntiVirusStatus(void)
+void CheckAntiVirusStatus()
 {
     // Get data from WMI
     std::vector<SString> enabledList;
@@ -757,7 +761,7 @@ void CheckAntiVirusStatus(void)
 // Basic check for some essential files
 //
 //////////////////////////////////////////////////////////
-void CheckDataFiles(void)
+void CheckDataFiles()
 {
     const SString strMTASAPath = GetMTASAPath();
     const SString strGTAPath = GetGTAPath();
@@ -834,64 +838,21 @@ void CheckDataFiles(void)
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {
-        {
-            "4783E7C0D0005B80673A972E4231A230",
-            "bass.dll",
-        },
-        {
-            "526E02E9EB8953655EB293D8BAC59C8F",
-            "bass_aac.dll",
-        },
-        {
-            "3935396799611AD3FDE5A66832D69DD6",
-            "bass_ac3.dll",
-        },
-        {
-            "E7F4494BDF7B1C49A303FE56C6B52DC9",
-            "bass_fx.dll",
-        },
-        {
-            "3CA82F8E39DE39A50C13474905EF2D65",
-            "bassflac.dll",
-        },
-        {
-            "13A3F5637A93F0340161A40C6FBD3F1F",
-            "bassmidi.dll",
-        },
-        {
-            "BCB4A47D5CBF53515AAE135AAA9C1C52",
-            "bassmix.dll",
-        },
-        {
-            "02C9E8F0288D15FF290DD31EB1C7BFBC",
-            "basswma.dll",
-        },
-        {
-            "6F26A1A5D165272BA48F45BC0B79750E",
-            "tags.dll",
-        },
-        {
-            "309D860FC8137E5FE9E7056C33B4B8BE",
-            "vea.dll",
-        },
-        {
-            "0602F672BA595716E64EC4040E6DE376",
-            "vog.dll",
-        },
-        {
-            "B37D7DF4A1430DB65AD3EA84801F9EC3",
-            "vvo.dll",
-        },
-        {
-            "47FF3EE45DE53528F1AFD9F5982DF8C7",
-            "vvof.dll",
-        },
-        {
-            "ADFB6D7B61E301761C700652B6FE7CCD",
-            "XInput9_1_0_mta.dll",
-        },
-    };
+    } integrityCheckList[] = {{"B15F1875F447DBB2A849050E5FD6125D", "bass.dll"},
+                              {"853933A2518EBF8E966C04C2EAA95391", "bass_aac.dll"},
+                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
+                              {"C176D670BF5440A6C704B55A21B01FEF", "bass_fx.dll"},
+                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
+                              {"8BF45CFAC7219673DEC8BB0ED54D0365", "bassmidi.dll"},
+                              {"5387D7484E6CAA959144DFE524BB3B05", "bassmix.dll"},
+                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
+                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
+                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
+                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
+                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
@@ -916,9 +877,12 @@ void CheckDataFiles(void)
     }
 
     // Warning if d3d9.dll exists in the GTA install directory
-    if (FileExists(PathJoin(strGTAPath, "d3d9.dll")))
+    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
     {
-        ShowD3dDllDialog(g_hInstance, PathJoin(strGTAPath, "d3d9.dll"));
+        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
+        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+
+        ShowD3dDllDialog(g_hInstance, filePath);
         HideD3dDllDialog();
     }
 
@@ -939,7 +903,7 @@ void CheckDataFiles(void)
 // Ensure DLLs are the correct version
 //
 //////////////////////////////////////////////////////////
-void CheckLibVersions(void)
+void CheckLibVersions()
 {
 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
 
@@ -1187,6 +1151,7 @@ int LaunchGame(SString strCmdLine)
     }
 
     WriteDebugEvent(SString("Loader - Process created: %s %s", *strGTAEXEPath, *GetApplicationSetting("serial")));
+    WriteDebugEvent(SString("Loader - Process ID: %lu, Thread ID: %lu", piLoadee.dwProcessId, piLoadee.dwThreadId));
 
     // Inject the core into GTA
     SetDllDirectory(strMtaDir);
@@ -1210,7 +1175,6 @@ int LaunchGame(SString strCmdLine)
         BsodDetectionOnGameBegin();
         // Show splash until game window is displayed (or max 20 seconds)
         DWORD status;
-        bool  bShownDeviceSelectionDialog = false;
         for (uint i = 0; i < 20; i++)
         {
             status = WaitForSingleObject(piLoadee.hProcess, 1000);
@@ -1223,16 +1187,18 @@ int LaunchGame(SString strCmdLine)
                 break;
             }
 
-            // Skip stuck process warning if DeviceSelection dialog is still open after 4 seconds
-            if (i >= 4)
-                bShownDeviceSelectionDialog |= IsDeviceSelectionDialogOpen(piLoadee.dwThreadId);
+            // Keep showing splash if the device selection dialog is open
+            if (IsDeviceSelectionDialogOpen(piLoadee.dwThreadId))
+            {
+                i--;
+            }
         }
 
         // Actually hide the splash
         HideSplash();
 
         // If hasn't shown the loading screen and gta_sa.exe process memory usage is not changing, give user option to terminate
-        if (status == WAIT_TIMEOUT && !bShownDeviceSelectionDialog)
+        if (status == WAIT_TIMEOUT)
         {
             CStuckProcessDetector stuckProcessDetector(piLoadee.hProcess, 5000);
             while (status == WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))            // Gets closed when loading screen is shown
@@ -1310,7 +1276,7 @@ int LaunchGame(SString strCmdLine)
 // Parse and do something with OnQuitCommand from registry
 //
 //////////////////////////////////////////////////////////
-void HandleOnQuitCommand(void)
+void HandleOnQuitCommand()
 {
     const SString strMTASAPath = GetMTASAPath();
     SetCurrentDirectory(strMTASAPath);

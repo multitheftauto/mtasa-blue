@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKCAR
-#define __CGAME_TASKCAR
+#pragma once
 
 #include "Task.h"
 
@@ -25,7 +24,7 @@ enum
 class CTaskComplexEnterCar : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexEnterCar(void){};
+    virtual ~CTaskComplexEnterCar(){};
 
     virtual int  GetTargetDoor() = 0;
     virtual void SetTargetDoor(int iDoor) = 0;
@@ -35,27 +34,25 @@ public:
 class CTaskComplexEnterCarAsDriver : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual ~CTaskComplexEnterCarAsDriver(void){};
+    virtual ~CTaskComplexEnterCarAsDriver(){};
 };
 
 class CTaskComplexEnterCarAsPassenger : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual ~CTaskComplexEnterCarAsPassenger(void){};
+    virtual ~CTaskComplexEnterCarAsPassenger(){};
 };
 
 class CTaskComplexEnterBoatAsDriver : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexEnterBoatAsDriver(void){};
+    virtual ~CTaskComplexEnterBoatAsDriver(){};
 };
 
 class CTaskComplexLeaveCar : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexLeaveCar(void){};
+    virtual ~CTaskComplexLeaveCar(){};
 
     virtual int GetTargetDoor() = 0;
 };
-
-#endif

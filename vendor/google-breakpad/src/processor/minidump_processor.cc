@@ -893,7 +893,6 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
                   break;
                 case MD_EXCEPTION_CODE_MAC_PPC_ALTIVEC_ASSIST:
                   reason.append("EXC_PPC_ALTIVECASSIST");
-                  break;
                 default:
                   reason.append(flags_string);
                   BPLOG(INFO) << "Unknown exception reason " << reason;
@@ -1218,8 +1217,6 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
 
     case MD_OS_ANDROID:
     case MD_OS_LINUX: {
-      char flags_string[11];
-      snprintf(flags_string, sizeof(flags_string), "0x%08x", exception_flags);
       switch (exception_code) {
         case MD_EXCEPTION_CODE_LIN_SIGHUP:
           reason = "SIGHUP";
@@ -1231,37 +1228,7 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
           reason = "SIGQUIT";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGILL:
-          reason = "SIGILL / ";
-          switch (exception_flags) {
-            case MD_EXCEPTION_FLAG_LIN_ILL_ILLOPC:
-              reason.append("ILL_ILLOPC");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_ILLOPN:
-              reason.append("ILL_ILLOPN");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_ILLADR:
-              reason.append("ILL_ILLADR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_ILLTRP:
-              reason.append("ILL_ILLTRP");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_PRVOPC:
-              reason.append("ILL_PRVOPC");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_PRVREG:
-              reason.append("ILL_PRVREG");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_COPROC:
-              reason.append("ILL_COPROC");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_ILL_BADSTK:
-              reason.append("ILL_BADSTK");
-              break;
-            default:
-              reason.append(flags_string);
-              BPLOG(INFO) << "Unknown exception reason " << reason;
-              break;
-          }
+          reason = "SIGILL";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGTRAP:
           reason = "SIGTRAP";
@@ -1270,61 +1237,10 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
           reason = "SIGABRT";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGBUS:
-          reason = "SIGBUS / ";
-          switch (exception_flags) {
-            case MD_EXCEPTION_FLAG_LIN_BUS_ADRALN:
-              reason.append("BUS_ADALN");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_BUS_ADRERR:
-              reason.append("BUS_ADRERR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_BUS_OBJERR:
-              reason.append("BUS_OBJERR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_BUS_MCEERR_AR:
-              reason.append("BUS_MCEERR_AR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_BUS_MCEERR_AO:
-              reason.append("BUS_MCEERR_AO");
-              break;
-            default:
-              reason.append(flags_string);
-              BPLOG(INFO) << "Unknown exception reason " << reason;
-              break;
-          }
+          reason = "SIGBUS";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGFPE:
-          reason = "SIGFPE / ";
-          switch (exception_flags) {
-            case MD_EXCEPTION_FLAG_LIN_FPE_INTDIV:
-              reason.append("FPE_INTDIV");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_INTOVF:
-              reason.append("FPE_INTOVF");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTDIV:
-              reason.append("FPE_FLTDIV");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTOVF:
-              reason.append("FPE_FLTOVF");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTUND:
-              reason.append("FPE_FLTUND");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTRES:
-              reason.append("FPE_FLTRES");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTINV:
-              reason.append("FPE_FLTINV");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_FPE_FLTSUB:
-              reason.append("FPE_FLTSUB");
-              break;
-            default:
-              reason.append(flags_string);
-              BPLOG(INFO) << "Unknown exception reason " << reason;
-              break;
-          }
+          reason = "SIGFPE";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGKILL:
           reason = "SIGKILL";
@@ -1333,25 +1249,7 @@ string MinidumpProcessor::GetCrashReason(Minidump *dump, uint64_t *address) {
           reason = "SIGUSR1";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGSEGV:
-          reason = "SIGSEGV /";
-          switch (exception_flags) {
-            case MD_EXCEPTION_FLAG_LIN_SEGV_MAPERR:
-              reason.append("SEGV_MAPERR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_SEGV_ACCERR:
-              reason.append("SEGV_ACCERR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_SEGV_BNDERR:
-              reason.append("SEGV_BNDERR");
-              break;
-            case MD_EXCEPTION_FLAG_LIN_SEGV_PKUERR:
-              reason.append("SEGV_PKUERR");
-              break;
-            default:
-              reason.append(flags_string);
-              BPLOG(INFO) << "Unknown exception reason " << reason;
-              break;
-          }
+          reason = "SIGSEGV";
           break;
         case MD_EXCEPTION_CODE_LIN_SIGUSR2:
           reason = "SIGUSR2";

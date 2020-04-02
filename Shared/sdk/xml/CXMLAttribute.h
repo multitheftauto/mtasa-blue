@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTE_H
-#define __CXMLATTRIBUTE_H
+#pragma once
 
 #include "CXMLCommon.h"
 #include <string>
@@ -18,10 +17,10 @@
 class CXMLAttribute : public CXMLCommon
 {
 public:
-    virtual ~CXMLAttribute(void){};
+    virtual ~CXMLAttribute(){};
 
-    virtual const std::string  GetName(void) const = 0;
-    virtual const std::string& GetValue(void) const = 0;
+    virtual const std::string  GetName() const = 0;
+    virtual const std::string& GetValue() const = 0;
 
     virtual void SetValue(const char* szValue) = 0;
     virtual void SetValue(bool bValue) = 0;
@@ -29,7 +28,5 @@ public:
     virtual void SetValue(unsigned int uiValue) = 0;
     virtual void SetValue(float fValue) = 0;
 
-    virtual void DeleteWrapper(void) = 0;
+    virtual void DeleteWrapper() = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CSINGULARFILEDOWNLOAD_H
-#define CSINGULARFILEDOWNLOAD_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -25,31 +24,32 @@
 class CSingularFileDownload
 {
 public:
-    CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum);
-    ~CSingularFileDownload(void);
+    CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum serverChecksum);
+    ~CSingularFileDownload();
 
     static void DownloadFinishedCallBack(const SHttpDownloadResult& result);
 
-    bool DoesClientAndServerChecksumMatch(void);
+    bool DoesClientAndServerChecksumMatch();
 
-    const char* GetName(void) { return m_strName; };
-    const char* GetShortName(void) { return m_strNameShort; };
+    const char* GetName() { return m_strName; };
+    const char* GetShortName() { return m_strNameShort; };
 
-    CResource* GetResource(void) { return m_pResource; };
+    CResource* GetResource() { return m_pResource; };
 
-    void SetComplete(void) { m_bComplete = true; };
-    bool GetComplete(void) { return m_bComplete; };
+    void SetComplete() { m_bComplete = true; };
+    bool GetComplete() { return m_bComplete; };
 
     void CallFinished(bool bSuccess);
-    void Cancel(void);
+    void Cancel();
 
-    CChecksum GenerateClientChecksum(void);
+    CChecksum GenerateClientChecksum();
 
 protected:
     SString m_strName;
     SString m_strNameShort;
 
     CResource* m_pResource;
+    CResource* m_pRequestResource;
 
     bool m_bComplete;
     bool m_bBeingDeleted;
@@ -57,5 +57,3 @@ protected:
     CChecksum m_LastClientChecksum;
     CChecksum m_ServerChecksum;
 };
-
-#endif

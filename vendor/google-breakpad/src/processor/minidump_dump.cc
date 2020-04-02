@@ -121,9 +121,6 @@ static bool PrintMinidumpDump(const Options& options) {
     thread_list->Print();
   }
 
-  // It's useful to be able to see the full list of modules here even if it
-  // would cause minidump_stackwalk to fail.
-  MinidumpModuleList::set_max_modules(UINT32_MAX);
   MinidumpModuleList *module_list = minidump.GetModuleList();
   if (!module_list) {
     ++errors;

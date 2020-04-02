@@ -15,7 +15,7 @@
 
 struct SLineOfSightFlags
 {
-    SLineOfSightFlags(void)
+    SLineOfSightFlags()
         : bCheckBuildings(true),
           bCheckVehicles(true),
           bCheckPeds(true),
@@ -57,35 +57,35 @@ struct SWeaponConfiguration
 class CCustomWeapon : public CObject
 {
 public:
-    CCustomWeapon(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
-    ~CCustomWeapon(void);
+    CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
+    ~CCustomWeapon();
 
     void SetWeaponTarget(CElement* pTarget, int subTarget);
     void SetWeaponTarget(CVector vecTarget);
-    void ResetWeaponTarget(void);
+    void ResetWeaponTarget();
 
-    eWeaponType GetWeaponType(void) { return m_Type; }
+    eWeaponType GetWeaponType() { return m_Type; }
 
-    eWeaponState GetWeaponState(void) { return m_State; }
+    eWeaponState GetWeaponState() { return m_State; }
     void         SetWeaponState(eWeaponState state) { m_State = state; }
 
     void SetClipAmmo(int iAmmo) { m_nAmmoInClip = iAmmo; }
-    int  GetClipAmmo(void) { return m_nAmmoInClip; }
+    int  GetClipAmmo() { return m_nAmmoInClip; }
 
     void SetAmmo(int iAmmo) { m_nAmmoTotal = iAmmo; }
-    int  GetAmmo(void) { return m_nAmmoTotal; }
+    int  GetAmmo() { return m_nAmmoTotal; }
 
-    CWeaponStat* GetWeaponStat(void) { return m_pWeaponStat; }
+    CWeaponStat* GetWeaponStat() { return m_pWeaponStat; }
 
-    CPlayer* GetOwner(void) { return m_pOwner; }
+    CPlayer* GetOwner() { return m_pOwner; }
     void     SetOwner(CPlayer* pOwner) { m_pOwner = pOwner; }
 
-    eTargetType GetTargetType(void) { return m_targetType; }
-    eBone       GetTargetBone(void) { return m_targetBone; }
-    int         GetTargetWheel(void) { return m_itargetWheel; }
-    CVector     GetVectorTarget(void) { return m_vecTarget; }
-    CElement*   GetElementTarget(void) { return m_pTarget; }
-    bool        HasChangedStats(void) { return m_pWeaponStat->HasChanged(); }
+    eTargetType GetTargetType() { return m_targetType; }
+    eBone       GetTargetBone() { return m_targetBone; }
+    int         GetTargetWheel() { return m_itargetWheel; }
+    CVector     GetVectorTarget() { return m_vecTarget; }
+    CElement*   GetElementTarget() { return m_pTarget; }
+    bool        HasChangedStats() { return m_pWeaponStat->HasChanged(); }
 
     bool SetFlags(eWeaponFlags flags, bool bData);
     bool SetFlags(const SLineOfSightFlags flags);
@@ -93,12 +93,12 @@ public:
 
     bool                 GetFlags(eWeaponFlags flags, bool& bData);
     bool                 GetFlags(SLineOfSightFlags& flags);
-    SWeaponConfiguration GetFlags(void) { return m_weaponConfig; }
+    SWeaponConfiguration GetFlags() { return m_weaponConfig; }
 
     static int GetWeaponFireTime(CWeaponStat* pWeaponStat);
     void       SetWeaponFireTime(int iWeaponFireTime);
-    int        GetWeaponFireTime(void);
-    void       ResetWeaponFireTime(void);
+    int        GetWeaponFireTime();
+    void       ResetWeaponFireTime();
 
 private:
     eWeaponType          m_Type;

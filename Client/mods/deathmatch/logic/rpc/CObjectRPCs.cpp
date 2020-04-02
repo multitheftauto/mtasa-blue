@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CObjectRPCs.h"
 
-void CObjectRPCs::LoadFunctions(void)
+void CObjectRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_OBJECTS, DestroyAllObjects, "DestroyAllObjects");
     AddHandler(SET_OBJECT_ROTATION, SetObjectRotation, "SetObjectRotation");

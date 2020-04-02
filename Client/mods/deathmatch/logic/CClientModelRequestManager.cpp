@@ -12,12 +12,12 @@
 
 using std::list;
 
-CClientModelRequestManager::CClientModelRequestManager(void)
+CClientModelRequestManager::CClientModelRequestManager()
 {
     m_bDoingPulse = false;
 }
 
-CClientModelRequestManager::~CClientModelRequestManager(void)
+CClientModelRequestManager::~CClientModelRequestManager()
 {
     // Delete all our requests.
     list<SClientModelRequest*>::iterator iter;
@@ -247,7 +247,7 @@ void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue
     }
 }
 
-void CClientModelRequestManager::DoPulse(void)
+void CClientModelRequestManager::DoPulse()
 {
     // Any requests?
     if (m_Requests.size() > 0)
@@ -265,18 +265,22 @@ void CClientModelRequestManager::DoPulse(void)
             // Is it loaded?
             if (pEntry->pModel->IsLoaded())
             {
-                // Make sure custom things are replaced
-                pEntry->pModel->MakeCustomModel();
+                // Copy then remove from the list because the request is complete and we don't want it modified in Request()
+                const SClientModelRequest entryCopy = *pEntry;
+                delete pEntry;
+                m_Requests.erase(iter);
 
-                // Call the callback
-                pEntry->pEntity->ModelRequestCallback(pEntry->pModel);
+                // Make sure custom things are replaced
+                entryCopy.pModel->MakeCustomModel();
+
+                // Create ped/object/vehicle using the loaded model (this can eventually trigger script events)
+                entryCopy.pEntity->ModelRequestCallback(entryCopy.pModel);
 
                 // Unreference us from the model (callback should've added a reference!)
-                pEntry->pModel->RemoveRef();
+                entryCopy.pModel->RemoveRef();
 
-                // Delete the request entry. Remove from the list and continue from after it
-                delete *iter;
-                iter = m_Requests.erase(iter);
+                // Restart loop because m_Requests may have been changed
+                iter = m_Requests.begin();
             }
             else
             {

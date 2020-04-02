@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #include <sys/timeb.h>
 #include <pthread.h>
 
@@ -34,11 +36,11 @@ namespace SharedUtil
     public:
         CThreadHandle(PFN_ThreadStart threadStart, void* arg) { res = pthread_create(&handle, NULL, threadStart, arg); }
 
-        static void AllowASyncCancel(void) { pthread_setcancelstate(PTHREAD_CANCEL_ASYNCHRONOUS, NULL); }
+        static void AllowASyncCancel() { pthread_setcancelstate(PTHREAD_CANCEL_ASYNCHRONOUS, NULL); }
 
-        bool IsValid(void) const { return res == 0; }
+        bool IsValid() const { return res == 0; }
 
-        void Cancel(void) { pthread_cancel(handle); }
+        void Cancel() { pthread_cancel(handle); }
     };
 
     //
@@ -50,23 +52,23 @@ namespace SharedUtil
         pthread_cond_t  cond;
         bool            m_bInCondWait;            // Hacky flag to avoid deadlock on dll exit
     public:
-        CComboMutex(void)
+        CComboMutex()
         {
             m_bInCondWait = false;
             pthread_mutex_init(&mutex, NULL);
             pthread_cond_init(&cond, NULL);
         }
 
-        ~CComboMutex(void)
+        ~CComboMutex()
         {
             if (!m_bInCondWait)
                 pthread_cond_destroy(&cond);
             pthread_mutex_destroy(&mutex);
         }
 
-        void Lock(void) { pthread_mutex_lock(&mutex); }
+        void Lock() { pthread_mutex_lock(&mutex); }
 
-        void Unlock(void) { pthread_mutex_unlock(&mutex); }
+        void Unlock() { pthread_mutex_unlock(&mutex); }
 
         // unlock - wait for signal - lock
         // Returns ETIMEDOUT if timeout period expired
@@ -111,7 +113,7 @@ namespace SharedUtil
             return 0;
         }
 
-        void Signal(void) { pthread_cond_signal(&cond); }
+        void Signal() { pthread_cond_signal(&cond); }
     };
 
 }            // namespace SharedUtil

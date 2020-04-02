@@ -48,7 +48,7 @@ namespace
     TIMEUS ms_StatsTimePoint3;
 
     // Sync thread stats helper functions
-    void UpdateStatsPreDoPulse(void)
+    void UpdateStatsPreDoPulse()
     {
         ms_StatsTimePoint1 = GetTimeUs();
         ms_StatsRecvNumMessages = 0;
@@ -61,7 +61,7 @@ namespace
         ms_StatsSendNumCommands = uiNumCommands;
     }
 
-    void UpdateStatsFinish(void)
+    void UpdateStatsFinish()
     {
         if (ms_StatsSendNumCommands != 0)
             ms_StatsTimePoint3 = GetTimeUs();
@@ -129,7 +129,7 @@ CNetServerBuffer::CNetServerBuffer(CSimPlayerManager* pSimPlayerManager)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-CNetServerBuffer::~CNetServerBuffer(void)
+CNetServerBuffer::~CNetServerBuffer()
 {
     // Stop the job queue processing thread
     StopThread();
@@ -164,7 +164,7 @@ void CNetServerBuffer::SetAutoPulseEnabled(bool bEnable)
 // Stop the job queue processing thread
 //
 ///////////////////////////////////////////////////////////////
-void CNetServerBuffer::StopThread(void)
+void CNetServerBuffer::StopThread()
 {
     // Stop the job queue processing thread
     shared.m_Mutex.Lock();
@@ -205,7 +205,7 @@ bool CNetServerBuffer::StartNetwork(const char* szIP, unsigned short usServerPor
 // BLOCKING
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::StopNetwork(void)
+void CNetServerBuffer::StopNetwork()
 {
     SStopNetworkArgs* pArgs = new SStopNetworkArgs();
     AddCommandAndWait(pArgs);
@@ -218,7 +218,7 @@ void CNetServerBuffer::StopNetwork(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::DoPulse(void)
+void CNetServerBuffer::DoPulse()
 {
     // Schedule a net pulse
     SDoPulseArgs* pArgs = new SDoPulseArgs();
@@ -323,7 +323,7 @@ bool CNetServerBuffer::GetNetworkStatistics(NetStatistics* pDest, const NetServe
 // Uses stats gathered here
 //
 ///////////////////////////////////////////////////////////////////////////
-const SPacketStat* CNetServerBuffer::GetPacketStats(void)
+const SPacketStat* CNetServerBuffer::GetPacketStats()
 {
     m_TimeSinceGetPacketStats.Reset();
     return m_PacketStatList[0];
@@ -615,7 +615,7 @@ void CNetServerBuffer::SetChecks(const char* szDisableComboACMap, const char* sz
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-unsigned int CNetServerBuffer::GetPendingPacketCount(void)
+unsigned int CNetServerBuffer::GetPendingPacketCount()
 {
     shared.m_Mutex.Lock();
     uint uiCount = shared.m_InResultQueue.size();
@@ -763,7 +763,7 @@ void CNetServerBuffer::GenerateRandomData(void* pOutData, uint uiLength)
 // Return a new job data object
 //
 ///////////////////////////////////////////////////////////////
-CNetJobData* CNetServerBuffer::GetNewJobData(void)
+CNetJobData* CNetServerBuffer::GetNewJobData()
 {
     CNetJobData* pJobData = new CNetJobData();
     return pJobData;
@@ -915,7 +915,7 @@ void CNetServerBuffer::AddPacketStat(CNetServer::ENetworkUsageDirection eDirecti
 // Called during pulse
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::ProcessIncoming(void)
+void CNetServerBuffer::ProcessIncoming()
 {
     bool bTimePacketHandler = m_TimeSinceGetPacketStats.Get() < 10000;
 
@@ -1009,7 +1009,7 @@ void* CNetServerBuffer::StaticThreadProc(void* pContext)
 // Job service loop
 //
 ///////////////////////////////////////////////////////////////
-void* CNetServerBuffer::ThreadProc(void)
+void* CNetServerBuffer::ThreadProc()
 {
     shared.m_Mutex.Lock();
     while (!shared.m_bTerminateThread)
@@ -1308,7 +1308,7 @@ bool CNetJobData::SetCallback(PFN_NETRESULT pfnNetResult, void* pContext)
 // Returns true if callback has been set and has not been called yet
 //
 ///////////////////////////////////////////////////////////////
-bool CNetJobData::HasCallback(void)
+bool CNetJobData::HasCallback()
 {
     return callback.bSet && !callback.bDone;
 }
@@ -1320,7 +1320,7 @@ bool CNetJobData::HasCallback(void)
 // Do callback
 //
 ///////////////////////////////////////////////////////////////
-void CNetJobData::ProcessCallback(void)
+void CNetJobData::ProcessCallback()
 {
     assert(HasCallback());
     callback.bDone = true;

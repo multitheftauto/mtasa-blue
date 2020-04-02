@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -90,8 +90,9 @@ CURLcode Curl_sspi_global_init(void)
       return CURLE_FAILED_INIT;
 
     /* Get address of the InitSecurityInterfaceA function from the SSPI dll */
-    pInitSecurityInterface = (INITSECURITYINTERFACE_FN)
-      GetProcAddress(s_hSecDll, SECURITYENTRYPOINT);
+    pInitSecurityInterface =
+      CURLX_FUNCTION_CAST(INITSECURITYINTERFACE_FN,
+                          (GetProcAddress(s_hSecDll, SECURITYENTRYPOINT)));
     if(!pInitSecurityInterface)
       return CURLE_FAILED_INIT;
 
@@ -131,7 +132,7 @@ void Curl_sspi_global_cleanup(void)
  * Parameters:
  *
  * userp    [in]     - The user name in the format User or Domain\User.
- * passdwp  [in]     - The user's password.
+ * passwdp  [in]     - The user's password.
  * identity [in/out] - The identity structure.
  *
  * Returns CURLE_OK on success.

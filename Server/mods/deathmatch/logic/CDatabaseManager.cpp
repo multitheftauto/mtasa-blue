@@ -26,11 +26,11 @@ class CDatabaseManagerImpl : public CDatabaseManager
 {
 public:
     ZERO_ON_NEW
-    CDatabaseManagerImpl(void);
-    virtual ~CDatabaseManagerImpl(void);
+    CDatabaseManagerImpl();
+    virtual ~CDatabaseManagerImpl();
 
     // CDatabaseManager
-    virtual void              DoPulse(void);
+    virtual void              DoPulse();
     virtual SConnectionHandle Connect(const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword,
                                       const SString& strOptions);
     virtual bool              Disconnect(SConnectionHandle hConnection);
@@ -43,18 +43,21 @@ public:
     virtual bool              QueryPoll(CDbJobData* pJobData, uint ulTimeout);
     virtual bool              QueryFree(CDbJobData* pJobData);
     virtual CDbJobData*       GetQueryFromId(SDbJobId id);
-    virtual const SString&    GetLastErrorMessage(void) { return m_strLastErrorMessage; }
-    virtual bool              IsLastErrorSuppressed(void) { return m_bLastErrorSuppressed; }
+    virtual const SString&    GetLastErrorMessage() { return m_strLastErrorMessage; }
+    virtual bool              IsLastErrorSuppressed() { return m_bLastErrorSuppressed; }
     virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ...);
     virtual bool              QueryWithCallback(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery,
                                                 CLuaArguments* pArgs = nullptr);
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...);
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
+    virtual int               GetQueueSizeFromConnection(SConnectionHandle connectionHandle);
 
     // CDatabaseManagerImpl
     SString InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
     SString InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl);
-    void    ClearLastErrorMessage(void)
+    SString HideQuestionMark(const SString& strQuery);
+    SString RestoreQuestionMark(const SString& strQuery);
+    void    ClearLastErrorMessage()
     {
         m_strLastErrorMessage.clear();
         m_bLastErrorSuppressed = false;
@@ -74,7 +77,7 @@ public:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseManager* NewDatabaseManager(void)
+CDatabaseManager* NewDatabaseManager()
 {
     return new CDatabaseManagerImpl();
 }
@@ -86,7 +89,7 @@ CDatabaseManager* NewDatabaseManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseManagerImpl::CDatabaseManagerImpl(void)
+CDatabaseManagerImpl::CDatabaseManagerImpl()
 {
     m_JobQueue = new CDatabaseJobQueueManager();
 }
@@ -98,7 +101,7 @@ CDatabaseManagerImpl::CDatabaseManagerImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseManagerImpl::~CDatabaseManagerImpl(void)
+CDatabaseManagerImpl::~CDatabaseManagerImpl()
 {
     // Disconnect all active connections
     std::map<SConnectionHandle, SString> connectionTypeMapCopy = m_ConnectionTypeMap;
@@ -115,7 +118,7 @@ CDatabaseManagerImpl::~CDatabaseManagerImpl(void)
 // Check if any callback functions are due
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseManagerImpl::DoPulse(void)
+void CDatabaseManagerImpl::DoPulse()
 {
     m_JobQueue->DoPulse();
 }
@@ -214,7 +217,7 @@ SString CDatabaseManagerImpl::PrepareString(SConnectionHandle hConnection, const
     }
 
     // Insert arguments with correct escapement
-    return InsertQueryArguments(hConnection, strQuery, pArgs);
+    return HideQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -236,7 +239,7 @@ CDbJobData* CDatabaseManagerImpl::Exec(SConnectionHandle hConnection, const SStr
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -273,7 +276,7 @@ SString CDatabaseManagerImpl::PrepareStringf(SConnectionHandle hConnection, cons
     }
 
     // Insert arguments with correct escapement
-    return InsertQueryArguments(hConnection, szQuery, vl);
+    return HideQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -298,7 +301,7 @@ CDbJobData* CDatabaseManagerImpl::Execf(SConnectionHandle hConnection, const cha
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -332,7 +335,7 @@ CDbJobData* CDatabaseManagerImpl::QueryStart(SConnectionHandle hConnection, cons
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -366,7 +369,7 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf(SConnectionHandle hConnection, con
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -400,7 +403,7 @@ bool CDatabaseManagerImpl::QueryWithResultf(SConnectionHandle hConnection, CRegi
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -448,7 +451,7 @@ bool CDatabaseManagerImpl::QueryWithCallback(SConnectionHandle hConnection, PFN_
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -486,7 +489,7 @@ bool CDatabaseManagerImpl::QueryWithCallbackf(SConnectionHandle hConnection, PFN
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -562,6 +565,18 @@ void CDatabaseManagerImpl::SetLogLevel(EJobLogLevelType logLevel, const SString&
     return m_JobQueue->SetLogLevel(logLevel, strLogFilename);
 }
 
+/////////////////////////////////////////////////////////////// 
+// 
+// CDatabaseManagerImpl::GetQueueSizeFromConnection 
+// 
+// 
+// 
+/////////////////////////////////////////////////////////////// 
+int CDatabaseManagerImpl::GetQueueSizeFromConnection(SConnectionHandle connectionHandle)
+{
+    return m_JobQueue->GetQueueSizeFromConnection(connectionHandle);
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CDatabaseManagerImpl::InsertQueryArguments
@@ -614,12 +629,37 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseManagerImpl::HideQuestionMark
+//
+// '?' must be hidden to prevent it being used as a variable placeholder in subsequent InsertQueryArguments calls.
+// Uses an unlikely UTF-8 sequence.
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::HideQuestionMark(const SString& strQuery)
+{
+    return strQuery.Replace("?", "\xF3\xB0\x83\xBF\xF4\x80\x81\x9A");
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::RestoreQuestionMark
+//
+// Undo HideQuestionMark()
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::RestoreQuestionMark(const SString& strQuery)
+{
+    return strQuery.Replace("\xF3\xB0\x83\xBF\xF4\x80\x81\x9A", "?");
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CDbJobData::CDbJobData
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-CDbJobData::CDbJobData(void)
+CDbJobData::CDbJobData()
 {
     id = CIdArray::PopUniqueId(this, EIdClass::DB_JOBDATA);
 }
@@ -631,7 +671,7 @@ CDbJobData::CDbJobData(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDbJobData::~CDbJobData(void)
+CDbJobData::~CDbJobData()
 {
     CIdArray::PushUniqueId(this, EIdClass::DB_JOBDATA, id);
 }
@@ -666,7 +706,7 @@ bool CDbJobData::SetCallback(PFN_DBRESULT pfnDbResult, void* pContext)
 // Returns true if callback has been set and has not been called yet
 //
 ///////////////////////////////////////////////////////////////
-bool CDbJobData::HasCallback(void)
+bool CDbJobData::HasCallback()
 {
     return callback.bSet && !callback.bDone;
 }
@@ -678,7 +718,7 @@ bool CDbJobData::HasCallback(void)
 // Do callback
 //
 ///////////////////////////////////////////////////////////////
-void CDbJobData::ProcessCallback(void)
+void CDbJobData::ProcessCallback()
 {
     assert(HasCallback());
     callback.bDone = true;
@@ -692,7 +732,7 @@ void CDbJobData::ProcessCallback(void)
 // Remove sensitive info
 //
 ///////////////////////////////////////////////////////////////
-SString CDbJobData::GetCommandStringForLog(void)
+SString CDbJobData::GetCommandStringForLog()
 {
     if (command.type == EJobCommand::CONNECT)
     {

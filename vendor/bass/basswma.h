@@ -1,6 +1,6 @@
 /*
 	BASSWMA 2.4 C/C++ header file
-	Copyright (c) 2002-2014 Un4seen Developments Ltd.
+	Copyright (c) 2002-2018 Un4seen Developments Ltd.
 
 	See the BASSWMA.CHM file for more detailed documentation
 */
@@ -55,6 +55,8 @@ typedef DWORD HWMENCODE;	// WMA encoding handle
 #define BASS_WMA_ENCODE_SCRIPT		0x20000	// set script (mid-stream tags) in the WMA encoding
 #define BASS_WMA_ENCODE_QUEUE		0x40000	// queue data to feed encoder asynchronously
 #define BASS_WMA_ENCODE_SOURCE		0x80000	// use a BASS channel as source
+#define BASS_WMA_ENCODE_VOICE		0x100000 // WMA Voice
+#define BASS_WMA_ENCODE_VOICE_MIXED	0x300000 // WMA Voice mixed mode
 
 // Additional flag for use with BASS_WMA_EncodeGetRates
 #define BASS_WMA_ENCODE_RATES_VBR	0x10000	// get available VBR quality settings

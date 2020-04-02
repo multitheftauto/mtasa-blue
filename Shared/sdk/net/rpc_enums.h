@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/sdk/net/rpc_enums.h
- *  PURPOSE:     Lua common functions
+ *  PURPOSE:     Lua RPC enums
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,6 +11,14 @@
 
 #pragma once
 
+/*
+    HEY, YOU!
+
+    ONLY ADD ENUMS TO THE END OF THIS FILE,
+    ABOVE `NUM_RPC_FUNCS`.
+
+    THANKS.
+*/
 enum eElementRPCFunctions
 {
     DONT_USE_0 = 0,
@@ -251,5 +259,17 @@ enum eElementRPCFunctions
 
     SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS,
 
-    NUM_RPC_FUNCS
+    SET_ELEMENT_ANGULAR_VELOCITY,
+
+    SET_PED_ANIMATION_SPEED,
+
+    SET_COLSHAPE_RADIUS,
+    SET_COLSHAPE_SIZE,
+    ADD_COLPOLYGON_POINT,
+    REMOVE_COLPOLYGON_POINT,
+    UPDATE_COLPOLYGON_POINT,
+  
+    SET_DISCORD_JOIN_PARAMETERS,
+
+    NUM_RPC_FUNCS // Add above this line
 };

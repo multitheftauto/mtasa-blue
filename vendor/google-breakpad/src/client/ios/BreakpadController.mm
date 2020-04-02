@@ -249,8 +249,10 @@ NSString* GetPlatform() {
 }
 
 - (void)withBreakpadRef:(void(^)(BreakpadRef))callback {
+  NSAssert(started_,
+      @"The controller must be started before withBreakpadRef is called");
   dispatch_async(queue_, ^{
-      callback(started_ ? breakpadRef_ : NULL);
+      callback(breakpadRef_);
   });
 }
 

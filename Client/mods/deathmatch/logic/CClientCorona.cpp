@@ -27,7 +27,7 @@ CClientCorona::CClientCorona(CClientMarker* pThis)
     m_ulIdentifier = --ulIdentifier;
 }
 
-CClientCorona::~CClientCorona(void)
+CClientCorona::~CClientCorona()
 {
     // Disable our corona
     CRegisteredCorona* pCorona = m_pCoronas->CreateCorona(m_ulIdentifier, &m_Matrix.vPos);
@@ -43,13 +43,13 @@ bool CClientCorona::IsHit(const CVector& vecPosition) const
     return IsPointNearPoint3D(m_Matrix.vPos, vecPosition, m_fSize + 4);
 }
 
-void CClientCorona::StreamIn(void)
+void CClientCorona::StreamIn()
 {
     // We're now streamed in
     m_bStreamedIn = true;
 }
 
-void CClientCorona::StreamOut(void)
+void CClientCorona::StreamOut()
 {
     // Disable the corona
     CRegisteredCorona* pCorona = m_pCoronas->CreateCorona(m_ulIdentifier, &m_Matrix.vPos);
@@ -62,7 +62,7 @@ void CClientCorona::StreamOut(void)
     m_bStreamedIn = false;
 }
 
-void CClientCorona::DoPulse(void)
+void CClientCorona::DoPulse()
 {
     CRegisteredCorona* pCorona = m_pCoronas->CreateCorona(m_ulIdentifier, &m_Matrix.vPos);
     if (!pCorona)

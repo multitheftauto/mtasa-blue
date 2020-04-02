@@ -44,11 +44,11 @@ void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconne
                       const char* szMessage = "");
 void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, unsigned int uiCode);
 
-bool InitializeSockets(void);
-bool CleanupSockets(void);
+bool InitializeSockets();
+bool CleanupSockets();
 
-float  GetRandomFloat(void);
-double GetRandomDouble(void);
+float  GetRandomFloat();
+double GetRandomDouble();
 int    GetRandom(int iLow, int iHigh);
 
 bool IsValidFilePath(const char* szPath);
@@ -57,6 +57,11 @@ bool IsValidOrganizationPath(const char* szPath);
 unsigned int HexToInt(const char* szHex);
 bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
 bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
+bool         ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha = false);
+inline bool  ColorStringToRGB(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount)
+{
+    return ColorStringToRGBA(szColor, defaultColor, vecColors, ucCount, true);
+}
 
 inline float WrapAround(float fValue, float fHigh)
 {

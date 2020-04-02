@@ -42,6 +42,7 @@
 
 #import "client/ios/handler/ios_exception_minidump_generator.h"
 #import "client/mac/crash_generation/ConfigFile.h"
+#import "client/mac/handler/exception_handler.h"
 #import "client/mac/handler/minidump_generator.h"
 #import "client/mac/handler/protected_memory_allocator.h"
 #import "client/mac/sender/uploader.h"
@@ -50,7 +51,7 @@
 #if !TARGET_OS_TV && !TARGET_OS_WATCH
 #import "client/mac/handler/exception_handler.h"
 #else
-#import "client/ios/exception_handler_no_mach.h"
+#import "client/ios/handler/exception_handler_no_mach.h"
 #endif  // !TARGET_OS_TV && !TARGET_OS_WATCH
 
 #if !defined(__EXCEPTIONS) || (__clang__ && !__has_feature(cxx_exceptions))

@@ -353,7 +353,6 @@ void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
   // will call the function with the right arguments.
   struct sigaction cur_handler;
   if (sigaction(sig, NULL, &cur_handler) == 0 &&
-      cur_handler.sa_sigaction == SignalHandler &&
       (cur_handler.sa_flags & SA_SIGINFO) == 0) {
     // Reset signal handler with the right flags.
     sigemptyset(&cur_handler.sa_mask);
@@ -549,7 +548,7 @@ bool ExceptionHandler::GenerateDump(CrashContext *context) {
   // Allow the child to ptrace us
   sys_prctl(PR_SET_PTRACER, child, 0, 0, 0);
   SendContinueSignalToChild();
-  int status = 0;
+  int status;
   const int r = HANDLE_EINTR(sys_waitpid(child, &status, __WALL));
 
   sys_close(fdes[1]);

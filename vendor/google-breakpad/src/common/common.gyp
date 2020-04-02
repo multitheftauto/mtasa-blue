@@ -50,6 +50,7 @@
         'android/breakpad_getcontext.S',
         'android/include/elf.h',
         'android/include/link.h',
+        'android/include/sgidefs.h',
         'android/include/stab.h',
         'android/include/sys/procfs.h',
         'android/include/sys/signal.h',

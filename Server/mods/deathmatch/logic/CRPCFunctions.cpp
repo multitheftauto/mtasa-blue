@@ -19,7 +19,7 @@ CPlayer* CRPCFunctions::m_pSourcePlayer;
 
 static CPlayerManager* m_pPlayerManager;
 
-CRPCFunctions::CRPCFunctions(void)
+CRPCFunctions::CRPCFunctions()
 {
     g_pRPCFunctions = this;
 
@@ -27,7 +27,7 @@ CRPCFunctions::CRPCFunctions(void)
     AddHandlers();
 }
 
-CRPCFunctions::~CRPCFunctions(void)
+CRPCFunctions::~CRPCFunctions()
 {
     vector<SRPCHandler*>::iterator iter = m_RPCHandlers.begin();
     for (; iter != m_RPCHandlers.end(); iter++)
@@ -39,7 +39,7 @@ CRPCFunctions::~CRPCFunctions(void)
     g_pRPCFunctions = NULL;
 }
 
-void CRPCFunctions::AddHandlers(void)
+void CRPCFunctions::AddHandlers()
 {
     AddHandler(PLAYER_INGAME_NOTICE, PlayerInGameNotice);
     AddHandler(INITIAL_DATA_STREAM, InitialDataStream);

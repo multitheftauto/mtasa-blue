@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUATASKDEFS_H
-#define __CLUATASKDEFS_H
+#pragma once
 
 #include "CLuaDefs.h"
 #include "lua/LuaCommon.h"
@@ -17,7 +16,7 @@
 class CLuaTaskDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     static int createTaskInstance(lua_State* luaVM);
 
@@ -34,5 +33,3 @@ public:
     static int getPlayerTaskInstance(lua_State* luaVM);
     static int setPlayerTask(lua_State* luaVM);
 };
-
-#endif

@@ -13,7 +13,7 @@ _forceinline void Unpack::InsertOldDist(uint Distance)
 _forceinline void Unpack::CopyString(uint Length,uint Distance)
 {
   size_t SrcPtr=UnpPtr-Distance;
-  if (SrcPtr<MaxWinSize-MAX_LZ_MATCH && UnpPtr<MaxWinSize-MAX_LZ_MATCH)
+  if (SrcPtr<MaxWinSize-MAX_INC_LZ_MATCH && UnpPtr<MaxWinSize-MAX_INC_LZ_MATCH)
   {
     // If we are not close to end of window, we do not need to waste time
     // to "& MaxWinMask" pointer protection.
@@ -44,6 +44,11 @@ _forceinline void Unpack::CopyString(uint Length,uint Distance)
     else
       while (Length>=8)
       {
+        // In theory we still could overlap here.
+        // Supposing Distance == MaxWinSize - 1 we have memcpy(Src, Src + 1, 8).
+        // But for real RAR archives Distance <= MaxWinSize - MAX_INC_LZ_MATCH
+        // always, so overlap here is impossible.
+
         // This memcpy expanded inline by MSVC. We could also use uint64
         // assignment, which seems to provide about the same speed.
         memcpy(Dest,Src,8); 
@@ -115,7 +120,7 @@ _forceinline uint Unpack::DecodeNumber(BitInput &Inp,DecodeTable *Dec)
 
   // Convert the position in the code list to position in alphabet
   // and return it.
-  return(Dec->DecodeNum[Pos]);
+  return Dec->DecodeNum[Pos];
 }
 
 

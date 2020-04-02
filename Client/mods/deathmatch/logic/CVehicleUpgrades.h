@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVEHICLEUPGRADES_H
-#define __CVEHICLEUPGRADES_H
+#pragma once
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
@@ -35,15 +34,15 @@ public:
     static bool GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
 
     bool               AddUpgrade(unsigned short usUpgrade, bool bAddedLocally);
-    void               AddAllUpgrades(void);
+    void               AddAllUpgrades();
     void               ForceAddUpgrade(unsigned short usUpgrade);
     bool               HasUpgrade(unsigned short usUpgrade);
     bool               RemoveUpgrade(unsigned short usUpgrade);
     unsigned short     GetSlotState(unsigned char ucSlot);
-    const SSlotStates& GetSlotStates(void) { return m_SlotStates; }
+    const SSlotStates& GetSlotStates() { return m_SlotStates; }
     static const char* GetSlotName(unsigned char ucSlot);
 
-    void ReAddAll(void);
+    void ReAddAll();
     void RemoveAll(bool bRipFromVehicle);
 
     void RestreamVehicleUpgrades(unsigned short usModel);
@@ -54,5 +53,3 @@ protected:
     ushort          m_usLastLocalAddNitroType;
     CElapsedTime    m_lastLocalAddNitroTimer;
 };
-
-#endif

@@ -22,7 +22,7 @@ typedef RTree<const SZone*, float, 3> CZoneTree;
 class CZoneNames
 {
 public:
-    CZoneNames(void);
+    CZoneNames();
     const char* GetZoneName(const CVector& vecPosition);
     const char* GetCityName(const CVector& vecPosition);
 

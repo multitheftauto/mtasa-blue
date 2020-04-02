@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPedWastedPacket::CPedWastedPacket(void)
+CPedWastedPacket::CPedWastedPacket()
 {
     m_PedID = INVALID_ELEMENT_ID;
     m_Killer = INVALID_ELEMENT_ID;

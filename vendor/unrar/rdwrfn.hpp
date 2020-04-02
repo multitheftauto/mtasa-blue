@@ -4,6 +4,10 @@
 class CmdAdd;
 class Unpack;
 
+#if 0
+// We use external i/o calls for Benchmark command.
+#define COMPRDATAIO_EXTIO
+#endif
 
 class ComprDataIO
 {
@@ -28,6 +32,7 @@ class ComprDataIO
     bool ShowProgress;
     bool TestMode;
     bool SkipUnpCRC;
+    bool NoFileHeader;
 
     File *SrcFile;
     File *DestFile;
@@ -38,8 +43,8 @@ class ComprDataIO
     int64 *SubHeadPos;
 
 #ifndef RAR_NOCRYPT
-    CryptData Crypt;
-    CryptData Decrypt;
+    CryptData *Crypt;
+    CryptData *Decrypt;
 #endif
 
 
@@ -49,6 +54,7 @@ class ComprDataIO
 
   public:
     ComprDataIO();
+    ~ComprDataIO();
     void Init();
     int UnpRead(byte *Addr,size_t Count);
     void UnpWrite(byte *Addr,size_t Count);
@@ -57,11 +63,12 @@ class ComprDataIO
     void SetPackedSizeToRead(int64 Size) {UnpPackedSize=Size;}
     void SetTestMode(bool Mode) {TestMode=Mode;}
     void SetSkipUnpCRC(bool Skip) {SkipUnpCRC=Skip;}
+    void SetNoFileHeader(bool Mode) {NoFileHeader=Mode;}
     void SetFiles(File *SrcFile,File *DestFile);
     void SetCommand(CmdAdd *Cmd) {Command=Cmd;}
     void SetSubHeader(FileHeader *hd,int64 *Pos) {SubHead=hd;SubHeadPos=Pos;}
     void SetEncryption(bool Encrypt,CRYPT_METHOD Method,SecPassword *Password,
-         const byte *Salt,const byte *InitV,uint Lg2Cnt,byte *PswCheck,byte *HashKey);
+         const byte *Salt,const byte *InitV,uint Lg2Cnt,byte *HashKey,byte *PswCheck);
     void SetAV15Encryption();
     void SetCmt13Encryption();
     void SetUnpackToMemory(byte *Addr,uint Size);

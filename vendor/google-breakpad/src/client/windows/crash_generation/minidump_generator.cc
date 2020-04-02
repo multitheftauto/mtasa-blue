@@ -176,7 +176,7 @@ bool HandleTraceData::CollectHandleData(
   stream_data->Reserved = 0;
   std::copy(operations_.begin(),
             operations_.end(),
-#if defined(_MSC_VER) && !defined(_LIBCPP_STD_VER)
+#ifdef _MSC_VER
             stdext::checked_array_iterator<AVRF_HANDLE_OPERATION*>(
                 reinterpret_cast<AVRF_HANDLE_OPERATION*>(stream_data + 1),
                 operations_.size())

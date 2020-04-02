@@ -12,8 +12,7 @@
 // This class manages all the CLuaMain instances (Virtual Machines)
 class CLuaManager;
 
-#ifndef __CLUAMANAGER_H
-#define __CLUAMANAGER_H
+#pragma once
 
 #include <list>
 #include "../CClientGUIManager.h"
@@ -26,7 +25,7 @@ class CLuaManager
 {
 public:
     CLuaManager(class CClientGame* pClientGame);
-    ~CLuaManager(void);
+    ~CLuaManager();
 
     CLuaMain* CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP);
     bool      RemoveVirtualMachine(CLuaMain* vm);
@@ -34,20 +33,20 @@ public:
     void      OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void      OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
-    std::list<CLuaMain*>::const_iterator IterBegin(void) { return m_virtualMachines.begin(); };
-    std::list<CLuaMain*>::const_iterator IterEnd(void) { return m_virtualMachines.end(); };
+    std::list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
+    std::list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
 
-    void DoPulse(void);
+    void DoPulse();
 
     void AddToPendingDeleteList(lua_State* m_luaVM) { m_PendingDeleteList.push_back(m_luaVM); }
-    void ProcessPendingDeleteList(void);
+    void ProcessPendingDeleteList();
 
     bool IsLuaVMValid(lua_State* luaVM) { return MapFindRef(m_VirtualMachineMap, luaVM) != nullptr; };
 
     CClientGUIManager* m_pGUIManager;
 
 private:
-    void LoadCFunctions(void);
+    void LoadCFunctions();
 
     CEvents*             m_pEvents;
     CRegisteredCommands* m_pRegisteredCommands;
@@ -56,5 +55,3 @@ private:
     std::list<CLuaMain*>                m_virtualMachines;
     std::list<lua_State*>               m_PendingDeleteList;
 };
-
-#endif

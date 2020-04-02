@@ -170,8 +170,6 @@ class LinuxDumper {
                                    unsigned int mapping_id,
                                    wasteful_vector<uint8_t>& identifier);
 
-  void SetCrashInfoFromSigInfo(const siginfo_t& siginfo);
-
   uintptr_t crash_address() const { return crash_address_; }
   void set_crash_address(uintptr_t crash_address) {
     crash_address_ = crash_address;
@@ -180,9 +178,6 @@ class LinuxDumper {
   int crash_signal() const { return crash_signal_; }
   void set_crash_signal(int crash_signal) { crash_signal_ = crash_signal; }
   const char* GetCrashSignalString() const;
-
-  void set_crash_signal_code(int code) { crash_signal_code_ = code; }
-  int crash_signal_code() const { return crash_signal_code_; }
 
   pid_t crash_thread() const { return crash_thread_; }
   void set_crash_thread(pid_t crash_thread) { crash_thread_ = crash_thread; }
@@ -232,9 +227,6 @@ class LinuxDumper {
 
   // Signal that terminated the crashed process.
   int crash_signal_;
-
-  // The code associated with |crash_signal_|.
-  int crash_signal_code_;
 
   // ID of the crashed thread.
   pid_t crash_thread_;

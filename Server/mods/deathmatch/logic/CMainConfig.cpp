@@ -30,6 +30,7 @@ struct
     {15, "data/pedstats.dat"}, {17, "data/txdcut.ide"},  {14, "data/vehicles.ide"}, {20, "data/weapon.dat"},         {4, "data/melee.dat"},
     {16, "data/water.dat"},    {18, "data/water1.dat"},  {2, "data/handling.cfg"},  {19, "models/coll/weapons.col"}, {21, "data/plants.dat"},
     {23, "data/furnitur.dat"}, {24, "data/procobj.dat"}, {8, "data/surface.dat"},   {12, "data/surfinfo.dat"},       {22, "anim/ped.ifp"},
+    {26, "data/timecyc.dat"},
 };
 
 CMainConfig::CMainConfig(CConsole* pConsole, CLuaManager* pLuaMain) : CXMLConfig(NULL)
@@ -69,7 +70,7 @@ CMainConfig::CMainConfig(CConsole* pConsole, CLuaManager* pLuaMain) : CXMLConfig
     m_bSyncMapElementData = true;
 }
 
-bool CMainConfig::Load(void)
+bool CMainConfig::Load()
 {
     // Eventually destroy the previously loaded xml
     if (m_pFile)
@@ -519,7 +520,7 @@ bool CMainConfig::Load(void)
 //
 // Set those settings!
 //
-void CMainConfig::ApplyBandwidthReductionMode(void)
+void CMainConfig::ApplyBandwidthReductionMode()
 {
     if (m_strBandwidthReductionMode == "maximum")
     {
@@ -546,7 +547,7 @@ void CMainConfig::SetFakeLag(int iPacketLoss, int iExtraPing, int iExtraPingVary
     ApplyNetOptions();
 }
 
-void CMainConfig::ApplyNetOptions(void)
+void CMainConfig::ApplyNetOptions()
 {
     m_NetOptions.netFilter.bValid = true;
     m_NetOptions.netFilter.bAutoFilter = m_bNetAutoFilter != 0;
@@ -558,12 +559,12 @@ void CMainConfig::ApplyNetOptions(void)
     g_pNetServer->SetNetOptions(m_NetOptions);
 }
 
-void CMainConfig::ApplyThreadNetEnabled(void)
+void CMainConfig::ApplyThreadNetEnabled()
 {
     CSimControl::EnableSimSystem(m_bThreadNetEnabled, false);
 }
 
-bool CMainConfig::LoadExtended(void)
+bool CMainConfig::LoadExtended()
 {
     std::string strBuffer;
     int         iTemp = 0, iResult = 0;
@@ -768,7 +769,6 @@ bool CMainConfig::LoadExtended(void)
     RegisterCommand("aexec", CConsoleCommands::AExec, false);
 
     RegisterCommand("whois", CConsoleCommands::WhoIs, false);
-    RegisterCommand("whowas", CConsoleCommands::WhoWas, false);
 
     RegisterCommand("debugscript", CConsoleCommands::DebugScript, false);
 
@@ -796,7 +796,7 @@ bool CMainConfig::LoadExtended(void)
     return true;
 }
 
-bool CMainConfig::Save(void)
+bool CMainConfig::Save()
 {
     // If we have a file
     if (m_pFile && m_pRootNode)
@@ -815,7 +815,7 @@ bool CMainConfig::Save(void)
 // Compare against default config and add missing nodes.
 // Returns true if nodes were added.
 //
-bool CMainConfig::AddMissingSettings(void)
+bool CMainConfig::AddMissingSettings()
 {
     // Only mtaserver.conf is currently supported
     if (!g_pGame->IsUsingMtaServerConf())
@@ -933,7 +933,7 @@ void CMainConfig::SetCommandLineParser(CCommandLineParser* pCommandLineParser)
     }
 }
 
-SString CMainConfig::GetServerIP(void)
+SString CMainConfig::GetServerIP()
 {
     std::string strServerIP;
     if (m_pCommandLineParser && m_pCommandLineParser->GetIP(strServerIP))
@@ -941,7 +941,7 @@ SString CMainConfig::GetServerIP(void)
     return SString(m_strServerIP).SplitLeft(",");
 }
 
-SString CMainConfig::GetServerIPList(void)
+SString CMainConfig::GetServerIPList()
 {
     std::string strServerIP;
     if (m_pCommandLineParser && m_pCommandLineParser->GetIP(strServerIP))
@@ -949,7 +949,7 @@ SString CMainConfig::GetServerIPList(void)
     return m_strServerIP;
 }
 
-unsigned short CMainConfig::GetServerPort(void)
+unsigned short CMainConfig::GetServerPort()
 {
     unsigned short usPort;
     if (m_pCommandLineParser && m_pCommandLineParser->GetPort(usPort))
@@ -957,17 +957,17 @@ unsigned short CMainConfig::GetServerPort(void)
     return m_usServerPort;
 }
 
-unsigned int CMainConfig::GetHardMaxPlayers(void)
+unsigned int CMainConfig::GetHardMaxPlayers()
 {
     return m_uiHardMaxPlayers;
 }
 
-unsigned int CMainConfig::GetMaxPlayers(void)
+unsigned int CMainConfig::GetMaxPlayers()
 {
     return std::min(GetHardMaxPlayers(), m_uiSoftMaxPlayers);
 }
 
-unsigned short CMainConfig::GetHTTPPort(void)
+unsigned short CMainConfig::GetHTTPPort()
 {
     unsigned short usHTTPPort;
     if (m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort(usHTTPPort))
@@ -975,7 +975,7 @@ unsigned short CMainConfig::GetHTTPPort(void)
     return m_usHTTPPort;
 }
 
-bool CMainConfig::IsVoiceEnabled(void)
+bool CMainConfig::IsVoiceEnabled()
 {
     bool bDisabled;
     if (m_pCommandLineParser && m_pCommandLineParser->IsVoiceDisabled(bDisabled))
@@ -983,7 +983,7 @@ bool CMainConfig::IsVoiceEnabled(void)
     return m_bVoiceEnabled;
 }
 
-int CMainConfig::GetPendingWorkToDoSleepTime(void)
+int CMainConfig::GetPendingWorkToDoSleepTime()
 {
     if (m_iPendingWorkToDoSleepTime != -1)
     {
@@ -1000,7 +1000,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime(void)
         return 10;
 }
 
-int CMainConfig::GetNoWorkToDoSleepTime(void)
+int CMainConfig::GetNoWorkToDoSleepTime()
 {
     if (m_iNoWorkToDoSleepTime != -1)
     {
@@ -1014,12 +1014,12 @@ int CMainConfig::GetNoWorkToDoSleepTime(void)
         return 10;
 }
 
-void CMainConfig::NotifyDidBackup(void)
+void CMainConfig::NotifyDidBackup()
 {
     m_bDidBackup = true;
 }
 
-bool CMainConfig::ShouldCompactInternalDatabases(void)
+bool CMainConfig::ShouldCompactInternalDatabases()
 {
     return (m_iCompactInternalDatabases == 1 && m_bDidBackup) || m_iCompactInternalDatabases == 2;
 }
@@ -1404,7 +1404,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
 // Put some int settings into an array for referencing
 //
 //////////////////////////////////////////////////////////////////////
-const std::vector<SIntSetting>& CMainConfig::GetIntSettingList(void)
+const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
 {
     static const SIntSetting settings[] = {
         // Set,  save,   min,    def,    max,    name,                                   variable,                                   callback
@@ -1450,19 +1450,19 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList(void)
 // Settings change callback
 //
 //////////////////////////////////////////////////////////////////////
-void CMainConfig::OnTickRateChange(void)
+void CMainConfig::OnTickRateChange()
 {
     CStaticFunctionDefinitions::SendSyncIntervals();
     g_pGame->SendSyncSettings();
     g_pGame->CalculateMinClientRequirement();
 }
 
-void CMainConfig::OnAseSettingChange(void)
+void CMainConfig::OnAseSettingChange()
 {
     g_pGame->ApplyAseSetting();
 }
 
-void CGame::ApplyAseSetting(void)
+void CGame::ApplyAseSetting()
 {
     if (!m_pMainConfig->GetAseLanListenEnabled())
         SAFE_DELETE(m_pLanBroadcast);

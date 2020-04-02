@@ -14,7 +14,7 @@
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
 
-CHudSA::CHudSA(void)
+CHudSA::CHudSA()
 {
     InitComponentList();
 
@@ -132,7 +132,7 @@ VOID CHudSA::Disable(bool bDisabled)
         MemPut<BYTE>(FUNC_DrawRadarPlanB, 0x83);
 }
 
-bool CHudSA::IsDisabled(void)
+bool CHudSA::IsDisabled()
 {
     return *(BYTE*)FUNC_Draw == 0xC3;
 }
@@ -200,7 +200,7 @@ void CHudSA::Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3
 //
 // CHudSA::InitComponentList
 //
-void CHudSA::InitComponentList(void)
+void CHudSA::InitComponentList()
 {
     SHudComponent componentList[] = {
         {1, HUD_AMMO, 1, FUNC_DrawAmmo, 1, 0xCC, 0xC3},
@@ -306,7 +306,7 @@ void CHudSA::AdjustComponents(float fAspectRatio)
 //
 // CHudSA::ResetComponentAdjustment
 //
-void CHudSA::ResetComponentAdjustment(void)
+void CHudSA::ResetComponentAdjustment()
 {
     // Restore default values (4:3 aspect ratio)
     MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);

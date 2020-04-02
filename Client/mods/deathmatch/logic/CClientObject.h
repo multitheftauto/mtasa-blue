@@ -10,8 +10,7 @@
 
 class CClientObject;
 
-#ifndef __CCLIENTOBJECT_H
-#define __CCLIENTOBJECT_H
+#pragma once
 
 #include "CClientStreamElement.h"
 
@@ -30,24 +29,26 @@ class CClientObject : public CClientStreamElement
 
 public:
     CClientObject(class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod);
-    ~CClientObject(void);
+    ~CClientObject();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTOBJECT; };
+    eClientEntityType GetType() const { return CCLIENTOBJECT; };
 
-    CObject*       GetGameObject(void) { return m_pObject; }
-    CEntity*       GetGameEntity(void) { return m_pObject; }
-    const CEntity* GetGameEntity(void) const { return m_pObject; }
+    CObject*       GetGameObject() { return m_pObject; }
+    CEntity*       GetGameEntity() { return m_pObject; }
+    const CEntity* GetGameEntity() const { return m_pObject; }
 
     void            GetPosition(CVector& vecPosition) const;
     void            SetPosition(const CVector& vecPosition);
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
     void         GetRotationDegrees(CVector& vecRotation) const;
     void         GetRotationRadians(CVector& vecRotation) const;
     void         SetRotationDegrees(const CVector& vecRotation);
     virtual void SetRotationRadians(const CVector& vecRotation);
+
+    void AttachTo(CClientEntity* pEntity) override;
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
@@ -60,63 +61,73 @@ public:
 
     void ModelRequestCallback(CModelInfo* pModelInfo);
 
-    float GetDistanceFromCentreOfMassToBaseOfModel(void);
+    float GetDistanceFromCentreOfMassToBaseOfModel();
 
-    bool IsVisible(void) { return m_bIsVisible; };
+    bool IsVisible() { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    unsigned short GetModel(void) const { return m_usModel; };
+    unsigned short GetModel() const { return m_usModel; };
     void           SetModel(unsigned short usModel);
 
-    bool           IsLowLod(void);
+    bool           IsLowLod();
     bool           SetLowLodObject(CClientObject* pLowLodObject);
-    CClientObject* GetLowLodObject(void);
+    CClientObject* GetLowLodObject();
 
-    void Render(void);
+    void Render();
 
-    bool IsFrozen(void) { return m_bIsFrozen; }
+    bool IsFrozen() { return m_bIsFrozen; }
     void SetFrozen(bool bFrozen);
 
-    unsigned char GetAlpha(void) { return m_ucAlpha; }
+    unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
     void          GetScale(CVector& vecScale) const;
     void          SetScale(const CVector& vecScale);
 
-    bool IsCollisionEnabled(void) { return m_bUsesCollision; };
+    bool IsCollisionEnabled() { return m_bUsesCollision; };
     void SetCollisionEnabled(bool bCollisionEnabled);
 
-    float GetHealth(void);
+    float GetHealth();
     void  SetHealth(float fHealth);
+    float GetTurnMass();
+    void  SetTurnMass(float fTurnMass);
+    float GetAirResistance();
+    void  SetAirResistance(float fAirResistance);
+    float GetElasticity();
+    void  SetElasticity(float fElasticity);
+    float GetBuoyancyConstant();
+    void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector& vecCenterOfMass) const;
+    void  SetCenterOfMass(const CVector& vecCenterOfMass);
 
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
-    bool Break(void);
-    bool IsRespawnEnabled(void) { return m_bRespawnEnabled; };
+    bool Break();
+    bool IsRespawnEnabled() { return m_bRespawnEnabled; };
     void SetRespawnEnabled(bool bRespawnEnabled) { m_bRespawnEnabled = bRespawnEnabled; };
 
-    float GetMass(void);
+    float GetMass();
     void  SetMass(float fMass);
 
-    bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
 
-    void ReCreate(void);
-    void UpdateVisibility(void);
+    void ReCreate();
+    void UpdateVisibility();
 
-    bool IsBeingRespawned(void) { return m_bBeingRespawned; };
+    bool IsBeingRespawned() { return m_bBeingRespawned; };
     void SetBeingRespawned(bool bBeingRespawned) { m_bBeingRespawned = bBeingRespawned; };
 
 protected:
     void StreamIn(bool bInstantly);
-    void StreamOut(void);
+    void StreamOut();
 
-    void Create(void);
-    void Destroy(void);
+    void Create();
+    void Destroy();
 
-    void NotifyCreate(void);
-    void NotifyDestroy(void);
+    void NotifyCreate();
+    void NotifyDestroy();
 
-    void StreamedInPulse(void);
+    void StreamedInPulse();
 
     class CClientObjectManager*       m_pObjectManager;
     class CClientModelRequestManager* m_pModelRequester;
@@ -135,6 +146,11 @@ protected:
     bool          m_bBeingRespawned;
     bool          m_bRespawnEnabled;
     float         m_fMass;
+    float         m_fTurnMass;
+    float         m_fAirResistance;
+    float         m_fElasticity;
+    float         m_fBuoyancyConstant;
+    CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
 
     CVector m_vecMoveSpeed;
@@ -149,5 +165,3 @@ public:
     CObject*              m_pObject;
     SLastSyncedObjectData m_LastSyncedData;
 };
-
-#endif

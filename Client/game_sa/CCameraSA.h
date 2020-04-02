@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CAMERA
-#define __CGAMESA_CAMERA
+#pragma once
 
 #include <game/CCamera.h>
 #include "CCamSA.h"
@@ -400,7 +399,7 @@ private:
 
 public:
     CCameraSA(CCameraSAInterface* cameraInterface);
-    ~CCameraSA(void);
+    ~CCameraSA();
 
     CCameraSAInterface* GetInterface() { return internalInterface; };
     VOID                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
@@ -412,7 +411,7 @@ public:
     VOID     SetMatrix(CMatrix* matrix);
     VOID     SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset);
     VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
-    float    Find3rdPersonQuickAimPitch(void);
+    float    Find3rdPersonQuickAimPitch();
     BYTE     GetActiveCam();
 
     CCam*         GetCam(BYTE bCameraID);
@@ -425,23 +424,21 @@ public:
     bool      TryToStartNewCamMode(DWORD dwCamMode);
     bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist);
     void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds);
-    bool      IsFading(void);
-    int       GetFadingDirection(void);
+    bool      IsFading();
+    int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);
     void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    float     GetCameraRotation(void);
-    RwMatrix* GetLTM(void);
-    CEntity*  GetTargetEntity(void);
+    float     GetCameraRotation();
+    RwMatrix* GetLTM();
+    CEntity*  GetTargetEntity();
     void      SetCameraClip(bool bObjects, bool bVehicles);
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
-    BYTE      GetCameraViewMode(void);
+    BYTE      GetCameraViewMode();
     VOID      SetCameraViewMode(BYTE dwCamMode);
-    void      RestoreLastGoodState(void);
+    void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
-    float     GetShakeForce(void);
+    float     GetShakeForce();
 
 private:
     static unsigned long FUNC_RwFrameGetLTM;
 };
-
-#endif

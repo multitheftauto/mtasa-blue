@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_AUTOMOBILE
-#define __CGAMESA_AUTOMOBILE
+#pragma once
 
 #include <game/CAutomobile.h>
 
@@ -179,39 +178,39 @@ private:
 public:
     CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
     CAutomobileSA(CAutomobileSAInterface* automobile);
-    ~CAutomobileSA(void);
+    ~CAutomobileSA();
 
     bool  BurstTyre(DWORD dwTyreID);
-    bool  BreakTowLink(void);
+    bool  BreakTowLink();
     void  BlowUpCar(CEntity* pEntity);
-    void  BlowUpCarsInPath(void);
-    void  CloseAllDoors(void);
-    void  CloseBoot(void);
+    void  BlowUpCarsInPath();
+    void  CloseAllDoors();
+    void  CloseBoot();
     float FindWheelWidth(bool bUnknown);
     // void                    Fix ( void );
     void  FixDoor(int iCarNodeIndex, eDoorsSA Door);
     int   FixPanel(int iCarNodeIndex, ePanelsSA Panel);
-    bool  GetAllWheelsOffGround(void);
-    float GetCarPitch(void);
-    float GetCarRoll(void);
+    bool  GetAllWheelsOffGround();
+    float GetCarPitch();
+    float GetCarRoll();
     void  GetComponentWorldPosition(int iComponentID, CVector* pVector);
     // float                   GetHeightAboveRoad ( void );  /* TODO */
-    DWORD      GetNumContactWheels(void);
-    float      GetRearHeightAboveRoad(void);
+    DWORD      GetNumContactWheels();
+    float      GetRearHeightAboveRoad();
     bool       IsComponentPresent(int iComponentID);
     bool       IsDoorClosed(eDoorsSA Door);
     bool       IsDoorFullyOpen(eDoorsSA Door);
     bool       IsDoorMissing(eDoorsSA Door);
     bool       IsDoorReady(eDoorsSA Door);
-    bool       IsInAir(void);
-    bool       IsOpenTopCar(void);
-    void       PlaceOnRoadProperly(void);
-    void       PlayCarHorn(void);
-    void       PopBoot(void);
-    void       PopBootUsingPhysics(void);
+    bool       IsInAir();
+    bool       IsOpenTopCar();
+    void       PlaceOnRoadProperly();
+    void       PlayCarHorn();
+    void       PopBoot();
+    void       PopBootUsingPhysics();
     void       PopDoor(int iCarNodeIndex, eDoorsSA Door, bool bUnknown);
     void       PopPanel(int iCarNodeIndex, ePanelsSA Panel, bool bFallOffFast);
-    void       ResetSuspension(void);
+    void       ResetSuspension();
     void       SetRandomDamage(bool bUnknown);
     void       SetTaxiLight(bool bState);
     void       SetTotalDamage(bool bUnknown);
@@ -219,5 +218,3 @@ public:
 
     CDoor* GetDoor(eDoors doorID);
 };
-
-#endif

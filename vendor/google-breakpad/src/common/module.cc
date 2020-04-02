@@ -44,6 +44,7 @@
 namespace google_breakpad {
 
 using std::dec;
+using std::endl;
 using std::hex;
 
 
@@ -232,12 +233,12 @@ bool Module::WriteRuleMap(const RuleMap &rule_map, std::ostream &stream) {
 
 bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
   stream << "MODULE " << os_ << " " << architecture_ << " "
-         << id_ << " " << name_ << "\n";
+         << id_ << " " << name_ << endl;
   if (!stream.good())
     return ReportError();
 
   if (!code_id_.empty()) {
-    stream << "INFO CODE_ID " << code_id_ << "\n";
+    stream << "INFO CODE_ID " << code_id_ << endl;
   }
 
   if (symbol_data != ONLY_CFI) {
@@ -248,7 +249,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
          file_it != files_.end(); ++file_it) {
       File *file = file_it->second;
       if (file->source_id >= 0) {
-        stream << "FILE " << file->source_id << " " <<  file->name << "\n";
+        stream << "FILE " << file->source_id << " " <<  file->name << endl;
         if (!stream.good())
           return ReportError();
       }
@@ -262,7 +263,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
              << (func->address - load_address_) << " "
              << func->size << " "
              << func->parameter_size << " "
-             << func->name << dec << "\n";
+             << func->name << dec << endl;
       if (!stream.good())
         return ReportError();
 
@@ -273,7 +274,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
                << line_it->size << " "
                << dec
                << line_it->number << " "
-               << line_it->file->source_id << "\n";
+               << line_it->file->source_id << endl;
         if (!stream.good())
           return ReportError();
       }
@@ -285,7 +286,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
       Extern *ext = *extern_it;
       stream << "PUBLIC " << hex
              << (ext->address - load_address_) << " 0 "
-             << ext->name << dec << "\n";
+             << ext->name << dec << endl;
     }
   }
 
@@ -302,7 +303,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
           || !WriteRuleMap(entry->initial_rules, stream))
         return ReportError();
 
-      stream << "\n";
+      stream << endl;
 
       // Write out this entry's delta rules as 'STACK CFI' records.
       for (RuleChangeMap::const_iterator delta_it = entry->rule_changes.begin();
@@ -313,7 +314,7 @@ bool Module::Write(std::ostream &stream, SymbolData symbol_data) {
             || !WriteRuleMap(delta_it->second, stream))
           return ReportError();
 
-        stream << "\n";
+        stream << endl;
       }
     }
   }

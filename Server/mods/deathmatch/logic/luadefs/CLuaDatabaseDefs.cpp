@@ -13,20 +13,29 @@
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("dbConnect", DbConnect);
-    CLuaCFunctions::AddFunction("dbExec", DbExec);
-    CLuaCFunctions::AddFunction("dbQuery", DbQuery);
-    CLuaCFunctions::AddFunction("dbFree", DbFree);
-    CLuaCFunctions::AddFunction("dbPoll", DbPoll);
-    CLuaCFunctions::AddFunction("dbPrepareString", DbPrepareString);
+    std::map<const char*, lua_CFunction> functions{
+        {"dbConnect", DbConnect},
+        {"dbExec", DbExec},
+        {"dbQuery", DbQuery},
+        {"dbFree", DbFree},
+        {"dbPoll", DbPoll},
+        {"dbPrepareString", DbPrepareString},
+        {"dbGetConnectionQueueSize", DbGetConnectionQueueSize},
 
-    CLuaCFunctions::AddFunction("executeSQLCreateTable", ExecuteSQLCreateTable);
-    CLuaCFunctions::AddFunction("executeSQLDropTable", ExecuteSQLDropTable);
-    CLuaCFunctions::AddFunction("executeSQLDelete", ExecuteSQLDelete);
-    CLuaCFunctions::AddFunction("executeSQLSelect", ExecuteSQLSelect);
-    CLuaCFunctions::AddFunction("executeSQLUpdate", ExecuteSQLUpdate);
-    CLuaCFunctions::AddFunction("executeSQLInsert", ExecuteSQLInsert);
-    CLuaCFunctions::AddFunction("executeSQLQuery", ExecuteSQLQuery);
+        {"executeSQLCreateTable", ExecuteSQLCreateTable},
+        {"executeSQLDropTable", ExecuteSQLDropTable},
+        {"executeSQLDelete", ExecuteSQLDelete},
+        {"executeSQLSelect", ExecuteSQLSelect},
+        {"executeSQLUpdate", ExecuteSQLUpdate},
+        {"executeSQLInsert", ExecuteSQLInsert},
+        {"executeSQLQuery", ExecuteSQLQuery},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaDatabaseDefs::AddClass(lua_State* luaVM)
@@ -181,7 +190,12 @@ void CLuaDatabaseDefs::DbQueryCallback(CDbJobData* pJobData, void* pContext)
     if (pJobData->stage == EJobStage::RESULT)
     {
         if (pLuaCallback)
-            pLuaCallback->Call();
+        {
+            if (pLuaCallback->IsValid())
+                pLuaCallback->Call();
+            else
+                g_pGame->GetDatabaseManager()->QueryFree(pJobData);
+        }
     }
     g_pGame->GetLuaCallbackManager()->DestroyCallback(pLuaCallback);
 }
@@ -642,6 +656,29 @@ int CLuaDatabaseDefs::DbPrepareString(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDatabaseDefs::DbGetConnectionQueueSize(lua_State* luaVM)
+{
+    CDatabaseConnectionElement* pElement;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        int size = g_pGame->GetDatabaseManager()->GetQueueSizeFromConnection(pElement->GetConnectionHandle());
+        if (size >= 0)
+        {
+            lua_pushnumber(luaVM, size);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

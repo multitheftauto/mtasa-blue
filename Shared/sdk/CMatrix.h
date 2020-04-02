@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMatrix_H
-#define __CMatrix_H
+#pragma once
 
 #include "CVector.h"
 
@@ -39,6 +38,20 @@ public:
 
     CMatrix(const CVector& vecPosition, const CVector& vecRotation)
     {
+        // Initialize as identity, so rotation isn't broken by no scale set.
+        vRight = CVector(1.0f, 0.0f, 0.0f);
+        vFront = CVector(0.0f, 1.0f, 0.0f);
+        vUp = CVector(0.0f, 0.0f, 1.0f);
+        SetRotation(vecRotation);
+        SetPosition(vecPosition);
+    }
+
+    CMatrix(const CVector& vecPosition, const CVector& vecRotation, const CVector& vecScale)
+    {
+        // Initialize with scale set
+        vRight = CVector(vecScale.fX, 0.0f, 0.0f);
+        vFront = CVector(0.0f, vecScale.fY, 0.0f);
+        vUp = CVector(0.0f, 0.0f, vecScale.fZ);
         SetRotation(vecRotation);
         SetPosition(vecPosition);
     }
@@ -97,7 +110,7 @@ public:
                        vRight.fZ * vec.fX + vFront.fZ * vec.fY + vUp.fZ * vec.fZ);
     }
 
-    CMatrix Inverse(void) const
+    CMatrix Inverse() const
     {
         float fDeterminant = vRight.fX * (vFront.fY * vUp.fZ - vUp.fY * vFront.fZ) - vFront.fX * (vRight.fY * vUp.fZ - vUp.fY * vRight.fZ) +
                              vUp.fX * (vRight.fY * vFront.fZ - vFront.fY * vRight.fZ);
@@ -128,6 +141,17 @@ public:
 
         matResult.vPos.fZ = -fRcp * (vRight.fX * (vFront.fY * vPos.fZ - vFront.fZ * vPos.fY) - vFront.fX * (vRight.fY * vPos.fZ - vRight.fZ * vPos.fY) +
                                      vPos.fX * (vRight.fY * vFront.fZ - vRight.fZ * vFront.fY));
+        return matResult;
+    }
+
+    CMatrix Clone() const
+    {
+        CMatrix matResult;
+        matResult.vRight = vRight.Clone();
+        matResult.vFront = vFront.Clone();
+        matResult.vUp = vUp.Clone();
+        matResult.vPos = vPos.Clone();
+        
         return matResult;
     }
 
@@ -185,17 +209,32 @@ public:
         }
     }
 
+    CMatrix GetRotationMatrix() const
+    {
+        // Operate only on rotation, ignore scale.
+        CMatrix matClone = Clone();
+        CVector vecScale = GetScale();
+        matClone.vRight /= vecScale.fX;
+        matClone.vFront /= vecScale.fY;
+        matClone.vUp /= vecScale.fZ;
+        matClone.vPos = CVector(0, 0, 0);
+        return matClone;
+    }
+
     // Get matrix rotation as angles
     // Inverted to match MTAized rotations for vehicles and players (and objects on the server)
     // Should produce the same results as ( CVector(0,0,0) - ConvertToEulerAngles() )
-    CVector GetRotation(void) const
+    CVector GetRotation() const
     {
-        float fRotY = atan2(vRight.fZ, sqrtf(Square(vRight.fX) + Square(vRight.fY)));
-        float fRotZ = atan2(vRight.fY, vRight.fX);
+        // Operate only on rotation, ignore scale.
+        CMatrix matRot = GetRotationMatrix();
+
+        float fRotY = atan2(matRot.vRight.fZ, sqrtf(Square(matRot.vRight.fX) + Square(matRot.vRight.fY)));
+        float fRotZ = atan2(matRot.vRight.fY, matRot.vRight.fX);
 
         float fSinZ = -sin(fRotZ);
         float fCosZ = cos(fRotZ);
-        float fRotX = atan2(vUp.fX * fSinZ + vUp.fY * fCosZ, vFront.fX * fSinZ + vFront.fY * fCosZ);
+        float fRotX = atan2(matRot.vUp.fX * fSinZ + matRot.vUp.fY * fCosZ, matRot.vFront.fX * fSinZ + matRot.vFront.fY * fCosZ);
         return CVector(-fRotX, -fRotY, fRotZ);
     }
 
@@ -211,25 +250,43 @@ public:
         float fSinY = sin(-vecRotation.fY);
         float fSinZ = sin(vecRotation.fZ);
 
+        // Keep current scale even after rotation.
+        CVector vecScale = GetScale();
+
         vRight.fX = fCosY * fCosZ;
         vRight.fY = fCosY * fSinZ;
         vRight.fZ = fSinY;
+        vRight *= vecScale.fX;
 
         vFront.fX = fSinX * fSinY * fCosZ - fCosX * fSinZ;
         vFront.fY = fSinX * fSinY * fSinZ + fCosX * fCosZ;
         vFront.fZ = -fSinX * fCosY;
+        vFront *= vecScale.fY;
 
         vUp.fX = -(fCosX * fSinY * fCosZ + fSinX * fSinZ);
         vUp.fY = fCosZ * fSinX - fCosX * fSinY * fSinZ;
         vUp.fZ = fCosX * fCosY;
+        vUp *= vecScale.fZ;
     }
 
     // Get matrix translational part
-    const CVector& GetPosition(void) const { return vPos; }
+    const CVector& GetPosition() const { return vPos; }
 
     // Set matrix translational part
     void SetPosition(const CVector& vecPosition) { vPos = vecPosition; }
 
+    CVector GetScale() const
+    {
+        return CVector(vRight.Length(), vFront.Length(), vUp.Length());
+    }
+
+    void SetScale(const CVector& vecScale) 
+    {
+        CMatrix matRot = GetRotationMatrix();
+        vRight = matRot.vRight * vecScale.fX;
+        vFront = matRot.vFront * vecScale.fY;
+        vUp = matRot.vUp * vecScale.fZ;
+    }
     //
     // Get reference to component axis by index
     //
@@ -241,6 +298,29 @@ public:
             return vFront;
         assert(uiIndex == AXIS_RIGHT);
         return vRight;
+    }
+
+    void GetBuffer(float* array)
+    {
+        array[0] = vRight.fX;
+        array[1] = vRight.fY;
+        array[2] = vRight.fZ;
+        array[3] = 0.0f;
+
+        array[4] = vFront.fX;
+        array[5] = vFront.fY;
+        array[6] = vFront.fZ;
+        array[7] = 0.0f;
+
+        array[8] = vUp.fX;
+        array[9] = vUp.fY;
+        array[10] = vUp.fZ;
+        array[11] = 0.0f;
+
+        array[12] = vPos.fX;
+        array[13] = vPos.fY;
+        array[14] = vPos.fZ;
+        array[15] = 1.0f;
     }
 
     enum EMatrixAxes
@@ -255,5 +335,3 @@ public:
     CVector vUp;
     CVector vPos;
 };
-
-#endif

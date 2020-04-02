@@ -51,15 +51,15 @@ struct SPlayerClothing
 class CPlayerClothes
 {
 public:
-    CPlayerClothes(void);
+    CPlayerClothes();
 
     const SPlayerClothing* GetClothing(unsigned char ucType);
     void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType);
     bool                   RemoveClothes(unsigned char ucType);
 
-    void RemoveAll(void);
+    void RemoveAll();
 
-    void DefaultClothes(void);
+    void DefaultClothes();
 
     static bool        HasEmptyClothing(unsigned char ucType);
     static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);

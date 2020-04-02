@@ -31,7 +31,7 @@ CClientRenderElement::CClientRenderElement(CClientManager* pManager, ElementID I
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderElement::~CClientRenderElement(void)
+CClientRenderElement::~CClientRenderElement()
 {
     Unlink();
 }
@@ -43,7 +43,7 @@ CClientRenderElement::~CClientRenderElement(void)
 // Remove from manager lists
 //
 ////////////////////////////////////////////////////////////////
-void CClientRenderElement::Unlink(void)
+void CClientRenderElement::Unlink()
 {
     if (!bDoneUnlink)
     {

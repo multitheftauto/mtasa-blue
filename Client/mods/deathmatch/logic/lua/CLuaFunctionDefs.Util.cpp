@@ -10,97 +10,6 @@
 
 #include "StdInc.h"
 
-int CLuaFunctionDefs::GetTok(lua_State* luaVM)
-{
-    SString          strInput = "";
-    unsigned int     uiToken = 0;
-    unsigned int     uiDelimiter = 0;
-    SString          strDelimiter;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
-    argStream.ReadNumber(uiToken);
-
-    if (argStream.NextIsNumber())
-    {
-        argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = {uiDelimiter, '\0'};
-        strDelimiter = UTF16ToMbUTF8(wUNICODE);
-    }
-    else            // It's already a string
-        argStream.ReadString(strDelimiter);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned int uiCount = 0;
-
-        if (uiToken > 0 && uiToken < 1024)
-        {
-            unsigned int uiCount = 1;
-            char*        szText = new char[strInput.length() + 1];
-            strcpy(szText, strInput);
-            char* szToken = strtok(szText, strDelimiter);
-
-            // We're looking for the first part?
-            if (uiToken != 1)
-            {
-                // strtok count number of times
-                do
-                {
-                    uiCount++;
-                    szToken = strtok(NULL, strDelimiter);
-                } while (uiCount != uiToken);
-            }
-
-            // Found it?
-            if (szToken)
-            {
-                // Return it
-                lua_pushstring(luaVM, szToken);
-                delete[] szText;
-                return 1;
-            }
-
-            // Delete the text
-            delete[] szText;
-        }
-        else
-            m_pScriptDebugging->LogWarning(luaVM, "Token parameter sent to split must be greater than 0 and smaller than 1024");
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::tocolor(lua_State* luaVM)
-{
-    //  int tocolor ( int red, int green, int blue [, int alpha = 255] )
-    int iRed;
-    int iGreen;
-    int iBlue;
-    int iAlpha;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iRed);
-    argStream.ReadNumber(iGreen);
-    argStream.ReadNumber(iBlue);
-    argStream.ReadNumber(iAlpha, 255);
-
-    if (!argStream.HasErrors())
-    {
-        // Make it into an unsigned long
-        unsigned long ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
-        lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
-        return 1;
-    }
-
-    // Make it black so funcs dont break
-    unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
-    lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
-    return 1;
-}
-
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
@@ -290,6 +199,57 @@ int CLuaFunctionDefs::GetLocalization(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
+{
+    const char* readingLayout = "ltr";
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+    DWORD readingLayoutValue = 0;
+
+    if (::GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IREADINGLAYOUT | LOCALE_RETURN_NUMBER, reinterpret_cast<LPWSTR>(&readingLayoutValue),
+                          sizeof(readingLayoutValue) / sizeof(WCHAR)) != 0)
+    {
+        switch (readingLayoutValue)
+        {
+            case 0: // Left to right (English)
+                readingLayout = "ltr";
+                break;
+            case 1: // Right to left (Arabic, Hebrew)
+                readingLayout = "rtl";
+                break;
+            case 2: // Vertical top to bottom with columns to the left and also left to right (Japanese)
+                readingLayout = "ttb-rtl-ltr";
+                break;
+            case 3: // Vertical top to bottom with columns proceeding to the right (Mongolian)
+                readingLayout = "ttb-ltr";
+                break;
+            default:
+                break;
+        }
+    }
+
+#else
+    HKL             keyboardLayout = ::GetKeyboardLayout(0 /* current thread*/);
+    LCID            locale = MAKELCID(LOWORD(keyboardLayout), SORT_DEFAULT);
+    LOCALESIGNATURE localeSignature = {};
+
+    if (GetLocaleInfoW(locale, LOCALE_FONTSIGNATURE, reinterpret_cast<LPWSTR>(&localeSignature), sizeof(localeSignature) / sizeof(WCHAR)) != 0)
+    {
+        if ((localeSignature.lsUsb[3] & 0x08000000) != 0)
+        {
+            readingLayout = "rtl";
+        }
+    }
+#endif
+
+    lua_createtable(luaVM, 0, 1);
+    lua_pushstring(luaVM, "readingLayout");
+    lua_pushstring(luaVM, readingLayout);
+    lua_settable(luaVM, -3);
+    
+    return 1;
+}
+
 int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
 {
     //  table getPerformanceStats ( string category, string options, string filter )
@@ -382,9 +342,9 @@ int CLuaFunctionDefs::GetDevelopmentMode(lua_State* luaVM)
 
 int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 {
-    SString          strFile = "";
+    SString          strFileInput = "";
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFile);
+    argStream.ReadString(strFileInput);
 
     if (!argStream.HasErrors())
     {
@@ -393,22 +353,31 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
         if (pLuaMain)
         {
             // Grab its resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CResource* pThisResource = pLuaMain->GetResource();
+            CResource* pOtherResource = pThisResource;
+
+            SString    strMetaPath;
+
+            // Resolve other resource from name
+            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, NULL, &strMetaPath))
             {
-                std::list<CResourceFile*>::const_iterator iter = pResource->IterBeginResourceFiles();
-                for (; iter != pResource->IterEndResourceFiles(); iter++)
+                std::list<CResourceFile*>::const_iterator iter = pOtherResource->IterBeginResourceFiles();
+                for (; iter != pOtherResource->IterEndResourceFiles(); iter++)
                 {
-                    if (strcmp(strFile, (*iter)->GetShortName()) == 0)
+                    if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
                     {
-                        if (CStaticFunctionDefinitions::DownloadFile(pResource, strFile, (*iter)->GetServerChecksum()))
+                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
                         }
                     }
                 }
-                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1)));
+                m_pScriptDebugging->LogCustom(luaVM, SString("%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: Invalid path", lua_tostring(luaVM, lua_upvalueindex(1)));
             }
         }
     }

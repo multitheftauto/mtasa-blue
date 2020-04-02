@@ -648,7 +648,9 @@ bool WriteMicrodump(pid_t crashing_process,
     if (blob_size != sizeof(ExceptionHandler::CrashContext))
       return false;
     context = reinterpret_cast<const ExceptionHandler::CrashContext*>(blob);
-    dumper.SetCrashInfoFromSigInfo(context->siginfo);
+    dumper.set_crash_address(
+        reinterpret_cast<uintptr_t>(context->siginfo.si_addr));
+    dumper.set_crash_signal(context->siginfo.si_signo);
     dumper.set_crash_thread(context->tid);
   }
   MicrodumpWriter writer(context, mappings,

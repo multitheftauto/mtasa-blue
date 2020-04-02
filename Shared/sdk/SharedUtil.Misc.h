@@ -16,7 +16,7 @@ namespace SharedUtil
     class CArgMap;
 #ifdef WIN32
 
-    SString GetMajorVersionString(void);
+    SString GetMajorVersionString();
 
     // Get a system registry value
     SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName);
@@ -48,10 +48,15 @@ namespace SharedUtil
     #endif
 
     //
+    // Return full path and filename of parent exe
+    //
+    SString GetParentProcessPathFilename(int pid);
+
+    //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
-    SString GetMTASABaseDir(void);
+    SString GetMTASABaseDir();
 
     //
     // Turns a relative MTASA path i.e. "MTA\file.dat"
@@ -60,7 +65,7 @@ namespace SharedUtil
     SString CalcMTASAPath(const SString& strPath);
 
     // Returns true if current process is GTA (i.e not MTA process)
-    bool IsGTAProcess(void);
+    bool IsGTAProcess();
 
     //
     // Run ShellExecute with these parameters after exit
@@ -79,7 +84,7 @@ namespace SharedUtil
     // What server to connect to after update
     //
     void    SetPostUpdateConnect(const SString& strHost);
-    SString GetPostUpdateConnect(void);
+    SString GetPostUpdateConnect();
 
     //
     // For tracking results of new features
@@ -87,12 +92,12 @@ namespace SharedUtil
     void    AddReportLog(uint uiId, const SString& strText, uint uiAmountLimit = 0);
     void    AddExceptionReportLog(uint uiId, const char* szExceptionName, const char* szExceptionText);
     void    SetReportLogContents(const SString& strText);
-    SString GetReportLogContents(void);
-    SString GetReportLogProcessTag(void);
+    SString GetReportLogContents();
+    SString GetReportLogProcessTag();
     void    WriteDebugEvent(const SString& strText);
     void    WriteErrorEvent(const SString& strText);
-    void    BeginEventLog(void);
-    void    CycleEventLog(void);
+    void    BeginEventLog();
+    void    CycleEventLog();
 
     void    SetApplicationSetting(const SString& strPath, const SString& strName, const SString& strValue);
     SString GetApplicationSetting(const SString& strPath, const SString& strName);
@@ -107,25 +112,25 @@ namespace SharedUtil
     int     GetApplicationSettingInt(const SString& strName);
     int     IncApplicationSettingInt(const SString& strName);
 
-    void WatchDogReset(void);
+    void WatchDogReset();
     bool WatchDogIsSectionOpen(const SString& str);
     void WatchDogIncCounter(const SString& str);
     int  WatchDogGetCounter(const SString& str);
     void WatchDogClearCounter(const SString& str);
     void WatchDogBeginSection(const SString& str);
     void WatchDogCompletedSection(const SString& str);
-    bool WatchDogWasUncleanStop(void);
+    bool WatchDogWasUncleanStop();
     void WatchDogSetUncleanStop(bool bOn);
-    bool WatchDogWasLastRunCrash(void);
+    bool WatchDogWasLastRunCrash();
     void WatchDogSetLastRunCrash(bool bOn);
-    void WatchDogUserDidInteractWithMenu(void);
+    void WatchDogUserDidInteractWithMenu();
 
     void           SetProductRegistryPath(const SString& strRegistryPath);
-    const SString& GetProductRegistryPath(void);
+    const SString& GetProductRegistryPath();
     void           SetProductCommonDataDir(const SString& strCommonDataDir);
-    const SString& GetProductCommonDataDir(void);
+    const SString& GetProductCommonDataDir();
     void           SetProductVersion(const SString& strVersion);
-    const SString& GetProductVersion(void);
+    const SString& GetProductVersion();
 
     // BrowseToSolution flags
     enum
@@ -144,28 +149,33 @@ namespace SharedUtil
         SHOW_MESSAGE_ONLY = 0x80,            // Just show message without going online
     };
     void BrowseToSolution(const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", const SString& strErrorCode = "");
-    bool ProcessPendingBrowseToSolution(void);
-    void ClearPendingBrowseToSolution(void);
+    bool ProcessPendingBrowseToSolution();
+    void ClearPendingBrowseToSolution();
 
     SString GetSystemErrorMessage(uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
     void    SetClipboardText(const SString& strText);
+    SString GetClipboardText();
 
     // Version checks
     bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
-    bool IsWindowsXPSP3OrGreater(void);
-    bool IsWindowsVistaOrGreater(void);
-    bool IsWindows7OrGreater(void);
-    bool IsWindows8OrGreater(void);
+    bool IsWindowsXPSP3OrGreater();
+    bool IsWindowsVistaOrGreater();
+    bool IsWindows7OrGreater();
+    bool IsWindows8OrGreater();
+
+    bool QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress);
+
+    DWORD GetMainThreadId();
 
 #endif
 
     // Ensure rand() seed gets set to a new unique value
-    void RandomizeRandomSeed(void);
+    void RandomizeRandomSeed();
 
     //
     // Return true if currently executing the main thread
     // See implementation for details
-    bool IsMainThread(void);
+    bool IsMainThread();
 
     // CPU stats
     struct SThreadCPUTimes
@@ -180,7 +190,7 @@ namespace SharedUtil
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore(void)
+        SThreadCPUTimesStore()
         {
             ZERO_POD_STRUCT(this);
             fAvgTimeSeconds = 5;
@@ -190,7 +200,7 @@ namespace SharedUtil
         uint64 ullPrevKernelTimeUs;
         float  fAvgTimeSeconds;
     };
-    DWORD _GetCurrentProcessorNumber(void);
+    DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
     void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = NULL);
 
@@ -213,11 +223,12 @@ namespace SharedUtil
     // string stuff
     //
 
-    std::wstring MbUTF8ToUTF16(const std::string& s);
+    std::wstring MbUTF8ToUTF16(const SString& s);
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
+    std::string UTF16ToMbUTF8(const wchar_t* ws);
 
-    std::wstring ANSIToUTF16(const std::string& s);
+    std::wstring ANSIToUTF16(const SString& s);
 
     int GetUTF8Confidence(const unsigned char* input, int len);
 
@@ -235,6 +246,13 @@ namespace SharedUtil
     T Clamp(const T& min, const T& a, const T& max)
     {
         return a < min ? min : a > max ? max : a;
+    }
+
+    // Checks whether a value is between two other values ( min <= a <= max )
+    template <class T>
+    bool Between(const T& min, const T& a, const T& max)
+    {
+        return a >= min && a <= max;
     }
 
     // Lerps between two values depending on the weight
@@ -528,10 +546,10 @@ namespace SharedUtil
     class CCriticalSection
     {
     public:
-        CCriticalSection(void);
-        ~CCriticalSection(void);
-        void Lock(void);
-        void Unlock(void);
+        CCriticalSection();
+        ~CCriticalSection();
+        void Lock();
+        void Unlock();
 
     private:
         void* m_pCriticalSection;
@@ -561,8 +579,8 @@ namespace SharedUtil
     //
     // Expiry stuff
     //
-    int GetBuildAge(void);
-    int GetDaysUntilExpire(void);
+    int GetBuildAge();
+    int GetDaysUntilExpire();
 
     //
     // string stuff
@@ -581,15 +599,15 @@ namespace SharedUtil
     class CStack
     {
     public:
-        CStack(void)
+        CStack()
         {
             m_ulCapacity = 0;
             ExpandBy(INITIAL_MAX_STACK_SIZE - 1);
         }
 
-        unsigned long GetCapacity(void) const { return m_ulCapacity; }
+        unsigned long GetCapacity() const { return m_ulCapacity; }
 
-        unsigned long GetUnusedAmount(void) const { return m_Queue.size(); }
+        unsigned long GetUnusedAmount() const { return m_Queue.size(); }
 
         void ExpandBy(unsigned long ulAmount)
         {
@@ -640,7 +658,7 @@ namespace SharedUtil
         char szData[MAX_LENGTH + 1];
 
     public:
-        SFixedString(void) { szData[0] = 0; }
+        SFixedString() { szData[0] = 0; }
 
         // In
         SFixedString& operator=(const char* szOther)
@@ -678,9 +696,9 @@ namespace SharedUtil
         void    Merge(const CArgMap& other, bool bAllowMultiValues = false);
         void    SetFromString(const SString& strLine, bool bAllowMultiValues = false);
         void    MergeFromString(const SString& strLine, bool bAllowMultiValues = false);
-        SString ToString(void) const;
-        bool    HasMultiValues(void) const;
-        void    RemoveMultiValues(void);
+        SString ToString() const;
+        bool    HasMultiValues() const;
+        void    RemoveMultiValues();
         SString Escape(const SString& strIn) const;
         SString Unescape(const SString& strIn) const;
         void    Set(const SString& strInCmd, const SString& strInValue);                                    // Set a unique key string value
@@ -771,14 +789,14 @@ namespace SharedUtil
         bool Contains(const T& item) const { return MapContains(m_Map, item); }
 
         // list only
-        typename LIST_TYPE ::iterator         begin(void) { return m_List.begin(); }
-        typename LIST_TYPE ::iterator         end(void) { return m_List.end(); }
-        typename LIST_TYPE ::reverse_iterator rbegin(void) { return m_List.rbegin(); }
-        typename LIST_TYPE ::reverse_iterator rend(void) { return m_List.rend(); }
-        uint                                  size(void) const { return m_List.size(); }
-        bool                                  empty(void) const { return m_List.empty(); }
-        const T&                              back(void) const { return m_List.back(); }
-        const T&                              front(void) const { return m_List.front(); }
+        typename LIST_TYPE ::iterator         begin() { return m_List.begin(); }
+        typename LIST_TYPE ::iterator         end() { return m_List.end(); }
+        typename LIST_TYPE ::reverse_iterator rbegin() { return m_List.rbegin(); }
+        typename LIST_TYPE ::reverse_iterator rend() { return m_List.rend(); }
+        uint                                  size() const { return m_List.size(); }
+        bool                                  empty() const { return m_List.empty(); }
+        const T&                              back() const { return m_List.back(); }
+        const T&                              front() const { return m_List.front(); }
 
         // list and map
         void push_back(const T& item)
@@ -793,13 +811,13 @@ namespace SharedUtil
             m_List.push_front(item);
         }
 
-        void pop_back(void)
+        void pop_back()
         {
             RemoveMapRef(m_List.back());
             m_List.pop_back();
         }
 
-        void pop_front(void)
+        void pop_front()
         {
             RemoveMapRef(m_List.front());
             m_List.pop_front();
@@ -816,7 +834,7 @@ namespace SharedUtil
             }
         }
 
-        void clear(void)
+        void clear()
         {
             m_Map.clear();
             m_List.clear();
@@ -848,7 +866,7 @@ namespace SharedUtil
         }
 
         // Debug
-        void Validate(void) const
+        void Validate() const
         {
             int iTotalRefs = 0;
             for (typename std::map<T, int>::const_iterator it = m_Map.begin(); it != m_Map.end(); ++it)
@@ -958,8 +976,8 @@ namespace SharedUtil
         public:
             Node* m_pNode;
             IteratorBase(CIntrusiveList<T>* pList, Node* pNode) : m_pList(pList), m_pNode(pNode) { m_pList->m_ActiveIterators.push_back(this); }
-            ~IteratorBase(void) { ListRemove(m_pList->m_ActiveIterators, this); }
-            T*           operator*(void) { return m_pNode->m_pOuterItem; }
+            ~IteratorBase() { ListRemove(m_pList->m_ActiveIterators, this); }
+            T*           operator*() { return m_pNode->m_pOuterItem; }
             virtual void NotifyRemovingNode(Node* pNode) = 0;
         };
 
@@ -972,7 +990,7 @@ namespace SharedUtil
             Iterator(CIntrusiveList<T>* pList, Node* pNode) : IteratorBase(pList, pNode) {}
             bool         operator==(const Iterator& other) const { return IteratorBase::m_pNode == other.m_pNode; }
             bool         operator!=(const Iterator& other) const { return IteratorBase::m_pNode != other.m_pNode; }
-            void         operator++(void) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
+            void         operator++() { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
             void         operator++(int) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
             virtual void NotifyRemovingNode(Node* pNode)
             {
@@ -990,7 +1008,7 @@ namespace SharedUtil
             ReverseIterator(CIntrusiveList<T>* pList, Node* pNode) : IteratorBase(pList, pNode) {}
             bool         operator==(const ReverseIterator& other) const { return IteratorBase::m_pNode == other.m_pNode; }
             bool         operator!=(const ReverseIterator& other) const { return IteratorBase::m_pNode != other.m_pNode; }
-            void         operator++(void) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
+            void         operator++() { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
             void         operator++(int) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
             virtual void NotifyRemovingNode(Node* pNode)
             {
@@ -1010,11 +1028,11 @@ namespace SharedUtil
             m_pLast = NULL;
         }
 
-        ~CIntrusiveList(void) { assert(m_ActiveIterators.empty()); }
+        ~CIntrusiveList() { assert(m_ActiveIterators.empty()); }
 
-        bool empty(void) const { return m_Size == 0; }
+        bool empty() const { return m_Size == 0; }
 
-        size_t size(void) const { return m_Size; }
+        size_t size() const { return m_Size; }
 
         //
         // Check if list contains item
@@ -1120,13 +1138,13 @@ namespace SharedUtil
             m_Size++;
         }
 
-        Iterator begin(void) { return Iterator(this, m_pFirst); }
+        Iterator begin() { return Iterator(this, m_pFirst); }
 
-        Iterator end(void) { return Iterator(this, NULL); }
+        Iterator end() { return Iterator(this, NULL); }
 
-        ReverseIterator rbegin(void) { return ReverseIterator(this, m_pLast); }
+        ReverseIterator rbegin() { return ReverseIterator(this, m_pLast); }
 
-        ReverseIterator rend(void) { return ReverseIterator(this, NULL); }
+        ReverseIterator rend() { return ReverseIterator(this, NULL); }
 
         // Allow use of std iterator names
         typedef Iterator        iterator;
@@ -1146,7 +1164,7 @@ namespace SharedUtil
     class CIntrusiveListExt : public CIntrusiveList<T>
     {
     public:
-        CIntrusiveListExt(void) : CIntrusiveList<T>(member_ptr) {}
+        CIntrusiveListExt() : CIntrusiveList<T>(member_ptr) {}
     };
 
     //
@@ -1244,7 +1262,7 @@ namespace SharedUtil
             return false;
         }
 
-        const SString& GetTypeName(void) const { return m_strTypeName; }
+        const SString& GetTypeName() const { return m_strTypeName; }
 
         SString                   m_strTypeName;
         SString                   m_strDefaultName;
@@ -1254,14 +1272,14 @@ namespace SharedUtil
     };
 
     #define DECLARE_ENUM2(T, U) \
-        CEnumInfo<U>*          GetEnumInfo     ( const T& ); \
-        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
-        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
-        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
-        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
+        CEnumInfo<U>*          GetEnumInfo     ( const T* ); \
+        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( (T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( (T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( (T*)0 )->GetTypeName (); }\
+        inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( (T*)0 )->ValueValid  ( (eDummy)value ); }\
 
     #define IMPLEMENT_ENUM_BEGIN2(T, U) \
-        CEnumInfo<U>* GetEnumInfo( const T& ) \
+        CEnumInfo<U>* GetEnumInfo( const T* ) \
         { \
             using CEnumInfo = CEnumInfo<U>; \
             static const CEnumInfo::SEnumItem items[] = {
@@ -1502,14 +1520,14 @@ namespace SharedUtil
         int m_iRefCount;
 
     protected:
-        virtual ~CRefCountableST(void) {}
+        virtual ~CRefCountableST() {}
 
     public:
-        CRefCountableST(void) : m_iRefCount(1) {}
+        CRefCountableST() : m_iRefCount(1) {}
 
-        void AddRef(void) { ++m_iRefCount; }
+        void AddRef() { ++m_iRefCount; }
 
-        void Release(void)
+        void Release()
         {
             assert(m_iRefCount > 0);
             bool bLastRef = --m_iRefCount == 0;
@@ -1536,19 +1554,19 @@ namespace SharedUtil
         static CCriticalSection ms_CS;
 
     protected:
-        virtual ~CRefCountable(void) {}
+        virtual ~CRefCountable() {}
 
     public:
-        CRefCountable(void) : m_iRefCount(1), m_pCS(&ms_CS) {}
+        CRefCountable() : m_iRefCount(1), m_pCS(&ms_CS) {}
 
-        void AddRef(void)
+        void AddRef()
         {
             m_pCS->Lock();
             ++m_iRefCount;
             m_pCS->Unlock();
         }
 
-        int Release(void)
+        int Release()
         {
             m_pCS->Lock();
             assert(m_iRefCount > 0);
@@ -1631,14 +1649,14 @@ namespace SharedUtil
     private:
         T* pData;            // Target
 
-        virtual ~CRefedPointer(void) { SAFE_DELETE(pData); }
+        virtual ~CRefedPointer() { SAFE_DELETE(pData); }
         CRefedPointer(const CRefedPointer<T>& other);
         CRefedPointer<T>& operator=(const CRefedPointer<T>& other);
 
     public:
-        CRefedPointer(void) { pData = new T(); }
+        CRefedPointer() { pData = new T(); }
 
-        T* GetData(void) { return pData; }
+        T* GetData() { return pData; }
     };
 
     //
@@ -1679,9 +1697,9 @@ namespace SharedUtil
             return *this;
         }
 
-        T* operator->(void) { return pPointer->GetData(); }
+        T* operator->() { return pPointer->GetData(); }
 
-        const T* operator->(void)const { return pPointer->GetData(); }
+        const T* operator->() const { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 

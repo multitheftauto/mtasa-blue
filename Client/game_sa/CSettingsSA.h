@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_SETTINGS
-#define __CGAMESA_SETTINGS
+#pragma once
 
 // R* have this info inside CMenuManager but I can't believe that makes much sense
 
@@ -35,9 +34,11 @@
 #define FUNC_SetAntiAliasing    0x7F8A90
 
 #define DEFAULT_VEHICLE_LOD_DISTANCE    ( 70.0f )
+#define DEFAULT_PEDS_LOD_DISTANCE       ( 60.0f )
 // Default train distance is 150, so make it relative to default vehicle distance
 #define TRAIN_LOD_DISTANCE_MULTIPLIER   ( 2.14f )
 #define MAX_VEHICLE_LOD_DISTANCE        ( 500.0f )
+#define MAX_PEDS_LOD_DISTANCE           ( 500.0f )
 
 struct CSettingsSAInterface            // see code around 0x57CE9A for where these are
 {
@@ -90,84 +91,90 @@ private:
     int                   m_iDesktopHeight;
 
 public:
-    CSettingsSA(void);
+    CSettingsSA();
 
-    bool          IsWideScreenEnabled(void);
+    bool          IsWideScreenEnabled();
     void          SetWideScreenEnabled(bool bEnabled);
-    unsigned int  GetNumVideoModes(void);
+    unsigned int  GetNumVideoModes();
     VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex);
-    unsigned int  GetCurrentVideoMode(void);
+    unsigned int  GetCurrentVideoMode();
     void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart);
-    unsigned int  GetNumAdapters(void);
-    unsigned int  GetCurrentAdapter(void);
+    unsigned int  GetNumAdapters();
+    unsigned int  GetCurrentAdapter();
     void          SetAdapter(unsigned int uiAdapterIndex);
-    bool          HasUnsafeResolutions(void);
+    bool          HasUnsafeResolutions();
     bool          IsUnsafeResolution(int iWidth, int iHeight);
-    unsigned char GetRadioVolume(void);
+    unsigned char GetRadioVolume();
     void          SetRadioVolume(unsigned char ucVolume);
-    unsigned char GetSFXVolume(void);
+    unsigned char GetSFXVolume();
     void          SetSFXVolume(unsigned char ucVolume);
-    unsigned int  GetUsertrackMode(void);
+    unsigned int  GetUsertrackMode();
     void          SetUsertrackMode(unsigned int uiMode);
-    bool          IsUsertrackAutoScan(void);
+    bool          IsUsertrackAutoScan();
     void          SetUsertrackAutoScan(bool bEnable);
-    bool          IsRadioEqualizerEnabled(void);
+    bool          IsRadioEqualizerEnabled();
     void          SetRadioEqualizerEnabled(bool bEnable);
-    bool          IsRadioAutotuneEnabled(void);
+    bool          IsRadioAutotuneEnabled();
     void          SetRadioAutotuneEnabled(bool bEnable);
 
-    float GetDrawDistance(void);
+    float GetDrawDistance();
     void  SetDrawDistance(float fDrawDistance);
 
-    unsigned int GetBrightness(void);
+    unsigned int GetBrightness();
     void         SetBrightness(unsigned int uiBrightness);
 
-    unsigned int GetFXQuality(void);
+    unsigned int GetFXQuality();
     void         SetFXQuality(unsigned int fxQualityId);
 
-    float GetMouseSensitivity(void);
+    float GetMouseSensitivity();
     void  SetMouseSensitivity(float fSensitivity);
 
-    unsigned int GetAntiAliasing(void);
+    unsigned int GetAntiAliasing();
     void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart);
 
-    bool IsMipMappingEnabled(void);
+    bool IsMipMappingEnabled();
     void SetMipMappingEnabled(bool bEnable);
 
-    bool IsVolumetricShadowsEnabled(void);
+    bool IsVolumetricShadowsEnabled();
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
 
-    float        GetAspectRatioValue(void);
-    eAspectRatio GetAspectRatio(void);
+    float        GetAspectRatioValue();
+    eAspectRatio GetAspectRatio();
     void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true);
 
-    bool IsGrassEnabled(void);
+    bool IsGrassEnabled();
     void SetGrassEnabled(bool bEnable);
 
-    eRadarMode GetRadarMode(void);
+    eRadarMode GetRadarMode();
     void       SetRadarMode(eRadarMode hudMode);
 
-    void  UpdateFieldOfViewFromSettings(void);
-    void  ResetFieldOfViewFromScript(void);
+    void  UpdateFieldOfViewFromSettings();
+    void  ResetFieldOfViewFromScript();
     void  SetFieldOfViewPlayer(float fAngle, bool bFromScript);
     void  SetFieldOfViewVehicle(float fAngle, bool bFromScript);
     void  SetFieldOfViewVehicleMax(float fAngle, bool bFromScript);
-    float GetFieldOfViewPlayer(void);
-    float GetFieldOfViewVehicle(void);
-    float GetFieldOfViewVehicleMax(void);
+    float GetFieldOfViewPlayer();
+    float GetFieldOfViewVehicle();
+    float GetFieldOfViewVehicleMax();
 
-    void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance);
-    void ResetVehiclesLODDistance(void);
+    void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript);
+    void ResetVehiclesLODDistance(bool bFromScript);
+    void ResetVehiclesLODDistanceFromScript();
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
 
-    void Save(void);
+    void Save();
 
-    static void StaticSetHooks(void);
+    void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript);
+    void  ResetPedsLODDistance(bool bFromScript);
+    void  ResetPedsLODDistanceFromScript();
+    float GetPedsLODDistance();
+
+    static void StaticSetHooks();
 
     uint FindVideoMode(int iResX, int iResY, int iColorBits);
-    void SetValidVideoMode(void);
-    int  OnSelectDevice(void);
+    void SetValidVideoMode();
+    int  OnSelectDevice();
 
 private:
     static unsigned long FUNC_GetNumVideoModes;
@@ -180,5 +187,3 @@ private:
     static unsigned long FUNC_GetCurrentSubSystem;
     static unsigned long FUNC_SetSubSystem;
 };
-
-#endif

@@ -22,7 +22,7 @@ CFunctionUseLogger::CFunctionUseLogger(const SString& strLogFilename)
 //
 // CFunctionUseLogger::~CFunctionUseLogger
 //
-CFunctionUseLogger::~CFunctionUseLogger(void)
+CFunctionUseLogger::~CFunctionUseLogger()
 {
     MaybeFlush(true);
 }
@@ -30,7 +30,7 @@ CFunctionUseLogger::~CFunctionUseLogger(void)
 //
 // CFunctionUseLogger::Pulse
 //
-void CFunctionUseLogger::Pulse(void)
+void CFunctionUseLogger::Pulse()
 {
     if (!m_FuncCallRecordMap.empty())
         MaybeFlush();

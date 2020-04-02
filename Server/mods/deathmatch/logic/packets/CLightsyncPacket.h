@@ -22,8 +22,8 @@ class CLightsyncPacket : public CPacket
 public:
     CLightsyncPacket() {}
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_LIGHTSYNC; };
-    unsigned long GetFlags(void) const { return PACKET_LOW_PRIORITY; };
+    ePacketID     GetPacketID() const { return PACKET_ID_LIGHTSYNC; };
+    unsigned long GetFlags() const { return PACKET_LOW_PRIORITY; };
 
     void         AddPlayer(CPlayer* pPlayer) { m_players.push_back(pPlayer); }
     unsigned int Count() const { return m_players.size(); }

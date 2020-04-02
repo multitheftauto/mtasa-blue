@@ -38,7 +38,7 @@ CGUIFont_Impl::CGUIFont_Impl(CGUI_Impl* pGUI, const char* szFontName, const char
     SetAutoScalingEnabled(bAutoScale);
 }
 
-CGUIFont_Impl::~CGUIFont_Impl(void)
+CGUIFont_Impl::~CGUIFont_Impl()
 {
     m_pFontManager->destroyFont(m_pFont);
 }
@@ -65,7 +65,7 @@ void CGUIFont_Impl::DrawTextString(const char* szText, CRect2D DrawArea, float f
                       fScaleX, fScaleY);
 }
 
-bool CGUIFont_Impl::IsAntiAliasingEnabled(void)
+bool CGUIFont_Impl::IsAntiAliasingEnabled()
 {
     return m_pFont->isAntiAliased();
 }
@@ -75,7 +75,7 @@ void CGUIFont_Impl::SetAutoScalingEnabled(bool bAutoScaled)
     m_pFont->setAutoScalingEnabled(bAutoScaled);
 }
 
-bool CGUIFont_Impl::IsAutoScalingEnabled(void)
+bool CGUIFont_Impl::IsAutoScalingEnabled()
 {
     return m_pFont->isAutoScaled();
 }
@@ -107,7 +107,7 @@ float CGUIFont_Impl::GetTextExtent(const char* szText, float fScale)
     return m_pFont->getTextExtent(CGUI_Impl::GetUTFString(szText), fScale);
 }
 
-CEGUI::Font* CGUIFont_Impl::GetFont(void)
+CEGUI::Font* CGUIFont_Impl::GetFont()
 {
     return m_pFont;
 }

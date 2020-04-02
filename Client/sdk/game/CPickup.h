@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PICKCUP
-#define __CGAME_PICKCUP
+#pragma once
 
 #include <windows.h>
 #include <CVector.h>
@@ -48,5 +47,3 @@ public:
 
 // not used
 typedef BOOL (*CBPickup)(CPickup*);
-
-#endif

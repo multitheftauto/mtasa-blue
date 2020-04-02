@@ -73,7 +73,7 @@ void CProjectileSA::Destroy(bool bBlow)
 
 // Corrects errors in the physics engine that cause projectiles to be far away from the objects they attached to
 // issue #8122
-bool CProjectileSA::CorrectPhysics(void)
+bool CProjectileSA::CorrectPhysics()
 {
     // make sure we have an interface for our bomb/satchel
     CPhysicalSAInterface* pInterface = static_cast<CPhysicalSAInterface*>(m_pInterface);

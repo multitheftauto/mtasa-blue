@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_FONT
-#define __CGAMESA_FONT
+#pragma once
 
 #include <game/CFont.h>
 #define WIN32_LEAN_AND_MEAN
@@ -23,5 +22,3 @@ class CFontSA : public CFont
 public:
     void PrintString(float fX, float fY, char* szString);
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILABEL_IMPL_H
-#define __CGUILABEL_IMPL_H
+#pragma once
 
 #include <gui/CGUILabel.h>
 #include "CGUIElement_Impl.h"
@@ -21,32 +20,30 @@ class CGUILabel_Impl : public CGUILabel, public CGUIElement_Impl
 {
 public:
     CGUILabel_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");
-    ~CGUILabel_Impl(void);
+    ~CGUILabel_Impl();
 
     void SetText(const char* Text);
 
     void                SetVerticalAlign(CGUIVerticalAlign eAlign);
-    CGUIVerticalAlign   GetVerticalAlign(void);
+    CGUIVerticalAlign   GetVerticalAlign();
     void                SetHorizontalAlign(CGUIHorizontalAlign eAlign);
-    CGUIHorizontalAlign GetHorizontalAlign(void);
+    CGUIHorizontalAlign GetHorizontalAlign();
 
     void      SetTextColor(CGUIColor Color);
     void      SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    CGUIColor GetTextColor(void);
+    CGUIColor GetTextColor();
     void      GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
 
     void SetFrameEnabled(bool bFrameEnabled);
-    bool IsFrameEnabled(void);
+    bool IsFrameEnabled();
 
     float GetCharacterWidth(int iCharIndex);
-    float GetFontHeight(void);
-    float GetTextExtent(void);
+    float GetFontHeight();
+    float GetTextExtent();
 
-    eCGUIType GetType(void) { return CGUI_LABEL; };
+    eCGUIType GetType() { return CGUI_LABEL; };
 
     #define EXCLUDE_SET_TEXT
     #include "CGUIElement_Inc.h"
     #undef EXCLUDE_SET_TEXT
 };
-
-#endif

@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PARTICLESYSTEMMANAGER
-#define __CGAME_PARTICLESYSTEMMANAGER
+#pragma once
 
 class CParticleSystemManager
 {
 };
-
-#endif

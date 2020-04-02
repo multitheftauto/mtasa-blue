@@ -103,7 +103,7 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     }
 }
 
-CAccountManager::~CAccountManager(void)
+CAccountManager::~CAccountManager()
 {
     // Save everything
     Save(true);
@@ -112,7 +112,7 @@ CAccountManager::~CAccountManager(void)
     RemoveAll();
 }
 
-void CAccountManager::ReconnectToDatabase(void)
+void CAccountManager::ReconnectToDatabase()
 {
     if (m_hDbConnection != INVALID_DB_HANDLE)
     {
@@ -130,7 +130,7 @@ void CAccountManager::ReconnectToDatabase(void)
     m_hDbConnection = m_pDatabaseManager->Connect("sqlite", PathConform(m_strDbPathFilename), "", "", strOptions);
 }
 
-void CAccountManager::DoPulse(void)
+void CAccountManager::DoPulse()
 {
     // Save it only once in a while whenever something has changed
     if (m_bChangedSinceSaved && GetTickCount64_() > m_llLastTimeSaved + 15000)
@@ -140,7 +140,7 @@ void CAccountManager::DoPulse(void)
     }
 }
 
-bool CAccountManager::Load(void)
+bool CAccountManager::Load()
 {
     // Create a registry result
     CRegistryResult result;
@@ -272,9 +272,9 @@ void CAccountManager::Save(CAccount* pAccount, bool bCheckForErrors)
     SString strQuery;
     strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
     if (!strSerial.empty())
-        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",serial=?", SQLITE_TEXT, *strSerial);
-    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",password=?, httppass=? WHERE name=?", SQLITE_TEXT, *strPassword, SQLITE_TEXT,
-                                                   *strHttpPassAppend, SQLITE_TEXT, *strName);
+        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", serial=?", SQLITE_TEXT, *strSerial);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT, *strPassword,
+                                                   SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
 
     if (bCheckForErrors)
     {
@@ -387,22 +387,46 @@ bool CAccountManager::IntegrityCheck()
     return true;
 }
 
-CAccount* CAccountManager::Get(const char* szName)
+CAccount* CAccountManager::Get(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     if (szName && szName[0])
     {
         std::vector<CAccount*> results;
-        m_List.FindAccountMatches(&results, szName, true);
-        for (uint i = 0; i < results.size(); i++)
+        m_List.FindAccountMatches(&results, szName, bCaseSensitive);
+
+        if (!bCaseSensitive)
         {
-            CAccount* pAccount = results[i];
-            if (pAccount->IsRegistered())
+            CAccount* pFirstMatchAccount = nullptr;
+
+            for (CAccount* pAccount : results)
             {
-                return pAccount;
+                if (!pAccount->IsRegistered())
+                    continue;
+
+                if (szPassword && !pAccount->IsPassword(szPassword))
+                    continue;
+
+                if (pAccount->GetName() == szName)
+                {
+                    return pAccount;
+                }
+                else if (!pFirstMatchAccount)
+                {
+                    pFirstMatchAccount = pAccount;
+                }
             }
+
+            return pFirstMatchAccount;
+        }
+
+        for (CAccount* pAccount : results)
+        {
+            if (pAccount->IsRegistered())
+                return pAccount;
         }
     }
-    return NULL;
+
+    return nullptr;
 }
 
 CAccount* CAccountManager::GetAccountFromScriptID(uint uiScriptID)
@@ -452,7 +476,7 @@ void CAccountManager::MarkAsChanged(CAccount* pAccount)
     }
 }
 
-void CAccountManager::RemoveAll(void)
+void CAccountManager::RemoveAll()
 {
     DeletePointersAndClearList(m_List);
 }
@@ -567,10 +591,6 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
     {
         pEchoClient->SendEcho("login: You successfully logged in");
     }
-
-    // Update who was info
-    if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
-        g_pGame->GetConsole()->GetWhoWas()->OnPlayerLogin(static_cast<CPlayer*>(pClient));
 
     // Delete the old account if it was a guest account
     if (!pCurrentAccount->IsRegistered())

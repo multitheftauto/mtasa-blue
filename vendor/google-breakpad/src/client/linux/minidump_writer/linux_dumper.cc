@@ -283,7 +283,6 @@ LinuxDumper::LinuxDumper(pid_t pid, const char* root_prefix)
       root_prefix_(root_prefix),
       crash_address_(0),
       crash_signal_(0),
-      crash_signal_code_(0),
       crash_thread_(pid),
       threads_(&allocator_, 8),
       mappings_(&allocator_),
@@ -353,12 +352,6 @@ LinuxDumper::ElfFileIdentifierForMapping(const MappingInfo& mapping,
   }
 
   return success;
-}
-
-void LinuxDumper::SetCrashInfoFromSigInfo(const siginfo_t& siginfo) {
-  set_crash_address(reinterpret_cast<uintptr_t>(siginfo.si_addr));
-  set_crash_signal(siginfo.si_signo);
-  set_crash_signal_code(siginfo.si_code);
 }
 
 const char* LinuxDumper::GetCrashSignalString() const {

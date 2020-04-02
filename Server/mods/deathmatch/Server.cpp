@@ -24,6 +24,13 @@ MTAEXPORT CServerBase* InitServer(void)
     return g_pServer;
 }
 
+#ifndef WIN32
+
+/* POSIX library destructor */
+extern "C" void __attribute__((destructor)) ReleaseServer(void);
+
+#endif
+
 MTAEXPORT void ReleaseServer(void)
 {
     // Destroy the server
@@ -45,9 +52,5 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
     return TRUE;
 }
-
-#else           /* POSIX library destructor */
-
-void __attribute__((destructor)) ReleaseServer(void);
 
 #endif

@@ -19,7 +19,7 @@ CClientCivilianManager::CClientCivilianManager(CClientManager* pManager)
     m_bCanRemoveFromList = true;
 }
 
-CClientCivilianManager::~CClientCivilianManager(void)
+CClientCivilianManager::~CClientCivilianManager()
 {
     // Destroy all vehicles
     DeleteAll();
@@ -35,7 +35,7 @@ CClientCivilian* CClientCivilianManager::Create(CCivilianPed* pPed, ElementID ID
     return new CClientCivilian(m_pManager, ID, pPed);
 }
 
-void CClientCivilianManager::DeleteAll(void)
+void CClientCivilianManager::DeleteAll()
 {
     // Delete all the civilians
     m_bCanRemoveFromList = false;

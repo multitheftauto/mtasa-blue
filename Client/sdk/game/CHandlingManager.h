@@ -9,20 +9,17 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHandlingManager
-#define __CGAME_CHandlingManager
+#pragma once
 
 #include "CHandlingEntry.h"
 
 class CHandlingManager
 {
 public:
-    virtual CHandlingEntry* CreateHandlingData(void) = 0;
+    virtual CHandlingEntry* CreateHandlingData() = 0;
 
     virtual const CHandlingEntry* GetOriginalHandlingData(enum eVehicleTypes eModel) = 0;
     virtual eHandlingProperty     GetPropertyEnumFromName(std::string strName) = 0;
-    virtual void                  RemoveChangedVehicle(void) = 0;
+    virtual void                  RemoveChangedVehicle() = 0;
     virtual void                  CheckSuspensionChanges(CHandlingEntry* pEntry) = 0;
 };
-
-#endif

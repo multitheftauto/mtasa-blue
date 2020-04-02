@@ -20,7 +20,10 @@ CVehicle* CVehicleScannerSA::GetClosestVehicleInRange()
 {
     CVehicleSAInterface* pVehicle = (CVehicleSAInterface*)(internalInterface->pClosestVehicleInRange);
     if (pVehicle)
-        return ((CPoolsSA*)pGame->GetPools())->GetVehicle((DWORD*)pVehicle);
-    else
-        return NULL;
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    }
+
+    return NULL;
 }

@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum)
+CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum serverChecksum)
 {
     // Store the name
     m_strName = szName;
@@ -19,8 +19,9 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     // Store the name (short)
     m_strNameShort = szNameShort;
 
-    // store the resource
+    // store resources
     m_pResource = pResource;
+    m_pRequestResource = pRequestResource;
 
     // Store the server checksum
     m_ServerChecksum = serverChecksum;
@@ -31,8 +32,10 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
 
     if (!DoesClientAndServerChecksumMatch())
     {
+        SHttpRequestOptions options;
+        options.bCheckContents = true;
         CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::RESOURCE_SINGULAR_FILES);
-        pHTTP->QueueFile(strHTTPURL.c_str(), szName, NULL, 0, false, this, DownloadFinishedCallBack, false, 10, 10000, true);
+        pHTTP->QueueFile(strHTTPURL.c_str(), szName, this, DownloadFinishedCallBack, options);
         m_bComplete = false;
         g_pClientGame->SetTransferringSingularFiles(true);
     }
@@ -42,7 +45,7 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     }
 }
 
-CSingularFileDownload::~CSingularFileDownload(void)
+CSingularFileDownload::~CSingularFileDownload()
 {
 }
 
@@ -63,25 +66,35 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
         CLuaArguments Arguments;
         Arguments.PushString(GetShortName());            // file name
         Arguments.PushBoolean(bSuccess);                 // Completed successfully?
+        if (m_pRequestResource)
+        {
+            Arguments.PushResource(m_pRequestResource);  // Resource that called downloadFile
+        }
+        else
+        {
+            Arguments.PushBoolean(false);                 // or false
+        }
+
         m_pResource->GetResourceEntity()->CallEvent("onClientFileDownloadComplete", Arguments, false);
     }
     SetComplete();
 }
 
-void CSingularFileDownload::Cancel(void)
+void CSingularFileDownload::Cancel()
 {
     m_bBeingDeleted = true;
     m_pResource = NULL;
+    m_pRequestResource = NULL;
 
     // TODO: Cancel also in Net
 }
 
-bool CSingularFileDownload::DoesClientAndServerChecksumMatch(void)
+bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
 {
     return (m_LastClientChecksum == m_ServerChecksum);
 }
 
-CChecksum CSingularFileDownload::GenerateClientChecksum(void)
+CChecksum CSingularFileDownload::GenerateClientChecksum()
 {
     m_LastClientChecksum = CChecksum::GenerateChecksumFromFile(m_strName);
     return m_LastClientChecksum;

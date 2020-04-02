@@ -11,14 +11,22 @@
 
 #include "StdInc.h"
 
-void CLuaTimerDefs::LoadFunctions(void)
+void CLuaTimerDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("setTimer", SetTimer);
-    CLuaCFunctions::AddFunction("killTimer", KillTimer);
-    CLuaCFunctions::AddFunction("resetTimer", ResetTimer);
-    CLuaCFunctions::AddFunction("getTimers", GetTimers);
-    CLuaCFunctions::AddFunction("isTimer", IsTimer);
-    CLuaCFunctions::AddFunction("getTimerDetails", GetTimerDetails);
+    std::map<const char*, lua_CFunction> functions{
+        {"setTimer", SetTimer},
+        {"killTimer", KillTimer},
+        {"resetTimer", ResetTimer},
+        {"getTimers", GetTimers},
+        {"isTimer", IsTimer},
+        {"getTimerDetails", GetTimerDetails},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaTimerDefs::AddClass(lua_State* luaVM)
@@ -60,7 +68,7 @@ int CLuaTimerDefs::SetTimer(lua_State* luaVM)
             // Check for the minimum interval
             if (dTimeInterval < LUA_TIMER_MIN_INTERVAL)
             {
-                argStream.SetCustomError("Interval is below 50");
+                argStream.SetCustomError("Interval is below " MTA_STR(LUA_TIMER_MIN_INTERVAL));
             }
             else
             {

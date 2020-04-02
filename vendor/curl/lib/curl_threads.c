@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -104,12 +104,21 @@ int Curl_thread_join(curl_thread_t *hnd)
 curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void *),
                                  void *arg)
 {
-  curl_thread_t t;
 #ifdef _WIN32_WCE
-  t = CreateThread(NULL, 0, func, arg, 0, NULL);
+  typedef HANDLE curl_win_thread_handle_t;
+#elif defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
+  typedef unsigned long curl_win_thread_handle_t;
 #else
-  t = (curl_thread_t)_beginthreadex(NULL, 0, func, arg, 0, NULL);
+  typedef uintptr_t curl_win_thread_handle_t;
 #endif
+  curl_thread_t t;
+  curl_win_thread_handle_t thread_handle;
+#ifdef _WIN32_WCE
+  thread_handle = CreateThread(NULL, 0, func, arg, 0, NULL);
+#else
+  thread_handle = _beginthreadex(NULL, 0, func, arg, 0, NULL);
+#endif
+  t = (curl_thread_t)thread_handle;
   if((t == 0) || (t == LongToHandle(-1L))) {
 #ifdef _WIN32_WCE
     DWORD gle = GetLastError();

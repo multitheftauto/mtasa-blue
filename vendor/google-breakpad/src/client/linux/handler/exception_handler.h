@@ -262,7 +262,7 @@ class ExceptionHandler {
   // can do this. We create a pipe which we can use to block the
   // cloned process after creating it, until we have explicitly enabled
   // ptrace. This is used to store the file descriptors for the pipe
-  int fdes[2] = {-1, -1};
+  int fdes[2];
 
   // Callers can add extra info about mappings for cases where the
   // dumper code cannot extract enough information from /proc/<pid>/maps.

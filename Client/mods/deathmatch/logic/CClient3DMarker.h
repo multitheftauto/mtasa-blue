@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENT3DMARKER_H
-#define __CCLIENT3DMARKER_H
+#pragma once
 
 #include "CClientMarker.h"
 class CClientMarker;
@@ -25,11 +24,11 @@ public:
     };
 
     CClient3DMarker(CClientMarker* pThis);
-    ~CClient3DMarker(void);
+    ~CClient3DMarker();
 
-    unsigned int GetMarkerType(void) const { return CClientMarkerCommon::CLASS_3DMARKER; };
+    unsigned int GetMarkerType() const { return CClientMarkerCommon::CLASS_3DMARKER; };
 
-    unsigned long Get3DMarkerType(void);
+    unsigned long Get3DMarkerType();
     void          Set3DMarkerType(unsigned long ulType);
 
     bool IsHit(const CVector& vecPosition) const;
@@ -40,23 +39,23 @@ public:
     void GetMatrix(CMatrix& mat) { mat = m_Matrix; };
     void SetMatrix(CMatrix& mat) { m_Matrix = mat; };
 
-    bool IsVisible(void) const { return m_bVisible; };
+    bool IsVisible() const { return m_bVisible; };
     void SetVisible(bool bVisible) { m_bVisible = bVisible; };
 
-    SColor GetColor(void) const { return m_Color; }
+    SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor& color) { m_Color = color; }
 
-    float GetSize(void) const { return m_fSize; };
+    float GetSize() const { return m_fSize; };
     void  SetSize(float fSize) { m_fSize = fSize; };
 
-    float GetPulseFraction(void) { return static_cast<float>(m_pMarker->GetPulseFraction()); };
+    float GetPulseFraction() { return static_cast<float>(m_pMarker->GetPulseFraction()); };
     void  SetPulseFraction(float fFraction) { m_pMarker->SetPulseFraction(fFraction); };
 
 protected:
-    void StreamIn(void);
-    void StreamOut(void);
+    void StreamIn();
+    void StreamOut();
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     CClientMarker* m_pThis;
@@ -70,5 +69,3 @@ private:
     unsigned int m_ulIdentifier;
     bool         m_bMarkerStreamedIn;
 };
-
-#endif

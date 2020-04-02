@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlockSA_H
-#define __CAnimBlockSA_H
+#pragma once
 
 #include <game/CAnimBlock.h>
 #include "Common.h"
@@ -20,7 +19,7 @@ class CAnimBlendAssocGroupSA;
 class CAnimBlockSAInterface            // 32 bytes
 {
 public:
-    int GetIndex(void);            // hacky, i know
+    int GetIndex();            // hacky, i know
 
     char           szName[16];
     bool           bLoaded;            // ?
@@ -38,19 +37,17 @@ class CAnimBlockSA : public CAnimBlock
 public:
     CAnimBlockSA(CAnimBlockSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CAnimBlockSAInterface*          GetInterface(void) { return m_pInterface; }
-    char*                           GetName(void) { return m_pInterface->szName; }
-    int                             GetIndex(void) { return m_pInterface->GetIndex(); }
-    void                            AddRef(void) { m_pInterface->usRefs++; }
-    unsigned short                  GetRefs(void) { return m_pInterface->usRefs; }
-    bool                            IsLoaded(void) { return m_pInterface->bLoaded; }
-    int                             GetIDOffset(void) { return m_pInterface->idOffset; }
-    size_t                          GetAnimationCount(void) { return m_pInterface->nAnimations; }
+    CAnimBlockSAInterface*          GetInterface() { return m_pInterface; }
+    char*                           GetName() { return m_pInterface->szName; }
+    int                             GetIndex() { return m_pInterface->GetIndex(); }
+    void                            AddRef() { m_pInterface->usRefs++; }
+    unsigned short                  GetRefs() { return m_pInterface->usRefs; }
+    bool                            IsLoaded() { return m_pInterface->bLoaded; }
+    int                             GetIDOffset() { return m_pInterface->idOffset; }
+    size_t                          GetAnimationCount() { return m_pInterface->nAnimations; }
     void                            Request(EModelRequestType requestType, bool bAllowBlockingFail = false);
     CAnimBlendHierarchySAInterface* GetAnimationHierarchyInterface(size_t iAnimation);
 
 protected:
     CAnimBlockSAInterface* m_pInterface;
 };
-
-#endif

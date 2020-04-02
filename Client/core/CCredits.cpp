@@ -20,7 +20,7 @@ namespace CCreditsGUI
 }            // namespace CCreditsGUI
 using namespace CCreditsGUI;
 
-CCredits::CCredits(void)
+CCredits::CCredits()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -30,45 +30,47 @@ CCredits::CCredits(void)
                     "\n";
 
     m_strCredits += _("Programming");
-    m_strCredits += ToUTF8(
-        L"\n\n"
+    m_strCredits +=
+        "\n\n"
 
-        L"Alberto \"ryden\" Alonso\n"
-        L"Marcus \"mabako\" Bauer\n"
-        L"Hendrik \"arc_\" van den Berge\n"
-        L"Stanislav \"lil_Toady\" Bobrov\n"
-        L"Dan \"Talidan\" Chowdhury\n"
-        L"Chris \"ccw\" Cockwanger\n"
-        L"Adge \"Jax\" Cutler\n"
-        L"Cecill \"ijs\" Etheredge\n"
-        L"Sebas \"x86\" Lamers\n"
-        L"Raphael \"Mr.Hankey\" Leiteritz\n"
-        L"Ed \"eAi\" Lyons\n"
-        L"Christian \"ChrML\" Myhre Lundheim\n"
-        L"Arushan \"aru\" Raj\n"
-        L"Frank \"Aim\" Spijkerman\n"
-        L"Pascal \"sbx320\" Stücker\n"
-        L"Kevin \"Kevuwk\" Whiteside\n"
-        L"Richard \"Cazomino05\" Whitlock\n"
-        L"Gamesnert\n"
-        L"Jusonex\n"
-        L"Qais \"qaisjp\" Patankar\n"
-        L"\n"
-        L"\n");
+        "Alberto \"ryden\" Alonso\n"
+        "Marcus \"mabako\" Bauer\n"
+        "Hendrik \"arc_\" van den Berge\n"
+        "Stanislav \"lil_Toady\" Bobrov\n"
+        "Dan \"Talidan\" Chowdhury\n"
+        "Chris \"ccw\" Cockwanger\n"
+        "Adge \"Jax\" Cutler\n"
+        "Cecill \"ijs\" Etheredge\n"
+        "Marek \"botder\" Kulik\n"
+        "Sebas \"x86\" Lamers\n"
+        "Raphael \"Mr.Hankey\" Leiteritz\n"
+        "Ed \"eAi\" Lyons\n"
+        "Christian \"ChrML\" Myhre Lundheim\n"
+        "Qais \"qaisjp\" Patankar\n"
+        "Arushan \"aru\" Raj\n"
+        "Frank \"Aim\" Spijkerman\n"
+        "Pascal \"sbx320\" Stücker\n"
+        "Kevin \"Kevuwk\" Whiteside\n"
+        "Richard \"Cazomino05\" Whitlock\n"
+        "Gamesnert\n"
+        "Jusonex\n"
+        "\n"
+        "\n";
 
     m_strCredits += _("Contributors");
     m_strCredits +=
         "\n\n"
 
+        "Patrik \"myonlake\" Juvonen\n"
+        "Danish \"Saml1er\" Khan\n"
         "Arran\n"
-        "Remp\n"
-        "MX_Master\n"
         "Iztas\n"
         "impulze\n"
         "JoeBullet\n"
         "lopezloo\n"
-        "Marek \"Necktrox\" Kulik\n"
-        "Dutchman101\n"
+        "MX_Master\n"
+        "Remp\n"
+        "\n"
         "\n";
 
     m_strCredits += _("Game Design / Scripting");
@@ -85,8 +87,17 @@ CCredits::CCredits(void)
         "Dustin \"Ransom\" Morren\n"
         "erorr404\n"
         "Synecy\n"
+        "Dutchman101\n"
         "\n"
         "\n";
+
+    if (g_pLocalization->IsLocalized() && !g_pLocalization->GetTranslators().empty())
+    {
+        m_strCredits += _("Language Localization");
+        m_strCredits += "\n\n";
+        m_strCredits += g_pLocalization->GetTranslators();
+        m_strCredits += "\n\n\n";
+    }
 
     m_strCredits += _("Patch contributors");
     m_strCredits +=
@@ -94,10 +105,18 @@ CCredits::CCredits(void)
 
         "Lukasz \"W\" Biegaj\n"
         "Florian \"Flobu\" Busse\n"
-        "Philip \"Fenix\" Farquharson\n"
-        "Robin \"robhol\" Holm\n"
-        "Adam \"50p\" Telega\n"
         "Callum \"Callum\" Dawson\n"
+        "Philip \"Fenix\" Farquharson\n"
+        "Seweryn \"Neproify\" Figura\n"
+        "Robin \"robhol\" Holm\n"
+        "Gabrielius \"Dezash\" Laurinavicius\n"
+        "Kamil \"forkerer\" Marciniak\n"
+        "Uladzislau \"TheNormalnij\" Nikalayevich\n"
+        "Nikita \"StrixG\" Obrecht\n"
+        "Ali \"Haxardous\" Qamber\n"
+        "Sam \"samr46\" R.\n"
+        "Fedor \"Ted\" Sinev\n"
+        "Adam \"50p\" Telega\n"
         "Ilya \"Kenix\" Volkov\n"
         "Gothem\n"
         "rafalh\n"
@@ -128,7 +147,6 @@ CCredits::CCredits(void)
         "John_Michael\n"
         "-ffs-Sniper\n"
         "W\n"
-        "Fedor Sinev\n"
         "zneext\n"
         "ZReC\n"
         "Pawelo / 4O4\n"
@@ -142,26 +160,33 @@ CCredits::CCredits(void)
         "JR10\n"
         "PhrozenByte\n"
         "AboShanab\n"
+        "GTX / Timic3\n"
+        "FileEX\n"
+        "Pirulax\n"
+        "xLuxy\n"
+        "Addlibs\n"
+        "SDraw\n"
+        "DetectedStorm\n"
+        "xerox8521\n"
+        "pentaflops\n"
+        "knitz12\n"
+        "ApeLsiN4eG\n"
+        "\n"
         "\n";
-    "\n";
-
-    if (g_pLocalization->IsLocalized() && !g_pLocalization->GetTranslators().empty())
-    {
-        m_strCredits += _("Language Localization");
-        m_strCredits += "\n\n";
-        m_strCredits += g_pLocalization->GetTranslators();
-        m_strCredits += "\n\n\n";
-    }
 
     m_strCredits += _("Special Thanks");
     m_strCredits +=
         "\n\n"
 
         "Derek \"slush\" Abdine\n"
+        "Jordan \"Woovie\" Banasik\n"
         "Javier \"jbeta\" Beta\n"
         "Oliver \"Oli\" Brown\n"
+        "Emiliano \"Sasu\" Castro\n"
         "Wojciech \"Wojjie\" Hlibowicki\n"
         "Chris \"Cray\" McArthur\n"
+        "Rob 'Sugar Daddy' Pooley\n"
+        "max \"Hobo Pie\" Power\n"
         "Hans \"Blokker\" Roes\n"
         "Kent \"Kent747\" Simon\n"
         "Matthew \"Towncivilian\" Wolfe\n"
@@ -170,15 +195,12 @@ CCredits::CCredits(void)
         "Pugwipe\n"
         "The_GTA\n"
         "Phatlooser\n"
-        "Dwayne 'The 'Woovie' Rock' Johnson\n"
-        "max 'Hobo Pie' Power\n"
-        "Rob 'Sugar Daddy' Pooley\n"
         "diegofkda\n"
         "Ren712\n"
+        "StifflersMom\n"
         "\n"
-        "\n"
-
         "\n";
+
     m_strCredits += _("This software makes use of the following libraries and software:");
     m_strCredits +=
         "\n"
@@ -197,7 +219,9 @@ CCredits::CCredits(void)
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "speex (http://www.speex.org/)\n"
-        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n";
+        "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
+        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
+        "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n";
 
     // Create our window
     CVector2D RelativeWindow = CVector2D(fWindowX / pManager->GetResolution().fX, fWindowY / pManager->GetResolution().fY);
@@ -229,19 +253,14 @@ CCredits::CCredits(void)
         if (uiLineCount >= 15 || *szCreditsIterator == 0)
         {
             // Copy out the text we shall put in that label
-            char         szBuffer[512];
-            unsigned int uiCreditsSize = (szCreditsIterator - szCreditsBegin);
-            if (uiCreditsSize >= 512)
-                uiCreditsSize = 511;
-            memcpy(szBuffer, szCreditsBegin, uiCreditsSize);
-            szBuffer[uiCreditsSize] = 0;
+            std::string strBuffer(szCreditsBegin, szCreditsIterator - szCreditsBegin);
 
             // Remember where we count from
             szCreditsBegin = szCreditsIterator;
             ++szCreditsBegin;
 
             // Create the label
-            m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, szBuffer));
+            m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, strBuffer.c_str()));
             m_pLabels[uiLabelIndex]->SetPosition(CVector2D(0.022f, fStartPosition), true);
             m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1200.0f));            // relative 0.95, 6.0
             m_pLabels[uiLabelIndex]->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
@@ -271,7 +290,7 @@ CCredits::CCredits(void)
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CCredits::OnOKButtonClick, this));
 }
 
-CCredits::~CCredits(void)
+CCredits::~CCredits()
 {
     // Delete all the labels
     int i = 0;
@@ -291,21 +310,25 @@ CCredits::~CCredits(void)
     delete m_pWindow;
 }
 
-void CCredits::Update(void)
+void CCredits::Update()
 {
     if (m_pWindow->IsVisible())
     {
-        // Speed it up if control is being held
-        if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0)
+        // Speed it up if arrow keys are being held
+        if ((GetAsyncKeyState(VK_DOWN) & 0x8000) != 0)
         {
-            m_clkStart -= 50;
+            m_clkStart -= 150;
+        }
+        if ((GetAsyncKeyState(VK_UP) & 0x8000) != 0)
+        {
+            m_clkStart += 150;
         }
 
         // Calculate the current position
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
-        // If we're too far down, make sure we restart next pulse
-        if (fCurrentTop <= -6.0f)
+        // If we're too far down or up, make sure we restart next pulse
+        if (fCurrentTop <= -8.0f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }
@@ -329,7 +352,7 @@ void CCredits::SetVisible(bool bVisible)
     m_clkStart = clock();
 }
 
-bool CCredits::IsVisible(void)
+bool CCredits::IsVisible()
 {
     return m_pWindow->IsVisible();
 }

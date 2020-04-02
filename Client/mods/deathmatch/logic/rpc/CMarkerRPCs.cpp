@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CMarkerRPCs.h"
 
-void CMarkerRPCs::LoadFunctions(void)
+void CMarkerRPCs::LoadFunctions()
 {
     AddHandler(SET_MARKER_TYPE, SetMarkerType, "SetMarkerType");
     AddHandler(SET_MARKER_COLOR, SetMarkerColor, "SetMarkerColor");

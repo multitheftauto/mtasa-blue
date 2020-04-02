@@ -12,11 +12,7 @@ enum PATH_EXCL_MODE {
   EXCL_SKIPWHOLEPATH,  // -ep  (exclude the path completely)
   EXCL_BASEPATH,       // -ep1 (exclude the base part of path)
   EXCL_SAVEFULLPATH,   // -ep2 (the full path without the disk letter)
-  EXCL_ABSPATH,        // -ep3 (the full path with the disk letter)
-
-  EXCL_SKIPABSPATH     // Works as EXCL_BASEPATH for fully qualified paths
-                       // and as EXCL_UNCHANGED for relative paths.
-                       // Used by WinRAR GUI only.
+  EXCL_ABSPATH         // -ep3 (the full path with the disk letter)
 };
 
 enum {SOLID_NONE=0,SOLID_NORMAL=1,SOLID_COUNT=2,SOLID_FILEEXT=4,
@@ -52,7 +48,7 @@ enum OVERWRITE_MODE
 
 enum QOPEN_MODE { QOPEN_NONE, QOPEN_AUTO, QOPEN_ALWAYS };
 
-enum RAR_CHARSET { RCH_DEFAULT=0,RCH_ANSI,RCH_OEM,RCH_UNICODE };
+enum RAR_CHARSET { RCH_DEFAULT=0,RCH_ANSI,RCH_OEM,RCH_UNICODE,RCH_UTF8 };
 
 #define     MAX_FILTER_TYPES           16
 enum FilterState {FILTER_DEFAULT=0,FILTER_AUTO,FILTER_FORCE,FILTER_DISABLE};
@@ -62,6 +58,20 @@ enum SAVECOPY_MODE {
   SAVECOPY_NONE=0, SAVECOPY_SILENT, SAVECOPY_LIST, SAVECOPY_LISTEXIT,
   SAVECOPY_DUPLISTEXIT
 };
+
+enum APPENDARCNAME_MODE
+{
+  APPENDARCNAME_NONE=0,APPENDARCNAME_DESTPATH,APPENDARCNAME_OWNDIR
+};
+
+enum POWER_MODE {
+  POWERMODE_KEEP=0,POWERMODE_OFF,POWERMODE_HIBERNATE,POWERMODE_SLEEP,
+  POWERMODE_RESTART
+};
+
+
+// Need "forced off" state to turn off sound in GUI command line.
+enum SOUND_NOTIFY_MODE {SOUND_NOTIFY_DEFAULT=0,SOUND_NOTIFY_ON,SOUND_NOTIFY_OFF};
 
 struct FilterMode
 {
@@ -85,16 +95,19 @@ class RAROptions
     bool InclAttrSet;
     size_t WinSize;
     wchar TempPath[NM];
-#ifdef USE_QOPEN
     wchar SFXModule[NM];
+
+#ifdef USE_QOPEN
     QOPEN_MODE QOpenMode;
 #endif
+
     bool ConfigDisabled; // Switch -cfg-.
     wchar ExtrPath[NM];
     wchar CommentFile[NM];
     RAR_CHARSET CommentCharset;
     RAR_CHARSET FilelistCharset;
     RAR_CHARSET ErrlogCharset;
+    RAR_CHARSET RedirectCharset;
 
     wchar ArcPath[NM];
     SecPassword Password;
@@ -104,7 +117,7 @@ class RAROptions
 
     wchar LogName[NM];
     MESSAGE_TYPE MsgStream;
-    bool Sound;
+    SOUND_NOTIFY_MODE Sound;
     OVERWRITE_MODE Overwrite;
     int Method;
     HASH_TYPE HashType;
@@ -113,6 +126,7 @@ class RAROptions
     bool DisablePercentage;
     bool DisableCopyright;
     bool DisableDone;
+    bool PrintVersion;
     int Solid;
     int SolidCount;
     bool ClearArc;
@@ -126,6 +140,7 @@ class RAROptions
     Array<int64> NextVolSizes;
     uint CurVolNum;
     bool AllYes;
+    bool MoreInfo; // -im, show more information, used only in "WinRAR t" now.
     bool DisableSortSolid;
     int ArcTime;
     int ConvertNames;
@@ -139,6 +154,10 @@ class RAROptions
     bool OpenShared;
     bool DeleteFiles;
 
+#ifdef _WIN_ALL
+    bool AllowIncompatNames; // Allow names with trailing dots and spaces.
+#endif
+
 
 #ifndef SFX_MODULE
     bool GenerateArcName;
@@ -149,8 +168,10 @@ class RAROptions
     bool SaveStreams;
     bool SetCompressedAttr;
     bool IgnoreGeneralAttr;
-    RarTime FileTimeBefore;
-    RarTime FileTimeAfter;
+    RarTime FileMtimeBefore,FileCtimeBefore,FileAtimeBefore;
+    bool FileMtimeBeforeOR,FileCtimeBeforeOR,FileAtimeBeforeOR;
+    RarTime FileMtimeAfter,FileCtimeAfter,FileAtimeAfter;
+    bool FileMtimeAfterOR,FileCtimeAfterOR,FileAtimeAfterOR;
     int64 FileSizeLess;
     int64 FileSizeMore;
     bool Lock;
@@ -159,9 +180,9 @@ class RAROptions
     FilterMode FilterModes[MAX_FILTER_TYPES];
     wchar EmailTo[NM];
     uint VersionControl;
-    bool AppendArcNameToPath;
-    bool Shutdown;
-    EXTTIME_MODE xmtime;
+    APPENDARCNAME_MODE AppendArcNameToPath;
+    POWER_MODE Shutdown;
+    EXTTIME_MODE xmtime; // Extended time modes (time precision to store).
     EXTTIME_MODE xctime;
     EXTTIME_MODE xatime;
     wchar CompressStdin[NM];
@@ -169,9 +190,6 @@ class RAROptions
     uint Threads; // We use it to init hash even if RAR_SMP is not defined.
 
 
-#ifdef _ANDROID
-    int64 FreeMem;
-#endif
 
 
 

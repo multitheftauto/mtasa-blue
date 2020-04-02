@@ -19,11 +19,11 @@ std::string GetProperty(const char* szProperty)
     return CGUIElement_Impl::GetProperty(szProperty);
 };
 
-CGUIPropertyIter GetPropertiesBegin(void)
+CGUIPropertyIter GetPropertiesBegin()
 {
     return CGUIElement_Impl::GetPropertiesBegin();
 };
-CGUIPropertyIter GetPropertiesEnd(void)
+CGUIPropertyIter GetPropertiesEnd()
 {
     return CGUIElement_Impl::GetPropertiesEnd();
 };
@@ -32,7 +32,7 @@ bool SetFont(const char* szFontName)
 {
     return CGUIElement_Impl::SetFont(szFontName);
 };
-std::string GetFont(void)
+std::string GetFont()
 {
     return CGUIElement_Impl::GetFont();
 };
@@ -42,7 +42,7 @@ void SetVisible(bool bVisible)
 {
     CGUIElement_Impl::SetVisible(bVisible);
 };
-bool IsVisible(void)
+bool IsVisible()
 {
     return CGUIElement_Impl::IsVisible();
 };
@@ -53,7 +53,7 @@ void SetEnabled(bool bEnabled)
 {
     CGUIElement_Impl::SetEnabled(bEnabled);
 };
-bool IsEnabled(void)
+bool IsEnabled()
 {
     return CGUIElement_Impl::IsEnabled();
 };
@@ -62,16 +62,16 @@ void SetZOrderingEnabled(bool bZOrderingEnabled)
 {
     CGUIElement_Impl::SetZOrderingEnabled(bZOrderingEnabled);
 };
-bool IsZOrderingEnabled(void)
+bool IsZOrderingEnabled()
 {
     return CGUIElement_Impl::IsZOrderingEnabled();
 };
 
-void BringToFront(void)
+void BringToFront()
 {
     CGUIElement_Impl::BringToFront();
 };
-void MoveToBack(void)
+void MoveToBack()
 {
     CGUIElement_Impl::MoveToBack();
 };
@@ -122,7 +122,7 @@ void SetMinimumSize(const CVector2D& vecSize)
 {
     CGUIElement_Impl::SetMinimumSize(vecSize);
 };
-CVector2D GetMinimumSize(void)
+CVector2D GetMinimumSize()
 {
     return CGUIElement_Impl::GetMinimumSize();
 };
@@ -135,7 +135,7 @@ void SetMaximumSize(const CVector2D& vecSize)
 {
     CGUIElement_Impl::SetMaximumSize(vecSize);
 };
-CVector2D GetMaximumSize(void)
+CVector2D GetMaximumSize()
 {
     return CGUIElement_Impl::GetMaximumSize();
 };
@@ -151,7 +151,7 @@ void SetText(const char* Text)
 };
 #endif
 
-std::string GetText(void)
+std::string GetText()
 {
     return CGUIElement_Impl::GetText();
 };
@@ -160,11 +160,11 @@ void SetAlpha(float fAlpha)
 {
     CGUIElement_Impl::SetAlpha(fAlpha);
 };
-float GetAlpha(void)
+float GetAlpha()
 {
     return CGUIElement_Impl::GetAlpha();
 };
-float GetEffectiveAlpha(void)
+float GetEffectiveAlpha()
 {
     return CGUIElement_Impl::GetEffectiveAlpha();
 };
@@ -172,25 +172,25 @@ void SetInheritsAlpha(bool bInheritsAlpha)
 {
     CGUIElement_Impl::SetInheritsAlpha(bInheritsAlpha);
 };
-bool GetInheritsAlpha(void)
+bool GetInheritsAlpha()
 {
     return CGUIElement_Impl::GetInheritsAlpha();
 };
 
-void Activate(void)
+void Activate()
 {
     CGUIElement_Impl::Activate();
 };
-void Deactivate(void)
+void Deactivate()
 {
     CGUIElement_Impl::Deactivate();
 };
-bool IsActive(void)
+bool IsActive()
 {
     return CGUIElement_Impl::IsActive();
 };
 
-void ForceRedraw(void)
+void ForceRedraw()
 {
     CGUIElement_Impl::ForceRedraw();
 };
@@ -198,7 +198,7 @@ void SetAlwaysOnTop(bool bAlwaysOnTop)
 {
     CGUIElement_Impl::SetAlwaysOnTop(bAlwaysOnTop);
 };
-bool IsAlwaysOnTop(void)
+bool IsAlwaysOnTop()
 {
     return CGUIElement_Impl::IsAlwaysOnTop();
 };
@@ -225,12 +225,12 @@ void SetParent(CGUIElement* pParent)
 {
     CGUIElement_Impl::SetParent(pParent);
 };
-CGUIElement* GetParent(void)
+CGUIElement* GetParent()
 {
     return CGUIElement_Impl::GetParent();
 };
 
-CEGUI::Window* GetWindow(void)
+CEGUI::Window* GetWindow()
 {
     return CGUIElement_Impl::GetWindow();
 };
@@ -239,12 +239,16 @@ void SetUserData(void* pData)
 {
     CGUIElement_Impl::SetUserData(pData);
 };
-void* GetUserData(void)
+void* GetUserData()
 {
     return CGUIElement_Impl::GetUserData();
 };
 
 void SetClickHandler(GUI_CALLBACK Callback)
+{
+    CGUIElement_Impl::SetClickHandler(Callback);
+};
+void SetClickHandler(const GUI_CALLBACK_MOUSE& Callback)
 {
     CGUIElement_Impl::SetClickHandler(Callback);
 };
@@ -293,23 +297,23 @@ void SetEnterKeyHandler(GUI_CALLBACK Callback)
     CGUIElement_Impl::SetEnterKeyHandler(Callback);
 };
 
-bool Event_OnClick(void)
+bool Event_OnClick(const CEGUI::EventArgs& e)
 {
-    return CGUIElement_Impl::Event_OnClick();
+    return CGUIElement_Impl::Event_OnClick(e);
 };
-bool Event_OnDoubleClick(void)
+bool Event_OnDoubleClick()
 {
     return CGUIElement_Impl::Event_OnDoubleClick();
 };
-bool Event_OnMouseEnter(void)
+bool Event_OnMouseEnter()
 {
     return CGUIElement_Impl::Event_OnMouseEnter();
 };
-bool Event_OnMouseLeave(void)
+bool Event_OnMouseLeave()
 {
     return CGUIElement_Impl::Event_OnMouseLeave();
 };
-bool Event_OnMouseButtonDown(void)
+bool Event_OnMouseButtonDown()
 {
     return CGUIElement_Impl::Event_OnMouseButtonDown();
 };

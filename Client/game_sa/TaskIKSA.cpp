@@ -79,7 +79,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
     }
 }
 
-CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA(void)
+CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA()
 {
     this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
 }

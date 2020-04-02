@@ -17,7 +17,7 @@ CClientMarkerManager::CClientMarkerManager(CClientManager* pManager)
     m_bCanRemoveFromList = true;
 }
 
-CClientMarkerManager::~CClientMarkerManager(void)
+CClientMarkerManager::~CClientMarkerManager()
 {
     // Make sure all checkpoints are deleted
     DeleteAll();
@@ -35,7 +35,7 @@ CClientMarker* CClientMarkerManager::Get(ElementID ID)
     return NULL;
 }
 
-void CClientMarkerManager::DeleteAll(void)
+void CClientMarkerManager::DeleteAll()
 {
     // Delete each checkpoint
     m_bCanRemoveFromList = false;
@@ -51,7 +51,7 @@ void CClientMarkerManager::DeleteAll(void)
     m_Markers.clear();
 }
 
-void CClientMarkerManager::DoPulse(void)
+void CClientMarkerManager::DoPulse()
 {
     m_Markers.SuspendModifyOperations();
     // Pulse all our markers

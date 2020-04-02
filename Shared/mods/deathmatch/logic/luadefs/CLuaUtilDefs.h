@@ -14,7 +14,7 @@
 class CLuaUtilDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // Reserved functions
     LUA_DECLARE(DisabledFunction);
@@ -48,4 +48,8 @@ public:
 
     // Debug functions
     LUA_DECLARE(DebugSleep);
+
+    // Utility functions
+    LUA_DECLARE(GetTok);
+    LUA_DECLARE(tocolor);
 };

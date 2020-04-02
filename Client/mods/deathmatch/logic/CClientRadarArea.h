@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTRADARAREA_H
-#define __CCLIENTRADARAREA_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <gui/CGUI.h>
@@ -23,35 +22,35 @@ class CClientRadarArea : public CClientEntity
 
 public:
     CClientRadarArea(class CClientManager* pManager, ElementID ID);
-    ~CClientRadarArea(void);
+    ~CClientRadarArea();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTRADARAREA; };
+    eClientEntityType GetType() const { return CCLIENTRADARAREA; };
 
-    const CVector2D& GetPosition(void) const { return m_vecPosition; };
+    const CVector2D& GetPosition() const { return m_vecPosition; };
     void             GetPosition(CVector2D& vecPosition) const { vecPosition = m_vecPosition; };
     void             GetPosition(CVector& vecPosition) const { vecPosition = CVector(m_vecPosition.fX, m_vecPosition.fY, 0.0f); };
     void             SetPosition(const CVector2D& vecPosition) { m_vecPosition = vecPosition; };
     void             SetPosition(const CVector& vecPosition) { m_vecPosition = CVector2D(vecPosition.fX, vecPosition.fY); };
 
-    const CVector2D& GetSize(void) const { return m_vecSize; };
+    const CVector2D& GetSize() const { return m_vecSize; };
     void             GetSize(CVector2D& vecSize) { vecSize = m_vecSize; };
     void             SetSize(const CVector2D& vecSize) { m_vecSize = vecSize; };
 
-    SColor GetColor(void) const { return m_Color; };
+    SColor GetColor() const { return m_Color; };
     void   SetColor(const SColor color) { m_Color = color; };
 
-    bool IsFlashing(void) const { return m_bFlashing; };
+    bool IsFlashing() const { return m_bFlashing; };
     void SetFlashing(bool bFlashing) { m_bFlashing = bFlashing; };
 
-    float GetAlphaFactor(void) const { return m_fAlphaFactor; };
+    float GetAlphaFactor() const { return m_fAlphaFactor; };
 
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usDimension);
 
 protected:
-    void DoPulse(void);
+    void DoPulse();
     void DoPulse(bool bRender);
 
     CClientRadarAreaManager* m_pRadarAreaManager;
@@ -65,5 +64,3 @@ protected:
     unsigned long m_ulFlashCycleStart;
     float         m_fAlphaFactor;
 };
-
-#endif

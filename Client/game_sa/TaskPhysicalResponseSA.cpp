@@ -43,31 +43,32 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     }
 }
 
-CPed* CTaskSimpleChokingSA::GetAttacker(void)
+CPed* CTaskSimpleChokingSA::GetAttacker()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
-    return pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker);
+    SClientEntity<CPedSA>*         pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker);
+    return pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeRemaining(void)
+unsigned int CTaskSimpleChokingSA::GetTimeRemaining()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_nTimeRemaining;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeStarted(void)
+unsigned int CTaskSimpleChokingSA::GetTimeStarted()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_nTimeStarted;
 }
 
-bool CTaskSimpleChokingSA::IsTeargas(void)
+bool CTaskSimpleChokingSA::IsTeargas()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_bIsTeargas ? true : false;
 }
 
-bool CTaskSimpleChokingSA::IsFinished(void)
+bool CTaskSimpleChokingSA::IsFinished()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_bIsFinished;

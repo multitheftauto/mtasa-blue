@@ -39,7 +39,7 @@ SExePatchedStatus GetExePatchedStatus(bool bUseExeCopy)
 // Check which patches should be applied
 //
 //////////////////////////////////////////////////////////
-SExePatchedStatus GetExePatchRequirements(void)
+SExePatchedStatus GetExePatchRequirements()
 {
     SExePatchedStatus status;
     status.bTimestamp = GetApplicationSettingInt("aero-enabled") ? true : false;
@@ -82,7 +82,7 @@ bool SetExePatchedStatus(bool bUseExeCopy, const SExePatchedStatus& status)
 // Returns true if patches should be applied to exe copy
 //
 //////////////////////////////////////////////////////////
-bool ShouldUseExeCopy(void)
+bool ShouldUseExeCopy()
 {
     SString strUseCopyReason;
     if (GetApplicationSettingInt("nvhacks", "optimus"))
@@ -99,6 +99,9 @@ bool ShouldUseExeCopy(void)
     if (RequiresAltTabFix())
         strUseCopyReason += " AltTabFix";
 
+    if (ShouldForceUseExeCopy())
+        strUseCopyReason += " ForceUseExeCopy";
+
     // Log reason for using proxy_sa
     static SString strUseCopyReasonPrevious;
     if (strUseCopyReasonPrevious != strUseCopyReason)
@@ -111,12 +114,29 @@ bool ShouldUseExeCopy(void)
 
 //////////////////////////////////////////////////////////
 //
+// ShouldForceUseExeCopy
+//
+// Determine if gta_sa.exe looks unusable (under 10MB)
+//          AND proxy_sa.exe looks usable (over 10MB)
+//
+//////////////////////////////////////////////////////////
+bool ShouldForceUseExeCopy()
+{
+    SString strGTAPath = GetGTAPath();
+    if (FileSize(PathJoin(strGTAPath, MTA_GTAEXE_NAME)) < 10 * 1024 * 1024)
+        if (FileSize(PathJoin(strGTAPath, MTA_HTAEXE_NAME)) > 10 * 1024 * 1024)
+            return true;
+    return false;
+}
+
+//////////////////////////////////////////////////////////
+//
 // RequiresAltTabFix
 //
 // Return true if there might be an alt-tab black screen problem when using gta_sa.exe
 //
 //////////////////////////////////////////////////////////
-bool RequiresAltTabFix(void)
+bool RequiresAltTabFix()
 {
     // Exception for optimus because of better hi-perf detection when using gta_sa.exe
     if (GetApplicationSettingInt("nvhacks", "optimus"))
@@ -184,12 +204,13 @@ uint64 GetExeFileSize(bool bUseExeCopy)
 // Return false if needs admin access
 //
 //////////////////////////////////////////////////////////
-bool CopyExe(void)
+bool CopyExe()
 {
     SString strGTAEXEPathFrom = GetExePathFilename(false);
     SString strGTAEXEPathTo = GetExePathFilename(true);
-    if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
-        return false;
+    if (strGTAEXEPathFrom != strGTAEXEPathTo)
+        if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
+            return false;
     return true;
 }
 
@@ -205,6 +226,8 @@ SString GetExePathFilename(bool bUseExeCopy)
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
+        if (ShouldForceUseExeCopy())
+            bUseExeCopy = true;
         const char* szExeName = bUseExeCopy ? MTA_HTAEXE_NAME : MTA_GTAEXE_NAME;
         SString     strGTAEXEPath = PathJoin(strGTAPath, szExeName);
         return strGTAEXEPath;
@@ -219,7 +242,7 @@ SString GetExePathFilename(bool bUseExeCopy)
 // Return full path and filename of exe we will probably be using
 //
 //////////////////////////////////////////////////////////
-SString GetUsingExePathFilename(void)
+SString GetUsingExePathFilename()
 {
     return GetExePathFilename(ShouldUseExeCopy());
 }
@@ -381,8 +404,8 @@ namespace
     uint newExportDir[] = {0x004a32d0, 0x00000060};
     uint oldExportTable[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint newExportTable[] = {0x00000000, 0x51a9df70, 0x00000000, 0x004a3302,             //  ....pß©Q.....3J.
-                             0x00000001, 0x00000001, 0x00000001, 0x004a32f8,             //  ............ø2J.
-                             0x004a32fc, 0x004a3300, 0x004c6988, 0x004a3317,             //  ü/£..3J.ˆiL..3J.
+                             0x00000001, 0x00000001, 0x00000001, 0x004a32f8,             //  ............<F8>2J.
+                             0x004a32fc, 0x004a3300, 0x004c6988, 0x004a3317,             //  <FC>/<A3>..3J.<88>iL..3J.
                              0x74670000, 0x61735f61, 0x6578652e, 0x00000000,             //  ..gta_sa.exe....
                              0x00000000, 0x4e000000, 0x74704f76, 0x73756d69,             //  .......NvOptimus
                              0x62616e45, 0x656d656c, 0x0000746e, 0x00000000};            //  Enablement......
@@ -534,7 +557,7 @@ EPatchResult UpdatePatchStatusNvightmare(const SString& strGTAEXEPath, EPatchMod
 // Return true if checksum for some dlls will cause problems
 //
 //////////////////////////////////////////////////////////
-bool GetPatchRequirementAltModules(void)
+bool GetPatchRequirementAltModules()
 {
     // Only do file check once per launch
     static bool bDone = false;
@@ -773,7 +796,7 @@ EPatchResult UpdatePatchStatusEntryPoint(const SString& strGTAEXEPath, EPatchMod
 // Return true if AddressOfEntryPoint in gta_sa.exe should be fixed (in proxy_sa.exe)
 //
 //////////////////////////////////////////////////////////
-bool GetPatchRequirementEntryPoint(void)
+bool GetPatchRequirementEntryPoint()
 {
     // Only do file check once per launch
     static bool bDone = false;

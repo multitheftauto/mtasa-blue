@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_WANTED
-#define __CGAME_WANTED
+#pragma once
 
 #include <windows.h>
 
@@ -19,9 +18,7 @@ class CWanted
 public:
     virtual void SetMaximumWantedLevel(DWORD dwWantedLevel) = 0;
     virtual void SetWantedLevel(DWORD dwWantedLevel) = 0;
-    virtual char GetWantedLevel(void) = 0;
+    virtual char GetWantedLevel() = 0;
     virtual void SetWantedLevelNoDrop(DWORD dwWantedLevel) = 0;
     virtual void SetWantedLevelNoFlash(DWORD dwWantedLevel) = 0;
 };
-
-#endif

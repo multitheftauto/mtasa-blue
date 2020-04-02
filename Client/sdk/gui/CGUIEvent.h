@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUI_EVENT_H
-#define __CGUI_EVENT_H
+#pragma once
 
 #include "CGUI.h"
 #include "CGUITypes.h"
@@ -47,5 +46,3 @@ struct CGUIFocusEventArgs
     CGUIElement* pActivatedWindow;
     CGUIElement* pDeactivatedWindow;
 };
-
-#endif

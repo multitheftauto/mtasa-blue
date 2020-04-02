@@ -11,30 +11,20 @@
 
 #include "StdInc.h"
 
-CEntity* CCamSA::GetTargetEntity(void) const
+CEntity* CCamSA::GetTargetEntity() const
 {
     CEntitySAInterface* pInterface = m_pInterface->CamTargetEntity;
-    CPoolsSA*           pPools = (CPoolsSA*)pGame->GetPools();
-    CEntity*            pReturn = NULL;
-
-    if (pPools && pInterface)
+    if (pInterface)
     {
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface));
-                break;
-            case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));
-                break;
-            case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface));
-                break;
-            default:
-                break;
-        }
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
-    return pReturn;
+    return nullptr;
+}
+
+void CCamSA::SetTargetEntity(CEntity* pEntity)
+{
+    m_pInterface->CamTargetEntity = pEntity->GetInterface();
 }
 
 void CCamSA::GetDirection(float& fHorizontal, float& fVertical)

@@ -21,7 +21,7 @@ extern CCore* g_pCore;
 //
 //
 ////////////////////////////////////////////////////
-CNewsBrowser::CNewsBrowser(void)
+CNewsBrowser::CNewsBrowser()
 {
     m_pWindow = NULL;
     m_pTabPanel = NULL;
@@ -35,7 +35,7 @@ CNewsBrowser::CNewsBrowser(void)
 //
 //
 ////////////////////////////////////////////////////
-CNewsBrowser::~CNewsBrowser(void)
+CNewsBrowser::~CNewsBrowser()
 {
     DestroyGUI();
 }
@@ -47,7 +47,7 @@ CNewsBrowser::~CNewsBrowser(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::InitNewsItemList(void)
+void CNewsBrowser::InitNewsItemList()
 {
     m_NewsitemList.clear();
 
@@ -122,7 +122,7 @@ void CNewsBrowser::InitNewsItemList(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::CreateHeadlines(void)
+void CNewsBrowser::CreateHeadlines()
 {
     InitNewsItemList();
     bool bNewsUpdated = GetApplicationSettingInt("news-updated") == 1;
@@ -144,7 +144,7 @@ void CNewsBrowser::CreateHeadlines(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::CreateGUI(void)
+void CNewsBrowser::CreateGUI()
 {
     CreateHeadlines();
     CGUI* pManager = g_pCore->GetGUI();
@@ -167,9 +167,16 @@ void CNewsBrowser::CreateGUI(void)
     m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
     m_pButtonOK->SetZOrderingEnabled(false);
 
+    // News link
+    m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
+    m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
+    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
+    m_pButtonNewsLink->SetZOrderingEnabled(false);
+
     // Set up the events
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
     m_pButtonOK->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
+    m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
 
     // Create the tab panel and necessary tabs
     m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
@@ -189,7 +196,7 @@ void CNewsBrowser::CreateGUI(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::DestroyGUI(void)
+void CNewsBrowser::DestroyGUI()
 {
     // Destroy
     for (uint i = 0; i < m_TabList.size(); i++)
@@ -357,7 +364,7 @@ void CNewsBrowser::SetVisible(bool bVisible)
 //
 //
 ////////////////////////////////////////////////////
-bool CNewsBrowser::IsVisible(void)
+bool CNewsBrowser::IsVisible()
 {
     return m_pWindow && m_pWindow->IsVisible();
 }
@@ -371,6 +378,16 @@ bool CNewsBrowser::IsVisible(void)
 ////////////////////////////////////////////////////
 bool CNewsBrowser::OnOKButtonClick(CGUIElement* pElement)
 {
+    // Close the window
+    m_pWindow->SetVisible(false);
+    return true;
+}
+
+bool CNewsBrowser::OnNewsLinkButtonClick(CGUIElement* pElement)
+{
+    // Visit the website
+    ShellExecuteNonBlocking("open", "https://mtasa.com/news");
+
     // Close the window
     m_pWindow->SetVisible(false);
     return true;

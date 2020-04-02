@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_RADAR
-#define __CGAME_RADAR
+#pragma once
 
 #include "Common.h"
 
@@ -38,5 +37,3 @@ public:
 
     virtual VOID DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color) = 0;
 };
-
-#endif

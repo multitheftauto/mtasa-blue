@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PAD
-#define __CGAME_PAD
+#pragma once
 
 #include <windows.h>
 
@@ -61,14 +60,12 @@ public:
     virtual VOID              SetLastControllerState(CControllerState* ControllerState) = 0;
     virtual VOID              Restore() = 0;
     virtual VOID              Store() = 0;
-    virtual bool              IsEnabled(void) = 0;
+    virtual bool              IsEnabled() = 0;
     virtual VOID              Disable(bool bDisable) = 0;
-    virtual VOID              Clear(void) = 0;
+    virtual VOID              Clear() = 0;
     virtual VOID              SetHornHistoryValue(bool value) = 0;
-    virtual long              GetAverageWeapon(void) = 0;
+    virtual long              GetAverageWeapon() = 0;
     virtual void              SetLastTimeTouched(DWORD dwTime) = 0;
     virtual uint              GetDrunkInputDelay() = 0;
     virtual void              SetDrunkInputDelay(uint inputDelay) = 0;
 };
-
-#endif

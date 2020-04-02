@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MONSTERTRUCK
-#define __CGAMESA_MONSTERTRUCK
+#pragma once
 
 #include <game/CMonsterTruck.h>
 #include "CAutomobileSA.h"
@@ -28,5 +27,3 @@ public:
     CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck);
     CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 };
-
-#endif

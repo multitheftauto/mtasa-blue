@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CUpdateInfoPacket::CUpdateInfoPacket(void)
+CUpdateInfoPacket::CUpdateInfoPacket()
 {
 }
 

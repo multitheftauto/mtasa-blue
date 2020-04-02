@@ -47,43 +47,43 @@ class ASE
 public:
     ZERO_ON_NEW
     ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
-    ~ASE(void);
+    ~ASE();
 
-    void DoPulse(void);
+    void DoPulse();
     bool SetPortEnabled(bool bInternetEnabled, bool bLanEnabled);
 
-    static ASE* GetInstance(void) { return _instance; }
+    static ASE* GetInstance() { return _instance; }
 
-    unsigned long GetMasterServerQueryCount(void) { return m_ulMasterServerQueryCount; }
-    uint          GetTotalQueryCount(void) { return m_uiNumQueriesTotal; }
-    uint          GetQueriesPerMinute(void) { return m_uiNumQueriesPerMinute; }
+    unsigned long GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
+    uint          GetTotalQueryCount() { return m_uiNumQueriesTotal; }
+    uint          GetQueriesPerMinute() { return m_uiNumQueriesPerMinute; }
 
-    CLanBroadcast* InitLan(void);
+    CLanBroadcast* InitLan();
 
-    const char* GetGameType(void) { return m_strGameType.c_str(); }
+    const char* GetGameType() { return m_strGameType.c_str(); }
     void        SetGameType(const char* szGameType);
-    const char* GetMapName(void) { return m_strMapName.c_str(); }
+    const char* GetMapName() { return m_strMapName.c_str(); }
     void        SetMapName(const char* szMapName);
 
-    CMainConfig*    GetMainConfig(void) { return m_pMainConfig; };
-    CPlayerManager* GetPlayerManager(void) { return m_pPlayerManager; };
+    CMainConfig*    GetMainConfig() { return m_pMainConfig; };
+    CPlayerManager* GetPlayerManager() { return m_pPlayerManager; };
 
     const char* GetRuleValue(const char* szKey);
     void        SetRuleValue(const char* szKey, const char* szValue);
     bool        RemoveRuleValue(const char* szKey);
-    void        ClearRules(void);
+    void        ClearRules();
 
-    list<CASERule*>::iterator IterBegin(void) { return m_Rules.begin(); }
-    list<CASERule*>::iterator IterEnd(void) { return m_Rules.end(); }
+    list<CASERule*>::iterator IterBegin() { return m_Rules.begin(); }
+    list<CASERule*>::iterator IterEnd() { return m_Rules.end(); }
 
-    std::string QueryLight(void);
+    std::string QueryLight();
 
 private:
-    const std::string* QueryFullCached(void);
-    std::string        QueryFull(void);
-    const std::string* QueryLightCached(void);
-    const std::string* QueryXfireLightCached(void);
-    std::string        QueryXfireLight(void);
+    const std::string* QueryFullCached();
+    std::string        QueryFull();
+    const std::string* QueryLightCached();
+    const std::string* QueryXfireLightCached();
+    std::string        QueryXfireLight();
 
     long long m_llCurrentTime;
     uint      m_uiCurrentPlayerCount;
@@ -144,9 +144,9 @@ public:
         m_strKey = szKey;
         m_strValue = szValue;
     }
-    const char* GetKey(void) { return m_strKey.c_str(); }
+    const char* GetKey() { return m_strKey.c_str(); }
     void        SetKey(const char* szKey) { m_strKey = szKey; }
-    const char* GetValue(void) { return m_strValue.c_str(); }
+    const char* GetValue() { return m_strValue.c_str(); }
     void        SetValue(const char* szValue) { m_strValue = szValue; }
 
 private:

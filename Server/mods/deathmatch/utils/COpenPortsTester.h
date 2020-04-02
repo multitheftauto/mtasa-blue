@@ -16,7 +16,7 @@ public:
     //
     // Start a new test
     //
-    void Start(void)
+    void Start()
     {
         if (m_iPortTestStage != 0)
             return;
@@ -46,7 +46,10 @@ public:
         }
 
         // Send request
-        GetDownloadManager()->QueueFile(strURL, NULL, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000);
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = 15000;
+        GetDownloadManager()->QueueFile(strURL, NULL, this, DownloadFinishedCallback, options);
 
         CLogger::LogPrintfNoStamp("Testing ports...\n");
 
@@ -127,7 +130,7 @@ public:
     //
     // Get http downloader used for port testing
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
     int m_iPortTestStage;

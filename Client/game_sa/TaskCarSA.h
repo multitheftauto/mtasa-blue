@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKCAR
-#define __CGAMESA_TASKCAR
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -66,7 +65,7 @@ public:
 class CTaskComplexEnterCarSA : public virtual CTaskComplexSA
 {
 public:
-    CTaskComplexEnterCarSA(void){};
+    CTaskComplexEnterCarSA(){};
     CTaskComplexEnterCarSA(CVehicle* pTargetVehicle, const bool bAsDriver, const bool bQuitAfterOpeningDoor, const bool bQuitAfterDraggingPedOut,
                            const bool bCarryOnAfterFallingOff = false);
 
@@ -101,7 +100,7 @@ public:
 class CTaskComplexEnterCarAsDriverSA : public virtual CTaskComplexEnterCarSA, public virtual CTaskComplexEnterCarAsDriver
 {
 public:
-    CTaskComplexEnterCarAsDriverSA(void){};
+    CTaskComplexEnterCarAsDriverSA(){};
     CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle);
 
     // from CTaskComplexEnterCarSA
@@ -123,7 +122,7 @@ public:
 class CTaskComplexEnterCarAsPassengerSA : public virtual CTaskComplexEnterCarSA, public virtual CTaskComplexEnterCarAsPassenger
 {
 public:
-    CTaskComplexEnterCarAsPassengerSA(void){};
+    CTaskComplexEnterCarAsPassengerSA(){};
     CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle, const int iTargetSeat = 0, const bool bCarryOnAfterFallingOff = false);
 
     // from CTaskComplexEnterCarSA
@@ -145,7 +144,7 @@ public:
 class CTaskComplexEnterBoatAsDriverSA : public virtual CTaskComplexSA, public virtual CTaskComplexEnterBoatAsDriver
 {
 public:
-    CTaskComplexEnterBoatAsDriverSA(void){};
+    CTaskComplexEnterBoatAsDriverSA(){};
     CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle);
 };
 
@@ -178,7 +177,7 @@ public:
 class CTaskComplexLeaveCarSA : public virtual CTaskComplexSA, public virtual CTaskComplexLeaveCar
 {
 public:
-    CTaskComplexLeaveCarSA(void){};
+    CTaskComplexLeaveCarSA(){};
     CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const int iTargetDoor = 0, const int iDelayTime = 0, const bool bSensibleLeaveCar = true,
                            const bool bForceGetOut = false);
 
@@ -188,5 +187,3 @@ public:
         return thisInterface->m_iTargetDoor;
     }
 };
-
-#endif

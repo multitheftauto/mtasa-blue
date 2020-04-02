@@ -54,7 +54,7 @@ void CResourceFileDownloadManager::AddPendingFileDownload(CDownloadableResource*
 // Figure which download group should be running
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::UpdatePendingDownloads(void)
+void CResourceFileDownloadManager::UpdatePendingDownloads()
 {
     // Get download group to use
     int iGroup = INVALID_DOWNLOAD_PRIORITY_GROUP;
@@ -106,7 +106,7 @@ void CResourceFileDownloadManager::OnRemoveResourceFile(CDownloadableResource* p
 // Downloading initial resource files
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::DoPulse(void)
+void CResourceFileDownloadManager::DoPulse()
 {
     if (!g_pNet->IsConnected())
         return;
@@ -221,10 +221,14 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(serverInfo.downloadChannel);
     SString strHTTPDownloadURLFull("%s/%s/%s", *serverInfo.strUrl, pResourceFile->GetResource()->GetName(), pResourceFile->GetShortName());
 
+    SHttpRequestOptions options;
+    options.uiConnectionAttempts = serverInfo.uiConnectionAttempts;
+    options.uiConnectTimeoutMs = serverInfo.uiConnectTimeoutMs;
+    options.bCheckContents = true;
+    options.bIsLocal = g_pClientGame->IsLocalGame();
     SString* pstrContext = MakeDownloadContextString(pResourceFile);
     SString  strFilename = pResourceFile->GetName();
-    bool     bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, NULL, 0, false, pstrContext, StaticDownloadFinished,
-                                            g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true);
+    bool bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, pstrContext, StaticDownloadFinished, options);
     if (!bUniqueDownload)
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar
@@ -274,6 +278,12 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
                 return;
             }
         }
+    }
+    else
+    if (result.iErrorCode == 1007)
+    {
+        // Download failed due to being unable to create file
+        // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
     }
     else
     {

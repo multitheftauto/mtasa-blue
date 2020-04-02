@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBox_H
-#define __CBox_H
+#pragma once
 
 #include "CVector.h"
 
@@ -39,5 +38,3 @@ public:
 
     bool operator!=(const CBox& other) const { return !operator==(other); }
 };
-
-#endif

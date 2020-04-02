@@ -16,8 +16,8 @@ class CProxyDirect3DTexture : public IDirect3DTexture9
 public:
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    ULONG __stdcall AddRef(void) { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release(void);
+    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall Release();
 
     /*** IDirect3DResource9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
@@ -28,18 +28,18 @@ public:
     HRESULT __stdcall GetPrivateData(REFGUID refguid, void* pData, DWORD* pSizeOfData) { return m_pOriginal->GetPrivateData(refguid, pData, pSizeOfData); }
     HRESULT __stdcall FreePrivateData(REFGUID refguid) { return m_pOriginal->FreePrivateData(refguid); }
     DWORD __stdcall SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
-    DWORD __stdcall GetPriority(void) { return m_pOriginal->GetPriority(); }
-    void __stdcall PreLoad(void) { return m_pOriginal->PreLoad(); }
-    D3DRESOURCETYPE __stdcall GetType(void) { return m_pOriginal->GetType(); }
+    DWORD __stdcall GetPriority() { return m_pOriginal->GetPriority(); }
+    void __stdcall PreLoad() { return m_pOriginal->PreLoad(); }
+    D3DRESOURCETYPE __stdcall GetType() { return m_pOriginal->GetType(); }
 
     /*** IDirect3DBaseTexture9 methods ***/
     DWORD __stdcall SetLOD(DWORD LODNew) { return m_pOriginal->SetLOD(LODNew); }
-    DWORD __stdcall GetLOD(void) { return m_pOriginal->GetLOD(); }
-    DWORD __stdcall GetLevelCount(void) { return m_pOriginal->GetLevelCount(); }
+    DWORD __stdcall GetLOD() { return m_pOriginal->GetLOD(); }
+    DWORD __stdcall GetLevelCount() { return m_pOriginal->GetLevelCount(); }
     HRESULT __stdcall SetAutoGenFilterType(D3DTEXTUREFILTERTYPE FilterType) { return m_pOriginal->SetAutoGenFilterType(FilterType); }
     D3DTEXTUREFILTERTYPE
-    __stdcall GetAutoGenFilterType(void) { return m_pOriginal->GetAutoGenFilterType(); }
-    void __stdcall GenerateMipSubLevels(void) { return m_pOriginal->GenerateMipSubLevels(); }
+    __stdcall GetAutoGenFilterType() { return m_pOriginal->GetAutoGenFilterType(); }
+    void __stdcall GenerateMipSubLevels() { return m_pOriginal->GenerateMipSubLevels(); }
 
     /*** IDirect3DTexture9 methods ***/
     HRESULT __stdcall GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc) { return m_pOriginal->GetLevelDesc(Level, pDesc); }
@@ -51,9 +51,9 @@ public:
     // CProxyDirect3DTexture
     CProxyDirect3DTexture(IDirect3DDevice9* InD3DDevice9, IDirect3DTexture9* InOriginal, UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format,
                           D3DPOOL Pool);
-    virtual ~CProxyDirect3DTexture(void);
+    virtual ~CProxyDirect3DTexture();
 
-    IDirect3DTexture9* GetOriginal(void) { return m_pOriginal; }
+    IDirect3DTexture9* GetOriginal() { return m_pOriginal; }
 
 protected:
     IDirect3DTexture9*                      m_pOriginal;

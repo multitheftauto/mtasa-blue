@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMEMO_IMPL_H
-#define __CGUIMEMO_IMPL_H
+#pragma once
 
 #include <gui/CGUIMemo.h>
 #include "CGUIElement_Impl.h"
@@ -19,31 +18,32 @@ class CGUIMemo_Impl : public CGUIMemo, public CGUIElement_Impl, public CGUITabLi
 {
 public:
     CGUIMemo_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "");
-    ~CGUIMemo_Impl(void);
+    ~CGUIMemo_Impl();
 
     void SetReadOnly(bool bReadOnly);
-    bool IsReadOnly(void);
+    bool IsReadOnly();
 
-    size_t GetCaretIndex(void);
+    size_t GetCaretIndex();
     void   SetCaretIndex(size_t Index);
 
-    float GetVerticalScrollPosition(void);
+    float GetVerticalScrollPosition();
     void  SetVerticalScrollPosition(float fPosition);
-    float GetScrollbarDocumentSize(void);
-    float GetScrollbarPageSize(void);
+    float GetMaxVerticalScrollPosition();
+    float GetScrollbarDocumentSize();
+    float GetScrollbarPageSize();
 
     void         SetSelection(unsigned int uiStart, unsigned int uiEnd);
-    unsigned int GetSelectionStart(void);
-    unsigned int GetSelectionEnd(void);
-    unsigned int GetSelectionLength(void);
+    unsigned int GetSelectionStart();
+    unsigned int GetSelectionEnd();
+    unsigned int GetSelectionLength();
 
-    void EnsureCaratIsVisible(void);
+    void EnsureCaratIsVisible();
 
-    bool ActivateOnTab(void);
+    bool ActivateOnTab();
 
     void SetTextChangedHandler(const GUI_CALLBACK& Callback);
 
-    eCGUIType GetType(void) { return CGUI_MEMO; };
+    eCGUIType GetType() { return CGUI_MEMO; };
 
     #include "CGUIElement_Inc.h"
 
@@ -53,5 +53,3 @@ private:
 
     GUI_CALLBACK m_TextChanged;
 };
-
-#endif

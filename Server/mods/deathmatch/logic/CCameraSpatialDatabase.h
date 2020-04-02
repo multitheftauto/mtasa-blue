@@ -25,7 +25,7 @@ public:
 class CCameraSpatialDatabase
 {
 public:
-    virtual ~CCameraSpatialDatabase(void) {}
+    virtual ~CCameraSpatialDatabase() {}
 
     virtual void UpdateItem(CPlayerCamera* pCamera) = 0;
     virtual void RemoveItem(CPlayerCamera* pCamera) = 0;

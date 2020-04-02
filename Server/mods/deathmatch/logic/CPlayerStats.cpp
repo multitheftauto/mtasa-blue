@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerStats::~CPlayerStats(void)
+CPlayerStats::~CPlayerStats()
 {
     vector<sStat*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)

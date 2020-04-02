@@ -9,10 +9,10 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA
-#define __CGAMESA
+#pragma once
 
 #include "CModelInfoSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
@@ -34,6 +34,7 @@
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
 #define     MODELINFO_MAX                   26000       // Actual max is 25755
+#define     OBJECTDYNAMICINFO_MAX           160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -104,7 +105,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
-
+    CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
 public:
     ZERO_ON_NEW
 
@@ -227,11 +228,6 @@ public:
         return m_pAEAudioHardware;
     };
     CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioEngine*    GetAudio()
-    {
-        DEBUG_TRACE("CAudio     * GetAudioEngine()");
-        return m_pAudioEngine;
-    };
     CAudioContainer* GetAudioContainer()
     {
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
@@ -311,8 +307,9 @@ public:
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
-    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID);
+    CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()
     {
@@ -357,34 +354,34 @@ public:
 
     VOID SetRenderHook(InRenderer* pInRenderer);
 
-    void Initialize(void);
-    void Reset(void);
-    void Terminate(void);
+    void Initialize();
+    void Reset();
+    void Terminate();
 
-    eGameVersion GetGameVersion(void);
-    eGameVersion FindGameVersion(void);
+    eGameVersion GetGameVersion();
+    eGameVersion FindGameVersion();
 
-    float GetFPS(void);
-    float GetTimeStep(void);
-    float GetOldTimeStep(void);
-    float GetTimeScale(void);
+    float GetFPS();
+    float GetTimeStep();
+    float GetOldTimeStep();
+    float GetTimeScale();
     void  SetTimeScale(float fTimeScale);
 
-    BOOL InitLocalPlayer();
+    BOOL InitLocalPlayer(class CClientPed* pClientPed);
 
-    float GetGravity(void);
+    float GetGravity();
     void  SetGravity(float fGravity);
 
-    float GetGameSpeed(void);
+    float GetGameSpeed();
     void  SetGameSpeed(float fSpeed);
 
-    unsigned char GetBlurLevel(void);
+    unsigned char GetBlurLevel();
     void          SetBlurLevel(unsigned char ucLevel);
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    unsigned long GetMinuteDuration(void);
+    unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
     bool IsCheatEnabled(const char* szCheatName);
@@ -405,24 +402,25 @@ public:
 
     bool VerifySADataFileNames();
     bool PerformChecks();
-    int& GetCheckStatus(void) { return m_iCheckStatus; }
+    int& GetCheckStatus() { return m_iCheckStatus; }
 
     void SetAsyncLoadingFromScript(bool bScriptEnabled, bool bScriptForced);
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    bool HasCreditScreenFadedOut(void);
+    bool HasCreditScreenFadedOut();
 
-    void         SetupSpecialCharacters(void);
-    CWeapon*     CreateWeapon(void);
+    void         SetupSpecialCharacters();
+    CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
-    void         FlushPendingRestreamIPL(void);
-    void         ResetModelLodDistances(void);
-    void         ResetAlphaTransparencies(void);
-    void         DisableVSync(void);
+    void         FlushPendingRestreamIPL();
+    void         ResetModelLodDistances();
+    void         ResetAlphaTransparencies();
+    void         DisableVSync();
+    void         ResetModelTimes();
 
     void  OnPedContextChange(CPed* pPedContext);
-    CPed* GetPedContext(void);
+    CPed* GetPedContext();
 
     void GetShaderReplacementStats(SShaderReplacementStats& outStats);
 
@@ -435,39 +433,40 @@ public:
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
 private:
-    CPools*             m_pPools;
-    CPlayerInfo*        m_pPlayerInfo;
-    CProjectileInfo*    m_pProjectileInfo;
-    CRadar*             m_pRadar;
-    CRestart*           m_pRestart;
-    CClock*             m_pClock;
-    CCoronas*           m_pCoronas;
-    CCheckpoints*       m_pCheckpoints;
-    CEventList*         m_pEventList;
-    CFireManager*       m_pFireManager;
-    CGarages*           m_pGarages;
-    CHud*               m_pHud;
-    CWanted*            m_pWanted;
-    CWeather*           m_pWeather;
-    CWorld*             m_pWorld;
-    CCamera*            m_pCamera;
-    CModelInfo*         m_pModelInfo;
-    CPickups*           m_pPickups;
-    CWeaponInfo*        m_pWeaponInfo;
-    CExplosionManager*  m_pExplosionManager;
-    C3DMarkers*         m_p3DMarkers;
-    CRenderWareSA*      m_pRenderWare;
-    CHandlingManager*   m_pHandlingManager;
-    CAnimManager*       m_pAnimManager;
-    CStreaming*         m_pStreaming;
-    CVisibilityPlugins* m_pVisibilityPlugins;
-    CKeyGen*            m_pKeyGen;
-    CRopes*             m_pRopes;
-    CFx*                m_pFx;
-    CFxManagerSA*       m_pFxManager;
-    CWaterManager*      m_pWaterManager;
-    CWeaponStatManager* m_pWeaponStatsManager;
-    CPointLights*       m_pPointLights;
+    CPools*                         m_pPools;
+    CPlayerInfo*                    m_pPlayerInfo;
+    CProjectileInfo*                m_pProjectileInfo;
+    CRadar*                         m_pRadar;
+    CRestart*                       m_pRestart;
+    CClock*                         m_pClock;
+    CCoronas*                       m_pCoronas;
+    CCheckpoints*                   m_pCheckpoints;
+    CEventList*                     m_pEventList;
+    CFireManager*                   m_pFireManager;
+    CGarages*                       m_pGarages;
+    CHud*                           m_pHud;
+    CWanted*                        m_pWanted;
+    CWeather*                       m_pWeather;
+    CWorld*                         m_pWorld;
+    CCamera*                        m_pCamera;
+    CModelInfo*                     m_pModelInfo;
+    CPickups*                       m_pPickups;
+    CWeaponInfo*                    m_pWeaponInfo;
+    CExplosionManager*              m_pExplosionManager;
+    C3DMarkers*                     m_p3DMarkers;
+    CRenderWareSA*                  m_pRenderWare;
+    CHandlingManager*               m_pHandlingManager;
+    CAnimManager*                   m_pAnimManager;
+    CStreaming*                     m_pStreaming;
+    CVisibilityPlugins*             m_pVisibilityPlugins;
+    CKeyGen*                        m_pKeyGen;
+    CRopes*                         m_pRopes;
+    CFx*                            m_pFx;
+    CFxManagerSA*                   m_pFxManager;
+    CWaterManager*                  m_pWaterManager;
+    CWeaponStatManager*             m_pWeaponStatsManager;
+    CPointLights*                   m_pPointLights;
+    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;
@@ -517,5 +516,3 @@ private:
     CPed*      m_pPedContext;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
-
-#endif

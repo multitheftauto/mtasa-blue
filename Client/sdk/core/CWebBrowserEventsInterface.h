@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEBBROWSEREVENTSINTERFACE_H
-#define __CWEBBROWSEREVENTSINTERFACE_H
+#pragma once
 
 class CAjaxResourceHandlerInterface;
 class CWebBrowserEventsInterface
@@ -26,9 +25,7 @@ public:
     virtual void Events_OnTooltip(const SString& strTooltip) = 0;
     virtual void Events_OnInputFocusChanged(bool bGainedFocus) = 0;
     virtual bool Events_OnResourcePathCheck(SString& strURL) = 0;
-    virtual bool Events_OnResourceFileCheck(const SString& strURL) = 0;
+    virtual bool Events_OnResourceFileCheck(const SString& strURL, CBuffer& outFileData) = 0;
     virtual void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) = 0;
     virtual void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) = 0;
 };
-
-#endif

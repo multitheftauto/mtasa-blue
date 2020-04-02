@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BUILDING
-#define __CGAMESA_BUILDING
+#pragma once
 
 #include <game/CBuilding.h>
 #include "CEntitySA.h"
@@ -33,5 +32,3 @@ public:
     CBuildingSA(DWORD dwModel);
     ~CBuildingSA();
 };
-
-#endif

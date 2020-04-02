@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCAMERA_H
-#define __CCLIENTCAMERA_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -36,10 +35,10 @@ class CClientCamera : public CClientEntity
     friend class CClientManager;
 
 public:
-    void Unlink(void){};
-    void DoPulse(void);
+    void Unlink(){};
+    void DoPulse();
 
-    eClientEntityType GetType(void) const { return CCLIENTCAMERA; };
+    eClientEntityType GetType() const { return CCLIENTCAMERA; };
 
     bool  SetMatrix(const CMatrix& Matrix);
     bool  GetMatrix(CMatrix& Matrix) const;
@@ -57,34 +56,35 @@ public:
     void FadeIn(float fTime);
     void FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
-    CClientPlayer* GetFocusedPlayer(void) { return m_pFocusedPlayer; };
+    CClientPlayer* GetFocusedPlayer() { return m_pFocusedPlayer; };
     void           SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false);
-    void           SetFocusToLocalPlayer(void);
+    void           SetFocusToLocalPlayer();
 
     void            SetCameraViewMode(eVehicleCamMode eMode);
-    eVehicleCamMode GetCameraViewMode(void);
+    eVehicleCamMode GetCameraViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
     void            GetCameraClip(bool& bObjects, bool& bVehicles);
 
-    bool IsInFixedMode(void) { return m_bFixed; }
+    bool IsInFixedMode() { return m_bFixed; }
     void ToggleCameraFixedMode(bool bEnabled);
 
-    CClientEntity* GetTargetEntity(void);
+    void           SetTargetEntity(CClientEntity* pEntity);
+    CClientEntity* GetTargetEntity();
 
     void UnreferencePlayer(CClientPlayer* pPlayer);
 
 private:
     CClientCamera(CClientManager* pManager);
-    ~CClientCamera(void);
+    ~CClientCamera();
 
     static bool StaticProcessFixedCamera(CCam* pCam);
     bool        ProcessFixedCamera(CCam* pCam);
     void        SetFocus(CVector* vecTarget, bool bSmoothTransition);
-    CMatrix     GetGtaMatrix(void) const;
+    CMatrix     GetGtaMatrix() const;
     void        SetGtaMatrix(const CMatrix& matInNew, CCam* pCam = NULL) const;
 
-    void SetFocusToLocalPlayerImpl(void);
+    void SetFocusToLocalPlayerImpl();
 
     void UnreferenceEntity(CClientEntity* pEntity);
     void InvalidateEntity(CClientEntity* pEntity);
@@ -106,5 +106,3 @@ private:
 
     CCamera* m_pCamera;
 };
-
-#endif

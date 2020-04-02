@@ -22,7 +22,7 @@ class CAudioContainerLookupTableSA
 {
 public:
     CAudioContainerLookupTableSA(const SString& strPath);
-    ~CAudioContainerLookupTableSA(void);
+    ~CAudioContainerLookupTableSA();
 
     int                  CountIndex(eAudioLookupIndex index);
     SAudioLookupEntrySA* GetEntry(eAudioLookupIndex lookupIndex, uint8 bankIndex);

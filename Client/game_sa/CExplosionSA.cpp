@@ -11,13 +11,13 @@
 
 #include "StdInc.h"
 
-eExplosionType CExplosionSA::GetExplosionType(void)
+eExplosionType CExplosionSA::GetExplosionType()
 {
     DEBUG_TRACE("eExplosionType CExplosionSA::GetExplosionType (  )");
     return internalInterface->m_ExplosionType;
 }
 
-CVector* CExplosionSA::GetExplosionPosition(void)
+CVector* CExplosionSA::GetExplosionPosition()
 {
     DEBUG_TRACE("CVector * CExplosionSA::GetExplosionPosition (  )");
     return &internalInterface->m_vecPosition;
@@ -31,7 +31,7 @@ void CExplosionSA::SetExplosionPosition(const CVector* vecPosition)
 /**
  * \todo Handle objects creating explosions
  */
-CEntity* CExplosionSA::GetExplosionCreator(void)
+CEntity* CExplosionSA::GetExplosionCreator()
 {
     DEBUG_TRACE("CEntity * CExplosionSA::GetExplosionCreator (  )");
     // we create a temporary entity to take care of finding the type of entity it is
@@ -40,40 +40,53 @@ CEntity* CExplosionSA::GetExplosionCreator(void)
     eEntityType entityType = entity->GetEntityType();
     delete entity;
 
-    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-
+    CPools* pools = pGame->GetPools();
     switch (entityType)
     {
         case ENTITY_TYPE_PED:
-            return (CEntity*)(pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
+        {
+            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            if (pPedClientEntity)
+            {
+                return pPedClientEntity->pEntity;
+            }
             break;
+        }
         case ENTITY_TYPE_VEHICLE:
-            return (CEntity*)(pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
+        {
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            if (pVehicleClientEntity)
+            {
+                return pVehicleClientEntity->pEntity;
+            }
             break;
+        }
         case ENTITY_TYPE_OBJECT:
+        {
             break;
+        }
     }
     return NULL;
 }
 
-CEntity* CExplosionSA::GetExplodingEntity(void)
+CEntity* CExplosionSA::GetExplodingEntity()
 {
     return NULL;
 }
 
-BOOL CExplosionSA::IsActive(void)
+BOOL CExplosionSA::IsActive()
 {
     DEBUG_TRACE("BOOL CExplosionSA::IsActive (  )");
     return internalInterface->m_cExplosionActive;
 }
 
-VOID CExplosionSA::Remove(void)
+VOID CExplosionSA::Remove()
 {
     DEBUG_TRACE("VOID CExplosionSA::Remove (  )");
     internalInterface->m_cExplosionActive = 0;
 }
 
-float CExplosionSA::GetExplosionForce(void)
+float CExplosionSA::GetExplosionForce()
 {
     DEBUG_TRACE("FLOAT CExplosionSA::GetExplosionForce()");
     return this->GetInterface()->m_fExplosionForce;
@@ -103,7 +116,7 @@ void CExplosionSA::SetActivationTimer(unsigned long ulActivationTime)
     this->GetInterface()->m_ActivationTime = ulActivationTime;
 }
 
-DWORD CExplosionSA::GetExpiryTime(void)
+DWORD CExplosionSA::GetExpiryTime()
 {
     DEBUG_TRACE("DWORD CExplosionSA::GetExpiryTime()");
     return this->GetInterface()->m_TimeExpires;
@@ -115,7 +128,7 @@ void CExplosionSA::SetExpiryTime(DWORD dwExpiryTime)
     this->GetInterface()->m_TimeExpires = dwExpiryTime;
 }
 
-float CExplosionSA::GetExplosionRadius(void)
+float CExplosionSA::GetExplosionRadius()
 {
     DEBUG_TRACE("FLOAT CExplosionSA::GetExplosionRadius()");
     return this->GetInterface()->m_fExplosionRadius;

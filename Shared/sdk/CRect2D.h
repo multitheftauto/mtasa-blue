@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRECT2D_H
-#define __CRECT2D_H
+#pragma once
 
 /**
  * CRect2D Structure used to store a 2D rectangle
@@ -40,5 +39,3 @@ public:
 
     bool operator!=(const CRect2D& rhs) const { return !(operator==(rhs)); }
 };
-
-#endif

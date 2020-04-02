@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDDAMAGERESPONSE
-#define __CGAMESA_PEDDAMAGERESPONSE
+#pragma once
 
 #include <game/CPedDamageResponse.h>
 
@@ -30,12 +29,10 @@ class CPedDamageResponseSA : public CPedDamageResponse
 public:
     CPedDamageResponseSA(CPedDamageResponseSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CPedDamageResponseSAInterface* GetInterface(void) { return m_pInterface; }
+    CPedDamageResponseSAInterface* GetInterface() { return m_pInterface; }
 
     void Calculate(CEntity* pEntity, float fDamage, eWeaponType weaponType, ePedPieceTypes bodyPart, bool b_1, bool bSpeak);
 
 private:
     CPedDamageResponseSAInterface* m_pInterface;
 };
-
-#endif

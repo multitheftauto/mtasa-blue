@@ -33,7 +33,7 @@ CXMLFileImpl::CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly)
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLFileImpl::~CXMLFileImpl(void)
+CXMLFileImpl::~CXMLFileImpl()
 {
     // Remove from array over XML stuff
     if (m_bUsingIDs)
@@ -46,7 +46,7 @@ CXMLFileImpl::~CXMLFileImpl(void)
     delete m_pDocument;
 }
 
-const char* CXMLFileImpl::GetFilename(void)
+const char* CXMLFileImpl::GetFilename()
 {
     return m_strFilename.c_str();
 }
@@ -63,7 +63,7 @@ void CXMLFileImpl::SetFilename(const char* szFilename)
 bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 {
     // Do we have a filename?
-    if (m_strFilename != "")
+    if (m_strFilename != "" && FileExists(m_strFilename))
     {
         // Reset previous file
         Reset();
@@ -113,7 +113,7 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
     return false;
 }
 
-bool CXMLFileImpl::Write(void)
+bool CXMLFileImpl::Write()
 {
     if (m_bReadOnly)
         return false;
@@ -135,7 +135,7 @@ bool CXMLFileImpl::Write(void)
     return false;
 }
 
-bool CXMLFileImpl::WriteSafer(void)
+bool CXMLFileImpl::WriteSafer()
 {
     // We have a filename?
     if (m_strFilename != "")
@@ -179,7 +179,7 @@ bool CXMLFileImpl::WriteSafer(void)
     return false;
 }
 
-void CXMLFileImpl::Clear(void)
+void CXMLFileImpl::Clear()
 {
     if (m_pRootNode)
     {
@@ -188,7 +188,7 @@ void CXMLFileImpl::Clear(void)
     }
 }
 
-void CXMLFileImpl::Reset(void)
+void CXMLFileImpl::Reset()
 {
     // Clear our wrapper tree
     ClearWrapperTree();
@@ -219,7 +219,7 @@ CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
     return m_pRootNode;
 }
 
-CXMLNode* CXMLFileImpl::GetRootNode(void)
+CXMLNode* CXMLFileImpl::GetRootNode()
 {
     // Return it
     return m_pRootNode;
@@ -232,7 +232,7 @@ CXMLErrorCodes::Code CXMLFileImpl::GetLastError(std::string& strOut)
     return m_errLastError;
 }
 
-void CXMLFileImpl::ResetLastError(void)
+void CXMLFileImpl::ResetLastError()
 {
     // Set the code and the string
     m_errLastError = CXMLErrorCodes::NoError;
@@ -246,12 +246,12 @@ void CXMLFileImpl::SetLastError(CXMLErrorCodes::Code errCode, const std::string&
     m_strLastError = strDescription;
 }
 
-TiXmlDocument* CXMLFileImpl::GetDocument(void)
+TiXmlDocument* CXMLFileImpl::GetDocument()
 {
     return m_pDocument;
 }
 
-bool CXMLFileImpl::BuildWrapperTree(void)
+bool CXMLFileImpl::BuildWrapperTree()
 {
     // Clear the previous tree
     ClearWrapperTree();
@@ -310,7 +310,7 @@ bool CXMLFileImpl::BuildSubElements(CXMLNodeImpl* pNode)
     return true;
 }
 
-void CXMLFileImpl::ClearWrapperTree(void)
+void CXMLFileImpl::ClearWrapperTree()
 {
     // Delete the previous wrapper tree
     if (m_pRootNode)
@@ -365,7 +365,7 @@ void CXMLFileImpl::FileRecoveryPreSave(const SString& strFilename)
 }
 
 // Unstore filename in case of problems during save
-void CXMLFileImpl::FileRecoveryPostSave(void)
+void CXMLFileImpl::FileRecoveryPostSave()
 {
     if (!ms_strSaveFlagFile.empty())
         FileDelete(ms_strSaveFlagFile);
