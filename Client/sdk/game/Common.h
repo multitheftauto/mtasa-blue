@@ -1548,23 +1548,23 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
-enum eShadowType
+enum class eShadowType
 {
     // use only color instead of texture
-    SHADOW_PLANE = -1,
-    SHADOW_CAR,
-    SHADOW_PED,
-    SHADOW_HELI,
-    SHADOW_BIKE,
-    SHADOW_RCBARON,
-    SHADOW_EXPLOSION,
-    SHADOW_HEADLIGHT1,
-    SHADOW_HEADLIGHT2,
-    SHADOW_BLOOD,
-    SHADOW_HEADMAN,
-    SHADOW_WINCRACK,
-    SHADOW_LAMP,
-    SHADOW_COUNT,
+    PLANE = -1,
+    CAR,
+    PED,
+    HELI,
+    BIKE,
+    RCBARON,
+    EXPLOSION,
+    HEADLIGHT1,
+    HEADLIGHT2,
+    BLOOD,
+    HEADMAN,
+    WINCRACK,
+    LAMP,
+    _COUNT,
 };
 
 namespace eObjectGroup
