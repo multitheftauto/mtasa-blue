@@ -213,7 +213,7 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
     return m_pEvents->WasEventCancelled();
 }
 
-bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum)
+bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
     SString strPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
@@ -221,7 +221,7 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
     // Call SingularFileDownloadManager
     if (g_pClientGame->GetSingularFileDownloadManager())
     {
-        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum);
+        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, pRequestResource, checksum);
         return true;
     }
     return false;
@@ -1715,25 +1715,6 @@ bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned c
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
-{
-    if (Ped.IsRunningAnimation())
-    {
-        if (Ped.IsCustomAnimationPlaying())
-        {
-            strBlockName = Ped.GetNextAnimationCustomBlockName();
-            strAnimName = Ped.GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = Ped.GetAnimationName();
-        }
-        return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim)
 {
     iMoveAnim = (unsigned int)Ped.GetMoveAnim();
@@ -2402,21 +2383,83 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsLocalPlayer())
             return false;
 
-        CVector vecOrigin;
-        Ped.GetPosition(vecOrigin);
-
-        // Move origin out a bit to avoid hitting ped collision
-        CVector vecDir = vecTarget - vecOrigin;
-        vecDir.Normalize();
-        vecOrigin += vecDir * 0.9f;
+        // Grab the gun muzzle position
+        CWeapon* pWeapon = Ped.GetWeapon(Ped.GetCurrentWeaponSlot());
+        CVector  vecOrigin;
+        if (!pWeapon)
+        {
+            Ped.GetPosition(vecOrigin);
+        }
+        else
+        {
+            CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), 1000.0f);
+            CVector      vecFireOffset = *pCurrentWeaponInfo->GetFireOffset();
+            vecOrigin = vecFireOffset;
+            Ped.GetTransformedBonePosition(BONE_RIGHTWRIST, vecOrigin);
+        }
 
         // Arm direction
         float fArmX = -atan2(vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY),
               fArmY = -atan2(vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D(vecTarget, vecOrigin));
 
-        // TODO: use gun muzzle for origin
-        Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
-        Ped.SetAim(fArmX, fArmY, 0);
+        if (Ped.IsInVehicle())
+        {
+            // Driveby aim animation
+            // 0 = forwards, 1 = left, 2 = back, 3 = right
+            unsigned char cInVehicleAimAnim = 0;
+
+            // Ped rotation
+            CVector vecRot;
+            Ped.GetRotationRadians(vecRot);
+            float fRotZ = -vecRot.fZ;            // Counter-clockwise
+            fRotZ = (fRotZ > PI) ? fRotZ - PI * 2 : fRotZ;
+
+            // Rotation difference
+            float fRotDiff = fArmX - fRotZ;
+            if (fRotDiff > PI)
+            {
+                fRotDiff = -(PI - (fRotDiff - PI));
+            }
+            else if (fRotDiff < -PI)
+            {
+                fRotDiff = fRotDiff + PI * 2;
+            }
+
+            // Find the aim anim and correct fArmX/fArmY
+            if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
+            {
+                // Facing left
+                cInVehicleAimAnim = 1;
+                fArmX = fArmX - PI / 2;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
+            {
+                // Facing backwards
+                cInVehicleAimAnim = 2;
+                fArmX = fArmX + PI;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
+            {
+                // Facing right
+                cInVehicleAimAnim = 3;
+                fArmX = fArmX + PI / 2;
+            }
+            else
+            {
+                // Facing forwards
+                // Do nothing, initial values are fine
+            }
+
+            // Set aim and target data without interpolation
+            Ped.SetAimingData(TICK_RATE, vecTarget, fArmX, fArmY, cInVehicleAimAnim, &vecOrigin, false);
+        }
+        else
+        {
+            Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
+            Ped.SetAim(fArmX, fArmY, 0);
+        }
 
         return true;
     }
@@ -7785,18 +7828,18 @@ CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, con
     return pFx;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
+CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bIsRawData, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop,
+CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
                                                       bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, vecPosition, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;

@@ -35,7 +35,7 @@ public:
     static bool WasEventCancelled();
 
     // Misc funcs
-    static bool DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum = CChecksum());
+    static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
 
     // Output funcs
     static bool OutputConsole(const char* szText);
@@ -142,7 +142,6 @@ public:
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
-    static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
     static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
     static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
     static bool           IsPedHeadless(CClientPed& Ped, bool& bHeadless);
@@ -732,8 +731,8 @@ public:
     static CClientEffect* CreateEffect(CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable);
 
     // Sound funcs
-    static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle);
-    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);
