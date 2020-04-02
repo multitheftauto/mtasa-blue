@@ -229,6 +229,10 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
             if (strModuleName.length() == 0)
                 strModuleName = "unknown";
 
+            #ifdef _WIN64
+                strModuleName += "64";
+            #endif
+
             SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
                                 pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,
                                 SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);

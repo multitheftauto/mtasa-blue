@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,6 +22,8 @@
  *
  ***************************************************************************/
 
+#include "curl_setup.h"
+
 #define MIME_RAND_BOUNDARY_CHARS        16  /* Nb. of random boundary chars. */
 #define MAX_ENCODED_LINE_LENGTH         76  /* Maximum encoded line length. */
 #define ENCODING_BUFFER_SIZE            256 /* Encoding temp buffers size. */
@@ -29,6 +31,7 @@
 /* Part flags. */
 #define MIME_USERHEADERS_OWNER  (1 << 0)
 #define MIME_BODY_ONLY          (1 << 1)
+#define MIME_FAST_READ          (1 << 2)
 
 #define FILE_CONTENTTYPE_DEFAULT        "application/octet-stream"
 #define MULTIPART_CONTENTTYPE_DEFAULT   "multipart/mixed"
@@ -69,7 +72,7 @@ enum mimestrategy {
 typedef struct {
   const char *   name;          /* Encoding name. */
   size_t         (*encodefunc)(char *buffer, size_t size, bool ateof,
-                             curl_mimepart *part);  /* Encoded read. */
+                               curl_mimepart *part);  /* Encoded read. */
   curl_off_t     (*sizefunc)(curl_mimepart *part);  /* Encoded size. */
 }  mime_encoder;
 
@@ -85,7 +88,7 @@ typedef struct {
 typedef struct {
   enum mimestate state;       /* Current state token. */
   void *ptr;                  /* State-dependent pointer. */
-  size_t offset;              /* State-dependent offset. */
+  curl_off_t offset;          /* State-dependent offset. */
 }  mime_state;
 
 /* minimum buffer size for the boundary string */
@@ -123,8 +126,13 @@ struct curl_mimepart_s {
   mime_state state;                /* Current readback state. */
   const mime_encoder *encoder;     /* Content data encoder. */
   mime_encoder_state encstate;     /* Data encoder state. */
+  size_t lastreadstatus;           /* Last read callback returned status. */
 };
 
+CURLcode Curl_mime_add_header(struct curl_slist **slp, const char *fmt, ...);
+
+#if (!defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_MIME)) ||     \
+  !defined(CURL_DISABLE_SMTP) || !defined(CURL_DISABLE_IMAP)
 
 /* Prototypes. */
 void Curl_mime_initpart(curl_mimepart *part, struct Curl_easy *easy);
@@ -140,7 +148,21 @@ curl_off_t Curl_mime_size(curl_mimepart *part);
 size_t Curl_mime_read(char *buffer, size_t size, size_t nitems,
                       void *instream);
 CURLcode Curl_mime_rewind(curl_mimepart *part);
-CURLcode Curl_mime_add_header(struct curl_slist **slp, const char *fmt, ...);
 const char *Curl_mime_contenttype(const char *filename);
+void Curl_mime_unpause(curl_mimepart *part);
+
+#else
+/* if disabled */
+#define Curl_mime_initpart(x,y)
+#define Curl_mime_cleanpart(x)
+#define Curl_mime_duppart(x,y) CURLE_OK /* Nothing to duplicate. Succeed */
+#define Curl_mime_set_subparts(a,b,c) CURLE_NOT_BUILT_IN
+#define Curl_mime_prepare_headers(a,b,c,d) CURLE_NOT_BUILT_IN
+#define Curl_mime_size(x) (curl_off_t) -1
+#define Curl_mime_read NULL
+#define Curl_mime_rewind(x) ((void)x, CURLE_NOT_BUILT_IN)
+#define Curl_mime_unpause(x)
+#endif
+
 
 #endif /* HEADER_CURL_MIME_H */

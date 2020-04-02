@@ -156,6 +156,3 @@ project "cryptopp"
 	filter {"system:windows"}
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4005" }
-
-	filter {"system:windows", "toolset:*_xp*"}
-		defines { "USE_MS_CRYPTOAPI", "_WIN32_WINNT=0x502", "NTDDI_VERSION=0x05020300" }

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -36,13 +36,14 @@
 #include "sendf.h"
 #include "connect.h"
 #include "vtls/vtls.h"
-#include "ssh.h"
+#include "vssh/ssh.h"
 #include "easyif.h"
 #include "multiif.h"
 #include "non-ascii.h"
 #include "strerror.h"
 #include "select.h"
 #include "strdup.h"
+#include "http2.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -224,7 +225,7 @@ bool Curl_recv_has_postponed_data(struct connectdata *conn, int sockindex)
   (void)sockindex;
   return false;
 }
-#define pre_receive_plain(c,n) do {} WHILE_FALSE
+#define pre_receive_plain(c,n) do {} while(0)
 #define get_pre_recved(c,n,b,l) 0
 #endif /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 
@@ -501,6 +502,9 @@ static CURLcode pausewrite(struct Curl_easy *data,
   unsigned int i;
   bool newtype = TRUE;
 
+  /* If this transfers over HTTP/2, pause the stream! */
+  Curl_http2_stream_pause(data, TRUE);
+
   if(s->tempcount) {
     for(i = 0; i< s->tempcount; i++) {
       if(s->tempwrite[i].type == type) {
@@ -529,6 +533,8 @@ static CURLcode pausewrite(struct Curl_easy *data,
     /* update the pointer and the size */
     s->tempwrite[i].buf = newptr;
     s->tempwrite[i].len = newlen;
+
+    len = newlen; /* for the debug output below */
   }
   else {
     dupl = Curl_memdup(ptr, len);
@@ -595,7 +601,10 @@ static CURLcode chop_write(struct connectdata *conn,
     size_t chunklen = len <= CURL_MAX_WRITE_SIZE? len: CURL_MAX_WRITE_SIZE;
 
     if(writebody) {
-      size_t wrote = writebody(ptr, 1, chunklen, data->set.out);
+      size_t wrote;
+      Curl_set_in_callback(data, true);
+      wrote = writebody(ptr, 1, chunklen, data->set.out);
+      Curl_set_in_callback(data, false);
 
       if(CURL_WRITEFUNC_PAUSE == wrote) {
         if(conn->handler->flags & PROTOPT_NONETWORK) {
@@ -689,19 +698,20 @@ CURLcode Curl_read_plain(curl_socket_t sockfd,
   ssize_t nread = sread(sockfd, buf, bytesfromsocket);
 
   if(-1 == nread) {
-    int err = SOCKERRNO;
-    int return_error;
+    const int err = SOCKERRNO;
+    const bool return_error =
 #ifdef USE_WINSOCK
-    return_error = WSAEWOULDBLOCK == err;
+      WSAEWOULDBLOCK == err
 #else
-    return_error = EWOULDBLOCK == err || EAGAIN == err || EINTR == err;
+      EWOULDBLOCK == err || EAGAIN == err || EINTR == err
 #endif
+      ;
+    *n = 0; /* no data returned */
     if(return_error)
       return CURLE_AGAIN;
     return CURLE_RECV_ERROR;
   }
 
-  /* we only return number of bytes read when we return OK */
   *n = nread;
   return CURLE_OK;
 }
@@ -724,10 +734,6 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
   char *buffertofill = NULL;
   struct Curl_easy *data = conn->data;
 
-  /* if HTTP/1 pipelining is both wanted and possible */
-  bool pipelining = Curl_pipeline_wanted(data->multi, CURLPIPE_HTTP1) &&
-    (conn->bundle->multiuse == BUNDLE_PIPELINING);
-
   /* Set 'num' to 0 or 1, depending on which socket that has been sent here.
      If it is the second socket, we set num to 1. Otherwise to 0. This lets
      us use the correct ssl handle. */
@@ -735,39 +741,12 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
 
   *n = 0; /* reset amount to zero */
 
-  /* If session can pipeline, check connection buffer  */
-  if(pipelining) {
-    size_t bytestocopy = CURLMIN(conn->buf_len - conn->read_pos,
-                                 sizerequested);
-
-    /* Copy from our master buffer first if we have some unread data there*/
-    if(bytestocopy > 0) {
-      memcpy(buf, conn->master_buffer + conn->read_pos, bytestocopy);
-      conn->read_pos += bytestocopy;
-      conn->bits.stream_was_rewound = FALSE;
-
-      *n = (ssize_t)bytestocopy;
-      return CURLE_OK;
-    }
-    /* If we come here, it means that there is no data to read from the buffer,
-     * so we read from the socket */
-    bytesfromsocket = CURLMIN(sizerequested, MASTERBUF_SIZE);
-    buffertofill = conn->master_buffer;
-  }
-  else {
-    bytesfromsocket = CURLMIN(sizerequested, (size_t)data->set.buffer_size);
-    buffertofill = buf;
-  }
+  bytesfromsocket = CURLMIN(sizerequested, (size_t)data->set.buffer_size);
+  buffertofill = buf;
 
   nread = conn->recv[num](conn, num, buffertofill, bytesfromsocket, &result);
   if(nread < 0)
     return result;
-
-  if(pipelining) {
-    memcpy(buf, conn->master_buffer, nread);
-    conn->buf_len = nread;
-    conn->read_pos = nread;
-  }
 
   *n += nread;
 

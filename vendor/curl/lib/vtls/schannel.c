@@ -7,7 +7,7 @@
  *
  * Copyright (C) 2012 - 2016, Marc Hoersken, <info@marc-hoersken.de>
  * Copyright (C) 2012, Mark Salisbury, <mark.salisbury@hp.com>
- * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -25,16 +25,6 @@
 /*
  * Source file for all Schannel-specific code for the TLS/SSL layer. No code
  * but vtls.c should ever call or use these functions.
- */
-
-/*
- * Based upon the PolarSSL implementation in polarssl.c and polarssl.h:
- *   Copyright (C) 2010, 2011, Hoi-Ho Chan, <hoiho.chan@gmail.com>
- *
- * Based upon the CyaSSL implementation in cyassl.c and cyassl.h:
- *   Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
- *
- * Thanks for code and inspiration!
  */
 
 #include "curl_setup.h"
@@ -58,6 +48,7 @@
 #include "warnless.h"
 #include "x509asn1.h"
 #include "curl_printf.h"
+#include "multiif.h"
 #include "system_win32.h"
 
  /* The last #include file should be: */
@@ -522,7 +513,6 @@ schannel_connect_step1(struct connectdata *conn, int sockindex)
 #endif
         schannel_cred.dwFlags = SCH_CRED_AUTO_CRED_VALIDATION;
 
-      /* TODO s/data->set.ssl.no_revoke/SSL_SET_OPTION(no_revoke)/g */
       if(data->set.ssl.no_revoke) {
         schannel_cred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
           SCH_CRED_IGNORE_REVOCATION_OFFLINE;
@@ -554,10 +544,6 @@ schannel_connect_step1(struct connectdata *conn, int sockindex)
     switch(conn->ssl_config.version) {
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
-      schannel_cred.grbitEnabledProtocols = SP_PROT_TLS1_0_CLIENT |
-        SP_PROT_TLS1_1_CLIENT |
-        SP_PROT_TLS1_2_CLIENT;
-      break;
     case CURL_SSLVERSION_TLSv1_0:
     case CURL_SSLVERSION_TLSv1_1:
     case CURL_SSLVERSION_TLSv1_2:
@@ -722,7 +708,7 @@ schannel_connect_step1(struct connectdata *conn, int sockindex)
     unsigned short* list_len = NULL;
 
     /* The first four bytes will be an unsigned int indicating number
-       of bytes of data in the rest of the the buffer. */
+       of bytes of data in the rest of the buffer. */
     extension_len = (unsigned int *)(&alpn_buffer[cur]);
     cur += sizeof(unsigned int);
 
@@ -868,13 +854,11 @@ schannel_connect_step2(struct connectdata *conn, int sockindex)
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   unsigned char *reallocated_buffer;
-  size_t reallocated_length;
   SecBuffer outbuf[3];
   SecBufferDesc outbuf_desc;
   SecBuffer inbuf[2];
   SecBufferDesc inbuf_desc;
   SECURITY_STATUS sspi_status = SEC_E_OK;
-  TCHAR *host_name;
   CURLcode result;
   bool doread;
   char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
@@ -917,7 +901,7 @@ schannel_connect_step2(struct connectdata *conn, int sockindex)
   if(BACKEND->encdata_length - BACKEND->encdata_offset <
      CURL_SCHANNEL_BUFFER_FREE_SIZE) {
     /* increase internal encrypted data buffer */
-    reallocated_length = BACKEND->encdata_offset +
+    size_t reallocated_length = BACKEND->encdata_offset +
       CURL_SCHANNEL_BUFFER_FREE_SIZE;
     reallocated_buffer = realloc(BACKEND->encdata_buffer,
                                  reallocated_length);
@@ -933,6 +917,7 @@ schannel_connect_step2(struct connectdata *conn, int sockindex)
   }
 
   for(;;) {
+    TCHAR *host_name;
     if(doread) {
       /* read encrypted handshake data from socket */
       result = Curl_read_plain(conn->sock[sockindex],
@@ -1182,6 +1167,7 @@ struct Adder_args
   struct connectdata *conn;
   CURLcode result;
   int idx;
+  int certs_count;
 };
 
 static bool
@@ -1192,7 +1178,9 @@ add_cert_to_certinfo(const CERT_CONTEXT *ccert_context, void *raw_arg)
   if(valid_cert_encoding(ccert_context)) {
     const char *beg = (const char *) ccert_context->pbCertEncoded;
     const char *end = beg + ccert_context->cbCertEncoded;
-    args->result = Curl_extract_certinfo(args->conn, (args->idx)++, beg, end);
+    int insert_index = (args->certs_count - 1) - args->idx;
+    args->result = Curl_extract_certinfo(args->conn, insert_index, beg, end);
+    args->idx++;
   }
   return args->result == CURLE_OK;
 }
@@ -1269,6 +1257,8 @@ schannel_connect_step3(struct connectdata *conn, int sockindex)
     }
     else
       infof(data, "ALPN, server did not agree to a protocol\n");
+    Curl_multiuse_state(conn, conn->negnpn == CURL_HTTP_VERSION_2 ?
+                        BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
   }
 #endif
 
@@ -1325,6 +1315,7 @@ schannel_connect_step3(struct connectdata *conn, int sockindex)
       struct Adder_args args;
       args.conn = conn;
       args.idx = 0;
+      args.certs_count = certs_count;
       traverse_cert_store(ccert_context, add_cert_to_certinfo, &args);
       result = args.result;
     }
@@ -1346,7 +1337,7 @@ schannel_connect_common(struct connectdata *conn, int sockindex,
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
-  time_t timeout_ms;
+  timediff_t timeout_ms;
   int what;
 
   /* check if the connection has already been established */
@@ -1393,7 +1384,7 @@ schannel_connect_common(struct connectdata *conn, int sockindex,
         connssl->connecting_state ? sockfd : CURL_SOCKET_BAD;
 
       what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
-                               nonblocking ? 0 : timeout_ms);
+                               nonblocking ? 0 : (time_t)timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL/TLS socket, errno: %d", SOCKERRNO);
@@ -1543,7 +1534,7 @@ schannel_send(struct connectdata *conn, int sockindex,
     /* send entire message or fail */
     while(len > (size_t)written) {
       ssize_t this_write;
-      time_t timeleft;
+      timediff_t timeleft;
       int what;
 
       this_write = 0;
@@ -1854,7 +1845,9 @@ schannel_recv(struct connectdata *conn, int sockindex,
       goto cleanup;
     }
     else {
+#ifndef CURL_DISABLE_VERBOSE_STRINGS
       char buffer[STRERROR_LEN];
+#endif
       *err = CURLE_RECV_ERROR;
       infof(data, "schannel: failed to read data from server: %s\n",
             Curl_sspi_strerror(sspi_status, buffer, sizeof(buffer)));
@@ -2129,14 +2122,9 @@ static CURLcode Curl_schannel_random(struct Curl_easy *data UNUSED_PARAM,
 static CURLcode pkp_pin_peer_pubkey(struct connectdata *conn, int sockindex,
                                     const char *pinnedpubkey)
 {
-  SECURITY_STATUS sspi_status;
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   CERT_CONTEXT *pCertContextServer = NULL;
-  const char *x509_der;
-  DWORD x509_der_len;
-  curl_X509certificate x509_parsed;
-  curl_asn1Element *pubkey;
 
   /* Result is returned to caller */
   CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
@@ -2146,6 +2134,12 @@ static CURLcode pkp_pin_peer_pubkey(struct connectdata *conn, int sockindex,
     return CURLE_OK;
 
   do {
+    SECURITY_STATUS sspi_status;
+    const char *x509_der;
+    DWORD x509_der_len;
+    curl_X509certificate x509_parsed;
+    curl_asn1Element *pubkey;
+
     sspi_status =
       s_pSecFn->QueryContextAttributes(&BACKEND->ctxt->ctxt_handle,
                                        SECPKG_ATTR_REMOTE_CERT_CONTEXT,

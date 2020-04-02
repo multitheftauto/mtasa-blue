@@ -22,7 +22,7 @@
 
 #include "curl_setup.h"
 
-#if defined(USE_LIBSSH2) || defined(USE_LIBSSH)
+#if defined(USE_SSH)
 
 #include <curl/curl.h>
 #include "curl_memory.h"
@@ -55,7 +55,7 @@ CURLcode Curl_getworkingpath(struct connectdata *conn,
     }
     if((working_path_len > 3) && (!memcmp(working_path, "/~/", 3)))
       /* It is referenced to the home directory, so strip the leading '/~/' */
-      memcpy(real_path, working_path + 3, 4 + working_path_len-3);
+      memcpy(real_path, working_path + 3, working_path_len - 2);
     else
       memcpy(real_path, working_path, 1 + working_path_len);
   }

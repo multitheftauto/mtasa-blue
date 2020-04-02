@@ -447,9 +447,9 @@ public:
     bool IsBulletSyncActive();
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
-    SString CalculateMinClientRequirement();
-    bool    IsBelowMinimumClient(const SString& strVersion);
-    bool    IsBelowRecommendedClient(const SString& strVersion);
+    CMtaVersion CalculateMinClientRequirement();
+    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
     void    ApplyAseSetting();
     bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
@@ -495,6 +495,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
+    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -637,9 +638,9 @@ private:
     CLuaMain* m_pLatentSendsLuaMain;
     ushort    m_usLatentSendsResourceNetId;
 
-    SString m_strPrevMinClientKickRequirement;
-    SString m_strPrevMinClientConnectRequirement;
-    SString m_strPrevLowestConnectedPlayerVersion;
+    CMtaVersion m_strPrevMinClientKickRequirement;
+    CMtaVersion m_strPrevMinClientConnectRequirement;
+    CMtaVersion m_strPrevLowestConnectedPlayerVersion;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 
