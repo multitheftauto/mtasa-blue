@@ -15,17 +15,16 @@ using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, C
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
 auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
-CFxSA::CFxSA(CFxSAInterface* pInterface)
+CFxSA::CFxSA(CFxSAInterface* pInterface) : m_pInterface(pInterface)
 {
-    m_pInterface = pInterface;
 
     RwTexture* pRwTexture;
-    for (int i = 0; i < SHADOW_COUNT; i++)
+    for (int i = 0; i < eShadowType::_COUNT; i++)
     {
         auto textureAddressPtr = (void*)(SHADOW_BASE_TEXTURE_OFFSET + i * 4);
         void* textureAddress = *textureAddressPtr;
         pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
-        m_textureMap[(eShadowType)i] = pRwTexture;
+        m_textureMap[static_cast<eShadowType>(i)] = pRwTexture;
     }
     m_textureMap[eShadowType::PLANE] = new RwTexture();
 }
