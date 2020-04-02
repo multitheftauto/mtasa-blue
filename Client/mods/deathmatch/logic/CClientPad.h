@@ -34,7 +34,7 @@ public:
 
     void DoPulse(CClientPed* pPed);
 
-    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState);
+    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides);
     static bool SetAnalogControlState(const char* szName, float fState);
     static void RemoveSetAnalogControlState(const char* szName);
 

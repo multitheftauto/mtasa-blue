@@ -84,6 +84,7 @@ public:
 
     void DeleteArguments();
     void ValidateTableKeys();
+    void Pop();
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         ReadFromJSONString(const char* szJSON);

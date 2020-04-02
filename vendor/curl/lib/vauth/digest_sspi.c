@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2014 - 2016, Steve Holme, <steve_holme@hotmail.com>.
- * Copyright (C) 2015 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2015 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -60,6 +60,11 @@ bool Curl_auth_is_digest_supported(void)
   /* Query the security package for Digest */
   status = s_pSecFn->QuerySecurityPackageInfo((TCHAR *) TEXT(SP_NAME_DIGEST),
                                               &SecurityPackage);
+
+  /* Release the package buffer as it is not required anymore */
+  if(status == SEC_E_OK) {
+    s_pSecFn->FreeContextBuffer(SecurityPackage);
+  }
 
   return (status == SEC_E_OK ? TRUE : FALSE);
 }
@@ -146,7 +151,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   }
 
   /* Generate our SPN */
-  spn = Curl_auth_build_spn(service, data->easy_conn->host.name, NULL);
+  spn = Curl_auth_build_spn(service, data->conn->host.name, NULL);
   if(!spn) {
     free(output_token);
     free(input_token);
@@ -220,7 +225,10 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     free(output_token);
     free(input_token);
 
-    return CURLE_RECV_ERROR;
+    if(status == SEC_E_INSUFFICIENT_MEMORY)
+      return CURLE_OUT_OF_MEMORY;
+
+    return CURLE_AUTH_ERROR;
   }
 
   /* Base64 encode the response */
@@ -607,7 +615,10 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
 
       Curl_safefree(digest->http_context);
 
-      return CURLE_OUT_OF_MEMORY;
+      if(status == SEC_E_INSUFFICIENT_MEMORY)
+        return CURLE_OUT_OF_MEMORY;
+
+      return CURLE_AUTH_ERROR;
     }
 
     output_token_len = resp_buf.cbBuffer;

@@ -54,7 +54,7 @@ public:
     bool BeginLoadingMedia();
 
     void   SetPaused(bool bPaused);
-    void   SetPlayPosition(double dPosition);
+    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition();
     double GetLength();
     double GetBufferLength();
@@ -93,12 +93,12 @@ public:
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
 protected:
-    HSTREAM     ConvertFileToMono(const SString& strPath);
-    static void PlayStreamIntern(void* arguments);
-    void        CompleteStreamConnect(HSTREAM pSound);
-    void        ApplyFxEffects();
-    void        ServiceVars();
-    void        SetFinishedCallbacks();
+    HSTREAM             ConvertFileToMono(const SString& strPath);
+    static DWORD WINAPI PlayStreamIntern(LPVOID argument);
+    void                CompleteStreamConnect(HSTREAM pSound);
+    void                ApplyFxEffects();
+    void                ServiceVars();
+    void                SetFinishedCallbacks();
 
     void Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
 

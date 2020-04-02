@@ -46,7 +46,7 @@ CConnectManager::~CConnectManager()
     g_pConnectManager = NULL;
 }
 
-bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
+bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, const char* szSecret)
 {
     assert(szHost);
     assert(szNick);
@@ -99,6 +99,11 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     m_Address.s_addr = 0;
     m_usPort = usPort;
     m_bSave = true;
+
+    if (szSecret)
+        m_strDiscordSecretJoin = szSecret;
+    else
+        m_strDiscordSecretJoin.clear();
 
     m_strLastHost = m_strHost;
     m_usLastPort = m_usPort;
@@ -323,7 +328,6 @@ void CConnectManager::DoPulse()
                 else            // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton().RemoveMessageBox(false);
-                    CCore::GetSingleton().HideQuickConnect();
                 }
 
                 CCore::GetSingleton().GetNetwork()->SetConnectionError(0);
@@ -370,11 +374,6 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton().RemoveMessageBox();
-
-                // If we connected from quick-connect, get rid of it
-                CQuickConnect* pQuickConnect = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuickConnectWindow();
-                if (pQuickConnect->IsVisible())
-                    pQuickConnect->SetVisible(false);
 
                 // Save the connection details into the config
                 if (g_pConnectManager->m_bSave)
@@ -494,4 +493,11 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
+}
+
+SString CConnectManager::GetJoinSecret()
+{
+    SString dummy = m_strDiscordSecretJoin;
+    m_strDiscordSecretJoin.clear();
+    return dummy;
 }

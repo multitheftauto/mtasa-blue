@@ -449,6 +449,17 @@ void CLuaArguments::DeleteArguments()
     m_Arguments.clear();
 }
 
+// Gets rid of the last argument in the list
+void CLuaArguments::Pop()
+{
+    // Delete the last element
+    CLuaArgument* item = m_Arguments.back();
+    delete item;
+
+    // Pop it out of the vector
+    m_Arguments.pop_back();
+}
+
 void CLuaArguments::ValidateTableKeys()
 {
     // Iterate over m_Arguments as pairs

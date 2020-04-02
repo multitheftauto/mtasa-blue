@@ -280,6 +280,12 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
         }
     }
     else
+    if (result.iErrorCode == 1007)
+    {
+        // Download failed due to being unable to create file
+        // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
+    }
+    else
     {
         // Download failed due to connection type problem
         CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(m_HttpServerList[pResourceFile->GetHttpServerIndex()].downloadChannel);

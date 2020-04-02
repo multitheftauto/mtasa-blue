@@ -23,6 +23,7 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
+#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -33,6 +34,8 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
+enum HWBRK_TYPE;
+enum HWBRK_SIZE;
 
 enum eCoreVersion
 {
@@ -173,8 +176,9 @@ public:
     virtual SString     GetBlueCopyrightString() = 0;
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
+    virtual HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress) = 0;
 
-    virtual bool IsHostSmotraServer() = 0;
+    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
 };
 
 class CClientTime

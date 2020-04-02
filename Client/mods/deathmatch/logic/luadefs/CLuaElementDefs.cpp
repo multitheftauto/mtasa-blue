@@ -48,6 +48,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getAttachedElements", GetAttachedElements},
         {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
         {"isElementLocal", IsElementLocal},
+        {"hasElementData", HasElementData},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"isElementOnScreen", IsElementOnScreen},
@@ -134,6 +135,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isStreamedIn", "isElementStreamedIn");
     lua_classfunction(luaVM, "isStreamable", "isElementStreamable");
     lua_classfunction(luaVM, "isLocal", "isElementLocal");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "isSyncer", "isElementSyncer");
     lua_classfunction(luaVM, "getChildren", "getElementChildren");
     lua_classfunction(luaVM, "getChild", "getElementChild");
@@ -316,47 +318,6 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
         {
             lua_pushelement(luaVM, pEntity);
             return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::GetElementData(lua_State* luaVM)
-{
-    //  var getElementData ( element theElement, string key [, inherit = true] )
-    CClientEntity* pEntity;
-    SString        strKey;
-    bool           bInherit;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
-    argStream.ReadBool(bInherit, true);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            CLuaArgument* pVariable = pEntity->GetCustomData(strKey, bInherit);
-            if (pVariable)
-            {
-                pVariable->Push(luaVM);
-                return 1;
-            }
         }
     }
     else
@@ -1010,7 +971,7 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
     {
         // Query the spatial database
         CClientEntityResult result;
-        GetClientSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+        GetClientSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
 
         lua_newtable(luaVM);
         unsigned int index = 0;
@@ -1092,7 +1053,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
                 lua_pushvector(luaVM, vecMin);
                 lua_pushvector(luaVM, vecMax);
                 return 2;
-            }           
+            }
         }
     }
     else

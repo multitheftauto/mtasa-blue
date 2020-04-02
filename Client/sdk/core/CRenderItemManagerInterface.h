@@ -126,6 +126,7 @@ struct SDxStatus
         bool         bHUDMatchAspectRatio;
         float        fFieldOfView;
         bool         bHighDetailVehicles;
+        bool         bHighDetailPeds;
     } settings;
 };
 

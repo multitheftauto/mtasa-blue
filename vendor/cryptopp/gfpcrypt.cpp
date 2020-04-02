@@ -1,4 +1,4 @@
-// dsa.cpp - written and placed in the public domain by Wei Dai
+// dsa.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 #include "config.h"
@@ -20,15 +20,15 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
+#if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void TestInstantiations_gfpcrypt()
 {
-	GDSA<SHA>::Signer test;
-	GDSA<SHA>::Verifier test1;
+	GDSA<SHA1>::Signer test;
+	GDSA<SHA1>::Verifier test1;
 	DSA::Signer test5(NullRNG(), 100);
 	DSA::Signer test2(test5);
-	NR<SHA>::Signer test3;
-	NR<SHA>::Verifier test4;
+	NR<SHA1>::Signer test3;
+	NR<SHA1>::Verifier test4;
 	DLIES<>::Encryptor test6;
 	DLIES<>::Decryptor test7;
 }
@@ -45,7 +45,7 @@ void DL_GroupParameters_DSA::GenerateRandom(RandomNumberGenerator &rng, const Na
 	}
 	else
 	{
-		int modulusSize = 1024, defaultSubgroupOrderSize;
+		int modulusSize = 2048, defaultSubgroupOrderSize;
 		alg.GetIntValue("ModulusSize", modulusSize) || alg.GetIntValue("KeySize", modulusSize);
 
 		switch (modulusSize)
@@ -70,8 +70,12 @@ void DL_GroupParameters_DSA::GenerateRandom(RandomNumberGenerator &rng, const Na
 bool DL_GroupParameters_DSA::ValidateGroup(RandomNumberGenerator &rng, unsigned int level) const
 {
 	bool pass = DL_GroupParameters_GFP::ValidateGroup(rng, level);
-	int pSize = GetModulus().BitCount(), qSize = GetSubgroupOrder().BitCount();
+	CRYPTOPP_ASSERT(pass);
+
+	const int pSize = GetModulus().BitCount(), qSize = GetSubgroupOrder().BitCount();
 	pass = pass && ((pSize==1024 && qSize==160) || (pSize==2048 && qSize==224) || (pSize==2048 && qSize==256) || (pSize==3072 && qSize==256));
+	CRYPTOPP_ASSERT(pass);
+
 	return pass;
 }
 
@@ -132,12 +136,20 @@ bool DL_GroupParameters_IntegerBased::ValidateGroup(RandomNumberGenerator &rng, 
 
 	bool pass = true;
 	pass = pass && p > Integer::One() && p.IsOdd();
+	CRYPTOPP_ASSERT(pass);
 	pass = pass && q > Integer::One() && q.IsOdd();
+	CRYPTOPP_ASSERT(pass);
 
 	if (level >= 1)
+	{
 		pass = pass && GetCofactor() > Integer::One() && GetGroupOrder() % q == Integer::Zero();
+		CRYPTOPP_ASSERT(pass);
+	}
 	if (level >= 2)
+	{
 		pass = pass && VerifyPrime(rng, q, level-2) && VerifyPrime(rng, p, level-2);
+		CRYPTOPP_ASSERT(pass);
+	}
 
 	return pass;
 }
@@ -148,17 +160,26 @@ bool DL_GroupParameters_IntegerBased::ValidateElement(unsigned int level, const 
 
 	bool pass = true;
 	pass = pass && GetFieldType() == 1 ? g.IsPositive() : g.NotNegative();
+	CRYPTOPP_ASSERT(pass);
+
 	pass = pass && g < p && !IsIdentity(g);
+	CRYPTOPP_ASSERT(pass);
 
 	if (level >= 1)
 	{
 		if (gpc)
+		{
 			pass = pass && gpc->Exponentiate(GetGroupPrecomputation(), Integer::One()) == g;
+			CRYPTOPP_ASSERT(pass);
+		}
 	}
 	if (level >= 2)
 	{
 		if (GetFieldType() == 2)
+		{
 			pass = pass && Jacobi(g*g-4, p)==-1;
+			CRYPTOPP_ASSERT(pass);
+		}
 
 		// verifying that Lucas((p+1)/2, w, p)==2 is omitted because it's too costly
 		// and at most 1 bit is leaked if it's false
@@ -168,9 +189,13 @@ bool DL_GroupParameters_IntegerBased::ValidateElement(unsigned int level, const 
 		{
 			Integer gp = gpc ? gpc->Exponentiate(GetGroupPrecomputation(), q) : ExponentiateElement(g, q);
 			pass = pass && IsIdentity(gp);
+			CRYPTOPP_ASSERT(pass);
 		}
 		else if (GetFieldType() == 1)
+		{
 			pass = pass && Jacobi(g, p) == 1;
+			CRYPTOPP_ASSERT(pass);
+		}
 	}
 
 	return pass;
@@ -204,7 +229,6 @@ void DL_GroupParameters_IntegerBased::GenerateRandom(RandomNumberGenerator &rng,
 	Initialize(p, q, g);
 }
 
-#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 void DL_GroupParameters_IntegerBased::EncodeElement(bool reversible, const Element &element, byte *encoded) const
 {
 	CRYPTOPP_UNUSED(reversible);
@@ -216,13 +240,12 @@ unsigned int DL_GroupParameters_IntegerBased::GetEncodedElementSize(bool reversi
 	CRYPTOPP_UNUSED(reversible);
 	return GetModulus().ByteCount();
 }
-#endif
 
 Integer DL_GroupParameters_IntegerBased::DecodeElement(const byte *encoded, bool checkForGroupMembership) const
 {
 	CRYPTOPP_UNUSED(checkForGroupMembership);
 	Integer g(encoded, GetModulus().ByteCount());
-	if (!ValidateElement(1, g, NULL))
+	if (!ValidateElement(1, g, NULLPTR))
 		throw DL_BadElement();
 	return g;
 }

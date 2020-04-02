@@ -38,7 +38,7 @@ CElement* CRadarArea::Clone(bool* bAddEntity, CResource* pResource)
     {
         pTemp->SetSize(GetSize());
         pTemp->SetColor(GetColor());
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
             pTemp->Sync(true);
         *bAddEntity = false;
     }

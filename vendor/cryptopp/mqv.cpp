@@ -1,15 +1,19 @@
-// mqv.cpp - written and placed in the public domain by Wei Dai
+// mqv.cpp - originally written and placed in the public domain by Wei Dai
 //           HMQV provided by Jeffrey Walton, Ray Clayton and Uri Blumenthal.
 //           FHMQV provided by Uri Blumenthal.
 
 #include "pch.h"
+#include "config.h"
 #include "mqv.h"
 #include "hmqv.h"
 #include "fhmqv.h"
 
+// Squash MS LNK4221 and libtool warnings
+extern const char MQV_FNAME[] = __FILE__;
+
 NAMESPACE_BEGIN(CryptoPP)
 
-#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
+#if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void TestInstantiations_MQV()
 {
 	MQV mqv;

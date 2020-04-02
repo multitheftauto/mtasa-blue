@@ -198,6 +198,7 @@ struct EColSurface
         HAY_BALE,
         GORE,
         RAILTRACK,
+        SIZE,
     };
 
     // Enum in a byte

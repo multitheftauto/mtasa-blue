@@ -38,36 +38,42 @@ void CClientIFP::Unlink()
     }
 }
 
-bool CClientIFP::LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName)
+bool CClientIFP::Load(SString blockName, bool isRawData, SString input)
 {
-    m_strBlockName = strBlockName;
+    m_strBlockName = std::move(blockName);
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
-    if (LoadIFPFile(strFile, isRawData))
+    if (isRawData)
     {
-        m_u32Hashkey = HashString(strBlockName.ToLower());
-        return true;
+        if (!CFileReader::LoadFromBuffer(std::move(input)))
+            return false;
     }
-    return false;
-}
+    else
+    {
+        if (!CFileReader::LoadFromFile(std::move(input)))
+            return false;
+    }
 
-bool CClientIFP::LoadIFPFile(const SString& strFile, const bool isRawData)
-{
-    if (isRawData ? LoadDataBufferToMemory(strFile) : LoadFileToMemory(strFile))
+    bool success = ReadIFPByVersion();
+
+    if (success)
     {
-        if (ReadIFPByVersion())
-        {
-            // We are freeing the file reader memory because we don't need to read it anymore.
-            // This function does not unload IFP, to unload ifp, use destroyElement from Lua
-            FreeFileReaderMemory();
-            return true;
-        }
+        m_u32Hashkey = HashString(m_strBlockName.ToLower());
     }
-    return false;
+
+    // We are freeing the file reader memory because we don't need to read it anymore.
+    // This function does not unload IFP, to unload ifp, use destroyElement from Lua
+    FreeFileReaderMemory();
+
+    return success;
 }
 
 bool CClientIFP::ReadIFPByVersion()
 {
+    // Check if we have enough bytes in memory to check the version
+    if (GetRemainingBytesCount() < 4)
+        return false;
+
     char Version[4];
     ReadBytes(Version, sizeof(Version));
 
