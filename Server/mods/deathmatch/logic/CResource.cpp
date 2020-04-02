@@ -745,9 +745,13 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (!GetCompatibilityStatus(strStatus))
     {
         m_strFailureReason = SString("Not starting resource %s as %s\n", m_strResourceName.c_str(), strStatus.c_str());
+#ifdef MTA_DEBUG
+        CLogger::LogPrint("[IGNORED IN CUSTOM BUILD] " + m_strFailureReason);
+#else
         CLogger::LogPrint(m_strFailureReason);
         m_eState = EResourceState::Loaded;
         return false;
+#endif
     }
     else if (!strStatus.empty())
     {
