@@ -90,6 +90,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
+    m_bTaskToBeRestoredOnAnimEnd = false;
+    m_eTaskTypeToBeRestoredOnAnimEnd = TASK_SIMPLE_PLAYER_ON_FOOT;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";
@@ -157,14 +159,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
-    m_iTimeAnimation = -1;
-    m_iBlendAnimation = 250;
-    m_bLoopAnimation = false;
-    m_bUpdatePositionAnimation = false;
-    m_bInterruptableAnimation = false;
-    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -212,6 +209,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage = NULL;
         m_shotSyncData = g_pMultiplayer->GetLocalShotSyncData();
         m_currentControllerState = NULL;
+        m_rawControllerState = CControllerState();
         m_lastControllerState = NULL;
         m_stats = NULL;
 
@@ -231,6 +229,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage->SetProcessPlayerWeapon(true);
         m_shotSyncData = m_remoteDataStorage->ShotSyncData();
         m_currentControllerState = m_remoteDataStorage->CurrentControllerState();
+        m_rawControllerState = CControllerState();
         m_lastControllerState = m_remoteDataStorage->LastControllerState();
         m_stats = m_remoteDataStorage->Stats();
         // ### remember if you want to set Int flags, subtract STATS_OFFSET from the enum ID ###
@@ -297,7 +296,7 @@ CClientPed::~CClientPed()
         CClientVehicle* pVehicle = GetOccupiedVehicle();
         if (m_pPlayerPed && pVehicle && GetOccupiedVehicleSeat() == 0)
         {
-            if (g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
+            if (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
             {
                 CVehicle* pGameVehicle = pVehicle->GetGameVehicle();
                 if (pGameVehicle)
@@ -1434,7 +1433,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
             // Warp him in
             InternalWarpIntoVehicle(pGameVehicle);
 
-            if (m_bIsLocalPlayer || g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)
+            if (m_bIsLocalPlayer || (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))
             {
                 // Tell vehicle audio we have driver
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
@@ -1566,7 +1565,7 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
             if (pVehicle != m_pOccupyingVehicle && pVehicle->GetOccupant())
             {
                 // Local player left vehicle or got abandoned by remote driver
-                if ((m_bIsLocalPlayer || (m_uiOccupiedVehicleSeat == 0 && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle)))
+                if ((m_bIsLocalPlayer || (m_uiOccupiedVehicleSeat == 0 && (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))))
                 {
                     // Tell vehicle audio the driver left
                     pGameVehicle->GetVehicleAudioEntity()->JustGotOutOfVehicleAsDriver();
@@ -2650,6 +2649,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
             // ControllerState checks and fixes only
             CControllerState Current;
             GetControllerState(Current);
+            m_rawControllerState = Current;
 
             ApplyControllerStateFixes(Current);
 
@@ -2684,6 +2684,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         CControllerState Current;
         GetControllerState(Current);
+        m_rawControllerState = Current;
 
         if (bDoControllerStateFixPulse)
             ApplyControllerStateFixes(Current);
@@ -2830,10 +2831,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
         }
 
@@ -3670,17 +3671,17 @@ void CClientPed::_CreateModel()
         }
 
         // Are we still playing a looped animation?
-        if (m_bLoopAnimation && m_pAnimationBlock)
+        if (m_AnimationCache.bLoop && m_pAnimationBlock)
         {
             if (m_bisCurrentAnimationCustom)
             {
                 m_bisNextAnimationCustom = true;
             }
             // Copy our anim name incase it gets deleted
-            SString strAnimName = m_strAnimationName;
+            SString strAnimName = m_AnimationCache.strName;
             // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                              m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
         }
 
         // Set the voice that corresponds to our model
@@ -3962,7 +3963,7 @@ void CClientPed::_ChangeModel()
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if (m_bLoopAnimation && m_pAnimationBlock)
+            if (m_AnimationCache.bLoop && m_pAnimationBlock)
             {
                 if (m_bisCurrentAnimationCustom)
                 {
@@ -3970,10 +3971,10 @@ void CClientPed::_ChangeModel()
                 }
 
                 // Copy our anim name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
 
             // Set the voice that corresponds to the new model
@@ -5094,7 +5095,7 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
@@ -5582,52 +5583,73 @@ bool CClientPed::IsDoingGangDriveby()
 
 void CClientPed::SetDoingGangDriveby(bool bDriveby)
 {
-    if (m_pPlayerPed)
+    m_bDoingGangDriveby = bDriveby;
+
+    if (!m_pPlayerPed)
+        return;
+
+    CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+
+    if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
     {
-        CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
-        if (pTask && pTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+        if (!bDriveby)
         {
-            if (!bDriveby)
-            {
-                pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
-            }
-        }
-        else if (bDriveby)
-        {
-            char   cSeat = GetOccupiedVehicleSeat();
-            bool   bRight = (cSeat % 2 != 0);
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight);
-            if (pTask)
-            {
-                pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-            }
-
-            char cWindow = -1;
-            switch (cSeat)
-            {
-                case 0:
-                    cWindow = WINDOW_LEFT_FRONT;
-                    break;
-
-                case 1:
-                    cWindow = WINDOW_RIGHT_FRONT;
-                    break;
-
-                case 2:
-                    cWindow = WINDOW_LEFT_BACK;
-                    break;
-
-                case 3:
-                    cWindow = WINDOW_RIGHT_BACK;
-                    break;
-            }
-            if (cWindow != -1)
-            {
-                GetOccupiedVehicle()->SetWindowOpen(cWindow, true);
-            }
+            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
         }
     }
-    m_bDoingGangDriveby = bDriveby;
+    else if (bDriveby)
+    {
+        unsigned int seat = GetOccupiedVehicleSeat();
+        bool         bRight = (seat % 2 != 0);
+
+        if (CTask* task = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight); task != nullptr)
+        {
+            task->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+        }
+
+        uchar ucWindow = -1;
+
+        switch (seat)
+        {
+            case 0:
+                ucWindow = WINDOW_LEFT_FRONT;
+                break;
+            case 1:
+                ucWindow = WINDOW_RIGHT_FRONT;
+                break;
+            case 2:
+                ucWindow = WINDOW_LEFT_BACK;
+                break;
+            case 3:
+                ucWindow = WINDOW_RIGHT_BACK;
+                break;
+        }
+
+        if (ucWindow != -1)
+        {
+            if (CClientVehicle* vehicle = GetOccupiedVehicle(); vehicle != nullptr)
+                vehicle->SetWindowOpen(ucWindow, true);
+        }
+    }
+}
+
+bool CClientPed::GetRunningAnimationName(SString& strBlockName, SString& strAnimName)
+{
+    if (IsRunningAnimation())
+    {
+        if (IsCustomAnimationPlaying())
+        {
+            strBlockName = GetNextAnimationCustomBlockName();
+            strAnimName = GetNextAnimationCustomName();
+        }
+        else
+        {
+            strBlockName = GetAnimationBlock()->GetName();
+            strAnimName = m_AnimationCache.strName;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool CClientPed::IsRunningAnimation()
@@ -5641,7 +5663,7 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_bLoopAnimation && m_pAnimationBlock);
+    return (m_AnimationCache.bLoop && m_pAnimationBlock);
 }
 
 void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
@@ -5666,8 +5688,8 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
     }
 }
 
-void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable,
-                                   bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
+                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5725,6 +5747,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
         else
@@ -5743,13 +5766,13 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
-    m_strAnimationName = szAnimName;
-    m_iTimeAnimation = iTime;
-    m_iBlendAnimation = iBlend;
-    m_bLoopAnimation = bLoop;
-    m_bUpdatePositionAnimation = bUpdatePosition;
-    m_bInterruptableAnimation = bInterruptable;
-    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
+    m_AnimationCache.strName = szAnimName;
+    m_AnimationCache.iTime = iTime;
+    m_AnimationCache.iBlend = iBlend;
+    m_AnimationCache.bLoop = bLoop;
+    m_AnimationCache.bUpdatePosition = bUpdatePosition;
+    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
 void CClientPed::KillAnimation()
@@ -5769,22 +5792,18 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_strAnimationName = "";
+    m_AnimationCache.strName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
 
 std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
-{ 
+{
     if (m_pAnimationBlock)
     {
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
-    return nullptr; 
-}
-const char* CClientPed::GetAnimationName()
-{ 
-    return m_strAnimationName; 
+    return nullptr;
 }
 
 void CClientPed::PostWeaponFire()
@@ -5970,7 +5989,10 @@ bool CClientPed::ReloadWeapon()
 
 bool CClientPed::IsReloadingWeapon()
 {
-    return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
+    if (CWeapon* weapon = GetWeapon(); weapon != nullptr)
+        return weapon->GetState() == WEAPONSTATE_RELOADING;
+    else
+        return false;
 }
 
 bool CClientPed::ShouldBeStealthAiming()
@@ -6177,7 +6199,7 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
         return nullptr;
     }
 
-    auto pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
+    auto                            pReplacedAnimation = GetReplacedAnimation(pOriginalHierarchyInterface);
     CAnimBlendHierarchySAInterface* pReplacedInterface = nullptr;
     if (pReplacedAnimation != nullptr)
     {
@@ -6185,13 +6207,13 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
     }
 
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+    auto          pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
     while (pAnimAssociation)
     {
         auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
         auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
         if (pAnimHierarchy)
-        {  
+        {
             CAnimBlendHierarchySAInterface* pInterface = pAnimHierarchy->GetInterface();
             if (pInterface == pOriginalHierarchyInterface)
             {
@@ -6205,7 +6227,6 @@ std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimAssociation(CAnimBlend
         pAnimAssociation = std::move(pAnimNextAssociation);
     }
     return nullptr;
-
 }
 
 CSphere CClientPed::GetWorldBoundingSphere()

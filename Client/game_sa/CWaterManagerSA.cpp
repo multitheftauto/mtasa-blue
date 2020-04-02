@@ -523,10 +523,10 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
     float minY = Clamp<float>(-3000.0f, std::min<float>(startPos.fY, endPos.fY), 3000.0f);
     float maxY = Clamp<float>(-3000.0f, std::max<float>(startPos.fY, endPos.fY), 3000.0f);
 
-    int lowXZone = Clamp<int>(0, (minX + 3000.0f) / 500.0f, 11);
-    int lowYZone = Clamp<int>(0, (minY + 3000.0f) / 500.0f, 11);
-    int highXZone = Clamp<int>(0, (maxX + 3000.0f) / 500.0f, 11);
-    int highYZone = Clamp<int>(0, (maxY + 3000.0f) / 500.0f, 11);
+    int lowXZone = Clamp<int>(0, static_cast<int>((minX + 3000.0f) / 500.0f), 11);
+    int lowYZone = Clamp<int>(0, static_cast<int>((minY + 3000.0f) / 500.0f), 11);
+    int highXZone = Clamp<int>(0, static_cast<int>((maxX + 3000.0f) / 500.0f), 11);
+    int highYZone = Clamp<int>(0, static_cast<int>((maxY + 3000.0f) / 500.0f), 11);
 
     if (lowXZone == highXZone)
     {

@@ -1,0 +1,81 @@
+# This file contains a list of commits with
+# mass changes for exclusion by `git blame`.
+#
+# Passing `--ignore-revs-file .git-blame-ignore-revs` as a flag will
+# tell git to "ignore changes made by the revision when assigning
+# blame, as if the change never happened".
+#
+# For example:
+#   git blame --ignore-revs-file .git-blame-ignore-revs ...
+#
+# For extra hot sauce, ignore white space changes too:
+#   git blame -w --ignore-revs-file .git-blame-ignore-revs ...
+#
+# You can make this a default for your repo using:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Also, if you use the GitLens extension for Visual Studio Code, you
+# can add "-w" as a value to "gitlens.advanced.blame.customArguments".
+#
+# Note that `git blame` does not use any file by default, and
+# the filename `.git-blame-ignore-revs` is just a convention.
+
+9f69b979c4ea825731a2c3102c6b707a58b7e356
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Wed Apr 28 22:29:05 2010 +0000
+#
+# Reverted r1551 "Set property 'svn:eol-style native' on all non binary files"
+
+2c1bd0ba585d74486e6724d56a10c0477bf2b559
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Sun Jul 31 23:35:22 2016 +0100
+#
+# Remove shared_logic (#55)
+
+da1709db93d060215067cad60533f621012cf2a2
+# Author: sbx320 <sbx320@sbx320.net>
+# Date:   Fri Sep 16 00:14:55 2016 +0200
+#
+# Cleaned up some parts of client deathmatch
+#
+# This commit mainly replaces iterator for loops with C++11 range based for loops for improved code readability
+
+c2caf8b8b95eb328a5fb24e29e8dcbfaf0362dfb
+# Author: Jusonex <jusonex96@gmail.com>
+# Date:   Mon Oct 10 21:03:37 2016 +0200
+#
+# Revert "Cleaned up some parts of client deathmatch"
+#
+# This reverts commit da1709db93d060215067cad60533f621012cf2a2.
+
+c39e2cbf9ef355e8720d98c7de7cda93fc25d735
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Mon Mar 12 17:11:00 2018 +0000
+#
+# Applied source formatting. See utils\win-apply-clang-format.bat
+
+ed77b94e1ec7715b8a6fcb5430036be3625f9d5a
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Wed May 30 21:55:12 2018 +0100
+#
+# Applied source formatting
+
+b4dc8b6495f652b56ac7d71fdf53099e50a8e74a
+# Author: Marek Kulik <mk.botder@gmail.com>
+# Date:   Sun Sep 30 14:25:20 2018 +0200
+#
+# Apply automatic code-formatting
+
+e11685cab4beb7958ab202261f9c9d9b4ce71e58
+# Author: Marek Kulik <38703318+botder@users.noreply.github.com>
+# Date:   Sun Jan 13 21:04:27 2019 +0100
+#
+# Replace (void) with () (PR #771)
+
+eefde6d95260aef53308baa7fb1e59cf24522cd9
+# Author: Marek Kulik <me@botder.com>
+# Date:   Wed Apr 1 16:55:42 2020 +0200
+#
+# Enable every entry in .gitattributes
+#
+# - Mark .git-blame-ignore-revs as export-ignore

@@ -67,6 +67,7 @@ public:
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
     void                InitHooks_VehicleCollision();
+    void                InitHooks_Vehicles();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
     void                InitHooks_VehicleLights();
@@ -130,6 +131,7 @@ public:
     void SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler);
     void SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler);
     void SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler);
+    void SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler);
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);

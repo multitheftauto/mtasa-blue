@@ -297,7 +297,6 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
     float fPlayerListSizeX = SB_PLAYERLIST_SIZE_X;
     float fSearchBarSizeX = pManager->GetTextExtent(_("Search players..."), "default-bold-small") + 90;
-    std::max(fSearchBarSizeX, pManager->GetTextExtent(_("Search servers..."), "default-bold-small") + 60);
 
     float fConnectButtonWidth = 26 + pManager->GetTextExtent(_("Connect"), "default-bold-small") + 5;
 

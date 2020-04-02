@@ -13,22 +13,72 @@
 
 bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    // bool                  - show the "X has joined the game" messages?
+    // string          (X)   - AC info
+    // string          (X)   - SD info
+    // bool            (1)   - whether these are new players that have just joined
+    //                       x ProtocolError(8)
+    //
     // [ following repeats <number of players joined> times ]
-    // unsigned char  (1)    - assigned player id
-    // unsigned char  (1)    - player nick length
-    // unsigned char  (X)    - player nick (X = player nick length)
-    // bool                  - is he dead?
-    // bool                  - spawned? (following data only if this is TRUE)
-    // unsigned char  (1)    - model id
-    // unsigned char  (1)    - team id
-    // bool                  - in a vehicle?
-    // unsigned short (2)    - vehicle id (if vehicle)
-    // unsigned char  (1)    - vehicle seat (if vehicle)
-    // CVector        (12)   - position (if player)
-    // float          (4)    - rotation (if player)
-    // bool                  - has a jetpack?
-    // unsigned short (2)    - dimension
+    //
+    // unsigned char   (1)   - assigned player id
+    //                       x ProtocolError(8)
+    // unsigned char   (1)   - time sync context
+    // unsigned char   (1)   - player nick length
+    //                       x ProtocolError(9)
+    // unsigned char   (X)   - player nick (X = player nick length)
+    //
+    // if bitStream version >= 0x34
+    // | unsigned short(2)  - bitStream version
+    // | unsigned int  (1)  - build number
+    //
+    // bool            (1)   - is he dead?
+    // bool            (1)   - spawned? (*)
+    // bool            (1)   - in a vehicle? (**)
+    // bool            (1)   - has a jetpack?
+    // bool            (1)   - nametag showing
+    // bool            (1)   - nametag color overridden (***)
+    // bool            (1)   - headless?
+    // bool            (1)   - frozen?
+    // unsigned char   (1)   - nametag text length
+    // unsigned char   (X)   - nametag text (X = nametag text length)
+    //
+    // if (***) nametag color overridden TRUE
+    // | unsigned char (3)   - nametag color (RGB)
+    //
+    // if bitStream version > 0x4B
+    // | unsigned char (1)   - movement anim (default = MOVE_DEFAULT)
+    //
+    // --------------------------------------
+    // (*) ALL following data only if SPAWNED
+    //     Always true for new server builds
+    // --------------------------------------
+    //
+    // unsigned char   (1)   - model id
+    //                       x ProtocolError(10)
+    // bool            (1)   - has team
+    // if has team
+    // | ElementID     (2)   - team id
+    // |                      x ProtocolError(10)
+    //
+    // if (**) inside vehicle
+    // | ElementID     (2)    - vehicle id
+    // | unsigned char (4)    - vehicle seat
+    // |                      x ProtocolError(11)
+    // else (on foot)
+    // | CVector       (12)   - position
+    // | float         (4)    - rotation
+
+    // unsigned short  (2)    - dimension
+    // unsigned char   (1)    - fighting style
+    // unsigned char   (1)    - alpha
+    // unsigned char   (1)    - interior
+    //
+    // ---------------------------------
+    // 16 reads of the following (0..15)
+    // ---------------------------------
+    // bool            (1)    - if player has this weapon id
+    // if player has this weapon
+    // | unsigned char   (6)  - weapon type of this id
 
     // Write the global flags
     BitStream.WriteBit(m_bShowInChat);
@@ -66,9 +116,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (BitStream.Version() >= 0x34)
         {
             BitStream.Write(pPlayer->GetBitStreamVersion());
-            SString strBuild = pPlayer->GetPlayerVersion().SubStr(8);
-            uint    uiBuildNumber = atoi(strBuild);
-            BitStream.Write(uiBuildNumber);
+            BitStream.Write(pPlayer->GetPlayerVersion().GetBuildNumber());
         }
 
         // Flags

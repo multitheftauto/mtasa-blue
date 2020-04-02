@@ -943,6 +943,8 @@ static CEntity* GetProjectileOwner(CPools*  pPools)
 
 static void GetProjectileTarget(CPools*  pPools)
 {
+    projectileTargetEntity = nullptr;
+
     if (projectileTargetEntityInterface)
     {
         switch (projectileTargetEntityInterface->nType)

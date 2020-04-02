@@ -17,7 +17,7 @@ class CConsole;
 #include "CCore.h"
 #include "CCommands.h"
 #include "CSingleton.h"
-#include "CConsoleHistory.h"
+#include "CEntryHistory.h"
 
 class CConsole : public CConsoleInterface
 {
@@ -44,8 +44,11 @@ public:
     void HandleTextAccepted(bool bHandled);
     void GetCommandInfo(const std::string& strIn, std::string& strCmdOut, std::string& strCmdLineOut);
 
-    void SetNextHistoryText();
-    void SetPreviousHistoryText();
+    void ResetHistoryChanges();
+    void SelectHistoryEntry(int iEntry);
+    bool SetNextHistoryText();
+    bool SetPreviousHistoryText();
+
     void SetNextAutoCompleteMatch();
     void ResetAutoCompleteMatch();
 
@@ -71,7 +74,7 @@ private:
 
     CGUI* m_pManager;
 
-    CConsoleHistory* m_pConsoleHistory;
+    CEntryHistory*   m_pConsoleHistory;
     int              m_iHistoryIndex;
     std::vector<int> m_AutoCompleteList;
     int              m_iAutoCompleteIndex;
@@ -88,4 +91,5 @@ private:
     float   m_fWindowY;
     float   m_fInputHeight;
     SString m_strPendingAdd;
+    SString m_strSavedInputText;
 };

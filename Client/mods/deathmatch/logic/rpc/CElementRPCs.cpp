@@ -436,7 +436,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTPLAYER:
         {
             CClientPed* pPed = static_cast<CClientPed*>(pSource);
-            const unsigned short usCurrentModel = pPed->GetModel();
+            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
 
             if (usCurrentModel != usModel)
             {

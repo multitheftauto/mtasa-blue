@@ -47,6 +47,15 @@ CChecksum CDownloadableResource::GenerateClientChecksum()
     return m_LastClientChecksum;
 }
 
+CChecksum CDownloadableResource::GenerateClientChecksum(CBuffer& outFileData)
+{
+    // If LoadFromFile fails, a default initialized checksum is returned (just like GenerateClientChecksum() behaves)
+    if (outFileData.LoadFromFile(m_strName))
+        m_LastClientChecksum = CChecksum::GenerateChecksumFromBuffer(outFileData.GetData(), outFileData.GetSize());
+    
+    return m_LastClientChecksum;
+}
+
 CChecksum CDownloadableResource::GetServerChecksum()
 {
     return m_ServerChecksum;

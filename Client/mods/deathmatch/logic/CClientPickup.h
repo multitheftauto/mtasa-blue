@@ -102,10 +102,11 @@ public:
     CEntity*       GetGameEntity() { return m_pObject; }
     const CEntity* GetGameEntity() const { return m_pObject; }
 
-    const CVector& GetPosition() { return m_vecPosition; };
-    void           GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
+    void           GetPosition(CVector& vecPosition) const override;
     void           SetPosition(const CVector& vecPosition);
     void           SetModel(unsigned short usModel);
+
+    void AttachTo(CClientEntity* pEntity) override;
 
     bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);

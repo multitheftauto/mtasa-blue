@@ -1,5 +1,5 @@
 /*===========================================================================
- BASS_FX 2.4 - Copyright (c) 2002-2018 (: JOBnik! :) [Arthur Aminov, ISRAEL]
+ BASS_FX 2.4 - Copyright (c) 2002-2019 (: JOBnik! :) [Arthur Aminov, ISRAEL]
                                                      [http://www.jobnik.org]
 
       bugs/suggestions/questions:
@@ -286,8 +286,8 @@ typedef struct {
 	float fBandwidth;						// [0.1...........<10] Bandwidth in octaves (fQ is not in use (fBandwidth has a priority over fQ))
 											// 						(between -3 dB frequencies for BANDPASS and NOTCH or between midpoint
 											// 						(fGgain/2) gain frequencies for PEAKINGEQ)
-	float fQ;								// [0.1.............1] The EE kinda definition (linear) (if fBandwidth is not in use)
-	float fS;								// [0.1.............1] A "shelf slope" parameter (linear) (used only with Shelving filters)
+	float fQ;								// [0.1.....1.......n] The EE kinda definition (linear) (if fBandwidth is not in use)
+	float fS;								// [0.1.....1.......n] A "shelf slope" parameter (linear) (used only with Shelving filters)
 											// 						when fS = 1, the shelf slope is as steep as you can get it and remain monotonically
 											// 						increasing or decreasing gain with frequency.
 	int   lChannel;							// BASS_BFX_CHANxxx flag/s
