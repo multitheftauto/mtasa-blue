@@ -77,18 +77,18 @@ end
 function os.expanddir_wildcard(from, to)
 	local dir = os.matchdirs(from)[1]
 	if not dir then return end
-	
+
 	-- TODO: Optimize this
 	os.copydir(dir, to)
 	os.rmdir(dir)
 end
 
-function os.md5_file(path)
+function os.sha256_file(path)
 	if os.host() == "windows" then
-		local s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
-		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+		local s, errc = os.outputof(string.format("powershell -Command (Get-FileHash \"%s\" -Algorithm SHA256).Hash", path))
+		return (errc == 0) and s or ""
 	else
-		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
+		return os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
 end
 
@@ -105,10 +105,12 @@ end
 function http.download_print_errors(url, file, options)
 	local result_str, response_code = http.download(url, file, options)
 	if result_str ~= "OK" then
-		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str )
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str .. " (" .. response_code .. ")" )
 		if response_code == 0 then
 			-- No response code means server was unreachable
 			print( "Check premake5 is not blocked by firewall rules" )
 		end
+		return false
 	end
+	return true
 end
