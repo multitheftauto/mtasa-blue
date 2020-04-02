@@ -870,17 +870,18 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &bIsSynced);
-    if (!pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize)
+    ESyncType     lastSyncType = ESyncType::BROADCAST;
+    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+
+    if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
-        if (bSynchronize)
+        if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
             unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
@@ -888,14 +889,22 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             BitStream.pBitStream->WriteCompressed(usNameLength);
             BitStream.pBitStream->Write(szName, usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+
+            if (syncType == ESyncType::BROADCAST)
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+            else
+                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
         }
 
+        // Unsubscribe all the players
+        if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
+            m_pPlayerManager->ClearElementData(pElement, szName);
+
         // Set its custom data
-        pElement->SetCustomData(szName, Variable, bSynchronize);
+        pElement->SetCustomData(szName, Variable, syncType);
         return true;
     }
     return false;
@@ -918,6 +927,9 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
         BitStream.pBitStream->WriteBit(false);            // Unused (was recursive flag)
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
 
+        // Clean up after the data removal
+        m_pPlayerManager->ClearElementData(pElement, szName);
+
         // Delete here
         pElement->DeleteCustomData(szName);
         return true;
@@ -925,6 +937,55 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
 
     // Failed
     return false;
+}
+
+bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    ESyncType     lastSyncType;
+    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+
+    if (lastSyncType == ESyncType::SUBSCRIBE)
+    {
+        if (!pPlayer->SubscribeElementData(pElement, szName))
+            return false;
+
+        // Tell our clients to update their data
+        unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+        CBitStream     BitStream;
+        BitStream.pBitStream->WriteCompressed(usNameLength);
+        BitStream.pBitStream->Write(szName, usNameLength);
+        pCurrentVariable->WriteToBitStream(*BitStream.pBitStream);
+
+        pPlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+
+        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, 1, BitStream.pBitStream->GetNumberOfBytesUsed());
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    return pPlayer->UnsubscribeElementData(pElement, szName);
+}
+
+bool CStaticFunctionDefinitions::HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    return pPlayer->IsSubscribed(pElement, szName);
 }
 
 bool CStaticFunctionDefinitions::SetElementParent(CElement* pElement, CElement* pParent)
@@ -3299,6 +3360,34 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax)
+{
+    assert(pElement);
+
+    if (uiPartyMax > m_pMainConfig->GetMaxPlayers() || uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
+        return false;
+
+    RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        if (pPlayer->GetBitStreamVersion() < 0x06E)
+            return false;
+
+        CBitStream bitStream;
+        bitStream.pBitStream->WriteString<uchar>(strKey);
+        bitStream.pBitStream->WriteString<uchar>(strPartyId);
+        bitStream.pBitStream->Write(uiPartySize);
+        bitStream.pBitStream->Write(uiPartyMax);
+        pPlayer->Send(CLuaPacket(SET_DISCORD_JOIN_PARAMETERS, *bitStream.pBitStream));
+
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword)
 {
     if (IS_PLAYER(pElement))
@@ -4147,7 +4236,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
+    RUN_CHILDREN(
+        SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
 
     if (IS_PED(pElement))
     {
@@ -9981,6 +10071,7 @@ bool CStaticFunctionDefinitions::SetMaxPlayers(unsigned int uiMax)
         return false;
     m_pMainConfig->SetSoftMaxPlayers(uiMax);
     g_pNetServer->SetMaximumIncomingConnections(uiMax);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CServerInfoSyncPacket(SERVER_INFO_FLAG_MAX_PLAYERS));
     return true;
 }
 

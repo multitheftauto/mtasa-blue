@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "net/SyncStructures.h"
+#include "CServerInfo.h"
 
 using std::list;
 
@@ -203,6 +204,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
 
         case PACKET_ID_PED_TASK:
             Packet_PedTask(bitStream);
+            return true;
+
+        case PACKET_ID_SERVER_INFO_SYNC:
+            Packet_ServerInfoSync(bitStream);
             return true;
 
         default:
@@ -989,6 +994,8 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1020,6 +1027,8 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
@@ -5219,6 +5228,24 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
         default:
             break;
     };
+}
+
+void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
+{
+    uint8 flags;
+    
+    if (!bitStream.Read(flags))
+        return;
+
+    // Read in order of flags
+    if (flags & SERVER_INFO_FLAG_MAX_PLAYERS)
+    {
+        uint maxPlayersCount;
+        if (!bitStream.Read(maxPlayersCount))
+            return;
+
+        g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
 }
 
 //
