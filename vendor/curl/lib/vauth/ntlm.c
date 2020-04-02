@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,6 +40,7 @@
 #include "curl_ntlm_core.h"
 #include "curl_gethostname.h"
 #include "curl_multibyte.h"
+#include "curl_md5.h"
 #include "warnless.h"
 #include "rand.h"
 #include "vtls/vtls.h"
@@ -403,7 +404,7 @@ CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
   (void)hostname,
 
   /* Clean up any former leftovers and initialise to defaults */
-  Curl_auth_ntlm_cleanup(ntlm);
+  Curl_auth_cleanup_ntlm(ntlm);
 
 #if defined(USE_NTRESPONSES) && defined(USE_NTLM2SESSION)
 #define NTLM2FLAG NTLMFLAG_NEGOTIATE_NTLM2_KEY
@@ -621,11 +622,11 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
     memcpy(tmp, &ntlm->nonce[0], 8);
     memcpy(tmp + 8, entropy, 8);
 
-    result = Curl_ssl_md5sum(tmp, 16, md5sum, MD5_DIGEST_LENGTH);
-    if(!result)
-      /* We shall only use the first 8 bytes of md5sum, but the des code in
-         Curl_ntlm_core_lm_resp only encrypt the first 8 bytes */
-      result = Curl_ntlm_core_mk_nt_hash(data, passwdp, ntbuffer);
+    Curl_md5it(md5sum, tmp, 16);
+
+    /* We shall only use the first 8 bytes of md5sum, but the des code in
+       Curl_ntlm_core_lm_resp only encrypt the first 8 bytes */
+    result = Curl_ntlm_core_mk_nt_hash(data, passwdp, ntbuffer);
     if(result)
       return result;
 
@@ -844,22 +845,22 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   /* Return with binary blob encoded into base64 */
   result = Curl_base64_encode(data, (char *)ntlmbuf, size, outptr, outlen);
 
-  Curl_auth_ntlm_cleanup(ntlm);
+  Curl_auth_cleanup_ntlm(ntlm);
 
   return result;
 }
 
 /*
-* Curl_auth_ntlm_cleanup()
-*
-* This is used to clean up the NTLM specific data.
-*
-* Parameters:
-*
-* ntlm    [in/out] - The NTLM data struct being cleaned up.
-*
-*/
-void Curl_auth_ntlm_cleanup(struct ntlmdata *ntlm)
+ * Curl_auth_cleanup_ntlm()
+ *
+ * This is used to clean up the NTLM specific data.
+ *
+ * Parameters:
+ *
+ * ntlm    [in/out] - The NTLM data struct being cleaned up.
+ *
+ */
+void Curl_auth_cleanup_ntlm(struct ntlmdata *ntlm)
 {
   /* Free the target info */
   Curl_safefree(ntlm->target_info);

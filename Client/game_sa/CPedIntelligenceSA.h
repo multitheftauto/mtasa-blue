@@ -69,4 +69,5 @@ public:
     CVehicleScanner*              GetVehicleScanner();
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSimpleUseGunSAInterface* GetTaskUseGun();
+    CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };

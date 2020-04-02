@@ -7,7 +7,7 @@
  *
  * Copyright (C) 2012 - 2016, Marc Hoersken, <info@marc-hoersken.de>
  * Copyright (C) 2012, Mark Salisbury, <mark.salisbury@hp.com>
- * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -96,9 +96,11 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
 
   ca_file_tstr = Curl_convert_UTF8_to_tchar((char *)ca_file);
   if(!ca_file_tstr) {
+    char buffer[STRERROR_LEN];
     failf(data,
           "schannel: invalid path name for CA file '%s': %s",
-          ca_file, Curl_strerror(conn, GetLastError()));
+          ca_file,
+          Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
     result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
   }
@@ -110,23 +112,27 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
    */
   ca_file_handle = CreateFile(ca_file_tstr,
                               GENERIC_READ,
-                              0,
+                              FILE_SHARE_READ,
                               NULL,
                               OPEN_EXISTING,
                               FILE_ATTRIBUTE_NORMAL,
                               NULL);
   if(ca_file_handle == INVALID_HANDLE_VALUE) {
+    char buffer[STRERROR_LEN];
     failf(data,
           "schannel: failed to open CA file '%s': %s",
-          ca_file, Curl_strerror(conn, GetLastError()));
+          ca_file,
+          Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
     result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
   }
 
   if(!GetFileSizeEx(ca_file_handle, &file_size)) {
+    char buffer[STRERROR_LEN];
     failf(data,
           "schannel: failed to determine size of CA file '%s': %s",
-          ca_file, Curl_strerror(conn, GetLastError()));
+          ca_file,
+          Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
     result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
   }
@@ -153,10 +159,11 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
 
     if(!ReadFile(ca_file_handle, ca_file_buffer + total_bytes_read,
                  bytes_to_read, &bytes_read, NULL)) {
-
+      char buffer[STRERROR_LEN];
       failf(data,
             "schannel: failed to read from CA file '%s': %s",
-            ca_file, Curl_strerror(conn, GetLastError()));
+            ca_file,
+            Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
       result = CURLE_SSL_CACERT_BADFILE;
       goto cleanup;
     }
@@ -215,11 +222,12 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
                              NULL,
                              NULL,
                              (const void **)&cert_context)) {
-
+          char buffer[STRERROR_LEN];
           failf(data,
                 "schannel: failed to extract certificate from CA file "
                 "'%s': %s",
-                ca_file, Curl_strerror(conn, GetLastError()));
+                ca_file,
+                Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
           result = CURLE_SSL_CACERT_BADFILE;
           more_certs = 0;
         }
@@ -243,10 +251,13 @@ static CURLcode add_certs_to_store(HCERTSTORE trust_store,
                                                NULL);
             CertFreeCertificateContext(cert_context);
             if(!add_cert_result) {
+              char buffer[STRERROR_LEN];
               failf(data,
                     "schannel: failed to add certificate from CA file '%s' "
                     "to certificate store: %s",
-                    ca_file, Curl_strerror(conn, GetLastError()));
+                    ca_file,
+                    Curl_winapi_strerror(GetLastError(), buffer,
+                                         sizeof(buffer)));
               result = CURLE_SSL_CACERT_BADFILE;
               more_certs = 0;
             }
@@ -282,6 +293,133 @@ cleanup:
   return result;
 }
 
+/*
+ * Returns the number of characters necessary to populate all the host_names.
+ * If host_names is not NULL, populate it with all the host names. Each string
+ * in the host_names is null-terminated and the last string is double
+ * null-terminated. If no DNS names are found, a single null-terminated empty
+ * string is returned.
+ */
+static DWORD cert_get_name_string(struct Curl_easy *data,
+                                  CERT_CONTEXT *cert_context,
+                                  LPTSTR host_names,
+                                  DWORD length)
+{
+  DWORD actual_length = 0;
+  BOOL compute_content = FALSE;
+  CERT_INFO *cert_info = NULL;
+  CERT_EXTENSION *extension = NULL;
+  CRYPT_DECODE_PARA decode_para = {0, 0, 0};
+  CERT_ALT_NAME_INFO *alt_name_info = NULL;
+  DWORD alt_name_info_size = 0;
+  BOOL ret_val = FALSE;
+  LPTSTR current_pos = NULL;
+  DWORD i;
+
+  /* CERT_NAME_SEARCH_ALL_NAMES_FLAG is available from Windows 8 onwards. */
+  if(Curl_verify_windows_version(6, 2, PLATFORM_WINNT,
+                                 VERSION_GREATER_THAN_EQUAL)) {
+#ifdef CERT_NAME_SEARCH_ALL_NAMES_FLAG
+    /* CertGetNameString will provide the 8-bit character string without
+     * any decoding */
+    DWORD name_flags =
+      CERT_NAME_DISABLE_IE4_UTF8_FLAG | CERT_NAME_SEARCH_ALL_NAMES_FLAG;
+    actual_length = CertGetNameString(cert_context,
+                                      CERT_NAME_DNS_TYPE,
+                                      name_flags,
+                                      NULL,
+                                      host_names,
+                                      length);
+    return actual_length;
+#endif
+  }
+
+  compute_content = host_names != NULL && length != 0;
+
+  /* Initialize default return values. */
+  actual_length = 1;
+  if(compute_content) {
+    *host_names = '\0';
+  }
+
+  if(!cert_context) {
+    failf(data, "schannel: Null certificate context.");
+    return actual_length;
+  }
+
+  cert_info = cert_context->pCertInfo;
+  if(!cert_info) {
+    failf(data, "schannel: Null certificate info.");
+    return actual_length;
+  }
+
+  extension = CertFindExtension(szOID_SUBJECT_ALT_NAME2,
+                                cert_info->cExtension,
+                                cert_info->rgExtension);
+  if(!extension) {
+    failf(data, "schannel: CertFindExtension() returned no extension.");
+    return actual_length;
+  }
+
+  decode_para.cbSize  =  sizeof(CRYPT_DECODE_PARA);
+
+  ret_val =
+    CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        szOID_SUBJECT_ALT_NAME2,
+                        extension->Value.pbData,
+                        extension->Value.cbData,
+                        CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_NOCOPY_FLAG,
+                        &decode_para,
+                        &alt_name_info,
+                        &alt_name_info_size);
+  if(!ret_val) {
+    failf(data,
+          "schannel: CryptDecodeObjectEx() returned no alternate name "
+          "information.");
+    return actual_length;
+  }
+
+  current_pos = host_names;
+
+  /* Iterate over the alternate names and populate host_names. */
+  for(i = 0; i < alt_name_info->cAltEntry; i++) {
+    const CERT_ALT_NAME_ENTRY *entry = &alt_name_info->rgAltEntry[i];
+    wchar_t *dns_w = NULL;
+    size_t current_length = 0;
+
+    if(entry->dwAltNameChoice != CERT_ALT_NAME_DNS_NAME) {
+      continue;
+    }
+    if(entry->pwszDNSName == NULL) {
+      infof(data, "schannel: Empty DNS name.");
+      continue;
+    }
+    current_length = wcslen(entry->pwszDNSName) + 1;
+    if(!compute_content) {
+      actual_length += (DWORD)current_length;
+      continue;
+    }
+    /* Sanity check to prevent buffer overrun. */
+    if((actual_length + current_length) > length) {
+      failf(data, "schannel: Not enough memory to list all host names.");
+      break;
+    }
+    dns_w = entry->pwszDNSName;
+    /* pwszDNSName is in ia5 string format and hence doesn't contain any
+     * non-ascii characters. */
+    while(*dns_w != '\0') {
+      *current_pos++ = (char)(*dns_w++);
+    }
+    *current_pos++ = '\0';
+    actual_length += (DWORD)current_length;
+  }
+  if(compute_content) {
+    /* Last string has double null-terminator. */
+    *current_pos = '\0';
+  }
+  return actual_length;
+}
+
 static CURLcode verify_host(struct Curl_easy *data,
                             CERT_CONTEXT *pCertContextServer,
                             const char * const conn_hostname)
@@ -292,21 +430,8 @@ static CURLcode verify_host(struct Curl_easy *data,
   DWORD len = 0;
   DWORD actual_len = 0;
 
-  /* CertGetNameString will provide the 8-bit character string without
-   * any decoding */
-  DWORD name_flags = CERT_NAME_DISABLE_IE4_UTF8_FLAG;
-
-#ifdef CERT_NAME_SEARCH_ALL_NAMES_FLAG
-  name_flags |= CERT_NAME_SEARCH_ALL_NAMES_FLAG;
-#endif
-
   /* Determine the size of the string needed for the cert hostname */
-  len = CertGetNameString(pCertContextServer,
-                          CERT_NAME_DNS_TYPE,
-                          name_flags,
-                          NULL,
-                          NULL,
-                          0);
+  len = cert_get_name_string(data, pCertContextServer, NULL, 0);
   if(len == 0) {
     failf(data,
           "schannel: CertGetNameString() returned no "
@@ -323,12 +448,8 @@ static CURLcode verify_host(struct Curl_easy *data,
     result = CURLE_OUT_OF_MEMORY;
     goto cleanup;
   }
-  actual_len = CertGetNameString(pCertContextServer,
-                                 CERT_NAME_DNS_TYPE,
-                                 name_flags,
-                                 NULL,
-                                 (LPTSTR) cert_hostname_buff,
-                                 len);
+  actual_len = cert_get_name_string(
+    data, pCertContextServer, (LPTSTR)cert_hostname_buff, len);
 
   /* Sanity check */
   if(actual_len != len) {
@@ -408,7 +529,7 @@ cleanup:
 
 CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
 {
-  SECURITY_STATUS status;
+  SECURITY_STATUS sspi_status;
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   CURLcode result = CURLE_OK;
@@ -420,13 +541,15 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
     conn->http_proxy.host.name :
     conn->host.name;
 
-  status = s_pSecFn->QueryContextAttributes(&BACKEND->ctxt->ctxt_handle,
-                                            SECPKG_ATTR_REMOTE_CERT_CONTEXT,
-                                            &pCertContextServer);
+  sspi_status =
+    s_pSecFn->QueryContextAttributes(&BACKEND->ctxt->ctxt_handle,
+                                     SECPKG_ATTR_REMOTE_CERT_CONTEXT,
+                                     &pCertContextServer);
 
-  if((status != SEC_E_OK) || (pCertContextServer == NULL)) {
+  if((sspi_status != SEC_E_OK) || (pCertContextServer == NULL)) {
+    char buffer[STRERROR_LEN];
     failf(data, "schannel: Failed to read remote certificate context: %s",
-          Curl_sspi_strerror(conn, status));
+          Curl_sspi_strerror(sspi_status, buffer, sizeof(buffer)));
     result = CURLE_PEER_FAILED_VERIFICATION;
   }
 
@@ -450,8 +573,9 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
                                   CERT_STORE_CREATE_NEW_FLAG,
                                   NULL);
       if(!trust_store) {
+        char buffer[STRERROR_LEN];
         failf(data, "schannel: failed to create certificate store: %s",
-              Curl_strerror(conn, GetLastError()));
+              Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
         result = CURLE_SSL_CACERT_BADFILE;
       }
       else {
@@ -477,9 +601,10 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
         CertCreateCertificateChainEngine(
           (CERT_CHAIN_ENGINE_CONFIG *)&engine_config, &cert_chain_engine);
       if(!create_engine_result) {
+        char buffer[STRERROR_LEN];
         failf(data,
               "schannel: failed to create certificate chain engine: %s",
-              Curl_strerror(conn, GetLastError()));
+              Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
         result = CURLE_SSL_CACERT_BADFILE;
       }
     }
@@ -500,8 +625,9 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
                                  CERT_CHAIN_REVOCATION_CHECK_CHAIN),
                                 NULL,
                                 &pChainContext)) {
+      char buffer[STRERROR_LEN];
       failf(data, "schannel: CertGetCertificateChain failed: %s",
-            Curl_sspi_strerror(conn, GetLastError()));
+            Curl_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
       pChainContext = NULL;
       result = CURLE_PEER_FAILED_VERIFICATION;
     }

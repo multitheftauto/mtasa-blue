@@ -145,8 +145,6 @@ public:
         nMaxPlayers = 0;
         nPing = 9999;
         uiCacheNoReplyCount = 0;
-        m_ElapsedTime.SetMaxIncrement(500);
-        m_ElapsedTime.Reset();
         uiQueryRetryCount = 0;
         uiRevision = 1;
         bMaybeOffline = false;
@@ -161,7 +159,6 @@ public:
         strEndpointSortKey = SString("%02x%02x%02x%02x-%04x", Address.S_un.S_un_b.s_b1, Address.S_un.S_un_b.s_b2, Address.S_un.S_un_b.s_b3,
                                      Address.S_un.S_un_b.s_b4, usGamePort);
 
-        m_Socket = INVALID_SOCKET;
         strGameMode = "";
         strMap = "";
         vecPlayers.clear();
@@ -172,17 +169,6 @@ public:
         m_iBuildNumber = 0;
     }
 
-    void CloseSocket()
-    {
-        if (m_Socket != INVALID_SOCKET)
-        {
-            closesocket(m_Socket);
-            m_Socket = INVALID_SOCKET;
-        }
-    }
-
-    bool           ParseQuery(const char* szBuffer, unsigned int nLength);
-    void           Query();
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
     unsigned short GetQueryPort();
@@ -228,9 +214,15 @@ public:
     uint    uiTieBreakPosition;
     SString strTieBreakSortKey;
 
+    CQueryReceiver queryReceiver;
+
     std::vector<SString> vecPlayers;
 
-    bool WaitingToSendQuery() const { return !bScanned && !bSkipped && m_Socket == INVALID_SOCKET; }
+    void Query();
+
+    bool ParseQuery();
+
+    bool WaitingToSendQuery() const { return !bScanned && !bSkipped && !queryReceiver.IsSocketValid(); }
 
     const SString& GetEndpoint() const { return strEndpoint; }
 
@@ -306,8 +298,6 @@ public:
     CServerListItemList* m_pItemList;
 
 protected:
-    int          m_Socket;
-    CElapsedTime m_ElapsedTime;
     int          m_iDataQuality;
 
     static std::set<CServerListItem*> ms_ValidServerListItemMap;

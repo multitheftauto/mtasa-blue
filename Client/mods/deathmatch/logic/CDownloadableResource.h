@@ -52,6 +52,7 @@ public:
     void          SetHttpServerIndex(uint uiHttpServerIndex) { m_uiHttpServerIndex = uiHttpServerIndex; }
 
     CChecksum GenerateClientChecksum();
+    CChecksum GenerateClientChecksum(CBuffer& outFileData);
     CChecksum GetServerChecksum();
 
     bool IsAutoDownload() { return m_bAutoDownload; };

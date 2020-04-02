@@ -86,8 +86,8 @@ public:
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
-    SString                     GetMinClientVersion() { return m_strMinClientVersion; }
-    const SString&              GetRecommendedClientVersion() { return m_strRecommendedClientVersion; }
+    CMtaVersion                 GetMinClientVersion() { return m_strMinClientVersion; }
+    const CMtaVersion&          GetRecommendedClientVersion() { return m_strRecommendedClientVersion; }
     int                         GetMinClientVersionAutoUpdate() { return m_iMinClientVersionAutoUpdate; }
     const SString&              GetIdFile() { return m_strIdFile; }
     bool                        GetThreadNetEnabled() { return m_bThreadNetEnabled; }
@@ -189,8 +189,8 @@ private:
     bool                       m_bAuthSerialHttpEnabled;
     std::vector<SString>       m_AuthSerialHttpIpExceptionList;
     std::vector<SString>       m_OwnerEmailAddressList;
-    SString                    m_strMinClientVersion;
-    SString                    m_strRecommendedClientVersion;
+    CMtaVersion                m_strMinClientVersion;
+    CMtaVersion                m_strRecommendedClientVersion;
     SString                    m_strIdFile;
     SString                    m_strGlobalDatabasesPath;
     SString                    m_strSystemDatabasesPath;

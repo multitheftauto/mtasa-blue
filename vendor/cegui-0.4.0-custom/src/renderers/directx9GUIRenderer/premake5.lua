@@ -2,6 +2,8 @@ project "DirectX9GUIRenderer"
 	language "C++"
 	kind "StaticLib"
 	targetname "DirectX9GUIRenderer"
+
+	defines { "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
 	
 	includedirs { 
 		"../sdk",

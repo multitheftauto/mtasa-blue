@@ -625,9 +625,7 @@ RequestMethod GetRequestMethodFromString ( const std::string & isRequestMethod  
 std::string & mytolower (std::string & s ///< string to make lowercase
 	) 
 { 
-
-	// had to remove the std:: from std::tolower because vc++ 6 complained
-	std::transform ( s.begin(), s.end(), s.begin(), std::ptr_fun<int, int>(tolower));
+	std::transform ( s.begin(), s.end(), s.begin(), [](char c) { return std::tolower(c); });
 	return s;
 
 }

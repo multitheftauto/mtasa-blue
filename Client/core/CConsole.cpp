@@ -14,13 +14,13 @@
 using SharedUtil::CalcMTASAPath;
 using std::string;
 
-#define CONSOLE_HISTORY_LENGTH      128
-#define CONSOLE_SIZE                4096
+#define CONSOLE_INPUT_HISTORY_LENGTH 128
+#define CONSOLE_SIZE 4096
 
-#define MAX_CONSOLE_COMMAND_LENGTH  255
+#define MAX_CONSOLE_COMMAND_LENGTH 255
 
-#define NATIVE_RES_X    1152.0f
-#define NATIVE_RES_Y    864.0f
+#define NATIVE_RES_X 1152.0f
+#define NATIVE_RES_Y 864.0f
 
 CConsole::CConsole(CGUI* pManager, CGUIElement* pParent)
 {
@@ -28,7 +28,7 @@ CConsole::CConsole(CGUI* pManager, CGUIElement* pParent)
     m_pManager = pManager;
 
     // Create our history
-    m_pConsoleHistory = new CConsoleHistory(CONSOLE_HISTORY_LENGTH);
+    m_pConsoleHistory = new CEntryHistory(CONSOLE_INPUT_HISTORY_LENGTH);
     m_iHistoryIndex = -1;
     m_iAutoCompleteIndex = -1;
     m_bIsEnabled = true;
@@ -52,7 +52,7 @@ CConsole::CConsole(CGUI* pManager, CGUIElement* pParent)
     m_pHistory->SetTextChangedHandler(GUI_CALLBACK(&CConsole::History_OnTextChanged, this));
 
     // Load the console history from a file
-    m_pConsoleHistory->LoadFromFile();
+    m_pConsoleHistory->LoadFromFile(MTA_CONSOLE_INPUT_LOG_PATH);
 }
 
 CConsole::~CConsole()
@@ -111,7 +111,8 @@ void CConsole::Clear()
     if (m_pHistory)
     {
         m_pHistory->SetText("");
-        m_strPendingAdd = "";
+        m_strPendingAdd.clear();
+        m_strSavedInputText.clear();
     }
 }
 
@@ -214,12 +215,13 @@ bool CConsole::Edit_OnTextAccepted(CGUIElement* pElement)
     // Get the text object from our input window.
     strInput = m_pInput->GetText();
 
-    // Add the input text to the console history
-    m_pConsoleHistory->Add(strInput.c_str());
+    // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
+    if (!strInput.empty() && (m_pConsoleHistory->Empty() || m_pConsoleHistory->GetLast() != strInput))
+        m_pConsoleHistory->Add(strInput.c_str());
 
     // Clear the input text.
     m_pInput->SetText("");
-    m_iHistoryIndex = -1;
+    ResetHistoryChanges();
 
     // Add the text to the history buffer.
     // Echo ( strInput.c_str () );
@@ -251,7 +253,7 @@ void CConsole::GetCommandInfo(const string& strIn, string& strCmdOut, string& st
     else
     {
         strCmdOut = strIn.c_str();
-        strCmdLineOut = "";
+        strCmdLineOut.clear();
     }
 }
 
@@ -281,84 +283,67 @@ bool CConsole::GracefullyMoveEditboxCaret(CGUIElement* pElement)
     return true;
 }
 
-void CConsole::SetNextHistoryText()
+void CConsole::ResetHistoryChanges()
 {
-    // Don't set history back if we aren't focused.
-    if (!m_pInput->IsActive())
-    {
-        return;
-    }
+    // Reset history selection, any history changes and our saved input
+    m_iHistoryIndex = -1;
+    m_pConsoleHistory->ResetChanges();
+    m_strSavedInputText.clear();
+}
 
-    // Next index
-    if (m_iHistoryIndex == CONSOLE_HISTORY_LENGTH)
-    {
-        return;
-    }
+void CConsole::SelectHistoryEntry(int iEntry)
+{
+    int iPreviousHistoryIndex = m_iHistoryIndex;
 
-    // Index too low?
-    if (m_iHistoryIndex < 0)
-    {
-        m_iHistoryIndex = 0;
-    }
+    // Check if we're in bounds, otherwise clear selection
+    if (!m_pConsoleHistory->Empty() && iEntry >= 0 && iEntry < m_pConsoleHistory->Size())
+        m_iHistoryIndex = iEntry;
+    else
+        m_iHistoryIndex = -1;
+
+    SString strInputText = m_pInput->GetText();
+
+    // Save current input as a temporary input value
+    if (iPreviousHistoryIndex == -1)
+        m_strSavedInputText = strInputText;
+    else
+        m_pConsoleHistory->Get(iPreviousHistoryIndex)->temp = strInputText;
+
+    // If we haven't selected any history entry, use our saved input text
+    if (m_iHistoryIndex == -1)
+        GracefullySetEditboxText(m_strSavedInputText.c_str());
     else
     {
-        ++m_iHistoryIndex;
-    }
-
-    if (m_iHistoryIndex == 0)
-    {
-        // Get the text object from our input window.
-        string strInput = m_pInput->GetText();
-        // Add our current text to the console history
-        m_pConsoleHistory->Add(strInput.c_str());
-    }
-
-    // Grab the item and set the input text to it
-    const char* szItem = m_pConsoleHistory->Get(m_iHistoryIndex);
-    if (szItem)
-    {
-        GracefullySetEditboxText(szItem);
-    }
-    else
-    {
-        --m_iHistoryIndex;
+        SString& strSelectedInputHistoryEntry = m_pConsoleHistory->Get(m_iHistoryIndex)->temp;
+        GracefullySetEditboxText(strSelectedInputHistoryEntry.c_str());
     }
 }
 
-void CConsole::SetPreviousHistoryText()
+bool CConsole::SetNextHistoryText()
 {
-    // Don't set history back if we aren't focused.
+    // If we can't take input or we're at the end of the list, stop here
+    if (!m_pInput->IsActive() || m_iHistoryIndex >= m_pConsoleHistory->Size() - 1)
+        return false;
+
+    // Select the previous entry
+    SelectHistoryEntry(m_iHistoryIndex + 1);
+
+    return true;
+}
+
+bool CConsole::SetPreviousHistoryText()
+{
+    // If we can't take input, stop here
     if (!m_pInput->IsActive())
-    {
-        return;
-    }
+        return false;
 
-    // Previous index
-    if (m_iHistoryIndex <= 0)
-    {
-        // Get the text object from our input window.
-        string      strInput = m_pInput->GetText();
-        const char* szInputText = strInput.c_str();
-        // Do we currently have some text?
-        if (szInputText && szInputText[0])
-        {
-            // Add our current text to the console history
-            m_pConsoleHistory->Add(szInputText);
+    // Select the next entry, or the default entry
+    if (m_pConsoleHistory->Size() > 0 && m_iHistoryIndex > 0)
+        SelectHistoryEntry(m_iHistoryIndex - 1);
+    else
+        SelectHistoryEntry(-1);
 
-            // Clear our current text
-            m_pInput->SetText("");
-            --m_iHistoryIndex;
-        }
-        return;
-    }
-
-    // Grab the item and set the input text to it
-    const char* szItem = m_pConsoleHistory->Get(m_iHistoryIndex - 1);
-    if (szItem)
-    {
-        GracefullySetEditboxText(szItem);
-        --m_iHistoryIndex;
-    }
+    return true;
 }
 
 void CConsole::ResetAutoCompleteMatch()
@@ -380,8 +365,9 @@ void CConsole::SetNextAutoCompleteMatch()
         {
             // Step through the history
             int iIndex = -1;
-            while (const char* szItem = m_pConsoleHistory->Get(++iIndex))
+            while (CEntryHistoryItem* pEntryHistoryItem = m_pConsoleHistory->Get(++iIndex))
             {
+                const char* szItem = *pEntryHistoryItem;
                 if (strlen(szItem) < 3)            // Skip very short lines
                     continue;
 
@@ -390,7 +376,10 @@ void CConsole::SetNextAutoCompleteMatch()
                 {
                     if (m_AutoCompleteList.size())            // Dont add duplicates of the previously added line
                     {
-                        const char* szPrevItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_AutoCompleteList.size() - 1));
+                        CEntryHistoryItem* pPrevEntryHistoryItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_AutoCompleteList.size() - 1));
+                        if (!pPrevEntryHistoryItem)
+                            continue;
+                        const char* szPrevItem = *pPrevEntryHistoryItem;
                         if (strcmp(szItem, szPrevItem) == 0)
                             continue;
                     }
@@ -409,11 +398,12 @@ void CConsole::SetNextAutoCompleteMatch()
     m_iAutoCompleteIndex = (m_iAutoCompleteIndex + 1) % m_AutoCompleteList.size();
 
     // Grab the item and set the input text to it
-    const char* szItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_iAutoCompleteIndex));
+    CEntryHistoryItem* pHistoryEntryItem = m_pConsoleHistory->Get(m_AutoCompleteList.at(m_iAutoCompleteIndex));
+    if (!pHistoryEntryItem)
+        return;
+    const char* szItem = *pHistoryEntryItem;
     if (szItem)
-    {
         GracefullySetEditboxText(szItem);
-    }
 }
 
 void CConsole::CreateElements(CGUIElement* pParent)
@@ -534,7 +524,7 @@ void CConsole::FlushPendingAdd()
         // Make new buffer
         SString strBuffer = m_pHistory->GetText();
         strBuffer += m_strPendingAdd;
-        m_strPendingAdd = "";
+        m_strPendingAdd.clear();
 
         // Trim new buffer
         uint uiBufferLength = strBuffer.length();

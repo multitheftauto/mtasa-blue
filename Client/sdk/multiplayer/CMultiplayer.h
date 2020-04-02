@@ -113,6 +113,7 @@ typedef void(GameVehicleDestructHandler)(CEntitySAInterface* pVehicle);
 typedef void(GamePlayerDestructHandler)(CEntitySAInterface* pPlayer);
 typedef void(GameProjectileDestructHandler)(CEntitySAInterface* pProjectile);
 typedef void(GameModelRemoveHandler)(ushort usModelId);
+typedef void(GameRunNamedAnimDestructorHandler)(class CTaskSimpleRunNamedAnimSAInterface* pTask);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
@@ -233,6 +234,7 @@ public:
     virtual void  SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler) = 0;
     virtual void  SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler) = 0;
     virtual void  SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
+    virtual void  SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler) = 0;
     virtual void  SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
