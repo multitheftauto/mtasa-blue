@@ -52,6 +52,7 @@
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
+class CServerInfo;
 
 struct SVehExtrapolateSettings
 {
@@ -226,7 +227,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -276,6 +277,7 @@ public:
     CSyncDebug*                   GetSyncDebug() { return m_pSyncDebug; };
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
+    CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
@@ -437,6 +439,8 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
+
+    void TriggerDiscordJoin(SString strSecret);
 
 private:
     // CGUI Callbacks
@@ -700,6 +704,8 @@ private:
     CScriptDebugging*   m_pScriptDebugging;
     CRegisteredCommands m_RegisteredCommands;
 
+    std::unique_ptr<CServerInfo> m_ServerInfo;
+
     // Map statuses
     SString m_strCurrentMapName;
     SString m_strModRoot;
@@ -812,6 +818,7 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
+    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;
