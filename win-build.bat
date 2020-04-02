@@ -17,9 +17,9 @@ for /f "usebackq tokens=1* delims=: " %%i in (`%VSWHERE% -latest -requires Micro
 )
 
 rem Output an error if not exists
-set MSBUILDPATH="%InstallDir%\MSBuild\15.0\Bin\MSBuild.exe"
+set MSBUILDPATH="%InstallDir%\MSBuild\Current\Bin\MSBuild.exe"
 if not exist %MSBUILDPATH% (
-	echo Could not find MSBuild. Make sure you have Visual Studio 2017 installed
+	echo Could not find MSBuild. Make sure you have Visual Studio 2019 installed
 	goto end
 )
 echo Found MSBuild at: %MSBUILDPATH%

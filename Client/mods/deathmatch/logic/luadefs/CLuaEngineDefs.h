@@ -39,6 +39,7 @@ public:
     LUA_DECLARE(EngineReplaceVehiclePart);
     LUA_DECLARE(EngineGetModelLODDistance);
     LUA_DECLARE(EngineSetModelLODDistance);
+    LUA_DECLARE(EngineResetModelLODDistance);
     LUA_DECLARE(EngineSetAsynchronousLoading);
     LUA_DECLARE(EngineApplyShaderToWorldTexture);
     LUA_DECLARE(EngineRemoveShaderFromWorldTexture);
@@ -51,6 +52,9 @@ public:
     LUA_DECLARE(EngineSetModelCollisionData);
     LUA_DECLARE(EngineUpdateModelCollisionBoundingBox);
     LUA_DECLARE(IsModelCollisionLoaded);
+    LUA_DECLARE(EngineSetModelVisibleTime);
+    LUA_DECLARE(EngineGetModelVisibleTime);
+    LUA_DECLARE(EngineGetModelTextures);
     LUA_DECLARE(EngineSetSurfaceProperties);
     LUA_DECLARE(EngineGetSurfaceProperties);
     LUA_DECLARE(EngineResetSurfaceProperties);

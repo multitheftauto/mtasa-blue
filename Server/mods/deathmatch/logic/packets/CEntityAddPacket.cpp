@@ -162,15 +162,11 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             {
                 const char*         szName = iter->first.c_str();
                 const CLuaArgument* pArgument = &iter->second.Variable;
-                bool                bSynchronized = iter->second.bSynchronized;
 
-                if (bSynchronized)
-                {
-                    unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
-                    BitStream.Write(ucNameLength);
-                    BitStream.Write(szName, ucNameLength);
-                    pArgument->WriteToBitStream(BitStream);
-                }
+                unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
+                BitStream.Write(ucNameLength);
+                BitStream.Write(szName, ucNameLength);
+                pArgument->WriteToBitStream(BitStream);
             }
 
             // Grab its name
@@ -887,8 +883,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
                         if (pClothing)
                         {
-                            unsigned char ucTextureLength = strlen(pClothing->szTexture);
-                            unsigned char ucModelLength = strlen(pClothing->szModel);
+                            unsigned char ucTextureLength = static_cast<uchar>(strlen(pClothing->szTexture));
+                            unsigned char ucModelLength = static_cast<uchar>(strlen(pClothing->szModel));
 
                             BitStream.Write(ucTextureLength);
                             BitStream.Write(pClothing->szTexture, ucTextureLength);

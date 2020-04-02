@@ -17,6 +17,7 @@ class CColCuboid : public CColShape
 {
 public:
     CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     virtual CSphere GetWorldBoundingSphere();
 

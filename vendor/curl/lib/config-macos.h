@@ -436,6 +436,9 @@
 /* Define to 1 if you have the `ssl' library (-lssl). */
 /* #undef HAVE_LIBSSL */
 
+/* Define to 1 if you have the `wolfssh' library (-lwolfssh). */
+/* #undef HAVE_LIBWOLFSSH */
+
 /* if zlib is available */
 #define HAVE_LIBZ 1
 
@@ -629,6 +632,9 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
+/* Define to 1 if you have the `SSL_get_esni_status' function. */
+/* #undef HAVE_SSL_GET_ESNI_STATUS */
+
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
 
@@ -785,6 +791,9 @@
 /* Define to 1 if you have the winsock.h header file. */
 /* #undef HAVE_WINSOCK_H */
 
+/* Define to 1 if you have the <wolfssh/ssh.h> header file. */
+/* #undef HAVE_WOLFSSH_SSH_H */
+
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
@@ -834,7 +843,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin18.7.0"
+#define OS "x86_64-apple-darwin19.3.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -953,6 +962,12 @@
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
 
+/* if BearSSL is enabled */
+/* #undef USE_BEARSSL */
+
+/* if ESNI support is available */
+/* #undef USE_ESNI */
+
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
 
@@ -1041,6 +1056,9 @@
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
+
+/* if wolfSSH is in use */
+/* #undef USE_WOLFSSH */
 
 /* if wolfSSL is enabled */
 /* #undef USE_WOLFSSL */
