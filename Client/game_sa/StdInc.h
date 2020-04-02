@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 // Pragmas
 #pragma warning (disable:4409)

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -69,12 +69,12 @@
   do {                                                  \
     x->subend = x->subpointer;                          \
     CURL_SB_CLEAR(x);                                   \
-  } WHILE_FALSE
+  } while(0)
 #define CURL_SB_ACCUM(x,c)                                      \
   do {                                                          \
     if(x->subpointer < (x->subbuffer + sizeof(x->subbuffer)))   \
       *x->subpointer++ = (c);                                   \
-  } WHILE_FALSE
+  } while(0)
 
 #define  CURL_SB_GET(x) ((*x->subpointer++)&0xff)
 #define  CURL_SB_LEN(x) (x->subend - x->subpointer)
@@ -1692,7 +1692,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
   }
 #endif
   /* mark this as "no further transfer wanted" */
-  Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
+  Curl_setup_transfer(data, -1, -1, FALSE, -1);
 
   return result;
 }

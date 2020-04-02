@@ -13,11 +13,11 @@
 class CAnimBlendNodeSAInterface
 {
 public:
-    float                                   field_0;
-    float                                   field_4;
-    short                                   field_8;
-    short                                   field_A;
-    float                                   field_C;
+    float                                   m_theta0;
+    float                                   m_theta1;
+    short                                   m_endKeyFrameId;
+    short                                   m_startKeyFrameId;
+    float                                   m_timeDelta;
     class CAnimBlendSequenceSAInterface*    pAnimSequence;
     class CAnimBlendAssociationSAInterface* pAnimBlendAssociation;
 };

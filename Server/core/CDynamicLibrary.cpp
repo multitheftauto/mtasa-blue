@@ -68,7 +68,7 @@ bool CDynamicLibrary::Load(const char* szFilename)
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
 
         // Display the error message and exit the process
-        printf("Loading library %s failed; %s\n", szFilename, lpMsgBuf);
+        printf("Loading library %s failed; %s\n", szFilename, static_cast<const char*>(lpMsgBuf));
 
         // Free the error message buffer
         LocalFree(lpMsgBuf);

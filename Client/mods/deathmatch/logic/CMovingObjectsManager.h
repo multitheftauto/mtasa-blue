@@ -1,18 +1,19 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CMovingObjectsManager.h
- *  PURPOSE:     Header for moving objects manager class
+ *  PURPOSE:     Manager for moving objects
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#include "CDeathmatchObject.h"
 #include <list>
+
+class CDeathmatchObject;
 
 class CMovingObjectsManager
 {
@@ -21,11 +22,20 @@ public:
     void Remove(CDeathmatchObject* pObject)
     {
         if (!m_List.empty())
+        {
             m_List.remove(pObject);
+
+            if (m_currentPulseObject == pObject)
+                m_currentPulseObject = nullptr;
+        }
     };
 
     void DoPulse();
 
 private:
     std::list<CDeathmatchObject*> m_List;
+
+    // Current object being updated in DoPulse method. Setting it to nullptr during this period
+    // will prevent the code from trying to erase it from m_List.
+    CDeathmatchObject* m_currentPulseObject = nullptr;
 };

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2014 - 2017, Steve Holme, <steve_holme@hotmail.com>.
+ * Copyright (C) 2014 - 2019, Steve Holme, <steve_holme@hotmail.com>.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -57,6 +57,11 @@ bool Curl_auth_is_gssapi_supported(void)
   status = s_pSecFn->QuerySecurityPackageInfo((TCHAR *)
                                               TEXT(SP_NAME_KERBEROS),
                                               &SecurityPackage);
+
+  /* Release the package buffer as it is not required anymore */
+  if(status == SEC_E_OK) {
+    s_pSecFn->FreeContextBuffer(SecurityPackage);
+  }
 
   return (status == SEC_E_OK ? TRUE : FALSE);
 }
@@ -217,8 +222,12 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
   /* Free the decoded challenge as it is not required anymore */
   free(chlg);
 
+  if(status == SEC_E_INSUFFICIENT_MEMORY) {
+    return CURLE_OUT_OF_MEMORY;
+  }
+
   if(status != SEC_E_OK && status != SEC_I_CONTINUE_NEEDED) {
-    return CURLE_RECV_ERROR;
+    return CURLE_AUTH_ERROR;
   }
 
   if(memcmp(&context, krb5->context, sizeof(context))) {
@@ -309,7 +318,10 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
   if(status != SEC_E_OK) {
     free(chlg);
 
-    return CURLE_OUT_OF_MEMORY;
+    if(status == SEC_E_INSUFFICIENT_MEMORY)
+      return CURLE_OUT_OF_MEMORY;
+
+    return CURLE_AUTH_ERROR;
   }
 
   /* Get the fully qualified username back from the context */
@@ -319,7 +331,10 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
   if(status != SEC_E_OK) {
     free(chlg);
 
-    return CURLE_RECV_ERROR;
+    if(status == SEC_E_INSUFFICIENT_MEMORY)
+      return CURLE_OUT_OF_MEMORY;
+
+    return CURLE_AUTH_ERROR;
   }
 
   /* Setup the "input" security buffer */
@@ -438,7 +453,10 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
     free(message);
     free(trailer);
 
-    return CURLE_OUT_OF_MEMORY;
+    if(status == SEC_E_INSUFFICIENT_MEMORY)
+      return CURLE_OUT_OF_MEMORY;
+
+    return CURLE_AUTH_ERROR;
   }
 
   /* Allocate the encryption (wrap) buffer */
@@ -474,7 +492,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
 }
 
 /*
- * Curl_auth_gssapi_cleanup()
+ * Curl_auth_cleanup_gssapi()
  *
  * This is used to clean up the GSSAPI (Kerberos V5) specific data.
  *
@@ -483,7 +501,7 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
  * krb5     [in/out] - The Kerberos 5 data struct being cleaned up.
  *
  */
-void Curl_auth_gssapi_cleanup(struct kerberos5data *krb5)
+void Curl_auth_cleanup_gssapi(struct kerberos5data *krb5)
 {
   /* Free our security context */
   if(krb5->context) {

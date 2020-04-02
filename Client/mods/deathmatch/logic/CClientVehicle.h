@@ -261,7 +261,9 @@ public:
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
 
-    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus);
+    bool AreLightsOn();
+
+    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
     void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
@@ -352,6 +354,7 @@ public:
     bool            SetTowedVehicle(CClientVehicle* pVehicle, const CVector* vecRotationDegrees = NULL);
     CClientVehicle* GetTowedByVehicle() { return m_pTowedByVehicle; }
     bool            InternalSetTowLink(CClientVehicle* pTrailer);
+    bool            IsTowableBy(CClientVehicle* towingVehicle);
 
     eWinchType     GetWinchType() { return m_eWinchType; }
     bool           SetWinchType(eWinchType winchType);

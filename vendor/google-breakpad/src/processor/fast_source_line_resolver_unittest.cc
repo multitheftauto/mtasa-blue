@@ -79,9 +79,12 @@ class TestCodeModule : public CodeModule {
   virtual string debug_file() const { return ""; }
   virtual string debug_identifier() const { return ""; }
   virtual string version() const { return ""; }
-  virtual const CodeModule* Copy() const {
+  virtual CodeModule* Copy() const {
     return new TestCodeModule(code_file_);
   }
+  virtual bool is_unloaded() const { return false; }
+  virtual uint64_t shrink_down_delta() const { return 0; }
+  virtual void SetShrinkDownDelta(uint64_t shrink_down_delta) {}
 
  private:
   string code_file_;

@@ -169,7 +169,7 @@ void CScriptFile::Flush()
     fflush(m_pFile);
 }
 
-long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
+long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -185,8 +185,16 @@ long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
-    outBuffer.SetSize(ulSize);
-    return fread(outBuffer.GetData(), 1, ulSize, m_pFile);
+    try
+    {
+        outBuffer.resize(ulSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return -2;
+    }
+
+    return fread(outBuffer.data(), 1, ulSize, m_pFile);
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)

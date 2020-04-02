@@ -13,6 +13,8 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
+#include "D3DResourceSystemSA.h"
+#include "CFileLoaderSA.h"
 
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
@@ -63,6 +65,12 @@ CGameSA::CGameSA()
     for (int i = 0; i < MODELINFO_MAX; i++)
     {
         ModelInfo[i].SetModelID(i);
+    }
+
+    // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
+    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    {
+        ObjectGroupsInfo[i].SetGroup(i);
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
@@ -201,6 +209,8 @@ CGameSA::CGameSA()
     CPedSA::StaticSetHooks();
     CSettingsSA::StaticSetHooks();
     CFxSystemSA::StaticSetHooks();
+    CFileLoaderSA::StaticSetHooks();
+    D3DResourceSystemSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -296,24 +306,18 @@ bool CGameSA::IsInForeground()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
+CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
     if (dwModelID < MODELINFO_MAX)
     {
-        if (ModelInfo[dwModelID].IsValid())
+        if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
             return &ModelInfo[dwModelID];
         }
-        else
-        {
-            return NULL;
-        }
+        return nullptr;
     }
-    else
-    {
-        return NULL;
-    }
+    return nullptr;
 }
 
 /**
@@ -466,6 +470,9 @@ void CGameSA::Reset()
 
         // Restore model dummies' positions
         CModelInfoSA::ResetAllVehicleDummies();
+        CModelInfoSA::RestoreAllObjectsPropertiesGroups();
+        // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
+        CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
     }
 }
 
@@ -872,6 +879,11 @@ void CGameSA::ResetModelLodDistances()
     CModelInfoSA::StaticResetLodDistances();
 }
 
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
+}
+
 void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();
@@ -904,4 +916,13 @@ CPed* CGameSA::GetPedContext()
     if (!m_pPedContext)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);
     return m_pPedContext;
+}
+
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+{
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
+    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
+        return &ObjectGroupsInfo[ucObjectGroup];
+
+    return nullptr;
 }

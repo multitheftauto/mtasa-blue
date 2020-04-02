@@ -14,4 +14,4 @@ project "mbedtls"
 	}
 
 	filter { "system:windows" }
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

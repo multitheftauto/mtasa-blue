@@ -52,20 +52,20 @@ namespace CEGUI
 /*************************************************************************
 	Constants
 *************************************************************************/
+#ifdef DYNAMIC_FACTORY_MODULE
 const char	FactoryModule::RegisterFactoryFunctionName[] = "registerFactory";
 const char  FactoryModule::RegisterAllFunctionName[]     = "registerAllFactories";
+#endif
 
 
 /*************************************************************************
 	Construct the FactoryModule object by loading the dynamic loadable
 	module specified.
 *************************************************************************/
-FactoryModule::FactoryModule(const String& filename) :
-	d_moduleName(filename)
+FactoryModule::FactoryModule(const String& filename)
 {
-	// Statically linked factory modules (e.g. falagard), so skip!
-
-	/**
+#ifdef DYNAMIC_FACTORY_MODULE
+    d_moduleName = filename;
 
 #if defined(__linux__)
 	// dlopen() does not add .so to the filename, like windows does for .dll
@@ -103,8 +103,7 @@ FactoryModule::FactoryModule(const String& filename) :
     // functions are now optional, and only throw upon the first attempt to use a missing function.
     d_regFunc = (FactoryRegisterFunction)DYNLIB_GETSYM(d_handle, RegisterFactoryFunctionName);
     d_regAllFunc = (RegisterAllFunction)DYNLIB_GETSYM(d_handle, RegisterAllFunctionName);
-
-	**/
+#endif  // DYNAMIC_FACTORY_MODULE
 }
 
 
@@ -113,7 +112,9 @@ FactoryModule::FactoryModule(const String& filename) :
 *************************************************************************/
 FactoryModule::~FactoryModule(void)
 {
+#ifdef DYNAMIC_FACTORY_MODULE
 	DYNLIB_UNLOAD(d_handle);
+#endif
 }
 
 
@@ -122,6 +123,7 @@ FactoryModule::~FactoryModule(void)
 *************************************************************************/
 void FactoryModule::registerFactory(const String& type) const
 {
+#ifdef DYNAMIC_FACTORY_MODULE
     // are we attempting to use a missing function export
     if (!d_regFunc)
     {
@@ -129,14 +131,12 @@ void FactoryModule::registerFactory(const String& type) const
     }
 
 	d_regFunc(type);
+#endif
 }
 
 uint FactoryModule::registerAllFactories() const
 {
-	// Statically linked factory modules (e.g. falagard), so skip!
-	
-	/**
-
+#ifdef DYNAMIC_FACTORY_MODULE
 	// are we attempting to use a missing function export
     if (!d_regAllFunc)
     {
@@ -144,8 +144,7 @@ uint FactoryModule::registerAllFactories() const
     }
 
     return d_regAllFunc();
-
-	**/
+#endif
 
 	registerAllFactoriesF();
 
