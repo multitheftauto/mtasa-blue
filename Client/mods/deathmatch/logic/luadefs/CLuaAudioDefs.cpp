@@ -1378,8 +1378,8 @@ int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientPlayer*   pPlayer;
-    CClientSound*    pSound;
+    CClientPlayer*   pPlayer = nullptr;
+    CClientSound*    pSound = nullptr;
     eSoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);
@@ -1867,8 +1867,8 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
-    CClientPlayer*   pPlayer;
-    CClientSound*    pSound;
+    CClientPlayer*   pPlayer = nullptr;
+    CClientSound*    pSound = nullptr;
     eSoundEffectType eEffectType;
 
     CScriptArgReader argStream(luaVM);

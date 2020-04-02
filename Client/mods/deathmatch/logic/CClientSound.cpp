@@ -13,7 +13,7 @@
 CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     m_pSoundManager = pManager->GetSoundManager();
-    m_pAudio = NULL;
+    m_pAudio = nullptr;
 
     SetTypeName("sound");
 
@@ -26,7 +26,7 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_bPan = true;
     m_fPan = 0.0f;
 
-    m_pBuffer = NULL;
+    m_pBuffer = nullptr;
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
 }
 
