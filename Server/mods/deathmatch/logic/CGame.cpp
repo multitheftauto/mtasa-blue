@@ -1238,7 +1238,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("CPlayerJoinCompletePacket");
 
     // Sync up server info on entry
-    if (Player.GetBitStreamVersion() >= 0x06D)
+    if (Player.GetBitStreamVersion() >= 0x06E)
         Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
@@ -2500,18 +2500,28 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
                 return;
             }
 
-            // Tell our clients to update their data. Send to everyone but the one we got this packet from.
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-            CBitStream     BitStream;
-            BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(szName, usNameLength);
-            Value.WriteToBitStream(*BitStream.pBitStream);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+            ESyncType lastSyncType = ESyncType::BROADCAST;
+            pElement->GetCustomData(szName, false, &lastSyncType);
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
-                                                                                     BitStream.pBitStream->GetNumberOfBytesUsed());
+            if (lastSyncType != ESyncType::LOCAL)
+            {
+                // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+                CBitStream     BitStream;
+                BitStream.pBitStream->WriteCompressed(usNameLength);
+                BitStream.pBitStream->Write(szName, usNameLength);
+                Value.WriteToBitStream(*BitStream.pBitStream);
+                if (lastSyncType == ESyncType::BROADCAST)
+                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+                else
+                    m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
+                                                              pSourcePlayer);
 
-            pElement->SetCustomData(szName, Value, true, pSourcePlayer);
+                CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
+                                                                                         BitStream.pBitStream->GetNumberOfBytesUsed());
+            }
+
+            pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer);
         }
     }
 }
