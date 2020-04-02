@@ -836,6 +836,11 @@ void CGameSA::ResetModelLodDistances()
     CModelInfoSA::StaticResetLodDistances();
 }
 
+void CGameSA::ResetModelTimes()
+{
+    CModelInfoSA::StaticResetModelTimes();
+}
+
 void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();

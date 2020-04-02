@@ -72,6 +72,9 @@ void CLuaElementDefs::LoadFunctions()
         {"hasElementData", HasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
+        {"addElementDataSubscriber", addElementDataSubscriber},
+        {"removeElementDataSubscriber", removeElementDataSubscriber},
+        {"hasElementDataSubscriber", hasElementDataSubscriber},
 
         // Set
         {"setElementID", setElementID},
@@ -120,6 +123,9 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
     lua_classfunction(luaVM, "removeData", "removeElementData");
+    lua_classfunction(luaVM, "addDataSubscriber", "addElementDataSubscriber");
+    lua_classfunction(luaVM, "removeDataSubscriber", "removeElementDataSubscriber");
+    lua_classfunction(luaVM, "hasDataSubscriber", "hasElementDataSubscriber");
 
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
@@ -1557,42 +1563,47 @@ int CLuaElementDefs::setElementID(lua_State* luaVM)
 
 int CLuaElementDefs::setElementData(lua_State* luaVM)
 {
-    //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+    //  bool setElementData ( element theElement, string key, var value, [var syncMode = true] )
     CElement*    pElement;
     SString      strKey;
     CLuaArgument value;
-    bool         bSynchronize;
+    ESyncType    syncType = ESyncType::BROADCAST;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadString(strKey);
     argStream.ReadLuaArgument(value);
-    argStream.ReadBool(bSynchronize, true);
+
+    if (argStream.NextIsBool())
+    {
+        bool bSynchronize;
+        argStream.ReadBool(bSynchronize, true);
+
+        syncType = bSynchronize ? ESyncType::BROADCAST : ESyncType::LOCAL;
+    }
+    else
+        argStream.ReadEnumString(syncType, ESyncType::BROADCAST);
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
-            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+            // Warn and truncate if key is too long
+            m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+        }
 
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, bSynchronize))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1610,31 +1621,109 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
         {
-            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+            // Warn and truncate if key is too long
+            m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+        }
 
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::RemoveElementData(pElement, strKey))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+        if (CStaticFunctionDefinitions::RemoveElementData(pElement, strKey))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool addElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::AddElementDataSubscriber(pElement, strKey, pPlayer))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool removeElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer*  pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+  
+        if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
+{
+    //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
+    CElement* pElement;
+    SString   strKey;
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        bool bResult = CStaticFunctionDefinitions::HasElementDataSubscriber(pElement, strKey, pPlayer);
+        lua_pushboolean(luaVM, bResult);
+        return 1;
+    }
+
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
 int CLuaElementDefs::setElementMatrix(lua_State* luaVM)

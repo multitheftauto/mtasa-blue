@@ -71,3 +71,11 @@ e11685cab4beb7958ab202261f9c9d9b4ce71e58
 # Date:   Sun Jan 13 21:04:27 2019 +0100
 #
 # Replace (void) with () (PR #771)
+
+eefde6d95260aef53308baa7fb1e59cf24522cd9
+# Author: Marek Kulik <me@botder.com>
+# Date:   Wed Apr 1 16:55:42 2020 +0200
+#
+# Enable every entry in .gitattributes
+#
+# - Mark .git-blame-ignore-revs as export-ignore
