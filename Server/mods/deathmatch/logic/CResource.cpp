@@ -751,49 +751,47 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
         return false;
     }
 
-    #if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
-        // Check this server can run this resource
-        SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
-        if (m_strMinServerReqFromMetaXml > strServerVersion)
+    // Check this server can run this resource
+    SString strServerVersion = CStaticFunctionDefinitions::GetVersionSortable();
+    if (m_strMinServerReqFromMetaXml > strServerVersion)
+    {
+        strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);
+        return false;
+    }
+
+    // This should not happen
+    if (m_strMinServerReqFromSource > strServerVersion)
+    {
+        strOutStatus = "server has come back from the future";
+        return false;
+    }
+
+    // Check if calculated version is higher than declared version
+    if (m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml)
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        strOutStatus += SString("client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason);
+        m_strMinClientReqFromMetaXml = m_strMinClientReqFromSource;            // Apply higher version requirement
+    }
+    else if (m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml)
+    {
+        strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
+        strOutStatus += SString("server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason);
+    }
+
+    // See if any connected client are below min requirements
+    {
+        uint uiNumIncompatiblePlayers = 0;
+        for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
+            if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
+                uiNumIncompatiblePlayers++;
+
+        if (uiNumIncompatiblePlayers > 0)
         {
-            strOutStatus = SString("this server version is too low (%s required)", *m_strMinServerReqFromMetaXml);
+            strOutStatus = SString("%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml);
             return false;
         }
-
-        // This should not happen
-        if (m_strMinServerReqFromSource > strServerVersion)
-        {
-            strOutStatus = "server has come back from the future";
-            return false;
-        }
-
-        // Check if calculated version is higher than declared version
-        if (m_strMinClientReqFromSource > m_strMinClientReqFromMetaXml)
-        {
-            strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-            strOutStatus += SString("client %s because of '%s')", *m_strMinClientReqFromSource, *m_strMinClientReason);
-            m_strMinClientReqFromMetaXml = m_strMinClientReqFromSource;            // Apply higher version requirement
-        }
-        else if (m_strMinServerReqFromSource > m_strMinServerReqFromMetaXml)
-        {
-            strOutStatus = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-            strOutStatus += SString("server %s because of '%s')", *m_strMinServerReqFromSource, *m_strMinServerReason);
-        }
-
-        // See if any connected client are below min requirements
-        {
-            uint uiNumIncompatiblePlayers = 0;
-            for (std::list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin(); iter != g_pGame->GetPlayerManager()->IterEnd(); iter++)
-                if ((*iter)->IsJoined() && m_strMinClientReqFromMetaXml > (*iter)->GetPlayerVersion())
-                    uiNumIncompatiblePlayers++;
-
-            if (uiNumIncompatiblePlayers > 0)
-            {
-                strOutStatus = SString("%d connected player(s) below required client version %s", uiNumIncompatiblePlayers, *m_strMinClientReqFromMetaXml);
-                return false;
-            }
-        }
-    #endif
+    }
 
     return true;
 }
