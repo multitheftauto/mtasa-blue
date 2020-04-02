@@ -23,6 +23,7 @@ void CCustomData::Copy(CCustomData* pCustomData)
 
 SCustomData* CCustomData::Get(const char* szName)
 {
+    assert(szName);
     CFastHashMap<SString, SCustomData>::iterator it = m_Data.find(szName);
     if (it != m_Data.end())
         return &it->second;
