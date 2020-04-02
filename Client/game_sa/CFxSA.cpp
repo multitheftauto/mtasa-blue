@@ -22,9 +22,9 @@ CFxSA::CFxSA(CFxSAInterface* pInterface)
     RwTexture* pRwTexture;
     for (int i = 0; i < SHADOW_COUNT; i++)
     {
-        void* textureAddress;
-        memcpy(&textureAddress, (void*)(SHADOW_BASE_TEXTURE_OFFSET + i * 4), 4);
-        pRwTexture = reinterpret_cast<RwTexture*>((void*)textureAddress);
+        auto textureAddressPtr = (void*)(SHADOW_BASE_TEXTURE_OFFSET + i * 4);
+        void* textureAddress = *textureAddressPtr;
+        pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
         m_textureMap[(eShadowType)i] = pRwTexture;
     }
     m_textureMap[eShadowType::PLANE] = new RwTexture();
