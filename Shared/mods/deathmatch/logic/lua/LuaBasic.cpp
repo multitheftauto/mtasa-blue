@@ -73,6 +73,12 @@ namespace lua
     }
 
     template <>
+    std::size_t PopPrimitive<std::size_t>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<std::size_t>(lua_tonumber(L, index++));
+    }
+
+    template <>
     float PopPrimitive<float>(lua_State* L, std::size_t& index)
     {
         return static_cast<float>(lua_tonumber(L, index++));
