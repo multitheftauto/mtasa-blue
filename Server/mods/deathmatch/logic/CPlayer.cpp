@@ -216,6 +216,51 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
     return false;
 }
 
+bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
+{
+#ifdef MTA_DEBUG
+    OutputDebugString(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
+
+    return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
+{
+#ifdef MTA_DEBUG
+    OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
+
+    return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement)
+{
+    bool erased = false;
+
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    {
+        if (it->first == pElement)
+        {
+#ifdef MTA_DEBUG
+            OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+#endif
+
+            it = m_DataSubscriptions.erase(it);
+            erased = true;
+        }
+        else
+            ++it;
+    }
+
+    return erased;
+}
+
+bool CPlayer::IsSubscribed(CElement* pElement, const std::string& strName) const
+{
+    return m_DataSubscriptions.find(std::make_pair(pElement, strName)) != m_DataSubscriptions.end();
+}
+
 const char* CPlayer::GetSourceIP()
 {
     if (m_strIP.empty())

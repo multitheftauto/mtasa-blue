@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum)
+CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum serverChecksum)
 {
     // Store the name
     m_strName = szName;
@@ -19,8 +19,9 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     // Store the name (short)
     m_strNameShort = szNameShort;
 
-    // store the resource
+    // store resources
     m_pResource = pResource;
+    m_pRequestResource = pRequestResource;
 
     // Store the server checksum
     m_ServerChecksum = serverChecksum;
@@ -65,6 +66,15 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
         CLuaArguments Arguments;
         Arguments.PushString(GetShortName());            // file name
         Arguments.PushBoolean(bSuccess);                 // Completed successfully?
+        if (m_pRequestResource)
+        {
+            Arguments.PushResource(m_pRequestResource);  // Resource that called downloadFile
+        }
+        else
+        {
+            Arguments.PushBoolean(false);                 // or false
+        }
+
         m_pResource->GetResourceEntity()->CallEvent("onClientFileDownloadComplete", Arguments, false);
     }
     SetComplete();
@@ -74,6 +84,7 @@ void CSingularFileDownload::Cancel()
 {
     m_bBeingDeleted = true;
     m_pResource = NULL;
+    m_pRequestResource = NULL;
 
     // TODO: Cancel also in Net
 }

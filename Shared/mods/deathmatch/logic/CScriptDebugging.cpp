@@ -55,6 +55,21 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
+    SLuaDebugInfo luaDebugInfo;
+    LogString("", luaDebugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
+}
+
+void CScriptDebugging::LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
+{
+    assert(szFormat);
+
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    va_list marker;
+    va_start(marker, szFormat);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    va_end(marker);
+
     LogString("", GetLuaDebugInfo(luaVM), szBuffer, 0, ucRed, ucGreen, ucBlue);
 }
 
@@ -158,11 +173,10 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
 void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
                                  unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    SString strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
+    SString strText = SString("%s%s", szPrePend, szMessage);
 
-    // Create a different message if type is "INFO"
-    if (uiMinimumDebugLevel > 2)
-        strText = SString("%s%s", szPrePend, szMessage);
+    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel <= 2)
+        strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
 
     switch (uiMinimumDebugLevel)
     {

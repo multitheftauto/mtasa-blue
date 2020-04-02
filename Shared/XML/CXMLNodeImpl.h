@@ -59,7 +59,7 @@ public:
     eXMLClass     GetClassType() { return CXML_NODE; };
     unsigned long GetID()
     {
-        dassert(m_pFile && m_pFile->IsUsingIDs());
+        dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
     };
     bool IsUsingIDs() { return m_bUsingIDs; };

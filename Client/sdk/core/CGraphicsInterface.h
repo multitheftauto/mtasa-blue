@@ -37,6 +37,14 @@ enum PrimitiveVerticeSizes
     VERT_XY_COLOR_UV = 5
 };
 
+enum Primitive3DVerticeSizes
+{
+    VERT_XYZ = 3,
+    VERT_XYZ_COLOR,
+    VERT_XYZ_UV,
+    VERT_XYZ_COLOR_UV,
+};
+
 struct ID3DXFont;
 struct IDirect3DDevice9;
 struct IDirect3DTexture9;
@@ -119,6 +127,7 @@ public:
     virtual float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXTextExtent(const char* szText, float fScale = 1.0f, ID3DXFont* pDXFont = NULL, bool bColorCoded = false) = 0;
+    virtual void GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false) = 0;
 
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont) = 0;
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
@@ -153,8 +162,15 @@ public:
     virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                              bool bPostGUI) = 0;
+    
+    virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
+    virtual void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                             bool bPostGUI) = 0;
+
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
+
+    virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
 
     virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 

@@ -376,6 +376,16 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAllowExternalSounds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow external sounds"), true));
+    m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
+
+    m_pDiscordCheck = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Enable Discord Rich Presence"), true));
+    m_pDiscordCheck->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pDiscordCheck->GetPosition(vecTemp, false);
+    m_pDiscordCheck->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -619,6 +629,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxWindowed = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Windowed"), true));
     m_pCheckBoxWindowed->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
     m_pCheckBoxWindowed->AutoSize(NULL, 20.0f);
+    m_pCheckBoxWindowed->GetPosition(vecTemp, false);
+    m_pCheckBoxWindowed->GetSize(vecSize);
+
+    m_pCheckBoxDPIAware = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("DPI aware"), false));
+    m_pCheckBoxDPIAware->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY));
+    m_pCheckBoxDPIAware->AutoSize(NULL, 20.0f);
 
     m_pVideoResolutionLabel->GetPosition(vecTemp, false);            // Restore our label position
 
@@ -1207,8 +1223,10 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
+    m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -1429,6 +1447,11 @@ void CSettings::UpdateVideoTab()
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);
     m_pBrightness->SetScrollPosition((float)gameSettings->GetBrightness() / 384);
 
+    // DPI aware
+    bool processDPIAware = false;
+    CVARS_GET("process_dpi_aware", processDPIAware);
+    m_pCheckBoxDPIAware->SetSelected(processDPIAware);
+
     // FieldOfView
     int iFieldOfView;
     CVARS_GET("fov", iFieldOfView);
@@ -1493,6 +1516,16 @@ void CSettings::UpdateVideoTab()
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Enable Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    m_pDiscordCheck->SetSelected(discordRichPresence);
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -2314,7 +2347,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned char>(m_pBindsList->GetItemData(i, m_hBind));
+        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -3268,6 +3301,15 @@ void CSettings::SaveData()
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
     SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
 
+    // Process DPI awareness
+    bool previousProcessDPIAware = false;
+    CVARS_GET("process_dpi_aware", previousProcessDPIAware);
+
+    const bool processsDPIAwareChanged = (m_pCheckBoxDPIAware->GetSelected() != previousProcessDPIAware);
+
+    if (processsDPIAwareChanged)
+        CVARS_SET("process_dpi_aware", !previousProcessDPIAware);
+
     // iFieldOfView
     int iFieldOfView = std::min<int>(4, (m_pFieldOfView->GetScrollPosition()) * (4 + 1)) * 5 + 70;
     CVARS_SET("fov", iFieldOfView);
@@ -3311,6 +3353,19 @@ void CSettings::SaveData()
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
+
+    // Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    if (discordRichPresence != m_pDiscordCheck->GetSelected())
+    {
+        CVARS_SET("discord_rich_presence", m_pDiscordCheck->GetSelected());
+        g_pCore->GetDiscordManager()->Disconnect();
+    }
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
+    CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -3527,7 +3582,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4316,6 +4371,24 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
 }
 
 //
+// AllowExternalSounds
+//
+bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxAllowExternalSounds->GetSelected() && !m_bShownAllowExternalSoundsMessage)
+    {
+        m_bShownAllowExternalSoundsMessage = true;
+        SString strMessage;
+        strMessage +=
+            _("Some scripts may play sounds, such as radio, from the internet."
+              "\n\nDisabling this setting may decrease network"
+              "\nbandwidth consumption.\n");
+        CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+    }
+    return true;
+}
+
+//
 // CustomizedSAFiles
 //
 void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
@@ -4364,6 +4437,48 @@ bool CSettings::OnWindowedClick(CGUIElement* pElement)
 {
     UpdateFullScreenComboBoxEnabled();
     return true;
+}
+
+//
+// OnDPIAwareClick
+//
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton);
+
+bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
+{
+    static bool shownWarning = false;
+
+    if (m_pCheckBoxDPIAware->GetSelected() && !shownWarning)
+    {
+        shownWarning = true;
+
+        SStringX strMessage(
+            _("Enabling DPI awareness is an experimental feature and\n"
+              "we only recommend it when you play MTA:SA on a scaled monitor.\n"
+              "You may experience graphical issues if you enable this option."
+              "\n\nAre you sure you want to enable this option?"));
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
+        pQuestionBox->SetMessage(strMessage);
+        pQuestionBox->SetButton(0, _("No"));
+        pQuestionBox->SetButton(1, _("Yes"));
+        pQuestionBox->SetCallback(DPIAwareQuestionCallBack, m_pCheckBoxDPIAware);
+        pQuestionBox->Show();
+    }
+
+    return true;
+}
+
+static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    if (uiButton == 0)
+    {
+        auto const checkBox = reinterpret_cast<CGUICheckBox*>(userdata);
+        checkBox->SetSelected(false);
+    }
 }
 
 bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)

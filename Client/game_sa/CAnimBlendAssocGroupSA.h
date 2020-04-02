@@ -171,6 +171,17 @@ enum eAnimGroup
     TOTAL_ANIM_GROUPS = 139
 };
 
+class CAnimationStyleDescriptorSAInterface
+{
+public:
+    char groupName[16];
+    char blockName[16];
+    int field_20;
+    int animsCount;
+    void *animNames;
+    void *animDesc;
+};
+
 class CAnimBlendAssocGroupSAInterface
 {
 public:

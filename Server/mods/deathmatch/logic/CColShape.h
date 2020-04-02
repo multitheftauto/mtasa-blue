@@ -61,10 +61,10 @@ public:
 
 protected:
     CVector m_vecPosition;
+    class CColManager*  m_pManager;
 
 private:
     bool                m_bIsEnabled;
-    class CColManager*  m_pManager;
     class CColCallback* m_pCallback;
     bool                m_bAutoCallEvent;
 

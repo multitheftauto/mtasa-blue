@@ -274,6 +274,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                     {
                         pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                         pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+                        pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
                     }
                 }
             }

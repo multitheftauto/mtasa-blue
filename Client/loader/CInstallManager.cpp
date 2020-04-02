@@ -768,7 +768,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
         // See if exe copy seems usable
         SString strHTAEXEPath = PathJoin(strGTAPath, MTA_HTAEXE_NAME);
         uint64  uiStdFileSize = FileSize(strGTAEXEPath);
-        if (uiStdFileSize && uiStdFileSize == FileSize(strHTAEXEPath))
+        if (uiStdFileSize && FileSize(strHTAEXEPath) > 10 * 1024 * 1024)
             strGTAEXEPath = strHTAEXEPath;
     }
 

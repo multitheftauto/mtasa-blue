@@ -18,11 +18,13 @@ project "Client Core"
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk"
+			"../../vendor/hwbrk",
+			"../../vendor/discordgsdk/cpp"
 		}
 
 	libdirs {
 		"../../vendor/detours/lib",
+		"../../vendor/discordgsdk/lib/x86",
 	}
 
 
@@ -49,12 +51,11 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "discordgsdk", "discord_game_sdk.dll.lib"
 	}
 
 	defines {
 		"INITGUID",
-		"_WIN32_WINNT=0x502",
 		"PNG_SETJMP_NOT_SUPPORTED"
 	}
 
