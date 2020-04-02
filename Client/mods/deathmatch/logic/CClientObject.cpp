@@ -53,19 +53,12 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
     // Add this object to the list
     m_pObjectManager->AddToList(this);
 
-<<<<<<< HEAD
-    if ( m_bIsLowLod )
-        m_pManager->OnLowLODElementCreated ();
-
-    // Check DisableCollisions //
-    for ( CClientEntity * entity : m_DisabledCollisions )
-    {
-        SetCollidableWith ( entity, false );
-    }
-=======
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementCreated();
->>>>>>> a0ce68f284487ba636e839b06c103bc2442d95e0
+
+    // Check DisableCollisions
+    for (CClientEntity* entity : m_DisabledCollisions)
+        SetCollidableWith(entity, false);
 }
 
 CClientObject::~CClientObject()
