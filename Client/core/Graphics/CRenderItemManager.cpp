@@ -755,6 +755,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
+    outStatus.settings.bHighDetailPeds = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -765,6 +766,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio);
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
+    CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
 
     if (outStatus.settings.iFXQuality == 0)
     {
@@ -1200,7 +1202,6 @@ void CRenderItemManager::FlushNonAARenderTarget()
                 float fV2 = 1;
 
                 const SRTVertex vertices[] = {{fX1, fY1, 0, 1, fU1, fV1}, {fX2, fY1, 0, 1, fU2, fV1}, {fX1, fY2, 0, 1, fU1, fV2},
-
                                               {fX2, fY1, 0, 1, fU2, fV1}, {fX2, fY2, 0, 1, fU2, fV2}, {fX1, fY2, 0, 1, fU1, fV2}};
 
                 // Set vertex stream

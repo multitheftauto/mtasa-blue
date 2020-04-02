@@ -439,7 +439,7 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
 /* a simple hash function similiar to what perl does for strings.
  * for good results, the string should not be excessivly large.
  */
-static unsigned long lh_perllike_str_hash(const void *k) 
+static unsigned long lh_perllike_str_hash(const void *k)
 {
     const char *rkey = (const char *)k;
     unsigned hashval = 1;

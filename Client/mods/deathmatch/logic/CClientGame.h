@@ -52,6 +52,7 @@
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
+class CServerInfo;
 
 struct SVehExtrapolateSettings
 {
@@ -73,6 +74,7 @@ class CClientGame
 {
     friend class CPacketHandler;
     typedef std::map<CAnimBlendAssociationSAInterface*, std::shared_ptr<CIFPAnimations> > AnimAssociations_type;
+    typedef std::map<class CTaskSimpleRunNamedAnimSAInterface*, CClientPed*>              RunNamedAnimTask_type;
 
 public:
     enum eStatus
@@ -225,7 +227,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -275,15 +277,19 @@ public:
     CSyncDebug*                   GetSyncDebug() { return m_pSyncDebug; };
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
+    CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
-    CClientPlayer*         GetLocalPlayer() { return m_pLocalPlayer; };
     CRadarMap*             GetRadarMap() { return m_pRadarMap; };
     CMovingObjectsManager* GetMovingObjectsManager() { return m_pMovingObjectsManager; }
+
+    CClientPlayer*       GetLocalPlayer() { return m_pLocalPlayer; }
+    const CClientPlayer* GetLocalPlayer() const { return m_pLocalPlayer; }
+    void                 ResetLocalPlayer() { m_pLocalPlayer = nullptr; }
 
     CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
     CPedSync*               GetPedSync() { return m_pPedSync; }
@@ -434,6 +440,8 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
 
+    void TriggerDiscordJoin(SString strSecret);
+
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
@@ -483,6 +491,8 @@ private:
     void Event_OnIngame();
     void Event_OnIngameAndConnected();
 
+    void SetupGlobalLuaEvents();
+
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
     static void                              StaticFireHandler(CFire* pFire);
@@ -520,6 +530,7 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
+    static void StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -562,6 +573,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
+    void        GameRunNamedAnimDestructorHandler(class CTaskSimpleRunNamedAnimSAInterface* pTask);
     bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
@@ -601,8 +613,6 @@ public:
     void                           SetFileCacheRoot();
     const char*                    GetFileCacheRoot() { return m_strFileCacheRoot; }
 
-    void                        CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
-                                                                std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
     void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
     void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
     std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);
@@ -615,6 +625,7 @@ public:
 
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
+    void InsertRunNamedAnimTaskToMap(class CTaskSimpleRunNamedAnimSAInterface* pTask, CClientPed* pPed);
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
@@ -692,6 +703,8 @@ private:
     CLuaManager*        m_pLuaManager;
     CScriptDebugging*   m_pScriptDebugging;
     CRegisteredCommands m_RegisteredCommands;
+
+    std::unique_ptr<CServerInfo> m_ServerInfo;
 
     // Map statuses
     SString m_strCurrentMapName;
@@ -805,6 +818,7 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
+    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;
@@ -830,10 +844,14 @@ private:
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 
+    ksignals::Delegate m_Delegate;
+
     // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
     std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
     std::set<CClientPed*>                                m_setOfPedPointers;
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
+    // Key is the task and value is the CClientPed*
+    RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
 };
 
 extern CClientGame* g_pClientGame;

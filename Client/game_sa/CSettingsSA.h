@@ -158,14 +158,16 @@ public:
     float GetFieldOfViewVehicle();
     float GetFieldOfViewVehicleMax();
 
-    void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance);
-    void ResetVehiclesLODDistance();
+    void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript);
+    void ResetVehiclesLODDistance(bool bFromScript);
+    void ResetVehiclesLODDistanceFromScript();
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
 
     void Save();
 
-    void SetPedsLODDistance(float fPedsLODDistance);
-    void ResetPedsLODDistance();
+    void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript);
+    void  ResetPedsLODDistance(bool bFromScript);
+    void  ResetPedsLODDistanceFromScript();
     float GetPedsLODDistance();
 
     static void StaticSetHooks();

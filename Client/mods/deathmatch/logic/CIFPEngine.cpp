@@ -10,27 +10,26 @@
 
 #include <StdInc.h>
 
-std::shared_ptr<CClientIFP> CIFPEngine::EngineLoadIFP(CResource* pResource, CClientManager* pManager, const SString& strFile, bool bIsRawData,
-                                                      const SString& strBlockName)
+std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
 {
     // Grab the resource root entity
-    CClientEntity*     pRoot = pResource->GetResourceIFPRoot();
-    const unsigned int u32BlockNameHash = HashString(strBlockName.ToLower());
+    const unsigned int u32BlockNameHash = HashString(blockName.ToLower());
 
     // Check whether the IFP blockname exists or not
     if (g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash) == nullptr)
     {
         // Create a IFP element
-        std::shared_ptr<CClientIFP> pIFP(new CClientIFP(pManager, INVALID_ELEMENT_ID));
+        std::shared_ptr<CClientIFP> pIFP(new CClientIFP(clientManager, INVALID_ELEMENT_ID));
 
         // Try to load the IFP file
-        if (pIFP->LoadIFP(strFile, bIsRawData, strBlockName))
+        if (pIFP->Load(blockName, isRawInput, std::move(input)))
         {
             // We can use the map to retrieve correct IFP by block name later
             g_pClientGame->InsertIFPPointerToMap(u32BlockNameHash, pIFP);
 
             // Success loading the file. Set parent to IFP root
-            pIFP->SetParent(pRoot);
+            pIFP->SetParent(resource->GetResourceIFPRoot());
+
             return pIFP;
         }
     }
@@ -45,7 +44,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
         CClientPed& Ped = static_cast<CClientPed&>(*pEntity);
 
         const unsigned int          u32BlockNameHash = HashString(strCustomBlockName.ToLower());
-        CAnimBlock*                 pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
+        std::unique_ptr<CAnimBlock> pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
         std::shared_ptr<CClientIFP> pCustomIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
         if (pInternalBlock && pCustomIFP)
         {
@@ -56,8 +55,8 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             CAnimBlendHierarchySAInterface* pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy(strCustomAnimName);
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
+                EngineApplyAnimation(Ped, pInternalAnimHierarchy->GetInterface(), pCustomAnimHierarchyInterface);
                 Ped.ReplaceAnimation(pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface);
-                EngineApplyAnimation(Ped, pCustomAnimHierarchyInterface);
                 return true;
             }
         }
@@ -78,7 +77,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
         }
         else
         {
-            CAnimBlock* pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
+            std::unique_ptr<CAnimBlock> pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
             if (pInternalBlock)
             {
                 if (eRestoreType == eRestoreAnimation::BLOCK)
@@ -101,16 +100,29 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
     return false;
 }
 
-bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
+bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface, CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
 {
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = Ped.GetClump();
     if (pClump)
     {
-        auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pAnimHierarchyInterface);
-        auto pCurrentAnimAssociation = pAnimationManager->RpAnimBlendClumpGetAssociationHashKey(pClump, pAnimHierarchy->GetNameHashKey());
+        auto pCurrentAnimAssociation = Ped.GetAnimAssociation(pOriginalHierarchyInterface);
         if (pCurrentAnimAssociation)
         {
+            auto pCurrentAnimHierarchy = pCurrentAnimAssociation->GetAnimHierarchy();
+            auto pAssocHierachyInterface = pCurrentAnimHierarchy->GetInterface();
+            if (pAssocHierachyInterface == pAnimHierarchyInterface)
+            {
+                return true;
+            }
+
+            int iGroupID = pCurrentAnimAssociation->GetAnimGroup();
+            int iAnimID = pCurrentAnimAssociation->GetAnimID();
+            if (iGroupID < 0 && iAnimID < 0)
+            {
+                return true;
+            }
+            auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pAnimHierarchyInterface);
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
             pCurrentAnimAssociation->FreeAnimBlendNodeArray();
             pCurrentAnimAssociation->Init(pClump, pAnimHierarchyInterface);

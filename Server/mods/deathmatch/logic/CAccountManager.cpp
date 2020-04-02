@@ -272,9 +272,9 @@ void CAccountManager::Save(CAccount* pAccount, bool bCheckForErrors)
     SString strQuery;
     strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
     if (!strSerial.empty())
-        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",serial=?", SQLITE_TEXT, *strSerial);
-    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",password=?, httppass=? WHERE name=?", SQLITE_TEXT, *strPassword, SQLITE_TEXT,
-                                                   *strHttpPassAppend, SQLITE_TEXT, *strName);
+        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", serial=?", SQLITE_TEXT, *strSerial);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT, *strPassword,
+                                                   SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
 
     if (bCheckForErrors)
     {

@@ -46,6 +46,7 @@ public:
     LUA_DECLARE(GetPlayerAccount);
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
+    LUA_DECLARE(GetPlayerScriptDebugLevel);
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);
@@ -60,10 +61,12 @@ public:
     LUA_DECLARE(SetPlayerNametagShowing);
     LUA_DECLARE(SetPlayerMuted);
     LUA_DECLARE(SetPlayerBlurLevel);
+    LUA_DECLARE(SetPlayerDiscordJoinParams);
     LUA_DECLARE(RedirectPlayer);
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);
     LUA_DECLARE(TakePlayerScreenShot);
+    LUA_DECLARE(SetPlayerScriptDebugLevel);
 
     // All seeing eye
     LUA_DECLARE(GetPlayerAnnounceValue);

@@ -1,4 +1,4 @@
-// cast.cpp - written and placed in the public domain by Wei Dai and Leonard Janke
+// cast.cpp - originally written and placed in the public domain by Wei Dai and Leonard Janke
 // based on Steve Reid's public domain cast.c
 
 #include "pch.h"
@@ -35,7 +35,7 @@ typedef BlockGetAndPut<word32, BigEndian> Block;
 
 void CAST128::Enc::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
-	word32 t, l, r;
+	word32 &t=m_t[0], &l=m_t[1], &r=m_t[2];
 
 	/* Get inblock into l,r */
 	Block::Get(inBlock)(l)(r);
@@ -65,7 +65,7 @@ void CAST128::Enc::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock,
 
 void CAST128::Dec::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
-	word32 t, l, r;
+	word32 &t=m_t[0], &l=m_t[1], &r=m_t[2];
 
 	/* Get inblock into l,r */
 	Block::Get(inBlock)(r)(l);
@@ -90,8 +90,6 @@ void CAST128::Dec::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock,
 	F1(l, r,  0, 16);
 	/* Put l,r into outblock */
 	Block::Put(xorBlock, outBlock)(l)(r);
-	/* Wipe clean */
-	t = l = r = 0;
 }
 
 void CAST128::Base::UncheckedSetKey(const byte *userKey, unsigned int keylength, const NameValuePairs &)
@@ -100,7 +98,7 @@ void CAST128::Base::UncheckedSetKey(const byte *userKey, unsigned int keylength,
 
 	reduced = (keylength <= 10);
 
-	word32 X[4], Z[4];
+	word32 X[4], Z[4]={0};
 	GetUserKey(BIG_ENDIAN_ORDER, X, 4, userKey, keylength);
 
 #define x(i) GETBYTE(X[i/4], 3-i%4)
@@ -213,6 +211,7 @@ the keys are used */
 
 void CAST256::Base::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
+	// TODO: add a SecBlock workspace to the class when the ABI can change
 	word32 t, block[4];
 	Block::Get(inBlock)(block[0])(block[1])(block[2])(block[3]);
 
@@ -255,8 +254,7 @@ void CAST256::Base::UncheckedSetKey(const byte *userKey, unsigned int keylength,
 {
 	AssertValidKeyLength(keylength);
 
-	word32 kappa[8];
-	GetUserKey(BIG_ENDIAN_ORDER, kappa, 8, userKey, keylength);
+	GetUserKey(BIG_ENDIAN_ORDER, kappa.begin(), 8, userKey, keylength);
 
 	for(int i=0; i<12; ++i)
 	{
@@ -289,8 +287,6 @@ void CAST256::Base::UncheckedSetKey(const byte *userKey, unsigned int keylength,
 			}
 		}
 	}
-
-	memset(kappa, 0, sizeof(kappa));
 }
 
 NAMESPACE_END

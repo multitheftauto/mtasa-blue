@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-12-26 16:51+0000\n"
-"Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
+"PO-Revision-Date: 2019-09-29 12:47+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; Kamil Schneider; Jurandovsky; pkpawelo; 105NWr; ThePiotrek; FileEX; XJMLN; ccw; Bober; SKmedix; qaisjp; GabVVas; krallxz@gmail.com\n"
+"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; Kamil Schneider; Jurandovsky; ccw; pkpawelo; 105NWr; FileEX; ThePiotrek; Bober; XJMLN; SKmedix; GabVVas; qaisjp; krallxz@gmail.com; botder\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1545843061.0\n"
+"X-POOTLE-MTIME: 1569761233.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,8 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
-"Pobrana wersja MTA:SA nie wspiera systemów Windows XP oraz Vista. Pobierz "
-"inną wersję z www.mtasa.com."
+"Ta wersja MTA:SA nie obsługuje systemów Windows XP i Vista. Pobierz inną "
+"wersję ze strony www.mtasa.com"
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -104,7 +104,7 @@ msgstr ""
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr "Zainstaluj lub zaaktualizuj DirectX (jeżeli wymagane)."
+msgstr "Zainstaluj lub zaktualizuj DirectX (jeśli jest wymagany)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199

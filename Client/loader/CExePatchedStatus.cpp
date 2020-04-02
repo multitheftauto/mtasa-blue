@@ -99,6 +99,9 @@ bool ShouldUseExeCopy()
     if (RequiresAltTabFix())
         strUseCopyReason += " AltTabFix";
 
+    if (ShouldForceUseExeCopy())
+        strUseCopyReason += " ForceUseExeCopy";
+
     // Log reason for using proxy_sa
     static SString strUseCopyReasonPrevious;
     if (strUseCopyReasonPrevious != strUseCopyReason)
@@ -107,6 +110,23 @@ bool ShouldUseExeCopy()
         strUseCopyReasonPrevious = strUseCopyReason;
     }
     return !strUseCopyReason.empty();
+}
+
+//////////////////////////////////////////////////////////
+//
+// ShouldForceUseExeCopy
+//
+// Determine if gta_sa.exe looks unusable (under 10MB)
+//          AND proxy_sa.exe looks usable (over 10MB)
+//
+//////////////////////////////////////////////////////////
+bool ShouldForceUseExeCopy()
+{
+    SString strGTAPath = GetGTAPath();
+    if (FileSize(PathJoin(strGTAPath, MTA_GTAEXE_NAME)) < 10 * 1024 * 1024)
+        if (FileSize(PathJoin(strGTAPath, MTA_HTAEXE_NAME)) > 10 * 1024 * 1024)
+            return true;
+    return false;
 }
 
 //////////////////////////////////////////////////////////
@@ -188,8 +208,9 @@ bool CopyExe()
 {
     SString strGTAEXEPathFrom = GetExePathFilename(false);
     SString strGTAEXEPathTo = GetExePathFilename(true);
-    if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
-        return false;
+    if (strGTAEXEPathFrom != strGTAEXEPathTo)
+        if (!FileCopy(strGTAEXEPathFrom, strGTAEXEPathTo))
+            return false;
     return true;
 }
 
@@ -205,6 +226,8 @@ SString GetExePathFilename(bool bUseExeCopy)
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
+        if (ShouldForceUseExeCopy())
+            bUseExeCopy = true;
         const char* szExeName = bUseExeCopy ? MTA_HTAEXE_NAME : MTA_GTAEXE_NAME;
         SString     strGTAEXEPath = PathJoin(strGTAPath, szExeName);
         return strGTAEXEPath;

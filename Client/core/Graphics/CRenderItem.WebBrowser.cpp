@@ -93,6 +93,14 @@ void CWebBrowserItem::CreateUnderlyingData()
     if (!m_pD3DTexture)
         return;
 
+    // D3DXCreateTexture sets width and height to 1 if the argument value was 0
+    // See: https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3dxcreatetexture
+    if (m_uiSizeX == 0)
+        m_uiSizeX = 1;
+
+    if (m_uiSizeY == 0)
+        m_uiSizeY = 1;
+
     // Get the render target surface here for convenience
     ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel(0, &m_pD3DRenderTargetSurface);
 

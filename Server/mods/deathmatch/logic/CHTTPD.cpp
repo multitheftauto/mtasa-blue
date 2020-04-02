@@ -134,7 +134,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
             RSAES_OAEP_SHA_Encryptor encryptor(publicKey);
             SecByteBlock             cipherText(encryptor.CiphertextLength(challenge.size()));
             AutoSeededRandomPool     rng;
-            encryptor.Encrypt(rng, (const byte*)challenge.data(), challenge.size(), cipherText.begin());
+            encryptor.Encrypt(rng, (const CryptoPP::byte*)challenge.data(), challenge.size(), cipherText.begin());
 
             if (!cipherText.empty())
             {

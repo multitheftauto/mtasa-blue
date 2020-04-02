@@ -1525,8 +1525,8 @@ int GetFileAge(const SString& strPathFilename)
         FindClose(hFind);
         FILETIME ftNow;
         GetSystemTimeAsFileTime(&ftNow);
-        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime};
-        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, ftNow.dwHighDateTime};
+        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, static_cast<LONG>(findFileData.ftCreationTime.dwHighDateTime)};
+        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, static_cast<LONG>(ftNow.dwHighDateTime)};
         return static_cast<int>((timeNow.QuadPart - creationTime.QuadPart) / (LONGLONG)10000000);
     }
     return 0;
@@ -2057,231 +2057,44 @@ void LogSettings()
         const char* szName;
         const char* szDesc;
     } const settings[] = {
-        {
-            false,
-            "general",
-            GENERAL_PROGRESS_ANIMATION_DISABLE,
-            "",
-        },
-        {
-            false,
-            "general",
-            "aero-enabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "aero-changeable",
-            "",
-        },
-        {
-            false,
-            "general",
-            "driver-overrides-disabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "device-selection-disabled",
-            "",
-        },
-        {
-            false,
-            "general",
-            "customized-sa-files-using",
-            "",
-        },
-        {
-            false,
-            "general",
-            "times-connected",
-            "",
-        },
-        {
-            false,
-            "general",
-            "times-connected-editor",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "nvidia",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-force-detection",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-export-enablement",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-rename-exe",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-alt-startup",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-force-windowed",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-dialog-skip",
-            "",
-        },
-        {
-            false,
-            "nvhacks",
-            "optimus-startup-option",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "CR1",
-            "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME",
-        },
-        {
-            true,
-            "watchdog",
-            "CR2",
-            "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN",
-        },
-        {
-            true,
-            "watchdog",
-            "CR3",
-            "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU",
-        },
-        {
-            true,
-            "watchdog",
-            "L0",
-            "SECTION_NOT_CLEAN_GTA_EXIT",
-        },
-        {
-            true,
-            "watchdog",
-            "L1",
-            "SECTION_NOT_STARTED_ONLINE_GAME",
-        },
-        {
-            true,
-            "watchdog",
-            "L2",
-            "SECTION_NOT_SHOWN_LOADING_SCREEN",
-        },
-        {
-            true,
-            "watchdog",
-            "L3",
-            "SECTION_STARTUP_FREEZE",
-        },
-        {
-            true,
-            "watchdog",
-            "L4",
-            "SECTION_NOT_USED_MAIN_MENU",
-        },
-        {
-            true,
-            "watchdog",
-            "L5",
-            "SECTION_POST_INSTALL",
-        },
-        {
-            true,
-            "watchdog",
-            "lastruncrash",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "preload-upgrades",
-            "",
-        },
-        {
-            true,
-            "watchdog",
-            "Q0",
-            "SECTION_IS_QUITTING",
-        },
-        {
-            true,
-            "watchdog",
-            "uncleanstop",
-            "",
-        },
-        {
-            false,
-            "diagnostics",
-            "send-dumps",
-            "",
-        },
-        {
-            true,
-            "diagnostics",
-            "last-minidump-time",
-            "",
-        },
-        {
-            true,
-            "diagnostics",
-            "user-confirmed-bsod-time",
-            "",
-        },
-        {
-            true,
-            DIAG_MINIDUMP_DETECTED_COUNT,
-            "",
-        },
-        {
-            true,
-            DIAG_MINIDUMP_CONFIRMED_COUNT,
-            "",
-        },
-        {
-            true,
-            DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
-            "",
-        },
-        {
-            false,
-            "general",
-            "noav-user-says-skip",
-            "",
-        },
-        {
-            false,
-            "general",
-            "noav-last-asked-time",
-            "",
-        },
+        {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
+        {false, "general", "aero-enabled", ""},
+        {false, "general", "aero-changeable", ""},
+        {false, "general", "driver-overrides-disabled", ""},
+        {false, "general", "device-selection-disabled", ""},
+        {false, "general", "customized-sa-files-using", ""},
+        {false, "general", "times-connected", ""},
+        {false, "general", "times-connected-editor", ""},
+        {false, "nvhacks", "nvidia", ""},
+        {false, "nvhacks", "optimus-force-detection", ""},
+        {false, "nvhacks", "optimus-export-enablement", ""},
+        {false, "nvhacks", "optimus", ""},
+        {false, "nvhacks", "optimus-rename-exe", ""},
+        {false, "nvhacks", "optimus-alt-startup", ""},
+        {false, "nvhacks", "optimus-force-windowed", ""},
+        {false, "nvhacks", "optimus-dialog-skip", ""},
+        {false, "nvhacks", "optimus-startup-option", ""},
+        {true, "watchdog", "CR1", "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME"},
+        {true, "watchdog", "CR2", "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN"},
+        {true, "watchdog", "CR3", "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU"},
+        {true, "watchdog", "L0", "SECTION_NOT_CLEAN_GTA_EXIT"},
+        {true, "watchdog", "L1", "SECTION_NOT_STARTED_ONLINE_GAME"},
+        {true, "watchdog", "L2", "SECTION_NOT_SHOWN_LOADING_SCREEN"},
+        {true, "watchdog", "L3", "SECTION_STARTUP_FREEZE"},
+        {true, "watchdog", "L4", "SECTION_NOT_USED_MAIN_MENU"},
+        {true, "watchdog", "L5", "SECTION_POST_INSTALL"},
+        {true, "watchdog", "lastruncrash", ""},
+        {true, "watchdog", "preload-upgrades", ""},
+        {true, "watchdog", "Q0", "SECTION_IS_QUITTING"},
+        {true, "watchdog", "uncleanstop", ""},
+        {false, "diagnostics", "send-dumps", ""},
+        {true, "diagnostics", "last-minidump-time", ""},
+        {true, "diagnostics", "user-confirmed-bsod-time", ""},
+        {true, DIAG_MINIDUMP_DETECTED_COUNT, ""},
+        {true, DIAG_MINIDUMP_CONFIRMED_COUNT, ""},
+        {true, DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, ""},
+        {false, "general", "noav-user-says-skip", ""},
+        {false, "general", "noav-last-asked-time", ""},
     };
 
     for (uint i = 0; i < NUMELMS(settings); i++)
@@ -2340,9 +2153,10 @@ BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
     WINDOWINFO windowInfo;
     if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if (windowInfo.atomWindowType == (WORD)WC_DIALOG)
+        if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
-            SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            // Ensure dialog is not hidden by other applications
+            SetForegroundWindow(hwnd);
             return false;
         }
     }

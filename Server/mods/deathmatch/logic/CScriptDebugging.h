@@ -23,7 +23,7 @@ struct SLogLine
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-                  operator SString&() { return strText; }
+    void          operator+=(const char* szAppend) { strText += szAppend; }
     bool          operator==(const SLogLine& other) const
     {
         return strText == other.strText && uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed && ucGreen == other.ucGreen &&
@@ -42,6 +42,7 @@ public:
     void ClearPlayers();
 
     void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
+    void LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
     void LogWarning(lua_State* luaVM, const char* szFormat, ...);
     void LogError(lua_State* luaVM, const char* szFormat, ...);

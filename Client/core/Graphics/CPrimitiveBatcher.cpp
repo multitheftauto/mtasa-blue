@@ -100,24 +100,10 @@ void CPrimitiveBatcher::UpdateMatrices(float fViewportSizeX, float fViewportSize
 void CPrimitiveBatcher::SetDeviceStates()
 {
     // Set states
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-    m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-    m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-    m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-    m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
-    m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-    m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-    m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
-    m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-    m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
     m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 }
 ////////////////////////////////////////////////////////////////
 //

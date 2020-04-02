@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -24,6 +24,14 @@
 
 #if defined(BUILDING_LIBCURL) && !defined(CURL_NO_OLDIES)
 #define CURL_NO_OLDIES
+#endif
+
+/*
+ * Disable Visual Studio warnings:
+ * 4127 "conditional expression is constant"
+ */
+#ifdef _MSC_VER
+#pragma warning(disable:4127)
 #endif
 
 /*
@@ -96,8 +104,8 @@
 #  include "config-vxworks.h"
 #endif
 
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-#  include "config-linux.h"
+#ifdef __PLAN9__
+#  include "config-plan9.h"
 #endif
 
 #endif /* HAVE_CONFIG_H */
@@ -314,11 +322,12 @@
 #endif
 
 #ifdef __AMIGA__
-#  ifndef __ixemul__
-#    include <exec/types.h>
-#    include <exec/execbase.h>
-#    include <proto/exec.h>
-#    include <proto/dos.h>
+#  include <exec/types.h>
+#  include <exec/execbase.h>
+#  include <proto/exec.h>
+#  include <proto/dos.h>
+#  ifdef HAVE_PROTO_BSDSOCKET_H
+#    include <proto/bsdsocket.h> /* ensure bsdsocket.library use */
 #    define select(a,b,c,d,e) WaitSelect(a,b,c,d,e,0)
 #  endif
 #endif
@@ -485,7 +494,6 @@
 #ifdef WIN32
 
 #  define DIR_CHAR      "\\"
-#  define DOT_CHAR      "_"
 
 #else /* WIN32 */
 
@@ -511,14 +519,6 @@
 #  endif
 
 #  define DIR_CHAR      "/"
-#  ifndef DOT_CHAR
-#    define DOT_CHAR      "."
-#  endif
-
-#  ifdef MSDOS
-#    undef DOT_CHAR
-#    define DOT_CHAR      "_"
-#  endif
 
 #  ifndef fileno /* sunos 4 have this as a macro! */
      int fileno(FILE *stream);
@@ -571,6 +571,12 @@
  * Mutually exclusive CURLRES_* definitions.
  */
 
+#if defined(ENABLE_IPV6) && defined(HAVE_GETADDRINFO)
+#  define CURLRES_IPV6
+#else
+#  define CURLRES_IPV4
+#endif
+
 #ifdef USE_ARES
 #  define CURLRES_ASYNCH
 #  define CURLRES_ARES
@@ -583,12 +589,6 @@
 #  define CURLRES_THREADED
 #else
 #  define CURLRES_SYNCH
-#endif
-
-#ifdef ENABLE_IPV6
-#  define CURLRES_IPV6
-#else
-#  define CURLRES_IPV4
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -650,9 +650,10 @@ int netware_init(void);
 #define LIBIDN_REQUIRED_VERSION "0.4.1"
 
 #if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_NSS) || \
-    defined(USE_POLARSSL) || defined(USE_MBEDTLS) || \
-    defined(USE_CYASSL) || defined(USE_SCHANNEL) || \
-    defined(USE_DARWINSSL) || defined(USE_GSKIT) || defined(USE_MESALINK)
+    defined(USE_MBEDTLS) || \
+    defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
+    defined(USE_SECTRANSP) || defined(USE_GSKIT) || defined(USE_MESALINK) || \
+    defined(USE_BEARSSL)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
@@ -671,7 +672,7 @@ int netware_init(void);
 /* Single point where USE_NTLM definition might be defined */
 #if !defined(CURL_DISABLE_NTLM) && !defined(CURL_DISABLE_CRYPTO_AUTH)
 #if defined(USE_OPENSSL) || defined(USE_WINDOWS_SSPI) || \
-    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_DARWINSSL) || \
+    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_SECTRANSP) || \
     defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) || \
     defined(USE_MBEDTLS)
 
@@ -687,6 +688,10 @@ int netware_init(void);
 
 #ifdef CURL_WANTS_CA_BUNDLE_ENV
 #error "No longer supported. Set CURLOPT_CAINFO at runtime instead."
+#endif
+
+#if defined(USE_LIBSSH2) || defined(USE_LIBSSH) || defined(USE_WOLFSSH)
+#define USE_SSH
 #endif
 
 /*
@@ -717,7 +722,7 @@ int netware_init(void);
  */
 
 #ifndef Curl_nop_stmt
-#  define Curl_nop_stmt do { } WHILE_FALSE
+#  define Curl_nop_stmt do { } while(0)
 #endif
 
 /*
@@ -818,6 +823,16 @@ endings either CRLF or LF so 't' is appropriate.
 struct passwd;
 int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
                size_t buflen, struct passwd **result);
+#endif
+
+#ifdef DEBUGBUILD
+#define UNITTEST
+#else
+#define UNITTEST static
+#endif
+
+#if defined(USE_NGTCP2) || defined(USE_QUICHE)
+#define ENABLE_QUIC
 #endif
 
 #endif /* HEADER_CURL_SETUP_H */
