@@ -268,6 +268,7 @@ protected:
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<TimeInfo*, TimeInfo*>                                                        ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                                             ms_OriginalObjectPropertiesGroups;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
@@ -313,11 +314,15 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
-    void           SetLODDistance(float fDistance);
+    float          GetOriginalLODDistance();
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();

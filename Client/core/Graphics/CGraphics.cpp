@@ -488,6 +488,7 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
+
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -521,16 +522,11 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pLineInterface->Begin();
         }
-    }
 
-    // Blend mode changing?
-    if (bDrawModeChanging || bBlendModeChanging)
-    {
         SetBlendModeRenderStates(newBlendMode);
+        m_CurBlendMode = newBlendMode;
+        m_CurDrawMode = newDrawMode;
     }
-
-    m_CurDrawMode = newDrawMode;
-    m_CurBlendMode = newBlendMode;
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
@@ -648,30 +644,10 @@ float CGraphics::GetDXTextExtent(const char* szText, float fScale, LPD3DXFONT pD
         // DT_CALCRECT may not take space characters at the end of a line
         // into consideration for the rect size.
         // Count the amount of space characters at the end
-        int iSpaceCount = 0;
-        for (auto c = strText.rbegin(); c != strText.rend(); ++c)
-        {
-            if (*c == ' ')
-                ++iSpaceCount;
-            else
-                break;
-        }
-
-        // Compute the size of a single space and use that
-        // to get the width of the ignored space characters
-        int iAdditionalPixels = 0;
-        if (iSpaceCount > 0)
-        {
-            HDC  dc = pDXFont->GetDC();
-            SIZE size;
-            GetTextExtentPoint32W(dc, L" ", 1, &size);
-            iAdditionalPixels = iSpaceCount * size.cx;
-            // Remove trailing spaces from the text
-            strText = strText.Left(strText.length() - iSpaceCount);
-        }
+        int iAdditionalPixels = GetTrailingSpacesWidth(pDXFont, strText);
 
         // Compute the size of the text itself
-        pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
+        pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
         return ((float)(rect.right - rect.left + iAdditionalPixels) * fScale);
     }
@@ -726,6 +702,63 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
     }
 
     return 0.0f;
+}
+
+void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth, float fScaleX, float fScaleY, LPD3DXFONT pDXFont, bool bWordBreak,
+                              bool bColorCoded)
+{
+    if (*szText == '\0')
+        return;
+
+    if (!pDXFont)
+        pDXFont = GetFont();
+
+    pDXFont = MaybeGetBigFont(pDXFont, fScaleX, fScaleY);
+
+    if (pDXFont)
+    {
+        WString strText = MbUTF8ToUTF16(szText);
+
+        if (bColorCoded)
+            RemoveColorCodesInPlaceW(strText);
+
+        ulong ulFormat = DT_CALCRECT;
+        if (bWordBreak)
+            ulFormat |= DT_WORDBREAK;
+
+        // Calculate the size of the text
+        RECT rect = {0, 0, fWidth / fScaleX, 0};
+        pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
+
+        vecSize.fX = (rect.right - rect.left) * fScaleX;
+        vecSize.fY = (rect.bottom - rect.top) * fScaleY;
+    }
+}
+
+int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
+{
+    // Count the amount of space characters at the end
+    int iSpaceCount = 0;
+    for (auto c = strText.rbegin(); c != strText.rend(); ++c)
+    {
+        if (*c == ' ')
+            ++iSpaceCount;
+        else
+            break;
+    }
+
+    // Compute the size of a single space and use that
+    // to get the width of the ignored space characters
+    int iSpacesWidth = 0;
+    if (iSpaceCount > 0)
+    {
+        HDC  dc = pDXFont->GetDC();
+        SIZE size;
+        GetTextExtentPoint32W(dc, L" ", 1, &size);
+        iSpacesWidth = iSpaceCount * size.cx;
+    }
+
+    return iSpacesWidth;
 }
 
 ID3DXFont* CGraphics::GetFont(eFontType fontType, float* pfOutScaleUsed, float fRequestedScale, const char* szCustomScaleUser)
@@ -900,6 +933,7 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVE;
+    Item.blendMode = m_ActiveBlendMode;
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
     AddQueueItem(Item, bPostGUI);
@@ -968,6 +1002,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.blendMode = m_ActiveBlendMode;
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
@@ -1737,7 +1772,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 fU2 *= fUScale;
                 fV2 *= fVScale;
             }
-            CheckModes(EDrawMode::TILE_BATCHER);
+            CheckModes(EDrawMode::TILE_BATCHER, Item.blendMode);
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
@@ -1746,14 +1781,14 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_PRIMITIVE:
         {
             const sDrawQueuePrimitive primitive = Item.Primitive;
-            CheckModes(EDrawMode::PRIMITIVE);
+            CheckModes(EDrawMode::PRIMITIVE, Item.blendMode);
             m_pPrimitiveBatcher->AddPrimitive(primitive.eType, primitive.pVecVertices);
             break;
         }
         case QUEUE_PRIMITIVEMATERIAL:
         {
             const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
-            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL, Item.blendMode);
             m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }

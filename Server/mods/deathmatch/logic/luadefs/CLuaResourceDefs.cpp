@@ -53,6 +53,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceExportedFunctions", getResourceExportedFunctions},
         {"getResourceOrganizationalPath", getResourceOrganizationalPath},
         {"isResourceArchived", isResourceArchived},
+        {"isResourceProtected", isResourceProtected},
 
         // Set stuff
         {"setResourceInfo", setResourceInfo},
@@ -121,6 +122,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getState", "getResourceState");
     lua_classfunction(luaVM, "getACLRequests", "getResourceACLRequests");
     lua_classfunction(luaVM, "isArchived", "isResourceArchived");
+    lua_classfunction(luaVM, "isProtected", "isResourceProtected");
 
     lua_classvariable(luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot");
     lua_classvariable(luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions");
@@ -132,6 +134,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "rootElement", NULL, "getResourceRootElement");
     lua_classvariable(luaVM, "state", NULL, "getResourceState");
     lua_classvariable(luaVM, "archived", NULL, "isResourceArchived");
+    lua_classvariable(luaVM, "protected", nullptr, "isResourceProtected");
     lua_classvariable(luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason");
     // lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     // lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
@@ -609,7 +612,7 @@ int CLuaResourceDefs::restartResource(lua_State* luaVM)
         return 1;
     }
 
-    if (pResource->IsActive())
+    if (pResource->IsActive() && !pResource->IsStopping())
     {
         m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_RESTART, &StartOptions);
         lua_pushboolean(luaVM, true);
@@ -1460,5 +1463,20 @@ int CLuaResourceDefs::isResourceArchived(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushnil(luaVM);
+    return 1;
+}
+
+int CLuaResourceDefs::isResourceProtected(lua_State* luaVM)
+{
+    //  bool isResourceProtected ( resource theResource )
+    CResource* pResource;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pResource);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, pResource->IsProtected());
     return 1;
 }

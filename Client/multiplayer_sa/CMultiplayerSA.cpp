@@ -322,6 +322,7 @@ float fWaterColorA = 0.0F;
 CStatsData  localStatsData;
 bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
+float       fDuckingHealthThreshold;
 
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
@@ -1485,6 +1486,11 @@ void CMultiplayerSA::InitHooks()
     // Allow water cannon to hit objects and players visually
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
+
+    
+    // Allow crouching with 1HP
+    MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
+    fDuckingHealthThreshold = 0;
 
     InitHooks_CrashFixHacks();
 
