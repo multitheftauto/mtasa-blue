@@ -242,6 +242,8 @@ void CClientPad::DoPulse(CClientPed* pPed)
                     (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
                                                                                                  : (m_fStates[5]) ? m_fStates[5] * -128 : m_fStates[6] * 128);
 
+                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
+
                 cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;            // Jump
 
                 cs.ButtonCross = (m_fStates[12]) ? 255 : 0;            // Sprint

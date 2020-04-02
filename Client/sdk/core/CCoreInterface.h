@@ -23,6 +23,7 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
+#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -176,6 +177,8 @@ public:
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
     virtual HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress) = 0;
+
+    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
 };
 
 class CClientTime

@@ -14,7 +14,6 @@
 #include "CModelInfoSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
-#include "CFileLoaderSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
@@ -107,8 +106,6 @@ private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
     CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
-    CFileLoaderSA FileLoader;
-
 public:
     ZERO_ON_NEW
 
@@ -420,6 +417,7 @@ public:
     void         ResetModelLodDistances();
     void         ResetAlphaTransparencies();
     void         DisableVSync();
+    void         ResetModelTimes();
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();

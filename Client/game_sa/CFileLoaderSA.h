@@ -12,7 +12,7 @@ public:
     CFileLoaderSA();
     ~CFileLoaderSA();
 
-    void InstallHooks();
+    static void StaticSetHooks();
 };
 
 bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId);

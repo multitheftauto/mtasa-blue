@@ -4,7 +4,6 @@
 
 CFileLoaderSA::CFileLoaderSA()
 {
-    InstallHooks();
 }
 
 CFileLoaderSA::~CFileLoaderSA()
@@ -12,7 +11,7 @@ CFileLoaderSA::~CFileLoaderSA()
 
 }
 
-void CFileLoaderSA::InstallHooks()
+void CFileLoaderSA::StaticSetHooks()
 {
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
@@ -98,7 +97,7 @@ bool CFileLoader_LoadAtomicFile(RwStream *stream, unsigned int modelId)
         }
 
         gAtomicModelId = modelId;
-        SRelatedModelInfo relatedModelInfo;
+        SRelatedModelInfo relatedModelInfo = {0};
         relatedModelInfo.pClump = pReadClump;
         relatedModelInfo.bDeleteOldRwObject = false;
 
@@ -123,21 +122,13 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     char name[24];
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
     auto pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
-    char* frameNodeName = GetFrameNodeName((RwFrame*)atomic->object.object.parent);
+    RwFrame* pOldFrame = reinterpret_cast<RwFrame*>(atomic->object.object.parent);
+    char* frameNodeName = GetFrameNodeName(pOldFrame);
     bool bDamage = false;
     GetNameAndDamage(frameNodeName, (char*)&name, bDamage);
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
-    // Fix #359: engineReplaceModel memory leak
-    // Delete the current atomic before setting a new one.
-    if (pRelatedModelInfo->bDeleteOldRwObject && pBaseModelInfo->pRwObject)
-    {
-        // DeleteRwObject will decrement the reference count. 
-        // We don't want the texture to get unloaded, so let's increment it.
-        CTxdStore_AddRef(pBaseModelInfo->usTextureDictionary);
-        pAtomicModelInfo->DeleteRwObject();
-    }
-
+    RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
@@ -147,9 +138,24 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     {
         pAtomicModelInfo->SetAtomic(atomic);
     }
+
     RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
+
+    // Fix #359: engineReplaceModel memory leak
+    if (!bDamage && pRelatedModelInfo->bDeleteOldRwObject)
+    {
+       if (pOldAtomic)
+       {
+           RpAtomicDestroy(pOldAtomic);
+       }
+
+       if (pOldFrame)
+       {
+           RwFrameDestroy(pOldFrame);
+       }
+    }
     return atomic;
 }

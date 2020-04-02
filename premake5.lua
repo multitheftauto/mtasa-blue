@@ -4,6 +4,7 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 require "install_cef"
+require "install_discord"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -133,6 +134,7 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
+		include "vendor/discordgsdk"
 	end
 
 	filter {}
