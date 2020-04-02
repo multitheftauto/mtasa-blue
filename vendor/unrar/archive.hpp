@@ -20,6 +20,9 @@ enum ADDSUBDATA_FLAGS
   ASDF_CRYPTIFHEADERS = 8  // Encrypt data after subheader only in -hp mode.
 };
 
+// RAR5 headers must not exceed 2 MB.
+#define MAX_HEADER_SIZE_RAR5 0x200000
+
 class Archive:public File
 {
   private:
@@ -34,21 +37,16 @@ class Archive:public File
     void RequestArcPassword();
     void UnexpEndArcMsg();
     void BrokenHeaderMsg();
-    void UnkEncVerMsg(const wchar *Name);
-    void UnkEncVerMsg();
+    void UnkEncVerMsg(const wchar *Name,const wchar *Info);
     bool ReadCommentData(Array<wchar> *CmtData);
 
-#if !defined(SHELL_EXT) && !defined(RAR_NOCRYPT)
+#if !defined(RAR_NOCRYPT)
     CryptData HeadersCrypt;
 #endif
-#ifndef SHELL_EXT
     ComprDataIO SubDataIO;
-#endif
     bool DummyCmd;
     RAROptions *Cmd;
 
-    int64 RecoverySize;
-    int RecoveryPercent;
 
     RarTime LatestTime;
     int LastReadBlock;
@@ -57,11 +55,12 @@ class Archive:public File
     bool SilentOpen;
 #ifdef USE_QOPEN
     QuickOpen QOpen;
+    bool ProhibitQOpen;
 #endif
   public:
     Archive(RAROptions *InitCmd=NULL);
     ~Archive();
-    RARFORMAT IsSignature(const byte *D,size_t Size);
+    static RARFORMAT IsSignature(const byte *D,size_t Size);
     bool IsArchive(bool EnableBroken);
     size_t SearchBlock(HEADER_TYPE HeaderType);
     size_t SearchSubBlock(const wchar *Type);
@@ -85,15 +84,19 @@ class Archive:public File
     void AddSubData(byte *SrcData,uint64 DataSize,File *SrcFile,
          const wchar *Name,uint Flags);
     bool ReadSubData(Array<byte> *UnpData,File *DestFile);
-    HEADER_TYPE GetHeaderType() {return CurHeaderType;};
+    HEADER_TYPE GetHeaderType() {return CurHeaderType;}
     RAROptions* GetRAROptions() {return Cmd;}
     void SetSilentOpen(bool Mode) {SilentOpen=Mode;}
+#if 0
+    void GetRecoveryInfo(bool Required,int64 *Size,int *Percent);
+#endif
 #ifdef USE_QOPEN
     bool Open(const wchar *Name,uint Mode=FMF_READ);
     int Read(void *Data,size_t Size);
     void Seek(int64 Offset,int Method);
     int64 Tell();
     void QOpenUnload() {QOpen.Unload();}
+    void SetProhibitQOpen(bool Mode) {ProhibitQOpen=Mode;}
 #endif
 
     BaseBlock ShortBlock;
@@ -106,10 +109,7 @@ class Archive:public File
     FileHeader SubHead;
     CommentHeader CommHead;
     ProtectHeader ProtectHead;
-    AVHeader AVHead;
-    SignHeader SignHead;
     UnixOwnersHeader UOHead;
-    MacFInfoHeader MACHead;
     EAHeader EAHead;
     StreamHeader StreamHead;
 
@@ -130,7 +130,7 @@ class Archive:public File
     bool BrokenHeader;
     bool FailedHeaderDecryption;
 
-#if !defined(SHELL_EXT) && !defined(RAR_NOCRYPT)
+#if !defined(RAR_NOCRYPT)
     byte ArcSalt[SIZE_SALT50];
 #endif
 

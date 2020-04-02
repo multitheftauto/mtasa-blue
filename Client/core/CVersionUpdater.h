@@ -9,28 +9,25 @@
  *
  *****************************************************************************/
 
-#ifndef __CVERSIONUPDATER_H
-#define __CVERSIONUPDATER_H
+#pragma once
 
 class CVersionUpdaterInterface
 {
 public:
-    virtual ~CVersionUpdaterInterface(void) {}
-    virtual bool           SaveConfigToXML(void) = 0;
+    virtual ~CVersionUpdaterInterface() {}
+    virtual bool           SaveConfigToXML() = 0;
     virtual void           EnableChecking(bool bOn) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual void           DoPulse() = 0;
     virtual void           InitiateUpdate(const SString& strType, const SString& strData, const SString& strHost) = 0;
     virtual bool           IsOptionalUpdateInfoRequired(const SString& strHost) = 0;
-    virtual void           InitiateDataFilesFix(void) = 0;
-    virtual void           InitiateManualCheck(void) = 0;
+    virtual void           InitiateDataFilesFix() = 0;
+    virtual void           InitiateManualCheck() = 0;
     virtual void           GetAseServerList(std::vector<SString>& outResult) = 0;
     virtual void           InitiateSidegradeLaunch(const SString& strVersion, const SString& strIp, ushort usPort, const SString& strName,
                                                    const SString& strPassword) = 0;
     virtual void           GetBrowseVersionMaps(std::map<SString, int>& outBlockedVersionMap, std::map<SString, int>& outAllowedVersionMap) = 0;
     virtual void           GetNewsSettings(SString& strOutOldestPost, uint& uiOutMaxHistoryLength) = 0;
-    virtual const SString& GetDebugFilterString(void) = 0;
+    virtual const SString& GetDebugFilterString() = 0;
 };
 
 CVersionUpdaterInterface* GetVersionUpdater();
-
-#endif

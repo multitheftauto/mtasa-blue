@@ -19,7 +19,7 @@ CCheckpointsSA::CCheckpointsSA()
         this->Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface*)(ARRAY_CHECKPOINTS + i * sizeof(CCheckpointSAInterface)));
 }
 
-CCheckpointsSA::~CCheckpointsSA(void)
+CCheckpointsSA::~CCheckpointsSA()
 {
     for (int i = 0; i < MAX_CHECKPOINTS; i++)
     {

@@ -10,8 +10,7 @@
 
 class CClientSoundManager;
 
-#ifndef __CCLIENTSOUNDMANAGER_H
-#define __CCLIENTSOUNDMANAGER_H
+#pragma once
 
 #include <list>
 #include <bass.h>
@@ -22,15 +21,15 @@ class CClientSoundManager
 public:
     ZERO_ON_NEW
     CClientSoundManager(CClientManager* pClientManager);
-    ~CClientSoundManager(void);
+    ~CClientSoundManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetDimension(unsigned short usDimension);
 
-    CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle);
+    CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
     CClientSound* PlaySound2D(void* pMemory, unsigned int uiLength, bool bLoop);
-    CClientSound* PlaySound3D(const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    CClientSound* PlaySound3D(const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
     CClientSound* PlaySound3D(void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop);
 
     CClientSound* PlayGTASFX(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop = false);
@@ -43,16 +42,18 @@ public:
 
     int GetFxEffectFromName(const std::string& strEffectName);
 
-    std::map<std::string, int> GetFxEffects(void) { return m_FxEffectNames; }
+    std::map<std::string, int> GetFxEffects() { return m_FxEffectNames; }
 
-    void UpdateVolume(void);
+    void UpdateVolume();
 
     void UpdateDistanceStreaming(const CVector& vecListenerPosition);
 
     void OnDistanceStreamIn(CClientSound* pSound);
     void OnDistanceStreamOut(CClientSound* pSound);
 
-    bool IsMinimizeMuted(void) { return m_bMinimizeMuted; };
+    bool IsDistanceStreamedIn(CClientSound* pSound) { return MapContains(m_DistanceStreamedInMap, pSound); };
+
+    bool IsMinimizeMuted() { return m_bMinimizeMuted; };
     void SetMinimizeMuted(bool bMute) { m_bMinimizeMuted = bMute; };
 
     void QueueChannelStop(DWORD pSound);
@@ -78,5 +79,3 @@ private:
     std::map<CBassAudio*, CElapsedTime> m_AudioStopQueue;
     CCriticalSection                    m_CS;
 };
-
-#endif

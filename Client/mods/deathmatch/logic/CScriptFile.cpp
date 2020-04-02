@@ -22,7 +22,7 @@ CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long 
     m_accessType = accessType;
 }
 
-CScriptFile::~CScriptFile(void)
+CScriptFile::~CScriptFile()
 {
     // Close the file
     Unload();
@@ -71,13 +71,13 @@ bool CScriptFile::Load(CResource* pResourceForFilePath, eMode Mode)
     return false;
 }
 
-void CScriptFile::Unload(void)
+void CScriptFile::Unload()
 {
     // Close the file if required
     SAFE_DELETE(m_pFile);
 }
 
-bool CScriptFile::IsEOF(void)
+bool CScriptFile::IsEOF()
 {
     if (!m_pFile)
         return true;
@@ -86,7 +86,7 @@ bool CScriptFile::IsEOF(void)
     return m_pFile->FEof();
 }
 
-long CScriptFile::GetPointer(void)
+long CScriptFile::GetPointer()
 {
     if (!m_pFile)
         return -1;
@@ -94,7 +94,7 @@ long CScriptFile::GetPointer(void)
     return m_pFile->FTell();
 }
 
-long CScriptFile::GetSize(void)
+long CScriptFile::GetSize()
 {
     if (!m_pFile)
         return -1;
@@ -142,7 +142,7 @@ long CScriptFile::SetPointer(unsigned long ulPosition)
     return ulPosition;
 }
 
-void CScriptFile::Flush(void)
+void CScriptFile::Flush()
 {
     if (!m_pFile)
         return;
@@ -150,7 +150,7 @@ void CScriptFile::Flush(void)
     m_pFile->FFlush();
 }
 
-long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
+long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -168,8 +168,16 @@ long CScriptFile::Read(unsigned long ulSize, CBuffer& outBuffer)
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
-    outBuffer.SetSize(ulSize);
-    return m_pFile->FRead(outBuffer.GetData(), ulSize);
+    try
+    {
+        outBuffer.resize(ulSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return -2;
+    }
+
+    return m_pFile->FRead(outBuffer.data(), ulSize);
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)
@@ -182,7 +190,7 @@ long CScriptFile::Write(unsigned long ulSize, const char* pData)
 }
 
 // If file was downloaded with a resource, validate checksum
-void CScriptFile::DoResourceFileCheck(void)
+void CScriptFile::DoResourceFileCheck()
 {
     if (!m_pFile || m_bDoneResourceFileCheck)
         return;
@@ -207,11 +215,11 @@ void CScriptFile::DoResourceFileCheck(void)
         m_pFile->FSeek(lCurrentPos, SEEK_SET);
 
         // Check file content
-        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer);
+        g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, buffer.GetData(), buffer.GetSize());
     }
 }
 
-CResource* CScriptFile::GetResource(void)
+CResource* CScriptFile::GetResource()
 {
     return m_pResource;
 }

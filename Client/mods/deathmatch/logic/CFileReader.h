@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef CFILEREADER_H
-#define CFILEREADER_H
 #pragma once
 
 #include <cstdint>
@@ -22,27 +20,35 @@ public:
         SIZE_ERROR = -1
     };
 
-    CFileReader(void);
-    bool LoadFileToMemory(const SString& strFilePath);
-    bool LoadDataBufferToMemory(const SString& buffer);
+    CFileReader();
+
+    bool LoadFromFile(SString filePath) noexcept;
+    bool LoadFromBuffer(SString buffer) noexcept;
+
     // Do not call any file reader functions after calling this function
-    void FreeFileReaderMemory(void);
+    void FreeFileReaderMemory();
 
     template <class T>
     void ReadBuffer(T* pDestination)
     {
         const std::uint32_t u32ReadOffset = m_u32BytesReadFromBuffer;
         m_u32BytesReadFromBuffer += sizeof(T);
-        *pDestination = *reinterpret_cast<T*>(&m_vecFileDataBuffer[u32ReadOffset]);
+        *pDestination = *reinterpret_cast<T*>(m_buffer.data() + u32ReadOffset);
     }
 
     void ReadBytes(void* pDestination, const std::uint32_t u32BytesToRead);
     void ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead);
     void SkipBytes(const std::uint32_t u32BytesToSkip);
 
-private:
-    std::vector<char> m_vecFileDataBuffer;
-    std::uint32_t     m_u32BytesReadFromBuffer;
-};
+    std::uint32_t GetRemainingBytesCount() const noexcept
+    {
+        if (static_cast<std::uint32_t>(m_buffer.size()) > m_u32BytesReadFromBuffer)
+            return static_cast<std::uint32_t>(m_buffer.size()) - m_u32BytesReadFromBuffer;
+        else
+            return 0;
+    }
 
-#endif
+private:
+    SString       m_buffer;
+    std::uint32_t m_u32BytesReadFromBuffer;
+};

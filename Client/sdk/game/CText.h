@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TEXT
-#define __CGAME_TEXT
+#pragma once
 
 class CText
 {
@@ -18,5 +17,3 @@ public:
     virtual char* GetText(char* szKey) = 0;
     virtual void  SetText(char* szKey, char* szValue) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHECKPOINTS
-#define __CGAME_CHECKPOINTS
+#pragma once
 
 #include <CVector.h>
 #include "CCheckpoint.h"
@@ -22,5 +21,3 @@ public:
                                           const SColor color) = 0;
     virtual CCheckpoint* FindFreeMarker() = 0;
 };
-
-#endif

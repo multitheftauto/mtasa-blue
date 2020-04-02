@@ -39,7 +39,7 @@ CGUIListItem_Impl::CGUIListItem_Impl(const char* szText, unsigned int uiType, CG
     m_pData = NULL;
 }
 
-CGUIListItem_Impl::~CGUIListItem_Impl(void)
+CGUIListItem_Impl::~CGUIListItem_Impl()
 {
     if (m_deleteDataCallback)
         m_deleteDataCallback(m_pData);
@@ -84,17 +84,17 @@ void CGUIListItem_Impl::SetImage(CGUIStaticImage* pImage)
     }
 }
 
-std::string CGUIListItem_Impl::GetText(void) const
+std::string CGUIListItem_Impl::GetText() const
 {
     return CGUI_Impl::GetUTFString(m_pListItem->getText().c_str()).c_str();
 }
 
-CEGUI::ListboxItem* CGUIListItem_Impl::GetListItem(void)
+CEGUI::ListboxItem* CGUIListItem_Impl::GetListItem()
 {
     return m_pListItem;
 }
 
-bool CGUIListItem_Impl::GetSelectedState(void)
+bool CGUIListItem_Impl::GetSelectedState()
 {
     return m_pListItem->isSelected();
 }

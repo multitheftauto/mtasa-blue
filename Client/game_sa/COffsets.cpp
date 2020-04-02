@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void COffsets::Initialize10EU(void)
+void COffsets::Initialize10EU()
 {
     InitializeCommon10();
 
@@ -27,7 +27,7 @@ void COffsets::Initialize10EU(void)
     CCameraSA::FUNC_RwFrameGetLTM = 0x7F09D0;
 }
 
-void COffsets::Initialize10US(void)
+void COffsets::Initialize10US()
 {
     InitializeCommon10();
 
@@ -43,7 +43,7 @@ void COffsets::Initialize10US(void)
     CCameraSA::FUNC_RwFrameGetLTM = 0x7F0990;
 }
 
-void COffsets::Initialize11(void)
+void COffsets::Initialize11()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;
@@ -66,12 +66,12 @@ void COffsets::Initialize11(void)
     CWeatherSA::FUNC_IsRaining = 0x4ABF50;
 }
 
-void COffsets::Initialize20(void)
+void COffsets::Initialize20()
 {
     // TODO
 }
 
-void COffsets::InitializeCommon10(void)
+void COffsets::InitializeCommon10()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;

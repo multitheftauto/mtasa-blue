@@ -9,12 +9,9 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PEDDAMAGERESPONSECALCULATOR
-#define __CGAME_PEDDAMAGERESPONSECALCULATOR
+#pragma once
 
 class CPedDamageResponseCalculator
 {
 public:
 };
-
-#endif

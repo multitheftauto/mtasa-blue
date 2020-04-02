@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CRadarRPCs.h"
 
-void CRadarRPCs::LoadFunctions(void)
+void CRadarRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_RADAR_AREAS, DestroyAllRadarAreas, "DestroyAllRadarAreas");
     AddHandler(SET_RADAR_AREA_SIZE, SetRadarAreaSize, "SetRadarAreaSize");

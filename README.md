@@ -1,10 +1,10 @@
-## Multi Theft Auto: San Andreas [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/master.svg?label=Linux:master)](https://travis-ci.org/multitheftauto/mtasa-blue) [![Build Status](https://img.shields.io/appveyor/ci/multitheftauto/mtasa-blue/master.svg?label=Windows:master)](https://ci.appveyor.com/project/multitheftauto/mtasa-blue)
+## Multi Theft Auto: San Andreas [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush)
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
 
 ## Introduction
 
-Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language. 
+Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language.
 
 Originally founded back in early 2003 as an experimental piece of C/C++ software, Multi Theft Auto has since grown into an advanced multiplayer platform for gamers and third-party developers. Our software provides a minimal sandbox style gameplay that can be extended through the Lua scripting language in many ways, allowing servers to run custom created game modes with custom content for up to hundreds of online players.
 
@@ -26,7 +26,6 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### IDE Setup
@@ -68,4 +67,4 @@ Execute `win-create-projects.bat`.
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2018.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2020.

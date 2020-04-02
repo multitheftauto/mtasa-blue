@@ -29,7 +29,7 @@ CLatentSendQueue::CLatentSendQueue(NetPlayerID remoteId, ushort usBitStreamVersi
 //
 //
 ///////////////////////////////////////////////////////////////
-CLatentSendQueue::~CLatentSendQueue(void)
+CLatentSendQueue::~CLatentSendQueue()
 {
 }
 
@@ -194,7 +194,7 @@ bool CLatentSendQueue::CancelSend(SSendHandle handle)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CLatentSendQueue::CancelAllSends(void)
+void CLatentSendQueue::CancelAllSends()
 {
     // Use a copy because CancelSend will not remove a finishing transfer
     std::list<SSendItem> listCopy = m_TxQueue;
@@ -254,7 +254,7 @@ void CLatentSendQueue::GetSendHandles(std::vector<SSendHandle>& outResultList)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CLatentSendQueue::UpdateEstimatedDurations(void)
+void CLatentSendQueue::UpdateEstimatedDurations()
 {
     uint uiUsingRate = MIN_SEND_RATE;
     // Recalculate estimated times for all transfers
@@ -284,7 +284,7 @@ void CLatentSendQueue::UpdateEstimatedDurations(void)
 // Called when a transfer is removed from the queue.
 //
 ///////////////////////////////////////////////////////////////
-void CLatentSendQueue::PostQueueRemove(void)
+void CLatentSendQueue::PostQueueRemove()
 {
     // Recalculate the current transfer rate
     m_uiCurrentRate = MIN_SEND_RATE;

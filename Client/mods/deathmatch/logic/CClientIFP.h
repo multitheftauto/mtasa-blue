@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTIFP_H
-#define __CCLIENTIFP_H
 #pragma once
 
 #include "CClientEntity.h"
@@ -199,29 +197,27 @@ public:
     };
 
     CClientIFP(class CClientManager* pManager, ElementID ID);
+    virtual eClientEntityType GetType() const { return CCLIENTIFP; }
 
-    virtual eClientEntityType GetType(void) const { return CCLIENTIFP; }
+    void MarkAsUnloading() { m_bUnloading = true; }
+    bool IsUnloading() { return m_bUnloading; }
 
-    void MarkAsUnloading(void) { m_bUnloading = true; }
-    bool IsUnloading(void) { return m_bUnloading; }
+    bool Load(SString blockName, bool isRawData, SString input);
 
-    bool LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName);
-
-    const SString&      GetBlockName(void) { return m_strBlockName; }
-    const unsigned int& GetBlockNameHash(void) { return m_u32Hashkey; }
+    const SString&      GetBlockName() { return m_strBlockName; }
+    const unsigned int& GetBlockNameHash() { return m_u32Hashkey; }
 
     CAnimBlendHierarchySAInterface* GetAnimationHierarchy(const SString& strAnimationName);
-    std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer(void) { return m_pIFPAnimations; }
+    std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer() { return m_pIFPAnimations; }
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
+    void Unlink();
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
 private:
-    bool LoadIFPFile(const SString& strFile, const bool isRawData);
-    bool ReadIFPByVersion(void);
-    void ReadIFPVersion1(void);
+    bool ReadIFPByVersion();
+    void ReadIFPVersion1();
     void ReadIFPVersion2(bool bAnp3);
 
     WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
@@ -234,7 +230,7 @@ private:
     void                   ReadHeaderVersion1(SInfo& Info);
     void                   ReadAnimationNameVersion1(SAnimation& IfpAnimation);
     void                   ReadDgan(SDgan& Dgan);
-    CClientIFP::eFrameType ReadKfrm(void);
+    CClientIFP::eFrameType ReadKfrm();
     void                   ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, bool bAnp3);
 
     bool ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames);
@@ -293,5 +289,3 @@ private:
         "R UpperArm", "R ForeArm",        "R Hand",     "R Finger",  "R Finger01", "L breast", "R breast",   "Belly",
         "L Thigh",    "L Calf",           "L Foot",     "L Toe0",    "R Thigh",    "R Calf",   "R Foot",     "R Toe0"};
 };
-
-#endif

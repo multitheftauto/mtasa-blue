@@ -9,28 +9,25 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIWINDOW_H
-#define __CGUIWINDOW_H
+#pragma once
 
 #include "CGUIElement.h"
 
 class CGUIWindow : public CGUIElement
 {
 public:
-    virtual ~CGUIWindow(void){};
+    virtual ~CGUIWindow(){};
 
     virtual void SetMovable(bool bMovable) = 0;
-    virtual bool IsMovable(void) = 0;
+    virtual bool IsMovable() = 0;
     virtual void SetSizingEnabled(bool bResizeEnabled) = 0;
-    virtual bool IsSizingEnabled(void) = 0;
+    virtual bool IsSizingEnabled() = 0;
     virtual void SetFrameEnabled(bool bFrameEnabled) = 0;
-    virtual bool IsFrameEnabled(void) = 0;
+    virtual bool IsFrameEnabled() = 0;
     virtual void SetCloseButtonEnabled(bool bCloseButtonEnabled) = 0;
-    virtual bool IsCloseButtonEnabled(void) = 0;
+    virtual bool IsCloseButtonEnabled() = 0;
     virtual void SetTitlebarEnabled(bool bTitlebarEnabled) = 0;
-    virtual bool IsTitlebarEnabled(void) = 0;
+    virtual bool IsTitlebarEnabled() = 0;
 
     virtual void SetCloseClickHandler(GUI_CALLBACK Callback) = 0;
 };
-
-#endif

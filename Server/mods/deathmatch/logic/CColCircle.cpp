@@ -13,8 +13,8 @@
 
 using namespace std;
 
-CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode, bool bIsPartnered)
-    : CColShape(pManager, pParent, pNode, bIsPartnered)
+CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, bool bIsPartnered)
+    : CColShape(pManager, pParent, bIsPartnered)
 {
     m_vecPosition.fX = vecPosition.fX;
     m_vecPosition.fY = vecPosition.fY;
@@ -23,13 +23,19 @@ CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D
     UpdateSpatialData();
 }
 
+CElement* CColCircle::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColCircle* pColCircle = new CColCircle(m_pManager, GetParentEntity(), m_vecPosition, m_fRadius);
+    return pColCircle;
+}
+
 bool CColCircle::DoHitDetection(const CVector& vecNowPosition)
 {
     // Do a simple distance check between now position and our position
     return IsPointNearPoint2D(vecNowPosition, m_vecPosition, m_fRadius);
 }
 
-bool CColCircle::ReadSpecialData(void)
+bool CColCircle::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
@@ -40,7 +46,7 @@ bool CColCircle::ReadSpecialData(void)
     return true;
 }
 
-CSphere CColCircle::GetWorldBoundingSphere(void)
+CSphere CColCircle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

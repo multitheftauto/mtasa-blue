@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISTATICIMAGE_IMPL_H
-#define __CGUISTATICIMAGE_IMPL_H
+#pragma once
 
 #include <gui/CGUIStaticImage.h>
 #include "CGUITexture_Impl.h"
@@ -22,21 +21,21 @@ class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl, pu
 {
 public:
     CGUIStaticImage_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);
-    ~CGUIStaticImage_Impl(void);
+    ~CGUIStaticImage_Impl();
 
     bool LoadFromFile(const char* szFilename);
     bool LoadFromTexture(CGUITexture* pTexture);
     bool GetNativeSize(CVector2D& vecSize);
-    void Clear(void);
+    void Clear();
 
     void SetFrameEnabled(bool bFrameEnabled);
-    bool IsFrameEnabled(void);
+    bool IsFrameEnabled();
 
-    CEGUI::Image* GetDirectImage(void);
+    CEGUI::Image* GetDirectImage();
 
-    void Render(void);
+    void Render();
 
-    eCGUIType GetType(void) { return CGUI_STATICIMAGE; }
+    eCGUIType GetType() { return CGUI_STATICIMAGE; }
 
 private:
     class CGUI_Impl*        m_pGUI;
@@ -48,5 +47,3 @@ private:
 
     #include "CGUIElement_Inc.h"
 };
-
-#endif

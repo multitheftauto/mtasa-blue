@@ -11,68 +11,70 @@
 
 class CConsole;
 
-#ifndef __CCONSOLE_H
-#define __CCONSOLE_H
+#pragma once
 
 #include <core/CConsoleInterface.h>
 #include "CCore.h"
 #include "CCommands.h"
 #include "CSingleton.h"
-#include "CConsoleHistory.h"
+#include "CEntryHistory.h"
 
 class CConsole : public CConsoleInterface
 {
 public:
     CConsole(CGUI* pManager, CGUIElement* pParent = NULL);
-    ~CConsole(void);
+    ~CConsole();
 
     void Echo(const char* szText);
     void Print(const char* szText);
     void Printf(const char* szFormat, ...);
 
-    void Clear(void);
+    void Clear();
 
-    bool IsEnabled(void);
+    bool IsEnabled();
     void SetEnabled(bool bEnabled);
 
-    bool IsVisible(void);
+    bool IsVisible();
     void SetVisible(bool bVisible);
-    void Show(void);
-    void Hide(void);
-    bool IsInputActive(void);
-    void ActivateInput(void);
+    void Show();
+    void Hide();
+    bool IsInputActive();
+    void ActivateInput();
 
     void HandleTextAccepted(bool bHandled);
     void GetCommandInfo(const std::string& strIn, std::string& strCmdOut, std::string& strCmdLineOut);
 
-    void SetNextHistoryText(void);
-    void SetPreviousHistoryText(void);
-    void SetNextAutoCompleteMatch(void);
-    void ResetAutoCompleteMatch(void);
+    void ResetHistoryChanges();
+    void SelectHistoryEntry(int iEntry);
+    bool SetNextHistoryText();
+    bool SetPreviousHistoryText();
 
-    CVector2D GetPosition(void);
+    void SetNextAutoCompleteMatch();
+    void ResetAutoCompleteMatch();
+
+    CVector2D GetPosition();
     void      SetPosition(CVector2D& vecPosition);
 
-    CVector2D GetSize(void);
+    CVector2D GetSize();
     void      SetSize(CVector2D& vecSize);
 
 protected:
     bool OnCloseButtonClick(CGUIElement* pElement);
     bool Edit_OnTextAccepted(CGUIElement* pElement);
     bool History_OnTextChanged(CGUIElement* pElement);
-    void FlushPendingAdd(void);
+    void FlushPendingAdd();
     void GracefullySetEditboxText(const char* szText);
     bool GracefullyMoveEditboxCaret(CGUIElement* pElement);
 
 private:
     void CreateElements(CGUIElement* pParent = NULL);
-    void DestroyElements(void);
+    void DestroyElements();
 
     bool OnWindowSize(CGUIElement* pElement);
 
     CGUI* m_pManager;
 
-    CConsoleHistory* m_pConsoleHistory;
+    CEntryHistory*   m_pConsoleHistory;
     int              m_iHistoryIndex;
     std::vector<int> m_AutoCompleteList;
     int              m_iAutoCompleteIndex;
@@ -89,6 +91,5 @@ private:
     float   m_fWindowY;
     float   m_fInputHeight;
     SString m_strPendingAdd;
+    SString m_strSavedInputText;
 };
-
-#endif

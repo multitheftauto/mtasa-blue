@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_AUDIOENGINE
-#define __CGAME_AUDIOENGINE
+#pragma once
 
 #include <windows.h>
 #include "CVehicle.h"
@@ -43,11 +42,9 @@ public:
     virtual void          SetMissionAudioPosition(CVector* position, int slot = 1) = 0;
     virtual bool          PlayLoadedMissionAudio(int slot = 1) = 0;
     virtual void          PauseAllSound(bool bPaused) = 0;
-    virtual void          StopRadio(void) = 0;
+    virtual void          StopRadio() = 0;
     virtual void          StartRadio(unsigned int station) = 0;
 
     virtual void ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
     virtual void ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical) = 0;
 };
-
-#endif

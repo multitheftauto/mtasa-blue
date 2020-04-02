@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BIKE
-#define __CGAMESA_BIKE
+#pragma once
 
 #include <game/CBike.h>
 #include "CVehicleSA.h"
@@ -32,5 +31,3 @@ public:
 
     // void                    PlaceOnRoadProperly ( void );
 };
-
-#endif

@@ -13,7 +13,7 @@
 #include "CBlipRPCs.h"
 #include "net/SyncStructures.h"
 
-void CBlipRPCs::LoadFunctions(void)
+void CBlipRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_BLIPS, DestroyAllBlips, "DestroyAllBlips");
     AddHandler(SET_BLIP_ICON, SetBlipIcon, "SetBlipIcon");

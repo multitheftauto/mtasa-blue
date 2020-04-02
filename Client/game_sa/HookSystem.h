@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __HOOKSYSTEM_H
-#define __HOOKSYSTEM_H
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -72,5 +71,3 @@ struct SPokeInfo
     DWORD dwAddress;
     BYTE  ucValue;
 };
-
-#endif

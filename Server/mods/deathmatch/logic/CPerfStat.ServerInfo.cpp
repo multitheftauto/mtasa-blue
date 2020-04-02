@@ -58,17 +58,17 @@ class CPerfStatServerInfoImpl : public CPerfStatServerInfo
 public:
     ZERO_ON_NEW
 
-    CPerfStatServerInfoImpl(void);
-    virtual ~CPerfStatServerInfoImpl(void);
+    CPerfStatServerInfoImpl();
+    virtual ~CPerfStatServerInfoImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatServerInfoImpl
-    void    RecordStats(void);
-    SString GetProcessMemoryUsage(void);
+    void    RecordStats();
+    SString GetProcessMemoryUsage();
 
     SString                   m_strCategoryName;
     time_t                    m_tStartTime;
@@ -116,7 +116,7 @@ CPerfStatServerInfo* CPerfStatServerInfo::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatServerInfoImpl::CPerfStatServerInfoImpl(void)
+CPerfStatServerInfoImpl::CPerfStatServerInfoImpl()
 {
     m_strCategoryName = "Server info";
     m_tStartTime = time(NULL);
@@ -129,7 +129,7 @@ CPerfStatServerInfoImpl::CPerfStatServerInfoImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatServerInfoImpl::~CPerfStatServerInfoImpl(void)
+CPerfStatServerInfoImpl::~CPerfStatServerInfoImpl()
 {
 }
 
@@ -140,7 +140,7 @@ CPerfStatServerInfoImpl::~CPerfStatServerInfoImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatServerInfoImpl::GetCategoryName(void)
+const SString& CPerfStatServerInfoImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -152,7 +152,7 @@ const SString& CPerfStatServerInfoImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatServerInfoImpl::DoPulse(void)
+void CPerfStatServerInfoImpl::DoPulse()
 {
     long long llTime = GetTickCount64_();
 
@@ -173,7 +173,7 @@ void CPerfStatServerInfoImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatServerInfoImpl::RecordStats(void)
+void CPerfStatServerInfoImpl::RecordStats()
 {
     // Sample new stats and calc the delta
     SBandwidthStatistics liveStats;
@@ -204,7 +204,7 @@ void CPerfStatServerInfoImpl::RecordStats(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatServerInfoImpl::GetProcessMemoryUsage(void)
+SString CPerfStatServerInfoImpl::GetProcessMemoryUsage()
 {
 #ifdef WIN32
     PROCESS_MEMORY_COUNTERS psmemCounter;

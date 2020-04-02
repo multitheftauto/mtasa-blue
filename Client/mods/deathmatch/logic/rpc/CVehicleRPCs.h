@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CVehicleRPCs_H
-#define __CVehicleRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CVehicleRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllVehicles);
     DECLARE_ELEMENT_RPC(FixVehicle);
@@ -59,5 +58,3 @@ public:
     DECLARE_ELEMENT_RPC(SetVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
 };
-
-#endif

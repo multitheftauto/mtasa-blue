@@ -1221,69 +1221,6 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
     return false;
 }
 
-bool CConsoleCommands::WhoWas(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
-{
-    // Got any arguments?
-    if (szArguments && strlen(szArguments) > 0)
-    {
-        // Is the nick requested anyone?
-        bool bAnyone = (SStringX(szArguments) == "*");
-
-        // Start iterating the whowas list
-        CWhoWas* pWhoWas = pConsole->GetWhoWas();
-        if (pWhoWas->Count() > 0)
-        {
-            // Start iterating the list
-            unsigned int                       uiCount = 0;
-            list<SWhoWasEntry>::const_iterator iter = pWhoWas->IterBegin();
-            for (; iter != pWhoWas->IterEnd(); iter++)
-            {
-                // Matches?
-                if (bAnyone || iter->strNick.ContainsI(szArguments))
-                {
-                    // Haven't got too many entries printed?
-                    if (++uiCount <= 20)
-                    {
-                        // Convert the IP to a string
-                        SString strIP = LongToDottedIP(iter->ulIP);
-
-                        // Populate a line about him
-                        SString strName = iter->strNick;
-                        if (iter->strAccountName != GUEST_ACCOUNT_NAME)
-                            strName += SString(" (%s)", *iter->strAccountName);
-                        pClient->SendEcho(
-                            SString("%s  -  IP:%s  serial:%s  version:%s", *strName, *strIP, iter->strSerial.c_str(), iter->strPlayerVersion.c_str()));
-                    }
-                    else
-                    {
-                        pClient->SendEcho("...");
-                        return true;
-                    }
-                }
-            }
-
-            // No matching entries?
-            if (uiCount == 0)
-            {
-                pClient->SendEcho("whowas: No matching nicks");
-                return false;
-            }
-
-            return true;
-        }
-        else
-        {
-            pClient->SendEcho("whowas: The whowas list is empty");
-        }
-    }
-    else
-    {
-        pClient->SendEcho("whowas: Syntax is 'whowas <nick>'");
-    }
-
-    return false;
-}
-
 bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     // Valid parameter?

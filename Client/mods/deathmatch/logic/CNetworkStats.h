@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNETWORKSTATS_H
-#define __CNETWORKSTATS_H
+#pragma once
 
 #include "CClientDisplayManager.h"
 
@@ -19,11 +18,11 @@ class CNetworkStats
 public:
     CNetworkStats(CClientDisplayManager* pDisplayManager);
 
-    void Draw(void);
-    void Reset(void);
+    void Draw();
+    void Reset();
 
 private:
-    void Update(void);
+    void Update();
 
     CClientDisplayManager* m_pDisplayManager;
 
@@ -38,5 +37,3 @@ private:
     float m_fByteSendRate;
     float m_fByteReceiveRate;
 };
-
-#endif

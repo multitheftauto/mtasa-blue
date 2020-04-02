@@ -19,7 +19,7 @@ CCommandFile::CCommandFile(const char* szFilename, CConsole& Console, CClient& C
     m_bEcho = true;
 }
 
-CCommandFile::~CCommandFile(void)
+CCommandFile::~CCommandFile()
 {
     // Unload it again
     if (m_pFile)
@@ -28,7 +28,7 @@ CCommandFile::~CCommandFile(void)
     }
 }
 
-bool CCommandFile::Run(void)
+bool CCommandFile::Run()
 {
     // Got a file?
     if (m_pFile)

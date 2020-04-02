@@ -15,7 +15,7 @@
 class CLuaVoiceDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     LUA_DECLARE(IsVoiceEnabled);
     LUA_DECLARE(SetPlayerVoiceBroadcastTo);
     LUA_DECLARE(setPlayerVoiceIgnoreFrom);

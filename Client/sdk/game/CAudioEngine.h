@@ -9,13 +9,22 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_AUDIOENGINE
-#define __CGAME_AUDIOENGINE
+#pragma once
 
 #include <windows.h>
 #include "CVehicle.h"
 
-typedef void(WorldSoundHandler)(uint uiGroup, uint uiIndex);
+class CEntitySAInterface;
+
+struct SWorldSoundEvent
+{
+    unsigned int        uiGroup;
+    unsigned int        uiIndex;
+    CEntitySAInterface* pGameEntity;
+    CVector             vecPosition;
+};
+
+using WorldSoundHandler = bool(const SWorldSoundEvent& event);
 
 enum eSurfaceType
 {
@@ -51,18 +60,16 @@ public:
     virtual VOID          SetMissionAudioPosition(CVector* position, int slot = 1) = 0;
     virtual bool          PlayLoadedMissionAudio(int slot = 1) = 0;
     virtual VOID          PauseAllSound(bool bPaused) = 0;
-    virtual VOID          StopRadio(void) = 0;
+    virtual VOID          StopRadio() = 0;
     virtual VOID          StartRadio(unsigned int station) = 0;
     virtual void          PauseAmbientSounds(bool bPaused) = 0;
     virtual VOID          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled) = 0;
     virtual bool          IsAmbientSoundEnabled(eAmbientSoundType eType) = 0;
-    virtual void          ResetAmbientSounds(void) = 0;
+    virtual void          ResetAmbientSounds() = 0;
     virtual VOID          SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bEnabled, bool bForceCancel) = 0;
     virtual bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex) = 0;
-    virtual void          ResetWorldSounds(void) = 0;
+    virtual void          ResetWorldSounds() = 0;
     virtual void          SetWorldSoundHandler(WorldSoundHandler* pHandler) = 0;
     virtual void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
     virtual void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical) = 0;
 };
-
-#endif

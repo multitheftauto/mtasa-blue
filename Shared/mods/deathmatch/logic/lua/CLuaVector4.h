@@ -14,13 +14,13 @@
 class CLuaVector4D : public CVector4D
 {
 public:
-    CLuaVector4D(void);
+    CLuaVector4D();
     CLuaVector4D(const CVector4D& vector);
     CLuaVector4D(float fX, float fY, float fZ, float fW);
 
-    ~CLuaVector4D(void);
+    ~CLuaVector4D();
 
-    unsigned int GetScriptID(void) const { return m_uiScriptID; }
+    unsigned int GetScriptID() const { return m_uiScriptID; }
 
     static CLuaVector4D* GetFromScriptID(unsigned int uiScriptID);
 

@@ -33,9 +33,9 @@ BYTE CDamageManagerSA::GetDoorStatus(eDoors bDoor)
     return NULL;
 }
 
-VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus)
+VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
 {
-    DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus )");
+    DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent )");
 
     if (bDoor < MAX_DOORS)
     {
@@ -70,11 +70,11 @@ VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus)
                 DWORD dwFunc = 0x6B1600;
                 DWORD dwThis = (DWORD)internalEntityInterface;
                 DWORD dwDoor = (DWORD)bDoor;
-                bool  bUnknown = false;
+                bool  bQuiet = !spawnFlyingComponent;
                 _asm
                 {
                     mov     ecx, dwThis
-                    push    bUnknown
+                    push    bQuiet
                     push    dwDoor
                     call    dwFunc
                 }
@@ -197,7 +197,7 @@ BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
     return 0;
 }
 
-unsigned long CDamageManagerSA::GetPanelStatus(void)
+unsigned long CDamageManagerSA::GetPanelStatus()
 {
     return internalInterface->Panels;
 }
@@ -240,7 +240,7 @@ BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
     return bReturn;
 }
 
-unsigned char CDamageManagerSA::GetLightStatus(void)
+unsigned char CDamageManagerSA::GetLightStatus()
 {
     return static_cast<unsigned char>(internalInterface->Lights);
 }

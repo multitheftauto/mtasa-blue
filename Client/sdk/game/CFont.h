@@ -9,13 +9,10 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_FONT
-#define __CGAME_FONT
+#pragma once
 
 class CFont
 {
 public:
     virtual void PrintString(float fX, float fY, char* szString) = 0;
 };
-
-#endif

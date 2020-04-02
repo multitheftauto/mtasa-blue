@@ -15,7 +15,7 @@
 class CLuaResourceDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Create/edit functions
@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(getResourceExportedFunctions);
     LUA_DECLARE(getResourceOrganizationalPath);
     LUA_DECLARE(isResourceArchived);
+    LUA_DECLARE(isResourceProtected);
 
     // Set stuff
     LUA_DECLARE(setResourceInfo);

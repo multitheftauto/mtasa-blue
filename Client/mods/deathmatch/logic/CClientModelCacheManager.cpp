@@ -36,20 +36,20 @@ public:
     ZERO_ON_NEW
 
     // CClientModelCacheManager interface
-    virtual void DoPulse(void);
+    virtual void DoPulse();
     virtual void OnRestreamModel(ushort usModelId);
 
     // CClientModelCacheManagerImpl methods
-    CClientModelCacheManagerImpl(void);
-    ~CClientModelCacheManagerImpl(void);
+    CClientModelCacheManagerImpl();
+    ~CClientModelCacheManagerImpl();
 
-    void DoPulsePedModels(void);
-    void DoPulseVehicleModels(void);
+    void DoPulsePedModels();
+    void DoPulseVehicleModels();
     void ProcessPlayerList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPlayer*>& playerList, float fMaxStreamDistanceSq);
     void ProcessPedList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientPed*>& pedList, float fMaxStreamDistanceSq);
     void ProcessVehicleList(std::map<ushort, float>& outNeedCacheList, const std::vector<CClientVehicle*>& vehicleList, float fMaxStreamDistanceSq);
     void InsertIntoNeedCacheList(std::map<ushort, float>& outNeedCacheList, ushort usModelId, float fDistSq);
-    void ClearStats(void);
+    void ClearStats();
     void AddProcessStat(const char* szTag, bool bCache, ePuresyncType syncType, ushort usModelId, const CVector& vecStartPos, const CVector& vecEndPos);
 
 protected:
@@ -79,7 +79,7 @@ CClientModelCacheManager* NewClientModelCacheManager()
 // CClientModelCacheManagerImpl::CClientModelCacheManagerImpl
 //
 ///////////////////////////////////////////////////////////////
-CClientModelCacheManagerImpl::CClientModelCacheManagerImpl(void)
+CClientModelCacheManagerImpl::CClientModelCacheManagerImpl()
 {
     m_pCoreModelCacheManager = g_pCore->GetModelCacheManager();
 }
@@ -89,7 +89,7 @@ CClientModelCacheManagerImpl::CClientModelCacheManagerImpl(void)
 // CClientModelCacheManagerImpl::~CClientModelCacheManagerImpl
 //
 ///////////////////////////////////////////////////////////////
-CClientModelCacheManagerImpl::~CClientModelCacheManagerImpl(void)
+CClientModelCacheManagerImpl::~CClientModelCacheManagerImpl()
 {
     m_pCoreModelCacheManager->OnClientClose();
 }
@@ -99,13 +99,12 @@ CClientModelCacheManagerImpl::~CClientModelCacheManagerImpl(void)
 // CClientModelCacheManagerImpl::DoPulse
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::DoPulse(void)
+void CClientModelCacheManagerImpl::DoPulse()
 {
     m_TickCountNow = CTickCount::Now();
     ClearStats();
 
-    CClientPlayer* m_pLocalPlayer = g_pClientGame->GetLocalPlayer();
-    if (!m_pLocalPlayer)
+    if (!g_pClientGame->GetLocalPlayer())
         return;
 
     m_fGameFps = g_pGame->GetFPS();
@@ -160,7 +159,7 @@ void CClientModelCacheManagerImpl::DoPulse(void)
 // Pulse caching system for ped models
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::DoPulsePedModels(void)
+void CClientModelCacheManagerImpl::DoPulsePedModels()
 {
     // Scale up query radius to compensate for the camera speed and possible ped speeds
     float fPedQueryRadius = PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2 + PED_MAX_VELOCITY * 2;
@@ -203,7 +202,7 @@ void CClientModelCacheManagerImpl::DoPulsePedModels(void)
 // Pulse caching system for vehicle models
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::DoPulseVehicleModels(void)
+void CClientModelCacheManagerImpl::DoPulseVehicleModels()
 {
     // Scale up query radius to compensate for the camera speed and possible vehicle speeds
     float fVehicleQueryRadius = VEHICLE_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2 + VEHICLE_MAX_VELOCITY * 2;
@@ -484,7 +483,7 @@ void CClientModelCacheManagerImpl::InsertIntoNeedCacheList(std::map<ushort, floa
 // CClientModelCacheManagerImpl::ClearStats
 //
 ///////////////////////////////////////////////////////////////
-void CClientModelCacheManagerImpl::ClearStats(void)
+void CClientModelCacheManagerImpl::ClearStats()
 {
 }
 

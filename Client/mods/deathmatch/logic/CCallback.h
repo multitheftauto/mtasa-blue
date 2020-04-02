@@ -8,15 +8,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CCALLCALLBACK_H
-#define __CCALLCALLBACK_H
+#pragma once
 
 // Represents any callback
 template <typename Ret, typename Arguments>
 class CCallbackInterface
 {
 public:
-    virtual ~CCallbackInterface(void){};
+    virtual ~CCallbackInterface(){};
 
     virtual Ret operator()(Arguments) const = 0;
 };
@@ -73,7 +72,7 @@ public:
     CCallback(const CCallback<Ret, Arguments>& copy) : m_pCallback(copy.m_pCallback) {}
 
     // Destructor
-    ~CCallback(void) { delete m_pCallback; }
+    ~CCallback() { delete m_pCallback; }
 
     // Call operator
     Ret operator()(Arguments Args) const { return (*m_pCallback)(Args); }
@@ -81,5 +80,3 @@ public:
 protected:
     CCallbackInterface<Ret, Arguments>* m_pCallback;
 };
-
-#endif

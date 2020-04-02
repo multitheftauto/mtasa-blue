@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(void)
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_ucNumberOfPlayers = 0;

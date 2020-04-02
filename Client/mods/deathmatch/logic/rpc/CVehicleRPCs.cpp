@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CVehicleRPCs.h"
 
-void CVehicleRPCs::LoadFunctions(void)
+void CVehicleRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_VEHICLES, DestroyAllVehicles, "DestroyAllVehicles");
     AddHandler(FIX_VEHICLE, FixVehicle, "FixVehicle");
@@ -307,7 +307,15 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     unsigned char ucDoor, ucState;
                     if (bitStream.Read(ucDoor) && bitStream.Read(ucState))
                     {
-                        pVehicle->SetDoorStatus(ucDoor, ucState);
+                        bool spawnFlyingComponent = true;
+
+                        if (bitStream.Version() >= 0x06D)
+                        {
+                            if (!bitStream.ReadBit(spawnFlyingComponent))
+                                break;
+                        }
+
+                        pVehicle->SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
                     }
                     break;
                 }

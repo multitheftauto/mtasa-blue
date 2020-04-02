@@ -32,7 +32,7 @@ CProxyDirect3DEffect::CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DX
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DEffect::~CProxyDirect3DEffect(void)
+CProxyDirect3DEffect::~CProxyDirect3DEffect()
 {
     m_stats.iCurrentCount--;
     m_stats.iDestroyedCount++;
@@ -66,7 +66,7 @@ HRESULT CProxyDirect3DEffect::QueryInterface(REFIID riid, void** ppvObj)
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DEffect::Release(void)
+ULONG CProxyDirect3DEffect::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();
@@ -109,6 +109,25 @@ HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrc
                                           LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT* ppEffect, LPD3DXBUFFER* ppCompilationErrors)
 {
     HRESULT hr = D3DXCreateEffectFromFile(pDevice, pSrcFile, pDefines, pInclude, Flags, pPool, ppEffect, ppCompilationErrors);
+    if (SUCCEEDED(hr))
+    {
+        // Create proxy so we can track when it's finished with
+        *ppEffect = new CProxyDirect3DEffect(pDevice, *ppEffect);
+    }
+    return hr;
+}
+
+/////////////////////////////////////////////////////////////
+//
+// D3DXCreateEffect
+//
+// Wrap result of orignal function
+//
+/////////////////////////////////////////////////////////////
+HRESULT WINAPI MyD3DXCreateEffect(LPDIRECT3DDEVICE9 pDevice, LPCVOID pSrcData, UINT SrcDataLen, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,
+    LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT* ppEffect, LPD3DXBUFFER* ppCompilationErrors)
+{
+    HRESULT hr = D3DXCreateEffect(pDevice, pSrcData, SrcDataLen, pDefines, pInclude, Flags, pPool, ppEffect, ppCompilationErrors);
     if (SUCCEEDED(hr))
     {
         // Create proxy so we can track when it's finished with

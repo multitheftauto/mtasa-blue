@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_3DMARKER
-#define __CGAME_3DMARKER
+#pragma once
 
 #include "Common.h"
 
@@ -24,7 +23,7 @@ class CMatrix;
 class C3DMarker
 {
 public:
-    virtual ~C3DMarker(void){};
+    virtual ~C3DMarker(){};
 
     virtual void     GetMatrix(CMatrix* pMatrix) = 0;
     virtual void     SetMatrix(CMatrix* pMatrix) = 0;
@@ -48,5 +47,3 @@ public:
     virtual VOID     SetActive() = 0;
     virtual RpClump* GetRwObject() = 0;
 };
-
-#endif

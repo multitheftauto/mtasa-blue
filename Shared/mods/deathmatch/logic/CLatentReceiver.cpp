@@ -29,7 +29,7 @@ CLatentReceiver::CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion
 //
 //
 ///////////////////////////////////////////////////////////////
-CLatentReceiver::~CLatentReceiver(void)
+CLatentReceiver::~CLatentReceiver()
 {
 }
 

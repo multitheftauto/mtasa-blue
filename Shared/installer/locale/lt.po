@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2016-01-04 13:29+0000\n"
-"Last-Translator: Kristupas <bufilio@gmail.com>\n"
+"PO-Revision-Date: 2018-11-24 09:18+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; Tadas Lapė; ccw; Karolis Vaikutis; Dzinas\n"
+"Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; ccw; Tadas Lapė; qaisjp; Karolis Vaikutis; Dzinas\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1451914164.0\n"
+"X-POOTLE-MTIME: 1543051126.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Ši MTA:SA versija, kurią atsisiuntėte, nepalaiko Windows XP ar Vista "
+"operacinės sitemos. Prašome atsisiųsti tinkamą versiją iš www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Ši MTA:SA versija yra skirta senesnėms Windows versijoms. Prašome atsisiųsti"
+" naujausią versiją iš www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -97,7 +101,7 @@ msgstr "Pridėti prie Windows Games Explorer (jei yra)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Įdiegti ar atnaujinti DirectX (jei reikalinga)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -205,7 +209,7 @@ msgstr "Pridėti prie Games Explorer"
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Įdiegti DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -249,6 +253,7 @@ msgstr ""
 "Galiojanti Grand Theft Auto: San Andreas versija nerasta.$\r"
 "$\n"
 "Tačiau diegimas tęsis.$\r"
+"$\n"
 "Jei kils problemų, prašome įdiegti iš naujo."
 
 #. INST_SEC_CORE_RESOURCES

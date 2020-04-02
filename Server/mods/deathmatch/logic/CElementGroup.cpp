@@ -84,7 +84,7 @@ void CElementGroup::Remove(class CElement* element)
     m_elements.remove(element);
 }
 
-unsigned int CElementGroup::GetCount(void)
+unsigned int CElementGroup::GetCount()
 {
     return m_elements.size();
 }

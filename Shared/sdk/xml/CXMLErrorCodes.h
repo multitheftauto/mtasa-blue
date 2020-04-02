@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLERRORCODES_H
-#define __CXMLERRORCODES_H
+#pragma once
 
 class CXMLErrorCodes
 {
@@ -22,5 +21,3 @@ public:
         OtherError = 2
     };
 };
-
-#endif

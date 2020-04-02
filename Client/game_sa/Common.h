@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_COMMON
-#define __CGAMESA_COMMON
+#pragma once
 
 #define CGAME_DLL
 
@@ -41,6 +40,4 @@ static void OutputDebugText(char* szDebugText)
     #endif
 #else
     #define DEBUG_TRACE(szText) // we do nothing with release versions
-#endif
-
 #endif

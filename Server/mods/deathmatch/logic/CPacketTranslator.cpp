@@ -16,7 +16,7 @@ CPacketTranslator::CPacketTranslator(CPlayerManager* pPlayerManager)
     m_pPlayerManager = pPlayerManager;
 }
 
-CPacketTranslator::~CPacketTranslator(void)
+CPacketTranslator::~CPacketTranslator()
 {
 }
 
@@ -168,6 +168,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_PLAYER_NETWORK_STATUS:
             pTemp = new CPlayerNetworkStatusPacket;
+            break;
+
+        case PACKET_ID_DISCORD_JOIN:
+            pTemp = new CDiscordJoinPacket;
             break;
 
         default:

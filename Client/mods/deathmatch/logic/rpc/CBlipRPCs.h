@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CBlipRPCs_H
-#define __CBlipRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CBlipRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllBlips);
     DECLARE_ELEMENT_RPC(SetBlipIcon);
@@ -26,5 +25,3 @@ public:
     DECLARE_ELEMENT_RPC(SetBlipOrdering);
     DECLARE_ELEMENT_RPC(SetBlipVisibleDistance);
 };
-
-#endif

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CANTICHEAT_H
-#define __CANTICHEAT_H
+#pragma once
 
 #include "CAntiCheatModule.h"
 #include <list>
@@ -17,18 +16,17 @@
 class CAntiCheat
 {
 public:
-    CAntiCheat(void);
-    ~CAntiCheat(void);
+    CAntiCheat();
+    ~CAntiCheat();
 
     void AddModule(CAntiCheatModule& Module);
     void RemoveModule(CAntiCheatModule& Module);
-    void ClearModules(void);
+    void ClearModules();
 
-    bool PerformChecks(void);
+    bool PerformChecks();
+    static SString GetInfo(const SString &acInfo, const SString &sdInfo);
 
 private:
     std::list<CAntiCheatModule*>           m_Entries;
     std::list<CAntiCheatModule*>::iterator m_LastEntry;
 };
-
-#endif

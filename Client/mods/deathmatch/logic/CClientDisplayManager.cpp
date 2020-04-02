@@ -12,13 +12,13 @@
 
 using std::list;
 
-CClientDisplayManager::CClientDisplayManager(void)
+CClientDisplayManager::CClientDisplayManager()
 {
     // Init
     m_bCanRemoveFromList = true;
 }
 
-CClientDisplayManager::~CClientDisplayManager(void)
+CClientDisplayManager::~CClientDisplayManager()
 {
     RemoveAll();
 }
@@ -54,7 +54,7 @@ void CClientDisplayManager::AddToList(CClientDisplay* pDisplay)
     m_List.push_back(pDisplay);
 }
 
-void CClientDisplayManager::RemoveAll(void)
+void CClientDisplayManager::RemoveAll()
 {
     // Delete all the items in the list
     m_bCanRemoveFromList = false;
@@ -80,7 +80,7 @@ void CClientDisplayManager::RemoveFromList(CClientDisplay* pDisplay)
     }
 }
 
-void CClientDisplayManager::DoPulse(void)
+void CClientDisplayManager::DoPulse()
 {
     // Render all our displays
     m_bCanRemoveFromList = false;

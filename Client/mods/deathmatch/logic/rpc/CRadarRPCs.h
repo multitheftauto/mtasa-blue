@@ -9,20 +9,17 @@
  *
  *****************************************************************************/
 
-#ifndef __CRadarRPCs_H
-#define __CRadarRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CRadarRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllRadarAreas);
     DECLARE_ELEMENT_RPC(SetRadarAreaSize);
     DECLARE_ELEMENT_RPC(SetRadarAreaColor);
     DECLARE_ELEMENT_RPC(SetRadarAreaFlashing);
 };
-
-#endif

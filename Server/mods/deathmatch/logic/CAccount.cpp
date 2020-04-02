@@ -32,7 +32,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
         m_pManager->MarkAsChanged(this);            // Save if password upgraded
 }
 
-CAccount::~CAccount(void)
+CAccount::~CAccount()
 {
     CIdArray::PushUniqueId(this, EIdClass::ACCOUNT, m_uiScriptID);
     if (m_pClient)
@@ -96,7 +96,7 @@ void CAccount::SetPassword(const SString& strPassword)
     }
 }
 
-SString CAccount::GetPasswordHash(void)
+SString CAccount::GetPasswordHash()
 {
     return m_Password.GetPasswordHash();
 }
@@ -187,7 +187,7 @@ void CAccount::RemoveData(const std::string& strKey)
 //
 // Account serial usage is only recorded for accounts that require serial authorization,
 // and is only loaded when required.
-void CAccount::EnsureLoadedSerialUsage(void)
+void CAccount::EnsureLoadedSerialUsage()
 {
     if (!m_bLoadedSerialUsage)
     {
@@ -196,12 +196,12 @@ void CAccount::EnsureLoadedSerialUsage(void)
     }
 }
 
-bool CAccount::HasLoadedSerialUsage(void)
+bool CAccount::HasLoadedSerialUsage()
 {
     return m_bLoadedSerialUsage;
 }
 
-std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList(void)
+std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList()
 {
     EnsureLoadedSerialUsage();
     return m_SerialUsageList;
@@ -286,7 +286,7 @@ bool CAccount::RemoveSerial(const SString& strSerial)
 //
 // Cleanup unauthorized serials
 //
-void CAccount::RemoveUnauthorizedSerials(void)
+void CAccount::RemoveUnauthorizedSerials()
 {
     EnsureLoadedSerialUsage();
     for (auto iter = m_SerialUsageList.begin(); iter != m_SerialUsageList.end();)

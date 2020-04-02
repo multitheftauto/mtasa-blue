@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PATHFIND
-#define __CGAMESA_PATHFIND
+#pragma once
 
 #include <game/CPathFind.h>
 
@@ -48,5 +47,3 @@ public:
     void SetMaxVehicles(int iMaxVehicles);
     void SetAllRandomPedsThisType(int iType);
 };
-
-#endif

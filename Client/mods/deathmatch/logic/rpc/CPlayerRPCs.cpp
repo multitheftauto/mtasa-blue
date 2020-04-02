@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CPlayerRPCs.h"
 
-void CPlayerRPCs::LoadFunctions(void)
+void CPlayerRPCs::LoadFunctions()
 {
     AddHandler(SET_PLAYER_MONEY, SetPlayerMoney, "SetPlayerMoney");
     AddHandler(SHOW_PLAYER_HUD_COMPONENT, ShowPlayerHudComponent, "ShowPlayerHudComponent");

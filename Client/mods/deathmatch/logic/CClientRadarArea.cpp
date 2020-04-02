@@ -29,18 +29,18 @@ CClientRadarArea::CClientRadarArea(class CClientManager* pManager, ElementID ID)
     m_pRadarAreaManager->AddToList(this);
 }
 
-CClientRadarArea::~CClientRadarArea(void)
+CClientRadarArea::~CClientRadarArea()
 {
     // Remove us from the manager's list
     Unlink();
 }
 
-void CClientRadarArea::Unlink(void)
+void CClientRadarArea::Unlink()
 {
     m_pRadarAreaManager->RemoveFromList(this);
 }
 
-void CClientRadarArea::DoPulse(void)
+void CClientRadarArea::DoPulse()
 {
     DoPulse(true);
 }

@@ -87,8 +87,19 @@ CClientPlayer::CClientPlayer(CClientManager* pManager, ElementID ID, bool bIsLoc
     m_LastPuresyncType = PURESYNC_TYPE_NONE;
 }
 
-CClientPlayer::~CClientPlayer(void)
+CClientPlayer::~CClientPlayer()
 {
+    if (m_bIsLocalPlayer)
+    {
+        CClientPlayerManager* playerManager = m_pManager->GetPlayerManager();
+
+        if (playerManager->GetLocalPlayer() == this)
+        {
+            playerManager->SetLocalPlayer(nullptr);
+            g_pClientGame->ResetLocalPlayer();
+        }
+    }
+
     // Remove us from the team
     if (m_pTeam)
         m_pTeam->RemovePlayer(this);
@@ -100,7 +111,7 @@ CClientPlayer::~CClientPlayer(void)
         delete m_voice;
 }
 
-void CClientPlayer::Unlink(void)
+void CClientPlayer::Unlink()
 {
     m_pManager->GetPlayerManager()->RemoveFromList(this);
 }
@@ -160,7 +171,7 @@ void CClientPlayer::SetNametagOverrideColor(unsigned char ucR, unsigned char ucG
     m_bNametagColorOverridden = true;
 }
 
-void CClientPlayer::RemoveNametagOverrideColor(void)
+void CClientPlayer::RemoveNametagOverrideColor()
 {
     m_ucNametagColorR = 255;
     m_ucNametagColorG = 255;
@@ -192,7 +203,7 @@ bool CClientPlayer::IsOnMyTeam(CClientPlayer* pPlayer)
     return false;
 }
 
-void CClientPlayer::Reset(void)
+void CClientPlayer::Reset()
 {
     // stats
     for (unsigned short us = 0; us <= NUM_PLAYER_STATS; us++)
@@ -328,12 +339,12 @@ void CClientPlayer::SetRemoteVersionInfo(ushort usBitstreamVersion, uint uiBuild
     m_uiRemoteBuildNumber = uiBuildNumber;
 }
 
-ushort CClientPlayer::GetRemoteBitstreamVersion(void)
+ushort CClientPlayer::GetRemoteBitstreamVersion()
 {
     return m_usRemoteBitstreamVersion;
 }
 
-uint CClientPlayer::GetRemoteBuildNumber(void)
+uint CClientPlayer::GetRemoteBuildNumber()
 {
     return m_uiRemoteBuildNumber;
 }

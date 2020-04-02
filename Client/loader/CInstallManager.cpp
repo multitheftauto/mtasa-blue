@@ -22,7 +22,7 @@ namespace
     //////////////////////////////////////////////////////////
 
     // Ensure report log stuff has correct tags
-    void UpdateSettingsForReportLog(void)
+    void UpdateSettingsForReportLog()
     {
         UpdateMTAVersionApplicationSetting();
         SetApplicationSetting("os-version", SString("%d.%d", GetOSVersion().dwMajor, GetOSVersion().dwMinor));
@@ -35,13 +35,13 @@ namespace
     // Comms between 'Admin' and 'User' processes
     void SendStringToUserProcess(const SString& strText) { SetApplicationSetting("admin2user_comms", strText); }
 
-    SString ReceiveStringFromAdminProcess(void) { return GetApplicationSetting("admin2user_comms"); }
+    SString ReceiveStringFromAdminProcess() { return GetApplicationSetting("admin2user_comms"); }
 
-    bool IsBlockingUserProcess(void) { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
+    bool IsBlockingUserProcess() { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
 
-    void SetIsBlockingUserProcess(void) { SetApplicationSetting("admin2user_comms", "user_waiting"); }
+    void SetIsBlockingUserProcess() { SetApplicationSetting("admin2user_comms", "user_waiting"); }
 
-    void ClearIsBlockingUserProcess(void)
+    void ClearIsBlockingUserProcess()
     {
         if (IsBlockingUserProcess())
             SetApplicationSetting("admin2user_comms", "");
@@ -57,7 +57,7 @@ namespace
 //////////////////////////////////////////////////////////
 CInstallManager* g_pInstallManager = NULL;
 
-CInstallManager* GetInstallManager(void)
+CInstallManager* GetInstallManager()
 {
     if (!g_pInstallManager)
         g_pInstallManager = new CInstallManager();
@@ -71,45 +71,90 @@ CInstallManager* GetInstallManager(void)
 //
 //
 //////////////////////////////////////////////////////////
-void CInstallManager::InitSequencer(void)
+void CInstallManager::InitSequencer()
 {
     #define CR "\n"
-    SString strSource = CR "initial: "            // *** Starts here  by default
-        CR "            CALL CheckOnRestartCommand " CR "            IF LastResult != ok GOTO update_end: " CR
-                           " "                                                  ////// Start of 'update game' //////
-        CR "            CALL MaybeSwitchToTempExe "                             // If update files comes with an .exe, switch to that for the install
-        CR " " CR "copy_files: " CR "            CALL InstallFiles "            // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end: " CR " " CR "            CALL ChangeToAdmin "            // If install failed, try as admin
-        CR " " CR "copy_files_admin: " CR "            CALL InstallFiles "                                            // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end_admin: " CR " " CR
-                           "            CALL ShowCopyFailDialog "            // If install failed as admin, show message box
-        CR "            IF LastResult == retry GOTO copy_files_admin: " CR " " CR "update_end_admin: " CR "            CALL ChangeFromAdmin " CR " " CR
-                           "update_end: "                                                    ////// End of 'update game' //////
-        CR "            CALL SwitchBackFromTempExe " CR " " CR "newlayout_check:"            ////// Start of 'new layout check' //////
-        CR "            CALL ProcessLayoutChecks " CR "            IF LastResult == ok GOTO newlayout_end: " CR " " CR
-                           "            CALL ChangeToAdmin "                                        // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO newlayout_check: " CR "newlayout_end: "            ////// End of 'new layout check' //////
-        CR " " CR "langfile_check: "                                                                ////// Start of 'Lang file fix' //////
-        CR "            CALL ProcessLangFileChecks "                                                // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO langfile_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO langfile_check: " CR " " CR "langfile_end: "                           ////// End of 'Lang file fix' //////
-        CR " " CR "exepatch_check: "                                                                                    ////// Start of 'Exe patch fix' //////
-        CR "            CALL ProcessExePatchChecks "            // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO exepatch_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO exepatch_check: " CR " " CR "exepatch_end: "                           ////// End of 'Exe patch fix' //////
-        CR " " CR "service_check: "                                                                                     ////// Start of 'Service checks' //////
-        CR "            CALL ProcessServiceChecks "            // Make changes to comply with service requirements
-        CR "            IF LastResult == ok GOTO service_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO service_check: " CR "            CALL Quit " CR " " CR
-                           "service_end: "                       ////// End of 'Service checks' //////
-        CR " " CR "appcompat_check: "                            ////// Start of 'AppCompat checks' //////
-        CR "            CALL ProcessAppCompatChecks "            // Make changes to comply with appcompat requirements
-        CR "            IF LastResult == ok GOTO appcompat_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO appcompat_check: " CR "            CALL Quit " CR " " CR
-                           "appcompat_end: "                                                             ////// End of 'AppCompat checks' //////
-        CR " " CR "            CALL ChangeFromAdmin " CR "            CALL InstallNewsItems "            // Install pending news
-        CR "            GOTO launch: " CR " " CR "crashed: "                                             // *** Starts here when restarting after crash
-        CR "            CALL ShowCrashFailDialog " CR "            IF LastResult == ok GOTO initial: " CR "            CALL Quit " CR " " CR "launch: ";
+    SString strSource = CR "initial: "                                             // *** Starts here  by default
+        CR "            CALL CheckOnRestartCommand "                               //
+        CR "            IF LastResult != ok GOTO update_end: "                     //
+        CR " "                                                                     ////// Start of 'update game' //////
+        CR "            CALL MaybeSwitchToTempExe "                                // If update files comes with an .exe, switch to that for the install
+        CR " "                                                                     //
+        CR "copy_files: "                                                          //
+        CR "            CALL InstallFiles "                                        // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end: "                     //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If install failed, try as admin
+        CR " "                                                                     //
+        CR "copy_files_admin: "                                                    //
+        CR "            CALL InstallFiles "                                        // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end_admin: "               //
+        CR " "                                                                     //
+        CR "            CALL ShowCopyFailDialog "                                  // If install failed as admin, show message box
+        CR "            IF LastResult == retry GOTO copy_files_admin: "            //
+        CR " "                                                                     //
+        CR "update_end_admin: "                                                    //
+        CR "            CALL ChangeFromAdmin "                                     //
+        CR " "                                                                     //
+        CR "update_end: "                                                          ////// End of 'update game' //////
+        CR "            CALL SwitchBackFromTempExe "                               //
+        CR " "                                                                     //
+        CR "newlayout_check:"                                                      ////// Start of 'new layout check' //////
+        CR "            CALL ProcessLayoutChecks "                                 //
+        CR "            IF LastResult == ok GOTO newlayout_end: "                  //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO newlayout_check: "                //
+        CR "newlayout_end: "                                                       ////// End of 'new layout check' //////
+        CR " "                                                                     //
+        CR "langfile_check: "                                                      ////// Start of 'Lang file fix' //////
+        CR "            CALL ProcessLangFileChecks "                               // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO langfile_end: "                   //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO langfile_check: "                 //
+        CR " "                                                                     //
+        CR "langfile_end: "                                                        ////// End of 'Lang file fix' //////
+        CR " "                                                                     //
+        CR "exepatch_check: "                                                      ////// Start of 'Exe patch fix' //////
+        CR "            CALL ProcessExePatchChecks "                               // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO exepatch_end: "                   //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO exepatch_check: "                 //
+        CR " "                                                                     //
+        CR "exepatch_end: "                                                        ////// End of 'Exe patch fix' //////
+        CR " "                                                                     //
+        CR "service_check: "                                                       ////// Start of 'Service checks' //////
+        CR "            CALL ProcessServiceChecks "                                // Make changes to comply with service requirements
+        CR "            IF LastResult == ok GOTO service_end: "                    //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO service_check: "                  //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "service_end: "                                                         ////// End of 'Service checks' //////
+        CR " "                                                                     //
+        CR "appcompat_check: "                                                     ////// Start of 'AppCompat checks' //////
+        CR "            CALL ProcessAppCompatChecks "                              // Make changes to comply with appcompat requirements
+        CR "            IF LastResult == ok GOTO appcompat_end: "                  //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO appcompat_check: "                //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
+        CR " "                                                                     //
+        CR "            CALL ChangeFromAdmin "                                     //
+        CR "            CALL InstallNewsItems "                                    // Install pending news
+        CR "            GOTO launch: "                                             //
+        CR " "                                                                     //
+        CR "crashed: "                                                             // *** Starts here when restarting after crash
+        CR "            CALL ShowCrashFailDialog "                                 //
+        CR "            IF LastResult == ok GOTO initial: "                        //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "launch: ";
 
     m_pSequencer = new CSequencerType();
     m_pSequencer->SetSource(this, strSource);
@@ -159,7 +204,7 @@ void CInstallManager::SetMTASAPathSource(const SString& strCommandLineIn)
 // Process next step
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::Continue(void)
+SString CInstallManager::Continue()
 {
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
@@ -228,7 +273,7 @@ void CInstallManager::RestoreSequencerFromSnapshot(const SString& strText)
 // Save current sequencer position to a string
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::GetSequencerSnapshot(void)
+SString CInstallManager::GetSequencerSnapshot()
 {
     m_pSequencer->SetVariable("LastResult", "");
     return m_pSequencer->SaveStateToString();
@@ -241,7 +286,7 @@ SString CInstallManager::GetSequencerSnapshot(void)
 // Get path to launch exe
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::GetLauncherPathFilename(void)
+SString CInstallManager::GetLauncherPathFilename()
 {
     SString strLocation = m_pSequencer->GetVariable(INSTALL_LOCATION);
     SString strResult = PathJoin(strLocation == "far" ? GetSystemCurrentDirectory() : GetMTASAPath(), MTA_EXE_NAME);
@@ -261,7 +306,7 @@ SString CInstallManager::GetLauncherPathFilename(void)
 // Save the state of the sequencer and launch process as admin
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ChangeToAdmin(void)
+SString CInstallManager::_ChangeToAdmin()
 {
     if (!IsUserAdmin())
     {
@@ -294,7 +339,7 @@ SString CInstallManager::_ChangeToAdmin(void)
 // Save the state of the sequencer and exit back to the user process
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ChangeFromAdmin(void)
+SString CInstallManager::_ChangeFromAdmin()
 {
     if (IsUserAdmin() && IsBlockingUserProcess())
     {
@@ -313,7 +358,7 @@ SString CInstallManager::_ChangeFromAdmin(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ShowCrashFailDialog(void)
+SString CInstallManager::_ShowCrashFailDialog()
 {
     // Crashed before gta game started ?
     if (WatchDogIsSectionOpen("L1"))
@@ -354,7 +399,7 @@ SString CInstallManager::_ShowCrashFailDialog(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_CheckOnRestartCommand(void)
+SString CInstallManager::_CheckOnRestartCommand()
 {
     // Check for pending update
     const SString strResult = CheckOnRestartCommand();
@@ -381,7 +426,7 @@ SString CInstallManager::_CheckOnRestartCommand(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_MaybeSwitchToTempExe(void)
+SString CInstallManager::_MaybeSwitchToTempExe()
 {
     // If a new "Multi Theft Auto.exe" exists, let that complete the install
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
@@ -402,7 +447,7 @@ SString CInstallManager::_MaybeSwitchToTempExe(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_SwitchBackFromTempExe(void)
+SString CInstallManager::_SwitchBackFromTempExe()
 {
     // If currently running temp install exe, switch back
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
@@ -425,7 +470,7 @@ SString CInstallManager::_SwitchBackFromTempExe(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_InstallFiles(void)
+SString CInstallManager::_InstallFiles()
 {
     WatchDogReset();
 
@@ -455,7 +500,7 @@ SString CInstallManager::_InstallFiles(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ShowCopyFailDialog(void)
+SString CInstallManager::_ShowCopyFailDialog()
 {
     int iResponse = MessageBoxUTF8(NULL, _("Could not update due to file conflicts. Please close other applications and retry"), _("Error") + _E("CL02"),
                                    MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST);
@@ -489,7 +534,7 @@ void MigrateFile(const SString& strFilenameOld, const SString& strFilenameNew)
 // Make sure new reg/dir structure is ok
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessLayoutChecks(void)
+SString CInstallManager::_ProcessLayoutChecks()
 {
     //
     // Validation
@@ -623,7 +668,7 @@ SString CInstallManager::_ProcessLayoutChecks(void)
 // Make sure required language files exist
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessLangFileChecks(void)
+SString CInstallManager::_ProcessLangFileChecks()
 {
     if (!HasGTAPath())
         return "ok";
@@ -699,7 +744,7 @@ SString CInstallManager::_ProcessLangFileChecks(void)
 // Return false if admin required
 //
 //////////////////////////////////////////////////////////
-bool CInstallManager::UpdateOptimusSymbolExport(void)
+bool CInstallManager::UpdateOptimusSymbolExport()
 {
     return _ProcessExePatchChecks() == "ok";
 }
@@ -723,7 +768,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
         // See if exe copy seems usable
         SString strHTAEXEPath = PathJoin(strGTAPath, MTA_HTAEXE_NAME);
         uint64  uiStdFileSize = FileSize(strGTAEXEPath);
-        if (uiStdFileSize && uiStdFileSize == FileSize(strHTAEXEPath))
+        if (uiStdFileSize && FileSize(strHTAEXEPath) > 10 * 1024 * 1024)
             strGTAEXEPath = strHTAEXEPath;
     }
 
@@ -737,7 +782,7 @@ SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
 // Check which changes need to be made to the exe and make a copy if required
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessExePatchChecks(void)
+SString CInstallManager::_ProcessExePatchChecks()
 {
     if (!HasGTAPath())
         return "ok";
@@ -784,7 +829,7 @@ SString CInstallManager::_ProcessExePatchChecks(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessServiceChecks(void)
+SString CInstallManager::_ProcessServiceChecks()
 {
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
@@ -804,7 +849,7 @@ SString CInstallManager::_ProcessServiceChecks(void)
 // Remove/add required options from AppCompatFlags/Layers
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessAppCompatChecks(void)
+SString CInstallManager::_ProcessAppCompatChecks()
 {
     BOOL bIsWOW64 = false;            // 64bit OS
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
@@ -838,6 +883,13 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
     removeList.push_back(L"DISABLETHEMES");
     removeList.push_back(L"DISABLEDWM");
     removeList.push_back(L"HIGHDPIAWARE");
+
+    // Fix for GitHub issue #983 "crash on join server"
+#ifdef DEBUG
+    removeList.push_back(L"IgnoreFreeLibrary<client_d.dll>");
+#else
+    removeList.push_back(L"IgnoreFreeLibrary<client.dll>");
+#endif
 
     // Remove potential performance hit
     removeList.push_back(L"FaultTolerantHeap");
@@ -896,6 +948,21 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
                 bTryAdmin = true;
     }
 
+    // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
+    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+    WString strUrlItem = L"Games";
+    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+    if (!strUrlValue.empty())
+    {
+        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+        if (strUrlValue.ContainsI(L":"))
+        {
+            strUrlValue = L"disabled";  // Can be anything not containing `:`
+            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                bTryAdmin = true;
+        }
+    }
+
     // Handle admin requirement
     if (bTryAdmin)
     {
@@ -915,7 +982,7 @@ SString CInstallManager::_ProcessAppCompatChecks(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_InstallNewsItems(void)
+SString CInstallManager::_InstallNewsItems()
 {
     // Get install news queue
     CArgMap queue;
@@ -972,7 +1039,7 @@ SString CInstallManager::_InstallNewsItems(void)
 //
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::_Quit(void)
+SString CInstallManager::_Quit()
 {
     ExitProcess(0);
     // return "ok";

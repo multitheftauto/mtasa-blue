@@ -24,25 +24,29 @@ CWaterManager::~CWaterManager()
     DeleteAll();
 }
 
-CWater* CWaterManager::Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* pNode)
+CWater* CWaterManager::Create(CWater::EWaterType waterType, CElement* pParent, bool bShallow)
 {
-    CWater* pWater = new CWater(this, pParent, pNode, waterType);
+    CWater* const pWater = new CWater(this, pParent, waterType, bShallow);
+
     if (pWater->GetID() == INVALID_ELEMENT_ID)
     {
         delete pWater;
-        return NULL;
+        return nullptr;
     }
+
     return pWater;
 }
 
 CWater* CWaterManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    CWater* pWater = new CWater(this, pParent, &Node);
-    if (pWater->GetID() == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData(pEvents))
+    CWater* const pWater = new CWater(this, pParent);
+
+    if (pWater->GetID() == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData(pEvents, Node))
     {
         delete pWater;
-        pWater = NULL;
+        return nullptr;
     }
+
     return pWater;
 }
 
@@ -70,7 +74,7 @@ void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLev
     }
 }
 
-void CWaterManager::ResetWorldWaterLevel(void)
+void CWaterManager::ResetWorldWaterLevel()
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;

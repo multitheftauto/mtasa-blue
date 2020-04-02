@@ -19,12 +19,12 @@ CClientPedManager::CClientPedManager(CClientManager* pManager)
     m_bRemoveFromList = true;
 }
 
-CClientPedManager::~CClientPedManager(void)
+CClientPedManager::~CClientPedManager()
 {
     DeleteAll();
 }
 
-void CClientPedManager::DeleteAll(void)
+void CClientPedManager::DeleteAll()
 {
     m_bRemoveFromList = false;
     vector<CClientPed*>::iterator iter = m_List.begin();
@@ -51,6 +51,7 @@ void CClientPedManager::DoPulse(bool bDoStandardPulses)
     }
 }
 
+
 CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
 {
     // Grab the element with the given id. Check its type.
@@ -61,16 +62,6 @@ CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
     }
 
     return NULL;
-}
-
-CClientPed* CClientPedManager::Get(CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pPlayer);
-}
-
-CClientPed* CClientPedManager::GetSafe(CEntity* pEntity, bool bCheckPlayers)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pEntity);
 }
 
 bool CClientPedManager::Exists(CClientPed* pPed)

@@ -19,15 +19,16 @@
 class CDatabaseJobQueue
 {
 public:
-    virtual ~CDatabaseJobQueue(void) {}
+    virtual ~CDatabaseJobQueue() {}
 
-    virtual void        DoPulse(void) = 0;
+    virtual void        DoPulse() = 0;
     virtual CDbJobData* AddCommand(EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData) = 0;
     virtual bool        PollCommand(CDbJobData* pJobData, uint uiTimeout) = 0;
     virtual bool        FreeCommand(CDbJobData* pJobData) = 0;
     virtual CDbJobData* FindCommandFromId(SDbJobId id) = 0;
     virtual void        IgnoreConnectionResults(SConnectionHandle connectionHandle) = 0;
-    virtual bool        UsesConnection(SConnectionHandle connectionHandle) = 0;
+    virtual bool        IsConnectionClosed() = 0;
+    virtual int         GetQueueSize() = 0;
 };
 
-CDatabaseJobQueue* NewDatabaseJobQueue(void);
+CDatabaseJobQueue* NewDatabaseJobQueue();
