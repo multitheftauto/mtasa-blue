@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 // Pragmas
 #pragma warning (disable:4995)
@@ -50,6 +49,7 @@
 #include <hwbrk.h>
 
 // Core-level includes
+#include "CQueryReceiver.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"

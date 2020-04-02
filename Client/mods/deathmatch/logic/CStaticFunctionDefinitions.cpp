@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
@@ -213,7 +213,7 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
     return m_pEvents->WasEventCancelled();
 }
 
-bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum)
+bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
     SString strPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
@@ -221,7 +221,7 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
     // Call SingularFileDownloadManager
     if (g_pClientGame->GetSingularFileDownloadManager())
     {
-        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum);
+        g_pClientGame->GetSingularFileDownloadManager()->AddFile(pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, pRequestResource, checksum);
         return true;
     }
     return false;
@@ -1441,8 +1441,8 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTPLAYER:
         {
             // Grab the model
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = Ped.GetModel();
+            CClientPed&          Ped = static_cast<CClientPed&>(Entity);
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
 
             if (usCurrentModel == usModel)
                 return false;
@@ -1458,7 +1458,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTVEHICLE:
         {
-            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
             const unsigned short usCurrentModel = Vehicle.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1478,7 +1478,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            CClientObject&       Object = static_cast<CClientObject&>(Entity);
             const unsigned short usCurrentModel = Object.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1497,7 +1497,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         }
         case CCLIENTPROJECTILE:
         {
-            CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
+            CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
             const unsigned short usCurrentModel = Projectile.GetModel();
 
             if (usCurrentModel == usModel)
@@ -1638,7 +1638,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
         // Check it's Analog
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
         {
-            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+            if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, false))
             {
                 bState = fState > 0;
                 return true;
@@ -1660,17 +1660,22 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& Ped, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput)
 {
     if (Ped.GetType() == CCLIENTPLAYER)
     {
         CControllerState cs;
-        Ped.GetControllerState(cs);
-        bool         bOnFoot = (!Ped.GetRealOccupiedVehicle());
-        unsigned int uiIndex;
+        bool             bOnFoot = (!Ped.GetRealOccupiedVehicle());
+        unsigned int     uiIndex;
+
+        if (bRawInput)
+            cs = Ped.m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+        else
+            Ped.GetControllerState(cs);
+
         // check it's analog or use binary.
         if (CClientPad::GetAnalogControlIndex(szControl, uiIndex))
-            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState);
+            CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput);
         else
             fState = CClientPad::GetControlState(szControl, cs, bOnFoot) == true ? 1.0f : 0.0f;
 
@@ -1708,25 +1713,6 @@ bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned c
 {
     ucStyle = Ped.GetFightingStyle();
     return true;
-}
-
-bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
-{
-    if (Ped.IsRunningAnimation())
-    {
-        if (Ped.IsCustomAnimationPlaying())
-        {
-            strBlockName = Ped.GetNextAnimationCustomBlockName();
-            strAnimName = Ped.GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = Ped.GetAnimationBlock()->GetName();
-            strAnimName = Ped.GetAnimationName();
-        }
-        return true;
-    }
-    return false;
 }
 
 bool CStaticFunctionDefinitions::GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim)
@@ -2160,7 +2146,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                     // Play the gateway animation
                     const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
-                    auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
+                    auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
@@ -2308,6 +2294,25 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
+{
+    RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
+    if (IS_PED(&Entity) && Entity.IsLocalEntity())
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.GetFightingStyle() != ucStyle)
+        {
+            // Is valid style
+            if (ucStyle >= 4 && ucStyle <= 16)
+            {
+                Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget)
 {
     RUN_CHILDREN(SetPedLookAt(**iter, vecPosition, iTime, iBlend, pTarget))
@@ -2378,21 +2383,83 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsLocalPlayer())
             return false;
 
-        CVector vecOrigin;
-        Ped.GetPosition(vecOrigin);
-
-        // Move origin out a bit to avoid hitting ped collision
-        CVector vecDir = vecTarget - vecOrigin;
-        vecDir.Normalize();
-        vecOrigin += vecDir * 0.9f;
+        // Grab the gun muzzle position
+        CWeapon* pWeapon = Ped.GetWeapon(Ped.GetCurrentWeaponSlot());
+        CVector  vecOrigin;
+        if (!pWeapon)
+        {
+            Ped.GetPosition(vecOrigin);
+        }
+        else
+        {
+            CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), 1000.0f);
+            CVector      vecFireOffset = *pCurrentWeaponInfo->GetFireOffset();
+            vecOrigin = vecFireOffset;
+            Ped.GetTransformedBonePosition(BONE_RIGHTWRIST, vecOrigin);
+        }
 
         // Arm direction
         float fArmX = -atan2(vecTarget.fX - vecOrigin.fX, vecTarget.fY - vecOrigin.fY),
               fArmY = -atan2(vecTarget.fZ - vecOrigin.fZ, DistanceBetweenPoints2D(vecTarget, vecOrigin));
 
-        // TODO: use gun muzzle for origin
-        Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
-        Ped.SetAim(fArmX, fArmY, 0);
+        if (Ped.IsInVehicle())
+        {
+            // Driveby aim animation
+            // 0 = forwards, 1 = left, 2 = back, 3 = right
+            unsigned char cInVehicleAimAnim = 0;
+
+            // Ped rotation
+            CVector vecRot;
+            Ped.GetRotationRadians(vecRot);
+            float fRotZ = -vecRot.fZ;            // Counter-clockwise
+            fRotZ = (fRotZ > PI) ? fRotZ - PI * 2 : fRotZ;
+
+            // Rotation difference
+            float fRotDiff = fArmX - fRotZ;
+            if (fRotDiff > PI)
+            {
+                fRotDiff = -(PI - (fRotDiff - PI));
+            }
+            else if (fRotDiff < -PI)
+            {
+                fRotDiff = fRotDiff + PI * 2;
+            }
+
+            // Find the aim anim and correct fArmX/fArmY
+            if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
+            {
+                // Facing left
+                cInVehicleAimAnim = 1;
+                fArmX = fArmX - PI / 2;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
+            {
+                // Facing backwards
+                cInVehicleAimAnim = 2;
+                fArmX = fArmX + PI;
+                fArmY = -fArmY;
+            }
+            else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
+            {
+                // Facing right
+                cInVehicleAimAnim = 3;
+                fArmX = fArmX + PI / 2;
+            }
+            else
+            {
+                // Facing forwards
+                // Do nothing, initial values are fine
+            }
+
+            // Set aim and target data without interpolation
+            Ped.SetAimingData(TICK_RATE, vecTarget, fArmX, fArmY, cInVehicleAimAnim, &vecOrigin, false);
+        }
+        else
+        {
+            Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
+            Ped.SetAim(fArmX, fArmY, 0);
+        }
 
         return true;
     }
@@ -2428,6 +2495,17 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
         Ped.SetOnFire(bOnFire);
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedArmor(CClientPed& Ped, float fArmor)
+{
+    if (Ped.IsLocalEntity())
+    {
+        Ped.SetArmor(fArmor);
+        return true;
+    }
+
     return false;
 }
 
@@ -2944,9 +3022,9 @@ bool CStaticFunctionDefinitions::RemoveVehicleUpgrade(CClientEntity& Entity, uns
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState)
+bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent)
 {
-    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState))
+    RUN_CHILDREN(SetVehicleDoorState(**iter, ucDoor, ucState, spawnFlyingComponent))
 
     if (IS_VEHICLE(&Entity))
     {
@@ -2976,7 +3054,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
                     break;
             }
 
-            Vehicle.SetDoorStatus(ucDoor, ucState);
+            Vehicle.SetDoorStatus(ucDoor, ucState, spawnFlyingComponent);
 
             return true;
         }
@@ -5512,6 +5590,13 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMai
     CVector2D absoluteSize;
     pElement->GetSize(absoluteSize, false);
     auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+
+    if (!pGUIElement->GetBrowser())
+    {
+        delete pGUIElement;
+        return nullptr;
+    }
+
     pGUIElement->SetParent(pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity());
 
     // Load CEGUI element texture from webview
@@ -6949,7 +7034,7 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
 
     float fState;
     // Analog
-    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState))
+    if (CStaticFunctionDefinitions::GetAnalogControlState(szControl, fState, false))
     {
         bState = fState > 0;
         return true;
@@ -6968,13 +7053,18 @@ bool CStaticFunctionDefinitions::GetControlState(const char* szControl, bool& bS
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState)
+bool CStaticFunctionDefinitions::GetAnalogControlState(const char* szControl, float& fState, bool bRawInput)
 {
     CControllerState cs;
     CClientPlayer*   pLocalPlayer = m_pPlayerManager->GetLocalPlayer();
-    pLocalPlayer->GetControllerState(cs);
-    bool bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
-    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState))
+    bool             bOnFoot = (!pLocalPlayer->GetRealOccupiedVehicle());
+
+    if (bRawInput)
+        cs = pLocalPlayer->m_rawControllerState;            // use the raw controller values without MTA glitch fixes modifying our raw inputs
+    else
+        pLocalPlayer->GetControllerState(cs);
+
+    if (CClientPad::GetAnalogControlState(szControl, cs, bOnFoot, fState, bRawInput))
     {
         return true;
     }
@@ -7162,6 +7252,141 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
     return pShape;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CClientColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CClientColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CClientColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CClientColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CClientColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CClientColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CClientColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CClientColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CClientColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (pColPolygon->RemovePoint(uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+        return true;
+    }
+
+    return false;
 }
 
 // Make sure all colliders for a colshape are up to date
@@ -7603,18 +7828,18 @@ CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, con
     return pFx;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
+CClientSound* CStaticFunctionDefinitions::PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound2D(strSound, bIsURL, bIsRawData, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;
 }
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop,
+CClientSound* CStaticFunctionDefinitions::PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
                                                       bool bThrottle)
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, vecPosition, bLoop, bThrottle);
+    CClientSound* pSound = m_pSoundManager->PlaySound3D(strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
     if (pSound)
         pSound->SetParent(pResource->GetResourceDynamicEntity());
     return pSound;

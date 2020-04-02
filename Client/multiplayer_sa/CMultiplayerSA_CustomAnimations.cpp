@@ -64,6 +64,12 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
     bDisableCallsToCAnimBlendNode = bDisableCalls;
 }
 
+CAnimationStyleDescriptorSAInterface* getAnimStyleDescriptorInterface(AssocGroupId animGroup)
+{
+    auto pAnimAssocDefinitionsArray = (CAnimationStyleDescriptorSAInterface*)0x8AA5A8;
+    return &pAnimAssocDefinitionsArray[animGroup];
+}
+
 CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
 {
     auto pAnimGroupArray = reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(*(DWORD*)0xb4ea34);
@@ -129,7 +135,13 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
     if (pAnimAssociationInterface)
     {
-        auto* pAnimAssocGroupInterface = getAnimAssocGroupInterface(u32AnimGroupID);
+        auto pAnimAssocGroupInterface = getAnimAssocGroupInterface(u32AnimGroupID);
+        if (!pAnimAssocGroupInterface->pAnimBlock || pAnimAssocGroupInterface->groupID == -1)
+        {
+            auto pAnimStyleDescriptorInterface = getAnimStyleDescriptorInterface(u32AnimGroupID);
+            auto pAnimBlock = pGameInterface->GetAnimManager()->GetAnimationBlock(pAnimStyleDescriptorInterface->blockName);
+            pAnimBlock->Request(BLOCKING, true);
+        }
         m_pAssocGroupCopyAnimationHandler(pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
     }
     return pAnimAssociationInterface;

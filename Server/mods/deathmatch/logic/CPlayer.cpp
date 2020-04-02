@@ -206,6 +206,61 @@ void CPlayer::SetNick(const char* szNick)
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
 }
 
+// Ignore min client version checks if is a custom build and both player and server have build number of 0
+bool CPlayer::ShouldIgnoreMinClientVersionChecks()
+{
+#if (MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM) && (MTASA_VERSION_BUILD == 0)
+    if (GetPlayerVersion().GetBuildNumber() == 0)
+        return true;
+#endif
+    return false;
+}
+
+bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
+{
+#ifdef MTA_DEBUG
+    OutputDebugString(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
+
+    return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
+{
+#ifdef MTA_DEBUG
+    OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
+
+    return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement)
+{
+    bool erased = false;
+
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    {
+        if (it->first == pElement)
+        {
+#ifdef MTA_DEBUG
+            OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+#endif
+
+            it = m_DataSubscriptions.erase(it);
+            erased = true;
+        }
+        else
+            ++it;
+    }
+
+    return erased;
+}
+
+bool CPlayer::IsSubscribed(CElement* pElement, const std::string& strName) const
+{
+    return m_DataSubscriptions.find(std::make_pair(pElement, strName)) != m_DataSubscriptions.end();
+}
+
 const char* CPlayer::GetSourceIP()
 {
     if (m_strIP.empty())
@@ -1098,7 +1153,7 @@ float CPlayer::GetWeaponRangeFromSlot(uint uiSlot)
     return m_fWeaponRangeLast;
 }
 
-void CPlayer::SetPlayerVersion(const SString& strPlayerVersion)
+void CPlayer::SetPlayerVersion(const CMtaVersion& strPlayerVersion)
 {
     m_strPlayerVersion = strPlayerVersion;
 }

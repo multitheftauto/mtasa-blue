@@ -152,9 +152,6 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
 
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-DWORD RETURN_CAnimManager_BlendAnimation = 0x4D4617;
-
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
 
@@ -325,6 +322,7 @@ float fWaterColorA = 0.0F;
 CStatsData  localStatsData;
 bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
+float       fDuckingHealthThreshold;
 
 PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
 PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
@@ -354,7 +352,6 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
-BlendAnimationHandler*      m_pBlendAnimationHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -417,7 +414,6 @@ void   HOOK_CAnimBlendAssoc_destructor();
 void   HOOK_CAnimManager_AddAnimation();
 void   HOOK_CAnimManager_AddAnimationAndSync();
 void   HOOK_CAnimManager_BlendAnimation_Hierarchy();
-void   HOOK_CAnimManager_BlendAnimation();
 void   HOOK_CPed_GetWeaponSkill();
 void   HOOK_CPed_AddGogglesModel();
 void   HOOK_CPhysical_ProcessCollisionSectorList();
@@ -734,7 +730,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1492,6 +1487,11 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
 
+    
+    // Allow crouching with 1HP
+    MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
+    fDuckingHealthThreshold = 0;
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -2227,11 +2227,6 @@ void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
 {
     m_pPreHudRenderHandler = pHandler;
-}
-
-void CMultiplayerSA::SetBlendAnimationHandler(BlendAnimationHandler* pHandler)
-{
-    m_pBlendAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
@@ -5391,42 +5386,6 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
             cmp     esi, 16h
             jmp     RETURN_CPed_GetWeaponSkill
         }
-    }
-}
-
-bool _cdecl OnCAnimManagerBlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendData)
-{
-    if (m_pBlendAnimationHandler)
-    {
-        return m_pBlendAnimationHandler(pClump, animGroup, animID, fBlendData);
-    }
-    return true;
-}
-
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
-{
-    _asm
-    {
-        push    ebp
-        mov     ebp, esp
-
-        push    [ebp + 20]
-        push    [ebp + 16]
-        push    [ebp + 12]
-        push    [ebp + 8]
-        call    OnCAnimManagerBlendAnimation
-        add     esp, 4 * 4
-
-        pop     ebp
-        test    al, al
-        jnz     standardcode
-        mov     eax, 0
-        retn
-
-        standardcode:
-        sub     esp, 14h
-        mov     ecx, [esp + 18h]
-        jmp     RETURN_CAnimManager_BlendAnimation
     }
 }
 
