@@ -33,7 +33,7 @@
 #define FUNC_CFx_TriggerWaterSplash        0x4a1070
 #define FUNC_CFx_TriggerBulletSplash       0x4a10e0
 #define FUNC_CFx_TriggerFootSplash         0x4a1150
-#define SHADOW_BASE_TEXTURE_OFFSET         0xC403E0
+constexpr auto SHADOW_BASE_TEXTURE_OFFSET = 0xC403E0;
 
 class CFxSAInterface
 {
