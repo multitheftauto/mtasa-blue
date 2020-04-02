@@ -381,6 +381,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
     m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
 
+    m_pDiscordCheck = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Enable Discord Rich Presence"), true));
+    m_pDiscordCheck->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pDiscordCheck->GetPosition(vecTemp, false);
+    m_pDiscordCheck->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1512,6 +1517,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
 
+    // Enable Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    m_pDiscordCheck->SetSelected(discordRichPresence);
+
     // Allow external sounds
     bool bAllowExternalSoundsEnabled;
     CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
@@ -2337,7 +2347,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned char>(m_pBindsList->GetItemData(i, m_hBind));
+        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -3343,6 +3353,15 @@ void CSettings::SaveData()
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
+
+    // Discord Rich Presence
+    bool discordRichPresence;
+    CVARS_GET("discord_rich_presence", discordRichPresence);
+    if (discordRichPresence != m_pDiscordCheck->GetSelected())
+    {
+        CVARS_SET("discord_rich_presence", m_pDiscordCheck->GetSelected());
+        g_pCore->GetDiscordManager()->Disconnect();
+    }
 
     // Allow external sounds
     bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();

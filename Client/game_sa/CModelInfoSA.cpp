@@ -16,11 +16,12 @@ extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>>                 CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::map<TimeInfo*, TimeInfo*>                                        CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -562,7 +563,61 @@ float CModelInfoSA::GetLODDistance()
     return 0.0f;
 }
 
-void CModelInfoSA::SetLODDistance(float fDistance)
+bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!pTime)
+        return false;
+
+    if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
+        MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
+
+    pTime->m_nTimeOn = cHourOn;
+    pTime->m_nTimeOff = cHourOff;
+    return true;
+}
+
+bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return false;
+
+    TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+    if (!time)
+        return false;
+
+    cHourOn = time->m_nTimeOn;
+    cHourOff = time->m_nTimeOff;
+    return true;
+}
+
+void CModelInfoSA::StaticResetModelTimes()
+{
+    // Restore default values
+    for (std::map<TimeInfo*, TimeInfo*>::const_iterator iter = ms_ModelDefaultModelTimeInfo.begin(); iter != ms_ModelDefaultModelTimeInfo.end(); ++iter)
+    {
+        iter->first->m_nTimeOn = iter->second->m_nTimeOn;
+        iter->first->m_nTimeOff = iter->second->m_nTimeOff;
+    }
+
+    ms_ModelDefaultModelTimeInfo.clear();
+}
+
+float CModelInfoSA::GetOriginalLODDistance()
+{
+    // Return default LOD distance value (if doesn't exist, LOD distance hasn't been changed)
+    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID))
+        return MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+
+    return 0.0f;
+}
+
+void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
 {
 #if 0
     // fLodDistanceUnscaled values:
@@ -580,18 +635,22 @@ void CModelInfoSA::SetLODDistance(float fDistance)
     // So, to ensure the maximum draw distance with a working alpha fade-in, fLodDistanceUnscaled has to be
     // no more than: 325 - (325-170) * draw_distance_setting
     //
+    if (!bOverrideMaxDistance) {
+        // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
+        float fDrawDistanceSetting = UnlerpClamped(0.925f, CSettingsSA().GetDrawDistance(), 1.8f);
 
-    // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
-    float fDrawDistanceSetting = UnlerpClamped ( 0.925f, CSettingsSA ().GetDrawDistance (), 1.8f );
+        // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
+        float fMaximumValue = Lerp(325.f, fDrawDistanceSetting, 170.f);
 
-    // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
-    float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
-
-    // Ensure fDistance is in range
-    fDistance = std::min ( fDistance, fMaximumValue );
+        // Ensure fDistance is in range
+        fDistance = std::min(fDistance, fMaximumValue);
+    }
 #endif
-    // Limit to 325.f as it goes horrible after that
-    fDistance = std::min(fDistance, 325.f);
+    if (!bOverrideMaxDistance) {
+        // Limit to 325.f as it goes horrible after that
+        fDistance = std::min(fDistance, 325.f);
+    }
+
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
     {
@@ -1141,7 +1200,7 @@ void CModelInfoSA::RestoreColModel()
                 call    func
                 add     esp, 8
             }
-            #pragma message(__LOC__ "(IJs) Document this function some time.")
+            // (IJs) Document this function some time
         }
     }
 
@@ -1430,6 +1489,36 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+}
+
+bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
+{
+    bool isTowable = true;
+
+    const bool isTowTruck = towingModel->GetModel() == 525;
+    const bool isTractor = towingModel->GetModel() == 531;
+
+    if (IsTrain() || towingModel->IsTrain())
+    {
+        // A train is never towing other vehicles. Trains are linked by other means
+        isTowable = false;
+    }
+    else if (isTowTruck || isTractor)
+    {
+        const bool isFarmTrailer = GetModel() == 610;
+
+        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
+        if (IsBoat() || IsBike() || IsBmx())
+        {
+            isTowable = false;
+        }
+        else if (IsTrailer() && !(isTractor && isFarmTrailer))
+        {
+            isTowable = false;
+        }
+    }
+
+    return isTowable;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

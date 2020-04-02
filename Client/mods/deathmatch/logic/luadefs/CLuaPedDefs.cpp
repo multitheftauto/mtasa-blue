@@ -35,7 +35,6 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTarget", GetPedTarget},
         {"getPedTargetStart", GetPedTargetStart},
         {"getPedTargetEnd", GetPedTargetEnd},
-        {"getPedTargetRange", GetPedTargetRange},
         {"getPedTargetCollision", GetPedTargetCollision},
         {"getPedWeaponSlot", GetPedWeaponSlot},
         {"getPedWeapon", GetPedWeapon},
@@ -664,25 +663,6 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedTargetRange(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // TODO: getPedTargetRange
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
 {
     // Verify the argument
@@ -1132,14 +1112,16 @@ int CLuaPedDefs::GetPedAnalogControlState(lua_State* luaVM)
     SString          strControlState = "";
     float            fState = 0.0f;
     CClientPed*      pPed = NULL;
+    bool             bRawInput;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strControlState);
+    argStream.ReadBool(bRawInput, false);
 
     if (!argStream.HasErrors())
     {
         float fState;
-        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState))
+        if (CStaticFunctionDefinitions::GetPedAnalogControlState(*pPed, strControlState, fState, bRawInput))
         {
             lua_pushnumber(luaVM, fState);
             return 1;
@@ -1232,11 +1214,27 @@ int CLuaPedDefs::GetPedAnimation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         SString strBlockName, strAnimName;
-        if (CStaticFunctionDefinitions::GetPedAnimation(*pPed, strBlockName, strAnimName))
+        if (pPed->GetRunningAnimationName(strBlockName, strAnimName))
         {
+            const SAnimationCache& animationCache = pPed->GetAnimationCache();
             lua_pushstring(luaVM, strBlockName);
             lua_pushstring(luaVM, strAnimName);
-            return 2;
+            lua_newtable(luaVM);
+            lua_pushinteger(luaVM, animationCache.iTime);
+            lua_setfield(luaVM, -2, "time");
+            lua_pushboolean(luaVM, animationCache.bLoop);
+            lua_setfield(luaVM, -2, "loop");
+            lua_pushboolean(luaVM, animationCache.bUpdatePosition);
+            lua_setfield(luaVM, -2, "updatePosition");
+            lua_pushboolean(luaVM, animationCache.bInterruptable);
+            lua_setfield(luaVM, -2, "interruptable");
+            lua_pushboolean(luaVM, animationCache.bFreezeLastFrame);
+            lua_setfield(luaVM, -2, "freezeLastFrame");
+            lua_pushinteger(luaVM, animationCache.iBlend);
+            lua_setfield(luaVM, -2, "blendTime");
+            lua_pushboolean(luaVM, pPed->IsTaskToBeRestoredOnAnimEnd());
+            lua_setfield(luaVM, -2, "restoreTaskOnAnimEnd");
+            return 3;
         }
     }
     else
@@ -2098,7 +2096,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(*pEntity, strAnimName, fSpeed))
             {

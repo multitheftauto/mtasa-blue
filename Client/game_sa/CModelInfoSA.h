@@ -257,20 +257,21 @@ enum eModelInfoType : unsigned char
 class CModelInfoSA : public CModelInfo
 {
 protected:
-    CBaseModelInfoSAInterface*                                                                   m_pInterface;
-    DWORD                                                                                        m_dwModelID;
-    DWORD                                                                                        m_dwReferences;
-    DWORD                                                                                        m_dwPendingInterfaceRef;
-    CColModel*                                                                                   m_pCustomColModel;
-    CColModelSAInterface*                                                                        m_pOriginalColModelInterface;
-    RpClump*                                                                                     m_pCustomClump;
-    static std::map<unsigned short, int>                                                         ms_RestreamTxdIDMap;
-    static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
-    static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>>                 ms_ModelDefaultDummiesPosition;
-    static std::unordered_map<DWORD, unsigned short>                                             ms_OriginalObjectPropertiesGroups;
-    bool                                                                                         m_bAddedRefForCollision;
-    SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
+    CBaseModelInfoSAInterface*                                                   m_pInterface;
+    DWORD                                                                        m_dwModelID;
+    DWORD                                                                        m_dwReferences;
+    DWORD                                                                        m_dwPendingInterfaceRef;
+    CColModel*                                                                   m_pCustomColModel;
+    CColModelSAInterface*                                                        m_pOriginalColModelInterface;
+    RpClump*                                                                     m_pCustomClump;
+    static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
+    static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<TimeInfo*, TimeInfo*>                                        ms_ModelDefaultModelTimeInfo;
+    static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
+    bool                                                                         m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
     CModelInfoSA();
@@ -313,11 +314,15 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     float          GetLODDistance();
-    void           SetLODDistance(float fDistance);
+    float          GetOriginalLODDistance();
+    void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
     static void    StaticResetLodDistances();
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
+    bool           GetTime(char& cHourOn, char& cHourOff);
+    bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -373,6 +378,9 @@ public:
     unsigned short GetObjectPropertiesGroup();
     void           RestoreObjectPropertiesGroup();
     static void    RestoreAllObjectsPropertiesGroups();
+
+    // Vehicle towing functions
+    bool IsTowableBy(CModelInfo* towingModel) override;
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

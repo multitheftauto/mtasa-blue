@@ -58,7 +58,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
 CLuaMain::~CLuaMain()
 {
     // remove all current remote calls originating from this VM
-    g_pGame->GetRemoteCalls()->Remove(this);
+    g_pGame->GetRemoteCalls()->OnLuaMainDestroy(this);
     g_pGame->GetLuaCallbackManager()->OnLuaMainDestroy(this);
     g_pGame->GetLatentTransferManager()->OnLuaMainDestroy(this);
     g_pGame->GetDebugHookManager()->OnLuaMainDestroy(this);

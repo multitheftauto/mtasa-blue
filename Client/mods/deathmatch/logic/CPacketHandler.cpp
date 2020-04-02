@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "net/SyncStructures.h"
+#include "CServerInfo.h"
 
 using std::list;
 
@@ -203,6 +204,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
 
         case PACKET_ID_PED_TASK:
             Packet_PedTask(bitStream);
+            return true;
+
+        case PACKET_ID_SERVER_INFO_SYNC:
+            Packet_ServerInfoSync(bitStream);
             return true;
 
         default:
@@ -529,7 +534,7 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
             strErrorCode = _E("CD41");
             break;
         case ePlayerDisconnectType::ELEMENT_FAILURE:
-            strReason = _("Disconnected: Player Element Could not be created.");
+            strReason = _("Disconnected: Player element could not be created.");
             strErrorCode = _E("CD42");
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
@@ -989,6 +994,8 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1020,6 +1027,8 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
+
+    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
@@ -1581,7 +1590,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
-                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
             }
             for (unsigned int i = 0; i < MAX_WHEELS; ++i)
             {
@@ -3216,7 +3225,7 @@ retry:
 
                     // Setup our damage model
                     for (int i = 0; i < MAX_DOORS; i++)
-                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i]);
+                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
@@ -4834,10 +4843,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     if (!pResourceEntity || !pResourceDynamicEntity)
     {
-        // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-        WriteDebugEvent(SString("Packet_ResourceStart() [1] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-        assert(false);
+        RaiseProtocolError(70);
         return;
     }
 
@@ -4845,15 +4851,6 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
-        if (!pResource->GetResourceEntity())
-        {
-            // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-            WriteDebugEvent(SString("Packet_ResourceStart() [2] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                    ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-            assert(false);
-            return;
-        }
-
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
 
@@ -4977,15 +4974,6 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             // Load the resource now
             if (pResource->CanBeLoaded())
             {
-                if (!pResource->GetResourceEntity())
-                {
-                    // Crash investigation code for forced crash in CResource::Load() at `assert(0);` - m_pResourceEntity is null
-                    WriteDebugEvent(SString("Packet_ResourceStart() [3] - pResourceEntity: %p (ID: %u), pResourceDynamicEntity: %p (ID: %u)", pResourceEntity,
-                                            ResourceEntityID.Value(), pResourceDynamicEntity, ResourceDynamicEntityID.Value()));
-                    assert(false);
-                    return;
-                }
-
                 pResource->Load();
             }
         }
@@ -5235,6 +5223,24 @@ void CPacketHandler::Packet_PedTask(NetBitStreamInterface& bitStream)
         default:
             break;
     };
+}
+
+void CPacketHandler::Packet_ServerInfoSync(NetBitStreamInterface& bitStream)
+{
+    uint8 flags;
+    
+    if (!bitStream.Read(flags))
+        return;
+
+    // Read in order of flags
+    if (flags & SERVER_INFO_FLAG_MAX_PLAYERS)
+    {
+        uint maxPlayersCount;
+        if (!bitStream.Read(maxPlayersCount))
+            return;
+
+        g_pClientGame->GetServerInfo()->SetMaxPlayers(maxPlayersCount);
+    }
 }
 
 //

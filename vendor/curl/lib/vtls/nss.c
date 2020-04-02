@@ -113,7 +113,7 @@ typedef struct {
   ptr->type = (_type);                                      \
   ptr->pValue = (_val);                                     \
   ptr->ulValueLen = (_len);                                 \
-} WHILE_FALSE
+} while(0)
 
 #define CERT_NewTempCertificate __CERT_NewTempCertificate
 
@@ -2127,7 +2127,7 @@ static CURLcode nss_do_connect(struct connectdata *conn, int sockindex)
 
 
   /* check timeout situation */
-  const time_t time_left = Curl_timeleft(data, NULL, TRUE);
+  const timediff_t time_left = Curl_timeleft(data, NULL, TRUE);
   if(time_left < 0) {
     failf(data, "timed out before SSL handshake");
     result = CURLE_OPERATION_TIMEDOUT;
