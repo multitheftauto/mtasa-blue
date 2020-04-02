@@ -269,9 +269,8 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
     if (IsShadowsLimitReached())
         return false;
 
-    RwTexture* pTexture = nullptr;
+    RwTexture* pTexture = m_textureMap[shadowType];
     char       type = 1;
-    pTexture = m_textureMap[shadowType];
 
     switch (shadowType)
     {
