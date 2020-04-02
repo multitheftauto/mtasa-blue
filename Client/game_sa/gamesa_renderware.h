@@ -44,6 +44,7 @@ typedef RwFrame*(__cdecl* RwFrameForAllObjects_t)(RwFrame* frame, void* callback
 typedef RwFrame*(__cdecl* RwFrameTranslate_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
 typedef RwFrame*(__cdecl* RwFrameScale_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
 typedef RwFrame*(__cdecl* RwFrameCreate_t)();
+typedef int(__cdecl* RwFrameDestroy_t)(RwFrame* frame);
 typedef RwFrame*(__cdecl* RwFrameSetIdentity_t)(RwFrame* frame);
 typedef RpGeometry*(__cdecl* RpGeometryCreate_t)(int numverts, int numtriangles, unsigned int format);
 typedef const RpGeometry*(__cdecl* RpGeometryTriangleSetVertexIndices_t)(const RpGeometry* geo, RpTriangle* tri, unsigned short v1, unsigned short v2,
@@ -149,6 +150,7 @@ RWFUNC(RpGeometryUnlock_t RpGeometryUnlock, (RpGeometryUnlock_t)0xDEAD)
 RWFUNC(RpGeometryLock_t RpGeometryLock, (RpGeometryLock_t)0xDEAD)
 RWFUNC(RpAtomicCreate_t RpAtomicCreate, (RpAtomicCreate_t)0xDEAD)
 RWFUNC(RwFrameCreate_t RwFrameCreate, (RwFrameCreate_t)0xDEAD)
+RWFUNC(RwFrameDestroy_t RwFrameDestroy, (RwFrameDestroy_t)0xDEAD)
 RWFUNC(RpGeometryTransform_t RpGeometryTransform, (RpGeometryTransform_t)0xDEAD)
 RWFUNC(RwFrameSetIdentity_t RwFrameSetIdentity, (RwFrameSetIdentity_t)0xDEAD)
 RWFUNC(RwMatrixCreate_t RwMatrixCreate, (RwMatrixCreate_t)0xDEAD)
