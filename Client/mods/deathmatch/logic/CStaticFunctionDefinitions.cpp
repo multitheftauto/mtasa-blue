@@ -986,7 +986,9 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
 
 bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize)
 {
+    assert(szName);
     if (Entity.SetCustomData(szName, Variable, bSynchronize))
+
     {
         if (bSynchronize && !Entity.IsLocalEntity())
         {

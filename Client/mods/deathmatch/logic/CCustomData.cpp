@@ -32,6 +32,8 @@ SCustomData* CCustomData::Get(const char* szName)
 
 bool CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CLuaArgument* pOldVariable)
 {
+    assert(szName);
+
     // Grab the item with the given name
     SCustomData* pData = Get(szName);
     if (pData)

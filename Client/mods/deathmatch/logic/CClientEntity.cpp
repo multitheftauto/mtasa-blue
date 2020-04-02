@@ -460,6 +460,7 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
 
 bool CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
+    assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
