@@ -56,21 +56,21 @@ bool CCustomData::DeleteSynced(const char* szName)
     return false;
 }
 
-void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
-    if (bSynchronized)
+    if (syncType == ESyncType::BROADCAST)
     {
         SCustomData* pDataSynced = GetSynced(szName);
         if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
-            pDataSynced->bSynchronized = bSynchronized;
+            pDataSynced->syncType = syncType;
         }
         else
         {
             SCustomData newData;
             newData.Variable = Variable;
-            newData.bSynchronized = bSynchronized;
+            newData.syncType = syncType;
             m_SyncedData[szName] = newData;
         }
     }
@@ -80,7 +80,7 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
     }
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(szName);
 
@@ -90,17 +90,17 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSy
     {
         // Update existing
         pData->Variable = Variable;
-        pData->bSynchronized = bSynchronized;
-        UpdateSynced(szName, Variable, bSynchronized);
+        pData->syncType = syncType;
+        UpdateSynced(szName, Variable, syncType);
     }
     else
     {
         // Add new
         SCustomData newData;
         newData.Variable = Variable;
-        newData.bSynchronized = bSynchronized;
+        newData.syncType = syncType;
         m_Data[szName] = newData;
-        UpdateSynced(szName, Variable, bSynchronized);
+        UpdateSynced(szName, Variable, syncType);
     }
 }
 

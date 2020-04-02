@@ -192,6 +192,23 @@ namespace
         {"guiFocus", "1.5.6-9.16361"},
         {"getPedFightingStyle", "1.5.6-9.16362"},
         {"onClientElementModelChange", "1.5.6-9.16404"},
+        {"setPedFightingStyle", "1.5.7-9.20157"},
+        {"setPedArmor", "1.5.7-9.20157"},
+        {"areVehicleLightsOn", "1.5.7-9.20157"},
+        {"dxDrawPrimitive3D", "1.5.7-9.20157"},
+        {"dxDrawMaterialPrimitive3D", "1.5.7-9.20157"},
+        {"engineGetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineRestoreModelPhysicalPropertiesGroup", "1.5.7-9.20157"},
+        {"engineSetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineGetObjectGroupPhysicalProperty", "1.5.7-9.20157"},
+        {"engineRestoreObjectGroupPhysicalProperties", "1.5.7-9.20157"},
+        {"engineRequestModel", "1.5.7-9.20157"},
+        {"engineFreeModel", "1.5.7-9.20157"},
+        {"xmlLoadString", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -272,6 +289,12 @@ namespace
         {"setPedWearingJetpack", "1.5.5-9.13846"},
         {"setElementAngularVelocity", "1.5.5-9.14060"},
         {"getElementAngularVelocity", "1.5.5-9.14060"},
+        {"xmlLoadString", "1.5.7-9.20157"},
+        {"getPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"setPlayerScriptDebugLevel", "1.5.7-9.20157"},
+        {"getRemoteRequests", "1.5.7-9.20307"},
+        {"getRemoteRequestInfo", "1.5.7-9.20307"},
+        {"abortRemoteRequest", "1.5.7-9.20307"},
     };
 
     //
@@ -307,7 +330,6 @@ namespace
         {false, "getPlayerTarget", "getPedTarget"},
         {false, "getPlayerTargetStart", "getPedTargetStart"},
         {false, "getPlayerTargetEnd", "getPedTargetEnd"},
-        {false, "getPlayerTargetRange", "getPedTargetRange"},
         {false, "getPlayerTargetCollision", "getPedTargetCollision"},
         {false, "getPlayerWeaponSlot", "getPedWeaponSlot"},
         {false, "getPlayerWeapon", "getPedWeapon"},

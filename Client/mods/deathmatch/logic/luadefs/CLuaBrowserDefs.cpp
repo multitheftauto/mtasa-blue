@@ -933,16 +933,24 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         {
             CClientGUIElement* pGUIElement =
                 CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
-            
-            CLuaArguments Arguments;
-            Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
-            
-            lua_pushelement(luaVM, pGUIElement);
-            return 1;
+
+            if (pGUIElement)
+            {
+                CLuaArguments Arguments;
+                Arguments.PushBoolean(false);
+                pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
+
+                lua_pushelement(luaVM, pGUIElement);
+                return 1;
+            }
+            else
+            {
+                argStream.SetCustomError("Failed to create browser element", "Create browser");
+            }
         }
     }
-    else
+    
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);

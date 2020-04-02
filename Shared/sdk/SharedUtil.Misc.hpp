@@ -81,7 +81,7 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
 //
 // Return full path and filename of parent exe
 //
-SString GetParentProcessPathFilename(int pid)
+SString SharedUtil::GetParentProcessPathFilename(int pid)
 {
     HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
@@ -1330,12 +1330,6 @@ bool SharedUtil::IsMainThread()
 #ifdef WIN32
     DWORD mainThreadID = GetMainThreadId();
     DWORD currentThreadID = GetCurrentThreadId();
-
-#ifdef MTA_CLIENT
-    if (mainThreadID != currentThreadID)
-        WriteDebugEvent(SString("IsMainThread() - Main: %lu, Current: %lu", mainThreadID, currentThreadID));
-#endif
-
     return mainThreadID == currentThreadID;
 #else
     static pthread_t dwMainThread = pthread_self();

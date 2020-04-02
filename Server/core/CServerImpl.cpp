@@ -754,7 +754,7 @@ void CServerImpl::HandleInput()
         case '\r':
 #ifdef WIN32
             // Echo a newline
-            Printf("\n");
+            Printf(" \n");
 #else
             // Set string termination (required for compare/string functions)
             m_szInputBuffer[m_uiInputCount] = 0;
@@ -1014,7 +1014,7 @@ bool CServerImpl::ResetInput()
         // Let's print our current input buffer
 #ifdef WIN32
         // Echo a newline
-        Printf("\n");
+        Printf(" \n");
 #else
         // Set string termination (required for compare/string functions)
         m_szInputBuffer[m_uiInputCount] = 0;

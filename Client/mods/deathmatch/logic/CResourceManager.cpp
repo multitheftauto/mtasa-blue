@@ -247,7 +247,7 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
 }
 
 // Check resource file data matches server checksum
-void CResourceManager::ValidateResourceFile(const SString& strInFilename, const CBuffer& fileData)
+void CResourceManager::ValidateResourceFile(const SString& strInFilename, const char* buffer, size_t bufferSize)
 {
     SString                strFilename = PathConform(strInFilename).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef(m_ResourceFileMap, strFilename);
@@ -262,8 +262,8 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
         else
         {
             CChecksum checksum;
-            if (!fileData.IsEmpty())
-                checksum = CChecksum::GenerateChecksumFromBuffer(fileData.GetData(), fileData.GetSize());
+            if (buffer)
+                checksum = CChecksum::GenerateChecksumFromBuffer(buffer, bufferSize);
             else
                 checksum = CChecksum::GenerateChecksumFromFile(strInFilename);
             if (checksum != pResourceFile->GetServerChecksum())

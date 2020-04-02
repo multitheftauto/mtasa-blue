@@ -61,6 +61,7 @@ public:
     LUA_DECLARE(SetPlayerNametagShowing);
     LUA_DECLARE(SetPlayerMuted);
     LUA_DECLARE(SetPlayerBlurLevel);
+    LUA_DECLARE(SetPlayerDiscordJoinParams);
     LUA_DECLARE(RedirectPlayer);
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);

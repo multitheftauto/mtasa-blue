@@ -41,6 +41,7 @@ CCredits::CCredits()
         "Chris \"ccw\" Cockwanger\n"
         "Adge \"Jax\" Cutler\n"
         "Cecill \"ijs\" Etheredge\n"
+        "Marek \"botder\" Kulik\n"
         "Sebas \"x86\" Lamers\n"
         "Raphael \"Mr.Hankey\" Leiteritz\n"
         "Ed \"eAi\" Lyons\n"
@@ -62,7 +63,6 @@ CCredits::CCredits()
 
         "Patrik \"myonlake\" Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
-        "Marek \"botder\" Kulik\n"
         "Arran\n"
         "Iztas\n"
         "impulze\n"
@@ -107,9 +107,14 @@ CCredits::CCredits()
         "Florian \"Flobu\" Busse\n"
         "Callum \"Callum\" Dawson\n"
         "Philip \"Fenix\" Farquharson\n"
+        "Seweryn \"Neproify\" Figura\n"
         "Robin \"robhol\" Holm\n"
         "Gabrielius \"Dezash\" Laurinavicius\n"
+        "Kamil \"forkerer\" Marciniak\n"
+        "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Nikita \"StrixG\" Obrecht\n"
+        "Ali \"Haxardous\" Qamber\n"
+        "Sam \"samr46\" R.\n"
         "Fedor \"Ted\" Sinev\n"
         "Adam \"50p\" Telega\n"
         "Ilya \"Kenix\" Volkov\n"
@@ -158,8 +163,14 @@ CCredits::CCredits()
         "GTX / Timic3\n"
         "FileEX\n"
         "Pirulax\n"
+        "xLuxy\n"
+        "Addlibs\n"
         "SDraw\n"
-        "samr46\n"
+        "DetectedStorm\n"
+        "xerox8521\n"
+        "pentaflops\n"
+        "knitz12\n"
+        "ApeLsiN4eG\n"
         "\n"
         "\n";
 
@@ -168,11 +179,14 @@ CCredits::CCredits()
         "\n\n"
 
         "Derek \"slush\" Abdine\n"
+        "Jordan \"Woovie\" Banasik\n"
         "Javier \"jbeta\" Beta\n"
         "Oliver \"Oli\" Brown\n"
+        "Emiliano \"Sasu\" Castro\n"
         "Wojciech \"Wojjie\" Hlibowicki\n"
         "Chris \"Cray\" McArthur\n"
         "Rob 'Sugar Daddy' Pooley\n"
+        "max \"Hobo Pie\" Power\n"
         "Hans \"Blokker\" Roes\n"
         "Kent \"Kent747\" Simon\n"
         "Matthew \"Towncivilian\" Wolfe\n"
@@ -181,8 +195,6 @@ CCredits::CCredits()
         "Pugwipe\n"
         "The_GTA\n"
         "Phatlooser\n"
-        "Jordan \"Woovie\" Banasik\n"
-        "max \"Hobo Pie\" Power\n"
         "diegofkda\n"
         "Ren712\n"
         "StifflersMom\n"
@@ -207,7 +219,9 @@ CCredits::CCredits()
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "speex (http://www.speex.org/)\n"
-        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n";
+        "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
+        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
+        "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n";
 
     // Create our window
     CVector2D RelativeWindow = CVector2D(fWindowX / pManager->GetResolution().fX, fWindowY / pManager->GetResolution().fY);

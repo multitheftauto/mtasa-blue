@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012 - 2017, Nick Zitzmann, <nickzman@gmail.com>.
- * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -79,7 +79,7 @@
 /* These macros mean "the following code is present to allow runtime backward
    compatibility with at least this cat or earlier":
    (You set this at build-time using the compiler command line option
-   "-mmacos-version-min.") */
+   "-mmacosx-version-min.") */
 #define CURL_SUPPORT_MAC_10_5 MAC_OS_X_VERSION_MIN_REQUIRED <= 1050
 #define CURL_SUPPORT_MAC_10_6 MAC_OS_X_VERSION_MIN_REQUIRED <= 1060
 #define CURL_SUPPORT_MAC_10_7 MAC_OS_X_VERSION_MIN_REQUIRED <= 1070
@@ -1164,7 +1164,7 @@ static OSStatus CopyIdentityFromPKCS12File(const char *cPath,
    * the Keychain.
    *
    * As this doesn't match iOS, and apps may not want to see their client
-   * certificate saved in the the user's keychain, we use SecItemImport
+   * certificate saved in the user's keychain, we use SecItemImport
    * with a NULL keychain to avoid importing it.
    *
    * This returns a SecCertificateRef from which we can construct a
@@ -2805,7 +2805,7 @@ sectransp_connect_common(struct connectdata *conn,
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
-  long timeout_ms;
+  timediff_t timeout_ms;
   int what;
 
   /* check if the connection has already been established */
@@ -2852,7 +2852,7 @@ sectransp_connect_common(struct connectdata *conn,
       connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
 
       what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
-                               nonblocking?0:timeout_ms);
+                               nonblocking?0:(time_t)timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
