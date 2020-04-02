@@ -1,5 +1,4 @@
 #ifdef WIN32
-#pragma message("Compiling precompiled header.\n")
 
 #include <winsock2.h>
 #include <windows.h>
@@ -19,6 +18,8 @@
 #include <ctime>
 #include <sstream>
 #include <mutex>
+#include <unordered_set>
+#include <future>
 
 // Forward declarations
 class CAclRightName;
@@ -38,7 +39,6 @@ struct SAclRequest;
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"
-#include "CQuat.h"
 #include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
@@ -48,6 +48,7 @@ struct SAclRequest;
 
 // Packet includes
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CChatClearPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "packets/CCommandPacket.h"
 #include "packets/CConsoleEchoPacket.h"
@@ -109,6 +110,8 @@ struct SAclRequest;
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
+#include "packets/CDiscordJoinPacket.h"
 
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
@@ -138,6 +141,9 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
+
+// has to be included before CLuaFunctionParseHelpers to prevent "invalid use of incomplete type ‘class CRemoteCalls´
+#include "CRemoteCalls.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -250,7 +256,6 @@ struct SAclRequest;
 #include "CRegisteredCommands.h"
 #include "CRegistryManager.h"
 #include "CRegistry.h"
-#include "CRemoteCalls.h"
 #include "CResource.h"
 #include "CResourceChecker.h"
 #include "CResourceClientConfigItem.h"
@@ -281,7 +286,6 @@ struct SAclRequest;
 #include "CWater.h"
 #include "CWaterManager.h"
 #include "CWeaponNames.h"
-#include "CWhoWas.h"
 #include "CXMLConfig.h"
 #include "CZoneNames.h"
 #include "TaskNames.h"
@@ -305,4 +309,4 @@ struct SAclRequest;
 #include "../../version.h"
 
 extern CNetServer* g_pRealNetServer;
-extern CGame* g_pGame;
+extern CGame*      g_pGame;

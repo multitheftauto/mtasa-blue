@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -60,8 +60,6 @@ Curl_hash_init(struct curl_hash *h,
                comp_function comparator,
                curl_hash_dtor dtor)
 {
-  int i;
-
   if(!slots || !hfunc || !comparator ||!dtor) {
     return 1; /* failure */
   }
@@ -74,6 +72,7 @@ Curl_hash_init(struct curl_hash *h,
 
   h->table = malloc(slots * sizeof(struct curl_llist));
   if(h->table) {
+    int i;
     for(i = 0; i < slots; ++i)
       Curl_llist_init(&h->table[i], (curl_llist_dtor) hash_element_dtor);
     return 0; /* fine */
@@ -124,17 +123,9 @@ Curl_hash_add(struct curl_hash *h, void *key, size_t key_len, void *p)
 
   he = mk_hash_element(key, key_len, p);
   if(he) {
-    if(Curl_llist_insert_next(l, l->tail, he)) {
-      ++h->size;
-      return p; /* return the new entry */
-    }
-    /*
-     * Couldn't insert it, destroy the 'he' element and the key again. We
-     * don't call hash_element_dtor() since that would also call the
-     * "destructor" for the actual data 'p'. When we fail, we shall not touch
-     * that data.
-     */
-    free(he);
+    Curl_llist_insert_next(l, l->tail, he, &he->list);
+    ++h->size;
+    return p; /* return the new entry */
   }
 
   return NULL; /* failure */
@@ -148,11 +139,10 @@ Curl_hash_add(struct curl_hash *h, void *key, size_t key_len, void *p)
 int Curl_hash_delete(struct curl_hash *h, void *key, size_t key_len)
 {
   struct curl_llist_element *le;
-  struct curl_hash_element  *he;
   struct curl_llist *l = FETCH_LIST(h, key, key_len);
 
   for(le = l->head; le; le = le->next) {
-    he = le->ptr;
+    struct curl_hash_element *he = le->ptr;
     if(h->comp_func(he->key, he->key_len, key, key_len)) {
       Curl_llist_remove(l, le, (void *) h);
       --h->size;
@@ -170,13 +160,12 @@ void *
 Curl_hash_pick(struct curl_hash *h, void *key, size_t key_len)
 {
   struct curl_llist_element *le;
-  struct curl_hash_element  *he;
   struct curl_llist *l;
 
   if(h) {
     l = FETCH_LIST(h, key, key_len);
     for(le = l->head; le; le = le->next) {
-      he = le->ptr;
+      struct curl_hash_element *he = le->ptr;
       if(h->comp_func(he->key, he->key_len, key, key_len)) {
         return he->ptr;
       }
@@ -269,11 +258,11 @@ size_t Curl_hash_str(void *key, size_t key_length, size_t slots_num)
 {
   const char *key_str = (const char *) key;
   const char *end = key_str + key_length;
-  unsigned long h = 5381;
+  size_t h = 5381;
 
   while(key_str < end) {
     h += h << 5;
-    h ^= (unsigned long) *key_str++;
+    h ^= *key_str++;
   }
 
   return (h % slots_num);
@@ -299,7 +288,6 @@ void Curl_hash_start_iterate(struct curl_hash *hash,
 struct curl_hash_element *
 Curl_hash_next_element(struct curl_hash_iterator *iter)
 {
-  int i;
   struct curl_hash *h = iter->hash;
 
   /* Get the next element in the current list, if any */
@@ -308,10 +296,11 @@ Curl_hash_next_element(struct curl_hash_iterator *iter)
 
   /* If we have reached the end of the list, find the next one */
   if(!iter->current_element) {
-    for(i = iter->slot_index;i < h->slots;i++) {
+    int i;
+    for(i = iter->slot_index; i < h->slots; i++) {
       if(h->table[i].head) {
         iter->current_element = h->table[i].head;
-        iter->slot_index = i+1;
+        iter->slot_index = i + 1;
         break;
       }
     }

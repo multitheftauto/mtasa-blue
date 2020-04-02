@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -60,9 +60,6 @@
 
 /* Define if you have the <io.h> header file. */
 #define HAVE_IO_H 1
-
-/* Define if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
 
 /* Define if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
@@ -186,7 +183,13 @@
 /* #define HAVE_DOPRNT 1 */
 
 /* Define if you have the ftruncate function. */
-#define HAVE_FTRUNCATE 1
+/* #define HAVE_FTRUNCATE 1 */
+
+/* Define to 1 if you have the `getpeername' function. */
+#define HAVE_GETPEERNAME 1
+
+/* Define to 1 if you have the getsockname function. */
+#define HAVE_GETSOCKNAME 1
 
 /* Define if you have the gethostbyaddr function. */
 #define HAVE_GETHOSTBYADDR 1
@@ -399,12 +402,18 @@
 /* Define to the size of `short', as computed by sizeof. */
 #define SIZEOF_SHORT 2
 
+/* Define to the size of `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
+
 /* Define to the size of `size_t', as computed by sizeof. */
 #if defined(_WIN64)
 #  define SIZEOF_SIZE_T 8
 #else
 #  define SIZEOF_SIZE_T 4
 #endif
+
+/* Define to the size of `curl_off_t', as computed by sizeof. */
+#define SIZEOF_CURL_OFF_T 8
 
 /* ---------------------------------------------------------------- */
 /*               BSD-style lwIP TCP/IP stack SPECIFIC               */
@@ -576,8 +585,9 @@ Vista
 #  endif
 #endif
 
-/* Availability of freeaddrinfo, getaddrinfo and getnameinfo functions is
-   quite convoluted, compiler dependent and even build target dependent. */
+/* Availability of freeaddrinfo, getaddrinfo, getnameinfo and if_nametoindex
+   functions is quite convoluted, compiler dependent and even build target
+   dependent. */
 #if defined(HAVE_WS2TCPIP_H)
 #  if defined(__POCC__)
 #    define HAVE_FREEADDRINFO           1
@@ -688,6 +698,7 @@ Vista
 #define HAVE_LDAP_URL_PARSE 1
 #else
 #undef HAVE_LDAP_URL_PARSE
+#define HAVE_LDAP_SSL 1
 #define USE_WIN32_LDAP 1
 #endif
 
@@ -703,8 +714,17 @@ Vista
 #endif
 
 /* Define to use the Windows crypto library. */
-#if !defined(USE_OPENSSL) && !defined(USE_NSS)
+#if !defined(CURL_WINDOWS_APP)
 #define USE_WIN32_CRYPTO
+#endif
+
+/* Define to use Unix sockets. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1500)
+/* sdkddkver.h first shipped with Platform SDK v6.0A included with VS2008 */
+#include <sdkddkver.h>
+#if defined(NTDDI_WIN10_RS4)
+#define USE_UNIX_SOCKETS
+#endif
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -717,8 +737,12 @@ Vista
 #define OS "i386-pc-win32"
 #elif defined(_M_X64) || defined(__x86_64__) /* x86_64 (MSVC >=2005 or gcc) */
 #define OS "x86_64-pc-win32"
-#elif defined(_M_IA64) /* Itanium */
+#elif defined(_M_IA64) || defined(__ia64__) /* Itanium */
 #define OS "ia64-pc-win32"
+#elif defined(_M_ARM_NT) || defined(__arm__) /* ARMv7-Thumb2 (Windows RT) */
+#define OS "thumbv7a-pc-win32"
+#elif defined(_M_ARM64) || defined(__aarch64__) /* ARM64 (Windows 10) */
+#define OS "aarch64-pc-win32"
 #else
 #define OS "unknown-pc-win32"
 #endif

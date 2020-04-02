@@ -14,7 +14,13 @@ class SaveFilePos
     }
     ~SaveFilePos()
     {
-      SaveFile->Seek(SavePos,SEEK_SET);
+      // If file is already closed by current exception processing,
+      // we would get uneeded error messages and an exception inside of
+      // exception and terminate if we try to seek without checking
+      // if file is still opened. We should not also restore the position
+      // if external code closed the file on purpose.
+      if (SaveFile->IsOpened())
+        SaveFile->Seek(SavePos,SEEK_SET);
     }
 };
 

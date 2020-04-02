@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -22,18 +22,28 @@
 
 #include "curl_setup.h"
 
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+
+#ifdef HAVE_LINUX_TCP_H
+#include <linux/tcp.h>
+#endif
+
 #include <curl/curl.h>
 
 #include "urldata.h"
 #include "sendf.h"
 #include "connect.h"
 #include "vtls/vtls.h"
-#include "ssh.h"
+#include "vssh/ssh.h"
+#include "easyif.h"
 #include "multiif.h"
 #include "non-ascii.h"
 #include "strerror.h"
 #include "select.h"
 #include "strdup.h"
+#include "http2.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -63,7 +73,7 @@ static size_t convert_lineends(struct Curl_easy *data,
     if(*startPtr == '\n') {
       /* This block of incoming data starts with the
          previous block's LF so get rid of it */
-      memmove(startPtr, startPtr+1, size-1);
+      memmove(startPtr, startPtr + 1, size-1);
       size--;
       /* and it wasn't a bare CR but a CRLF conversion instead */
       data->state.crlf_conversions++;
@@ -75,7 +85,7 @@ static size_t convert_lineends(struct Curl_easy *data,
   inPtr = outPtr = memchr(startPtr, '\r', size);
   if(inPtr) {
     /* at least one CR, now look for CRLF */
-    while(inPtr < (startPtr+size-1)) {
+    while(inPtr < (startPtr + size-1)) {
       /* note that it's size-1, so we'll never look past the last byte */
       if(memcmp(inPtr, "\r\n", 2) == 0) {
         /* CRLF found, bump past the CR and copy the NL */
@@ -98,7 +108,7 @@ static size_t convert_lineends(struct Curl_easy *data,
       inPtr++;
     } /* end of while loop */
 
-    if(inPtr < startPtr+size) {
+    if(inPtr < startPtr + size) {
       /* handle last byte */
       if(*inPtr == '\r') {
         /* deal with a CR at the end of the buffer */
@@ -112,7 +122,7 @@ static size_t convert_lineends(struct Curl_easy *data,
       }
       outPtr++;
     }
-    if(outPtr < startPtr+size)
+    if(outPtr < startPtr + size)
       /* tidy up by null terminating the now shorter data */
       *outPtr = '\0';
 
@@ -149,7 +159,7 @@ static void pre_receive_plain(struct connectdata *conn, int num)
       /* Have some incoming data */
       if(!psnd->buffer) {
         /* Use buffer double default size for intermediate buffer */
-        psnd->allocated_size = 2 * BUFSIZE;
+        psnd->allocated_size = 2 * conn->data->set.buffer_size;
         psnd->buffer = malloc(psnd->allocated_size);
         psnd->recv_size = 0;
         psnd->recv_processed = 0;
@@ -215,7 +225,7 @@ bool Curl_recv_has_postponed_data(struct connectdata *conn, int sockindex)
   (void)sockindex;
   return false;
 }
-#define pre_receive_plain(c,n) do {} WHILE_FALSE
+#define pre_receive_plain(c,n) do {} while(0)
 #define get_pre_recved(c,n,b,l) 0
 #endif /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
 
@@ -228,10 +238,21 @@ void Curl_infof(struct Curl_easy *data, const char *fmt, ...)
     size_t len;
     char print_buffer[2048 + 1];
     va_start(ap, fmt);
-    vsnprintf(print_buffer, sizeof(print_buffer), fmt, ap);
+    len = mvsnprintf(print_buffer, sizeof(print_buffer), fmt, ap);
+    /*
+     * Indicate truncation of the input by replacing the last 3 characters
+     * with "...", and transfer the newline over in case the format had one.
+     */
+    if(len >= sizeof(print_buffer)) {
+      len = strlen(fmt);
+      if(fmt[--len] == '\n')
+        msnprintf(print_buffer + (sizeof(print_buffer) - 5), 5, "...\n");
+      else
+        msnprintf(print_buffer + (sizeof(print_buffer) - 4), 4, "...");
+    }
     va_end(ap);
     len = strlen(print_buffer);
-    Curl_debug(data, CURLINFO_TEXT, print_buffer, len, NULL);
+    Curl_debug(data, CURLINFO_TEXT, print_buffer, len);
   }
 }
 
@@ -241,26 +262,25 @@ void Curl_infof(struct Curl_easy *data, const char *fmt, ...)
 
 void Curl_failf(struct Curl_easy *data, const char *fmt, ...)
 {
-  va_list ap;
-  size_t len;
-  va_start(ap, fmt);
+  if(data->set.verbose || data->set.errorbuffer) {
+    va_list ap;
+    size_t len;
+    char error[CURL_ERROR_SIZE + 2];
+    va_start(ap, fmt);
+    mvsnprintf(error, CURL_ERROR_SIZE, fmt, ap);
+    len = strlen(error);
 
-  vsnprintf(data->state.buffer, BUFSIZE, fmt, ap);
-
-  if(data->set.errorbuffer && !data->state.errorbuf) {
-    snprintf(data->set.errorbuffer, CURL_ERROR_SIZE, "%s", data->state.buffer);
-    data->state.errorbuf = TRUE; /* wrote error string */
-  }
-  if(data->set.verbose) {
-    len = strlen(data->state.buffer);
-    if(len < BUFSIZE - 1) {
-      data->state.buffer[len] = '\n';
-      data->state.buffer[++len] = '\0';
+    if(data->set.errorbuffer && !data->state.errorbuf) {
+      strcpy(data->set.errorbuffer, error);
+      data->state.errorbuf = TRUE; /* wrote error string */
     }
-    Curl_debug(data, CURLINFO_TEXT, data->state.buffer, len, NULL);
+    if(data->set.verbose) {
+      error[len] = '\n';
+      error[++len] = '\0';
+      Curl_debug(data, CURLINFO_TEXT, error, len);
+    }
+    va_end(ap);
   }
-
-  va_end(ap);
 }
 
 /* Curl_sendf() sends formatted data to the server */
@@ -280,7 +300,7 @@ CURLcode Curl_sendf(curl_socket_t sockfd, struct connectdata *conn,
   if(!s)
     return CURLE_OUT_OF_MEMORY; /* failure */
 
-  bytes_written=0;
+  bytes_written = 0;
   write_len = strlen(s);
   sptr = s;
 
@@ -292,7 +312,7 @@ CURLcode Curl_sendf(curl_socket_t sockfd, struct connectdata *conn,
       break;
 
     if(data->set.verbose)
-      Curl_debug(data, CURLINFO_DATA_OUT, sptr, (size_t)bytes_written, conn);
+      Curl_debug(data, CURLINFO_DATA_OUT, sptr, (size_t)bytes_written);
 
     if((size_t)bytes_written != write_len) {
       /* if not all was written at once, we must advance the pointer, decrease
@@ -361,7 +381,7 @@ ssize_t Curl_send_plain(struct connectdata *conn, int num,
      available. */
   pre_receive_plain(conn, num);
 
-#ifdef MSG_FASTOPEN /* Linux */
+#if defined(MSG_FASTOPEN) && !defined(TCP_FASTOPEN_CONNECT) /* Linux */
   if(conn->bits.tcp_fastopen) {
     bytes_written = sendto(sockfd, mem, len, MSG_FASTOPEN,
                            conn->ip_addr->ai_addr, conn->ip_addr->ai_addrlen);
@@ -381,19 +401,20 @@ ssize_t Curl_send_plain(struct connectdata *conn, int num,
       (WSAEWOULDBLOCK == err)
 #else
       /* errno may be EWOULDBLOCK or on some systems EAGAIN when it returned
-         due to its inability to send off data without blocking. We therefor
+         due to its inability to send off data without blocking. We therefore
          treat both error codes the same here */
       (EWOULDBLOCK == err) || (EAGAIN == err) || (EINTR == err) ||
       (EINPROGRESS == err)
 #endif
       ) {
       /* this is just a case of EWOULDBLOCK */
-      bytes_written=0;
+      bytes_written = 0;
       *code = CURLE_AGAIN;
     }
     else {
+      char buffer[STRERROR_LEN];
       failf(conn->data, "Send failure: %s",
-            Curl_strerror(conn, err));
+            Curl_strerror(err, buffer, sizeof(buffer)));
       conn->data->state.os_errno = err;
       *code = CURLE_SEND_ERROR;
     }
@@ -448,7 +469,7 @@ ssize_t Curl_recv_plain(struct connectdata *conn, int num, char *buf,
       (WSAEWOULDBLOCK == err)
 #else
       /* errno may be EWOULDBLOCK or on some systems EAGAIN when it returned
-         due to its inability to send off data without blocking. We therefor
+         due to its inability to send off data without blocking. We therefore
          treat both error codes the same here */
       (EWOULDBLOCK == err) || (EAGAIN == err) || (EINTR == err)
 #endif
@@ -457,8 +478,9 @@ ssize_t Curl_recv_plain(struct connectdata *conn, int num, char *buf,
       *code = CURLE_AGAIN;
     }
     else {
+      char buffer[STRERROR_LEN];
       failf(conn->data, "Recv failure: %s",
-            Curl_strerror(conn, err));
+            Curl_strerror(err, buffer, sizeof(buffer)));
       conn->data->state.os_errno = err;
       *code = CURLE_RECV_ERROR;
     }
@@ -480,8 +502,11 @@ static CURLcode pausewrite(struct Curl_easy *data,
   unsigned int i;
   bool newtype = TRUE;
 
+  /* If this transfers over HTTP/2, pause the stream! */
+  Curl_http2_stream_pause(data, TRUE);
+
   if(s->tempcount) {
-    for(i=0; i< s->tempcount; i++) {
+    for(i = 0; i< s->tempcount; i++) {
       if(s->tempwrite[i].type == type) {
         /* data for this type exists */
         newtype = FALSE;
@@ -508,6 +533,8 @@ static CURLcode pausewrite(struct Curl_easy *data,
     /* update the pointer and the size */
     s->tempwrite[i].buf = newptr;
     s->tempwrite[i].len = newlen;
+
+    len = newlen; /* for the debug output below */
   }
   else {
     dupl = Curl_memdup(ptr, len);
@@ -533,18 +560,20 @@ static CURLcode pausewrite(struct Curl_easy *data,
 }
 
 
-/* Curl_client_chop_write() writes chunks of data not larger than
- * CURL_MAX_WRITE_SIZE via client write callback(s) and
- * takes care of pause requests from the callbacks.
+/* chop_write() writes chunks of data not larger than CURL_MAX_WRITE_SIZE via
+ * client write callback(s) and takes care of pause requests from the
+ * callbacks.
  */
-CURLcode Curl_client_chop_write(struct connectdata *conn,
-                                int type,
-                                char *ptr,
-                                size_t len)
+static CURLcode chop_write(struct connectdata *conn,
+                           int type,
+                           char *optr,
+                           size_t olen)
 {
   struct Curl_easy *data = conn->data;
   curl_write_callback writeheader = NULL;
   curl_write_callback writebody = NULL;
+  char *ptr = optr;
+  size_t len = olen;
 
   if(!len)
     return CURLE_OK;
@@ -572,7 +601,10 @@ CURLcode Curl_client_chop_write(struct connectdata *conn,
     size_t chunklen = len <= CURL_MAX_WRITE_SIZE? len: CURL_MAX_WRITE_SIZE;
 
     if(writebody) {
-      size_t wrote = writebody(ptr, 1, chunklen, data->set.out);
+      size_t wrote;
+      Curl_set_in_callback(data, true);
+      wrote = writebody(ptr, 1, chunklen, data->set.out);
+      Curl_set_in_callback(data, false);
 
       if(CURL_WRITEFUNC_PAUSE == wrote) {
         if(conn->handler->flags & PROTOPT_NONETWORK) {
@@ -590,23 +622,28 @@ CURLcode Curl_client_chop_write(struct connectdata *conn,
       }
     }
 
-    if(writeheader) {
-      size_t wrote = writeheader(ptr, 1, chunklen, data->set.writeheader);
-
-      if(CURL_WRITEFUNC_PAUSE == wrote)
-        /* here we pass in the HEADER bit only since if this was body as well
-           then it was passed already and clearly that didn't trigger the
-           pause, so this is saved for later with the HEADER bit only */
-        return pausewrite(data, CLIENTWRITE_HEADER, ptr, len);
-
-      if(wrote != chunklen) {
-        failf(data, "Failed writing header");
-        return CURLE_WRITE_ERROR;
-      }
-    }
-
     ptr += chunklen;
     len -= chunklen;
+  }
+
+  if(writeheader) {
+    size_t wrote;
+    ptr = optr;
+    len = olen;
+    Curl_set_in_callback(data, true);
+    wrote = writeheader(ptr, 1, len, data->set.writeheader);
+    Curl_set_in_callback(data, false);
+
+    if(CURL_WRITEFUNC_PAUSE == wrote)
+      /* here we pass in the HEADER bit only since if this was body as well
+         then it was passed already and clearly that didn't trigger the
+         pause, so this is saved for later with the HEADER bit only */
+      return pausewrite(data, CLIENTWRITE_HEADER, ptr, len);
+
+    if(wrote != len) {
+      failf(data, "Failed writing header");
+      return CURLE_WRITE_ERROR;
+    }
   }
 
   return CURLE_OK;
@@ -650,7 +687,7 @@ CURLcode Curl_client_write(struct connectdata *conn,
 #endif /* CURL_DO_LINEEND_CONV */
     }
 
-  return Curl_client_chop_write(conn, type, ptr, len);
+  return chop_write(conn, type, ptr, len);
 }
 
 CURLcode Curl_read_plain(curl_socket_t sockfd,
@@ -661,19 +698,20 @@ CURLcode Curl_read_plain(curl_socket_t sockfd,
   ssize_t nread = sread(sockfd, buf, bytesfromsocket);
 
   if(-1 == nread) {
-    int err = SOCKERRNO;
-    int return_error;
+    const int err = SOCKERRNO;
+    const bool return_error =
 #ifdef USE_WINSOCK
-    return_error = WSAEWOULDBLOCK == err;
+      WSAEWOULDBLOCK == err
 #else
-    return_error = EWOULDBLOCK == err || EAGAIN == err || EINTR == err;
+      EWOULDBLOCK == err || EAGAIN == err || EINTR == err
 #endif
+      ;
+    *n = 0; /* no data returned */
     if(return_error)
       return CURLE_AGAIN;
     return CURLE_RECV_ERROR;
   }
 
-  /* we only return number of bytes read when we return OK */
   *n = nread;
   return CURLE_OK;
 }
@@ -694,53 +732,21 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
   ssize_t nread = 0;
   size_t bytesfromsocket = 0;
   char *buffertofill = NULL;
-
-  /* if HTTP/1 pipelining is both wanted and possible */
-  bool pipelining = Curl_pipeline_wanted(conn->data->multi, CURLPIPE_HTTP1) &&
-    (conn->bundle->multiuse == BUNDLE_PIPELINING);
+  struct Curl_easy *data = conn->data;
 
   /* Set 'num' to 0 or 1, depending on which socket that has been sent here.
      If it is the second socket, we set num to 1. Otherwise to 0. This lets
      us use the correct ssl handle. */
   int num = (sockfd == conn->sock[SECONDARYSOCKET]);
 
-  *n=0; /* reset amount to zero */
+  *n = 0; /* reset amount to zero */
 
-  /* If session can pipeline, check connection buffer  */
-  if(pipelining) {
-    size_t bytestocopy = CURLMIN(conn->buf_len - conn->read_pos,
-                                 sizerequested);
-
-    /* Copy from our master buffer first if we have some unread data there*/
-    if(bytestocopy > 0) {
-      memcpy(buf, conn->master_buffer + conn->read_pos, bytestocopy);
-      conn->read_pos += bytestocopy;
-      conn->bits.stream_was_rewound = FALSE;
-
-      *n = (ssize_t)bytestocopy;
-      return CURLE_OK;
-    }
-    /* If we come here, it means that there is no data to read from the buffer,
-     * so we read from the socket */
-    bytesfromsocket = CURLMIN(sizerequested, BUFSIZE * sizeof(char));
-    buffertofill = conn->master_buffer;
-  }
-  else {
-    bytesfromsocket = CURLMIN((long)sizerequested,
-                              conn->data->set.buffer_size ?
-                              conn->data->set.buffer_size : BUFSIZE);
-    buffertofill = buf;
-  }
+  bytesfromsocket = CURLMIN(sizerequested, (size_t)data->set.buffer_size);
+  buffertofill = buf;
 
   nread = conn->recv[num](conn, num, buffertofill, bytesfromsocket, &result);
   if(nread < 0)
     return result;
-
-  if(pipelining) {
-    memcpy(buf, conn->master_buffer, nread);
-    conn->buf_len = nread;
-    conn->read_pos = nread;
-  }
 
   *n += nread;
 
@@ -748,26 +754,24 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
 }
 
 /* return 0 on success */
-static int showit(struct Curl_easy *data, curl_infotype type,
-                  char *ptr, size_t size)
+int Curl_debug(struct Curl_easy *data, curl_infotype type,
+               char *ptr, size_t size)
 {
   static const char s_infotype[CURLINFO_END][3] = {
     "* ", "< ", "> ", "{ ", "} ", "{ ", "} " };
+  int rc = 0;
 
 #ifdef CURL_DOES_CONVERSIONS
-  char buf[BUFSIZE+1];
+  char *buf = NULL;
   size_t conv_size = 0;
 
   switch(type) {
   case CURLINFO_HEADER_OUT:
-    /* assume output headers are ASCII */
-    /* copy the data into my buffer so the original is unchanged */
-    if(size > BUFSIZE) {
-      size = BUFSIZE; /* truncate if necessary */
-      buf[BUFSIZE] = '\0';
-    }
+    buf = Curl_memdup(ptr, size);
+    if(!buf)
+      return 1;
     conv_size = size;
-    memcpy(buf, ptr, size);
+
     /* Special processing is needed for this block if it
      * contains both headers and data (separated by CRLFCRLF).
      * We want to convert just the headers, leaving the data as-is.
@@ -794,63 +798,31 @@ static int showit(struct Curl_easy *data, curl_infotype type,
   }
 #endif /* CURL_DOES_CONVERSIONS */
 
-  if(data->set.fdebug)
-    return (*data->set.fdebug)(data, type, ptr, size,
-                               data->set.debugdata);
-
-  switch(type) {
-  case CURLINFO_TEXT:
-  case CURLINFO_HEADER_OUT:
-  case CURLINFO_HEADER_IN:
-    fwrite(s_infotype[type], 2, 1, data->set.err);
-    fwrite(ptr, size, 1, data->set.err);
-#ifdef CURL_DOES_CONVERSIONS
-    if(size != conv_size) {
-      /* we had untranslated data so we need an explicit newline */
-      fwrite("\n", 1, 1, data->set.err);
-    }
-#endif
-    break;
-  default: /* nada */
-    break;
+  if(data->set.fdebug) {
+    Curl_set_in_callback(data, true);
+    rc = (*data->set.fdebug)(data, type, ptr, size, data->set.debugdata);
+    Curl_set_in_callback(data, false);
   }
-  return 0;
-}
-
-int Curl_debug(struct Curl_easy *data, curl_infotype type,
-               char *ptr, size_t size,
-               struct connectdata *conn)
-{
-  int rc;
-  if(data->set.printhost && conn && conn->host.dispname) {
-    char buffer[160];
-    const char *t=NULL;
-    const char *w="Data";
+  else {
     switch(type) {
-    case CURLINFO_HEADER_IN:
-      w = "Header";
-      /* FALLTHROUGH */
-    case CURLINFO_DATA_IN:
-      t = "from";
-      break;
+    case CURLINFO_TEXT:
     case CURLINFO_HEADER_OUT:
-      w = "Header";
-      /* FALLTHROUGH */
-    case CURLINFO_DATA_OUT:
-      t = "to";
+    case CURLINFO_HEADER_IN:
+      fwrite(s_infotype[type], 2, 1, data->set.err);
+      fwrite(ptr, size, 1, data->set.err);
+#ifdef CURL_DOES_CONVERSIONS
+      if(size != conv_size) {
+        /* we had untranslated data so we need an explicit newline */
+        fwrite("\n", 1, 1, data->set.err);
+      }
+#endif
       break;
-    default:
+    default: /* nada */
       break;
-    }
-
-    if(t) {
-      snprintf(buffer, sizeof(buffer), "[%s %s %s]", w, t,
-               conn->host.dispname);
-      rc = showit(data, CURLINFO_TEXT, buffer, strlen(buffer));
-      if(rc)
-        return rc;
     }
   }
-  rc = showit(data, type, ptr, size);
+#ifdef CURL_DOES_CONVERSIONS
+  free(buf);
+#endif
   return rc;
 }

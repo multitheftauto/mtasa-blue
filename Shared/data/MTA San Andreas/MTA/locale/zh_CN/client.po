@@ -6,674 +6,580 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2016-01-23 05:20+0000\n"
-"Last-Translator: Jin <yin66236@gmail.com>\n"
+"POT-Creation-Date: 2019-09-07 18:33+0100\n"
+"PO-Revision-Date: 2019-03-10 04:23+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Jin \"yinjin_116s\" Yin; mk124; ChineseGTA \"ChineseGTA\" Li; "
-"LilDollaTechZone; hcyxsq; ccw\n"
-"X-POOTLE-MTIME: 1453526401.0\n"
+"X-POOTLE-MTIME: 1552191805.0\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
+#: ..\Client\cefweb\CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "网站请求"
+
+#: ..\Client\cefweb\CWebsiteRequests.cpp:27
+msgid ""
+"The server requests the following websites in order to load them (later):"
+msgstr "本服务器需要（稍后）加载如下网站："
+
+#: ..\Client\cefweb\CWebsiteRequests.cpp:32
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "请勿输入敏感信息，谨防泄密"
+
+#: ..\Client\cefweb\CWebsiteRequests.cpp:44
+msgid "Remember decision"
+msgstr "记住选项"
+
+#: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:923
+msgid "Allow"
+msgstr "允许"
+
+#: ..\Client\cefweb\CWebsiteRequests.cpp:55
+msgid "Deny"
+msgstr "拒绝"
+
+#: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ 指令帮助 ]***\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:190
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:182
+#, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* 当前时间为 %d:%02d:%02d"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:280
-msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "连接: 指令为 'connect <服务器地址> <端口> [<昵称> <密码>]'"
+#: ..\Client\core\CCommandFuncs.cpp:266
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "连接: 指令为 'connect <服务器地址> [<端口> <昵称> <密码>]'"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:288
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:339
+#: ..\Client\core\CCommandFuncs.cpp:274 ..\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
 msgstr "连接: 无效的端口号"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:304
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:354
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:296 ..\Client\core\CCommandFuncs.cpp:357
+#, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "连接: 正在连接到 %s:%u..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:308
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:358
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
+#, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "连接: 无法连接到 %s:%u!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:313
+#: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
 msgstr "连接: 卸载当前 mod 失败"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:392
+#: ..\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
 msgstr "绑定 GTA 所有的控制设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:406
+#: ..\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
 msgstr "已保存的配置文件"
 
 #. Print it
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:466
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:475
+#, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "* 您的序列号为 : %s"
 
 #. Unknown command
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommands.cpp:201
+#: ..\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
 msgstr "未知的命令或控制台变量:"
+
+#: ..\Client\core\CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "连接失败。使用了不可用的昵称!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunity.cpp:154
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:218
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:232
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:234
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:240
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:248
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:274
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:276
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:278
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:280
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:282
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:85
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:112
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:128
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:266
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:316
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:407
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:414
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:424
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1281
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1294
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DHook9.cpp:118
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CGUI.cpp:85
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:149
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:158
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:163
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:172
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1224
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1246
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1304
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1354
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2678
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4078
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:533
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:542
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:227
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:240
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:243
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:781
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:563
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:638
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:663
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:685
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1020
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1099
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1109
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1178
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1212
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1252
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1264
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:138
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:194
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:374
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:75
+#: ..\Client\core\CConnectManager.cpp:80
+#: ..\Client\core\CConnectManager.cpp:111
+#: ..\Client\core\CConnectManager.cpp:127
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\core\CConnectManager.cpp:321
+#: ..\Client\core\CConnectManager.cpp:404
+#: ..\Client\core\CConnectManager.cpp:411
+#: ..\Client\core\CConnectManager.cpp:421 ..\Client\core\CCore.cpp:1185
+#: ..\Client\core\CCore.cpp:1198 ..\Client\core\CGUI.cpp:86
+#: ..\Client\core\CSettings.cpp:2859 ..\Client\core\CSettings.cpp:4009
+#: ..\Client\core\CSettings.cpp:4037 ..\Client\core\CSettings.cpp:4542
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:128
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1330
+#: ..\Client\loader\CInstallManager.cpp:505
+#: ..\Client\loader\CInstallManager.cpp:514
+#: ..\Client\loader\MainFunctions.cpp:239
+#: ..\Client\loader\MainFunctions.cpp:254
+#: ..\Client\loader\MainFunctions.cpp:256
+#: ..\Client\loader\MainFunctions.cpp:817
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:574
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1246
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
+#: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Error"
 msgstr "错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunity.cpp:154
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:218
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:240
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:248
-msgid "Services currently unavailable"
-msgstr "当前服务不可用"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:112
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:150
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2718
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2773
-msgid "Login Error"
-msgstr "登录错误"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:112
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2718
-msgid "Invalid username/password"
-msgstr "无效的用户名或密码"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:222
-msgid "Success"
-msgstr "成功"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:222
-msgid "Successfully registered!"
-msgstr "注册成功!"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:274
-msgid "Username missing"
-msgstr "请填写用户名"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:276
-msgid "Email missing"
-msgstr "请填写电子邮件地址"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:278
-msgid "Password missing"
-msgstr "请填写密码"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:280
-msgid "Passwords do not match"
-msgstr "密码不匹配"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:282
-msgid "Validation code missing"
-msgstr "请填写验证码"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:84
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "连接失败。使用了不可用的昵称!"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:111
+#: ..\Client\core\CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
 msgstr "连接失败。服务器地址无效!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:127
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:126
+#, c-format, c-format
 msgid "Connecting to %s at port %u failed!"
 msgstr "连接 %s 所在端口 %u 失败!"
 
 #. Display the status box
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:148
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:147
+#, c-format, c-format
 msgid "Connecting to %s:%u ..."
 msgstr "正在连接到 %s:%u ..."
 
 #. Display the status box
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:149
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:579
+#: ..\Client\core\CConnectManager.cpp:148
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:590
 msgid "CONNECTING"
 msgstr "连接中"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:266
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1178
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
 msgstr "连接已超时"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:280
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:283
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1223
+#: ..\Client\core\CConnectManager.cpp:277
+#: ..\Client\core\CConnectManager.cpp:281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1208
 msgid "Disconnected: unknown protocol error"
 msgstr "已断开连接: 未知协议错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:286
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1226
+#: ..\Client\core\CConnectManager.cpp:285
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1212
 msgid "Disconnected: disconnected remotely"
 msgstr "已断开连接: 服务器主动断开连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:289
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1229
+#: ..\Client\core\CConnectManager.cpp:289
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1216
 msgid "Disconnected: connection lost remotely"
 msgstr "已断开连接: 与服务器连接中断"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:292
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1232
+#: ..\Client\core\CConnectManager.cpp:293
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1220
 msgid "Disconnected: you are banned from this server"
 msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:298
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1238
+#: ..\Client\core\CConnectManager.cpp:300
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected from the server"
 msgstr "已断开连接: 从服务器断开连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:301
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1241
+#: ..\Client\core\CConnectManager.cpp:304
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: connection to the server was lost"
 msgstr "已断开连接: 与服务器的连接已中断"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:307
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1247
+#: ..\Client\core\CConnectManager.cpp:311
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1240
 msgid "Disconnected: connection was refused"
 msgstr "已断开连接: 服务器拒绝连接"
 
 #. Failed loading the mod
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:406
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:403
+#, c-format, c-format
 msgid "No such mod installed (%s)"
 msgstr "未安装指定的 Mod (%s)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:414
+#: ..\Client\core\CConnectManager.cpp:411
 msgid "Bad server response (2)"
 msgstr "意外的服务器响应 (2)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:424
+#: ..\Client\core\CConnectManager.cpp:421
 msgid "Bad server response (1)"
 msgstr "意外的服务器响应 (1)"
 
 #. Create window
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConsole.cpp:423
+#: ..\Client\core\CConsole.cpp:417
 msgid "CONSOLE"
 msgstr "控制台"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:710
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:202
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:618
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "你希望查看一些与此问题相关的在线帮助吗?"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:715
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1101
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:204
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:482
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1617
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1643
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3925
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3973
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1597
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1616
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1901
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1921
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:33
-msgid "No"
-msgstr "否"
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:716
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1102
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:205
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:482
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1618
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1644
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3926
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3974
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1598
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1617
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1902
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1922
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:68
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:32
-msgid "Yes"
-msgstr "是"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:771
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:686
-#, c-format
+#: ..\Client\core\CCore.cpp:698 ..\Client\loader\CInstallManager.cpp:657
+#, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:773
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:152
+#: ..\Client\core\CCore.cpp:700 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "致命错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:947
-#, c-format
+#: ..\Client\core\CCore.cpp:843
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "请移除该文件修复问题："
+
+#: ..\Client\core\CCore.cpp:875
+#, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "模块 %s 不适用!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1281
+#: ..\Client\core\CCore.cpp:1185
 msgid "Error executing URL"
 msgstr "执行 URL 时出错"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1293
-#, c-format
+#: ..\Client\core\CCore.cpp:1197
+#, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "执行命令行 ('%s') 对应的 Mod 时出错"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1378
+#: ..\Client\core\CCore.cpp:1282
 msgid "this help screen"
 msgstr "此帮助画面"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1379
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1380
+#: ..\Client\core\CCore.cpp:1283 ..\Client\core\CCore.cpp:1284
 msgid "exits the application"
 msgstr "退出程序"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1381
+#: ..\Client\core\CCore.cpp:1285
 msgid "shows the version"
 msgstr "显示版本号"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1382
+#: ..\Client\core\CCore.cpp:1286
 msgid "shows the time"
 msgstr "显示时间"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1383
+#: ..\Client\core\CCore.cpp:1287
 msgid "shows the hud"
 msgstr "显示 HUD 界面"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1384
+#: ..\Client\core\CCore.cpp:1288
 msgid "shows all the binds"
 msgstr "显示所有绑定设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1385
+#: ..\Client\core\CCore.cpp:1289
 msgid "shows your serial"
 msgstr "显示你的序列号"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1394
+#: ..\Client\core\CCore.cpp:1298
 msgid "connects to a server (host port nick pass)"
 msgstr "连接到一个服务器 (服务器 端口 昵称 密码)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1395
+#: ..\Client\core\CCore.cpp:1299
 msgid "connects to a previous server"
 msgstr "连接到之前登陆过的服务器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1396
+#: ..\Client\core\CCore.cpp:1300
 msgid "binds a key (key control)"
 msgstr "绑定一个按键 (控制键)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1397
+#: ..\Client\core\CCore.cpp:1301
 msgid "unbinds a key (key)"
 msgstr "取消绑定按键 (key)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1398
+#: ..\Client\core\CCore.cpp:1302
 msgid "copies the default gta controls"
 msgstr "复制默认的 GTA 控制按键设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1399
+#: ..\Client\core\CCore.cpp:1303
 msgid "outputs a screenshot"
 msgstr "输出截图"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1400
+#: ..\Client\core\CCore.cpp:1304
 msgid "immediately saves the config"
 msgstr "立刻保存设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1402
+#: ..\Client\core\CCore.cpp:1306
 msgid "clears the debug view"
 msgstr "清空调试视图"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1403
+#: ..\Client\core\CCore.cpp:1307
 msgid "scrolls the chatbox upwards"
 msgstr "向上滚动聊天框"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1404
+#: ..\Client\core\CCore.cpp:1308
 msgid "scrolls the chatbox downwards"
 msgstr "向下滚动聊天框"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1405
+#: ..\Client\core\CCore.cpp:1309
 msgid "scrolls the debug view upwards"
 msgstr "向上滚动调试视图"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1406
+#: ..\Client\core\CCore.cpp:1310
 msgid "scrolls the debug view downwards"
 msgstr "向下滚动调试视图"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1409
+#: ..\Client\core\CCore.cpp:1313
 msgid "shows the memory statistics"
 msgstr "显示内存统计信息"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1410
+#: ..\Client\core\CCore.cpp:1314
 msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.h:55
-msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-msgstr "版权所有 (C) 2003 - 2015 Multi Theft Auto"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:32
+#: ..\Client\core\CCredits.cpp:32
 msgid "Programming"
 msgstr "程序开发"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:57
+#: ..\Client\core\CCredits.cpp:60
 msgid "Contributors"
 msgstr "贡献者"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:69
+#: ..\Client\core\CCredits.cpp:76
 msgid "Game Design / Scripting"
 msgstr "游戏设计 / 脚本编写员"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:85
-msgid "Patch contributors"
-msgstr "补丁贡献者"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:132
+#: ..\Client\core\CCredits.cpp:96
 msgid "Language Localization"
 msgstr "本地化翻译"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:138
+#: ..\Client\core\CCredits.cpp:102
+msgid "Patch contributors"
+msgstr "补丁贡献者"
+
+#: ..\Client\core\CCredits.cpp:177
 msgid "Special Thanks"
 msgstr "特别鸣谢"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:163
+#: ..\Client\core\CCredits.cpp:204
 msgid "This software makes use of the following libraries and software:"
 msgstr "本软件利用以下程序库和软件:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DEvents9.cpp:234
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "截图包含 %d 个字节，但实际预期为 %d"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DEvents9.cpp:240
-msgid "Screenshot failed"
-msgstr "截图失败"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DHook9.cpp:115
-msgid ""
-"Could not initialize Direct3D9.\n"
-"\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr ""
-"无法初始化 Direct3D9 。\n"
-"\n"
-"请确认您已正确安装了 DirectX 最终用户运行时以及\n"
-"最新的系统更新包。"
-
 #. Even the default skin doesn't work, so give up
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CGUI.cpp:85
+#: ..\Client\core\CGUI.cpp:85
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
 msgstr "您选定的皮肤以及系统默认皮肤均无法载入，请重新安装 MTA 。"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CJoystickManager.cpp:1600
+#: ..\Client\core\CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
 msgstr "加速轴"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CJoystickManager.cpp:1601
+#: ..\Client\core\CJoystickManager.cpp:1580
 msgid "Brake Axis"
 msgstr "制动轴"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:187
+#: ..\Client\core\CKeyBinds.cpp:180
 msgid "Fire"
 msgstr "开火"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:188
+#: ..\Client\core\CKeyBinds.cpp:181
 msgid "Next weapon"
 msgstr "下一个武器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:189
+#: ..\Client\core\CKeyBinds.cpp:182
 msgid "Previous weapon"
 msgstr "上一个武器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:190
+#: ..\Client\core\CKeyBinds.cpp:183
 msgid "Forwards"
 msgstr "前进"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:191
+#: ..\Client\core\CKeyBinds.cpp:184
 msgid "Backwards"
 msgstr "后退"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:192
+#: ..\Client\core\CKeyBinds.cpp:185 ..\Client\core\CSettings.cpp:2177
+#: ..\Client\core\CSettings.cpp:2205
 msgid "Left"
 msgstr "左移"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:193
+#: ..\Client\core\CKeyBinds.cpp:186 ..\Client\core\CSettings.cpp:2179
+#: ..\Client\core\CSettings.cpp:2206
 msgid "Right"
 msgstr "右移"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:194
+#: ..\Client\core\CKeyBinds.cpp:187
 msgid "Zoom in"
 msgstr "放大"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:195
+#: ..\Client\core\CKeyBinds.cpp:188
 msgid "Zoom out"
 msgstr "缩小"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:196
+#: ..\Client\core\CKeyBinds.cpp:189
 msgid "Enter/Exit"
 msgstr "进入/离开"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:197
+#: ..\Client\core\CKeyBinds.cpp:190
 msgid "Change camera"
 msgstr "切换镜头"
 
 #. 10
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:198
+#: ..\Client\core\CKeyBinds.cpp:191
 msgid "Jump"
 msgstr "跳跃"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:199
+#: ..\Client\core\CKeyBinds.cpp:192
 msgid "Sprint"
 msgstr "冲刺"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:200
+#: ..\Client\core\CKeyBinds.cpp:193
 msgid "Look behind"
 msgstr "向后看"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:201
+#: ..\Client\core\CKeyBinds.cpp:194
 msgid "Crouch"
 msgstr "蹲下"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:202
+#: ..\Client\core\CKeyBinds.cpp:195
 msgid "Action"
 msgstr "行动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:203
+#: ..\Client\core\CKeyBinds.cpp:196
 msgid "Walk"
 msgstr "步行"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:204
+#: ..\Client\core\CKeyBinds.cpp:197
 msgid "Vehicle fire"
 msgstr "在载具里开火"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:205
+#: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
 msgstr "向载具副驾驶席的方向开火"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:206
+#: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
 msgstr "载具向左"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:207
+#: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle right"
 msgstr "载具向右"
 
 #. 20
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:208
+#: ..\Client\core\CKeyBinds.cpp:201
 msgid "Steer forwards/down"
 msgstr "控制向前/向下驾驶"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:209
+#: ..\Client\core\CKeyBinds.cpp:202
 msgid "Steer backwards/up"
 msgstr "控制向后/向下驾驶"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:210
+#: ..\Client\core\CKeyBinds.cpp:203
 msgid "Accelerate"
 msgstr "油门"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:211
+#: ..\Client\core\CKeyBinds.cpp:204
 msgid "Brake/Reverse"
 msgstr "刹车/倒车"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:212
+#: ..\Client\core\CKeyBinds.cpp:205
 msgid "Radio next"
 msgstr "下一个电台"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:213
+#: ..\Client\core\CKeyBinds.cpp:206
 msgid "Radio previous"
 msgstr "上一个电台"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:214
+#: ..\Client\core\CKeyBinds.cpp:207
 msgid "Radio user track skip"
 msgstr "跳过用户本地电台"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:215
+#: ..\Client\core\CKeyBinds.cpp:208
 msgid "Horn"
 msgstr "鸣笛"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:216
+#: ..\Client\core\CKeyBinds.cpp:209
 msgid "Sub-mission"
 msgstr "激活特殊车辆任务"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:217
+#: ..\Client\core\CKeyBinds.cpp:210
 msgid "Handbrake"
 msgstr "手刹"
 
 #. 30
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:218
+#: ..\Client\core\CKeyBinds.cpp:211
 msgid "Vehicle look left"
 msgstr "载具里向左看"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:219
+#: ..\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look right"
 msgstr "载具里向右看"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:220
+#: ..\Client\core\CKeyBinds.cpp:213
 msgid "Vehicle look behind"
 msgstr "载具里向后看"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:221
+#: ..\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle mouse look"
 msgstr "载具里使用鼠标观察"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:222
+#: ..\Client\core\CKeyBinds.cpp:215
 msgid "Special control left"
 msgstr "特殊控制 向左"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:223
+#: ..\Client\core\CKeyBinds.cpp:216
 msgid "Special control right"
 msgstr "特殊控制 向右"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:224
+#: ..\Client\core\CKeyBinds.cpp:217
 msgid "Special control down"
 msgstr "特殊控制 向下"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:225
+#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control up"
 msgstr "特殊控制 向上"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:226
+#: ..\Client\core\CKeyBinds.cpp:219
 msgid "Aim weapon"
 msgstr "武器瞄准"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:227
+#: ..\Client\core\CKeyBinds.cpp:220
 msgid "Conversation yes"
 msgstr "对话中选择肯定对方"
 
 #. 40
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:228
+#: ..\Client\core\CKeyBinds.cpp:221
 msgid "Conversation no"
 msgstr "对话中选择否定对方"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:229
+#: ..\Client\core\CKeyBinds.cpp:222
 msgid "Group control forwards"
 msgstr "小组控制 前进"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:230
+#: ..\Client\core\CKeyBinds.cpp:223
 msgid "Group control backwards"
 msgstr "小组控制 后退"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1095
+#. TRANSLATORS: Replace with your language native name
+#: ..\Client\core\CLocalization.cpp:16
+msgid "English"
+msgstr "简体中文"
+
+#: ..\Client\core\CMainMenu.cpp:315
+msgid ""
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
+msgstr "您当前正在使用一个分支版本的客户端！测试版本的客户端不能被用来连接公共服务器！"
+
+#: ..\Client\core\CMainMenu.cpp:334 ..\Client\core\CVersionUpdater.cpp:1919
+msgid ""
+"MTA will not receive updates on XP/Vista after July 2019.\n"
+"\n"
+"Upgrade Windows to play on the latest servers."
+msgstr ""
+
+#: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -683,1082 +589,655 @@ msgstr ""
 "\n"
 "你确定要断开连接吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1099
+#: ..\Client\core\CMainMenu.cpp:1137
 msgid "DISCONNECT WARNING"
 msgstr "断开连接警告"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:149
-msgid "No host specified!"
-msgstr "未指定主机!"
+#: ..\Client\core\CMainMenu.cpp:1139 ..\Client\core\CQuestionBox.cpp:194
+#: ..\Client\core\CSettings.cpp:1333 ..\Client\core\CSettings.cpp:1357
+#: ..\Client\core\CSettings.cpp:4329 ..\Client\core\CSettings.cpp:4396
+#: ..\Client\core\CSettings.cpp:4445 ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CVersionUpdater.cpp:1588
+#: ..\Client\core\CVersionUpdater.cpp:1857
+#: ..\Client\core\CVersionUpdater.cpp:1876
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\loader\Dialogs.cpp:32
+msgid "No"
+msgstr "否"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:158
-msgid "No port specified!"
-msgstr "未指定端口!"
+#. /////////////////////////////////////////////////////////////////////////
+#. Dialog strings
+#. /////////////////////////////////////////////////////////////////////////
+#: ..\Client\core\CMainMenu.cpp:1140 ..\Client\core\CQuestionBox.cpp:195
+#: ..\Client\core\CSettings.cpp:1334 ..\Client\core\CSettings.cpp:1358
+#: ..\Client\core\CSettings.cpp:4330 ..\Client\core\CSettings.cpp:4397
+#: ..\Client\core\CSettings.cpp:4446 ..\Client\core\CVersionUpdater.cpp:1571
+#: ..\Client\core\CVersionUpdater.cpp:1589
+#: ..\Client\core\CVersionUpdater.cpp:1858
+#: ..\Client\core\CVersionUpdater.cpp:1877
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:72 ..\Client\loader\Dialogs.cpp:31
+msgid "Yes"
+msgstr "是"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:163
-msgid "Invalid port specified!"
-msgstr "指定了无效的端口号!"
+#. News link
+#: ..\Client\core\CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr ""
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:172
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1246
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1304
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:563
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:663
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
+#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "你希望查看一些与此问题相关的在线帮助吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CScreenShot.cpp:53
-#, c-format
+#: ..\Client\core\CScreenShot.cpp:51
+#, c-format, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "已截图: '%s'"
 
-#. Create the window
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:91
-msgid "SERVER BROWSER"
-msgstr "服务器浏览器"
-
-#. Create the tabs
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:139
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:92
-msgid "Internet"
-msgstr "互联网"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:140
-msgid "Local"
-msgstr "本地"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:141
-msgid "Favourites"
-msgstr "收藏夹"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:142
-msgid "Recent"
-msgstr "最近"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:201
-msgid ""
-"FOR QUICK CONNECT:\n"
-"\n"
-"Type the address and port into the address bar.\n"
-"Or select a server from the history list and press 'Connect'"
-msgstr ""
-"快速链接:\n"
-"\n"
-"请在地址栏里输入服务器地址及端口号。\n"
-"或者在历史记录里选择服务器并且点击 '连接'"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:214
-msgid "HELP"
-msgstr "帮助"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:224
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:270
-msgid "Refresh"
-msgstr "刷新"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:225
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:271
-msgid "Add Favorite"
-msgstr "添加到收藏夹"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:226
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:272
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:317
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:376
-msgid "Connect"
-msgstr "连接"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:227
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:273
-msgid "Server information"
-msgstr "服务器信息"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:230
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:274
-msgid "Search servers"
-msgstr "搜索服务器"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:231
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:275
-msgid "Search players"
-msgstr "搜索玩家"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:232
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:276
-msgid "Start search"
-msgstr "开始搜索"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:314
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1643
-msgid "Search players..."
-msgstr "搜索玩家中..."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:315
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:426
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1641
-msgid "Search servers..."
-msgstr "搜索服务器中..."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:457
-msgid "Name"
-msgstr "名称"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:458
-msgid "Players"
-msgstr "玩家数"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:459
-msgid "Ping"
-msgstr "网络延迟"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:460
-msgid "Gamemode"
-msgstr "游戏模式"
-
-#. Player List Columns
-#. Column for player names
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:482
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:145
-msgid "Player list"
-msgstr "玩家列表"
-
-#. Include label
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:490
-msgid "Include:"
-msgstr "包含:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:496
-msgid "Empty"
-msgstr "空"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:502
-msgid "Full"
-msgstr "满"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:508
-msgid "Locked"
-msgstr "已上锁"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:520
-msgid "Offline"
-msgstr "离线"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:533
-msgid "Other Versions"
-msgstr "其他版本"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:554
-msgid "Back"
-msgstr "返回"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:560
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:36
-msgid "Help"
-msgstr "帮助"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:743
-msgid "Loading..."
-msgstr "载入中..."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1193
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:2120
-msgid "  ..loading.."
-msgstr "..载入中.."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1224
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1354
-msgid "No address specified!"
-msgstr "未指定服务器地址!"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1237
-msgid "Unknown protocol"
-msgstr "未知协议"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1237
-msgid "Please use the mtasa:// protocol!"
-msgstr "请使用 mtasa:// 协议格式!"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1326
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:322
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:552
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:557
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1063
-msgid "Information"
-msgstr "信息"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1326
-msgid "You have to select a server to connect to."
-msgstr "你需要选择一个服务器来连接。"
-
-#. Create queue window
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:32
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:305
-msgid "SERVER IS FULL"
-msgstr "服务器到达人数上限"
-
-#. Start position
-#. Server Name
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:45
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:59
-msgid "Name:"
-msgstr "名称:"
-
-#. Server IP
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:46
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:71
-msgid "Server Address:"
-msgstr "服务器地址:"
-
-#. Gamemode
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:47
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:83
-msgid "Gamemode:"
-msgstr "游戏模式:"
-
-#. Map
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:48
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:94
-msgid "Map:"
-msgstr "地图:"
-
-#. Players
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:49
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:105
-msgid "Players:"
-msgstr "玩家数:"
-
-#. Passworded
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:50
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:116
-msgid "Passworded:"
-msgstr "是否需要密码:"
-
-#. Latency
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:51
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:127
-msgid "Latency:"
-msgstr "传输延迟:"
-
-#. Close button
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:151
-msgid "Close"
-msgstr "关闭"
-
-#. Join Game button
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:158
-msgid "Join Game"
-msgstr "加入游戏"
-
-#. Please enter password label
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:172
-msgid "Please enter the password to the server:"
-msgstr "请输入进入此服务器所需的密码:"
-
-#. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:182
-msgid "Join the server as soon as a player slot is available."
-msgstr "当服务器有空位时进入。"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:313
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "请输入服务器密码"
-
-#. The server has timed out
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:405
-msgid "Timed Out"
-msgstr "已超时"
-
-#. Set every GUI elements text to blank
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:434
-msgid "Querying..."
-msgstr "正在查询..."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:26
-msgid "Idle"
-msgstr "空闲"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:154
-msgid "player"
-msgid_plural "players"
-msgstr[0] "个玩家个玩家"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:155
-msgid "on"
-msgstr "于"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:158
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "个服务器个服务器"
-
-#. We are polling for the master server list (first pass)
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:249
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "查询主服务器列表 (已花费 %lu 毫秒)"
-
-#. Abort
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:263
-msgid "Master server list could not be parsed."
-msgstr "主服务器列表无法解析。"
-
-#. Abort
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:270
-msgid "Master server list could not be retrieved."
-msgstr "主服务器列表无法检索。"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:280
-msgid "(Backup server list)"
-msgstr "(备份服务器列表)"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:330
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "无法绑定局域网广播套接字 (LAN-broadcast socket)"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:350
-msgid "Attempting to discover LAN servers"
-msgstr "正在尝试搜索局域网内的服务器"
-
 #. Create window (with frame) if it will fit inside the screen resolution
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:94
+#: ..\Client\core\CSettings.cpp:82
 msgid "SETTINGS"
 msgstr "设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:125
+#: ..\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
 msgstr "多人游戏"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:126
+#: ..\Client\core\CSettings.cpp:115
 msgid "Video"
 msgstr "视频"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:127
+#: ..\Client\core\CSettings.cpp:116
 msgid "Audio"
 msgstr "音频"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:128
+#: ..\Client\core\CSettings.cpp:117
 msgid "Binds"
 msgstr "绑定"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:129
+#: ..\Client\core\CSettings.cpp:118
 msgid "Controls"
 msgstr "控制"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:130
+#: ..\Client\core\CSettings.cpp:119
 msgid "Interface"
 msgstr "界面"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:131
+#: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
 msgstr "网页浏览器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:132
+#: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
 msgstr "高级"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:133
-msgid "Community"
-msgstr "社区"
-
 #. Create buttons
 #. OK button
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:137
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4099
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1635
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1864
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1962
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1985
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2004
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2017
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2175
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2185
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2194
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2209
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:64
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:34
+#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4563
+#: ..\Client\core\CVersionUpdater.cpp:1606
+#: ..\Client\core\CVersionUpdater.cpp:1822
+#: ..\Client\core\CVersionUpdater.cpp:1915
+#: ..\Client\core\CVersionUpdater.cpp:1941
+#: ..\Client\core\CVersionUpdater.cpp:1959
+#: ..\Client\core\CVersionUpdater.cpp:1971
+#: ..\Client\core\CVersionUpdater.cpp:2123
+#: ..\Client\core\CVersionUpdater.cpp:2132
+#: ..\Client\core\CVersionUpdater.cpp:2141
+#: ..\Client\core\CVersionUpdater.cpp:2155
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
 msgstr "确定"
 
 #. Cancel button
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:142
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4098
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1829
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1846
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1883
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:66
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:37
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:125
+#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4562
+#: ..\Client\core\CVersionUpdater.cpp:1789
+#: ..\Client\core\CVersionUpdater.cpp:1805
+#: ..\Client\core\CVersionUpdater.cpp:1840
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
 msgstr "取消"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:157
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:356
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:625
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:880
+#: ..\Client\core\CSettings.cpp:145 ..\Client\core\CSettings.cpp:336
+#: ..\Client\core\CSettings.cpp:593 ..\Client\core\CSettings.cpp:852
 msgid "Load defaults"
 msgstr "读取默认值"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:168
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:194
+#. *
+#. *  Controls tab
+#. *
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:179
 msgid "Mouse sensitivity:"
 msgstr "鼠标灵敏度:"
 
 #. VerticalAimSensitivity
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:169
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:212
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:197
 msgid "Vertical aim sensitivity:"
 msgstr "垂直瞄准灵敏度:"
 
 #. Mouse Options
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:173
+#: ..\Client\core\CSettings.cpp:158
 msgid "Mouse options"
 msgstr "鼠标选项"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:180
+#: ..\Client\core\CSettings.cpp:165
 msgid "Invert mouse vertically"
 msgstr "鼠标垂直反转"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:184
+#: ..\Client\core\CSettings.cpp:169
 msgid "Steer with mouse"
 msgstr "用鼠标控制驾驶"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:188
+#: ..\Client\core\CSettings.cpp:173
 msgid "Fly with mouse"
 msgstr "使用鼠标飞行"
 
 #. Joypad options
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:230
+#: ..\Client\core\CSettings.cpp:215
 msgid "Joypad options"
 msgstr "手柄设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:243
+#: ..\Client\core\CSettings.cpp:228
 msgid "Standard controls (Mouse + Keyboard)"
 msgstr "标准控制 (鼠标 + 键盘)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:250
+#: ..\Client\core\CSettings.cpp:235
 msgid "Classic controls (Joypad)"
 msgstr "经典控制 (手柄)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:287
+#: ..\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
 msgstr "盲区"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:292
+#: ..\Client\core\CSettings.cpp:277
 msgid "Saturation"
 msgstr "饱和度"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:298
+#: ..\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
 msgstr "将'绑定'标签用于手柄按键。"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:341
+#: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
 msgstr "手柄 左方向"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:347
+#: ..\Client\core\CSettings.cpp:328
 msgid "Right Stick"
 msgstr "手柄 右方向"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:363
+#: ..\Client\core\CSettings.cpp:343
 msgid "DESCRIPTION"
 msgstr "说明"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:364
+#: ..\Client\core\CSettings.cpp:344
 msgid "KEY"
 msgstr "按键"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:366
+#: ..\Client\core\CSettings.cpp:346
 msgid "ALT. KEY"
 msgstr "ALT. 按键"
 
-#. m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:379
-msgid "Username:"
-msgstr "用户名:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:384
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:66
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:68
-msgid "Password:"
-msgstr "密码:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:403
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2782
-msgid "Login"
-msgstr "登录"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:409
-msgid "Register"
-msgstr "注册"
-
 #. *
-#. *	Multiplayer tab
+#. *    Multiplayer tab
 #. *
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:417
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:420
+#: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
 msgstr "昵称:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:430
+#: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
 msgstr "保存服务器密码"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:435
+#: ..\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
 msgstr "自动刷新服务器浏览器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:440
+#: ..\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
 msgstr "允许上传屏幕画面"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:445
+#: ..\Client\core\CSettings.cpp:379
+msgid "Allow external sounds"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
 msgstr "使用定制的 GTA:SA 文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:450
+#: ..\Client\core\CSettings.cpp:389
 msgid "Map rendering options"
 msgstr "地图渲染选项"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:456
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:644
+#: ..\Client\core\CSettings.cpp:395 ..\Client\core\CSettings.cpp:604
 msgid "Opacity:"
 msgstr "不透明度:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:478
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:491
+#. *
+#. *  Audio tab
+#. *
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:424
+msgid "Master volume:"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:443
 msgid "Radio volume:"
 msgstr "电台音量:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:479
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:510
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:462
 msgid "SFX volume:"
 msgstr "音效音量:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:480
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:529
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:481
 msgid "MTA volume:"
 msgstr "MTA 音量:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:481
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:548
+#: ..\Client\core\CSettings.cpp:416 ..\Client\core\CSettings.cpp:500
 msgid "Voice volume:"
 msgstr "语音音量:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:482
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:606
+#: ..\Client\core\CSettings.cpp:416 ..\Client\core\CSettings.cpp:541
 msgid "Play mode:"
 msgstr "游戏模式:"
 
 #. *
 #. * Webbrowser tab
 #. *
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:485
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:647
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:891
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1154
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:53
+#: ..\Client\core\CSettings.cpp:418 ..\Client\core\CSettings.cpp:606
+#: ..\Client\core\CSettings.cpp:867 ..\Client\core\CSettings.cpp:1955
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
 msgstr "常规"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:569
-msgid "Mute Radio sounds when minimized"
-msgstr "当窗口最小化时屏蔽电台音乐"
+#: ..\Client\core\CSettings.cpp:519
+msgid "Radio options"
+msgstr ""
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:574
-msgid "Mute SFX sounds when minimized"
-msgstr "当窗口最小化时屏蔽游戏音效"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:579
-msgid "Mute MTA sounds when minimized"
-msgstr "当窗口最小化时屏蔽 MTA 音效"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:584
-msgid "Mute Voice sounds when minimized"
-msgstr "当窗口最小化时屏蔽语音"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:591
+#: ..\Client\core\CSettings.cpp:525
 msgid "Radio Equalizer"
 msgstr "电台均衡器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:595
+#: ..\Client\core\CSettings.cpp:530
 msgid "Radio Auto-tune"
 msgstr "默认电台"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:600
+#: ..\Client\core\CSettings.cpp:535
 msgid "Usertrack options"
 msgstr "用户本地电台选项"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:614
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2851
+#: ..\Client\core\CSettings.cpp:549 ..\Client\core\CSettings.cpp:2975
 msgid "Radio"
 msgstr "收音机"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:615
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2852
+#: ..\Client\core\CSettings.cpp:550 ..\Client\core\CSettings.cpp:2977
 msgid "Random"
 msgstr "随机"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:616
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2853
+#: ..\Client\core\CSettings.cpp:551 ..\Client\core\CSettings.cpp:2979
 msgid "Sequential"
 msgstr "顺序"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:619
+#: ..\Client\core\CSettings.cpp:554
 msgid "Automatic Media Scan"
 msgstr "自动扫描媒体文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:636
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:653
+#: ..\Client\core\CSettings.cpp:561
+#, fuzzy
+msgid "Mute options"
+msgstr "鼠标选项"
+
+#: ..\Client\core\CSettings.cpp:567
+#, fuzzy
+msgid "Mute All sounds when minimized"
+msgstr "当窗口最小化时屏蔽游戏音效"
+
+#: ..\Client\core\CSettings.cpp:572
+msgid "Mute Radio sounds when minimized"
+msgstr "当窗口最小化时屏蔽电台音乐"
+
+#: ..\Client\core\CSettings.cpp:577
+msgid "Mute SFX sounds when minimized"
+msgstr "当窗口最小化时屏蔽游戏音效"
+
+#: ..\Client\core\CSettings.cpp:582
+msgid "Mute MTA sounds when minimized"
+msgstr "当窗口最小化时屏蔽 MTA 音效"
+
+#: ..\Client\core\CSettings.cpp:587
+msgid "Mute Voice sounds when minimized"
+msgstr "当窗口最小化时屏蔽语音"
+
+#. *
+#. *  Video tab
+#. *
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:612
 msgid "Resolution:"
 msgstr "分辨率:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:637
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:694
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:659
 msgid "FOV:"
 msgstr "FOV："
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:638
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:710
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:675
 msgid "Draw Distance:"
 msgstr "显示距离:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:639
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:728
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:693
 msgid "Brightness:"
 msgstr "亮度:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:640
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:746
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:711
 msgid "FX Quality:"
 msgstr "效果质量:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:641
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:760
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:725
 msgid "Anisotropic filtering:"
 msgstr "各向异性过滤:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:642
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:787
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:752
 msgid "Anti-aliasing:"
 msgstr "抗锯齿:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:643
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:802
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:766
 msgid "Aspect Ratio:"
 msgstr "纵横比:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:665
+#: ..\Client\core\CSettings.cpp:624
 msgid "Windowed"
 msgstr "窗口模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:673
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1250
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:354
+#: ..\Client\core\CSettings.cpp:630
+msgid "DPI aware"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:638 ..\Client\core\CSettings.cpp:953
+#: ..\Client\loader\MainFunctions.cpp:370
 msgid "Fullscreen mode:"
 msgstr "全屏模式:"
 
-#. Fullscreen style
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:680
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1797
+#: ..\Client\core\CSettings.cpp:645 ..\Client\core\CSettings.cpp:1554
 msgid "Standard"
 msgstr "标准"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:681
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1798
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:354
+#: ..\Client\core\CSettings.cpp:646 ..\Client\core\CSettings.cpp:1556
+#: ..\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
 msgstr "无边框窗口"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:682
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1799
+#: ..\Client\core\CSettings.cpp:647 ..\Client\core\CSettings.cpp:1558
 msgid "Borderless keep res"
 msgstr "保持无边框窗口"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:686
+#: ..\Client\core\CSettings.cpp:651
 msgid "Mip Mapping"
 msgstr "多重细节层纹理 (Mip Mapping)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:754
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1732
+#: ..\Client\core\CSettings.cpp:719 ..\Client\core\CSettings.cpp:1462
 msgid "Low"
 msgstr "低"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:755
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1733
+#: ..\Client\core\CSettings.cpp:720 ..\Client\core\CSettings.cpp:1464
 msgid "Medium"
 msgstr "中"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:756
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1734
+#: ..\Client\core\CSettings.cpp:721 ..\Client\core\CSettings.cpp:1035
+#: ..\Client\core\CSettings.cpp:1466 ..\Client\core\CSettings.cpp:3033
 msgid "High"
 msgstr "高"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:757
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1735
+#: ..\Client\core\CSettings.cpp:722 ..\Client\core\CSettings.cpp:1468
 msgid "Very high"
 msgstr "非常高"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:772
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:795
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1268
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1322
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1434
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1738
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2901
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2923
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2941
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3734
+#: ..\Client\core\CSettings.cpp:737 ..\Client\core\CSettings.cpp:760
+#: ..\Client\core\CSettings.cpp:966 ..\Client\core\CSettings.cpp:1020
+#: ..\Client\core\CSettings.cpp:1151 ..\Client\core\CSettings.cpp:1472
+#: ..\Client\core\CSettings.cpp:3040 ..\Client\core\CSettings.cpp:3072
+#: ..\Client\core\CSettings.cpp:3094 ..\Client\core\CSettings.cpp:4077
 msgid "Off"
 msgstr "关"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:796
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1739
+#: ..\Client\core\CSettings.cpp:761 ..\Client\core\CSettings.cpp:1474
 msgid "1x"
 msgstr "1x"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:797
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1740
+#: ..\Client\core\CSettings.cpp:762 ..\Client\core\CSettings.cpp:1476
 msgid "2x"
 msgstr "2x"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:798
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1741
+#: ..\Client\core\CSettings.cpp:763 ..\Client\core\CSettings.cpp:1478
 msgid "3x"
 msgstr "3x"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:812
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1270
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1746
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2902
+#: ..\Client\core\CSettings.cpp:776 ..\Client\core\CSettings.cpp:968
+#: ..\Client\core\CSettings.cpp:1484 ..\Client\core\CSettings.cpp:3042
 msgid "Auto"
 msgstr "自动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:813
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1747
+#: ..\Client\core\CSettings.cpp:777 ..\Client\core\CSettings.cpp:1486
 msgid "4:3"
 msgstr "4:3"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:814
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1748
+#: ..\Client\core\CSettings.cpp:778 ..\Client\core\CSettings.cpp:1488
 msgid "16:10"
 msgstr "16:10"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:815
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1749
+#: ..\Client\core\CSettings.cpp:779 ..\Client\core\CSettings.cpp:1490
 msgid "16:9"
 msgstr "16:9"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:818
+#: ..\Client\core\CSettings.cpp:782
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD与显示纵横比相匹配"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:824
+#: ..\Client\core\CSettings.cpp:788
 msgid "Volumetric Shadows"
 msgstr "体积阴影"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:828
+#: ..\Client\core\CSettings.cpp:792
 msgid "Grass effect"
 msgstr "草地效果"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:832
+#: ..\Client\core\CSettings.cpp:796
 msgid "Heat haze"
 msgstr "热浪"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:836
+#: ..\Client\core\CSettings.cpp:800
 msgid "Tyre Smoke etc"
 msgstr "轮胎烟雾等"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:841
+#: ..\Client\core\CSettings.cpp:804
+msgid "Render vehicles always in high detail"
+msgstr "总是以高细节渲染载具"
+
+#: ..\Client\core\CSettings.cpp:808
+msgid "Render peds always in high detail"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
 msgstr "全屏幕最小化"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:853
+#: ..\Client\core\CSettings.cpp:825
 msgid "Enable Device Selection Dialog"
 msgstr "启用设备选择对话框"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:865
+#: ..\Client\core\CSettings.cpp:837
 msgid "Show unsafe resolutions"
 msgstr "显示不安全的分辨率"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:898
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:904
-msgid "Language:"
-msgstr "语言:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:899
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:926
-msgid "Skin:"
-msgstr "皮肤:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:900
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:947
-msgid "Presets:"
-msgstr "预设:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:937
-msgid "Chat"
-msgstr "聊天"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:957
-msgid "Load"
-msgstr "载入"
-
-#. Color selection
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:963
-msgid "Chat BG"
-msgstr "聊天背景"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:964
-msgid "Chat Text"
-msgstr "聊天文字"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:965
-msgid "Input BG"
-msgstr "输入文字背景"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:966
-msgid "Input Text"
-msgstr "输入文本"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:992
-msgid "Font:"
-msgstr "字体:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1020
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1046
-msgid "Lines:"
-msgstr "行:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1021
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1057
-msgid "Scale:"
-msgstr "比例:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1022
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1078
-msgid "Width:"
-msgstr "宽度:"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1093
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1101
-msgid "after"
-msgstr "后"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1094
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1114
-msgid "for"
-msgstr "于"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1097
-msgid "Fade out old lines"
-msgstr "淡出旧行数"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1110
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1123
-msgid "sec"
-msgstr "秒"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1135
-msgid "Hide background when not typing"
-msgstr "不输入文字时隐藏背景"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1140
-msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1145
-msgid "Allow server to flash the window"
-msgstr ""
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1160
+#: ..\Client\core\CSettings.cpp:873
 msgid "Enable remote websites"
-msgstr ""
+msgstr "启用远程网站"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1165
+#: ..\Client\core\CSettings.cpp:878
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "在远程网站启用Javascript"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1170
-msgid "Enable plugins (like Flash, Silverlight; Java is disabled by default)"
-msgstr ""
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1175
+#: ..\Client\core\CSettings.cpp:883
 msgid "Custom blacklist"
-msgstr ""
+msgstr "自定义黑名单"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1185
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1213
+#: ..\Client\core\CSettings.cpp:893 ..\Client\core\CSettings.cpp:921
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "请输入域名 例：google.com"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1187
+#: ..\Client\core\CSettings.cpp:895
 msgid "Block"
-msgstr ""
+msgstr "阻止"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1195
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1223
+#: ..\Client\core\CSettings.cpp:903 ..\Client\core\CSettings.cpp:931
 msgid "Domain"
-msgstr ""
+msgstr "域名"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1197
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1225
+#: ..\Client\core\CSettings.cpp:905 ..\Client\core\CSettings.cpp:933
 msgid "Remove domain"
-msgstr ""
+msgstr "移除域名"
 
 #. Reset vecTemp
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1203
+#: ..\Client\core\CSettings.cpp:911
 msgid "Custom whitelist"
-msgstr ""
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1215
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:48
-msgid "Allow"
-msgstr ""
+msgstr "自定义白名单"
 
 #. Misc section label
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1238
+#: ..\Client\core\CSettings.cpp:946
 msgid "Misc"
 msgstr "其它"
 
 #. Fast clothes loading
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1245
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1261
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4117
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:959
+#: ..\Client\core\CSettings.cpp:4581
 msgid "Fast CJ clothes loading:"
 msgstr "快速载入CJ服装:"
 
 #. Browser scan speed
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1246
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1275
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4119
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:973
+#: ..\Client\core\CSettings.cpp:4583
 msgid "Browser speed:"
 msgstr "浏览器速度:"
 
 #. Single download
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1247
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1289
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4121
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:987
+#: ..\Client\core\CSettings.cpp:4585
 msgid "Single connection:"
 msgstr "单程连接:"
 
 #. Packet tag
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1248
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1302
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:1000
+#: ..\Client\core\CSettings.cpp:4587
 msgid "Packet tag:"
-msgstr ""
+msgstr "数据包标签："
 
 #. Progress animation
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1249
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1315
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1013
+#: ..\Client\core\CSettings.cpp:4589
 msgid "Progress animation:"
-msgstr ""
+msgstr "进度动画："
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1251
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4115
+#. Process priority
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1026
+#: ..\Client\core\CSettings.cpp:4579
 msgid "Process priority:"
 msgstr "进程优先级:"
 
 #. Debug setting
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1252
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1342
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4127
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1040
+#: ..\Client\core\CSettings.cpp:4591
 msgid "Debug setting:"
 msgstr "Debug 设置:"
 
 #. Streaming memory
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1253
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1365
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4129
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1063
+#: ..\Client\core\CSettings.cpp:4593
 msgid "Streaming memory:"
 msgstr "流媒体缓存:"
 
 #. Update build type
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1254
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1448
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1165
 msgid "Update build type:"
 msgstr "更新构建类型:"
 
 #. UpdateAutoInstall
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1255
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1427
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1144
 msgid "Install important updates:"
-msgstr ""
+msgstr "安装重要更新："
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1269
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1297
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1310
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2903
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2914
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2919
+#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:995
+#: ..\Client\core\CSettings.cpp:1008 ..\Client\core\CSettings.cpp:3044
+#: ..\Client\core\CSettings.cpp:3060 ..\Client\core\CSettings.cpp:3067
 msgid "On"
 msgstr "开"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1282
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2907
+#: ..\Client\core\CSettings.cpp:980 ..\Client\core\CSettings.cpp:3049
 msgid "Very slow"
 msgstr "非常慢"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1283
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1296
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1309
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1323
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1349
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1361
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1435
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1455
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2908
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2913
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2918
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2924
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2936
+#: ..\Client\core\CSettings.cpp:981 ..\Client\core\CSettings.cpp:994
+#: ..\Client\core\CSettings.cpp:1007 ..\Client\core\CSettings.cpp:1021
+#: ..\Client\core\CSettings.cpp:1047 ..\Client\core\CSettings.cpp:1059
+#: ..\Client\core\CSettings.cpp:1152 ..\Client\core\CSettings.cpp:1172
+#: ..\Client\core\CSettings.cpp:3051 ..\Client\core\CSettings.cpp:3058
+#: ..\Client\core\CSettings.cpp:3065 ..\Client\core\CSettings.cpp:3074
+#: ..\Client\core\CSettings.cpp:3087
 msgid "Default"
 msgstr "默认"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1284
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2909
+#: ..\Client\core\CSettings.cpp:982 ..\Client\core\CSettings.cpp:3053
 msgid "Fast"
 msgstr "快"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1372
+#: ..\Client\core\CSettings.cpp:1033 ..\Client\core\CSettings.cpp:3029
+msgid "Normal"
+msgstr "正常"
+
+#: ..\Client\core\CSettings.cpp:1034 ..\Client\core\CSettings.cpp:3031
+msgid "Above normal"
+msgstr "高于正常"
+
+#: ..\Client\core\CSettings.cpp:1070
 msgid "Min"
 msgstr "最低"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1385
+#: ..\Client\core\CSettings.cpp:1083
 msgid "Max"
 msgstr "最高"
 
 #. Windows 8 compatibility
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1392
+#: ..\Client\core\CSettings.cpp:1090
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 兼容模式:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1397
+#: ..\Client\core\CSettings.cpp:1095
 msgid "16-bit color"
 msgstr "16位色"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1402
+#: ..\Client\core\CSettings.cpp:1100
 msgid "Mouse fix"
 msgstr "鼠标修正"
 
+#. Cache path info
+#: ..\Client\core\CSettings.cpp:1118
+msgid "Client resource files:"
+msgstr "客户端资源文件："
+
+#: ..\Client\core\CSettings.cpp:1122
+msgid "Show in Explorer"
+msgstr "在系统资源管理器中显示"
+
 #. Auto updater section label
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1420
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1423
+#: ..\Client\core\CSettings.cpp:1137 ..\Client\core\CSettings.cpp:1140
 msgid "Auto updater"
 msgstr "自动更新"
 
 #. Check for updates
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1461
+#: ..\Client\core\CSettings.cpp:1178
 msgid "Check for update now"
 msgstr "立即检查更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1611
+#: ..\Client\core\CSettings.cpp:1327
 msgid "Some settings will be changed when you next start MTA"
 msgstr "一些设置将会在您下次启动MTA时生效"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1612
+#: ..\Client\core\CSettings.cpp:1328
 msgid ""
 "\n"
 "\n"
@@ -1768,15 +1247,15 @@ msgstr ""
 "\n"
 "你想现在重启吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1615
+#: ..\Client\core\CSettings.cpp:1331
 msgid "RESTART REQUIRED"
 msgstr "需要重新启动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1637
+#: ..\Client\core\CSettings.cpp:1351
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "当你退出本服务器时有些设置将会改变"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1638
+#: ..\Client\core\CSettings.cpp:1352
 #, fuzzy
 msgid ""
 "\n"
@@ -1785,95 +1264,233 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"你想现在重启吗?"
+"你想现在断开连接吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1641
+#: ..\Client\core\CSettings.cpp:1355
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "需要断开服务器连接"
 
 #. Update the joystick name
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1922
+#: ..\Client\core\CSettings.cpp:1678
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "未能检测到游戏手柄       -      请检查手柄连接以及重启游戏"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2085
+#: ..\Client\core\CSettings.cpp:1869
 msgid "Binding axis"
 msgstr "绑定坐标轴"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2085
+#: ..\Client\core\CSettings.cpp:1869
 msgid "Move an axis to bind, or escape to clear"
 msgstr "移动一个轴来绑定,或者离开以清除绑定"
 
-#. Determine if the primary or secondary column was selected
-#. m_hPriKey  Note: handle is not the same as index
+#: ..\Client\core\CSettings.cpp:1946
+msgid "Language:"
+msgstr "语言:"
+
+#: ..\Client\core\CSettings.cpp:1946
+msgid "Skin:"
+msgstr "皮肤:"
+
+#: ..\Client\core\CSettings.cpp:1946
+msgid "Presets:"
+msgstr "预设:"
+
+#: ..\Client\core\CSettings.cpp:1995
+msgid "Chat"
+msgstr "聊天"
+
+#: ..\Client\core\CSettings.cpp:2012
+msgid "Load"
+msgstr "载入"
+
+#: ..\Client\core\CSettings.cpp:2024
+msgid "Colors"
+msgstr "颜色"
+
+#: ..\Client\core\CSettings.cpp:2025
+msgid "Layout"
+msgstr "布局"
+
+#: ..\Client\core\CSettings.cpp:2026 ..\Client\core\CSettings.cpp:2272
+msgid "Options"
+msgstr "选项"
+
+#: ..\Client\core\CSettings.cpp:2032
+msgid "Chat Background"
+msgstr "聊天背景"
+
+#: ..\Client\core\CSettings.cpp:2032
+msgid "Chat Text"
+msgstr "聊天文字"
+
+#: ..\Client\core\CSettings.cpp:2032
+msgid "Input Background"
+msgstr "输入背景"
+
+#: ..\Client\core\CSettings.cpp:2032
+msgid "Input Text"
+msgstr "输入文本"
+
+#: ..\Client\core\CSettings.cpp:2055
+msgid "Lines:"
+msgstr "行:"
+
+#: ..\Client\core\CSettings.cpp:2055
+msgid "Scale:"
+msgstr "比例:"
+
+#: ..\Client\core\CSettings.cpp:2055
+msgid "Width:"
+msgstr "宽度:"
+
+#: ..\Client\core\CSettings.cpp:2058
+msgid "Size"
+msgstr "大小"
+
+#: ..\Client\core\CSettings.cpp:2107
+msgid "after"
+msgstr "后"
+
+#: ..\Client\core\CSettings.cpp:2107
+msgid "for"
+msgstr "于"
+
+#: ..\Client\core\CSettings.cpp:2107
+msgid "sec"
+msgstr "秒"
+
+#: ..\Client\core\CSettings.cpp:2110
+msgid "Fading"
+msgstr "淡化"
+
+#: ..\Client\core\CSettings.cpp:2116
+msgid "Fade out old lines"
+msgstr "淡出旧行数"
+
+#: ..\Client\core\CSettings.cpp:2156
+msgid "Horizontal:"
+msgstr "水平："
+
+#: ..\Client\core\CSettings.cpp:2156
+msgid "Vertical:"
+msgstr "垂直："
+
+#: ..\Client\core\CSettings.cpp:2156
+msgid "Text-Align:"
+msgstr "水平对齐："
+
+#: ..\Client\core\CSettings.cpp:2156
+msgid "X-Offset:"
+msgstr "X轴偏移："
+
+#: ..\Client\core\CSettings.cpp:2157
+msgid "Y-Offset:"
+msgstr "Y轴偏移："
+
+#: ..\Client\core\CSettings.cpp:2163
+msgid "Position"
+msgstr "位置"
+
+#: ..\Client\core\CSettings.cpp:2178 ..\Client\core\CSettings.cpp:2192
+msgid "Center"
+msgstr "中心"
+
+#: ..\Client\core\CSettings.cpp:2191
+msgid "Top"
+msgstr "顶部"
+
+#: ..\Client\core\CSettings.cpp:2193
+msgid "Bottom"
+msgstr "底部"
+
+#: ..\Client\core\CSettings.cpp:2241
+#, fuzzy
+msgid "Font"
+msgstr "字体"
+
+#: ..\Client\core\CSettings.cpp:2278
+msgid "Hide background when not typing"
+msgstr "不输入文字时隐藏背景"
+
+#: ..\Client\core\CSettings.cpp:2283
+msgid "Nickname completion using the \"Tab\" key"
+msgstr "请按下 “Tab”完成昵称输入"
+
+#: ..\Client\core\CSettings.cpp:2288
+msgid "Allow server to flash the window"
+msgstr "允许服务器刷新窗口"
+
+#: ..\Client\core\CSettings.cpp:2293
+msgid "Allow tray balloon notifications"
+msgstr "允许气泡显示通知"
+
+#: ..\Client\core\CSettings.cpp:2298
+msgid "Chat text black/white outline"
+msgstr "聊天文本黑白描边"
+
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2363
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2368
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
+#: ..\Client\core\CSettings.cpp:2546 ..\Client\core\CSettings.cpp:2553
 msgid "Press a key to bind, or escape to clear"
 msgstr "输入你要绑定的按键, 或离开以清除绑定"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2364
+#: ..\Client\core\CSettings.cpp:2547
 msgid "Binding a primary key"
 msgstr "绑定一个主键"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2369
+#: ..\Client\core\CSettings.cpp:2554
 msgid "Binding a secondary key"
 msgstr "绑定一个次要按键"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2445
+#: ..\Client\core\CSettings.cpp:2628
 msgid "GTA GAME CONTROLS"
 msgstr "GTA 内置游戏控制"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2447
+#: ..\Client\core\CSettings.cpp:2630
 msgid "MULTIPLAYER CONTROLS"
 msgstr "多人游戏控制"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2678
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4078
+#: ..\Client\core\CSettings.cpp:2859 ..\Client\core\CSettings.cpp:4542
 msgid "Your nickname contains invalid characters!"
 msgstr "你的昵称包含非法字符!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2726
-msgid "Logging in..."
-msgstr "正在登录..."
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2782
-msgid "Logout"
-msgstr "登出"
-
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3366
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3369
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Red:"
 msgstr "红:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3381
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3384
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Green:"
 msgstr "绿:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3396
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3399
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Blue:"
 msgstr "蓝:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3411
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3414
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Transparency:"
 msgstr "透明度:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
-#, fuzzy
+#: ..\Client\core\CSettings.cpp:3624
+msgid "Color"
+msgstr "颜色"
+
+#: ..\Client\core\CSettings.cpp:3701
+msgid "Preview"
+msgstr "预览"
+
+#: ..\Client\core\CSettings.cpp:4009
 msgid "Please disconnect before changing language"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
+#: ..\Client\core\CSettings.cpp:4037
 msgid "Please disconnect before changing skin"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3919
+#: ..\Client\core\CSettings.cpp:4323
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1883,11 +1500,11 @@ msgstr ""
 "\n"
 "你确定要启用这个功能吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3923
+#: ..\Client\core\CSettings.cpp:4327
 msgid "PERFORMANCE WARNING"
 msgstr "性能警告"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3942
+#: ..\Client\core\CSettings.cpp:4347
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1897,11 +1514,23 @@ msgstr ""
 "\n"
 "(聊天框和GUI界面将不会被上传)\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3944
+#: ..\Client\core\CSettings.cpp:4349
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "屏幕上传信息"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3965
+#: ..\Client\core\CSettings.cpp:4364
+msgid ""
+"Some scripts may play sounds, such as radio, from the internet.\n"
+"\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:4367
+msgid "EXTERNAL SOUNDS"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:4388
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1917,16 +1546,28 @@ msgstr ""
 "\n"
 "你确定你想使用它们吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3971
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2135
+#: ..\Client\core\CSettings.cpp:4394 ..\Client\core\CVersionUpdater.cpp:2084
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "定制的 GTA:SA 文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4096
+#: ..\Client\core\CSettings.cpp:4437
+msgid ""
+"Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n"
+"\n"
+"Are you sure you want to enable this option?"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:4443
+msgid "EXPERIMENTAL FEATURE"
+msgstr ""
+
+#: ..\Client\core\CSettings.cpp:4560
 msgid "Please enter a nickname"
 msgstr "请输入一个昵称"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4097
+#: ..\Client\core\CSettings.cpp:4561
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1934,84 +1575,83 @@ msgstr ""
 "请输入一个在游戏里面使用的昵称      \n"
 " 这将会在你登陆服务器时显示"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4115
+#: ..\Client\core\CSettings.cpp:4579
 msgid "Very experimental feature."
 msgstr "大量实验性功能."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4117
+#: ..\Client\core\CSettings.cpp:4581
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "停止CJ的跳舞命令 (将会增加65MB内存占用)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4119
+#: ..\Client\core\CSettings.cpp:4583
 msgid "Older routers may require a slower scan speed."
 msgstr "比较老的路由会降慢扫描的速度"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4121
+#: ..\Client\core\CSettings.cpp:4585
 msgid "Switch on to use only one connection when downloading."
 msgstr "打开将会启用单线程下载"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
+#: ..\Client\core\CSettings.cpp:4587
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
+msgstr "标记网络包以帮助ISP识别MTA流量"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
+#: ..\Client\core\CSettings.cpp:4589
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "在屏幕底部显示旋转圈圈动画"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4127
+#: ..\Client\core\CSettings.cpp:4591
 msgid "Select default always. (This setting is not saved)"
 msgstr "总是设为默认值. (不保存设置)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4129
+#: ..\Client\core\CSettings.cpp:4593
 msgid "Maximum is usually best"
 msgstr "数值最大通常是最好的"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4131
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4133
+#: ..\Client\core\CSettings.cpp:4595 ..\Client\core\CSettings.cpp:4597
 msgid "Auto updater:"
 msgstr "自动更新:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4131
+#: ..\Client\core\CSettings.cpp:4595
 msgid "Select default unless you like filling out bug reports."
 msgstr "如果你喜欢发送错误报告就可以不选择默认."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4133
+#: ..\Client\core\CSettings.cpp:4597
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "选项默认安装重要更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4135
+#: ..\Client\core\CSettings.cpp:4599
 msgid "16-bit color:"
 msgstr "16位色"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4135
+#: ..\Client\core\CSettings.cpp:4599
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "启动16位色模式 -需要重启MTA"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4137
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Mouse fix:"
 msgstr "鼠标修正:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4137
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Mouse movement fix - May need PC restart"
 msgstr "鼠标移动修正 - 可能需要重启计算机"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:637
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Busy"
 msgstr "正忙"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:637
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Can't check for updates right now"
 msgstr "当前暂时无法检查更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1594
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1614
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1633
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1566
+#: ..\Client\core\CVersionUpdater.cpp:1586
+#: ..\Client\core\CVersionUpdater.cpp:1604
+#, c-format, c-format
 msgid "MTA:SA %s required"
 msgstr "要求 MTA:SA %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1595
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1567
+#, c-format, c-format
 msgid ""
 "An updated version of MTA:SA %s is required to join the selected server.\n"
 "\n"
@@ -2021,12 +1661,12 @@ msgstr ""
 "\n"
 "你希望下载并且安装 MTA:SA %s 吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1615
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1587
+#, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "你希望启动 MTA:SA %s 并连接到此服务器吗 ?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1634
+#: ..\Client\core\CVersionUpdater.cpp:1605
 msgid ""
 "It is not possible to connect at this time.\n"
 "\n"
@@ -2036,41 +1676,41 @@ msgstr ""
 "\n"
 "请稍后再试."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1827
+#: ..\Client\core\CVersionUpdater.cpp:1787
 msgid "Connecting"
 msgstr "正在连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1828
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1845
+#: ..\Client\core\CVersionUpdater.cpp:1788
+#: ..\Client\core\CVersionUpdater.cpp:1804
 msgid "Please wait..."
 msgstr "请稍候..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1844
+#: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "CHECKING"
 msgstr "检查中"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1862
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1960
+#: ..\Client\core\CVersionUpdater.cpp:1820
+#: ..\Client\core\CVersionUpdater.cpp:1913
 msgid "UPDATE CHECK"
 msgstr "检查更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1863
+#: ..\Client\core\CVersionUpdater.cpp:1821
 msgid "No update needed"
 msgstr "无最新更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1881
+#: ..\Client\core\CVersionUpdater.cpp:1838
 msgid "DOWNLOADING"
 msgstr "下载中"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1882
+#: ..\Client\core\CVersionUpdater.cpp:1839
 msgid "waiting..."
 msgstr "正在等待..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1899
+#: ..\Client\core\CVersionUpdater.cpp:1855
 msgid "MANDATORY UPDATE"
 msgstr "强制更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1900
+#: ..\Client\core\CVersionUpdater.cpp:1856
 msgid ""
 "To join this server, you must update MTA.\n"
 "\n"
@@ -2080,11 +1720,11 @@ msgstr ""
 "\n"
 "你想现在更新吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1919
+#: ..\Client\core\CVersionUpdater.cpp:1874
 msgid "OPTIONAL UPDATE"
 msgstr "可选更新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1920
+#: ..\Client\core\CVersionUpdater.cpp:1875
 msgid ""
 "Server says an update is recommended, but not essential.\n"
 "\n"
@@ -2094,7 +1734,7 @@ msgstr ""
 "\n"
 "你想现在更新吗 ?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1961
+#: ..\Client\core\CVersionUpdater.cpp:1914
 msgid ""
 "Update not currently avalable.\n"
 "\n"
@@ -2104,52 +1744,60 @@ msgstr ""
 "\n"
 "详情查看 www.mtasa.com"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1983
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2173
+#: ..\Client\core\CVersionUpdater.cpp:1939
+#: ..\Client\core\CVersionUpdater.cpp:2121
 msgid "ERROR SAVING"
 msgstr "保存错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1984
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2174
+#: ..\Client\core\CVersionUpdater.cpp:1940
+#: ..\Client\core\CVersionUpdater.cpp:2122
 msgid "Unable to create the file."
 msgstr "未能创建文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1993
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2002
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2183
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2192
+#: ..\Client\core\CVersionUpdater.cpp:1948
+#: ..\Client\core\CVersionUpdater.cpp:1957
+#: ..\Client\core\CVersionUpdater.cpp:2130
+#: ..\Client\core\CVersionUpdater.cpp:2139
 msgid "ERROR DOWNLOADING"
 msgstr "下载错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1994
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2184
+#: ..\Client\core\CVersionUpdater.cpp:1949
+#: ..\Client\core\CVersionUpdater.cpp:2131
 msgid "The downloaded file appears to be incorrect."
 msgstr "下载的文件校检不正确"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2003
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2193
+#: ..\Client\core\CVersionUpdater.cpp:1958
+#: ..\Client\core\CVersionUpdater.cpp:2140
 msgid "For some reason."
 msgstr "由于某些原因."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2015
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2207
+#: ..\Client\core\CVersionUpdater.cpp:1969
+#: ..\Client\core\CVersionUpdater.cpp:2153
 msgid "DOWNLOAD COMPLETE"
 msgstr "下载完毕"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2040
+#: ..\Client\core\CVersionUpdater.cpp:1993
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - 在 _DialogUpdateResult 出现未知错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2142
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2152
+#: ..\Client\core\CVersionUpdater.cpp:2086
+msgid ""
+"This server is blocking your customized GTA:SA files.\n"
+"\n"
+"To join this server please uncheck:\n"
+"Settings->Multiplayer->Use customized GTA:SA files"
+msgstr ""
+
+#: ..\Client\core\CVersionUpdater.cpp:2091
+#: ..\Client\core\CVersionUpdater.cpp:2101
 msgid "Ok"
 msgstr "确定"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2150
+#: ..\Client\core\CVersionUpdater.cpp:2099
 msgid "ERROR"
 msgstr "错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2151
+#: ..\Client\core\CVersionUpdater.cpp:2100
 msgid ""
 "Some MTA:SA data files are missing.\n"
 "\n"
@@ -2161,13 +1809,13 @@ msgstr ""
 "\n"
 "请重新安装 MTA:SA"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2792
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:2727
+#, c-format, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% 完成"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2794
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:2729
+#, c-format, c-format
 msgid ""
 "\n"
 "\n"
@@ -2177,67 +1825,380 @@ msgstr ""
 "\n"
 "等待响应   -   %-3d"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr ""
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
+#, c-format, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "截图包含 %d 个字节，但实际预期为 %d"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:26
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:236
+msgid "Screenshot failed"
+msgstr "截图失败"
+
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:125
 msgid ""
-"The server requests the following websites in order to load them (later):"
+"Could not initialize Direct3D9.\n"
+"\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
 msgstr ""
+"无法初始化 Direct3D9 。\n"
+"\n"
+"请确认您已正确安装了 DirectX 最终用户运行时以及\n"
+"最新的系统更新包。"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:31
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+#. Create the window
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:85
+msgid "SERVER BROWSER"
+msgstr "服务器浏览器"
+
+#. Create the tabs
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:133
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:90
+msgid "Internet"
+msgstr "互联网"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:134
+msgid "Local"
+msgstr "本地"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:135
+msgid "Favourites"
+msgstr "收藏夹"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:136
+msgid "Recent"
+msgstr "最近"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:191
+msgid ""
+"FOR QUICK CONNECT:\n"
+"\n"
+"Type the address and port into the address bar.\n"
+"Or select a server from the history list and press 'Connect'"
 msgstr ""
+"快速链接:\n"
+"\n"
+"请在地址栏里输入服务器地址及端口号。\n"
+"或者在历史记录里选择服务器并且点击 '连接'"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:43
-msgid "Remember decision"
-msgstr ""
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:203
+msgid "HELP"
+msgstr "帮助"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:54
-msgid "Deny"
-msgstr ""
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:252
+msgid "Refresh"
+msgstr "刷新"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:639
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:253
+msgid "Add Favorite"
+msgstr "添加到收藏夹"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:254
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:301
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:361
+msgid "Connect"
+msgstr "连接"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:255
+msgid "Server information"
+msgstr "服务器信息"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:256
+msgid "Search servers"
+msgstr "搜索服务器"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:257
+msgid "Search players"
+msgstr "搜索玩家"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:258
+msgid "Start search"
+msgstr "开始搜索"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:299
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1616
+msgid "Search players..."
+msgstr "搜索玩家中..."
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:411
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1614
+msgid "Search servers..."
+msgstr "搜索服务器中..."
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:442
+msgid "Name"
+msgstr "名称"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
+msgid "Players"
+msgstr "玩家数"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
+msgid "Ping"
+msgstr "网络延迟"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
+msgid "Gamemode"
+msgstr "游戏模式"
+
+#. Player List Columns
+#. Column for player names
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:467
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:138
+msgid "Player list"
+msgstr "玩家列表"
+
+#. Include label
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:475
+msgid "Include:"
+msgstr "包含:"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:481
+msgid "Empty"
+msgstr "空"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:487
+msgid "Full"
+msgstr "满"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:493
+msgid "Locked"
+msgstr "已上锁"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:505
+msgid "Offline"
+msgstr "离线"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:518
+msgid "Other Versions"
+msgstr "其他版本"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:539
+msgid "Back"
+msgstr "返回"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:545
+#: ..\Client\loader\Dialogs.cpp:35
+msgid "Help"
+msgstr "帮助"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:728
+msgid "Loading..."
+msgstr "载入中..."
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1172
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:2103
+msgid "  ..loading.."
+msgstr "..载入中.."
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1330
+msgid "No address specified!"
+msgstr "未指定服务器地址!"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
+msgid "Unknown protocol"
+msgstr "未知协议"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
+msgid "Please use the mtasa:// protocol!"
+msgstr "请使用 mtasa:// 协议格式!"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:574
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
+#: ..\Client\loader\MainFunctions.cpp:584
+#: ..\Client\loader\MainFunctions.cpp:591
+#: ..\Client\loader\MainFunctions.cpp:1201
+msgid "Information"
+msgstr "信息"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
+msgid "You have to select a server to connect to."
+msgstr "你需要选择一个服务器来连接。"
+
+#. Create queue window
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:32
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "服务器到达人数上限"
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:53
+msgid "Name:"
+msgstr "名称:"
+
+#. Server IP
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "服务器地址:"
+
+#. Gamemode
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "游戏模式:"
+
+#. Map
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:86
+msgid "Map:"
+msgstr "地图:"
+
+#. Players
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:97
+msgid "Players:"
+msgstr "玩家数:"
+
+#. Passworded
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "是否需要密码:"
+
+#. Latency
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "传输延迟:"
+
+#. Close button
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:144
+msgid "Close"
+msgstr "关闭"
+
+#. Join Game button
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "加入游戏"
+
+#. Please enter password label
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "请输入进入此服务器所需的密码:"
+
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "当服务器有空位时进入。"
+
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "请输入服务器密码"
+
+#. The server has timed out
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "已超时"
+
+#. Set every GUI elements text to blank
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "正在查询..."
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:25
+msgid "Idle"
+msgstr "空闲"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:152
+msgid "player"
+msgid_plural "players"
+msgstr[0] "个玩家个玩家"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:153
+msgid "on"
+msgstr "于"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:156
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "个服务器个服务器"
+
+#. We are polling for the master server list (first pass)
+#: ..\Client\core\ServerBrowser\CServerList.cpp:240
+#, c-format, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "查询主服务器列表 (已花费 %lu 毫秒)"
+
+#. Abort
+#: ..\Client\core\ServerBrowser\CServerList.cpp:256
+msgid "Master server list could not be parsed."
+msgstr "主服务器列表无法解析。"
+
+#. Abort
+#: ..\Client\core\ServerBrowser\CServerList.cpp:266
+msgid "Master server list could not be retrieved."
+msgstr "主服务器列表无法检索。"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:276
+msgid "(Backup server list)"
+msgstr "(备份服务器列表)"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:328
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "无法绑定局域网广播套接字 (LAN-broadcast socket)"
+
+#: ..\Client\core\ServerBrowser\CServerList.cpp:347
+msgid "Attempting to discover LAN servers"
+msgstr "正在尝试搜索局域网内的服务器"
+
+#: ..\Client\game_sa\CSettingsSA.cpp:800
 msgid "Can't find valid screen resolution."
 msgstr "无法找到有效的屏幕分辨率."
 
 #. Confirm that res should be used
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:716
+#: ..\Client\game_sa\CSettingsSA.cpp:876
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "您确定要使用这个分辨率吗？"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:718
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:94
+#: ..\Client\game_sa\CSettingsSA.cpp:878 ..\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:145
+#: ..\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
 msgstr "更新 Aero 设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:147
+#: ..\Client\loader\CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
 msgstr "更新 大型内存设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:149
+#: ..\Client\loader\CExePatchedStatus.cpp:157
 msgid "Update DEP setting"
 msgstr "更新DEP数据执行保护设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:151
+#: ..\Client\loader\CExePatchedStatus.cpp:159
 msgid "Update graphics driver compliance"
 msgstr "更新显卡驱动依赖"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:153
+#: ..\Client\loader\CExePatchedStatus.cpp:161
+#: ..\Client\loader\CExePatchedStatus.cpp:163
 msgid "Fix file issues"
 msgstr "修复文件问题"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:154
+#: ..\Client\loader\CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "复制主要的可执行文件以避免显卡驱动问题"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:336
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:314 ..\Client\loader\Utils.cpp:1207
+#, c-format, c-format
 msgid ""
 "MTA:SA needs Administrator access for the following task:\n"
 "\n"
@@ -2251,8 +2212,8 @@ msgstr ""
 "\n"
 "请在下一个窗口中确认指令."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:350
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:329
+#, c-format, c-format
 msgid ""
 "MTA:SA could not complete the following task:\n"
 "\n"
@@ -2262,7 +2223,7 @@ msgstr ""
 "\n"
 "'%s'\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:401
+#: ..\Client\loader\CInstallManager.cpp:379
 msgid ""
 "** The crash was caused by a graphics driver error **\n"
 "\n"
@@ -2272,76 +2233,75 @@ msgstr ""
 "\n"
 "** 请更新驱动 **"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:512
+#: ..\Client\loader\CInstallManager.cpp:485
 msgid "Install updated MTA:SA files"
 msgstr "安装已更新的 MTA:SA 文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:533
+#: ..\Client\loader\CInstallManager.cpp:505
 msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
 msgstr "本次更新由于文件冲突导致失败. 请关掉其他程序后再试"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:542
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:514
+#, c-format, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto 没有被正确安装, 请重新安装. %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:743
+#: ..\Client\loader\CInstallManager.cpp:713
 msgid "Missing file:"
 msgstr "缺少以下文件："
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:747
+#: ..\Client\loader\CInstallManager.cpp:717
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "若MTA加载失败，请重新安装GTA:SA"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:872
+#: ..\Client\loader\CInstallManager.cpp:838
 msgid "Update install settings"
 msgstr "更新安装设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:984
+#: ..\Client\loader\CInstallManager.cpp:971
 msgid "Update compatibility settings"
 msgstr "更新兼容性设置"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:35
+#: ..\Client\loader\Dialogs.cpp:34
 msgid "Quit"
 msgstr "退出"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:51
+#: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas 遇到了问题"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:52
+#: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
 msgstr "崩溃信息"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:53
+#: ..\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "勾选本选项以使用‘互联网’将本崩溃信息发送到MTA开发团队"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:54
+#: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "这样做可以增加修复此崩溃的机会。"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:55
+#: ..\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "您想要重新启动MTA: San Andreas 吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:62
+#: ..\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - 警告"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:63
+#: ..\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
 msgstr "你的侠盗猎车手：圣安地列斯的安装目录包含以下 d3d9.dll 文件:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:64
+#: ..\Client\loader\Dialogs.cpp:65
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2349,75 +2309,75 @@ msgstr ""
 "\n"
 "我们推荐您重命名或删除该 d3d9.dll"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:66
+#: ..\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
 msgstr "不要再提示我关于此d3d9.dll问题"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:67
+#: ..\Client\loader\Dialogs.cpp:68
 msgid "Show me the file"
 msgstr "显示文件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:68
+#: ..\Client\loader\Dialogs.cpp:69
 msgid "Play MTA:SA"
 msgstr "启动 MTA:SA"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:75
+#: ..\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - 不明确的选项"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:76
+#: ..\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
 msgstr "检测到显卡支持NVidia Optimus技术!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:77
+#: ..\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
 msgstr "尝试每一个选项再看哪种模式可以正常运行:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:78
+#: ..\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
 msgstr "A - 标准 NVidia 模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:79
+#: ..\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
 msgstr "B - 备用 NVidia 模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:80
+#: ..\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - 标准NVidia及重命名exe模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:81
+#: ..\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - 备用NVidia及重命名exe模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:82
+#: ..\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
 msgstr "E - 标准Intel模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:83
+#: ..\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
 msgstr "F - 备用Intel模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:84
+#: ..\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
 msgstr "G - 标准Intel及重命名exe模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:85
+#: ..\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - 备用Intel及重命名exe模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:86
+#: ..\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
 msgstr "如果以上模式都没法玩让你痛不欲生, 这个模式或许能拯救你:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:87
+#: ..\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
 msgstr "强制窗口化模式"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:95
+#: ..\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
 msgstr "警告:没有检测出反病毒软件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:96
+#: ..\Client\loader\Dialogs.cpp:97
 msgid ""
 "MTA could not detect an anti-virus on your PC.\n"
 "\n"
@@ -2431,11 +2391,11 @@ msgstr ""
 "\n"
 "点击 '帮助' 以获得更多信息."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:99
+#: ..\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
 msgstr "我已安装杀毒软件"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:100
+#: ..\Client\loader\Dialogs.cpp:102
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
@@ -2443,51 +2403,43 @@ msgstr ""
 "朕才不安装反病毒软件.\n"
 "朕就喜欢慢点的电脑顺便成为僵尸网络的一份子."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:702
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:757
+#: ..\Client\loader\Dialogs.cpp:691 ..\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "搜索Grand Theft Auto: San Andreas"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:705
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:759
+#: ..\Client\loader\Dialogs.cpp:694 ..\Client\loader\Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "请启动Grand Theft Auto San Andreas"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:713
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:189
+#: ..\Client\loader\Dialogs.cpp:702 ..\Client\loader\Install.cpp:187
 msgid "Installing update..."
 msgstr "安装更新中..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:721
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:291
+#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:290
 msgid "Extracting files..."
 msgstr "解压文件中..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:726
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1628
+#: ..\Client\loader\Dialogs.cpp:715 ..\Client\loader\Utils.cpp:1630
 msgid "Copying files..."
 msgstr "复制文件..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:731
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1688
+#: ..\Client\loader\Dialogs.cpp:720 ..\Client\loader\Utils.cpp:1690
 msgid "Copy finished early. Everything OK."
 msgstr "文件提前复制完毕.所有数据正常."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:736
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1694
+#: ..\Client\loader\Dialogs.cpp:725 ..\Client\loader\Utils.cpp:1696
 msgid "Finishing..."
 msgstr "正在完成..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:740
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1696
+#: ..\Client\loader\Dialogs.cpp:729 ..\Client\loader\Utils.cpp:1698
 msgid "Done!"
 msgstr "已完成!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:95
+#: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "你希望关闭MTA服务端以安装更新吗？"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:223
+#: ..\Client\loader\MainFunctions.cpp:235
 msgid ""
 "Trouble restarting MTA:SA\n"
 "\n"
@@ -2505,7 +2457,7 @@ msgstr ""
 "\n"
 "再次尝试启动 MTA:SA ?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:240
+#: ..\Client\loader\MainFunctions.cpp:253
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2515,7 +2467,7 @@ msgstr ""
 "\n"
 "如果问题持续出现,请重启你的计算机"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:243
+#: ..\Client\loader\MainFunctions.cpp:256
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2525,7 +2477,7 @@ msgstr ""
 "\n"
 "你想要关闭它吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:267
+#: ..\Client\loader\MainFunctions.cpp:280
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
@@ -2535,7 +2487,7 @@ msgstr ""
 "\n"
 "你希望恢复到早期的版本吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:295
+#: ..\Client\loader\MainFunctions.cpp:309
 msgid ""
 "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n"
@@ -2547,7 +2499,7 @@ msgstr ""
 "\n"
 "你希望重设GTA设置吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:304
+#: ..\Client\loader\MainFunctions.cpp:320
 msgid ""
 "GTA settings have been reset.\n"
 "\n"
@@ -2557,38 +2509,44 @@ msgstr ""
 "\n"
 "点击确认继续."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:309
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:325
+#, c-format, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "指定文件不允许删除: '%s'"
 
 #. No settings to delete, or can't find them
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:316
+#: ..\Client\loader\MainFunctions.cpp:333
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Do you want to see some online help?"
 msgstr ""
-"在运行MTA:SA?时遇到问题?\n"
+"在运行MTA:SA?.时遇到问题了吗?\n"
 "\n"
-"想要查看在线帮助吗?"
+"您需要到选项里修改设置吗?"
 
 #. Inform user
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:353
+#: ..\Client\loader\MainFunctions.cpp:369
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"您在运行MTA:SA?. 的时候出现问题了吗\n"
+"\n"
+"您需要修改以下设置吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:385
+#: ..\Client\loader\MainFunctions.cpp:412
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"您在运行MTA:SA?. 的时候出现问题了吗\n"
+"\n"
+"尝试为GTA和MTA关闭以下产品："
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:415
+#: ..\Client\loader\MainFunctions.cpp:446
 msgid ""
 "WARNING\n"
 "\n"
@@ -2602,29 +2560,30 @@ msgstr ""
 "请运行杀毒软件以确保你的系统安全.\n"
 "\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:418
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:449
+#, c-format, c-format
 msgid "The detected file was:  %s\n"
 msgstr "监测到的文件为: %s\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:552
+#: ..\Client\loader\MainFunctions.cpp:583
 msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "侠盗猎车手: 圣安地列斯的进程已经在运行,MTA:SA需要关闭它才能启动.你想现在结束掉这个进程吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:557
+#: ..\Client\loader\MainFunctions.cpp:590
 msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
 msgstr "无法关闭侠盗猎车手: 圣安地列斯. 如果问题仍继续出现, 请重新启动计算机"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:579
+#: ..\Client\loader\MainFunctions.cpp:613
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr "注册键值丢失.请重新安装 MTA:SA."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:583
+#: ..\Client\loader\MainFunctions.cpp:619
 msgid ""
 "The path to your installation of GTA: San Andreas contains unsupported "
 "(unicode) characters. Please move your Grand Theft Auto: San Andreas "
@@ -2634,14 +2593,14 @@ msgstr ""
 "侠盗猎车手: 圣安地列斯的路径包含不支持的字符(unicode)。请移动你的GTA: San "
 "Andrea到一个只包含标准ASCII字符的目录并且重新安装MTA:SA"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:587
+#: ..\Client\loader\MainFunctions.cpp:626
 msgid ""
 "It appears you have a Steam version of GTA:SA, which is currently "
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr "资料显示你有一个 Steam版本的 GTA:SA, 此版本不能兼容MTA:SA.你现在将会被指向到一个可以帮您解决这一问题的页面"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:600
+#: ..\Client\loader\MainFunctions.cpp:641
 msgid ""
 "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n"
@@ -2655,35 +2614,35 @@ msgstr ""
 "如果您有过对付 MTA:SA 问题的经验,\n"
 "请移动你的安装目录到一个没有包含分号的目录."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:741
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:748
+#: ..\Client\loader\MainFunctions.cpp:781
 msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
 msgstr "载入失败.请确保你最新的数据文件已经正确安装"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:755
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:790
+#, c-format, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "载入失败.请确保 %s 已经正确安装"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:762
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:797
+#, c-format, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "载入失败. 无法在 %s 里定位 gta_sa.exe."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:772
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:807
+#, c-format, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr "载入失败. %s 在GTA目录已经存在.请在继续前删除"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:780
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:816
+#, c-format, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "主文件含有错误名称(%s)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:791
+#: ..\Client\loader\MainFunctions.cpp:827
 msgid ""
 "Main file is unsigned. Possible virus activity.\n"
 "\n"
@@ -2693,7 +2652,7 @@ msgstr ""
 "\n"
 "若MTA无法正常运行请查看在线帮助."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:819
+#: ..\Client\loader\MainFunctions.cpp:857
 msgid ""
 "Data files modified. Possible virus activity.\n"
 "\n"
@@ -2703,10 +2662,9 @@ msgstr ""
 "\n"
 "若MTA无法正常运行请查看在线帮助."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:830
+#: ..\Client\loader\MainFunctions.cpp:869
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2714,27 +2672,38 @@ msgstr ""
 "\n"
 "如果运行MTA:SA时遇到了问题请删除这些 .asi 文件."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:894
+#: ..\Client\loader\MainFunctions.cpp:931
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "文件版本不匹配导致出错.如果游戏时遇到了问题请重新安装MTA:SA.\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:903
+#: ..\Client\loader\MainFunctions.cpp:940
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "缺少部分文件. 如果在游戏时遇到了问题请重新安装MTA:SA.\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:915
+#: ..\Client\loader\MainFunctions.cpp:952
 msgid ""
 "MTA:SA is not compatible with Windows 'Safe Mode'.\n"
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA:SA 与Windows的安全模式不兼容.\n"
+"\n"
+"请重启你的电脑.\n"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1002
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:1088
+msgid "Fix configuration issue"
+msgstr "修复配置文件问题"
+
+#. Try to relaunch as admin if not done so already
+#: ..\Client\loader\MainFunctions.cpp:1130
+msgid "Fix elevation required error"
+msgstr "修复高程要求错误"
+
+#: ..\Client\loader\MainFunctions.cpp:1137
+#, c-format, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
@@ -2742,23 +2711,23 @@ msgstr ""
 "\n"
 "[%s]"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1063
+#: ..\Client\loader\MainFunctions.cpp:1201
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
 msgstr "侠盗猎车手: 圣安地列斯没有正常启动.你想要关闭它吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:850
+#: ..\Client\loader\Utils.cpp:832
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "请选择 侠盗猎车手:圣安地列斯的安装目录"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1302
-#, c-format
+#: ..\Client\loader\Utils.cpp:1308
+#, c-format, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "在读取 %s 模块时出错! (%s)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1737
-#, c-format
+#: ..\Client\loader\Utils.cpp:1738
+#, c-format, c-format
 msgid ""
 "New installation of %s detected.\n"
 "\n"
@@ -2768,258 +2737,267 @@ msgstr ""
 "\n"
 "你想把配置文件从%s复制到这里吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1777
-#, c-format
+#: ..\Client\loader\Utils.cpp:1777
+#, c-format, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA 在打开 '%s' 文件时遇到问题."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1800
-#, c-format
+#: ..\Client\loader\Utils.cpp:1799
+#, c-format, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA 缺少 '%s' 文件."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1826
+#: ..\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA 在加载模型文件时遇到问题."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1828
+#: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr ""
+msgstr "如果您最近修改了gta3.img，请尝试重新安装GTA:SA。"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1854
+#: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA 在改装车辆时遇到问题."
 
-#. Ask user to confirm
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1930
+#: ..\Client\loader\Utils.cpp:1870
+#, c-format, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA 在以下文件找到错误 '%s'"
+
+#: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "你在运行MTA:SA的时候重启电脑了吗?"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:2002
+#: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
 msgstr "请在运行前关闭以下程序:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:41
+#: ..\Client\mods\deathmatch\CClient.cpp:35
 msgid "This version has expired."
 msgstr "此版本已经过期"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:62
+#: ..\Client\mods\deathmatch\CClient.cpp:55
 msgid "disconnect from the game"
 msgstr "从服务器断开连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:63
+#: ..\Client\mods\deathmatch\CClient.cpp:56
 msgid "shows the nametags"
 msgstr "显示用户标签"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:64
+#: ..\Client\mods\deathmatch\CClient.cpp:57
 msgid "shows the chatbox"
 msgstr "显示聊天框"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:65
+#: ..\Client\mods\deathmatch\CClient.cpp:58
 msgid "shows the network statistics"
 msgstr "显示网络统计信息"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:69
+#: ..\Client\mods\deathmatch\CClient.cpp:62
 msgid "open the chat input"
 msgstr "打开聊天输入框"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:70
+#: ..\Client\mods\deathmatch\CClient.cpp:63
 msgid "transmits voice to other players"
 msgstr "与其他玩家发送语音"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:71
+#: ..\Client\mods\deathmatch\CClient.cpp:64
 msgid "enters a car as passenger"
 msgstr "以乘员方式进入车辆"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:72
+#: ..\Client\mods\deathmatch\CClient.cpp:65
 msgid "next radio channel"
 msgstr "下一雷达频道"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:73
+#: ..\Client\mods\deathmatch\CClient.cpp:66
 msgid "previous radio channel"
 msgstr "上一电台频道"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:74
+#: ..\Client\mods\deathmatch\CClient.cpp:67
 msgid "enables the radar view"
 msgstr "启用雷达视角"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:75
+#: ..\Client\mods\deathmatch\CClient.cpp:68
 msgid "zooms the radar in"
 msgstr "放大雷达"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:76
+#: ..\Client\mods\deathmatch\CClient.cpp:69
 msgid "zooms the radar out"
 msgstr "缩小雷达"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:77
+#: ..\Client\mods\deathmatch\CClient.cpp:70
 msgid "moves the radar north"
 msgstr "雷达向北移动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:78
+#: ..\Client\mods\deathmatch\CClient.cpp:71
 msgid "moves the radar south"
 msgstr "雷达向南移动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:79
+#: ..\Client\mods\deathmatch\CClient.cpp:72
 msgid "moves the radar east"
 msgstr "雷达向东移动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:80
+#: ..\Client\mods\deathmatch\CClient.cpp:73
 msgid "moves the radar west"
 msgstr "雷达向西移动"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:81
+#: ..\Client\mods\deathmatch\CClient.cpp:74
 msgid "attaches the radar"
 msgstr "连接雷达"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:82
+#: ..\Client\mods\deathmatch\CClient.cpp:75
 msgid "reduces radar opacity"
 msgstr "降低雷达不透明度"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:83
+#: ..\Client\mods\deathmatch\CClient.cpp:76
 msgid "increases radar opacity"
 msgstr "增加雷达不透明度"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:84
+#: ..\Client\mods\deathmatch\CClient.cpp:77
 msgid "toggles radar help text"
 msgstr "吸附雷达帮助"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:85
+#: ..\Client\mods\deathmatch\CClient.cpp:78
 msgid "sends a message to the targetted player"
 msgstr "向目标对象发送信息"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:86
+#: ..\Client\mods\deathmatch\CClient.cpp:79
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "当进入载具时切换下一个武器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:87
+#: ..\Client\mods\deathmatch\CClient.cpp:80
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "当进入载具时切换上一个武器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:88
+#: ..\Client\mods\deathmatch\CClient.cpp:81
 msgid "outputs info about the current server"
 msgstr "当前服务器的输出信息"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:91
+#: ..\Client\mods\deathmatch\CClient.cpp:84
 msgid "defines the scale multiplier of all text-displays"
 msgstr "定义文字显示的标度系数"
 
 #. Development mode
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:98
+#: ..\Client\mods\deathmatch\CClient.cpp:91
 msgid "(Development mode) shows the colshapes"
 msgstr "(开发模式) shows the colshapes"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:99
+#: ..\Client\mods\deathmatch\CClient.cpp:92
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(开发模式) prints world sound ids into the debug window"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:579
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:590
 msgid "Entering the game ..."
 msgstr "进入游戏中 ..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:638
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:685
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
 msgid "The server is not installed"
 msgstr "服务器未被安装"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:695
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1088
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Local Server"
 msgstr "本地服务器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:695
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
 msgid "Starting local server ..."
 msgstr "正在启用本地服务器 ..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1020
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "您已经被踢出游戏 ( %s )"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1088
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Connecting to local server..."
 msgstr "正在连接到本地服务器..."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1099
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
 msgid "Error connecting to server."
 msgstr "连接到服务器时发生错误."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1109
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
 msgid "Connecting to local server timed out. See console for details."
 msgstr "连接本地服务器超时.请在console中查看详细内容"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1212
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Connection with the server was lost"
 msgstr "与服务器丢失连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1235
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1224
 msgid "Disconnected: the server is currently full"
 msgstr "断开连接:服务器满载"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1244
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1236
 msgid "Disconnected: invalid password specified"
 msgstr "断开连接: 无效的密码"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1264
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
 msgid "MTA Client verification failed!"
 msgstr "MTA客户端验证失败!"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:39
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "服务器主机"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:55
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:53
 msgid "Resources"
 msgstr "资源"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:57
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:59
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:55
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:57
 msgid "Server name:"
 msgstr "服务器名称:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:75
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:77
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:64
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:66
+msgid "Password:"
+msgstr "密码:"
+
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:73
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:75
 msgid "Max players:"
 msgstr "最大允许玩家:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:84
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:86
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:82
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
 msgstr "广播:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:88
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
 msgstr "本地局域网"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:101
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:99
 msgid "Selected"
 msgstr "已选择"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:118
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:116
 msgid "All"
 msgstr "所有"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:120
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:118
 msgid "Start"
 msgstr "开启"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:472
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
 msgstr "断开连接: 无效的昵称"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:475
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
 msgstr "与服务器断开连接"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:478
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
+#, c-format, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
@@ -3027,8 +3005,8 @@ msgstr ""
 "断开连接: 序列号被封禁.\n"
 "原因: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:483
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
+#, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
@@ -3036,8 +3014,8 @@ msgstr ""
 "断开连接: 您被封禁.\n"
 "原因: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:488
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
@@ -3045,16 +3023,16 @@ msgstr ""
 "断开连接: 账号被封禁.\n"
 "原因: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:492
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
 msgstr "断开连接: 游戏版本不对应"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:495
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "断开连接: 过多玩家同时进入服务器,请等候几分钟后再进入."
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:498
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
+#, c-format, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
 "Information: %s"
@@ -3062,8 +3040,8 @@ msgstr ""
 "断开连接: 服务器来自不同的分支.\n"
 "相关信息: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:502
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
+#, c-format, c-format
 msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
@@ -3071,8 +3049,8 @@ msgstr ""
 "断开连接: 版本已损坏.\n"
 "相关信息: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:506
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
+#, c-format, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
@@ -3080,8 +3058,8 @@ msgstr ""
 "断开连接: 用户版本比服务器版本旧.\n"
 "相关信息: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:510
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
+#, c-format, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
@@ -3089,108 +3067,172 @@ msgstr ""
 "断开连接: 用户版本比服务器版本新.\n"
 "相关信息: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:514
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
 msgstr "断开连接: 昵称已有人使用"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:517
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
 msgstr "断开连接: 无法创建玩家元素"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:520
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
+#, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "断开连接: 服务器拒绝连接: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:524
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
 msgstr "断开连接: 序列验证失败"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:527
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
+#, c-format, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "断开连接: 数据不同步 %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:535
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
+#, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "断开连接: 您已经被 %s 踢出服务器(KICKED)"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:539
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
+#, c-format, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "断开连接: 您已经被 %s 禁止进入服务器"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:548
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
+msgstr "断开连接：服务器已关闭或重启"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
+msgid "You were kicked from the game"
+msgstr "您已经被踢出游戏"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
+msgid "This server requires a non-modifed gta_sa.exe"
 msgstr ""
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:571
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+msgid "Please replace gta_sa.exe"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+msgid "This server does not allow virtual machines"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
+msgid "This server requires driver signing to be enabled"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
+msgid "Please restart your PC"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
+msgid "This server has detected missing anti-cheat components"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
+msgid "Try restarting MTA"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
+msgid "Please replace gta3.img or gta_int.img"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
+msgid "This server does not allow Wine"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr ""
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
 msgstr "剩余时间"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:579
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:629
+#, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:581
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:631
+#, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 时"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:583
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:633
+#, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分"
 
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:635
+#, c-format, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d 秒"
+
 #. Display the error
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:587
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639
 msgid "Disconnected"
 msgstr "断开连接"
 
 #. Throw the error and disconnect
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:130
+#, c-format, c-format
 msgid "Download error: %s"
 msgstr "下载错误: %s"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:194
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 msgid "Could not start the local server. See console for details."
 msgstr "无法启动本地服务器.请在 console 中查看详细信息"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:195
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:182
+#, c-format, c-format
 msgid "Error: Could not start local server. [%s]"
 msgstr "错误: 无法启动本地服务器. [%s]"
 
 #. Create our text for each transfer type
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:30
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:24
 msgid "Download Progress:"
 msgstr "下载进度:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:31
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:25
 msgid "Map download progress:"
 msgstr "地图下载进度:"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:36
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:122
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:31
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:119
+#, c-format, c-format
 msgid "%s of %s"
 msgstr "%s 之 %s"
 
 #. stats label
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:37
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:63
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:32
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:58
 msgid "Disconnect to cancel download"
 msgstr "断开连接以取消下载"
 
 #. Populate the message and show the box
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:150
-#, c-format
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:142
+#, c-format, c-format
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
@@ -3200,22 +3242,27 @@ msgstr "致命错误 (%u).如果此问题继续存在,请在mtasa.com里求助."
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:167
-#, c-format
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:158
+#, c-format, c-format
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr "协议错误 (%u).如果此问题继续存在,请在mtasa.com里求助"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:169
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"
 msgstr "连接错误"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:75
+#. Couldn't create render target for CPostEffects
+#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "显卡驱动出现问题"
+
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto 没有被正确安装. 请重新安装"
 
-#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:630
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:705
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
@@ -3224,6 +3271,81 @@ msgstr ""
 "你的浏览器将会显示一个带有帮助信息的网页\n"
 "\n"
 "(如果你的网页载入失败, 粘贴 (CTRL-V) URL 到你的服务器)"
+
+#~ msgid "No host specified!"
+#~ msgstr "未指定主机!"
+
+#~ msgid "No port specified!"
+#~ msgstr "未指定端口!"
+
+#~ msgid "Invalid port specified!"
+#~ msgstr "指定了无效的端口号!"
+
+#~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
+#~ msgstr "连接: 指令为 'connect <服务器地址> <端口> [<昵称> <密码>]'"
+
+#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2018 Multi Theft Auto"
+
+#~ msgid "Services currently unavailable"
+#~ msgstr "当前服务不可用"
+
+#~ msgid "Login Error"
+#~ msgstr "登录错误"
+
+#~ msgid "Invalid username/password"
+#~ msgstr "无效的用户名或密码"
+
+#~ msgid "Success"
+#~ msgstr "成功"
+
+#~ msgid "Successfully registered!"
+#~ msgstr "注册成功!"
+
+#~ msgid "Username missing"
+#~ msgstr "请填写用户名"
+
+#~ msgid "Email missing"
+#~ msgstr "请填写电子邮件地址"
+
+#~ msgid "Password missing"
+#~ msgstr "请填写密码"
+
+#~ msgid "Passwords do not match"
+#~ msgstr "密码不匹配"
+
+#~ msgid "Validation code missing"
+#~ msgstr "请填写验证码"
+
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "版权所有 (C) 2003 - 2015 Multi Theft Auto"
+
+#~ msgid "Community"
+#~ msgstr "社区"
+
+#~ msgid "Username:"
+#~ msgstr "用户名:"
+
+#~ msgid "Login"
+#~ msgstr "登录"
+
+#~ msgid "Register"
+#~ msgstr "注册"
+
+#~ msgid "Chat BG"
+#~ msgstr "聊天背景"
+
+#~ msgid "Input BG"
+#~ msgstr "输入文字背景"
+
+#~ msgid "Font:"
+#~ msgstr "字体:"
+
+#~ msgid "Logging in..."
+#~ msgstr "正在登录..."
+
+#~ msgid "Logout"
+#~ msgstr "登出"
 
 #~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
 #~ msgstr "版权所有 (C) 2003 - 2014 Multi Theft Auto"

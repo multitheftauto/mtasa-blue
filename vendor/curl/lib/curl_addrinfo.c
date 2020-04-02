@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -27,6 +27,9 @@
 #ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
 #endif
+#ifdef HAVE_NETINET_IN6_H
+#  include <netinet/in6.h>
+#endif
 #ifdef HAVE_NETDB_H
 #  include <netdb.h>
 #endif
@@ -45,6 +48,10 @@
 #if defined(NETWARE) && defined(__NOVELL_LIBC__)
 #  undef  in_addr_t
 #  define in_addr_t unsigned long
+#endif
+
+#if defined(WIN32) && defined(USE_UNIX_SOCKETS)
+#include <afunix.h>
 #endif
 
 #include <stddef.h>
@@ -286,7 +293,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
   DEBUGASSERT((he->h_name != NULL) && (he->h_addr_list != NULL));
 
-  for(i=0; (curr = he->h_addr_list[i]) != NULL; i++) {
+  for(i = 0; (curr = he->h_addr_list[i]) != NULL; i++) {
 
     size_t ss_size;
 #ifdef ENABLE_IPV6
@@ -338,7 +345,7 @@ Curl_he2ai(const struct hostent *he, int port)
       addr = (void *)ai->ai_addr; /* storage area for this info */
 
       memcpy(&addr->sin_addr, curr, sizeof(struct in_addr));
-      addr->sin_family = (unsigned short)(he->h_addrtype);
+      addr->sin_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr->sin_port = htons((unsigned short)port);
       break;
 
@@ -347,7 +354,7 @@ Curl_he2ai(const struct hostent *he, int port)
       addr6 = (void *)ai->ai_addr; /* storage area for this info */
 
       memcpy(&addr6->sin6_addr, curr, sizeof(struct in6_addr));
-      addr6->sin6_family = (unsigned short)(he->h_addrtype);
+      addr6->sin6_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr6->sin6_port = htons((unsigned short)port);
       break;
 #endif
@@ -529,9 +536,10 @@ Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath, bool abstract)
 }
 #endif
 
-#if defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO)
+#if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) &&  \
+  defined(HAVE_FREEADDRINFO)
 /*
- * curl_dofreeaddrinfo()
+ * curl_dbg_freeaddrinfo()
  *
  * This is strictly for memory tracing and are using the same style as the
  * family otherwise present in memdebug.c. I put these ones here since they
@@ -539,23 +547,23 @@ Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath, bool abstract)
  */
 
 void
-curl_dofreeaddrinfo(struct addrinfo *freethis,
-                    int line, const char *source)
+curl_dbg_freeaddrinfo(struct addrinfo *freethis,
+                      int line, const char *source)
 {
+  curl_dbg_log("ADDR %s:%d freeaddrinfo(%p)\n",
+               source, line, (void *)freethis);
 #ifdef USE_LWIPSOCK
   lwip_freeaddrinfo(freethis);
 #else
   (freeaddrinfo)(freethis);
 #endif
-  curl_memlog("ADDR %s:%d freeaddrinfo(%p)\n",
-              source, line, (void *)freethis);
 }
 #endif /* defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO) */
 
 
 #if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO)
 /*
- * curl_dogetaddrinfo()
+ * curl_dbg_getaddrinfo()
  *
  * This is strictly for memory tracing and are using the same style as the
  * family otherwise present in memdebug.c. I put these ones here since they
@@ -563,24 +571,24 @@ curl_dofreeaddrinfo(struct addrinfo *freethis,
  */
 
 int
-curl_dogetaddrinfo(const char *hostname,
-                   const char *service,
-                   const struct addrinfo *hints,
-                   struct addrinfo **result,
-                   int line, const char *source)
+curl_dbg_getaddrinfo(const char *hostname,
+                    const char *service,
+                    const struct addrinfo *hints,
+                    struct addrinfo **result,
+                    int line, const char *source)
 {
 #ifdef USE_LWIPSOCK
-  int res=lwip_getaddrinfo(hostname, service, hints, result);
+  int res = lwip_getaddrinfo(hostname, service, hints, result);
 #else
-  int res=(getaddrinfo)(hostname, service, hints, result);
+  int res = (getaddrinfo)(hostname, service, hints, result);
 #endif
   if(0 == res)
     /* success */
-    curl_memlog("ADDR %s:%d getaddrinfo() = %p\n",
-                source, line, (void *)*result);
+    curl_dbg_log("ADDR %s:%d getaddrinfo() = %p\n",
+                 source, line, (void *)*result);
   else
-    curl_memlog("ADDR %s:%d getaddrinfo() failed\n",
-                source, line);
+    curl_dbg_log("ADDR %s:%d getaddrinfo() failed\n",
+                 source, line);
   return res;
 }
 #endif /* defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) */

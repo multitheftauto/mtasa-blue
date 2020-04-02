@@ -1,14 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:
-*  PURPOSE:
-*  DEVELOPERS:
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:
+ *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once 
+
+#include <set>
+
+class CExceptionInformation;
 
 enum EDumpFileNameParts
 {
@@ -26,7 +31,6 @@ enum EDumpFileNameParts
     DUMP_PART_TIME,
 };
 
-
 //
 // CCrashDumpWriter
 //
@@ -34,26 +38,31 @@ enum EDumpFileNameParts
 //
 class CCrashDumpWriter
 {
+    //static 
 public:
-    static long WINAPI  HandleExceptionGlobal   ( _EXCEPTION_POINTERS* pException );
-    static void         DumpCoreLog             ( CExceptionInformation* pExceptionInformation );
-    static void         DumpMiniDump            ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation );
-    static void         RunErrorTool            ( CExceptionInformation* pExceptionInformation );
-    static void         AppendToDumpFile        ( const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd );
-    static void         GetPoolInfo             ( CBuffer& buffer );
-    static void         GetD3DInfo              ( CBuffer& buffer );
-    static void         GetCrashAvertedStats    ( CBuffer& buffer );
-    static void         GetLogInfo              ( CBuffer& buffer );
-    static void         GetDxInfo               ( CBuffer& buffer );
-    static void         GetMemoryInfo           ( CBuffer& buffer );
-    static void         GetMiscInfo             ( CBuffer& buffer );
-    static void         OnCrashAverted          ( uint uiId );
-    static void         OnEnterCrashZone        ( uint uiId );
-    static void         LogEvent                ( const char* szType, const char* szContext, const char* szBody );
-    static SString      GetCrashAvertedStatsSoFar ( void );
-    static void         ReserveMemoryKBForCrashDumpProcessing ( uint uiMemoryKB );
-    static void         FreeMemoryForCrashDumpProcessing ( void );
-    static void         SetHandlers             ( void );
-    static void         UpdateCounters          ( void );
-    static void         HandleInvalidParameter  ( const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved );
+    static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
+    static LONG WINAPI HandleExceptionHardWareBreakPoint(PEXCEPTION_POINTERS ExceptionInfo);
+    static bool        GetHardWareBreakPointAddress(PCONTEXT ContextRecord, DWORD& dwAddress);
+    static void        DumpCoreLog(CExceptionInformation* pExceptionInformation);
+    static void        DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
+    static void        RunErrorTool(CExceptionInformation* pExceptionInformation);
+    static void        AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd);
+    static void        GetPoolInfo(CBuffer& buffer);
+    static void        GetD3DInfo(CBuffer& buffer);
+    static void        GetCrashAvertedStats(CBuffer& buffer);
+    static void        GetLogInfo(CBuffer& buffer);
+    static void        GetDxInfo(CBuffer& buffer);
+    static void        GetMemoryInfo(CBuffer& buffer);
+    static void        GetCurrentAnimTaskInfo(CBuffer& buffer);
+    static void        GetMiscInfo(CBuffer& buffer);
+    static void        OnCrashAverted(uint uiId);
+    static void        OnEnterCrashZone(uint uiId);
+    static void        LogEvent(const char* szType, const char* szContext, const char* szBody);
+    static SString     GetCrashAvertedStatsSoFar();
+    static void        ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB);
+    static void        FreeMemoryForCrashDumpProcessing();
+    static void        SetHandlers();
+    static void        UpdateCounters();
+    static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
+    static HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 };

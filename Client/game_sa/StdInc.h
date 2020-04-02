@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 // Pragmas
 #pragma warning (disable:4409)
@@ -61,6 +60,7 @@
 #include "CAudioEngineSA.h"
 #include "CAEAudioHardwareSA.h"
 #include "CAEVehicleAudioEntitySA.h"
+#include "CAESoundManagerSA.h"
 #include "CAudioContainerSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPopulationSA.h"

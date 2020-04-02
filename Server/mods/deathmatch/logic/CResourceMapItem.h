@@ -1,87 +1,72 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CResourceMapItem.h
-*  PURPOSE:     Resource server-side map item class
-*  DEVELOPERS:  Ed Lyons <>
-*               Kevin Whiteside <>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CResourceMapItem.h
+ *  PURPOSE:     Resource server-side map item class
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+#pragma once
 
-#ifndef CRESOURCEMAPITEM_H
-#define CRESOURCEMAPITEM_H
-
-
-#include "CElementGroup.h"
-#include "CBlipManager.h"
-#include "CDummy.h"
-#include "CEvents.h"
-#include "CGroups.h"
-#include "CMarkerManager.h"
-#include "CObjectManager.h"
-#include "CPickupManager.h"
-#include "CPlayerManager.h"
-#include "CRadarAreaManager.h"
-#include "CVehicleManager.h"
-#include "CTeamManager.h"
 #include "CResourceFile.h"
 
+class CDummy;
+class CElement;
+class CResource;
+class CElementGroup;
+class CXMLAttributes;
+class CXMLNode;
+class CGroups;
+class CMarkerManager;
+class CBlipManager;
+class CObjectManager;
+class CPickupManager;
+class CPlayerManager;
+class CRadarAreaManager;
+class CVehicleManager;
+class CTeamManager;
+class CPedManager;
+class CWaterManager;
+class CEvents;
+
+// This class represents a single resource map item, being a .map file
+// It's task is to load the .map file into elements and store them
+// as a reference in a CElementGroup. This allows easy removal on the deletion
+// of the resource.
 class CResourceMapItem : public CResourceFile
 {
-    
 public:
+    CResourceMapItem(CResource* pResource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* pXMLAttributes, int iDimension);
+    ~CResourceMapItem();
 
-                                        CResourceMapItem                ( class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes, int iDimension );
-                                        ~CResourceMapItem               ( void );
+    bool Start() override;
+    bool Stop() override;
 
-    inline CElementGroup *              GetElementGroup                 ( void ) { return m_pElementGroup; }
+    CElementGroup* GetElementGroup() const { return m_pElementGroup; }
+    CDummy*        GetMapRootElement() const { return m_pMapElement; };
 
-    bool                                LoadSubNodes                    ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
-    CElement*                           LoadNode                        ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
-
-    bool                                LoadMap                         ( const char * szMapFilename );
-
-    bool                                Start                           ( void );
-    bool                                Stop                            ( void );
-
-    void                                LinkupElements                  ( void );
-
-    inline CDummy*                      GetMapRootElement               ( void ) { return m_pMapElement; };
-    
 private:
+    bool LoadMap(const char* szMapFilename);
+    void LoadChildNodes(CXMLNode& Node, CElement* pParent);
+    void HandleNode(CXMLNode& Node, CElement* pParent);
+    void LinkupElements();
 
-    bool                                HandleNode                          ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart, CElement** pCreated );
-
-    CGroups*                            m_pGroups;
-    CMarkerManager*                     m_pMarkerManager;
-    CBlipManager*                       m_pBlipManager;
-    CObjectManager*                     m_pObjectManager;
-    CPickupManager*                     m_pPickupManager;
-    CPlayerManager*                     m_pPlayerManager;
-    CRadarAreaManager*                  m_pRadarAreaManager;
-    CVehicleManager*                    m_pVehicleManager;
-    CTeamManager*                       m_pTeamManager;
-    CPedManager*                        m_pPedManager;
-    CWaterManager*                      m_pWaterManager;
-    CLuaManager*                        m_pLuaManager;
-    CEvents*                            m_pEvents;
-    class CScriptDebugging*             m_pScriptDebugging; // are these 
-    bool                                m_bIsLoaded;
-
-    CXMLFile*                           m_pXMLFile;
-    CXMLNode*                           m_pXMLRootNode;
-    CDummy*                             m_pRootElement;
-    CDummy*                             m_pMapElement;
-
-    int                                 m_iDimension;
-
-    CElementGroup*                      m_pElementGroup; // contains all the elements in this map
-
+private:
+    CGroups*           m_pGroups;
+    CMarkerManager*    m_pMarkerManager;
+    CBlipManager*      m_pBlipManager;
+    CObjectManager*    m_pObjectManager;
+    CPickupManager*    m_pPickupManager;
+    CPlayerManager*    m_pPlayerManager;
+    CRadarAreaManager* m_pRadarAreaManager;
+    CVehicleManager*   m_pVehicleManager;
+    CTeamManager*      m_pTeamManager;
+    CPedManager*       m_pPedManager;
+    CWaterManager*     m_pWaterManager;
+    CEvents*           m_pEvents;
+    CDummy*            m_pMapElement;
+    CElementGroup*     m_pElementGroup;
+    int                m_iDimension;
 };
-
-#endif

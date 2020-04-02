@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -53,9 +53,6 @@
 
 /* Define if you have the <io.h> header file.  */
 #define HAVE_IO_H 1
-
-/* Define if you have the <limits.h> header file.  */
-#define HAVE_LIMITS_H 1
 
 /* Define if you need the malloc.h header header file even with stdlib.h  */
 #define NEED_MALLOC_H 1
@@ -345,6 +342,9 @@
 
 /* The size of `short', as computed by sizeof. */
 #define SIZEOF_SHORT 2
+
+/* Define to the size of `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
 
 /* The size of `size_t', as computed by sizeof. */
 #if defined(_WIN64)

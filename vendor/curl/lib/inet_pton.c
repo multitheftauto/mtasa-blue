@@ -1,6 +1,6 @@
 /* This is from the BIND 4.9.4 release, modified to compile by itself */
 
-/* Copyright (c) 1996 by Internet Software Consortium.
+/* Copyright (c) 1996 - 2019 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -57,8 +57,8 @@ static int      inet_pton6(const char *src, unsigned char *dst);
  * notice:
  *      On Windows we store the error in the thread errno, not
  *      in the winsock error code. This is to avoid losing the
- *      actual last winsock error. So use macro ERRNO to fetch the
- *      errno this function sets when returning (-1), not SOCKERRNO.
+ *      actual last winsock error. So when this function returns
+ *      -1, check errno not SOCKERRNO.
  * author:
  *      Paul Vixie, 1996.
  */
@@ -73,7 +73,7 @@ Curl_inet_pton(int af, const char *src, void *dst)
     return (inet_pton6(src, (unsigned char *)dst));
 #endif
   default:
-    SET_ERRNO(EAFNOSUPPORT);
+    errno = EAFNOSUPPORT;
     return (-1);
   }
   /* NOTREACHED */
@@ -153,7 +153,7 @@ inet_pton6(const char *src, unsigned char *dst)
   static const char xdigits_l[] = "0123456789abcdef",
     xdigits_u[] = "0123456789ABCDEF";
   unsigned char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
-  const char *xdigits, *curtok;
+  const char *curtok;
   int ch, saw_xdigit;
   size_t val;
 
@@ -168,6 +168,7 @@ inet_pton6(const char *src, unsigned char *dst)
   saw_xdigit = 0;
   val = 0;
   while((ch = *src++) != '\0') {
+    const char *xdigits;
     const char *pch;
 
     pch = strchr((xdigits = xdigits_l), ch);

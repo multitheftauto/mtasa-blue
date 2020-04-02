@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/core/CChatInterface.h
-*  PURPOSE:     Chat interface class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/core/CChatInterface.h
+ *  PURPOSE:     Chat interface class
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -40,7 +40,7 @@ namespace Chat
     {
         namespace Horizontal
         {
-            enum eHorizontal: int
+            enum eHorizontal : int
             {
                 LEFT = 0,
                 CENTER = 1,
@@ -50,27 +50,27 @@ namespace Chat
 
         namespace Vertical
         {
-            enum eVertical: int
+            enum eVertical : int
             {
                 TOP = 0,
                 CENTER = 1,
                 BOTTOM = 2
             };
         }
-    }
+    }            // namespace Position
 
     namespace Text
     {
         namespace Align
         {
-            enum eAlign: int
+            enum eAlign : int
             {
                 LEFT = 0,
                 RIGHT = 1
             };
         }
-    }
-}
+    }            // namespace Text
+}            // namespace Chat
 
 typedef Chat::Font::eFont                       eChatFont;
 typedef Chat::ColorType::eType                  eChatColorType;

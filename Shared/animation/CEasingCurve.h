@@ -1,12 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.1
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        animation/CEasingCurve.h
-*  PURPOSE:     Easing curves for non-linear time interpolation
-*  DEVELOPERS:  Kayl
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.1
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        animation/CEasingCurve.h
+ *  PURPOSE:     Easing curves for non-linear time interpolation
+ *
+ *****************************************************************************/
 
 /****************************************************************************
 ** Derived from LGPL code from Qt Framework (QEasingCurve)
@@ -19,14 +18,13 @@ class CEasingCurve;
 
 #pragma once
 
-//Real implementation class defined in .cpp
+// Real implementation class defined in .cpp
 class CEasingCurve_Impl;
 
-//User friendly interface
+// User friendly interface
 class CEasingCurve
 {
 public:
-
     enum eType
     {
         Linear,
@@ -59,25 +57,25 @@ public:
     };
 
     typedef double (*SimpleEasingFunction)(double progress);
-    
-                        CEasingCurve ( eType a_eType = Linear );
-    
-                        CEasingCurve ( const CEasingCurve& a_rfOther );
-    CEasingCurve&       operator=( const CEasingCurve& a_rfOther );
 
-                        ~CEasingCurve ();
+    CEasingCurve(eType a_eType = Linear);
 
-    static eType        GetEasingTypeFromString ( const std::string& a_rstrType );
-    static std::string  GetStringFromEasingType ( eType a_eType );
+    CEasingCurve(const CEasingCurve& a_rfOther);
+    CEasingCurve& operator=(const CEasingCurve& a_rfOther);
 
-    void                SetType ( eType a_eType );
-    eType               GetType ( ) const;
+    ~CEasingCurve();
 
-    void                SetParams ( double a_fPeriod, double a_fAmplitude, double a_fOvershoot );
-    void                GetParams ( double& a_rfPeriod, double& a_rfAmplitude, double& a_rfOvershoot ) const;
-    
-    float               ValueForProgress ( float progress ) const;
-    bool                IsTargetValueFinalValue () const; //at t=1 can we use target as the final value (false for sin & cos)
+    static eType       GetEasingTypeFromString(const std::string& a_rstrType);
+    static std::string GetStringFromEasingType(eType a_eType);
+
+    void  SetType(eType a_eType);
+    eType GetType() const;
+
+    void SetParams(double a_fPeriod, double a_fAmplitude, double a_fOvershoot);
+    void GetParams(double& a_rfPeriod, double& a_rfAmplitude, double& a_rfOvershoot) const;
+
+    float ValueForProgress(float progress) const;
+    bool  IsTargetValueFinalValue() const;            // at t=1 can we use target as the final value (false for sin & cos)
 protected:
-    CEasingCurve_Impl*  m_pImplementation;
+    CEasingCurve_Impl* m_pImplementation;
 };
