@@ -1743,7 +1743,7 @@ void CClientPed::InternalSetHealth(float fHealth)
             m_pPlayerPed->SetHealth(fHealth);
 
             // Recover from dead state to bring the ped back to life
-            m_pTaskManager->RemoveTask(TASK_SIMPLE_DEAD);
+            m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
         }
     }
 }
