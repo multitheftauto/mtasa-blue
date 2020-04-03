@@ -268,9 +268,7 @@ struct CLuaFunctionParserBase
             T value = lua::PopPrimitive<T>(L, index);
             if (std::isnan(value))
             {
-                SString strMessage("Expected number at argument %d, got NaN", index);
-                SString strMessage("Bad argument @ '%s' [Expected number at argument %d, got NaN]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(),
-                                   index);
+                SString strMessage("Bad argument @ '%s' [Expected number at argument %d, got NaN]", lua_tostring(L, lua_upvalueindex(1)), index);
                 strError = strMessage;
             }
             return value;
