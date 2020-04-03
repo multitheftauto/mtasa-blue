@@ -467,7 +467,7 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
     {
         if (pSound)
         {
-            lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetSoundLooped(*pSound, bLoop));
+            lua_pushboolean(luaVM, pSound->SetLooped(bLoop));
             return 1;
         }
         else
@@ -503,12 +503,8 @@ int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
     {
         if (pSound)
         {
-            bool bLoop = false;
-            if (CStaticFunctionDefinitions::IsSoundLooped(*pSound, bLoop))
-            {
-                lua_pushboolean(luaVM, bLoop);
-                return 1;
-            }
+            lua_pushboolean(luaVM, pSound->IsLooped());
+            return 1;
         }
     }
     else

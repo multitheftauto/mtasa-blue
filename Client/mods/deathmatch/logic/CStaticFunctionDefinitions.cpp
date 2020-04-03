@@ -7907,17 +7907,6 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetSoundLooped(CClientSound& Sound, bool bLoop)
-{
-    return Sound.SetLooped(bLoop);
-}
-
-bool CStaticFunctionDefinitions::IsSoundLooped(CClientSound& Sound, bool& bLoop)
-{
-    bLoop = Sound.IsLooped();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
 {
     if (Sound.IsSoundStream())
