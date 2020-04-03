@@ -40,7 +40,7 @@ struct CLuaFunctionParserBase
     template <typename T>
     inline SString TypeToName()
     {
-        if constexpr (std::is_same_v<T, std::string>)
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return "string";
         else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
                            std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
@@ -131,7 +131,8 @@ struct CLuaFunctionParserBase
         {
             SString strReceived = ReadParameterAsString(L, index);
             SString strExpected = TypeToName<T>();
-            SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+            SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(), index,
+                               strReceived.c_str());
             strError = strMessage;
             return T{};
         }
@@ -173,7 +174,7 @@ struct CLuaFunctionParserBase
     {
         int iArgument = lua_type(L, index);
         // primitive types
-        if constexpr (std::is_same_v<T, std::string>)
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
         if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
                       std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
@@ -259,7 +260,7 @@ struct CLuaFunctionParserBase
             return dummy_type{};
         // primitive types are directly popped
         else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, short> || std::is_same_v<T, bool> ||
-                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
+                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);
         // floats/doubles may not be NaN
         else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
@@ -268,6 +269,8 @@ struct CLuaFunctionParserBase
             if (std::isnan(value))
             {
                 SString strMessage("Expected number at argument %d, got NaN", index);
+                SString strMessage("Bad argument @ '%s' [Expected number at argument %d, got NaN]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(),
+                                   index);
                 strError = strMessage;
             }
             return value;
@@ -283,7 +286,8 @@ struct CLuaFunctionParserBase
             {
                 SString strReceived = ReadParameterAsString(L, index);
                 SString strExpected = GetEnumTypeName((T)0);
-                SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(), index,
+                                   strReceived.c_str());
                 strError = strMessage;
                 return static_cast<T>(0);
             }
@@ -370,7 +374,8 @@ struct CLuaFunctionParserBase
             {
                 SString strReceived = isLightUserData ? GetUserDataClassName(pValue, L) : GetUserDataClassName(*(void**)pValue, L);
                 SString strExpected = GetClassTypeName((T)0);
-                SString strMessage("Expected %s at argument %d, got %s", strExpected.c_str(), index, strReceived.c_str());
+                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)),
+                                   strExpected.c_str(), index, strReceived.c_str());
                 strError = strMessage;
                 return nullptr;
             }
@@ -421,7 +426,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
         }
         catch (std::invalid_argument& e)
         {
-            // This exception can only be thrown from the called function
+            // This exception can be thrown from the called function
             // as an additional way to provide further argument errors
             strError = e.what();
         }
