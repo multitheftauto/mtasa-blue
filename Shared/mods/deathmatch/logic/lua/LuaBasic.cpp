@@ -11,46 +11,6 @@
 
 namespace lua
 {
-    int Push(lua_State* L, int value)
-    {
-        lua_pushnumber(L, value);
-        return 1;
-    }
-    int Push(lua_State* L, unsigned int value)
-    {
-        lua_pushnumber(L, value);
-        return 1;
-    }
-    int Push(lua_State* L, float value)
-    {
-        lua_pushnumber(L, value);
-        return 1;
-    }
-    int Push(lua_State* L, double value)
-    {
-        lua_pushnumber(L, value);
-        return 1;
-    }
-
-    int Push(lua_State* L, bool value)
-    {
-        lua_pushboolean(L, value);
-        return 1;
-    }
-
-    int Push(lua_State* L, nullptr_t)
-    {
-        lua_pushnil(L);
-        return 1;
-    }
-
-    int Push(lua_State* L, const std::string& value)
-    {
-        lua_pushlstring(L, value.data(), value.length());
-        return 1;
-    }
-
-
     template <>
     std::string PopPrimitive<std::string>(lua_State* L, std::size_t& index)
     {
