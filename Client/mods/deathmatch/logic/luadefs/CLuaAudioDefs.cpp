@@ -507,11 +507,7 @@ int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
             return 1;
         }
     }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushnil(luaVM);
-    return 1;
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
 int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
