@@ -459,55 +459,30 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
 {
     CClientSound*    pSound;
     bool             bLoop;
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pSound);
     argStream.ReadBool(bLoop);
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            lua_pushboolean(luaVM, pSound->SetLooped(bLoop));
-            return 1;
-        }
-        else
-        {
-            m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
-            lua_pushboolean(luaVM, false);
-        return 1;
-        }
-    }
-    else
+    if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushboolean(luaVM, pSound->SetLooped(bLoop));
     return 1;
 }
 
 int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
 {
     CClientSound*    pSound;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
-        lua_pushnil(luaVM);
-        return 1;
-    }
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            lua_pushboolean(luaVM, pSound->IsLooped());
-            return 1;
-        }
-    }
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pSound);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, pSound->IsLooped());
+    return 1;
 }
 
 int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
