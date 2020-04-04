@@ -434,16 +434,17 @@ void CClientSound::GetVelocity(CVector& vecVelocity)
 
 bool CClientSound::SetLooped(bool bLoop)
 {
-    if (m_bLoop != bLoop)
-    {
-        m_bLoop = bLoop;
-        m_SimulatedPlayPosition.SetLooped(bLoop);
+    if (m_bLoop == bLoop)
+        return false;
+        
+    m_bLoop = bLoop;
+    m_SimulatedPlayPosition.SetLooped(bLoop);
 
-        if (m_pAudio)
-            m_pAudio->SetLooped(m_bLoop);
-            return true;
-    }
-    return false;
+    if (!m_pAudio)
+        return false;
+
+    m_pAudio->SetLooped(m_bLoop);
+    return true;
 }
 
 bool CClientSound::IsLooped(void) const
