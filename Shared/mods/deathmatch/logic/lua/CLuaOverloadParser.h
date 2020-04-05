@@ -85,6 +85,6 @@ public:
             throw std::invalid_argument("Overload resolution failed.");
         }
         // If this exception is thrown, there is a bug in the overload, as they are not unique
-        throw std::invalid_argument("MTA:SA Bug. Please file an issue with the parameters used for calling.");
+        throw std::invalid_argument("MTA:SA Bug. Please file an issue at https://git.io/blue-issues with the parameters used for calling.");
     }
 };
