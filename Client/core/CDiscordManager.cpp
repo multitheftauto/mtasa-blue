@@ -18,11 +18,7 @@
 
 CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}
 {
-    Reconnect(true);            // Try to interact with discord on construction
-    m_Thread = new CThreadHandle(CDiscordManager::DiscordThread, this);
-
-    m_StoredActivity.GetAssets().SetLargeImage("mta_logo_round");            // Always thing
-    m_StoredActivity.GetAssets().SetLargeText("Playing MTA:SA");
+    
 }
 
 CDiscordManager::~CDiscordManager()
@@ -37,6 +33,15 @@ CDiscordManager::~CDiscordManager()
 
     delete m_Thread;
     SAFE_DELETE(m_DiscordCore);
+}
+
+void CDiscordManager::Initialize()
+{
+    Reconnect(true);            // Try to interact with discord on construction
+    m_Thread = new CThreadHandle(CDiscordManager::DiscordThread, this);
+
+    m_StoredActivity.GetAssets().SetLargeImage("mta_logo_round");            // Always thing
+    m_StoredActivity.GetAssets().SetLargeText("Playing MTA:SA");
 }
 
 // Establish connection with discord

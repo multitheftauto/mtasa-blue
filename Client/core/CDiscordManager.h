@@ -24,6 +24,7 @@ public:
     static void  OnActivityJoin(const char* joinSecret);
     static void* DiscordThread(void* arg);
 
+    void Initialize();
     void Reconnect(bool bOnInitialization = false);
     void DoPulse();
 
