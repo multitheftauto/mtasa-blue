@@ -78,7 +78,7 @@ void CClientColShape::SetPosition(const CVector& vecPosition)
 void CClientColShape::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pAttachedToEntity)
+    if (pEntity && m_pAttachedToEntity)
     {
         CVector pVector;
 
