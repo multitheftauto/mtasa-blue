@@ -74,7 +74,7 @@ struct CLuaFunctionParserBase
             return "";
     }
 
-    // Reads the parameter type (& value in some cases) at a given index 
+    // Reads the parameter type (& value in some cases) at a given index
     // For example a 42 on the Lua stack is returned as 'number (42)'
     static SString ReadParameterAsString(lua_State* L, std::size_t index)
     {
@@ -156,7 +156,7 @@ struct CLuaFunctionParserBase
             using next_t = typename is_variant<T>::rest_t;
             if (TypeMatch<first_t>(L, index))
                 return 0;
-            
+
             // Else try the remaining types of the variant
             int iResult = TypeMatchVariant<next_t>(L, index);
             if (iResult == -1)
@@ -250,6 +250,14 @@ struct CLuaFunctionParserBase
         }
     }
 
+    // PopUnsafe pops a `T` from the stack at the specified index
+    // For most types there is no additional validation present, which is why this function
+    // should not be called without making sure that `T` is compatible with the lua type
+    // at the given index. Hence this function is called unsafe.
+    // Errors may still occur here, if the error condition cannot be caught by TypeMatch
+    // For example this will happen if a function is called with an element of the wrong type
+    // as this condition cannot be caught before actually reading the userdata from the Lua stack
+    // On success, this function may also increment `index`
     template <typename T>
     inline T PopUnsafe(lua_State* L, std::size_t& index)
     {
@@ -268,7 +276,9 @@ struct CLuaFunctionParserBase
             T value = lua::PopPrimitive<T>(L, index);
             if (std::isnan(value))
             {
-                SString strMessage("Bad argument @ '%s' [Expected number at argument %d, got NaN]", lua_tostring(L, lua_upvalueindex(1)), index);
+                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                // underlying element is of a wrong type
+                SString strMessage("Bad argument @ '%s' [Expected number at argument %d, got NaN]", lua_tostring(L, lua_upvalueindex(1)), index - 1);
                 strError = strMessage;
             }
             return value;
@@ -284,8 +294,10 @@ struct CLuaFunctionParserBase
             {
                 SString strReceived = ReadParameterAsString(L, index);
                 SString strExpected = GetEnumTypeName((T)0);
-                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(), index,
-                                   strReceived.c_str());
+                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                // underlying element is of a wrong type
+                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(),
+                                   index - 1, strReceived.c_str());
                 strError = strMessage;
                 return static_cast<T>(0);
             }
@@ -371,9 +383,15 @@ struct CLuaFunctionParserBase
             if (result == nullptr)
             {
                 SString strReceived = isLightUserData ? GetUserDataClassName(pValue, L) : GetUserDataClassName(*(void**)pValue, L);
+                // strReceived may be an empty string if we cannot resolve the class name for the internal ID
+                // this happens if the element was destroyed before calling a function with an element parameter
+                if (strReceived == "")
+                    strReceived = "destroyed element";
                 SString strExpected = GetClassTypeName((T)0);
-                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)),
-                                   strExpected.c_str(), index, strReceived.c_str());
+                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                // underlying element is of a wrong type
+                SString strMessage("Bad argument @ '%s' [Expected %s at argument %d, got %s]", lua_tostring(L, lua_upvalueindex(1)), strExpected.c_str(),
+                                   index - 1, strReceived.c_str());
                 strError = strMessage;
                 return nullptr;
             }
