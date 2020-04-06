@@ -56,6 +56,7 @@ private:
     discord::Activity m_StoredActivity;
 
     bool m_WaitingForServerName;
+    bool m_Initialized;
 
     volatile bool m_Suicide;            // Thread kill command
 
