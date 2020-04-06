@@ -16,7 +16,7 @@
 #define DISCORD_CLIENT_ID 468493322583801867
 #endif
 
-CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}, m_bInitialized(false)
+CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}, m_Initialized(false)
 {
     
 }
@@ -43,7 +43,7 @@ void CDiscordManager::Initialize()
     m_StoredActivity.GetAssets().SetLargeImage("mta_logo_round");            // Always thing
     m_StoredActivity.GetAssets().SetLargeText("Playing MTA:SA");
 
-    m_bInitialized = true;
+    m_Initialized = true;
 }
 
 // Establish connection with discord
@@ -175,7 +175,7 @@ void* CDiscordManager::DiscordThread(void* arg)
 // establishing connection with discord is sometimes time-consuming, especially when it's not running
 void CDiscordManager::DoPulse()
 {
-    if (!m_bInitialized) return; // Wait until initialization
+    if (!m_Initialized) return; // Wait until initialization
 
     if (!m_DiscordCore)
     {
