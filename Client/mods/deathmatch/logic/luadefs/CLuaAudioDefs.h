@@ -38,8 +38,6 @@ public:
     LUA_DECLARE(GetSoundPosition);
     LUA_DECLARE(GetSoundLength);
     LUA_DECLARE(GetSoundBufferLength);
-    LUA_DECLARE(SetSoundLooped);
-    LUA_DECLARE(IsSoundLooped);
     LUA_DECLARE(SetSoundPaused);
     LUA_DECLARE(IsSoundPaused);
     LUA_DECLARE(SetSoundVolume);
@@ -63,6 +61,9 @@ public:
     LUA_DECLARE(GetSoundEffects);
     LUA_DECLARE(SetSoundPan);
     LUA_DECLARE(GetSoundPan);
+
+    static bool SetSoundLooped(CClientSound* pSound, bool bLoop);
+    static bool IsSoundLooped(CClientSound* pSound);
 
     // Radio functions
     LUA_DECLARE(SetRadioChannel);

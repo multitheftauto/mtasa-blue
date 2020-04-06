@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaAudioDefs::LoadFunctions()
 {
@@ -34,8 +35,8 @@ void CLuaAudioDefs::LoadFunctions()
         {"getSoundPosition", GetSoundPosition},
         {"getSoundLength", GetSoundLength},
         {"getSoundBufferLength", GetSoundBufferLength},
-        {"setSoundLooped", SetSoundLooped},
-        {"isSoundLooped", IsSoundLooped},
+        {"setSoundLooped", ArgumentParser<SetSoundLooped>},
+        {"isSoundLooped", ArgumentParser<IsSoundLooped>},
         {"setSoundPaused", SetSoundPaused},
         {"isSoundPaused", IsSoundPaused},
         {"setSoundVolume", SetSoundVolume},
@@ -455,34 +456,14 @@ int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundLooped(CClientSound* pSound, bool bLoop)
 {
-    CClientSound*    pSound;
-    bool             bLoop;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadBool(bLoop);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, pSound->SetLooped(bLoop));
-    return 1;
+    return pSound->SetLooped(bLoop);
 }
 
-int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
+bool CLuaAudioDefs::IsSoundLooped(CClientSound* pSound)
 {
-    CClientSound*    pSound;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, pSound->IsLooped());
-    return 1;
+    return pSound->IsLooped();
 }
 
 int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
