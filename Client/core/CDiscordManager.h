@@ -17,7 +17,6 @@
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:
-    CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}, m_Initialized(false), m_Thread(nullptr) {}
     ~CDiscordManager();
 
     void Initialize();
@@ -49,16 +48,16 @@ private:
     bool NeedsSuicide() const { return m_Suicide; }
     void SetDead() { m_Suicide = false; }
 
-    discord::Core*    m_DiscordCore;
-    discord::Activity m_StoredActivity;
+    discord::Core*    m_DiscordCore = nullptr;
+    discord::Activity m_StoredActivity{};
 
-    bool m_WaitingForServerName;
-    bool m_Initialized;
+    bool m_WaitingForServerName = false;
+    bool m_Initialized = false;
 
-    volatile bool m_Suicide;            // Thread kill command
+    volatile bool m_Suicide = false;            // Thread kill command
 
     std::mutex                 m_ThreadSafety;
-    SharedUtil::CThreadHandle* m_Thread;
+    SharedUtil::CThreadHandle* m_Thread = nullptr;
 
     CElapsedTime   m_TimeForReconnection;
     CQueryReceiver m_QueryReceiver;
