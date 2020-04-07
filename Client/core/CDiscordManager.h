@@ -20,13 +20,7 @@ public:
     CDiscordManager();
     ~CDiscordManager();
 
-    static void  DiscordLogCallback(discord::LogLevel level, const char* message);
-    static void  OnActivityJoin(const char* joinSecret);
-    static void* DiscordThread(void* arg);
-
     void Initialize();
-    void Reconnect(bool bOnInitialization = false);
-    void DoPulse();
 
     // ActivityManager
     void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback);            // Change it all, or ...
@@ -41,16 +35,19 @@ public:
     void RegisterPlay(bool connected);
     void Disconnect();
 
-    discord::Activity GetStoredActivity() const { return m_StoredActivity; }            // For retrieving stored information in rich presence
-
-    bool NeedsSuicide() const { return m_Suicide; }
-    void SetDead() { m_Suicide = false; }
-    void DisconnectNotification();
-
     SString GetJoinSecret();
 
 private:
+    void Reconnect(bool bOnInitialization = false);
+    void DoPulse();
     void Restore();
+
+    static void  DiscordLogCallback(discord::LogLevel level, const char* message);
+    static void  OnActivityJoin(const char* joinSecret);
+    static void* DiscordThread(void* arg);
+
+    bool NeedsSuicide() const { return m_Suicide; }
+    void SetDead() { m_Suicide = false; }
 
     discord::Core*    m_DiscordCore;
     discord::Activity m_StoredActivity;
