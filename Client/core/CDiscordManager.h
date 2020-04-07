@@ -17,7 +17,7 @@
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:
-    CDiscordManager();
+    CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}, m_Initialized(false), m_Thread(nullptr) {}
     ~CDiscordManager();
 
     void Initialize();
