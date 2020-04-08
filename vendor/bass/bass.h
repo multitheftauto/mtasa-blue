@@ -1,6 +1,6 @@
 /*
 	BASS 2.4 C/C++ header file
-	Copyright (c) 1999-2019 Un4seen Developments Ltd.
+	Copyright (c) 1999-2020 Un4seen Developments Ltd.
 
 	See the BASS.CHM file for more detailed documentation
 */
@@ -521,7 +521,7 @@ RETURN : Number of bytes written. Set the BASS_STREAMPROC_END flag to end the st
 
 #define BASS_STREAMPROC_END		0x80000000	// end of user stream flag
 
-// special STREAMPROCs
+// Special STREAMPROCs
 #define STREAMPROC_DUMMY		(STREAMPROC*)0		// "dummy" stream
 #define STREAMPROC_PUSH			(STREAMPROC*)-1		// push stream
 #define STREAMPROC_DEVICE		(STREAMPROC*)-2		// device mix stream
@@ -631,6 +631,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_ATTRIB_BITRATE			12
 #define BASS_ATTRIB_BUFFER			13
 #define BASS_ATTRIB_GRANULE			14
+#define BASS_ATTRIB_USER			15
 #define BASS_ATTRIB_MUSIC_AMPLIFY	0x100
 #define BASS_ATTRIB_MUSIC_PANSEP	0x101
 #define BASS_ATTRIB_MUSIC_PSCALER	0x102
@@ -1032,6 +1033,7 @@ float BASSDEF(BASS_GetVolume)();
 
 HPLUGIN BASSDEF(BASS_PluginLoad)(const char *file, DWORD flags);
 BOOL BASSDEF(BASS_PluginFree)(HPLUGIN handle);
+BOOL BASSDEF(BASS_PluginEnable)(HPLUGIN handle, BOOL enable);
 const BASS_PLUGININFO *BASSDEF(BASS_PluginGetInfo)(HPLUGIN handle);
 
 BOOL BASSDEF(BASS_Set3DFactors)(float distf, float rollf, float doppf);
