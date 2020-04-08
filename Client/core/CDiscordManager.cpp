@@ -16,11 +16,6 @@
 #define DISCORD_CLIENT_ID 468493322583801867
 #endif
 
-CDiscordManager::CDiscordManager() : m_DiscordCore(nullptr), m_Suicide(false), m_WaitingForServerName(false), m_StoredActivity{}, m_Initialized(false)
-{
-    
-}
-
 CDiscordManager::~CDiscordManager()
 {
     m_Suicide = true;
@@ -37,6 +32,8 @@ CDiscordManager::~CDiscordManager()
 
 void CDiscordManager::Initialize()
 {
+    if (m_Initialized) return;
+
     Reconnect(true);            // Try to interact with discord on construction
     m_Thread = new CThreadHandle(CDiscordManager::DiscordThread, this);
 
@@ -175,10 +172,11 @@ void* CDiscordManager::DiscordThread(void* arg)
 // establishing connection with discord is sometimes time-consuming, especially when it's not running
 void CDiscordManager::DoPulse()
 {
-    if (!m_Initialized) return; // Wait until initialization
-
+    m_ThreadSafety.lock();
     if (!m_DiscordCore)
     {
+        m_ThreadSafety.unlock();
+
         // Discord is not initialized, maybe it's not installed or not yet running
         // So every 15sec we will check if the player got discord running
         if (m_TimeForReconnection.Get() >= 15000)
@@ -189,6 +187,7 @@ void CDiscordManager::DoPulse()
 
         return;
     }
+    m_ThreadSafety.unlock();
 
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
 
@@ -362,13 +361,6 @@ void CDiscordManager::Disconnect()
 {
     std::lock_guard<std::mutex> guardian(m_ThreadSafety);
     SAFE_DELETE(m_DiscordCore);
-}
-
-void CDiscordManager::DisconnectNotification()
-{
-    std::lock_guard<std::mutex> guardian(m_ThreadSafety);
-    m_WaitingForServerName = false;            // No longer wait
-    m_QueryReceiver.InvalidateSocket();
 }
 
 SString CDiscordManager::GetJoinSecret()
