@@ -239,7 +239,11 @@ void CDiscordManager::UpdateActivity(std::function<void(EDiscordRes)> callback)
     if (!m_DiscordCore)
         return;
 
-    m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res) { callback(static_cast<EDiscordRes>(res)); });
+    m_DiscordCore->ActivityManager().UpdateActivity(m_StoredActivity, [=](discord::Result res)
+    {
+        callback(static_cast<EDiscordRes>(res));
+        if (res != discord::Result::Ok) WriteDebugEvent(SString("[DISCORD]: Updating activity failed, code: %i", static_cast<int>(res)));
+    });
 }
 
 void CDiscordManager::SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback)
@@ -283,6 +287,16 @@ void CDiscordManager::SetJoinParameters(const char* joinSecret, const char* part
     if (!joinSecret || !partyId)
         return;
 
+    if (!strlen(joinSecret) || !strlen(partyId))
+    {
+        // Delete join state
+        m_StoredActivity.GetSecrets().SetJoin("");
+        m_StoredActivity.GetParty().SetId("");
+        m_StoredActivity.GetParty().GetSize().SetCurrentSize(0);
+        m_StoredActivity.GetParty().GetSize().SetMaxSize(0);
+        return;
+    }
+
     SString      ipaddr;
     unsigned int port;
     CVARS_GET("host", ipaddr);
@@ -314,6 +328,10 @@ void CDiscordManager::RegisterPlay(bool connected)
     {
         m_StoredActivity.GetAssets().SetSmallText("");
         m_StoredActivity.GetAssets().SetSmallImage("");
+        m_StoredActivity.GetSecrets().SetJoin("");
+        m_StoredActivity.GetParty().SetId("");
+        m_StoredActivity.GetParty().GetSize().SetCurrentSize(0);
+        m_StoredActivity.GetParty().GetSize().SetMaxSize(0);
         UpdateActivity([=](EDiscordRes res) {});
         return;
     }
