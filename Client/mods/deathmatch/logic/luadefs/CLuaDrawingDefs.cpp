@@ -1800,7 +1800,7 @@ int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetTexturePixels(lua_State* luaVM)
 {
-    //  string dxGetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
+    //  bool dxSetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
     CClientTexture* pTexture;
     CPixels         pixels;
     CVector2D       vecPosition;
