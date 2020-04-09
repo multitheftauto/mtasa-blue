@@ -92,7 +92,7 @@ void CClientMarker::SetPosition(const CVector& vecPosition)
 void CClientMarker::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pCollision){
+    if (pEntity && m_pCollision){
         m_pCollision->AttachTo(pEntity);
     }
 }
