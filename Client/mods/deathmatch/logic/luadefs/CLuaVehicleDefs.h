@@ -143,6 +143,8 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
+    static bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, unsigned char variant, unsigned char variant2);
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

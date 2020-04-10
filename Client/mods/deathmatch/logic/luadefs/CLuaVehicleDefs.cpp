@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 #define MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP      "1.5.5-9.11710"
 
 void CLuaVehicleDefs::LoadFunctions()
@@ -138,7 +139,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled},
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
-        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition },
+        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
     };
 
     // Add functions
@@ -4054,4 +4056,17 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2)
+{
+    if (ucVariant == 254 && ucVariant2 == 254)
+        CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
+
+    if ((ucVariant <= 5 || ucVariant == 255) && (ucVariant2 <= 5 || ucVariant2 == 255))
+    {
+        pVehicle->SetVariant(ucVariant, ucVariant2);
+        return true;
+    }
+    return false;
 }
