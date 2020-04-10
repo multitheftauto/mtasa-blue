@@ -1466,7 +1466,7 @@ bool CJoystickManager::SaveToXML()
 
         {
             // Create a new 'info' node
-            CXMLNode* pNode = pMainNode->CreateChild ( "info" );
+            CXMLNode* pNode = pMainNode->CreateChild("info");
 
             // If it was created
             if (pNode)

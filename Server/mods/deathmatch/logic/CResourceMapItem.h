@@ -43,7 +43,7 @@ public:
     ~CResourceMapItem();
 
     inline CElementGroup* GetElementGroup() const { return m_pElementGroup; }
-    inline CDummy*        GetMapRootElement() const { return m_pMapElement; };
+    inline CDummy*        GetMapRootElement() const { return m_pMapElement; }
 
     bool      LoadSubNodes(CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
     CElement* LoadNode(CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
