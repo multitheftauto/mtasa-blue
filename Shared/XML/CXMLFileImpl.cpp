@@ -53,31 +53,27 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 
         // Open file
         std::ifstream file(m_strFilename, std::ios::in | std::ios::ate);
+        if (!file.is_open())
+            return false;
 
         // Disable whitespace skipping
         file.unsetf(std::ios::skipws);
 
         std::vector<char> vecFileContents{};
         std::string       strFileContents;
+        std::streampos    fileSize = file.tellg();
 
-        if (file.is_open())
-        {
-            std::streampos fileSize = file.tellg();
+        vecFileContents.reserve(fileSize);
+        file.seekg(0, std::ios::beg);
+        vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
+        file.close();
 
-            vecFileContents.reserve(fileSize);
-            file.seekg(0, std::ios::beg);
-            vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
-            file.close();
+        // Also copy to buffer if requested
+        if (pOutFileContents)
+            pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
 
-            // Also copy to buffer if requested
-            if (pOutFileContents)
-                pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
-
-            for (const auto& text : vecFileContents)
-                strFileContents += text;
-        }
-        else
-            return false;
+        for (const auto& text : vecFileContents)
+            strFileContents += text;
 
         // Load the xml
         m_pDocument = std::make_unique<pugi::xml_document>();
