@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/xml/CXMLFile.h
  *  PURPOSE:     XML file interface
@@ -12,8 +12,8 @@
 
 #include "CXMLCommon.h"
 #include "CXMLErrorCodes.h"
-
 #include <string>
+#include <vector>
 
 class CXMLNode;
 

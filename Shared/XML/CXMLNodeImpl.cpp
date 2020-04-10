@@ -1,11 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLNodeImpl.cpp
+ *  PURPOSE:     XML node class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
 CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node& node, bool bUsingIDs, CXMLNodeImpl* pParent) : m_ulID(INVALID_XML_ID), m_node(node), m_pParent(pParent)
@@ -57,9 +59,7 @@ CXMLNode* CXMLNodeImpl::GetChild(unsigned int uiIndex)
     for (auto& pChild : m_Children)
     {
         if (uiIndex == 0)
-        {
             return pChild.get();
-        }
         --uiIndex;
     }
 
@@ -75,9 +75,7 @@ CXMLNode* CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiI
         if (pNode->GetTagName() == strTagName)
         {
             if (uiIndex == 0)
-            {
                 return pNode.get();
-            }
             --uiIndex;
         }
     }
@@ -237,12 +235,8 @@ CXMLAttribute* CXMLNodeImpl::AddAttribute(const std::string& strName)
 CXMLAttribute* CXMLNodeImpl::GetAttribute(const std::string& strName)
 {
     for (auto& pAttribute : m_Attributes)
-    {
         if (pAttribute->GetName() == strName)
-        {
             return pAttribute.get();
-        }
-    }
     return nullptr;
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        xml/CXMLArrayImpl.cpp
  *  PURPOSE:     XML array class
@@ -26,9 +26,7 @@ unsigned long CXMLArray::PopUniqueID(CXMLCommon* pEntry)
 {
     // Add more ID's if required
     if (m_IDStack.GetUnusedAmount() < 10000)
-    {
         ExpandBy(10000);
-    }
 
     // Grab the next unused ID
     unsigned long ulPhysicalIndex;
@@ -71,9 +69,8 @@ CXMLCommon* CXMLArray::GetEntry(unsigned long ulLogicalID)
     unsigned long ulPhysicalIndex = ulLogicalID - XML_ARRAY_BASE_ID;
 
     if (ulLogicalID != INVALID_XML_ID && ulPhysicalIndex <= m_ulCapacity)
-    {
         return m_Elements[ulPhysicalIndex];
-    }
+
     return NULL;
 }
 

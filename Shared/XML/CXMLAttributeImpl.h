@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        xml/CXMLAttributeImpl.h
  *  PURPOSE:     XML attribute class
@@ -29,8 +29,8 @@ public:
     void SetValue(unsigned int uiValue);
     void SetValue(float fValue);
 
-    eXMLClass     GetClassType() { return CXML_ATTR; };
-    unsigned long GetID() { return m_ulID; };
+    inline eXMLClass     GetClassType() { return CXML_ATTR; };
+    inline unsigned long GetID() { return m_ulID; };
 
 private:
     unsigned long       m_ulID;

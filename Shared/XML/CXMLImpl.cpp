@@ -10,7 +10,7 @@
  *****************************************************************************/
 #include "StdInc.h"
 
-CXMLImpl::CXMLImpl(void)
+CXMLImpl::CXMLImpl()
 {
     // Init array stuff
     CXMLArray::Initialize();
@@ -47,9 +47,7 @@ CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_ATTR)
-    {
         return reinterpret_cast<CXMLAttribute*>(pCommon);
-    }
 
     // Doesn't exist or bad type
     return nullptr;
@@ -60,9 +58,7 @@ CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_FILE)
-    {
         return reinterpret_cast<CXMLFile*>(pCommon);
-    }
 
     // Doesn't exist or bad type
     return nullptr;
@@ -73,9 +69,7 @@ CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ulID)
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
     if (pCommon && pCommon->GetClassType() == CXML_NODE)
-    {
         return reinterpret_cast<CXMLNode*>(pCommon);
-    }
 
     // Doesn't exist or bad type
     return nullptr;

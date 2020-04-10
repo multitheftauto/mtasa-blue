@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        xml/CXMLFileImpl.h
  *  PURPOSE:     XML file class
@@ -21,8 +21,8 @@ public:
     CXMLFileImpl(const std::string& strFilename, CXMLNode* pNode, bool bReadOnly = false);
     ~CXMLFileImpl();
 
-    const std::string& GetFilename() override { return m_strFilename; }
-    void               SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; }
+    inline const std::string& GetFilename() override { return m_strFilename; }
+    inline void               SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; }
 
     bool Parse(std::vector<char>* pOutFileContents = nullptr) override;
     bool Write() override;
@@ -33,10 +33,10 @@ public:
 
     CXMLErrorCodes::Code GetLastError(std::string& strOut) override;
 
-    eXMLClass     GetClassType() override { return CXML_FILE; }
-    unsigned long GetID() override { return m_ulID; }
+    inline eXMLClass     GetClassType() override { return CXML_FILE; }
+    inline unsigned long GetID() override { return m_ulID; }
 
-    bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    inline bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
 private:
     void                          BuildWrapperTree(bool bUsingIDs);

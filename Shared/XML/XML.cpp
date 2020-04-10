@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CXMLImpl *pXMLInterface = NULL;
+CXMLImpl* pXMLInterface = NULL;
 
 MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
 {

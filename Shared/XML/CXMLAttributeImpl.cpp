@@ -1,11 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLAttributeImpl.cpp
+ *  PURPOSE:     XML attribute class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
 CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute& attribute, bool bUsingIDs) : m_ulID(INVALID_XML_ID), m_Attribute(attribute)

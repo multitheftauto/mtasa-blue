@@ -41,7 +41,6 @@ class CLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
-
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
              CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
 
