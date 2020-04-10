@@ -59,10 +59,9 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
         // Disable whitespace skipping
         file.unsetf(std::ios::skipws);
 
+        // Read file contents into vector
         std::vector<char> vecFileContents{};
-        std::string       strFileContents;
         std::streampos    fileSize = file.tellg();
-
         vecFileContents.reserve(fileSize);
         file.seekg(0, std::ios::beg);
         vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
@@ -72,8 +71,8 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
         if (pOutFileContents)
             pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
 
-        for (const auto& text : vecFileContents)
-            strFileContents += text;
+        // Also create a string for pugixml to load
+        std::string strFileContents(vecFileContents.begin(), vecFileContents.end());
 
         // Load the xml
         m_pDocument = std::make_unique<pugi::xml_document>();
