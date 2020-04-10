@@ -68,18 +68,15 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
     vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
     file.close();
 
+    // Load the xml
+    m_pDocument = std::make_unique<pugi::xml_document>();
+    m_parserResult = m_pDocument->load_buffer(vecFileContents.data(), vecFileContents.size());
+    if (!m_parserResult)
+        return false;
+
     // Also copy to buffer if requested
     if (pOutFileContents)
         pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
-
-    // Also create a string for pugixml to load
-    std::string strFileContents(vecFileContents.begin(), vecFileContents.end());
-
-    // Load the xml
-    m_pDocument = std::make_unique<pugi::xml_document>();
-    m_parserResult = m_pDocument->load_string(strFileContents.c_str());
-    if (!m_parserResult)
-        return false;
 
     BuildWrapperTree(m_ulID != INVALID_XML_ID);
     return true;
