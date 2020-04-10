@@ -822,22 +822,11 @@ CElement* CMapManager::LoadNode(CResource& Loader, CXMLNode& Node, CElement* pPa
 bool CMapManager::LoadSubNodes(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart)
 {
     // Iterate the nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCount = Node.GetChildCount();
-    for (unsigned int i = 0; i < uiCount; i++)
-    {
-        // Grab the node
-        pNode = Node.GetChild(i);
+    for (auto& pNode : Node.GetChildren())
         if (pNode)
-        {
             // Handle it
             if (!HandleNode(Loader, *pNode, pParent, pAdded, bIsDuringStart, NULL))
-            {
                 return false;
-            }
-        }
-    }
-
     // Success
     return true;
 }

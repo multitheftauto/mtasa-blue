@@ -79,27 +79,18 @@ bool CAccessControlListManager::Load()
     ClearReadCache();
 
     // load the acl's
-    CXMLNode*    pSubNode = NULL;
-    unsigned int uiSubNodesCount = m_pRootNode->GetChildCount();
-    for (unsigned int i = 0; i < uiSubNodesCount; i++)
+    for (auto& pSubNode : m_pRootNode->GetChildren())
     {
-        pSubNode = m_pRootNode->GetChild(i);
-        if (!pSubNode)
-            continue;
-
-        if (pSubNode->GetTagName().compare("acl") == 0)
+        if (pSubNode && pSubNode->GetTagName().compare("acl") == 0)
         {
             CXMLAttribute* pAttribute = pSubNode->GetAttribute("name");
             if (pAttribute)
             {
                 CAccessControlList* pACL = AddACL(pAttribute->GetValue());
 
-                CXMLNode*    pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetChildCount();
-                for (unsigned int j = 0; j < uiSubSubNodesCount; j++)
+                for (auto& pSubSubNode : pSubNode->GetChildren())
                 {
                     // If this subnode doesn't exist, return to the for loop and continue it
-                    pSubSubNode = pSubNode->GetChild(j);
                     if (!pSubSubNode)
                         continue;
 
@@ -144,26 +135,17 @@ bool CAccessControlListManager::Load()
     }
 
     // Load the groups
-    pSubNode = NULL;
-    uiSubNodesCount = m_pRootNode->GetChildCount();
-    for (unsigned int i = 0; i < uiSubNodesCount; i++)
+    for (auto& pSubNode : m_pRootNode->GetChildren())
     {
-        pSubNode = m_pRootNode->GetChild(i);
-        if (!pSubNode)
-            continue;
-
-        if (pSubNode->GetTagName().compare("group") == 0)
+        if (pSubNode && pSubNode->GetTagName().compare("group") == 0)
         {
             CXMLAttribute* pAttribute = pSubNode->GetAttribute("name");
             if (pAttribute)
             {
                 CAccessControlListGroup* pGroup = AddGroup(pAttribute->GetValue());
 
-                CXMLNode*    pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetChildCount();
-                for (unsigned int j = 0; j < uiSubSubNodesCount; j++)
+                for (auto& pSubSubNode : pSubNode->GetChildren())
                 {
-                    pSubSubNode = pSubNode->GetChild(j);
                     if (!pSubSubNode)
                         continue;
 

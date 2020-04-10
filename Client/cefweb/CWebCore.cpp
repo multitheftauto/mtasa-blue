@@ -650,44 +650,29 @@ void CWebCore::LoadListsFromXML(bool bWhitelist, bool bBlacklist, bool bCustomLi
     {
         CXMLNode* pWhiteSubNode = pRootNode->GetChild("globalwhitelist");
         if (pWhiteSubNode)
-        {
-            for (uint i = 0; i < pWhiteSubNode->GetChildCount(); i++)
-            {
-                AddAllowedPage(pWhiteSubNode->GetChild(i)->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
-            }
-        }
+            for (auto& pNode : pWhiteSubNode->GetChildren())
+                AddAllowedPage(pNode->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
     }
 
     if (bBlacklist)
     {
         CXMLNode* pBlackSubNode = pRootNode->GetChild("globalblacklist");
         if (pBlackSubNode)
-        {
-            for (uint i = 0; i < pBlackSubNode->GetChildCount(); i++)
-            {
-                AddBlockedPage(pBlackSubNode->GetChild(i)->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
-            }
-        }
+            for (auto& pNode : pBlackSubNode->GetChildren())
+                AddBlockedPage(pNode->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
     }
 
     if (bCustomLists)
     {
         CXMLNode* pBlackSubNode = pRootNode->GetChild("customblacklist");
         if (pBlackSubNode)
-        {
-            for (uint i = 0; i < pBlackSubNode->GetChildCount(); i++)
-            {
-                AddBlockedPage(pBlackSubNode->GetChild(i)->GetTagContent(), eWebFilterType::WEBFILTER_USER);
-            }
-        }
+            for (auto& pNode : pBlackSubNode->GetChildren())
+                AddBlockedPage(pNode->GetTagContent(), eWebFilterType::WEBFILTER_USER);
+
         CXMLNode* pWhiteSubNode = pRootNode->GetChild("customwhitelist");
         if (pWhiteSubNode)
-        {
-            for (uint i = 0; i < pWhiteSubNode->GetChildCount(); i++)
-            {
-                AddAllowedPage(pWhiteSubNode->GetChild(i)->GetTagContent(), eWebFilterType::WEBFILTER_USER);
-            }
-        }
+            for (auto& pNode : pWhiteSubNode->GetChildren())
+                AddAllowedPage(pNode->GetTagContent(), eWebFilterType::WEBFILTER_USER);
     }
 }
 

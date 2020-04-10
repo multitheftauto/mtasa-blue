@@ -1637,18 +1637,15 @@ bool CServerBrowser::OnGeneralHelpDeactivate(CGUIElement* pElement)
 
 bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList)
 {
-    CXMLNode* pSubNode = NULL;
-    in_addr   Address;
-    int       iPort;
-
     if (!pNode)
         return false;
 
+    in_addr Address;
+    int     iPort;
+
     // Loop through all subnodes looking for relevant nodes
-    unsigned int uiCount = pNode->GetChildCount();
-    for (unsigned int i = 0; i < uiCount; i++)
+    for (auto& pSubNode : pNode->GetChildren())
     {
-        pSubNode = pNode->GetChild(i);
         if (pSubNode && pSubNode->GetTagName().compare(strTagName) == 0)
         {
             // This node is relevant, so get the attributes we need and add it to the list
@@ -1738,10 +1735,8 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
     }
 
     // loop through all subnodes
-    unsigned int uiCount = pNode->GetChildCount();
-    for (unsigned int ui = 0; ui < uiCount; ui++)
+    for (auto& pSubNode : pNode->GetChildren())
     {
-        CXMLNode* pSubNode = pNode->GetChild(ui);
         if (pSubNode && pSubNode->GetTagName().compare("list") == 0)
         {
             CXMLAttribute* pListID = pSubNode->GetAttribute("id");

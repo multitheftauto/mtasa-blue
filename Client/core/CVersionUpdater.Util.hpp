@@ -522,8 +522,8 @@ namespace
             if (CXMLNode* pNode = GetSubNode(strPath))
             {
                 // Process each subnode
-                for (uint i = 0; i < pNode->GetChildCount(); i++)
-                    outList.push_back(pNode->GetChild(i)->GetTagContent());
+                for (auto& pSubNode : pNode->GetChildren())
+                    outList.push_back(pSubNode->GetTagContent());
                 return true;
             }
             return false;
@@ -535,10 +535,8 @@ namespace
             if (CXMLNode* pNode = GetSubNode(strPath))
             {
                 // Process each subnode
-                for (uint i = 0; i < pNode->GetChildCount(); i++)
+                for (auto& pSubNode : pNode->GetChildren())
                 {
-                    CXMLNode* pSubNode = pNode->GetChild(i);
-
                     SDataInfoItem item;
                     item.strName = pSubNode->GetTagName();
                     item.strValue = pSubNode->GetTagContent();

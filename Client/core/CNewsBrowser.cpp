@@ -102,8 +102,8 @@ void CNewsBrowser::InitNewsItemList()
                 // Imageset filenames
                 CXMLNode* pImages = pRoot->GetChild("imagesetlist", 0);
                 if (pImages)
-                    for (uint i = 0; i < pImages->GetChildCount(); i++)
-                        newsItem.imagesetFilenameList.push_back(pImages->GetChild(i)->GetTagContent());
+                    for (auto& pImage : pImages->GetChildren())
+                        newsItem.imagesetFilenameList.push_back(pImage->GetTagContent());
             }
 
             delete pFile;

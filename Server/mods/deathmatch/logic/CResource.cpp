@@ -1761,15 +1761,12 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 bool CResource::GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer)
 {
     // Look through its subnodes for settings with a matching name
-    CXMLNode*    pRoot = m_pNodeSettings->GetRootNode();
-    unsigned int uiCount = pRoot->GetChildCount();
-    unsigned int i = 0;
-    std::string  strTagName;
+    CXMLNode*   pRoot = m_pNodeSettings->GetRootNode();
+    std::string strTagName;
 
-    for (; i < uiCount; i++)
+    for (auto& pTemp : pRoot->GetChildren())
     {
         // Grab its tag name
-        CXMLNode* pTemp = pRoot->GetChild(i);
         strTagName = pTemp->GetTagName();
 
         // Check that its "setting"
@@ -1949,8 +1946,11 @@ bool CResource::RemoveFile(const char* szName)
         CXMLNode* pNodeFound = nullptr;
 
         // Loop through the map nodes under the root
-        for (CXMLNode* pNode = pRootNode->GetChild(i); pNode != nullptr; pNode = pRootNode->GetChild(++i))
+        for (auto& pNode : pRootNode->GetChildren())
         {
+            if (!pNode)
+                continue;
+
             // Grab the tag name
             const std::string& strTempBuffer = pNode->GetTagName();
 
@@ -1961,7 +1961,7 @@ bool CResource::RemoveFile(const char* szName)
                 CXMLAttribute* pAttrib = pNode->GetAttribute("src");
                 if (pAttrib && pAttrib->GetValue() == szName)
                 {
-                    pNodeFound = pNode;
+                    pNodeFound = pNode.get();
                     break;
                 }
             }

@@ -369,19 +369,14 @@ bool CBanManager::LoadBanList()
     }
 
     // Iterate the nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCount = pRootNode->GetChildCount();
-
-    for (unsigned int i = 0; i < uiCount; i++)
+    for (auto& pNode : pRootNode->GetChildren())
     {
-        // Grab the node
-        pNode = pRootNode->GetChild(i);
-
         if (pNode)
         {
             if (pNode->GetTagName().compare("ban") == 0)
             {
-                std::string strIP = SafeGetValue(pNode, "ip"), strSerial = SafeGetValue(pNode, "serial"), strAccount = SafeGetValue(pNode, "account");
+                const auto  node = pNode.get();
+                std::string strIP = SafeGetValue(node, "ip"), strSerial = SafeGetValue(node, "serial"), strAccount = SafeGetValue(node, "account");
                 if (!strIP.empty() || !strSerial.empty() || !strAccount.empty())
                 {
                     CBan* pBan = AddBan();
@@ -391,15 +386,15 @@ bool CBanManager::LoadBanList()
                     }
                     pBan->SetAccount(strAccount);
                     pBan->SetSerial(strSerial);
-                    pBan->SetBanner(SafeGetValue(pNode, "banner"));
-                    pBan->SetNick(SafeGetValue(pNode, "nick"));
-                    pBan->SetReason(SafeGetValue(pNode, "reason"));
+                    pBan->SetBanner(SafeGetValue(node, "banner"));
+                    pBan->SetNick(SafeGetValue(node, "nick"));
+                    pBan->SetReason(SafeGetValue(node, "reason"));
 
-                    std::string strTime = SafeGetValue(pNode, "time");
+                    std::string strTime = SafeGetValue(node, "time");
                     if (!strTime.empty())
                         pBan->SetTimeOfBan((time_t)atoi(strTime.c_str()));
 
-                    strTime = SafeGetValue(pNode, "unban");
+                    strTime = SafeGetValue(node, "unban");
                     if (!strTime.empty())
                         pBan->SetTimeOfUnban((time_t)atoi(strTime.c_str()));
                 }

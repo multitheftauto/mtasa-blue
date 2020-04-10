@@ -145,10 +145,8 @@ bool CServerIdManagerImpl::LoadServerIdMap()
     m_ServerIdMap.clear();
 
     // Read each node
-    for (uint i = 0; i < pRoot->GetChildCount(); i++)
+    for (auto& pSubNode : pRoot->GetChildren())
     {
-        CXMLNode* pSubNode = pRoot->GetChild(i);
-
         CServerIdKey  key;
         CServerIdInfo info;
 
