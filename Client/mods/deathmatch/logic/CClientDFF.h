@@ -1,77 +1,75 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientDFF.h
-*  PURPOSE:     .dff model handling class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientDFF.h
+ *  PURPOSE:     .dff model handling class
+ *
+ *****************************************************************************/
 
 class CClientDFF;
 
-#ifndef __CCLIENTDFF_H
-#define __CCLIENTDFF_H
+#pragma once
 
 #include <list>
 #include "CClientEntity.h"
 
 struct SLoadedClumpInfo
 {
-    SLoadedClumpInfo ( void ) : bTriedLoad ( false ), pClump ( NULL ) {} 
+    SLoadedClumpInfo() : bTriedLoad(false), pClump(NULL) {}
     bool     bTriedLoad;
     RpClump* pClump;
 };
 
-
 class CClientDFF : public CClientEntity
 {
-    DECLARE_CLASS( CClientDFF, CClientEntity )
+    DECLARE_CLASS(CClientDFF, CClientEntity)
     friend class CClientDFFManager;
 
 public:
-                                    CClientDFF              ( class CClientManager* pManager, ElementID ID );
-                                    ~CClientDFF             ( void );
+    CClientDFF(class CClientManager* pManager, ElementID ID);
+    ~CClientDFF();
 
-    eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
+    eClientEntityType GetType() const { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const SString& strFile, bool bIsRawData );
+    bool Load(bool isRaw, SString input);
 
-    bool                            ReplaceModel            ( unsigned short usModel, bool bAlphaTransparency );
+    bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
 
-    bool                            HasReplaced             ( unsigned short usModel );
+    bool HasReplaced(unsigned short usModel);
 
-    void                            RestoreModel            ( unsigned short usModel );
-    void                            RestoreModels           ( void );
+    void RestoreModel(unsigned short usModel);
+    void RestoreModels();
 
-    static bool                     IsDFFData               ( const SString& strData );
+    static bool IsDFFData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
-    void                            Unlink                  ( void ) {};
-    void                            GetPosition             ( CVector& vecPosition ) const {};
-    void                            SetPosition             ( const CVector& vecPosition ) {};
+    void Unlink(){};
+    void GetPosition(CVector& vecPosition) const {};
+    void SetPosition(const CVector& vecPosition){};
 
-protected:
-    bool                            DoReplaceModel          ( unsigned short usModel, bool bAlphaTransparency );
-    void                            UnloadDFF               ( void );
-    void                            InternalRestoreModel    ( unsigned short usModel );
+private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
 
-    bool                            ReplaceObjectModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplaceVehicleModel     ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplaceWeaponModel      ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
-    bool                            ReplacePedModel         ( RpClump* pClump, ushort usModel, bool bAlphaTransparency );
+    bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
+    void UnloadDFF();
+    void InternalRestoreModel(unsigned short usModel);
 
-    RpClump*                        GetLoadedClump          ( ushort usModelId );
+    bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
+    bool ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
+    bool ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
+    bool ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
 
-    class CClientDFFManager*        m_pDFFManager;
+    RpClump* GetLoadedClump(ushort usModelId);
 
-    SString                         m_strDffFilename;
-    CBuffer                         m_RawDataBuffer;
-    bool                            m_bIsRawData;
-    std::map < ushort, SLoadedClumpInfo > m_LoadedClumpInfoMap;
+    class CClientDFFManager* m_pDFFManager;
 
-    std::list < unsigned short >    m_Replaced;
+    SString                            m_strDffFilename;
+    SString                            m_RawDataBuffer;
+    bool                               m_bIsRawData = false;
+    std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
+
+    std::list<unsigned short> m_Replaced;
 };
-
-#endif

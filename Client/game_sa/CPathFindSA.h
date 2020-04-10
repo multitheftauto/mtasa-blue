@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPathFindSA.h
-*  PURPOSE:     Header file for game entity path finding class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPathFindSA.h
+ *  PURPOSE:     Header file for game entity path finding class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_PATHFIND
-#define __CGAMESA_PATHFIND
+#pragma once
 
 #include <game/CPathFind.h>
 
@@ -34,20 +32,18 @@
 class CPathFindSA : public CPathFind
 {
 public:
-    CNodeAddress *  FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance );
-    CPathNode *     GetPathNode ( CNodeAddress * node );
-    CVector *       GetNodePosition ( CPathNode * pNode, CVector * pPosition);
-    CVector *       GetNodePosition ( CNodeAddress * pNode, CVector * pPosition );
-    void            SwitchRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false );
-    void            SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable = false );
+    CNodeAddress* FindNthNodeClosestToCoors(CVector* vecCoors, int iNodeNumber, int iType, CNodeAddress* pNodeAddress, float fDistance);
+    CPathNode*    GetPathNode(CNodeAddress* node);
+    CVector*      GetNodePosition(CPathNode* pNode, CVector* pPosition);
+    CVector*      GetNodePosition(CNodeAddress* pNode, CVector* pPosition);
+    void          SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
+    void          SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
 
     // Belong elsewhere - cpopulation and ccarctrl
-    void            SetPedDensity ( float fPedDensity );
-    void            SetVehicleDensity ( float fVehicleDensity );
-    void            SetMaxPeds ( int iMaxPeds );
-    void            SetMaxPedsInterior ( int iMaxPeds );
-    void            SetMaxVehicles ( int iMaxVehicles );
-    void            SetAllRandomPedsThisType ( int iType );
+    void SetPedDensity(float fPedDensity);
+    void SetVehicleDensity(float fVehicleDensity);
+    void SetMaxPeds(int iMaxPeds);
+    void SetMaxPedsInterior(int iMaxPeds);
+    void SetMaxVehicles(int iMaxVehicles);
+    void SetAllRandomPedsThisType(int iType);
 };
-
-#endif

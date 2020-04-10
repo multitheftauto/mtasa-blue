@@ -1,46 +1,46 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientWeaponManager.cpp
-*  PURPOSE:     Weapon manager class
-*  DEVELOPERS:  Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientWeaponManager.cpp
+ *  PURPOSE:     Weapon manager class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
+using namespace std;
 
-CClientWeaponManager::CClientWeaponManager ( CClientManager * pManager )
+CClientWeaponManager::CClientWeaponManager(CClientManager* pManager)
 {
     m_pManager = pManager;
     m_bDeleteAll = false;
 }
 
-
-CClientWeaponManager::~CClientWeaponManager ( void )
+CClientWeaponManager::~CClientWeaponManager()
 {
     m_bDeleteAll = true;
-    for ( auto& pWeapon : m_Weapons )
+    list<CClientWeapon*>::iterator iter = m_Weapons.begin();
+    for (; iter != m_Weapons.end(); iter++)
     {
-        delete pWeapon;
+        delete *iter;
     }
     m_bDeleteAll = false;
 }
 
-
-void CClientWeaponManager::RemoveFromList ( CClientWeapon * pWeapon )
+void CClientWeaponManager::RemoveFromList(CClientWeapon* pWeapon)
 {
-    if ( !m_bDeleteAll )
+    if (!m_bDeleteAll)
     {
-        m_Weapons.remove ( pWeapon );
+        m_Weapons.remove(pWeapon);
     }
 }
 
-void CClientWeaponManager::DoPulse ( void )
-{    
-    for (auto& pWeapon : m_Weapons)
+void CClientWeaponManager::DoPulse()
+{
+    list<CClientWeapon*>::iterator iter = m_Weapons.begin();
+    for (; iter != m_Weapons.end(); iter++)
     {
-        pWeapon->DoPulse();
+        (*iter)->DoPulse();
     }
 }

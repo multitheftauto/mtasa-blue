@@ -1,37 +1,35 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMovingObjectsManager.cpp
-*  PURPOSE:     Manager for moving objects
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CMovingObjectsManager.cpp
+ *  PURPOSE:     Manager for moving objects
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDeathmatchObject.h"
 
-void CMovingObjectsManager::DoPulse ( void )
+void CMovingObjectsManager::DoPulse()
 {
-    // Pulse all the objects we're moving
-    bool bRemoved = false;
-    CDeathmatchObject* pObject;
-    auto iter = m_List.begin ();
-    while ( iter != m_List.end () )
-    {
-        pObject = *iter;
-        pObject->UpdateMovement ();
+    using Iterator = std::list<CDeathmatchObject*>::iterator;
 
-        // Remove it if it has stopped moving
-        if ( !pObject->IsMoving () )
+    for (Iterator iter = m_List.begin(); iter != m_List.end(); /* manual increment */)
+    {
+        // Use a copy of the iterator to avoid an iterator invalidation crash
+        Iterator current = iter++;
+
+        CDeathmatchObject* const object = *current;
+        m_currentPulseObject = object;
+        object->UpdateMovement();
+
+        if (m_currentPulseObject && !object->IsMoving())
         {
-            // Remove from list
-            iter = m_List.erase ( iter );
+            m_List.erase(current);
         }
-        else
-            ++iter;
     }
+
+    m_currentPulseObject = nullptr;
 }

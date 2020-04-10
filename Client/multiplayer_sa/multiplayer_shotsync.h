@@ -1,24 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/multiplayer_shotsync.h
-*  PURPOSE:     Multiplayer module shooting sync methods
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/multiplayer_shotsync.h
+ *  PURPOSE:     Multiplayer module shooting sync methods
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "multiplayersa_init.h"
 #include <multiplayer/CMultiplayer.h>
 
-#ifndef __CMULTIPLAYERSASHOTSYNC
-#define __CMULTIPLAYERSASHOTSYNC
+#pragma once
 
 #include <game/CPlayerPed.h>
 
@@ -47,31 +41,29 @@
 #define HOOKPOS_CWeapon_DoBulletImpact                  0x73B550
 
 // our stuff
-VOID InitShotsyncHooks();
-CShotSyncData * GetLocalPedShotSyncData ( );
-VOID WriteGunDirectionDataForPed ( class CPedSAInterface * pPedInterface, float * fGunDirectionX, float * fGunDirectionY, char * cGunDirection );
-bool IsLocalPlayer ( CPedSAInterface * pPedInterface );
+VOID           InitShotsyncHooks();
+CShotSyncData* GetLocalPedShotSyncData();
+VOID           WriteGunDirectionDataForPed(class CPedSAInterface* pPedInterface, float* fGunDirectionX, float* fGunDirectionY, char* cGunDirection);
+bool           IsLocalPlayer(CPedSAInterface* pPedInterface);
 
 // hooks
 VOID HOOK_CWeapon__Fire();
-VOID HOOK_CWeapon__PostFire ();
-VOID HOOK_CWeapon__PostFire2 ();
-VOID HOOK_CPedIK__PointGunInDirection ();
-VOID HOOK_CTaskSimpleGangDriveBy__PlayerTarget ();
-VOID HOOK_CWeapon__Fire_Sniper ();
-VOID HOOK_CEventDamage__AffectsPed ();
-VOID HOOK_CEventVehicleExplosion__AffectsPed ();
-VOID HOOK_CFireManager__StartFire ();
-VOID HOOK_CFireManager__StartFire_ ();
+VOID HOOK_CWeapon__PostFire();
+VOID HOOK_CWeapon__PostFire2();
+VOID HOOK_CPedIK__PointGunInDirection();
+VOID HOOK_CTaskSimpleGangDriveBy__PlayerTarget();
+VOID HOOK_CWeapon__Fire_Sniper();
+VOID HOOK_CEventDamage__AffectsPed();
+VOID HOOK_CEventVehicleExplosion__AffectsPed();
+VOID HOOK_CFireManager__StartFire();
+VOID HOOK_CFireManager__StartFire_();
 VOID HOOK_CProjectileInfo__AddProjectile();
 VOID HOOK_CProjectile__CProjectile();
 VOID HOOK_IKChainManager_PointArm();
 VOID HOOK_IKChainManager_LookAt();
-VOID HOOK_SkipAim ();
-VOID HOOK_CTaskSimpleUsegun_ProcessPed ();
-VOID HOOK_CWeapon_FireInstantHit ();
-VOID HOOK_CWeapon_FireInstantHit_CameraMode ();
-VOID HOOK_CWeapon_FireInstantHit_IsPlayer ();
-VOID HOOK_CWeapon_DoBulletImpact ();
-
-#endif
+VOID HOOK_SkipAim();
+VOID HOOK_CTaskSimpleUsegun_ProcessPed();
+VOID HOOK_CWeapon_FireInstantHit();
+VOID HOOK_CWeapon_FireInstantHit_CameraMode();
+VOID HOOK_CWeapon_FireInstantHit_IsPlayer();
+VOID HOOK_CWeapon_DoBulletImpact();

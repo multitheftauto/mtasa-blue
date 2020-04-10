@@ -1,26 +1,25 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/XML.cpp
-*  PURPOSE:     XML module entry
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/XML.cpp
+ *  PURPOSE:     XML module entry
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 CXMLImpl *pXMLInterface = NULL;
 
-_DECLSPEC_EX CXML *InitXMLInterface(const char *szSaveFlagDirectory)
+MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
 {
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;
 }
 
-_DECLSPEC_EX void ReleaseXMLInterface()
+MTAEXPORT void ReleaseXMLInterface()
 {
     if (pXMLInterface)
     {

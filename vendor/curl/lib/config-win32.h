@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -53,11 +53,13 @@
 #define HAVE_GETOPT_H 1
 #endif
 
+/* Define to 1 if you have the <inttypes.h> header file. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+#define HAVE_INTTYPES_H 1
+#endif
+
 /* Define if you have the <io.h> header file. */
 #define HAVE_IO_H 1
-
-/* Define if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
 
 /* Define if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
@@ -86,6 +88,11 @@
 
 /* Define if you have the <ssl.h> header file. */
 /* #define HAVE_SSL_H 1 */
+
+/* Define to 1 if you have the <stdbool.h> header file. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+#define HAVE_STDBOOL_H 1
+#endif
 
 /* Define if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -160,6 +167,11 @@
 /* Define if you can safely include both <sys/time.h> and <time.h>. */
 /* #define TIME_WITH_SYS_TIME 1 */
 
+/* Define to 1 if bool is an available type. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+#define HAVE_BOOL_T 1
+#endif
+
 /* ---------------------------------------------------------------- */
 /*                             FUNCTIONS                            */
 /* ---------------------------------------------------------------- */
@@ -171,7 +183,13 @@
 /* #define HAVE_DOPRNT 1 */
 
 /* Define if you have the ftruncate function. */
-#define HAVE_FTRUNCATE 1
+/* #define HAVE_FTRUNCATE 1 */
+
+/* Define to 1 if you have the `getpeername' function. */
+#define HAVE_GETPEERNAME 1
+
+/* Define to 1 if you have the getsockname function. */
+#define HAVE_GETSOCKNAME 1
 
 /* Define if you have the gethostbyaddr function. */
 #define HAVE_GETHOSTBYADDR 1
@@ -250,7 +268,8 @@
 #define HAVE_STRSTR 1
 
 /* Define if you have the strtoll function. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__POCC__)
+#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__POCC__) || \
+    (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #define HAVE_STRTOLL 1
 #endif
 
@@ -383,6 +402,9 @@
 /* Define to the size of `short', as computed by sizeof. */
 #define SIZEOF_SHORT 2
 
+/* Define to the size of `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
+
 /* Define to the size of `size_t', as computed by sizeof. */
 #if defined(_WIN64)
 #  define SIZEOF_SIZE_T 8
@@ -390,20 +412,8 @@
 #  define SIZEOF_SIZE_T 4
 #endif
 
-/* ---------------------------------------------------------------- */
-/*                          STRUCT RELATED                          */
-/* ---------------------------------------------------------------- */
-
-/* Define if you have struct sockaddr_storage. */
-#if !defined(__SALFORDC__) && !defined(__BORLANDC__)
-#define HAVE_STRUCT_SOCKADDR_STORAGE 1
-#endif
-
-/* Define if you have struct timeval. */
-#define HAVE_STRUCT_TIMEVAL 1
-
-/* Define if struct sockaddr_in6 has the sin6_scope_id member. */
-#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
+/* Define to the size of `curl_off_t', as computed by sizeof. */
+#define SIZEOF_CURL_OFF_T 8
 
 /* ---------------------------------------------------------------- */
 /*               BSD-style lwIP TCP/IP stack SPECIFIC               */
@@ -480,7 +490,9 @@
 #endif
 
 /* Define if the compiler supports the 'long long' data type. */
-#if defined(__MINGW32__) || defined(__WATCOMC__)
+#if defined(__MINGW32__) || defined(__WATCOMC__)      || \
+    (defined(_MSC_VER)     && (_MSC_VER     >= 1310)) || \
+    (defined(__BORLANDC__) && (__BORLANDC__ >= 0x561))
 #define HAVE_LONGLONG 1
 #endif
 
@@ -490,7 +502,7 @@
 #define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
-/* VS2005 and later dafault size for time_t is 64-bit, unless
+/* VS2005 and later default size for time_t is 64-bit, unless
    _USE_32BIT_TIME_T has been defined to get a 32-bit time_t. */
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #  ifndef _USE_32BIT_TIME_T
@@ -500,26 +512,39 @@
 #  endif
 #endif
 
-/* Officially, Microsoft's Windows SDK versions 6.X do not support Windows
-   2000 as a supported build target. VS2008 default installations provide
-   an embedded Windows SDK v6.0A along with the claim that Windows 2000 is
-   a valid build target for VS2008. Popular belief is that binaries built
-   with VS2008 using Windows SDK versions 6.X and Windows 2000 as a build
-   target are functional. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1500)
+/* Define some minimum and default build targets for Visual Studio */
+#if defined(_MSC_VER)
+   /* Officially, Microsoft's Windows SDK versions 6.X does not support Windows
+      2000 as a supported build target. VS2008 default installations provides
+      an embedded Windows SDK v6.0A along with the claim that Windows 2000 is a
+      valid build target for VS2008. Popular belief is that binaries built with
+      VS2008 using Windows SDK versions v6.X and Windows 2000 as a build target
+      are functional. */
 #  define VS2008_MIN_TARGET 0x0500
-#endif
 
-/* When no build target is specified VS2008 default build target is Windows
-   Vista, which leaves out even Winsows XP. If no build target has been given
-   for VS2008 we will target the minimum Officially supported build target,
-   which happens to be Windows XP. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1500)
-#  define VS2008_DEF_TARGET  0x0501
+   /* The minimum build target for VS2012 is Vista unless Update 1 is installed
+      and the v110_xp toolset is chosen. */
+#  if defined(_USING_V110_SDK71_)
+#    define VS2012_MIN_TARGET 0x0501
+#  else
+#    define VS2012_MIN_TARGET 0x0600
+#  endif
+
+   /* VS2008 default build target is Windows Vista. We override default target
+      to be Windows XP. */
+#  define VS2008_DEF_TARGET 0x0501
+
+   /* VS2012 default build target is Windows Vista unless Update 1 is installed
+      and the v110_xp toolset is chosen. */
+#  if defined(_USING_V110_SDK71_)
+#    define VS2012_DEF_TARGET 0x0501
+#  else
+#    define VS2012_DEF_TARGET 0x0600
+#  endif
 #endif
 
 /* VS2008 default target settings and minimum build target check. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1500)
+#if defined(_MSC_VER) && (_MSC_VER >= 1500) && (_MSC_VER <= 1600)
 #  ifndef _WIN32_WINNT
 #    define _WIN32_WINNT VS2008_DEF_TARGET
 #  endif
@@ -528,6 +553,24 @@
 #  endif
 #  if (_WIN32_WINNT < VS2008_MIN_TARGET) || (WINVER < VS2008_MIN_TARGET)
 #    error VS2008 does not support Windows build targets prior to Windows 2000
+#  endif
+#endif
+
+/* VS2012 default target settings and minimum build target check. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1700)
+#  ifndef _WIN32_WINNT
+#    define _WIN32_WINNT VS2012_DEF_TARGET
+#  endif
+#  ifndef WINVER
+#    define WINVER VS2012_DEF_TARGET
+#  endif
+#  if (_WIN32_WINNT < VS2012_MIN_TARGET) || (WINVER < VS2012_MIN_TARGET)
+#    if defined(_USING_V110_SDK71_)
+#      error VS2012 does not support Windows build targets prior to Windows XP
+#    else
+#      error VS2012 does not support Windows build targets prior to Windows \
+Vista
+#    endif
 #  endif
 #endif
 
@@ -542,8 +585,9 @@
 #  endif
 #endif
 
-/* Availability of freeaddrinfo, getaddrinfo and getnameinfo functions is
-   quite convoluted, compiler dependent and even build target dependent. */
+/* Availability of freeaddrinfo, getaddrinfo, getnameinfo and if_nametoindex
+   functions is quite convoluted, compiler dependent and even build target
+   dependent. */
 #if defined(HAVE_WS2TCPIP_H)
 #  if defined(__POCC__)
 #    define HAVE_FREEADDRINFO           1
@@ -570,6 +614,26 @@
 #  ifndef __POCC__OLDNAMES
 #    error Compatibility names /Go compiler option is required
 #  endif
+#endif
+
+/* ---------------------------------------------------------------- */
+/*                          STRUCT RELATED                          */
+/* ---------------------------------------------------------------- */
+
+/* Define if you have struct sockaddr_storage. */
+#if !defined(__SALFORDC__) && !defined(__BORLANDC__)
+#define HAVE_STRUCT_SOCKADDR_STORAGE 1
+#endif
+
+/* Define if you have struct timeval. */
+#define HAVE_STRUCT_TIMEVAL 1
+
+/* Define if struct sockaddr_in6 has the sin6_scope_id member. */
+#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
+
+#if defined(HAVE_WINSOCK2_H) && defined(_WIN32_WINNT) && \
+    (_WIN32_WINNT >= 0x0600)
+#define HAVE_STRUCT_POLLFD 1
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -626,26 +690,41 @@
 /* ---------------------------------------------------------------- */
 
 #if defined(CURL_HAS_NOVELL_LDAPSDK) || defined(CURL_HAS_MOZILLA_LDAPSDK)
-#undef CURL_LDAP_WIN
+#undef USE_WIN32_LDAP
 #define HAVE_LDAP_SSL_H 1
 #define HAVE_LDAP_URL_PARSE 1
 #elif defined(CURL_HAS_OPENLDAP_LDAPSDK)
-#undef CURL_LDAP_WIN
+#undef USE_WIN32_LDAP
 #define HAVE_LDAP_URL_PARSE 1
 #else
 #undef HAVE_LDAP_URL_PARSE
-#define CURL_LDAP_WIN 1
+#define HAVE_LDAP_SSL 1
+#define USE_WIN32_LDAP 1
 #endif
 
-#if defined(__WATCOMC__) && defined(CURL_LDAP_WIN)
+#if defined(__WATCOMC__) && defined(USE_WIN32_LDAP)
 #if __WATCOMC__ < 1280
 #define WINBERAPI  __declspec(cdecl)
 #define WINLDAPAPI __declspec(cdecl)
 #endif
 #endif
 
-#if defined(__POCC__) && defined(CURL_LDAP_WIN)
+#if defined(__POCC__) && defined(USE_WIN32_LDAP)
 #  define CURL_DISABLE_LDAP 1
+#endif
+
+/* Define to use the Windows crypto library. */
+#if !defined(CURL_WINDOWS_APP)
+#define USE_WIN32_CRYPTO
+#endif
+
+/* Define to use Unix sockets. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1500)
+/* sdkddkver.h first shipped with Platform SDK v6.0A included with VS2008 */
+#include <sdkddkver.h>
+#if defined(NTDDI_WIN10_RS4)
+#define USE_UNIX_SOCKETS
+#endif
 #endif
 
 /* ---------------------------------------------------------------- */
@@ -658,8 +737,12 @@
 #define OS "i386-pc-win32"
 #elif defined(_M_X64) || defined(__x86_64__) /* x86_64 (MSVC >=2005 or gcc) */
 #define OS "x86_64-pc-win32"
-#elif defined(_M_IA64) /* Itanium */
+#elif defined(_M_IA64) || defined(__ia64__) /* Itanium */
 #define OS "ia64-pc-win32"
+#elif defined(_M_ARM_NT) || defined(__arm__) /* ARMv7-Thumb2 (Windows RT) */
+#define OS "thumbv7a-pc-win32"
+#elif defined(_M_ARM64) || defined(__aarch64__) /* ARM64 (Windows 10) */
+#define OS "aarch64-pc-win32"
 #else
 #define OS "unknown-pc-win32"
 #endif
@@ -670,7 +753,7 @@
 /* If you want to build curl with the built-in manual */
 #define USE_MANUAL 1
 
-#if defined(__POCC__) || (USE_IPV6)
+#if defined(__POCC__) || defined(USE_IPV6)
 #  define ENABLE_IPV6 1
 #endif
 

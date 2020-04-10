@@ -1,11 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLFileImpl.h
+ *  PURPOSE:     XML file class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #pragma once
 
 #include "CXMLNodeImpl.h"
@@ -15,33 +17,37 @@
 class CXMLFileImpl : public CXMLFile
 {
 public:
-    CXMLFileImpl(const std::string &strFilename, bool bUseIDs);
-    CXMLFileImpl(const std::string &strFilename, CXMLNode *pNode);
+    CXMLFileImpl(const std::string& strFilename, bool bUseIDs = false, bool bReadOnly = false);
+    CXMLFileImpl(const std::string& strFilename, CXMLNode* pNode, bool bReadOnly = false);
     ~CXMLFileImpl();
 
-    const std::string& GetFilename()                 override { return m_strFilename; }
-    void SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; } 
+    const std::string& GetFilename() override { return m_strFilename; }
+    void               SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; }
 
-    bool Parse() override;
+    bool Parse(std::vector<char>* pOutFileContents = nullptr) override;
     bool Write() override;
     void Reset() override;
 
-    class CXMLNode *CreateRootNode(const std::string &strTagName) override;
-    class CXMLNode *GetRootNode   () override;
+    class CXMLNode* CreateRootNode(const std::string& strTagName) override;
+    class CXMLNode* GetRootNode() override;
 
-    CXMLErrorCodes::Code GetLastError(std::string &strOut) override;
+    CXMLErrorCodes::Code GetLastError(std::string& strOut) override;
 
-    eXMLClass GetClassType() override { return CXML_FILE; }
-    unsigned long GetID()    override { return m_ulID; }
+    eXMLClass     GetClassType() override { return CXML_FILE; }
+    unsigned long GetID() override { return m_ulID; }
+
+    bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
 private:
-    void BuildWrapperTree(bool bUsingIDs);
+    void                          BuildWrapperTree(bool bUsingIDs);
     std::unique_ptr<CXMLNodeImpl> WrapperTreeWalker(pugi::xml_node* node, bool bUsingIDs);
 
 private:
     std::unique_ptr<class CXMLNodeImpl> m_pRoot;
     std::unique_ptr<pugi::xml_document> m_pDocument;
-    pugi::xml_parse_result  m_parserResult;
-    std::string             m_strFilename;
-    unsigned long           m_ulID;
+    pugi::xml_parse_result              m_parserResult;
+    std::string                         m_strFilename;
+    unsigned long                       m_ulID;
+    const bool                          m_bUsingIDs = false;
+    const bool                          m_bReadOnly = false;
 };

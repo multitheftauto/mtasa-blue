@@ -33,6 +33,7 @@
 #include <winnt.h>
 #include <atlbase.h>
 #include <dia2.h>
+#include <diacreate.h>
 #include <ImageHlp.h>
 #include <stdio.h>
 
@@ -121,6 +122,50 @@ class AutoImage {
   PLOADED_IMAGE img_;
 };
 
+bool SymbolsMatch(IDiaSymbol* a, IDiaSymbol* b) {
+  DWORD a_section, a_offset, b_section, b_offset;
+  if (FAILED(a->get_addressSection(&a_section)) ||
+      FAILED(a->get_addressOffset(&a_offset)) ||
+      FAILED(b->get_addressSection(&b_section)) ||
+      FAILED(b->get_addressOffset(&b_offset)))
+    return false;
+  return a_section == b_section && a_offset == b_offset;
+}
+
+bool CreateDiaDataSourceInstance(CComPtr<IDiaDataSource> &data_source) {
+  if (SUCCEEDED(data_source.CoCreateInstance(CLSID_DiaSource))) {
+    return true;
+  }
+
+  class DECLSPEC_UUID("B86AE24D-BF2F-4ac9-B5A2-34B14E4CE11D") DiaSource100;
+  class DECLSPEC_UUID("761D3BCD-1304-41D5-94E8-EAC54E4AC172") DiaSource110;
+  class DECLSPEC_UUID("3BFCEA48-620F-4B6B-81F7-B9AF75454C7D") DiaSource120;
+  class DECLSPEC_UUID("E6756135-1E65-4D17-8576-610761398C3C") DiaSource140;
+
+  // If the CoCreateInstance call above failed, msdia*.dll is not registered.
+  // We can try loading the DLL corresponding to the #included DIA SDK, but
+  // the DIA headers don't provide a version. Lets try to figure out which DIA
+  // version we're compiling against by comparing CLSIDs.
+  const wchar_t *msdia_dll = nullptr;
+  if (CLSID_DiaSource == _uuidof(DiaSource100)) {
+    msdia_dll = L"msdia100.dll";
+  } else if (CLSID_DiaSource == _uuidof(DiaSource110)) {
+    msdia_dll = L"msdia110.dll";
+  } else if (CLSID_DiaSource == _uuidof(DiaSource120)) {
+    msdia_dll = L"msdia120.dll";
+  } else if (CLSID_DiaSource == _uuidof(DiaSource140)) {
+    msdia_dll = L"msdia140.dll";
+  }
+
+  if (msdia_dll &&
+      SUCCEEDED(NoRegCoCreate(msdia_dll, CLSID_DiaSource, IID_IDiaDataSource,
+                              reinterpret_cast<void **>(&data_source)))) {
+    return true;
+  }
+
+  return false;
+}
+
 }  // namespace
 
 PDBSourceLineWriter::PDBSourceLineWriter() : output_(NULL) {
@@ -149,13 +194,10 @@ bool PDBSourceLineWriter::Open(const wstring &file, FileFormat format) {
   }
 
   CComPtr<IDiaDataSource> data_source;
-  if (FAILED(data_source.CoCreateInstance(CLSID_DiaSource))) {
+  if (!CreateDiaDataSourceInstance(data_source)) {
     const int kGuidSize = 64;
     wchar_t classid[kGuidSize] = {0};
     StringFromGUID2(CLSID_DiaSource, classid, kGuidSize);
-    // vc80 uses bce36434-2c24-499e-bf49-8bd99b0eeb68.
-    // vc90 uses 4C41678E-887B-4365-A09E-925D28DB33C2.
-    // vc100 uses B86AE24D-BF2F-4AC9-B5A2-34B14E4CE11D.
     fprintf(stderr, "CoCreateInstance CLSID_DiaSource %S failed "
             "(msdia*.dll unregistered?)\n", classid);
     return false;
@@ -233,7 +275,7 @@ bool PDBSourceLineWriter::PrintLines(IDiaEnumLineNumbers *lines) {
     AddressRangeVector ranges;
     MapAddressRange(image_map_, AddressRange(rva, length), &ranges);
     for (size_t i = 0; i < ranges.size(); ++i) {
-      fprintf(output_, "%x %x %d %d\n", ranges[i].rva, ranges[i].length,
+      fprintf(output_, "%lx %lx %lu %lu\n", ranges[i].rva, ranges[i].length,
               line_num, source_id);
     }
     line.Release();
@@ -277,10 +319,10 @@ bool PDBSourceLineWriter::PrintFunction(IDiaSymbol *function,
   AddressRangeVector ranges;
   MapAddressRange(image_map_, AddressRange(rva, static_cast<DWORD>(length)),
                   &ranges);
-  wstring wname(name);
   for (size_t i = 0; i < ranges.size(); ++i) {
-    fprintf(output_, "FUNC %x %x %x %ws\n",
-            ranges[i].rva, ranges[i].length, stack_param_size, wname.c_str());
+    fprintf(output_, "FUNC %lx %lx %x %ws\n",
+            ranges[i].rva, ranges[i].length, stack_param_size,
+            name.m_str);
   }
 
   CComPtr<IDiaEnumLineNumbers> lines;
@@ -629,15 +671,14 @@ bool PDBSourceLineWriter::PrintFrameDataUsingPDB() {
         }
       }
 
-      wstring wprogram_string(program_string);
       for (size_t i = 0; i < frame_infos.size(); ++i) {
         const FrameInfo& fi(frame_infos[i]);
-        fprintf(output_, "STACK WIN %x %x %x %x %x %x %x %x %x %d ",
+        fprintf(output_, "STACK WIN %lx %lx %lx %lx %x %lx %lx %lx %lx %d ",
                 type, fi.rva, fi.code_size, fi.prolog_size,
                 0 /* epilog_size */, parameter_size, saved_register_size,
                 local_size, max_stack_size, program_string_result == S_OK);
         if (program_string_result == S_OK) {
-          fprintf(output_, "%ws\n", wprogram_string.c_str());
+          fprintf(output_, "%ws\n", program_string.m_str);
         } else {
           fprintf(output_, "%d\n", allocates_base_pointer);
         }
@@ -778,10 +819,10 @@ bool PDBSourceLineWriter::PrintFrameDataUsingEXE() {
         unwind_info = NULL;
       }
     } while (unwind_info);
-    fprintf(output_, "STACK CFI INIT %x %x .cfa: $rsp .ra: .cfa %d - ^\n",
+    fprintf(output_, "STACK CFI INIT %lx %lx .cfa: $rsp .ra: .cfa %lu - ^\n",
             funcs[i].BeginAddress,
             funcs[i].EndAddress - funcs[i].BeginAddress, rip_offset);
-    fprintf(output_, "STACK CFI %x .cfa: $rsp %d +\n",
+    fprintf(output_, "STACK CFI %lx .cfa: $rsp %lu +\n",
             funcs[i].BeginAddress, stack_size);
   }
 
@@ -821,10 +862,43 @@ bool PDBSourceLineWriter::PrintCodePublicSymbol(IDiaSymbol *symbol) {
   AddressRangeVector ranges;
   MapAddressRange(image_map_, AddressRange(rva, 1), &ranges);
   for (size_t i = 0; i < ranges.size(); ++i) {
-    wstring wname(name);
-    fprintf(output_, "PUBLIC %x %x %ws\n", ranges[i].rva,
-            stack_param_size > 0 ? stack_param_size : 0, wname.c_str());
+    fprintf(output_, "PUBLIC %lx %x %ws\n", ranges[i].rva,
+            stack_param_size > 0 ? stack_param_size : 0,
+            name.m_str);
   }
+
+  // Now walk the function in the original untranslated space, asking DIA
+  // what function is at that location, stepping through OMAP blocks. If
+  // we're still in the same function, emit another entry, because the
+  // symbol could have been split into multiple pieces. If we've gotten to
+  // another symbol in the original address space, then we're done for
+  // this symbol. See https://crbug.com/678874.
+  for (;;) {
+    // This steps to the next block in the original image. Simply doing
+    // rva++ would also be correct, but would emit tons of unnecessary
+    // entries.
+    rva = image_map_.subsequent_rva_block[rva];
+    if (rva == 0)
+      break;
+
+    CComPtr<IDiaSymbol> next_sym = NULL;
+    LONG displacement;
+    if (FAILED(session_->findSymbolByRVAEx(rva, SymTagPublicSymbol, &next_sym,
+                                           &displacement))) {
+      break;
+    }
+
+    if (!SymbolsMatch(symbol, next_sym))
+      break;
+
+    AddressRangeVector next_ranges;
+    MapAddressRange(image_map_, AddressRange(rva, 1), &next_ranges);
+    for (size_t i = 0; i < next_ranges.size(); ++i) {
+      fprintf(output_, "PUBLIC %lx %x %ws\n", next_ranges[i].rva,
+              stack_param_size > 0 ? stack_param_size : 0, name.m_str);
+    }
+  }
+
   return true;
 }
 
@@ -906,7 +980,7 @@ bool PDBSourceLineWriter::FindPEFile() {
 
     // Look for an EXE or DLL file.
     const wchar_t *extensions[] = { L"exe", L"dll" };
-    for (int i = 0; i < sizeof(extensions) / sizeof(extensions[0]); i++) {
+    for (size_t i = 0; i < sizeof(extensions) / sizeof(extensions[0]); i++) {
       size_t dot_pos = file.find_last_of(L".");
       if (dot_pos != wstring::npos) {
         file.replace(dot_pos + 1, wstring::npos, extensions[i]);
@@ -944,6 +1018,16 @@ bool PDBSourceLineWriter::GetSymbolFunctionName(IDiaSymbol *function,
       fprintf(stderr, "failed to get function name\n");
       return false;
     }
+
+    // It's possible for get_name to return an empty string, so
+    // special-case that.
+    if (wcscmp(*name, L"") == 0) {
+      SysFreeString(*name);
+      // dwarf_cu_to_module.cc uses "<name omitted>", so match that.
+      *name = SysAllocString(L"<name omitted>");
+      return true;
+    }
+
     // If a name comes from get_name because no undecorated form existed,
     // it's already formatted properly to be used as output.  Don't do any
     // additional processing.
@@ -1082,12 +1166,15 @@ int PDBSourceLineWriter::GetFunctionStackParamSize(IDiaSymbol *function) {
       goto next_child;
     }
 
-    int child_end = child_register_offset + static_cast<ULONG>(child_length);
-    if (child_register_offset < lowest_base) {
-      lowest_base = child_register_offset;
-    }
-    if (child_end > highest_end) {
-      highest_end = child_end;
+    // Extra scope to avoid goto jumping over variable initialization
+    {
+      int child_end = child_register_offset + static_cast<ULONG>(child_length);
+      if (child_register_offset < lowest_base) {
+        lowest_base = child_register_offset;
+      }
+      if (child_end > highest_end) {
+        highest_end = child_end;
+      }
     }
 
 next_child:

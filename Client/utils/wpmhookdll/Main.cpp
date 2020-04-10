@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        utils/wpmhookdll/Main.cpp
-*  PURPOSE:     Memory manipulation hooking utility
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        utils/wpmhookdll/Main.cpp
+ *  PURPOSE:     Memory manipulation hooking utility
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -24,123 +23,100 @@ using namespace std;
 
 HWND hGTA = NULL;
 
-
 // ******** ReadProcessMemory hook! *********
-typedef BOOL ( WINAPI* pReadProcessMemory ) ( HANDLE hProcess,
-                                              LPCVOID lpBaseAddress,
-                                              LPVOID lpBuffer,
-                                              SIZE_T nSize,
-                                              SIZE_T* lpNumberOfBytesRead );
+typedef BOOL(WINAPI* pReadProcessMemory)(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead);
 
 pReadProcessMemory pfnReadProcessMemory = NULL;
 
-BOOL WINAPI Hook_ReadProcessMemory ( HANDLE hProcess,
-                                     LPCVOID lpBaseAddress,
-                                     LPVOID lpBuffer,
-                                     SIZE_T nSize,
-                                     SIZE_T* lpNumberOfBytesRead )
+BOOL WINAPI Hook_ReadProcessMemory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
 {
     // Tell MTA about the RPM call
-    PostMessage ( hGTA, MESSAGE_MONITOR_RPM, reinterpret_cast < LPARAM > ( lpBaseAddress ), nSize );
+    PostMessage(hGTA, MESSAGE_MONITOR_RPM, reinterpret_cast<LPARAM>(lpBaseAddress), nSize);
 
     // Call the original WriteProcessMemory
-    return pfnReadProcessMemory ( hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead );
+    return pfnReadProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
 }
 
-
 // ******** WriteProcessMemory hook! *********
-typedef BOOL ( WINAPI* pWriteProcessMemory ) ( HANDLE hProcess,
-                                               LPVOID lpBaseAddress,
-                                               LPCVOID lpBuffer,
-                                               SIZE_T nSize,
-                                               SIZE_T* lpNumberOfBytesWritten );
+typedef BOOL(WINAPI* pWriteProcessMemory)(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten);
 
 pWriteProcessMemory pfnWriteProcessMemory = NULL;
 
-BOOL WINAPI Hook_WriteProcessMemory ( HANDLE hProcess,
-                                      LPVOID lpBaseAddress,
-                                      LPCVOID lpBuffer,
-                                      SIZE_T nSize,
-                                      SIZE_T* lpNumberOfBytesWritten )
+BOOL WINAPI Hook_WriteProcessMemory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten)
 {
     // Tell MTA about the WPM call
-    PostMessage ( hGTA, MESSAGE_MONITOR_WPM, reinterpret_cast < LPARAM > ( lpBaseAddress ), nSize );
+    PostMessage(hGTA, MESSAGE_MONITOR_WPM, reinterpret_cast<LPARAM>(lpBaseAddress), nSize);
 
     // Call the original WriteProcessMemory
-    return pfnWriteProcessMemory ( hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten );
+    return pfnWriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesWritten);
 }
 
-
-void Initialize ( void )
+void Initialize(void)
 {
     // Grab the GTA window handle
-    hGTA = FindWindow ( "Grand theft auto San Andreas", NULL );
-    if ( hGTA != NULL )
+    hGTA = FindWindow("Grand theft auto San Andreas", NULL);
+    if (hGTA != NULL)
     {
         // Make sure Kernel32.dll is loaded
-        PBYTE pKernel32 = reinterpret_cast < PBYTE > ( LoadLibrary ( "Kernel32.dll" ) );
-        if ( pKernel32 )
+        PBYTE pKernel32 = reinterpret_cast<PBYTE>(LoadLibrary("Kernel32.dll"));
+        if (pKernel32)
         {
             // Hook ReadProcessMemory
-            pfnReadProcessMemory = reinterpret_cast < pReadProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "ReadProcessMemory" ), 
-                                                                                              reinterpret_cast < PBYTE > ( Hook_ReadProcessMemory ) ) );
+            pfnReadProcessMemory = reinterpret_cast<pReadProcessMemory>(
+                DetourFunction(DetourFindFunction("Kernel32.dll", "ReadProcessMemory"), reinterpret_cast<PBYTE>(Hook_ReadProcessMemory)));
 
             // Hook WriteProcessMemory
-            pfnWriteProcessMemory = reinterpret_cast < pWriteProcessMemory > ( DetourFunction ( DetourFindFunction ( "Kernel32.dll", "WriteProcessMemory" ), 
-                                                                                                reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) ) );
+            pfnWriteProcessMemory = reinterpret_cast<pWriteProcessMemory>(
+                DetourFunction(DetourFindFunction("Kernel32.dll", "WriteProcessMemory"), reinterpret_cast<PBYTE>(Hook_WriteProcessMemory)));
 
             // Success?
-            if ( pfnReadProcessMemory && pfnWriteProcessMemory )
+            if (pfnReadProcessMemory && pfnWriteProcessMemory)
             {
                 // Tell MTA we successfully hooked the trainer
-                PostMessage ( hGTA, MESSAGE_MONITOR_START, 0, 0 );
+                PostMessage(hGTA, MESSAGE_MONITOR_START, 0, 0);
                 return;
             }
         }
 
         // Tell MTA we successfully injected but failed hooking the functions
-        PostMessage ( hGTA, MESSAGE_MONITOR_START, 1, 1 );
+        PostMessage(hGTA, MESSAGE_MONITOR_START, 1, 1);
     }
 }
 
-
-void Finalize ( void )
+void Finalize(void)
 {
     // Unhook WriteProcessMemory
-    if ( pfnWriteProcessMemory )
+    if (pfnWriteProcessMemory)
     {
-        DetourRemove ( reinterpret_cast < PBYTE > ( pfnWriteProcessMemory ), 
-                       reinterpret_cast < PBYTE > ( Hook_WriteProcessMemory ) );
+        DetourRemove(reinterpret_cast<PBYTE>(pfnWriteProcessMemory), reinterpret_cast<PBYTE>(Hook_WriteProcessMemory));
     }
 
     // Unhook ReadProcessMemory
-    if ( pfnReadProcessMemory )
+    if (pfnReadProcessMemory)
     {
-        DetourRemove ( reinterpret_cast < PBYTE > ( pfnReadProcessMemory ), 
-                       reinterpret_cast < PBYTE > ( Hook_ReadProcessMemory ) );
+        DetourRemove(reinterpret_cast<PBYTE>(pfnReadProcessMemory), reinterpret_cast<PBYTE>(Hook_ReadProcessMemory));
     }
 
     // Tell MTA we've unhooked from the trainer
-    if ( hGTA != NULL )
+    if (hGTA != NULL)
     {
-        PostMessage ( hGTA, MESSAGE_MONITOR_END, 0, 0 );
+        PostMessage(hGTA, MESSAGE_MONITOR_END, 0, 0);
     }
 }
 
-
-int WINAPI DllMain ( HINSTANCE hModule, DWORD dwReason, PVOID pvNothing )
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
-    switch ( dwReason )
+    switch (dwReason)
     {
         case DLL_PROCESS_ATTACH:
         {
-            Initialize ();
+            Initialize();
             return TRUE;
         }
 
         case DLL_PROCESS_DETACH:
         {
-            Finalize ();
+            Finalize();
             return TRUE;
         }
     }

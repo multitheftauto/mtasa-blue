@@ -1,34 +1,27 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CResourceScriptItem.h
-*  PURPOSE:     Resource server-side script item class
-*  DEVELOPERS:  Ed Lyons <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CResourceScriptItem.h
+ *  PURPOSE:     Resource server-side script item class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef CRESOURCESCRIPTITEM_H
-#define CRESOURCESCRIPTITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 
 class CResourceScriptItem : public CResourceFile
 {
-    
 public:
+    CResourceScriptItem(class CResource* resource, const char* szShortName, const char* szResourceFileName,
+                        const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes);
+    ~CResourceScriptItem();
 
-                                        CResourceScriptItem             ( class CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes );
-                                        ~CResourceScriptItem            ( void );
+    bool Start();
+    bool Stop();
 
-    bool                                Start                           ( void );
-    bool                                Stop                            ( void );
-    
 private:
-
 };
-
-#endif
-

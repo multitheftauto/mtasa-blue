@@ -8,10 +8,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs, CXMLNodeImpl* pParent) : 
-    m_ulID(INVALID_XML_ID), 
-    m_node(node),
-    m_pParent(pParent)
+CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node& node, bool bUsingIDs, CXMLNodeImpl* pParent) : m_ulID(INVALID_XML_ID), m_node(node), m_pParent(pParent)
 {
     if (bUsingIDs)
         m_ulID = CXMLArray::PopUniqueID(this);
@@ -23,26 +20,30 @@ CXMLNodeImpl::~CXMLNodeImpl()
         CXMLArray::PushUniqueID(this);
 }
 
-CXMLNode *CXMLNodeImpl::CreateChild(const std::string& strTagName)
+CXMLNode* CXMLNodeImpl::CreateChild(const std::string& strTagName, CXMLNode* pInsertAfter)
 {
     auto node = m_node.append_child(strTagName.c_str());
     auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ulID != INVALID_XML_ID, this);
-    m_Children.push_back(std::move(wrapper));
+    if (pInsertAfter)
+    {
+        auto matchingIter = std::find_if(m_Children.begin(), m_Children.end(), [pInsertAfter](const auto& p) { return pInsertAfter == p.get(); });
+        if (matchingIter != m_Children.end())
+            m_Children.insert(matchingIter++, std::move(wrapper));
+        else
+            m_Children.push_back(std::move(wrapper));
+    }
+    else
+        m_Children.push_back(std::move(wrapper));
     return m_Children.back().get();
 }
 
-void CXMLNodeImpl::RemoveChild(CXMLNode *pNode)
+void CXMLNodeImpl::RemoveChild(CXMLNode* pNode)
 {
     // Remove from pugixml node
     m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(pNode)->GetNode());
 
     // Remove from child list
-    m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(),
-        [pNode](const auto &pEntry) 
-        {
-            return pNode == pEntry.get();
-        }),
-    m_Children.end());
+    m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(), [pNode](const auto& pEntry) { return pNode == pEntry.get(); }), m_Children.end());
 }
 
 unsigned int CXMLNodeImpl::GetChildCount()
@@ -50,10 +51,10 @@ unsigned int CXMLNodeImpl::GetChildCount()
     return static_cast<unsigned int>(m_Children.size());
 }
 
-CXMLNode *CXMLNodeImpl::GetChild(unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::GetChild(unsigned int uiIndex)
 {
     // Lookup the node
-    for (auto &pChild : m_Children)
+    for (auto& pChild : m_Children)
     {
         if (uiIndex == 0)
         {
@@ -66,10 +67,10 @@ CXMLNode *CXMLNodeImpl::GetChild(unsigned int uiIndex)
     return nullptr;
 }
 
-CXMLNode *CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiIndex)
 {
     // Lookup the node
-    for (auto &pNode : m_Children)
+    for (auto& pNode : m_Children)
     {
         if (pNode->GetTagName() == strTagName)
         {
@@ -85,77 +86,78 @@ CXMLNode *CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiI
     return nullptr;
 }
 
-const std::string CXMLNodeImpl::GetTagName() { 
-    return m_node.name(); 
+const std::string CXMLNodeImpl::GetTagName()
+{
+    return m_node.name();
 }
 
-void CXMLNodeImpl::SetTagName(const std::string &strString)
+void CXMLNodeImpl::SetTagName(const std::string& strString)
 {
     m_node.set_name(strString.c_str());
 }
 
 const std::string CXMLNodeImpl::GetTagContent()
 {
-    const char *szSubText = m_node.child_value();
+    const char* szSubText = m_node.child_value();
     return szSubText ? std::string(szSubText) : std::string("");
 }
 
-bool CXMLNodeImpl::GetTagContent(bool &bContent)
+bool CXMLNodeImpl::GetTagContent(bool& bContent)
 {
-    const char *szText = m_node.child_value();
+    const char* szText = m_node.child_value();
     if (!szText)
         return false;
 
     std::string strText = szText;
-    if(strText == "1") 
+    if (strText == "1")
     {
         bContent = true;
         return true;
-    } 
+    }
     if (strText == "0")
     {
         bContent = false;
         return true;
     }
-    return false; 
+    return false;
 }
 
-bool CXMLNodeImpl::GetTagContent(int &iContent)
+bool CXMLNodeImpl::GetTagContent(int& iContent)
 {
-    const char *szText = m_node.child_value();
+    const char* szText = m_node.child_value();
     if (!szText)
         return false;
 
     return StringToNumber(szText, iContent);
 }
 
-bool CXMLNodeImpl::GetTagContent(unsigned int &uiContent)
+bool CXMLNodeImpl::GetTagContent(unsigned int& uiContent)
 {
-    const char *szText = m_node.child_value();
+    const char* szText = m_node.child_value();
     if (!szText)
         return false;
 
     return StringToNumber(szText, uiContent);
 }
 
-bool CXMLNodeImpl::GetTagContent(float &fContent)
+bool CXMLNodeImpl::GetTagContent(float& fContent)
 {
-    const char *szText = m_node.child_value();
+    const char* szText = m_node.child_value();
     if (!szText)
         return false;
 
     return StringToNumber(szText, fContent);
 }
 
-void CXMLNodeImpl::SetTagContent(const std::string & strContent, bool bCDATA)
+void CXMLNodeImpl::SetTagContent(const std::string& strContent, bool bCDATA)
 {
     SetTagContent(strContent.c_str(), bCDATA);
 }
 
-void CXMLNodeImpl::SetTagContent(const char *szText, bool bCDATA)
+void CXMLNodeImpl::SetTagContent(const char* szText, bool bCDATA)
 {
     // Remove children if any
-    for (auto &child : m_node.children())
+    for (auto& child : m_node.children())
         m_node.remove_child(child);
     m_Children.clear();
 
@@ -185,10 +187,10 @@ void CXMLNodeImpl::SetTagContent(float fContent)
     SetTagContent(std::to_string(fContent));
 }
 
-void CXMLNodeImpl::SetTagContentf(const char *szFormat, ...)
+void CXMLNodeImpl::SetTagContentf(const char* szFormat, ...)
 {
     // Convert the formatted string to a string (MAX 1024 BYTES) and set it
-    char szBuffer[1024];
+    char    szBuffer[1024];
     va_list va;
     va_start(va, szFormat);
     VSNPRINTF(szBuffer, 1024, szFormat, va);
@@ -196,22 +198,27 @@ void CXMLNodeImpl::SetTagContentf(const char *szFormat, ...)
     SetTagContent(szBuffer);
 }
 
-bool CXMLNodeImpl::RemoveAttribute(const std::string &strName)
+int CXMLNodeImpl::GetLine()
+{
+    // TODO
+    return 0;
+}
+
+bool CXMLNodeImpl::RemoveAttribute(const std::string& strName)
 {
     bool bRemoved = false;
 
     // Remove from attributes list
     m_Attributes.erase(std::remove_if(m_Attributes.begin(), m_Attributes.end(),
-        [&bRemoved, strName](const auto &pNode) 
-        {
-            if (pNode->GetName() == strName)
-            {
-                bRemoved = true;
-                return true;
-            }
-            return false;
-        }),
-    m_Attributes.end());
+                                      [&bRemoved, strName](const auto& pNode) {
+                                          if (pNode->GetName() == strName)
+                                          {
+                                              bRemoved = true;
+                                              return true;
+                                          }
+                                          return false;
+                                      }),
+                       m_Attributes.end());
 
     // Remove from pugixml node
     m_node.remove_attribute(strName.c_str());
@@ -219,7 +226,7 @@ bool CXMLNodeImpl::RemoveAttribute(const std::string &strName)
     return bRemoved;
 }
 
-CXMLAttribute *CXMLNodeImpl::AddAttribute(const std::string &strName)
+CXMLAttribute* CXMLNodeImpl::AddAttribute(const std::string& strName)
 {
     auto xmlAttribute = m_node.append_attribute(strName.c_str());
     auto wrapper = std::make_unique<CXMLAttributeImpl>(xmlAttribute, m_ulID != INVALID_XML_ID);
@@ -227,9 +234,9 @@ CXMLAttribute *CXMLNodeImpl::AddAttribute(const std::string &strName)
     return m_Attributes.back().get();
 }
 
-CXMLAttribute *CXMLNodeImpl::GetAttribute(const std::string &strName)
+CXMLAttribute* CXMLNodeImpl::GetAttribute(const std::string& strName)
 {
-    for (auto &pAttribute : m_Attributes)
+    for (auto& pAttribute : m_Attributes)
     {
         if (pAttribute->GetName() == strName)
         {
@@ -239,10 +246,68 @@ CXMLAttribute *CXMLNodeImpl::GetAttribute(const std::string &strName)
     return nullptr;
 }
 
+SString CXMLNodeImpl::GetCommentText()
+{
+    // TODO
+    return "";
+
+    //SString        strComment;
+    //pugi::xml_node pCommentNode = m_node.previous_sibling();
+    //if (pCommentNode && pCommentNode.type() == pugi::node_comment)
+    //{
+    //    strComment = pCommentNode.value();
+    //    // Remove indents
+    //    std::vector<SString> lineList;
+    //    ReadTokenSeparatedList("\n", strComment, lineList);
+    //    strComment = SString::Join("\n", lineList);
+    //}
+    //return strComment;
+}
+
+//
+// Set comment text for this node.
+// Leading blank line can only be inserted when creating the comment.
+//
+void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankLine)
+{
+    // TODO
+
+    //// If previous sibling is not a comment, then insert one (with blank line if required)
+    //pugi::xml_node pCommentNode = m_node.previous_sibling();
+    //if (!pCommentNode || pCommentNode.type() != pugi::node_comment)
+    //{
+    //    if (bLeadingBlankLine)
+    //    {
+    //        pugi::xml_node pBlankLine = m_node.parent().insert_child_before(pugi::node_comment, m_node);
+    //    }
+    //    pCommentNode = m_node.parent().insert_child_before(pugi::node_comment, m_node);
+    //}
+
+    //// Calc indent
+    //SString   strIndent = "     ";
+    //CXMLNode* pTemp = this;
+    //while (pTemp = pTemp->GetParent())
+    //{
+    //    strIndent += "    ";
+    //}
+
+    //// Apply indent
+    //std::vector<SString> lineList;
+    //SStringX(szCommentText).Split("\n", lineList);
+    //for (uint i = 1; i < lineList.size(); ++i)
+    //{
+    //    lineList[i] = strIndent + lineList[i];
+    //}
+
+    //// Compose final comment string
+    //SString strComment = " " + SString::Join("\n", lineList) + " ";
+    //pCommentNode.set_value(strComment);
+}
+
 void CXMLNodeImpl::RemoveAllChildren()
 {
-    for (auto &pChild : m_Children)
-        m_node.remove_child(reinterpret_cast<CXMLNodeImpl *>(pChild.get())->m_node);
+    for (auto& pChild : m_Children)
+        m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(pChild.get())->m_node);
     m_Children.clear();
 }
 
@@ -256,7 +321,7 @@ void CXMLNodeImpl::AddChild(std::unique_ptr<CXMLNode> pChild)
     m_Children.push_back(std::move(pChild));
 }
 
-bool CXMLNodeImpl::StringToNumber(const char *szString, long &lValue)
+bool CXMLNodeImpl::StringToNumber(const char* szString, long& lValue)
 {
     try
     {
@@ -269,7 +334,7 @@ bool CXMLNodeImpl::StringToNumber(const char *szString, long &lValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char *szString, unsigned int &uiValue)
+bool CXMLNodeImpl::StringToNumber(const char* szString, unsigned int& uiValue)
 {
     try
     {
@@ -287,7 +352,7 @@ bool CXMLNodeImpl::StringToNumber(const char *szString, unsigned int &uiValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char *szString, int &iValue)
+bool CXMLNodeImpl::StringToNumber(const char* szString, int& iValue)
 {
     try
     {
@@ -300,7 +365,7 @@ bool CXMLNodeImpl::StringToNumber(const char *szString, int &iValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char *szString, float &fValue)
+bool CXMLNodeImpl::StringToNumber(const char* szString, float& fValue)
 {
     try
     {

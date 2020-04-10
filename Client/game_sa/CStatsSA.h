@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CStatsSA.h
-*  PURPOSE:     Header file for game statistics class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CStatsSA.h
+ *  PURPOSE:     Header file for game statistics class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_STATS
-#define __CGAMESA_STATS
+#pragma once
 
 #include <game/CStats.h>
 #define WIN32_LEAN_AND_MEAN
@@ -27,13 +25,11 @@
 class CStatsSA : public CStats
 {
 public:
-    float           GetStatValue        ( unsigned short usIndex );
-    void            ModifyStat          ( unsigned short usIndex, float fAmmount );
-    void            IncrementStat       ( unsigned short usIndex, float fAmmount );
-    void            DecrementStat       ( unsigned short usIndex, float fAmmount );
-    void            SetStatValue        ( unsigned short usIndex, float fAmmount );
+    float GetStatValue(unsigned short usIndex);
+    void  ModifyStat(unsigned short usIndex, float fAmmount);
+    void  IncrementStat(unsigned short usIndex, float fAmmount);
+    void  DecrementStat(unsigned short usIndex, float fAmmount);
+    void  SetStatValue(unsigned short usIndex, float fAmmount);
 
-    unsigned short  GetSkillStatIndex   ( eWeaponType type );
+    unsigned short GetSkillStatIndex(eWeaponType type);
 };
-
-#endif

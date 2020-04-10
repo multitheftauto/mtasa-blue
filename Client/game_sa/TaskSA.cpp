@@ -1,17 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskSA.cpp
-*  PURPOSE:     Base game task
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskSA.cpp
+ *  PURPOSE:     Base game task
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -23,7 +19,7 @@ CTaskSA::CTaskSA()
     DEBUG_TRACE("CTaskSA::CTaskSA()");
     Parent = 0;
     TaskInterface = 0;
-    dwTasksCreatedTotal ++;
+    dwTasksCreatedTotal++;
     dwTasksAlive++;
     m_bBeingDestroyed = false;
 }
@@ -33,7 +29,6 @@ CTaskSA::~CTaskSA()
     DEBUG_TRACE("CTaskSA::~CTaskSA()");
     dwTasksAlive--;
 }
-
 
 // alocate memory for the task (ammount nSize)
 void CTaskSA::CreateTaskInterface(size_t nSize)
@@ -58,8 +53,7 @@ void CTaskSA::CreateTaskInterface(size_t nSize)
     Parent = 0;
 }
 
-
-CTask * CTaskSA::Clone() 
+CTask* CTaskSA::Clone()
 {
     DEBUG_TRACE("CTask * CTaskSA::Clone() ");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -71,20 +65,20 @@ CTask * CTaskSA::Clone()
         call    dwFunc
         mov     dwReturn, eax
     }
-    return (CTask *)dwReturn;
+    return (CTask*)dwReturn;
 }
 
-void CTaskSA::SetParent(CTask* pParent) 
+void CTaskSA::SetParent(CTask* pParent)
 {
     UCTask unionTask;
     unionTask.pTask = pParent;
-    this->GetInterface()->m_pParent = unionTask.pTaskSA->GetInterface(); 
-    this->Parent = unionTask.pTaskSA; 
+    this->GetInterface()->m_pParent = unionTask.pTaskSA->GetInterface();
+    this->Parent = unionTask.pTaskSA;
 }
 
-CTask * CTaskSA::GetSubTask() 
+CTask* CTaskSA::GetSubTask()
 {
-    static CTaskManagementSystemSA * s_pTaskManagementSystem = (CTaskManagementSystemSA *)pGame->GetTaskManagementSystem();
+    static CTaskManagementSystemSA* s_pTaskManagementSystem = (CTaskManagementSystemSA*)pGame->GetTaskManagementSystem();
 
     DEBUG_TRACE("CTask * CTaskSA::GetSubTask()");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -96,7 +90,7 @@ CTask * CTaskSA::GetSubTask()
         call    dwFunc
         mov     dwReturn, eax
     }
-    return s_pTaskManagementSystem->GetTask ( (CTaskSAInterface *)dwReturn );
+    return s_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
 }
 
 bool CTaskSA::IsSimpleTask()
@@ -104,7 +98,7 @@ bool CTaskSA::IsSimpleTask()
     DEBUG_TRACE("bool CTaskSA::IsSimpleTask()");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->IsSimpleTask;
-    bool bReturn = 0;
+    bool  bReturn = 0;
     _asm
     {
         mov     ecx, dwThisInterface
@@ -114,15 +108,15 @@ bool CTaskSA::IsSimpleTask()
     return bReturn;
 }
 
-int CTaskSA::GetTaskType() 
+int CTaskSA::GetTaskType()
 {
     DEBUG_TRACE("int CTaskSA::GetTaskType()");
-    CTaskSAInterface * pTaskInterface = this->GetInterface();
-   
-    DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
-    int iReturn = 9999;
+    CTaskSAInterface* pTaskInterface = this->GetInterface();
 
-    if ( dwFunc && dwFunc != 0x82263A ) // some functions have no task type 0x82263A is purecal (assert?)
+    DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
+    int   iReturn = 9999;
+
+    if (dwFunc && dwFunc != 0x82263A)            // some functions have no task type 0x82263A is purecal (assert?)
     {
         _asm
         {
@@ -137,12 +131,12 @@ int CTaskSA::GetTaskType()
 /**
  * \todo Handle pEvent correctly to convert it
  */
-void CTaskSA::StopTimer(const CEvent* pEvent) 
+void CTaskSA::StopTimer(const CEvent* pEvent)
 {
     DEBUG_TRACE("void CTaskSA::StopTimer(const CEvent* pEvent)");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->StopTimer;
-    if ( dwFunc != 0x82263A  && dwFunc )
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -156,18 +150,19 @@ void CTaskSA::StopTimer(const CEvent* pEvent)
 /**
  * \todo Handle pEvent correctly to convert it
  */
-bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent) 
+bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)
 {
     DEBUG_TRACE("bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return false;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return false;
 
-    DWORD dwPedInterface = (DWORD) pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD) this->GetInterface ();
-    DWORD dwFunc = this->GetInterface ()->VTBL->MakeAbortable;
-    bool bReturn = 0;
-    if ( dwFunc != 0x82263A  && dwFunc ) // 82263A = purecall
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = this->GetInterface()->VTBL->MakeAbortable;
+    bool  bReturn = 0;
+    if (dwFunc != 0x82263A && dwFunc)            // 82263A = purecall
     {
         _asm
         {
@@ -186,8 +181,8 @@ const char* CTaskSA::GetTaskName()
 {
     DEBUG_TRACE("char * CTaskSA::GetTaskName()");
     int iTaskType = GetTaskType();
-    if ( iTaskType != NO_TASK_TYPE )
-        if ( TaskNames[iTaskType].szName )
+    if (iTaskType != NO_TASK_TYPE)
+        if (TaskNames[iTaskType].szName)
             return TaskNames[iTaskType].szName;
         else
             return "";
@@ -199,13 +194,13 @@ void CTaskSA::Destroy()
 {
     DEBUG_TRACE("void CTaskSA::Destroy()");
 
-    if ( m_bBeingDestroyed ) // we want to make sure we don't delete this twice or we get crashes :)
-        return;              // our hook in CTaskManagementSystem will try to delete this otherwise
+    if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
+        return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
 
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->DeletingDestructor;
-    if ( dwFunc )
+    if (dwFunc)
     {
         _asm
         {
@@ -234,40 +229,40 @@ void CTaskSA::DestroyJustThis()
 {
     DEBUG_TRACE("void CTaskSA::DestroyJustThis()");
 
-    if ( m_bBeingDestroyed ) // we want to make sure we don't delete this twice or we get crashes :)
-        return;              // our hook in CTaskManagementSystem will try to delete this otherwise
+    if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
+        return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
 
     delete this;
 }
 
-void CTaskSA::SetAsPedTask ( CPed * pPed, const int iTaskPriority, const bool bForceNewTask )
+void CTaskSA::SetAsPedTask(CPed* pPed, const int iTaskPriority, const bool bForceNewTask)
 {
-    ((CTaskManagerSA*)pPed->GetPedIntelligence()->GetTaskManager())->SetTask ( this, iTaskPriority, bForceNewTask );
+    ((CTaskManagerSA*)pPed->GetPedIntelligence()->GetTaskManager())->SetTask(this, iTaskPriority, bForceNewTask);
 }
 
-void CTaskSA::SetAsSecondaryPedTask ( CPed * pPed, const int iType )
+void CTaskSA::SetAsSecondaryPedTask(CPed* pPed, const int iType)
 {
-    ((CTaskManagerSA*)pPed->GetPedIntelligence()->GetTaskManager())->SetTaskSecondary ( this, iType );
+    ((CTaskManagerSA*)pPed->GetPedIntelligence()->GetTaskManager())->SetTaskSecondary(this, iType);
 }
-
 
 // ####################################################################
 // ## CTaskSimple Functions
 // ####################################################################
 
-bool CTaskSimpleSA::ProcessPed ( CPed* pPed )
+bool CTaskSimpleSA::ProcessPed(CPed* pPed)
 {
     DEBUG_TRACE("bool CTaskSimpleSA::ProcessPed(CPed* pPed)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return false;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return false;
 
-    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    DWORD dwFunc = ((TaskSimpleVTBL *)this->GetInterface ()->VTBL)->ProcessPed;
-    bool bReturn = 0;
-    if ( dwFunc != 0x82263A && dwFunc )
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = ((TaskSimpleVTBL*)this->GetInterface()->VTBL)->ProcessPed;
+    bool  bReturn = 0;
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -280,18 +275,19 @@ bool CTaskSimpleSA::ProcessPed ( CPed* pPed )
     return bReturn;
 }
 
-bool CTaskSimpleSA::SetPedPosition ( CPed* pPed )
+bool CTaskSimpleSA::SetPedPosition(CPed* pPed)
 {
     DEBUG_TRACE("bool CTaskSimpleSA::SetPedPosition(CPed* pPed)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return false;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return false;
 
-    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    DWORD dwFunc = ((TaskSimpleVTBL *)this->GetInterface ()->VTBL)->SetPedPosition;
-    bool bReturn = 0;
-    if ( dwFunc != 0x82263A && dwFunc )
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = ((TaskSimpleVTBL*)this->GetInterface()->VTBL)->SetPedPosition;
+    bool  bReturn = 0;
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -317,19 +313,18 @@ CTaskComplexSA::CTaskComplexSA()
 }
 */
 
-
 void CTaskComplexSA::SetSubTask(CTask* pSubTask)
 {
     DEBUG_TRACE("void CTaskComplexSA::SetSubTask(CTask* pSubTask)");
-/*  if(this->m_pSubTask)
-        delete this->m_pSubTask;
-    else
-        this->m_pSubTask = pSubTask;*/
+    /*  if(this->m_pSubTask)
+            delete this->m_pSubTask;
+        else
+            this->m_pSubTask = pSubTask;*/
 
     DWORD dwTaskInterface = (DWORD)pSubTask->GetInterface();
     DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL *)this->GetInterface()->VTBL)->SetSubTask;
-    if ( dwFunc != 0x82263A  && dwFunc )
+    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->SetSubTask;
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -340,18 +335,19 @@ void CTaskComplexSA::SetSubTask(CTask* pSubTask)
     }
 }
 
-CTask * CTaskComplexSA::CreateNextSubTask ( CPed* pPed )
+CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
 {
     DEBUG_TRACE("CTask * CTaskComplexSA::CreateNextSubTask(CPed* pPed)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return NULL;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return NULL;
 
-    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    DWORD dwFunc = ((TaskComplexVTBL *)this->GetInterface ()->VTBL)->CreateNextSubTask;
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->CreateNextSubTask;
     DWORD dwReturn = 0;
-    if ( dwFunc != 0x82263A && dwFunc )
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -361,21 +357,22 @@ CTask * CTaskComplexSA::CreateNextSubTask ( CPed* pPed )
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask ( ( CTaskSAInterface * ) dwReturn );
+    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
 }
 
-CTask * CTaskComplexSA::CreateFirstSubTask ( CPed* pPed )
+CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
 {
     DEBUG_TRACE("CTask * CTaskComplexSA::CreateFirstSubTask(CPed* pPed)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return NULL;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return NULL;
 
-    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    DWORD dwFunc = ((TaskComplexVTBL *)this->GetInterface ()->VTBL)->CreateFirstSubTask;
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->CreateFirstSubTask;
     DWORD dwReturn = 0;
-    if ( dwFunc != 0x82263A && dwFunc )
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -385,21 +382,22 @@ CTask * CTaskComplexSA::CreateFirstSubTask ( CPed* pPed )
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask ( ( CTaskSAInterface * ) dwReturn );
+    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
 }
 
-CTask * CTaskComplexSA::ControlSubTask ( CPed* pPed )
+CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
 {
     DEBUG_TRACE("CTask * CTaskComplexSA::ControlSubTask(CPed* pPed)");
 
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return NULL;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return NULL;
 
-    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface ();
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    DWORD dwFunc = ((TaskComplexVTBL *)this->GetInterface ()->VTBL)->ControlSubTask;
+    DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
+    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->ControlSubTask;
     DWORD dwReturn = 0;
-    if ( dwFunc != 0x82263A && dwFunc )
+    if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
         {
@@ -409,6 +407,5 @@ CTask * CTaskComplexSA::ControlSubTask ( CPed* pPed )
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask ( ( CTaskSAInterface * ) dwReturn );
+    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
 }
-

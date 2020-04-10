@@ -1,27 +1,42 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAnimBlendAssocGroupSA.cpp
-*  PURPOSE:     Animation blend association group
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAnimBlendAssocGroupSA.cpp
+ *  PURPOSE:     Animation blend association group
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA ( CAnimBlendAssocGroupSAInterface * pInterface )
+CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface)
 {
     m_pInterface = pInterface;
     m_pAnimBlock = NULL;
-    SetupAnimBlock ();
+    SetupAnimBlock();
 }
 
-void CAnimBlendAssocGroupSA::InitEmptyAssociations ( RpClump * pClump )
+CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned int AnimID)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;
+
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    AnimID
+        call    dwFunc
+        mov     pAnimAssociationReturn, eax
+    }
+    return pAnimAssociationReturn;
+}
+
+void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
+{
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_InitEmptyAssociations;
     _asm
     {
@@ -31,25 +46,24 @@ void CAnimBlendAssocGroupSA::InitEmptyAssociations ( RpClump * pClump )
     }
 }
 
-bool CAnimBlendAssocGroupSA::IsCreated ( void )
+bool CAnimBlendAssocGroupSA::IsCreated()
 {
-    bool bReturn;
-    DWORD dwThis = ( DWORD ) m_pInterface;    
+    bool  bReturn;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_IsCreated;
     _asm
     {
         mov     ecx, dwThis
         call    dwFunc
-        mov     al, bReturn
+        mov     bReturn, al
     }
     return bReturn;
 }
 
-
-int CAnimBlendAssocGroupSA::GetNumAnimations ( void )
+int CAnimBlendAssocGroupSA::GetNumAnimations()
 {
-    int iReturn;
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    int   iReturn;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_GetNumAnimations;
     _asm
     {
@@ -60,23 +74,21 @@ int CAnimBlendAssocGroupSA::GetNumAnimations ( void )
     return iReturn;
 }
 
-
-CAnimBlock * CAnimBlendAssocGroupSA::GetAnimBlock ( void )
+CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
 {
-    SetupAnimBlock ();      
+    SetupAnimBlock();
 
     return m_pAnimBlock;
 }
 
-
-CAnimBlendStaticAssociation * CAnimBlendAssocGroupSA::GetAnimation ( unsigned int ID )
+CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int ID)
 {
     // ppAssociations [ ID - this->iIDOffset ] ??
-    CAnimBlendStaticAssociation * pReturn;
-    DWORD dwThis = ( DWORD ) m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
+    CAnimBlendStaticAssociation* pReturn;
+    DWORD                        dwThis = (DWORD)m_pInterface;
+    DWORD                        dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
     _asm
-    {        
+    {
         mov     ecx, dwThis
         push    ID
         call    dwFunc
@@ -85,20 +97,28 @@ CAnimBlendStaticAssociation * CAnimBlendAssocGroupSA::GetAnimation ( unsigned in
     return pReturn;
 }
 
+AssocGroupId CAnimBlendAssocGroupSA::GetGroupID()
+{ 
+    if ((DWORD)m_pInterface < 0x250)
+    {
+        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface",
+            SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
+    }
+    return m_pInterface->groupID; 
+};
 
-bool CAnimBlendAssocGroupSA::IsLoaded ( void )
+bool CAnimBlendAssocGroupSA::IsLoaded()
 {
-    if ( m_pInterface->pAnimBlock )
+    if (m_pInterface->pAnimBlock)
     {
         return m_pInterface->pAnimBlock->bLoaded;
     }
     return false;
 }
 
-
-void CAnimBlendAssocGroupSA::CreateAssociations ( const char * szBlockName )
+void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CreateAssociations;
     _asm
     {
@@ -108,19 +128,19 @@ void CAnimBlendAssocGroupSA::CreateAssociations ( const char * szBlockName )
     }
 }
 
-
-void CAnimBlendAssocGroupSA::SetupAnimBlock ( void )
+void CAnimBlendAssocGroupSA::SetupAnimBlock()
 {
     // Make sure our AnimBlock matches up with our interface's
-    CAnimBlockSAInterface * pCurrent = ( m_pAnimBlock ) ? m_pAnimBlock->m_pInterface : NULL;
-    CAnimBlockSAInterface * pActual = m_pInterface->pAnimBlock;
-    if ( pCurrent != pActual )
+    CAnimBlockSAInterface* pCurrent = (m_pAnimBlock) ? m_pAnimBlock->m_pInterface : NULL;
+    CAnimBlockSAInterface* pActual = m_pInterface->pAnimBlock;
+    if (pCurrent != pActual)
     {
-        if ( m_pAnimBlock )
+        if (m_pAnimBlock)
         {
             delete m_pAnimBlock;
             m_pAnimBlock = NULL;
         }
-        if ( pActual ) m_pAnimBlock = new CAnimBlockSA ( pActual );
+        if (pActual)
+            m_pAnimBlock = new CAnimBlockSA(pActual);
     }
 }

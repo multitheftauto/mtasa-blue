@@ -1,29 +1,28 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLArrayImpl.cpp
-*  PURPOSE:     XML array class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLArrayImpl.cpp
+ *  PURPOSE:     XML array class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
 #define XML_ARRAY_BASE_ID 0x01000000
 
 CStack<unsigned long, 1> CXMLArray::m_IDStack;
-std::vector<CXMLCommon *> CXMLArray::m_Elements;
-unsigned long CXMLArray::m_ulCapacity = 0;
+std::vector<CXMLCommon*> CXMLArray::m_Elements;
+unsigned long            CXMLArray::m_ulCapacity = 0;
 
-void CXMLArray::Initialize(void)
+void CXMLArray::Initialize()
 {
     m_ulCapacity = 0;
     ExpandBy(20000);
 }
 
-unsigned long CXMLArray::PopUniqueID(CXMLCommon *pEntry)
+unsigned long CXMLArray::PopUniqueID(CXMLCommon* pEntry)
 {
     // Add more ID's if required
     if (m_IDStack.GetUnusedAmount() < 10000)
@@ -33,13 +32,11 @@ unsigned long CXMLArray::PopUniqueID(CXMLCommon *pEntry)
 
     // Grab the next unused ID
     unsigned long ulPhysicalIndex;
-    bool bSuccess = m_IDStack.Pop(ulPhysicalIndex);
+    bool          bSuccess = m_IDStack.Pop(ulPhysicalIndex);
     assert(bSuccess);
 
     // Checks
-    assert((ulPhysicalIndex != INVALID_XML_ID) &&
-           (ulPhysicalIndex <= m_ulCapacity) &&
-           (m_Elements.size() > ulPhysicalIndex) &&
+    assert((ulPhysicalIndex != INVALID_XML_ID) && (ulPhysicalIndex <= m_ulCapacity) && (m_Elements.size() > ulPhysicalIndex) &&
            (m_Elements[ulPhysicalIndex] == NULL));
 
     m_Elements[ulPhysicalIndex] = pEntry;
@@ -55,19 +52,18 @@ void CXMLArray::PushUniqueID(unsigned long ulLogicalID)
     unsigned long ulPhysicalIndex = ulLogicalID - XML_ARRAY_BASE_ID;
 
     // Checks
-    assert((ulLogicalID != INVALID_XML_ID) && (ulPhysicalIndex <= m_ulCapacity) &&
-           (m_Elements[ulPhysicalIndex]));
+    assert((ulLogicalID != INVALID_XML_ID) && (ulPhysicalIndex <= m_ulCapacity) && (m_Elements[ulPhysicalIndex]));
 
     m_IDStack.Push(ulPhysicalIndex);
     m_Elements[ulPhysicalIndex] = NULL;
 }
 
-void CXMLArray::PushUniqueID(CXMLCommon *pEntry)
+void CXMLArray::PushUniqueID(CXMLCommon* pEntry)
 {
     PushUniqueID(pEntry->GetID());
 }
 
-CXMLCommon *CXMLArray::GetEntry(unsigned long ulLogicalID)
+CXMLCommon* CXMLArray::GetEntry(unsigned long ulLogicalID)
 {
     // Return the element with the given ID
 
@@ -89,9 +85,9 @@ void CXMLArray::ExpandBy(unsigned long ulAmount)
     assert(m_IDStack.GetCapacity() == m_ulCapacity);
 }
 
-unsigned long CXMLArray::GetCapacity() 
-{ 
-    return m_ulCapacity; 
+unsigned long CXMLArray::GetCapacity()
+{
+    return m_ulCapacity;
 }
 
 unsigned long CXMLArray::GetUnusedAmount()

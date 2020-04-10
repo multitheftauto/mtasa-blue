@@ -1,78 +1,78 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        gui/CGUIWebBrowser_Impl.cpp
-*  PURPOSE:     WebBrowser widget class
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        gui/CGUIWebBrowser_Impl.cpp
+ *  PURPOSE:     WebBrowser widget class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 #include <core/CWebViewInterface.h>
 
-CGUIWebBrowser_Impl::CGUIWebBrowser_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
+CGUIWebBrowser_Impl::CGUIWebBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     // Initialize
-    m_pImagesetManager  = pGUI->GetImageSetManager ();
-    m_pImageset         = nullptr;
-    m_pImage            = nullptr;
-    m_pGUI              = pGUI;
-    m_pManager          = pGUI;
-    m_pWebView          = nullptr;
+    m_pImagesetManager = pGUI->GetImageSetManager();
+    m_pImageset = nullptr;
+    m_pImage = nullptr;
+    m_pGUI = pGUI;
+    m_pManager = pGUI;
+    m_pWebView = nullptr;
 
     // Get an unique identifier for CEGUI
-    char szUnique [CGUI_CHAR_SIZE];
-    pGUI->GetUniqueName ( szUnique );
+    char szUnique[CGUI_CHAR_SIZE];
+    pGUI->GetUniqueName(szUnique);
 
     // Create the control and set default properties
-    m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIWEBBROWSER_NAME, szUnique );
-    m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect ( 0.0f, 0.0f, 1.0f, 1.0f ) );
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setBackgroundEnabled ( false );
+    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUIWEBBROWSER_NAME, szUnique);
+    m_pWindow->setDestroyedByParent(false);
+    m_pWindow->setRect(CEGUI::Relative, CEGUI::Rect(0.0f, 0.0f, 1.0f, 1.0f));
+    reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setBackgroundEnabled(false);
 
     // Store the pointer to this CGUI element in the CEGUI element
-    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    m_pWindow->setUserData(reinterpret_cast<void*>(this));
 
-    AddEvents ();
+    AddEvents();
 
     // Apply browser events
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseButtonDown, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonUp, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseButtonUp, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseMove, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseMove, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseWheel, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseWheel, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventActivated, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_Activated, this ) );
-    m_pWindow->subscribeEvent ( CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_Deactivated, this ) );
+    m_pWindow->subscribeEvent(CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_MouseButtonDown, this));
+    m_pWindow->subscribeEvent(CEGUI::Window::EventMouseButtonUp, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_MouseButtonUp, this));
+    m_pWindow->subscribeEvent(CEGUI::Window::EventMouseMove, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_MouseMove, this));
+    m_pWindow->subscribeEvent(CEGUI::Window::EventMouseWheel, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_MouseWheel, this));
+    m_pWindow->subscribeEvent(CEGUI::Window::EventActivated, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_Activated, this));
+    m_pWindow->subscribeEvent(CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber(&CGUIWebBrowser_Impl::Event_Deactivated, this));
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
-    if ( pParent )
+    if (pParent)
     {
-        SetParent ( pParent );
+        SetParent(pParent);
     }
     else
     {
-        pGUI->AddChild ( this );
-        SetParent ( nullptr );
+        pGUI->AddChild(this);
+        SetParent(nullptr);
     }
 }
 
-CGUIWebBrowser_Impl::~CGUIWebBrowser_Impl ()
+CGUIWebBrowser_Impl::~CGUIWebBrowser_Impl()
 {
     Clear();
 
-    DestroyElement ();
+    DestroyElement();
 }
 
-void CGUIWebBrowser_Impl::Clear ()
+void CGUIWebBrowser_Impl::Clear()
 {
     // Stop the control from using it
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( nullptr );
+    reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setImage(nullptr);
 
     // Kill the images
-    if ( m_pImageset )
+    if (m_pImageset)
     {
-        m_pImageset->undefineAllImages ();
-        m_pImagesetManager->destroyImageset ( m_pImageset );
+        m_pImageset->undefineAllImages();
+        m_pImagesetManager->destroyImageset(m_pImageset);
         m_pImage = nullptr;
         m_pImageset = nullptr;
     }
@@ -106,37 +106,36 @@ void CGUIWebBrowser_Impl::LoadFromWebView(CWebViewInterface* pWebView)
 
     // Define an image and get its pointer
     m_pImageset->defineImage(szUnique, CEGUI::Point(0, 0), CEGUI::Size(pCEGUITexture->getWidth(), pCEGUITexture->getHeight()), CEGUI::Point(0, 0));
-    m_pImage = const_cast<CEGUI::Image*>(&m_pImageset->getImage(szUnique)); // const_cast here is a huge hack, but is okay here since all images generated here are unique
+    m_pImage = const_cast<CEGUI::Image*>(
+        &m_pImageset->getImage(szUnique));            // const_cast here is a huge hack, but is okay here since all images generated here are unique
 
     // Set the image just loaded as the image to be drawn for the widget
     reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setImage(m_pImage);
 }
 
-void CGUIWebBrowser_Impl::SetFrameEnabled ( bool bFrameEnabled )
+void CGUIWebBrowser_Impl::SetFrameEnabled(bool bFrameEnabled)
 {
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setFrameEnabled ( bFrameEnabled );
+    reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
 }
 
-
-bool CGUIWebBrowser_Impl::IsFrameEnabled ()
+bool CGUIWebBrowser_Impl::IsFrameEnabled()
 {
-    return reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> isFrameEnabled ();
+    return reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->isFrameEnabled();
 }
 
-
-CEGUI::Image* CGUIWebBrowser_Impl::GetDirectImage ()
+CEGUI::Image* CGUIWebBrowser_Impl::GetDirectImage()
 {
-    return const_cast < CEGUI::Image* > ( reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) ->getImage () );
+    return const_cast<CEGUI::Image*>(reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->getImage());
 }
 
-void CGUIWebBrowser_Impl::Render ()
+void CGUIWebBrowser_Impl::Render()
 {
-    return reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> render ();
+    return reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->render();
 }
 
-bool CGUIWebBrowser_Impl::HasInputFocus ()
+bool CGUIWebBrowser_Impl::HasInputFocus()
 {
-    return m_pWebView->HasInputFocus ();
+    return m_pWebView->HasInputFocus();
 }
 
 void CGUIWebBrowser_Impl::SetSize(const CVector2D& vecSize, bool bRelative)
@@ -154,62 +153,61 @@ void CGUIWebBrowser_Impl::SetSize(const CVector2D& vecSize, bool bRelative)
         m_pWebView->Resize(absSize);
 }
 
-bool CGUIWebBrowser_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& e)
 {
-    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+    const CEGUI::MouseEventArgs& args = reinterpret_cast<const CEGUI::MouseEventArgs&>(e);
 
-    if ( args.button == CEGUI::MouseButton::LeftButton )
-        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT );
-    else if ( args.button == CEGUI::MouseButton::MiddleButton )
-        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE );
-    else if ( args.button == CEGUI::MouseButton::RightButton )
-        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT );
+    if (args.button == CEGUI::MouseButton::LeftButton)
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT);
+    else if (args.button == CEGUI::MouseButton::MiddleButton)
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE);
+    else if (args.button == CEGUI::MouseButton::RightButton)
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT);
 
     return true;
 }
 
-bool CGUIWebBrowser_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_MouseButtonUp(const CEGUI::EventArgs& e)
 {
-    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+    const CEGUI::MouseEventArgs& args = reinterpret_cast<const CEGUI::MouseEventArgs&>(e);
 
-    if ( args.button == CEGUI::MouseButton::LeftButton )
-        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT );
-    else if ( args.button == CEGUI::MouseButton::MiddleButton )
-        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE );
-    else if ( args.button == CEGUI::MouseButton::RightButton )
-        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT );
+    if (args.button == CEGUI::MouseButton::LeftButton)
+        m_pWebView->InjectMouseUp(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT);
+    else if (args.button == CEGUI::MouseButton::MiddleButton)
+        m_pWebView->InjectMouseUp(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE);
+    else if (args.button == CEGUI::MouseButton::RightButton)
+        m_pWebView->InjectMouseUp(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT);
 
     return true;
 }
 
-bool CGUIWebBrowser_Impl::Event_MouseMove ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_MouseMove(const CEGUI::EventArgs& e)
 {
-    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
-    
-    m_pWebView->InjectMouseMove ( (int)(args.position.d_x - m_pWindow->windowToScreenX ( 0.0f )), (int)(args.position.d_y - m_pWindow->windowToScreenY ( 0.0f )) );
+    const CEGUI::MouseEventArgs& args = reinterpret_cast<const CEGUI::MouseEventArgs&>(e);
+
+    m_pWebView->InjectMouseMove((int)(args.position.d_x - m_pWindow->windowToScreenX(0.0f)), (int)(args.position.d_y - m_pWindow->windowToScreenY(0.0f)));
     return true;
 }
 
-bool CGUIWebBrowser_Impl::Event_MouseWheel ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_MouseWheel(const CEGUI::EventArgs& e)
 {
-    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
-    
-    m_pWebView->InjectMouseWheel ( (int)(args.wheelChange * 40), 0 );
+    const CEGUI::MouseEventArgs& args = reinterpret_cast<const CEGUI::MouseEventArgs&>(e);
+
+    m_pWebView->InjectMouseWheel((int)(args.wheelChange * 40), 0);
     return true;
 }
 
-bool CGUIWebBrowser_Impl::Event_Activated ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_Activated(const CEGUI::EventArgs& e)
 {
-    m_pWebView->Focus ( true );
+    m_pWebView->Focus(true);
     return true;
 }
 
-bool CGUIWebBrowser_Impl::Event_Deactivated ( const CEGUI::EventArgs& e )
+bool CGUIWebBrowser_Impl::Event_Deactivated(const CEGUI::EventArgs& e)
 {
-    m_pWebView->Focus ( false );
+    m_pWebView->Focus(false);
     return true;
 }
-
 
 CGUIWebBrowserTexture::CGUIWebBrowserTexture(CEGUI::Renderer* pOwner, CWebViewInterface* pWebView) : CEGUI::DirectX9Texture(pOwner), m_pWebView(pWebView)
 {

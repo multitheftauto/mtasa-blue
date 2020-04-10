@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Enums.h
-*  PURPOSE:     Client/server shared enum definitions
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Enums.h
+ *  PURPOSE:     Client/server shared enum definitions
+ *
+ *****************************************************************************/
 #pragma once
 
 namespace EEventPriority
@@ -19,8 +19,7 @@ namespace EEventPriority
 }
 using EEventPriority::EEventPriorityType;
 
-DECLARE_ENUM( EEventPriority::EEventPriorityType )
-
+DECLARE_ENUM(EEventPriority::EEventPriorityType)
 
 namespace EPlayerScreenShotResult
 {
@@ -35,8 +34,7 @@ namespace EPlayerScreenShotResult
 }
 using EPlayerScreenShotResult::EPlayerScreenShotResultType;
 
-DECLARE_ENUM( EPlayerScreenShotResult::EPlayerScreenShotResultType )
-
+DECLARE_ENUM(EPlayerScreenShotResult::EPlayerScreenShotResultType)
 
 namespace EDebugHook
 {
@@ -46,12 +44,14 @@ namespace EDebugHook
         POST_EVENT,
         PRE_FUNCTION,
         POST_FUNCTION,
+        PRE_EVENT_FUNCTION,
+        POST_EVENT_FUNCTION,
+        MAX_DEBUG_HOOK_TYPE
     };
 }
 using EDebugHook::EDebugHookType;
 
-DECLARE_ENUM( EDebugHook::EDebugHookType );
-
+DECLARE_ENUM(EDebugHook::EDebugHookType);
 
 enum eEulerRotationOrder
 {
@@ -61,7 +61,10 @@ enum eEulerRotationOrder
     EULER_MINUS_ZYX,
 };
 
-DECLARE_ENUM( eEulerRotationOrder );
+DECLARE_ENUM(eEulerRotationOrder);
 
-DECLARE_ENUM( EHashFunction::EHashFunctionType );
-DECLARE_ENUM( ePacketID );
+DECLARE_ENUM(EHashFunction::EHashFunctionType);
+DECLARE_ENUM_CLASS(PasswordHashFunction);
+DECLARE_ENUM_CLASS(StringEncryptFunction);
+
+DECLARE_ENUM(ePacketID);

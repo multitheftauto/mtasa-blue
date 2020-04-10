@@ -551,7 +551,6 @@ LUA_API int lua_pushthread (lua_State *L) {
 }
 
 
-
 /*
 ** get functions (Lua -> stack)
 */
@@ -1128,3 +1127,10 @@ LUA_API int luaX_is_apicheck_enabled()
     return 0;
 }
 #endif
+
+// MTA addition to tweak GC behaviour
+LUA_API void lua_addtotalbytes(lua_State *L, int n)
+{
+    global_State *g = G(L);
+    g->totalbytes += n;
+}

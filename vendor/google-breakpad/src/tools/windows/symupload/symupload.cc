@@ -228,12 +228,14 @@ int wmain(int argc, wchar_t *argv[]) {
     fwprintf(stderr, L"Warning: Could not get file version for %s\n", module);
   }
 
+  map<wstring, wstring> files;
+  files[L"symbol_file"] = symbol_file;
+
   bool success = true;
 
   while (currentarg < argc) {
     int response_code;
-    if (!HTTPUpload::SendRequest(argv[currentarg], parameters,
-                                 symbol_file, L"symbol_file",
+    if (!HTTPUpload::SendRequest(argv[currentarg], parameters, files,
                                  timeout == -1 ? NULL : &timeout,
                                  nullptr, &response_code)) {
       success = false;
@@ -247,7 +249,7 @@ int wmain(int argc, wchar_t *argv[]) {
   _wunlink(symbol_file.c_str());
 
   if (success) {
-    wprintf(L"Uploaded symbols for windows-%s/%s/%s (%s %s)\n",
+    wprintf(L"Uploaded breakpad symbols for windows-%s/%s/%s (%s %s)\n",
             pdb_info.cpu.c_str(), pdb_info.debug_file.c_str(),
             pdb_info.debug_identifier.c_str(), code_file.c_str(),
             file_version.c_str());

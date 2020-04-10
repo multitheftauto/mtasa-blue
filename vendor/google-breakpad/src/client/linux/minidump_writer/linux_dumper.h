@@ -49,7 +49,8 @@
 
 #include "client/linux/dump_writer_common/mapping_info.h"
 #include "client/linux/dump_writer_common/thread_info.h"
-#include "common/memory.h"
+#include "common/linux/file_id.h"
+#include "common/memory_allocator.h"
 #include "google_breakpad/common/minidump_format.h"
 
 namespace google_breakpad {
@@ -72,7 +73,9 @@ const char kLinuxGateLibraryName[] = "linux-gate.so";
 
 class LinuxDumper {
  public:
-  explicit LinuxDumper(pid_t pid);
+  // The |root_prefix| is prepended to mapping paths before opening them, which
+  // is useful if the crash originates from a chroot.
+  explicit LinuxDumper(pid_t pid, const char* root_prefix = "");
 
   virtual ~LinuxDumper();
 
@@ -96,10 +99,22 @@ class LinuxDumper {
   // Returns true on success. One must have called |ThreadsSuspend| first.
   virtual bool GetThreadInfoByIndex(size_t index, ThreadInfo* info) = 0;
 
+  size_t GetMainThreadIndex() const {
+    for (size_t i = 0; i < threads_.size(); ++i) {
+      if (threads_[i] == pid_) return i;
+    }
+    return -1u;
+  }
+
   // These are only valid after a call to |Init|.
   const wasteful_vector<pid_t> &threads() { return threads_; }
   const wasteful_vector<MappingInfo*> &mappings() { return mappings_; }
   const MappingInfo* FindMapping(const void* address) const;
+  // Find the mapping which the given memory address falls in. Unlike
+  // FindMapping, this method uses the unadjusted mapping address
+  // ranges from the kernel, rather than the ranges that have had the
+  // load bias applied.
+  const MappingInfo* FindMappingNoBias(uintptr_t address) const;
   const wasteful_vector<elf_aux_val_t>& auxv() { return auxv_; }
 
   // Find a block of memory to take as the stack given the top of stack pointer.
@@ -107,6 +122,32 @@ class LinuxDumper {
   //   stack_len: (output) the length of the memory area
   //   stack_top: the current top of the stack
   bool GetStackInfo(const void** stack, size_t* stack_len, uintptr_t stack_top);
+
+  // Sanitize a copy of the stack by overwriting words that are not
+  // pointers with a sentinel (0x0defaced).
+  //   stack_copy: a copy of the stack to sanitize. |stack_copy| might
+  //               not be word aligned, but it represents word aligned
+  //               data copied from another location.
+  //   stack_len: the length of the allocation pointed to by |stack_copy|.
+  //   stack_pointer: the address of the stack pointer (used to locate
+  //                  the stack mapping, as an optimization).
+  //   sp_offset: the offset relative to stack_copy that reflects the
+  //              current value of the stack pointer.
+  void SanitizeStackCopy(uint8_t* stack_copy, size_t stack_len,
+                         uintptr_t stack_pointer, uintptr_t sp_offset);
+
+  // Test whether |stack_copy| contains a pointer-aligned word that
+  // could be an address within a given mapping.
+  //   stack_copy: a copy of the stack to check. |stack_copy| might
+  //               not be word aligned, but it represents word aligned
+  //               data copied from another location.
+  //   stack_len: the length of the allocation pointed to by |stack_copy|.
+  //   sp_offset: the offset relative to stack_copy that reflects the
+  //              current value of the stack pointer.
+  //   mapping: the mapping against which to test stack words.
+  bool StackHasPointerToMapping(const uint8_t* stack_copy, size_t stack_len,
+                                uintptr_t sp_offset,
+                                const MappingInfo& mapping);
 
   PageAllocator* allocator() { return &allocator_; }
 
@@ -127,7 +168,7 @@ class LinuxDumper {
   bool ElfFileIdentifierForMapping(const MappingInfo& mapping,
                                    bool member,
                                    unsigned int mapping_id,
-                                   uint8_t identifier[sizeof(MDGUID)]);
+                                   wasteful_vector<uint8_t>& identifier);
 
   uintptr_t crash_address() const { return crash_address_; }
   void set_crash_address(uintptr_t crash_address) {
@@ -136,20 +177,26 @@ class LinuxDumper {
 
   int crash_signal() const { return crash_signal_; }
   void set_crash_signal(int crash_signal) { crash_signal_ = crash_signal; }
+  const char* GetCrashSignalString() const;
 
   pid_t crash_thread() const { return crash_thread_; }
   void set_crash_thread(pid_t crash_thread) { crash_thread_ = crash_thread; }
+
+  // Concatenates the |root_prefix_| and |mapping| path. Writes into |path| and
+  // returns true unless the string is too long.
+  bool GetMappingAbsolutePath(const MappingInfo& mapping,
+                              char path[PATH_MAX]) const;
 
   // Extracts the effective path and file name of from |mapping|. In most cases
   // the effective name/path are just the mapping's path and basename. In some
   // other cases, however, a library can be mapped from an archive (e.g., when
   // loading .so libs from an apk on Android) and this method is able to
   // reconstruct the original file name.
-  static void GetMappingEffectiveNameAndPath(const MappingInfo& mapping,
-                                             char* file_path,
-                                             size_t file_path_size,
-                                             char* file_name,
-                                             size_t file_name_size);
+  void GetMappingEffectiveNameAndPath(const MappingInfo& mapping,
+                                      char* file_path,
+                                      size_t file_path_size,
+                                      char* file_name,
+                                      size_t file_name_size);
 
  protected:
   bool ReadAuxv();
@@ -171,6 +218,9 @@ class LinuxDumper {
 
    // ID of the crashed process.
   const pid_t pid_;
+
+  // Path of the root directory to which mapping paths are relative.
+  const char* const root_prefix_;
 
   // Virtual address at which the process crashed.
   uintptr_t crash_address_;

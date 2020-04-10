@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTextSA.h
-*  PURPOSE:     Header file for text rendering class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CTextSA.h
+ *  PURPOSE:     Header file for text rendering class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_TEXT
-#define __CGAMESA_TEXT
+#pragma once
 
 #include <game/CText.h>
 
@@ -29,9 +27,7 @@ class CTextSA : public CText
 {
 public:
     CTextSA();
-    char    * GetText(char * szKey);
-    void    SetText(char * szKey, char * szValue);
-    //char  * GetReplacementText ( char * szKey );
+    char* GetText(char* szKey);
+    void  SetText(char* szKey, char* szValue);
+    // char  * GetReplacementText ( char * szKey );
 };
-
-#endif

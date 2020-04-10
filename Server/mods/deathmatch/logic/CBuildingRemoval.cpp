@@ -1,17 +1,16 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CBuildingRemoval.cpp
-*  PURPOSE:
-*  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CBuildingRemoval.cpp
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CBuildingRemoval::CBuildingRemoval ( unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior )
+CBuildingRemoval::CBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior)
 {
     m_usModel = usModel;
     m_fRadius = fRadius;
@@ -19,7 +18,6 @@ CBuildingRemoval::CBuildingRemoval ( unsigned short usModel, float fRadius, cons
     m_cInterior = cInterior;
 }
 
-CBuildingRemoval::~CBuildingRemoval ( )
+CBuildingRemoval::~CBuildingRemoval()
 {
-
 }

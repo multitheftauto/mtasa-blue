@@ -23,7 +23,7 @@
 -- @returns
 --    True if successful, otherwise nil.
 --
-function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
+function os.copydir(src_dir, dst_dir, filter, single_dst_dir, skip_existing)
 	if not os.isdir(src_dir) then error(src_dir .. " is not an existing directory!") end
 	filter = filter or "**"
 	src_dir = src_dir .. "/"
@@ -36,20 +36,30 @@ function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
 	os.chdir( dir ) -- change current directory back to root
 
 	local counter = 0
+	local skipped = 0
 	for k, v in ipairs(matches) do
 		local target = iif(single_dst_dir, path.getname(v), v)
 		--make sure, that directory exists or os.copyfile() fails
 		os.mkdir( path.getdirectory(dst_dir .. target))
-		if os.copyfile( src_dir .. v, dst_dir .. target) then
-			counter = counter + 1
+		if skip_existing and os.isfile( dst_dir .. target ) then
+			skipped = skipped + 1
+		else
+			if os.copyfile( src_dir .. v, dst_dir .. target) then
+				counter = counter + 1
+			end
 		end
 	end
 
-	if counter == #matches then
-		print( counter .. " files copied.")
+	if counter + skipped == #matches then
+		if counter ~= 0 then
+			print( counter .. " files copied.")
+		end
+		if skipped ~= 0 then
+			print( skipped .. " existing files not updated.")
+		end
 		return true
 	else
-		print( "Error: " .. counter .. "/" .. #matches .. " files copied.")
+		print( "Error: " .. #matches - counter - skipped .. "/" .. #matches .. " files failed to copy.")
 		return nil
 	end
 end
@@ -67,27 +77,54 @@ end
 function os.expanddir_wildcard(from, to)
 	local dir = os.matchdirs(from)[1]
 	if not dir then return end
-	
+
 	-- TODO: Optimize this
 	os.copydir(dir, to)
 	os.rmdir(dir)
 end
 
-function os.md5_file(path)
-	if os.get() == "windows" then
-		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
-		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+function os.sha256_file(path)
+	local windows = os.host() == "windows"
+	local s, errc
+	if windows then
+		s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" SHA256", path))
 	else
-		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
+		s, errc = os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end
+
+	-- Check for error
+	if errc ~= 0 then
+		print("Error os.sha256_file: ", errc)
+		return ""
+	end
+
+	-- Clean windows output
+	if windows then
+		s = (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+	end
+
+	return s:lower()
 end
 
 function os.extract_archive(archive_path, target_path, override)
 	local flags = override and "-aoa" or "-aos"
 
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	else
 		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	end
+end
+
+function http.download_print_errors(url, file, options)
+	local result_str, response_code = http.download(url, file, options)
+	if result_str ~= "OK" then
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str .. " (" .. response_code .. ")" )
+		if response_code == 0 then
+			-- No response code means server was unreachable
+			print( "Check premake5 is not blocked by firewall rules" )
+		end
+		return false
+	end
+	return true
 end

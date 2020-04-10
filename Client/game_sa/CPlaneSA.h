@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPlaneSA.h
-*  PURPOSE:     Header file for plane vehicle entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPlaneSA.h
+ *  PURPOSE:     Header file for plane vehicle entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_PLANE
-#define __CGAMESA_PLANE
+#pragma once
 
 #include <game/CPlane.h>
 #include "CAutomobileSA.h"
@@ -26,10 +23,8 @@ class CPlaneSAInterface : public CAutomobileSAInterface
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {
 private:
-//  CBoatSAInterface        * internalInterface;
+    //  CBoatSAInterface        * internalInterface;
 public:
-    CPlaneSA( CPlaneSAInterface * plane );
-    CPlaneSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
+    CPlaneSA(CPlaneSAInterface* plane);
+    CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 };
-
-#endif

@@ -409,7 +409,7 @@ uint Font::getRequiredTextureSize(const String& glyph_set)
     // Make power of 2
     int targetlevel = 1;
     while (size >>= 1) ++targetlevel;
-    size = Max ( 32, 1 << targetlevel );
+    size = std::max (32, 1 << targetlevel);
 
     // Try
     while ( !utilFontGlyphSet( glyph_set, size, NULL, NULL ) )

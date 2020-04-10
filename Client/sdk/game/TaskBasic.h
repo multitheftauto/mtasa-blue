@@ -1,72 +1,69 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/TaskBasic.h
-*  PURPOSE:     Basic task interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/TaskBasic.h
+ *  PURPOSE:     Basic task interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_TASKBASIC
-#define __CGAME_TASKBASIC
+#pragma once
 
 #include "Task.h"
 
 class CTaskComplexUseMobilePhone : public virtual CTaskComplex
 {
 public:
-    virtual                     ~CTaskComplexUseMobilePhone ( void ) {};
+    virtual ~CTaskComplexUseMobilePhone(){};
 };
 
 class CTaskSimpleAnim : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleAnim ( void ) {};
+    virtual ~CTaskSimpleAnim(){};
 };
-
 
 class CTaskSimpleRunAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual                     ~CTaskSimpleRunAnim ( void ) {};
+    virtual ~CTaskSimpleRunAnim(){};
 };
-
 
 class CTaskSimpleRunNamedAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual                     ~CTaskSimpleRunNamedAnim ( void ) {};
+    virtual ~CTaskSimpleRunNamedAnim(){};
 };
 
 class CTaskComplexDie : public virtual CTaskComplex
 {
 public:
-    virtual                     ~CTaskComplexDie ( void ) {};
+    virtual ~CTaskComplexDie(){};
 };
 
 class CTaskSimpleStealthKill : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleStealthKill ( void ) {};
+    virtual ~CTaskSimpleStealthKill(){};
 };
 
 class CTaskSimpleDead : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleDead ( void ) {};
+    virtual ~CTaskSimpleDead(){};
 };
 
 class CTaskSimpleBeHit : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleBeHit ( void ) {};
+    virtual ~CTaskSimpleBeHit(){};
 };
 
 enum eSunbatherType
 {
-    SUNBATHER_MALE_1=0,
+    SUNBATHER_MALE_1 = 0,
     SUNBATHER_MALE_2,
     SUNBATHER_FEMALE_1,
     SUNBATHER_FEMALE_2,
@@ -76,8 +73,8 @@ enum eSunbatherType
 class CTaskComplexSunbathe : public virtual CTaskComplex
 {
 public:
-    virtual                     ~CTaskComplexSunbathe   ( void ) {};
-    virtual void                SetEndTime              ( DWORD dwTime ) = 0;
+    virtual ~CTaskComplexSunbathe(){};
+    virtual void SetEndTime(DWORD dwTime) = 0;
 };
 
 ////////////////////
@@ -86,7 +83,7 @@ public:
 class CTaskSimplePlayerOnFoot : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimplePlayerOnFoot ( void ) {};
+    virtual ~CTaskSimplePlayerOnFoot(){};
 };
 
 ////////////////////
@@ -95,7 +92,5 @@ public:
 class CTaskComplexFacial : public virtual CTaskComplex
 {
 public:
-    virtual                     ~CTaskComplexFacial ( void ) {};
+    virtual ~CTaskComplexFacial(){};
 };
-
-#endif

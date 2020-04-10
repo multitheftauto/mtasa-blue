@@ -1,19 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        loader/Main.h
-*  PURPOSE:     MTA loader
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        loader/Main.h
+ *  PURPOSE:     MTA loader
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __MAIN_H
-#define __MAIN_H
+#pragma once
 
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 #define MTA_HTAEXE_NAME "proxy_sa.exe"
@@ -32,6 +28,4 @@
     #define MTA_DLL_NAME            "core.dll"
     #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1c.dll"
     #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client.dll"
-#endif
-
 #endif

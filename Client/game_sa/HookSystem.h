@@ -1,25 +1,23 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/HookSystem.h
-*  PURPOSE:     Function hook installation system
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/HookSystem.h
+ *  PURPOSE:     Function hook installation system
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __HOOKSYSTEM_H
-#define __HOOKSYSTEM_H
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #define     MAX_JUMPCODE_SIZE           20
 
-BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
-BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
-
+BOOL  HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize);
+BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
 
 // Auto detect requirement of US/EU hook installation
 #define EZHookInstall(type) \
@@ -39,7 +37,6 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
             } \
         }
 
-
 // US/EU hook installation
 // Includes additional return pointer copies if required
 #define EZHookInstall_HERE(type,CO) \
@@ -54,25 +51,23 @@ BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
             RETURN_##type##C_BOTH = RETURN_##type##C_##CO##; \
         }
 
-
 // Structure for holding hook info
 struct SHookInfo
 {
-    template < class T > SHookInfo ( DWORD dwAddress, T dwHook, uint uiSize ): dwAddress ( dwAddress ) , dwHook ( (DWORD)dwHook ) , uiSize ( uiSize ) {}
+    template <class T>
+    SHookInfo(DWORD dwAddress, T dwHook, uint uiSize) : dwAddress(dwAddress), dwHook((DWORD)dwHook), uiSize(uiSize)
+    {
+    }
     DWORD dwAddress;
     DWORD dwHook;
-    uint uiSize;
+    uint  uiSize;
 };
 
 #define MAKE_HOOK_INFO(type)  SHookInfo ( HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type )
-
 
 // Structure for holding poke info
 struct SPokeInfo
 {
     DWORD dwAddress;
-    BYTE ucValue;
+    BYTE  ucValue;
 };
-
-
-#endif

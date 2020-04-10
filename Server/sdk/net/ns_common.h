@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/net/ns_common.h
-*  PURPOSE:     Net common defines
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/net/ns_common.h
+ *  PURPOSE:     Net common defines
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __NS_COMMON_H
-#define __NS_COMMON_H
+#pragma once
 
 #include "net/bitstream.h"
 #include "net/packetenums.h"
@@ -33,7 +32,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER) ( unsigned char, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo* );
+typedef bool (*PPACKETHANDLER)(unsigned char, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo*);
 
 enum NetServerPacketPriority
 {
@@ -49,64 +48,64 @@ enum NetServerPacketReliability
     PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
     PACKET_RELIABILITY_RELIABLE,
     PACKET_RELIABILITY_RELIABLE_ORDERED,
-    PACKET_RELIABILITY_RELIABLE_SEQUENCED   //     Can drop packets
+    PACKET_RELIABILITY_RELIABLE_SEQUENCED            //     Can drop packets
 };
 
 // Copy of raknet statistics
 struct NetRawStatistics
 {
-    unsigned messageSendBuffer[ 4 ];
-    unsigned messagesSent[ 4 ];
-    long long messageDataBitsSent[ 4 ];
-    long long messageTotalBitsSent[ 4 ];
-    unsigned packetsContainingOnlyAcknowlegements;
-    unsigned acknowlegementsSent;
-    unsigned acknowlegementsPending;
+    unsigned  messageSendBuffer[4];
+    unsigned  messagesSent[4];
+    long long messageDataBitsSent[4];
+    long long messageTotalBitsSent[4];
+    unsigned  packetsContainingOnlyAcknowlegements;
+    unsigned  acknowlegementsSent;
+    unsigned  acknowlegementsPending;
     long long acknowlegementBitsSent;
-    unsigned packetsContainingOnlyAcknowlegementsAndResends;
-    unsigned messageResends;
+    unsigned  packetsContainingOnlyAcknowlegementsAndResends;
+    unsigned  messageResends;
     long long messageDataBitsResent;
     long long messagesTotalBitsResent;
-    unsigned messagesOnResendQueue;
-    unsigned numberOfUnsplitMessages;
-    unsigned numberOfSplitMessages;
-    unsigned totalSplits;
-    unsigned packetsSent;
+    unsigned  messagesOnResendQueue;
+    unsigned  numberOfUnsplitMessages;
+    unsigned  numberOfSplitMessages;
+    unsigned  totalSplits;
+    unsigned  packetsSent;
     long long encryptionBitsSent;
     long long totalBitsSent;
-    unsigned sequencedMessagesOutOfOrder;
-    unsigned sequencedMessagesInOrder;
-    unsigned orderedMessagesOutOfOrder;
-    unsigned orderedMessagesInOrder;
-    unsigned packetsReceived;
-    unsigned packetsWithBadCRCReceived;
+    unsigned  sequencedMessagesOutOfOrder;
+    unsigned  sequencedMessagesInOrder;
+    unsigned  orderedMessagesOutOfOrder;
+    unsigned  orderedMessagesInOrder;
+    unsigned  packetsReceived;
+    unsigned  packetsWithBadCRCReceived;
     long long bitsReceived;
     long long bitsWithBadCRCReceived;
-    unsigned acknowlegementsReceived;
-    unsigned duplicateAcknowlegementsReceived;
-    unsigned messagesReceived;
-    unsigned invalidMessagesReceived;
-    unsigned duplicateMessagesReceived;
-    unsigned messagesWaitingForReassembly;
-    unsigned internalOutputQueueSize;
-    double bitsPerSecond;
+    unsigned  acknowlegementsReceived;
+    unsigned  duplicateAcknowlegementsReceived;
+    unsigned  messagesReceived;
+    unsigned  invalidMessagesReceived;
+    unsigned  duplicateMessagesReceived;
+    unsigned  messagesWaitingForReassembly;
+    unsigned  internalOutputQueueSize;
+    double    bitsPerSecond;
     long long connectionStartTime;
-    bool bandwidthExceeded;
+    bool      bandwidthExceeded;
 };
 
 struct NetStatistics
 {
     // Needed for getNetworkStats()
-    unsigned long long  bytesReceived;
-    unsigned long long  bytesSent;
-    uint    packetsReceived;
-    uint    packetsSent;
-    float   packetlossTotal;
-    float   packetlossLastSecond;
-    uint    messagesInSendBuffer;
-    uint    messagesInResendBuffer;
-    bool    isLimitedByCongestionControl;
-    bool    isLimitedByOutgoingBandwidthLimit;
+    unsigned long long bytesReceived;
+    unsigned long long bytesSent;
+    uint               packetsReceived;
+    uint               packetsSent;
+    float              packetlossTotal;
+    float              packetlossLastSecond;
+    uint               messagesInSendBuffer;
+    uint               messagesInResendBuffer;
+    bool               isLimitedByCongestionControl;
+    bool               isLimitedByOutgoingBandwidthLimit;
 
     // Copy of raknet statistics
     NetRawStatistics raw;
@@ -114,45 +113,45 @@ struct NetStatistics
 
 struct SBandwidthStatistics
 {
-    long long llOutgoingUDPByteCount;
-    long long llIncomingUDPByteCount;
-    long long llIncomingUDPByteCountBlocked;
-    long long llOutgoingUDPPacketCount;
-    long long llIncomingUDPPacketCount;
-    long long llIncomingUDPPacketCountBlocked;
-    long long llOutgoingUDPByteResentCount;
-    long long llOutgoingUDPMessageResentCount;
+    long long       llOutgoingUDPByteCount;
+    long long       llIncomingUDPByteCount;
+    long long       llIncomingUDPByteCountBlocked;
+    long long       llOutgoingUDPPacketCount;
+    long long       llIncomingUDPPacketCount;
+    long long       llIncomingUDPPacketCountBlocked;
+    long long       llOutgoingUDPByteResentCount;
+    long long       llOutgoingUDPMessageResentCount;
     SThreadCPUTimes threadCPUTimes;
 };
 
 struct SNetPerformanceStatistics
 {
-    uint uiUpdateCycleRecvTimeAvgUs;
-    uint uiUpdateCycleSendTimeAvgUs;
-    uint uiUpdateCycleRecvTimeMaxUs;
-    uint uiUpdateCycleSendTimeMaxUs;
+    uint  uiUpdateCycleRecvTimeAvgUs;
+    uint  uiUpdateCycleSendTimeAvgUs;
+    uint  uiUpdateCycleRecvTimeMaxUs;
+    uint  uiUpdateCycleSendTimeMaxUs;
     float fUpdateCycleRecvDatagramsAvg;
-    uint uiUpdateCycleRecvDatagramsMax;
+    uint  uiUpdateCycleRecvDatagramsMax;
     float fUpdateCycleDatagramsAvg;
-    uint uiUpdateCycleDatagramsMax;
-    uint uiUpdateCycleDatagramsLimit;
+    uint  uiUpdateCycleDatagramsMax;
+    uint  uiUpdateCycleDatagramsLimit;
     float fUpdateCycleMessagesAvg;
-    uint uiUpdateCycleMessagesMax;
-    uint uiUpdateCycleMessagesLimit;
-    uint uiUpdateCycleSendsLimitedTotal;
+    uint  uiUpdateCycleMessagesMax;
+    uint  uiUpdateCycleMessagesLimit;
+    uint  uiUpdateCycleSendsLimitedTotal;
     float fUpdateCycleSendsLimitedPercent;
 };
 
 struct SSyncThreadStatistics
 {
-    uint uiRecvTimeAvgUs;
-    uint uiSendTimeAvgUs;
-    uint uiRecvTimeMaxUs;
-    uint uiSendTimeMaxUs;
+    uint  uiRecvTimeAvgUs;
+    uint  uiSendTimeAvgUs;
+    uint  uiRecvTimeMaxUs;
+    uint  uiSendTimeMaxUs;
     float fRecvMsgsAvg;
-    uint uiRecvMsgsMax;
+    uint  uiRecvMsgsMax;
     float fSendCmdsAvg;
-    uint uiSendCmdsMax;
+    uint  uiSendCmdsMax;
 };
 
 enum ePacketOrdering
@@ -164,8 +163,6 @@ enum ePacketOrdering
 };
 
 // Typedefs to make shared code easier
-typedef NetServerPlayerID NetPlayerID;
-typedef NetServerPacketPriority NetPacketPriority;
+typedef NetServerPlayerID          NetPlayerID;
+typedef NetServerPacketPriority    NetPacketPriority;
 typedef NetServerPacketReliability NetPacketReliability;
-
-#endif

@@ -1,14 +1,14 @@
 project "zlib"
-	language "C++"
+	language "C"
 	kind "StaticLib"
 	targetname "zlib"
-	
-	vpaths { 
-		["Headers/*"] = "**.h",
+
+	vpaths {
+		["Headers/*"] = "*.h",
 		["Sources/*"] = "*.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"*.h",
@@ -18,4 +18,5 @@ project "zlib"
 	excludes {
 		"example.c"
 	}
-	
+
+	defines { "verbose=-1" }    -- Stop "bit length overflow" warning

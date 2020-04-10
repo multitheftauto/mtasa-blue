@@ -38,7 +38,7 @@ Zac Hansen ( xaxxon@slackworks.com )
 #pragma warning(disable : 4786)
 
 // to use winsock2.h instead of winsock.h
-#include <winsock.h>
+#include <winsock2.h>
 #include <windows.h>
 #include <time.h>
 
@@ -58,21 +58,24 @@ Zac Hansen ( xaxxon@slackworks.com )
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/poll.h>
 
 ///////////////////////////////////
 #endif // end platform headers   //
 ///////////////////////////////////
 
+#include "CPollFdSet.h"
 #include "networkabstraction.h"
 
 #ifdef _WIN32
     #define E_WOULDBLOCK WSAEWOULDBLOCK
     #define GetLastSocketError() WSAGetLastError()
+    #define poll(fds,nfds,timeout) WSAPoll(fds,nfds,timeout)
 #else
     #define E_WOULDBLOCK EWOULDBLOCK
     #define GetLastSocketError() errno
     #define SOCKET_ERROR (-1)
-    #define INVALID_SOCKET (0)
+    #define INVALID_SOCKET (-1)
     #ifndef Sleep
         #define Sleep(x) usleep((x)*1000)
     #endif

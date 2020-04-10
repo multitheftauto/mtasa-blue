@@ -37,6 +37,7 @@
 #include "breakpad_googletest_includes.h"
 #include "google_breakpad/processor/basic_source_line_resolver.h"
 #include "google_breakpad/processor/call_stack.h"
+#include "google_breakpad/processor/microdump.h"
 #include "google_breakpad/processor/microdump_processor.h"
 #include "google_breakpad/processor/process_state.h"
 #include "google_breakpad/processor/stack_frame.h"
@@ -47,6 +48,7 @@
 namespace {
 
 using google_breakpad::BasicSourceLineResolver;
+using google_breakpad::Microdump;
 using google_breakpad::MicrodumpProcessor;
 using google_breakpad::ProcessState;
 using google_breakpad::SimpleSymbolSupplier;
@@ -83,11 +85,12 @@ class MicrodumpProcessorTest : public ::testing::Test {
     StackFrameSymbolizer frame_symbolizer(&supplier, &resolver);
     MicrodumpProcessor processor(&frame_symbolizer);
 
-    return processor.Process(microdump_contents, state);
+    Microdump microdump(microdump_contents);
+    return processor.Process(&microdump, state);
   }
 
-  void AnalyzeDump(const string& microdump_file_name, ProcessState* state,
-                   bool omit_symbols) {
+  void AnalyzeDump(const string& microdump_file_name, bool omit_symbols,
+                   int expected_cpu_count, ProcessState* state) {
     string symbols_file = omit_symbols ? "" : files_path_ + "symbols/microdump";
     string microdump_file_path = files_path_ + microdump_file_name;
     string microdump_contents;
@@ -101,20 +104,13 @@ class MicrodumpProcessorTest : public ::testing::Test {
     ASSERT_EQ(0, state->requesting_thread());
     ASSERT_EQ(1U, state->threads()->size());
 
-    ASSERT_EQ(2, state->system_info()->cpu_count);
+    ASSERT_EQ(expected_cpu_count, state->system_info()->cpu_count);
     ASSERT_EQ("android", state->system_info()->os_short);
     ASSERT_EQ("Android", state->system_info()->os);
   }
 
   string files_path_;
 };
-
-TEST_F(MicrodumpProcessorTest, TestProcess_Empty) {
-  ProcessState state;
-  google_breakpad::ProcessResult result =
-      ProcessMicrodump("", "", &state);
-  ASSERT_EQ(google_breakpad::PROCESS_ERROR_MINIDUMP_NOT_FOUND, result);
-}
 
 TEST_F(MicrodumpProcessorTest, TestProcess_Invalid) {
   ProcessState state;
@@ -123,15 +119,32 @@ TEST_F(MicrodumpProcessorTest, TestProcess_Invalid) {
   ASSERT_EQ(google_breakpad::PROCESS_ERROR_NO_THREAD_LIST, result);
 }
 
+TEST_F(MicrodumpProcessorTest, TestProcess_WithoutCrashReason) {
+  ProcessState state;
+  AnalyzeDump("microdump-arm64.dmp", true /* omit_symbols */,
+              2 /* expected_cpu_count */, &state);
+  ASSERT_EQ(state.crash_reason(), "");
+  ASSERT_EQ(state.crash_address(), 0x0u);
+}
+
+TEST_F(MicrodumpProcessorTest, TestProcess_WithCrashReason) {
+  ProcessState state;
+  AnalyzeDump("microdump-withcrashreason.dmp", true /* omit_symbols */,
+              8 /* expected_cpu_count */, &state);
+  ASSERT_EQ(state.crash_reason(), "SIGTRAP");
+  ASSERT_EQ(state.crash_address(), 0x4A7CB000u);
+}
+
 TEST_F(MicrodumpProcessorTest, TestProcess_MissingSymbols) {
   ProcessState state;
-  AnalyzeDump("microdump-arm64.dmp", &state, true /* omit_symbols */);
+  AnalyzeDump("microdump-arm64.dmp", true /* omit_symbols */,
+              2 /* expected_cpu_count */, &state);
 
   ASSERT_EQ(8U, state.modules()->module_count());
   ASSERT_EQ("arm64", state.system_info()->cpu);
   ASSERT_EQ("OS 64 VERSION INFO", state.system_info()->os_version);
   ASSERT_EQ(1U, state.threads()->size());
-  ASSERT_EQ(12U, state.threads()->at(0)->frames()->size());
+  ASSERT_EQ(11U, state.threads()->at(0)->frames()->size());
 
   ASSERT_EQ("",
             state.threads()->at(0)->frames()->at(0)->function_name);
@@ -155,10 +168,15 @@ TEST_F(MicrodumpProcessorTest, TestProcess_UnsupportedArch) {
 
 TEST_F(MicrodumpProcessorTest, TestProcessArm) {
   ProcessState state;
-  AnalyzeDump("microdump-arm.dmp", &state, false /* omit_symbols */);
+  AnalyzeDump("microdump-arm.dmp", false /* omit_symbols */,
+              2 /* expected_cpu_count*/, &state);
 
   ASSERT_EQ(6U, state.modules()->module_count());
   ASSERT_EQ("arm", state.system_info()->cpu);
+  ASSERT_EQ("OpenGL ES 3.0 V@104.0 AU@  (GIT@Id3510ff6dc)",
+            state.system_info()->gl_version);
+  ASSERT_EQ("Qualcomm", state.system_info()->gl_vendor);
+  ASSERT_EQ("Adreno (TM) 330", state.system_info()->gl_renderer);
   ASSERT_EQ("OS VERSION INFO", state.system_info()->os_version);
   ASSERT_EQ(8U, state.threads()->at(0)->frames()->size());
   ASSERT_EQ("MicrodumpWriterTest_Setup_Test::TestBody",
@@ -173,7 +191,8 @@ TEST_F(MicrodumpProcessorTest, TestProcessArm) {
 
 TEST_F(MicrodumpProcessorTest, TestProcessArm64) {
   ProcessState state;
-  AnalyzeDump("microdump-arm64.dmp", &state, false /* omit_symbols */);
+  AnalyzeDump("microdump-arm64.dmp", false /* omit_symbols */,
+              2 /* expected_cpu_count*/, &state);
 
   ASSERT_EQ(8U, state.modules()->module_count());
   ASSERT_EQ("arm64", state.system_info()->cpu);
@@ -187,6 +206,75 @@ TEST_F(MicrodumpProcessorTest, TestProcessArm64) {
             state.threads()->at(0)->frames()->at(7)->function_name);
   ASSERT_EQ("breakpad_unittests",
             state.threads()->at(0)->frames()->at(7)->module->code_file());
+}
+
+TEST_F(MicrodumpProcessorTest, TestProcessX86) {
+  ProcessState state;
+  AnalyzeDump("microdump-x86.dmp", false /* omit_symbols */,
+              4 /* expected_cpu_count */, &state);
+
+  ASSERT_EQ(124U, state.modules()->module_count());
+  ASSERT_EQ("x86", state.system_info()->cpu);
+  ASSERT_EQ("asus/WW_Z00A/Z00A:5.0/LRX21V/2.19.40.22_20150627_5104_user:user/"
+      "release-keys", state.system_info()->os_version);
+  ASSERT_EQ(17U, state.threads()->at(0)->frames()->size());
+  ASSERT_EQ("libc.so",
+            state.threads()->at(0)->frames()->at(0)->module->debug_file());
+  // TODO(mmandlis): Get symbols for the test X86 microdump and test function
+  // names.
+}
+
+TEST_F(MicrodumpProcessorTest, TestProcessMultiple) {
+  ProcessState state;
+  AnalyzeDump("microdump-multiple.dmp", false /* omit_symbols */,
+              6 /* expected_cpu_count */, &state);
+  ASSERT_EQ(156U, state.modules()->module_count());
+  ASSERT_EQ("arm", state.system_info()->cpu);
+  ASSERT_EQ("lge/p1_tmo_us/p1:6.0/MRA58K/1603210524c8d:user/release-keys",
+            state.system_info()->os_version);
+  ASSERT_EQ(5U, state.threads()->at(0)->frames()->size());
+}
+
+TEST_F(MicrodumpProcessorTest, TestProcessMips) {
+  ProcessState state;
+  AnalyzeDump("microdump-mips32.dmp", false /* omit_symbols */,
+              2 /* expected_cpu_count */, &state);
+
+  ASSERT_EQ(7U, state.modules()->module_count());
+  ASSERT_EQ("mips", state.system_info()->cpu);
+  ASSERT_EQ("3.0.8-g893bf16 #7 SMP PREEMPT Fri Jul 10 15:20:59 PDT 2015",
+      state.system_info()->os_version);
+  ASSERT_EQ(4U, state.threads()->at(0)->frames()->size());
+
+  ASSERT_EQ("blaTest",
+            state.threads()->at(0)->frames()->at(0)->function_name);
+  ASSERT_EQ("Crash",
+            state.threads()->at(0)->frames()->at(1)->function_name);
+  ASSERT_EQ("main",
+            state.threads()->at(0)->frames()->at(2)->function_name);
+  ASSERT_EQ("crash_example",
+            state.threads()->at(0)->frames()->at(0)->module->debug_file());
+}
+
+TEST_F(MicrodumpProcessorTest, TestProcessMips64) {
+  ProcessState state;
+  AnalyzeDump("microdump-mips64.dmp", false /* omit_symbols */,
+              1 /* expected_cpu_count */, &state);
+
+  ASSERT_EQ(8U, state.modules()->module_count());
+  ASSERT_EQ("mips64", state.system_info()->cpu);
+  ASSERT_EQ("3.10.0-gf185e20 #112 PREEMPT Mon Oct 5 11:12:49 PDT 2015",
+        state.system_info()->os_version);
+  ASSERT_EQ(4U, state.threads()->at(0)->frames()->size());
+
+  ASSERT_EQ("blaTest",
+            state.threads()->at(0)->frames()->at(0)->function_name);
+  ASSERT_EQ("Crash",
+            state.threads()->at(0)->frames()->at(1)->function_name);
+  ASSERT_EQ("main",
+            state.threads()->at(0)->frames()->at(2)->function_name);
+  ASSERT_EQ("crash_example",
+            state.threads()->at(0)->frames()->at(0)->module->debug_file());
 }
 
 }  // namespace

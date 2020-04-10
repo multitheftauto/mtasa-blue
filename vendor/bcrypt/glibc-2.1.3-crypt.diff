@@ -1,0 +1,53 @@
+--- glibc-2.1.3.orig/crypt/sysdeps/unix/Makefile	1997-03-05 00:33:59 +0000
++++ glibc-2.1.3/crypt/sysdeps/unix/Makefile	2000-06-11 03:13:41 +0000
+@@ -1,4 +1,4 @@
+ ifeq ($(subdir),md5-crypt)
+-libcrypt-routines += crypt crypt_util
+-dont_distribute += crypt.c crypt_util.c
++libcrypt-routines += crypt crypt_util crypt_blowfish x86 crypt_gensalt wrapper
++dont_distribute += crypt.c crypt_util.c crypt_blowfish.c x86.S crypt_gensalt.c wrapper.c
+ endif
+--- glibc-2.1.3.orig/crypt/sysdeps/unix/crypt-entry.c	1998-12-10 12:49:04 +0000
++++ glibc-2.1.3/crypt/sysdeps/unix/crypt-entry.c	2000-06-11 03:14:57 +0000
+@@ -70,7 +70,7 @@ extern struct crypt_data _ufc_foobar;
+  */
+ 
+ char *
+-__crypt_r (key, salt, data)
++__des_crypt_r (key, salt, data)
+      const char *key;
+      const char *salt;
+      struct crypt_data * __restrict data;
+@@ -115,6 +115,7 @@ __crypt_r (key, salt, data)
+   _ufc_output_conversion_r (res[0], res[1], salt, data);
+   return data->crypt_3_buf;
+ }
++#if 0
+ weak_alias (__crypt_r, crypt_r)
+ 
+ char *
+@@ -147,3 +148,4 @@ __fcrypt (key, salt)
+   return crypt (key, salt);
+ }
+ #endif
++#endif
+--- glibc-2.1.3.orig/md5-crypt/Makefile	1998-07-02 22:46:47 +0000
++++ glibc-2.1.3/md5-crypt/Makefile	2000-06-11 03:12:34 +0000
+@@ -21,7 +21,7 @@
+ #
+ subdir	:= md5-crypt
+ 
+-headers := crypt.h
++headers := crypt.h gnu-crypt.h ow-crypt.h
+ 
+ distribute := md5.h
+ 
+--- glibc-2.1.3.orig/md5-crypt/Versions	1998-07-02 22:32:07 +0000
++++ glibc-2.1.3/md5-crypt/Versions	2000-06-11 09:11:03 +0000
+@@ -1,5 +1,6 @@
+ libcrypt {
+   GLIBC_2.0 {
+     crypt; crypt_r; encrypt; encrypt_r; fcrypt; setkey; setkey_r;
++    crypt_rn; crypt_ra; crypt_gensalt; crypt_gensalt_rn; crypt_gensalt_ra;
+   }
+ }

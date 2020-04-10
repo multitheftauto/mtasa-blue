@@ -1,23 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPathFindSA.cpp
-*  PURPOSE:     Game entity path finding logic
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPathFindSA.cpp
+ *  PURPOSE:     Game entity path finding logic
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CNodeAddress * CPathFindSA::FindNthNodeClosestToCoors ( CVector * vecCoors, int iNodeNumber, int iType, CNodeAddress * pNodeAddress, float fDistance )
+CNodeAddress* CPathFindSA::FindNthNodeClosestToCoors(CVector* vecCoors, int iNodeNumber, int iType, CNodeAddress* pNodeAddress, float fDistance)
 {
     DWORD dwFunc = FUNC_FindNthNodeClosestToCoors;
-    
-    CNodeAddress node;
-    CNodeAddress * nodeptr; 
+
+    CNodeAddress  node;
+    CNodeAddress* nodeptr;
 
     _asm
     {
@@ -44,10 +43,10 @@ CNodeAddress * CPathFindSA::FindNthNodeClosestToCoors ( CVector * vecCoors, int 
     return pNodeAddress;
 }
 
-CPathNode * CPathFindSA::GetPathNode ( CNodeAddress * node )
+CPathNode* CPathFindSA::GetPathNode(CNodeAddress* node)
 {
     DWORD dwFunc = FUNC_FindNodePointer;
-    if ( node->sRegion >= 0 && node->sIndex >= 0 )
+    if (node->sRegion >= 0 && node->sIndex >= 0)
     {
         DWORD dwPathNode = 0;
         _asm
@@ -57,12 +56,12 @@ CPathNode * CPathFindSA::GetPathNode ( CNodeAddress * node )
             call    dwFunc
             mov     dwPathNode, eax
         }
-        return (CPathNode *)dwPathNode;
+        return (CPathNode*)dwPathNode;
     }
     return NULL;
 }
 
-CVector * CPathFindSA::GetNodePosition ( CPathNode * pNode, CVector * pPosition)
+CVector* CPathFindSA::GetNodePosition(CPathNode* pNode, CVector* pPosition)
 {
     DWORD dwFunc = FUNC_CPathNode_GetCoors;
     _asm
@@ -74,13 +73,13 @@ CVector * CPathFindSA::GetNodePosition ( CPathNode * pNode, CVector * pPosition)
     return pPosition;
 }
 
-CVector * CPathFindSA::GetNodePosition ( CNodeAddress * pNode, CVector * pPosition )
+CVector* CPathFindSA::GetNodePosition(CNodeAddress* pNode, CVector* pPosition)
 {
-    CPathNode * pPathNode = GetPathNode ( pNode );
-    return GetNodePosition ( pPathNode, pPosition );
+    CPathNode* pPathNode = GetPathNode(pNode);
+    return GetNodePosition(pPathNode, pPosition);
 }
 
-void CPathFindSA::SwitchRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable )
+void CPathFindSA::SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable)
 {
     float fX1 = vecAreaCorner1->fX;
     float fY1 = vecAreaCorner1->fY;
@@ -110,7 +109,7 @@ void CPathFindSA::SwitchRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vec
     }
 }
 
-void CPathFindSA::SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * vecAreaCorner2, bool bEnable )
+void CPathFindSA::SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable)
 {
     float fX1 = vecAreaCorner1->fX;
     float fY1 = vecAreaCorner1->fY;
@@ -139,32 +138,32 @@ void CPathFindSA::SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * 
     }
 }
 
-void CPathFindSA::SetPedDensity ( float fPedDensity )
+void CPathFindSA::SetPedDensity(float fPedDensity)
 {
-    MemPutFast < float > ( VAR_PedDensityMultiplier, fPedDensity );
+    MemPutFast<float>(VAR_PedDensityMultiplier, fPedDensity);
 }
 
-void CPathFindSA::SetVehicleDensity ( float fVehicleDensity )
+void CPathFindSA::SetVehicleDensity(float fVehicleDensity)
 {
-    MemPutFast < float > ( VAR_CarDensityMultiplier, fVehicleDensity );
+    MemPutFast<float>(VAR_CarDensityMultiplier, fVehicleDensity);
 }
 
-void CPathFindSA::SetMaxPeds ( int iMaxPeds )
+void CPathFindSA::SetMaxPeds(int iMaxPeds)
 {
-    MemPutFast < int > ( VAR_MaxNumberOfPedsInUse, iMaxPeds );
+    MemPutFast<int>(VAR_MaxNumberOfPedsInUse, iMaxPeds);
 }
 
-void CPathFindSA::SetMaxPedsInterior ( int iMaxPeds )
+void CPathFindSA::SetMaxPedsInterior(int iMaxPeds)
 {
-     MemPutFast < int > ( VAR_NumberOfPedsInUseInterior, iMaxPeds );
+    MemPutFast<int>(VAR_NumberOfPedsInUseInterior, iMaxPeds);
 }
 
-void CPathFindSA::SetMaxVehicles ( int iMaxVehicles )
+void CPathFindSA::SetMaxVehicles(int iMaxVehicles)
 {
-    MemPutFast < int > ( VAR_MaxNumberOfCarsInUse, iMaxVehicles );
+    MemPutFast<int>(VAR_MaxNumberOfCarsInUse, iMaxVehicles);
 }
 
-void CPathFindSA::SetAllRandomPedsThisType ( int iType )
+void CPathFindSA::SetAllRandomPedsThisType(int iType)
 {
-    MemPutFast < int > ( VAR_m_AllRandomPedsThisType, iType );
+    MemPutFast<int>(VAR_m_AllRandomPedsThisType, iType);
 }

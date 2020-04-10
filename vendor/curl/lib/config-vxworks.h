@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -75,7 +75,7 @@
 /* #undef CURL_EXTERN_SYMBOL */
 
 /* Use Windows LDAP implementation */
-/* #undef CURL_LDAP_WIN */
+/* #undef USE_WIN32_LDAP */
 
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
@@ -143,9 +143,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
-/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-#define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
-
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
@@ -160,9 +157,6 @@
 
 /* Define to 1 if you have a working fcntl O_NONBLOCK function. */
 #define HAVE_FCNTL_O_NONBLOCK 1
-
-/* Define to 1 if you have the fdopen function. */
-#define HAVE_FDOPEN 1
 
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
@@ -378,14 +372,8 @@
 /* Define to 1 if you have the `libssh2_version' function. */
 /* #undef HAVE_LIBSSH2_VERSION */
 
-/* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
-
 /* if zlib is available */
 #define HAVE_LIBZ 1
-
-/* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
 
 /* if your compiler supports LL */
 #define HAVE_LL 1
@@ -429,9 +417,6 @@
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 #define HAVE_OPENSSL_CRYPTO_H 1
-
-/* Define to 1 if you have the <openssl/engine.h> header file. */
-#define HAVE_OPENSSL_ENGINE_H 1
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
 #define HAVE_OPENSSL_ERR_H 1
@@ -546,12 +531,6 @@
 
 /* Define to 1 if you have the `socket' function. */
 #define HAVE_SOCKET 1
-
-/* Define this if you have the SPNEGO library fbopenssl */
-/* #undef HAVE_SPNEGO */
-
-/* Define to 1 if you have the `SSL_get_shutdown' function. */
-#define HAVE_SSL_GET_SHUTDOWN 1
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -853,9 +832,6 @@
 /* The size of `time_t', as computed by sizeof. */
 #define SIZEOF_TIME_T 4
 
-/* The size of `void*', as computed by sizeof. */
-#define SIZEOF_VOIDP 4
-
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
@@ -885,9 +861,6 @@
 
 /* if OpenSSL is in use */
 #define USE_OPENSSL 1
-
-/* if SSL is enabled */
-#define USE_SSLEAY 1
 
 /* Define to 1 if you are building a Windows target without large file
    support. */

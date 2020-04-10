@@ -8,9 +8,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute &attribute, bool bUsingIDs) : 
-    m_ulID(INVALID_XML_ID), 
-    m_Attribute(attribute)
+CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute& attribute, bool bUsingIDs) : m_ulID(INVALID_XML_ID), m_Attribute(attribute)
 {
     if (bUsingIDs)
         m_ulID = CXMLArray::PopUniqueID(this);
@@ -32,21 +30,21 @@ const std::string CXMLAttributeImpl::GetValue() const
     return std::string(m_Attribute.value());
 }
 
-void CXMLAttributeImpl::SetValue(const std::string &strValue)
+void CXMLAttributeImpl::SetValue(const std::string& strValue)
 {
     SetValue(strValue.c_str());
 }
 
-void CXMLAttributeImpl::SetValue(const char *szValue)
+void CXMLAttributeImpl::SetValue(const char* szValue)
 {
     m_Attribute.set_value(szValue);
 }
 
 void CXMLAttributeImpl::SetValue(bool bValue)
 {
-    if(bValue)
+    if (bValue)
         SetValue("1");
-    else 
+    else
         SetValue("0");
 }
 

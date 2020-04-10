@@ -181,15 +181,15 @@ void Reader::Reporter::LoadCommandRegionTruncated() {
 
 void Reader::Reporter::LoadCommandsOverrun(size_t claimed, size_t i,
                                            LoadCommandType type) {
-  fprintf(stderr, "%s: file's header claims there are %ld"
-          " load commands, but load command #%ld",
+  fprintf(stderr, "%s: file's header claims there are %zu"
+          " load commands, but load command #%zu",
           filename_.c_str(), claimed, i);
   if (type) fprintf(stderr, ", of type %d,", type);
   fprintf(stderr, " extends beyond the end of the load command region\n");
 }
 
 void Reader::Reporter::LoadCommandTooShort(size_t i, LoadCommandType type) {
-  fprintf(stderr, "%s: the contents of load command #%ld, of type %d,"
+  fprintf(stderr, "%s: the contents of load command #%zu, of type %d,"
           " extend beyond the size given in the load command's header\n",
           filename_.c_str(), i, type);
 }
@@ -481,7 +481,9 @@ bool Reader::WalkSegmentSections(const Segment &segment,
       reporter_->SectionsMissing(segment.name);
       return false;
     }
-    if ((section.flags & SECTION_TYPE) == S_ZEROFILL) {
+    const uint32_t section_type = section.flags & SECTION_TYPE;
+    if (section_type == S_ZEROFILL || section_type == S_THREAD_LOCAL_ZEROFILL ||
+            section_type == S_GB_ZEROFILL) {
       // Zero-fill sections have a size, but no contents.
       section.contents.start = section.contents.end = NULL;
     } else if (segment.contents.start == NULL &&

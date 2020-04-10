@@ -1,41 +1,40 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTextSA.cpp
-*  PURPOSE:     Text rendering
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CTextSA.cpp
+ *  PURPOSE:     Text rendering
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using namespace std;
 
-VOID HOOK_CText_Get();
+VOID  HOOK_CText_Get();
 DWORD STORE_CText_Get = 0;
-char * szText;
-char * szReplacementText;
+char* szText;
+char* szReplacementText;
 
 TextEntry TextEntries[MAX_TEXT_ENTRIES];
 
 CTextSA::CTextSA()
 {
-    //HookInstall(FUNC_CText_Get, (DWORD)HOOK_CText_Get, &STORE_CText_Get, 9);
+    // HookInstall(FUNC_CText_Get, (DWORD)HOOK_CText_Get, &STORE_CText_Get, 9);
 }
 
-char * CTextSA::GetText(char * szKey)
+char* CTextSA::GetText(char* szKey)
 {
     return NULL;
 }
 
-void CTextSA::SetText(char * szKey, char * szValue)
+void CTextSA::SetText(char* szKey, char* szValue)
 {
-    for(int i = 0; i < MAX_TEXT_ENTRIES; i++)
+    for (int i = 0; i < MAX_TEXT_ENTRIES; i++)
     {
-        if ( TextEntries[i].szKey[0] == 0 ) 
+        if (TextEntries[i].szKey[0] == 0)
         {
             strcpy(TextEntries[i].szKey, szKey);
             strcpy(TextEntries[i].szValue, szValue);
@@ -44,7 +43,7 @@ void CTextSA::SetText(char * szKey, char * szValue)
     }
 }
 
-char * GetReplacementText(char * szKey)
+__declspec(noinline) char* GetReplacementText(char* szKey)
 {
     // NOTE: This is really slow (0.8% of program time spent here) so needs to be
     // rewriten before it can be readded. As far as I'm aware we do not use this code
@@ -52,7 +51,7 @@ char * GetReplacementText(char * szKey)
 
     /*for(int i = 0; i < MAX_TEXT_ENTRIES; i++)
     {
-        if ( strcmp(TextEntries[i].szKey, szKey) == 0 ) 
+        if ( strcmp(TextEntries[i].szKey, szKey) == 0 )
         {
             if ( TextEntries[i].szValue[0] != 0 )
             {
@@ -76,9 +75,9 @@ VOID _declspec(naked) HOOK_CText_Get()
     }
 
     szReplacementText = GetReplacementText(szText);
-    if ( szReplacementText != NULL )
+    if (szReplacementText != NULL)
     {
-        //OutputDebugString("Replaced Text!");
+        // OutputDebugString("Replaced Text!");
         _asm
         {
             popad
@@ -91,7 +90,7 @@ VOID _declspec(naked) HOOK_CText_Get()
     }
     else
     {
-        //OutputDebugString(szText);
+        // OutputDebugString(szText);
         _asm
         {
             popad

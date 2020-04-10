@@ -1,0 +1,266 @@
+R"=====(
+<!-- This file is compiled into the server binary.
+     It is used for inserting missing settings into mtaserver.conf at server startup -->
+<config>
+    <!-- This parameter specifies the name the server will be visible as in the ingame server browser 
+         and on Game-Monitor. It is a required parameter. -->
+    <servername>Default MTA Server</servername>
+    
+    <!-- This parameter specifies the contact email addresses for the owner(s) of this server.
+         The email addresses will not be publicly available, and only used by MTA administrators
+         to contact the server owner.
+         Note: Missing or incorrect owner_email_address can affect visibility in the master server list.
+         Values: Comma separated list of email addresses -->
+    <owner_email_address></owner_email_address>
+
+    <!-- ONLY USE THIS PARAMETER IF YOU ARE SURE OF WHAT YOU ARE DOING - it is generally only
+         needed for professional servers and should be left at the default value otherwise.
+         This parameter specifies the IP to use for servers that have multiple IP addresses. If set
+         to auto, it will automatically detect and use the server's standard local IP address.
+         Values: auto or x.x.x.x ; default value: auto
+         ** SERVERIP SHOULD BE LEFT SET TO auto UNLESS YOU ARE SURE OF WHAT YOU ARE DOING **
+         ** WARNING: SETTING serverip AND THEN ASKING FOR SUPPORT CAN CAUSE DEATH OR INJURY ** -->
+    <serverip>auto</serverip>
+
+    <!-- This parameter specifies the UDP port on which the server will be accepting incoming player
+         connections; default value: 22003. It is a required parameter. -->
+    <serverport>22003</serverport> 
+    
+    <!-- This parameter specifies the number of maximum player slots available on the server; default
+         value: 32. It is a required parameter. -->
+    <maxplayers>32</maxplayers>
+        
+    <!-- This parameter specifies the TCP port on which the server will be accepting incoming http
+         connections. It can be set to the same value as <serverport>. It is a required parameter
+         if <httpserver> is set to 1. -->
+    <httpport>22005</httpport>
+    
+    <!-- If set, this parameter specifies the external URL from which clients will be able to download
+         needed resources ingame. If not set (or the external URL files are incorrect), resource downloads
+         are switched to the internal http server. -->
+    <httpdownloadurl></httpdownloadurl>
+
+    <!-- This parameter limits the number of http connections each client can make. Depending on the type
+         of http server that is used, a lower figure may reduce download timeouts.
+         Available range: 1 to 8. -->
+    <httpmaxconnectionsperclient>5</httpmaxconnectionsperclient>
+
+    <!-- This parameter limits the number http connections that an IP can initiate over a short period of time.
+         Available range: 1 to 100. default value: 20 -->
+    <httpdosthreshold>20</httpdosthreshold>
+
+    <!-- This parameter lists the IP addresses that are to be excluded from http dos threshold limits.
+         e.g. 88.11.22.33,101.2.3.4 -->
+    <http_dos_exclude></http_dos_exclude>
+
+    <!-- By default, the server will block the use of locally customized gta3.img player skins
+         This setting can be used to allow such mods. Not recommended for competitive servers.
+         Values: none, peds ; default value: none -->
+    <allow_gta3_img_mods>none</allow_gta3_img_mods>
+
+    <!-- By default, the server will block the use of customized GTA:SA data files. -->
+    <!-- To allow specific client files, add one or more of the following: -->
+    <!-- <client_file name="data/carmods.dat" verify="0"/> -->
+
+    <!-- Comma separated list of disabled anti-cheats.
+         For details see http://wiki.multitheftauto.com/wiki/Anti-cheat_guide
+         e.g. To disable anti-cheat #2 and #3, use: 2,3 -->
+    <disableac></disableac>
+
+    <!-- Comma separated list of enabled special detections.
+         A special detection is a type of anti-cheat for usually harmless game modifications and blocking certain software.
+         Competitive servers may wish to enable certain special detections, but most servers should leave this setting on its default.
+         For details and SD codes, see http://wiki.multitheftauto.com/wiki/Anti-cheat_guide
+         Available values: special detection (SD) codes ; (e.g. To enable special detection #15 use: 15) -->
+    <enablesd></enablesd>
+
+    <!-- Minimum client version. Clients with a lower version will not be allowed to connect. After
+         disconnection, clients will be given an opportunity to download an update.
+         If left blank, this setting is disabled and there are no restrictions on who can connect.
+         Version numbers are described here: http://wiki.multitheftauto.com/wiki/GetPlayerVersion
+         and look like this: 1.1.0-9.03100.0 
+         Note that this setting only determines if the client should be prompted to update. The actual
+         build number they receive will be the highest available. See: http://nightly.mtasa.com/ver  -->
+    <minclientversion></minclientversion>
+
+    <!-- This parameter specifies if/when the <minclientversion> setting is automatically updated.
+         Keeping <minclientversion> updated can help reduce cheating.
+         Note: The instant setting (2) is only recommended for competitive servers.
+         Values: 0 - disabled, 1 - enabled (delayed by a few days), 2 - enabled (instant) ; default value: 1.  -->
+    <minclientversion_auto_update>1</minclientversion_auto_update>
+
+    <!-- Recommended client version. When connecting, if clients have a lower version, they will be given
+         the option to download an update. If left blank, this setting is disabled.
+         Note that this setting only determines if the client should be prompted to update. The actual
+         build number they receive will be the highest available. See: http://nightly.mtasa.com/ver  -->
+    <recommendedclientversion></recommendedclientversion>
+
+    <!-- This parameter can be used to make the server report to Game-Monitor master servers, allowing it to
+         be visible in the ingame server browser. An additional UDP port needs to be available for this to
+         work (value from <serverport> + 123 , so on a default <serverport> value 22003 the right port
+         will be 22126 ). Available values: 0 - disabled , 1 - enabled. Optional parameter, defaults to 0. -->
+    <ase>1</ase>
+
+    <!-- This parameter allows you to disable LAN broadcasting. --> 
+    <donotbroadcastlan>0</donotbroadcastlan>
+
+    <!-- If set, players will have to provide a password specified below, before they can connect to the
+         server. If left blank, server doesn't require a password from them. -->
+    <password></password> 
+
+    <!-- This parameter reduces the server's bandwidth usage by using various optimizations.
+         Values: none, medium or maximum ; default value: medium -->
+    <bandwidth_reduction>medium</bandwidth_reduction> 
+
+    <!-- The following ???_sync_interval parameters determine the time in milliseconds between certain
+         network packets being sent. More information on how each settings works is available here:
+         http://wiki.multitheftauto.com/wiki/Server_mtaserver.conf -->
+    <!-- Player sync interval. Default: 100 -->
+    <player_sync_interval>100</player_sync_interval>
+    <!-- Lightweight (player) sync interval. Used when players are far apart. Default: 1500 -->
+    <lightweight_sync_interval>1500</lightweight_sync_interval> 
+    <!-- Camera sync interval. Default: 500 -->
+    <camera_sync_interval>500</camera_sync_interval> 
+    <!-- Ped sync interval. Default: 400 -->
+    <ped_sync_interval>400</ped_sync_interval> 
+    <!-- Unoccupied_vehicle sync interval. Default: 400 -->
+    <unoccupied_vehicle_sync_interval>400</unoccupied_vehicle_sync_interval> 
+    <!-- Keysync mouse rotation sync interval. For limiting key sync packets due to mouse movement. Default: 100 -->
+    <keysync_mouse_sync_interval>100</keysync_mouse_sync_interval> 
+    <!-- Keysync analog movement sync interval. For limiting key sync packets due to joystick movement. Default: 100 -->
+    <keysync_analog_sync_interval>100</keysync_analog_sync_interval> 
+
+    <!-- This parameter can improve the reliability of shots when using certain weapons. However, it uses more bandwidth.
+         Values: 0 - disabled , 1 - enabled ; default value: 1. -->
+    <bullet_sync>1</bullet_sync> 
+
+    <!-- This parameter sets the amount of extrapolation that clients will apply to remote vehicles. This can reduce
+         some of the latency induced location disparency by predicting where the remote vehicles will probably be.
+         Depending on the gamemode, an incorrect prediction may have a negative effect. Therefore this setting
+         should be considered experimental.
+         Available range: 0 to 100.  Default - 0 -->
+    <vehext_percent>0</vehext_percent>
+
+    <!-- This parameter places a limit on how much time (in milliseconds) the vehicle extrapolation will attempt to
+         compensate for.
+         Only relevant if <vehext_percent> is greater than zero.
+         Available range: 50 to 500.  Default - 150 -->
+    <vehext_ping_limit>150</vehext_ping_limit>
+
+    <!-- This parameter can reduce the delay of player actions appearing on remote clients by 2 frames (approx 50ms).
+         Due to the impact this may have on shot lag compensation, it should be considered experimental.
+         Values: 0 - disabled , 1 - enabled ; default value: 0. -->
+    <latency_reduction>0</latency_reduction>
+
+    <!-- Specifies the location and file name of this servers unique private key.
+         This is used to prevent private files saved on the client from being read by other servers.
+         More infomation about client private files can be found here: http://wiki.multitheftauto.com/wiki/Filepath
+         Keep a backup of this file in a safe place. Default value: server-id.keys-->
+    <idfile>server-id.keys</idfile> 
+
+    <!-- Specifies the location and name of the main server log file. If left blank, server won't be saving this file. -->
+    <logfile>logs/server.log</logfile>
+
+    <!-- As well as the main log file, login successes and failures are logged here for easy reviewing of security issues.
+         If left blank, this file is not used -->
+    <authfile>logs/server_auth.log</authfile>
+
+    <!-- Specifies the location and name of the file used to log database queries.
+         The server command 'debugdb' sets the amount of logging. -->
+    <dbfile>logs/db.log</dbfile>
+
+    <!-- Specifies the location and name of the file used to log loadstring function calls.
+         If left blank or not set, no logging is done. -->
+    <!-- <loadstringfile>logs/loadstring.log</loadstringfile> -->
+    
+    <!-- This parameter specifies the location and name of the Access Control List settings file. If left
+         blank, server will use acl.xml file, located in the same folder as this configuration file. -->
+    <acl>acl.xml</acl> 
+
+    <!-- Specifies the location and name of the debugscript log file. If left blank, server won't be saving this file. -->
+    <scriptdebuglogfile>logs/scripts.log</scriptdebuglogfile>
+
+    <!-- Specifies the level of the debugscript log file. Available values: 0, 1, 2, 3. When not set, defaults to 0. -->
+    <scriptdebugloglevel>0</scriptdebugloglevel>
+
+    <!-- Specifies the level of the html debug. Available values: 0, 1, 2, 3. When not set, defaults to 0. -->
+    <htmldebuglevel>0</htmldebuglevel>
+
+    <!-- Specifies whether or not duplicate log lines should be filtered. Available values: 0 or 1, defaults to 1. -->
+    <filter_duplicate_log_lines>1</filter_duplicate_log_lines>
+
+    <!-- Specifies the frame rate limit that will be applied to connecting clients.
+         Available range: 25 to 100. Default: 36. -->
+    <fpslimit>36</fpslimit>
+
+    <!-- This parameter specifies whether or not to enable player voice chat in-game
+         Values: 0 - disabled , 1 - enabled -->
+    <voice>0</voice>
+    
+    <!-- This parameter specifies the sample rate for voice chat.  'voice' parameter must be set to 1 for this to be effective.
+         Higher settings use more bandwidth and increase the sampling quality of voice chat
+         Values: 0 - Narrowband (8kHz), 1 - Wideband (16kHz), 2 - Ultrawideband (32kHz).  Default - 1 -->
+    <voice_samplerate>1</voice_samplerate>
+    
+    <!-- This parameter specifies the voice quality for voice chat.  'voice' parameter must be set to 1 for this to be effective.
+         Higher settings use more bandwidth and increase the the overall quality of voice chat
+         Available range: 0 to 10.  Default - 4 -->
+    <voice_quality>4</voice_quality>
+
+    <!-- Specifies the voice bitrate, in bps. This optional parameter overrides the previous two settings. 
+         If not set, MTA handles this automatically.  Use with care. -->
+    <!-- <voice_bitrate>24600</voice_bitrate> -->
+
+    <!-- This parameter specifies the path to use for a basic backup of some server files.
+         Note that basic backups are only made during server startup. Default value: backups -->
+    <backup_path>backups</backup_path>
+
+    <!-- This parameter specifies the number of days between each basic backup.
+         Backups are only made during server startup, so the actual interval may be much longer.
+         Setting backup_interval to 0 will disable backups
+         Available range: 0 to 30.  Default - 3 -->
+    <backup_interval>3</backup_interval>
+
+    <!-- This parameter specifies the maximum number of backup copies to keep.
+         Setting backup_copies to 0 will disable backups
+         Available range: 0 to 100.  Default - 10 -->
+    <backup_copies>10</backup_copies>
+
+    <!-- This parameter specifies when the internal sqlite databases should be defragmented.
+         http://www.sqlite.org/lang_vacuum.html
+         Values: 0 - Never, 1 - On server start only after basic backup, 2 - On server start always.  Default - 1 -->
+    <compact_internal_databases>1</compact_internal_databases>
+
+    <!-- This parameter specifies whether server crash dump files should be sent to MTA HQ.
+         Values: 0 - Off, 1 - On. Default - 1 -->
+    <crash_dump_upload>1</crash_dump_upload>
+
+    <!-- This parameter lists the ACL groups that are protected by serial authorization.
+         Login attempts to a protected account from a second serial are blocked until the serial is manually authorized via
+         the authserial command.
+         For more info see: https://mtasa.com/authserial
+         Note: This is security critical feature and disabling auth_serial_groups can affect visibility in the master server list.
+         Values: Comma separated list of ACL groups.  Default - Admin -->
+    <auth_serial_groups>Admin</auth_serial_groups>
+
+    <!-- This parameter specifies if the authorized serial login checks should also apply to the http interface.
+         Protected account login attempts to the http interface will only succeed if the IP address matches one
+         recently used by the account holder in-game
+         For more info see: https://mtasa.com/authserialhttp
+         Note: This is security critical feature and disabling auth_serial_http can affect visibility in the master server list.
+         Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <auth_serial_http>1</auth_serial_http>
+
+    <!-- This parameter specifies which IP addresses should always pass auth_serial_http checks.
+         Values: Comma separated list of IP addresses -->
+    <auth_serial_http_ip_exceptions>127.0.0.1</auth_serial_http_ip_exceptions>
+
+    <!-- This parameter specifies if extra security measures are applied to resources which use dbConnect with mysql.
+         The extra measures are:
+           - Script files cannot be accessed with fileOpen()
+           - meta.xml is read only
+         *NOTE* This only protects resources which use dbConnect with mysql
+         Values: 0 - Off, 1 - Enabled.  Default - 1 -->
+    <database_credentials_protection>1</database_credentials_protection>
+</config>
+)====="
