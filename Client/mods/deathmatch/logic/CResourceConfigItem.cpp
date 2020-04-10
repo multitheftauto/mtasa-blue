@@ -53,10 +53,7 @@ bool CResourceConfigItem::Start()
             std::vector<char> fileContents;
             if (m_pXMLFile->Parse(&fileContents))
             {
-                m_pXMLRootNode = m_pXMLFile->GetRootNode();
-                return true;
-                // TODO
-                /*if (CChecksum::GenerateChecksumFromBuffer(&fileContents.at(0), fileContents.size()) == GetServerChecksum())
+                if (CChecksum::GenerateChecksumFromBuffer(&fileContents.at(0), fileContents.size()) == GetServerChecksum())
                 {
                     m_pXMLRootNode = m_pXMLFile->GetRootNode();
                     return true;
@@ -64,7 +61,7 @@ bool CResourceConfigItem::Start()
                 else
                 {
                     CLogger::ErrorPrintf("Config %s checksum mismatch in resource %s\n", GetShortName(), m_pResource->GetName());
-                }*/
+                }
             }
             else
             {

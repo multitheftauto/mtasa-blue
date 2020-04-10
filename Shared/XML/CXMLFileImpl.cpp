@@ -46,44 +46,43 @@ CXMLFileImpl::~CXMLFileImpl()
 
 bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 {
-    if (!m_strFilename.empty())
-    {
-        // Reset previous file
-        Reset();
+    if (m_strFilename.empty())
+        return false;
 
-        // Open file
-        std::ifstream file(m_strFilename, std::ios::in | std::ios::ate);
-        if (!file.is_open())
-            return false;
+    // Reset previous file
+    Reset();
 
-        // Disable whitespace skipping
-        file.unsetf(std::ios::skipws);
+    // Open file
+    std::ifstream file(m_strFilename, std::ios::in | std::ios::ate | std::ios::binary);
+    if (!file.is_open())
+        return false;
 
-        // Read file contents into vector
-        std::vector<char> vecFileContents{};
-        std::streampos    fileSize = file.tellg();
-        vecFileContents.reserve(fileSize);
-        file.seekg(0, std::ios::beg);
-        vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
-        file.close();
+    // Disable whitespace skipping
+    file.unsetf(std::ios::skipws);
 
-        // Also copy to buffer if requested
-        if (pOutFileContents)
-            pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
+    // Read file contents into vector
+    std::vector<char> vecFileContents{};
+    std::streampos    fileSize = file.tellg();
+    vecFileContents.reserve(fileSize);
+    file.seekg(0, std::ios::beg);
+    vecFileContents.insert(vecFileContents.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
+    file.close();
 
-        // Also create a string for pugixml to load
-        std::string strFileContents(vecFileContents.begin(), vecFileContents.end());
+    // Also copy to buffer if requested
+    if (pOutFileContents)
+        pOutFileContents->insert(pOutFileContents->begin(), vecFileContents.begin(), vecFileContents.end());
 
-        // Load the xml
-        m_pDocument = std::make_unique<pugi::xml_document>();
-        m_parserResult = m_pDocument->load_string(strFileContents.c_str());
-        if (!m_parserResult)
-            return false;
+    // Also create a string for pugixml to load
+    std::string strFileContents(vecFileContents.begin(), vecFileContents.end());
 
-        BuildWrapperTree(m_ulID != INVALID_XML_ID);
-        return true;
-    }
-    return false;
+    // Load the xml
+    m_pDocument = std::make_unique<pugi::xml_document>();
+    m_parserResult = m_pDocument->load_string(strFileContents.c_str());
+    if (!m_parserResult)
+        return false;
+
+    BuildWrapperTree(m_ulID != INVALID_XML_ID);
+    return true;
 }
 
 void CXMLFileImpl::BuildWrapperTree(bool bUsingIDs)
@@ -98,17 +97,13 @@ std::unique_ptr<CXMLNodeImpl> CXMLFileImpl::WrapperTreeWalker(pugi::xml_node* no
 
     // Construct Attributes
     for (auto& attribute : node->attributes())
-    {
         wrapperNode->AddAttribute(std::make_unique<CXMLAttributeImpl>(attribute, bUsingIDs));
-    }
 
     // Recursively call on our children
     for (auto& child : node->children())
-    {
         // Only for actual child nodes
         if (child.type() == pugi::node_element)
             wrapperNode->AddChild(WrapperTreeWalker(&child, bUsingIDs));
-    }
 
     return wrapperNode;
 }
@@ -134,15 +129,13 @@ CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
         m_pRoot->GetNode().set_name(strTagName.c_str());
         return GetRootNode();
     }
-    else
-    {
-        m_pDocument = std::make_unique<pugi::xml_document>();
-        auto innerRoot = m_pDocument->append_child(strTagName.c_str());
-        auto rootWrapper = std::make_unique<CXMLNodeImpl>(*m_pDocument.get(), m_ulID != INVALID_XML_ID);
-        rootWrapper->AddChild(std::make_unique<CXMLNodeImpl>(innerRoot, m_ulID != INVALID_XML_ID));
-        m_pRoot = std::move(rootWrapper);
-        return GetRootNode();
-    }
+
+    m_pDocument = std::make_unique<pugi::xml_document>();
+    auto innerRoot = m_pDocument->append_child(strTagName.c_str());
+    auto rootWrapper = std::make_unique<CXMLNodeImpl>(*m_pDocument.get(), m_ulID != INVALID_XML_ID);
+    rootWrapper->AddChild(std::make_unique<CXMLNodeImpl>(innerRoot, m_ulID != INVALID_XML_ID));
+    m_pRoot = std::move(rootWrapper);
+    return GetRootNode();
 }
 
 CXMLNode* CXMLFileImpl::GetRootNode()
