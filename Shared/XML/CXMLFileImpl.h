@@ -42,7 +42,6 @@ private:
     void                          BuildWrapperTree(bool bUsingIDs);
     std::unique_ptr<CXMLNodeImpl> WrapperTreeWalker(pugi::xml_node* node, bool bUsingIDs);
 
-private:
     std::unique_ptr<class CXMLNodeImpl> m_pRoot;
     std::unique_ptr<pugi::xml_document> m_pDocument;
     pugi::xml_parse_result              m_parserResult;

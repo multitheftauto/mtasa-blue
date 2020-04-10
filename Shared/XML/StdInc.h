@@ -14,12 +14,11 @@
 
 // STL
 #include <algorithm>
-#include <memory>
-#include <string>
-#include <vector>
 #include <functional>
 #include <list>
 #include <memory>
+#include <string>
+#include <vector>
 
 // SDK
 #include "Common.h"
@@ -27,8 +26,9 @@
 #include "SharedUtil.h"
 
 // Implementation
-#include "CXMLAttributeImpl.h"
-#include "CXMLFileImpl.h"
-#include "CXMLNodeImpl.h"
-#include "CXMLImpl.h"
 #include "CXMLArray.h"
+#include "CXMLAttributeImpl.h"
+#include "CXMLDocumentImpl.h"
+#include "CXMLFileImpl.h"
+#include "CXMLImpl.h"
+#include "CXMLNodeImpl.h"

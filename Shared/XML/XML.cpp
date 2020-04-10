@@ -29,21 +29,18 @@ MTAEXPORT void ReleaseXMLInterface()
 }
 
 #ifdef WIN32
-#include <Windows.h>
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     // Kill the interface on detach
     if (dwReason == DLL_PROCESS_DETACH)
-    {
         ReleaseXMLInterface();
-    }
 
     return TRUE;
 }
 
 #else
 
-void __attribute__((destructor)) ReleaseXMLInterface(void);
+void __attribute__((destructor)) ReleaseXMLInterface();
 
 #endif

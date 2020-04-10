@@ -27,6 +27,6 @@ public:
     CXMLFile*      GetFileFromID(unsigned long ulID) override;
     CXMLNode*      GetNodeFromID(unsigned long ulID) override;
 
-    CXMLNode* ParseString(const char* strXmlContent);
+    CXMLNode* ParseString(const char* strXmlContent) override;
     CXMLNode* BuildNode(CXMLNodeImpl* xmlParent, pugi::xml_node* xmlNode);
 };
