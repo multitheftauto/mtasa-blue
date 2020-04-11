@@ -28,7 +28,7 @@ CXMLNode* CXMLNodeImpl::CreateChild(const std::string& tagName, CXMLNode* insert
     auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ID != INVALID_XML_ID, this);
     if (insertAfter)
     {
-        auto matchingIter = std::find_if(m_children.begin(), m_children.end(), [insertAfter](const auto& p) { return insertAfter == p.get(); });
+        auto matchingIter = std::find_if(m_children.begin(), m_children.end(), [insertAfter](const auto& entry) { return insertAfter == entry.get(); });
         if (matchingIter != m_children.end())
             m_children.insert(matchingIter++, std::move(wrapper));
         else
@@ -262,7 +262,7 @@ SString CXMLNodeImpl::GetCommentText() const
 // Set comment text for this node.
 // Leading blank line can only be inserted when creating the comment.
 //
-void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankLine)
+void CXMLNodeImpl::SetCommentText(const char* commentText, bool leadingBlankLine)
 {
     // TODO
 

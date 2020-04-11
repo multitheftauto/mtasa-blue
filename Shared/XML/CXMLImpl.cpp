@@ -25,9 +25,9 @@ CXMLFile* CXMLImpl::CreateXML(const std::string& filename, bool useIDs, bool rea
     return nullptr;
 }
 
-void CXMLImpl::DeleteXML(CXMLFile* pFile)
+void CXMLImpl::DeleteXML(CXMLFile* file)
 {
-    delete pFile;
+    delete file;
 }
 
 CXMLFile* CXMLImpl::CopyXML(const std::string& filename, CXMLNode* node, bool readOnly)
@@ -77,12 +77,25 @@ CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ID) const
 
 CXMLNode* CXMLImpl::ParseString(const char* xmlContent)
 {
-    // TODO
+    // TODO: Rewrite to fix memory leaks
+    pugi::xml_document* xmlDoc = new pugi::xml_document();
+    if (xmlDoc)
+    {
+        if (xmlDoc->load_string(xmlContent))
+        {
+            pugi::xml_node xmlDocumentRoot = xmlDoc->document_element();
+            CXMLNodeImpl*  xmlBaseNode = new CXMLNodeImpl(xmlDocumentRoot, true);
+            CXMLNode*      xmlRootNode = CXMLImpl::BuildNode(xmlBaseNode, &xmlDocumentRoot);
+            return xmlRootNode;
+        }
+    }
     return nullptr;
 }
 
 CXMLNode* CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, pugi::xml_node* xmlNode)
 {
-    // TODO
-    return nullptr;
+    for (auto& xmlChild : xmlNode->children())
+        CXMLImpl::BuildNode(new CXMLNodeImpl(xmlChild, true, xmlParent), &xmlChild);
+
+    return xmlParent;
 }

@@ -495,6 +495,18 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else if (uMsg == WM_CHAR || uMsg == WM_SYSCHAR)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
 
+    // Alt-Gr check
+    if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU)) 
+    {
+        HKL current_layout = ::GetKeyboardLayout(0);
+        SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
+        if (((scan_res >> 8) & 0xFF) == (2 | 4))
+        {
+            keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
+            keyEvent.modifiers |= EVENTFLAG_ALTGR_DOWN;
+        }
+    }
+
     m_pFocusedWebView->InjectKeyboardEvent(keyEvent);
 }
 
