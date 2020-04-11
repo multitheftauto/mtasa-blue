@@ -17,36 +17,36 @@
 class CXMLFileImpl : public CXMLFile
 {
 public:
-    CXMLFileImpl(const std::string& strFilename, bool bUseIDs = false, bool bReadOnly = false);
-    CXMLFileImpl(const std::string& strFilename, CXMLNode* pNode, bool bReadOnly = false);
+    CXMLFileImpl(const std::string& filename, bool useIDs = false, bool readOnly = false);
+    CXMLFileImpl(const std::string& filename, CXMLNode* node, bool readOnly = false);
     ~CXMLFileImpl();
 
-    inline const std::string& GetFilename() override { return m_strFilename; }
-    inline void               SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; }
+    inline const std::string& GetFilename() const override { return m_filename; }
+    inline void               SetFilename(const std::string& filename) override { m_filename = filename; }
 
-    bool Parse(std::vector<char>* pOutFileContents = nullptr) override;
+    bool Parse(std::vector<char>* outFileContents = nullptr) override;
     bool Write() override;
     void Reset() override;
 
-    class CXMLNode* CreateRootNode(const std::string& strTagName) override;
-    class CXMLNode* GetRootNode() override;
+    class CXMLNode* CreateRootNode(const std::string& tagName) override;
+    class CXMLNode* GetRootNode() const override;
 
-    CXMLErrorCodes::Code GetLastError(std::string& strOut) override;
+    CXMLErrorCodes::Code GetLastError(std::string& out) override;
 
     inline eXMLClass     GetClassType() const override { return eXMLClass::CXML_FILE; }
     inline unsigned long GetID() const override { return m_ID; }
 
-    inline bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    inline bool IsValid() const { return !m_usingIDs || m_ID != INVALID_XML_ID; };
 
 private:
-    void                          BuildWrapperTree(bool bUsingIDs);
-    std::unique_ptr<CXMLNodeImpl> WrapperTreeWalker(pugi::xml_node* node, bool bUsingIDs);
+    void                          BuildWrapperTree(bool usingIDs);
+    std::unique_ptr<CXMLNodeImpl> WrapperTreeWalker(pugi::xml_node* node, bool usingIDs);
 
-    std::unique_ptr<class CXMLNodeImpl> m_pRoot;
-    std::unique_ptr<pugi::xml_document> m_pDocument;
+    std::unique_ptr<class CXMLNodeImpl> m_root;
+    std::unique_ptr<pugi::xml_document> m_document;
     pugi::xml_parse_result              m_parserResult;
-    std::string                         m_strFilename;
-    unsigned long                       m_ulID;
-    const bool                          m_bUsingIDs = false;
-    const bool                          m_bReadOnly = false;
+    std::string                         m_filename;
+    unsigned long                       m_ID;
+    const bool                          m_usingIDs = false;
+    const bool                          m_readOnly = false;
 };

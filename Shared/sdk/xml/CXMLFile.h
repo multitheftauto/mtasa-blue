@@ -12,27 +12,26 @@
 
 #include "CXMLCommon.h"
 #include "CXMLErrorCodes.h"
+#include "CXMLNode.h"
 #include <string>
 #include <vector>
-
-class CXMLNode;
 
 class CXMLFile : public CXMLCommon
 {
 public:
     virtual ~CXMLFile() = default;
 
-    virtual const std::string& GetFilename() = 0;
-    virtual void               SetFilename(const std::string& strFilename) = 0;
+    virtual const std::string& GetFilename() const = 0;
+    virtual void               SetFilename(const std::string& filename) = 0;
 
-    virtual bool Parse(std::vector<char>* pOutFileContents = nullptr) = 0;
+    virtual bool Parse(std::vector<char>* outFileContents = nullptr) = 0;
     virtual bool Write() = 0;
     virtual void Reset() = 0;
 
-    virtual CXMLNode* CreateRootNode(const std::string& strTagName) = 0;
-    virtual CXMLNode* GetRootNode() = 0;
+    virtual CXMLNode* CreateRootNode(const std::string& tagName) = 0;
+    virtual CXMLNode* GetRootNode() const = 0;
 
-    virtual CXMLErrorCodes::Code GetLastError(std::string& strOut) = 0;
+    virtual CXMLErrorCodes::Code GetLastError(std::string& out) = 0;
 
-    virtual bool IsValid() = 0;
+    virtual bool IsValid() const = 0;
 };
