@@ -7,7 +7,7 @@ rem Optionally install resources
 echo.
 set ANSWER=n
 set /P ANSWER="Install resources? [y/N] "
-if "%ANSWER%"=="y" (
+if /I "%ANSWER%"=="y" (
     utils\premake5 install_resources
 )
 
