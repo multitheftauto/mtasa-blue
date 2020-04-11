@@ -8,28 +8,27 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
 #pragma once
 
-class CXMLCommon;
+#include <xml/CXMLCommon.h>
 
 class CXMLArray
 {
 public:
     static void Initialize();
 
-    static unsigned long PopUniqueID(CXMLCommon* pEntry);
-    static void          PushUniqueID(CXMLCommon* pEntry);
+    static unsigned long PopUniqueID(CXMLCommon* entry);
+    static void          PushUniqueID(CXMLCommon* entry);
 
-    static CXMLCommon*   GetEntry(unsigned long ulID);
+    static CXMLCommon*   GetEntry(unsigned long ID);
     static unsigned long GetCapacity();
     static unsigned long GetUnusedAmount();
 
 private:
-    static void ExpandBy(unsigned long ulAmount);
-    static void PushUniqueID(unsigned long ulID);
+    static void ExpandBy(unsigned long amount);
+    static void PushUniqueID(unsigned long ID);
 
     static CStack<unsigned long, 1> m_IDStack;
-    static std::vector<CXMLCommon*> m_Elements;
-    static unsigned long            m_ulCapacity;
+    static std::vector<CXMLCommon*> m_elements;
+    static unsigned long            m_capacity;
 };

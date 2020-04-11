@@ -12,79 +12,75 @@
 
 #define XML_ARRAY_BASE_ID 0x01000000
 
-CStack<unsigned long, 1> CXMLArray::m_IDStack;
-std::vector<CXMLCommon*> CXMLArray::m_Elements;
-unsigned long            CXMLArray::m_ulCapacity = 0;
-
 void CXMLArray::Initialize()
 {
-    m_ulCapacity = 0;
+    m_capacity = 0;
     ExpandBy(20000);
 }
 
-unsigned long CXMLArray::PopUniqueID(CXMLCommon* pEntry)
+unsigned long CXMLArray::PopUniqueID(CXMLCommon* entry)
 {
     // Add more ID's if required
     if (m_IDStack.GetUnusedAmount() < 10000)
         ExpandBy(10000);
 
     // Grab the next unused ID
-    unsigned long ulPhysicalIndex;
-    bool          bSuccess = m_IDStack.Pop(ulPhysicalIndex);
-    assert(bSuccess);
+    unsigned long physicalIndex;
+    bool          success = m_IDStack.Pop(physicalIndex);
+    assert(success);
 
     // Checks
-    assert((ulPhysicalIndex != INVALID_XML_ID) && (ulPhysicalIndex <= m_ulCapacity) && (m_Elements.size() > ulPhysicalIndex) &&
-           (m_Elements[ulPhysicalIndex] == NULL));
+    assert((physicalIndex != INVALID_XML_ID) && (physicalIndex <= m_capacity) && (m_elements.size() > physicalIndex) &&
+           (m_elements[physicalIndex] == nullptr));
 
-    m_Elements[ulPhysicalIndex] = pEntry;
+    m_elements[physicalIndex] = entry;
 
     // Map to ID
-    unsigned long ulLogicalID = ulPhysicalIndex + XML_ARRAY_BASE_ID;
-    return ulLogicalID;
+    unsigned long logicalID = physicalIndex + XML_ARRAY_BASE_ID;
+    return logicalID;
 }
 
-void CXMLArray::PushUniqueID(unsigned long ulLogicalID)
+void CXMLArray::PushUniqueID(unsigned long logicalID)
 {
     // Map to index
-    unsigned long ulPhysicalIndex = ulLogicalID - XML_ARRAY_BASE_ID;
+    unsigned long physicalIndex = logicalID - XML_ARRAY_BASE_ID;
 
     // Checks
-    assert((ulLogicalID != INVALID_XML_ID) && (ulPhysicalIndex <= m_ulCapacity) && (m_Elements[ulPhysicalIndex]));
+    assert((logicalID != INVALID_XML_ID) && (physicalIndex <= m_capacity) && (m_elements[physicalIndex]));
 
-    m_IDStack.Push(ulPhysicalIndex);
-    m_Elements[ulPhysicalIndex] = NULL;
+    m_IDStack.Push(physicalIndex);
+    m_elements[physicalIndex] = nullptr;
 }
 
-void CXMLArray::PushUniqueID(CXMLCommon* pEntry)
+void CXMLArray::PushUniqueID(CXMLCommon* entry)
 {
-    PushUniqueID(pEntry->GetID());
+    PushUniqueID(entry->GetID());
 }
 
-CXMLCommon* CXMLArray::GetEntry(unsigned long ulLogicalID)
+CXMLCommon* CXMLArray::GetEntry(unsigned long logicalID)
 {
     // Return the element with the given ID
 
     // Map to index
-    unsigned long ulPhysicalIndex = ulLogicalID - XML_ARRAY_BASE_ID;
+    unsigned long physicalIndex = logicalID - XML_ARRAY_BASE_ID;
 
-    if (ulLogicalID != INVALID_XML_ID && ulPhysicalIndex <= m_ulCapacity)
-        return m_Elements[ulPhysicalIndex];
+    if (logicalID != INVALID_XML_ID && physicalIndex <= m_capacity)
+        return m_elements[physicalIndex];
 
     return NULL;
 }
 
-void CXMLArray::ExpandBy(unsigned long ulAmount)
+void CXMLArray::ExpandBy(unsigned long amount)
 {
-    m_IDStack.ExpandBy(ulAmount);
-    m_Elements.resize(m_ulCapacity + ulAmount + 1, NULL);
-    m_ulCapacity += ulAmount;
-    assert(m_IDStack.GetCapacity() == m_ulCapacity);
+    m_IDStack.ExpandBy(amount);
+    m_elements.resize(m_capacity + amount + 1, nullptr);
+    m_capacity += amount;
+    assert(m_IDStack.GetCapacity() == m_capacity);
 }
 
 unsigned long CXMLArray::GetCapacity()
 {
-    return m_ulCapacity;
+    return m_capacity;
 }
 
 unsigned long CXMLArray::GetUnusedAmount()
