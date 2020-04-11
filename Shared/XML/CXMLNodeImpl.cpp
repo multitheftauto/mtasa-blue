@@ -10,73 +10,73 @@
  *****************************************************************************/
 #include "StdInc.h"
 
-CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node& node, bool bUsingIDs, CXMLNodeImpl* pParent) : m_ulID(INVALID_XML_ID), m_node(node), m_pParent(pParent)
+CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node& node, bool usingIDs, CXMLNodeImpl* parent) : m_ID(INVALID_XML_ID), m_node(node), m_parent(parent)
 {
-    if (bUsingIDs)
-        m_ulID = CXMLArray::PopUniqueID(this);
+    if (usingIDs)
+        m_ID = CXMLArray::PopUniqueID(this);
 }
 
 CXMLNodeImpl::~CXMLNodeImpl()
 {
-    if (m_ulID != INVALID_XML_ID)
+    if (m_ID != INVALID_XML_ID)
         CXMLArray::PushUniqueID(this);
 }
 
-CXMLNode* CXMLNodeImpl::CreateChild(const std::string& strTagName, CXMLNode* pInsertAfter)
+CXMLNode* CXMLNodeImpl::CreateChild(const std::string& tagName, CXMLNode* insertAfter)
 {
-    auto node = m_node.append_child(strTagName.c_str());
-    auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ulID != INVALID_XML_ID, this);
-    if (pInsertAfter)
+    auto node = m_node.append_child(tagName.c_str());
+    auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ID != INVALID_XML_ID, this);
+    if (insertAfter)
     {
-        auto matchingIter = std::find_if(m_Children.begin(), m_Children.end(), [pInsertAfter](const auto& p) { return pInsertAfter == p.get(); });
-        if (matchingIter != m_Children.end())
-            m_Children.insert(matchingIter++, std::move(wrapper));
+        auto matchingIter = std::find_if(m_children.begin(), m_children.end(), [insertAfter](const auto& p) { return insertAfter == p.get(); });
+        if (matchingIter != m_children.end())
+            m_children.insert(matchingIter++, std::move(wrapper));
         else
-            m_Children.push_back(std::move(wrapper));
+            m_children.push_back(std::move(wrapper));
     }
     else
-        m_Children.push_back(std::move(wrapper));
-    return m_Children.back().get();
+        m_children.push_back(std::move(wrapper));
+    return m_children.back().get();
 }
 
-void CXMLNodeImpl::RemoveChild(CXMLNode* pNode)
+void CXMLNodeImpl::RemoveChild(CXMLNode* node)
 {
     // Remove from pugixml node
-    m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(pNode)->GetNode());
+    m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(node)->GetNode());
 
     // Remove from child list
-    m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(), [pNode](const auto& pEntry) { return pNode == pEntry.get(); }), m_Children.end());
+    m_children.erase(std::remove_if(m_children.begin(), m_children.end(), [node](const auto& entry) { return node == entry.get(); }), m_children.end());
 }
 
-unsigned int CXMLNodeImpl::GetChildCount()
+unsigned int CXMLNodeImpl::GetChildCount() const
 {
-    return static_cast<unsigned int>(m_Children.size());
+    return static_cast<unsigned int>(m_children.size());
 }
 
-CXMLNode* CXMLNodeImpl::GetChild(unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::GetChild(unsigned int index) const
 {
     // Lookup the node
-    for (auto& pChild : m_Children)
+    for (auto& child : m_children)
     {
-        if (uiIndex == 0)
-            return pChild.get();
-        --uiIndex;
+        if (index == 0)
+            return child.get();
+        --index;
     }
 
     // No such node
     return nullptr;
 }
 
-CXMLNode* CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::GetChild(const std::string& tagName, unsigned int index) const
 {
     // Lookup the node
-    for (auto& pNode : m_Children)
+    for (auto& node : m_children)
     {
-        if (pNode->GetTagName() == strTagName)
+        if (node->GetTagName() == tagName)
         {
-            if (uiIndex == 0)
-                return pNode.get();
-            --uiIndex;
+            if (index == 0)
+                return node.get();
+            --index;
         }
     }
 
@@ -84,23 +84,23 @@ CXMLNode* CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiI
     return nullptr;
 }
 
-const std::string CXMLNodeImpl::GetTagName()
+const std::string CXMLNodeImpl::GetTagName() const
 {
     return m_node.name();
 }
 
-void CXMLNodeImpl::SetTagName(const std::string& strString)
+void CXMLNodeImpl::SetTagName(const std::string& string)
 {
-    m_node.set_name(strString.c_str());
+    m_node.set_name(string.c_str());
 }
 
-const std::string CXMLNodeImpl::GetTagContent()
+const std::string CXMLNodeImpl::GetTagContent() const
 {
-    const char* szSubText = m_node.child_value();
-    return szSubText ? std::string(szSubText) : std::string("");
+    const char* subText = m_node.child_value();
+    return subText ? std::string(subText) : std::string("");
 }
 
-bool CXMLNodeImpl::GetTagContent(bool& bContent)
+bool CXMLNodeImpl::GetTagContent(bool& content) const
 {
     const char* szText = m_node.child_value();
     if (!szText)
@@ -109,138 +109,138 @@ bool CXMLNodeImpl::GetTagContent(bool& bContent)
     std::string strText = szText;
     if (strText == "1")
     {
-        bContent = true;
+        content = true;
         return true;
     }
     if (strText == "0")
     {
-        bContent = false;
+        content = false;
         return true;
     }
     return false;
 }
 
-bool CXMLNodeImpl::GetTagContent(int& iContent)
+bool CXMLNodeImpl::GetTagContent(int& content)
 {
-    const char* szText = m_node.child_value();
-    if (!szText)
+    const char* text = m_node.child_value();
+    if (!text)
         return false;
 
-    return StringToNumber(szText, iContent);
+    return StringToNumber(text, content);
 }
 
-bool CXMLNodeImpl::GetTagContent(unsigned int& uiContent)
+bool CXMLNodeImpl::GetTagContent(unsigned int& content)
 {
-    const char* szText = m_node.child_value();
-    if (!szText)
+    const char* text = m_node.child_value();
+    if (!text)
         return false;
 
-    return StringToNumber(szText, uiContent);
+    return StringToNumber(text, content);
 }
 
-bool CXMLNodeImpl::GetTagContent(float& fContent)
+bool CXMLNodeImpl::GetTagContent(float& content)
 {
-    const char* szText = m_node.child_value();
-    if (!szText)
+    const char* text = m_node.child_value();
+    if (!text)
         return false;
 
-    return StringToNumber(szText, fContent);
+    return StringToNumber(text, content);
 }
 
-void CXMLNodeImpl::SetTagContent(const std::string& strContent, bool bCDATA)
+void CXMLNodeImpl::SetTagContent(const std::string& content, bool cdata)
 {
-    SetTagContent(strContent.c_str(), bCDATA);
+    SetTagContent(content.c_str(), cdata);
 }
 
-void CXMLNodeImpl::SetTagContent(const char* szText, bool bCDATA)
+void CXMLNodeImpl::SetTagContent(const char* text, bool cdata)
 {
     // Remove children if any
     for (auto& child : m_node.children())
         m_node.remove_child(child);
-    m_Children.clear();
+    m_children.clear();
 
-    m_node.append_child(bCDATA ? pugi::node_cdata : pugi::node_pcdata).set_value(szText);
+    m_node.append_child(cdata ? pugi::node_cdata : pugi::node_pcdata).set_value(text);
 }
 
-void CXMLNodeImpl::SetTagContent(bool bContent)
+void CXMLNodeImpl::SetTagContent(bool content)
 {
-    if (bContent)
+    if (content)
         SetTagContent("1");
     else
         SetTagContent("0");
 }
 
-void CXMLNodeImpl::SetTagContent(int iContent)
+void CXMLNodeImpl::SetTagContent(int content)
 {
-    SetTagContent(std::to_string(iContent));
+    SetTagContent(std::to_string(content));
 }
 
-void CXMLNodeImpl::SetTagContent(unsigned int uiContent)
+void CXMLNodeImpl::SetTagContent(unsigned int content)
 {
-    SetTagContent(std::to_string(uiContent));
+    SetTagContent(std::to_string(content));
 }
 
-void CXMLNodeImpl::SetTagContent(float fContent)
+void CXMLNodeImpl::SetTagContent(float content)
 {
-    SetTagContent(std::to_string(fContent));
+    SetTagContent(std::to_string(content));
 }
 
-void CXMLNodeImpl::SetTagContentf(const char* szFormat, ...)
+void CXMLNodeImpl::SetTagContentf(const char* format, ...)
 {
     // Convert the formatted string to a string (MAX 1024 BYTES) and set it
-    char    szBuffer[1024];
+    char    buffer[1024];
     va_list va;
-    va_start(va, szFormat);
-    VSNPRINTF(szBuffer, 1024, szFormat, va);
+    va_start(va, format);
+    VSNPRINTF(buffer, 1024, format, va);
     va_end(va);
-    SetTagContent(szBuffer);
+    SetTagContent(buffer);
 }
 
-int CXMLNodeImpl::GetLine()
+int CXMLNodeImpl::GetLine() const
 {
     // TODO
     return 0;
 }
 
-bool CXMLNodeImpl::RemoveAttribute(const std::string& strName)
+bool CXMLNodeImpl::RemoveAttribute(const std::string& name)
 {
-    bool bRemoved = false;
+    bool removed = false;
 
     // Remove from attributes list
-    m_Attributes.erase(std::remove_if(m_Attributes.begin(), m_Attributes.end(),
-                                      [&bRemoved, strName](const auto& pNode) {
-                                          if (pNode->GetName() == strName)
+    m_attributes.erase(std::remove_if(m_attributes.begin(), m_attributes.end(),
+                                      [&removed, name](const auto& node) {
+                                          if (node->GetName() == name)
                                           {
-                                              bRemoved = true;
+                                              removed = true;
                                               return true;
                                           }
                                           return false;
                                       }),
-                       m_Attributes.end());
+                       m_attributes.end());
 
     // Remove from pugixml node
-    m_node.remove_attribute(strName.c_str());
+    m_node.remove_attribute(name.c_str());
 
-    return bRemoved;
+    return removed;
 }
 
-CXMLAttribute* CXMLNodeImpl::AddAttribute(const std::string& strName)
+CXMLAttribute* CXMLNodeImpl::AddAttribute(const std::string& name)
 {
-    auto xmlAttribute = m_node.append_attribute(strName.c_str());
-    auto wrapper = std::make_unique<CXMLAttributeImpl>(xmlAttribute, m_ulID != INVALID_XML_ID);
+    auto xmlAttribute = m_node.append_attribute(name.c_str());
+    auto wrapper = std::make_unique<CXMLAttributeImpl>(xmlAttribute, m_ID != INVALID_XML_ID);
     AddAttribute(std::move(wrapper));
-    return m_Attributes.back().get();
+    return m_attributes.back().get();
 }
 
-CXMLAttribute* CXMLNodeImpl::GetAttribute(const std::string& strName)
+CXMLAttribute* CXMLNodeImpl::GetAttribute(const std::string& name) const
 {
-    for (auto& pAttribute : m_Attributes)
-        if (pAttribute->GetName() == strName)
-            return pAttribute.get();
+    for (auto& attribute : m_attributes)
+        if (attribute->GetName() == name)
+            return attribute.get();
     return nullptr;
 }
 
-SString CXMLNodeImpl::GetCommentText()
+SString CXMLNodeImpl::GetCommentText() const
 {
     // TODO
     return "";
@@ -300,26 +300,26 @@ void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankL
 
 void CXMLNodeImpl::RemoveAllChildren()
 {
-    for (auto& pChild : m_Children)
-        m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(pChild.get())->m_node);
-    m_Children.clear();
+    for (auto& child : m_children)
+        m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(child.get())->m_node);
+    m_children.clear();
 }
 
-void CXMLNodeImpl::AddAttribute(std::unique_ptr<CXMLAttribute> pAttribute)
+void CXMLNodeImpl::AddAttribute(std::unique_ptr<CXMLAttribute> attribute)
 {
-    m_Attributes.push_back(std::move(pAttribute));
+    m_attributes.push_back(std::move(attribute));
 }
 
-void CXMLNodeImpl::AddChild(std::unique_ptr<CXMLNode> pChild)
+void CXMLNodeImpl::AddChild(std::unique_ptr<CXMLNode> child)
 {
-    m_Children.push_back(std::move(pChild));
+    m_children.push_back(std::move(child));
 }
 
-bool CXMLNodeImpl::StringToNumber(const char* szString, long& lValue)
+bool CXMLNodeImpl::StringToNumber(const char* string, long& value)
 {
     try
     {
-        lValue = std::stol(szString);
+        value = std::stol(string);
     }
     catch (...)
     {
@@ -328,15 +328,15 @@ bool CXMLNodeImpl::StringToNumber(const char* szString, long& lValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char* szString, unsigned int& uiValue)
+bool CXMLNodeImpl::StringToNumber(const char* string, unsigned int& value)
 {
     try
     {
         // Sadly there's no stoui
-        unsigned long temp = std::stoul(szString);
+        unsigned long temp = std::stoul(string);
         if (temp > std::numeric_limits<unsigned int>::max())
             return false;
-        uiValue = temp;
+        value = temp;
         return true;
     }
     catch (...)
@@ -346,11 +346,11 @@ bool CXMLNodeImpl::StringToNumber(const char* szString, unsigned int& uiValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char* szString, int& iValue)
+bool CXMLNodeImpl::StringToNumber(const char* string, int& value)
 {
     try
     {
-        iValue = std::stoi(szString);
+        value = std::stoi(string);
     }
     catch (...)
     {
@@ -359,11 +359,11 @@ bool CXMLNodeImpl::StringToNumber(const char* szString, int& iValue)
     return true;
 }
 
-bool CXMLNodeImpl::StringToNumber(const char* szString, float& fValue)
+bool CXMLNodeImpl::StringToNumber(const char* string, float& value)
 {
     try
     {
-        fValue = std::stof(szString);
+        value = std::stof(string);
     }
     catch (...)
     {
