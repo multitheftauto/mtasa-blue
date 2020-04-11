@@ -11,29 +11,29 @@
 
 #include "StdInc.h"
 
-CXMLImpl* pXMLInterface = NULL;
+CXMLImpl* xmlInterface = nullptr;
 
-MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
+MTAEXPORT CXML* InitXMLInterface(const char* saveFlagDirectory)
 {
-    pXMLInterface = new CXMLImpl;
-    return pXMLInterface;
+    xmlInterface = new CXMLImpl;
+    return xmlInterface;
 }
 
 MTAEXPORT void ReleaseXMLInterface()
 {
-    if (pXMLInterface)
+    if (xmlInterface)
     {
-        delete pXMLInterface;
-        pXMLInterface = NULL;
+        delete xmlInterface;
+        xmlInterface = nullptr;
     }
 }
 
 #ifdef WIN32
 
-int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+int WINAPI DllMain(HINSTANCE module, DWORD reason, PVOID nothing)
 {
     // Kill the interface on detach
-    if (dwReason == DLL_PROCESS_DETACH)
+    if (reason == DLL_PROCESS_DETACH)
         ReleaseXMLInterface();
 
     return TRUE;
