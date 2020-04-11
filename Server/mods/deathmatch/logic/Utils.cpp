@@ -661,8 +661,18 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
-    ControllerState.ButtonSquare = keys.data.bButtonSquare;
-    ControllerState.ButtonCross = keys.data.bButtonCross;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
+    if (BitStream.Version() >= 0x06F)
+    {
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = keys.data.bShockButtonL;
@@ -679,14 +689,16 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
 void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;
-    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);              // Action / Secondary-Fire
-    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);            // Aim-Weapon / Handbrake
-    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);                // Jump / Reverse
-    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);                  // Sprint / Accelerate
-    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);                // Fire // Fire
-    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);            // Enter/Exit/Special-Attack / Enter/exit
-    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                // Crouch / Horn
-    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                       // Walk / -
+    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);                   // Action / Secondary-Fire
+    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);                 // Aim-Weapon / Handbrake
+    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);                     // Jump / Reverse
+    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);                       // Sprint / Accelerate
+    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);                     // Fire // Fire
+    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
+    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
+    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Reverse
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -704,13 +716,22 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
     // Put the result into the controllerstate
     ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
     ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
-    ControllerState.ButtonSquare = keys.data.bButtonSquare;
-    ControllerState.ButtonCross = keys.data.bButtonCross;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
+    if (BitStream.Version() >= 0x06F)
+    {
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
     ControllerState.ButtonCircle = keys.data.bButtonCircle;
     ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
     ControllerState.ShockButtonL = keys.data.bShockButtonL;
     ControllerState.m_bPedWalk = keys.data.bPedWalk;
-
     ControllerState.LeftStickX = keys.data.sLeftStickX;
     ControllerState.LeftStickY = keys.data.sLeftStickY;
 
@@ -729,6 +750,8 @@ void WriteFullKeysync(const CControllerState& ControllerState, NetBitStreamInter
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
