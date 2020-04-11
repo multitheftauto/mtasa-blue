@@ -10,7 +10,7 @@
  *****************************************************************************/
 #pragma once
 
-enum eXMLClass
+enum class eXMLClass
 {
     CXML_FILE = 0,
     CXML_NODE,
@@ -22,8 +22,8 @@ enum eXMLClass
 class CXMLCommon
 {
 public:
-    virtual ~CXMLCommon(){};
+    virtual ~CXMLCommon() = default;
 
-    virtual eXMLClass     GetClassType() = 0;
-    virtual unsigned long GetID() = 0;
+    virtual eXMLClass     GetClassType() const = 0;
+    virtual unsigned long GetID() const = 0;
 };

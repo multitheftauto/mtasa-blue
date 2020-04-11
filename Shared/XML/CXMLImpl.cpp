@@ -16,9 +16,9 @@ CXMLImpl::CXMLImpl()
     CXMLArray::Initialize();
 }
 
-CXMLFile* CXMLImpl::CreateXML(const std::string& szFilename, bool bUseIDs, bool bReadOnly)
+CXMLFile* CXMLImpl::CreateXML(const std::string& filename, bool useIDs, bool readOnly)
 {
-    CXMLFile* xmlFile = new CXMLFileImpl(szFilename, bUseIDs, bReadOnly);
+    CXMLFile* xmlFile = new CXMLFileImpl(filename, useIDs, readOnly);
     if (xmlFile->IsValid())
         return xmlFile;
     delete xmlFile;
@@ -30,9 +30,9 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
     delete pFile;
 }
 
-CXMLFile* CXMLImpl::CopyXML(const std::string& strFilename, CXMLNode* pNode, bool bReadOnly)
+CXMLFile* CXMLImpl::CopyXML(const std::string& filename, CXMLNode* node, bool readOnly)
 {
-    return new CXMLFileImpl(strFilename, pNode, bReadOnly);
+    return new CXMLFileImpl(filename, node, readOnly);
 }
 
 CXMLNode* CXMLImpl::CreateDummyNode()
@@ -42,40 +42,40 @@ CXMLNode* CXMLImpl::CreateDummyNode()
     return new CXMLNodeImpl(node, false);
 }
 
-CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
+CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ID) const
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
-    if (pCommon && pCommon->GetClassType() == CXML_ATTR)
-        return reinterpret_cast<CXMLAttribute*>(pCommon);
+    CXMLCommon* common = CXMLArray::GetEntry(ID);
+    if (common && common->GetClassType() == eXMLClass::CXML_ATTR)
+        return reinterpret_cast<CXMLAttribute*>(common);
 
     // Doesn't exist or bad type
     return nullptr;
 }
 
-CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
+CXMLFile* CXMLImpl::GetFileFromID(unsigned long ID) const
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
-    if (pCommon && pCommon->GetClassType() == CXML_FILE)
-        return reinterpret_cast<CXMLFile*>(pCommon);
+    CXMLCommon* common = CXMLArray::GetEntry(ID);
+    if (common && common->GetClassType() == eXMLClass::CXML_FILE)
+        return reinterpret_cast<CXMLFile*>(common);
 
     // Doesn't exist or bad type
     return nullptr;
 }
 
-CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ulID)
+CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ID) const
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
-    if (pCommon && pCommon->GetClassType() == CXML_NODE)
-        return reinterpret_cast<CXMLNode*>(pCommon);
+    CXMLCommon* common = CXMLArray::GetEntry(ID);
+    if (common && common->GetClassType() == eXMLClass::CXML_NODE)
+        return reinterpret_cast<CXMLNode*>(common);
 
     // Doesn't exist or bad type
     return nullptr;
 }
 
-CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
+CXMLNode* CXMLImpl::ParseString(const char* xmlContent)
 {
     // TODO
     return nullptr;

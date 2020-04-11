@@ -12,6 +12,7 @@
 
 #include <pugixml.hpp>
 #include <xml/CXMLAttribute.h>
+#include <xml/CXMLCommon.h>
 
 class CXMLAttributeImpl : public CXMLAttribute
 {
@@ -29,8 +30,8 @@ public:
     void SetValue(unsigned int uiValue);
     void SetValue(float fValue);
 
-    inline eXMLClass     GetClassType() { return CXML_ATTR; };
-    inline unsigned long GetID() { return m_ulID; };
+    inline eXMLClass     GetClassType() const override { return eXMLClass::CXML_ATTR; };
+    inline unsigned long GetID() const override { return m_ID; };
 
 private:
     unsigned long       m_ulID;

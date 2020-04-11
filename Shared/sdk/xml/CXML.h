@@ -10,22 +10,22 @@
  *****************************************************************************/
 #pragma once
 
-class CXMLNode;
-class CXMLFile;
-class CXMLAttribute;
+#include "CXMLAttribute.h"
+#include "CXMLFile.h"
+#include "CXMLNode.h"
 
 class CXML
 {
 public:
-    virtual CXMLFile* CreateXML(const std::string& strFilename, bool bUseIDs = false, bool bReadOnly = false) = 0;
-    virtual void      DeleteXML(CXMLFile* pFile) = 0;
-    virtual CXMLFile* CopyXML(const std::string& strFilename, CXMLNode* pNode, bool bReadOnly = false) = 0;
+    virtual CXMLFile* CreateXML(const std::string& filename, bool useIDs = false, bool readOnly = false) = 0;
+    virtual void      DeleteXML(CXMLFile* file) = 0;
+    virtual CXMLFile* CopyXML(const std::string& filename, CXMLNode* node, bool readOnly = false) = 0;
 
     virtual CXMLNode* CreateDummyNode() = 0;
 
-    virtual CXMLAttribute* GetAttrFromID(unsigned long ulID) = 0;
-    virtual CXMLFile*      GetFileFromID(unsigned long ulID) = 0;
-    virtual CXMLNode*      GetNodeFromID(unsigned long ulID) = 0;
+    virtual CXMLAttribute* GetAttrFromID(unsigned long ID) const = 0;
+    virtual CXMLFile*      GetFileFromID(unsigned long ID) const = 0;
+    virtual CXMLNode*      GetNodeFromID(unsigned long ID) const = 0;
 
-    virtual CXMLNode* ParseString(const char* strXmlContent) = 0;
+    virtual CXMLNode* ParseString(const char* xmlContent) = 0;
 };

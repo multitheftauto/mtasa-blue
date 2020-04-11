@@ -33,8 +33,8 @@ public:
 
     CXMLErrorCodes::Code GetLastError(std::string& strOut) override;
 
-    inline eXMLClass     GetClassType() override { return CXML_FILE; }
-    inline unsigned long GetID() override { return m_ulID; }
+    inline eXMLClass     GetClassType() const override { return eXMLClass::CXML_FILE; }
+    inline unsigned long GetID() const override { return m_ID; }
 
     inline bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 

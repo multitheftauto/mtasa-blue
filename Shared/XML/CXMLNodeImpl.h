@@ -11,6 +11,7 @@
 #pragma once
 
 #include <pugixml.hpp>
+#include <xml/CXMLCommon.h>
 #include <xml/CXMLNode.h>
 
 class CXMLNodeImpl : public CXMLNode
@@ -59,8 +60,8 @@ public:
     void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false) override;
 
     // CXMLCommon Interface
-    inline eXMLClass     GetClassType() override { return CXML_NODE; };
-    inline unsigned long GetID() override { return m_ulID; };
+    inline eXMLClass     GetClassType() const override { return eXMLClass::CXML_NODE; }
+    inline unsigned long GetID() const override { return m_ID; }
 
     // CXMLNodeImpl
     void                   AddAttribute(std::unique_ptr<CXMLAttribute> pAttribute);
