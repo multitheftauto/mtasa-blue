@@ -46,7 +46,8 @@ CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
     TiXmlDocument* xmlDoc = new TiXmlDocument();
     if (xmlDoc)
     {   
-        if (xmlDoc->Parse(strXmlContent, 0, TIXML_ENCODING_UTF8))
+        xmlDoc->Parse(strXmlContent, 0, TIXML_ENCODING_UNKNOWN);
+        if (!xmlDoc->Error())
         {
             TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
             CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
@@ -65,8 +66,11 @@ CXMLNode* CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
     while (xmlChild = xmlNode->IterateChildren(xmlChild))
     {
         xmlChildElement = xmlChild->ToElement();
-        xmlChildNode = new CXMLNodeImpl(nullptr, xmlParent, *xmlChildElement);
-        CXMLImpl::BuildNode(xmlChildNode, xmlChildElement);
+        if (xmlChildElement)
+        {
+            xmlChildNode = new CXMLNodeImpl(nullptr, xmlParent, *xmlChildElement);
+            CXMLImpl::BuildNode(xmlChildNode, xmlChildElement);
+        }
     }
     return xmlParent;
 }
