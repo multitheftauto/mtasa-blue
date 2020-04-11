@@ -21,10 +21,10 @@ public:
     virtual const std::string GetName() const = 0;
     virtual const std::string GetValue() const = 0;
 
-    virtual void SetValue(const std::string& strValue) = 0;
-    virtual void SetValue(const char* szValue) = 0;
-    virtual void SetValue(bool bValue) = 0;
-    virtual void SetValue(int iValue) = 0;
-    virtual void SetValue(unsigned int uiValue) = 0;
-    virtual void SetValue(float fValue) = 0;
+    virtual void SetValue(const std::string& value) = 0;
+    virtual void SetValue(const char* value) = 0;
+    virtual void SetValue(bool value) = 0;
+    virtual void SetValue(int value) = 0;
+    virtual void SetValue(unsigned int value) = 0;
+    virtual void SetValue(float value) = 0;
 };

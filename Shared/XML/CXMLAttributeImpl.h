@@ -17,23 +17,23 @@
 class CXMLAttributeImpl : public CXMLAttribute
 {
 public:
-    CXMLAttributeImpl(pugi::xml_attribute& attribute, bool bUsingIDs);
-    virtual ~CXMLAttributeImpl();
+    CXMLAttributeImpl(pugi::xml_attribute& attribute, bool usingIDs);
+    ~CXMLAttributeImpl();
 
-    const std::string GetName() const;
-    const std::string GetValue() const;
+    const std::string GetName() const override;
+    const std::string GetValue() const override;
 
-    void SetValue(const std::string& strValue);
-    void SetValue(const char* szValue);
-    void SetValue(bool bValue);
-    void SetValue(int iValue);
-    void SetValue(unsigned int uiValue);
-    void SetValue(float fValue);
+    void SetValue(const std::string& value) override;
+    void SetValue(const char* value) override;
+    void SetValue(bool value) override;
+    void SetValue(int value) override;
+    void SetValue(unsigned int value) override;
+    void SetValue(float value) override;
 
     inline eXMLClass     GetClassType() const override { return eXMLClass::CXML_ATTR; };
     inline unsigned long GetID() const override { return m_ID; };
 
 private:
-    unsigned long       m_ulID;
-    pugi::xml_attribute m_Attribute;
+    unsigned long       m_ID;
+    pugi::xml_attribute m_attribute;
 };

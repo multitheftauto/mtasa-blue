@@ -10,57 +10,57 @@
  *****************************************************************************/
 #include "StdInc.h"
 
-CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute& attribute, bool bUsingIDs) : m_ulID(INVALID_XML_ID), m_Attribute(attribute)
+CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute& attribute, bool usingIDs) : m_ID(INVALID_XML_ID), m_attribute(attribute)
 {
-    if (bUsingIDs)
-        m_ulID = CXMLArray::PopUniqueID(this);
+    if (usingIDs)
+        m_ID = CXMLArray::PopUniqueID(this);
 }
 
 CXMLAttributeImpl::~CXMLAttributeImpl()
 {
-    if (m_ulID != INVALID_XML_ID)
+    if (m_ID != INVALID_XML_ID)
         CXMLArray::PushUniqueID(this);
 }
 
 const std::string CXMLAttributeImpl::GetName() const
 {
-    return std::string(m_Attribute.name());
+    return std::string(m_attribute.name());
 }
 
 const std::string CXMLAttributeImpl::GetValue() const
 {
-    return std::string(m_Attribute.value());
+    return std::string(m_attribute.value());
 }
 
-void CXMLAttributeImpl::SetValue(const std::string& strValue)
+void CXMLAttributeImpl::SetValue(const char* value)
 {
-    SetValue(strValue.c_str());
+    m_attribute.set_value(value);
 }
 
-void CXMLAttributeImpl::SetValue(const char* szValue)
+void CXMLAttributeImpl::SetValue(const std::string& value)
 {
-    m_Attribute.set_value(szValue);
+    SetValue(value.c_str());
 }
 
-void CXMLAttributeImpl::SetValue(bool bValue)
+void CXMLAttributeImpl::SetValue(const bool value)
 {
-    if (bValue)
+    if (value)
         SetValue("1");
     else
         SetValue("0");
 }
 
-void CXMLAttributeImpl::SetValue(int iValue)
+void CXMLAttributeImpl::SetValue(int value)
 {
-    SetValue(std::to_string(iValue));
+    SetValue(std::to_string(value));
 }
 
-void CXMLAttributeImpl::SetValue(unsigned int uiValue)
+void CXMLAttributeImpl::SetValue(unsigned int value)
 {
-    SetValue(std::to_string(uiValue));
+    SetValue(std::to_string(value));
 }
 
-void CXMLAttributeImpl::SetValue(float fValue)
+void CXMLAttributeImpl::SetValue(float value)
 {
-    SetValue(std::to_string(fValue));
+    SetValue(std::to_string(value));
 }
