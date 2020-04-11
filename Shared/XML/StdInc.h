@@ -28,7 +28,6 @@
 // Implementation
 #include "CXMLArray.h"
 #include "CXMLAttributeImpl.h"
-#include "CXMLDocumentImpl.h"
 #include "CXMLFileImpl.h"
 #include "CXMLImpl.h"
 #include "CXMLNodeImpl.h"

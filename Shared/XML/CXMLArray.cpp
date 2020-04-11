@@ -10,6 +10,10 @@
  *****************************************************************************/
 #include "StdInc.h"
 
+CStack<unsigned long, 1> CXMLArray::m_IDStack;
+std::vector<CXMLCommon*> CXMLArray::m_elements;
+unsigned long            CXMLArray::m_capacity = 0;
+
 #define XML_ARRAY_BASE_ID 0x01000000
 
 void CXMLArray::Initialize()
