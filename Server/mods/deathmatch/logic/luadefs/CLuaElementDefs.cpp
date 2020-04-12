@@ -2483,10 +2483,10 @@ int CLuaElementDefs::GetElementCount(lua_State* luaVM)
             return 1;
         }
     }
-    else
+    
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    m_pScriptDebugging->LogBadPointer(luaVM, "element", 1);
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;

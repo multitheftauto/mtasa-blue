@@ -7669,7 +7669,6 @@ int CStaticFunctionDefinitions::GetElementCount(EElementCountType eElementType)
 
                 return count;
             }
-            break;
         case ELEMENT_BLIP:
             return m_pBlipManager->Count();
         case ELEMENT_RADARAREA:
