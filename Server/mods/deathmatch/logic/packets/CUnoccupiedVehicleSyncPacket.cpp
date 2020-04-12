@@ -18,7 +18,7 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket()
 
 bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
 {
-    uint uiMaxCount = g_pGame->GetVehicleManager()->Count() * 2 + 10;
+    uint uiMaxCount = static_cast<uint>(g_pGame->GetVehicleManager()->GetVehicleCount()) * 2u + 10u;
     // While we're not out of bytes
     for (uint i = 0; BitStream.GetNumberOfUnreadBits() >= 8; i++)
     {

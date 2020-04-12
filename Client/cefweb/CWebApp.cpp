@@ -32,7 +32,11 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 
-    command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+    if (process_type.empty())
+    {
+        command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+        command_line->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+    }
 }
 
 CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,

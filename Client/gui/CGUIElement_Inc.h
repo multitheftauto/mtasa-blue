@@ -248,6 +248,10 @@ void SetClickHandler(GUI_CALLBACK Callback)
 {
     CGUIElement_Impl::SetClickHandler(Callback);
 };
+void SetClickHandler(const GUI_CALLBACK_MOUSE& Callback)
+{
+    CGUIElement_Impl::SetClickHandler(Callback);
+};
 void SetDoubleClickHandler(GUI_CALLBACK Callback)
 {
     CGUIElement_Impl::SetDoubleClickHandler(Callback);
@@ -293,9 +297,9 @@ void SetEnterKeyHandler(GUI_CALLBACK Callback)
     CGUIElement_Impl::SetEnterKeyHandler(Callback);
 };
 
-bool Event_OnClick()
+bool Event_OnClick(const CEGUI::EventArgs& e)
 {
-    return CGUIElement_Impl::Event_OnClick();
+    return CGUIElement_Impl::Event_OnClick(e);
 };
 bool Event_OnDoubleClick()
 {

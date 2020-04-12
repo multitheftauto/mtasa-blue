@@ -18,11 +18,13 @@ project "Client Core"
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk"
+			"../../vendor/hwbrk",
+			"../../vendor/discordgsdk/cpp"
 		}
 
 	libdirs {
 		"../../vendor/detours/lib",
+		"../../vendor/discordgsdk/lib/x86",
 	}
 
 
@@ -30,7 +32,7 @@ project "Client Core"
 	pchsource "StdInc.cpp"
 
 	vpaths {
-		["Headers/*"] = "**.h",
+		["Headers/*"] = {"**.h", "**.hpp"},
 		["Sources/*"] = "**.cpp",
 		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
@@ -43,13 +45,14 @@ project "Client Core"
 		"../launch/resource/mtaicon.ico",
 		"core.rc",
 		"**.h",
+		"**.hpp",
 		"**.cpp"
 	}
 
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "discordgsdk", "discord_game_sdk.dll.lib"
 	}
 
 	defines {

@@ -76,8 +76,11 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
     static bool RemoveElementData(CElement* pElement, const char* szName);
+    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
@@ -125,6 +128,7 @@ public:
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
     static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
+    static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
@@ -133,6 +137,7 @@ public:
     static bool TakePlayerMoney(CElement* pElement, long lMoney);
     static bool ShowPlayerHudComponent(CElement* pElement, eHudComponent component, bool bShow);
     static bool SetPlayerDebuggerVisible(CElement* pElement, bool bVisible);
+    static bool SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel);
     static bool SetPlayerWantedLevel(CElement* pElement, unsigned int iLevel);
     static bool ForcePlayerMap(CElement* pElement, bool bVisible);
     static bool SetPlayerNametagText(CElement* pElement, const char* szText);
@@ -142,6 +147,7 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
+    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -299,7 +305,7 @@ public:
     static bool AddVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
-    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState);
+    static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
@@ -453,6 +459,19 @@ public:
     static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
 
+    // Shape get functions
+    static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+    
+    // Shape set functions
+    static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
+
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);
     static bool           GetWeaponNameFromID(unsigned char ucID, char* szName);
@@ -545,6 +564,8 @@ public:
     static bool         SetMaxPlayers(unsigned int uiMax);
     static bool OutputChatBox(const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded,
                               CLuaMain* pLuaMain);
+    static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                              bool bColorCoded);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
     static bool ClearChatBox(CElement* pElement);

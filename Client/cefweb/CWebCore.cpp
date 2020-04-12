@@ -107,8 +107,9 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
     if (pWebView)
     {
-        // Ensure that no attached events are in the queue
+        // Ensure that no attached events or tasks are in the queue
         RemoveWebViewEvents(pWebView);
+        RemoveWebViewTasks(pWebView);
 
         m_WebViews.remove(pWebView);
         // pWebView->Release(); // Do not release since other references get corrupted then
@@ -120,6 +121,9 @@ void CWebCore::DoPulse()
 {
     // Check for queued whitelist/blacklist downloads
     g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)->ProcessQueuedFiles();
+
+    // Execute queued tasks on the main thread
+    DoTaskQueuePulse();
 
     // Execute queued events on the main thread (Lua calls must be executed on the main thread)
     DoEventQueuePulse();
@@ -195,6 +199,52 @@ void CWebCore::DoEventQueuePulse()
     for (auto& view : m_WebViews)
     {
         view->UpdateTexture();
+    }
+}
+
+void CWebCore::WaitForTask(std::function<void(bool)> task, CWebView* webView)
+{
+    if (!webView || webView->IsBeingDestroyed())
+        return;
+
+    // NOTE: Tasks are processed in the main thread: NEVER call this method in the main thread
+    assert(!IsMainThread());
+
+    std::future<void> result;
+    {
+        std::scoped_lock lock(m_TaskQueueMutex);
+        m_TaskQueue.emplace_back(TaskEntry{task, webView});
+        result = m_TaskQueue.back().task.get_future();
+    }
+
+    result.get();
+}
+
+void CWebCore::RemoveWebViewTasks(CWebView* webView)
+{
+    std::scoped_lock lock(m_TaskQueueMutex);
+
+    for (auto iter = m_TaskQueue.begin(); iter != m_TaskQueue.end(); ++iter)
+    {
+        if (iter->webView != webView)
+            continue;
+
+        iter->task(true);
+        iter = m_TaskQueue.erase(iter);
+    }
+}
+
+void CWebCore::DoTaskQueuePulse()
+{
+    std::list<TaskEntry> taskQueue;
+    {
+        std::scoped_lock lock(m_TaskQueueMutex);
+        std::swap(m_TaskQueue, taskQueue);
+    }
+
+    for (TaskEntry& entry : taskQueue)
+    {
+        entry.task(false);
     }
 }
 
@@ -444,6 +494,18 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_KEYUP;
     else if (uMsg == WM_CHAR || uMsg == WM_SYSCHAR)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
+
+    // Alt-Gr check
+    if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU)) 
+    {
+        HKL current_layout = ::GetKeyboardLayout(0);
+        SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
+        if (((scan_res >> 8) & 0xFF) == (2 | 4))
+        {
+            keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
+            keyEvent.modifiers |= EVENTFLAG_ALTGR_DOWN;
+        }
+    }
 
     m_pFocusedWebView->InjectKeyboardEvent(keyEvent);
 }
