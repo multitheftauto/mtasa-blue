@@ -614,7 +614,7 @@ int CLuaPedDefs::GetPedTarget(lua_State* luaVM)
 int CLuaPedDefs::GetPedTargetStart(lua_State* luaVM)
 {
     // Verify the argument
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
@@ -639,7 +639,7 @@ int CLuaPedDefs::GetPedTargetStart(lua_State* luaVM)
 
 int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
 {
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
@@ -661,7 +661,7 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
 int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
 {
     // Verify the argument
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
@@ -669,7 +669,7 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
     {
         // Grab the ped end target position and return it
         CVector vecEnd;
-        pPed->GetShotData(NULL, &vecEnd);
+        pPed->GetShotData(nullptr, &vecEnd);
 
         lua_pushnumber(luaVM, vecEnd.fX);
         lua_pushnumber(luaVM, vecEnd.fY);
@@ -686,14 +686,14 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
 
 int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
 {
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
     if (!argStream.HasErrors())
     {
         CVector vecEnd;
-        pPed->GetShotData(NULL, &vecEnd);
+        pPed->GetShotData(nullptr, &vecEnd);
 
         lua_pushvector(luaVM, vecEnd);
         return 1;
@@ -708,7 +708,7 @@ int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
 int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
 {
     // Verify the argument
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
@@ -734,7 +734,7 @@ int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
 
 int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
 {
-    CClientPed*      pPed = NULL;
+    CClientPed*      pPed = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
