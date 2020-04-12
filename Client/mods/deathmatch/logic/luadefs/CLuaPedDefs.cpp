@@ -150,8 +150,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled");
-    lua_classfunction(luaVM, "getTargetEnd", "getPedTargetEnd");
-    lua_classfunction(luaVM, "getTargetStart", "getPedTargetStart");
+    lua_classfunction(luaVM, "getTargetEnd", OOP_GetPedTargetEnd);
+    lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
     lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
@@ -207,8 +207,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
     lua_classvariable(luaVM, "targetCollision", NULL, "getPedTargetCollision");
-    lua_classvariable(luaVM, "targetEnd", NULL, "getPedTargetEnd");
-    lua_classvariable(luaVM, "targetStart", NULL, "getPedTargetStart");
+    lua_classvariable(luaVM, "targetEnd", NULL, OOP_GetPedTargetEnd);
+    lua_classvariable(luaVM, "targetStart", NULL, OOP_GetPedTargetStart);
     // lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedWeaponMuzzlePosition" ); // TODO: needs to return a vector3 for oop
     lua_classvariable(luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot");
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
@@ -637,6 +637,28 @@ int CLuaPedDefs::GetPedTargetStart(lua_State* luaVM)
     return 1;
 }
 
+int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
+{
+    CClientPed*      pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecStart;
+        pPed->GetShotData(&vecStart);
+
+        lua_pushvector(luaVM, vecStart);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
 int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
 {
     // Verify the argument
@@ -659,6 +681,27 @@ int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
+{
+    CClientPed*      pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecEnd;
+        pPed->GetShotData(NULL, &vecEnd);
+
+        lua_pushvector(luaVM, vecEnd);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
