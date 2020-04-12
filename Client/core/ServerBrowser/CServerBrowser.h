@@ -208,6 +208,7 @@ private:
     void         UpdateHistoryList();
     CServerList* GetServerList(ServerBrowserType Type);
     void         AddServerToList(const CServerListItem* pServer, const ServerBrowserType Type);
+    bool         RemoveSelectedServerFromRecentlyPlayedList();
 
     bool OnClick(CGUIElement* pElement);
     bool OnDoubleClick(CGUIElement* pElement);
@@ -232,6 +233,7 @@ private:
     bool OnAddressDefocused(CGUIElement* pElement);
 
     bool OnServerListChangeRow(CGUIKeyEventArgs Args);
+    bool OnServerListKeyDown(CGUIKeyEventArgs Args);
 
     ServerBrowserType GetCurrentServerBrowserType();
     ServerBrowserType GetCurrentServerBrowserTypeForSave();
