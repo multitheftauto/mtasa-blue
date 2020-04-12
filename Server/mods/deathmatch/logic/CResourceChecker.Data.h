@@ -295,6 +295,7 @@ namespace
         {"getRemoteRequests", "1.5.7-9.20307"},
         {"getRemoteRequestInfo", "1.5.7-9.20307"},
         {"abortRemoteRequest", "1.5.7-9.20307"},
+        {"getElementCount", "1.5.7-9.99999"}, // idk what number should be here
     };
 
     //
@@ -387,6 +388,8 @@ namespace
 
         // Ped jetpacks
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
+        {true, "getMarkerCount", "Replaced with getElementCount. Refer to the wiki for details"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -440,6 +443,9 @@ namespace
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
         {false, "getVehicleTurnVelocity", "getElementAngularVelocity"},
         {false, "setVehicleTurnVelocity", "setElementAngularVelocity"},
+
+        {true, "getMarkerCount", "Replaced with getElementCount. Refer to the wiki for details"},
+        {true, "getPlayerCount", "Replaced with getElementCount. Refer to the wiki for details"},
 
         // Server ped jetpack
         {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
