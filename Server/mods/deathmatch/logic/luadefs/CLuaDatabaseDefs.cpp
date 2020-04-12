@@ -20,6 +20,7 @@ void CLuaDatabaseDefs::LoadFunctions()
         {"dbFree", DbFree},
         {"dbPoll", DbPoll},
         {"dbPrepareString", DbPrepareString},
+        {"dbGetConnectionQueueSize", DbGetConnectionQueueSize},
 
         {"executeSQLCreateTable", ExecuteSQLCreateTable},
         {"executeSQLDropTable", ExecuteSQLDropTable},
@@ -655,6 +656,29 @@ int CLuaDatabaseDefs::DbPrepareString(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDatabaseDefs::DbGetConnectionQueueSize(lua_State* luaVM)
+{
+    CDatabaseConnectionElement* pElement;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        int size = g_pGame->GetDatabaseManager()->GetQueueSizeFromConnection(pElement->GetConnectionHandle());
+        if (size >= 0)
+        {
+            lua_pushnumber(luaVM, size);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

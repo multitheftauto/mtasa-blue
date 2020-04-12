@@ -89,6 +89,23 @@ void CClientMarker::SetPosition(const CVector& vecPosition)
     UpdateStreamPosition(vecPosition);
 }
 
+void CClientMarker::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+    if (m_pCollision){
+        m_pCollision->AttachTo(pEntity);
+    }
+}
+
+void CClientMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
+{
+    CClientEntity::SetAttachedOffsets(vecPosition, vecRotation);
+    if (m_pCollision)
+    {
+        m_pCollision->SetAttachedOffsets(vecPosition, vecRotation);
+    }
+}
+
 bool CClientMarker::SetMatrix(const CMatrix& matrix)
 {
     if (m_pMarker)

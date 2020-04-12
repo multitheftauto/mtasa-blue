@@ -46,6 +46,9 @@ public:
     void SetPosition(const CVector& vecPosition);
     bool SetMatrix(const CMatrix& matrix);
 
+    void AttachTo(CClientEntity* pEntity) override;
+    void SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation) override;
+
     void DoPulse();
 
     eClientEntityType GetType() const { return CCLIENTMARKER; }

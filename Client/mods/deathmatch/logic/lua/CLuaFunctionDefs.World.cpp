@@ -549,6 +549,13 @@ int CLuaFunctionDefs::SetBlurLevel(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::ResetBlurLevel(lua_State* luaVM)
+{
+    g_pGame->SetBlurLevel(36);
+    lua_pushboolean(luaVM, true);
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTime(lua_State* luaVM)
 {
     //  bool setTime ( int hour, int minute )
