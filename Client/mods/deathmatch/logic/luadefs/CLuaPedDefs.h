@@ -26,7 +26,7 @@ public:
     LUA_DECLARE(GetPedTarget);
     LUA_DECLARE_OOP(GetPedTargetStart);
     LUA_DECLARE_OOP(GetPedTargetEnd);
-    LUA_DECLARE(GetPedTargetCollision);
+    LUA_DECLARE_OOP(GetPedTargetCollision);
     LUA_DECLARE(GetPedWeaponSlot);
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedAmmoInClip);

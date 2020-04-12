@@ -10,8 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
-#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
+#define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -133,7 +133,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getOxygenLevel", "getPedOxygenLevel");
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getTarget", "getPedTarget");
-    lua_classfunction(luaVM, "getTargetCollision", "getPedTargetCollision");
+    lua_classfunction(luaVM, "getTargetCollision", OOP_GetPedTargetCollision);
     lua_classfunction(luaVM, "getSimplestTask", "getPedSimplestTask");
     lua_classfunction(luaVM, "getTask", "getPedTask");
     lua_classfunction(luaVM, "getTotalAmmo", "getPedTotalAmmo");
@@ -206,7 +206,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
-    lua_classvariable(luaVM, "targetCollision", NULL, "getPedTargetCollision");
+    lua_classvariable(luaVM, "targetCollision", NULL, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", NULL, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", NULL, OOP_GetPedTargetStart);
     // lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedWeaponMuzzlePosition" ); // TODO: needs to return a vector3 for oop
@@ -658,7 +658,6 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaPedDefs::GetPedTargetEnd(lua_State* luaVM)
 {
     // Verify the argument
@@ -729,6 +728,28 @@ int CLuaPedDefs::GetPedTargetCollision(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
+{
+    CClientPed*      pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecCollision;
+        if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
+        {
+            lua_pushvector(luaVM, vecCollision);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
