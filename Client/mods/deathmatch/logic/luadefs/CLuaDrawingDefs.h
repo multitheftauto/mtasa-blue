@@ -60,7 +60,6 @@ public:
     LUA_DECLARE(DxSetAspectRatioAdjustmentEnabled);
     LUA_DECLARE(DxIsAspectRatioAdjustmentEnabled);
     LUA_DECLARE(DxSetTextureEdge);
-    LUA_DECLARE(DxIsTextureCreated);
 
 private:
     static void AddDxMaterialClass(lua_State* luaVM);

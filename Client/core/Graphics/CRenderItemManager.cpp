@@ -127,23 +127,18 @@ void CRenderItemManager::OnResetDevice()
 //
 ////////////////////////////////////////////////////////////////
 CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY,
-                                                ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth,
-                                                bool bUseMultithreading)
+                                                ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth)
 {
     CFileTextureItem* pTextureItem = new CFileTextureItem();
-    pTextureItem->PostConstruct(this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format, textureAddress, textureType, uiVolumeDepth,
-                                bUseMultithreading);
+    pTextureItem->PostConstruct(this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format, textureAddress, textureType, uiVolumeDepth);
 
-    if (!bUseMultithreading)
+    if (!pTextureItem->IsValid())
     {
-        if (!pTextureItem->IsValid())
-        {
-            SAFE_RELEASE(pTextureItem);
-            return NULL;
-        }
-
-        UpdateMemoryUsage();
+        SAFE_RELEASE(pTextureItem);
+        return NULL;
     }
+
+    UpdateMemoryUsage();
     return pTextureItem;
 }
 

@@ -58,7 +58,6 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
         {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
         {"dxSetTextureEdge", DxSetTextureEdge},
-        {"dxIsTextureCreated", DxIsTextureCreated},
     };
 
     // Add functions
@@ -1020,7 +1019,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
     ETextureAddress textureAddress;
     ETextureType    textureType;
     int             depth = 1;
-    bool            bUseMultithreading;
+    CLuaFunctionRef luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     if (!argStream.NextIsNumber())
@@ -1035,7 +1034,8 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
             argStream.ReadEnumString(renderFormat, RFORMAT_UNKNOWN);
             argStream.ReadBool(bMipMaps, true);
             argStream.ReadEnumString(textureAddress, TADDRESS_WRAP);
-            argStream.ReadBool(bUseMultithreading, false);
+            argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+            argStream.ReadFunctionComplete();
         }
         else
         {
@@ -1043,7 +1043,8 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
             argStream.ReadEnumString(renderFormat, RFORMAT_UNKNOWN);
             argStream.ReadBool(bMipMaps, true);
             argStream.ReadEnumString(textureAddress, TADDRESS_WRAP);
-            argStream.ReadBool(bUseMultithreading, false);
+            argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+            argStream.ReadFunctionComplete();
         }
     }
     else
@@ -1057,7 +1058,8 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
         argStream.ReadEnumString(textureType, TTYPE_TEXTURE);
         if (textureType == TTYPE_VOLUMETEXTURE)
             argStream.ReadNumber(depth);
-        argStream.ReadBool(bUseMultithreading, false);
+        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+        argStream.ReadFunctionComplete();
     }
 
     if (!argStream.HasErrors())
@@ -1077,7 +1079,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                     if (FileExists(strPath))
                     {
                         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture(
-                            strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress, TTYPE_TEXTURE, 1U, bUseMultithreading);
+                            strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress, TTYPE_TEXTURE, 1U);
                         if (pTexture)
                         {
                             // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
@@ -1097,7 +1099,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
             {
                 // From pixels
                 CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture(
-                    "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress, TTYPE_TEXTURE, 1U, bUseMultithreading);
+                    "", &pixels, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress, TTYPE_TEXTURE, 1U);
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
@@ -1109,7 +1111,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
             {
                 // Blank sized
                 CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", NULL, false, width, height, renderFormat,
-                                                                                                                 textureAddress, textureType, depth, bUseMultithreading);
+                                                                                                                 textureAddress, textureType, depth);
                 if (pTexture)
                 {
                     pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
@@ -2065,28 +2067,6 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
         pTexture->GetMaterialItem()->m_TextureAddress = textureAddress;
         pTexture->GetMaterialItem()->m_uiBorderColor = borderColor;
         lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaDrawingDefs::DxIsTextureCreated(lua_State* luaVM)
-{
-    //  bool dxSetTextureEdge ( texture theTexture )
-    CClientTexture* pTexture;
-    ETextureAddress textureAddress;
-    SColor          borderColor;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTexture);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushboolean(luaVM, pTexture->GetMaterialItem()->m_bTextureLoaded);
         return 1;
     }
     else

@@ -17,8 +17,7 @@
 //
 ////////////////////////////////////////////////////////////////
 void CFileTextureItem::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps, uint uiSizeX,
-                                     uint uiSizeY, ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth,
-                                     bool bUseMultithreading)
+                                     uint uiSizeY, ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth)
 {
     Super::PostConstruct(pManager);
 
@@ -26,35 +25,13 @@ void CFileTextureItem::PostConstruct(CRenderItemManager* pManager, const SString
     m_TextureType = textureType;
     m_TextureAddress = textureAddress;
 
-    Super::m_bTextureLoaded = false;
-
-    if (bUseMultithreading)
-    {
-        m_thread = std::thread([=, &pPixels]() {
-            // Initial creation of d3d data
-            if (pPixels)
-                CreateUnderlyingData(pPixels, bMipMaps, format);
-            else if (!strFilename.empty())
-                CreateUnderlyingData(strFilename, bMipMaps, uiSizeX, uiSizeY, format);
-            else
-                CreateUnderlyingData(bMipMaps, uiSizeX, uiSizeY, format, textureType, uiVolumeDepth);
-
-            Super::m_bTextureLoaded = true;
-        });
-        m_thread.detach();
-    }
+    // Initial creation of d3d data
+    if (pPixels)
+        CreateUnderlyingData(pPixels, bMipMaps, format);
+    else if (!strFilename.empty())
+        CreateUnderlyingData(strFilename, bMipMaps, uiSizeX, uiSizeY, format);
     else
-    {
-        // Initial creation of d3d data
-        if (pPixels)
-            CreateUnderlyingData(pPixels, bMipMaps, format);
-        else if (!strFilename.empty())
-            CreateUnderlyingData(strFilename, bMipMaps, uiSizeX, uiSizeY, format);
-        else
-            CreateUnderlyingData(bMipMaps, uiSizeX, uiSizeY, format, textureType, uiVolumeDepth);
-
-        Super::m_bTextureLoaded = true;
-    }
+        CreateUnderlyingData(bMipMaps, uiSizeX, uiSizeY, format, textureType, uiVolumeDepth);
 }
 
 ////////////////////////////////////////////////////////////////

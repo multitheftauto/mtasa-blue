@@ -148,7 +148,7 @@ public:
     virtual CGuiFontItem* CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize) = 0;
     virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
-                                             ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1, bool bUseMultithreading = false) = 0;
+                                             ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
     virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                        bool bLayered, bool bDebug, int iTypeMask) = 0;
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
@@ -261,7 +261,6 @@ class CRenderItem
     int                 m_iMemoryKBUsed;
     int                 m_iRevision;
     bool                m_bIncludeInMemoryStats;
-    std::atomic<bool>   m_bTextureLoaded;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -447,7 +446,7 @@ class CFileTextureItem : public CTextureItem
     CFileTextureItem() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
-                               ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1, bool bUseMultithreading = false);
+                               ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
