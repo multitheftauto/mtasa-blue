@@ -69,6 +69,7 @@ public:
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
+    LUA_DECLARE(GetElementCount);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);

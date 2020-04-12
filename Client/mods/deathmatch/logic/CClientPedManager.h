@@ -41,6 +41,8 @@ public:
     void RestreamPeds(unsigned short usModel);
     void RestreamWeapon(unsigned short usModel);
 
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+
 protected:
     CClientPedManager(class CClientManager* pManager);
     ~CClientPedManager();

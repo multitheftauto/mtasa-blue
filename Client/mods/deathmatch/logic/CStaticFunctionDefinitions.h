@@ -77,6 +77,8 @@ public:
     static bool           GetLowLodElement(CClientEntity& Entity, CClientEntity*& pOutLowLodEntity);
     static bool           IsElementLowLod(CClientEntity& Entity, bool& bOutIsLowLod);
     static bool           IsElementCallPropagationEnabled(CClientEntity& Entity, bool& bOutEnabled);
+    static int            GetElementCount(EElementCountType eElementType);
+
    // static int            GetElementCount(EElementType eElementType);
 
     // Element set funcs

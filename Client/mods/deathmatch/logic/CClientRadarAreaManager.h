@@ -36,6 +36,8 @@ public:
     unsigned short GetDimension() { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+
 private:
     void DoPulse();
     void DoPulse(bool bRender);

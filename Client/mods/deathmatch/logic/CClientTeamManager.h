@@ -32,6 +32,8 @@ public:
     std::list<CClientTeam*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CClientTeam*>::const_iterator IterEnd() { return m_List.end(); }
 
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+
 private:
     std::list<CClientTeam*> m_List;
     bool                    m_bRemoveFromList;

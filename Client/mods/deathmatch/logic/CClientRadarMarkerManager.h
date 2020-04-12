@@ -38,6 +38,8 @@ public:
     bool        Exists(CClientRadarMarker* pMarker);
     static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= RADAR_MARKER_LIMIT; }
 
+    unsigned int Count() { return static_cast<unsigned int>(m_Markers.size()); };
+
 private:
     void AddToList(CClientRadarMarker* pMarker) { m_Markers.push_back(pMarker); };
     void RemoveFromList(CClientRadarMarker* pMarker);

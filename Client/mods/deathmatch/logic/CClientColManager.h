@@ -29,6 +29,9 @@ public:
     bool Exists(CClientColShape* pShape);
     void DeleteAll();
 
+    std::vector<CClientColShape*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::vector<CClientColShape*>::const_iterator IterEnd() { return m_List.end(); }
+
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
 
 protected:
