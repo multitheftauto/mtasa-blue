@@ -458,7 +458,7 @@ class CFileTextureItem : public CTextureItem
 
     uint         m_uiVolumeDepth;
     ETextureType m_TextureType;
-    std::atomic<bool> m_bTextureLoaded;
+    std::mutex   m_Mutex;
 };
 
 ////////////////////////////////////////////////////////////////
