@@ -7660,7 +7660,16 @@ int CStaticFunctionDefinitions::GetElementCount(EElementCountType eElementType)
         case ELEMENT_MARKER:
             return m_pMarkerManager->Count();
         case ELEMENT_COLSHAPE:
-            return m_pColManager->Count();
+            {
+                auto iter = m_pColManager->IterBegin();
+                int count = 0;
+                for (; iter != m_pColManager->IterEnd(); iter++)
+                    if ((*iter)->GetAutoCallEvent()) // filter away markers and pickups
+                        count++;
+
+                return count;
+            }
+            break;
         case ELEMENT_BLIP:
             return m_pBlipManager->Count();
         case ELEMENT_RADARAREA:
