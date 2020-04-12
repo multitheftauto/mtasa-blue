@@ -7652,7 +7652,7 @@ int CStaticFunctionDefinitions::GetElementCount(EElementCountType eElementType)
         case ELEMENT_WATER:
             return m_pWaterManager->Count();
         case ELEMENT_VEHICLE:
-            return m_pVehicleManager->Count();
+            return m_pVehicleManager->GetVehicleCount();
         case ELEMENT_OBJECT:
             return m_pObjectManager->Count();
         case ELEMENT_PICKUP:

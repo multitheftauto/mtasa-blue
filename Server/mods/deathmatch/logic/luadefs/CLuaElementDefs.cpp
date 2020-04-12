@@ -2468,16 +2468,9 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 int CLuaElementDefs::GetElementCount(lua_State* luaVM)
 {
     // Verify the argument
-    SString           strType = "";
-    EElementCountType eType = ELEMENT_UNKNOWN;
+    EElementCountType eType;
     CScriptArgReader  argStream(luaVM);
     argStream.ReadEnumString(eType);
-
-    if (argStream.HasErrors())
-    {
-        eType = ELEMENT_UNKNOWN;
-        argStream.ReadString(strType);
-    }
 
     if (!argStream.HasErrors())
     {
@@ -2485,20 +2478,9 @@ int CLuaElementDefs::GetElementCount(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            int iCount = -1;
-            if (eType != ELEMENT_UNKNOWN)
-            {
-                iCount = CStaticFunctionDefinitions::GetElementCount(eType);
-            }
-            else
-            {
-                // m_pRootEntity->FindAllChildrenByType(strType.c_str(), luaVM, bStreamedIn);
-            }
-            if (iCount >= 0)
-            {
-                lua_pushnumber(luaVM, iCount);
-                return 1;
-            }
+            size_t iCount = CStaticFunctionDefinitions::GetElementCount(eType);
+            lua_pushnumber(luaVM, iCount);
+            return 1;
         }
     }
     else
