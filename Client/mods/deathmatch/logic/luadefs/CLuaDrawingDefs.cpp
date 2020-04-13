@@ -1750,6 +1750,10 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushstring(luaVM, "SettingHighDetailVehicles");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailVehicles);
         lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingHighDetailPeds");
+        lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
+        lua_settable(luaVM, -3);
         return 1;
     }
     else
