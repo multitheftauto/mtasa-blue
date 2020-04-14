@@ -2284,6 +2284,7 @@ bool CServerBrowser::OnServerListKeyDown(CGUIKeyEventArgs Args)
         }
         // Remove selected server from recent list when pressing on backspace
         case DIK_BACK:
+        case DIK_DELETE:
         {
             RemoveSelectedServerFromRecentlyPlayedList();
             break;
