@@ -206,9 +206,9 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
-    lua_classvariable(luaVM, "targetCollision", NULL, OOP_GetPedTargetCollision);
-    lua_classvariable(luaVM, "targetEnd", NULL, OOP_GetPedTargetEnd);
-    lua_classvariable(luaVM, "targetStart", NULL, OOP_GetPedTargetStart);
+    lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
+    lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
+    lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
     // lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedWeaponMuzzlePosition" ); // TODO: needs to return a vector3 for oop
     lua_classvariable(luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot");
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
