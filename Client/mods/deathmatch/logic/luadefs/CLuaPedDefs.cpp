@@ -643,16 +643,16 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecStart;
-        pPed->GetShotData(&vecStart);
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
+    CVector vecStart;
+
+    if (pPed->GetShotData(&vecStart))
+    {
         lua_pushvector(luaVM, vecStart);
         return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -690,16 +690,16 @@ int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecEnd;
-        pPed->GetShotData(nullptr, &vecEnd);
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
+    CVector vecEnd;
+
+    if (pPed->GetShotData(nullptr, &vecEnd))
+    {
         lua_pushvector(luaVM, vecEnd);
         return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -738,17 +738,15 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    CVector vecCollision;
+    if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
     {
-        CVector vecCollision;
-        if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
-        {
-            lua_pushvector(luaVM, vecCollision);
-            return 1;
-        }
+        lua_pushvector(luaVM, vecCollision);
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
