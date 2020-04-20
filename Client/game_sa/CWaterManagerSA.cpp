@@ -742,25 +742,17 @@ bool CWaterManagerSA::SetPositionWaterLevel(const CVector& vecPosition, float fL
     return SetPolyWaterLevel(pPoly, fLevel, pChangeSource);
 }
 
-bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
+bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel)
 {
     assert(m_bInitializedVertices);
     CVector vecVertexPos;
-
-    if (bIncludeWorldSeaLevel || bIncludeWorldNonSeaLevel)
+    for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
     {
-        for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
-        {
-            m_Vertices[i].GetPosition(vecVertexPos);
-            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel())) 
-                vecVertexPos.fZ = fLevel;
-            m_Vertices[i].SetPosition(vecVertexPos, pChangeSource);
-        }        
+        m_Vertices[i].GetPosition(vecVertexPos);
+        if (bIncludeWorldNonSeaLevel || !m_Vertices[i].IsWorldNonSeaLevel())
+            vecVertexPos.fZ = fLevel;
+        m_Vertices[i].SetPosition(vecVertexPos, pChangeSource);
     }
-
-    if (bIncludeOutsideWorldLevel)
-        SetOutsideWorldWaterLevel(fLevel);
-
     return true;
 }
 
@@ -774,17 +766,6 @@ bool CWaterManagerSA::SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* p
         pPoly->GetVertex(i)->SetPosition(vecVertexPos, pChangeSource);
     }
     return true;
-}
-
-void CWaterManagerSA::SetOutsideWorldWaterLevel(float fLevel)
-{
-    // Outside world vertexes
-    MemPut<float>(0x6EFECC, fLevel);
-    MemPut<float>(0x6EFF0C, fLevel);
-    MemPut<float>(0x6EFF4A, fLevel);
-    MemPut<float>(0x6EFFA6, fLevel);
-    // Collision
-    MemPut<float>(0x6E873F, fLevel);
 }
 
 float CWaterManagerSA::GetWaveLevel()
@@ -976,16 +957,12 @@ void CWaterManagerSA::ResetWorldWaterLevel()
     if (m_bInitializedVertices)
         for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
             m_Vertices[i].Reset();
-
-    SetOutsideWorldWaterLevel(DEFAULT_WATER_LEVEL);
 }
 
 void CWaterManagerSA::Reset()
 {
     // Resets all water to the original single player configuration
     UndoChanges();
-
-    SetOutsideWorldWaterLevel(DEFAULT_WATER_LEVEL);
 
     MemSetFast(m_QuadPool, 0, sizeof(m_QuadPool));
     MemSetFast(m_TrianglePool, 0, sizeof(m_TrianglePool));

@@ -13,7 +13,6 @@
 
 #include "CWaterSA.h"
 
-#define DEFAULT_WATER_LEVEL                0.0f
 #define DEFAULT_WAVE_LEVEL                 0.0f
 
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
@@ -155,10 +154,9 @@ public:
 
     bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
 
-    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
+    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource);
-    void SetOutsideWorldWaterLevel(float fLevel);
     void ResetWorldWaterLevel();
 
     float GetWaveLevel();

@@ -27,12 +27,10 @@ void CWaterRPCs::SetWorldWaterLevel(NetBitStreamInterface& bitStream)
 {
     float fLevel;
     bool  bIncludeWorldNonSeaLevel;
-    bool  bIncludeWorldSeaLevel;
-    bool  bIncludeOutsideWorldLevel;
 
-    if (bitStream.Read(fLevel) && bitStream.ReadBit(bIncludeWorldNonSeaLevel) && bitStream.ReadBit(bIncludeWorldSeaLevel) && bitStream.ReadBit(bIncludeOutsideWorldLevel))
+    if (bitStream.Read(fLevel) && bitStream.ReadBit(bIncludeWorldNonSeaLevel))
     {
-        m_pWaterManager->SetWorldWaterLevel(fLevel, NULL, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
+        m_pWaterManager->SetWorldWaterLevel(fLevel, NULL, bIncludeWorldNonSeaLevel);
     }
 }
 
