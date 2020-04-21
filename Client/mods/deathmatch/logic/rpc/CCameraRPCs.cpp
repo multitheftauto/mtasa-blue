@@ -83,6 +83,12 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
                     }
                     break;
                 }
+                case CCLIENTPED:
+                case CCLIENTVEHICLE:
+                {
+                    m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
+                    break;
+                }
                 default:
                     return;
             }
