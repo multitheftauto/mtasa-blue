@@ -63,9 +63,6 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
         CClientEntity* pEntity = CElementIDs::GetElement(targetID);
         if (pEntity)
         {
-            // Save our current target for later
-            CClientEntity* pPreviousTarget = m_pCamera->GetTargetEntity();
-
             switch (pEntity->GetType())
             {
                 case CCLIENTPLAYER:
