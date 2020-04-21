@@ -4514,7 +4514,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         if (!pTarget)
             pTarget = pPlayer;
 
-        // Make sure our target is a player element
+        // Make sure our target is supported
         switch (pTarget->GetType())
         {
             case CElement::PLAYER:
