@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
@@ -1596,14 +1596,6 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 // This makes sure the health is set to what will get reported
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
-
-                // update dead state for peds
-                if (fHealth > 0 && pPed->IsDead())
-                {
-                    pPed->SetIsDead(false);
-                }
-
-                // set new health
                 pPed->SetHealth(fHealth);
             }
             else

@@ -1,8 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CClientPed.cpp
+ *  FILE:        mods/shared_logic/CClientPed.cpp
  *  PURPOSE:     Ped entity class
  *
  *****************************************************************************/
@@ -1733,17 +1734,8 @@ void CClientPed::InternalSetHealth(float fHealth)
         // Recheck we have a ped, ReCreateModel might destroy it
         if (m_pPlayerPed)
         {
-            // update dead state for peds
-            if (fHealth > 0 && IsDead())
-            {
-                m_bDead = false;
-            }
-
             // Set the new health
             m_pPlayerPed->SetHealth(fHealth);
-
-            // Recover from dead state to bring the ped back to life
-            m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
         }
     }
 }
@@ -1892,10 +1884,16 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
             }
         }
     }
-    
-    // set health and armor to 0
-    SetHealth(0.0f);
-    SetArmor(0.0f);
+    if (m_bIsLocalPlayer)
+    {
+        SetHealth(0.0f);
+        SetArmor(0.0f);
+    }
+    else
+    {
+        LockHealth(0.0f);
+        LockArmor(0.0f);
+    }
 
     // Silently remove the ped satchels
     DestroySatchelCharges(false, true);
