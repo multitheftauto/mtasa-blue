@@ -4531,14 +4531,14 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
                     BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
                 BitStream.pBitStream->Write(pTarget->GetID());
                 pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
-                break;
+                return true;
             }
             default:
                 return false;
         }
     }
 
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetCameraInterior(CElement* pElement, unsigned char ucInterior)
