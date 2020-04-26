@@ -322,16 +322,16 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 /////////////////////////////////////////////////////////////////////
 //
 // GetWMIVideoAdapterMemorySize
-//
-//
+//  Note that this will never return more than 4 GB of video memory
+//  
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
+unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
 {
     // This won't change after the first call
-    static long long llResult = 0;
+    static unsigned int uiResult = 0;
 
-    if (llResult == 0)
+    if (uiResult == 0)
     {
         SString strDeviceId;
 
@@ -348,7 +348,6 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
             // Calc flags
             bool bAttachedToDesktop = (device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) != 0;
             bool bMirroringDriver = (device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) != 0;
-            bool bPrimaryDevice = (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
 
             // Only check attached, non mirror displays
             if (bAttachedToDesktop && !bMirroringDriver)
@@ -373,32 +372,32 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
             const SString& AdapterRAM = result[i][1];
             const SString& Availability = result[i][2];
 
-            long long llAdapterRAM = _atoi64(AdapterRAM);
+            unsigned int uiAdapterRAM = atoi(AdapterRAM);
             int       iAvailability = atoi(Availability);
 
-            if (llResult == 0)
-                llResult = llAdapterRAM;
+            if (uiResult == 0)
+                uiResult = uiAdapterRAM;
 
             if (iAvailability == 3)
-                llResult = std::max(llResult, llAdapterRAM);
+                uiResult = std::max(uiResult, uiAdapterRAM);
 
             if (uiAdapterRAM != 0)
             {
                 // If this matches the previously found device, return the adapter RAM
                 if (!strDeviceId.empty() && PNPDeviceID.BeginsWithI(strDeviceId))
                 {
-                    llResult = llAdapterRAM;
+                    uiResult = uiAdapterRAM;
                     break;            // Found match
                 }
             }
         }
     }
 
-    if (llResult == 0)
+    if (uiResult == 0)
     {
-        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+        uiResult = 2LL * 1024 * 1024 * 1024;            // 2GB
     }
-    return llResult;
+    return uiResult;
 }
 
 /////////////////////////////////////////////////////////////////////
