@@ -61,7 +61,7 @@ public:
     int                               GetNumAnimations();
     CAnimBlock*                       GetAnimBlock();
     CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
-    AssocGroupId                      GetGroupID();
+    eAnimGroup                        GetGroupID();
     void                              CreateAssociations(const char* szBlockName);
 
     bool IsLoaded();

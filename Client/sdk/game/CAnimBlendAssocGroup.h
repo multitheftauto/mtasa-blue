@@ -19,8 +19,9 @@ struct RpClump;
 class CAnimBlock;
 class CAnimBlendAssocGroupSAInterface;
 
-enum eAnimGroup
+enum class eAnimGroup : int
 {
+    ANIM_GROUP_NONE = -1,
     ANIM_GROUP_DEFAULT = 0,
     ANIM_GROUP_DOOR = 1,
     ANIM_GROUP_BIKES = 2,
@@ -163,14 +164,16 @@ enum eAnimGroup
     TOTAL_ANIM_GROUPS = 139
 };
 
-enum eMoveAnims
+enum class eAnimID : int
 {
-    ANIM_MOVE_WALK = 0,
-    ANIM_MOVE_RUN = 1,
-    ANIM_MOVE_SPRINT = 2,
-    ANIM_MOVE_IDLE = 3,
-    ANIM_MOVE_IDLE_TIRED = 10,
-    ANIM_MOVE_WEAPON_CROUCH = 55
+    ANIM_ID_WALK = 0,
+    ANIM_ID_RUN = 1,
+    ANIM_ID_SPRINT = 2,
+    ANIM_ID_IDLE = 3,
+    ANIM_ID_IDLE_TIRED = 10,
+    ANIM_ID_WEAPON_CROUCH = 55,
+    ANIM_ID_WEAPON_FIRE = 224,
+    ANIM_ID_STEALTH_AIM = 347,
 };
 
 class CAnimBlendAssocGroup
@@ -182,7 +185,7 @@ public:
     virtual int                               GetNumAnimations() = 0;
     virtual CAnimBlock*                       GetAnimBlock() = 0;
     virtual CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID) = 0;
-    virtual AssocGroupId                      GetGroupID() = 0;
+    virtual eAnimGroup                        GetGroupID() = 0;
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
     virtual bool                              IsLoaded() = 0;
     virtual void                              SetIDOffset(int iOffset) = 0;
