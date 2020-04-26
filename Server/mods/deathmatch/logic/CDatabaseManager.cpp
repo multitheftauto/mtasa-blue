@@ -50,6 +50,7 @@ public:
                                                 CLuaArguments* pArgs = nullptr);
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...);
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
+    virtual int               GetQueueSizeFromConnection(SConnectionHandle connectionHandle);
 
     // CDatabaseManagerImpl
     SString InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
@@ -562,6 +563,18 @@ CDbJobData* CDatabaseManagerImpl::GetQueryFromId(SDbJobId id)
 void CDatabaseManagerImpl::SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename)
 {
     return m_JobQueue->SetLogLevel(logLevel, strLogFilename);
+}
+
+/////////////////////////////////////////////////////////////// 
+// 
+// CDatabaseManagerImpl::GetQueueSizeFromConnection 
+// 
+// 
+// 
+/////////////////////////////////////////////////////////////// 
+int CDatabaseManagerImpl::GetQueueSizeFromConnection(SConnectionHandle connectionHandle)
+{
+    return m_JobQueue->GetQueueSizeFromConnection(connectionHandle);
 }
 
 ///////////////////////////////////////////////////////////////

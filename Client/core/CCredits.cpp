@@ -220,7 +220,8 @@ CCredits::CCredits()
         "PortAudio (http://www.portaudio.com/)\n"
         "speex (http://www.speex.org/)\n"
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
-        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n";
+        "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
+        "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n";
 
     // Create our window
     CVector2D RelativeWindow = CVector2D(fWindowX / pManager->GetResolution().fX, fWindowY / pManager->GetResolution().fY);

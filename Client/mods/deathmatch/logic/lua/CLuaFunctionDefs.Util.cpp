@@ -342,9 +342,9 @@ int CLuaFunctionDefs::GetDevelopmentMode(lua_State* luaVM)
 
 int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
 {
-    SString          strFile = "";
+    SString          strFileInput = "";
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFile);
+    argStream.ReadString(strFileInput);
 
     if (!argStream.HasErrors())
     {
@@ -353,22 +353,31 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
         if (pLuaMain)
         {
             // Grab its resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CResource* pThisResource = pLuaMain->GetResource();
+            CResource* pOtherResource = pThisResource;
+
+            SString    strMetaPath;
+
+            // Resolve other resource from name
+            if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, NULL, &strMetaPath))
             {
-                std::list<CResourceFile*>::const_iterator iter = pResource->IterBeginResourceFiles();
-                for (; iter != pResource->IterEndResourceFiles(); iter++)
+                std::list<CResourceFile*>::const_iterator iter = pOtherResource->IterBeginResourceFiles();
+                for (; iter != pOtherResource->IterEndResourceFiles(); iter++)
                 {
-                    if (strcmp(strFile, (*iter)->GetShortName()) == 0)
+                    if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
                     {
-                        if (CStaticFunctionDefinitions::DownloadFile(pResource, strFile, (*iter)->GetServerChecksum()))
+                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
                         {
                             lua_pushboolean(luaVM, true);
                             return 1;
                         }
                     }
                 }
-                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1)));
+                m_pScriptDebugging->LogCustom(luaVM, SString("%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
+            }
+            else
+            {
+                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: Invalid path", lua_tostring(luaVM, lua_upvalueindex(1)));
             }
         }
     }

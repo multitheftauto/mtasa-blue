@@ -2301,7 +2301,7 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
 
-                if (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed())
+                if (!m_pTowedByVehicle && (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed()))
                 {
                     m_pVehicle->SetMatrix(&m_matFrozen);
                     CVector vec(0.0f, 0.0f, 0.0f);
@@ -3598,32 +3598,9 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
-    {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
-
-            // Keep the bonet and boot intact
-            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-            break;
-        default:
-            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
-    }
+    // Keep the bonet and boot intact
+    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
 }
 
 void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)

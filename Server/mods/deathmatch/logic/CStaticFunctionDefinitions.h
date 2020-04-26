@@ -75,8 +75,11 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize);
+    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
     static bool RemoveElementData(CElement* pElement, const char* szName);
+    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
@@ -143,6 +146,7 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
+    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -453,6 +457,19 @@ public:
     static CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
     static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
+
+    // Shape get functions
+    static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+    
+    // Shape set functions
+    static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex);
 
     // Weapon funcs
     static CCustomWeapon* CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition);

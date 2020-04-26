@@ -19,20 +19,20 @@ extern CCore* g_pCore;
 template <>
 CServerBrowser* CSingleton<CServerBrowser>::m_pSingleton = NULL;
 
-#define SB_SPAN             0.85f  //How much % of the screen the server browser should fill
-#define SB_NAVBAR_SIZE_Y    40 // Navbar button size
-#define SB_BUTTON_SIZE_X    26
-#define SB_BUTTON_SIZE_Y    26
-#define SB_SPACER           10 //Spacer between searchbar and navbar
-#define SB_SMALL_SPACER     5
-#define SB_SEARCHBAR_COMBOBOX_SIZE_X   45  // Mow much the search type combobox occupies of searchbar
-#define SB_SEARCHBAR_COMBOBOX_SIZE_Y   22
-#define SB_PLAYERLIST_SIZE_X    200  // Width of players list [NB. adjusted for low resolutions in CServerBrowser::CreateTab]
-#define SB_BACK_BUTTON_SIZE_Y   40  // Size of the back butt
-#define COMBOBOX_ARROW_SIZE_X   23  //Fixed CEGUI size of the 'combobox' arrow
-#define TAB_SIZE_Y              25  //Fixed CEGUI size of the Tab in a tab panel
+#define SB_SPAN 0.85f                  // How much % of the screen the server browser should fill
+#define SB_NAVBAR_SIZE_Y 40            // Navbar button size
+#define SB_BUTTON_SIZE_X 26
+#define SB_BUTTON_SIZE_Y 26
+#define SB_SPACER 10            // Spacer between searchbar and navbar
+#define SB_SMALL_SPACER 5
+#define SB_SEARCHBAR_COMBOBOX_SIZE_X 45            // Mow much the search type combobox occupies of searchbar
+#define SB_SEARCHBAR_COMBOBOX_SIZE_Y 22
+#define SB_PLAYERLIST_SIZE_X 200            // Width of players list [NB. adjusted for low resolutions in CServerBrowser::CreateTab]
+#define SB_BACK_BUTTON_SIZE_Y 40            // Size of the back butt
+#define COMBOBOX_ARROW_SIZE_X 23            // Fixed CEGUI size of the 'combobox' arrow
+#define TAB_SIZE_Y 25                       // Fixed CEGUI size of the Tab in a tab panel
 
-#define CONNECT_HISTORY_LIMIT   20
+#define CONNECT_HISTORY_LIMIT 20
 
 //
 // Local helper
@@ -562,7 +562,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Attach some keyboard events to the serverlist.
     m_pServerList[type]->SetEnterKeyHandler(GUI_CALLBACK(&CServerBrowser::OnDoubleClick, this));
     m_pServerList[type]->SetDoubleClickHandler(GUI_CALLBACK(&CServerBrowser::OnDoubleClick, this));
-    m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY(&CServerBrowser::OnServerListChangeRow, this));
+    m_pServerList[type]->SetKeyDownHandler(GUI_CALLBACK_KEY(&CServerBrowser::OnServerListKeyDown, this));
 
     // If any of the include checkboxes overlap with the help/back buttons, we move them down - next to the status bar.
     CVector2D                  vecButtonPos = m_pButtonGeneralHelp[type]->GetPosition();
@@ -1088,6 +1088,31 @@ void CServerBrowser::AddServerToList(const CServerListItem* pServer, const Serve
         m_pServerList[Type]->SetItemColor(iIndex, m_hPing[Type], color.R, color.G, color.B, color.A);
         m_pServerList[Type]->SetItemColor(iIndex, m_hGame[Type], color.R, color.G, color.B, color.A);
     }
+}
+
+bool CServerBrowser::RemoveSelectedServerFromRecentlyPlayedList()
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    CServerListItem*  pServer;
+    CServerList*      pHistoryList;
+    int               iSelectedItem;
+
+    if (Type != ServerBrowserTypes::RECENTLY_PLAYED)
+        return false;
+
+    pServer = FindSelectedServer(Type);
+
+    if (!pServer)
+        return false;
+
+    pHistoryList = GetRecentList();
+    iSelectedItem = m_pServerList[Type]->GetSelectedItemRow();
+
+    pHistoryList->Remove(pServer->Address, pServer->usGamePort);
+    m_pServerList[Type]->RemoveRow(iSelectedItem);
+    SaveRecentlyPlayedList();
+
+    return true;
 }
 
 CServerList* CServerBrowser::GetServerList(ServerBrowserType Type)
@@ -2217,27 +2242,51 @@ void CServerBrowser::OnQuickConnectButtonClick()
 bool CServerBrowser::OnServerListChangeRow(CGUIKeyEventArgs Args)
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
-    int               SelectedItem = m_pServerList[Type]->GetSelectedItemRow();
+    int               iSelectedItem = m_pServerList[Type]->GetSelectedItemRow();
     int               iMax = m_pServerList[Type]->GetRowCount();
 
     switch (Args.scancode)
     {
         case DIK_UPARROW:
         {
-            if (SelectedItem > 0)
+            if (iSelectedItem > 0)
             {
-                m_pServerList[Type]->SetSelectedItem(SelectedItem - 1, 1, true);
+                m_pServerList[Type]->SetSelectedItem(iSelectedItem - 1, 1, true);
                 OnClick(m_pServerPlayerList[Type]);            // hacky
             }
             break;
         }
         case DIK_DOWNARROW:
         {
-            if (SelectedItem < (iMax - 1))
+            if (iSelectedItem < (iMax - 1))
             {
-                m_pServerList[Type]->SetSelectedItem(SelectedItem + 1, 1, true);
+                m_pServerList[Type]->SetSelectedItem(iSelectedItem + 1, 1, true);
                 OnClick(m_pServerPlayerList[Type]);            // hacky
             }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return true;
+}
+
+bool CServerBrowser::OnServerListKeyDown(CGUIKeyEventArgs Args)
+{
+    switch (Args.scancode)
+    {
+        case DIK_UPARROW:
+        case DIK_DOWNARROW:
+        {
+            OnServerListChangeRow(Args);
+            break;
+        }
+        // Remove selected server from recent list when pressing on backspace
+        case DIK_BACK:
+        case DIK_DELETE:
+        {
+            RemoveSelectedServerFromRecentlyPlayedList();
             break;
         }
         default:
