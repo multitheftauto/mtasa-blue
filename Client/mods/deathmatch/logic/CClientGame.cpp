@@ -4061,14 +4061,15 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (pClientPed != nullptr)
     {
         std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
-        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK &&
+            animID != ANIM_MOVE_WEAPON_CROUCH)
         {
             // check for idle animation
-            if (animID == 3)
+            if (animID == ANIM_MOVE_IDLE)
             {
-                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                if (iGroupID == ANIM_GROUP_DEFAULT || (iGroupID >= ANIM_GROUP_PLAYER && iGroupID <= ANIM_GROUP_PLAYERJETPACK) || iGroupID >= ANIM_GROUP_MAN)
                 {
-                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(ANIM_GROUP_DEFAULT, ANIM_MOVE_WEAPON_CROUCH);
                     pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
                     isCustomAnimationToPlay = true;
                 }
