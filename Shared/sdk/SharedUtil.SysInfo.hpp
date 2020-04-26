@@ -382,12 +382,15 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
             if (iAvailability == 3)
                 llResult = std::max(llResult, llAdapterRAM);
 
-            if (llAdapterRAM != 0)
-                if (PNPDeviceID.BeginsWithI(strDeviceId))
+            if (uiAdapterRAM != 0)
+            {
+                // If this matches the previously found device, return the adapter RAM
+                if (!strDeviceId.empty() && PNPDeviceID.BeginsWithI(strDeviceId))
                 {
                     llResult = llAdapterRAM;
                     break;            // Found match
                 }
+            }
         }
     }
 
