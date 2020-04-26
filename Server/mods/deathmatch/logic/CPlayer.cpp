@@ -219,7 +219,7 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
 bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
 {
 #ifdef MTA_DEBUG
-    OutputDebugString(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
 #endif
 
     return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
@@ -228,7 +228,7 @@ bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strNam
 bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
 {
 #ifdef MTA_DEBUG
-    OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
 #endif
 
     return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
@@ -243,7 +243,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
         if (it->first == pElement)
         {
 #ifdef MTA_DEBUG
-            OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+            OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
 #endif
 
             it = m_DataSubscriptions.erase(it);
