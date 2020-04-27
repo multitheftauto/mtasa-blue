@@ -144,7 +144,8 @@ public:
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
     virtual VOID      SetCameraVehicleViewMode(BYTE dwCamMode) = 0;
     virtual VOID      SetCameraPedViewMode(BYTE dwCamMode) = 0;
-    virtual BYTE      GetCameraViewMode() = 0;
+    virtual BYTE      GetCameraVehicleViewMode() = 0;
+    virtual BYTE      GetCameraPedViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce() = 0;
 };

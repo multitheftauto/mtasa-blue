@@ -106,11 +106,13 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
 
 int CLuaCameraDefs::GetCameraViewMode(lua_State* luaVM)
 {
-    unsigned short ucMode;
-    if (CStaticFunctionDefinitions::GetCameraViewMode(ucMode))
+    unsigned short ucVehicleMode;
+    unsigned short ucPedMode;
+    if (CStaticFunctionDefinitions::GetCameraViewMode(ucVehicleMode, ucPedMode))
     {
-        lua_pushnumber(luaVM, ucMode);
-        return 1;
+        lua_pushnumber(luaVM, ucVehicleMode);
+        lua_pushnumber(luaVM, ucPedMode);
+        return 2;
     }
 
     lua_pushboolean(luaVM, false);

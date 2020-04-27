@@ -434,7 +434,8 @@ public:
     CEntity*  GetTargetEntity();
     void      SetCameraClip(bool bObjects, bool bVehicles);
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
-    BYTE      GetCameraViewMode();
+    BYTE      GetCameraVehicleViewMode();
+    BYTE      GetCameraPedViewMode();
     VOID      SetCameraVehicleViewMode(BYTE dwCamMode);
     VOID      SetCameraPedViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState();

@@ -491,10 +491,16 @@ void CClientCamera::SetCameraPedViewMode(ePedCamMode eMode)
     m_pCamera->SetCameraPedViewMode(eMode);
 }
 
-eVehicleCamMode CClientCamera::GetCameraViewMode()
+eVehicleCamMode CClientCamera::GetCameraVehicleViewMode()
 {
-    return (eVehicleCamMode)m_pCamera->GetCameraViewMode();
+    return (eVehicleCamMode)m_pCamera->GetCameraVehicleViewMode();
 }
+
+ePedCamMode CClientCamera::GetCameraPedViewMode()
+{
+    return (ePedCamMode)m_pCamera->GetCameraPedViewMode();
+}
+
 
 void CClientCamera::SetCameraClip(bool bObjects, bool bVehicles)
 {

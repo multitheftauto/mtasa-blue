@@ -63,7 +63,8 @@ public:
 
     void            SetCameraVehicleViewMode(eVehicleCamMode eMode);
     void            SetCameraPedViewMode(ePedCamMode eMode);
-    eVehicleCamMode GetCameraViewMode();
+    eVehicleCamMode GetCameraVehicleViewMode();
+    ePedCamMode     GetCameraPedViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
     void            GetCameraClip(bool& bObjects, bool& bVehicles);
 
