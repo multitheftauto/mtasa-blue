@@ -18,7 +18,9 @@
 
 struct CLuaFunctionParserBase
 {
+    // iIndex is passed around by reference
     std::size_t iIndex = 1;
+
     std::string strError = "";
     std::string strErrorFoundType = "";
 
@@ -212,7 +214,11 @@ struct CLuaFunctionParserBase
 
         // lua_State* can be taken as first argument of any function
         if constexpr (std::is_same_v<T, lua_State*>)
-            return index == 0;
+        {
+            bool constraint = index == 1;
+            dassert(constraint && "`lua_State*` must only be placed in the first parameter of Lua definitions");
+            return constraint;
+        }
 
         // variants can be used by any of the underlying types
         // thus recursively use this function
