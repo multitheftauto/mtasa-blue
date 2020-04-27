@@ -3695,7 +3695,7 @@ CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationAndSyncHandler(
 }
 
 bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
+                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, eAnimID animID)
 {
     return g_pClientGame->AssocGroupCopyAnimationHandler(pAnimAssoc, pClump, pAnimAssocGroup, animID);
 }
@@ -4025,7 +4025,7 @@ CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClum
 }
 
 bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssocInterface, RpClump* pClump,
-                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
+                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, eAnimID animID)
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
@@ -4044,9 +4044,9 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                           SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
-    int iGroupID = pAnimAssocGroup->GetGroupID();
+    eAnimGroup iGroupID = pAnimAssocGroup->GetGroupID();
 
-    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    if (iGroupID == eAnimGroup::ANIM_GROUP_NONE || pAnimAssocGroup->GetAnimBlock() == nullptr)
     {
         g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
                           SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
@@ -4061,14 +4061,17 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (pClientPed != nullptr)
     {
         std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
-        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK &&
+            animID != eAnimID::ANIM_ID_WEAPON_CROUCH)
         {
             // check for idle animation
-            if (animID == 3)
+            if (animID == eAnimID::ANIM_ID_IDLE)
             {
-                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                if (iGroupID == eAnimGroup::ANIM_GROUP_DEFAULT ||
+                    (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
-                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    auto pDuckAnimStaticAssoc =
+                        pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
                     pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
                     isCustomAnimationToPlay = true;
                 }

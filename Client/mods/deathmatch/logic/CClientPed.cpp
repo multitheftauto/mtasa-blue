@@ -9,7 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendHierarchy.h"
+#include "game/CAnimBlendAssocGroup.h"
+
 using std::list;
 using std::vector;
 
@@ -2920,9 +2921,9 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         if (pAssoc)
         {
             // Check we're not doing any important animations
-            AnimationId animId = pAssoc->GetAnimID();
-            if (animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI || animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
-                animId == ANIM_ID_STEALTH_AIM)
+            eAnimID animId = pAssoc->GetAnimID();
+            if (animId == eAnimID::ANIM_ID_WALK || animId == eAnimID::ANIM_ID_RUN || animId == eAnimID::ANIM_ID_IDLE ||
+                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_STEALTH_AIM)
             {
                 // Are our knife anims loaded?
                 std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
@@ -6164,8 +6165,9 @@ void CClientPed::RestoreAllAnimations()
         {
             auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
             auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
-            int  iGroupID = pAnimAssociation->GetAnimGroup(), iAnimID = pAnimAssociation->GetAnimID();
-            if (pAnimHierarchy && iGroupID >= 0 && iAnimID >= 0)
+            eAnimGroup  iGroupID = pAnimAssociation->GetAnimGroup();
+            eAnimID iAnimID = pAnimAssociation->GetAnimID();
+            if (pAnimHierarchy && iGroupID >= eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID >= eAnimID::ANIM_ID_WALK)
             {
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
