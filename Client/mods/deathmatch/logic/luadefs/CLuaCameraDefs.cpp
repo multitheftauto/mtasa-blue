@@ -449,7 +449,7 @@ int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CStaticFunctionDefinitions::SetCameraViewMode(usVehicleViewMode);
+        CStaticFunctionDefinitions::SetCameraVehicleViewMode(usVehicleViewMode);
 
         if (argStream.NextIsNumber())
         {

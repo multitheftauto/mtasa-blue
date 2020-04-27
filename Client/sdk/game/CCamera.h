@@ -142,7 +142,7 @@ public:
     virtual CEntity*  GetTargetEntity() = 0;
     virtual void      SetCameraClip(bool bObjects, bool bVehicles) = 0;
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
-    virtual VOID      SetCameraViewMode(BYTE dwCamMode) = 0;
+    virtual VOID      SetCameraVehicleViewMode(BYTE dwCamMode) = 0;
     virtual VOID      SetCameraPedViewMode(BYTE dwCamMode) = 0;
     virtual BYTE      GetCameraViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;

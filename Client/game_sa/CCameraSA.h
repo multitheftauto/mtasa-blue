@@ -435,7 +435,7 @@ public:
     void      SetCameraClip(bool bObjects, bool bVehicles);
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
     BYTE      GetCameraViewMode();
-    VOID      SetCameraViewMode(BYTE dwCamMode);
+    VOID      SetCameraVehicleViewMode(BYTE dwCamMode);
     VOID      SetCameraPedViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);

@@ -587,7 +587,7 @@ BYTE CCameraSA::GetCameraViewMode()
     return *(BYTE*)VAR_VehicleCameraView;
 }
 
-VOID CCameraSA::SetCameraViewMode(BYTE dwCamMode)
+VOID CCameraSA::SetCameraVehicleViewMode(BYTE dwCamMode)
 {
     MemPutFast<BYTE>(VAR_VehicleCameraView, dwCamMode);
 }

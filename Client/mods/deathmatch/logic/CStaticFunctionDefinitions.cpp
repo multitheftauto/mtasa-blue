@@ -4912,9 +4912,9 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetCameraViewMode(unsigned short ucMode)
+bool CStaticFunctionDefinitions::SetCameraVehicleViewMode(unsigned short ucMode)
 {
-    m_pCamera->SetCameraViewMode((eVehicleCamMode)ucMode);
+    m_pCamera->SetCameraVehicleViewMode((eVehicleCamMode)ucMode);
     return true;
 }
 
