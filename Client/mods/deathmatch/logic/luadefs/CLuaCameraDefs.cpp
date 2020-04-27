@@ -446,20 +446,17 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
 int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
 {
     unsigned short   usVehicleViewMode = 0;
+    unsigned short   usPedViewMode = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usVehicleViewMode);
+    argStream.ReadNumber(usPedViewMode, 0);
 
     if (!argStream.HasErrors())
     {
         CStaticFunctionDefinitions::SetCameraVehicleViewMode(usVehicleViewMode);
 
-        if (argStream.NextIsNumber())
-        {
-            unsigned short usPedViewMode = 0;
-            argStream.ReadNumber(usPedViewMode);
-
+        if (usPedViewMode != 0)
             CStaticFunctionDefinitions::SetCameraPedViewMode(usPedViewMode);
-        }
 
         lua_pushboolean(luaVM, true);
         return 1;
