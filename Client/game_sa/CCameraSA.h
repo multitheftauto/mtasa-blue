@@ -38,6 +38,7 @@
 #define VAR_ActiveCam                       0x7E46FE
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
 #define VAR_VehicleCameraView               0xB6F0DC
+#define VAR_PedCameraView                   0xB6F0F0
 
 #define MAX_CAMS                            3
 
@@ -435,6 +436,7 @@ public:
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
     BYTE      GetCameraViewMode();
     VOID      SetCameraViewMode(BYTE dwCamMode);
+    VOID      SetCameraPedViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
     float     GetShakeForce();

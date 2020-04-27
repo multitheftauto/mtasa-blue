@@ -95,6 +95,13 @@ enum eVehicleCamMode
     MODE_CINEMATIC
 };
 
+enum ePedCamMode
+{
+    MODE_CLOSE,
+    MODE_MIDDLE,
+    MODE_FAR,
+};
+
 enum
 {
     FADE_OUT = 0,
@@ -136,6 +143,7 @@ public:
     virtual void      SetCameraClip(bool bObjects, bool bVehicles) = 0;
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
     virtual VOID      SetCameraViewMode(BYTE dwCamMode) = 0;
+    virtual VOID      SetCameraPedViewMode(BYTE dwCamMode) = 0;
     virtual BYTE      GetCameraViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce() = 0;

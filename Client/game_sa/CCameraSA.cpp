@@ -592,6 +592,11 @@ VOID CCameraSA::SetCameraViewMode(BYTE dwCamMode)
     MemPutFast<BYTE>(VAR_VehicleCameraView, dwCamMode);
 }
 
+VOID CCameraSA::SetCameraPedViewMode(BYTE dwCamMode)
+{
+    MemPutFast<BYTE>(VAR_PedCameraView, dwCamMode);
+}
+
 void CCameraSA::SetShakeForce(float fShakeForce)
 {
     CCameraSAInterface* pCameraInterface = GetInterface();

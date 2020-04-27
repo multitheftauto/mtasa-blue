@@ -4918,6 +4918,12 @@ bool CStaticFunctionDefinitions::SetCameraViewMode(unsigned short ucMode)
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraPedViewMode(unsigned short ucMode)
+{
+    m_pCamera->SetCameraPedViewMode((ePedCamMode)ucMode);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetCameraViewMode(unsigned short& ucMode)
 {
     ucMode = m_pCamera->GetCameraViewMode();

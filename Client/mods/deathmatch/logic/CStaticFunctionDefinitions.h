@@ -394,6 +394,7 @@ public:
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
     static bool SetCameraViewMode(unsigned short ucMode);
+    static bool SetCameraPedViewMode(unsigned short ucMode);
 
     // Cursor funcs
     static bool GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld);

@@ -62,6 +62,7 @@ public:
     void           SetFocusToLocalPlayer();
 
     void            SetCameraViewMode(eVehicleCamMode eMode);
+    void            SetCameraPedViewMode(ePedCamMode eMode);
     eVehicleCamMode GetCameraViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
     void            GetCameraClip(bool& bObjects, bool& bVehicles);

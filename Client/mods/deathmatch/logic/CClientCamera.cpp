@@ -486,6 +486,11 @@ void CClientCamera::SetCameraViewMode(eVehicleCamMode eMode)
     m_pCamera->SetCameraViewMode(eMode);
 }
 
+void CClientCamera::SetCameraPedViewMode(ePedCamMode eMode)
+{
+    m_pCamera->SetCameraPedViewMode(eMode);
+}
+
 eVehicleCamMode CClientCamera::GetCameraViewMode()
 {
     return (eVehicleCamMode)m_pCamera->GetCameraViewMode();
