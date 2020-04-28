@@ -40,6 +40,8 @@ public:
     bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
+    unsigned char m_ucInterior = 0;
+
 private:
     static bool CompareNametagDistance(CClientPlayer* p1, CClientPlayer* p2);
 

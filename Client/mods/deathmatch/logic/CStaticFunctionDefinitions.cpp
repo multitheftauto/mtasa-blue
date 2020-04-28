@@ -1237,6 +1237,16 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
     if (bSetPosition)
         Entity.SetPosition(vecPosition);
 
+    if (Entity.GetType() == CCLIENTPLAYER)
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (Ped.IsLocalPlayer())
+        {
+            // Update all of our streamers/managers to the local player's interior
+            m_pClientGame->SetAllInteriors(ucInterior);
+        }
+    }
+
     return true;
 }
 

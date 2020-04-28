@@ -2312,6 +2312,11 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pCamera->SetDimension(usDimension);
 }
 
+void CClientGame::SetAllInteriors(unsigned char ucInterior)
+{
+    m_pNametags->m_ucInterior = ucInterior;
+}
+
 bool CClientGame::StaticKeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey)
 {
     return g_pClientGame->KeyStrokeHandler(strKey, bState, bIsConsoleInputKey);
@@ -5683,8 +5688,9 @@ void CClientGame::ResetMapInfo()
     m_pCamera->SetFocusToLocalPlayer();
     g_pGame->GetSettings()->ResetFieldOfViewFromScript();
 
-    // Dimension
+    // Dimension and interiors
     SetAllDimensions(0);
+    SetAllInteriors(0);
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);

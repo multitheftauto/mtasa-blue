@@ -25,6 +25,8 @@ using std::list;
 #define DEFAULT_VIEW_RANGE          45.0f
 #define DEFAULT_VIEW_RANGE_EXP      ((DEFAULT_VIEW_RANGE)*(DEFAULT_VIEW_RANGE))
 
+const bool bRenderOwn = false;
+
 CNametags::CNametags(CClientManager* pManager)
 {
     m_pPlayerStreamer = pManager->GetPlayerStreamer();
@@ -261,7 +263,7 @@ void CNametags::DrawDefault()
     static float fResHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
 
     // Got any players that are not local?
-    if (m_pPlayerManager->Count() <= 1)
+    if (m_pPlayerManager->Count() <= 1 && !bRenderOwn)
         return;
 
     list<CClientPlayer*> playerTags;
@@ -363,7 +365,7 @@ void CNametags::DrawDefault()
         if (pElement->GetType() != CCLIENTPLAYER)
             continue;
         pPlayer = static_cast<CClientPlayer*>(pElement);
-        if (pPlayer->IsLocalPlayer())
+        if (pPlayer->IsLocalPlayer() && !bRenderOwn)
             continue;
 
         // Get the distance from the camera
@@ -428,8 +430,16 @@ void CNametags::DrawDefault()
 
 void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
 {
-    // If they aren't in the same dimension, dont draw
-    if (pPlayer->GetDimension() != m_usDimension || !pPlayer->IsNametagShowing())
+    // If nametag is hidden, don't draw
+    if (!pPlayer->IsNametagShowing())
+        return;
+
+    // If they aren't in the same dimension, don't draw
+    if (pPlayer->GetDimension() != m_usDimension)
+        return;
+
+    // If they aren't in the same interior, don't draw
+    if (pPlayer->GetInterior() != m_ucInterior)
         return;
 
     // Grab the resolution width and height
