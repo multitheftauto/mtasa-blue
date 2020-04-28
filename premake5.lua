@@ -4,6 +4,7 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 require "install_cef"
+require "install_discord"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -85,17 +86,10 @@ workspace "MTASA"
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
-	filter {"system:windows", "toolset:*_xp*"}
-		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
-		defines { "_WIN32_WINNT=0x502" } -- _WIN32_WINNT_WS03 (Windows Server 2003)
-
-	filter {"system:windows", "toolset:not *_xp*"}
-		defines { "_WIN32_WINNT=0x601" } -- _WIN32_WINNT_WIN7 (Windows 7)
-
 	filter "system:windows"
-		toolset "v141"
+		toolset "v142"
 		staticruntime "On"
-		defines { "WIN32", "_WIN32" }
+		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}

@@ -126,8 +126,11 @@ public:
     virtual bool           IsValid() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
-    virtual void           SetLODDistance(float fDistance) = 0;
+    virtual float          GetOriginalLODDistance() = 0;
+    virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
     virtual void           RestreamIPL() = 0;
+    virtual bool           GetTime(char& hourOn, char& hourOff) = 0;
+    virtual bool           SetTime(char hourOn, char hourOff) = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
@@ -152,6 +155,7 @@ public:
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
+    virtual void         ResetVehicleDummies() = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
@@ -179,4 +183,7 @@ public:
     virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
     virtual unsigned short GetObjectPropertiesGroup() = 0;
     virtual void           RestoreObjectPropertiesGroup() = 0;
+
+    // Vehicle towing functions
+    virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 };

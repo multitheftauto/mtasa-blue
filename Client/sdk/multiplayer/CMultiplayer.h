@@ -62,6 +62,8 @@ class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
+enum class eAnimGroup;
+enum class eAnimID;
 
 typedef bool(ExplosionHandler)(class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType);
 typedef void(PreContextSwitchHandler)(class CPlayerPed* pPlayer);
@@ -94,7 +96,7 @@ typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* p
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
 typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
-                                             AnimationId animID);
+                                             eAnimID animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
@@ -377,7 +379,7 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
-    virtual DWORD GetLastStaticAnimationGroupID() = 0;
-    virtual DWORD GetLastStaticAnimationID() = 0;
+    virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
+    virtual eAnimID GetLastStaticAnimationID() = 0;
     virtual DWORD GetLastAnimArrayAddress() = 0;
 };

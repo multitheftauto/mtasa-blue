@@ -23,6 +23,12 @@ CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D
     UpdateSpatialData();
 }
 
+CElement* CColCircle::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColCircle* pColCircle = new CColCircle(m_pManager, GetParentEntity(), m_vecPosition, m_fRadius);
+    return pColCircle;
+}
+
 bool CColCircle::DoHitDetection(const CVector& vecNowPosition)
 {
     // Do a simple distance check between now position and our position

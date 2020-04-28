@@ -9,7 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendHierarchy.h"
+#include "game/CAnimBlendAssocGroup.h"
+
 using std::list;
 using std::vector;
 
@@ -159,14 +160,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
-    m_iTimeAnimation = -1;
-    m_iBlendAnimation = 250;
-    m_bLoopAnimation = false;
-    m_bUpdatePositionAnimation = false;
-    m_bInterruptableAnimation = false;
-    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -214,6 +210,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage = NULL;
         m_shotSyncData = g_pMultiplayer->GetLocalShotSyncData();
         m_currentControllerState = NULL;
+        m_rawControllerState = CControllerState();
         m_lastControllerState = NULL;
         m_stats = NULL;
 
@@ -233,6 +230,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
         m_remoteDataStorage->SetProcessPlayerWeapon(true);
         m_shotSyncData = m_remoteDataStorage->ShotSyncData();
         m_currentControllerState = m_remoteDataStorage->CurrentControllerState();
+        m_rawControllerState = CControllerState();
         m_lastControllerState = m_remoteDataStorage->LastControllerState();
         m_stats = m_remoteDataStorage->Stats();
         // ### remember if you want to set Int flags, subtract STATS_OFFSET from the enum ID ###
@@ -2652,6 +2650,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
             // ControllerState checks and fixes only
             CControllerState Current;
             GetControllerState(Current);
+            m_rawControllerState = Current;
 
             ApplyControllerStateFixes(Current);
 
@@ -2686,6 +2685,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         CControllerState Current;
         GetControllerState(Current);
+        m_rawControllerState = Current;
 
         if (bDoControllerStateFixPulse)
             ApplyControllerStateFixes(Current);
@@ -2832,10 +2832,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
         }
 
@@ -2921,9 +2921,9 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         if (pAssoc)
         {
             // Check we're not doing any important animations
-            AnimationId animId = pAssoc->GetAnimID();
-            if (animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI || animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
-                animId == ANIM_ID_STEALTH_AIM)
+            eAnimID animId = pAssoc->GetAnimID();
+            if (animId == eAnimID::ANIM_ID_WALK || animId == eAnimID::ANIM_ID_RUN || animId == eAnimID::ANIM_ID_IDLE ||
+                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_STEALTH_AIM)
             {
                 // Are our knife anims loaded?
                 std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
@@ -3672,17 +3672,17 @@ void CClientPed::_CreateModel()
         }
 
         // Are we still playing a looped animation?
-        if (m_bLoopAnimation && m_pAnimationBlock)
+        if (m_AnimationCache.bLoop && m_pAnimationBlock)
         {
             if (m_bisCurrentAnimationCustom)
             {
                 m_bisNextAnimationCustom = true;
             }
             // Copy our anim name incase it gets deleted
-            SString strAnimName = m_strAnimationName;
+            SString strAnimName = m_AnimationCache.strName;
             // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                              m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
         }
 
         // Set the voice that corresponds to our model
@@ -3964,7 +3964,7 @@ void CClientPed::_ChangeModel()
             m_bDontChangeRadio = false;
 
             // Are we still playing a looped animation?
-            if (m_bLoopAnimation && m_pAnimationBlock)
+            if (m_AnimationCache.bLoop && m_pAnimationBlock)
             {
                 if (m_bisCurrentAnimationCustom)
                 {
@@ -3972,10 +3972,10 @@ void CClientPed::_ChangeModel()
                 }
 
                 // Copy our anim name incase it gets deleted
-                SString strAnimName = m_strAnimationName;
+                SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation,
-                                  m_bInterruptableAnimation, m_bFreezeLastFrameAnimation);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
+                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
 
             // Set the voice that corresponds to the new model
@@ -5634,6 +5634,25 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     }
 }
 
+bool CClientPed::GetRunningAnimationName(SString& strBlockName, SString& strAnimName)
+{
+    if (IsRunningAnimation())
+    {
+        if (IsCustomAnimationPlaying())
+        {
+            strBlockName = GetNextAnimationCustomBlockName();
+            strAnimName = GetNextAnimationCustomName();
+        }
+        else
+        {
+            strBlockName = GetAnimationBlock()->GetName();
+            strAnimName = m_AnimationCache.strName;
+        }
+        return true;
+    }
+    return false;
+}
+
 bool CClientPed::IsRunningAnimation()
 {
     if (m_pPlayerPed)
@@ -5645,7 +5664,7 @@ bool CClientPed::IsRunningAnimation()
         }
         return false;
     }
-    return (m_bLoopAnimation && m_pAnimationBlock);
+    return (m_AnimationCache.bLoop && m_pAnimationBlock);
 }
 
 void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
@@ -5748,13 +5767,13 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
-    m_strAnimationName = szAnimName;
-    m_iTimeAnimation = iTime;
-    m_iBlendAnimation = iBlend;
-    m_bLoopAnimation = bLoop;
-    m_bUpdatePositionAnimation = bUpdatePosition;
-    m_bInterruptableAnimation = bInterruptable;
-    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
+    m_AnimationCache.strName = szAnimName;
+    m_AnimationCache.iTime = iTime;
+    m_AnimationCache.iBlend = iBlend;
+    m_AnimationCache.bLoop = bLoop;
+    m_AnimationCache.bUpdatePosition = bUpdatePosition;
+    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
 void CClientPed::KillAnimation()
@@ -5774,7 +5793,7 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_strAnimationName = "";
+    m_AnimationCache.strName = "";
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -5786,10 +5805,6 @@ std::unique_ptr<CAnimBlock> CClientPed::GetAnimationBlock()
         return g_pGame->GetAnimManager()->GetAnimBlock(m_pAnimationBlock->GetInterface());
     }
     return nullptr;
-}
-const char* CClientPed::GetAnimationName()
-{
-    return m_strAnimationName;
 }
 
 void CClientPed::PostWeaponFire()
@@ -6150,8 +6165,9 @@ void CClientPed::RestoreAllAnimations()
         {
             auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
             auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
-            int  iGroupID = pAnimAssociation->GetAnimGroup(), iAnimID = pAnimAssociation->GetAnimID();
-            if (pAnimHierarchy && iGroupID >= 0 && iAnimID >= 0)
+            eAnimGroup  iGroupID = pAnimAssociation->GetAnimGroup();
+            eAnimID iAnimID = pAnimAssociation->GetAnimID();
+            if (pAnimHierarchy && iGroupID >= eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID >= eAnimID::ANIM_ID_WALK)
             {
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())

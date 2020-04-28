@@ -602,6 +602,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
 
                                         // Send it to the player
                                         pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
+                                        break;
                                     }
                                     case CClient::CLIENT_SCRIPT:
                                     {

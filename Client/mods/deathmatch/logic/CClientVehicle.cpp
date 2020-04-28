@@ -825,7 +825,7 @@ void CClientVehicle::Fix()
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
     for (int i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i]);
+        SetDoorStatus(i, ucDoorStates[i], true);
     for (int i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0);
     for (int i = 0; i < MAX_LIGHTS; i++)
@@ -1486,13 +1486,13 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
     return 0;
 }
 
-void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus)
+void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent)
 {
     if (ucDoor < MAX_DOORS)
     {
         if (m_pVehicle && HasDamageModel())
         {
-            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus);
+            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus, spawnFlyingComponent);
         }
         m_ucDoorStates[ucDoor] = ucStatus;
     }
@@ -2229,7 +2229,7 @@ void CClientVehicle::StreamedInPulse()
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
                 for (int i = 0; i < MAX_DOORS; i++)
-                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i]);
+                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
                 for (int i = 0; i < MAX_PANELS; i++)
                     pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
                 for (int i = 0; i < MAX_LIGHTS; i++)
@@ -2301,7 +2301,7 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
 
-                if (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed())
+                if (!m_pTowedByVehicle && (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed()))
                 {
                     m_pVehicle->SetMatrix(&m_matFrozen);
                     CVector vec(0.0f, 0.0f, 0.0f);
@@ -2744,26 +2744,7 @@ void CClientVehicle::Create()
         // Reattach a towed vehicle?
         if (m_pTowedVehicle)
         {
-            bool isTowable = true;
-
-            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
-            {
-                // A train is never towing other vehicles, other trains are linked by other means
-                isTowable = false;
-            }
-            else if (m_usModel == 525 || m_usModel == 531)
-            {
-                const eClientVehicleType vehicleType = m_pTowedVehicle->GetVehicleType();
-
-                // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
-                if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT ||
-                    vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX)
-                {
-                    isTowable = false;
-                }
-            }
-
-            if (isTowable)
+            if (m_pTowedVehicle->IsTowableBy(this))
             {
                 // Make sure that the trailer is streamed in
                 if (!m_pTowedVehicle->GetGameVehicle())
@@ -2793,18 +2774,17 @@ void CClientVehicle::Create()
         // Reattach if we're being towed
         if (m_pTowedByVehicle)
         {
-            if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
-            {
-                // A train is never towed by other vehicles, it's linked by other means
-                m_pTowedByVehicle->m_pTowedVehicle = nullptr;
-                m_pTowedByVehicle = nullptr;
-            }
-            else
+            if (IsTowableBy(m_pTowedByVehicle))
             {
                 if (m_pTowedByVehicle->GetGameVehicle())
                 {
                     m_pTowedByVehicle->InternalSetTowLink(this);
                 }
+            }
+            else
+            {
+                m_pTowedByVehicle->m_pTowedVehicle = nullptr;
+                m_pTowedByVehicle = nullptr;
             }
         }
 
@@ -3036,6 +3016,11 @@ void CClientVehicle::Destroy()
             // Force the trailer to stream out
             GetTowedVehicle()->StreamOut();
         }
+        
+        if (m_pTowedByVehicle)
+        {
+            m_pVehicle->BreakTowLink();
+        }
 
         if (GetVehicleType() == CLIENTVEHICLE_TRAIN)
         {
@@ -3186,20 +3171,9 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
 
         return true;
     }
-    else if (this->GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN))
+    else if (GetVehicleType() == CLIENTVEHICLE_TRAIN || (pVehicle && !pVehicle->IsTowableBy(this)))
     {
         return false;
-    }
-    else if ((m_usModel == 525 || m_usModel == 531) && pVehicle)
-    {
-        const eClientVehicleType vehicleType = pVehicle->GetVehicleType();
-
-        // Tow truck (525) and tractor (531) can only tow certain vehicle types without issues
-        if (vehicleType == CLIENTVEHICLE_TRAILER || vehicleType == CLIENTVEHICLE_TRAIN || vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_BIKE || 
-            vehicleType == CLIENTVEHICLE_BMX)
-        {
-            return false;
-        }
     }
 
     if (pVehicle == m_pTowedVehicle)
@@ -3307,6 +3281,11 @@ bool CClientVehicle::InternalSetTowLink(CClientVehicle* pTrailer)
     pTrailer->PlaceProperlyOnGround();            // Probably not needed
 
     return true;
+}
+
+bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
+{
+    return GetModelInfo()->IsTowableBy(towingVehicle->GetModelInfo());
 }
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
@@ -3619,32 +3598,9 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
-    {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
-
-            // Keep the bonet and boot intact
-            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-            break;
-        default:
-            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
-    }
+    // Keep the bonet and boot intact
+    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
 }
 
 void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)

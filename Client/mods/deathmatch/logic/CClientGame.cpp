@@ -15,6 +15,7 @@
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
 #include <windowsx.h>
+#include "CServerInfo.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -51,7 +52,7 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
-CClientGame::CClientGame(bool bLocalPlay)
+CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
@@ -558,7 +559,7 @@ void CClientGame::StartPlayback()
     }
 }
 
-bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type)
+bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type, const char* szSecret)
 {
     m_ServerType = Type;
     // int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
@@ -629,6 +630,12 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             // Append community information (Removed)
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
+
+            if (g_pNet->GetServerBitStreamVersion() >= 0x06E)
+            {
+                SString joinSecret = SStringX(szSecret);
+                pBitStream->WriteString<uchar>(joinSecret);
+            }
 
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -1272,7 +1279,7 @@ void CClientGame::DoPulses()
         UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        // UpdateTrailers (); // Test: Does it always work without this check?
+        UpdateTrailers (); // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
@@ -3547,6 +3554,7 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
+    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
@@ -3687,7 +3695,7 @@ CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationAndSyncHandler(
 }
 
 bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
+                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, eAnimID animID)
 {
     return g_pClientGame->AssocGroupCopyAnimationHandler(pAnimAssoc, pClump, pAnimAssocGroup, animID);
 }
@@ -4017,7 +4025,7 @@ CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClum
 }
 
 bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssocInterface, RpClump* pClump,
-                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
+                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, eAnimID animID)
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
@@ -4036,9 +4044,9 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                           SString("pAnimAssocGroupInterface = %p | AnimID = %d", pAnimAssocGroup->GetInterface(), animID), 543);
     }
 
-    int iGroupID = pAnimAssocGroup->GetGroupID();
+    eAnimGroup iGroupID = pAnimAssocGroup->GetGroupID();
 
-    if (iGroupID == -1 || pAnimAssocGroup->GetAnimBlock() == nullptr)
+    if (iGroupID == eAnimGroup::ANIM_GROUP_NONE || pAnimAssocGroup->GetAnimBlock() == nullptr)
     {
         g_pCore->LogEvent(544, "AssocGroupCopyAnimationHandler", "pAnimAssocGroupInterface was invalid (animation block is null?)",
                           SString("GetAnimBlock() = %p | GroupID = %d", pAnimAssocGroup->GetAnimBlock(), iGroupID), 544);
@@ -4053,14 +4061,17 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     if (pClientPed != nullptr)
     {
         std::unique_ptr<CAnimBlendHierarchy> pAnimHierarchy = nullptr;
-        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK)
+        if (pClientPed->IsTaskToBeRestoredOnAnimEnd() && pClientPed->GetTaskTypeToBeRestoredOnAnimEnd() == TASK_SIMPLE_DUCK &&
+            animID != eAnimID::ANIM_ID_WEAPON_CROUCH)
         {
             // check for idle animation
-            if (animID == 3)
+            if (animID == eAnimID::ANIM_ID_IDLE)
             {
-                if ((iGroupID == 0) || (iGroupID >= 54 && iGroupID <= 70) || (iGroupID >= 118))
+                if (iGroupID == eAnimGroup::ANIM_GROUP_DEFAULT ||
+                    (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
-                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(0, 55);
+                    auto pDuckAnimStaticAssoc =
+                        pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
                     pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
                     isCustomAnimationToPlay = true;
                 }
@@ -6945,6 +6956,17 @@ void CClientGame::RestreamModel(unsigned short usModel)
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
+void CClientGame::TriggerDiscordJoin(SString strSecret)
+{
+    if (g_pNet->GetServerBitStreamVersion() < 0x06E)
+        return;
+
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    pBitStream->WriteString<uchar>(strSecret);
+    g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
+    g_pNet->DeallocateNetBitStream(pBitStream);
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
@@ -7081,4 +7103,18 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     arguments.PushNumber(event.iModel);
     arguments.PushNumber(event.iColSurface);
     pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
+}
+
+void CClientGame::UpdateDiscordState()
+{
+    // Set discord state to players[/slot] count
+    uint playerCount = g_pClientGame->GetPlayerManager()->Count();
+    uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
+    SString state(std::to_string(playerCount));
+
+    if (g_pCore->GetNetwork()->GetServerBitStreamVersion() >= 0x06E)
+        state += "/" + std::to_string(playerSlot);
+
+    state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
+    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
 }

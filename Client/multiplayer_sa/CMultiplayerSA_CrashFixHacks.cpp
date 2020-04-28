@@ -1755,6 +1755,42 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CPlaceName::Process
+//
+// Prevent the original game code from accessing the ped's vehicle, when it's a null pointer
+// and the ped flag bInVehicle is set by setting the ped flag to zero.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x571F37 | 8B F1             | mov   esi, ecx
+// >>> 0x571F39 | 8B 88 6C 04 00 00 | mov   ecx, [eax + 46Ch]
+//     0x571F3F | F6 C5 01          | test  ch, 1
+#define HOOKPOS_CPlaceName__Process         0x571F39
+#define HOOKSIZE_CPlaceName__Process        6
+static DWORD CONTINUE_CPlaceName__Process = 0x571F3F;
+
+static void _declspec(naked) HOOK_CPlaceName__Process()
+{
+    _asm
+    {
+        pushad
+        mov     ecx, [eax + 46Ch]
+        test    ch, 1                       // if (ped->pedFlags.bInVehicle
+        jz      continueAfterFixLocation
+        mov     ebx, [eax + 58Ch]           //     && !ped->m_pVehicle)
+        test    ebx, ebx
+        jnz     continueAfterFixLocation
+        and     ch, 0FEh
+        mov     dword ptr [eax + 46Ch], ecx // ped->pedFlags.bInVehicle = 0
+
+        continueAfterFixLocation:
+        popad
+        mov     ecx, [eax + 46Ch]
+        jmp     CONTINUE_CPlaceName__Process
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1806,6 +1842,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask);
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_1);
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
+    EZHookInstall(CPlaceName__Process);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

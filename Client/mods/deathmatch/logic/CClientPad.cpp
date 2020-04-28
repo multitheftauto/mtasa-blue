@@ -242,6 +242,8 @@ void CClientPad::DoPulse(CClientPed* pPed)
                     (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
                                                                                                  : (m_fStates[5]) ? m_fStates[5] * -128 : m_fStates[6] * 128);
 
+                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
+
                 cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;            // Jump
 
                 cs.ButtonCross = (m_fStates[12]) ? 255 : 0;            // Sprint
@@ -468,13 +470,13 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
 }
 
 // Get the analog control state directly from a pad state.  Use for players.
-bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState)
+bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides)
 {
     unsigned int uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
-        // Do we have a script override?
-        if (m_sScriptedStates[uiIndex] != CS_NAN)
+        // If we are not ignoring overrides and have a script override
+        if (!bIgnoreOverrides && m_sScriptedStates[uiIndex] != CS_NAN)
             switch (uiIndex)
             {
                 case 0:
