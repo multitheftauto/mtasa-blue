@@ -85,7 +85,7 @@ enum eCamMode
     MODE_AIMWEAPON_ATTACHED            // 65
 };
 
-enum eVehicleCamMode
+enum class eVehicleCamMode
 {
     MODE_BUMPER,
     MODE_CLOSE_EXTERNAL,
@@ -95,7 +95,7 @@ enum eVehicleCamMode
     MODE_CINEMATIC
 };
 
-enum ePedCamMode
+enum class ePedCamMode
 {
     MODE_CLOSE,
     MODE_MIDDLE,

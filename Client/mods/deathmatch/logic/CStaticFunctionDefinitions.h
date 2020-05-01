@@ -393,8 +393,8 @@ public:
     static bool SetCameraTarget(const CVector& vecTarget);
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    static bool SetCameraVehicleViewMode(unsigned short ucMode);
-    static bool SetCameraPedViewMode(unsigned short ucMode);
+    static bool SetCameraVehicleViewMode(eVehicleCamMode ucMode);
+    static bool SetCameraPedViewMode(ePedCamMode ucMode);
 
     // Cursor funcs
     static bool GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld);

@@ -453,10 +453,10 @@ int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CStaticFunctionDefinitions::SetCameraVehicleViewMode(usVehicleViewMode);
+        CStaticFunctionDefinitions::SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
 
         if (usPedViewMode != 0)
-            CStaticFunctionDefinitions::SetCameraPedViewMode(usPedViewMode);
+            CStaticFunctionDefinitions::SetCameraPedViewMode((ePedCamMode)usPedViewMode);
 
         lua_pushboolean(luaVM, true);
         return 1;
