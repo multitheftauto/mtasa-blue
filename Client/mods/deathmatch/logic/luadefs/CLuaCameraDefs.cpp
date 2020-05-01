@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaCameraDefs::LoadFunctions()
 {
@@ -33,7 +34,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"fadeCamera", FadeCamera},
         {"setCameraClip", SetCameraClip},
         {"getCameraClip", GetCameraClip},
-        {"setCameraViewMode", SetCameraViewMode},
+        {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraShakeLevel", SetCameraShakeLevel},
     };
@@ -443,30 +444,15 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
     return 2;
 }
 
-int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraViewMode(int usVehicleViewMode, std::optional<int> usPedViewMode)
 {
-    unsigned short   usVehicleViewMode = 0;
-    unsigned short   usPedViewMode = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usVehicleViewMode);
-    argStream.ReadNumber(usPedViewMode, 0);
+    CStaticFunctionDefinitions::SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
 
-    if (!argStream.HasErrors())
-    {
-        CStaticFunctionDefinitions::SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
+    if (usPedViewMode)
+        CStaticFunctionDefinitions::SetCameraPedViewMode((ePedCamMode)usPedViewMode.value());
 
-        if (usPedViewMode != 0)
-            CStaticFunctionDefinitions::SetCameraPedViewMode((ePedCamMode)usPedViewMode);
-
-        lua_pushboolean(luaVM, true);
-        return 1;
+    return true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 {

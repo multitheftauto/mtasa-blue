@@ -10,12 +10,15 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <optional>
 
 class CLuaCameraDefs : public CLuaDefs
 {
 public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
+
+    static bool SetCameraViewMode(int usVehicleViewMode, std::optional<int> usPedViewMode);
 
     // Cam get funcs
     LUA_DECLARE(GetCamera);
@@ -35,7 +38,6 @@ public:
     LUA_DECLARE(FadeCamera);
     LUA_DECLARE(SetCameraClip);
     LUA_DECLARE(GetCameraClip);
-    LUA_DECLARE(SetCameraViewMode);
     LUA_DECLARE(SetCameraGoggleEffect);
     LUA_DECLARE(SetCameraShakeLevel);
 
