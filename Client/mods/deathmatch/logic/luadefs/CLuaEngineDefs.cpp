@@ -597,7 +597,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
+                    if (pModel == nullptr)
+                        pModel = new CClientModel(m_pManager, iModelID, eModelType);
                     pModel->Allocate();
                     pModel->SetParentResource(pResource);
 
