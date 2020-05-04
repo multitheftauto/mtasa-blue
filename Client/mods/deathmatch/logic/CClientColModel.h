@@ -99,5 +99,9 @@ private:
     unsigned short                m_usVerticesCount;
     CColModel*                    m_pColModel;
     std::list<unsigned short>     m_Replaced;
-    bool                          b_hasChanged; // For updating bounding box, update only if necessary. True default due object loaded collision could have wrong bounding box.
+
+    // m_bHasChanged should be set to true when the bounding box has changed.
+    // This ensures that the bounding box is only recalculated when necessary.
+    // This is true by default as an object loaded collision could have the wrong bounding box.
+    bool b_hasChanged = true;
 };
