@@ -64,7 +64,11 @@ public:
         return (MAX_COLLISION_SIZE2 >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE2 &&
                     MAX_COLLISION_SIZE2 >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE2);
     }
+
+    // CompareVector returns true if all points in the second vector are greater than the corresponding points in the first vector
     static bool CompareVector(CVector& vecMin, CVector& vecMax) { return vecMax.fX >= vecMin.fX && vecMax.fY >= vecMin.fY && vecMax.fZ >= vecMin.fZ; }
+
+    // AlignVector clamps a "source" vector between a min and max vector. Or something like that. I don't know.
     static void AlignVector(CVector& destMin, CVector& destMax, const CVector& src)
     {
         if (src.fX < destMax.fX)
