@@ -1,60 +1,24 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CUtils.cpp
- *  PURPOSE:     Util functions
+ *  FILE:        mods/deathmatch/logic/Utils.cpp
+ *  PURPOSE:     Miscellaneous utility functions
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
 
-using namespace std;
+#ifndef MTA_CLIENT
+#include "net/SyncStructures.h"
 
-char* ReplaceAnyStringOccurrence(char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax)
-{
-    // TODO: Check for max size
-    // Copy the input buffer
-    char* szTemp = new char[strlen(szBuffer) + 1];
-    strcpy(szTemp, szBuffer);
+#include <sys/types.h>  // For stat().
+#include <sys/stat.h>   // For stat().
+#endif
 
-    // Clear the original string
-    strcpy(szBuffer, "");
-
-    // Grab the size of what to replace and what to replace with
-    size_t sizeWhat = strlen(szWhat);
-    size_t sizeWith = strlen(szWith);
-
-    // Iterate through the original string
-    char*        szSourceIterator = szTemp;
-    char*        szDestIterator = szBuffer;
-    unsigned int uiCurrentSize = 0;
-    while (*szSourceIterator)
-    {
-        if (strncmp(szSourceIterator, szWhat, sizeWhat) == 0)
-        {
-            strcpy(szDestIterator, szWith);
-
-            // Inc the stuff
-            uiCurrentSize += static_cast<unsigned int>(sizeWith);
-            szSourceIterator += sizeWhat;
-            szDestIterator += sizeWith;
-        }
-        else
-        {
-            *szDestIterator = *szSourceIterator;
-            ++uiCurrentSize;
-            ++szSourceIterator;
-            ++szDestIterator;
-        }
-    }
-
-    // Free the copy and return the buffer
-    delete[] szTemp;
-    return szBuffer;
-}
-
+#ifdef MTA_CLIENT
 unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace)
 {
     // Replace any unwanted character with a space
@@ -62,7 +26,7 @@ unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace)
     char*        szTemp = szText;
     while (*szTemp != 0)
     {
-        if (!IsWantedCharacter(*szTemp))
+        if (!IsVisibleCharacter(*szTemp))
         {
             *szTemp = cReplace;
             ++uiReplaced;
@@ -95,12 +59,6 @@ unsigned int StripControlCodes(char* szText, unsigned char cReplace)
     return uiReplaced;
 }
 
-bool IsWantedCharacter(unsigned char c)
-{
-    // 32..126 are visible characters
-    return c >= 32 && c <= 126;
-}
-
 bool IsControlCode(unsigned char c)
 {
     return c < 32;
@@ -119,7 +77,7 @@ bool IsValidFilePath(const char* szDir)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
-        if (!IsWantedCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
     return true;
@@ -213,25 +171,240 @@ void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
         szDottedIP[0] = 0;
     }
 }
+#else
 
-float GetRandomFloat()
+bool DoesDirectoryExist(const char* szPath)
 {
-    return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f);
+#ifdef WIN32
+    DWORD dwAtr = GetFileAttributes(szPath);
+    if (dwAtr == INVALID_FILE_ATTRIBUTES)
+        return false;
+    return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0);
+#else
+    struct stat Info;
+    stat(szPath, &Info);
+    return (S_ISDIR(Info.st_mode));
+#endif
 }
+
+bool CheckNickProvided(const char* szNick)
+{
+    if (stricmp(szNick, "admin") == 0)
+        return false;
+    if (stricmp(szNick, "console") == 0)
+        return false;
+    if (stricmp(szNick, "server") == 0)
+        return false;
+    if (IsIn("`", szNick))
+        return false;
+    return true;
+}
+
+void ReplaceCharactersInString(char* szString, char cWhat, char cWith)
+{
+    // Loop through the string looking for what
+    size_t sizeString = strlen(szString);
+    for (size_t sizeIndex = 0; sizeIndex < sizeString; sizeIndex++)
+    {
+        // Replace matching character with the given replacement
+        if (szString[sizeIndex] == cWhat)
+            szString[sizeIndex] = cWith;
+    }
+}
+
+void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
+{
+    int idx = 0;
+    while ((idx = s.find_first_of(a, idx)) >= 0)
+        s.replace(idx, 1, b);
+}
+
+bool IsIn(const char* szShortText, const char* szLongText)
+{
+    if (szShortText && szLongText)
+    {
+        char* strShort = new char[strlen(szShortText) + 1];
+        char* strLong = new char[strlen(szLongText) + 1];
+
+        strcpy(strShort, szShortText);
+        strcpy(strLong, szLongText);
+
+        char* szMatch = strstr(uppercase(strLong), uppercase(strShort));
+        if (szMatch != NULL)
+        {
+            delete[] strShort;
+            delete[] strLong;
+            return true;
+        }
+        delete[] strShort;
+        delete[] strLong;
+    }
+    return false;
+}
+
+char* uppercase(char* s)
+{
+    for (unsigned int i = 0; i < strlen(s); i++)
+    {
+        s[i] = toupper(s[i]);
+    }
+    return s;
+}
+
+void stripString(char* szString)
+{
+    if (szString)
+    {
+        int          offset = 0;
+        unsigned int i = 0;
+        size_t       sizeString = strlen(szString);
+        for (i = 0; i < sizeString; i++)
+        {
+            if (szString[i] < 32 || szString[i] > 126)
+            {
+                offset++;
+            }
+            else
+            {
+                szString[i - offset] = szString[i];
+            }
+        }
+        szString[i - offset] = '\0';
+    }
+}
+
+void stripControlCodes(char* szString)
+{
+    if (szString)
+    {
+        unsigned char*       pWrite = reinterpret_cast<unsigned char*>(szString);
+        const unsigned char* pRead = pWrite;
+
+        while (*pRead != '\0')
+        {
+            if (*pRead >= 32)
+            {
+                *pWrite = *pRead;
+                ++pWrite;
+            }
+            ++pRead;
+        }
+        *pWrite = '\0';
+    }
+}
+
+bool StringBeginsWith(const char* szText, const char* szBegins)
+{
+    if (szText && szBegins)
+    {
+        unsigned int uiTextLength = strlen(szText);
+        unsigned int uiBeginsLength = strlen(szBegins);
+
+        if (uiTextLength < uiBeginsLength)
+        {
+            return false;
+        }
+
+        for (unsigned int ui = 0; ui < uiBeginsLength; ui++)
+        {
+            if (szText[ui] != szBegins[ui])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool IsNumericString(const char* szString)
+{
+    char szSet[] = "-1234567890";
+    return strspn(szString, szSet) == strlen(szString);
+}
+
+bool IsNumericString(const char* szString, size_t sizeString)
+{
+    char szSet[] = "-1234567890";
+    return strspn(szString, szSet) == sizeString;
+}
+
+void DisconnectPlayer(CGame* pGame, CPlayer& Player, const char* szMessage)
+{
+    DisconnectPlayer(pGame, Player, CPlayerDisconnectedPacket::CUSTOM, szMessage);
+}
+
+void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, const char* szMessage)
+{
+    if (Player.IsLeavingServer())
+        return;
+
+    // Send it to the disconnected player
+    Player.Send(CPlayerDisconnectedPacket(eDisconnectType, szMessage));
+
+    // Quit him
+    pGame->QuitPlayer(Player);
+}
+
+void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, time_t BanDuration,
+                      const char* szMessage)
+{
+    if (Player.IsLeavingServer())
+        return;
+
+    Player.Send(CPlayerDisconnectedPacket(eDisconnectType, BanDuration, szMessage));
+    pGame->QuitPlayer(Player);
+}
+
+void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCode)
+{
+    if (Player.IsLeavingServer())
+        return;
+
+    // Send message to the disconnected player
+    Player.Send(CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::CONNECTION_DESYNC, SString("(%u)", uiCode)));
+
+    // Quit him
+    pGame->QuitPlayer(Player, CClient::QUIT_CONNECTION_DESYNC);
+}
+
+bool InitializeSockets()
+{
+#ifdef WIN32
+    WSADATA wsaData;
+    if (WSAStartup(0x202, &wsaData) == SOCKET_ERROR)
+    {
+        WSACleanup();
+        return false;
+    }
+#endif
+    return true;
+}
+
+bool CleanupSockets()
+{
+#ifdef WIN32
+    WSACleanup();
+#endif
+    return true;
+}
+#endif
 
 double GetRandomDouble()
 {
     return static_cast<double>(rand()) / (static_cast<double>(RAND_MAX) + 1.0);
 }
 
-unsigned int GetRandom(unsigned int uiLow, unsigned int uiHigh)
+int GetRandom(int iLow, int iHigh)
 {
-    double dLow = static_cast<double>(uiLow);
-    double dHigh = static_cast<double>(uiHigh);
+    double dLow = static_cast<double>(iLow);
+    double dHigh = static_cast<double>(iHigh);
 
-    return static_cast<unsigned int>(floor((dHigh - dLow + 1.0) * GetRandomDouble())) + uiLow;
+    return static_cast<int>(floor((dHigh - dLow + 1.0) * GetRandomDouble())) + iLow;
 }
-
+#ifdef MTA_CLIENT
 SString GetDataUnit(unsigned long long ullInput)
 {
     // Convert it to a float
@@ -347,6 +520,77 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
     return (HINSTANCE)(1);
 }
 
+#endif
+#else
+bool IsValidFilePath(const char* szDir)
+{
+    if (szDir == NULL)
+        return false;
+
+    unsigned int uiLen = strlen(szDir);
+
+    if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
+    unsigned char c, c_d;
+
+    // iterate through the char array
+    for (unsigned int i = 0; i < uiLen; i++)
+    {
+        c = szDir[i];                                          // current character
+        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
+bool IsValidOrganizationPath(const char* szDir)
+{
+    if (szDir == NULL)
+        return false;
+
+    unsigned int uiLen = strlen(szDir);
+
+    if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
+        return false;
+
+    unsigned char c;
+    bool          bInsideBraces = false;
+
+    // iterate through the char array
+    for (unsigned int i = 0; i < uiLen; i++)
+    {
+        c = szDir[i];            // current character
+
+        // Enforce braces around visible letters
+        if (!bInsideBraces && IsVisibleCharacter(c) && c != '[' && c != ']' && c != '/' && c != '\\')
+            return false;
+
+        if (c == '[')
+        {
+            if (bInsideBraces)
+                return false;            // Duplicate braces (e.g. "[hel[lo]world]")
+            else
+                bInsideBraces = true;
+        }
+        else if (c == ']')
+        {
+            if (!bInsideBraces)
+                return false;            // Ending brace without opening brace (e.g. "hello]")
+            else
+                bInsideBraces = false;
+        }
+        else if (c == '/' || c == '\\')
+        {
+            if (bInsideBraces)
+                return false;            // Slash within braches (e.g. "[hell/o]")
+        }
+    }
+
+    // Make sure we ended with closed braces
+    return !bInsideBraces;
+}
 #endif
 
 unsigned int HexToInt(const char* szHex)
@@ -496,6 +740,7 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
     return true;
 }
 
+#ifdef MTA_CLIENT
 //
 // Safely read a ushort sized string from a NetBitStreamInterface
 //
@@ -528,6 +773,265 @@ bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strO
 
     return bResult;
 }
+#else
+bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
+{
+    SSmallKeysyncSync keys;
+    if (!BitStream.Read(&keys))
+        return false;
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
+    if (BitStream.Version() >= 0x06F)
+    {
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
+    ControllerState.ButtonCircle = keys.data.bButtonCircle;
+    ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
+    ControllerState.ShockButtonL = keys.data.bShockButtonL;
+    ControllerState.m_bPedWalk = keys.data.bPedWalk;
+    if (BitStream.Version() >= 0x2C)
+    {
+        ControllerState.LeftStickX = keys.data.sLeftStickX;
+        ControllerState.LeftStickY = keys.data.sLeftStickY;
+    }
+
+    return true;
+}
+
+void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream)
+{
+    SSmallKeysyncSync keys;
+    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);                   // Action / Secondary-Fire
+    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);                 // Aim-Weapon / Handbrake
+    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);                     // Jump / Reverse
+    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);                       // Sprint / Accelerate
+    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);                     // Fire // Fire
+    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
+    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
+    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Reverse
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Accelerate
+    keys.data.sLeftStickX = ControllerState.LeftStickX;
+    keys.data.sLeftStickY = ControllerState.LeftStickY;
+
+    // Write it
+    BitStream.Write(&keys);
+}
+
+bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
+{
+    // Read the keysync
+    SFullKeysyncSync keys;
+    if (!BitStream.Read(&keys))
+        return false;
+
+    // Put the result into the controllerstate
+    ControllerState.LeftShoulder1 = keys.data.bLeftShoulder1;
+    ControllerState.RightShoulder1 = keys.data.bRightShoulder1;
+    short sButtonSquare = keys.data.bButtonSquare ? 255 : 0;
+    short sButtonCross = keys.data.bButtonCross ? 255 : 0;
+    if (BitStream.Version() >= 0x06F)
+    {
+        if (keys.data.ucButtonSquare != 0)
+            sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
+
+        if (keys.data.ucButtonCross != 0)
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+    }
+    ControllerState.ButtonSquare = sButtonSquare;
+    ControllerState.ButtonCross = sButtonCross;
+    ControllerState.ButtonCircle = keys.data.bButtonCircle;
+    ControllerState.ButtonTriangle = keys.data.bButtonTriangle;
+    ControllerState.ShockButtonL = keys.data.bShockButtonL;
+    ControllerState.m_bPedWalk = keys.data.bPedWalk;
+    ControllerState.LeftStickX = keys.data.sLeftStickX;
+    ControllerState.LeftStickY = keys.data.sLeftStickY;
+
+    return true;
+}
+
+void WriteFullKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream)
+{
+    // Put the controllerstate bools into a key byte
+    SFullKeysyncSync keys;
+    keys.data.bLeftShoulder1 = (ControllerState.LeftShoulder1 != 0);
+    keys.data.bRightShoulder1 = (ControllerState.RightShoulder1 != 0);
+    keys.data.bButtonSquare = (ControllerState.ButtonSquare != 0);
+    keys.data.bButtonCross = (ControllerState.ButtonCross != 0);
+    keys.data.bButtonCircle = (ControllerState.ButtonCircle != 0);
+    keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);
+    keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);
+    keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);
+    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;
+    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;
+    keys.data.sLeftStickX = ControllerState.LeftStickX;
+    keys.data.sLeftStickY = ControllerState.LeftStickY;
+
+    // Write it
+    BitStream.Write(&keys);
+}
+
+void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd)
+{
+    //
+    // Read rotations
+    //
+    const float         fPI = 3.14159265f;
+    SFloatAsBitsSync<8> rotation(-fPI, fPI, false);
+
+    BitStream.Read(&rotation);
+    float fCamRotZ = rotation.data.fValue;
+
+    BitStream.Read(&rotation);
+    float fCamRotX = rotation.data.fValue;
+
+    // Remake direction
+    float fCosCamRotX = cos(fCamRotX);
+    vecOutCamFwd.fX = fCosCamRotX * sin(fCamRotZ);
+    vecOutCamFwd.fY = fCosCamRotX * cos(fCamRotZ);
+    vecOutCamFwd.fZ = sin(fCamRotX);
+
+    //
+    // Read offset
+    //
+
+    // Lookup table used when sending
+    struct
+    {
+        uint  uiNumBits;
+        float fRange;
+    } bitCountTable[4] = {
+        {3, 4.0f},                // 3 bits is +-4        12 bits total
+        {5, 16.0f},               // 5 bits is +-16       18 bits total
+        {9, 256.0f},              // 9 bits is +-256      30 bits total
+        {14, 8192.0f},            // 14 bits is +-8192    45 bits total
+    };
+    // Read flag
+    bool bUseAbsolutePosition = false;
+    BitStream.ReadBit(bUseAbsolutePosition);
+
+    // Read table look up index for num of bits
+    uchar idx = 0;
+    BitStream.ReadBits((char*)&idx, 2);
+
+    const uint  uiNumBits = bitCountTable[idx].uiNumBits;
+    const float fRange = bitCountTable[idx].fRange;
+
+    // Read each component
+    SFloatAsBitsSyncBase position(uiNumBits, -fRange, fRange, false);
+
+    CVector vecUsePosition;
+    BitStream.Read(&position);
+    vecUsePosition.fX = position.data.fValue;
+
+    BitStream.Read(&position);
+    vecUsePosition.fY = position.data.fValue;
+
+    BitStream.Read(&position);
+    vecUsePosition.fZ = position.data.fValue;
+
+    // Remake position
+    if (bUseAbsolutePosition)
+        vecOutCamPosition = vecUsePosition;
+    else
+        vecOutCamPosition = vecBasePosition - vecUsePosition;
+}
+
+bool IsNametagValid(const char* szNick)
+{
+    // Grab the size of the nick. Check that it's not to long or short
+    size_t sizeNick = MbUTF8ToUTF16(szNick).size();
+    if (sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH)
+    {
+        return false;
+    }
+
+    // Check that each character is valid (visible characters exluding space)
+    unsigned char ucTemp;
+    for (size_t i = 0; i < sizeNick; i++)
+    {
+        ucTemp = szNick[i];
+        if (ucTemp < 32)
+        {
+            return false;
+        }
+    }
+
+    // nametag is valid, return true
+    return true;
+}
+
+bool IsNickValid(const char* szNick)
+{
+    // Grab the size of the nick. Check that it's within the player
+    size_t sizeNick = strlen(szNick);
+    if (sizeNick < MIN_PLAYER_NICK_LENGTH || sizeNick > MAX_PLAYER_NICK_LENGTH)
+    {
+        return false;
+    }
+
+    // Check that each character is valid (visible characters exluding space)
+    unsigned char ucTemp;
+    for (size_t i = 0; i < sizeNick; i++)
+    {
+        ucTemp = szNick[i];
+        if (ucTemp < 33 || ucTemp > 126)
+        {
+            return false;
+        }
+    }
+
+    // Nickname is valid, return true
+    return true;
+}
+
+void RotateVector(CVector& vecLine, const CVector& vecRotation)
+{
+    // Rotate it along the X axis
+    // [ 1     0        0    0 ]
+    // [ 0   cos a   sin a   0 ]
+    // [ 0  -sin a   cos a   0 ]
+
+    float fLineY = vecLine.fY;
+    vecLine.fY = cos(vecRotation.fX) * fLineY + sin(vecRotation.fX) * vecLine.fZ;
+    vecLine.fZ = -sin(vecRotation.fX) * fLineY + cos(vecRotation.fX) * vecLine.fZ;
+
+    // Rotate it along the Y axis
+    // [ cos a   0   -sin a   0 ]
+    // [   0     1     0      0 ]
+    // [ sin a   0    cos a   0 ]
+
+    float fLineX = vecLine.fX;
+    vecLine.fX = cos(vecRotation.fY) * fLineX - sin(vecRotation.fY) * vecLine.fZ;
+    vecLine.fZ = sin(vecRotation.fY) * fLineX + cos(vecRotation.fY) * vecLine.fZ;
+
+    // Rotate it along the Z axis
+    // [  cos a   sin a   0   0 ]
+    // [ -sin a   cos a   0   0 ]
+    // [    0       0     1   0 ]
+
+    fLineX = vecLine.fX;
+    vecLine.fX = cos(vecRotation.fZ) * fLineX + sin(vecRotation.fZ) * vecLine.fY;
+    vecLine.fY = -sin(vecRotation.fZ) * fLineX + cos(vecRotation.fZ) * vecLine.fY;
+}
+
+SString LongToDottedIP(unsigned long ulIP)
+{
+    in_addr in;
+    in.s_addr = ulIP;
+    return inet_ntoa(in);
+}
+#endif
 
 // RX(theta)
 // | 1              0               0       |
@@ -568,12 +1072,12 @@ CVector euler_ZXY_to_ZYX(const CVector& a_vZXY)
 
     CVector vZYX;
 
-    // ZYX (unknown)     => A = s(x)*c(y)    /   c(x)*c(y)   = t(x)
-    // ZXY (known)       => A = s(x)     /   c(x)*c(y)
+    // ZYX (unknown)     => A = s(x)*c(y)    /  c(x)*c(y)   = t(x)
+    // ZXY (known)       => A = s(x)         /   c(x)*c(y)
     vZYX.fX = atan2(sx, cx * cy);
 
-    // ZYX (unknown)     => B = c(y)*s(z)                    /   c(y)*c(z)                   = t(z)
-    // ZXY (known)       => B = c(y)*s(z)+s(x)*s(y)*c(z)     /   c(y)*c(z)-s(x)*s(y)*s(z)
+    // ZYX (unknown)     => B = c(y)*s(z)                /   c(y)*c(z)                   = t(z)
+    // ZXY (known)       => B = c(y)*s(z)+s(x)*s(y)*c(z) /   c(y)*c(z)-s(x)*s(y)*s(z)
     vZYX.fZ = atan2(cy * sz + sx * sy * cz, cy * cz - sx * sy * sz);
 
     // ZYX (unknown)     => C = -s(y)

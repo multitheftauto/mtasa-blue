@@ -1,15 +1,26 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CUtils.h
- *  PURPOSE:     Util functions header
+ *  FILE:        mods/deathmatch/logic/Utils.h
+ *  PURPOSE:     Miscellaneous utility functions
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
+
+#ifdef MTA_CLIENT
 extern CLocalizationInterface* g_pLocalization;
+#else
+#include <CVector.h>
+#include <CVector2D.h>
+#include <net/bitstream.h>
+#include <cmath>
+#include "CCommon.h"
+#include "CPad.h"
+#endif
 
 // Vector math
 inline float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
@@ -41,6 +52,7 @@ inline float HorizontalAngleBetweenPoints3D(const CVector& vecPosition1, const C
     return fRad;
     // return (fRad*180/PI);
 }
+
 inline float AngleBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
 {
     float fRad = (PI * 2) - atan2((vecPosition2.fX - vecPosition1.fX), (vecPosition2.fY - vecPosition1.fY));
@@ -61,6 +73,7 @@ inline float AngleBetweenPoints2D(const CVector& vecPosition1, const CVector& ve
     }
     return fRad;
 }
+
 inline float DistanceBetweenPoints3D(const CVector& vecPosition1, const CVector& vecPosition2)
 {
     float fDistanceX = vecPosition2.fX - vecPosition1.fX;
@@ -86,6 +99,43 @@ inline bool IsPointNearPoint3D(const CVector& vecPosition1, const CVector& vecPo
 
     return (fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance);
 }
+
+#ifndef MTA_CLIENT
+bool  CheckNickProvided(const char* szNick);
+float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2);
+float DistanceBetweenPoints2D(const CVector2D& vecPosition1, const CVector2D& vecPosition2);
+float DistanceBetweenPoints3D(const CVector& vecPosition1, const CVector& vecPosition2);
+bool  IsPointNearPoint2D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance);
+bool  IsPointNearPoint3D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance);
+
+void ReplaceCharactersInString(char* szString, char cWhat, char cWith);
+void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
+
+bool DoesDirectoryExist(const char* szPath);
+
+bool  IsIn(const char* szShortText, const char* szLongText);
+char* uppercase(char* s);
+void  stripString(char* szString);
+void  stripControlCodes(char* szString);
+bool  StringBeginsWith(const char* szText, const char* szBegins);
+bool  IsNumericString(const char* szString);
+bool  IsNumericString(const char* szString, size_t sizeString);
+
+void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, const char* szMessage);
+void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, const char* szMessage = "");
+void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, time_t BanDuration,
+                      const char* szMessage = "");
+void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, unsigned int uiCode);
+
+bool InitializeSockets();
+bool CleanupSockets();
+
+double GetRandomDouble();
+int    GetRandom(int iLow, int iHigh);
+
+bool IsValidFilePath(const char* szPath);
+bool IsValidOrganizationPath(const char* szPath);
+#endif
 
 inline float WrapAround(float fValue, float fHigh)
 {
@@ -157,15 +207,6 @@ inline void ConvertDegreesToRadians(CVector& vecRotation)
     vecRotation.fY = ConvertDegreesToRadians(vecRotation.fY);
     vecRotation.fZ = ConvertDegreesToRadians(vecRotation.fZ);
 }
-inline CVector Extrapolate(const CVector& vecOld, const CVector& vecSpeed, long ul_delta_t)
-{
-    CVector vecRet;
-    float   fDelta_t = static_cast<float>(ul_delta_t);
-    vecRet.fX = vecOld.fX + (vecSpeed.fX * fDelta_t);
-    vecRet.fY = vecOld.fY + (vecSpeed.fY * fDelta_t);
-    vecRet.fZ = vecOld.fZ + (vecSpeed.fZ * fDelta_t);
-    return vecRet;
-}
 inline CVector GetExtrapolatedSpeed(const CVector& vecOne, unsigned long ul_time_1, const CVector& vecTwo, unsigned long ul_time_2)
 {
     CVector       vecSpeed;
@@ -201,11 +242,12 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
     return fWrapped;
 }
 
+void RotateVector(CVector& vecLine, const CVector& vecRotation);
+
+#ifdef MTA_CLIENT
 // Misc utility functions
-char*        ReplaceAnyStringOccurrence(char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax);
 unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ');
 unsigned int StripControlCodes(char* szText, unsigned char cReplace = ' ');
-bool         IsWantedCharacter(unsigned char c);
 bool         IsControlCode(unsigned char c);
 bool         IsValidFilePath(const char* szDir);
 void         ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
@@ -213,28 +255,76 @@ void         ReplaceOccurrencesInString(std::string& s, const char* a, const cha
 void RaiseFatalError(unsigned int uiCode);
 void RaiseProtocolError(unsigned int uiCode);
 
-void RotateVector(CVector& vecLine, const CVector& vecRotation);
 void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation);
 
 unsigned int GetRandom(unsigned int uiLow, unsigned int uiHigh);
 double       GetRandomDouble();
-float        GetRandomFloat();
 
 SString GetDataUnit(unsigned long long ullInput);
-
-unsigned int HexToInt(const char* szHex);
-bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
-bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
 
 // Utility network functions
 void LongToDottedIP(unsigned long ulIP, char* szDottedIP);
 
 bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strOut);
+#else
+
+bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream);
+void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream);
+bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream);
+void WriteFullKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream);
+void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd);
+
+// Validation funcs
+bool IsNickValid(const char* szNick);
+bool IsNametagValid(const char* szNick);
+
+// Network funcs
+SString LongToDottedIP(unsigned long ulIP);
+
+inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes)
+{
+    SString strParsedQuery = "";
+    for (unsigned int k = 0; k < strEscapeString.length(); k++)
+    {
+        if (bSingleQuotes && strEscapeString[k] == '\'')
+            strParsedQuery += '\'';
+        if (bDoubleQuotes && strEscapeString[k] == '\"')
+            strParsedQuery += '\"';
+
+        strParsedQuery += strEscapeString[k];
+    }
+    return strParsedQuery;
+}
+#endif
+
+inline bool IsVisibleCharacter(unsigned char c)
+{
+    // 32..126 are visible characters
+    return c >= 32 && c <= 126;
+}
+
+unsigned int HexToInt(const char* szHex);
+bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
+bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
 
 // Maths utility functions
 CVector ConvertEulerRotationOrder(const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder);
 
+// Clear list of object pointers
+template <class T>
+void DeletePointersAndClearList(T& elementList)
+{
+    T cloneList = elementList;
+    elementList.clear();
+
+    typename T::const_iterator iter = cloneList.begin();
+    for (; iter != cloneList.end(); iter++)
+    {
+        delete *iter;
+    }
+}
+
 // for debug
-#ifdef MTA_DEBUG
+#if defined(MTA_DEBUG) && defined(MTA_CLIENT)
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
 #endif
