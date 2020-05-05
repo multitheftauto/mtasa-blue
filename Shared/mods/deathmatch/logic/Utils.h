@@ -113,7 +113,6 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
 
 bool DoesDirectoryExist(const char* szPath);
 
-bool  IsIn(const char* szShortText, const char* szLongText);
 char* uppercase(char* s);
 void  stripString(char* szString);
 void  stripControlCodes(char* szString);

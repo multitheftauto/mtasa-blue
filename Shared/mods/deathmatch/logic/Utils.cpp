@@ -195,7 +195,7 @@ bool CheckNickProvided(const char* szNick)
         return false;
     if (stricmp(szNick, "server") == 0)
         return false;
-    if (IsIn("`", szNick))
+    if (strchr(szNick, '`') != nullptr)
         return false;
     return true;
 }
@@ -217,29 +217,6 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
     int idx = 0;
     while ((idx = s.find_first_of(a, idx)) >= 0)
         s.replace(idx, 1, b);
-}
-
-bool IsIn(const char* szShortText, const char* szLongText)
-{
-    if (szShortText && szLongText)
-    {
-        char* strShort = new char[strlen(szShortText) + 1];
-        char* strLong = new char[strlen(szLongText) + 1];
-
-        strcpy(strShort, szShortText);
-        strcpy(strLong, szLongText);
-
-        char* szMatch = strstr(uppercase(strLong), uppercase(strShort));
-        if (szMatch != NULL)
-        {
-            delete[] strShort;
-            delete[] strLong;
-            return true;
-        }
-        delete[] strShort;
-        delete[] strLong;
-    }
-    return false;
 }
 
 char* uppercase(char* s)
