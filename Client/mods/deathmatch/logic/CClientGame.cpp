@@ -1793,7 +1793,7 @@ void CClientGame::UpdateVehicleInOut()
             }
 
             // Are we supposed to be in a vehicle? But aren't?
-            if (pOccupiedVehicle && !pVehicle)
+            if (pOccupiedVehicle && !pVehicle && !m_pLocalPlayer->IsWrapInToVehicleRequired())
             {
                 // Jax: this happens when we try to warp into a streamed out vehicle, including when we use CClientVehicle::StreamInNow
                 // ..maybe we need a different way to detect bike falls?

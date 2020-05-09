@@ -1347,6 +1347,8 @@ void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, u
 
 void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 {
+    SetWrapInToVehicleRequired(true);
+
     // Ensure vehicle model is loaded
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
     if (g_pGame->IsASyncLoadingEnabled() && !pModelInfo->IsLoaded())
@@ -4165,6 +4167,7 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
             pInTask->SetIsWarpingPedIntoCar();
             pInTask->ProcessPed(m_pPlayerPed);
             pInTask->Destroy();
+            SetWrapInToVehicleRequired(false);
         }
 
         // If we're a remote player
@@ -4180,6 +4183,8 @@ void CClientPed::InternalRemoveFromVehicle(CVehicle* pGameVehicle)
 {
     if (m_pPlayerPed && m_pTaskManager)
     {
+        SetWrapInToVehicleRequired(false);
+
         // Reset whatever task
         m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
 

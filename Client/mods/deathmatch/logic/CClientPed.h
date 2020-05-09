@@ -569,6 +569,9 @@ public:
     void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
     eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
 
+    bool IsWrapInToVehicleRequired() { return m_bWrapInToVehicleRequired; }
+    void SetWrapInToVehicleRequired(bool wrap) { m_bWrapInToVehicleRequired = wrap; }
+
     void NotifyCreate();
     void NotifyDestroy();
 
@@ -733,4 +736,5 @@ public:
     ReplacedAnim_type m_mapOfReplacedAnimations;
     bool              m_bTaskToBeRestoredOnAnimEnd;
     eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
+    bool              m_bWrapInToVehicleRequired = false;
 };
