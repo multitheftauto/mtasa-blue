@@ -18,7 +18,7 @@ void CLuaCameraDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         // Cam get funcs
         {"getCamera", GetCamera},
-        {"getCameraViewMode", GetCameraViewMode},
+        {"getCameraViewMode", ArgumentParserWarn<false, GetCameraViewMode>},
         {"getCameraMatrix", GetCameraMatrix},
         {"getCameraTarget", GetCameraTarget},
         {"getCameraInterior", GetCameraInterior},
@@ -105,19 +105,14 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetCameraViewMode(lua_State* luaVM)
+std::tuple<int, int> CLuaCameraDefs::GetCameraViewMode()
 {
     unsigned short ucVehicleMode;
     unsigned short ucPedMode;
-    if (CStaticFunctionDefinitions::GetCameraViewMode(ucVehicleMode, ucPedMode))
-    {
-        lua_pushnumber(luaVM, ucVehicleMode);
-        lua_pushnumber(luaVM, ucPedMode);
-        return 2;
-    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CStaticFunctionDefinitions::GetCameraViewMode(ucVehicleMode, ucPedMode);
+
+    return std::make_tuple(ucVehicleMode, ucPedMode);
 }
 
 int CLuaCameraDefs::GetCameraMatrix(lua_State* luaVM)
