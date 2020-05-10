@@ -184,5 +184,5 @@ Branch protection is **not enforced** for repository administrators,
 and those people are therefore not required to send pull requests. Individual repository admins may,
 for the greater good, pledge to submit pull requests despite this lack of enforcement.
 
-For informational purposes, the current repository administrators are a _subset of_
-[those listed here](https://forum.mtasa.com/staff/)—it is not an authoritative list.
+For informational purposes, the current repository administrators are those marked as _The MTA Team_ on
+[this list](https://forum.mtasa.com/staff/).
