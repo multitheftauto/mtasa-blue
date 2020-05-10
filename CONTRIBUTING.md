@@ -66,7 +66,7 @@ the mod will be reverted other than in exceptional circumstances.
 The most important of the [seven rules](http://chris.beams.io/posts/git-commit/) has been copied below, but please read the article:
 
 1. Separate subject from body with a blank line
-2. Limit the subject line to 50 characters
+2. Limit the subject line to around 60-80 characters (the [seven rules] say 50, but we think ~70 is okay)
 3. Use the imperative mood in the subject line
 4. Use the body to explain what and why vs. how
 
