@@ -114,6 +114,15 @@ namespace lua
         return 1;
     }
 
+    // Tuples can be used to return multiple results
+    template<typename... Ts>
+    int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
+    {
+        // Call Push on each element of the tuple
+        std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
+        return sizeof...(Ts);
+    }
+
     // Overload for enum types only
     template <typename T>
     typename std::enable_if_t<std::is_enum_v<T>, int> Push(lua_State* L, const T&& val)

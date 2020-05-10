@@ -1109,9 +1109,9 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
             // Reset vehicle in/out stuff
             g_pClientGame->ResetVehicleInOut();
 
-            // Make sure all other elements are aware of what dimension we are in now.
-            // So elements can be removed properly.
+            // Announce our dimension/interior to all elements, so that elements are removed properly
             g_pClientGame->SetAllDimensions(usDimension);
+            g_pClientGame->SetAllInteriors(ucInterior);
 
             // Reset return position so we can't warp back to where we were if local player
             g_pClientGame->m_pNetAPI->ResetReturnPosition();

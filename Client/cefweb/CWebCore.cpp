@@ -496,7 +496,7 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
 
     // Alt-Gr check
-    if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU)) 
+    if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU))
     {
         HKL current_layout = ::GetKeyboardLayout(0);
         SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
@@ -562,9 +562,7 @@ bool CWebCore::UpdateListsFromMaster()
 
         if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
         {
-        #ifdef MTA_DEBUG
             OutputDebugLine("Updating white- and blacklist...");
-        #endif
             SHttpRequestOptions options;
             options.uiConnectionAttempts = 3;
             g_pCore->GetNetwork()
