@@ -2986,14 +2986,14 @@ void CClientVehicle::Destroy()
         }
 
         // Remove all the passengers physically
+        bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
         for (unsigned int i = 0; i < 8; i++)
         {
             CClientPed* pPassenger = m_pPassengers[i];
             if (pPassenger)
             {
                 pPassenger->InternalRemoveFromVehicle(m_pVehicle);
-                if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE))
-                    pPassenger->SetWarpInToVehicleRequired(true);
+                pPassenger->SetWarpInToVehicleRequired(bWarpInToVehicleRequired);
             }
         }
 
