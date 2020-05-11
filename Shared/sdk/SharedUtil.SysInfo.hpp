@@ -332,7 +332,7 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
     unsigned int uiResult = 0;
 
     SString DevVen;
-    DevVen.Format("VEN_%X&DEV_%X", ulVen, ulDev);
+    DevVen.Format("VEN_%04X&DEV_%04X", ulVen, ulDev);
 
     // Get WMI info about all video controllers
     SQueryWMIResult result;
