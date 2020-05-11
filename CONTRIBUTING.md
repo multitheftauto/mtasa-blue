@@ -111,7 +111,6 @@ leaving the pull request clean.
     value of the CVAR.
     ```
 
-
 3.  Here we say `Fix #1115` so that GitHub automatically closes issue #1115. There's no description.
     ```
     Fix #1115: add async encode/decodeString
@@ -186,3 +185,8 @@ for the greater good, pledge to submit pull requests despite this lack of enforc
 
 For informational purposes, the current repository administrators are those marked as _The MTA Team_ on
 [this list](https://forum.mtasa.com/staff/).
+
+**Merge button**
+
+Generally use the "Squash and merge" button. If multiple commits are needed because you think
+having the separate commits are useful, use "Rebase and merge".
