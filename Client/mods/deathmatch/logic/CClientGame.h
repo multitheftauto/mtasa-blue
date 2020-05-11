@@ -190,6 +190,7 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot

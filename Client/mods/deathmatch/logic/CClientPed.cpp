@@ -1347,8 +1347,6 @@ void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, u
 
 void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 {
-    SetWarpInToVehicleRequired(true);
-
     // Ensure vehicle model is loaded
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
     if (g_pGame->IsASyncLoadingEnabled() && !pModelInfo->IsLoaded())
@@ -1515,14 +1513,12 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     RemoveTargetPosition();
 
     // Make peds stream in when they warp to a vehicle
-    if (pVehicle)
-    {
-        CVector vecInVehiclePosition;
-        GetPosition(vecInVehiclePosition);
-        UpdateStreamPosition(vecInVehiclePosition);
-        if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
-            StreamIn(true);
-    }
+    CVector vecInVehiclePosition;
+    GetPosition(vecInVehiclePosition);
+    UpdateStreamPosition(vecInVehiclePosition);
+    if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
+        StreamIn(true);
+    SetWarpInToVehicleRequired(true);
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon()
@@ -1537,6 +1533,7 @@ void CClientPed::ResetToOutOfVehicleWeapon()
 
 CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 {
+    SetWarpInToVehicleRequired(false);
     SetDoingGangDriveby(false);
 
     // Reset any enter/exit tasks
