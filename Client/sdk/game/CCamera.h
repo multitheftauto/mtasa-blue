@@ -87,19 +87,19 @@ enum eCamMode
 
 enum class eVehicleCamMode
 {
-    MODE_BUMPER,
-    MODE_CLOSE_EXTERNAL,
-    MODE_MIDDLE_EXTERNAL,
-    MODE_FAR_EXTERNAL,
-    MODE_LOW_EXTERNAL,
-    MODE_CINEMATIC
+    BUMPER,
+    CLOSE_EXTERNAL,
+    MIDDLE_EXTERNAL,
+    FAR_EXTERNAL,
+    LOW_EXTERNAL,
+    CINEMATIC
 };
 
 enum class ePedCamMode
 {
-    MODE_CLOSE,
-    MODE_MIDDLE,
-    MODE_FAR,
+    CLOSE,
+    MIDDLE,
+    MAX,
 };
 
 enum

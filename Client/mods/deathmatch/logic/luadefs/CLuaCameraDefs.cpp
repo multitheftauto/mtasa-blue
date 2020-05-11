@@ -441,10 +441,12 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
 
 bool CLuaCameraDefs::SetCameraViewMode(int usVehicleViewMode, std::optional<int> usPedViewMode)
 {
-    CStaticFunctionDefinitions::SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
+    CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
+
+    pCamera->SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
 
     if (usPedViewMode)
-        CStaticFunctionDefinitions::SetCameraPedViewMode((ePedCamMode)usPedViewMode.value());
+        pCamera->SetCameraPedViewMode((ePedCamMode)usPedViewMode.value());
 
     return true;
     }
