@@ -382,7 +382,6 @@ public:
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
 
     // Camera get funcs
-    static bool           GetCameraViewMode(unsigned short& ucVehicleMode, unsigned short& ucPedMode);
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
     static CClientEntity* GetCameraTarget();
     static bool           GetCameraInterior(unsigned char& ucInterior);

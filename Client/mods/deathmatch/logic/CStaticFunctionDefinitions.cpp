@@ -4922,13 +4922,6 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetCameraViewMode(unsigned short& ucVehicleMode, unsigned short& ucPedMode)
-{
-    ucVehicleMode = (unsigned short)m_pCamera->GetCameraVehicleViewMode();
-    ucPedMode     = (unsigned short)m_pCamera->GetCameraPedViewMode();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld)
 {
     if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
