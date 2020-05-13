@@ -14,6 +14,8 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
+
+    // gather GTASA default skins
     for (int i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
@@ -23,6 +25,18 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
             lua_settable(luaVM, -3);
         }
     }
+
+    // gather our, engineRequestModel skins
+    // start at 313, so we wont reinsert the same skin ids(sometimes 3 is allocated, and that would appear twice in the list if we would start at 0)
+    for (const CClientModel* model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::CCLIENTMODELPED, 313)) 
+    {
+        lua_pushnumber(luaVM, ++iIndex);
+        lua_pushnumber(luaVM, model->GetModelID());
+        lua_settable(luaVM, -3);
+    }
+
+    // Another option could be to loop thru all MAX_MODELS skins,
+    // and check if they're valid, and if they're of the correct type, but i feel like thats pretty harsh, cosidering we can solve it like this
 
     return 1;
 }

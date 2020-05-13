@@ -72,6 +72,22 @@ CClientModel* CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
+std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID)
+{
+    std::vector<CClientModel*> found;
+    found.reserve(16); // just pre-allocate some space, because we know there might be a few models
+
+    for (int i = minModelID; i < MAX_MODEL_ID; i++)
+    {
+        CClientModel* model = m_Models[i];
+        if (model && model->GetModelType() == type)
+        {
+            found.push_back(model);
+        }
+    }
+    return found;
+}
+
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
     for (ushort i = 0; i < MAX_MODEL_ID; i++)
