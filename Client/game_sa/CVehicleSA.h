@@ -437,6 +437,8 @@ public:
 
     // 1425
     BYTE Padding226[15];
+
+    void AddExhaustParticles();
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
 

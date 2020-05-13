@@ -286,6 +286,9 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 
+#define HOOKPOS_CVehicle_AddExhaustParticles 0x6DE2F1
+DWORD         RETURN_CVehicle_AddExhaustParticles = 0x6DE2F7;
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -353,6 +356,7 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+VehicleAddExhaustParticlesHandler* m_pVehicleAddExhaustParticlesHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -503,6 +507,7 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
+void HOOK_CVehicle_AddExhaustParticles();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -727,6 +732,9 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+        // Feature #341 Github
+    HookInstall(HOOKPOS_CVehicle_AddExhaustParticles, (DWORD)HOOK_CVehicle_AddExhaustParticles, 6);
 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
@@ -2258,6 +2266,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetVehicleAddExhaustParticlesHandler(VehicleAddExhaustParticlesHandler* pHandler)
+{
+    m_pVehicleAddExhaustParticlesHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6822,5 +6835,71 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
+    }
+}
+
+void __cdecl CVehicle_AddExhaustParticles(CVehicleSAInterface* pInterface, CVector** pLeftFumesPosition, CVector** pRightFumesPosition)
+{
+    m_pVehicleAddExhaustParticlesHandler(pInterface, pLeftFumesPosition, pRightFumesPosition);
+}
+
+DWORD RETURN_NORMAL_FLOW_EXHAUST = 0x6DE32D;
+void _declspec(naked) HOOK_CVehicle_AddExhaustParticles()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (m_pVehicleAddExhaustParticlesHandler)
+    {
+        _asm
+        {
+            popad
+
+            push    ebp
+            mov     ebp, esp
+            sub     esp, 24
+
+            lea     eax, [ebp - 4]            // pRightFumesPosition (16 bytes)
+            push    eax
+            lea     eax, [ebp - 8]            // pLeftFumesPosition
+            push    eax
+            push    esi            // pInterface
+            call    CVehicle_AddExhaustParticles
+            add     esp, 12
+
+            mov     edx, [ebp - 4]            // pRightFumesPosition
+            mov     eax, [edx]
+            mov     [ebp + 0x3C + 4], eax            // vSecond->x = pRightFumesPosition->x
+            mov     eax, [edx + 4]
+            mov     [ebp + 0x3C + 8], eax            // vSecond->y = pRightFumesPosition->y
+            mov     eax, [edx + 8]
+            mov     [ebp + 0x3C + 12], eax            // vSecond->z = pRightFumesPosition->z
+
+            mov     edx, [ebp - 8]            // pLeftFumesPosition
+            mov     eax, [edx]
+            mov     [ebp + 0x64 + 4], eax            // vFirst->x = pLeftFumesPosition->x
+            mov     eax, [edx + 4]
+            mov     [ebp + 0x64 + 8], eax            // vFirst->y = pLeftFumesPosition->y
+            mov     eax, [edx + 8]
+            mov     [ebp + 0x64 + 12], eax            // vFirst->z = pLeftFumesPosition->z
+
+
+            mov     esp, ebp
+            pop     ebp
+
+            push    ebx
+            lea     ecx, [esp + 0x80]
+            jmp     RETURN_NORMAL_FLOW_EXHAUST
+        }
+    }
+
+    _asm
+    {
+        popad
+        mov     edx, [edi + 5Ch]
+        add     edx, 48h
+        jmp     RETURN_CVehicle_AddExhaustParticles
     }
 }

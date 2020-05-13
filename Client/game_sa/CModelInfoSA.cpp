@@ -930,7 +930,7 @@ void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
     return pOrigSuspensionLines;
 }
 
-CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
+CVector* CModelInfoSA::GetVehicleExhaustFumesPosition()
 {
     return GetVehicleDummyPosition(eVehicleDummies::EXHAUST);
 }
@@ -940,18 +940,23 @@ void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
     return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
 }
 
-CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
+CVector* CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
 {
-    if (!IsVehicle())
-        return CVector();
+    // There are only 15 dummies in GTA.
+    if (!IsVehicle() || eDummy > VEH_UNKNOWNDUMMY)
+    {
+        static CVector vecDefaultPosition = CVector();
+        return &vecDefaultPosition;
+    }
 
     // Request model load right now if not loaded yet (#9897)
     if (!IsLoaded())
         Request(BLOCKING, "GetVehicleDummyPosition");
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return pVehicleModel->pVisualInfo->vecDummies[eDummy];
+    return &pVehicleModel->pVisualInfo->vecDummies[eDummy];
 }
+
 
 void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
 {

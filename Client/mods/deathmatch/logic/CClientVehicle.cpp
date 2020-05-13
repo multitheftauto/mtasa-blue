@@ -4671,6 +4671,29 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
     return false;
 }
 
+
+void CClientVehicle::SetDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
+{
+    if (eDummy == EXHAUST)
+    {
+        SetDummyPosition(EXHAUST_LEFT, vecPosition);
+        SetDummyPosition(EXHAUST_RIGHT, {vecPosition.fX * -1, vecPosition.fY, vecPosition.fZ});
+        return;
+    }
+    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    vehicleDummy.bSet = true;
+    vehicleDummy.vecPosition = vecPosition;
+}
+
+CVector* CClientVehicle::GetDummyPosition(eVehicleDummies eDummy)
+{
+    SVehicleDummy& vehicleDummy = m_arrDummies[eDummy];
+    if (vehicleDummy.bSet)
+    {
+        return &vehicleDummy.vecPosition;
+    }
+    return nullptr;
+}
 bool CClientVehicle::ResetComponentScale(const SString& vehicleComponent)
 {
     // set our rotation on the model

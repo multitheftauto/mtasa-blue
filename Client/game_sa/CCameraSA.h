@@ -386,8 +386,12 @@ public:
 
     DWORD m_uiFadeTimeStarted;
     DWORD m_uiFadeTimeStartedMusic;
+
+    inline CVector& GetPosition() { return Placeable.matrix ? Placeable.matrix->vPos : Placeable.m_transform.m_translate; }
 };
 // static_assert(sizeof(CCameraSAInterface) == 0xD78, "Invalid size for CCameraSAInterface");
+
+ extern CCameraSAInterface& g_TheCamera;
 
 class CCameraSA : public CCamera
 {

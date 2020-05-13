@@ -1534,6 +1534,12 @@ enum eVehicleDummies
     EXHAUST_SECONDARY,
     WING_AIRTRAIL,
     VEH_GUN,
+    VEH_UNKNOWNDUMMY,
+
+    // Anything above is not part of GTA
+    EXHAUST_LEFT,
+    EXHAUST_RIGHT,
+    VEHICLE_TOTAL_MTA_DUMMIES
 };
 
 enum class eResizableVehicleWheelGroup

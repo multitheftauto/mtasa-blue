@@ -19,6 +19,7 @@
 class CBikeSAInterface : public CVehicleSAInterface
 {
     // fill this
+    void CalculateLeanMatrix();
 };
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA

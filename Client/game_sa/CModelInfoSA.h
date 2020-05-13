@@ -285,6 +285,8 @@ protected:
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
+    static CBaseModelInfoSAInterface** ms_modelInfoPtrs;
+
     CModelInfoSA();
     CModelInfoSA(DWORD dwModelID);
 
@@ -349,9 +351,9 @@ public:
     unsigned int GetNumRemaps();
     void*        GetVehicleSuspensionData();
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
-    CVector      GetVehicleExhaustFumesPosition() override;
+    CVector*     GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
+    CVector*     GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();

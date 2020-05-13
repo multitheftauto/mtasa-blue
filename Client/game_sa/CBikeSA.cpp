@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 
+void CBikeSAInterface::CalculateLeanMatrix()
+{
+    ((void(__thiscall*)(CBikeSAInterface*))0x6B7150)(this);
+}
+
 CBikeSA::CBikeSA(CBikeSAInterface* bike)
 {
     DEBUG_TRACE("CBikeSA::CBikeSA( CBikeSAInterface * bike )");

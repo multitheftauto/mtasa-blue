@@ -579,6 +579,11 @@ ADD_ENUM(HAND_REST, "hand_rest")
 ADD_ENUM(EXHAUST_SECONDARY, "exhaust_second")
 ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
+ADD_ENUM(VEH_UNKNOWNDUMMY, "veh_unknowndummy")
+
+// anything above is not part of gta
+ADD_ENUM(EXHAUST_LEFT, "exhaust_left")
+ADD_ENUM(EXHAUST_RIGHT, "exhaust_right")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)

@@ -2064,7 +2064,7 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
         GetMatrixForGravity(m_vecGravity, matOld);
         GetMatrixForGravity(*pvecGravity, matNew);
 
-        CVector* pvecPosition = &m_pInterface->Placeable.matrix->vPos;
+        CVector* pvecPosition = &m_pInterface->matrix->vPos;
 
         matOld.Invert();
         pCam->GetTargetHistoryPos()[0] = matOld * (pCam->GetTargetHistoryPos()[0] - *pvecPosition);
@@ -2327,7 +2327,7 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
     // Only apply to CAutomobile and down
     if (GetBaseVehicleType() == 0)
     {
-        CVector vecDelta = vecNewPosition - m_pInterface->Placeable.matrix->vPos;
+        CVector vecDelta = vecNewPosition - m_pInterface->matrix->vPos;
         if (vecDelta.LengthSquared() > 10 * 10)
         {
             // Reposition colpoints for big moves to avoid random spinning
@@ -2766,3 +2766,136 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
+
+/*
+void CVehicleSAInterface::AddExhaustParticles()
+{
+
+    //((void(__thiscall*)(CVehicle*))0x6DE240)(this);
+
+    if (bOffscreen)
+        return;
+    float fSquaredMagnitude = (g_TheCamera.GetPosition() - GetPosition()).LengthSquared();
+    if (fSquaredMagnitude > 256.0f || fSquaredMagnitude > 64.0f && !((CTimer::m_FrameCounter + static_cast<std::uint8_t>(m_nModelIndex)) & 1))
+    {
+        return;
+    }
+    auto    pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(CModelInfoSA::ms_modelInfoPtrs[m_nModelIndex]);
+    CVector firstExhaustPos = pVehicleModelInfo->pVisualInfo->vecDummies[DUMMY_EXHAUST];
+    CVector secondExhaustPos = firstExhaustPos;
+    secondExhaustPos.x *= -1.0f;
+    CMatrix_Padded entityMatrix(*Placeable.matrix);
+    bool    bHasDoubleExhaust = m_pHandlingData->m_bDoubleExhaust;
+    if (m_nVehicleSubClass == VEHICLE_BIKE)
+    {
+        CBikeSAInterface* pBike = static_cast<CBikeSAInterface*>(this);
+        pBike->CalculateLeanMatrix();
+        entityMatrix = pBike->m_mLeanMatrix;
+        switch (m_nModelIndex)
+        {
+            case MODEL_FCR900:
+                if (m_anExtras[0] == 1 || m_anExtras[0] == 2)
+                    bHasDoubleExhaust = true;
+                break;
+            case MODEL_NRG500:
+                if (!m_anExtras[0] || m_anExtras[0] == 1)
+                    secondExhaustPos = pVehicleModelInfo->m_pVehicleStruct->m_avDummyPos[DUMMY_EXHAUST_SECONDARY];
+                break;
+            case MODEL_BF400:
+                if (m_anExtras[0] == 2)
+                    bHasDoubleExhaust = true;
+                break;
+        }
+    }
+    if (firstExhaustPos != 0.0f)
+    {
+        CVector vecParticleVelocity;
+        if (DotProduct(m_matrix->up, m_vecMoveSpeed) >= 0.05f)
+        {
+            vecParticleVelocity = m_vecMoveSpeed * 30.0f;
+        }
+        else
+        {
+            static float randomFactor = CGeneral::GetRandomNumberInRange(-1.8f, -0.9f);
+            vecParticleVelocity = randomFactor * m_matrix->up;
+        }
+        firstExhaustPos = entityMatrix * firstExhaustPos;
+        bool  bFirstExhaustSubmergedInWater = false;
+        bool  bSecondExhaustSubmergedInWater = false;
+        float pLevel = 0.0f;
+        if (physicalFlags.bTouchingWater && CWaterLevel::GetWaterLevel(firstExhaustPos.x, firstExhaustPos.y, firstExhaustPos.z, &pLevel, true, nullptr) &&
+            pLevel >= firstExhaustPos.z)
+        {
+            bFirstExhaustSubmergedInWater = true;
+        }
+        if (bHasDoubleExhaust)
+        {
+            secondExhaustPos = entityMatrix * secondExhaustPos;
+            if (physicalFlags.bTouchingWater &&
+                CWaterLevel::GetWaterLevel(secondExhaustPos.x, secondExhaustPos.y, secondExhaustPos.z, &pLevel, true, nullptr) && pLevel >= secondExhaustPos.z)
+            {
+                bSecondExhaustSubmergedInWater = true;
+            }
+        }
+        if (CGeneral::GetRandomNumberInRange(1.0f, 3.0f) * (m_fGasPedal + 1.1f) > 2.5f)
+        {
+            float fMoveSpeed = m_vecMoveSpeed.Magnitude() * 0.5f;
+            float particleAlpha = 0.0f;
+            if (0.25f - fMoveSpeed >= 0.0f)
+                particleAlpha = 0.25f - fMoveSpeed;
+            float        fLife = std::max(0.2f - fMoveSpeed, 0.0f);
+            FxPrtMult_c  fxPrt(0.9f, 0.9f, 1.0f, particleAlpha, 0.2f, 1.0f, fLife);
+            std::int32_t numExhausts = 2;
+            for (std::int32_t i = 0; i < 2; i++)
+            {
+                FxSystem_c* pFirstExhaustFxSystem = g_fx.m_pPrtSmokeII3expand;
+                if (bFirstExhaustSubmergedInWater)
+                {
+                    fxPrt.m_color.alpha = particleAlpha * 0.5f;
+                    fxPrt.m_fSize = 0.6f;
+                    pFirstExhaustFxSystem = g_fx.m_pPrtBubble;
+                }
+                pFirstExhaustFxSystem->AddParticle(&firstExhaustPos, &vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness, 0.6f, 0);
+                if (bHasDoubleExhaust)
+                {
+                    FxSystem_c* pSecondExhaustFxSystem = g_fx.m_pPrtSmokeII3expand;
+                    if (bSecondExhaustSubmergedInWater)
+                    {
+                        fxPrt.m_color.alpha = particleAlpha * 0.5f;
+                        fxPrt.m_fSize = 0.6f;
+                        pSecondExhaustFxSystem = g_fx.m_pPrtBubble;
+                    }
+                    pSecondExhaustFxSystem->AddParticle(&secondExhaustPos, &vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness, 0.6f, 0);
+                }
+                if (m_fGasPedal > 0.5f && m_nCurrentGear < 3)
+                {
+                    if (rand() & 1)
+                    {
+                        FxSystem_c* pSecondaryExhaustFxSystem = g_fx.m_pPrtSmokeII3expand;
+                        if (bFirstExhaustSubmergedInWater)
+                        {
+                            fxPrt.m_color.alpha = particleAlpha * 0.5f;
+                            fxPrt.m_fSize = 0.6f;
+                            pSecondaryExhaustFxSystem = g_fx.m_pPrtBubble;
+                        }
+                        pSecondaryExhaustFxSystem->AddParticle(&firstExhaustPos, &vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness, 0.6f,
+                                                               0);
+                    }
+                    else if (bHasDoubleExhaust)
+                    {
+                        FxSystem_c* pSecondaryExhaustFxSystem = g_fx.m_pPrtSmokeII3expand;
+                        if (bSecondExhaustSubmergedInWater)
+                        {
+                            fxPrt.m_color.alpha = particleAlpha * 0.5f;
+                            fxPrt.m_fSize = 0.6f;
+                            pSecondaryExhaustFxSystem = g_fx.m_pPrtBubble;
+                        }
+                        pSecondaryExhaustFxSystem->AddParticle(&secondExhaustPos, &vecParticleVelocity, 0.0f, &fxPrt, -1.0f, m_fContactSurfaceBrightness, 0.6f,
+                                                               0);
+                    }
+                }
+            }
+        }
+    }
+}
+*/

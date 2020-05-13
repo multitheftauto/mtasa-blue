@@ -14,6 +14,8 @@
  * \todo Need to add other TakeControl functions
  */
 
+auto g_TheCamera = *reinterpret_cast<CCameraSAInterface*>(0xB6F028);
+
 unsigned long CCameraSA::FUNC_RwFrameGetLTM;
 static bool   bCameraClipObjects;
 static bool   bCameraClipVehicles;

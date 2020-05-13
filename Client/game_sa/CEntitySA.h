@@ -225,6 +225,8 @@ public:
             return numLodChildrenRendered & 0x1f;
         return -1;
     }
+
+    inline CVector& GetPosition() { return Placeable.matrix ? Placeable.matrix->vPos : Placeable.m_transform.m_translate; }
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
