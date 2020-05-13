@@ -30,6 +30,7 @@ void CClientModelManager::RemoveAll(void)
     {
         Remove(m_Models[i]);
     }
+    m_modelCount = 0;
 }
 
 void CClientModelManager::Add(CClientModel* pModel)
@@ -37,6 +38,7 @@ void CClientModelManager::Add(CClientModel* pModel)
     if (m_Models[pModel->GetModelID()] == nullptr)
     {
         m_Models[pModel->GetModelID()] = pModel;
+        m_modelCount++;
     }
 }
 
@@ -45,6 +47,7 @@ bool CClientModelManager::Remove(CClientModel* pModel)
     if (pModel && m_Models[pModel->GetModelID()] != nullptr)
     {
         m_Models[pModel->GetModelID()] = nullptr;
+        m_modelCount--;
         return true;
     }
     return false;
@@ -75,7 +78,7 @@ CClientModel* CClientModelManager::FindModelByID(int iModelID)
 std::vector<CClientModel*> CClientModelManager::GetModelsByType(const eClientModelType type, const unsigned int minModelID)
 {
     std::vector<CClientModel*> found;
-    found.reserve(16); // just pre-allocate some space, because we know there might be a few models
+    found.reserve(m_modelCount);
 
     for (int i = minModelID; i < MAX_MODEL_ID; i++)
     {

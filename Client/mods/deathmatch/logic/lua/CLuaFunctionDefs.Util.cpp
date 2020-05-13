@@ -26,17 +26,14 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
         }
     }
 
-    // gather our, engineRequestModel skins
-    // start at 313, so we wont reinsert the same skin ids(sometimes 3 is allocated, and that would appear twice in the list if we would start at 0)
+    // gather our custom skin model IDs allocated with engineRequestModel
+    // (there might be some < 313 as well, and since we dont want duplicates, we start at 313, others are already included by the loop above)
     for (const CClientModel* model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::CCLIENTMODELPED, 313)) 
     {
         lua_pushnumber(luaVM, ++iIndex);
         lua_pushnumber(luaVM, model->GetModelID());
         lua_settable(luaVM, -3);
     }
-
-    // Another option could be to loop thru all MAX_MODELS skins,
-    // and check if they're valid, and if they're of the correct type, but i feel like thats pretty harsh, cosidering we can solve it like this
 
     return 1;
 }

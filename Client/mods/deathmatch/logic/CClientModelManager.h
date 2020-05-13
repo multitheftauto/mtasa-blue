@@ -42,4 +42,5 @@ public:
 
 private:
     CClientModel* m_Models[MAX_MODEL_ID];
+    unsigned int m_modelCount = 0;
 };
