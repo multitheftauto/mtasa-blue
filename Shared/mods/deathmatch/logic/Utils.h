@@ -11,13 +11,96 @@
 
 #pragma once
 
+#ifdef MTA_CLIENT
+extern CLocalizationInterface* g_pLocalization;
+#else
 #include <CVector.h>
 #include <CVector2D.h>
 #include <net/bitstream.h>
 #include <cmath>
 #include "CCommon.h"
 #include "CPad.h"
+#endif
 
+// Vector math
+inline float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+
+    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
+}
+
+// Vector math
+inline float DistanceBetweenPoints2D(const CVector2D& vecPosition1, const CVector2D& vecPosition2)
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+
+    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
+}
+
+inline float HorizontalAngleBetweenPoints3D(const CVector& vecPosition1, const CVector& vecPosition2)
+{
+    CVector zeroVec;
+    zeroVec.fX = 0;
+    zeroVec.fY = 0;
+    zeroVec.fZ = 0;
+    float fLenA = DistanceBetweenPoints2D(zeroVec, vecPosition1);
+    float fLenB = DistanceBetweenPoints2D(zeroVec, vecPosition2);
+    float fRad = acos(((vecPosition1.fX * vecPosition2.fX) + (vecPosition1.fY * vecPosition2.fY)) / (fLenA * fLenB));
+    return fRad;
+    // return (fRad*180/PI);
+}
+
+inline float AngleBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
+{
+    float fRad = (PI * 2) - atan2((vecPosition2.fX - vecPosition1.fX), (vecPosition2.fY - vecPosition1.fY));
+    // Clamp it to -PI .. PI
+    if (fRad < -PI)
+    {
+        do
+        {
+            fRad += PI * 2.0f;
+        } while (fRad < -PI);
+    }
+    else if (fRad > PI)
+    {
+        do
+        {
+            fRad -= PI * 2.0f;
+        } while (fRad > PI);
+    }
+    return fRad;
+}
+
+inline float DistanceBetweenPoints3D(const CVector& vecPosition1, const CVector& vecPosition2)
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+
+    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
+}
+
+inline bool IsPointNearPoint2D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance)
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+
+    return (fDistanceX * fDistanceX + fDistanceY * fDistanceY <= fDistance * fDistance);
+}
+
+inline bool IsPointNearPoint3D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance)
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+
+    return (fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance);
+}
+
+#ifndef MTA_CLIENT
 bool  CheckNickProvided(const char* szNick);
 float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2);
 float DistanceBetweenPoints2D(const CVector2D& vecPosition1, const CVector2D& vecPosition2);
@@ -30,7 +113,6 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
 
 bool DoesDirectoryExist(const char* szPath);
 
-bool  IsIn(const char* szShortText, const char* szLongText);
 char* uppercase(char* s);
 void  stripString(char* szString);
 void  stripControlCodes(char* szString);
@@ -47,16 +129,12 @@ void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, unsig
 bool InitializeSockets();
 bool CleanupSockets();
 
-float  GetRandomFloat();
 double GetRandomDouble();
 int    GetRandom(int iLow, int iHigh);
 
 bool IsValidFilePath(const char* szPath);
 bool IsValidOrganizationPath(const char* szPath);
-
-unsigned int HexToInt(const char* szHex);
-bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
-bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
+#endif
 
 inline float WrapAround(float fValue, float fHigh)
 {
@@ -128,12 +206,29 @@ inline void ConvertDegreesToRadians(CVector& vecRotation)
     vecRotation.fY = ConvertDegreesToRadians(vecRotation.fY);
     vecRotation.fZ = ConvertDegreesToRadians(vecRotation.fZ);
 }
-
+inline CVector GetExtrapolatedSpeed(const CVector& vecOne, unsigned long ul_time_1, const CVector& vecTwo, unsigned long ul_time_2)
+{
+    CVector       vecSpeed;
+    unsigned long dt = ul_time_2 - ul_time_1;
+    vecSpeed.fX = (vecTwo.fX - vecOne.fX) / dt;
+    vecSpeed.fY = (vecTwo.fY - vecOne.fY) / dt;
+    vecSpeed.fZ = (vecTwo.fZ - vecOne.fZ) / dt;
+    return vecSpeed;
+}
 inline void ConvertDegreesToRadiansNoWrap(CVector& vecRotation)
 {
     vecRotation.fX = ConvertDegreesToRadiansNoWrap(vecRotation.fX);
     vecRotation.fY = ConvertDegreesToRadiansNoWrap(vecRotation.fY);
     vecRotation.fZ = ConvertDegreesToRadiansNoWrap(vecRotation.fZ);
+}
+inline float GetOffsetDegrees(float a, float b)
+{
+    float c = (b > a) ? b - a : 0.0f - (a - b);
+    if (c > 180.0f)
+        c = 0.0f - (360.0f - c);
+    else if (c <= -180.0f)
+        c = (360.0f + c);
+    return c;
 }
 
 // Assuming fValue is the result of a difference calculation, calculate
@@ -146,8 +241,31 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
     return fWrapped;
 }
 
-// Escapes the HTML characters <, >, &, " and '. Don't forget to remove your buffer to avoid memory leaks.
-const char* HTMLEscapeString(const char* szSource);
+void RotateVector(CVector& vecLine, const CVector& vecRotation);
+
+#ifdef MTA_CLIENT
+// Misc utility functions
+unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ');
+unsigned int StripControlCodes(char* szText, unsigned char cReplace = ' ');
+bool         IsControlCode(unsigned char c);
+bool         IsValidFilePath(const char* szDir);
+void         ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
+
+void RaiseFatalError(unsigned int uiCode);
+void RaiseProtocolError(unsigned int uiCode);
+
+void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation);
+
+unsigned int GetRandom(unsigned int uiLow, unsigned int uiHigh);
+double       GetRandomDouble();
+
+SString GetDataUnit(unsigned long long ullInput);
+
+// Utility network functions
+void LongToDottedIP(unsigned long ulIP, char* szDottedIP);
+
+bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strOut);
+#else
 
 bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream);
 void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInterface& BitStream);
@@ -158,16 +276,9 @@ void ReadCameraOrientation(const CVector& vecBasePosition, NetBitStreamInterface
 // Validation funcs
 bool IsNickValid(const char* szNick);
 bool IsNametagValid(const char* szNick);
-void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
 // Network funcs
 SString LongToDottedIP(unsigned long ulIP);
-
-inline bool IsVisibleCharacter(unsigned char c)
-{
-    // 32..126 are visible characters
-    return c >= 32 && c <= 126;
-}
 
 inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes)
 {
@@ -183,6 +294,17 @@ inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, boo
     }
     return strParsedQuery;
 }
+#endif
+
+inline bool IsVisibleCharacter(unsigned char c)
+{
+    // 32..126 are visible characters
+    return c >= 32 && c <= 126;
+}
+
+unsigned int HexToInt(const char* szHex);
+bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
+bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
 
 // Maths utility functions
 CVector ConvertEulerRotationOrder(const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder);
@@ -200,3 +322,8 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
+
+// for debug
+#if defined(MTA_DEBUG) && defined(MTA_CLIENT)
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
+#endif

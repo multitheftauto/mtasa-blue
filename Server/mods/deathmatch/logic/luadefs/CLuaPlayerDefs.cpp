@@ -2012,7 +2012,7 @@ int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
 
     if (argStream.NextIsUserData())
     {
-        CPlayer* pResponsible;
+        CClient* pResponsible;
         argStream.ReadUserData(pResponsible);
         if (!argStream.HasErrors())
         {

@@ -1513,14 +1513,12 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     RemoveTargetPosition();
 
     // Make peds stream in when they warp to a vehicle
-    if (pVehicle)
-    {
-        CVector vecInVehiclePosition;
-        GetPosition(vecInVehiclePosition);
-        UpdateStreamPosition(vecInVehiclePosition);
-        if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
-            StreamIn(true);
-    }
+    CVector vecInVehiclePosition;
+    GetPosition(vecInVehiclePosition);
+    UpdateStreamPosition(vecInVehiclePosition);
+    if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
+        StreamIn(true);
+    SetWarpInToVehicleRequired(true);
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon()
@@ -1535,6 +1533,7 @@ void CClientPed::ResetToOutOfVehicleWeapon()
 
 CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 {
+    SetWarpInToVehicleRequired(false);
     SetDoingGangDriveby(false);
 
     // Reset any enter/exit tasks
@@ -4165,6 +4164,7 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
             pInTask->SetIsWarpingPedIntoCar();
             pInTask->ProcessPed(m_pPlayerPed);
             pInTask->Destroy();
+            SetWarpInToVehicleRequired(false);
         }
 
         // If we're a remote player
@@ -4180,6 +4180,8 @@ void CClientPed::InternalRemoveFromVehicle(CVehicle* pGameVehicle)
 {
     if (m_pPlayerPed && m_pTaskManager)
     {
+        SetWarpInToVehicleRequired(false);
+
         // Reset whatever task
         m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
 

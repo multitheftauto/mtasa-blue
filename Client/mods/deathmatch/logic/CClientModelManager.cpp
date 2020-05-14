@@ -35,11 +35,13 @@ void CClientModelManager::RemoveAll(void)
 
 void CClientModelManager::Add(CClientModel* pModel)
 {
-    if (m_Models[pModel->GetModelID()] == nullptr)
+    if (m_Models[pModel->GetModelID()] != nullptr)
     {
-        m_Models[pModel->GetModelID()] = pModel;
-        m_modelCount++;
+        dassert(m_Models[pModel->GetModelID()] == pModel);
+        return;
     }
+    m_Models[pModel->GetModelID()] = pModel;
+    m_modelCount++;
 }
 
 bool CClientModelManager::Remove(CClientModel* pModel)

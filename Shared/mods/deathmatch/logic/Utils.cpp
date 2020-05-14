@@ -10,46 +10,171 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#ifndef MTA_CLIENT
 #include "net/SyncStructures.h"
-
-#ifndef WIN32
-char* strupr(char* a)
-{
-    char* ret = a;
-    while (*a != '\0')
-    {
-        if (islower((uchar)*a))
-            *a = toupper((uchar)*a);
-        ++a;
-    }
-    return ret;
-}
-#endif
-
-#ifndef WIN32
-#include <unistd.h>     // For access().
-#endif
 
 #include <sys/types.h>  // For stat().
 #include <sys/stat.h>   // For stat().
+#endif
+
+#ifdef MTA_CLIENT
+unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace)
+{
+    // Replace any unwanted character with a space
+    unsigned int uiReplaced = 0;
+    char*        szTemp = szText;
+    while (*szTemp != 0)
+    {
+        if (!IsVisibleCharacter(*szTemp))
+        {
+            *szTemp = cReplace;
+            ++uiReplaced;
+        }
+
+        ++szTemp;
+    }
+
+    // Return how many characters we replaced
+    return uiReplaced;
+}
+
+unsigned int StripControlCodes(char* szText, unsigned char cReplace)
+{
+    // Replace any unwanted character with a space
+    unsigned int uiReplaced = 0;
+    char*        szTemp = szText;
+    while (*szTemp != 0)
+    {
+        if (IsControlCode(*szTemp) && *szTemp != '\n' && *szTemp != '\t')
+        {
+            *szTemp = cReplace;
+            ++uiReplaced;
+        }
+
+        ++szTemp;
+    }
+
+    // Return how many characters we replaced
+    return uiReplaced;
+}
+
+bool IsControlCode(unsigned char c)
+{
+    return c < 32;
+}
+
+bool IsValidFilePath(const char* szDir)
+{
+    if (szDir == NULL)
+        return false;
+
+    unsigned int  uiLen = strlen(szDir);
+    unsigned char c, c_d;
+
+    // iterate through the char array
+    for (unsigned int i = 0; i < uiLen; i++)
+    {
+        c = szDir[i];                                          // current character
+        c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
+void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
+{
+    int idx = 0;
+    while ((idx = s.find_first_of(a, idx)) >= 0)
+        s.replace(idx, 1, b);
+}
+
+void RaiseFatalError(unsigned int uiCode)
+{
+#ifdef MTA_DEBUG
+    assert(0);
+#endif
+
+    // Populate the message and show the box
+    SString strBuffer(_("Fatal error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strTroubleLink(SString("fatal-error&code=%d", uiCode));
+    g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CD62"), strBuffer, strTroubleLink);
+
+    // Request the mod unload
+    AddReportLog(7108, SString("Game - RaiseFatalError %d", uiCode));
+    g_pCore->GetModManager()->RequestUnload();
+}
+
+void RaiseProtocolError(unsigned int uiCode)
+{
+    //#ifdef MTA_DEBUG
+    //    assert ( 0 );
+    //#endif
+
+    // Populate the message and show the box
+    SString strBuffer(_("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);
+    SString strTroubleLink(SString("protocol-error&code=%d", uiCode));
+    g_pCore->ShowErrorMessageBox(_("Connection error") + _E("CD63"), strBuffer, strTroubleLink);            // Protocol error
+
+    // Request the mod unload
+    g_pCore->GetModManager()->RequestUnload();
+    AddReportLog(7109, SString("Game - RaiseProtocolError %d", uiCode));
+}
+
+void RotateVector(CVector& vecLine, const CVector& vecRotation)
+{
+    // Rotate it along the X axis
+    // [ 1     0        0    0 ]
+    // [ 0   cos a   sin a   0 ]
+    // [ 0  -sin a   cos a   0 ]
+
+    float fLineY = vecLine.fY;
+    vecLine.fY = cos(vecRotation.fX) * fLineY + sin(vecRotation.fX) * vecLine.fZ;
+    vecLine.fZ = -sin(vecRotation.fX) * fLineY + cos(vecRotation.fX) * vecLine.fZ;
+
+    // Rotate it along the Y axis
+    // [ cos a   0   -sin a   0 ]
+    // [   0     1     0      0 ]
+    // [ sin a   0    cos a   0 ]
+
+    float fLineX = vecLine.fX;
+    vecLine.fX = cos(vecRotation.fY) * fLineX - sin(vecRotation.fY) * vecLine.fZ;
+    vecLine.fZ = sin(vecRotation.fY) * fLineX + cos(vecRotation.fY) * vecLine.fZ;
+
+    // Rotate it along the Z axis
+    // [  cos a   sin a   0   0 ]
+    // [ -sin a   cos a   0   0 ]
+    // [    0       0     1   0 ]
+
+    fLineX = vecLine.fX;
+    vecLine.fX = cos(vecRotation.fZ) * fLineX + sin(vecRotation.fZ) * vecLine.fY;
+    vecLine.fY = -sin(vecRotation.fZ) * fLineX + cos(vecRotation.fZ) * vecLine.fY;
+}
+
+void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation)
+{
+    returnMatrix = CMatrix(vecPosition, vecRotation) * matrix;
+}
+
+void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
+{
+    in_addr in;
+    in.s_addr = ulIP;
+    char* szTemp = inet_ntoa(in);
+    if (szTemp)
+    {
+        strncpy(szDottedIP, szTemp, 22);
+    }
+    else
+    {
+        szDottedIP[0] = 0;
+    }
+}
+#else
 
 bool DoesDirectoryExist(const char* szPath)
 {
-    /* Didn't seem to work on Tweak server
-    if ( access ( szPath, 0 ) == 0 )
-    {
-        struct stat status;
-        stat ( szPath, &status );
-
-        if ( status.st_mode & S_IFDIR )
-        {
-            return true;
-        }
-    }
-
-    return false;
-    */
-
 #ifdef WIN32
     DWORD dwAtr = GetFileAttributes(szPath);
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
@@ -70,58 +195,9 @@ bool CheckNickProvided(const char* szNick)
         return false;
     if (stricmp(szNick, "server") == 0)
         return false;
-    if (IsIn("`", szNick))
+    if (strchr(szNick, '`') != nullptr)
         return false;
     return true;
-}
-
-float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
-{
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-
-    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
-}
-
-float DistanceBetweenPoints2D(const CVector2D& vecPosition1, const CVector2D& vecPosition2)
-{
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-
-    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
-}
-
-float DistanceBetweenPoints3D(const CVector& vecPosition1, const CVector& vecPosition2)
-{
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
-
-    return sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
-}
-
-bool IsPointNearPoint2D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance)
-{
-    if (DistanceBetweenPoints2D(vecPosition1, vecPosition2) <= fDistance)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool IsPointNearPoint3D(const CVector& vecPosition1, const CVector& vecPosition2, float fDistance)
-{
-    if (DistanceBetweenPoints3D(vecPosition1, vecPosition2) <= fDistance)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 void ReplaceCharactersInString(char* szString, char cWhat, char cWith)
@@ -141,29 +217,6 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
     int idx = 0;
     while ((idx = s.find_first_of(a, idx)) >= 0)
         s.replace(idx, 1, b);
-}
-
-bool IsIn(const char* szShortText, const char* szLongText)
-{
-    if (szShortText && szLongText)
-    {
-        char* strShort = new char[strlen(szShortText) + 1];
-        char* strLong = new char[strlen(szLongText) + 1];
-
-        strcpy(strShort, szShortText);
-        strcpy(strLong, szLongText);
-
-        char* szMatch = strstr(uppercase(strLong), uppercase(strShort));
-        if (szMatch != NULL)
-        {
-            delete[] strShort;
-            delete[] strLong;
-            return true;
-        }
-        delete[] strShort;
-        delete[] strLong;
-    }
-    return false;
 }
 
 char* uppercase(char* s)
@@ -314,11 +367,7 @@ bool CleanupSockets()
 #endif
     return true;
 }
-
-float GetRandomFloat()
-{
-    return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f);
-}
+#endif
 
 double GetRandomDouble()
 {
@@ -332,7 +381,124 @@ int GetRandom(int iLow, int iHigh)
 
     return static_cast<int>(floor((dHigh - dLow + 1.0) * GetRandomDouble())) + iLow;
 }
+#ifdef MTA_CLIENT
+SString GetDataUnit(unsigned long long ullInput)
+{
+    // Convert it to a float
+    float fInput = static_cast<float>(ullInput);
 
+    // Bytes per sec?
+    if (fInput < 1024)
+    {
+        return SString("%u B", (uint)ullInput);
+    }
+
+    // Kilobytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f kB", fInput);
+    }
+
+    // Megabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f MB", fInput);
+    }
+
+    // Gigabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f GB", fInput);
+    }
+
+    // Terrabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f TB", fInput);
+    }
+
+    // Unknown
+    SString strUnknown = "X";
+    return strUnknown;
+}
+
+#ifdef MTA_DEBUG
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
+{
+    /* Called correctly? */
+    if (szLibPath == NULL)
+    {
+        return 0;
+    }
+
+    /* Allocate memory in the remote process for the library path */
+    HANDLE  hThread = 0;
+    void*   pLibPathRemote = NULL;
+    HMODULE hKernel32 = GetModuleHandle("Kernel32");
+    pLibPathRemote = VirtualAllocEx(hProcess, NULL, strlen(szLibPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+
+    if (pLibPathRemote == NULL)
+    {
+        DWORD dwError = GetLastError();
+        return 0;
+    }
+
+    /* Make sure pLibPathRemote is always freed */
+    __try
+    {
+        /* Write the DLL library path to the remote allocation */
+        DWORD byteswritten = 0;
+        WriteProcessMemory(hProcess, pLibPathRemote, (void*)szLibPath, strlen(szLibPath) + 1, &byteswritten);
+
+        if (byteswritten != strlen(szLibPath) + 1)
+        {
+            return 0;
+        }
+
+        /* Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
+           remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
+           will make the remote process load the DLL into it's userspace (giving the DLL full
+           access to the game executable).*/
+        hThread =
+            CreateRemoteThread(hProcess, NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, "LoadLibraryA")), pLibPathRemote, 0, NULL);
+
+        if (hThread == 0)
+        {
+            return 0;
+        }
+    }
+    __finally
+    {
+        VirtualFreeEx(hProcess, pLibPathRemote, strlen(szLibPath) + 1, MEM_RELEASE);
+    }
+
+    /*  We wait for the created remote thread to finish executing. When it's done, the DLL
+        is loaded into the game's userspace, and we can destroy the thread-handle. We wait
+        5 seconds which is way longer than this should take to prevent this application
+        from deadlocking if something goes really wrong allowing us to kill the injected
+        game executable and avoid user inconvenience.*/
+    WaitForSingleObject(hThread, INFINITE);
+
+    /* Get the handle of the remotely loaded DLL module */
+    DWORD hLibModule = 0;
+    GetExitCodeThread(hProcess, &hLibModule);
+
+    // Wait for the LoadLibrary thread to finish
+    WaitForSingleObject(hThread, INFINITE);
+
+    /* Clean up the resources we used to inject the DLL */
+    VirtualFreeEx(hProcess, pLibPathRemote, strlen(szLibPath) + 1, MEM_RELEASE);
+
+    /* Success */
+    return (HINSTANCE)(1);
+}
+
+#endif
+#else
 bool IsValidFilePath(const char* szDir)
 {
     if (szDir == NULL)
@@ -402,6 +568,7 @@ bool IsValidOrganizationPath(const char* szDir)
     // Make sure we ended with closed braces
     return !bInsideBraces;
 }
+#endif
 
 unsigned int HexToInt(const char* szHex)
 {
@@ -550,6 +717,40 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
     return true;
 }
 
+#ifdef MTA_CLIENT
+//
+// Safely read a ushort sized string from a NetBitStreamInterface
+//
+bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strOut)
+{
+    bool bResult = false;
+
+    // Read out the string length
+    unsigned short usLength;
+    if (bitStream.Read(usLength))
+    {
+        // Allocate a buffer and read the string into it
+        char* szValue = new char[usLength + 1];
+        // String with a length of zero is considered a success
+        if (!usLength || bitStream.Read(szValue, usLength))
+        {
+            // Put it into us
+            szValue[usLength] = 0;
+            strOut = szValue;
+            bResult = true;
+        }
+
+        // Delete the buffer
+        delete[] szValue;
+    }
+
+    // Clear output on fail
+    if (!bResult)
+        strOut = "";
+
+    return bResult;
+}
+#else
 bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;
@@ -807,70 +1008,7 @@ SString LongToDottedIP(unsigned long ulIP)
     in.s_addr = ulIP;
     return inet_ntoa(in);
 }
-
-const char* HTMLEscapeString(const char* szSource)
-{
-    unsigned long ulLength = strlen(szSource);
-    unsigned long ulMaxSize = 0;
-
-    // Count the maximum possible size so we can create an appropriate buffer
-    for (unsigned long i = 0; i < ulLength; i++)
-    {
-        switch (szSource[i])
-        {
-            case '<':
-                ulMaxSize += 4;
-                break;
-            case '>':
-                ulMaxSize += 4;
-                break;
-            case '&':
-                ulMaxSize += 5;
-                break;
-            case '"':
-                ulMaxSize += 6;
-                break;
-            case '\'':
-                ulMaxSize += 6;
-                break;
-            default:
-                ulMaxSize += 1;
-                break;
-        }
-    }
-
-    // Allocate the buffer
-    char* szBuffer = new char[ulMaxSize];
-
-    // Concatenate all the characters and their potential replacements
-    unsigned long c = 0;
-    for (unsigned long i = 0; i < ulLength; i++)
-    {
-        switch (szSource[i])
-        {
-            case '<':
-                strcat(szBuffer, "&lt;");
-                break;
-            case '>':
-                strcat(szBuffer, "&gt;");
-                break;
-            case '&':
-                strcat(szBuffer, "&amp;");
-                break;
-            case '"':
-                strcat(szBuffer, "&quot;");
-                break;
-            case '\'':
-                strcat(szBuffer, "&apos;");
-                break;
-            default:
-                szBuffer[c] = szSource[i];
-                break;
-                c++;
-        }
-    }
-    return szBuffer;
-}
+#endif
 
 // RX(theta)
 // | 1              0               0       |
