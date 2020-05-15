@@ -1512,13 +1512,15 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     RemoveTargetPosition();
 
+    if (!pVehicle->IsStreamedIn() || !m_pPlayerPed)
+        SetWarpInToVehicleRequired(true);
+
     // Make peds stream in when they warp to a vehicle
     CVector vecInVehiclePosition;
     GetPosition(vecInVehiclePosition);
     UpdateStreamPosition(vecInVehiclePosition);
     if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
         StreamIn(true);
-    SetWarpInToVehicleRequired(true);
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon()
