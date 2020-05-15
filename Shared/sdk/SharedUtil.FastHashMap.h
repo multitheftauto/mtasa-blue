@@ -54,7 +54,7 @@ namespace SharedUtil
     class CFastHashMap : public google::dense_hash_map<K, V>
     {
     public:
-        CFastHashMap(uint uiInitialSize) : google::dense_hash_map<K, V>(uiInitialSize)
+        CFastHashMap(unsigned int uiInitialSize) : google::dense_hash_map<K, V>(uiInitialSize)
         {
             this->set_empty_key(GetEmptyMapKey((K*)NULL));
             this->set_deleted_key(GetDeletedMapKey((K*)NULL));

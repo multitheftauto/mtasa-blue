@@ -202,7 +202,7 @@ public:
     bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
     bool          GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
     bool          GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    void          SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    bool          SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
     void          DeleteCustomData(const char* szName);
 
     virtual bool GetMatrix(CMatrix& matrix) const;

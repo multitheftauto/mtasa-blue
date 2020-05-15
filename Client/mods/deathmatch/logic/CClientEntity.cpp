@@ -458,33 +458,30 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+bool CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        return false;
     }
 
     // Grab the old variable
-    CLuaArgument oldVariable;
-    SCustomData* pData = m_pCustomData->Get(szName);
-    if (pData)
+    CLuaArgument OldVariable;
+    if (m_pCustomData->Set(szName, Variable, bSynchronized, &OldVariable))
     {
-        oldVariable = pData->Variable;
+        // Trigger the onClientElementDataChange event on us
+        CLuaArguments Arguments;
+        Arguments.PushString(szName);
+        Arguments.PushArgument(OldVariable);
+        Arguments.PushArgument(Variable);
+        CallEvent("onClientElementDataChange", Arguments, true);
+
+        return true;
     }
-
-    // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
-
-    // Trigger the onClientElementDataChange event on us
-    CLuaArguments Arguments;
-    Arguments.PushString(szName);
-    Arguments.PushArgument(oldVariable);
-    Arguments.PushArgument(Variable);
-    CallEvent("onClientElementDataChange", Arguments, true);
+    return false;
 }
 
 void CClientEntity::DeleteCustomData(const char* szName)
