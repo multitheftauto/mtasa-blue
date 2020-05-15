@@ -30,8 +30,12 @@ class CLuaArgument
 {
 public:
     CLuaArgument();
+    CLuaArgument(CLuaArgument&& rhs);
+
     CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+
+
     ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
@@ -53,7 +57,7 @@ public:
 
     bool               GetBoolean() const { return m_bBoolean; };
     lua_Number         GetNumber() const { return m_Number; };
-    const std::string& GetString() { return m_strString; };
+    const std::string& GetString() const { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
@@ -68,12 +72,12 @@ public:
 private:
     void LogUnableToPacketize(const char* szMessage) const;
 
-    int            m_iType;
+    int            m_iType = LUA_TNIL;
     bool           m_bBoolean;
     lua_Number     m_Number;
     std::string    m_strString;
-    void*          m_pUserData;
-    CLuaArguments* m_pTableData;
+    void*          m_pUserData = nullptr;
+    CLuaArguments* m_pTableData = nullptr;
     bool           m_bWeakTableRef;
 
 #ifdef MTA_DEBUG

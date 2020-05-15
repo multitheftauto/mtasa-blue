@@ -437,6 +437,7 @@ private:
 
     std::map<std::string, std::string> m_AnnounceValues;
 
+    // element data subscriobtion. CElement* being the element, and std::string being the edata name.
     std::set<std::pair<CElement*, std::string>> m_DataSubscriptions;
 
     uint m_uiWeaponIncorrectCount;

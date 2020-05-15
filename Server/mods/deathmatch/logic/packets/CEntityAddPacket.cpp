@@ -154,34 +154,38 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(pElement->IsCallPropagationEnabled());
 
             // Write custom data
-            CCustomData* pCustomData = pElement->GetCustomDataPointer();
-            assert(pCustomData);
-            BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
-            map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
-            for (; iter != pCustomData->SyncedIterEnd(); ++iter)
             {
-                const char*         szName = iter->first.c_str();
-                const CLuaArgument* pArgument = &iter->second.Variable;
+                CCustomData* pCustomData = pElement->GetCustomDataPointer();
+                assert(pCustomData);
 
-                unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
-                BitStream.Write(ucNameLength);
-                BitStream.Write(szName, ucNameLength);
-                pArgument->WriteToBitStream(BitStream);
+                BitStream.WriteCompressed(pCustomData->GetBroadcastedCount());
+
+                for (element_data_const_iter iter = pCustomData->BroadcastedBegin(); iter != pCustomData->BroadcastedEnd(); iter++)
+                {
+                    const SCustomData& customData = iter->second;
+
+                    const auto& name = iter->first;
+                    const auto nameLength = (unsigned char)name.size();
+                    BitStream.Write(nameLength);
+                    BitStream.Write(name.c_str(), nameLength);
+
+                    customData.variable.WriteToBitStream(BitStream);
+                }
             }
 
             // Grab its name
-            char szEmpty[1];
-            szEmpty[0] = 0;
-            const char* szName = pElement->GetName().c_str();
-            if (!szName)
-                szName = szEmpty;
-
-            // Write the name. It can be empty.
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-            BitStream.WriteCompressed(usNameLength);
-            if (usNameLength > 0)
             {
-                BitStream.Write(szName, usNameLength);
+                char szEmpty[1];
+                szEmpty[0] = 0;
+                const char* szName = pElement->GetName().c_str();
+                if (!szName)
+                    szName = szEmpty;
+
+                // Write the name. It can be empty.
+                unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+                BitStream.WriteCompressed(usNameLength);
+                if (usNameLength > 0)
+                    BitStream.Write(szName, usNameLength);
             }
 
             // Write the sync time context

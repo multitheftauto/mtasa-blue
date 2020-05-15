@@ -218,13 +218,17 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
 
 bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
 {
+#if MTA_DEBUG
     OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
     return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
 }
 
 bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
 {
+#if MTA_DEBUG
     OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+#endif
     return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
 }
 
@@ -236,7 +240,9 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
     {
         if (it->first == pElement)
         {
+#if MTA_DEBUG
             OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+#endif
             it = m_DataSubscriptions.erase(it);
             erased = true;
         }

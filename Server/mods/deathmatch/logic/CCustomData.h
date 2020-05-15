@@ -18,6 +18,7 @@
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 
+
 enum class ESyncType
 {
     LOCAL,
@@ -27,35 +28,83 @@ enum class ESyncType
 
 struct SCustomData
 {
-    CLuaArgument Variable;
+    CLuaArgument variable;
     ESyncType    syncType;
+
+    SCustomData() = default;
+
+    SCustomData(const CLuaArgument& var, const ESyncType syncType) noexcept :
+        variable(var),
+        syncType(syncType)
+    {
+    }
+
+    SCustomData(const SCustomData& rhs) noexcept :
+        variable(rhs.variable),
+        syncType(rhs.syncType)
+    {
+    }
+
+    SCustomData(SCustomData&& rhs) noexcept :
+        variable(std::move(rhs.variable)),
+        syncType(rhs.syncType)
+    {
+    }
+
+    SCustomData& operator=(const SCustomData& rhs) noexcept
+    {
+        if (this == &rhs)
+            return *this;
+
+        variable = rhs.variable;
+        syncType = rhs.syncType;
+    }
+
+    SCustomData& operator=(SCustomData&& rhs) noexcept
+    {
+        if (this == &rhs)
+            return *this;
+
+        variable = std::move(rhs.variable);
+        syncType = rhs.syncType;
+    }
 };
+
+// doing 'using' here, because of SCustomData
+using element_data_map = CFastHashMap<std::string, SCustomData>;
+using element_data_iter = element_data_map::iterator;
+using element_data_const_iter = element_data_map::const_iterator;
 
 class CCustomData
 {
 public:
-    void Copy(CCustomData* pCustomData);
+    void Copy(const CCustomData* const from);
 
-    SCustomData* Get(const char* szName);
-    SCustomData* GetSynced(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST);
+    const SCustomData* Get(const SString& name) { return Get(name); };
+    const SCustomData* Get(const SString& name, const ESyncType syncType) { return Get(name, syncType); } 
 
-    bool Delete(const char* szName);
+    void                Set(const SString& name, const CLuaArgument& var, const ESyncType syncType = ESyncType::BROADCAST, SCustomData* const oldData = nullptr);
 
-    unsigned short CountOnlySynchronized();
+    bool Delete(const SString& name);
+    bool Delete(const SString& name, const ESyncType syncType);
 
-    CXMLNode* OutputToXML(CXMLNode* pNode);
+    unsigned int GetBroadcastedCount() const { return m_broadcastedMap.size(); }
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    CXMLNode* OutputToXML(CXMLNode* node);
 
-    std::map<std::string, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
-    std::map<std::string, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
+    element_data_const_iter LocalOrSubDataBegin() const { return m_localOrSubMap.begin(); }
+    element_data_const_iter LocalOrSubDataEnd() const { return m_localOrSubMap.end(); }
+
+    element_data_const_iter BroadcastedBegin() const { return m_broadcastedMap.begin(); }
+    element_data_const_iter BroadcastedEnd() const { return m_broadcastedMap.end(); }
 
 private:
-    bool DeleteSynced(const char* szName);
-    void UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType);
-
-    std::map<std::string, SCustomData> m_Data;
-    std::map<std::string, SCustomData> m_SyncedData;
+    // outIter used for returning the position of the data in the appropriate map(m_broadcastedMap if the data's type is BROADCAST, otherwise m_localOrSubMap)
+    SCustomData* Get(const SString& name, element_data_iter* const outIter);
+    // This version is used to speed up the search, because we dont need to search two maps, just one. Useful when we know its syncType
+    SCustomData* Get(const SString& name, const ESyncType syncType, element_data_iter* const outIter);
+        
+    // ACHTUNG(WARNING): no key can be in both maps at the same time.
+    element_data_map m_localOrSubMap; // local, and subscribed edata
+    element_data_map m_broadcastedMap; // broadcasted edata
 };

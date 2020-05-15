@@ -134,14 +134,14 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
+    const SCustomData* CElement::GetCustomData(const SString& name, const bool bInheritData) const;
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
-    void DeleteCustomData(const char* szName);
+    void           SetCustomData(const SString& name, const CLuaArgument& Variable, const ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
+    void DeleteCustomData(const SString& name);
     void SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);

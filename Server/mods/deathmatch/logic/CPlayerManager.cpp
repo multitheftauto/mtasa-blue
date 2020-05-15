@@ -181,20 +181,16 @@ void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort 
     CPlayerManager::Broadcast(Packet, sendList);
 }
 
-void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const SString& name, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
 
     // Send the packet to each ingame player on the server except the skipped one
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
+    for (auto player : m_Players)
     {
-        CPlayer* pPlayer = *iter;
-        if (pPlayer != pSkip && pPlayer->IsJoined() && pPlayer->IsSubscribed(pElement, szName))
-        {
-            sendList.push_back(pPlayer);
-        }
+        if (player != pSkip && player->IsJoined() && player->IsSubscribed(pElement, name))
+            sendList.push_back(player);
     }
 
     CPlayerManager::Broadcast(Packet, sendList);

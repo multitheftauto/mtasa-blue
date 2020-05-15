@@ -1,5 +1,6 @@
 #include "StdInc.h"
 
+
 int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )
@@ -26,20 +27,26 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
             {
                 // Warn and truncate if key is too long
                 m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                    "string length reduced to " QUOTE_DEFINE(MAX_CUSTOMDATA_NAME_LENGTH) " characters at argument 2"));
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
 #ifdef MTA_CLIENT
             CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
-#else
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
-#endif
             if (pVariable)
             {
                 pVariable->Push(luaVM);
                 return 1;
             }
+#else
+            auto customData = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
+            if (customData)
+            {
+                customData->variable.Push(luaVM);
+                return 1;
+            }
+#endif
+            
         }
     }
     else
@@ -76,12 +83,13 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
     {
         // Warn and truncate if key is too long
         m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                     *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+            "string length reduced to " QUOTE_DEFINE(MAX_CUSTOMDATA_NAME_LENGTH) " characters at argument 2"));
         strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
     }
 
     // Check if data exists with the given key
-    bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
+    const bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
     lua_pushboolean(luaVM, exists);
+
     return 1;
 }

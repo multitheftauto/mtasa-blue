@@ -19,17 +19,25 @@ extern CGame* g_pGame;
 
 using namespace std;
 
-CLuaArgument::CLuaArgument()
+CLuaArgument::CLuaArgument(CLuaArgument&& rhs) :
+    m_iType(m_iType),
+    m_bBoolean(m_bBoolean),
+    m_Number(m_Number),
+    m_strString(std::move(m_strString)),
+    m_pUserData(m_pUserData),
+    m_pTableData(m_pTableData),
+    m_bWeakTableRef(m_bWeakTableRef),
+#ifdef MTA_DEBUG
+    m_strFilename(std::move(m_strFilename)),
+    m_iLine(m_iLine)
+#endif
 {
-    m_iType = LUA_TNIL;
-    m_pTableData = NULL;
-    m_pUserData = NULL;
 }
 
-CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
+CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) :
+    m_pTableData(nullptr)
 {
     // Initialize and call our = on the argument
-    m_pTableData = NULL;
     CopyRecursive(Argument, pKnownTables);
 }
 
@@ -423,10 +431,7 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
             strBuffer = "nil";
             break;
         case LUA_TBOOLEAN:
-            if (m_bBoolean)
-                strBuffer = "true";
-            else
-                strBuffer = "false";
+            strBuffer = m_bBoolean ? "true" : "false";
             break;
         case LUA_TTABLE:
             return false;
@@ -844,6 +849,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
                 // Prevent clash with how MTA stores elements, resources and table refs as strings
                 strTemp[2] = '~';
             }
+
             if (strTemp.length() <= USHRT_MAX)
             {
                 return json_object_new_string_len((char*)strTemp.c_str(), strTemp.length());

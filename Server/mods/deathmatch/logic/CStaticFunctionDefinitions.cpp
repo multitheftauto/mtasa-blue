@@ -391,13 +391,10 @@ CElement* CStaticFunctionDefinitions::GetElementByIndex(const char* szType, unsi
     return m_pMapManager->GetRootElement()->FindChildByType(szType, uiIndex, true);
 }
 
-CLuaArgument* CStaticFunctionDefinitions::GetElementData(CElement* pElement, const char* szName, bool bInherit)
+const SCustomData* CStaticFunctionDefinitions::GetElementData(CElement* pElement, const SString& name, bool bInherit)
 {
     assert(pElement);
-    assert(szName);
-
-    // Return its custom data
-    return pElement->GetCustomData(szName, bInherit);
+    return pElement->GetCustomData(name, bInherit);
 }
 
 CLuaArguments* CStaticFunctionDefinitions::GetAllElementData(CElement* pElement, CLuaArguments* table)
@@ -870,41 +867,44 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const SString& name, const CLuaArgument& Variable, const ESyncType syncType)
 {
     assert(pElement);
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
+    assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    ESyncType     lastSyncType = ESyncType::BROADCAST;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+    auto currentData = pElement->GetCustomData(name, false);
+    const auto currentSyncType = currentData->syncType;
 
-    if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
+    // checking 'currentData->variable != Variable' is pretty expensive in case of tables, I would rather not test it, beceause most of the time its probably not the same.
+    // Even if it is, its way cheaper to send out a table twice once, than to check it every other time.
+    if (!currentData || currentSyncType != syncType || currentData->variable.GetType() != Variable.GetType())
     {
         if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            unsigned short usNameLength = static_cast<unsigned short>(name.length());
             CBitStream     BitStream;
             BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(szName, usNameLength);
+            BitStream.pBitStream->Write(name.c_str(), usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
             if (syncType == ESyncType::BROADCAST)
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
             else
-                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
+                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, name.c_str());
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), m_pPlayerManager->Count(),
                                                                                  BitStream.pBitStream->GetNumberOfBytesUsed());            
         }
-
         // Unsubscribe all the players
-        if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(pElement, szName);
+        else if (currentSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
+            m_pPlayerManager->ClearElementData(pElement, name);
+
+        
+        
 
         // Set its custom data
-        pElement->SetCustomData(szName, Variable, syncType);
+        pElement->SetCustomData(name, Variable, syncType);
         return true;
     }
     return false;
@@ -939,34 +939,31 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
     return false;
 }
 
-bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, const SString& name, CPlayer* pPlayer)
 {
     assert(pElement);
-    assert(szName);
     assert(pPlayer);
 
-    ESyncType     lastSyncType;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+    if (!pPlayer->SubscribeElementData(pElement, name))
+        return false;
 
-    if (lastSyncType == ESyncType::SUBSCRIBE)
+    const SCustomData* customDataCurrent = pElement->GetCustomData(name, false);
+    if (customDataCurrent->syncType == ESyncType::SUBSCRIBE)
     {
-        if (!pPlayer->SubscribeElementData(pElement, szName))
-            return false;
+        CBitStream BitStream;
 
-        // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-        CBitStream     BitStream;
-        BitStream.pBitStream->WriteCompressed(usNameLength);
-        BitStream.pBitStream->Write(szName, usNameLength);
-        pCurrentVariable->WriteToBitStream(*BitStream.pBitStream);
+        const auto length = (unsigned short)(name.length());
+        BitStream.pBitStream->WriteCompressed(length);
+        BitStream.pBitStream->Write(name.c_str(), length);
+
+        customDataCurrent->variable.WriteToBitStream(*BitStream.pBitStream);
 
         pPlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
 
-        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, 1, BitStream.pBitStream->GetNumberOfBytesUsed());
+        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), 1, BitStream.pBitStream->GetNumberOfBytesUsed());
 
         return true;
     }
-
     return false;
 }
 
