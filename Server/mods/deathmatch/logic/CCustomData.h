@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
@@ -12,7 +11,8 @@
 
 #pragma once
 
-#include <StdInc.h>
+#include "SString.h"
+#include "SharedUtil.FastHashMap.h"
 #include <core/CServerInterface.h>
 #include "lua/CLuaArgument.h"
 
@@ -28,8 +28,8 @@ enum class ESyncType
 
 struct SCustomData
 {
-    CLuaArgument variable;
-    ESyncType    syncType;
+    CLuaArgument variable{};
+    ESyncType    syncType = ESyncType::BROADCAST;
 
     SCustomData() = default;
 
@@ -53,25 +53,37 @@ struct SCustomData
 
     SCustomData& operator=(const SCustomData& rhs) noexcept
     {
-        if (this == &rhs)
-            return *this;
-
-        variable = rhs.variable;
-        syncType = rhs.syncType;
+        if (this != &rhs)
+        {
+            variable = rhs.variable;
+            syncType = rhs.syncType;
+        }
+        return *this;
     }
 
     SCustomData& operator=(SCustomData&& rhs) noexcept
     {
-        if (this == &rhs)
-            return *this;
+        if (this != &rhs)
+        {
+            variable = std::move(rhs.variable);
+            syncType = rhs.syncType;
+        }
+        return *this;
+    }
 
-        variable = std::move(rhs.variable);
-        syncType = rhs.syncType;
+    // i know its silly we need to pass in the data name, but.. yeah, i have no better solution
+    // its still more maintable than the current code
+    void WriteToBitStream(NetBitStreamInterface& bitstream, const SString& dataName) const
+    {
+        const unsigned short usNameLength = static_cast<unsigned short>(dataName.length());
+        bitstream.WriteCompressed(usNameLength);
+        bitstream.Write(dataName.c_str(), usNameLength);
+        variable.WriteToBitStream(bitstream);
     }
 };
 
 // doing 'using' here, because of SCustomData
-using element_data_map = CFastHashMap<std::string, SCustomData>;
+using element_data_map = CFastHashMap<SString, SCustomData>;
 using element_data_iter = element_data_map::iterator;
 using element_data_const_iter = element_data_map::const_iterator;
 
@@ -80,13 +92,18 @@ class CCustomData
 public:
     void Copy(const CCustomData* const from);
 
-    const SCustomData* Get(const SString& name) { return Get(name); };
-    const SCustomData* Get(const SString& name, const ESyncType syncType) { return Get(name, syncType); } 
+    // the public versions of the private functions
+    const SCustomData* Get(const SString& name) { return Get(name, nullptr); }
+    const SCustomData* Get(const SString& name, const ESyncType syncType) { return Get(name, syncType, nullptr); } 
 
-    void                Set(const SString& name, const CLuaArgument& var, const ESyncType syncType = ESyncType::BROADCAST, SCustomData* const oldData = nullptr);
+    // Returns the(maybe newly created) pointer to the SCustomData, if modified, otherwise nullptr
+    const SCustomData*  Set(const SString& name, const CLuaArgument& newValue, const ESyncType newSyncType, SCustomData* const oldData = nullptr);
 
-    bool Delete(const SString& name);
-    bool Delete(const SString& name, const ESyncType syncType);
+    // Returns the pointer to the (maybe newly created) SCustomData, if modified, otherwise nullptr.
+    const SCustomData* Set(const SString& name, const CLuaArgument& newValue, SCustomData* const oldData = nullptr);
+
+    bool Delete(const SString& name, SCustomData* const oldData = nullptr);
+    bool Delete(const SString& name, const ESyncType syncType, SCustomData* const oldData);
 
     unsigned int GetBroadcastedCount() const { return m_broadcastedMap.size(); }
 
@@ -108,60 +125,3 @@ private:
     element_data_map m_localOrSubMap; // local, and subscribed edata
     element_data_map m_broadcastedMap; // broadcasted edata
 };
-=======
-/*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CCustomData.h
- *  PURPOSE:     Custom entity data class
- *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *
- *****************************************************************************/
-
-#pragma once
-
-#include <core/CServerInterface.h>
-#include "lua/CLuaArgument.h"
-#include <map>
-#include <string>
-#include "SharedUtil.FastHashMap.h"
-
-#define MAX_CUSTOMDATA_NAME_LENGTH 128
-
-struct SCustomData
-{
-    CLuaArgument Variable;
-    bool         bSynchronized;
-};
-
-class CCustomData
-{
-public:
-    void Copy(CCustomData* pCustomData);
-
-    SCustomData* Get(const char* szName);
-    SCustomData* GetSynced(const char* szName);
-    bool         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CLuaArgument* pOldVariable = nullptr);
-
-    bool Delete(const char* szName);
-
-    unsigned short CountOnlySynchronized();
-
-    CXMLNode* OutputToXML(CXMLNode* pNode);
-
-    CFastHashMap<SString, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    CFastHashMap<SString, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
-
-    CFastHashMap<SString, SCustomData>::const_iterator SyncedIterBegin() { return m_SyncedData.begin(); }
-    CFastHashMap<SString, SCustomData>::const_iterator SyncedIterEnd() { return m_SyncedData.end(); }
-
-private:
-    bool DeleteSynced(const char* szName);
-    void UpdateSynced(const char* szName, const CLuaArgument& Variable, bool bSynchronized);
-
-    CFastHashMap<SString, SCustomData> m_Data;
-    CFastHashMap<SString, SCustomData> m_SyncedData;
-};
->>>>>>> 55b22ca230a22c71693ca4b90825ca94c486efd5
