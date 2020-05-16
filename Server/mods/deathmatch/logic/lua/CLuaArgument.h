@@ -77,6 +77,7 @@ private:
     lua_Number     m_Number = 0;
     std::string    m_strString = "";
     void*          m_pUserData = nullptr;
+
     CLuaArguments* m_pTableData = nullptr;
     bool           m_bWeakTableRef = false;
 

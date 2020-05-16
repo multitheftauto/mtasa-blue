@@ -20,8 +20,9 @@ extern CGame* g_pGame;
 using namespace std;
 
 CLuaArgument::CLuaArgument(CLuaArgument&& rhs, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) noexcept :
-    m_iType(rhs.m_iType),
+    m_iType(rhs.m_iType)
 #ifdef MTA_DEBUG
+    ,
     m_strFilename(std::move(rhs.m_strFilename)),
     m_iLine(rhs.m_iLine)
 #endif
@@ -73,7 +74,7 @@ CLuaArgument::CLuaArgument(CLuaArgument&& rhs, CFastHashMap<CLuaArguments*, CLua
     // nothing else needs to be invalidated, because its perfectly fine to not do so.
 }
 
-CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) :
+CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) noexcept :
     m_pTableData(nullptr)
 {
     // Initialize and call our = on the argument
