@@ -29,10 +29,10 @@ class CLuaArguments;
 class CLuaArgument
 {
 public:
-    CLuaArgument();
-    CLuaArgument(CLuaArgument&& rhs);
+    CLuaArgument() noexcept {};
+    CLuaArgument(CLuaArgument&& rhs, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
 
-    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL) noexcept;
     CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
 
 
@@ -73,16 +73,16 @@ private:
     void LogUnableToPacketize(const char* szMessage) const;
 
     int            m_iType = LUA_TNIL;
-    bool           m_bBoolean;
-    lua_Number     m_Number;
-    std::string    m_strString;
+    bool           m_bBoolean = false;
+    lua_Number     m_Number = 0;
+    std::string    m_strString = "";
     void*          m_pUserData = nullptr;
     CLuaArguments* m_pTableData = nullptr;
-    bool           m_bWeakTableRef;
+    bool           m_bWeakTableRef = false;
 
 #ifdef MTA_DEBUG
-    std::string m_strFilename;
-    int         m_iLine;
+    std::string m_strFilename = "";
+    int         m_iLine = 0;
 #endif
 
     void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
