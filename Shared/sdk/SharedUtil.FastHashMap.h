@@ -40,6 +40,18 @@ T* GetDeletedMapKey(T**)
     return (T*)-4;
 }
 
+inline SString GetEmptyMapKey(SString*)
+{
+    return "\xFF\xFE";
+}
+
+inline SString GetDeletedMapKey(SString*)
+{
+    return "\xFF\xFF";
+}
+
+// these are defined in CElement, as well as at other places.
+// do not try to refactor this, and move the defs. here, beause you'll face 100+ linker errors.
 unsigned int GetEmptyMapKey(unsigned int*);
 unsigned int GetDeletedMapKey(unsigned int*);
 
@@ -135,15 +147,4 @@ namespace SharedUtil
         return it->second;
     }
 }            // namespace SharedUtil
-
-inline SString GetEmptyMapKey(SString*)
-{
-    return SStringX("\xFF\xFE");
-}
-
-inline SString GetDeletedMapKey(SString*)
-{
-    return SStringX("\xFF\xFF");
-}
-
 #endif  // WITH_ALLOC_TRACKING
