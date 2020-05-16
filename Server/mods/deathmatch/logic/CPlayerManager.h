@@ -44,9 +44,9 @@ public:
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
-    void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
-    void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
-    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const SString& name, CPlayer* pSkip = nullptr);
+    unsigned int BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
+    unsigned int BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
+    unsigned int BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const SString& name, CPlayer* pSkip = nullptr);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);

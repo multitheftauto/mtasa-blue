@@ -874,12 +874,13 @@ void CStaticFunctionDefinitions::SyncElementData(CElement* const ownerElement, c
     CBitStream BitStream;
     data.WriteToBitStream(*BitStream.pBitStream, name);
 
+    unsigned int sentToPlayerCount = 0;
     if (data.syncType == ESyncType::BROADCAST)
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), skip);
+        sentToPlayerCount = m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), skip);
     else
-        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), ownerElement, name, skip);
+        sentToPlayerCount =  m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), ownerElement, name, skip);
 
-    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed());
+    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), sentToPlayerCount, BitStream.pBitStream->GetNumberOfBytesUsed());
 }
 
 bool CStaticFunctionDefinitions::SetElementData(CElement* const ownerElement, const SString& name, const CLuaArgument& newValue, const ESyncType newSyncType)
