@@ -2486,45 +2486,32 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
     if (pSourcePlayer)
     {
         // Grab the element
-        ElementID ID = Packet.GetElementID();
-        CElement* pElement = CElementIDs::GetElement(ID);
+        CElement* pElement = CElementIDs::GetElement(Packet.GetElementID());
         if (pElement)
         {
-            // Change the data
-            const SString& name = Packet.GetName();
-            CLuaArgument&  Value = Packet.GetValue();
+            const SString& dataName = Packet.GetName();
+            CLuaArgument& newValue = Packet.GetValue();
 
             // Ignore if the wrong length
-            if (name.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+            if (dataName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
             {
-                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer()->GetNick(),
-                                     *name.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)", pSourcePlayer->GetNick(), dataName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1).c_str());
                 return;
             }
 
-            auto currentData = pElement->GetCustomData(name, false);
-            const auto lastSyncType = currentData->syncType;
+            ESyncType lastSyncType = ESyncType::BROADCAST;
+            if (auto currentData = pElement->GetCustomData(dataName, false))
+                lastSyncType = currentData->syncType;
 
             if (lastSyncType != ESyncType::LOCAL)
             {
-                // Tell our clients to update their data. Send to everyone but the one we got this packet from.
-                unsigned short usNameLength = static_cast<unsigned short>(name.length());
-                CBitStream     BitStream;
-                BitStream.pBitStream->WriteCompressed(usNameLength);
-                BitStream.pBitStream->Write(name.c_str(), usNameLength);
-                Value.WriteToBitStream(*BitStream.pBitStream);
-
-                if (lastSyncType == ESyncType::BROADCAST)
-                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
-                else
-                    m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, name,
-                                                              pSourcePlayer);
-
-                CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(name.c_str(), m_pPlayerManager->Count(),
-                                                                                         BitStream.pBitStream->GetNumberOfBytesUsed());
+                SCustomData oldData;
+                if (auto currentData = pElement->GetCustomDataPointer()->Set(dataName, newValue, &oldData))
+                {
+                    CStaticFunctionDefinitions::SyncElementData(pElement, *currentData, dataName, pSourcePlayer);
+                    pElement->CallOnElementDataChangeEvent(dataName, std::move(oldData.variable));
+                }         
             }
-
-            pElement->SetCustomData(name, Value, lastSyncType, pSourcePlayer);
         }
     }
 }
