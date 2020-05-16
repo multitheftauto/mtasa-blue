@@ -75,11 +75,12 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const SString& szName, const CLuaArgument& Variable, const ESyncType syncType);
-    static bool RemoveElementData(CElement* pElement, const char* szName);
+    static void SyncElementData(CElement* const ownerElement, const SCustomData& data, const SString& name, CPlayer* const skip = nullptr, CPlayer* const target = nullptr);
+    static bool SetElementData(CElement* const ownerElement, const SString& name, const CLuaArgument& variable, const ESyncType syncType = ESyncType::BROADCAST);
+    static bool RemoveElementData(CElement* const pElement, const SString& name);
     static bool AddElementDataSubscriber(CElement* pElement, const SString& name, CPlayer* pPlayer);
-    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
-    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* const pElement, const SString& name, CPlayer* const pPlayer);
+    static bool HasElementDataSubscriber(CElement* const pElement, const SString& name, CPlayer* const pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);

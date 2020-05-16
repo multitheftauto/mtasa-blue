@@ -867,75 +867,67 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const SString& name, const CLuaArgument& Variable, const ESyncType syncType)
+void CStaticFunctionDefinitions::SyncElementData(CElement* const ownerElement, const SCustomData& data, const SString& name, CPlayer* const skip, CPlayer* const target)
 {
-    assert(pElement);
+    assert(ownerElement);
+
+    CBitStream BitStream;
+    data.WriteToBitStream(*BitStream.pBitStream, name);
+
+    if (data.syncType == ESyncType::BROADCAST)
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), skip);
+    else
+        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(ownerElement, SET_ELEMENT_DATA, *BitStream.pBitStream), ownerElement, name, skip);
+
+    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed());
+}
+
+bool CStaticFunctionDefinitions::SetElementData(CElement* const ownerElement, const SString& name, const CLuaArgument& newValue, const ESyncType newSyncType)
+{
+    assert(ownerElement);
     assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    auto currentData = pElement->GetCustomData(name, false);
-    const auto currentSyncType = currentData->syncType;
-
-    // checking 'currentData->variable != Variable' is pretty expensive in case of tables, I would rather not test it, beceause most of the time its probably not the same.
-    // Even if it is, its way cheaper to send out a table twice once, than to check it every other time.
-    if (!currentData || currentSyncType != syncType || currentData->variable.GetType() != Variable.GetType())
+    SCustomData oldData;
+    if (ownerElement->GetCustomDataPointer()->Set(name, newValue, newSyncType, &oldData)) // uses hacky way, to avoid searching twice for the same data.
     {
-        if (syncType != ESyncType::LOCAL)
-        {
-            // Tell our clients to update their data
-            unsigned short usNameLength = static_cast<unsigned short>(name.length());
-            CBitStream     BitStream;
-            BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(name.c_str(), usNameLength);
-            Variable.WriteToBitStream(*BitStream.pBitStream);
+        if (newSyncType != ESyncType::LOCAL)
+            SyncElementData(ownerElement, oldData, name);
 
-            if (syncType == ESyncType::BROADCAST)
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
-            else
-                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, name.c_str());
+        else if (oldData.syncType == ESyncType::SUBSCRIBE && newSyncType != ESyncType::SUBSCRIBE)
+            m_pPlayerManager->ClearElementData(ownerElement, name);
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
-        }
-        // Unsubscribe all the players
-        else if (currentSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(pElement, name);
+        ownerElement->CallOnElementDataChangeEvent(name, std::move(newValue), std::move(oldData.variable));
 
-        
-        
-
-        // Set its custom data
-        pElement->SetCustomData(name, Variable, syncType);
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const char* szName)
+bool CStaticFunctionDefinitions::RemoveElementData(CElement* const pElement, const SString& name)
 {
     assert(pElement);
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
+    assert(name.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
     // Check it exists
-    if (pElement->GetCustomData(szName, false))
+    if (pElement->GetCustomData(name, false))
     {
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
         CBitStream     BitStream;
-        BitStream.pBitStream->WriteCompressed(usNameLength);
-        BitStream.pBitStream->Write(szName, usNameLength);
-        BitStream.pBitStream->WriteBit(false);            // Unused (was recursive flag)
+
+        auto nameLength = static_cast<unsigned short>(name.length());
+        BitStream.pBitStream->WriteCompressed(nameLength);
+        BitStream.pBitStream->Write(name, nameLength);
+        BitStream.pBitStream->WriteBit(false);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
 
         // Clean up after the data removal
-        m_pPlayerManager->ClearElementData(pElement, szName);
+        m_pPlayerManager->ClearElementData(pElement, name);
 
         // Delete here
-        pElement->DeleteCustomData(szName);
+        pElement->DeleteCustomData(name);
+
         return true;
     }
-
-    // Failed
     return false;
 }
 
@@ -967,22 +959,20 @@ bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, co
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::RemoveElementDataSubscriber(CElement* const pElement, const SString& name, CPlayer* const pPlayer)
 {
     assert(pElement);
-    assert(szName);
     assert(pPlayer);
 
-    return pPlayer->UnsubscribeElementData(pElement, szName);
+    return pPlayer->UnsubscribeElementData(pElement, name);
 }
 
-bool CStaticFunctionDefinitions::HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+bool CStaticFunctionDefinitions::HasElementDataSubscriber(CElement* const pElement, const SString& name, CPlayer* const pPlayer)
 {
     assert(pElement);
-    assert(szName);
     assert(pPlayer);
 
-    return pPlayer->IsSubscribed(pElement, szName);
+    return pPlayer->IsSubscribed(pElement, name);
 }
 
 bool CStaticFunctionDefinitions::SetElementParent(CElement* pElement, CElement* pParent)
