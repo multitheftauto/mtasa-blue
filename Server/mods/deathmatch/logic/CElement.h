@@ -140,8 +140,8 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    bool           SetCustomData(const SString& name, const CLuaArgument& Variable, const ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = nullptr, bool bTriggerEvent = true);
-    void           CallOnElementDataChangeEvent(const SString& name, CLuaArgument currentValue, CLuaArgument oldValue = CLuaArgument(), CPlayer* pModifiedBy = nullptr);
+    bool           SetCustomData(const SString& name, const CLuaArgument& Variable, const ESyncType syncType = ESyncType::BROADCAST, CPlayer* modifiedBy = nullptr, bool triggerEvent = true);
+    void           CallOnElementDataChangeEvent(const SString& name, CLuaArgument currentValue, CLuaArgument oldValue = CLuaArgument(), CPlayer* const modifiedBy = nullptr);
     void           DeleteCustomData(const SString& name);
     void SendAllCustomData(CPlayer* pPlayer);
     

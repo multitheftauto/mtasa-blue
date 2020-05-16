@@ -629,7 +629,7 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
         case LUA_TSTRING:
         {
             const auto str = arg.GetString();
-            bOut = str == "true" || str == "1";
+            bOut = str == "true" || str == "1"; // same as above
             return bOut || (str == "false" || str == "0");
         }
         case LUA_TBOOLEAN:
@@ -640,7 +640,7 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-bool CElement::SetCustomData(const SString& name, const CLuaArgument& newValue, const ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+bool CElement::SetCustomData(const SString& name, const CLuaArgument& newValue, const ESyncType syncType, CPlayer* modifiedBy, bool triggerEvent)
 {
     // ACHTUNG:
     // Note to anyone in the future who modifies this: dont forget about CStaticFunctionDefinitions::SetElementData, 
@@ -650,16 +650,15 @@ bool CElement::SetCustomData(const SString& name, const CLuaArgument& newValue, 
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)\n", name.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1).c_str());
-        return;
+        return false;
     }
 
-    
-    if (bTriggerEvent)
+    if (triggerEvent)
     {
         SCustomData oldData;
         if (m_pCustomData->Set(name, newValue, syncType, &oldData))
         {
-            CallOnElementDataChangeEvent(name, newValue, std::move(oldData.variable), pClient);
+            CallOnElementDataChangeEvent(name, newValue, oldData.variable, modifiedBy);
             return true;
         }
     }
@@ -669,26 +668,26 @@ bool CElement::SetCustomData(const SString& name, const CLuaArgument& newValue, 
     return false;
 }
 
-void CElement::CallOnElementDataChangeEvent(const SString& name, CLuaArgument currentValue, CLuaArgument oldValue, CPlayer* const pModifiedBy)
+void CElement::CallOnElementDataChangeEvent(const SString& name, CLuaArgument currentValue, CLuaArgument oldValue, CPlayer* const modifiedBy)
 {
     CLuaArguments Arguments;
     Arguments.PushString(name);
     Arguments.PushArgument(std::move(oldValue));
     Arguments.PushArgument(std::move(currentValue));
 
-    CallEvent("onElementDataChange", Arguments, pModifiedBy);
+    CallEvent("onElementDataChange", Arguments, modifiedBy);
 }
 
 void CElement::DeleteCustomData(const SString& name)
 {
-    const auto pData = m_pCustomData->Get(name);
-    if (pData)
+    SCustomData deleteData;
+    if (m_pCustomData->Delete(name, &deleteData))
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
         Arguments.PushString(name);
-        Arguments.PushArgument(pData->variable);
-        Arguments.PushNil(); // push nil to indicate it has been removed
+        Arguments.PushArgument(std::move(deleteData.variable));
+        Arguments.PushNil();
 
         m_pCustomData->Delete(name);
 
