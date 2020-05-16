@@ -348,6 +348,13 @@ CLuaArgument* CLuaArguments::PushArgument(const CLuaArgument& argument)
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushArgument(CLuaArgument&& argument)
+{
+    CLuaArgument* pArgument = new CLuaArgument(argument);            // create a copy
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
 CLuaArgument* CLuaArguments::PushString(const std::string& strString)
 {
     CLuaArgument* pArgument = new CLuaArgument();

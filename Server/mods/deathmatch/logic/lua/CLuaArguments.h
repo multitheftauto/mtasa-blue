@@ -80,6 +80,7 @@ public:
     CLuaArgument* PushDbQuery(CDbJobData* pJobData);
 
     CLuaArgument* PushArgument(const CLuaArgument& argument);
+    CLuaArgument* CLuaArguments::PushArgument(CLuaArgument&& argument); // for std::move
     CLuaArgument* PushTable(CLuaArguments* table);
 
     void DeleteArguments();
