@@ -897,7 +897,7 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* const ownerElement, co
         else if (oldData.syncType == ESyncType::SUBSCRIBE && newSyncType != ESyncType::SUBSCRIBE)
             m_pPlayerManager->ClearElementData(ownerElement, name);
 
-        ownerElement->CallOnElementDataChangeEvent(name, std::move(newValue), std::move(oldData.variable));
+        ownerElement->CallOnElementDataChangeEvent(name, newValue, std::move(oldData.variable));
 
         return true;
     }
@@ -943,18 +943,7 @@ bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, co
     const SCustomData* customDataCurrent = pElement->GetCustomData(name, false);
     if (customDataCurrent->syncType == ESyncType::SUBSCRIBE)
     {
-        CBitStream BitStream;
-
-        const auto length = (unsigned short)(name.length());
-        BitStream.pBitStream->WriteCompressed(length);
-        BitStream.pBitStream->Write(name.c_str(), length);
-
-        customDataCurrent->variable.WriteToBitStream(*BitStream.pBitStream);
-
-        pPlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
-
-        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(name.c_str(), 1, BitStream.pBitStream->GetNumberOfBytesUsed());
-
+        SyncElementData(pElement, *customDataCurrent, name, nullptr, pPlayer);
         return true;
     }
     return false;
