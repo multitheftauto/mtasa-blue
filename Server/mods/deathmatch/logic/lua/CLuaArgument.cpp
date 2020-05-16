@@ -19,19 +19,58 @@ extern CGame* g_pGame;
 
 using namespace std;
 
-CLuaArgument::CLuaArgument(CLuaArgument&& rhs) :
-    m_iType(m_iType),
-    m_bBoolean(m_bBoolean),
-    m_Number(m_Number),
-    m_strString(std::move(m_strString)),
-    m_pUserData(m_pUserData),
-    m_pTableData(m_pTableData),
-    m_bWeakTableRef(m_bWeakTableRef),
+CLuaArgument::CLuaArgument(CLuaArgument&& rhs, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) noexcept :
+    m_iType(rhs.m_iType),
 #ifdef MTA_DEBUG
-    m_strFilename(std::move(m_strFilename)),
-    m_iLine(m_iLine)
+    m_strFilename(std::move(rhs.m_strFilename)),
+    m_iLine(rhs.m_iLine)
 #endif
 {
+    switch (m_iType)
+    {
+    case LUA_TBOOLEAN:
+    {
+        m_bBoolean = rhs.m_bBoolean;
+        break;
+    }
+
+    case LUA_TLIGHTUSERDATA:
+    case LUA_TUSERDATA:
+    {
+        m_pUserData = rhs.m_pUserData;
+        break;
+    }
+
+    case LUA_TNUMBER:
+    {
+        m_Number = rhs.m_Number;
+        break;
+    }
+
+    case LUA_TTABLE:
+    {
+        m_bWeakTableRef = pKnownTables && (m_pTableData = MapFindRef(*pKnownTables, rhs.m_pTableData));
+
+        if (!m_bWeakTableRef)
+            m_pTableData = rhs.m_pTableData;
+
+        break;
+    }
+
+    case LUA_TSTRING:
+    {
+        m_strString = std::move(rhs.m_strString);
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    // invalidate rhs
+    rhs.m_iType = LUA_TNONE;
+    rhs.m_pTableData = nullptr; // nullptr it, so it wont get 'delete'-d.
+    // nothing else needs to be invalidated, because its perfectly fine to not do so.
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables) :
