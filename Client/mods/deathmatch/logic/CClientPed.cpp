@@ -2556,7 +2556,7 @@ CVector CClientPed::GetAim() const
     return CVector();
 }
 
-void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2568,7 +2568,7 @@ void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned cha
     }
 }
 
-void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2587,7 +2587,7 @@ void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX,
     }
 }
 
-void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                CVector* pSource, bool bInterpolateAim)
 {
     if (!m_bIsLocalPlayer)
