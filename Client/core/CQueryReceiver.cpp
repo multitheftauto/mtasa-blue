@@ -156,16 +156,20 @@ SQueryInfo CQueryReceiver::GetServerResponse(uint restrictions)
             return info;
 
         if ((restrictions & RESTRICTION_PASSWORDED_FLAG) == false)
-            info.isPassworded = (szBuffer[i++] == 1);
+            info.isPassworded = (szBuffer[i] == 1);
+        i++;
 
         if ((restrictions & RESTRICTION_SERIALS_FLAG) == false)
-            info.serials = (szBuffer[i++] == 1);
+            info.serials = (szBuffer[i] == 1);
+        i++;
 
         if ((restrictions & RESTRICTION_PLAYER_COUNT) == false)
-            info.players = (unsigned char)szBuffer[i++];
+            info.players = (unsigned char)szBuffer[i];
+        i++;
 
         if ((restrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
-            info.playerSlot = (unsigned char)szBuffer[i++];
+            info.playerSlot = (unsigned char)szBuffer[i];
+        i++;
 
         // Recover large player count if present
         const SString strPlayerCount = strMapTemp.Right(strMapTemp.length() - strlen(strMapTemp) - 1);
