@@ -215,9 +215,7 @@ struct CLuaFunctionParserBase
         // lua_State* can be taken as first argument of any function
         if constexpr (std::is_same_v<T, lua_State*>)
         {
-            bool constraint = index == 1;
-            dassert(constraint && "`lua_State*` must only be placed in the first parameter of Lua definitions");
-            return constraint;
+            return index == 1;
         }
 
         // variants can be used by any of the underlying types
