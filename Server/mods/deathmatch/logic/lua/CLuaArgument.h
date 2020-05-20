@@ -39,7 +39,7 @@ public:
     bool                operator!=(const CLuaArgument& Argument);
 
     void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
+    int Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
 
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
