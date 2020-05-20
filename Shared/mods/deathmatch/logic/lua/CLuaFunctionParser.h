@@ -57,7 +57,7 @@ struct CLuaFunctionParserBase
             return TypeToName<param_t>();
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
-            return "argument(anything)";
+            return "value";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
