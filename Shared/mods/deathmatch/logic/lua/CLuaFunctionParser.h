@@ -8,6 +8,8 @@
  *****************************************************************************/
 #pragma once
 
+class CLuaArgument;
+
 #include <optional>
 #include <variant>
 #include <SharedUtil.Template.h>
@@ -15,6 +17,7 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
+
 
 struct CLuaFunctionParserBase
 {
@@ -54,6 +57,8 @@ struct CLuaFunctionParserBase
             using param_t = typename is_specialization<T, std::optional>::param_t;
             return TypeToName<param_t>();
         }
+        else if constexpr (std::is_same_v<T, CLuaArgument>)
+            return "argument(anything)";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
         else if constexpr (is_5specialization<T, std::unordered_map>::value)
@@ -191,6 +196,10 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_enum_v<T>)
             return iArgument == LUA_TSTRING;
 
+        // CLuaArgument can hold any value
+        if constexpr (std::is_same_v<T, CLuaArgument>)
+            return iArgument != LUA_TNONE;
+
         // std::optional is used for optional parameters
         // which may also be in the middle of a parameter list
         // therefore it is always valid to attempt to read an
@@ -212,7 +221,7 @@ struct CLuaFunctionParserBase
 
         // lua_State* can be taken as first argument of any function
         if constexpr (std::is_same_v<T, lua_State*>)
-            return index == 0;
+            return index == 1;
 
         // variants can be used by any of the underlying types
         // thus recursively use this function
@@ -525,6 +534,7 @@ struct CLuaFunctionParserBase
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
+
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
         {
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
@@ -541,6 +551,19 @@ struct CLuaFunctionParserBase
             }
             return static_cast<T>(result);
         }
+        else if constexpr (std::is_same_v<T, CLuaArgument>)
+        {
+            int iType = lua_type(L, index);
+            if (iType != LUA_TNONE)
+            {
+                CLuaArgument argument;
+                argument.Read(L, index++);
+                return argument;
+            }
+
+            SetBadArgumentError(L, "value", index, "none");
+            return T{};
+        }      
     }
 };
 
