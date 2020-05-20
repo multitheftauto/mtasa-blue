@@ -79,6 +79,8 @@ namespace lua
 
     inline int Push(lua_State* L, const CLuaArgument* const arg)
     {
+        assert(arg);
+
         if (arg->GetType() == LUA_TNONE)
             return 0;
 
