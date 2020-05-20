@@ -69,12 +69,12 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", ArgumentParserWarn<false, getElementData>},
-        {"hasElementData", ArgumentParserWarn<false, hasElementData>},
+        {"hasElementData", ArgumentParser<hasElementData>},
         {"setElementData", ArgumentParserWarn<false, setElementData>},
         {"removeElementData", ArgumentParserWarn<false, removeElementData>},
-        {"addElementDataSubscriber", ArgumentParserWarn<false, addElementDataSubscriber>},
-        {"removeElementDataSubscriber", ArgumentParserWarn<false, removeElementDataSubscriber>},
-        {"hasElementDataSubscriber", ArgumentParserWarn<false, hasElementDataSubscriber>},
+        {"addElementDataSubscriber", ArgumentParser<addElementDataSubscriber>},
+        {"removeElementDataSubscriber", ArgumentParser<removeElementDataSubscriber>},
+        {"hasElementDataSubscriber", ArgumentParser<hasElementDataSubscriber>},
 
         // Set
         {"setElementID", setElementID},

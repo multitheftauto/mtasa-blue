@@ -48,7 +48,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getAttachedElements", GetAttachedElements},
         {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
         {"isElementLocal", IsElementLocal},
-        {"hasElementData", ArgumentParserWarn<false, HasElementData>},
+        {"hasElementData", ArgumentParser<HasElementData>},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"isElementOnScreen", IsElementOnScreen},
