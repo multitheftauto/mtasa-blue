@@ -79,7 +79,7 @@ namespace lua
         return 1;
     }
 
-    inline int Push(lua_State* L, const CLuaArgument& const arg)
+    inline int Push(lua_State* L, const CLuaArgument& arg)
     {
         if (arg.GetType() == LUA_TNONE)
             return 0;
