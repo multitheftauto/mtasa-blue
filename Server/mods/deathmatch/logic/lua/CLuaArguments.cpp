@@ -139,10 +139,8 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-int CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables)
+void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables)
 {
-    unsigned int pushedOnStackCount = 0;
-
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK(luaVM, 4);
 
