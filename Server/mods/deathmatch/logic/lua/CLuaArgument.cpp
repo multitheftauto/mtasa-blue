@@ -300,26 +300,26 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
             case LUA_TNIL:
             {
                 lua_pushnil(luaVM);
-                return 1;
+                break;
             }
 
             case LUA_TBOOLEAN:
             {
                 lua_pushboolean(luaVM, m_bBoolean);
-                return 1;
+                break;
             }
 
             case LUA_TLIGHTUSERDATA:
             case LUA_TUSERDATA:
             {
                 lua_pushuserdata(luaVM, m_pUserData);
-                return 1;
+                break;
             }
 
             case LUA_TNUMBER:
             {
                 lua_pushnumber(luaVM, m_Number);
-                return 1;
+                break;
             }
 
             case LUA_TTABLE:
@@ -331,11 +331,10 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
                     lua_pushnumber(luaVM, *pThingy);
                     lua_gettable(luaVM, -2);
                     lua_remove(luaVM, -2);
-                    return 1;
                 }
                 else
                 {
-                    return m_pTableData->PushAsTable(luaVM, pKnownTables);
+                    m_pTableData->PushAsTable(luaVM, pKnownTables);
                 }
                 break;
             }
@@ -343,7 +342,7 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
             case LUA_TSTRING:
             {
                 lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
-                return 1;
+                break;
             }
         }
     }
