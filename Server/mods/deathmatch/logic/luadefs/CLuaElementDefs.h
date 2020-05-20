@@ -67,13 +67,14 @@ public:
     LUA_DECLARE(setElementVisibleTo);
 
     // Element data
-    LUA_DECLARE(GetElementData);
-    LUA_DECLARE(HasElementData);
-    LUA_DECLARE(setElementData);
-    LUA_DECLARE(removeElementData);
-    LUA_DECLARE(addElementDataSubscriber);
-    LUA_DECLARE(removeElementDataSubscriber);
-    LUA_DECLARE(hasElementDataSubscriber);
+    static bool removeElementData(lua_State* luaVM, CElement* const element, std::string key);
+    static bool addElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
+    static bool removeElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
+    static bool hasElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
+    // shared with the client(can be found in CLuaElementSharedDefs.cpp)
+    static std::variant<bool, CLuaArgument*> CLuaElementDefs::getElementData(lua_State* const luaVM, CElement* const element, std::string key, std::optional<bool> inherit);
+    static bool hasElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit);
+    static bool setElementData(lua_State* const luaVM, CElement* const element, std::string key, CLuaArgument newValue, const std::optional<std::variant<bool, ESyncType>> optionalNewSyncType);
 
     // Attachement
     LUA_DECLARE(attachElements);

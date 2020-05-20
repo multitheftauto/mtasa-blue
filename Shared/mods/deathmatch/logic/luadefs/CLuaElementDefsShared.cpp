@@ -1,87 +1,78 @@
 #include "StdInc.h"
 
-int CLuaElementDefs::GetElementData(lua_State* luaVM)
+// Warn and truncate if key is too long(luaVM must be in a var luaVM)
+// is undef-ed at the end of the element data func defs
+#define EDATA_KEY_WARN_TRUNCATE(key) \
+if ((key).length() > MAX_CUSTOMDATA_NAME_LENGTH) \
+{ \
+    m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [string length reduced to " QUOTE_DEFINE(MAX_CUSTOMDATA_NAME_LENGTH) " characters at argument 2]", lua_tostring(luaVM, lua_upvalueindex(1))).c_str()); \
+    (key) = (key).substr(0, MAX_CUSTOMDATA_NAME_LENGTH); \
+} \
+
+
+#ifdef MTA_CLIENT
+std::variant<bool, CLuaArgument*> CLuaElementDefs::GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
+#else
+std::variant<bool, CLuaArgument*> CLuaElementDefs::getElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
+#endif
 {
-    //  var getElementData ( element theElement, string key [, inherit = true] )
+    EDATA_KEY_WARN_TRUNCATE(key);
 
 #ifdef MTA_CLIENT
-    CClientEntity* pElement;
+    CLuaArgument* const pVariable = element->GetCustomData(key.c_str(), inherit.value_or(true));
 #else
-    CElement* pElement;
+    CLuaArgument* const pVariable = CStaticFunctionDefinitions::GetElementData(element, key.c_str(), inherit.value_or(true));
 #endif
-    SString strKey;
-    bool    bInherit;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
-    argStream.ReadBool(bInherit, true);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-#ifdef MTA_CLIENT
-            CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
-#else
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
-#endif
-            if (pVariable)
-            {
-                pVariable->Push(luaVM);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return { pVariable ? pVariable : false };
 }
 
-int CLuaElementDefs::HasElementData(lua_State* luaVM)
+#ifdef MTA_CLIENT
+//  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+bool CLuaElementDefs::SetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, CLuaArgument newValue, const std::optional<bool> optionalIsSynced)
+#else
+//  bool setElementData ( element theElement, string key, var value, [bool synchronize = true / string syncType = "broadcast"] )
+bool CLuaElementDefs::setElementData(lua_State* const luaVM, CElement* const element, std::string key, CLuaArgument newValue, const std::optional<std::variant<bool, ESyncType>> optionalNewSyncType)
+#endif
 {
-    //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
+#ifndef MTA_CLIENT
+    ESyncType newSyncType = ESyncType::BROADCAST;
+    if (optionalNewSyncType.has_value())
+    {
+        const auto& value = optionalNewSyncType.value();
+        if (std::holds_alternative<bool>(value) && !std::get<bool>(value))
+            newSyncType = ESyncType::LOCAL;
+        else
+            newSyncType = std::get<ESyncType>(value);
+    }
+
+    LogWarningIfPlayerHasNotJoinedYet(luaVM, element);
+#endif
+    EDATA_KEY_WARN_TRUNCATE(key);
+
 
 #ifdef MTA_CLIENT
-    CClientEntity* pElement;
+    return CStaticFunctionDefinitions::SetElementData(*element, key.c_str(), newValue, optionalIsSynced.value_or(true));
 #else
-    CElement* pElement;
+    return CStaticFunctionDefinitions::SetElementData(element, key.c_str(), newValue, newSyncType);
 #endif
-    SString   strKey;
-    bool      bInherit;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
-    argStream.ReadBool(bInherit, true);
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-    {
-        // Warn and truncate if key is too long
-        m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                     *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-        strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-    }
-
-    // Check if data exists with the given key
-    bool exists = pElement->GetCustomData(strKey, bInherit) != nullptr;
-    lua_pushboolean(luaVM, exists);
-    return 1;
 }
+
+
+#ifdef MTA_CLIENT
+bool CLuaElementDefs::HasElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
+#else
+bool CLuaElementDefs::hasElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
+#endif
+{
+    EDATA_KEY_WARN_TRUNCATE(key);
+
+#ifdef MTA_CLIENT
+    return element->GetCustomData(key.c_str(), inherit.value_or(true)) != nullptr;
+#else
+    return CStaticFunctionDefinitions::GetElementData(element, key.c_str(), inherit.value_or(true)) != nullptr;
+#endif
+
+}
+
+#undef EDATA_KEY_WARN_TRUNCATE

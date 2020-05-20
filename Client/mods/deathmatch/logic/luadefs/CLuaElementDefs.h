@@ -10,6 +10,8 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <optional>
+#include <variant>
 
 class CLuaElementDefs : public CLuaDefs
 {
@@ -26,8 +28,8 @@ public:
     LUA_DECLARE(GetElementID);
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
-    LUA_DECLARE(GetElementData);
-    LUA_DECLARE(HasElementData);
+    static std::variant<bool, CLuaArgument*> GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
+    static bool HasElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);
@@ -73,7 +75,7 @@ public:
     LUA_DECLARE(CreateElement);
     LUA_DECLARE(DestroyElement);
     LUA_DECLARE(SetElementID);
-    LUA_DECLARE(SetElementData);
+    static bool SetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, CLuaArgument newValue, const std::optional<bool> optionalIsSynced);
     LUA_DECLARE(RemoveElementData);
     LUA_DECLARE(SetElementMatrix);
     LUA_DECLARE(SetElementPosition);

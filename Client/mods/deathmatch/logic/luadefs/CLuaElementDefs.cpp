@@ -22,7 +22,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElement", IsElement},
         {"getElementByID", GetElementByID},
         {"getElementByIndex", GetElementByIndex},
-        {"getElementData", GetElementData},
+        {"getElementData", ArgumentParserWarn<false, GetElementData>},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
@@ -48,7 +48,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getAttachedElements", GetAttachedElements},
         {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
         {"isElementLocal", IsElementLocal},
-        {"hasElementData", HasElementData},
+        {"hasElementData", ArgumentParserWarn<false, HasElementData>},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"isElementOnScreen", IsElementOnScreen},
@@ -73,7 +73,7 @@ void CLuaElementDefs::LoadFunctions()
         {"destroyElement", DestroyElement},
         {"setElementID", SetElementID},
         {"setElementParent", SetElementParent},
-        {"setElementData", SetElementData},
+        {"setElementData", ArgumentParserWarn<false, SetElementData>},
         // {"removeElementData", RemoveElementData}, TODO Clientside
         {"setElementMatrix", SetElementMatrix},
         {"setElementPosition", SetElementPosition},
@@ -1717,80 +1717,41 @@ int CLuaElementDefs::SetElementID(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::SetElementData(lua_State* luaVM)
-{
-    //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
-    CClientEntity* pEntity;
-    SString        strKey;
-    CLuaArgument   value;
-    bool           bSynchronize;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
-    argStream.ReadLuaArgument(value);
-    argStream.ReadBool(bSynchronize, true);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 {
-    //  bool removeElementData ( element theElement, string key )
-    CClientEntity* pEntity;
-    SString        strKey;
+    // Is currently unspported client side.
+    //
+    ////  bool removeElementData ( element theElement, string key )
+    //CClientEntity* pEntity;
+    //SString        strKey;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
+    //CScriptArgReader argStream(luaVM);
+    //argStream.ReadUserData(pEntity);
+    //argStream.ReadString(strKey);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
+    //if (!argStream.HasErrors())
+    //{
+    //    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    //    if (pLuaMain)
+    //    {
+    //        if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+    //        {
+    //            // Warn and truncate if key is too long
+    //            m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
+    //                *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+    //            strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
+    //        }
 
-            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, strKey))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    //        if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, strKey))
+    //        {
+    //            lua_pushboolean(luaVM, true);
+    //            return 1;
+    //        }
+    //    }
+    //}
+    //else
+    //    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
 
     // Failed
     lua_pushboolean(luaVM, false);
