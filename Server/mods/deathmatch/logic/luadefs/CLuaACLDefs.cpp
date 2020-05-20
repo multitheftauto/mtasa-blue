@@ -20,7 +20,7 @@ static const char* GetResourceName(lua_State* luaVM)
 
 void CLuaACLDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"aclReload", aclReload},
         {"aclSave", aclSave},
 

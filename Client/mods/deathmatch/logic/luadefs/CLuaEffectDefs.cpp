@@ -13,7 +13,7 @@
 
 void CLuaEffectDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"fxAddBlood", fxAddBlood},
         {"fxAddWood", fxAddWood},
         {"fxAddSparks", fxAddSparks},

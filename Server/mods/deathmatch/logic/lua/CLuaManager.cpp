@@ -155,7 +155,7 @@ CResource* CLuaManager::GetVirtualMachineResource(lua_State* luaVM)
 
 void CLuaManager::LoadCFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
         {"removeEventHandler", CLuaFunctionDefs::RemoveEventHandler},

@@ -14,7 +14,7 @@
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createRadarArea", CreateRadarArea},
         {"getRadarAreaColor", GetRadarAreaColor},
         {"getRadarAreaSize", GetRadarAreaSize},

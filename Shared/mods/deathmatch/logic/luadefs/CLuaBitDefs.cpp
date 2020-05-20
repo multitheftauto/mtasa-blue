@@ -14,7 +14,7 @@
 
 void CLuaBitDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"bitAnd", bitAnd},
         {"bitNot", bitNot},
         {"bitOr", bitOr},

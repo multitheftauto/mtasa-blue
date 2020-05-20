@@ -13,7 +13,7 @@
 
 void CLuaBanDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"addBan", AddBan},
         {"removeBan", RemoveBan},
 

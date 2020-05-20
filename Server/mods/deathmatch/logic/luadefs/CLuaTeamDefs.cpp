@@ -13,7 +13,7 @@
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Team create/destroy functions
         {"createTeam", CreateTeam},
 

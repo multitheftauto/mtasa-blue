@@ -13,7 +13,7 @@
 
 void CLuaAccountDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Log in/out funcs
         {"logIn", LogIn},
         {"logOut", LogOut},

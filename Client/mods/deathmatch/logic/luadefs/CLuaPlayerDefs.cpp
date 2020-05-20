@@ -13,7 +13,7 @@
 
 void CLuaPlayerDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Player get funcs
         {"getLocalPlayer", GetLocalPlayer},
         {"getPlayerName", GetPlayerName},

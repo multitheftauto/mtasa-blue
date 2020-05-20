@@ -16,7 +16,7 @@ using std::list;
 
 void CLuaElementDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Element get funcs
         {"getRootElement", GetRootElement},
         {"isElement", IsElement},

@@ -151,7 +151,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 
 void CLuaManager::LoadCFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
         {"getPlayerRotation", CLuaPedDefs::GetPedRotation},
         {"canPlayerBeKnockedOffBike", CLuaPedDefs::CanPedBeKnockedOffBike},

@@ -12,7 +12,7 @@
 
 void CLuaUtilDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
         {"deref", Dereference},

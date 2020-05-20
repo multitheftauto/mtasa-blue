@@ -13,7 +13,7 @@
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Object create/destroy funcs
         {"createObject", CreateObject},
 
