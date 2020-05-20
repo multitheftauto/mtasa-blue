@@ -76,7 +76,6 @@ public:
     LUA_DECLARE(DestroyElement);
     LUA_DECLARE(SetElementID);
     static bool SetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, CLuaArgument newValue, const std::optional<bool> optionalIsSynced);
-    LUA_DECLARE(RemoveElementData);
     LUA_DECLARE(SetElementMatrix);
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
