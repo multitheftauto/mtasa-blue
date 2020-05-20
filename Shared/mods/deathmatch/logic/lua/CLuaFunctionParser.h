@@ -18,6 +18,7 @@ class CLuaArgument;
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 
+
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
@@ -535,6 +536,7 @@ struct CLuaFunctionParserBase
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
+
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
         {
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
