@@ -551,16 +551,9 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
-            int iType = lua_type(L, index);
-            if (iType != LUA_TNONE)
-            {
-                CLuaArgument argument;
-                argument.Read(L, index++);
-                return argument;
-            }
-
-            SetBadArgumentError(L, "value", index, "none");
-            return T{};
+            CLuaArgument argument;
+            argument.Read(L, index++);
+            return argument;
         }      
     }
 };
