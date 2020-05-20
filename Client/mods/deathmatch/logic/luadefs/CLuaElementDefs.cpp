@@ -11,6 +11,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
 using std::list;
 #define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
