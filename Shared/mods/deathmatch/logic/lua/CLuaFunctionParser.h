@@ -8,8 +8,6 @@
  *****************************************************************************/
 #pragma once
 
-class CLuaArgument;
-
 #include <optional>
 #include <variant>
 #include <SharedUtil.Template.h>
@@ -17,7 +15,6 @@ class CLuaArgument;
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
-
 
 struct CLuaFunctionParserBase
 {
@@ -197,10 +194,6 @@ struct CLuaFunctionParserBase
         // Enums are represented as strings to Lua
         if constexpr (std::is_enum_v<T>)
             return iArgument == LUA_TSTRING;
-
-        // CLuaArgument can hold any value
-        if constexpr (std::is_same_v<T, CLuaArgument>)
-            return iArgument != LUA_TNONE;
 
         // std::optional is used for optional parameters
         // which may also be in the middle of a parameter list
@@ -536,7 +529,6 @@ struct CLuaFunctionParserBase
         }
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
-
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
         {
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
