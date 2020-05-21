@@ -32,7 +32,6 @@ public:
     LUA_DECLARE(DxDrawPrimitive3D);
     LUA_DECLARE(DxDrawMaterialPrimitive3D);
     LUA_DECLARE_OOP(DxGetTextSize);
-    LUA_DECLARE(DxDrawWiredSphere);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);
@@ -61,6 +60,7 @@ public:
     LUA_DECLARE(DxIsAspectRatioAdjustmentEnabled);
     LUA_DECLARE(DxSetTextureEdge);
 
+    static bool DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, const std::optional<SColorARGB> color, const std::optional<float> lineWidth, const std::optional<unsigned int> iterations);
 private:
     static void AddDxMaterialClass(lua_State* luaVM);
     static void AddDxTextureClass(lua_State* luaVM);
