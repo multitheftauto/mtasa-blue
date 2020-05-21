@@ -11,6 +11,8 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <optional>
+#include <variant>
 
 class CLuaEngineDefs : public CLuaDefs
 {
@@ -49,7 +51,7 @@ public:
     LUA_DECLARE(EngineGetVisibleTextureNames);
 
     static bool EngineSetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID, char hourOn, char hourOff);
-    static std::tuple<char, char> EngineGetModelVisibleTime(const std::variant<std::string, unsigned int> variantModelID);
+    static std::tuple<char, char> EngineGetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID);
 
     LUA_DECLARE(EngineGetModelTextures);
     LUA_DECLARE(EngineSetSurfaceProperties);
