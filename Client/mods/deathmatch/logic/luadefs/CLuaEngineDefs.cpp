@@ -37,7 +37,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", EngineSetModelVisibleTime},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
         {"engineGetModelVisibleTime", EngineGetModelVisibleTime},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
@@ -777,7 +777,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
     CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
     if (!modelInfo)
-        throw std::invalid_argument(SString("Invalid model id %u", modelID));
+        throw std::invalid_argument(SString("Invalid model id %u. Valid IDs are in range 0 - 19999", modelID));
 
     //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
     const float originalDistance = modelInfo->GetOriginalLODDistance();
@@ -1093,38 +1093,23 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
+bool CLuaEngineDefs::EngineSetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID, char hourOn, char hourOff)
 {
-    // bool engineSetModelVisibleTime ( int/string modelID, int hourOn, int hourOff )
-    SString strModelId;
-    char cHourOn,cHourOff;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-    argStream.ReadNumber(cHourOn);
-    argStream.ReadNumber(cHourOff);
+    const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
+    CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        throw std::invalid_argument(SString("Invalid model id %u", modelID));
 
-    if (!argStream.HasErrors())
-    {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            if (cHourOn > cHourOff)
-                std::swap(cHourOn, cHourOff);
+    if (hourOn > 24 || hourOn < 0)
+        throw std::invalid_argument("hourOn must be between 0 and 24");
 
-            if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
-            {
-                lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
-                return 1;
-            }
-        }
-    }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (hourOff > 24 || hourOff < 0)
+        throw std::invalid_argument("hourOff must be between 0 and 24");
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (hourOn > hourOff)
+        std::swap(hourOn, hourOff);
+
+    return modelInfo->SetTime(hourOn, hourOff);
 }
 
 int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
