@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
@@ -29,7 +30,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawPrimitive3D", DxDrawPrimitive3D},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
-        {"dxDrawWiredSphere", DxDrawWiredSphere},
+        {"dxDrawWiredSphere", ArgumentParser<DxDrawWiredSphere>},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetTextSize", DxGetTextSize},
         {"dxGetFontHeight", DxGetFontHeight},
@@ -2071,41 +2072,16 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
     return 1;
 }
 
-int CLuaDrawingDefs::DxDrawWiredSphere(lua_State* luaVM)
+bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, std::optional<SColor> color,
+                                        const std::optional<float> lineWidth, const std::optional<unsigned int> iterations)
 {
-    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, color theColor, float fLineWidth, uint iterations )
-    CVector          vecPosition;
-    float            fRadius;
-    SColorARGB       color(64, 255, 0, 0);
-    float            fLineWidth = 1;
-    uint             uiIterations = 1;
-    CScriptArgReader argStream(luaVM);
+    // Greater than 4, crash the game
+    if (iterations == 0 || iterations > 4)
+        throw std::invalid_argument("Iterations must be between 1 and 4");
 
-    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+    if (!color)
+        color = SColorARGB(64, 255, 0, 0);
 
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRadius);
-    argStream.ReadColor(color, SColorARGB(64, 255, 0, 0));
-    argStream.ReadNumber(fLineWidth, 1);
-    argStream.ReadNumber(uiIterations, 1);
-
-    if (!argStream.HasErrors())
-    {
-        // Greater than 4, crash the game
-        if (uiIterations >= 1 && uiIterations <= 4)
-        {
-            pGraphics->DrawWiredSphere(vecPosition, fRadius, color, fLineWidth, uiIterations);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-
-        argStream.SetCustomError("Iterations must be between 1 and 4");
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pCore->GetGraphics()->DrawWiredSphere(position, radius, color.value(), lineWidth.value_or(1), iterations.value_or(1));
+    return true;
 }
