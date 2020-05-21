@@ -10,7 +10,9 @@
  *****************************************************************************/
 
 #pragma once
-#include "CLuaDefs.h"
+#include <optional>
+#include <variant>
+#include <utility>
 
 class CLuaDrawingDefs : public CLuaDefs
 {
@@ -31,7 +33,39 @@ public:
     LUA_DECLARE(DxDrawMaterialPrimitive);
     LUA_DECLARE(DxDrawPrimitive3D);
     LUA_DECLARE(DxDrawMaterialPrimitive3D);
-    LUA_DECLARE_OOP(DxGetTextSize);
+
+    static CVector2D OOP_DxGetTextSize(
+        std::variant<CClientDxFont*, eFontType> font, // is optional, so we can call it from DxGetTextSize with a std::nullopt, and we just grab the FONT_DEFAULT.
+        const std::string text,
+        const std::optional<float> optWidth,
+        const std::optional<float> optScaleXY,
+        const std::optional<float> optScaleY,
+        const std::optional<bool> optWordBreak,
+        const std::optional<bool> optColorCoded
+    );
+
+     static inline std::tuple<float, float> DxGetTextSize(
+        std::string text,
+        std::optional<float> optWidth,
+        std::optional<float> optScaleXY,
+        std::optional<float> optScaleY,
+        std::optional<std::variant<CClientDxFont*, eFontType>> optFont,
+        std::optional<bool> optWordBreak,
+        std::optional<bool> optColorCoded
+    )
+    {
+        const auto size = OOP_DxGetTextSize(
+            optFont.has_value() ? std::move(optFont.value()) : FONT_DEFAULT,
+            std::move(text),
+            std::move(optWidth),
+            std::move(optScaleXY),
+            std::move(optScaleY),
+            std::move(optWordBreak),
+            std::move(optColorCoded)
+        );
+
+        return { size.fX, size.fY };
+    }
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);
