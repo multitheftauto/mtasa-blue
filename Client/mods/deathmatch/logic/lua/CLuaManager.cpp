@@ -405,8 +405,8 @@ void CLuaManager::LoadCFunctions()
     };
 
     // Add all functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 
     // Luadef definitions
     CLuaAudioDefs::LoadFunctions();

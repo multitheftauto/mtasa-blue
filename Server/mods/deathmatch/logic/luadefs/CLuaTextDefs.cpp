@@ -39,8 +39,8 @@ void CLuaTextDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTextDefs::AddClass(lua_State* luaVM)

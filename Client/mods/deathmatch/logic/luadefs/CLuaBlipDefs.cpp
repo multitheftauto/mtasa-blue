@@ -30,8 +30,8 @@ void CLuaBlipDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaBlipDefs::AddClass(lua_State* luaVM)

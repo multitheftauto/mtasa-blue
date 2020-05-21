@@ -102,8 +102,8 @@ void CLuaPlayerDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPlayerDefs::AddClass(lua_State* luaVM)

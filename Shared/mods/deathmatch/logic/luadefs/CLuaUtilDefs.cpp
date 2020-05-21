@@ -49,8 +49,8 @@ void CLuaUtilDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)

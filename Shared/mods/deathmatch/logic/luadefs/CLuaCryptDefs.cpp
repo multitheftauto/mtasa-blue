@@ -28,8 +28,8 @@ void CLuaCryptDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& [k, v] : functions)
-        CLuaCFunctions::AddFunction(k, v);
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 std::string CLuaCryptDefs::Md5(std::string strMd5)
