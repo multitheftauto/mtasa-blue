@@ -100,10 +100,8 @@ void CLuaElementDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [k, v] : functions)
+        CLuaCFunctions::AddFunction(k, v);
 }
 
 // TODO: specials

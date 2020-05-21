@@ -32,10 +32,8 @@ void CLuaBitDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [k, v] : functions)
+        CLuaCFunctions::AddFunction(k, v);
 }
 
 int CLuaBitDefs::bitAnd(lua_State* luaVM)
