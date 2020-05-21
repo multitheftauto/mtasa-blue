@@ -3053,7 +3053,7 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
     pPlayer->GetAim(fAimX, fAimY);
     const CVector& vecAimSource = pPlayer->GetAimSource();
     const CVector& vecAimTarget = pPlayer->GetAimTarget();
-    unsigned char  ucDrivebyAim = pPlayer->GetVehicleAimAnim();
+    eVehicleAimDirection ucDrivebyAim = pPlayer->GetVehicleAimAnim();
 
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, false);
@@ -3222,7 +3222,7 @@ void CClientGame::UpdateMimics()
             m_pLocalPlayer->GetShotData(&vecOrigin, &vecTarget);
             float fAimX = pShotSync->m_fArmDirectionX;
             float fAimY = pShotSync->m_fArmDirectionY;
-            char  cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
+            eVehicleAimDirection cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
             bool  bAkimboUp = g_pMultiplayer->GetAkimboTargetUp();
 
             /*
