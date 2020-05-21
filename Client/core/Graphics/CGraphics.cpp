@@ -2509,7 +2509,7 @@ namespace
     }
 }            // namespace WireShpere
 
-void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations)
+void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations)
 {
     const SWireModel& model = GetSphereWireModel(iterations);
 
