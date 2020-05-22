@@ -46,7 +46,7 @@ public:
     LUA_DECLARE(GetPlayerAccount);
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
-    LUA_DECLARE(GetPlayerScriptDebugLevel);
+    static unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player);
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);
