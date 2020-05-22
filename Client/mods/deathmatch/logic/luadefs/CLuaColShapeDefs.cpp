@@ -13,7 +13,7 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createColCircle", CreateColCircle},
         {"createColCuboid", CreateColCuboid},
         {"createColSphere", CreateColSphere},
@@ -36,10 +36,8 @@ void CLuaColShapeDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)

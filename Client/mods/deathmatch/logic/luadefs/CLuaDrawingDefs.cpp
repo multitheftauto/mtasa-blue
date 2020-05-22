@@ -15,7 +15,7 @@ extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"dxDrawLine", DxDrawLine},
         {"dxDrawMaterialLine3D", DxDrawMaterialLine3D},
         {"dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D},
@@ -61,10 +61,8 @@ void CLuaDrawingDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaDrawingDefs::AddClass(lua_State* luaVM)
@@ -1797,6 +1795,10 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushstring(luaVM, "SettingHighDetailVehicles");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailVehicles);
         lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingHighDetailPeds");
+        lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
+        lua_settable(luaVM, -3);
         return 1;
     }
     else
@@ -1847,7 +1849,7 @@ int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetTexturePixels(lua_State* luaVM)
 {
-    //  string dxGetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
+    //  bool dxSetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
     CClientTexture* pTexture;
     CPixels         pixels;
     CVector2D       vecPosition;

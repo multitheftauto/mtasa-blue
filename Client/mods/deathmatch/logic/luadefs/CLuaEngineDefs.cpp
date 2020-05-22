@@ -13,7 +13,7 @@
 
 void CLuaEngineDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"engineFreeModel", EngineFreeModel},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
@@ -59,10 +59,8 @@ void CLuaEngineDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -597,7 +595,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
+                    if (pModel == nullptr)
+                        pModel = new CClientModel(m_pManager, iModelID, eModelType);
                     pModel->Allocate();
                     pModel->SetParentResource(pResource);
 

@@ -198,6 +198,7 @@
       <right name="command.aclrequest" access="true" />
       <right name="command.authserial" access="true" />
       <right name="command.reloadacl" access="true" />
+      <right name="command.stopall" access="true" />
       <right name="function.addBan" access="true" />
       <right name="function.setUnbanTime" access="true" />
       <right name="function.setBanAdmin" access="true" />

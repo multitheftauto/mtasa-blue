@@ -2981,14 +2981,19 @@ void CClientVehicle::Destroy()
         {
             // Only remove him physically. Don't let the ped update us
             pPed->InternalRemoveFromVehicle(m_pVehicle);
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE))
+                pPed->SetWarpInToVehicleRequired(true);
         }
 
         // Remove all the passengers physically
+        bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
         for (unsigned int i = 0; i < 8; i++)
         {
-            if (m_pPassengers[i])
+            CClientPed* pPassenger = m_pPassengers[i];
+            if (pPassenger)
             {
-                m_pPassengers[i]->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->SetWarpInToVehicleRequired(bWarpInToVehicleRequired);
             }
         }
 
@@ -3598,8 +3603,6 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
-
     // Keep the bonet and boot intact
     ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
     memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);

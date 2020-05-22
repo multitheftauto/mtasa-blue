@@ -257,21 +257,21 @@ enum eModelInfoType : unsigned char
 class CModelInfoSA : public CModelInfo
 {
 protected:
-    CBaseModelInfoSAInterface*                                                                   m_pInterface;
-    DWORD                                                                                        m_dwModelID;
-    DWORD                                                                                        m_dwReferences;
-    DWORD                                                                                        m_dwPendingInterfaceRef;
-    CColModel*                                                                                   m_pCustomColModel;
-    CColModelSAInterface*                                                                        m_pOriginalColModelInterface;
-    RpClump*                                                                                     m_pCustomClump;
-    static std::map<unsigned short, int>                                                         ms_RestreamTxdIDMap;
-    static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
-    static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<TimeInfo*, TimeInfo*>                                                        ms_ModelDefaultModelTimeInfo;
-    static std::unordered_map<DWORD, unsigned short>                                             ms_OriginalObjectPropertiesGroups;
-    bool                                                                                         m_bAddedRefForCollision;
-    SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
+    CBaseModelInfoSAInterface*                                                   m_pInterface;
+    DWORD                                                                        m_dwModelID;
+    DWORD                                                                        m_dwReferences;
+    DWORD                                                                        m_dwPendingInterfaceRef;
+    CColModel*                                                                   m_pCustomColModel;
+    CColModelSAInterface*                                                        m_pOriginalColModelInterface;
+    RpClump*                                                                     m_pCustomClump;
+    static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
+    static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<TimeInfo*, TimeInfo*>                                        ms_ModelDefaultModelTimeInfo;
+    static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
+    bool                                                                         m_bAddedRefForCollision;
+    SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
     CModelInfoSA();
@@ -345,6 +345,7 @@ public:
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
+    void         ResetVehicleDummies();
     static void  ResetAllVehicleDummies();
 
     // ONLY use for peds

@@ -61,6 +61,9 @@ public:
     void SetSize(float fSize);
     void SetColor(const SColor color);
 
+    void AttachTo(CElement* pElement);
+    void SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
+
     void SetIcon(unsigned char ucIcon);
 
     CColShape* GetColShape() { return m_pCollision; }
