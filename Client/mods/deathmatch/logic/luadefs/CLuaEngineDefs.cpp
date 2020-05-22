@@ -29,7 +29,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRequestModel", EngineRequestModel},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
-        {"engineResetModelLODDistance", EngineResetModelLODDistance},
+        {"engineResetModelLODDistance", ArgumentParser<EngineResetModelLODDistance>},
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
@@ -772,7 +772,8 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
+//  bool engineResetModelLODDistance(int / string modelID)
+bool CLuaEngineDefs::EngineResetModelLODDistance(const std::variant<std::string, unsigned short> variantModelID)
 {
     const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
     CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
