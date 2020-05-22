@@ -43,7 +43,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerACInfo", GetPlayerACInfo},
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
-        {"getPlayerScriptDebugLevel", GetPlayerScriptDebugLevel},
+        {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -1511,31 +1511,9 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::GetPlayerScriptDebugLevel(lua_State* luaVM)
+unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 {
-    // int getPlayerScriptDebugLevel ( player thePlayer )
-    CPlayer* pPlayer;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    unsigned int uiLevel;
-
-    if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
-    {
-        lua_pushnumber(luaVM, uiLevel);
-        return 1;
-    }
-    else
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    return player->GetScriptDebugLevel();
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
