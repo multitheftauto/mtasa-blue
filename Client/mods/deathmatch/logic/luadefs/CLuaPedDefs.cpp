@@ -75,7 +75,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
-        {"setPedFightingStyle", SetPedFightingStyle},
+        {"setPedFightingStyle", ArgumentParser<SetPedFightingStyle>},
         {"setPedLookAt", SetPedLookAt},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
@@ -1762,19 +1762,13 @@ int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
+bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const unsigned char style)
 {
-    CClientEntity*   pEntity;
-    unsigned char    ucStyle;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(ucStyle);
+    // Is valid style?
+    if (style < 4 || style > 16)
+        throw std::invalid_argument("Style can only be between 4 and 16");
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle));
-    return 1;
+    return  CStaticFunctionDefinitions::SetPedFightingStyle(*entity, style);
 }
 
 int CLuaPedDefs::SetPedLookAt(lua_State* luaVM)
