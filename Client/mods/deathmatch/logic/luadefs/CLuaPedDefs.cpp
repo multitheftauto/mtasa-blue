@@ -86,7 +86,7 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
@@ -2198,21 +2198,17 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+
+
+
+bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
-    CClientPed*      pPed;
-    float            fArmor;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    argStream.ReadNumber(fArmor);
-
-    if (argStream.HasErrors())
+    if (ped->IsLocalEntity())
     {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        ped->SetArmor(armor);
+        return true;
     }
-
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
-    return 1;
+    return false;
 }
 
 int CLuaPedDefs::SetPedOxygenLevel(lua_State* luaVM)
