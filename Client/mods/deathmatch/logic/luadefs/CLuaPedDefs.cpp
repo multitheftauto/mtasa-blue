@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 
@@ -86,7 +88,7 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
@@ -2198,21 +2200,13 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
-    CClientPed*      pPed;
-    float            fArmor;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    argStream.ReadNumber(fArmor);
+    if (!ped->IsLocalEntity())
+        throw std::invalid_argument("This client side function will only work with client created peds");
 
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
-    return 1;
+    ped->SetArmor(armor);
+    return true;
 }
 
 int CLuaPedDefs::SetPedOxygenLevel(lua_State* luaVM)
