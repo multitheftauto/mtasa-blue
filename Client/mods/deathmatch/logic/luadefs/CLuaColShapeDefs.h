@@ -11,6 +11,8 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <optional>
+#include <variant>
 
 class CLuaColShapeDefs : public CLuaDefs
 {
@@ -25,16 +27,26 @@ public:
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
 
-    LUA_DECLARE(GetColShapeRadius);
-    LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE(GetColShapeSize);
-    LUA_DECLARE(SetColShapeSize);
-    LUA_DECLARE(GetColPolygonPoints);
-    LUA_DECLARE(GetColPolygonPointPosition);
-    LUA_DECLARE(SetColPolygonPointPosition);
-    LUA_DECLARE(AddColPolygonPoint);
-    LUA_DECLARE(RemoveColPolygonPoint);
-
-    LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
+    LUA_DECLARE(IsInsideColShape);
+
+    static float GetColShapeRadius(CClientColShape* const colShape);
+    static bool  SetColShapeRadius(CClientColShape* const colShape, const float radius);
+
+    static std::variant<CVector, CVector2D, float> GetColShapeSize_OOP(CClientColShape* const colShape);
+    static std::variant<std::tuple<float>, std::tuple<float, float>, std::tuple<float, float, float>> GetColShapeSize(CClientColShape* const colShape);
+
+    LUA_DECLARE(SetColShapeSize);
+    LUA_DECLARE(GetColPolygonPoints)
+
+    static const CVector2D& GetColPolygonPointPosition_OOP(CClientColShape* const colShape, unsigned int pointIndex);
+    static inline std::tuple<float, float> GetColPolygonPointPosition(CClientColShape* const colShape, unsigned int pointIndex)
+    {
+        const auto& vector = GetColPolygonPointPosition_OOP(colShape, pointIndex);
+        return { vector.fX, vector.fY };
+    }
+
+    static bool SetColPolygonPointPosition(CClientColShape* const colShape, unsigned int pointIndex, const CVector2D point);
+    static bool AddColPolygonPoint(CClientColShape* const colShape, const CVector2D point, const std::optional<unsigned int> optPointIndex);
+    static bool RemoveColPolygonPoint(CClientColShape* const colShape, unsigned int pointIndex);
 };

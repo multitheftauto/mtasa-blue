@@ -7323,17 +7323,6 @@ bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVe
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
-{
-    if (uiPointIndex < pColPolygon->CountPoints())
-    {
-        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
 {
     if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))

@@ -2019,7 +2019,7 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
 {
     // Greater than 4, crash the game
     if (iterations == 0 || iterations > 4)
-        throw std::invalid_argument("argument 'iterations' must be between 1 and 4");
+        throw std::invalid_argument("Iterations must be between 1 and 4");
 
     g_pCore->GetGraphics()->DrawWiredSphere(position, radius, color.value_or(SColorARGB(64, 255, 0, 0)), lineWidth.value_or(1), iterations.value_or(1));
     return true;

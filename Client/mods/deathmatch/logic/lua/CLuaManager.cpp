@@ -8,6 +8,8 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#include "../logic/lua/CLuaFunctionParser.h"
+#include "../logic/luadefs/CLuaDefs.h"
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"

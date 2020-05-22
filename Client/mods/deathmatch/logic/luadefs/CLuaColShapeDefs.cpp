@@ -21,15 +21,15 @@ void CLuaColShapeDefs::LoadFunctions()
         {"createColPolygon", CreateColPolygon},
         {"createColTube", CreateColTube},
 
-        {"getColShapeRadius", GetColShapeRadius},
-        {"setColShapeRadius", SetColShapeRadius},
-        {"getColShapeSize", GetColShapeSize},
+        {"getColShapeRadius", ArgumentParser<GetColShapeRadius>},
+        {"setColShapeRadius", ArgumentParser<SetColShapeRadius>},
+        {"getColShapeSize", ArgumentParser<GetColShapeSize>},
         {"setColShapeSize", SetColShapeSize},
         {"getColPolygonPoints", GetColPolygonPoints},
-        {"getColPolygonPointPosition", GetColPolygonPointPosition},
-        {"setColPolygonPointPosition", SetColPolygonPointPosition},
-        {"addColPolygonPoint", AddColPolygonPoint},
-        {"removeColPolygonPoint", RemoveColPolygonPoint},
+        {"getColPolygonPointPosition", ArgumentParser<GetColPolygonPointPosition>},
+        {"setColPolygonPointPosition", ArgumentParser<SetColPolygonPointPosition>},
+        {"addColPolygonPoint", ArgumentParser<AddColPolygonPoint>},
+        {"removeColPolygonPoint", ArgumentParser<RemoveColPolygonPoint>},
 
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
@@ -55,49 +55,24 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInside", "isInsideColShape");
     lua_classfunction(luaVM, "getShapeType", "getColShapeType");
 
-    lua_classfunction(luaVM, "getRadius", GetColShapeRadius);
-    lua_classfunction(luaVM, "setRadius", SetColShapeRadius);
-    lua_classfunction(luaVM, "getSize", GetColShapeSize);
+    lua_classfunction(luaVM, "getRadius", ArgumentParser<GetColShapeRadius>);
+    lua_classfunction(luaVM, "setRadius", ArgumentParser<SetColShapeRadius>);
+    lua_classfunction(luaVM, "getSize", ArgumentParser<GetColShapeSize_OOP>);
     lua_classfunction(luaVM, "setSize", SetColShapeSize);
     lua_classfunction(luaVM, "getPoints", GetColPolygonPoints);
-    lua_classfunction(luaVM, "getPointPosition", GetColPolygonPointPosition);
-    lua_classfunction(luaVM, "setPointPosition", SetColPolygonPointPosition);
-    lua_classfunction(luaVM, "addPoint", AddColPolygonPoint);
-    lua_classfunction(luaVM, "removePoint", RemoveColPolygonPoint);
+    lua_classfunction(luaVM, "getPointPosition", ArgumentParser<GetColPolygonPointPosition_OOP>);
+    lua_classfunction(luaVM, "setPointPosition", ArgumentParser<SetColPolygonPointPosition>);
+    lua_classfunction(luaVM, "addPoint", ArgumentParser<AddColPolygonPoint>);
+    lua_classfunction(luaVM, "removePoint", ArgumentParser<RemoveColPolygonPoint>);
 
     lua_classvariable(luaVM, "elementsWithin", nullptr, "getElementsWithinColShape");
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
-    lua_classvariable(luaVM, "radius", SetColShapeRadius, GetColShapeRadius);
-    lua_classvariable(luaVM, "size", SetColShapeSize, GetColShapeSize);
+    lua_classvariable(luaVM, "radius", ArgumentParser<SetColShapeRadius>, ArgumentParser<GetColShapeRadius>);
+    lua_classvariable(luaVM, "size", ArgumentParser<SetColShapeSize>, ArgumentParser<GetColShapeSize>);
     lua_classvariable(luaVM, "points", nullptr, GetColPolygonPoints);
 
     lua_registerclass(luaVM, "ColShape", "Element");
-}
-
-int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
-{
-    // Verify the arguments
-    CClientColShape* pColShape = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (!argStream.HasErrors())
-    {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            lua_pushnumber(luaVM, pColShape->GetShapeType());
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
@@ -379,6 +354,31 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
     return 1;
 }
 
+int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
+{
+    // Verify the arguments
+    CClientColShape* pColShape = nullptr;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            lua_pushnumber(luaVM, pColShape->GetShapeType());
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
 {
     //  bool isInsideColShape ( colshape theColShape, float posX, float posY, float posZ )
@@ -405,83 +405,58 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
     return 1;
 }
 
-int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
+float CLuaColShapeDefs::GetColShapeRadius(CClientColShape* const colShape)
 {
-    CClientColShape* pColShape;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    float fRadius;
-    if (CStaticFunctionDefinitions::GetColShapeRadius(pColShape, fRadius))
-    {
-        lua_pushnumber(luaVM, fRadius);
-        return 1;
-    }
-
-    argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    float radius;
+    if (!CStaticFunctionDefinitions::GetColShapeRadius(colShape, radius))
+        throw std::invalid_argument("ColShape must be either a circle, sphere or tube");
+    return radius;
 }
 
-int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
+bool CLuaColShapeDefs::SetColShapeRadius(CClientColShape* const colShape, const float radius)
 {
-    CClientColShape* pColShape;
-    float            fRadius;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(fRadius);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    if (CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius))
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-
-    argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (!CStaticFunctionDefinitions::SetColShapeRadius(colShape, std::max(0.0f, radius)))
+        throw std::invalid_argument("ColShape must be either a circle, sphere or tube");
+    return true;
 }
 
-int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
+std::variant<CVector, CVector2D, float> CLuaColShapeDefs::GetColShapeSize_OOP(CClientColShape* const colShape)
 {
-    CClientColShape* pColShape;
+    switch (colShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+            return static_cast<CClientColRectangle*>(colShape)->GetSize();
+        case COLSHAPE_CUBOID:
+            return static_cast<CClientColCuboid*>(colShape)->GetSize();
+        case COLSHAPE_TUBE:
+            return static_cast<CClientColTube*>(colShape)->GetHeight();
+        default:
+            throw std::invalid_argument("ColShape must be either a rectangle, cuboid or tube");
+    }
+}
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    switch (pColShape->GetShapeType())
+// TODO: refactor this, when std::optional support(to Push) is added to the new arg parser
+std::variant<std::tuple<float>, std::tuple<float, float>, std::tuple<float, float, float>> CLuaColShapeDefs::GetColShapeSize(CClientColShape* const colShape)
+{
+    switch (colShape->GetShapeType())
     {
         case COLSHAPE_RECTANGLE:
         {
-            CVector2D size = static_cast<CClientColRectangle*>(pColShape)->GetSize();
-            lua_pushvector(luaVM, size);
-            return 1;
+            const auto& size = static_cast<CClientColRectangle*>(colShape)->GetSize();
+            return std::tuple<float, float>{size.fX, size.fY};
         }
         case COLSHAPE_CUBOID:
         {
-            CVector size = static_cast<CClientColCuboid*>(pColShape)->GetSize();
-            lua_pushvector(luaVM, size);
-            return 1;
+            const auto& size = static_cast<CClientColCuboid*>(colShape)->GetSize();
+            return std::tuple<float, float, float>{size.fX, size.fY, size.fZ};
         }
         case COLSHAPE_TUBE:
         {
-            float fHeight = static_cast<CClientColTube*>(pColShape)->GetHeight();
-            lua_pushnumber(luaVM, fHeight);
-            return 1;
+            return std::tuple<float>(static_cast<CClientColTube*>(colShape)->GetHeight());
         }
+        default:
+            throw std::invalid_argument("ColShape must be either a rectangle, cuboid or tube");
     }
-
-    argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
 int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
@@ -520,7 +495,7 @@ int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
             break;
         }
         default:
-            argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
+            argStream.SetCustomError("ColShape must be rectangle, cuboid or tube");
     }
 
     if (argStream.HasErrors())
@@ -558,144 +533,69 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
         return 1;
     }
 
-    argStream.SetCustomError("ColShape must be Polygon");
+    argStream.SetCustomError("ColShape must be polygon");
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
-int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
+const CVector2D& CLuaColShapeDefs::GetColPolygonPointPosition_OOP(CClientColShape* const colShape, unsigned int pointIndex)
 {
-    CClientColShape* pColShape;
-    uint             uiPointIndex;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(uiPointIndex);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+    if (colShape->GetShapeType() == COLSHAPE_POLYGON)
     {
-        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        CVector2D          vecPoint;
-        if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
-        {
-            lua_pushvector(luaVM, vecPoint);
-        }
-        else
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
-            lua_pushboolean(luaVM, false);
-        }
-        return 1;
-    }
+        // Lua indexing starts at 1, we start at 0
+        pointIndex--;
 
-    argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        CClientColPolygon* const colPolygon = static_cast<CClientColPolygon*>(colShape);
+        if (pointIndex < colPolygon->CountPoints())
+        {
+            return *(colPolygon->IterBegin() + pointIndex);
+        }
+    }
 }
 
-int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
+bool CLuaColShapeDefs::SetColPolygonPointPosition(CClientColShape* const colShape, unsigned int pointIndex, const CVector2D point)
 {
-    CClientColShape* pColShape;
-    uint             uiPointIndex;
-    CVector2D        vecPoint;
+    if (colShape->GetShapeType() != COLSHAPE_POLYGON)
+        throw std::invalid_argument("ColShape must be a polygon");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(uiPointIndex);
-    argStream.ReadVector2D(vecPoint);
+    pointIndex--;            // lua starts at 1, we at 0
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (!CStaticFunctionDefinitions::SetColPolygonPointPosition(static_cast<CClientColPolygon*>(colShape), pointIndex, point))
+        std::invalid_argument("Invalid point index");
 
-    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
-    {
-        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        if (uiPointIndex > 0 && CStaticFunctionDefinitions::SetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
-        {
-            lua_pushboolean(luaVM, true);
-        }
-        else
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
-            lua_pushboolean(luaVM, false);
-        }
-        return 1;
-    }
-
-    argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return true;
 }
 
-int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
+bool CLuaColShapeDefs::AddColPolygonPoint(CClientColShape* const colShape, const CVector2D point, const std::optional<unsigned int> optPointIndex)
 {
-    CClientColShape* pColShape;
-    uint             uiPointIndex;
-    CVector2D        vecPoint;
+    if (colShape->GetShapeType() != COLSHAPE_POLYGON)
+        throw std::invalid_argument("ColShape must be polygon");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadVector2D(vecPoint);
-    argStream.ReadNumber(uiPointIndex, 0);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+    const auto colPolygon = static_cast<CClientColPolygon*>(colShape);
+    if (!optPointIndex)
+        return CStaticFunctionDefinitions::AddColPolygonPoint(colPolygon, point);
+    else
     {
-        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        if (uiPointIndex == 0)
-        {
-            lua_pushboolean(luaVM, CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, vecPoint));
-        }
-        else if (CStaticFunctionDefinitions::AddColPolygonPoint(pColPolygon, uiPointIndex - 1, vecPoint))
-        {
-            lua_pushboolean(luaVM, true);
-        }
-        else
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
-            lua_pushboolean(luaVM, false);
-        }
-        return 1;
+        // - 1 because lua starts at 1, and we at 0
+        return CStaticFunctionDefinitions::AddColPolygonPoint(colPolygon, optPointIndex.value() - 1, point);
     }
 
-    argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    throw std::invalid_argument("Invalid point index");
 }
 
-int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
+bool CLuaColShapeDefs::RemoveColPolygonPoint(CClientColShape* const colShape, unsigned int pointIndex)
 {
-    CClientColShape* pColShape;
-    uint             uiPointIndex;
+    if (colShape->GetShapeType() != COLSHAPE_POLYGON)
+        throw std::invalid_argument("ColShape must be polygon");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadNumber(uiPointIndex);
+    // Lua indexing starts at 1, we start at 0.
+    pointIndex--;
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    const auto colPolygon = static_cast<CClientColPolygon*>(colShape);
+    if (colPolygon->CountPoints() <= 3)
+        throw std::invalid_argument("Can't remove the last 3 points");
 
-    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
-    {
-        CClientColPolygon* pColPolygon = static_cast<CClientColPolygon*>(pColShape);
-        if (pColPolygon->CountPoints() <= 3)
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Can't remove the last 3 points");
-            lua_pushboolean(luaVM, false);
-        }
-        else if (uiPointIndex > 0 && CStaticFunctionDefinitions::RemoveColPolygonPoint(pColPolygon, uiPointIndex - 1))
-        {
-            lua_pushboolean(luaVM, true);
-        }
-        else
-        {
-            m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
-            lua_pushboolean(luaVM, false);
-        }
-        return 1;
-    }
+    if (!CStaticFunctionDefinitions::RemoveColPolygonPoint(colPolygon, pointIndex - 1))
+        throw std::invalid_argument("Invalid point index");
 
-    argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return true;
 }
