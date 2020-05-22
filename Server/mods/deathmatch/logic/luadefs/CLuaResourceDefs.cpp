@@ -53,7 +53,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceExportedFunctions", getResourceExportedFunctions},
         {"getResourceOrganizationalPath", getResourceOrganizationalPath},
         {"isResourceArchived", isResourceArchived},
-        {"isResourceProtected", isResourceProtected},
+        {"isResourceProtected", ArgumentParser<isResourceProtected>},
 
         // Set stuff
         {"setResourceInfo", setResourceInfo},
@@ -1464,17 +1464,7 @@ int CLuaResourceDefs::isResourceArchived(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::isResourceProtected(lua_State* luaVM)
+bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
 {
-    //  bool isResourceProtected ( resource theResource )
-    CResource* pResource;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, pResource->IsProtected());
-    return 1;
+    return resource->IsProtected();
 }
