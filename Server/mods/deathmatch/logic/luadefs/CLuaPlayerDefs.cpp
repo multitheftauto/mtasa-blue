@@ -65,7 +65,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
-        {"setPlayerScriptDebugLevel", SetPlayerScriptDebugLevel},
+        {"setPlayerScriptDebugLevel", ArgumentParser<SetPlayerScriptDebugLevel>},
 
         // All seeing eye
         {"getPlayerAnnounceValue", GetPlayerAnnounceValue},
@@ -946,47 +946,23 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
+bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const std::variant<unsigned int, bool> variant)
 {
-    CElement*    pElement;
-    unsigned int uiMode;
-    bool         bHideDebugger = false;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    if (argStream.NextIsBool())
+    unsigned int level;
+    if (std::holds_alternative<bool>(variant))
     {
-        bool bTemp;
-        argStream.ReadBool(bTemp);
-
-        if (bTemp)
-            argStream.SetCustomError("You can only pass false to hide the debug window or a level (0-3)");
-        else
-            bHideDebugger = true;
+        // cant be a true bool
+        if (std::get<bool>(variant))
+            throw std::invalid_argument("You can only pass 'false' to hide the debug window, pass in a level(0-3) to enable it");
+        level = 0;
     }
     else
     {
-        argStream.ReadNumber(uiMode);
-
-        if (uiMode < 0 || uiMode > 3)
-            argStream.SetCustomError("Invalid level (0-3)");
+        level = std::get<unsigned int>(variant);
+        if (level > 3)
+            throw std::invalid_argument("Invalid level (0-3)");
     }
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    return CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(element, level);
 }
 
 int CLuaPlayerDefs::SetPlayerWantedLevel(lua_State* luaVM)
