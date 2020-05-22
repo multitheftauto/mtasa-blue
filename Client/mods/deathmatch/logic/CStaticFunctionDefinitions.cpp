@@ -2306,18 +2306,18 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
 
 bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
 {
+    // Is valid style?
+    if (ucStyle < 4 || ucStyle > 16)
+        return false;
+
     RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
     if (IS_PED(&Entity) && Entity.IsLocalEntity())
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (Ped.GetFightingStyle() != ucStyle)
         {
-            // Is valid style
-            if (ucStyle >= 4 && ucStyle <= 16)
-            {
-                Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
-                return true;
-            }
+            Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+            return true;
         }
     }
     return false;
@@ -2504,17 +2504,6 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
         Ped.SetOnFire(bOnFire);
         return true;
     }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetPedArmor(CClientPed& Ped, float fArmor)
-{
-    if (Ped.IsLocalEntity())
-    {
-        Ped.SetArmor(fArmor);
-        return true;
-    }
-
     return false;
 }
 

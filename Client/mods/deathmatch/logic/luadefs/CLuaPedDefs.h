@@ -80,7 +80,7 @@ public:
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
-    LUA_DECLARE(SetPedFightingStyle);
+    static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
