@@ -134,6 +134,7 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
 
         case LUA_TSTRING:
             pResult->ReadString(pData->GetStrValue());
+            break;
 
         default:
             dassert(0); // It never should hit this, if so, something corrupted
