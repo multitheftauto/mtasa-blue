@@ -646,7 +646,7 @@ bool CAccountManager::LogOut(CClient* pClient, CClient* pEchoClient)
     return true;
 }
 
-std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount, const char* szKey)
+CLuaArgument CAccountManager::GetAccountData(CAccount* pAccount, const char* szKey)
 {
     if (!pAccount->IsRegistered())
     {
@@ -668,8 +668,7 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID,
                                          SQLITE_TEXT, szKey);
 
-    // Default result is nil
-    auto pResult = std::make_shared<CLuaArgument>();
+    CLuaArgument luaResult;
 
     // Do we have any results?
     if (result->nRows > 0)
@@ -686,18 +685,18 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
         switch (type)
         {
         case LUA_TBOOLEAN:
-            pResult->ReadBool(strcmp(value, "true") == 0);
+            luaResult.ReadBool(strcmp(value, "true") == 0);
             break;
 
         case LUA_TNUMBER:
-            pResult->ReadNumber(strtod(value, NULL));
+            luaResult.ReadNumber(strtod(value, NULL));
             break;
 
         case LUA_TNIL:
             break;
 
         case LUA_TSTRING:
-            pResult->ReadString(value);
+            luaResult.ReadString(value);
             break;
 
         default:
@@ -708,10 +707,10 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
     else
     {
         // No results
-        pResult->ReadBool(false);
+        luaResult.ReadBool(false);
     }
 
-    return pResult;
+    return luaResult;
 }
 
 bool CAccountManager::SetAccountData(CAccount* pAccount, const char* szKey, const SString& strValue, int iType)
