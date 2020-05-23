@@ -105,7 +105,7 @@ public:
     bool HasChanged() { return m_bChanged; }
     uint GetScriptID() const { return m_uiScriptID; }
 
-    std::shared_ptr<CLuaArgument>             GetData(const std::string& strKey);
+    CLuaArgument                              GetData(const std::string& strKey);
     bool                                      SetData(const std::string& strKey, const std::string& strValue, int iType);
     bool                                      HasData(const std::string& strKey);
     void                                      RemoveData(const std::string& strKey);
