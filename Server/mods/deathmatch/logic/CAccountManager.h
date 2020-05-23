@@ -133,10 +133,10 @@ public:
     bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword);
     bool LogOut(CClient* pClient, CClient* pEchoClient);
 
-    std::shared_ptr<CLuaArgument> GetAccountData(CAccount* pAccount, const char* szKey);
-    bool                          SetAccountData(CAccount* pAccount, const char* szKey, const SString& strValue, int iType);
-    bool                          CopyAccountData(CAccount* pFromAccount, CAccount* pToAccount);
-    bool                          GetAllAccountData(CAccount* pAccount, lua_State* pLua);
+	CLuaArgument GetAccountData(CAccount* pAccount, const char* szKey);
+    bool         SetAccountData(CAccount* pAccount, const char* szKey, const SString& strValue, int iType);
+    bool         CopyAccountData(CAccount* pFromAccount, CAccount* pToAccount);
+    bool         GetAllAccountData(CAccount* pAccount, lua_State* pLua);
 
     void      GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts);
     void      GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts);

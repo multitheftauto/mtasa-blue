@@ -112,28 +112,28 @@ CAccountData* CAccount::GetDataPointer(const std::string& strKey)
     return MapFind(m_Data, strKey);
 }
 
-std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
+CLuaArgument CAccount::GetData(const std::string& strKey)
 {
     CAccountData* pData = GetDataPointer(strKey);
-    auto          pResult = std::make_shared<CLuaArgument>();
+    CLuaArgument  luaResult;
 
     if (pData)
     {
         switch (pData->GetType())
         {
         case LUA_TBOOLEAN:
-            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+            luaResult.ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
             break;
 
         case LUA_TNUMBER:
-            pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
+            luaResult.ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
             break;
 
         case LUA_TNIL:
             break;
 
         case LUA_TSTRING:
-            pResult->ReadString(pData->GetStrValue());
+            luaResult.ReadString(pData->GetStrValue());
             break;
 
         default:
@@ -143,9 +143,10 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
     }
     else
     {
-        pResult->ReadBool(false);
+        luaResult.ReadBool(false);
     }
-    return pResult;
+
+    return luaResult;
 }
 
 // Return true if data was changed
