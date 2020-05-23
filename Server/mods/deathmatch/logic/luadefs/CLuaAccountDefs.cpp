@@ -173,12 +173,7 @@ int CLuaAccountDefs::GetAccountData(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        auto pArgument = CStaticFunctionDefinitions::GetAccountData(pAccount, strKey);
-        if (pArgument)
-        {
-            pArgument->Push(luaVM);
-            return 1;
-        }
+        CStaticFunctionDefinitions::GetAccountData(pAccount, strKey).Push(luaVM);
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
