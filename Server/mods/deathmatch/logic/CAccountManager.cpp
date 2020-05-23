@@ -698,6 +698,7 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
 
         case LUA_TSTRING:
             pResult->ReadString(value);
+
         default:
             dassert(0); // It never should hit this, if so, something corrupted
             break;
