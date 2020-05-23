@@ -8,6 +8,8 @@
  *****************************************************************************/
 #pragma once
 
+class CLuaArgument;
+
 #include <optional>
 #include <variant>
 #include <SharedUtil.Template.h>
@@ -194,6 +196,10 @@ struct CLuaFunctionParserBase
         // Enums are represented as strings to Lua
         if constexpr (std::is_enum_v<T>)
             return iArgument == LUA_TSTRING;
+
+        // CLuaArgument can hold any value
+        if constexpr (std::is_same_v<T, CLuaArgument>)
+            return iArgument != LUA_TNONE;
 
         // std::optional is used for optional parameters
         // which may also be in the middle of a parameter list
