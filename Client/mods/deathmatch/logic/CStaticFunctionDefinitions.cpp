@@ -2415,8 +2415,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         if (Ped.IsInVehicle())
         {
             // Driveby aim animation
-            // 0 = forwards, 1 = left, 2 = back, 3 = right
-            unsigned char cInVehicleAimAnim = 0;
+            eVehicleAimDirection cInVehicleAimAnim = eVehicleAimDirection::FORWARDS;
 
             // Ped rotation
             CVector vecRot;
@@ -2439,21 +2438,21 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
             if (fRotDiff > PI * 0.25 && fRotDiff < PI * 0.75)
             {
                 // Facing left
-                cInVehicleAimAnim = 1;
+                cInVehicleAimAnim = eVehicleAimDirection::LEFT;
                 fArmX = fArmX - PI / 2;
                 fArmY = -fArmY;
             }
             else if (fRotDiff > PI * 0.75 || fRotDiff < -PI * 0.75)
             {
                 // Facing backwards
-                cInVehicleAimAnim = 2;
+                cInVehicleAimAnim = eVehicleAimDirection::BACKWARDS;
                 fArmX = fArmX + PI;
                 fArmY = -fArmY;
             }
             else if (fRotDiff < -PI * 0.25 && fRotDiff > -PI * 0.75)
             {
                 // Facing right
-                cInVehicleAimAnim = 3;
+                cInVehicleAimAnim = eVehicleAimDirection::RIGHT;
                 fArmX = fArmX + PI / 2;
             }
             else
@@ -2468,7 +2467,7 @@ bool CStaticFunctionDefinitions::SetPedAimTarget(CClientEntity& Entity, CVector&
         else
         {
             Ped.SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
-            Ped.SetAim(fArmX, fArmY, 0);
+            Ped.SetAim(fArmX, fArmY, eVehicleAimDirection::FORWARDS);
         }
 
         return true;
