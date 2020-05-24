@@ -11,13 +11,15 @@
 #include "../Client/game_sa/CModelInfoSA.h"
 #include "../Client/game_sa/CColModelSA.h"
 
-CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID), m_pColModel(nullptr)
+CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
     m_pManager = pManager;
     m_pColModelManager = pManager->GetColModelManager();
 
     SetTypeName("col");
+
+    m_pColModel = nullptr;
 
     // Add us to DFF manager's list
     m_pColModelManager->AddToList(this);

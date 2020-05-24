@@ -16,6 +16,8 @@
 #define FUNC_CColModel_Constructor 0x40FB60
 #define FUNC_CColModel_Destructor 0x40F700
 
+enum class eCollisionShape;
+
 typedef struct
 {
     CVector vecMin;
@@ -139,20 +141,20 @@ typedef struct
         return vertices.size();
     }
 
-    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0) const
+    bool isValidIndex(eCollisionShape eShape, ushort usIndex, ushort numVertices = 0) const
     {
         switch (eShape)
         {
-            case 0:
+            case eCollisionShape::BOX:
                 return (usIndex >= 0 && usIndex < numColBoxes);
                 break;
-            case 1:
+            case eCollisionShape::SPHERE:
                 return (usIndex >= 0 && usIndex < numColSpheres);
                 break;
-            case 2:
+            case eCollisionShape::TRIANGLE:
                 return (usIndex >= 0 && usIndex < numColTriangles);
                 break;
-            case 3:
+            case eCollisionShape::VERTEX:
                 return (usIndex >= 0 && usIndex < numVertices);
                 break;
         }

@@ -102,26 +102,26 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
-enum eCollisionShapes
+enum class eCollisionShape
 {
-    COLLISION_BOX,
-    COLLISION_SPHERE,
-    COLLISION_TRIANGLE,
-    COLLISION_VERTEX,
+    BOX,
+    SPHERE,
+    TRIANGLE,
+    VERTEX,
 };
-DECLARE_ENUM(eCollisionShapes);
+DECLARE_ENUM_CLASS(eCollisionShape);
 
-enum eCollisionKey
+enum class eCollisionKey
 {
-    COLLISION_KEY_SIZE,
-    COLLISION_KEY_MATERIAL,
-    COLLISION_KEY_POSITION,
-    COLLISION_KEY_RADIUS,
-    COLLISION_KEY_LIGHTING,
-    COLLISION_KEY_VERTICES,
-    COLLISION_KEY_MOVE,
+    SIZE,
+    MATERIAL,
+    POSITION,
+    RADIUS,
+    LIGHTING,
+    VERTICES,
+    MOVE,
 };
-DECLARE_ENUM(eCollisionKey);
+DECLARE_ENUM_CLASS(eCollisionKey);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
@@ -472,7 +472,7 @@ inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
 {
     return "objectgroup-breakmode";
 }
-inline SString GetClassTypeName(eCollisionShapes*)
+inline SString GetClassTypeName(eCollisionShape*)
 {
     return "collision-shape";
 }
