@@ -72,6 +72,8 @@ struct CLuaFunctionParserBase
             return "vector3";
         else if constexpr (std::is_same_v<T, CVector4D>)
             return "vector4";
+        else if constexpr (std::is_same_v<T, SColor>)
+            return "colour";
         else if constexpr (std::is_same_v<T, lua_State*>)
             return "";            // not reachable
         else if constexpr (is_variant<T>::value)
@@ -201,6 +203,12 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, CLuaArgument>)
             return iArgument != LUA_TNONE;
 
+        // All color classes are read as a single tocolor number
+        // Do not be tempted to change this to is_base_of<SColor, T>
+        // SColorARGB etc are only **constructors** for SColor!
+        if constexpr (std::is_same_v<SColor, T>)
+            return lua_isnumber(L, index);
+
         // std::optional is used for optional parameters
         // which may also be in the middle of a parameter list
         // therefore it is always valid to attempt to read an
@@ -295,7 +303,7 @@ struct CLuaFunctionParserBase
     }
 
 
-    void SetBadArgumentError(lua_State* L, SString strExpected, int index, void* pReceived, bool isLightUserData) 
+    void SetBadArgumentError(lua_State* L, SString strExpected, int index, void* pReceived, bool isLightUserData)
     {
         SString strReceived = isLightUserData ? GetUserDataClassName(pReceived, L) : GetUserDataClassName(*(void**)pReceived, L);
         // strReceived may be an empty string if we cannot resolve the class name for the internal ID
@@ -470,7 +478,7 @@ struct CLuaFunctionParserBase
                 SetBadArgumentError(L, "vector2", index - 1, pValue, isLightUserData);
                 return T{};
             }
-        }            
+        }
         else if constexpr (std::is_same_v<T, CVector>)
         {
             if (lua_isnumber(L, index))
@@ -550,12 +558,14 @@ struct CLuaFunctionParserBase
             }
             return static_cast<T>(result);
         }
+        else if constexpr (std::is_same_v<T, SColor>)
+            return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;
             argument.Read(L, index++);
             return argument;
-        }      
+        }
     }
 };
 
