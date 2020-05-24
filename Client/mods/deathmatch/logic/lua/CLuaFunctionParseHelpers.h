@@ -428,14 +428,6 @@ inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
 }
-inline SString GetClassTypeName(eCollisionShapes*)
-{
-    return "collision-shape";
-}
-inline SString GetClassTypeName(eCollisionKey*)
-{
-    return "collision-key";
-}
 inline SString GetClassTypeName(eSurfaceProperties*)
 {
     return "surface-property-type";
