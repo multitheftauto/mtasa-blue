@@ -668,7 +668,7 @@ CLuaArgument CAccountManager::GetAccountData(CAccount* pAccount, const char* szK
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID,
                                          SQLITE_TEXT, szKey);
 
-    CLuaArgument luaResult;
+    CLuaArgument luaResult; // by default its value is 'nil'
 
     // Do we have any results?
     if (result->nRows > 0)
@@ -692,7 +692,7 @@ CLuaArgument CAccountManager::GetAccountData(CAccount* pAccount, const char* szK
             luaResult.ReadNumber(strtod(value, NULL));
             break;
 
-        case LUA_TNIL:
+        case LUA_TNIL: // by default luaResult's value is 'nil'
             break;
 
         case LUA_TSTRING:
