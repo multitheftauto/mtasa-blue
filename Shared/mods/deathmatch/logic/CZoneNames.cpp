@@ -403,7 +403,7 @@ static const SZone _zoneInfoList[] = {
 };
 static const IMPLEMENT_FIXED_ARRAY(SZone, zoneInfoList);
 
-CZoneNames::CZoneNames(void)
+CZoneNames::CZoneNames()
 {
     // Initialize zone tree
     for (uint i = 0; i < NUMELMS(zoneInfoList); i++)

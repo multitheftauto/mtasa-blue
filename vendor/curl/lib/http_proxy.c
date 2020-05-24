@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -58,8 +58,9 @@ static CURLcode https_proxy_connect(struct connectdata *conn, int sockindex)
       Curl_ssl_connect_nonblocking(conn, sockindex,
                                    &conn->bits.proxy_ssl_connected[sockindex]);
     if(result)
-      conn->bits.close = TRUE; /* a failed connection is marked for closure to
-                                  prevent (bad) re-use or similar */
+      /* a failed connection is marked for closure to prevent (bad) re-use or
+         similar */
+      connclose(conn, "TLS handshake failed");
   }
   return result;
 #else
@@ -222,7 +223,7 @@ static CURLcode CONNECT(struct connectdata *conn,
 
       host_port = aprintf("%s:%d", hostname, remote_port);
       if(!host_port) {
-        Curl_add_buffer_free(req_buffer);
+        Curl_add_buffer_free(&req_buffer);
         return CURLE_OUT_OF_MEMORY;
       }
 
@@ -247,7 +248,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
                   remote_port);
         if(!hostheader) {
-          Curl_add_buffer_free(req_buffer);
+          Curl_add_buffer_free(&req_buffer);
           return CURLE_OUT_OF_MEMORY;
         }
 
@@ -255,7 +256,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           host = aprintf("Host: %s\r\n", hostheader);
           if(!host) {
             free(hostheader);
-            Curl_add_buffer_free(req_buffer);
+            Curl_add_buffer_free(&req_buffer);
             return CURLE_OUT_OF_MEMORY;
           }
         }
@@ -267,7 +268,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           useragent = conn->allocptr.uagent;
 
         result =
-          Curl_add_bufferf(req_buffer,
+          Curl_add_bufferf(&req_buffer,
                            "CONNECT %s HTTP/%s\r\n"
                            "%s"  /* Host: */
                            "%s"  /* Proxy-Authorization */
@@ -290,13 +291,13 @@ static CURLcode CONNECT(struct connectdata *conn,
 
         if(!result)
           /* CRLF terminate the request */
-          result = Curl_add_bufferf(req_buffer, "\r\n");
+          result = Curl_add_bufferf(&req_buffer, "\r\n");
 
         if(!result) {
           /* Send the connect request to the proxy */
           /* BLOCKING */
           result =
-            Curl_add_buffer_send(req_buffer, conn,
+            Curl_add_buffer_send(&req_buffer, conn,
                                  &data->info.request_size, 0, sockindex);
         }
         req_buffer = NULL;
@@ -304,7 +305,7 @@ static CURLcode CONNECT(struct connectdata *conn,
           failf(data, "Failed sending CONNECT to proxy");
       }
 
-      Curl_add_buffer_free(req_buffer);
+      Curl_add_buffer_free(&req_buffer);
       if(result)
         return result;
 
@@ -327,7 +328,7 @@ static CURLcode CONNECT(struct connectdata *conn,
     { /* READING RESPONSE PHASE */
       int error = SELECT_OK;
 
-      while(s->keepon && !error) {
+      while(s->keepon) {
         ssize_t gotbytes;
 
         /* make sure we have space to read more data */
@@ -384,11 +385,12 @@ static CURLcode CONNECT(struct connectdata *conn,
             /* chunked-encoded body, so we need to do the chunked dance
                properly to know when the end of the body is reached */
             CHUNKcode r;
+            CURLcode extra;
             ssize_t tookcareof = 0;
 
             /* now parse the chunked piece of data so that we can
                properly tell when the stream ends */
-            r = Curl_httpchunk_read(conn, s->ptr, 1, &tookcareof);
+            r = Curl_httpchunk_read(conn, s->ptr, 1, &tookcareof, &extra);
             if(r == CHUNKE_STOP) {
               /* we're done reading chunks! */
               infof(data, "chunk reading DONE\n");
@@ -455,6 +457,7 @@ static CURLcode CONNECT(struct connectdata *conn,
             }
             else if(s->chunked_encoding) {
               CHUNKcode r;
+              CURLcode extra;
 
               infof(data, "Ignore chunked response-body\n");
 
@@ -472,7 +475,8 @@ static CURLcode CONNECT(struct connectdata *conn,
 
               /* now parse the chunked piece of data so that we can
                  properly tell when the stream ends */
-              r = Curl_httpchunk_read(conn, s->line_start + 1, 1, &gotbytes);
+              r = Curl_httpchunk_read(conn, s->line_start + 1, 1, &gotbytes,
+                                      &extra);
               if(r == CHUNKE_STOP) {
                 /* we're done reading chunks! */
                 infof(data, "chunk reading DONE\n");
@@ -632,6 +636,7 @@ static CURLcode CONNECT(struct connectdata *conn,
   conn->allocptr.proxyuserpwd = NULL;
 
   data->state.authproxy.done = TRUE;
+  data->state.authproxy.multipass = FALSE;
 
   infof(data, "Proxy replied %d to CONNECT request\n",
         data->info.httpproxycode);
@@ -643,7 +648,7 @@ static CURLcode CONNECT(struct connectdata *conn,
 
 void Curl_connect_free(struct Curl_easy *data)
 {
-  struct connectdata *conn = data->easy_conn;
+  struct connectdata *conn = data->conn;
   struct http_connect_state *s = conn->connect_state;
   if(s) {
     free(s);

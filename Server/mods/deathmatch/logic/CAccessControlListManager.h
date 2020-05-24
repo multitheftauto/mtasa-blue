@@ -24,13 +24,13 @@ class CAccessControlListManager : public CXMLConfig
 {
 public:
     ZERO_ON_NEW
-    CAccessControlListManager(void);
-    virtual ~CAccessControlListManager(void);
+    CAccessControlListManager();
+    virtual ~CAccessControlListManager();
 
-    void DoPulse(void);
-    bool Load(void);
-    bool Reload(void);
-    bool Save(void);
+    void DoPulse();
+    bool Load();
+    bool Reload();
+    bool Save();
 
     class CAccessControlListGroup* GetGroup(const char* szGroupName);
     class CAccessControlList*      GetACL(const char* szACLName);
@@ -44,30 +44,30 @@ public:
     void DeleteGroup(class CAccessControlListGroup* pGroup);
     void DeleteACL(class CAccessControlList* pACL);
 
-    void ClearACLs(void);
-    void ClearGroups(void);
+    void ClearACLs();
+    void ClearGroups();
 
     CAccessControlListGroup* GetGroupFromScriptID(uint uiScriptID);
     CAccessControlList*      GetACLFromScriptID(uint uiScriptID);
 
-    list<class CAccessControlList*>::const_iterator ACL_Begin(void) { return m_ACLs.begin(); };
-    list<class CAccessControlList*>::const_iterator ACL_End(void) { return m_ACLs.end(); };
-    size_t                                          ACL_Count(void) { return m_ACLs.size(); };
+    list<class CAccessControlList*>::const_iterator ACL_Begin() { return m_ACLs.begin(); };
+    list<class CAccessControlList*>::const_iterator ACL_End() { return m_ACLs.end(); };
+    size_t                                          ACL_Count() { return m_ACLs.size(); };
 
-    list<class CAccessControlListGroup*>::const_iterator Groups_Begin(void) { return m_Groups.begin(); };
-    list<class CAccessControlListGroup*>::const_iterator Groups_End(void) { return m_Groups.end(); };
-    size_t                                               Groups_Count(void) { return m_Groups.size(); };
+    list<class CAccessControlListGroup*>::const_iterator Groups_Begin() { return m_Groups.begin(); };
+    list<class CAccessControlListGroup*>::const_iterator Groups_End() { return m_Groups.end(); };
+    size_t                                               Groups_Count() { return m_Groups.size(); };
 
     static const char* ExtractObjectName(const char* szObjectName, CAccessControlListGroupObject::EObjectType& eType);
 
     static const char* ExtractRightName(const char* szRightName, CAccessControlListRight::ERightType& eType);
 
-    void                 OnChange(void);
-    uint                 GetGlobalRevision(void) { return m_uiGlobalRevision; }
+    void                 OnChange();
+    uint                 GetGlobalRevision() { return m_uiGlobalRevision; }
     std::vector<SString> GetObjectGroupNames(const SString& strObjectName, CAccessControlListGroupObject::EObjectType objectType);
 
 private:
-    void ClearReadCache(void);
+    void ClearReadCache();
     bool InternalCanObjectUseRight(const char* szObjectName, CAccessControlListGroupObject::EObjectType, const char* szRightName,
                                    CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight);
     void RemoveACLDependencies(class CAccessControlList* pACL);

@@ -23,7 +23,7 @@ namespace
         DWORD numModelsRequested;
         DWORD memoryUsed;
 
-        void Record(void)
+        void Record()
         {
             #define VAR_CStreaming_bLoadingBigModel         0x08E4A58
             #define VAR_CStreaming_numPriorityRequests      0x08E4BA0

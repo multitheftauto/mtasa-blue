@@ -25,5 +25,5 @@ enum eDuckControlTypes
 class CTaskSimpleDuck : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleDuck(void){};
+    virtual ~CTaskSimpleDuck(){};
 };

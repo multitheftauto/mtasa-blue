@@ -20,7 +20,7 @@
 class CMatrix4
 {
 public:
-    CMatrix4(void) { Identity(); }
+    CMatrix4() { Identity(); }
 
     void rotX(float angle)
     {
@@ -70,7 +70,7 @@ public:
         m_cell[10] = 1.0;
     }
 
-    void Identity(void)
+    void Identity()
     {
         m_cell[1] = m_cell[2] = m_cell[3] = m_cell[4] = m_cell[6] = m_cell[7] = m_cell[8] = m_cell[9] = m_cell[11] = m_cell[12] = m_cell[13] = m_cell[14] = 0;
 

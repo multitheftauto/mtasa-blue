@@ -43,17 +43,17 @@ public:
 
 public:
     CMarker(class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent);
-    ~CMarker(void);
+    ~CMarker();
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    void Unlink(void);
+    void Unlink();
 
-    bool           HasTarget(void) { return m_bHasTarget; };
-    const CVector& GetTarget(void) { return m_vecTarget; };
-    unsigned char  GetMarkerType(void) { return m_ucType; };
-    float          GetSize(void) { return m_fSize; };
-    SColor         GetColor(void) const { return m_Color; };
-    unsigned char  GetIcon(void) { return m_ucIcon; }
+    bool           HasTarget() { return m_bHasTarget; };
+    const CVector& GetTarget() { return m_vecTarget; };
+    unsigned char  GetMarkerType() { return m_ucType; };
+    float          GetSize() { return m_fSize; };
+    SColor         GetColor() const { return m_Color; };
+    unsigned char  GetIcon() { return m_ucIcon; }
 
     void SetPosition(const CVector& vecPosition);
     void SetTarget(const CVector* pTargetVector);
@@ -61,11 +61,14 @@ public:
     void SetSize(float fSize);
     void SetColor(const SColor color);
 
+    void AttachTo(CElement* pElement);
+    void SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
+
     void SetIcon(unsigned char ucIcon);
 
-    CColShape* GetColShape(void) { return m_pCollision; }
+    CColShape* GetColShape() { return m_pCollision; }
 
-    virtual CSphere GetWorldBoundingSphere(void);
+    virtual CSphere GetWorldBoundingSphere();
 
 protected:
     bool ReadSpecialData(const int iLine) override;

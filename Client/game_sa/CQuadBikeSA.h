@@ -26,5 +26,5 @@ public:
     CQuadBikeSA(CQuadBikeSAInterface* quadbike);
     CQuadBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CQuadBikeSA(void) {}
+    virtual ~CQuadBikeSA() {}
 };

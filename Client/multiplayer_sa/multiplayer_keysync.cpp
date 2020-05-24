@@ -79,7 +79,7 @@ VOID InitKeysyncHooks()
 }
 
 extern CPed* pContextSwitchedPed;
-void         PostContextSwitch(void)
+void         PostContextSwitch()
 {
     // Prevent the game making remote player's weapons get switched by the local player's
     MemPutFast<BYTE>(0x60D850, 0x56);

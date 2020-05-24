@@ -16,11 +16,11 @@
 class CTaskSimpleClimb : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleClimb(void){};
+    virtual ~CTaskSimpleClimb(){};
 };
 
 class CTaskSimpleJetPack : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleJetPack(void){};
+    virtual ~CTaskSimpleJetPack(){};
 };

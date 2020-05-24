@@ -10,9 +10,9 @@
 
 #include "StdInc.h"
 
-void CLuaUTFDefs::LoadFunctions(void)
+void CLuaUTFDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"utfLen", UtfLen},
         {"utfSeek", UtfSeek},
         {"utfSub", UtfSub},
@@ -21,10 +21,8 @@ void CLuaUTFDefs::LoadFunctions(void)
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaUTFDefs::UtfLen(lua_State* luaVM)
@@ -135,7 +133,7 @@ int CLuaUTFDefs::UtfChar(lua_State* luaVM)
         }
 
         // Generate a null-terminating string for our character
-        wchar_t wUNICODE[2] = {iCode, '\0'};
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(iCode), '\0'};
 
         // Convert our UTF character into an ANSI string
         SString strANSI = UTF16ToMbUTF8(wUNICODE);

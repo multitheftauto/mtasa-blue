@@ -93,7 +93,7 @@ void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
     };
 }
 
-std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy(void)
+std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
 }

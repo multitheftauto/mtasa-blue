@@ -11,12 +11,12 @@
 
 #include "StdInc.h"
 
-CCustomDataPacket::CCustomDataPacket(void)
+CCustomDataPacket::CCustomDataPacket()
 {
     m_szName = NULL;
 }
 
-CCustomDataPacket::~CCustomDataPacket(void)
+CCustomDataPacket::~CCustomDataPacket()
 {
     delete[] m_szName;
     m_szName = NULL;

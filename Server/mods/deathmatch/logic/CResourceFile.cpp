@@ -47,7 +47,7 @@ CResourceFile::CResourceFile(CResource* resource, const char* szShortName, const
             m_attributeMap[(*iter)->GetName()] = (*iter)->GetValue();
 }
 
-CResourceFile::~CResourceFile(void)
+CResourceFile::~CResourceFile()
 {
 }
 

@@ -61,13 +61,13 @@ public:
     virtual void GetServerListCachedInfo(CServerList* pList);
     virtual bool GenerateServerList(CServerList* pList);
 
-    CServerCache(void);
-    ~CServerCache(void);
+    CServerCache();
+    ~CServerCache();
 
 protected:
-    bool         LoadServerCache(void);
+    bool         LoadServerCache();
     static DWORD StaticThreadProc(LPVOID lpdwThreadParam);
-    static void  StaticSaveServerCache(void);
+    static void  StaticSaveServerCache();
 
     bool                              m_bListChanged;
     std::map<CCachedKey, CCachedInfo> m_ServerCachedMap;
@@ -96,7 +96,7 @@ CServerCacheInterface* GetServerCache()
 //
 //
 ///////////////////////////////////////////////////////////////
-CServerCache::CServerCache(void)
+CServerCache::CServerCache()
 {
     LoadServerCache();
 }
@@ -108,7 +108,7 @@ CServerCache::CServerCache(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CServerCache::~CServerCache(void)
+CServerCache::~CServerCache()
 {
 }
 
@@ -119,7 +119,7 @@ CServerCache::~CServerCache(void)
 // Load cache data from config
 //
 ///////////////////////////////////////////////////////////////
-bool CServerCache::LoadServerCache(void)
+bool CServerCache::LoadServerCache()
 {
     // Load config XML file
     CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
@@ -248,7 +248,7 @@ DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CServerCache::StaticSaveServerCache(void)
+void CServerCache::StaticSaveServerCache()
 {
     CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
     if (!m_pConfigFile)

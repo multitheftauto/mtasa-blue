@@ -54,7 +54,7 @@ void CResourceFileDownloadManager::AddPendingFileDownload(CDownloadableResource*
 // Figure which download group should be running
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::UpdatePendingDownloads(void)
+void CResourceFileDownloadManager::UpdatePendingDownloads()
 {
     // Get download group to use
     int iGroup = INVALID_DOWNLOAD_PRIORITY_GROUP;
@@ -106,7 +106,7 @@ void CResourceFileDownloadManager::OnRemoveResourceFile(CDownloadableResource* p
 // Downloading initial resource files
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::DoPulse(void)
+void CResourceFileDownloadManager::DoPulse()
 {
     if (!g_pNet->IsConnected())
         return;
@@ -278,6 +278,12 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
                 return;
             }
         }
+    }
+    else
+    if (result.iErrorCode == 1007)
+    {
+        // Download failed due to being unable to create file
+        // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
     }
     else
     {

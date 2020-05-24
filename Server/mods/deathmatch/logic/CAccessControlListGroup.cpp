@@ -17,7 +17,7 @@ CAccessControlListGroup::CAccessControlListGroup(const char* szGroupName)
     m_strGroupName = szGroupName;
 }
 
-CAccessControlListGroup::~CAccessControlListGroup(void)
+CAccessControlListGroup::~CAccessControlListGroup()
 {
     CIdArray::PushUniqueId(this, EIdClass::ACL_GROUP, m_uiScriptID);
     ObjectList::iterator iter = m_Objects.begin();
@@ -216,12 +216,12 @@ void CAccessControlListGroup::WriteToXMLNode(CXMLNode* pNode)
     }
 }
 
-void CAccessControlListGroup::OnChange(void)
+void CAccessControlListGroup::OnChange()
 {
     g_pGame->GetACLManager()->OnChange();
 }
 
-void CAccessControlListRight::OnChange(void)
+void CAccessControlListRight::OnChange()
 {
     g_pGame->GetACLManager()->OnChange();
 }

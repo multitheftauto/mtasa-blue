@@ -20,7 +20,7 @@ CPerPlayerEntity::CPerPlayerEntity(CElement* pParent) : CElement(pParent)
     AddVisibleToReference(g_pGame->GetMapManager()->GetRootElement());
 };
 
-CPerPlayerEntity::~CPerPlayerEntity(void)
+CPerPlayerEntity::~CPerPlayerEntity()
 {
     // Unsync us from everyone
     // Sync ( false );
@@ -71,7 +71,7 @@ void CPerPlayerEntity::OnReferencedSubtreeRemove(CElement* pElement)
     RemovePlayersBelow(pElement, m_PlayersRemoved);
 }
 
-void CPerPlayerEntity::UpdatePerPlayer(void)
+void CPerPlayerEntity::UpdatePerPlayer()
 {
     if (m_PlayersAdded.empty() && m_PlayersRemoved.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
         return;
@@ -136,7 +136,7 @@ bool CPerPlayerEntity::RemoveVisibleToReference(CElement* pElement)
     return false;
 }
 
-void CPerPlayerEntity::ClearVisibleToReferences(void)
+void CPerPlayerEntity::ClearVisibleToReferences()
 {
     // For each reference in our list
     bool                            bCleared = false;

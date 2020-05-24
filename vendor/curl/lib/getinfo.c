@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -85,7 +85,6 @@ CURLcode Curl_initinfo(struct Curl_easy *data)
 #ifdef USE_SSL
   Curl_ssl_free_certinfo(data);
 #endif
-
   return CURLE_OK;
 }
 
@@ -164,10 +163,10 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
       *param_longp = (long)data->info.filetime;
     break;
   case CURLINFO_HEADER_SIZE:
-    *param_longp = data->info.header_size;
+    *param_longp = (long)data->info.header_size;
     break;
   case CURLINFO_REQUEST_SIZE:
-    *param_longp = data->info.request_size;
+    *param_longp = (long)data->info.request_size;
     break;
   case CURLINFO_SSL_VERIFYRESULT:
     *param_longp = data->set.ssl.certverifyresult;
@@ -236,6 +235,9 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
     case 20:
       *param_longp = CURL_HTTP_VERSION_2_0;
       break;
+    case 30:
+      *param_longp = CURL_HTTP_VERSION_3;
+      break;
     default:
       *param_longp = CURL_HTTP_VERSION_NONE;
       break;
@@ -244,7 +246,6 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
   case CURLINFO_PROTOCOL:
     *param_longp = data->info.conn_protocol;
     break;
-
   default:
     return CURLE_UNKNOWN_OPTION;
   }
@@ -302,7 +303,9 @@ static CURLcode getinfo_offt(struct Curl_easy *data, CURLINFO info,
   case CURLINFO_REDIRECT_TIME_T:
     *param_offt = data->progress.t_redirect;
     break;
-
+  case CURLINFO_RETRY_AFTER:
+    *param_offt = data->info.retry_after;
+    break;
   default:
     return CURLE_UNKNOWN_OPTION;
   }
@@ -391,7 +394,7 @@ static CURLcode getinfo_slist(struct Curl_easy *data, CURLINFO info,
                                           param_slistp;
       struct curl_tlssessioninfo *tsi = &data->tsi;
 #ifdef USE_SSL
-      struct connectdata *conn = data->easy_conn;
+      struct connectdata *conn = data->conn;
 #endif
 
       *tsip = tsi;

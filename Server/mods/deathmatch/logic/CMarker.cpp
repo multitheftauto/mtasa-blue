@@ -34,7 +34,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     UpdateSpatialData();
 }
 
-CMarker::~CMarker(void)
+CMarker::~CMarker()
 {
     // Delete our collision object
     if (m_pCollision)
@@ -52,14 +52,14 @@ CElement* CMarker::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetMarkerType(GetMarkerType());
         pTemp->SetColor(GetColor());
         pTemp->SetSize(GetSize());
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
             pTemp->Sync(true);
         *bAddEntity = false;
     }
     return pTemp;
 }
 
-void CMarker::Unlink(void)
+void CMarker::Unlink()
 {
     // Remove us from the marker manager
     m_pMarkerManager->RemoveFromList(this);
@@ -167,6 +167,21 @@ void CMarker::SetPosition(const CVector& vecPosition)
         BitStream.pBitStream->Write(vecPosition.fZ);
         BitStream.pBitStream->Write(GetSyncTimeContext());
         BroadcastOnlyVisible(CElementRPCPacket(this, SET_ELEMENT_POSITION, *BitStream.pBitStream));
+    }
+}
+
+void CMarker::AttachTo(CElement* pElement)
+{
+    CElement::AttachTo(pElement);
+    m_pCollision->AttachTo(pElement);
+}
+
+void CMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
+{
+    CElement::SetAttachedOffsets(vecPosition, vecRotation);
+    if (m_pCollision)
+    {
+        m_pCollision->SetAttachedOffsets(vecPosition, vecRotation);
     }
 }
 
@@ -380,7 +395,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     }
 }
 
-CSphere CMarker::GetWorldBoundingSphere(void)
+CSphere CMarker::GetWorldBoundingSphere()
 {
     return CSphere(GetPosition(), GetSize());
 }

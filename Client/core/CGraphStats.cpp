@@ -33,13 +33,13 @@ class CGraphStats : public CGraphStatsInterface
 {
 public:
     ZERO_ON_NEW
-    CGraphStats(void);
-    ~CGraphStats(void);
+    CGraphStats();
+    ~CGraphStats();
 
     // CGraphStatsInterface methods
-    virtual void Draw(void);
+    virtual void Draw();
     virtual void SetEnabled(bool bEnabled);
-    virtual bool IsEnabled(void);
+    virtual bool IsEnabled();
     virtual void AddTimingPoint(const char* szName);
 
 protected:
@@ -55,7 +55,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 CGraphStats* g_pGraphStats = NULL;
 
-CGraphStatsInterface* GetGraphStats(void)
+CGraphStatsInterface* GetGraphStats()
 {
     if (!g_pGraphStats)
         g_pGraphStats = new CGraphStats();
@@ -67,11 +67,11 @@ CGraphStatsInterface* GetGraphStats(void)
 // CGraphStats implementation
 //
 ///////////////////////////////////////////////////////////////
-CGraphStats::CGraphStats(void)
+CGraphStats::CGraphStats()
 {
 }
 
-CGraphStats::~CGraphStats(void)
+CGraphStats::~CGraphStats()
 {
 }
 
@@ -96,7 +96,7 @@ void CGraphStats::SetEnabled(bool bEnabled)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CGraphStats::IsEnabled(void)
+bool CGraphStats::IsEnabled()
 {
     return m_bEnabled;
 }
@@ -193,7 +193,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CGraphStats::Draw(void)
+void CGraphStats::Draw()
 {
     if (!m_bEnabled)
         return;

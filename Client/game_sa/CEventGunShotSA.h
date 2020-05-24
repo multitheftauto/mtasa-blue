@@ -28,7 +28,7 @@ public:
     CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1);
     CEventGunShotSA(CEventGunShotSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CEventGunShotSAInterface* GetInterface(void) { return m_pInterface; }
+    CEventGunShotSAInterface* GetInterface() { return m_pInterface; }
 
     void Destroy(bool bDestroyInterface);
 

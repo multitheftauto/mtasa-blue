@@ -37,6 +37,14 @@ enum PrimitiveVerticeSizes
     VERT_XY_COLOR_UV = 5
 };
 
+enum Primitive3DVerticeSizes
+{
+    VERT_XYZ = 3,
+    VERT_XYZ_COLOR,
+    VERT_XYZ_UV,
+    VERT_XYZ_COLOR_UV,
+};
+
 struct ID3DXFont;
 struct IDirect3DDevice9;
 struct IDirect3DTexture9;
@@ -91,7 +99,7 @@ using EBlendMode::EBlendModeType;
 class CGraphicsInterface
 {
 public:
-    virtual IDirect3DDevice9* GetDevice(void) = 0;
+    virtual IDirect3DDevice9* GetDevice() = 0;
 
     virtual void CalcWorldCoors(CVector* vecScreen, CVector* vecWorld) = 0;
     virtual void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen) = 0;
@@ -104,14 +112,14 @@ public:
     virtual void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false) = 0;
 
     virtual void           SetBlendMode(EBlendModeType blendMode) = 0;
-    virtual EBlendModeType GetBlendMode(void) = 0;
+    virtual EBlendModeType GetBlendMode() = 0;
 
-    virtual unsigned int GetViewportWidth(void) = 0;
-    virtual unsigned int GetViewportHeight(void) = 0;
+    virtual unsigned int GetViewportWidth() = 0;
+    virtual unsigned int GetViewportHeight() = 0;
 
     virtual void  SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRatio = 4 / 3.f) = 0;
-    virtual bool  IsAspectRatioAdjustmentEnabled(void) = 0;
-    virtual float GetAspectRatioAdjustmentSourceRatio(void) = 0;
+    virtual bool  IsAspectRatioAdjustmentEnabled() = 0;
+    virtual float GetAspectRatioAdjustmentSourceRatio() = 0;
     virtual void  SetAspectRatioAdjustmentSuspended(bool bSuspended) = 0;
     virtual float ConvertPositionForAspectRatio(float fY) = 0;
     virtual void  ConvertSideForAspectRatio(float* pfY, float* pfHeight) = 0;
@@ -119,6 +127,7 @@ public:
     virtual float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXTextExtent(const char* szText, float fScale = 1.0f, ID3DXFont* pDXFont = NULL, bool bColorCoded = false) = 0;
+    virtual void GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false) = 0;
 
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont) = 0;
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
@@ -153,21 +162,28 @@ public:
     virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                              bool bPostGUI) = 0;
+    
+    virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
+    virtual void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                             bool bPostGUI) = 0;
+
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
+
+    virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations) = 0;
 
     virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
     // Subsystems
-    virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;
-    virtual CScreenGrabberInterface*     GetScreenGrabber(void) = 0;
-    virtual CPixelsManagerInterface*     GetPixelsManager(void) = 0;
+    virtual CRenderItemManagerInterface* GetRenderItemManager() = 0;
+    virtual CScreenGrabberInterface*     GetScreenGrabber() = 0;
+    virtual CPixelsManagerInterface*     GetPixelsManager() = 0;
 
     // Transition between GTA and MTA controlled rendering
-    virtual void EnteringMTARenderZone(void) = 0;
-    virtual void LeavingMTARenderZone(void) = 0;
-    virtual void MaybeEnteringMTARenderZone(void) = 0;
-    virtual void MaybeLeavingMTARenderZone(void) = 0;
+    virtual void EnteringMTARenderZone() = 0;
+    virtual void LeavingMTARenderZone() = 0;
+    virtual void MaybeEnteringMTARenderZone() = 0;
+    virtual void MaybeLeavingMTARenderZone() = 0;
 
     // Texture data manipulation
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,

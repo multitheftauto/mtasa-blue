@@ -23,15 +23,15 @@ class CGUITexture_Impl : public CGUITexture
 {
 public:
     CGUITexture_Impl(class CGUI_Impl* pGUI);
-    ~CGUITexture_Impl(void);
+    ~CGUITexture_Impl();
 
     bool LoadFromFile(const char* szFilename);
     void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight);
-    void Clear(void);
+    void Clear();
 
-    CEGUI::Texture*    GetTexture(void);
+    CEGUI::Texture*    GetTexture();
     void               SetTexture(CEGUI::Texture* pTexture);
-    LPDIRECT3DTEXTURE9 GetD3DTexture(void);
+    LPDIRECT3DTEXTURE9 GetD3DTexture();
 
     void CreateTexture(unsigned int width, unsigned int height);
 

@@ -41,11 +41,11 @@ typedef pthread_mutex_t ThreadMutex;
 class CThread
 {
 public:
-    CThread(void);
-    virtual ~CThread(void);
+    CThread();
+    virtual ~CThread();
 
     bool Start(CThreadData* pData);
-    void Stop(void);
+    void Stop();
 
     static bool TryLock(ThreadMutex* Mutex);
     static void Lock(ThreadMutex* Mutex);
@@ -56,7 +56,7 @@ protected:
 
     virtual int Execute(CThreadData* pData) = 0;
 
-    CThreadData* Arg(void) const;
+    CThreadData* Arg() const;
     void         Arg(CThreadData* pData);
 
 #ifdef WIN32    // Win32 threads

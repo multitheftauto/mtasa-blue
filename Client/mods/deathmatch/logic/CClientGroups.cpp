@@ -12,7 +12,7 @@
 
 using std::list;
 
-void CClientGroups::DeleteAll(void)
+void CClientGroups::DeleteAll()
 {
     // Delete all the elements
     m_bDontRemoveFromList = true;

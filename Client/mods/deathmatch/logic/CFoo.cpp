@@ -15,7 +15,7 @@
 
 bool bFoo_PlayerLimitCrash = false;
 
-void CFoo::DoPulse(void)
+void CFoo::DoPulse()
 {
     CClientManager* pManager = g_pClientGame->GetManager();
     if (pManager->IsGameLoaded())
@@ -194,7 +194,8 @@ void CFoo::Test(const char* szString)
 
     else if (stricmp(szString, "choke") == 0)
     {
-        g_pClientGame->GetLocalPlayer()->SetChoking(true);
+        if (g_pClientGame->GetLocalPlayer())
+            g_pClientGame->GetLocalPlayer()->SetChoking(true);
     }
 
     //

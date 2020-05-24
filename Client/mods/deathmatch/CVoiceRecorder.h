@@ -47,25 +47,25 @@ enum eServerSampleRate
 class CVoiceRecorder
 {
 public:
-    CVoiceRecorder(void);
-    ~CVoiceRecorder(void);
+    CVoiceRecorder();
+    ~CVoiceRecorder();
 
     void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
-    bool IsEnabled(void) { return m_bEnabled; }
+    bool IsEnabled() { return m_bEnabled; }
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetPTTState(bool bState);
     bool GetPTTState();
 
-    unsigned int  GetSampleRate(void) { return m_SampleRate; }
-    unsigned char GetSampleQuality(void) { return m_ucQuality; }
+    unsigned int  GetSampleRate() { return m_SampleRate; }
+    unsigned char GetSampleQuality() { return m_ucQuality; }
 
-    const SpeexMode* getSpeexModeFromSampleRate(void);
+    const SpeexMode* getSpeexModeFromSampleRate();
 
 private:
-    void DeInit(void);
+    void DeInit();
     void SendFrame(const void* inputBuffer);
 
     static int PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,

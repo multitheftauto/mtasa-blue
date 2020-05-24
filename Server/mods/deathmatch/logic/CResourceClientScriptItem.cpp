@@ -29,7 +29,7 @@ CResourceClientScriptItem::CResourceClientScriptItem(CResource* resource, const 
         m_bIsNoClientCache = false;
 }
 
-CResourceClientScriptItem::~CResourceClientScriptItem(void)
+CResourceClientScriptItem::~CResourceClientScriptItem()
 {
 }
 
@@ -45,7 +45,7 @@ ResponseCode CResourceClientScriptItem::Request(HttpRequest* ipoHttpRequest, Htt
         return CResourceFile::Request(ipoHttpRequest, ipoHttpResponse);
 }
 
-bool CResourceClientScriptItem::Start(void)
+bool CResourceClientScriptItem::Start()
 {
     // Pre-load the script
     if (IsNoClientCache() == true)
@@ -79,7 +79,7 @@ bool CResourceClientScriptItem::Start(void)
     return true;
 }
 
-bool CResourceClientScriptItem::Stop(void)
+bool CResourceClientScriptItem::Stop()
 {
     return true;
 }

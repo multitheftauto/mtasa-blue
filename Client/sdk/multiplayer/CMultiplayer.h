@@ -62,12 +62,14 @@ class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
+enum class eAnimGroup;
+enum class eAnimID;
 
 typedef bool(ExplosionHandler)(class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType);
 typedef void(PreContextSwitchHandler)(class CPlayerPed* pPlayer);
-typedef void(PostContextSwitchHandler)(void);
+typedef void(PostContextSwitchHandler)();
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
-typedef void(PostWeaponFireHandler)(void);
+typedef void(PostWeaponFireHandler)();
 typedef void(BulletImpactHandler)(class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef void(BulletFireHandler)(class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent);
@@ -79,22 +81,22 @@ typedef void(ProjectileHandler)(class CEntity* owner, class CProjectile* project
                                 class CVector* origin, float fForce, class CVector* target, class CEntity* targetEntity);
 typedef bool(BreakTowLinkHandler)(class CVehicle* towingVehicle);
 typedef bool(ProcessCamHandler)(class CCam* pCam);
-typedef void(DrawRadarAreasHandler)(void);
-typedef void(Render3DStuffHandler)(void);
-typedef void(PreRenderSkyHandler)(void);
-typedef void(RenderHeliLightHandler)(void);
+typedef void(DrawRadarAreasHandler)();
+typedef void(Render3DStuffHandler)();
+typedef void(PreRenderSkyHandler)();
+typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
-typedef void(PreWorldProcessHandler)(void);
-typedef void(PostWorldProcessHandler)(void);
-typedef void(IdleHandler)(void);
-typedef void(PreFxRenderHandler)(void);
-typedef void(PreHudRenderHandler)(void);
+typedef void(PreWorldProcessHandler)();
+typedef void(PostWorldProcessHandler)();
+typedef void(IdleHandler)();
+typedef void(PreFxRenderHandler)();
+typedef void(PreHudRenderHandler)();
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
 typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
-                                             AnimationId animID);
+                                             eAnimID animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
@@ -113,12 +115,15 @@ typedef void(GameVehicleDestructHandler)(CEntitySAInterface* pVehicle);
 typedef void(GamePlayerDestructHandler)(CEntitySAInterface* pPlayer);
 typedef void(GameProjectileDestructHandler)(CEntitySAInterface* pProjectile);
 typedef void(GameModelRemoveHandler)(ushort usModelId);
+typedef void(GameRunNamedAnimDestructorHandler)(class CTaskSimpleRunNamedAnimSAInterface* pTask);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
+
+enum class eVehicleAimDirection : unsigned char;
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -132,7 +137,7 @@ public:
     float m_fArmDirectionX;
     float m_fArmDirectionY;
     // only for in-vehicle shooting
-    char m_cInVehicleAimDirection;            // 0 = forwards, 1 = left, 2 = back, 3 = right
+    eVehicleAimDirection m_cInVehicleAimDirection;
     // use origin
     bool m_bUseOrigin;
 
@@ -152,16 +157,16 @@ public:
 class CRemoteDataStorage
 {
 public:
-    virtual class CControllerState* CurrentControllerState(void) = 0;
-    virtual class CControllerState* LastControllerState(void) = 0;
-    virtual class CShotSyncData*    ShotSyncData(void) = 0;
-    virtual class CStatsData*       Stats(void) = 0;
-    virtual float                   GetCameraRotation(void) = 0;
+    virtual class CControllerState* CurrentControllerState() = 0;
+    virtual class CControllerState* LastControllerState() = 0;
+    virtual class CShotSyncData*    ShotSyncData() = 0;
+    virtual class CStatsData*       Stats() = 0;
+    virtual float                   GetCameraRotation() = 0;
     virtual void                    SetCameraRotation(float fCameraRotation) = 0;
     virtual void                    SetGravity(float fGravity) = 0;
     virtual void                    SetProcessPlayerWeapon(bool bProcess) = 0;
-    virtual CVector&                GetAkimboTarget(void) = 0;
-    virtual bool                    GetAkimboTargetUp(void) = 0;
+    virtual CVector&                GetAkimboTarget() = 0;
+    virtual bool                    GetAkimboTargetUp() = 0;
     virtual void                    SetAkimboTarget(const CVector& vecTarget) = 0;
     virtual void                    SetAkimboTargetUp(bool bUp) = 0;
 };
@@ -179,14 +184,13 @@ public:
         FAST_CLOTHES_ON = 2,
     };
 
-    virtual void                InitializeAnimationHooks(bool bIsHostSmotra) = 0;
     virtual CRemoteDataStorage* CreateRemoteDataStorage() = 0;
     virtual void                DestroyRemoteDataStorage(CRemoteDataStorage* pData) = 0;
     virtual void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData) = 0;
     virtual CRemoteDataStorage* GetRemoteDataStorage(CPlayerPed* pPed) = 0;
     virtual void                RemoveRemoteDataStorage(CPlayerPed* pPed) = 0;
 
-    virtual class CPed* GetContextSwitchedPed(void) = 0;
+    virtual class CPed* GetContextSwitchedPed() = 0;
 
     virtual class CPopulationMP* GetPopulationMP() = 0;
     virtual void                 PreventLeavingVehicles() = 0;
@@ -234,6 +238,7 @@ public:
     virtual void  SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler) = 0;
     virtual void  SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler) = 0;
     virtual void  SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
+    virtual void  SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler) = 0;
     virtual void  SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
@@ -249,12 +254,12 @@ public:
     virtual void  ResetSky() = 0;
     virtual void  SetHeatHaze(const SHeatHazeSettings& settings) = 0;
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
-    virtual void  ResetHeatHaze(void) = 0;
+    virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;
     virtual void  GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha) = 0;
     virtual void  SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha) = 0;
-    virtual void  ResetWater(void) = 0;
+    virtual void  ResetWater() = 0;
     virtual void  SetCloudsEnabled(bool bDisabled) = 0;
     virtual bool  GetInteriorSoundsEnabled() = 0;
     virtual void  SetInteriorSoundsEnabled(bool bEnabled) = 0;
@@ -262,16 +267,16 @@ public:
     virtual void  SetInteriorFurnitureEnabled(char cRoomId, bool bEnabled) = 0;
     virtual void  SetWindVelocity(float fX, float fY, float fZ) = 0;
     virtual void  GetWindVelocity(float& fX, float& fY, float& fZ) = 0;
-    virtual void  RestoreWindVelocity(void) = 0;
+    virtual void  RestoreWindVelocity() = 0;
     virtual void  SetFarClipDistance(float fDistance) = 0;
-    virtual float GetFarClipDistance(void) = 0;
-    virtual void  RestoreFarClipDistance(void) = 0;
+    virtual float GetFarClipDistance() = 0;
+    virtual void  RestoreFarClipDistance() = 0;
     virtual void  SetNearClipDistance(float fDistance) = 0;
-    virtual float GetNearClipDistance(void) = 0;
-    virtual void  RestoreNearClipDistance(void) = 0;
+    virtual float GetNearClipDistance() = 0;
+    virtual void  RestoreNearClipDistance() = 0;
     virtual void  SetFogDistance(float fDistance) = 0;
-    virtual float GetFogDistance(void) = 0;
-    virtual void  RestoreFogDistance(void) = 0;
+    virtual float GetFogDistance() = 0;
+    virtual void  RestoreFogDistance() = 0;
     virtual void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
                               unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue) = 0;
     virtual void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed,
@@ -352,21 +357,21 @@ public:
     virtual bool IsSuspensionEnabled() = 0;
     virtual void SetSuspensionEnabled(bool bEnabled) = 0;
 
-    virtual void FlushClothesCache(void) = 0;
+    virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;
     virtual void SetLODSystemEnabled(bool bEnable) = 0;
     virtual void SetAltWaterOrderEnabled(bool bEnable) = 0;
 
-    virtual float GetAircraftMaxHeight(void) = 0;
+    virtual float GetAircraftMaxHeight() = 0;
     virtual void  SetAircraftMaxHeight(float fHeight) = 0;
 
-    virtual float GetAircraftMaxVelocity(void) = 0;
+    virtual float GetAircraftMaxVelocity() = 0;
     virtual void  SetAircraftMaxVelocity(float fVelocity) = 0;
 
     virtual void SetAutomaticVehicleStartupOnPedEnter(bool bSet) = 0;
 
     virtual void SetPedTargetingMarkerEnabled(bool bEnabled) = 0;
-    virtual bool IsPedTargetingMarkerEnabled(void) = 0;
+    virtual bool IsPedTargetingMarkerEnabled() = 0;
 
     virtual void GetRwResourceStats(SRwResourceStats& outStats) = 0;
     virtual void GetClothesCacheStats(SClothesCacheStats& outStats) = 0;
@@ -375,4 +380,8 @@ public:
 
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
+
+    virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
+    virtual eAnimID GetLastStaticAnimationID() = 0;
+    virtual DWORD GetLastAnimArrayAddress() = 0;
 };

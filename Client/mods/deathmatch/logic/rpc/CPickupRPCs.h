@@ -16,7 +16,7 @@
 class CPickupRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllPickups);
     DECLARE_ELEMENT_RPC(SetPickupType);

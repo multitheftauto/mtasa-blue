@@ -47,7 +47,7 @@ CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile)
     // just so it can be passed on to CVehicle
 }
 
-CAutomobileSA::~CAutomobileSA(void)
+CAutomobileSA::~CAutomobileSA()
 {
     for (int i = 0; i < MAX_DOORS; i++)
     {
@@ -74,7 +74,7 @@ bool CAutomobileSA::BurstTyre(DWORD dwTyreID)
     return bReturn;
 }
 
-bool CAutomobileSA::BreakTowLink(void)
+bool CAutomobileSA::BreakTowLink()
 {
     DEBUG_TRACE("bool CAutomobileSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -105,7 +105,7 @@ void CAutomobileSA::BlowUpCar(CEntity* pEntity)
     }
 }
 
-void CAutomobileSA::BlowUpCarsInPath(void)
+void CAutomobileSA::BlowUpCarsInPath()
 {
     DEBUG_TRACE("void CAutomobileSA::BlowUpCarsInPath ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -118,7 +118,7 @@ void CAutomobileSA::BlowUpCarsInPath(void)
     }
 }
 
-void CAutomobileSA::CloseAllDoors(void)
+void CAutomobileSA::CloseAllDoors()
 {
     DEBUG_TRACE("void CAutomobileSA::CloseAllDoors ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -131,7 +131,7 @@ void CAutomobileSA::CloseAllDoors(void)
     }
 }
 
-void CAutomobileSA::CloseBoot(void)
+void CAutomobileSA::CloseBoot()
 {
     DEBUG_TRACE("void CAutomobileSA::CloseBoot ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -211,7 +211,7 @@ int CAutomobileSA::FixPanel(int iCarNodeIndex, ePanelsSA Panel)
     return iReturn;
 }
 
-bool CAutomobileSA::GetAllWheelsOffGround(void)
+bool CAutomobileSA::GetAllWheelsOffGround()
 {
     DEBUG_TRACE("bool CAutomobileSA::GetAllWheelsOffGround ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -228,7 +228,7 @@ bool CAutomobileSA::GetAllWheelsOffGround(void)
     return bReturn;
 }
 
-float CAutomobileSA::GetCarPitch(void)
+float CAutomobileSA::GetCarPitch()
 {
     DEBUG_TRACE("float CAutomobileSA::GetCarPitch ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -245,7 +245,7 @@ float CAutomobileSA::GetCarPitch(void)
     return fReturn;
 }
 
-float CAutomobileSA::GetCarRoll(void)
+float CAutomobileSA::GetCarRoll()
 {
     DEBUG_TRACE("float CAutomobileSA::GetCarRoll ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -282,7 +282,7 @@ void CAutomobileSA::GetComponentWorldPosition(int iComponentID, CVector* pVector
 
 }*/
 
-DWORD CAutomobileSA::GetNumContactWheels(void)
+DWORD CAutomobileSA::GetNumContactWheels()
 {
     DEBUG_TRACE("DWORD CAutomobileSA::GetNumContactWheels ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -299,7 +299,7 @@ DWORD CAutomobileSA::GetNumContactWheels(void)
     return dwReturn;
 }
 
-float CAutomobileSA::GetRearHeightAboveRoad(void)
+float CAutomobileSA::GetRearHeightAboveRoad()
 {
     DEBUG_TRACE("float CAutomobileSA::GetRearHeightAboveRoad ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -406,7 +406,7 @@ bool CAutomobileSA::IsDoorReady(eDoorsSA Door)
     return bReturn;
 }
 
-bool CAutomobileSA::IsInAir(void)
+bool CAutomobileSA::IsInAir()
 {
     DEBUG_TRACE("bool CAutomobileSA::IsInAir ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -423,7 +423,7 @@ bool CAutomobileSA::IsInAir(void)
     return bReturn;
 }
 
-bool CAutomobileSA::IsOpenTopCar(void)
+bool CAutomobileSA::IsOpenTopCar()
 {
     DEBUG_TRACE("bool CAutomobileSA::IsOpenTopCar ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -440,7 +440,7 @@ bool CAutomobileSA::IsOpenTopCar(void)
     return bReturn;
 }
 
-void CAutomobileSA::PlayCarHorn(void)
+void CAutomobileSA::PlayCarHorn()
 {
     DEBUG_TRACE("void CAutomobileSA::PlayCarHorn ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -453,7 +453,7 @@ void CAutomobileSA::PlayCarHorn(void)
     }
 }
 
-void CAutomobileSA::PopBoot(void)
+void CAutomobileSA::PopBoot()
 {
     DEBUG_TRACE("void CAutomobileSA::PopBoot ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -466,7 +466,7 @@ void CAutomobileSA::PopBoot(void)
     }
 }
 
-void CAutomobileSA::PopBootUsingPhysics(void)
+void CAutomobileSA::PopBootUsingPhysics()
 {
     DEBUG_TRACE("void CAutomobileSA::PopBootUsingPhysics ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -513,7 +513,7 @@ void CAutomobileSA::PopPanel(int iCarNodeIndex, ePanelsSA Panel, bool bFallOffFa
     }
 }
 
-void CAutomobileSA::ResetSuspension(void)
+void CAutomobileSA::ResetSuspension()
 {
     DEBUG_TRACE("void CAutomobileSA::ResetSuspension ( void )");
     DWORD dwThis = (DWORD)GetInterface();

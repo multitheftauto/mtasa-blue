@@ -284,7 +284,7 @@ void CObjectSA::SetHealth(float fHealth)
     static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth = fHealth;
 }
 
-float CObjectSA::GetHealth(void)
+float CObjectSA::GetHealth()
 {
     return static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth;
 }

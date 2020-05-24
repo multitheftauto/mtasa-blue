@@ -71,13 +71,13 @@ UnixFileSystem::open_directory(const std::string& pathname, std::vector<std::str
   }
 }
 
-std::auto_ptr<std::istream>
+std::unique_ptr<std::istream>
 UnixFileSystem::open_file(const std::string& filename)
 {
 #ifdef WIN32
-  return std::auto_ptr<std::istream>(new std::ifstream(FromUTF8(filename.c_str())));
+  return std::unique_ptr<std::istream>(new std::ifstream(FromUTF8(filename.c_str())));
 #else
-  return std::auto_ptr<std::istream>(new std::ifstream(filename.c_str()));
+  return std::unique_ptr<std::istream>(new std::ifstream(filename.c_str()));
 #endif
 }
 

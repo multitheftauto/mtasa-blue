@@ -20,13 +20,13 @@ CXMLAttributesImpl::CXMLAttributesImpl(TiXmlElement& Node, bool bUseIDs) : m_bUs
     CreateAttributes();
 }
 
-CXMLAttributesImpl::~CXMLAttributesImpl(void)
+CXMLAttributesImpl::~CXMLAttributesImpl()
 {
     // Delete all attribute wrappers (not from the xml tree)
     DeleteAttributes();
 }
 
-unsigned int CXMLAttributesImpl::Count(void)
+unsigned int CXMLAttributesImpl::Count()
 {
     return static_cast<unsigned int>(m_Attributes.size());
 }
@@ -103,7 +103,7 @@ bool CXMLAttributesImpl::Delete(const char* szName)
     return false;
 }
 
-void CXMLAttributesImpl::DeleteAll(void)
+void CXMLAttributesImpl::DeleteAll()
 {
     // Delete each attribute
     m_bCanRemoveFromList = false;
@@ -117,7 +117,7 @@ void CXMLAttributesImpl::DeleteAll(void)
     m_bCanRemoveFromList = true;
 }
 
-TiXmlElement& CXMLAttributesImpl::GetNode(void)
+TiXmlElement& CXMLAttributesImpl::GetNode()
 {
     return m_Node;
 }
@@ -137,7 +137,7 @@ void CXMLAttributesImpl::RemoveFromList(CXMLAttribute* pAttribute)
     }
 }
 
-void CXMLAttributesImpl::CreateAttributes(void)
+void CXMLAttributesImpl::CreateAttributes()
 {
     // Grab the first attribute and iterate from there
     TiXmlAttribute* pAttrib = m_Node.FirstAttribute();
@@ -151,7 +151,7 @@ void CXMLAttributesImpl::CreateAttributes(void)
     }
 }
 
-void CXMLAttributesImpl::DeleteAttributes(void)
+void CXMLAttributesImpl::DeleteAttributes()
 {
     // Deleted every item in the list
     m_bCanRemoveFromList = false;

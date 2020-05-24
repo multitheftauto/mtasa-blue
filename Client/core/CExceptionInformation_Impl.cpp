@@ -13,7 +13,7 @@
 
 #define MAX_MODULE_PATH 512
 
-CExceptionInformation_Impl::CExceptionInformation_Impl(void)
+CExceptionInformation_Impl::CExceptionInformation_Impl()
 {
     m_uiCode = 0;
     m_pAddress = NULL;
@@ -38,7 +38,7 @@ CExceptionInformation_Impl::CExceptionInformation_Impl(void)
     m_ulEFlags = 0;
 }
 
-CExceptionInformation_Impl::~CExceptionInformation_Impl(void)
+CExceptionInformation_Impl::~CExceptionInformation_Impl()
 {
     if (m_szModulePathName)
         delete m_szModulePathName;

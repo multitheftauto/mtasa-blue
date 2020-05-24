@@ -56,15 +56,15 @@ public:
 
     virtual SString GetConnectionPrivateDirectory(bool bPreviousVer);
 
-    CServerIdManagerImpl(void);
-    ~CServerIdManagerImpl(void);
+    CServerIdManagerImpl();
+    ~CServerIdManagerImpl();
 
 protected:
     void                 SaveServerIdMap(bool bWait = false);
     const CServerIdInfo& GetServerIdInfo(const SString& strServerId);
-    bool                 LoadServerIdMap(void);
+    bool                 LoadServerIdMap();
     static DWORD         StaticThreadProc(LPVOID lpdwThreadParam);
-    static void          StaticSaveServerIdMap(void);
+    static void          StaticSaveServerIdMap();
 
     bool                                  m_bListChanged;
     bool                                  m_bClearedDefaultDirectory;
@@ -96,7 +96,7 @@ CServerIdManager* CServerIdManager::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CServerIdManagerImpl::CServerIdManagerImpl(void)
+CServerIdManagerImpl::CServerIdManagerImpl()
 {
     // Calc private dir root
     m_strServerIdLookupBaseDir = PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_DIR);
@@ -119,7 +119,7 @@ CServerIdManagerImpl::CServerIdManagerImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CServerIdManagerImpl::~CServerIdManagerImpl(void)
+CServerIdManagerImpl::~CServerIdManagerImpl()
 {
 }
 
@@ -130,7 +130,7 @@ CServerIdManagerImpl::~CServerIdManagerImpl(void)
 // Load server id data from xml file
 //
 ///////////////////////////////////////////////////////////////
-bool CServerIdManagerImpl::LoadServerIdMap(void)
+bool CServerIdManagerImpl::LoadServerIdMap()
 {
     // Load config XML file
     CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML));
@@ -226,7 +226,7 @@ DWORD CServerIdManagerImpl::StaticThreadProc(LPVOID lpdwThreadParam)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CServerIdManagerImpl::StaticSaveServerIdMap(void)
+void CServerIdManagerImpl::StaticSaveServerIdMap()
 {
     CXMLFile* pConfigFile = g_pCore->GetXML()->CreateXML(PathJoin(g_pClientGame->GetFileCacheRoot(), MTA_SERVERID_LOOKUP_XML));
     if (!pConfigFile)

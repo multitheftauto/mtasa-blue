@@ -25,7 +25,7 @@ CDummy::CDummy(CGroups* pGroups, CElement* pParent) : CElement(pParent)
     }
 }
 
-CDummy::~CDummy(void)
+CDummy::~CDummy()
 {
     // Unlink from manager
     Unlink();
@@ -39,7 +39,7 @@ CElement* CDummy::Clone(bool* bAddEntity, CResource* pResource)
     return pNewElement;
 }
 
-void CDummy::Unlink(void)
+void CDummy::Unlink()
 {
     // Remove us from groupmanager's list
     if (m_pGroups)

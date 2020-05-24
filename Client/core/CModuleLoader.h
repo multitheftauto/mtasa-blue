@@ -25,7 +25,7 @@ public:
     void UnloadModule();
 
     bool           IsOk() const { return m_bStatus; }
-    const SString& GetLastErrorMessage(void) const;
+    const SString& GetLastErrorMessage() const;
 
     PVOID GetFunctionPointer(const std::string& FunctionName);
 

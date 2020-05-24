@@ -24,10 +24,10 @@ enum MouseControlVehicleType
 class CMouseControl
 {
 public:
-    CMouseControl(void);
-    ~CMouseControl(void);
+    CMouseControl();
+    ~CMouseControl();
 
-    void Reset(void);
+    void Reset();
     bool ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void ApplyAxes(CControllerState& cs);
 

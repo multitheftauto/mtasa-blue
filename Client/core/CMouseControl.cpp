@@ -25,7 +25,7 @@ extern CCore* g_pCore;
 //
 //
 ////////////////////////////////////////////////////
-CMouseControl::CMouseControl(void)
+CMouseControl::CMouseControl()
 {
     m_usLeftStickX = 0;
     m_usLeftStickY = 0;
@@ -38,7 +38,7 @@ CMouseControl::CMouseControl(void)
 //
 //
 ////////////////////////////////////////////////////
-CMouseControl::~CMouseControl(void)
+CMouseControl::~CMouseControl()
 {
 }
 
@@ -114,7 +114,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
 //
 //
 ////////////////////////////////////////////////////
-void CMouseControl::Reset(void)
+void CMouseControl::Reset()
 {
     m_usLeftStickX = 0;
     m_usLeftStickY = 0;

@@ -14,7 +14,7 @@
 class CLuaElementDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Element get functions
@@ -27,6 +27,7 @@ public:
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
     LUA_DECLARE(GetElementData);
+    LUA_DECLARE(HasElementData);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);

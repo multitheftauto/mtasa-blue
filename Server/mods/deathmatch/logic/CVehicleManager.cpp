@@ -78,7 +78,7 @@ static const SFixedArray<eVehicleType, 212> gs_vehicleTypes = {
 
 static SFixedArray<unsigned char, 212> g_ucVariants;
 
-CVehicleManager::CVehicleManager(void)
+CVehicleManager::CVehicleManager()
 {
     assert(NUMELMS(g_ucMaxPassengers) == 212);
     assert(NUMELMS(g_ulVehicleAttributes) == 212);
@@ -370,7 +370,7 @@ CVehicleManager::CVehicleManager(void)
     }
 }
 
-CVehicleManager::~CVehicleManager(void)
+CVehicleManager::~CVehicleManager()
 {
     DeleteAll();
 }
@@ -402,7 +402,7 @@ CVehicle* CVehicleManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEve
     return pVehicle;
 }
 
-void CVehicleManager::DeleteAll(void)
+void CVehicleManager::DeleteAll()
 {
     // Delete all items
     DeletePointersAndClearList(m_List);

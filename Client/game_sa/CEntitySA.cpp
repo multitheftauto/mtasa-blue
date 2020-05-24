@@ -16,7 +16,7 @@ extern CGameSA* pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
-CEntitySA::CEntitySA(void)
+CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
     m_pInterface = NULL;
@@ -97,7 +97,7 @@ VOID CEntitySA::Teleport(float fX, float fY, float fZ)
     }
 }
 
-VOID CEntitySA::ProcessControl(void)
+VOID CEntitySA::ProcessControl()
 {
     DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
     DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
@@ -189,7 +189,7 @@ VOID CEntitySA::SetOrientation(float fX, float fY, float fZ)
     pGame->GetWorld()->Add(this, CEntity_SetOrientation);
 }
 
-VOID CEntitySA::FixBoatOrientation(void)
+VOID CEntitySA::FixBoatOrientation()
 {
     DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
@@ -233,7 +233,7 @@ VOID CEntitySA::SetPosition(CVector* vecPosition)
         SetPosition(vecPosition->fX, vecPosition->fY, vecPosition->fZ);
 }
 
-void CEntitySA::RestoreLastGoodPhysicsState(void)
+void CEntitySA::RestoreLastGoodPhysicsState()
 {
     // Validate m_LastGoodPosition
     if (!IsValidPosition(m_LastGoodPosition))
@@ -248,7 +248,7 @@ void CEntitySA::RestoreLastGoodPhysicsState(void)
 //
 // Get entity position. Fixes bad numbers
 //
-CVector* CEntitySA::GetPosition(void)
+CVector* CEntitySA::GetPosition()
 {
     CVector* pPosition = GetPositionInternal();
     if (!IsValidPosition(*pPosition))
@@ -470,7 +470,7 @@ bool CEntitySA::IsOnScreen()
     return bReturn;
 }
 
-bool CEntitySA::IsFullyVisible(void)
+bool CEntitySA::IsFullyVisible()
 {
     if (m_pInterface->bDistanceFade)
         return false;
@@ -481,7 +481,7 @@ bool CEntitySA::IsFullyVisible(void)
     return true;
 }
 
-bool CEntitySA::IsVisible(void)
+bool CEntitySA::IsVisible()
 {
     return m_pInterface->bIsVisible;
 }
@@ -545,7 +545,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     else return false;
 }
 
-BYTE CEntitySA::GetAreaCode(void)
+BYTE CEntitySA::GetAreaCode()
 {
     return m_pInterface->m_areaCode;
 }
@@ -560,7 +560,7 @@ void CEntitySA::SetUnderwater(bool bUnderwater)
     m_pInterface->bUnderwater = bUnderwater;
 }
 
-bool CEntitySA::GetUnderwater(void)
+bool CEntitySA::GetUnderwater()
 {
     return m_pInterface->bUnderwater;
 }

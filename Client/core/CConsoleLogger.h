@@ -21,10 +21,8 @@ public:
     CConsoleLogger();
     ~CConsoleLogger();
 
-    void        LinePrintf(const char* szFormat, ...);
-    void        WriteLine(const std::string& strLine);
-    static void CleanLine(SString& strLine);
-    static int  ReplaceNextWord(SString& strLine, int iPos, const char* szBlanker);
+    void LinePrintf(const char* szFormat, ...);
+    void WriteLine(const std::string& strLine);
 
 private:
     std::string  m_strFilename;

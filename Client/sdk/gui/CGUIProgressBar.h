@@ -17,8 +17,8 @@
 class CGUIProgressBar : public CGUIElement
 {
 public:
-    virtual ~CGUIProgressBar(void){};
+    virtual ~CGUIProgressBar(){};
 
     virtual void  SetProgress(float fProgress) = 0;
-    virtual float GetProgress(void) = 0;
+    virtual float GetProgress() = 0;
 };

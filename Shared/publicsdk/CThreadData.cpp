@@ -18,7 +18,7 @@
 
 #include "CThreadData.h"
 
-CThreadData::CThreadData(void)
+CThreadData::CThreadData()
 {
     bAbortThread = false;
 
@@ -32,7 +32,7 @@ CThreadData::CThreadData(void)
     #endif
 }
 
-CThreadData::~CThreadData(void)
+CThreadData::~CThreadData()
 {
     #ifdef WIN32
     DeleteCriticalSection(&MutexPrimary);

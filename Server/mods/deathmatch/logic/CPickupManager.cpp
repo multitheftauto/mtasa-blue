@@ -51,7 +51,7 @@ CPickup* CPickupManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvent
     return pPickup;
 }
 
-void CPickupManager::DeleteAll(void)
+void CPickupManager::DeleteAll()
 {
     DeletePointersAndClearList(m_List);
 }

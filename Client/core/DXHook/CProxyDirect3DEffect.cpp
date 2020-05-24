@@ -32,7 +32,7 @@ CProxyDirect3DEffect::CProxyDirect3DEffect(IDirect3DDevice9* InD3DDevice9, ID3DX
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DEffect::~CProxyDirect3DEffect(void)
+CProxyDirect3DEffect::~CProxyDirect3DEffect()
 {
     m_stats.iCurrentCount--;
     m_stats.iDestroyedCount++;
@@ -66,7 +66,7 @@ HRESULT CProxyDirect3DEffect::QueryInterface(REFIID riid, void** ppvObj)
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DEffect::Release(void)
+ULONG CProxyDirect3DEffect::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();

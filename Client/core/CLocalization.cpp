@@ -29,7 +29,7 @@ CLocalization::CLocalization(const SString& strLocale, const SString& strLocaleP
     SetCurrentLanguage(strLocale);
 }
 
-CLocalization::~CLocalization(void)
+CLocalization::~CLocalization()
 {
     for (auto iter : m_LanguageMap)
     {
@@ -124,7 +124,7 @@ SString CLocalization::GetTranslators()
     return "";
 }
 
-std::vector<SString> CLocalization::GetAvailableLocales(void)
+std::vector<SString> CLocalization::GetAvailableLocales()
 {
     std::vector<SString> localeList = {"en_US"};
     for (const auto& language : m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN))
@@ -135,25 +135,25 @@ std::vector<SString> CLocalization::GetAvailableLocales(void)
 }
 
 // Tell whether the client is translated
-bool CLocalization::IsLocalized(void)
+bool CLocalization::IsLocalized()
 {
     std::string strLocale;
     CVARS_GET("locale", strLocale);
     return strLocale != "en_US";
 }
 
-SString CLocalization::GetLanguageCode(void)
+SString CLocalization::GetLanguageCode()
 {
     return m_pCurrentLang->GetCode();
 }
 
-SString CLocalization::GetLanguageName(void)
+SString CLocalization::GetLanguageName()
 {
     return m_pCurrentLang->GetName();
 }
 
 // Get the file directory of the current language
-SString CLocalization::GetLanguageDirectory(void)
+SString CLocalization::GetLanguageDirectory()
 {
     SString strFullPath = m_pCurrentLang->GetDictionary().get_filepath();
 

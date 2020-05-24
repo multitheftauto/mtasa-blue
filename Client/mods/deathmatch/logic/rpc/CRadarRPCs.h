@@ -16,7 +16,7 @@
 class CRadarRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllRadarAreas);
     DECLARE_ELEMENT_RPC(SetRadarAreaSize);

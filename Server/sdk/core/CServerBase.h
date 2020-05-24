@@ -18,13 +18,13 @@ class CServerBase
 public:
     virtual void ServerInitialize(CServerInterface* pServer) = 0;
     virtual bool ServerStartup(int iArgumentCount, char* szArguments[]) = 0;
-    virtual void ServerShutdown(void) = 0;
+    virtual void ServerShutdown() = 0;
 
-    virtual void DoPulse(void) = 0;
+    virtual void DoPulse() = 0;
     virtual void HandleInput(char* szCommand) = 0;
     virtual void GetTag(char* szInfoTag, int iInfoTag) = 0;
 
-    virtual bool IsFinished(void) = 0;
-    virtual bool PendingWorkToDo(void) = 0;
+    virtual bool IsFinished() = 0;
+    virtual bool PendingWorkToDo() = 0;
     virtual bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit) = 0;
 };

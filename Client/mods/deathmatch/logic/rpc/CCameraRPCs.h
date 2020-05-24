@@ -16,7 +16,7 @@
 class CCameraRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetCameraMatrix);
     DECLARE_RPC(SetCameraTarget);

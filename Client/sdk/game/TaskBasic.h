@@ -16,49 +16,49 @@
 class CTaskComplexUseMobilePhone : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexUseMobilePhone(void){};
+    virtual ~CTaskComplexUseMobilePhone(){};
 };
 
 class CTaskSimpleAnim : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleAnim(void){};
+    virtual ~CTaskSimpleAnim(){};
 };
 
 class CTaskSimpleRunAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual ~CTaskSimpleRunAnim(void){};
+    virtual ~CTaskSimpleRunAnim(){};
 };
 
 class CTaskSimpleRunNamedAnim : public virtual CTaskSimpleAnim
 {
 public:
-    virtual ~CTaskSimpleRunNamedAnim(void){};
+    virtual ~CTaskSimpleRunNamedAnim(){};
 };
 
 class CTaskComplexDie : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexDie(void){};
+    virtual ~CTaskComplexDie(){};
 };
 
 class CTaskSimpleStealthKill : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleStealthKill(void){};
+    virtual ~CTaskSimpleStealthKill(){};
 };
 
 class CTaskSimpleDead : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleDead(void){};
+    virtual ~CTaskSimpleDead(){};
 };
 
 class CTaskSimpleBeHit : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimpleBeHit(void){};
+    virtual ~CTaskSimpleBeHit(){};
 };
 
 enum eSunbatherType
@@ -73,7 +73,7 @@ enum eSunbatherType
 class CTaskComplexSunbathe : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexSunbathe(void){};
+    virtual ~CTaskComplexSunbathe(){};
     virtual void SetEndTime(DWORD dwTime) = 0;
 };
 
@@ -83,7 +83,7 @@ public:
 class CTaskSimplePlayerOnFoot : public virtual CTaskSimple
 {
 public:
-    virtual ~CTaskSimplePlayerOnFoot(void){};
+    virtual ~CTaskSimplePlayerOnFoot(){};
 };
 
 ////////////////////
@@ -92,5 +92,5 @@ public:
 class CTaskComplexFacial : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexFacial(void){};
+    virtual ~CTaskComplexFacial(){};
 };

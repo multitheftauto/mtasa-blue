@@ -16,7 +16,7 @@
 class CObjectRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllObjects);
     DECLARE_ELEMENT_RPC(SetModel);

@@ -19,20 +19,21 @@ class CDatabaseJobQueueManager
 {
 public:
     ZERO_ON_NEW
-    ~CDatabaseJobQueueManager(void);
-    void        DoPulse(void);
+    ~CDatabaseJobQueueManager();
+    void        DoPulse();
     CDbJobData* AddCommand(EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData);
     bool        PollCommand(CDbJobData* pJobData, uint uiTimeout);
     bool        FreeCommand(CDbJobData* pJobData);
     CDbJobData* FindCommandFromId(SDbJobId id);
     void        IgnoreConnectionResults(SConnectionHandle connectionHandle);
     void        SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
+    int         GetQueueSizeFromConnection(SConnectionHandle connectionHandle);
 
 protected:
-    CDatabaseJobQueue* GetQueueFromConnectCommand(const SString& strData);
+    CDatabaseJobQueue* GetQueueFromConnectCommand(SConnectionHandle connectionHandle);
     CDatabaseJobQueue* FindQueueFromConnection(SConnectionHandle connectionHandle);
-    SConnectionHandle  GetNextConnectionHandle(void);
+    SConnectionHandle  GetNextConnectionHandle();
 
-    std::map<SString, CDatabaseJobQueue*> m_QueueNameMap;
-    SConnectionHandle                     m_ConnectionHandleCounter;
+    std::map<SConnectionHandle, CDatabaseJobQueue*> m_QueueNameMap;
+    SConnectionHandle                               m_ConnectionHandleCounter;
 };

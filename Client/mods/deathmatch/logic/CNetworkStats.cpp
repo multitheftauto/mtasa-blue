@@ -17,7 +17,7 @@ CNetworkStats::CNetworkStats(CClientDisplayManager* pDisplayManager)
     Reset();
 }
 
-void CNetworkStats::Reset(void)
+void CNetworkStats::Reset()
 {
     m_ulLastUpdateTime = CClientTime::GetTime();
 
@@ -35,7 +35,7 @@ void CNetworkStats::Reset(void)
     m_ullLastBytesReceived = stats.bytesReceived;
 }
 
-void CNetworkStats::Draw(void)
+void CNetworkStats::Draw()
 {
     // Time to update?
     if (CClientTime::GetTime() >= m_ulLastUpdateTime + 1000)
@@ -152,7 +152,7 @@ void CNetworkStats::Draw(void)
     g_pCore->GetGraphics()->DrawStringQueued(fX, fY, fX, fY, 0xFFFFFFFF, strBuffer, 1, 1, DT_NOCLIP, NULL, true);
 }
 
-void CNetworkStats::Update(void)
+void CNetworkStats::Update()
 {
     NetStatistics stats;
     g_pNet->GetNetworkStatistics(&stats);

@@ -13,7 +13,7 @@
 
 void CLuaWorldDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Get
         {"getTime", getTime},
         {"getWeather", getWeather},
@@ -90,10 +90,8 @@ void CLuaWorldDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaWorldDefs::getTime(lua_State* luaVM)

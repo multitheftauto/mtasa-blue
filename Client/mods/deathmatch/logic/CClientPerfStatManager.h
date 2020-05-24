@@ -17,10 +17,10 @@
 class CClientPerfStatManager
 {
 public:
-    virtual ~CClientPerfStatManager(void) {}
+    virtual ~CClientPerfStatManager() {}
 
-    virtual void DoPulse(void) = 0;
+    virtual void DoPulse() = 0;
     virtual void GetStats(CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter) = 0;
 
-    static CClientPerfStatManager* GetSingleton(void);
+    static CClientPerfStatManager* GetSingleton();
 };

@@ -12,9 +12,9 @@
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
-void CLuaFileDefs::LoadFunctions(void)
+void CLuaFileDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"fileOpen", fileOpen},
         {"fileCreate", fileCreate},
         {"fileExists", fileExists},
@@ -36,10 +36,8 @@ void CLuaFileDefs::LoadFunctions(void)
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)
@@ -550,7 +548,8 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         // Make sure the destination folder exists so we can move the file
                         MakeSureDirExists(strDestAbsPath);
 
-                        if (FileRename(strSrcAbsPath, strDestAbsPath))
+                        int errorCode;
+                        if (FileRename(strSrcAbsPath, strDestAbsPath, &errorCode))
                         {
                             // If file renamed/moved return success
                             lua_pushboolean(luaVM, true);
@@ -558,7 +557,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
                         }
 
                         // Output error
-                        m_pScriptDebugging->LogWarning(luaVM, "fileRename failed; unable to rename file");
+                        m_pScriptDebugging->LogWarning(luaVM, SString("fileRename failed; unable to rename file (Error %d)", errorCode));
                     }
                     else
                     {
@@ -703,18 +702,24 @@ int CLuaFileDefs::fileRead(lua_State* luaVM)
         }
 
         // Allocate a buffer to read the stuff into and read some :~ into it
-        CBuffer buffer;
-
+        SString buffer;
         long lBytesRead = pFile->Read(ulCount, buffer);
-        if (lBytesRead != -1)
+
+        if (lBytesRead >= 0)
         {
             // Push the string onto the Lua stack. Use pushlstring so we are binary
             // compatible. Normal push string takes zero terminated strings.
-            lua_pushlstring(luaVM, buffer.GetData(), lBytesRead);
+            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
             return 1;
         }
-
-        m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        else if (lBytesRead == -2)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

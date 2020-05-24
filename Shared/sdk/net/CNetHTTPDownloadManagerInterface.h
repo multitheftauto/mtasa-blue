@@ -40,6 +40,8 @@ struct SHttpDownloadResult
     bool        bSuccess;
     int         iErrorCode;
     const char* szHeaders;
+    uint        uiAttemptNumber;
+    uint        uiContentLength;
 };
 
 // For transferring SString to net module
@@ -50,7 +52,7 @@ struct SStringContent
         length = other.length();
         pData = *other;
     }
-                operator SString(void) const { return SStringX(pData, length); }
+                operator SString() const { return SStringX(pData, length); }
     size_t      length = 0;
     const char* pData = nullptr;
 };
@@ -71,7 +73,7 @@ struct SStringMapContent
         }
         assert(pos == numItems);
     }
-    operator std::map<SString, SString>(void) const
+    operator std::map<SString, SString>() const
     {
         std::map<SString, SString> result;
         for (size_t i = 0; i < numItems; i += 2)
@@ -145,9 +147,9 @@ inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& i
 
 struct SDownloadStatus
 {
-    uint uiAttemptNumber;   // 0=Queued 1+=Downloading
-    uint uiContentLength;   // Item total size. Will be 0 if http header 'Content-Length' is missing
-    uint uiBytesReceived;   // Download progress
+    uint uiAttemptNumber = 0;   // 0=Queued 1+=Downloading
+    uint uiContentLength = 0;   // Item total size. Will be 0 if http header 'Content-Length' is missing
+    uint uiBytesReceived = 0;   // Download progress
 };
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
@@ -162,15 +164,15 @@ class CNetHTTPDownloadManagerInterface
 {
 public:
     // Get some stats regarding the current download size now & total
-    virtual uint GetDownloadSizeNow(void) = 0;
-    virtual void ResetDownloadSize(void) = 0;
+    virtual uint GetDownloadSizeNow() = 0;
+    virtual void ResetDownloadSize() = 0;
 
     // Get an error if one has been set
-    virtual const char* GetError(void) = 0;
+    virtual const char* GetError() = 0;
 
     // Process the queued files
     // Returns true if all of the downloads have completed, false if there are additional downloads
-    virtual bool ProcessQueuedFiles(void) = 0;
+    virtual bool ProcessQueuedFiles() = 0;
 
     // Queue a file to download
     virtual bool QueueFile(const char* szURL, const char* szOutputFile, void* objectPtr = NULL,
@@ -180,7 +182,7 @@ public:
     // Limit number of concurrent http client connections
     virtual void SetMaxConnections(int iMaxConnections) = 0;
 
-    virtual void Reset(void) = 0;
+    virtual void Reset() = 0;
 
     // objectPtr and pfnDownloadFinishedCallback are used to identify the download and should be the same as when QueueFile was originally called
     virtual bool CancelDownload(void* objectPtr, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback) = 0;

@@ -11,9 +11,9 @@
 
 #include "StdInc.h"
 
-void CLuaSearchLightDefs::LoadFunctions(void)
+void CLuaSearchLightDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createSearchLight", CreateSearchLight},
 
         {"getSearchLightStartPosition", GetSearchLightStartPosition},
@@ -28,10 +28,8 @@ void CLuaSearchLightDefs::LoadFunctions(void)
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaSearchLightDefs::AddClass(lua_State* luaVM)

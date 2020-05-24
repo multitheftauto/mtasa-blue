@@ -14,7 +14,7 @@
 extern CGame* g_pGame;
 
 #if defined(_MSC_VER)
-#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#pragma warning(disable : 4355)            // warning C4355: 'this' : used in base member initializer list
 #endif
 
 CElement::CElement(CElement* pParent)
@@ -56,7 +56,7 @@ CElement::CElement(CElement* pParent)
     m_pAttachedTo = NULL;
 }
 
-CElement::~CElement(void)
+CElement::~CElement()
 {
     // Get rid of the children elements
     ClearChildren();
@@ -125,7 +125,7 @@ CElement::~CElement(void)
     SAFE_RELEASE(m_pChildrenListSnapshot);
 }
 
-bool CElement::IsCloneable(void)
+bool CElement::IsCloneable()
 {
     auto iType = GetType();
     switch (iType)
@@ -138,13 +138,14 @@ bool CElement::IsCloneable(void)
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
         case CElement::PATH_NODE_UNUSED:
+        case CElement::COLSHAPE:
             return true;
         default:
             return false;
     }
 }
 
-const CVector& CElement::GetPosition(void)
+const CVector& CElement::GetPosition()
 {
     if (m_pAttachedTo)
         GetAttachedPosition(m_vecPosition);
@@ -336,7 +337,7 @@ bool CElement::IsMyParent(CElement* pElement, bool bRecursive)
     return false;
 }
 
-void CElement::ClearChildren(void)
+void CElement::ClearChildren()
 {
     // Sanity check
     assert(m_pParent != this);
@@ -465,7 +466,7 @@ void CElement::DeleteEvents(CLuaMain* pLuaMain, bool bRecursive)
     }
 }
 
-void CElement::DeleteAllEvents(void)
+void CElement::DeleteAllEvents()
 {
     m_pEventManager->DeleteAll();
 }
@@ -489,11 +490,12 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
             args.PushString(pAttribute->GetValue().c_str());
 
         // Don't trigger onElementDataChanged event
-        SetCustomData(pAttribute->GetName().c_str(), *args[0], g_pGame->GetConfig()->GetSyncMapElementData(), NULL, false);
+        ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
+        SetCustomData(pAttribute->GetName().c_str(), *args[0], syncType, NULL, false);
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced)
+CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType)
 {
     assert(szName);
 
@@ -501,15 +503,15 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, boo
     SCustomData* pData = m_pCustomData->Get(szName);
     if (pData)
     {
-        if (pbIsSynced)
-            *pbIsSynced = pData->bSynchronized;
+        if (pSyncType)
+            *pSyncType = pData->syncType;
         return &pData->Variable;
     }
 
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pbIsSynced);
+        return m_pParent->GetCustomData(szName, true, pSyncType);
     }
 
     // None available
@@ -690,7 +692,7 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent)
+void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
@@ -709,7 +711,7 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, b
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
+    m_pCustomData->Set(szName, Variable, syncType);
 
     if (bTriggerEvent)
     {
@@ -750,16 +752,19 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
     {
         const std::string& strName = iter->first;
         const SCustomData& customData = iter->second;
-        if (customData.bSynchronized)
-        {
-            // Tell our clients to update their data
-            unsigned short usNameLength = static_cast<unsigned short>(strName.length());
-            CBitStream     BitStream;
-            BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(strName.c_str(), usNameLength);
-            customData.Variable.WriteToBitStream(*BitStream.pBitStream);
+
+        if (customData.syncType == ESyncType::LOCAL)
+            continue;
+
+        // Tell our clients to update their data
+        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        CBitStream     BitStream;
+        BitStream.pBitStream->WriteCompressed(usNameLength);
+        BitStream.pBitStream->Write(strName.c_str(), usNameLength);
+        customData.Variable.WriteToBitStream(*BitStream.pBitStream);
+
+        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
-        }
     }
 }
 
@@ -860,7 +865,7 @@ void CElement::OnSubtreeRemove(CElement* pElement)
     }
 }
 
-void CElement::UpdatePerPlayerEntities(void)
+void CElement::UpdatePerPlayerEntities()
 {
     // Call a virtual method that will end up CPerPlayerEntity or some other class using references
     UpdatePerPlayer();
@@ -873,7 +878,7 @@ void CElement::UpdatePerPlayerEntities(void)
     }
 }
 
-CElement* CElement::GetRootElement(void)
+CElement* CElement::GetRootElement()
 {
     if (m_pParent)
     {
@@ -1043,7 +1048,7 @@ bool CElement::CollisionExists(CColShape* pShape)
     return false;
 }
 
-void CElement::RemoveAllCollisions(void)
+void CElement::RemoveAllCollisions()
 {
     list<CColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
@@ -1053,7 +1058,7 @@ void CElement::RemoveAllCollisions(void)
     m_Collisions.clear();
 }
 
-CClient* CElement::GetClient(void)
+CClient* CElement::GetClient()
 {
     CClient* pClient = NULL;
     switch (GetType())
@@ -1121,7 +1126,7 @@ bool CElement::IsElementAttached(CElement* pElement)
     return false;
 }
 
-bool CElement::IsAttachable(void)
+bool CElement::IsAttachable()
 {
     switch (GetType())
     {
@@ -1143,7 +1148,7 @@ bool CElement::IsAttachable(void)
     return false;
 }
 
-bool CElement::IsAttachToable(void)
+bool CElement::IsAttachToable()
 {
     switch (GetType())
     {
@@ -1189,17 +1194,17 @@ void CElement::GetAttachedRotation(CVector& vecRotation)
     }
 }
 
-unsigned char CElement::GenerateSyncTimeContext(void)
+unsigned char CElement::GenerateSyncTimeContext()
 {
     // Increment the sync time index
     ++m_ucSyncTimeContext;
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     if (GetType() == EElementType::PLAYER)
     {
         CLogger::LogPrintf("Sync Context Updated from %i to %i.\n", m_ucSyncTimeContext - 1, m_ucSyncTimeContext);
     }
-    #endif
+#endif
     // It can't be 0 because that will make it not work when wraps around
     if (m_ucSyncTimeContext == 0)
         ++m_ucSyncTimeContext;
@@ -1442,13 +1447,13 @@ void CElement::SetPosition(const CVector& vecPosition)
     UpdateSpatialData();
 };
 
-CSphere CElement::GetWorldBoundingSphere(void)
+CSphere CElement::GetWorldBoundingSphere()
 {
     // Default to a point around the entity's position
     return CSphere(GetPosition(), 0.f);
 }
 
-void CElement::UpdateSpatialData(void)
+void CElement::UpdateSpatialData()
 {
     // Avoid recursion
     if (!m_bUpdatingSpatialData)
@@ -1473,7 +1478,7 @@ void CElement::UpdateSpatialData(void)
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshot* CElement::GetChildrenListSnapshot(void)
+CElementListSnapshot* CElement::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)

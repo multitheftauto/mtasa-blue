@@ -16,7 +16,7 @@
 class CWaterRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetWorldWaterLevel);
     DECLARE_RPC(ResetWorldWaterLevel);

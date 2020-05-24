@@ -12,19 +12,19 @@
 #include "StdInc.h"
 #include "net/SimHeaders.h"
 
-CPlayerManager::CPlayerManager(void)
+CPlayerManager::CPlayerManager()
 {
     // Init
     m_pScriptDebugging = NULL;
     m_ZombieCheckTimer.SetUseModuleTickCount(true);
 }
 
-CPlayerManager::~CPlayerManager(void)
+CPlayerManager::~CPlayerManager()
 {
     DeleteAll();
 }
 
-void CPlayerManager::DoPulse(void)
+void CPlayerManager::DoPulse()
 {
     PulseZombieCheck();
 
@@ -35,7 +35,7 @@ void CPlayerManager::DoPulse(void)
     }
 }
 
-void CPlayerManager::PulseZombieCheck(void)
+void CPlayerManager::PulseZombieCheck()
 {
     // Only check once a second
     if (m_ZombieCheckTimer.Get() < 1000)
@@ -82,20 +82,10 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     }
 
     // Create the new player
-    CPlayer* pPlayer = new CPlayer(this, m_pScriptDebugging, PlayerSocket);
-
-    // Invalid id?
-    if (pPlayer->GetID() == INVALID_ELEMENT_ID)
-    {
-        delete pPlayer;
-        return NULL;
-    }
-
-    // Return the created player
-    return pPlayer;
+    return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
 }
 
-unsigned int CPlayerManager::CountJoined(void)
+unsigned int CPlayerManager::CountJoined()
 {
     // Count each ingame player
     unsigned int                   uiCount = 0;
@@ -145,7 +135,7 @@ CPlayer* CPlayerManager::Get(const char* szNick, bool bCaseSensitive)
     return NULL;
 }
 
-void CPlayerManager::DeleteAll(void)
+void CPlayerManager::DeleteAll()
 {
     // Delete all the items in the list
     while (!m_Players.empty())
@@ -185,6 +175,25 @@ void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort 
         {
             if (pPlayer->GetDimension() == usDimension)
                 sendList.push_back(pPlayer);
+        }
+    }
+
+    CPlayerManager::Broadcast(Packet, sendList);
+}
+
+void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+{
+    // Make a list of players to send this packet to
+    CSendList sendList;
+
+    // Send the packet to each ingame player on the server except the skipped one
+    list<CPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
+    {
+        CPlayer* pPlayer = *iter;
+        if (pPlayer != pSkip && pPlayer->IsJoined() && pPlayer->IsSubscribed(pElement, szName))
+        {
+            sendList.push_back(pPlayer);
         }
     }
 
@@ -319,7 +328,25 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
             (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
 }
 
-void CPlayerManager::ResetAll(void)
+void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+{
+    list<CPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
+    {
+        CPlayer* pPlayer = *iter;
+        pPlayer->UnsubscribeElementData(pElement, name);
+    }
+}
+
+void CPlayerManager::ClearElementData(CElement* pElement)
+{
+    for (auto pPlayer : m_Players)
+    {
+        pPlayer->UnsubscribeElementData(pElement);
+    }
+}
+
+void CPlayerManager::ResetAll()
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

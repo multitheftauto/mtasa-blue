@@ -31,13 +31,13 @@ class CEventSA : public CEvent
 public:
     CEventSA(CEventSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CEventSAInterface* GetInterface(void) { return m_pInterface; }
+    CEventSAInterface* GetInterface() { return m_pInterface; }
 
-    eEventEntityType GetType(void);
-    CEntity*         GetEntity(void);
-    eEventEntity     GetEntityType(void);
-    CEntity*         GetCommittedBy(void);
-    CVector*         GetPosition(void);
+    eEventEntityType GetType();
+    CEntity*         GetEntity();
+    eEventEntity     GetEntityType();
+    CEntity*         GetCommittedBy();
+    CVector*         GetPosition();
 
 protected:
     CEventSAInterface* m_pInterface;

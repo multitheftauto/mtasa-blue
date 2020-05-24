@@ -55,7 +55,7 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
         m_pManager->OnLowLODElementCreated();
 }
 
-CClientObject::~CClientObject(void)
+CClientObject::~CClientObject()
 {
     // Unrequest whatever we've requested or we'll crash in unlucky situations
     m_pModelRequester->Cancel(this, false);
@@ -73,7 +73,7 @@ CClientObject::~CClientObject(void)
         m_pManager->OnLowLODElementDestroyed();
 }
 
-void CClientObject::Unlink(void)
+void CClientObject::Unlink()
 {
     m_pObjectManager->RemoveFromLists(this);
     g_pClientGame->GetObjectRespawner()->Unreference(this);
@@ -224,7 +224,7 @@ void CClientObject::ModelRequestCallback(CModelInfo* pModelInfo)
     Create();
 }
 
-float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel(void)
+float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     if (m_pObject)
     {
@@ -243,7 +243,7 @@ void CClientObject::SetVisible(bool bVisible)
 }
 
 // Call this when m_bIsVisible, m_IsHiddenLowLod or m_pObject is changed
-void CClientObject::UpdateVisibility(void)
+void CClientObject::UpdateVisibility()
 {
     if (m_pObject)
     {
@@ -272,7 +272,7 @@ void CClientObject::SetModel(unsigned short usModel)
     }
 }
 
-bool CClientObject::IsLowLod(void)
+bool CClientObject::IsLowLod()
 {
     return m_bIsLowLod;
 }
@@ -314,14 +314,14 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
     }
 }
 
-CClientObject* CClientObject::GetLowLodObject(void)
+CClientObject* CClientObject::GetLowLodObject()
 {
     if (m_bIsLowLod)
         return NULL;
     return m_pLowLodObject;
 }
 
-void CClientObject::Render(void)
+void CClientObject::Render()
 {
     if (m_pObject)
     {
@@ -399,7 +399,7 @@ void CClientObject::SetCollisionEnabled(bool bCollisionEnabled)
     m_bUsesCollision = bCollisionEnabled;
 }
 
-float CClientObject::GetHealth(void)
+float CClientObject::GetHealth()
 {
     if (m_pObject)
     {
@@ -450,7 +450,7 @@ void CClientObject::StreamIn(bool bInstantly)
     }
 }
 
-void CClientObject::StreamOut(void)
+void CClientObject::StreamOut()
 {
     // Save the health
     if (m_pObject)
@@ -470,7 +470,7 @@ void CClientObject::StreamOut(void)
 }
 
 // Don't call this function directly by lua functions
-void CClientObject::ReCreate(void)
+void CClientObject::ReCreate()
 {
     m_fHealth = 1000.0f;
 
@@ -480,7 +480,7 @@ void CClientObject::ReCreate(void)
     Create();
 }
 
-void CClientObject::Create(void)
+void CClientObject::Create()
 {
     // Not already created an object?
     if (!m_pObject)
@@ -562,7 +562,7 @@ void CClientObject::Create(void)
     }
 }
 
-void CClientObject::Destroy(void)
+void CClientObject::Destroy()
 {
     // If the object exists
     if (m_pObject)
@@ -581,18 +581,18 @@ void CClientObject::Destroy(void)
     }
 }
 
-void CClientObject::NotifyCreate(void)
+void CClientObject::NotifyCreate()
 {
     m_pObjectManager->OnCreation(this);
     CClientStreamElement::NotifyCreate();
 }
 
-void CClientObject::NotifyDestroy(void)
+void CClientObject::NotifyDestroy()
 {
     m_pObjectManager->OnDestruction(this);
 }
 
-void CClientObject::StreamedInPulse(void)
+void CClientObject::StreamedInPulse()
 {
     // Some things to do if low LOD object
     if (m_bIsLowLod)
@@ -684,7 +684,7 @@ void CClientObject::SetTurnSpeed(const CVector& vecTurnSpeed)
     m_vecTurnSpeed = vecTurnSpeed;
 }
 
-CSphere CClientObject::GetWorldBoundingSphere(void)
+CSphere CClientObject::GetWorldBoundingSphere()
 {
     CSphere     sphere;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(GetModel());
@@ -723,7 +723,7 @@ bool CClientObject::SetBreakable(bool bBreakable)
     return false;
 }
 
-bool CClientObject::Break(void)
+bool CClientObject::Break()
 {
     // Are we breakable?
     if (m_pObject && CClientObjectManager::IsBreakableModel(m_usModel) && !m_bBreakingDisabled)
@@ -734,7 +734,7 @@ bool CClientObject::Break(void)
     return false;
 }
 
-float CClientObject::GetMass(void)
+float CClientObject::GetMass()
 {
     if (m_pObject)
         return m_pObject->GetMass();
@@ -750,7 +750,7 @@ void CClientObject::SetMass(float fMass)
     m_fMass = fMass;
 }
 
-float CClientObject::GetTurnMass(void)
+float CClientObject::GetTurnMass()
 {
     if (m_pObject)
         return m_pObject->GetTurnMass();
@@ -766,7 +766,7 @@ void CClientObject::SetTurnMass(float fTurnMass)
     m_fTurnMass = fTurnMass;
 }
 
-float CClientObject::GetAirResistance(void)
+float CClientObject::GetAirResistance()
 {
     if (m_pObject)
         return m_pObject->GetAirResistance();
@@ -782,7 +782,7 @@ void CClientObject::SetAirResistance(float fAirResistance)
     m_fAirResistance = fAirResistance;
 }
 
-float CClientObject::GetElasticity(void)
+float CClientObject::GetElasticity()
 {
     if (m_pObject)
         return m_pObject->GetElasticity();
@@ -798,7 +798,7 @@ void CClientObject::SetElasticity(float fElasticity)
     m_fElasticity = fElasticity;
 }
 
-float CClientObject::GetBuoyancyConstant(void)
+float CClientObject::GetBuoyancyConstant()
 {
     if (m_pObject)
         return m_pObject->GetBuoyancyConstant();
@@ -835,5 +835,15 @@ void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNe
     m_bVisibleInAllDimensions = bVisible;
 
     // Stream-in/out the object as needed
-    this->SetDimension(bVisible ? g_pClientGame->GetLocalPlayer()->GetDimension() : usNewDimension);
+    if (bVisible)
+    {
+        if (g_pClientGame->GetLocalPlayer())
+        {
+            SetDimension(g_pClientGame->GetLocalPlayer()->GetDimension());
+        }
+    }
+    else
+    {
+        SetDimension(usNewDimension);
+    }
 }

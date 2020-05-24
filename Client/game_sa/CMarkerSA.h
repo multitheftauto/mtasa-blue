@@ -55,7 +55,7 @@ public:
     /* Our Functions */
     CMarkerSA(CMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
-    void Init(void);
+    void Init();
 
     VOID                SetSprite(eMarkerSprite Sprite);
     VOID                SetDisplay(eMarkerDisplay wDisplay);

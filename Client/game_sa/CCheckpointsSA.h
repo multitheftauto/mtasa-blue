@@ -32,7 +32,7 @@ private:
 public:
     // constructor
     CCheckpointsSA();
-    ~CCheckpointsSA(void);
+    ~CCheckpointsSA();
 
     CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
                                   const SColor color);

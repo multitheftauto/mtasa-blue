@@ -12,7 +12,6 @@
 #ifdef MTA_CLIENT
 
 #define _WIN32_DCOM
-using namespace std;
 #include <comdef.h>
 #include <Wbemidl.h>
 
@@ -234,10 +233,10 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
         // Fill each cell
         for (unsigned int i = 0; i < vecKeys.size(); i++)
         {
-            string strKey = vecKeys[i];
-            string strValue;
+            std::string strKey = vecKeys[i];
+            std::string strValue;
 
-            wstring wstrKey(strKey.begin(), strKey.end());
+            std::wstring wstrKey(strKey.begin(), strKey.end());
             hr = pclsObj->Get(wstrKey.c_str(), 0, &vtProp, 0, 0);
 
             if (hr == WBEM_S_NO_ERROR)
@@ -275,7 +274,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 //
 //
 /////////////////////////////////////////////////////////////////////
-SString SharedUtil::GetWMIOSVersion(void)
+SString SharedUtil::GetWMIOSVersion()
 {
     SQueryWMIResult result;
 
@@ -295,7 +294,7 @@ SString SharedUtil::GetWMIOSVersion(void)
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMITotalPhysicalMemory(void)
+long long SharedUtil::GetWMITotalPhysicalMemory()
 {
     // This won't change after the first call
     static long long llResult = 0;
@@ -323,16 +322,16 @@ long long SharedUtil::GetWMITotalPhysicalMemory(void)
 /////////////////////////////////////////////////////////////////////
 //
 // GetWMIVideoAdapterMemorySize
-//
-//
+//  Note that this will never return more than 4 GB of video memory
+//  
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
+unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
 {
     // This won't change after the first call
-    static long long llResult = 0;
+    static unsigned int uiResult = 0;
 
-    if (llResult == 0)
+    if (uiResult == 0)
     {
         SString strDeviceId;
 
@@ -349,7 +348,6 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
             // Calc flags
             bool bAttachedToDesktop = (device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) != 0;
             bool bMirroringDriver = (device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) != 0;
-            bool bPrimaryDevice = (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
 
             // Only check attached, non mirror displays
             if (bAttachedToDesktop && !bMirroringDriver)
@@ -374,29 +372,32 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
             const SString& AdapterRAM = result[i][1];
             const SString& Availability = result[i][2];
 
-            long long llAdapterRAM = _atoi64(AdapterRAM);
+            unsigned int uiAdapterRAM = atoi(AdapterRAM);
             int       iAvailability = atoi(Availability);
 
-            if (llResult == 0)
-                llResult = llAdapterRAM;
+            if (uiResult == 0)
+                uiResult = uiAdapterRAM;
 
             if (iAvailability == 3)
-                llResult = std::max(llResult, llAdapterRAM);
+                uiResult = std::max(uiResult, uiAdapterRAM);
 
-            if (llAdapterRAM != 0)
-                if (PNPDeviceID.BeginsWithI(strDeviceId))
+            if (uiAdapterRAM != 0)
+            {
+                // If this matches the previously found device, return the adapter RAM
+                if (!strDeviceId.empty() && PNPDeviceID.BeginsWithI(strDeviceId))
                 {
-                    llResult = llAdapterRAM;
+                    uiResult = uiAdapterRAM;
                     break;            // Found match
                 }
+            }
         }
     }
 
-    if (llResult == 0)
+    if (uiResult == 0)
     {
-        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+        uiResult = 2LL * 1024 * 1024 * 1024;            // 2GB
     }
-    return llResult;
+    return uiResult;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -549,7 +550,7 @@ bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* p
 // Return true if is Windows 64 bit OS
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::Is64BitOS(void)
+bool SharedUtil::Is64BitOS()
 {
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;

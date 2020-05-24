@@ -28,5 +28,5 @@ public:
 
 protected:
     // Debug view doesn't support position changes unlike chat box
-    void UpdatePosition(void){};
+    void UpdatePosition() override {};
 };

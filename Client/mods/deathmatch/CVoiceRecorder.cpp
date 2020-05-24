@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CVoiceRecorder.h"
 
-CVoiceRecorder::CVoiceRecorder(void)
+CVoiceRecorder::CVoiceRecorder()
 {
     m_bEnabled = false;
 
@@ -34,7 +34,7 @@ CVoiceRecorder::CVoiceRecorder(void)
     m_uiBufferSizeBytes = 0;
 }
 
-CVoiceRecorder::~CVoiceRecorder(void)
+CVoiceRecorder::~CVoiceRecorder()
 {
     DeInit();
 }
@@ -124,7 +124,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     g_pCore->GetConsole()->Printf("Server Voice Chat Quality [%i];  Sample Rate: [%iHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate);
 }
 
-void CVoiceRecorder::DeInit(void)
+void CVoiceRecorder::DeInit()
 {
     if (!m_bEnabled)
         return;
@@ -162,7 +162,7 @@ void CVoiceRecorder::DeInit(void)
     m_uiBufferSizeBytes = 0;
 }
 
-const SpeexMode* CVoiceRecorder::getSpeexModeFromSampleRate(void)
+const SpeexMode* CVoiceRecorder::getSpeexModeFromSampleRate()
 {
     switch (m_SampleRate)
     {
@@ -243,7 +243,7 @@ bool CVoiceRecorder::GetPTTState()
     return m_VoiceState != VOICESTATE_AWAITING_INPUT;
 }
 
-void CVoiceRecorder::DoPulse(void)
+void CVoiceRecorder::DoPulse()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
 

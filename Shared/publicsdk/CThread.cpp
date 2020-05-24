@@ -18,7 +18,7 @@
 
 #include "CThread.h"
 
-CThread::CThread(void)
+CThread::CThread()
 {
     m_pThreadData = NULL;
     m_pArg = NULL;
@@ -27,7 +27,7 @@ CThread::CThread(void)
 #endif
 }
 
-CThread::~CThread(void)
+CThread::~CThread()
 {
     Stop();
 }
@@ -53,7 +53,7 @@ bool CThread::Start(CThreadData* pData)
     return true;
 }
 
-void CThread::Stop(void)
+void CThread::Stop()
 {
     if (m_hThread)
     {
@@ -113,7 +113,7 @@ void* CThread::EntryPoint(void* pThis)
 }
 #endif
 
-CThreadData* CThread::Arg(void) const
+CThreadData* CThread::Arg() const
 {
     return m_pThreadData;
 }

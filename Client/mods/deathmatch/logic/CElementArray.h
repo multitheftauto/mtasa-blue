@@ -17,12 +17,12 @@ class CClientEntity;
 class CElementIDs
 {
 public:
-    static void Initialize(void);
+    static void Initialize();
 
     static CClientEntity* GetElement(ElementID ID);
     static void           SetElement(ElementID ID, CClientEntity* pEntity);
 
-    static ElementID PopClientID(void);
+    static ElementID PopClientID();
     static void      PushClientID(ElementID ID);
 
 private:

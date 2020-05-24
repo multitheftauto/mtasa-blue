@@ -29,7 +29,7 @@ public:
     virtual void SetMatrix(const CMatrix& matrix) = 0;
 
     virtual void  SetDrawDistance(float fDrawDistance) = 0;
-    virtual float GetDrawDistance(void) = 0;
+    virtual float GetDrawDistance() = 0;
 
-    virtual void* GetInterface(void) = 0;
+    virtual void* GetInterface() = 0;
 };

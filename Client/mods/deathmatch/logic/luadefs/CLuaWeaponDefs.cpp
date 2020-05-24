@@ -13,9 +13,9 @@
 
 #define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
 
-void CLuaWeaponDefs::LoadFunctions(void)
+void CLuaWeaponDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"getWeaponNameFromID", GetWeaponNameFromID},
         {"getWeaponIDFromName", GetWeaponIDFromName},
         {"getSlotFromWeapon", GetSlotFromWeapon},
@@ -42,10 +42,8 @@ void CLuaWeaponDefs::LoadFunctions(void)
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaWeaponDefs::AddClass(lua_State* luaVM)

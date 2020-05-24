@@ -14,6 +14,7 @@
 
 #define FUNC_FxManager_c__CreateFxSystem    0x4A9BE0
 #define FUNC_FxManager_c__DestroyFxSystem   0x4A9810
+#define FUNC_FxManager_c__GetSystemByName   0x4A9360
 
 class CFxSystemBPSAInterface;
 class CFxSystemSAInterface;
@@ -61,10 +62,12 @@ class CFxManagerSA : public CFxManager
 public:
     CFxManagerSA(CFxManagerSAInterface* pInterface) { m_pInterface = pInterface; }
     // CFxManager interface
-    CFxSystem* CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
-                              bool bSoundEnable);
-    void       DestroyFxSystem(CFxSystem* pFxSystem);
-    void       OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface);
+    CFxSystem*              CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
+                                           bool bSoundEnable);
+    void                    DestroyFxSystem(CFxSystem* pFxSystem);
+    void                    OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface);
+    CFxSystemBPSAInterface* GetFxSystemBlueprintByName(SString sName);
+    bool                    IsValidFxSystemBlueprintName(SString sName);
 
     // CFxManagerSA methods
     CFxSystemSA* GetFxSystem(CFxSystemSAInterface* pFxSystemSAInterface);

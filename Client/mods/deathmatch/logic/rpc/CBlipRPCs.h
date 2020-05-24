@@ -16,7 +16,7 @@
 class CBlipRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllBlips);
     DECLARE_ELEMENT_RPC(SetBlipIcon);

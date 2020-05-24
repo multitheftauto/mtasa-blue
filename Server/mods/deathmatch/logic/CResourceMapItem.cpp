@@ -156,7 +156,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
         }
         case CElement::RADAR_AREA:
         {
-            m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
         case CElement::TEAM:
@@ -199,17 +199,16 @@ void CResourceMapItem::LinkupElements()
 {
     CDummy* const pRootElement = g_pGame->GetMapManager()->GetRootElement();
 
-    for (auto iter = m_pVehicleManager->IterBegin(); iter != m_pVehicleManager->IterEnd(); ++iter)
+    for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        CVehicle* const pVehicle = *iter;
-        const char*     szAttachToID = pVehicle->GetAttachToID();
+        const char* szAttachToID = vehicle->GetAttachToID();
 
         if (szAttachToID[0])
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
 
             if (pElement)
-                pVehicle->AttachTo(pElement);
+                vehicle->AttachTo(pElement);
         }
     }
 

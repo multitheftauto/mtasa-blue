@@ -16,7 +16,7 @@
 class CTeamRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(RemoveTeam);
     DECLARE_ELEMENT_RPC(SetTeamName);

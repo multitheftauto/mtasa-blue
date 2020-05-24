@@ -18,19 +18,23 @@ class CClientColModel : public CClientEntity
     DECLARE_CLASS(CClientColModel, CClientEntity)
 public:
     CClientColModel(class CClientManager* pManager, ElementID ID);
-    ~CClientColModel(void);
+    ~CClientColModel();
 
-    eClientEntityType GetType(void) const { return CCLIENTCOL; }
+    eClientEntityType GetType() const { return CCLIENTCOL; }
 
+    bool LoadCol(const SString& strFile, bool bIsRawData);
+    bool Load(bool isRaw, SString input);
     bool           LoadCol(const SString& strFile, bool bIsRawData);
     bool           IsLoaded(void) { return m_pColModel != NULL; };
     unsigned short GetVerticesCount() { return m_usVerticesCount; };
     void           SetCollisionHasChanged(bool bChanged) { b_hasChanged = bChanged; };
     bool           HasChanged() { return b_hasChanged; };
 
+    bool IsLoaded() { return m_pColModel != NULL; };
+
     bool Replace(unsigned short usModel);
     void Restore(unsigned short usModel);
-    void RestoreAll(void);
+    void RestoreAll();
 
     bool        HasReplaced(unsigned short usModel);
     static bool IsCOLData(const SString& strData);
@@ -44,11 +48,14 @@ public:
     CColModelSAInterface* GetColModelInterface();
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
 private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     void InternalRestore(unsigned short usModel);
 
     class CClientColModelManager* m_pColModelManager;

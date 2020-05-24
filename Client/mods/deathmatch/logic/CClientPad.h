@@ -24,7 +24,7 @@ public:
 
     static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
 
-    CClientPad(void);
+    CClientPad();
 
     bool GetControlState(const char* szName, bool& bState);
     bool SetControlState(const char* szName, bool bState);
@@ -34,7 +34,7 @@ public:
 
     void DoPulse(CClientPed* pPed);
 
-    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState);
+    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides);
     static bool SetAnalogControlState(const char* szName, float fState);
     static void RemoveSetAnalogControlState(const char* szName);
 

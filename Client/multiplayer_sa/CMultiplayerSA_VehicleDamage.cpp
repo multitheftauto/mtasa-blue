@@ -437,7 +437,7 @@ void CMultiplayerSA::SetVehicleDamageHandler(VehicleDamageHandler* pHandler)
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_VehicleDamage(void)
+void CMultiplayerSA::InitHooks_VehicleDamage()
 {
     EZHookInstallChecked(CVehicle_InflictDamage);
     EZHookInstallChecked(CAutomobile_BurstTyre);

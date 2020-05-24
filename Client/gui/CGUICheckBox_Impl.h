@@ -18,12 +18,12 @@ class CGUICheckBox_Impl : public CGUICheckBox, public CGUIElement_Impl
 {
 public:
     CGUICheckBox_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", bool bChecked = false);
-    ~CGUICheckBox_Impl(void);
+    ~CGUICheckBox_Impl();
 
     void SetSelected(bool bChecked);
-    bool GetSelected(void);
+    bool GetSelected();
 
-    eCGUIType GetType(void) { return CGUI_CHECKBOX; };
+    eCGUIType GetType() { return CGUI_CHECKBOX; };
 
     #include "CGUIElement_Inc.h"
 };

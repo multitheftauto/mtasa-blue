@@ -20,14 +20,14 @@ public:
 // Debugmode only interface
 #ifdef MTA_DEBUG
     CSyncDebug(CClientManager* pManager);
-    ~CSyncDebug(void);
+    ~CSyncDebug();
 
     void Unreference(CClientPlayer& Player);
 
     void Attach(CClientPlayer& Player);
-    void Detach(void);
+    void Detach();
 
-    void OnPulse(void);
+    void OnPulse();
 
 #else
     CSyncDebug(CClientManager* pManager){};
@@ -35,9 +35,9 @@ public:
     void Unreference(CClientPlayer& Player){};
 
     void Attach(CClientPlayer& Player){};
-    void Detach(void){};
+    void Detach(){};
 
-    void OnPulse(void){};
+    void OnPulse(){};
 
 #endif
 
@@ -45,8 +45,8 @@ private:
 // Debugmode only interface
 #ifdef MTA_DEBUG
 
-    void OnDraw(void);
-    void OnUpdate(void);
+    void OnDraw();
+    void OnUpdate();
 
     CClientManager* m_pManager;
     CClientPlayer*  m_pPlayer;

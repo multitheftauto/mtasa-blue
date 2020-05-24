@@ -43,5 +43,5 @@ public:
     CBoatSA(CBoatSAInterface* boat);
     CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CBoatSA(void){};
+    virtual ~CBoatSA(){};
 };

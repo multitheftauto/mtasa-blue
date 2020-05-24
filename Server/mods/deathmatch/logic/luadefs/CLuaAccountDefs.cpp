@@ -13,7 +13,7 @@
 
 void CLuaAccountDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Log in/out funcs
         {"logIn", LogIn},
         {"logOut", LogOut},
@@ -44,10 +44,8 @@ void CLuaAccountDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaAccountDefs::AddClass(lua_State* luaVM)
@@ -214,6 +212,7 @@ int CLuaAccountDefs::GetAccount(lua_State* luaVM)
     SString strName;
     SString strPassword;
     bool    bUsePassword = false;
+    bool    bCaseSensitive;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
@@ -223,10 +222,14 @@ int CLuaAccountDefs::GetAccount(lua_State* luaVM)
         argStream.ReadString(strPassword);
         bUsePassword = true;
     }
+    else
+        argStream.Skip(1);
+
+    argStream.ReadBool(bCaseSensitive, true);
 
     if (!argStream.HasErrors())
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount(strName, bUsePassword ? strPassword.c_str() : NULL);
+        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount(strName, bUsePassword ? strPassword.c_str() : NULL, bCaseSensitive);
         if (pAccount)
         {
             lua_pushaccount(luaVM, pAccount);

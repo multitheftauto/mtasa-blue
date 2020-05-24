@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CWorldRPCs.h"
 
-void CWorldRPCs::LoadFunctions(void)
+void CWorldRPCs::LoadFunctions()
 {
     AddHandler(SET_TIME, SetTime, "SetTime");
     AddHandler(SET_WEATHER, SetWeather, "SetWeather");
@@ -61,6 +61,8 @@ void CWorldRPCs::LoadFunctions(void)
 
     AddHandler(SET_MOON_SIZE, SetMoonSize, "SetMoonSize");
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
+
+    AddHandler(SET_DISCORD_JOIN_PARAMETERS, SetDiscordJoinParams, "SetDiscordJoinParams");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -621,4 +623,18 @@ void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
 void CWorldRPCs::ResetMoonSize(NetBitStreamInterface& bitStream)
 {
     g_pMultiplayer->ResetMoonSize();
+}
+
+void CWorldRPCs::SetDiscordJoinParams(NetBitStreamInterface& bitStream)
+{
+    SString strKey, strPartyId;
+    uint    uiPartySize, uiPartyMax;
+
+    if (bitStream.ReadString<uchar>(strKey) && bitStream.ReadString<uchar>(strPartyId) && bitStream.Read(uiPartySize) && bitStream.Read(uiPartyMax))
+    {
+        if (strKey.length() > 64 || strPartyId.length() > 64 || uiPartySize > uiPartyMax || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
+            return;
+
+        g_pCore->GetDiscordManager()->SetJoinParameters(strKey, strPartyId, uiPartySize, uiPartyMax, [](EDiscordRes res) {});
+    }
 }

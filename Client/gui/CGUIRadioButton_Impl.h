@@ -18,12 +18,12 @@ class CGUIRadioButton_Impl : public CGUIRadioButton, public CGUIElement_Impl
 {
 public:
     CGUIRadioButton_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");
-    ~CGUIRadioButton_Impl(void);
+    ~CGUIRadioButton_Impl();
 
     void SetSelected(bool bChecked);
-    bool GetSelected(void);
+    bool GetSelected();
 
-    eCGUIType GetType(void) { return CGUI_RADIOBUTTON; };
+    eCGUIType GetType() { return CGUI_RADIOBUTTON; };
 
     #include "CGUIElement_Inc.h"
 

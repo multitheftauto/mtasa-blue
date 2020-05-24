@@ -13,7 +13,7 @@
 
 void CLuaPedDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Ped funcs
         {"createPed", CreatePed},
         {"getValidPedModels", GetValidPedModels},
@@ -78,10 +78,8 @@ void CLuaPedDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 // TODO: specials
@@ -415,6 +413,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     int       iBlend = 250;
     bool      bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
     bool      bDummy;
+    bool      bTaskToBeRestoredOnAnimEnd;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -434,6 +433,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadBool(bInterruptable, true);
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
+    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
 
     if (!argStream.HasErrors())
     {
@@ -441,7 +441,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
         szBlock = strBlockName.empty() ? NULL : strBlockName.c_str();
         szAnim = strAnimName.empty() ? NULL : strAnimName.c_str();
 
-        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -496,7 +496,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 10.0f)
         {
             if (CStaticFunctionDefinitions::SetPedAnimationSpeed(pElement, strAnimName, fSpeed))
             {

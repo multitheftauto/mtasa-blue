@@ -116,7 +116,7 @@ void CEffectCloner::ReleaseD3DEffect(CEffectWrap* pEffectWrap)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectCloner::DoPulse(void)
+void CEffectCloner::DoPulse()
 {
     MaybeTidyUp();
 }

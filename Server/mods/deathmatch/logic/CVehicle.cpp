@@ -103,7 +103,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
-CVehicle::~CVehicle(void)
+CVehicle::~CVehicle()
 {
     if (m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle() == this)
     {
@@ -196,7 +196,7 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CVehicle::Unlink(void)
+void CVehicle::Unlink()
 {
     // Remove us from the vehicle manager
     m_pVehicleManager->RemoveFromList(this);
@@ -265,61 +265,40 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the variant data
     if (GetCustomDataInt("variant1", iTemp, true))
-    {
         m_ucVariant = static_cast<unsigned char>(iTemp);
-    }
     if (GetCustomDataInt("variant2", iTemp, true))
-    {
         m_ucVariant2 = static_cast<unsigned char>(iTemp);
-    }
     if (m_ucVariant == 254 && m_ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
     // Grab the "turretX" data
     if (GetCustomDataFloat("turretX", m_fTurretPositionX, true))
-    {
         m_fTurretPositionX = ConvertDegreesToRadians(m_fTurretPositionX);
-    }
 
     // Grab the "turretY" data
     if (GetCustomDataFloat("turretY", m_fTurretPositionY, true))
-    {
         m_fTurretPositionY = ConvertDegreesToRadians(m_fTurretPositionY);
-    }
 
     // Grab the "health" data
     if (GetCustomDataFloat("health", m_fHealth, true))
-    {
         if (m_fHealth < 0.0f)
             m_fHealth = 0.0f;
-    }
 
-    // Grab the "Sirens" data
-    if (!GetCustomDataBool("sirens", m_bSirenActive, true))
-    {
-        m_bSirenActive = false;
-    }
+    // Grab the "sirens" data
+    GetCustomDataBool("sirens", m_bSirenActive, true);
 
     // Grab the "landingGearDown" data
     if (!GetCustomDataBool("landingGearDown", m_bLandingGearDown, true))
-    {
         m_bLandingGearDown = true;
-    }
 
-    if (!GetCustomDataBool("locked", m_bLocked, true))
-    {
-        m_bLocked = false;
-    }
+    // Grab the "locked" data
+    GetCustomDataBool("locked", m_bLocked, true);
 
     // Grab the "specialState" data
     if (GetCustomDataInt("specialState", iTemp, true))
-    {
         m_usAdjustableProperty = static_cast<unsigned short>(iTemp);
-    }
     else
-    {
         m_usAdjustableProperty = 0;
-    }
 
     // Grab the "color" data
     char szTemp[256];
@@ -350,17 +329,28 @@ bool CVehicle::ReadSpecialData(const int iLine)
         }
     }
 
+    // Grab the "headLightColor" data
+    if (GetCustomDataString("headLightColor", szTemp, 64, true))
+    {
+        // Convert it to RGBA
+        if (!XMLColorToInt(szTemp, m_HeadLightColor.R, m_HeadLightColor.G, m_HeadLightColor.B, m_HeadLightColor.A))
+        {
+            CLogger::ErrorPrintf("Bad 'headLightColor' value specified in <vehicle> (line %u)\n", iLine);
+            return false;
+        }
+    }
+
+    // Grab the "paintjob" data
     if (GetCustomDataInt("paintjob", iTemp, true))
         m_ucPaintjob = static_cast<unsigned char>(iTemp);
 
+    // Grab the "upgrades" data
     if (GetCustomDataString("upgrades", szTemp, 256, true))
     {
         if (m_pUpgrades)
         {
-            if (strcmp(szTemp, "all") == 0)
-            {
+            if (stricmp(szTemp, "all") == 0)
                 m_pUpgrades->AddAllUpgrades();
-            }
             else
             {
                 bool bTemp = true;
@@ -369,32 +359,69 @@ bool CVehicle::ReadSpecialData(const int iLine)
                     bTemp = false;
                     unsigned short usUpgrade = static_cast<unsigned short>(atoi(token));
                     if (CVehicleUpgrades::IsValidUpgrade(usUpgrade))
-                    {
                         m_pUpgrades->AddUpgrade(usUpgrade);
-                    }
                 }
             }
         }
     }
 
+    // Grab the "plate" data
     if (GetCustomDataString("plate", szTemp, 9, true))
         SetRegPlate(szTemp);
 
+    // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
+    // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
+    // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bIsFrozen = bFrozen;
+    // Grab the "frozen" data
+    GetCustomDataBool("frozen", m_bIsFrozen, true);
+
+    // Grab the "taxiLightOn" data
+    GetCustomDataBool("taxiLightOn", m_bTaxiLightState, true);
+
+    // Grab the "engineOn" data
+    GetCustomDataBool("engineOn", m_bEngineOn, true);
+
+    // Grab the "lightsOn" data
+    bool bLightsOn;
+    if (GetCustomDataBool("lightsOn", bLightsOn, true))
+        m_ucOverrideLights = bLightsOn ? 2 : 1;
+
+    // Grab the "damageProof" data
+    GetCustomDataBool("damageProof", m_bDamageProof, true);
+
+    // Grab the "explodableFuelTank" data
+    GetCustomDataBool("explodableFuelTank", m_bFuelTankExplodable, true);
+
+    // Grab the "toggleRespawn" data
+    bool bRespawnOn;
+    if (GetCustomDataBool("toggleRespawn", bRespawnOn, true))
+        SetRespawnEnabled(bRespawnOn);
+
+    // Grab the "respawnDelay" data
+    int iRespawnDelay;
+    if (GetCustomDataInt("respawnDelay", iRespawnDelay, true))
+        m_ulIdleRespawnInterval = iRespawnDelay;
+
+    // Grab the respawn position and rotation data
+    GetCustomDataFloat("respawnPosX", m_vecRespawnPosition.fX, true);
+    GetCustomDataFloat("respawnPosY", m_vecRespawnPosition.fY, true);
+    GetCustomDataFloat("respawnPosZ", m_vecRespawnPosition.fZ, true);
+    GetCustomDataFloat("respawnRotX", m_vecRespawnRotationDegrees.fX, true);
+    GetCustomDataFloat("respawnRotY", m_vecRespawnRotationDegrees.fY, true);
+    GetCustomDataFloat("respawnRotZ", m_vecRespawnRotationDegrees.fZ, true);
 
     return true;
 }
@@ -416,7 +443,7 @@ void CVehicle::SetMatrix(const CMatrix& matrix)
     SetRotationDegrees(vecRotation);
 }
 
-const CVector& CVehicle::GetPosition(void)
+const CVector& CVehicle::GetPosition()
 {
     // Are we attached to something?
     if (m_pAttachedTo)
@@ -483,7 +510,7 @@ void CVehicle::SetModel(unsigned short usModel)
     }
 }
 
-bool CVehicle::HasValidModel(void)
+bool CVehicle::HasValidModel()
 {
     return CVehicleManager::IsValidModel(m_usModel);
 }
@@ -494,7 +521,7 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
     m_ucVariant2 = ucVariant2;
 }
 
-CVehicleColor& CVehicle::RandomizeColor(void)
+CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
     m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
@@ -534,7 +561,7 @@ CPed* CVehicle::GetOccupant(unsigned int uiSeat)
     return NULL;
 }
 
-CPed* CVehicle::GetFirstOccupant(void)
+CPed* CVehicle::GetFirstOccupant()
 {
     // Try finding a seat with a Player in it
     unsigned int i = 0;
@@ -550,7 +577,7 @@ CPed* CVehicle::GetFirstOccupant(void)
     return NULL;
 }
 
-CPed* CVehicle::GetController(void)
+CPed* CVehicle::GetController()
 {
     CPed* pController = m_pOccupants[0];
 
@@ -632,12 +659,12 @@ void CVehicle::SetSyncer(CPlayer* pPlayer)
     }
 }
 
-unsigned char CVehicle::GetMaxPassengers(void)
+unsigned char CVehicle::GetMaxPassengers()
 {
     return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModel) : m_ucMaxPassengersOverride);
 }
 
-unsigned char CVehicle::GetFreePassengerSeat(void)
+unsigned char CVehicle::GetFreePassengerSeat()
 {
     // Grab the max passengers this vehicle can have and check the rage
     unsigned char ucMaxPassengers = GetMaxPassengers();
@@ -745,7 +772,7 @@ void CVehicle::SetRegPlate(const char* szRegPlate)
     STRNCPY(m_szRegPlate, szRegPlate, 9);
 }
 
-void CVehicle::GenerateRegPlate(void)
+void CVehicle::GenerateRegPlate()
 {
     // For all our 8 letters
     for (int i = 0; i < 8; i++)
@@ -777,35 +804,12 @@ void CVehicle::SetPaintjob(unsigned char ucPaintjob)
 
 void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
-    {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
-
-            // Keep the bonet and boot intact
-            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-            break;
-        default:
-            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
-    }
+    // Keep the bonet and boot intact
+    ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
 }
 
-void CVehicle::GenerateHandlingData(void)
+void CVehicle::GenerateHandlingData()
 {
     // Make a new CHandlingEntry
     if (m_pHandlingEntry == NULL)
@@ -838,7 +842,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
 }
-void CVehicle::RemoveVehicleSirens(void)
+void CVehicle::RemoveVehicleSirens()
 {
     for (int i = 0; i <= 7; i++)
     {
@@ -851,14 +855,14 @@ void CVehicle::RemoveVehicleSirens(void)
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
-void CVehicle::ResetDoors(void)
+void CVehicle::ResetDoors()
 {
     GetInitialDoorStates(m_ucDoorStates);
     for (unsigned int i = 0; i < 6; ++i)
         m_fDoorOpenRatio[i] = 0.0f;
 }
 
-void CVehicle::ResetDoorsWheelsPanelsLights(void)
+void CVehicle::ResetDoorsWheelsPanelsLights()
 {
     ResetDoors();
     memset(&m_ucWheelStates[0], 0, sizeof(m_ucWheelStates));
@@ -875,38 +879,38 @@ void CVehicle::SetIsBlown(bool bBlown)
         m_llBlowTime = CTickCount::Now();
 }
 
-bool CVehicle::GetIsBlown(void)
+bool CVehicle::GetIsBlown()
 {
     return m_llBlowTime.ToLongLong() != 0;
 }
 
-bool CVehicle::IsBlowTimerFinished(void)
+bool CVehicle::IsBlowTimerFinished()
 {
     return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
 }
 
-void CVehicle::StopIdleTimer(void)
+void CVehicle::StopIdleTimer()
 {
     m_llIdleTime = CTickCount(0LL);
 }
 
-void CVehicle::RestartIdleTimer(void)
+void CVehicle::RestartIdleTimer()
 {
     m_llIdleTime = CTickCount::Now();
 }
 
-bool CVehicle::IsIdleTimerRunning(void)
+bool CVehicle::IsIdleTimerRunning()
 {
     return m_llIdleTime.ToLongLong() != 0;
 }
 
-bool CVehicle::IsIdleTimerFinished(void)
+bool CVehicle::IsIdleTimerFinished()
 {
     return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((long long)m_ulIdleRespawnInterval);
 }
 
 // Check if vehicle has not moved (much) since the last call
-bool CVehicle::IsStationary(void)
+bool CVehicle::IsStationary()
 {
     const CVector& vecPosition = GetPosition();
     if ((vecPosition - m_vecStationaryCheckPosition).LengthSquared() < 0.1f * 0.1f)
@@ -936,14 +940,14 @@ void CVehicle::SetJackingPlayer(CPlayer* pPlayer)
         m_pJackingPlayer->SetJackingVehicle(this);
 }
 
-void CVehicle::OnRelayUnoccupiedSync(void)
+void CVehicle::OnRelayUnoccupiedSync()
 {
     // Detect dimension change
     m_bNeedsDimensionResync |= (GetDimension() != m_usLastUnoccupiedSyncDimension);
     m_usLastUnoccupiedSyncDimension = GetDimension();
 }
 
-void CVehicle::HandleDimensionResync(void)
+void CVehicle::HandleDimensionResync()
 {
     if (m_bNeedsDimensionResync)
     {

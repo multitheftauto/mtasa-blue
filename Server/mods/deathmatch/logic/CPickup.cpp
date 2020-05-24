@@ -46,7 +46,7 @@ CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager*
     UpdateSpatialData();
 }
 
-CPickup::~CPickup(void)
+CPickup::~CPickup()
 {
     // Delete our collision object
     if (m_pCollision)
@@ -70,7 +70,7 @@ CElement* CPickup::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CPickup::Unlink(void)
+void CPickup::Unlink()
 {
     // Remove us from the pickup manager's list
     m_pPickupManager->RemoveFromList(this);
@@ -317,7 +317,7 @@ void CPickup::SetVisible(bool bVisible)
         m_pCollision->SetEnabled(bVisible);
 }
 
-void CPickup::Randomize(void)
+void CPickup::Randomize()
 {
     // Randomize type
     if (m_bIsTypeRandom)

@@ -43,7 +43,7 @@ struct SFileItem
 // Copy directory tree at current dirctory to GetMTASAPath ()
 //
 ///////////////////////////////////////////////////////////////
-bool DoInstallFiles(void)
+bool DoInstallFiles()
 {
     SString strCurrentDir = PathConform(GetSystemCurrentDirectory());
 
@@ -254,7 +254,7 @@ bool ExtractFiles(const SString& strFile)
 // Changes current directory if required
 //
 //////////////////////////////////////////////////////////
-SString CheckOnRestartCommand(void)
+SString CheckOnRestartCommand()
 {
     const SString strMTASAPath = GetMTASAPath();
 

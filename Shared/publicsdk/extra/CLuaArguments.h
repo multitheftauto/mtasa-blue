@@ -31,9 +31,9 @@ using namespace std;
 class CLuaArguments
 {
 public:
-    CLuaArguments(void){};
+    CLuaArguments(){};
     CLuaArguments(const CLuaArguments& Arguments);
-    ~CLuaArguments(void) { DeleteArguments(); };
+    ~CLuaArguments() { DeleteArguments(); };
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
 
@@ -42,17 +42,17 @@ public:
     void PushArguments(CLuaArguments& Arguments);
     bool Call(lua_State* luaVM, const char* szFunction) const;
 
-    CLuaArgument* PushNil(void);
+    CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
     CLuaArgument* PushNumber(double dNumber);
     CLuaArgument* PushString(const char* szString);
     CLuaArgument* PushUserData(void* pUserData);
 
-    void DeleteArguments(void);
+    void DeleteArguments();
 
-    unsigned int                          Count(void) const { return static_cast<unsigned int>(m_Arguments.size()); };
-    vector<CLuaArgument*>::const_iterator IterBegin(void) { return m_Arguments.begin(); };
-    vector<CLuaArgument*>::const_iterator IterEnd(void) { return m_Arguments.end(); };
+    unsigned int                          Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
+    vector<CLuaArgument*>::const_iterator IterBegin() { return m_Arguments.begin(); };
+    vector<CLuaArgument*>::const_iterator IterEnd() { return m_Arguments.end(); };
 
 private:
     vector<CLuaArgument*> m_Arguments;

@@ -15,7 +15,7 @@
 class CLuaElementDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Create/destroy
@@ -67,9 +67,13 @@ public:
     LUA_DECLARE(setElementVisibleTo);
 
     // Element data
-    LUA_DECLARE(getElementData);
+    LUA_DECLARE(GetElementData);
+    LUA_DECLARE(HasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);
+    LUA_DECLARE(addElementDataSubscriber);
+    LUA_DECLARE(removeElementDataSubscriber);
+    LUA_DECLARE(hasElementDataSubscriber);
 
     // Attachement
     LUA_DECLARE(attachElements);

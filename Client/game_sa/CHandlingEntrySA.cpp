@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CHandlingEntrySA::CHandlingEntrySA(void)
+CHandlingEntrySA::CHandlingEntrySA()
 {
     // Create a new interface and zero it
     m_pHandlingSA = new tHandlingDataSA;
@@ -33,7 +33,7 @@ CHandlingEntrySA::CHandlingEntrySA(tHandlingDataSA* pOriginal)
     m_bChanged = true;
 }
 
-CHandlingEntrySA::~CHandlingEntrySA(void)
+CHandlingEntrySA::~CHandlingEntrySA()
 {
     if (m_bChanged)
     {

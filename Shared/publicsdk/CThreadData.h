@@ -25,8 +25,8 @@ class CThreadData;
 class CThreadData
 {
 public:
-    CThreadData(void);
-    ~CThreadData(void);
+    CThreadData();
+    ~CThreadData();
 
     bool        bAbortThread;
     ThreadMutex MutexPrimary;            // primary mutex for suspend/resume operations

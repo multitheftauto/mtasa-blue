@@ -169,7 +169,7 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
     return dwReturn != 0;
 }
 
-CEntity* CProjectileInfoSA::GetTarget(void)
+CEntity* CProjectileInfoSA::GetTarget()
 {
     CEntitySAInterface* pTargetInterface = internalInterface->pEntProjectileTarget;
     CEntity*            pTarget = NULL;
@@ -201,7 +201,7 @@ void CProjectileInfoSA::SetTarget(CEntity* pEntity)
         internalInterface->pEntProjectileTarget = pEntitySA->GetInterface();
 }
 
-bool CProjectileInfoSA::IsActive(void)
+bool CProjectileInfoSA::IsActive()
 {
     return (internalInterface->bProjectileActive == 1 && internalInterface->dwProjectileType != 0);
 }

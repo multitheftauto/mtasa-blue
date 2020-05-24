@@ -80,7 +80,7 @@ CProxyDirect3DVertexDeclaration::CProxyDirect3DVertexDeclaration(IDirect3DDevice
 //
 //
 /////////////////////////////////////////////////////////////
-CProxyDirect3DVertexDeclaration::~CProxyDirect3DVertexDeclaration(void)
+CProxyDirect3DVertexDeclaration::~CProxyDirect3DVertexDeclaration()
 {
     // Remove from cached info map
     MapRemove(g_pProxyDevice->m_VertexDeclMap, this);
@@ -114,7 +114,7 @@ HRESULT CProxyDirect3DVertexDeclaration::QueryInterface(REFIID riid, void** ppvO
 // Delete this object on final release of the original
 //
 /////////////////////////////////////////////////////////////
-ULONG CProxyDirect3DVertexDeclaration::Release(void)
+ULONG CProxyDirect3DVertexDeclaration::Release()
 {
     // Call original function
     ULONG count = m_pOriginal->Release();

@@ -19,6 +19,12 @@ CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& 
     UpdateSpatialData();
 }
 
+CElement* CColCuboid::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColCuboid* pColCuboid = new CColCuboid(m_pManager, GetParentEntity(), m_vecPosition, m_vecSize);
+    return pColCuboid;
+}
+
 bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
 {
     // FIXME: What about radius?
@@ -46,7 +52,7 @@ bool CColCuboid::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColCuboid::GetWorldBoundingSphere(void)
+CSphere CColCuboid::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition = m_vecPosition + m_vecSize * 0.5f;

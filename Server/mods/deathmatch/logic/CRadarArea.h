@@ -19,14 +19,14 @@ class CRadarArea : public CPerPlayerEntity
     friend class CRadarAreaManager;
 
 public:
-    ~CRadarArea(void);
+    ~CRadarArea();
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    void Unlink(void);
+    void Unlink();
 
-    const CVector2D& GetSize(void) { return m_vecSize; };
-    SColor           GetColor(void) const { return m_Color; };
-    bool             IsFlashing(void) { return m_bIsFlashing; };
+    const CVector2D& GetSize() { return m_vecSize; };
+    SColor           GetColor() const { return m_Color; };
+    bool             IsFlashing() { return m_bIsFlashing; };
 
     void SetPosition(const CVector& vecPosition);
     void SetSize(const CVector2D& vecSize);

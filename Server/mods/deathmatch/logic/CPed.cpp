@@ -54,7 +54,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     memset(&m_Weapons[0], 0, sizeof(m_Weapons));
     m_ucAlpha = 255;
     m_pContactElement = NULL;
-    m_bIsDead = true;
+    m_bIsDead = false;
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
@@ -81,7 +81,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     }
 }
 
-CPed::~CPed(void)
+CPed::~CPed()
 {
     // Make sure we've no longer occupied any vehicle
     if (m_pVehicle)
@@ -112,12 +112,14 @@ CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetHealth(GetHealth());
         pTemp->SetArmor(GetArmor());
         pTemp->SetSyncable(IsSyncable());
+        pTemp->SetSpawned(IsSpawned());
+        pTemp->SetIsDead(IsDead());
     }
 
     return pTemp;
 }
 
-void CPed::Unlink(void)
+void CPed::Unlink()
 {
     // Remove us from the Ped manager
     if (m_pPedManager)
@@ -170,6 +172,7 @@ bool CPed::ReadSpecialData(const int iLine)
         return false;
     }
 
+    // Grab the "rotZ" data
     float fRotation = 0.0f;
     GetCustomDataFloat("rotZ", fRotation, true);
     m_fRotation = ConvertDegreesToRadians(fRotation);
@@ -187,7 +190,7 @@ bool CPed::ReadSpecialData(const int iLine)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <ped> (line %d)\n", iLine);
+            CLogger::ErrorPrintf("Bad 'model' (%d) id specified in <ped> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
@@ -197,6 +200,7 @@ bool CPed::ReadSpecialData(const int iLine)
         return false;
     }
 
+    // Grab the "health" data
     if (GetCustomDataFloat("health", m_fHealth, true))
     {
         // Limit it to 0-100 (we can assume max health is 100 because they can't change stats here)
@@ -206,33 +210,41 @@ bool CPed::ReadSpecialData(const int iLine)
             m_fHealth = 0;
     }
     else
-    {
         // Set health to 100 if not defined
         m_fHealth = 100.0f;
-    }
 
+    // Grab the "armor" data
     GetCustomDataFloat("armor", m_fArmor, true);
 
+    // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
+    // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
+    // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bFrozen = bFrozen;
+    // Grab the "frozen" data
+    GetCustomDataBool("frozen", m_bFrozen, true);
+
+    // Grab the "headless" data
+    GetCustomDataBool("headless", m_bHeadless, true);
+
+    // Grab the "walkingStyle" data
+    GetCustomDataInt("walkingStyle", m_iMoveAnim, true);
 
     return true;
 }
 
-bool CPed::HasValidModel(void)
+bool CPed::HasValidModel()
 {
     return CPedManager::IsValidModel(m_usModel);
 }
@@ -319,7 +331,7 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
-float CPed::GetMaxHealth(void)
+float CPed::GetMaxHealth()
 {
     // TODO: Verify this formula
 
@@ -391,7 +403,7 @@ void CPed::SetVehicleAction(unsigned int uiAction)
     m_uiVehicleAction = uiAction;
 }
 
-bool CPed::IsAttachToable(void)
+bool CPed::IsAttachToable()
 {
     // We're not attachable if we're inside a vehicle (that would get messy)
     if (!GetOccupiedVehicle())

@@ -14,12 +14,12 @@
 class CSetCursorPosHookInterface
 {
 public:
-    virtual void ApplyHook(void) = 0;
-    virtual void RemoveHook(void) = 0;
+    virtual void ApplyHook() = 0;
+    virtual void RemoveHook() = 0;
 
-    virtual void DisableSetCursorPos(void) = 0;
-    virtual void EnableSetCursorPos(void) = 0;
-    virtual bool IsSetCursorPosEnabled(void) = 0;
+    virtual void DisableSetCursorPos() = 0;
+    virtual void EnableSetCursorPos() = 0;
+    virtual bool IsSetCursorPosEnabled() = 0;
 
     virtual BOOL CallSetCursorPos(int X, int Y) = 0;
 };

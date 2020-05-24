@@ -25,15 +25,15 @@
 class CSingularFileDownloadManager
 {
 public:
-    CSingularFileDownloadManager(void);
-    ~CSingularFileDownloadManager(void);
+    CSingularFileDownloadManager();
+    ~CSingularFileDownloadManager();
 
-    CSingularFileDownload* AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum = CChecksum());
+    CSingularFileDownload* AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum checksum = CChecksum());
     void                   CancelResourceDownloads(CResource* pResource);
 
-    void ClearList(void);
+    void ClearList();
 
-    bool AllComplete(void);
+    bool AllComplete();
 
 protected:
     std::list<CSingularFileDownload*> m_Downloads;

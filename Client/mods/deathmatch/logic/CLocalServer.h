@@ -18,7 +18,7 @@ class CLocalServer
 {
 public:
     CLocalServer(const char* szConfig);
-    ~CLocalServer(void);
+    ~CLocalServer();
 
 protected:
     bool OnStartButtonClick(CGUIElement* pElement);
@@ -27,15 +27,15 @@ protected:
     bool OnDelButtonClick(CGUIElement* pElement);
 
     // Server config
-    bool Load(void);
-    bool Save(void);
+    bool Load();
+    bool Save();
 
     void StoreConfigValue(const char* szNode, const char* szValue);
 
     void HandleResource(const char* szResource);
     void GetResourceNameList(std::vector<SString>& outResourceNameList, const SString& strResourceDirectoryPath);
 
-    std::string GetConfigName(void) { return m_strConfig; };
+    std::string GetConfigName() { return m_strConfig; };
 
 private:
     std::string m_strConfig;

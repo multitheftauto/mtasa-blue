@@ -23,9 +23,9 @@ class CAccessControlList
 {
 public:
     CAccessControlList(const char* szACLName, class CAccessControlListManager* pACLManager);
-    ~CAccessControlList(void);
+    ~CAccessControlList();
 
-    const char* GetName(void) { return m_strACLName; };
+    const char* GetName() { return m_strACLName; };
 
     CAccessControlListRight* AddRight(const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess);
     CAccessControlListRight* GetRight(const char* szRightName, CAccessControlListRight::ERightType eRightType);
@@ -33,14 +33,14 @@ public:
 
     void WriteToXMLNode(CXMLNode* pNode);
 
-    list<CAccessControlListRight*>::const_iterator IterBegin(void) { return m_Rights.begin(); };
-    list<CAccessControlListRight*>::const_iterator IterEnd(void) { return m_Rights.end(); };
+    list<CAccessControlListRight*>::const_iterator IterBegin() { return m_Rights.begin(); };
+    list<CAccessControlListRight*>::const_iterator IterEnd() { return m_Rights.end(); };
 
-    bool CanBeModifiedByScript(void);
-    uint GetScriptID(void) const { return m_uiScriptID; }
+    bool CanBeModifiedByScript();
+    uint GetScriptID() const { return m_uiScriptID; }
 
 private:
-    void OnChange(void);
+    void OnChange();
 
     SString                        m_strACLName;
     list<CAccessControlListRight*> m_Rights;

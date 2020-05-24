@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -136,14 +136,14 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
   struct Curl_easy *data = conn->data;
   char *real_path;
   struct FILEPROTO *file = data->req.protop;
-  int fd;
+  int fd = -1;
 #ifdef DOS_FILESYSTEM
   size_t i;
   char *actual_path;
 #endif
   size_t real_path_len;
 
-  CURLcode result = Curl_urldecode(data, data->state.path, 0, &real_path,
+  CURLcode result = Curl_urldecode(data, data->state.up.path, 0, &real_path,
                                    &real_path_len, FALSE);
   if(result)
     return result;
@@ -181,7 +181,9 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
       return CURLE_URL_MALFORMAT;
     }
 
-  fd = open_readonly(actual_path, O_RDONLY|O_BINARY);
+  if(strncmp("\\\\", actual_path, 2))
+    /* refuse to open path that starts with two backslashes */
+    fd = open_readonly(actual_path, O_RDONLY|O_BINARY);
   file->path = actual_path;
 #else
   if(memchr(real_path, 0, real_path_len)) {
@@ -197,7 +199,7 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
 
   file->fd = fd;
   if(!data->set.upload && (fd == -1)) {
-    failf(data, "Couldn't open file %s", data->state.path);
+    failf(data, "Couldn't open file %s", data->state.up.path);
     file_done(conn, CURLE_FILE_COULDNT_READ_FILE, FALSE);
     return CURLE_FILE_COULDNT_READ_FILE;
   }
@@ -307,11 +309,11 @@ static CURLcode file_upload(struct connectdata *conn)
     size_t nread;
     size_t nwrite;
     size_t readcount;
-    result = Curl_fillreadbuffer(conn, (int)data->set.buffer_size, &readcount);
+    result = Curl_fillreadbuffer(conn, data->set.buffer_size, &readcount);
     if(result)
       break;
 
-    if(readcount <= 0)  /* fix questionable compare error. curlvms */
+    if(!readcount)
       break;
 
     nread = readcount;
@@ -386,7 +388,6 @@ static CURLcode file_do(struct connectdata *conn, bool *done)
 
   *done = TRUE; /* unconditionally */
 
-  Curl_initinfo(data);
   Curl_pgrsStartNow(data);
 
   if(data->set.upload)
@@ -413,21 +414,19 @@ static CURLcode file_do(struct connectdata *conn, bool *done)
     }
   }
 
-  /* If we have selected NOBODY and HEADER, it means that we only want file
-     information. Which for FILE can't be much more than the file size and
-     date. */
-  if(data->set.opt_no_body && data->set.include_header && fstated) {
+  if(fstated) {
     time_t filetime;
     struct tm buffer;
     const struct tm *tm = &buffer;
     char header[80];
-    snprintf(header, sizeof(header),
-             "Content-Length: %" CURL_FORMAT_CURL_OFF_T "\r\n", expected_size);
-    result = Curl_client_write(conn, CLIENTWRITE_BOTH, header, 0);
+    msnprintf(header, sizeof(header),
+              "Content-Length: %" CURL_FORMAT_CURL_OFF_T "\r\n",
+              expected_size);
+    result = Curl_client_write(conn, CLIENTWRITE_HEADER, header, 0);
     if(result)
       return result;
 
-    result = Curl_client_write(conn, CLIENTWRITE_BOTH,
+    result = Curl_client_write(conn, CLIENTWRITE_HEADER,
                                (char *)"Accept-ranges: bytes\r\n", 0);
     if(result)
       return result;
@@ -438,20 +437,23 @@ static CURLcode file_do(struct connectdata *conn, bool *done)
       return result;
 
     /* format: "Tue, 15 Nov 1994 12:45:26 GMT" */
-    snprintf(header, sizeof(header),
-             "Last-Modified: %s, %02d %s %4d %02d:%02d:%02d GMT\r\n",
-             Curl_wkday[tm->tm_wday?tm->tm_wday-1:6],
-             tm->tm_mday,
-             Curl_month[tm->tm_mon],
-             tm->tm_year + 1900,
-             tm->tm_hour,
-             tm->tm_min,
-             tm->tm_sec);
-    result = Curl_client_write(conn, CLIENTWRITE_BOTH, header, 0);
-    if(!result)
-      /* set the file size to make it available post transfer */
-      Curl_pgrsSetDownloadSize(data, expected_size);
-    return result;
+    msnprintf(header, sizeof(header),
+              "Last-Modified: %s, %02d %s %4d %02d:%02d:%02d GMT\r\n%s",
+              Curl_wkday[tm->tm_wday?tm->tm_wday-1:6],
+              tm->tm_mday,
+              Curl_month[tm->tm_mon],
+              tm->tm_year + 1900,
+              tm->tm_hour,
+              tm->tm_min,
+              tm->tm_sec,
+              data->set.opt_no_body ? "": "\r\n");
+    result = Curl_client_write(conn, CLIENTWRITE_HEADER, header, 0);
+    if(result)
+      return result;
+    /* set the file size to make it available post transfer */
+    Curl_pgrsSetDownloadSize(data, expected_size);
+    if(data->set.opt_no_body)
+      return result;
   }
 
   /* Check whether file range has been specified */

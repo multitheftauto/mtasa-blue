@@ -10,9 +10,9 @@
 
 #include "StdInc.h"
 
-void CLuaUtilDefs::LoadFunctions(void)
+void CLuaUtilDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
         {"deref", Dereference},
@@ -49,10 +49,8 @@ void CLuaUtilDefs::LoadFunctions(void)
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
@@ -176,7 +174,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = {uiDelimiter, '\0'};
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string
@@ -194,18 +192,15 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         // Create a new table
         lua_newtable(luaVM);
 
-        // Add our first token
-        lua_pushnumber(luaVM, ++uiCount);
-        lua_pushstring(luaVM, szToken);
-        lua_settable(luaVM, -3);
-
         // strtok until we're out of tokens
-        while (szToken = strtok(NULL, strDelimiter))
+        while (szToken)
         {
             // Add the token to the table
             lua_pushnumber(luaVM, ++uiCount);
             lua_pushstring(luaVM, szToken);
             lua_settable(luaVM, -3);
+
+            szToken = strtok(NULL, strDelimiter);
         }
 
         // Delete the text
@@ -639,7 +634,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        wchar_t wUNICODE[2] = { static_cast<wchar_t>(uiDelimiter), '\0' };
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string

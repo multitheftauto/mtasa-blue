@@ -16,17 +16,17 @@
 class CWeather
 {
 public:
-    virtual unsigned char Get(void) = 0;
+    virtual unsigned char Get() = 0;
     virtual void          Set(unsigned char primary, unsigned char secondary) = 0;
     virtual void          SetPrimary(unsigned char weather) = 0;
     virtual void          SetSecondary(unsigned char weather) = 0;
 
     virtual void ForceWeather(unsigned char weather) = 0;
     virtual void ForceWeatherNow(unsigned char weather) = 0;
-    virtual void Release(void) = 0;
+    virtual void Release() = 0;
 
-    virtual bool  IsRaining(void) = 0;
-    virtual float GetAmountOfRain(void) = 0;
+    virtual bool  IsRaining() = 0;
+    virtual float GetAmountOfRain() = 0;
     virtual void  SetAmountOfRain(float fAmount) = 0;
-    virtual void  ResetAmountOfRain(void) = 0;
+    virtual void  ResetAmountOfRain() = 0;
 };

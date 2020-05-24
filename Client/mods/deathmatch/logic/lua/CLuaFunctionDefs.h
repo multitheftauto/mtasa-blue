@@ -51,7 +51,6 @@ public:
     LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
-    LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
     LUA_DECLARE(ClearChatBox);
 
@@ -125,6 +124,7 @@ public:
     LUA_DECLARE(SetGarageOpen);
     LUA_DECLARE(SetWorldSpecialPropertyEnabled);
     LUA_DECLARE(SetBlurLevel);
+    LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
     LUA_DECLARE(SetCloudsEnabled);
     LUA_DECLARE(GetCloudsEnabled);
@@ -178,6 +178,9 @@ public:
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
     LUA_DECLARE(FetchRemote);
+    LUA_DECLARE(GetRemoteRequests);
+    LUA_DECLARE(GetRemoteRequestInfo);
+    LUA_DECLARE(AbortRemoteRequest);
 
     // Input functions
     LUA_DECLARE(BindKey);
@@ -201,6 +204,7 @@ public:
     LUA_DECLARE(AddCommandHandler);
     LUA_DECLARE(RemoveCommandHandler);
     LUA_DECLARE(ExecuteCommandHandler);
+    LUA_DECLARE(GetCommandHandlers);
 
     // Utility
     LUA_DECLARE(GetNetworkUsageData);
@@ -212,6 +216,7 @@ public:
 
     // L10n
     LUA_DECLARE(GetLocalization);
+    LUA_DECLARE(GetKeyboardLayout);
 
     // Voice functions
     LUA_DECLARE(IsVoiceEnabled);

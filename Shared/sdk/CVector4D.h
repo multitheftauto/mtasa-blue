@@ -20,7 +20,7 @@
 class CVector4D
 {
 public:
-    CVector4D(void)
+    CVector4D()
     {
         fX = 0;
         fY = 0;
@@ -57,9 +57,9 @@ public:
 
     float Length() const { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
 
-    float LengthSquared(void) const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
+    float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
 
-    void Normalize(void)
+    void Normalize()
     {
         float fLength = Length();
         if (fLength > 0.0f)

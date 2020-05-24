@@ -33,12 +33,12 @@ class CPerfStatDebugTableImpl : public CPerfStatDebugTable
 public:
     ZERO_ON_NEW
 
-    CPerfStatDebugTableImpl(void);
-    virtual ~CPerfStatDebugTableImpl(void);
+    CPerfStatDebugTableImpl();
+    virtual ~CPerfStatDebugTableImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatDebugTable
@@ -74,7 +74,7 @@ CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugTableImpl::CPerfStatDebugTableImpl(void)
+CPerfStatDebugTableImpl::CPerfStatDebugTableImpl()
 {
     m_TimeSinceRemoveOld.SetMaxIncrement(500, true);
     m_strCategoryName = "Debug table";
@@ -87,7 +87,7 @@ CPerfStatDebugTableImpl::CPerfStatDebugTableImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl(void)
+CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl()
 {
 }
 
@@ -98,7 +98,7 @@ CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatDebugTableImpl::GetCategoryName(void)
+const SString& CPerfStatDebugTableImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -110,7 +110,7 @@ const SString& CPerfStatDebugTableImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugTableImpl::DoPulse(void)
+void CPerfStatDebugTableImpl::DoPulse()
 {
     // Do remove old once every second
     if (m_TimeSinceRemoveOld.Get() < 1000)

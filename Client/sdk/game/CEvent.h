@@ -16,5 +16,5 @@ class CEventSAInterface;
 class CEvent
 {
 public:
-    virtual CEventSAInterface* GetInterface(void) = 0;
+    virtual CEventSAInterface* GetInterface() = 0;
 };

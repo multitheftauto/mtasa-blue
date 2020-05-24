@@ -16,5 +16,5 @@
 class CBuilding : public virtual CEntity
 {
 public:
-    virtual ~CBuilding(void){};
+    virtual ~CBuilding(){};
 };

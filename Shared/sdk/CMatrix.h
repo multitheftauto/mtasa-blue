@@ -110,7 +110,7 @@ public:
                        vRight.fZ * vec.fX + vFront.fZ * vec.fY + vUp.fZ * vec.fZ);
     }
 
-    CMatrix Inverse(void) const
+    CMatrix Inverse() const
     {
         float fDeterminant = vRight.fX * (vFront.fY * vUp.fZ - vUp.fY * vFront.fZ) - vFront.fX * (vRight.fY * vUp.fZ - vUp.fY * vRight.fZ) +
                              vUp.fX * (vRight.fY * vFront.fZ - vFront.fY * vRight.fZ);
@@ -144,7 +144,7 @@ public:
         return matResult;
     }
 
-    CMatrix Clone(void) const
+    CMatrix Clone() const
     {
         CMatrix matResult;
         matResult.vRight = vRight.Clone();
@@ -224,7 +224,7 @@ public:
     // Get matrix rotation as angles
     // Inverted to match MTAized rotations for vehicles and players (and objects on the server)
     // Should produce the same results as ( CVector(0,0,0) - ConvertToEulerAngles() )
-    CVector GetRotation(void) const
+    CVector GetRotation() const
     {
         // Operate only on rotation, ignore scale.
         CMatrix matRot = GetRotationMatrix();
@@ -270,7 +270,7 @@ public:
     }
 
     // Get matrix translational part
-    const CVector& GetPosition(void) const { return vPos; }
+    const CVector& GetPosition() const { return vPos; }
 
     // Set matrix translational part
     void SetPosition(const CVector& vecPosition) { vPos = vecPosition; }

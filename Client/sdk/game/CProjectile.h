@@ -16,7 +16,7 @@
 class CProjectile : public virtual CObject
 {
 public:
-    virtual ~CProjectile(void){};
+    virtual ~CProjectile(){};
 
     virtual void Destroy(bool bBlow) = 0;
     virtual void SetProjectileInfo(class CProjectileInfo* pProjectileInfo) = 0;

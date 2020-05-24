@@ -49,7 +49,7 @@ public:
 class CTaskSimpleCarSetPedInAsDriverSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsDriver
 {
 public:
-    CTaskSimpleCarSetPedInAsDriverSA(void){};
+    CTaskSimpleCarSetPedInAsDriverSA(){};
     CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTargetVehicle, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
@@ -78,7 +78,7 @@ public:
 class CTaskSimpleCarSetPedInAsPassengerSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsPassenger
 {
 public:
-    CTaskSimpleCarSetPedInAsPassengerSA(void){};
+    CTaskSimpleCarSetPedInAsPassengerSA(){};
     CTaskSimpleCarSetPedInAsPassengerSA(CVehicle* pTargetVehicle, int iTargetDoor, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
@@ -107,7 +107,7 @@ public:
 class CTaskSimpleCarSetPedOutSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedOut
 {
 public:
-    CTaskSimpleCarSetPedOutSA(void){};
+    CTaskSimpleCarSetPedOutSA(){};
     CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, int iTargetDoor, bool bSwitchOffEngine = false);
 
     void SetIsWarpingPedOutOfCar();

@@ -24,7 +24,7 @@ class CClientStreamSector
 
 public:
     CClientStreamSector(CClientStreamSectorRow* pRow, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
-    ~CClientStreamSector(void);
+    ~CClientStreamSector();
 
     bool DoesContain(CVector& vecPosition);
     bool DoesContain(float fX);
@@ -35,14 +35,14 @@ public:
 
     void                                       Add(CClientStreamElement* pElement) { m_Elements.push_back(pElement); }
     void                                       Remove(CClientStreamElement* pElement) { m_Elements.remove(pElement); }
-    std::list<CClientStreamElement*>::iterator Begin(void) { return m_Elements.begin(); }
-    std::list<CClientStreamElement*>::iterator End(void) { return m_Elements.end(); }
+    std::list<CClientStreamElement*>::iterator Begin() { return m_Elements.begin(); }
+    std::list<CClientStreamElement*>::iterator End() { return m_Elements.end(); }
 
     void         AddElements(std::list<CClientStreamElement*>* pList);
     void         RemoveElements(std::list<CClientStreamElement*>* pList);
-    unsigned int CountElements(void) { return m_Elements.size(); }
+    unsigned int CountElements() { return m_Elements.size(); }
 
-    CClientStreamSectorRow* GetRow(void) { return m_pRow; }
+    CClientStreamSectorRow* GetRow() { return m_pRow; }
     void                    GetCorners(CVector2D& vecBottomLeft, CVector2D& vecTopRight)
     {
         vecBottomLeft = m_vecBottomLeft;
@@ -50,10 +50,10 @@ public:
     }
 
 private:
-    bool IsActivated(void) { return m_bActivated; }
+    bool IsActivated() { return m_bActivated; }
     void SetActivated(bool bActivated) { m_bActivated = bActivated; }
 
-    bool IsExtra(void) { return m_bExtra; }
+    bool IsExtra() { return m_bExtra; }
     void SetExtra(bool bExtra) { m_bExtra = bExtra; }
 
     CVector2D                        m_vecBottomLeft;
