@@ -668,7 +668,11 @@ CLuaArgument CAccountManager::GetAccountData(CAccount* pAccount, const char* szK
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID,
                                          SQLITE_TEXT, szKey);
 
+<<<<<<< HEAD
     CLuaArgument luaResult; // by default its value is 'nil'
+=======
+    CLuaArgument luaResult;
+>>>>>>> f8acfca997974003fede7acc3e7d0d4ae9da826c
 
     // Do we have any results?
     if (result->nRows > 0)

@@ -133,7 +133,7 @@ public:
     bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword);
     bool LogOut(CClient* pClient, CClient* pEchoClient);
 
-	CLuaArgument GetAccountData(CAccount* pAccount, const char* szKey);
+    CLuaArgument GetAccountData(CAccount* pAccount, const char* szKey);
     bool         SetAccountData(CAccount* pAccount, const char* szKey, const SString& strValue, int iType);
     bool         CopyAccountData(CAccount* pFromAccount, CAccount* pToAccount);
     bool         GetAllAccountData(CAccount* pAccount, lua_State* pLua);
