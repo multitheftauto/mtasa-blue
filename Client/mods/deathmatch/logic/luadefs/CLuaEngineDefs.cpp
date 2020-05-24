@@ -774,29 +774,18 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 {
-    SString          strModel = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModel);
+    const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
+    CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        throw std::invalid_argument(SString("Invalid model id %u", modelID));
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    
-    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
-    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
-    if (pModelInfo)
-    {
-        float fCurrentDistance = pModelInfo->GetLODDistance();
-        float fOriginalDistance = pModelInfo->GetOriginalLODDistance();
-        //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
-        if (fOriginalDistance > 0.0f && fOriginalDistance != fCurrentDistance) {
-            pModelInfo->SetLODDistance(fOriginalDistance, true);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
+    //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
+    const float originalDistance = modelInfo->GetOriginalLODDistance();
+    if (originalDistance == 0.0f || originalDistance == modelInfo->GetLODDistance())
+        return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    modelInfo->SetLODDistance(originalDistance, true);
+    return true;
 }
 
 int CLuaEngineDefs::EngineSetAsynchronousLoading(lua_State* luaVM)

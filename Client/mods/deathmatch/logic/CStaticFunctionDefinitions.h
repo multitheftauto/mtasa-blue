@@ -635,6 +635,13 @@ public:
     static bool ResetAllSurfaceInfo();
     static bool ResetSurfaceInfo(short sSurfaceID);
 
+    static inline unsigned short ResolveModelID(const std::variant<std::string, unsigned short>& variant)
+    {
+        if (std::holds_alternative<unsigned short>(variant))
+            return std::get<unsigned short>(variant);
+        return CModelNames::ResolveModelID(std::get<std::string>(variant));
+    }
+
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
     static bool BindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource);
