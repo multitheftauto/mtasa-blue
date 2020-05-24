@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CColModelSA.h
  *  PURPOSE:     Header file for collision model entity class
@@ -11,11 +11,10 @@
 
 #pragma once
 
-#include <windows.h>
 #include <game/CColModel.h>
 
-#define FUNC_CColModel_Constructor      0x40FB60
-#define FUNC_CColModel_Destructor       0x40F700
+#define FUNC_CColModel_Constructor 0x40FB60
+#define FUNC_CColModel_Destructor 0x40F700
 
 typedef struct
 {
@@ -27,22 +26,22 @@ typedef struct
 
 typedef struct
 {
-    CVector        vecCenter;
-    float          fRadius;
-    uchar          material;
-    uchar          flags;
-    CColLighting   lighting;
-    uchar          light;
+    CVector      vecCenter;
+    float        fRadius;
+    uchar        material;
+    uchar        flags;
+    CColLighting lighting;
+    uchar        light;
 } CColSphereSA;
 
 typedef struct
 {
-    CVector        min;
-    CVector        max;
-    uchar          material;
-    uchar          flags;
-    CColLighting   lighting;
-    uchar          light;
+    CVector      min;
+    CVector      max;
+    uchar        material;
+    uchar        flags;
+    CColLighting lighting;
+    uchar        light;
 } CColBoxSA;
 
 typedef struct
@@ -74,14 +73,14 @@ typedef struct
 
 typedef struct
 {
-    CVector m_vecStart;
-    float m_fStartRadius;
+    CVector       m_vecStart;
+    float         m_fStartRadius;
     unsigned char m_nMaterial;
     unsigned char m_nPiece;
     unsigned char m_nLighting;
-    char _pad13;
-    CVector m_vecEnd;
-    float m_fEndRadius;
+    char          _pad13;
+    CVector       m_vecEnd;
+    float         m_fEndRadius;
 } CColDisk;
 
 typedef struct
@@ -89,17 +88,13 @@ typedef struct
     signed __int16 x;
     signed __int16 y;
     signed __int16 z;
-    CVector getVector()
-    {
-        return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f);
-    }
-    void setVector(CVector vec)
+    CVector        getVector() const { return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f); }
+    void           setVector(CVector vec)
     {
         x = static_cast<signed __int16>(vec.fX * 128);
         y = static_cast<signed __int16>(vec.fY * 128);
         z = static_cast<signed __int16>(vec.fZ * 128);
     }
-
 } CompressedVector;
 
 typedef struct
@@ -120,7 +115,7 @@ typedef struct
     CompressedVector*    m_pShadowVertices;
     CColTriangleSA*      m_pShadowTriangles;
 
-    std::map<ushort, CompressedVector> getAllVertices()
+    std::map<ushort, CompressedVector> getAllVertices() const
     {
         std::map<ushort, CompressedVector> vertices;
         for (uint i = 0; numColTriangles > i; i++)
@@ -131,7 +126,8 @@ typedef struct
         }
         return vertices;
     }
-    size_t getNumVertices()
+
+    size_t getNumVertices() const
     {
         std::map<ushort, bool> vertices;
         for (uint i = 0; numColTriangles > i; i++)
@@ -143,30 +139,30 @@ typedef struct
         return vertices.size();
     }
 
-    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0)
+    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0) const
     {
         switch (eShape)
         {
             case 0:
                 return (usIndex >= 0 && usIndex < numColBoxes);
-            break;
+                break;
             case 1:
                 return (usIndex >= 0 && usIndex < numColSpheres);
-            break;
+                break;
             case 2:
                 return (usIndex >= 0 && usIndex < numColTriangles);
-            break;
+                break;
             case 3:
                 return (usIndex >= 0 && usIndex < numVertices);
-            break;
+                break;
         }
         return false;
     }
 
-    std::vector<ushort> getTrianglesByVertex(ushort usVertex)
+    std::vector<ushort> getTrianglesByVertex(ushort usVertex) const
     {
         std::vector<ushort> vecTriangles;
-        CColTriangleSA colTriangle;
+        CColTriangleSA      colTriangle;
         for (ushort i = 0; i < numColTriangles; i++)
         {
             colTriangle = pColTriangles[i];
@@ -176,16 +172,12 @@ typedef struct
         return vecTriangles;
     }
 
-    std::map<ushort, ushort> getVerticesUsage()
+    std::map<ushort, ushort> getVerticesUsage() const
     {
         std::map<ushort, ushort> verticesUsage;
         for (ushort i = 0; i < numColTriangles; i++)
-        {
             for (char cVertex = 0; cVertex < 3; cVertex++)
-            {
                 verticesUsage[pColTriangles[i].vertex[cVertex]]++;
-            }
-        }
         return verticesUsage;
     }
 } CColDataSA;
@@ -207,7 +199,7 @@ public:
     CColModelSA(CColModelSAInterface* pInterface);
     ~CColModelSA();
 
-    CColModelSAInterface* GetInterface() { return m_pInterface; }
+    CColModelSAInterface* GetInterface() const { return m_pInterface; }
     void                  Destroy() { delete this; }
 
 private:

@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *  PURPOSE:
  *
  *****************************************************************************/
@@ -580,6 +579,23 @@ ADD_ENUM(EXHAUST_SECONDARY, "exhaust_second")
 ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
+
+IMPLEMENT_ENUM_BEGIN(eCollisionShapes)
+ADD_ENUM(COLLISION_BOX, "box")
+ADD_ENUM(COLLISION_SPHERE, "sphere")
+ADD_ENUM(COLLISION_TRIANGLE, "triangle")
+ADD_ENUM(COLLISION_VERTEX, "vertex")
+IMPLEMENT_ENUM_END("collision-shape")
+
+IMPLEMENT_ENUM_BEGIN(eCollisionKey)
+ADD_ENUM(COLLISION_KEY_SIZE, "size")
+ADD_ENUM(COLLISION_KEY_MATERIAL, "material")
+ADD_ENUM(COLLISION_KEY_POSITION, "position")
+ADD_ENUM(COLLISION_KEY_RADIUS, "radius")
+ADD_ENUM(COLLISION_KEY_LIGHTING, "lighting")
+ADD_ENUM(COLLISION_KEY_VERTICES, "vertices")
+ADD_ENUM(COLLISION_KEY_MOVE, "move")
+IMPLEMENT_ENUM_END("collision-key")
 
 IMPLEMENT_ENUM_BEGIN(eSurfaceProperties)
 ADD_ENUM(SURFACE_PROPERTY_AUDIO, "audio")

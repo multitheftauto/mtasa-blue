@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.h
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
  *  PURPOSE:
  *
  *****************************************************************************/
@@ -121,10 +120,8 @@ enum eCollisionKey
     COLLISION_KEY_LIGHTING,
     COLLISION_KEY_VERTICES,
     COLLISION_KEY_MOVE,
-
 };
 DECLARE_ENUM(eCollisionKey);
-
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
@@ -430,6 +427,14 @@ inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
+}
+inline SString GetClassTypeName(eCollisionShapes*)
+{
+    return "collision-shape";
+}
+inline SString GetClassTypeName(eCollisionKey*)
+{
+    return "collision-key";
 }
 inline SString GetClassTypeName(eSurfaceProperties*)
 {
