@@ -28,7 +28,7 @@ public:
     LUA_DECLARE(GetElementID);
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
-    static std::variant<bool, CLuaArgument*> GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
+    static std::variant<bool, std::reference_wrapper<CLuaArgument>> GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
     static bool HasElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
