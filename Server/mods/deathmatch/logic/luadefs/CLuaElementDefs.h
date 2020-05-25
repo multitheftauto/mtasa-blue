@@ -72,7 +72,7 @@ public:
     static bool removeElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
     static bool hasElementDataSubscriber(lua_State* luaVM, CElement* const dataOwner, std::string key, CPlayer* const subber);
     // shared with the client(can be found in CLuaElementSharedDefs.cpp)
-    static std::variant<bool, std::reference_wrapper<CLuaArgument>> getElementData(lua_State* const luaVM, CElement* const element, std::string key, std::optional<bool> inherit);
+    static std::variant<bool, CLuaArgument*> getElementData(lua_State* const luaVM, CElement* const element, std::string key, std::optional<bool> inherit);
     static bool hasElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit);
     static bool setElementData(lua_State* const luaVM, CElement* const element, std::string key, CLuaArgument newValue, const std::optional<std::variant<bool, ESyncType>> optionalNewSyncType);
 

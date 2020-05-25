@@ -11,10 +11,11 @@ static void TruncateStringAndWarn(std::string& key, lua_State* const luaVM, CScr
     }
 }
 
+
 #ifdef MTA_CLIENT
-std::variant<bool, std::reference_wrapper<CLuaArgument>> CLuaElementDefs::GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
+std::variant<bool, CLuaArgument*> CLuaElementDefs::GetElementData(lua_State* const luaVM, CClientEntity* const element, std::string key, const std::optional<bool> inherit)
 #else
-std::variant<bool, std::reference_wrapper<CLuaArgument>> CLuaElementDefs::getElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
+std::variant<bool, CLuaArgument*> CLuaElementDefs::getElementData(lua_State* const luaVM, CElement* const element, std::string key, const std::optional<bool> inherit)
 #endif
 {
     TruncateStringAndWarn(key, luaVM, m_pScriptDebugging);
@@ -25,10 +26,7 @@ std::variant<bool, std::reference_wrapper<CLuaArgument>> CLuaElementDefs::getEle
     CLuaArgument* const pVariable = CStaticFunctionDefinitions::GetElementData(element, key.c_str(), inherit.value_or(true));
 #endif
 
-    if (pVariable)
-        return *pVariable;
-
-    return false;
+    return { pVariable ? pVariable : false };
 }
 
 #ifdef MTA_CLIENT
@@ -41,14 +39,13 @@ bool CLuaElementDefs::setElementData(lua_State* const luaVM, CElement* const ele
 {
 #ifndef MTA_CLIENT
     ESyncType newSyncType = ESyncType::BROADCAST;
-    if (optionalNewSyncType)
+    if (optionalNewSyncType.has_value())
     {
         const auto& value = optionalNewSyncType.value();
-        if (std::holds_alternative<ESyncType>(value))
-            newSyncType = std::get<ESyncType>(value);
-
-        else if (!std::get<bool>(value)) // by default its broadcast, so only set it to local if user passed in 'false'
+        if (std::holds_alternative<bool>(value) && !std::get<bool>(value))
             newSyncType = ESyncType::LOCAL;
+        else
+            newSyncType = std::get<ESyncType>(value);
     }
 
     LogWarningIfPlayerHasNotJoinedYet(luaVM, element);
