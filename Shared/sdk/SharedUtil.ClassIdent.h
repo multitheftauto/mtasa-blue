@@ -19,24 +19,24 @@ namespace SharedUtil
 
     #define DECLARE_BASE_CLASS(cls) \
         public: \
-            static ClassId GetClassId ( void ) \
+            constexpr static ClassId GetClassId ( void ) \
             { \
                 return CLASS_##cls; \
             } \
-            bool IsA( ClassId classId ) const \
+            constexpr bool IsA( ClassId classId ) const \
             { \
-                return ( ClassHierarchyBits & ( 1ULL << classId ) ) ? true : false; \
+                return ( bool )( ClassHierarchyBits & ( 1ULL << classId ) ); \
             } \
-            const char* GetClassName ( void ) \
+            constexpr const char* GetClassName ( void ) \
             { \
                 return ClassName; \
             } \
         protected: \
-            static const char* StaticGetClassName ( void ) \
+            constexpr static const char* StaticGetClassName ( void ) \
             { \
                 return #cls; \
             } \
-            static ClassBits CalcClassHierarchyBits ( void ) \
+            constexpr static ClassBits CalcClassHierarchyBits ( void ) \
             { \
                 return ( 1ULL << GetClassId () ); \
             } \
@@ -50,7 +50,7 @@ namespace SharedUtil
 
     #define DECLARE_CLASS(cls,super) \
         public: \
-            static ClassId GetClassId ( void ) \
+            constexpr static ClassId GetClassId ( void ) \
             { \
                 return CLASS_##cls; \
             } \
