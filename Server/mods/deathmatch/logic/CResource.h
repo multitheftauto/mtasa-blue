@@ -231,6 +231,11 @@ public:
     }
     bool IsStarting() const noexcept { return m_eState == EResourceState::Starting; }
     bool IsStopping() const noexcept { return m_eState == EResourceState::Stopping; }
+    static const char* GetStateName(const EResourceState state);
+    inline const char* GetCurrentStateName() { return GetStateName(m_eState); }
+
+    // otherEventName, and its args can be nullptr.
+    bool CallStateChaningEvents(CElement* const eventSourceElem, const EResourceState oldState, const char* otherEventName = nullptr, const CLuaArguments* const otherEventArguments = nullptr, const bool cancellable = true);
 
     bool IsClientSynced() const noexcept { return m_bClientSync; }
 

@@ -58,7 +58,7 @@ struct CLuaFunctionParserBase
             using param_t = typename is_specialization<T, std::optional>::param_t;
             return TypeToName<param_t>();
         }
-        else if constexpr (std::is_same_v<T, CLuaArgument>)
+        else if constexpr (std::is_same_v<std::remove_reference_t<T>, CLuaArgument>)
             return "value";
         else if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
@@ -198,7 +198,7 @@ struct CLuaFunctionParserBase
             return iArgument == LUA_TSTRING;
 
         // CLuaArgument can hold any value
-        if constexpr (std::is_same_v<T, CLuaArgument>)
+        if constexpr (std::is_same_v<std::remove_reference_t<T>, CLuaArgument>)
             return iArgument != LUA_TNONE;
 
         // std::optional is used for optional parameters
@@ -551,7 +551,7 @@ struct CLuaFunctionParserBase
             }
             return static_cast<T>(result);
         }
-        else if constexpr (std::is_same_v<T, CLuaArgument>)
+        else if constexpr (std::is_same_v<std::remove_reference_t<T>, CLuaArgument>)
         {
             CLuaArgument argument;
             argument.Read(L, index++);
