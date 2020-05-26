@@ -1795,13 +1795,19 @@ ID3DXFont* CGraphics::MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float&
 //
 void CGraphics::ClearDrawQueue(std::vector<sDrawQueueItem>& Queue)
 {
-    for (std::vector<sDrawQueueItem>::const_iterator iter = Queue.begin(); iter != Queue.end(); iter++)
+    for (auto& item : Queue)
     {
-        const sDrawQueueItem& item = *iter;
-        if (item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER)
+        switch (item.eType)
+    {
+        case QUEUE_TEXTURE:
+        case QUEUE_SHADER:
             RemoveQueueRef(item.Texture.pMaterial);
-        else if (item.eType == QUEUE_TEXT)
+            break;
+
+        case QUEUE_TEXT:
             RemoveQueueRef(item.Text.pDXFont);
+            break;
+    }
     }
     Queue.clear();
 }
