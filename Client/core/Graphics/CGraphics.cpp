@@ -484,43 +484,42 @@ void CGraphics::EndDrawBatch()
 //
 void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMode)
 {
-    bool bDrawModeChanging = (m_CurDrawMode != newDrawMode);
-    bool bBlendModeChanging = (m_CurBlendMode != newBlendMode);
-    // Draw mode changing?
-    if (bDrawModeChanging || bBlendModeChanging)
+    if (m_CurDrawMode != newDrawMode || m_CurBlendMode != newBlendMode)
     {
-
         // Flush old
-        if (m_CurDrawMode == EDrawMode::DX_SPRITE)
+        switch (m_CurDrawMode)
+        {
+        case EDrawMode::DX_SPRITE:
         {
             m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
             m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
             m_pDXSprite->End();
+            break;
         }
-        else if (m_CurDrawMode == EDrawMode::DX_LINE)
-        {
+        case EDrawMode::DX_LINE:
             m_pLineInterface->End();
-        }
-        else if (m_CurDrawMode == EDrawMode::TILE_BATCHER)
-        {
+            break;
+
+        case EDrawMode::TILE_BATCHER:
             m_pTileBatcher->Flush();
-        }
-        else if (m_CurDrawMode == EDrawMode::PRIMITIVE)
-        {
+            break;
+
+        case EDrawMode::PRIMITIVE:
             m_pPrimitiveBatcher->Flush();
-        }
-        else if (m_CurDrawMode == EDrawMode::PRIMITIVE_MATERIAL)
-        {
+            break;
+
+        case EDrawMode::PRIMITIVE_MATERIAL:
             m_pPrimitiveMaterialBatcher->Flush();
+            break;
         }
 
-        // Start new
-        if (newDrawMode == EDrawMode::DX_SPRITE)
+        switch (newDrawMode)
         {
+        case EDrawMode::DX_SPRITE:
             m_pDXSprite->Begin(D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE);
-        }
-        else if (newDrawMode == EDrawMode::DX_LINE)
-        {
+            break;
+
+        case EDrawMode::DX_LINE:
             m_pLineInterface->Begin();
         }
 
