@@ -158,46 +158,47 @@ void CGraphics::DrawString(int iX, int iY, unsigned long dwColor, float fScale, 
 // Slow
 void CGraphics::DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
 {
-    const uint   uiKernelSizeX = 5;
-    const uint   uiKernelSizeY = 5;
-    const float* pKernel;
+    constexpr int iKernelSizeX = 5;
+    constexpr int iKernelSizeY = 5;
+    const float*  pKernel;
 
     // Select outline style
-    int   iRed = (ulColor & 0x00FF0000) >> 16;
-    int   iGreen = (ulColor & 0x0000FF00) >> 8;
-    int   iBlue = (ulColor & 0x000000FF) >> 0;
-    float fBrightness = (iRed * 0.299f + iGreen * 0.587f + iBlue * 0.114f);
+    const int   iRed = (ulColor & 0x00FF0000) >> 16;
+    const int   iGreen = (ulColor & 0x0000FF00) >> 8;
+    const int   iBlue = (ulColor & 0x000000FF) >> 0;
+    const float fBrightness = (iRed * 0.299f + iGreen * 0.587f + iBlue * 0.114f);
     if (fBrightness > 64)
     {
         // Use black outline with thicker border
         ulColor = ulColor & 0xFF000000;
-        const float        F = 0, E = 0.16f, D = 0.33f, C = 0.66f, B = 1, A = 0;
-        static const float kernelData[] = {F, E, D, E, F, E, C, B, C, E, D, B, A, B, D, E, C, B, C, E, F, E, D, E, F};
+        constexpr const float        F = 0, E = 0.16f, D = 0.33f, C = 0.66f, B = 1, A = 0;
+        constexpr static const float kernelData[] = {F, E, D, E, F, E, C, B, C, E, D, B, A, B, D, E, C, B, C, E, F, E, D, E, F};
         pKernel = kernelData;
     }
     else
     {
         // Use white outline with thinner border
         ulColor = ulColor | 0x00FFFFFF;
-        const float        F = 0, E = 0, D = 0.25f, C = 0.5f, B = 1, A = 0;
-        static const float kernelData[] = {F, E, D, E, F, E, C, B, C, E, D, B, A, B, D, E, C, B, C, E, F, E, D, E, F};
+        constexpr const float        F = 0, E = 0, D = 0.25f, C = 0.5f, B = 1, A = 0;
+        constexpr static const float kernelData[] = {F, E, D, E, F, E, C, B, C, E, D, B, A, B, D, E, C, B, C, E, F, E, D, E, F};
         pKernel = kernelData;
     }
 
     // Apply definition
     int iInputAlpha = (ulColor & 0xFF000000) >> 24;
     iInputAlpha = iInputAlpha * iInputAlpha / 256;
-    for (uint y = 0; y < uiKernelSizeY; y++)
+    for (int y = 0; y < iKernelSizeY; y++)
     {
-        for (uint x = 0; x < uiKernelSizeX; x++)
+        for (int x = 0; x < iKernelSizeX; x++)
         {
             float fAlpha = *pKernel++;
             if (fAlpha == 0)
                 continue;
+
             uint uiUseAlpha = (uint)(iInputAlpha * fAlpha);
             uint uiUseColor = (uiUseAlpha << 24) | (ulColor & 0x00FFFFFF);
-            int  iOffsetX = x - (uiKernelSizeX - 1) / 2;
-            int  iOffsetY = y - (uiKernelSizeY - 1) / 2;
+            int  iOffsetX = x - (iKernelSizeX - 1) / 2;
+            int  iOffsetY = y - (iKernelSizeY - 1) / 2;
             RECT useRect = {rect.left + iOffsetX, rect.top + iOffsetY, rect.right + iOffsetX, rect.bottom + iOffsetY};
             pDXFont->DrawTextW(m_pDXSprite, szText, -1, &useRect, ulFormat, uiUseColor);
         }
