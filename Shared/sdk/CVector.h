@@ -28,40 +28,44 @@ class CVector
 public:
     float fX, fY, fZ;
 
-    CVector()
+    constexpr CVector() :
+        fX(0),
+        fY(0),
+        fZ(0)
     {
-        this->fX = 0;
-        this->fY = 0;
-        this->fZ = 0;
     };
 
-    CVector(float fX, float fY, float fZ)
+    constexpr CVector(float x, float y, float z) :
+        fX(x),
+        fY(y),
+        fZ(z)
     {
-        this->fX = fX;
-        this->fY = fY;
-        this->fZ = fZ;
     }
 
-    CVector(const CVector4D& vec)
+    constexpr CVector(const CVector4D& vec) :
+        fX(vec.fX),
+        fY(vec.fY),
+        fZ(vec.fZ)
     {
-        this->fX = vec.fX;
-        this->fY = vec.fY;
-        this->fZ = vec.fZ;
     }
 
+    // returns the length of the vector as well
     float Normalize()
     {
-        float t = sqrt(fX * fX + fY * fY + fZ * fZ);
+        const float t = sqrt(fX * fX + fY * fY + fZ * fZ);
         if (t > FLOAT_EPSILON)
         {
-            float fRcpt = 1 / t;
+            // stupid hack: mul. is faster than div.............
+            const float fRcpt = 1 / t; 
+
             fX *= fRcpt;
             fY *= fRcpt;
             fZ *= fRcpt;
+
+            return t;
         }
         else
-            t = 0;
-        return t;
+            return 0;
     }
 
     float Length() const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
