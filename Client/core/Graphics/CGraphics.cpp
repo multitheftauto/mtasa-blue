@@ -232,7 +232,9 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
         int  posOffsetY;
         int  overrideWidth;
         int  overrideHeight;
-    } static sectionList[] = {
+    };
+
+    constexpr static SSection sectionList[] = {
         {{3, 3, 5, 5}, 0, 0, 0, 0},              // Center
         {{3, 0, 5, 2}, 0, -2, 0, 2},             // Top
         {{0, 0, 2, 2}, -2, -2, 2, 2},            // Top left
@@ -244,8 +246,7 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
         {{6, 0, 8, 2}, 2, -2, 2, 2},             // Top right
     };
 
-    D3DXMATRIX        matrix;
-    const D3DXVECTOR2 scalingCentre(0.5f, 0.5f);
+    D3DXMATRIX matrix;
     for (uint i = 0; i < NUMELMS(sectionList); i++)
     {
         const SSection& section = sectionList[i];
@@ -743,7 +744,6 @@ int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
         GetTextExtentPoint32W(dc, L" ", 1, &size);
         iSpacesWidth = iSpaceCount * size.cx;
     }
-
     return iSpacesWidth;
 }
 
@@ -806,6 +806,7 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     sDrawQueueItem Item;
     Item.eType = QUEUE_LINE;
     Item.blendMode = m_ActiveBlendMode;
+
     Item.Line.fX1 = fX1;
     Item.Line.fY1 = fY1;
     Item.Line.fX2 = fX2;
@@ -859,6 +860,7 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     sDrawQueueItem Item;
     Item.eType = QUEUE_RECT;
     Item.blendMode = m_ActiveBlendMode;
+
     Item.Rect.fX = fX;
     Item.Rect.fY = fY;
     Item.Rect.fWidth = fWidth;
@@ -878,10 +880,10 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
         return;
 
     auto pVecVertices = new std::vector<PrimitiveVertice>();
-    fStartAngle = D3DXToRadian(fStartAngle);
-    fStopAngle = D3DXToRadian(fStopAngle);
+    pVecVertices->reserve(siSegments + 1);
+
     // Calculate each segment angle
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
+    const float kfSegmentAngle = (D3DXToRadian(fStopAngle) - D3DXToRadian(fStartAngle)) / siSegments;
 
     // Add center point
     pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
@@ -987,11 +989,14 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
 
     // Set up a queue item
     sDrawQueueItem Item;
+
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
     Item.blendMode = m_ActiveBlendMode;
+
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
+
     AddQueueItem(Item, bPostGUI);
 
     AddQueueRef(pMaterial);
@@ -1004,25 +1009,25 @@ bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 
     switch (eType)
     {
-        case D3DPT_LINESTRIP:
+    case D3DPT_LINESTRIP:
         return iNumVertives >= 2;
 
-        case D3DPT_LINELIST:
+    case D3DPT_LINELIST:
         return iNumVertives % 2 == 0;
 
-        case D3DPT_TRIANGLELIST:
+    case D3DPT_TRIANGLELIST:
         return iNumVertives % 3 == 0;
 
-        case D3DPT_TRIANGLEFAN:
-        case D3DPT_TRIANGLESTRIP:
+    case D3DPT_TRIANGLEFAN:
+    case D3DPT_TRIANGLESTRIP:
         return iNumVertives >= 3;
 
     case D3DPT_POINTLIST:
-    return true;
+        return true;
 
     default:
         dassert(0); // shoudnt be reached
-}
+    }
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1033,6 +1038,7 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
     // Set up a queue item
     sDrawQueueItem Item;
     Item.blendMode = m_ActiveBlendMode;
+
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;
@@ -1059,10 +1065,7 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
         Item.Texture.pMaterial = pMaterial;
 
         // Use tilebatcher if non-default texture addessing is needed
-        if (pMaterial->m_TextureAddress == TADDRESS_WRAP)
-            Item.eType = QUEUE_TEXTURE;
-        else
-            Item.eType = QUEUE_SHADER;
+        Item.eType = (pMaterial->m_TextureAddress == TADDRESS_WRAP) ? QUEUE_TEXTURE : QUEUE_SHADER;
     }
 
     // Keep material valid while in the queue
@@ -1099,8 +1102,10 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
 
         if (fScaleX != 1.0f || fScaleY != 1.0f)
         {
+            // Optimization hack: multiplying is faster than diving
             const float fRcpScaleX = 1 / fScaleX;
             const float fRcpScaleY = 1 / fScaleY;
+
             fLeft *= fRcpScaleX;
             fTop *= fRcpScaleY;
             fRight *= fRcpScaleX;
@@ -1153,10 +1158,10 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
 
         // Break into lines
         CSplitStringW splitLines(wstrText, L"\n");
-        int           iNumLines = splitLines.size();
+        const int     iNumLines = splitLines.size();
 
-        float fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
-        float fTotalHeight = iNumLines * fLineHeight;
+        const float fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
+        const float fTotalHeight = iNumLines * fLineHeight;
 
         // Y position of text
         float fY;
@@ -1169,9 +1174,10 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
 
         // Process each line
         SColor currentColor = dwColor;
-        for (uint i = 0; i < splitLines.size(); i++)
+
+        for (const auto& lineStr : splitLines)
         {
-            DrawColorCodedTextLine(fLeft, fRight, fY, currentColor, splitLines[i], fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning,
+            DrawColorCodedTextLine(fLeft, fRight, fY, currentColor, lineStr, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bSubPixelPositioning,
                                    fRotation, fRotationCenterX, fRotationCenterY);
             fY += fLineHeight;
         }
@@ -1189,6 +1195,8 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
         SColor       color;
     };
 
+    // TODO: Make an std::map with wszText, so we can cache this section list, because most texts are constant, not randomly changing
+    // also make section list a vector please... who uses lists these days?
     std::list<STextSection> sectionList;
 
     // Break line into color sections
@@ -1256,10 +1264,8 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
         fX = fLeft;            // DT_LEFT
 
     // Draw all the color sections
-    for (std::list<STextSection>::const_iterator iter = sectionList.begin(); iter != sectionList.end(); ++iter)
+    for (const auto& section : sectionList)
     {
-        const STextSection& section = *iter;
-
         float fLeft = fX;
         float fTop = fY;
 
@@ -1304,7 +1310,8 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     }
 }
 
-static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
+constexpr static sFontInfo fontInfos[] = {
+    {"tahoma", 15, FW_NORMAL},
                                       {"tahomabd", 15, FW_BOLD},
                                       {"verdana", 15, FW_NORMAL},
                                       {"arial", 15, FW_NORMAL},
@@ -1313,7 +1320,8 @@ static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
                                       {"bankgothic md bt", 30, FW_NORMAL},
                                       {"diploma", 30, FW_NORMAL},
                                       {"beckett", 30, FW_NORMAL},
-                                      {"unifont", 14, FW_NORMAL}};
+    {"unifont", 14, FW_NORMAL}
+};
 
 bool CGraphics::LoadStandardDXFonts()
 {
@@ -1425,10 +1433,8 @@ bool CGraphics::DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3D
 bool CGraphics::DestroyStandardDXFonts()
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
-    for (uint i = 0; i < m_FontResourceNames.size(); i++)
-    {
-        RemoveFontResourceEx(CalcMTASAPath("MTA\\cgui\\" + m_FontResourceNames[i]), FR_PRIVATE, 0);
-    }
+    for (const auto fontName : m_FontResourceNames)
+        RemoveFontResourceEx(CalcMTASAPath("MTA\\cgui\\" + fontName), FR_PRIVATE, 0);
 
     // Release
     for (int i = 0; i < NUM_FONTS; i++)
@@ -1438,8 +1444,8 @@ bool CGraphics::DestroyStandardDXFonts()
     }
 
     // Release custom scale versions of standard fonts as well
-    for (std::map<SString, SCustomScaleFontInfo>::iterator iter = m_CustomScaleFontMap.begin(); iter != m_CustomScaleFontMap.end(); ++iter)
-        SAFE_RELEASE(iter->second.pFont);
+    for (auto& [name, info] : m_CustomScaleFontMap)
+        SAFE_RELEASE(info.pFont);
 
     return true;
 }
@@ -1459,13 +1465,15 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
     const float fFileHeight = pTexture->m_uiSizeY;
 
     BeginDrawBatch();
-    RECT        cutImagePos;
     const float fMultU = (bRelativeUV ? fSurfaceWidth : fSurfaceWidth / fFileWidth);
     const float fMultV = (bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight);
+
+    RECT        cutImagePos;
     cutImagePos.left = (fU)*fMultU;
     cutImagePos.right = (fU + fSizeU) * fMultU;
     cutImagePos.top = (fV)*fMultV;
     cutImagePos.bottom = (fV + fSizeV) * fMultV;
+
     const float fCutWidth = cutImagePos.right - cutImagePos.left;
     const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
 
@@ -1515,13 +1523,16 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
     {
         if (m_pDXFonts[i])
             m_pDXFonts[i]->OnLostDevice();
+
         if (m_pBigDXFonts[i])
             m_pBigDXFonts[i]->OnLostDevice();
     }
 
-    for (std::map<SString, SCustomScaleFontInfo>::iterator iter = m_CustomScaleFontMap.begin(); iter != m_CustomScaleFontMap.end(); ++iter)
-        if (iter->second.pFont)
-            iter->second.pFont->OnLostDevice();
+    for (auto& [name, info] : m_CustomScaleFontMap)
+    {
+        if (info.pFont)
+            info.pFont->OnLostDevice();
+    }
 
     if (m_pDXSprite)
         m_pDXSprite->OnLostDevice();
@@ -1531,6 +1542,7 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
 
     m_pRenderItemManager->OnLostDevice();
     m_pScreenGrabber->OnLostDevice();
+
     SAFE_RELEASE(m_pSavedFrontBufferData);
     SAFE_RELEASE(m_pTempBackBufferData);
 }
@@ -1545,9 +1557,11 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
             m_pBigDXFonts[i]->OnResetDevice();
     }
 
-    for (std::map<SString, SCustomScaleFontInfo>::iterator iter = m_CustomScaleFontMap.begin(); iter != m_CustomScaleFontMap.end(); ++iter)
-        if (iter->second.pFont)
-            iter->second.pFont->OnResetDevice();
+    for (auto& [name, info] : m_CustomScaleFontMap)
+    {
+        if (info.pFont)
+            info.pFont->OnResetDevice();
+    }
 
     if (m_pDXSprite)
         m_pDXSprite->OnResetDevice();
@@ -1587,18 +1601,18 @@ void CGraphics::DrawLine3DPreGUIQueue()
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
-void CGraphics::DrawPrimitive3DPreGUIQueue(void)
+void CGraphics::DrawPrimitive3DPreGUIQueue()
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
     m_pMaterialPrimitive3DBatcherPreGUI->Flush();
 }
 
-bool CGraphics::HasLine3DPreGUIQueueItems(void)
+bool CGraphics::HasLine3DPreGUIQueueItems()
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
 }
 
-bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
+bool CGraphics::HasPrimitive3DPreGUIQueueItems()
 {
     return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
 }
@@ -1780,9 +1794,11 @@ ID3DXFont* CGraphics::MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float&
             if (m_pDXFonts[i] == pDXFont)
             {
                 // Adjust scale to compensate for higher res font
-                fScaleX *= 0.25f;
+                // devide by 4 because the big font is 4x bigger
+                fScaleX /= 4.0f;
                 if (&fScaleX != &fScaleY)            // Check fScaleY is not the same variable
-                    fScaleY *= 0.25f;
+                    fScaleX /= 4.0f;
+
                 return m_pBigDXFonts[i];
             }
         }
@@ -1887,12 +1903,14 @@ void CGraphics::LeavingMTARenderZone()
 ////////////////////////////////////////////////////////////////
 void CGraphics::MaybeEnteringMTARenderZone()
 {
-    if (m_MTARenderZone == MTA_RZONE_OUTSIDE)
+    switch (m_MTARenderZone)
     {
+    case MTA_RZONE_OUTSIDE:
         // Handle stacking if already outside
         m_iOutsideZoneCount++;
-    }
-    else if (m_MTARenderZone == MTA_RZONE_NONE)
+        break;
+
+    case MTA_RZONE_NONE:
     {
         assert(!m_pSavedStateBlock);
         assert(m_iOutsideZoneCount == 0);
@@ -1902,6 +1920,7 @@ void CGraphics::MaybeEnteringMTARenderZone()
         m_iOutsideZoneCount = 1;
         m_MTARenderZone = MTA_RZONE_OUTSIDE;
     }
+}
 }
 
 ////////////////////////////////////////////////////////////////
