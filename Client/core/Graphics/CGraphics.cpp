@@ -2244,36 +2244,40 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 bool CGraphics::ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
                                   CBuffer& outBuffer)
 {
-    bool               bResult = false;
     IDirect3DSurface9* pCurrentSurface = NULL;
     IDirect3DSurface9* pNewSurface = NULL;
 
-    do
-    {
+
+
+    bool bResult = false;
+
         // Create surfaces
         if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pCurrentSurface, NULL)))
-            break;
+        goto cleanup_and_return;
+
         if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiNewWidth, uiNewHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pNewSurface, NULL)))
-            break;
+        goto cleanup_and_return;
 
         // Data in
         if (!CopyDataToSurface(pCurrentSurface, (const BYTE*)pData, uiDataPitch))
-            break;
+        goto cleanup_and_return;
 
         // Resize
         if (FAILED(D3DXLoadSurfaceFromSurface(pNewSurface, NULL, NULL, pCurrentSurface, NULL, NULL, D3DX_FILTER_TRIANGLE, 0)))
-            break;
+        goto cleanup_and_return;
 
         // Data out
         if (!CopyDataFromSurface(pNewSurface, outBuffer))
-            break;
+        goto cleanup_and_return;
 
         bResult = true;
-    } while (false);
 
+
+cleanup_and_return:
     // Clean up
     SAFE_RELEASE(pCurrentSurface);
     SAFE_RELEASE(pNewSurface);
+
     return bResult;
 }
 
