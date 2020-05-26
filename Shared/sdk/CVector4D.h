@@ -20,28 +20,28 @@
 class CVector4D
 {
 public:
-    CVector4D()
+    constexpr CVector4D() :
+        fX(0),
+        fY(0),
+        fZ(0),
+        fW(0)
     {
-        fX = 0;
-        fY = 0;
-        fZ = 0;
-        fW = 0;
+    };
+
+    constexpr CVector4D(float x, float y, float z, float w) :
+        fX(x),
+        fY(y),
+        fZ(z),
+        fW(w)
+    {
     }
 
-    CVector4D(float _fX, float _fY, float _fZ, float _fW)
+    constexpr CVector4D(const CVector4D& vec) :
+        fX(vec.fX),
+        fY(vec.fY),
+        fZ(vec.fZ),
+        fW(vec.fW)
     {
-        fX = _fX;
-        fY = _fY;
-        fZ = _fZ;
-        fW = _fW;
-    }
-
-    CVector4D(const CVector4D& vec)
-    {
-        fX = vec.fX;
-        fY = vec.fY;
-        fZ = vec.fZ;
-        fW = vec.fW;
     }
 
     CVector4D& operator=(const CVector4D& vec)
@@ -71,21 +71,21 @@ public:
         }
     }
 
-    CVector4D operator*(float fRight) const { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
+    constexpr CVector4D operator*(float fRight) const { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
 
-    CVector4D operator/(float fRight) const
+    constexpr CVector4D operator/(float fRight) const
     {
         float fRcpValue = 1 / fRight;
         return CVector4D(fX * fRcpValue, fY * fRcpValue, fZ * fRcpValue, fW * fRcpValue);
     }
 
-    CVector4D operator+(const CVector4D& vecRight) const { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
+    constexpr CVector4D operator+(const CVector4D& vecRight) const { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
 
-    CVector4D operator-(const CVector4D& vecRight) const { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
+    constexpr CVector4D operator-(const CVector4D& vecRight) const { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
 
-    CVector4D operator*(const CVector4D& vecRight) const { return CVector4D(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ, fW * vecRight.fW); }
+    constexpr CVector4D operator*(const CVector4D& vecRight) const { return CVector4D(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ, fW * vecRight.fW); }
 
-    CVector4D operator/(const CVector4D& vecRight) const { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
+    constexpr CVector4D operator/(const CVector4D& vecRight) const { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
 
     void operator+=(float fRight)
     {
