@@ -1320,6 +1320,8 @@ bool CGraphics::LoadStandardDXFonts()
     // Add our custom font resources
     if (m_FontResourceNames.empty())
     {
+        m_FontResourceNames.reserve(5);
+
         m_FontResourceNames.push_back("pricedown.ttf");
         m_FontResourceNames.push_back("sabankgothic.ttf");
         m_FontResourceNames.push_back("saheader.ttf");
@@ -1327,17 +1329,17 @@ bool CGraphics::LoadStandardDXFonts()
         m_FontResourceNames.push_back("unifont-5.1.20080907.ttf");
     }
 
-    for (uint i = 0; i < m_FontResourceNames.size(); i++)
+    for (const auto& fontName : m_FontResourceNames)
     {
-        SString strPathFilename = CalcMTASAPath("MTA\\cgui\\" + m_FontResourceNames[i]);
+        SString strPathFilename = CalcMTASAPath("MTA\\cgui\\" + fontName);
         if (!AddFontResourceEx(strPathFilename, FR_PRIVATE, 0))
         {
-            SString strFileMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPathFilename);
-            uint    uiFileSize = (uint)FileSize(strPathFilename);
+            const SString strFileMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPathFilename);
+            const uint    uiFileSize = (uint)FileSize(strPathFilename);
             AddReportLog(9442, SString("Problem with AddFontResourceEx [MD5:%s Size:%d] %s ", *strFileMd5, uiFileSize, *strPathFilename));
             if (!FileExists(strPathFilename))
             {
-                BrowseToSolution("mta-datafiles-missing", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error loading MTA font " + m_FontResourceNames[i]);
+                BrowseToSolution("mta-datafiles-missing", EXIT_GAME_FIRST | ASK_GO_ONLINE, "Error loading MTA font " + fontName);
             }
         }
     }
