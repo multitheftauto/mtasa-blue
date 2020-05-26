@@ -485,49 +485,59 @@ void CGraphics::EndDrawBatch()
 //
 void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMode)
 {
-    if (m_CurDrawMode != newDrawMode || m_CurBlendMode != newBlendMode)
     {
-        // Flush old
-        switch (m_CurDrawMode)
-        {
-        case EDrawMode::DX_SPRITE:
-        {
-            m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-            m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-            m_pDXSprite->End();
-            break;
-        }
-        case EDrawMode::DX_LINE:
-            m_pLineInterface->End();
-            break;
+        const bool bDrawModeChanging = (m_CurDrawMode != newDrawMode);
+        const bool bBlendModeChanging = (m_CurBlendMode != newBlendMode);
 
-        case EDrawMode::TILE_BATCHER:
-            m_pTileBatcher->Flush();
-            break;
-
-        case EDrawMode::PRIMITIVE:
-            m_pPrimitiveBatcher->Flush();
-            break;
-
-        case EDrawMode::PRIMITIVE_MATERIAL:
-            m_pPrimitiveMaterialBatcher->Flush();
-            break;
-        }
-
-        switch (newDrawMode)
-        {
-        case EDrawMode::DX_SPRITE:
-            m_pDXSprite->Begin(D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE);
-            break;
-
-        case EDrawMode::DX_LINE:
-            m_pLineInterface->Begin();
-        }
-
-        SetBlendModeRenderStates(newBlendMode);
-        m_CurBlendMode = newBlendMode;
-        m_CurDrawMode = newDrawMode;
+        // Draw mode changing?
+        if (!bDrawModeChanging && !bBlendModeChanging)
+            return;
     }
+
+
+    // Flush old
+    switch (m_CurDrawMode)
+    {
+    case EDrawMode::DX_SPRITE:
+    {
+        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+        m_pDXSprite->End();
+        break;
+    }
+    case EDrawMode::DX_LINE:
+        m_pLineInterface->End();
+        break;
+
+    case EDrawMode::TILE_BATCHER:
+        m_pTileBatcher->Flush();
+        break;
+
+    case EDrawMode::PRIMITIVE:
+        m_pPrimitiveBatcher->Flush();
+        break;
+
+    case EDrawMode::PRIMITIVE_MATERIAL:
+        m_pPrimitiveMaterialBatcher->Flush();
+        break;
+    }
+
+    switch (newDrawMode)
+    {
+    case EDrawMode::DX_SPRITE:
+        m_pDXSprite->Begin(D3DXSPRITE_DONOTSAVESTATE | D3DXSPRITE_DONOTMODIFY_RENDERSTATE);
+        break;
+
+    case EDrawMode::DX_LINE:
+        m_pLineInterface->Begin();
+        break;
+
+    }
+
+    SetBlendModeRenderStates(newBlendMode);
+    m_CurBlendMode = newBlendMode;
+    m_CurDrawMode = newDrawMode;
+    
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
