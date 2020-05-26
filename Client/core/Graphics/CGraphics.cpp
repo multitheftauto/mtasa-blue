@@ -1000,39 +1000,29 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
 bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 {
     if (iNumVertives < 1)
-    {
         return false;
-    }
 
     switch (eType)
     {
         case D3DPT_LINESTRIP:
-            if (iNumVertives < 2)
-            {
-                return false;
-            }
-            break;
+        return iNumVertives >= 2;
+
         case D3DPT_LINELIST:
-            if (iNumVertives % 2 != 0)
-            {
-                return false;
-            }
-            break;
+        return iNumVertives % 2 == 0;
+
         case D3DPT_TRIANGLELIST:
-            if (iNumVertives % 3 != 0)
-            {
-                return false;
-            }
+        return iNumVertives % 3 == 0;
+
         case D3DPT_TRIANGLEFAN:
         case D3DPT_TRIANGLESTRIP:
-            if (iNumVertives < 3)
-            {
-                return false;
-            }
-            break;
-    }
+        return iNumVertives >= 3;
 
+    case D3DPT_POINTLIST:
     return true;
+
+    default:
+        dassert(0); // shoudnt be reached
+}
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
