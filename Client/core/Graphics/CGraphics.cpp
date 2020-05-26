@@ -1606,20 +1606,15 @@ bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
 {
     BeginDrawBatch();
-    // Items to draw?
+
     if (Queue.size() > 0)
     {
-        // Loop through it
-        std::vector<sDrawQueueItem>::iterator iter = Queue.begin();
-        for (; iter != Queue.end(); iter++)
-        {
-            // Draw the item
-            DrawQueueItem(*iter);
-        }
+        for (const auto queueItem : Queue)
+            DrawQueueItem(queueItem);
 
-        // Clear the list
         Queue.clear();
     }
+
     EndDrawBatch();
 }
 
