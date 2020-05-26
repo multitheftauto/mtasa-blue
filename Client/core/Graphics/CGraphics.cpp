@@ -2392,49 +2392,59 @@ namespace
     //
     void CreateSphereFaces(std::vector<SFace>& faceList, int iIterations)
     {
-        int numFaces = (int)(pow(4.0, iIterations) * 8);
         faceList.clear();
-        faceList.reserve(numFaces);
+        faceList.reserve(pow(4.0, iIterations) * (size_t)8);
 
         // Initial octahedron
-        static SFixedArray<CVector, 6>     vecPoints = {CVector(0, 0, 1),  CVector(0, 0, -1), CVector(-1, -1, 0),
-                                                    CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
-        static const SFixedArray<WORD, 24> indices = {0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2};
 
-        for (uint i = 0; i < NUMELMS(vecPoints); i++)
-            vecPoints[i].Normalize();
+        // Trick: so we can make this whole array constexpr
+        // basically, because these vectors were 1, 0, 1, etc..
+        // after normalization we'd get a ector with v, 0, v for example.
+        constexpr auto v = 1.414213562373095f / 2.0f; 
+        constexpr static CVector vecPoints[] = {
+            {0, 0, 1},
+            {0, 0, -1},
+            {-v, -v, 0},
+            {v, -v, 0},
+            {v, v, 0},
+            {-v, v, 0}
+        };
 
-        for (uint i = 0; i < NUMELMS(indices); i += 3)
-            faceList.push_back(SFace(vecPoints[indices[i]], vecPoints[indices[i + 1]], vecPoints[indices[i + 2]]));
+        // 24 random ass indecies in a table
+        for (const auto i : { 0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2 })
+            faceList.emplace_back(vecPoints[i], vecPoints[i + 1], vecPoints[i + 2]);
 
-        // For each iteration
-        while (iIterations--)
+        while (iIterations-- != 0)
         {
             // Divide each face into 4
-            for (int i = faceList.size() - 1; i >= 0; i--)
+            for (auto iter = faceList.rbegin(); iter != faceList.rend(); iter++)
             {
-                // Get the three face points
-                CVector a = faceList[i].a;
-                CVector b = faceList[i].b;
-                CVector c = faceList[i].c;
+                auto& face = *iter;
 
-                // Make three inner points
-                CVector a2 = (a + b) * 0.5f;
-                CVector b2 = (b + c) * 0.5f;
-                CVector c2 = (c + a) * 0.5f;
+                // Get the three face points
+                const CVector& a = face.a;
+                const CVector& b = face.b;
+                const CVector& c = face.c;
+
+                // Create the new face from the first sub-face
+                SFace newSubFace = SFace(
+                    (a + b) * 0.5f,
+                    (b + c) * 0.5f,
+                    (c + a) * 0.5f
+                );
 
                 // Keep points to the edge of the unit sphere
-                a2.Normalize();
-                b2.Normalize();
-                c2.Normalize();
-
-                // Replace the original face with the first sub-face
-                faceList[i] = SFace(a2, b2, c2);
+                newSubFace.a.Normalize();
+                newSubFace.b.Normalize();
+                newSubFace.c.Normalize();
 
                 // Add the three other sub-faces to the end of the list
-                faceList.push_back(SFace(a, a2, c2));
-                faceList.push_back(SFace(b, a2, b2));
-                faceList.push_back(SFace(c, b2, c2));
+                faceList.emplace_back(b, newSubFace.a, newSubFace.b);
+                faceList.emplace_back(a, newSubFace.a, newSubFace.c);
+                faceList.emplace_back(c, newSubFace.b, newSubFace.c);
+
+                // And only now replace old face with new, because otherwise a, b, c gets replaced to the new values
+                face = newSubFace;
             }
         }
     }
