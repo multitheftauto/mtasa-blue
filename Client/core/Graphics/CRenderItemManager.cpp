@@ -327,7 +327,7 @@ void CRenderItemManager::NotifyContructRenderItem(CRenderItem* pItem)
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::NotifyDestructRenderItem(CRenderItem* pItem)
 {
-    assert(!m_CreatedItemList.insert(pItem).second); // assert if item was already in the collection.
+    assert(!m_CreatedItemList.erase(pItem) == 1); // assert if item wasnt in the collection exactly once
 
     if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
