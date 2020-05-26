@@ -20,29 +20,31 @@
 class CVector2D
 {
 public:
-    CVector2D()
+
+    constexpr CVector2D() :
+        fX(0),
+        fY(0)
     {
-        fX = 0;
-        fY = 0;
+    };
+
+    constexpr CVector2D(float x, float y) :
+        fX(x),
+        fY(y)
+    {
     }
 
-    CVector2D(float _fX, float _fY)
+    constexpr CVector2D(const CVector& vec) :
+        fX(vec.fX),
+        fY(vec.fY)
     {
-        fX = _fX;
-        fY = _fY;
     }
 
-    CVector2D(const CVector& vec)
+    constexpr CVector2D(const CVector4D& vec) :
+        fX(vec.fX),
+        fY(vec.fY)
     {
-        fX = vec.fX;
-        fY = vec.fY;
     }
 
-    CVector2D(const CVector4D& vec)
-    {
-        fX = vec.fX;
-        fY = vec.fY;
-    }
 
     CVector2D& operator=(const CVector& vec)
     {
@@ -74,21 +76,17 @@ public:
         }
     }
 
-    CVector2D operator*(float fRight) const { return CVector2D(fX * fRight, fY * fRight); }
+    constexpr CVector2D operator*(float fRight) const { return CVector2D(fX * fRight, fY * fRight); }
 
-    CVector2D operator/(float fRight) const
-    {
-        float fRcpValue = 1 / fRight;
-        return CVector2D(fX * fRcpValue, fY * fRcpValue);
-    }
+    constexpr CVector2D operator/(float fRight) const { return CVector2D(fX / fRight, fY / fRight); }
 
-    CVector2D operator+(const CVector2D& vecRight) const { return CVector2D(fX + vecRight.fX, fY + vecRight.fY); }
+    constexpr CVector2D operator+(const CVector2D& vecRight) const { return CVector2D(fX + vecRight.fX, fY + vecRight.fY); }
 
-    CVector2D operator-(const CVector2D& vecRight) const { return CVector2D(fX - vecRight.fX, fY - vecRight.fY); }
+    constexpr CVector2D operator-(const CVector2D& vecRight) const { return CVector2D(fX - vecRight.fX, fY - vecRight.fY); }
 
-    CVector2D operator*(const CVector2D& vecRight) const { return CVector2D(fX * vecRight.fX, fY * vecRight.fY); }
+    constexpr CVector2D operator*(const CVector2D& vecRight) const { return CVector2D(fX * vecRight.fX, fY * vecRight.fY); }
 
-    CVector2D operator/(const CVector2D& vecRight) const { return CVector2D(fX / vecRight.fX, fY / vecRight.fY); }
+    constexpr CVector2D operator/(const CVector2D& vecRight) const { return CVector2D(fX / vecRight.fX, fY / vecRight.fY); }
 
     void operator+=(float fRight)
     {
@@ -140,7 +138,7 @@ public:
 
     bool operator==(const CVector2D& param) const { return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON)); }
 
-    bool operator!=(const CVector2D& param) const { return ((fabs(fX - param.fX) >= FLOAT_EPSILON) || (fabs(fY - param.fY) >= FLOAT_EPSILON)); }
+    bool operator!=(const CVector2D& param) const { return !(*this == param); }
 
     float fX;
     float fY;
