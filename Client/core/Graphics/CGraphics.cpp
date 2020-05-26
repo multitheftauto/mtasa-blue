@@ -2480,24 +2480,24 @@ namespace
         static std::map<uint, SWireModel> wireModelMap;
 
         // Find existing
-        SWireModel* pWireModel = MapFind(wireModelMap, iterations);
+        SWireModel* const pWireModel = MapFind(wireModelMap, iterations);
         if (pWireModel)
             return *pWireModel;
 
         // Add new
-        MapSet(wireModelMap, iterations, SWireModel());
-        SWireModel& wireModel = *MapFind(wireModelMap, iterations);
+        SWireModel& wireModel = wireModelMap.emplace(iterations, SWireModel()).first->second;
 
         std::vector<SFace> faceList;
         CreateSphereFaces(faceList, iterations);
 
         // Create big vertex/line list
-        for (uint i = 0; i < faceList.size(); i++)
+        for (const auto& face : faceList)
         {
-            wireModel.AddLine(faceList[i].a, faceList[i].b);
-            wireModel.AddLine(faceList[i].b, faceList[i].c);
-            wireModel.AddLine(faceList[i].c, faceList[i].a);
+            wireModel.AddLine(face.a, face.b);
+            wireModel.AddLine(face.b, face.c);
+            wireModel.AddLine(face.c, face.a);
         }
+
         return wireModel;
     }
 }            // namespace WireShpere
