@@ -20,15 +20,15 @@
 class CVector4D
 {
 public:
-    constexpr CVector4D() :
-        fX(0),
-        fY(0),
-        fZ(0),
-        fW(0)
-    {
-    };
+    float fX = 0.0f, fY = 0.0f, fZ = 0.0f, fW = 0.0f;
 
-    constexpr CVector4D(float x, float y, float z, float w) :
+    constexpr CVector4D() noexcept = default;
+
+    constexpr CVector4D(const CVector4D&) noexcept = default;
+
+    constexpr CVector4D& operator=(const CVector4D&) noexcept = default;
+
+    constexpr CVector4D(float x, float y, float z, float w) noexcept :
         fX(x),
         fY(y),
         fZ(z),
@@ -36,32 +36,16 @@ public:
     {
     }
 
-    constexpr CVector4D(const CVector4D& vec) :
-        fX(vec.fX),
-        fY(vec.fY),
-        fZ(vec.fZ),
-        fW(vec.fW)
+    constexpr float DotProduct(const CVector4D& other) const noexcept { return fX * other.fX + fY * other.fY + fZ * other.fZ; }
+
+    float Length() const noexcept { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
+
+    // returns just the squared length(eg.: x*x* + y*y + z*z + w*w)
+    constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
+
+    void Normalize() noexcept
     {
-    }
-
-    CVector4D& operator=(const CVector4D& vec)
-    {
-        fX = vec.fX;
-        fY = vec.fY;
-        fZ = vec.fZ;
-        fW = vec.fW;
-        return *this;
-    }
-
-    float DotProduct(CVector4D& other) const { return fX * other.fX + fY * other.fY + fZ * other.fZ; }
-
-    float Length() const { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
-
-    float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
-
-    void Normalize()
-    {
-        float fLength = Length();
+        const float fLength = Length();
         if (fLength > 0.0f)
         {
             fX /= fLength;
@@ -71,23 +55,22 @@ public:
         }
     }
 
-    constexpr CVector4D operator*(float fRight) const { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
-
-    constexpr CVector4D operator/(float fRight) const
-    {
-        float fRcpValue = 1 / fRight;
-        return CVector4D(fX * fRcpValue, fY * fRcpValue, fZ * fRcpValue, fW * fRcpValue);
-    }
-
-    constexpr CVector4D operator+(const CVector4D& vecRight) const { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
-
-    constexpr CVector4D operator-(const CVector4D& vecRight) const { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
-
     constexpr CVector4D operator*(const CVector4D& vecRight) const { return CVector4D(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ, fW * vecRight.fW); }
 
-    constexpr CVector4D operator/(const CVector4D& vecRight) const { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
+    constexpr CVector4D operator*(const float fRight) const noexcept { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
 
-    void operator+=(float fRight)
+
+    constexpr CVector4D operator+(const CVector4D& vecRight) const noexcept { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
+
+    constexpr CVector4D operator-(const CVector4D& vecRight) const noexcept { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
+
+
+    constexpr CVector4D operator/(const CVector4D& vecRight) const noexcept { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
+
+    constexpr CVector4D operator/(const float fRight) const noexcept { return CVector4D(fX / fRight, fY / fRight, fZ / fRight, fW / fRight); }
+
+
+    constexpr void operator+=(const float fRight) noexcept
     {
         fX += fRight;
         fY += fRight;
@@ -95,7 +78,7 @@ public:
         fW += fRight;
     }
 
-    void operator+=(const CVector4D& vecRight)
+    constexpr void operator+=(const CVector4D& vecRight) noexcept
     {
         fX += vecRight.fX;
         fY += vecRight.fY;
@@ -103,7 +86,7 @@ public:
         fW += vecRight.fW;
     }
 
-    void operator-=(float fRight)
+    constexpr void operator-=(const float fRight) noexcept
     {
         fX -= fRight;
         fY -= fRight;
@@ -111,7 +94,7 @@ public:
         fW -= fRight;
     }
 
-    void operator-=(const CVector4D& vecRight)
+    constexpr void operator-=(const CVector4D& vecRight) noexcept
     {
         fX -= vecRight.fX;
         fY -= vecRight.fY;
@@ -119,7 +102,7 @@ public:
         fW -= vecRight.fW;
     }
 
-    void operator*=(float fRight)
+    constexpr void operator*=(const float fRight) noexcept
     {
         fX *= fRight;
         fY *= fRight;
@@ -127,15 +110,8 @@ public:
         fW *= fRight;
     }
 
-    void operator*=(const CVector4D& vecRight)
-    {
-        fX *= vecRight.fX;
-        fY *= vecRight.fY;
-        fZ *= vecRight.fZ;
-        fW *= vecRight.fW;
-    }
 
-    void operator/=(float fRight)
+    constexpr void operator/=(const float fRight) noexcept
     {
         fX /= fRight;
         fY /= fRight;
@@ -143,7 +119,7 @@ public:
         fW /= fRight;
     }
 
-    void operator/=(const CVector4D& vecRight)
+    constexpr void operator/=(const CVector4D& vecRight) noexcept
     {
         fX /= vecRight.fX;
         fY /= vecRight.fY;
@@ -151,20 +127,11 @@ public:
         fW /= vecRight.fW;
     }
 
-    bool operator==(const CVector4D& param) const
+    constexpr bool operator==(const CVector4D& param) const noexcept
     {
         return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON) && (fabs(fZ - param.fZ) < FLOAT_EPSILON) &&
                 (fabs(fW - param.fW) < FLOAT_EPSILON));
     }
 
-    bool operator!=(const CVector4D& param) const
-    {
-        return ((fabs(fX - param.fX) >= FLOAT_EPSILON) || (fabs(fY - param.fY) >= FLOAT_EPSILON) || (fabs(fZ - param.fZ) >= FLOAT_EPSILON) ||
-                (fabs(fW - param.fW) >= FLOAT_EPSILON));
-    }
-
-    float fX;
-    float fY;
-    float fZ;
-    float fW;
+    constexpr bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
 };
