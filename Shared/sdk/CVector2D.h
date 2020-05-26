@@ -20,55 +20,53 @@
 class CVector2D
 {
 public:
+    float fX = 0.0f, fY = 0.0f;
 
-    constexpr CVector2D() :
-        fX(0),
-        fY(0)
-    {
-    };
+    constexpr CVector2D() noexcept = default;
 
-    constexpr CVector2D(float x, float y) :
+    constexpr CVector2D(float x, float y) noexcept :
         fX(x),
         fY(y)
     {
     }
 
-    constexpr CVector2D(const CVector& vec) :
+    constexpr CVector2D(const CVector& vec) noexcept :
         fX(vec.fX),
         fY(vec.fY)
     {
     }
 
-    constexpr CVector2D(const CVector4D& vec) :
+    constexpr CVector2D(const CVector4D& vec) noexcept :
         fX(vec.fX),
         fY(vec.fY)
     {
     }
 
 
-    CVector2D& operator=(const CVector& vec)
+    constexpr CVector2D& operator=(const CVector& vec) noexcept
     {
         fX = vec.fX;
         fY = vec.fY;
         return *this;
     }
 
-    CVector2D& operator=(const CVector4D& vec)
+    constexpr CVector2D& operator=(const CVector4D& vec) noexcept
     {
         fX = vec.fX;
         fY = vec.fY;
         return *this;
     }
 
-    float DotProduct(CVector2D& other) const { return fX * other.fX + fY * other.fY; }
+    constexpr float DotProduct(CVector2D& other) const { return fX * other.fX + fY * other.fY; }
 
-    float Length() const { return sqrt(fX * fX + fY * fY); }
+    float Length() const { return std::hypotf(fX, fY); }
 
-    float LengthSquared() const { return (fX * fX) + (fY * fY); }
+    // returns just the squared length(eg.: x*x* + y*y)
+    constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY); }
 
-    void Normalize()
+    inline void Normalize() noexcept
     {
-        float fLength = Length();
+        const float fLength = Length();
         if (fLength > 0.0f)
         {
             fX /= fLength;
@@ -76,70 +74,67 @@ public:
         }
     }
 
-    constexpr CVector2D operator*(float fRight) const { return CVector2D(fX * fRight, fY * fRight); }
+    constexpr CVector2D operator*(float fRight) const noexcept { return CVector2D(fX * fRight, fY * fRight); }
 
-    constexpr CVector2D operator/(float fRight) const { return CVector2D(fX / fRight, fY / fRight); }
+    constexpr CVector2D operator/(float fRight) const noexcept { return CVector2D(fX / fRight, fY / fRight); }
 
-    constexpr CVector2D operator+(const CVector2D& vecRight) const { return CVector2D(fX + vecRight.fX, fY + vecRight.fY); }
+    constexpr CVector2D operator+(const CVector2D& vecRight) const noexcept { return CVector2D(fX + vecRight.fX, fY + vecRight.fY); }
 
-    constexpr CVector2D operator-(const CVector2D& vecRight) const { return CVector2D(fX - vecRight.fX, fY - vecRight.fY); }
+    constexpr CVector2D operator-(const CVector2D& vecRight) const noexcept { return CVector2D(fX - vecRight.fX, fY - vecRight.fY); }
 
-    constexpr CVector2D operator*(const CVector2D& vecRight) const { return CVector2D(fX * vecRight.fX, fY * vecRight.fY); }
+    constexpr CVector2D operator*(const CVector2D& vecRight) const noexcept { return CVector2D(fX * vecRight.fX, fY * vecRight.fY); }
 
-    constexpr CVector2D operator/(const CVector2D& vecRight) const { return CVector2D(fX / vecRight.fX, fY / vecRight.fY); }
+    constexpr CVector2D operator/(const CVector2D& vecRight) const noexcept { return CVector2D(fX / vecRight.fX, fY / vecRight.fY); }
 
-    void operator+=(float fRight)
+    constexpr void operator+=(float fRight) noexcept
     {
         fX += fRight;
         fY += fRight;
     }
 
-    void operator+=(const CVector2D& vecRight)
+    constexpr void operator+=(const CVector2D& vecRight) noexcept
     {
         fX += vecRight.fX;
         fY += vecRight.fY;
     }
 
-    void operator-=(float fRight)
+    constexpr void operator-=(float fRight) noexcept
     {
         fX -= fRight;
         fY -= fRight;
     }
 
-    void operator-=(const CVector2D& vecRight)
+    constexpr void operator-=(const CVector2D& vecRight) noexcept
     {
         fX -= vecRight.fX;
         fY -= vecRight.fY;
     }
 
-    void operator*=(float fRight)
+    constexpr void operator*=(float fRight) noexcept
     {
         fX *= fRight;
         fY *= fRight;
     }
 
-    void operator*=(const CVector2D& vecRight)
+    constexpr void operator*=(const CVector2D& vecRight) noexcept
     {
         fX *= vecRight.fX;
         fY *= vecRight.fY;
     }
 
-    void operator/=(float fRight)
+    constexpr void operator/=(float fRight) noexcept
     {
         fX /= fRight;
         fY /= fRight;
     }
 
-    void operator/=(const CVector2D& vecRight)
+    constexpr void operator/=(const CVector2D& vecRight) noexcept
     {
         fX /= vecRight.fX;
         fY /= vecRight.fY;
     }
 
-    bool operator==(const CVector2D& param) const { return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON)); }
+    bool operator==(const CVector2D& param) const noexcept { return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON)); }
 
-    bool operator!=(const CVector2D& param) const { return !(*this == param); }
-
-    float fX;
-    float fY;
+    bool operator!=(const CVector2D& param) const noexcept { return !(*this == param); }
 };
