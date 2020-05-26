@@ -743,7 +743,7 @@ int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
     // Count the amount of space characters at the end
     int iSpaceCount = 0;
     for (auto c = strText.rbegin(); c != strText.rend() && *c == ' '; ++c)  // count from the end
-    iSpaceCount++;
+        iSpaceCount++;
 
     // Compute the size of a single space and use that
     // to get the width of the ignored space characters
