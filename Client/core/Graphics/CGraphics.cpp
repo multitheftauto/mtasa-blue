@@ -672,7 +672,8 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
         const size_t textLength = wcslen(wszText);
 
         size_t       spaceCount = 0;
-        for (int i = textLength - 1; i >= 0 && wszText[i] == L' '; --i) { spaceCount++; } // count spaces starting from the end
+        for (int i = textLength - 1; i >= 0 && wszText[i] == L' '; --i) // count spaces starting from the end
+            spaceCount++; 
 
         // Compute the size of a single space and use that to get the width of the ignored space characters
         size_t trailingSpacePixels = 0;
@@ -685,7 +686,6 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
         }
 
         RECT rect = {};
-
         if ((textLength - spaceCount) > 0)
         {
             pDXFont->DrawTextW(nullptr, wszText, textLength - spaceCount, &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
@@ -732,7 +732,8 @@ int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
 {
     // Count the amount of space characters at the end
     int iSpaceCount = 0;
-    for (auto c = strText.rbegin(); c != strText.rend() && *c == ' '; ++c) { iSpaceCount++; } // count from the end
+    for (auto c = strText.rbegin(); c != strText.rend() && *c == ' '; ++c)  // count from the end
+    iSpaceCount++;
 
     // Compute the size of a single space and use that
     // to get the width of the ignored space characters
