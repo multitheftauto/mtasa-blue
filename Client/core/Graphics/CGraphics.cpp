@@ -668,18 +668,10 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
     {
         // DT_CALCRECT may not take space characters at the end of a line into consideration for the rect size.
         // Count the amount of space characters at the end
-        size_t       spaceCount = 0;
         const size_t textLength = wcslen(wszText);
 
-        for (int i = textLength - 1; i >= 0; --i)
-        {
-            const wchar_t c = wszText[i];
-
-            if (c == L' ')
-                ++spaceCount;
-            else
-                break;
-        }
+        size_t       spaceCount = 0;
+        for (int i = textLength - 1; i >= 0 && wszText[i] == L' '; --i) { spaceCount++; } // count spaces starting from the end
 
         // Compute the size of a single space and use that to get the width of the ignored space characters
         size_t trailingSpacePixels = 0;
