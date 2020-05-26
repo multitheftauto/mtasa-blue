@@ -468,7 +468,7 @@ namespace SharedUtil
         };
 
         SColor() {}
-        SColor(unsigned long ulValue) { ulARGB = ulValue; }
+        SColor(unsigned long ulValue) : ulARGB(ulValue) {}
 
         operator unsigned long() const { return ulARGB; }
     };
