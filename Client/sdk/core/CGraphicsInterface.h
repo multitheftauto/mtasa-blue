@@ -20,6 +20,13 @@ struct PrimitiveVertice
     static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE;
     float             fX, fY, fZ;
     D3DCOLOR          Color;
+
+    PrimitiveVertice(float x, float y, float z, D3DCOLOR color) :
+        fX(x),
+        fY(y),
+        fZ(z),
+        Color(color)
+    {}
 };
 struct PrimitiveMaterialVertice
 {

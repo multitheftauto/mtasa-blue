@@ -915,13 +915,11 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     // And calculate all other vertices
     for (int segIndex = 0; segIndex <= siSegments; segIndex++)
     {
-        PrimitiveVertice& vert = pVecVertices->emplace_back(); // emplace it in the vector, and modify the inserted value afterwards
-
         const float curAngle = fStartAngleRad + segIndex * kfSegmentAngle;
-        vert.fX = fX + fRadius * cos(curAngle) * fRatio;
-        vert.fY = fY + fRadius * sin(curAngle);
-        vert.fZ = 0.0f;
-        vert.Color = ulColor;
+        const float verticefX = fX + fRadius * cos(curAngle) * fRatio;
+        const float verticefY = fY + fRadius * sin(curAngle);
+
+        pVecVertices->emplace_back(verticefX, verticefY, 0.0f, ulColor);
     }
 
     DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
