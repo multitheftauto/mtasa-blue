@@ -531,13 +531,11 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     case EDrawMode::DX_LINE:
         m_pLineInterface->Begin();
         break;
-
     }
 
     SetBlendModeRenderStates(newBlendMode);
     m_CurBlendMode = newBlendMode;
-    m_CurDrawMode = newDrawMode;
-    
+    m_CurDrawMode = newDrawMode;    
 }
 
 void CGraphics::CalcWorldCoors(CVector* vecScreen, CVector* vecWorld)
@@ -681,9 +679,15 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
         // Count the amount of space characters at the end
         const size_t textLength = wcslen(wszText);
 
+        // count spaces starting from the end until the first non-whitespace char
         size_t       spaceCount = 0;
-        for (int i = textLength - 1; i >= 0 && wszText[i] == L' '; --i) // count spaces starting from the end
+        for (int i = textLength - 1; i >= 0; --i) 
+        {
+            if (wszText[i] != L' ')
+                break;
+
             spaceCount++; 
+        }
 
         // Compute the size of a single space and use that to get the width of the ignored space characters
         size_t trailingSpacePixels = 0;
@@ -740,10 +744,15 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
 
 int CGraphics::GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText)
 {
-    // Count the amount of space characters at the end
+    // count spaces starting from the end until the first non-whitespace char
     int iSpaceCount = 0;
-    for (auto c = strText.rbegin(); c != strText.rend() && *c == ' '; ++c)  // count from the end
+    for (auto iter = strText.rbegin(); iter != strText.rend(); iter++)
+    {
+        if (*iter != L' ')
+            break;
+            
         iSpaceCount++;
+    }
 
     // Compute the size of a single space and use that
     // to get the width of the ignored space characters
