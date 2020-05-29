@@ -1822,7 +1822,7 @@ ID3DXFont* CGraphics::MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float&
                 // devide by 4 because the big font is 4x bigger
                 fScaleX /= 4.0f;
                 if (&fScaleX != &fScaleY)            // Check fScaleY is not the same variable
-                    fScaleX /= 4.0f;
+                    fScaleY /= 4.0f;
 
                 return m_pBigDXFonts[i];
             }
