@@ -312,7 +312,8 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont(const SString& strFullFilePath, 
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::NotifyContructRenderItem(CRenderItem* pItem)
 {
-    assert(!m_CreatedItemList.insert(pItem).second); // assert if item was already in the collection.
+    const bool wasInserted = m_CreatedItemList.insert(pItem).second;
+    assert(!wasInserted); // assert if item was already in the collection.
 
     if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
@@ -449,7 +450,8 @@ void CRenderItemManager::UpdateBackBufferCopySize()
     m_bBackBufferCopyMaybeNeedsResize = false;
 
     // Set what the max size requirement is for the back buffer copy
-    uint uiSizeX = 0, uiSizeY = 0;
+    uint uiSizeX = 0;
+    uint uiSizeY = 0;
     for (const auto item : m_CreatedItemList)
     {
         if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(item))
@@ -1044,7 +1046,9 @@ void CRenderItemManager::PreDrawWorld()
     IDirect3DTexture9*& pReadableDepthBuffer = g_pDeviceState->MainSceneState.DepthBuffer;
 
     // Determine what is needed
-    const bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty() && m_depthBufferFormat != RFORMAT_UNKNOWN;
+    bool bRequireDepthBuffer = false;
+    if (!m_ShadersUsingDepthBuffer.empty() && m_depthBufferFormat != RFORMAT_UNKNOWN)
+        bRequireDepthBuffer = true;
 
     bool bRequireNonAADisplay = false;
     if (g_pDeviceState->CreationState.PresentationParameters.MultiSampleType != D3DMULTISAMPLE_NONE)
