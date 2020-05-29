@@ -20,7 +20,10 @@
 class CVector4D
 {
 public:
-    float fX = 0.0f, fY = 0.0f, fZ = 0.0f, fW = 0.0f;
+    float fX = 0.0f;
+    float fY = 0.0f;
+    float fZ = 0.0f;
+    float fW = 0.0f;
 
     constexpr CVector4D() noexcept = default;
 
@@ -36,6 +39,8 @@ public:
     {
     }
 
+    // Warning, this function is returning the wrong value(fW is missing), its kept because nothing uses it, only
+    // CLuaVector4DDefs.
     constexpr float DotProduct(const CVector4D& other) const noexcept { return fX * other.fX + fY * other.fY + fZ * other.fZ; }
 
     float Length() const noexcept { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
