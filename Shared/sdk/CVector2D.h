@@ -20,7 +20,8 @@
 class CVector2D
 {
 public:
-    float fX = 0.0f, fY = 0.0f;
+    float fX = 0.0f;
+    float fY = 0.0f;
 
     constexpr CVector2D() noexcept = default;
 
