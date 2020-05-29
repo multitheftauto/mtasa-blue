@@ -903,21 +903,24 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     pVecVertices->reserve(siSegments + 1);
 
     // Calculate each segment angle
-    const float kfSegmentAngle = (D3DXToRadian(fStopAngle) - D3DXToRadian(fStartAngle)) / siSegments;
+    const float fStartAngleRad = D3DXToRadian(fStartAngle);
+    const float fStopAngleRad = D3DXToRadian(fStopAngle);
+
+    const float kfSegmentAngle = (fStopAngleRad - fStartAngleRad) / siSegments;
 
     // Add center point
-    pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
+    pVecVertices->emplace_back(fX, fY, 0.0f, ulColorCenter);
 
     // And calculate all other vertices
-    for (short siSeg = 0; siSeg <= siSegments; siSeg++)
+    for (int segIndex = 0; segIndex <= siSegments; segIndex++)
     {
-        PrimitiveVertice vert;
-        float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        PrimitiveVertice& vert = pVecVertices->emplace_back(); // emplace it in the vector, and modify the inserted value afterwards
+
+        const float curAngle = fStartAngleRad + segIndex * kfSegmentAngle;
         vert.fX = fX + fRadius * cos(curAngle) * fRatio;
         vert.fY = fY + fRadius * sin(curAngle);
         vert.fZ = 0.0f;
         vert.Color = ulColor;
-        pVecVertices->push_back(vert);
     }
 
     DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
