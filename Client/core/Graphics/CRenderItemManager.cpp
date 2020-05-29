@@ -313,7 +313,7 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont(const SString& strFullFilePath, 
 void CRenderItemManager::NotifyContructRenderItem(CRenderItem* pItem)
 {
     const bool wasInserted = m_CreatedItemList.insert(pItem).second;
-    assert(!wasInserted); // assert if item was already in the collection.
+    assert(wasInserted); // assert if item was already in the collection(and thus we didnt insert this)
 
     if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
@@ -328,7 +328,8 @@ void CRenderItemManager::NotifyContructRenderItem(CRenderItem* pItem)
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::NotifyDestructRenderItem(CRenderItem* pItem)
 {
-    assert(!m_CreatedItemList.erase(pItem) == 1); // assert if item wasnt in the collection exactly once
+    const auto deletedCount = m_CreatedItemList.erase(pItem);
+    assert(deletedCount == 1); // it must be in the collection exactly once
 
     if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
