@@ -27,7 +27,7 @@ using namespace std;
 template <>
 CGraphics* CSingleton<CGraphics>::m_pSingleton = NULL;
 
-static const SColor g_rectEdgePixelsData[] = {
+const SColor g_rectEdgePixelsData[] = {
     0x00FFFF00, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,            //
     0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
     0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
