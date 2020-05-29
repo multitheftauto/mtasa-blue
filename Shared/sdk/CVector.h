@@ -26,7 +26,9 @@
 class CVector
 {
 public:
-    float fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    float fX = 0.0f;
+    float fY = 0.0f;
+    float fZ = 0.0f;
 
     constexpr CVector() = default;
 
