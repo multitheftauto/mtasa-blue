@@ -348,6 +348,7 @@ private:
     std::vector<sDrawQueueItem> m_PostGUIQueue;
 
     void AddQueueItem(const sDrawQueueItem& Item, bool bPostGUI);
+    sDrawQueueItem& CreateQueueItem(const bool bPostGUI);
     void DrawQueueItem(const sDrawQueueItem& Item);
     void DrawQueue(std::vector<sDrawQueueItem>& Queue);
     void ClearDrawQueue(std::vector<sDrawQueueItem>& Queue);

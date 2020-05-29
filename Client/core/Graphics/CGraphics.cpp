@@ -819,11 +819,15 @@ void CGraphics::SetCursorPosition(int iX, int iY, DWORD Flags)
 
 void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI)
 {
+    if (g_pCore->IsWindowMinimized())
+        return;
+
     fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY1);
     fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY2);
 
     // Set up a queue item
-    sDrawQueueItem Item;
+    sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
+
     Item.eType = QUEUE_LINE;
     Item.blendMode = m_ActiveBlendMode;
 
@@ -833,9 +837,6 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     Item.Line.fY2 = fY2;
     Item.Line.fWidth = fWidth;
     Item.Line.ulColor = ulColor;
-
-    // Add it to the queue
-    AddQueueItem(Item, bPostGUI);
 }
 
 void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI)
@@ -874,10 +875,13 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
 
 void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning)
 {
+    if (g_pCore->IsWindowMinimized())
+        return;
+
     m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
 
     // Set up a queue item
-    sDrawQueueItem Item;
+    sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
     Item.eType = QUEUE_RECT;
     Item.blendMode = m_ActiveBlendMode;
 
@@ -887,9 +891,6 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     Item.Rect.fHeight = fHeight;
     Item.Rect.ulColor = ulColor;
     Item.Rect.bSubPixelPositioning = bSubPixelPositioning;
-
-    // Add it to the queue
-    AddQueueItem(Item, bPostGUI);
 }
 
 void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
@@ -940,14 +941,13 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
     {
         vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
     }
-
     // Set up a queue item
-    sDrawQueueItem Item;
+    sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
+
     Item.eType = QUEUE_PRIMITIVE;
     Item.blendMode = m_ActiveBlendMode;
     Item.Primitive.eType = eType;
     Item.Primitive.pVecVertices = pVecVertices;
-    AddQueueItem(Item, bPostGUI);
 }
 
 void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
@@ -1011,7 +1011,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     }
 
     // Set up a queue item
-    sDrawQueueItem Item;
+    sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
 
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
     Item.blendMode = m_ActiveBlendMode;
@@ -1019,8 +1019,6 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
-
-    AddQueueItem(Item, bPostGUI);
 
     AddQueueRef(pMaterial);
 }
@@ -1056,10 +1054,14 @@ bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
                                   CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
 {
+    if (g_pCore->IsWindowMinimized())
+        return;
+
     m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
 
     // Set up a queue item
-    sDrawQueueItem Item;
+    sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
+
     Item.blendMode = m_ActiveBlendMode;
 
     Item.Texture.fX = fX;
@@ -1093,15 +1095,16 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
 
     // Keep material valid while in the queue
     AddQueueRef(Item.Texture.pMaterial);
-
-    // Add it to the queue
-    AddQueueItem(Item, bPostGUI);
 }
 
 void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY,
                                  unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
                                  float fRotationCenterX, float fRotationCenterY)
 {
+
+    if (g_pCore->IsWindowMinimized())
+        return;
+
     if (!szText || !m_pDXSprite)
         return;
 
@@ -1143,7 +1146,9 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
             fBottom = floor(fBottom);
         }
 
-        sDrawQueueItem Item;
+        // Set up a queue item
+        sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
+
         Item.eType = QUEUE_TEXT;
         Item.blendMode = m_ActiveBlendMode;
 
@@ -1165,9 +1170,6 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
 
         // Keep font valid while in the queue incase it's a custom font
         AddQueueRef(Item.Text.pDXFont);
-
-        // Add it to the queue
-        AddQueueItem(Item, bPostGUI);
         return;
     }
     else
@@ -1211,6 +1213,9 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
                                        unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation,
                                        float fRotationCenterX, float fRotationCenterY)
 {
+    if (g_pCore->IsWindowMinimized())
+        return;
+
     struct STextSection
     {
         std::wstring wstrText;
@@ -1304,7 +1309,9 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
             fTop = floor(fTop);
         }
 
-        sDrawQueueItem Item;
+        // Set up a queue item
+        sDrawQueueItem& Item = CreateQueueItem(bPostGUI);
+
         Item.eType = QUEUE_TEXT;
         Item.blendMode = m_ActiveBlendMode;
 
@@ -1325,9 +1332,6 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
 
         // Keep font valid while in the queue incase it's a custom font
         AddQueueRef(Item.Text.pDXFont);
-
-        // Add it to the queue
-        AddQueueItem(Item, bPostGUI);
 
         fX += section.fWidth;
     }
@@ -1603,16 +1607,26 @@ void CGraphics::OnZBufferModified()
 
 void CGraphics::DrawPreGUIQueue()
 {
-    DrawQueue(m_PreGUIQueue);
+    if (g_pCore->IsWindowMinimized())
+        ClearDrawQueue(m_PreGUIQueue);
+    else
+        DrawQueue(m_PreGUIQueue);
 }
 
 void CGraphics::DrawPostGUIQueue()
 {
-    DrawQueue(m_PostGUIQueue);
-    m_pLine3DBatcherPostGUI->Flush();
-    m_pMaterialLine3DBatcherPostGUI->Flush();
-    m_pPrimitive3DBatcherPostGUI->Flush();
-    m_pMaterialPrimitive3DBatcherPostGUI->Flush();
+    if (g_pCore->IsWindowMinimized())
+    {
+        ClearDrawQueue(m_PostGUIQueue);
+    }
+    else
+    {
+        DrawQueue(m_PostGUIQueue);
+        m_pLine3DBatcherPostGUI->Flush();
+        m_pMaterialLine3DBatcherPostGUI->Flush();
+        m_pPrimitive3DBatcherPostGUI->Flush();
+        m_pMaterialPrimitive3DBatcherPostGUI->Flush();
+    }
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
@@ -1655,22 +1669,12 @@ void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
     EndDrawBatch();
 }
 
-void CGraphics::AddQueueItem(const sDrawQueueItem& Item, bool bPostGUI)
+// the order of adding refs(to textures, fonts and whatnot) doesnt matter
+// just add them before / after crating the item
+CGraphics::sDrawQueueItem& CGraphics::CreateQueueItem(const bool bPostGUI)
 {
-    // Add it to the correct queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())            // Don't draw over the main menu.  Ever.
-        m_PostGUIQueue.push_back(Item);
-    else
-        m_PreGUIQueue.push_back(Item);
-
-    // Prevent queuing when minimized
-    if (g_pCore->IsWindowMinimized())
-    {
-        ClearDrawQueue(m_PreGUIQueue);
-        ClearDrawQueue(m_PostGUIQueue);
-        assert(m_iDebugQueueRefs == 0);
-        return;
-    }
+    auto& emplaceInto = bPostGUI ? m_PostGUIQueue : m_PreGUIQueue;
+    return emplaceInto.emplace_back();
 }
 
 void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
