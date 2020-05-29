@@ -132,11 +132,11 @@ public:
         fW /= vecRight.fW;
     }
 
-    constexpr bool operator==(const CVector4D& param) const noexcept
+    bool operator==(const CVector4D& param) const noexcept
     {
         return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON) && (fabs(fZ - param.fZ) < FLOAT_EPSILON) &&
                 (fabs(fW - param.fW) < FLOAT_EPSILON));
     }
 
-    constexpr bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
+     bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
 };
