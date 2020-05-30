@@ -363,10 +363,10 @@ struct CLuaFunctionParserBase
                 return eValue;
             else
             {
-                SString strReceived = ReadParameterAsString(L, index);
-                SString strExpected = GetEnumTypeName((T)0);
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
+                SString strReceived = ReadParameterAsString(L, index - 1);
+                SString strExpected = GetEnumTypeName((T)0);
                 SetBadArgumentError(L, strExpected, index - 1, strReceived);
                 return static_cast<T>(0);
             }
