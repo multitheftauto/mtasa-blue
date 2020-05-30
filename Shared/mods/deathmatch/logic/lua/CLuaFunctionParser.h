@@ -385,6 +385,9 @@ struct CLuaFunctionParserBase
                 SetBadArgumentError(L, strExpected, index, strReceived);
             }
 
+            // We didn't call PopUnsafe, so we need to manually increment the index
+            index++;
+
             return std::nullopt;
         }
 
