@@ -188,7 +188,7 @@ struct CLuaFunctionParserBase
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
         if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
                       std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
-            return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
+            return lua_isnumber(L, index);
         if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
 
@@ -232,8 +232,7 @@ struct CLuaFunctionParserBase
         // Vector2 may either be represented by CLuaVector or by two numbers
         if constexpr (std::is_same_v<T, CVector2D>)
         {
-            int iNextArgument = lua_type(L, index + 1);
-            if ((iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING) && (iNextArgument == LUA_TNUMBER || iNextArgument == LUA_TSTRING))
+            if (lua_isnumber(L, index) && lua_isnumber(L, index + 1))
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
@@ -241,11 +240,7 @@ struct CLuaFunctionParserBase
         // Vector3 may either be represented by CLuaVector or by three numbers
         if constexpr (std::is_same_v<T, CVector>)
         {
-            int iNextArgument = lua_type(L, index + 1);
-            int iNextArgument2 = lua_type(L, index + 2);
-            if ((iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING) && 
-                (iNextArgument == LUA_TNUMBER || iNextArgument == LUA_TSTRING) &&
-                (iNextArgument2 == LUA_TNUMBER || iNextArgument2 == LUA_TSTRING))
+            if (lua_isnumber(L, index) && lua_isnumber(L, index + 1) && lua_isnumber(L, index + 2))
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
@@ -253,13 +248,7 @@ struct CLuaFunctionParserBase
         // Vector4 may either be represented by CLuaVector or by three numbers
         if constexpr (std::is_same_v<T, CVector4D>)
         {
-            int iNextArgument = lua_type(L, index + 1);
-            int iNextArgument2 = lua_type(L, index + 2);
-            int iNextArgument3 = lua_type(L, index + 3);
-            if ((iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING) && 
-                (iNextArgument == LUA_TNUMBER || iNextArgument == LUA_TSTRING) &&
-                (iNextArgument2 == LUA_TNUMBER || iNextArgument2 == LUA_TSTRING) && 
-                (iNextArgument3 == LUA_TNUMBER || iNextArgument3 == LUA_TSTRING))
+            if (lua_isnumber(L, index) && lua_isnumber(L, index + 1) && lua_isnumber(L, index + 2) && lua_isnumber(L, index + 3))
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
@@ -452,8 +441,7 @@ struct CLuaFunctionParserBase
         // Vectors may either be represented by CLuaVectorND or by N numbers
         else if constexpr (std::is_same_v<T, CVector2D>)
         {
-            int iType = lua_type(L, index);
-            if (iType == LUA_TNUMBER || iType == LUA_TSTRING)
+            if (lua_isnumber(L, index))
             {
                 CVector2D vec;
                 vec.fX = lua::PopPrimitive<float>(L, index);
@@ -462,6 +450,7 @@ struct CLuaFunctionParserBase
             }
             else
             {
+                int   iType = lua_type(L, index);
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto cast = [isLightUserData, pValue, L](auto null) {
@@ -484,8 +473,7 @@ struct CLuaFunctionParserBase
         }            
         else if constexpr (std::is_same_v<T, CVector>)
         {
-            int iType = lua_type(L, index);
-            if (iType == LUA_TNUMBER || iType == LUA_TSTRING)
+            if (lua_isnumber(L, index))
             {
                 CVector vec;
                 vec.fX = lua::PopPrimitive<float>(L, index);
@@ -495,6 +483,7 @@ struct CLuaFunctionParserBase
             }
             else
             {
+                int   iType = lua_type(L, index);
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
@@ -515,8 +504,7 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CVector4D>)
         {
-            int iType = lua_type(L, index);
-            if (iType == LUA_TNUMBER || iType == LUA_TSTRING)
+            if (lua_isnumber(L, index))
             {
                 CVector4D vec;
                 vec.fX = lua::PopPrimitive<float>(L, index);
@@ -527,6 +515,7 @@ struct CLuaFunctionParserBase
             }
             else
             {
+                int   iType = lua_type(L, index);
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
