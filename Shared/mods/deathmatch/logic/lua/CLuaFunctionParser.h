@@ -377,8 +377,15 @@ struct CLuaFunctionParserBase
             using param = typename is_specialization<T, std::optional>::param_t;
             if (TypeMatch<param>(L, index))
                 return PopUnsafe<param>(L, index);
-            else
-                return std::nullopt;
+
+            if (!lua_isnoneornil(L, index))
+            {
+                SString strReceived = ReadParameterAsString(L, index);
+                SString strExpected = TypeToName<param>();
+                SetBadArgumentError(L, strExpected, index, strReceived);
+            }
+
+            return std::nullopt;
         }
 
         else if constexpr (is_2specialization<T, std::vector>::value)            // 2 specialization due to allocator
