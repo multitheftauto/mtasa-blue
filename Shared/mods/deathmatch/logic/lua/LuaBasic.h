@@ -10,11 +10,11 @@
 #include <optional>
 #include <variant>
 
-/*
-    Basic Lua operations:
-        int Push(L, T value)
-        T PopPrimitive(L, std::size_t stackIndex)
-*/
+ /*
+     Basic Lua operations:
+         int Push(L, T value)
+         T PopPrimitive(L, std::size_t stackIndex)
+ */
 
 
 namespace lua
@@ -90,7 +90,7 @@ namespace lua
             return Push(L, val.value());
         else
             return Push(L, nullptr);
-     }
+    }
 
     template <typename T>
     int Push(lua_State* L, const std::vector<T>&& val)
@@ -141,7 +141,7 @@ namespace lua
 
     // Overload for pointers to classes. We boldly assume that these are script entities
     template <typename T>
-    typename std::enable_if_t<(std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
+    typename std::enable_if_t<(std::is_pointer_v<T>&& std::is_class_v<std::remove_pointer_t<T>>), int> Push(lua_State* L, const T&& val)
     {
         lua_pushelement(L, val);
         return 1;
