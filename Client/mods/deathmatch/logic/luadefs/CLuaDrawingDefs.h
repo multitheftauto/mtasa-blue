@@ -70,7 +70,8 @@ public:
 
         return { size.fX, size.fY };
     }
-    
+
+    LUA_DECLARE(DxDrawWiredSphere);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);
