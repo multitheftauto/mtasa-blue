@@ -45,7 +45,8 @@ public:
 
     float Length() const noexcept { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
 
-    // returns just the squared length(eg.: x*x* + y*y + z*z + w*w)
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z + w*w)
+    // For more info see CMaterialLine3DBatcher::Flush()
     constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
 
     void Normalize() noexcept
