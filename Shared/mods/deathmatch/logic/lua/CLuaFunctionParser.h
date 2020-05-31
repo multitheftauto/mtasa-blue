@@ -38,7 +38,7 @@ struct CLuaFunctionParserBase
             accumulator += "/" + TypeToName<param>();
 
         if constexpr (is_variant<T>::count != 1)
-            return TypeToNameVariant<is_variant<T>::rest_t>(accumulator);
+            return TypeToNameVariant<typename is_variant<T>::rest_t>(accumulator);
     }
 
     template <typename T>
