@@ -75,7 +75,8 @@ public:
 
     inline float Length() const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
 
-    // returns just the squared length(eg.: x*x* + y*y + z*z)
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z)
+    // For more info see CMaterialLine3DBatcher::Flush()
     inline float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ); }
 
     inline float DotProduct(const CVector* param) const { return fX * param->fX + fY * param->fY + fZ * param->fZ; }
