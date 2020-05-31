@@ -62,7 +62,8 @@ public:
 
     float Length() const { return std::hypotf(fX, fY); }
 
-    // returns just the squared length(eg.: x*x* + y*y)
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y)
+    // For more info see CMaterialLine3DBatcher::Flush()
     constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY); }
 
     inline void Normalize() noexcept
