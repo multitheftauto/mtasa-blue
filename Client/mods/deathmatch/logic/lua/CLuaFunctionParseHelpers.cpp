@@ -658,7 +658,7 @@ ADD_ENUM(eCollisionShape::BOX, "box")
 ADD_ENUM(eCollisionShape::SPHERE, "sphere")
 ADD_ENUM(eCollisionShape::TRIANGLE, "triangle")
 ADD_ENUM(eCollisionShape::VERTEX, "vertex")
-IMPLEMENT_ENUM_END("collision-shape")
+IMPLEMENT_ENUM_CLASS_END("collision-shape")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eCollisionKey)
 ADD_ENUM(eCollisionKey::SIZE, "size")
@@ -668,7 +668,7 @@ ADD_ENUM(eCollisionKey::RADIUS, "radius")
 ADD_ENUM(eCollisionKey::LIGHTING, "lighting")
 ADD_ENUM(eCollisionKey::VERTICES, "vertices")
 ADD_ENUM(eCollisionKey::MOVE, "move")
-IMPLEMENT_ENUM_END("collision-key")
+IMPLEMENT_ENUM_CLASS_END("collision-key")
 
 //
 // Get best guess at name of userdata type
