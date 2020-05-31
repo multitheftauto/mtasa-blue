@@ -13,7 +13,10 @@
 #include <optional>
 #include <variant>
 #include <utility>
+<<<<<<< HEAD
 #include <optional>
+=======
+>>>>>>> 641e98c02... Add necessary headers to DrawingDefs to be able to use the new parser
 
 class CLuaDrawingDefs : public CLuaDefs
 {
