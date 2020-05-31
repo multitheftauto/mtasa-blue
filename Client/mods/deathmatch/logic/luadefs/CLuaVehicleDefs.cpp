@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
 #define MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP      "1.5.5-9.11710"
 
 void CLuaVehicleDefs::LoadFunctions()
