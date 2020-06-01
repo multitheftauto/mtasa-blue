@@ -18,8 +18,8 @@
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         5
 #define MTASA_VERSION_MAINTENANCE   7
-#define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
-#define MTASA_VERSION_BUILD         0
+#define MTASA_VERSION_TYPE          VERSION_TYPE_RELEASE
+#define MTASA_VERSION_BUILD         20537
 
 #include "build_overrides_s.h"
 
@@ -102,7 +102,10 @@ MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE\n\
 Server will not work with release clients\n\
 -------------------------------------------------------------------------\n\
 If you want the server to work with release clients\n\
-set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h\n\
+set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in Server/version.h\n\
+\n\
+Client can't enter the game? Use Server net.dll from an official build.\n\
+(Official dll uses VERSION_TYPE_RELEASE, win-install-data gives UNSTABLE.)\n\
 -------------------------------------------------------------------------")
     #endif
 #endif
