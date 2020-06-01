@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
 #define MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP      "1.5.5-9.11710"
 
 void CLuaVehicleDefs::LoadFunctions()
@@ -36,7 +38,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
-        {"areVehicleLightsOn", AreVehicleLightsOn},
+        {"areVehicleLightsOn", ArgumentParser<AreVehicleLightsOn>},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
         {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
         {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
@@ -1009,18 +1011,9 @@ int CLuaVehicleDefs::GetVehiclePanelState(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::AreVehicleLightsOn(lua_State* luaVM)
+bool CLuaVehicleDefs::AreVehicleLightsOn(CClientVehicle* const pVehicle)
 {
-    CClientVehicle*  pVehicle;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
-    lua_pushboolean(luaVM, bLightsOn);
-    return 1;
+    return pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2;
 }
 
 int CLuaVehicleDefs::GetVehicleOverrideLights(lua_State* luaVM)
