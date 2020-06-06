@@ -11,4 +11,4 @@ if /I "%ANSWER%"=="y" (
     utils\premake5 install_resources
 )
 
-pause
+if %0 == "%~0" pause
