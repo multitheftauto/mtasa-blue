@@ -1,6 +1,6 @@
 ## Multi Theft Auto: San Andreas [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush)
 
-[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
+[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
 ## Introduction
 
@@ -58,7 +58,7 @@ docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue
 docker run --rm -v `pwd`:/build -e BUILD_BITS=32 multitheftauto/mtasa-blue
 ```
 If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
-
+To build the unoptimised debug build, add `-e BUILD_TARGET=debug` to the docker run arguments.
 ### Premake FAQ
 #### How to add new C++ source files?
 Execute `win-create-projects.bat`.
