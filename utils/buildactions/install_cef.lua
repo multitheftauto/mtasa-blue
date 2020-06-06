@@ -49,8 +49,18 @@ newaction {
 	description = "Downloads and installs CEF",
 
 	execute = function(...)
-		local upgrade = #_ARGS == 1 and _ARGS[1] == "upgrade"
-		if upgrade then
+		local upgrade = _ARGS[1] == "upgrade"
+		if upgrade and _ARGS[2] then
+			local version = _ARGS[2]
+
+			if version == CEF_VERSION then
+				print(("CEF version is already %s"):format(version))
+				return
+			end
+
+			CEF_VERSION = version
+			CEF_HASH = ""
+		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
 			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.html")
 			if result_str ~= "OK" or result_code ~= 200 then
@@ -98,7 +108,7 @@ newaction {
 		end
 
 		-- Download CEF
-		print("Downloading CEF...")
+		print("Downloading CEF " .. CEF_VERSION ..  "...")
 		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
 		if result_str ~= "OK" or response_code ~= 200 then
 			errormsg(("Could not download CEF with status code %s: "):format(response_code), result_str)
