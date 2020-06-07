@@ -929,12 +929,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 
     !ifndef LIGHTBUILD
         SectionGroup "$(INST_SEC_OPTIONAL_RESOURCES)" SEC07
-            Section "AMX Emulation package"
-            SectionIn 1 2
-                SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[amx]"
-                SetOverwrite ifnewer
-                File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[amx]\amx"
-            SectionEnd
             Section "Assault Gamemode"
             SectionIn 1 2
                 SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[assault]"
