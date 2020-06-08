@@ -57,7 +57,7 @@ public:
 
     constexpr CVector Clone() const { return *this; }
 
-    // returns the length of the vector and normalizes it
+    // Normalize returns the normalized length of the vector.
     float Normalize()
     {
         const float t = Length();
@@ -75,8 +75,8 @@ public:
 
     inline float Length() const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
 
-    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z)
-    // For more info see CMaterialLine3DBatcher::Flush()
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z).
+    // This can be useful if you only want to compare lengths.
     inline float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ); }
 
     inline float DotProduct(const CVector* param) const { return fX * param->fX + fY * param->fY + fZ * param->fZ; }
@@ -212,7 +212,6 @@ public:
 
     constexpr CVector operator/(const float fRight) const noexcept { return CVector(fX / fRight, fY / fRight, fZ / fRight); }
 
-
     constexpr void operator+=(const float fRight) noexcept
     {
         fX += fRight;
@@ -226,7 +225,6 @@ public:
         fY += vecRight.fY;
         fZ += vecRight.fZ;
     }
-
 
     constexpr void operator-=(const float fRight) noexcept
     {
@@ -242,7 +240,6 @@ public:
         fZ -= vecRight.fZ;
     }
 
-
     constexpr void operator*=(const float fRight) noexcept
     {
         fX *= fRight;
@@ -256,7 +253,6 @@ public:
         fY *= vecRight.fY;
         fZ *= vecRight.fZ;
     }
-
 
     constexpr void operator/=(const float fRight) noexcept
     {

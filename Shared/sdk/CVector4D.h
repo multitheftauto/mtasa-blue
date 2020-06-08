@@ -45,8 +45,8 @@ public:
 
     float Length() const noexcept { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
 
-    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z + w*w)
-    // For more info see CMaterialLine3DBatcher::Flush()
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z + w*w).
+    // This can be useful if you only want to compare lengths.
     constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
 
     void Normalize() noexcept
@@ -74,7 +74,6 @@ public:
     constexpr CVector4D operator/(const CVector4D& vecRight) const noexcept { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
 
     constexpr CVector4D operator/(const float fRight) const noexcept { return CVector4D(fX / fRight, fY / fRight, fZ / fRight, fW / fRight); }
-
 
     constexpr void operator+=(const float fRight) noexcept
     {
