@@ -25,8 +25,14 @@ if not exist %MSBUILDPATH% (
 echo Found MSBuild at: %MSBUILDPATH%
 
 set BUILD_TARGET=Release
-if exist %1 (
-    set BUILD_TARGET=%1
+IF [%1] == [Debug] (
+    set BUILD_TARGET=Debug
+) ELSE IF [%1] == [Release] (
+    set BUILD_TARGET=Release
+) ELSE (
+    IF not [%1] == [] (
+        echo Invalid first argument %1. Using default build-target %BUILD_TARGET%.
+    )
 )
 
 rem Start compiling
