@@ -24,8 +24,13 @@ if not exist %MSBUILDPATH% (
 )
 echo Found MSBuild at: %MSBUILDPATH%
 
+set BUILD_TARGET=Release
+if exist %1 (
+    set BUILD_TARGET=%1
+)
+
 rem Start compiling
-%MSBUILDPATH% Build/MTASA.sln /property:Configuration=Release /m
+%MSBUILDPATH% Build/MTASA.sln /property:Configuration=%BUILD_TARGET% /m
 
 :end
 pause
