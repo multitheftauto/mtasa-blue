@@ -3614,12 +3614,15 @@ void CClientPed::_CreateModel()
 
         // Restore any settings
         m_pPlayerPed->SetLanding(false);
-        // update matrix to contain current rotation values - fix github: #1291
-        // as setting it thru the interface(SetCurrent/TargetRotation) doesnt update the matrix 
-        {
-            m_Matrix.SetRotation({ 0, 0, m_fCurrentRotation });
-            SetMatrix(m_Matrix); // also sets the matrix on m_pPlayerPed
-        }
+
+        m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
+        m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
+
+        // Fix GitHub #1291: also update the matrix to contain the current rotation
+        // as just setting it through the interface above doesn't update our matrix.
+        m_Matrix.SetRotation({0, 0, m_fCurrentRotation});
+        SetMatrix(m_Matrix);            // also sets the matrix on m_pPlayerPed
+
         m_pPlayerPed->SetCurrentRotation(m_fCurrentRotation);
         m_pPlayerPed->SetTargetRotation(m_fTargetRotation);
 
