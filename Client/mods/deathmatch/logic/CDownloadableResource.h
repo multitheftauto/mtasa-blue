@@ -54,6 +54,7 @@ public:
     CChecksum GenerateClientChecksum();
     CChecksum GenerateClientChecksum(CBuffer& outFileData);
     CChecksum GetServerChecksum();
+    CChecksum GetLastClientChecksum();
 
     bool IsAutoDownload() { return m_bAutoDownload; };
     void SetDownloaded() { m_bDownloaded = true; };

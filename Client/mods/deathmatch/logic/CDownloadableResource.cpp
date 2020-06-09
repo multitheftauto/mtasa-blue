@@ -61,6 +61,11 @@ CChecksum CDownloadableResource::GetServerChecksum()
     return m_ServerChecksum;
 }
 
+CChecksum CDownloadableResource::GetLastClientChecksum()
+{
+    return m_LastClientChecksum;
+}
+
 int CDownloadableResource::GetDownloadPriorityGroup()
 {
     return m_pResource->GetDownloadPriorityGroup();
