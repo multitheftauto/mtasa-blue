@@ -244,6 +244,63 @@ bool CResource::IsWaitingForInitialDownloads()
     return false;
 }
 
+bool CResource::GenerateFileCCsAsync()
+{
+    if (IsWaitingForInitialDownloads())
+        return false;
+
+    if (m_ResourceFiles.empty())
+        return true;
+
+    m_ResFileChecksumFutures.clear();
+
+    for (auto* pFile : m_ResourceFiles)
+    {
+        const bool bIsScript = pFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+        if (bIsScript || pFile->IsAutoDownload())
+        {
+            std::future<void> future = SharedUtil::async(
+            [=]()
+            {
+                // make sure it uses a buffer(otherwise its loaded 2x from the disk)
+                CBuffer buffer;
+                pFile->GenerateClientChecksum(buffer); // update file checksum internally
+            });
+            m_ResFileChecksumFutures.emplace_back(pFile, std::move(future));
+        }
+    }
+
+    return true;
+}
+
+bool CResource::VerifyFileCSs()
+{
+    // make sure we have futures created
+    if (m_ResFileChecksumFutures.empty() && !GenerateFileCCsAsync())
+        return false;
+
+    // await all future results, and report if file's checksum wasnt okay
+    bool wasAllGut = true;
+    for (auto& [pFile, future] : m_ResFileChecksumFutures)
+    {
+        future.get(); // await checksum
+
+        if (!pFile->DoesClientAndServerChecksumMatch())
+        {
+            HandleDownloadedFileTrouble(pFile);
+            wasAllGut = false;
+        }
+        else
+        {
+            const auto fName = ExtractFilename(PathConform(pFile->GetShortName()));
+            g_pCore->GetConsole()->Print(*SString("Check file async: %s", *fName));
+        }
+    }
+    m_ResFileChecksumFutures.clear();
+
+    return wasAllGut;
+}
+
 void CResource::Load()
 {
     dassert(CanBeLoaded());
@@ -294,41 +351,22 @@ void CResource::Load()
     }
     m_NoClientCacheScriptList.clear();
 
-    // Load the files that are queued in the list "to be loaded"
-    list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
-    for (; iter != m_ResourceFiles.end(); ++iter)
-    {
-        CResourceFile* pResourceFile = *iter;
-        // Only load the resource file if it is a client script
-        if (pResourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
-        {
-            // Load the file
-            std::vector<char> buffer;
-            FileLoad(pResourceFile->GetName(), buffer);
-            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
+    // verify all autodl and script files
+    VerifyFileCSs();
 
-            DECLARE_PROFILER_SECTION(OnPreLoadScript)
-            // Check the contents
-            if (CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size()) == pResourceFile->GetServerChecksum())
-            {
-                m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
-            }
-            else
-            {
-                HandleDownloadedFileTrouble(pResourceFile, true);
-            }
-            DECLARE_PROFILER_SECTION(OnPostLoadScript)
-        }
-        else if (pResourceFile->IsAutoDownload())
+    // Load scripts into VM
+    for (auto* pFile : m_ResourceFiles)
+    {
+        const bool bIsScript = pFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+        if (bIsScript)
         {
-            // Check the file contents
-            if (CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
-            {
-                HandleDownloadedFileTrouble(pResourceFile, false);
-            }
+            DECLARE_PROFILER_SECTION(OnPreLoadScript)
+
+            CBuffer buffer;
+            if (buffer.LoadFromFile(pFile->GetName()))
+                m_pLuaVM->LoadScriptFromBuffer(buffer.GetData(), buffer.GetSize(), pFile->GetName());
+
+            DECLARE_PROFILER_SECTION(OnPostLoadScript)
         }
     }
 
@@ -468,15 +506,18 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 // Handle when things go wrong
 //
-void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
+void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile)
 {
+    const bool bScript = pResourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+
     // Compose message
-    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-    SString strGotMd5 = ConvertDataToHexString(CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()).md5.data, sizeof(MD5));
+    SString strGotMd5 = ConvertDataToHexString(pResourceFile->GetLastClientChecksum().md5.data, sizeof(MD5));
     SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+
+    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage =
-        SString("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
+
+    SString strMessage("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);

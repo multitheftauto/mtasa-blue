@@ -17,6 +17,7 @@
 #include "CResourceFile.h"
 #include "CElementGroup.h"
 #include <list>
+#include <future>
 
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
@@ -63,6 +64,10 @@ public:
     void    Stop();
     SString GetState();
 
+    // Desc: generates script and autodl file checksums
+    // To speed resource loading times drastically call this when loading resources in batch
+    bool GenerateFileCCsAsync();
+
     CDownloadableResource* AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
                                            CChecksum serverChecksum, bool bAutoDownload);
     CDownloadableResource* AddConfigFile(const char* szFileName, uint uiDownloadSize, CChecksum serverChecksum);
@@ -105,10 +110,16 @@ public:
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
     bool           IsOOPEnabled() { return m_bOOPEnabled; }
-    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
+    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile);
     bool           IsWaitingForInitialDownloads();
     int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+
+private:
+    // Called by ::Load().
+    // To speed up loading when a lot of resources are loaded at the same time,
+    // call CreateChecksumCheckFutures beforehand
+    bool VerifyFileCSs();
 
 private:
     unsigned short       m_usNetID;
@@ -142,7 +153,8 @@ private:
     SString m_strResourcePrivateDirectoryPath;               // stores the path to /mods/deathmatch/priv/server-id/resource_name
     SString m_strResourcePrivateDirectoryPathOld;            // stores the path to /mods/deathmatch/priv/old-server-id/resource_name
 
-    std::list<class CResourceFile*>       m_ResourceFiles;
+    std::list<std::pair<class CResourceFile*, std::future<void>>> m_ResFileChecksumFutures; 
+
     std::list<class CResourceConfigItem*> m_ConfigFiles;
     std::list<CExportedFunction*>         m_exportedFunctions;
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
