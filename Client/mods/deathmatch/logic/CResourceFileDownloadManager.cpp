@@ -114,6 +114,8 @@ void CResourceFileDownloadManager::DoPulse()
     if (!IsTransferringInitialFiles())
         return;
 
+    m_asyncFileChecksumTaskSched.CollectResults();
+
     // Pulse the http downloads
     uint uiDownloadSizeTotal = 0;
     for (auto serverInfo : m_HttpServerList)
@@ -263,53 +265,71 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
         return;
 
     assert(ListContains(m_ActiveFileDownloadList, pResourceFile));
+
     if (result.bSuccess)
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
-        if (checksum != pResourceFile->GetServerChecksum())
-        {
-            // Checksum failed - Try download on next server
-            if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
-            {
-                // Was re-added - Add size again to total.
-                AddDownloadSize(pResourceFile->GetDownloadSize());
-                SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath(pResourceFile->GetName()));
-                g_pClientGame->TellServerSomethingImportant(1011, strMessage, 3);
-                return;
-            }
-        }
-    }
-    else
-    if (result.iErrorCode == 1007)
-    {
-        // Download failed due to being unable to create file
-        // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
-    }
-    else
-    {
-        // Download failed due to connection type problem
-        CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(m_HttpServerList[pResourceFile->GetHttpServerIndex()].downloadChannel);
-        SString                           strHTTPError = pHTTP->GetError();
-        // Disable server from being used (if possible)
-        if (DisableHttpServer(pResourceFile->GetHttpServerIndex()))
-        {
-            //  Try download on next server
-            if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
-            {
-                // Was re-added - Add size again to total.
-                AddDownloadSize(pResourceFile->GetDownloadSize());
-                SString strMessage("External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError,
-                                   *ConformResourcePath(pResourceFile->GetName()));
-                g_pClientGame->TellServerSomethingImportant(1012, strMessage, 3);
-                return;
-            }
-        }
-        m_strLastHTTPError = strHTTPError;
-    }
+        m_asyncFileChecksumTaskSched.PushTask<bool>(
+        [=]() {
+            CBuffer buffer;
+            pResourceFile->GenerateClientChecksum(buffer); // update file checksum internally
 
-    // File now done (or failed)
-    ListRemove(m_ActiveFileDownloadList, pResourceFile);
-    pResourceFile->SetIsWaitingForDownload(false);
+            return pResourceFile->DoesClientAndServerChecksumMatch();
+        },
+        [=](const bool& didMatch) {
+            if (didMatch)
+            {
+                // File now done
+                ListRemove(m_ActiveFileDownloadList, pResourceFile);
+                pResourceFile->SetIsWaitingForDownload(false);
+            }
+            else
+            {
+                // Checksum failed - Try download on next server
+                if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
+                {
+                    // Was re-added - Add size again to total.
+                    AddDownloadSize(pResourceFile->GetDownloadSize());
+                    SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath(pResourceFile->GetName()));
+                    g_pClientGame->TellServerSomethingImportant(1011, strMessage, 3);
+                }
+            }
+        });
+    }
+    else
+    {
+        if (result.iErrorCode == 1007)
+        {
+            // Download failed due to being unable to create file
+            // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
+        }
+        else
+        {
+            // Download failed due to connection type problem
+            CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(m_HttpServerList[pResourceFile->GetHttpServerIndex()].downloadChannel);
+            SString                           strHTTPError = pHTTP->GetError();
+            // Disable server from being used (if possible)
+            if (DisableHttpServer(pResourceFile->GetHttpServerIndex()))
+            {
+                //  Try download on next server
+                if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
+                {
+                    // Was re-added - Add size again to total.
+                    AddDownloadSize(pResourceFile->GetDownloadSize());
+                    SString strMessage("External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError,
+                        *ConformResourcePath(pResourceFile->GetName()));
+                    g_pClientGame->TellServerSomethingImportant(1012, strMessage, 3);
+                }
+                else 
+                {
+                    // Failed
+
+                    m_strLastHTTPError = strHTTPError;
+                    ListRemove(m_ActiveFileDownloadList, pResourceFile);
+                    pResourceFile->SetIsWaitingForDownload(false);
+                }
+            }
+        }   
+    }
 }
 
 ///////////////////////////////////////////////////////////////

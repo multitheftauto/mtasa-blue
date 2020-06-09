@@ -39,6 +39,8 @@ protected:
     SString*               MakeDownloadContextString(CDownloadableResource* pDownloadableResource);
     CDownloadableResource* ResolveDownloadContextString(SString* pString);
 
+    CAsyncTaskScheduler    m_asyncFileChecksumTaskSched = CAsyncTaskScheduler(2);
+
     std::vector<CDownloadableResource*> m_PendingFileDownloadList;
     std::vector<CDownloadableResource*> m_ActiveFileDownloadList;
     std::vector<SHttpServerInfo>        m_HttpServerList;
