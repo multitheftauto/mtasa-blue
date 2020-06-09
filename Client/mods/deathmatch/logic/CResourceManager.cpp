@@ -96,18 +96,30 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
 
 void CResourceManager::OnDownloadGroupFinished()
 {
-    // Try to load newly ready resources
-    for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
+    std::vector<CResource*> resToLoad;
+    resToLoad.reserve(1024);
+
+    // Generate file checksums async for newly ready resources
+    for (auto pResource : m_resources)
     {
-        CResource* pResource = *iter;
         if (!pResource->IsActive())
         {
             // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
-            if (pResource->IsWaitingForInitialDownloads())
+            if (!pResource->GenerateFileCCsAsync())
                 break;
-            pResource->Load();
+            resToLoad.push_back(pResource);
         }
     }
+
+    g_pCore->GetConsole()->Print(SString("doing %i checksum checks", resToLoad.size()).c_str());
+
+    // Load newly ready resources
+    const auto tp = std::chrono::steady_clock::now();
+    for (auto pResource : resToLoad)
+        pResource->Load();
+
+    const auto diffMicro = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - tp);
+    g_pCore->GetConsole()->Print(SString("awaited %i checksum checks in %u us", (unsigned int)resToLoad.size(), (unsigned int)diffMicro.count()).c_str());
 }
 
 bool CResourceManager::RemoveResource(unsigned short usNetID)
