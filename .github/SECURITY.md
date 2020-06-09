@@ -1,6 +1,6 @@
 # Reporting a Vulnerability
 
-Before disclosing a security vulnerability, please do not try and check that they work
+Before disclosing a cheat or security vulnerability, please do not try and check that they work
 as they could either result in you getting globally banned or infected by a virus.
 
 Please submit your security vulnerabilities and cheats to our [private bugtracker].
