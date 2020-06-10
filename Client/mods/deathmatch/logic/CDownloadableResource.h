@@ -51,9 +51,10 @@ public:
     uint          GetHttpServerIndex() { return m_uiHttpServerIndex; }
     void          SetHttpServerIndex(uint uiHttpServerIndex) { m_uiHttpServerIndex = uiHttpServerIndex; }
 
-    CChecksum GenerateClientChecksum();
-    CChecksum GenerateClientChecksum(CBuffer& outFileData);
-    CChecksum GetServerChecksum();
+    CChecksum              GenerateClientChecksum();
+    CChecksum              GenerateClientChecksum(CBuffer& outFileData);
+    std::future<CChecksum> GenerateClientChecksumAsync();
+    CChecksum              GetServerChecksum();
 
     bool IsAutoDownload() { return m_bAutoDownload; };
     void SetDownloaded() { m_bDownloaded = true; };

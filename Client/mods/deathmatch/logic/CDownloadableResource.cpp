@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <functional> // std::bind
+#include <future>     // return value from SharedUtil::async
 
 CDownloadableResource::CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
                                              CChecksum serverChecksum, bool bAutoDownload)
@@ -39,6 +41,14 @@ CDownloadableResource::~CDownloadableResource()
 bool CDownloadableResource::DoesClientAndServerChecksumMatch()
 {
     return (m_LastClientChecksum == m_ServerChecksum);
+}
+
+std::future<CChecksum> CDownloadableResource::GenerateClientChecksumAsync()
+{
+    // Force us to use a buffer and not re-read the file twice,
+    // because HDD bandwidth is more important than multi-core speed(we're fast enough already in terms of CPU)
+    return SharedUtil::async([this]() { return GenerateClientChecksum(CBuffer()); });
+    //return SharedUtil::async(std::bind(&CDownloadableResource::GenerateClientChecksum, this), CBuffer());
 }
 
 CChecksum CDownloadableResource::GenerateClientChecksum()
