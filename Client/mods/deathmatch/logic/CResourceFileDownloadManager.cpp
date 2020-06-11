@@ -10,6 +10,11 @@
 
 #include "StdInc.h"
 
+CResourceFileDownloadManager::CResourceFileDownloadManager() :
+    m_asyncFileChecksumTaskSched(CAsyncTaskScheduler(Clamp<int>(2, std::thread::hardware_concurrency(), 16)))
+{
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CResourceFileDownloadManager::AddServer
@@ -113,6 +118,8 @@ void CResourceFileDownloadManager::DoPulse()
 
     if (!IsTransferringInitialFiles())
         return;
+
+    m_asyncFileChecksumTaskSched.CollectResults();
 
     // Pulse the http downloads
     uint uiDownloadSizeTotal = 0;
@@ -263,53 +270,103 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
         return;
 
     assert(ListContains(m_ActiveFileDownloadList, pResourceFile));
+
     if (result.bSuccess)
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
-        if (checksum != pResourceFile->GetServerChecksum())
+        using namespace std::chrono;
+
+        using steady_time_point_t = time_point<steady_clock>;
+        struct AsyncReturnValue
         {
-            // Checksum failed - Try download on next server
-            if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
+            steady_time_point_t GenerationStart;
+            steady_time_point_t GenerationEnd;
+            bool                DidMatch;
+            bool                DidActaullyDoSomething;
+        };
+
+        m_asyncFileChecksumTaskSched.PushTask<AsyncReturnValue>(
+        [=]() {
+            AsyncReturnValue ReturnValue;
+            ReturnValue.GenerationStart = steady_clock::now();
+
+            CBuffer buffer; // Force the function to use a buffer, instead of reading the file twice(its less disk intensive)
+            pResourceFile->GenerateClientChecksum(buffer); // Update checksum internally
+
+            ReturnValue.DidActaullyDoSomething = buffer.GetSize() > 0;
+            ReturnValue.GenerationEnd = steady_clock::now();
+            ReturnValue.DidMatch = pResourceFile->DoesClientAndServerChecksumMatch();
+
+            return ReturnValue;
+        },
+        [=](const AsyncReturnValue& ReturnVal) {
+            // Write out some debug info: TODO - remove
+            {
+                const auto GenerationIntervalMS = (uint)duration_cast<milliseconds>(ReturnVal.GenerationEnd - ReturnVal.GenerationStart).count();
+                const auto CallbackIntervalMS = (uint)duration_cast<milliseconds>(steady_clock::now() - ReturnVal.GenerationEnd).count();
+
+                g_pCore->GetConsole()->Printf("[ResFileDLManager - Checksum gen]: %s in %u ms (gen: %u ms,   callback: %u ms) [%s,  %sgot: %s]",
+                    pResourceFile->GetShortName(),
+                    GenerationIntervalMS + CallbackIntervalMS,
+                    GenerationIntervalMS,
+                    CallbackIntervalMS,
+                    ReturnVal.DidMatch ? "true" : "false",
+                    ReturnVal.DidActaullyDoSomething ? "true" : "falsee",
+                    ConvertDataToHexString(pResourceFile->GetLastClientChecksum().md5.data, sizeof(MD5)).c_str()
+                );
+            }
+
+            // If checksum incorrect - Try download on next server
+            if (!ReturnVal.DidMatch && BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
             {
                 // Was re-added - Add size again to total.
                 AddDownloadSize(pResourceFile->GetDownloadSize());
                 SString strMessage("External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath(pResourceFile->GetName()));
                 g_pClientGame->TellServerSomethingImportant(1011, strMessage, 3);
-                return;
             }
-        }
-    }
-    else
-    if (result.iErrorCode == 1007)
-    {
-        // Download failed due to being unable to create file
-        // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
-    }
-    else
-    {
-        // Download failed due to connection type problem
-        CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(m_HttpServerList[pResourceFile->GetHttpServerIndex()].downloadChannel);
-        SString                           strHTTPError = pHTTP->GetError();
-        // Disable server from being used (if possible)
-        if (DisableHttpServer(pResourceFile->GetHttpServerIndex()))
-        {
-            //  Try download on next server
-            if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
+            else
             {
-                // Was re-added - Add size again to total.
-                AddDownloadSize(pResourceFile->GetDownloadSize());
-                SString strMessage("External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError,
-                                   *ConformResourcePath(pResourceFile->GetName()));
-                g_pClientGame->TellServerSomethingImportant(1012, strMessage, 3);
-                return;
+                // File now done(or if failed, it'll be handled in CResource::CheckAllFilesAndReDownloadIfNeeded())
+                ListRemove(m_ActiveFileDownloadList, pResourceFile);
+                pResourceFile->SetIsWaitingForDownload(false);
             }
-        }
-        m_strLastHTTPError = strHTTPError;
+        });
     }
+    else
+    {
+        if (result.iErrorCode == 1007)
+        {
+            // Download failed due to being unable to create file
+            // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
+        }
+        else
+        {
+            // Download failed due to connection type problem
+            CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(m_HttpServerList[pResourceFile->GetHttpServerIndex()].downloadChannel);
+            SString                           strHTTPError = pHTTP->GetError();
+            // Disable server from being used (if possible)
+            if (DisableHttpServer(pResourceFile->GetHttpServerIndex()))
+            {
+                //  Try download on next server
+                if (BeginResourceFileDownload(pResourceFile, pResourceFile->GetHttpServerIndex() + 1))
+                {
+                    // Was re-added - Add size again to total.
+                    AddDownloadSize(pResourceFile->GetDownloadSize());
 
-    // File now done (or failed)
-    ListRemove(m_ActiveFileDownloadList, pResourceFile);
-    pResourceFile->SetIsWaitingForDownload(false);
+                    SString strMessage("External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError,
+                        *ConformResourcePath(pResourceFile->GetName()));
+                    g_pClientGame->TellServerSomethingImportant(1012, strMessage, 3);
+
+                    // Don't remove file from active dl list
+                    return;
+                }
+            }
+
+            // File now done(or if failed, it'll be handled in CResource::CheckAllFilesAndReDownloadIfNeeded())
+            m_strLastHTTPError = strHTTPError;
+            ListRemove(m_ActiveFileDownloadList, pResourceFile);
+            pResourceFile->SetIsWaitingForDownload(false);
+        }   
+    }
 }
 
 ///////////////////////////////////////////////////////////////

@@ -22,6 +22,9 @@ class CResourceFileDownloadManager
 {
 public:
     ZERO_ON_NEW
+
+    CResourceFileDownloadManager();
+
     void AddServer(const SString& strUrl, int iMaxConnectionsPerClient, EDownloadModeType downloadChannel, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
     void AddPendingFileDownload(CDownloadableResource* pDownloadableResource);
     void UpdatePendingDownloads();
@@ -38,6 +41,8 @@ protected:
     void                   DownloadFinished(const SHttpDownloadResult& result);
     SString*               MakeDownloadContextString(CDownloadableResource* pDownloadableResource);
     CDownloadableResource* ResolveDownloadContextString(SString* pString);
+
+    CAsyncTaskScheduler    m_asyncFileChecksumTaskSched;
 
     std::vector<CDownloadableResource*> m_PendingFileDownloadList;
     std::vector<CDownloadableResource*> m_ActiveFileDownloadList;
