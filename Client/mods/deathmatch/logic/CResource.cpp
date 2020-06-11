@@ -226,6 +226,94 @@ bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& 
     return false;
 }
 
+bool CResource::MakeSureAllFilesAreDownloaded()
+{
+    auto pDlManager = g_pClientGame->GetResourceFileDownloadManager();
+
+    for (auto* pConfigFile : m_ConfigFiles)
+        if (!FileExists(pConfigFile->GetName()))
+        {
+            g_pCore->GetConsole()->Printf("Downloading config file: %s/%s", GetName(), pConfigFile->GetShortName());
+            pDlManager->AddPendingFileDownload(pConfigFile);
+        }
+
+    // Download auto-dl files and scripts if needed
+    for (auto* pFile : m_ResourceFiles)
+        if (pFile->IsAutoDownload() && !FileExists(pFile->GetName()))
+        {
+            g_pCore->GetConsole()->Printf("Downloading file: %s/%s", GetName(), pFile->GetShortName());
+            pDlManager->AddPendingFileDownload(pFile);
+        }
+     
+    g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
+
+    // Check if we've added any downloads
+    return !IsWaitingForInitialDownloads();
+}
+
+bool CResource::CheckAllFilesAndReDownloadIfNeeded(const bool bCanDownload)
+{
+    if (bCanDownload && !MakeSureAllFilesAreDownloaded())
+    {
+        for (auto* pFile : m_ResourceFiles)
+            if (pFile->IsAutoDownload() && pFile->IsWaitingForDownload())
+                g_pCore->GetConsole()->Printf("%s/%s is being downloaded", GetName(), pFile->GetShortName());
+
+        for (auto* pFile : m_ConfigFiles)
+            if (pFile->IsWaitingForDownload())
+                g_pCore->GetConsole()->Printf("%s/%s [config] is being downloaded", GetName(), pFile->GetShortName());
+
+        g_pCore->GetConsole()->Printf("Not starting resource %s due to missing files", GetName());
+        return false;
+    }
+
+    // Make sure all checksums are generated
+    // We do this here, so it can run async
+    for (auto* pFile : m_ResourceFiles)
+        if (pFile->HasClientChecksumGenerated())
+            pFile->GenerateClientChecksumAsync();
+
+    // Files should be downloaded by now, let's check their hashes, and re-download if needed
+    bool bAllWasSehrGut = true;
+    for (auto* pFile : m_ResourceFiles)
+    {
+        // Only check auto-dl files and scripts
+        const bool bIsScript = pFile->GetResourceType() == CDownloadableResource::eResourceType::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+        if (!pFile->IsAutoDownload() || !bIsScript)
+            continue;
+
+        if (pFile->DoesClientAndServerChecksumMatch())
+            continue;
+
+        bAllWasSehrGut = false;
+
+        // Report checksums don't match
+        HandleDownloadedFileTrouble(pFile);
+
+        if (!bCanDownload)
+            continue;
+
+        // GetName() returns the path
+        const auto& strFilePath = pFile->GetName();
+
+        // Check for existing file, and try deleting
+        if (FileExists(strFilePath) && !FileDelete(strFilePath))
+        {
+            SString strMessage("Unable to delete old file %s", *ConformResourcePath(strFilePath));
+            g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+        }
+
+        // Re-download file
+        MakeSureDirExists(strFilePath);
+        g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pFile);     
+    }
+    g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
+
+    g_pCore->GetConsole()->Printf("File checks were %s in resource %s", bAllWasSehrGut ? "ok" : "not ok", GetName());
+
+    return bAllWasSehrGut;
+}
+
 bool CResource::CanBeLoaded()
 {
     return !IsActive() && !IsWaitingForInitialDownloads();
@@ -244,17 +332,21 @@ bool CResource::IsWaitingForInitialDownloads()
     return false;
 }
 
-void CResource::Load()
+bool CResource::Load(const bool bCanDownload)
 {
-    dassert(CanBeLoaded());
-    m_pRootEntity = g_pClientGame->GetRootEntity();
+    if (IsActive())
+        return false;
+
+    if (!CheckAllFilesAndReDownloadIfNeeded(bCanDownload))
+        return false;
 
     if (m_usRemainingNoClientCacheScripts > 0)
     {
         m_bLoadAfterReceivingNoClientCacheScripts = true;
-        return;
+        return false;
     }
 
+    m_pRootEntity = g_pClientGame->GetRootEntity();
     if (m_pRootEntity)
     {
         // Set the GUI parent to the resource root entity
@@ -294,29 +386,20 @@ void CResource::Load()
     }
     m_NoClientCacheScriptList.clear();
 
-    // Load the files that are queued in the list "to be loaded"
-    list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
-    for (; iter != m_ResourceFiles.end(); ++iter)
+    // Check script file checksums, and load them into the VM
+    for (auto* pFile : m_ResourceFiles)
     {
-        CResourceFile* pResourceFile = *iter;
-        // Only load the resource file if it is a client script
-        if (pResourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
+        const bool bIsScript = pFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+        if (bIsScript)
         {
-            // Load the file
-            std::vector<char> buffer;
-            FileLoad(pResourceFile->GetName(), buffer);
-            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
-
             DECLARE_PROFILER_SECTION(OnPreLoadScript)
-            // Check the contents
-            if (CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size()) == pResourceFile->GetServerChecksum())
-            {
-                m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
-            }
-            else
-            {
-                HandleDownloadedFileTrouble(pResourceFile, true);
-            }
+
+            CBuffer buffer;
+
+            // GenerateClientChecksum loads the file into the buffer, and generates the checksum
+            if (pFile->GenerateClientChecksum(buffer) == pFile->GetServerChecksum())
+                m_pLuaVM->LoadScriptFromBuffer(buffer.GetData(), buffer.GetSize(), pFile->GetName());
+
             DECLARE_PROFILER_SECTION(OnPostLoadScript)
         }
         else if (pResourceFile->IsAutoDownload())
@@ -346,6 +429,8 @@ void CResource::Load()
     }
     else
         assert(0);
+
+    return true;
 }
 
 void CResource::Stop()
@@ -449,7 +534,7 @@ void CResource::LoadNoClientCacheScript(const char* chunk, unsigned int len, con
         if (m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts)
         {
             m_bLoadAfterReceivingNoClientCacheScripts = false;
-            Load();
+            Load(true);
         }
     }
 }

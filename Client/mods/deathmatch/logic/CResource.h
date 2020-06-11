@@ -59,7 +59,7 @@ public:
     bool           IsActive() { return m_bActive; };
     bool           CanBeLoaded();
 
-    void    Load();
+    bool    Load(const bool bCanDownload);
     void    Stop();
     SString GetState();
 
@@ -109,6 +109,14 @@ public:
     bool           IsWaitingForInitialDownloads();
     int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+
+private:
+    // Returns if there are any files that yet need to be transferred
+    bool MakeSureAllFilesAreDownloaded();
+
+    // Check all file's(except script, as its checked directly before loading) checksums,
+    // And re-downloads them if they're incorrect
+    bool CheckAllFilesAndReDownloadIfNeeded(const bool bCanDownload);
 
 private:
     unsigned short       m_usNetID;
