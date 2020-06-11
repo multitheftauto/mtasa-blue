@@ -466,3 +466,11 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);
     g_pCore->GetConsole()->Printf("Download error: %s", *strMessage);
 }
+
+CResourceFile* CResource::GetFileFromShortName(const char* szShortName)
+{
+    for (auto* pFile : m_ResourceFiles)
+        if (strcmp(szShortName, pFile->GetShortName()) == 0)
+            return pFile;
+    return nullptr;
+}

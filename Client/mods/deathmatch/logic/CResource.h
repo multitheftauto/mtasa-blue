@@ -97,9 +97,6 @@ public:
 
     const auto& GetExportedFunctionNames() const { return m_ExportedFunctionsSet; }
 
-    std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
-    std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
-
     void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
@@ -109,7 +106,8 @@ public:
     bool           IsWaitingForInitialDownloads();
     int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
-
+    CResourceFile* GetFileFromShortName(const char* szShortName);
+    
 private:
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;

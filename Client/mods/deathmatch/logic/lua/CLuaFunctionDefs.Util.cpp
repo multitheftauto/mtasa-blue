@@ -361,26 +361,18 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
             // Resolve other resource from name
             if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, NULL, &strMetaPath))
             {
-                std::list<CResourceFile*>::const_iterator iter = pOtherResource->IterBeginResourceFiles();
-                for (; iter != pOtherResource->IterEndResourceFiles(); iter++)
-                {
-                    if (strcmp(strMetaPath, (*iter)->GetShortName()) == 0)
-                    {
-                        if (CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, (*iter)->GetServerChecksum()))
-                        {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                    }
-                }
-                m_pScriptDebugging->LogCustom(luaVM, SString("%s: File doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1))));
+                if (CResourceFile* pFile = pOtherResource->GetFileFromShortName(strMetaPath.c_str()))
+                    lua_pushboolean(luaVM, CStaticFunctionDefinitions::DownloadFile(pOtherResource, strMetaPath, pThisResource, pFile->GetServerChecksum()));
+                else
+                    m_pScriptDebugging->LogWarning(luaVM, "%s: File %s doesn't exist", lua_tostring(luaVM, lua_upvalueindex(1)), strMetaPath.c_str());
             }
             else
             {
-                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: Invalid path", lua_tostring(luaVM, lua_upvalueindex(1)));
+                m_pScriptDebugging->LogCustom(luaVM, 255, 255, 255, "%s: Invalid path (%s)", lua_tostring(luaVM, lua_upvalueindex(1)), strFileInput.c_str());
             }
         }
     }
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
