@@ -20,6 +20,7 @@
 
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
+#include <future>
 
 class CDownloadableResource
 {
@@ -51,10 +52,11 @@ public:
     uint          GetHttpServerIndex() { return m_uiHttpServerIndex; }
     void          SetHttpServerIndex(uint uiHttpServerIndex) { m_uiHttpServerIndex = uiHttpServerIndex; }
 
-    CChecksum              GenerateClientChecksum();
-    CChecksum              GenerateClientChecksum(CBuffer& outFileData);
-    std::future<CChecksum> GenerateClientChecksumAsync();
-    CChecksum              GetServerChecksum();
+    CChecksum GenerateClientChecksum();
+    CChecksum GenerateClientChecksum(CBuffer& outFileData);
+    void      GenerateClientChecksumAsync();
+    CChecksum GetServerChecksum();
+    CChecksum GetLastClientChecksum();
 
     bool IsAutoDownload() { return m_bAutoDownload; };
     void SetDownloaded() { m_bDownloaded = true; };
@@ -64,15 +66,19 @@ public:
     void SetModifedByScript(bool bModifedByScript) { m_bModifedByScript = bModifedByScript; };
     bool IsModifedByScript() { return m_bModifedByScript; };
 
+    bool HasClientChecksumGenerated();
+
 protected:
-    CResource*    m_pResource;
+    void MakeSureChecksumIsGenerated();
+
     eResourceType m_resourceType;
 
     SString m_strName;
     SString m_strNameShort;
 
-    CChecksum m_LastClientChecksum;
-    CChecksum m_ServerChecksum;
+    std::future<CChecksum> m_GenerateChecksumFuture;
+    CChecksum              m_LastClientChecksum;
+    CChecksum              m_ServerChecksum;
 
     bool m_bAutoDownload;
     bool m_bInDownloadQueue;            // File in auto download queue
