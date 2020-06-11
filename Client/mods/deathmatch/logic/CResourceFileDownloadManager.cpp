@@ -116,7 +116,7 @@ void CResourceFileDownloadManager::DoPulse()
 
     // Pulse the http downloads
     uint uiDownloadSizeTotal = 0;
-    for (auto serverInfo : m_HttpServerList)
+    for (auto& serverInfo : m_HttpServerList)
     {
         CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(serverInfo.downloadChannel);
         pHTTP->ProcessQueuedFiles();
