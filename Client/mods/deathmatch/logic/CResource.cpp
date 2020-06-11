@@ -152,14 +152,6 @@ CResource::~CResource()
         delete (*iterc);
     }
     m_ConfigFiles.clear();
-
-    // Delete the exported functions
-    list<CExportedFunction*>::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for (; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction)
-    {
-        delete (*iterExportedFunction);
-    }
-    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
@@ -207,22 +199,14 @@ CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiD
 
 void CResource::AddExportedFunction(const char* szFunctionName)
 {
-    m_exportedFunctions.push_back(new CExportedFunction(szFunctionName));
+    m_ExportedFunctionsSet.insert(szFunctionName); 
 }
 
 bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
-    list<CExportedFunction*>::iterator iter = m_exportedFunctions.begin();
-    for (; iter != m_exportedFunctions.end(); ++iter)
-    {
-        if (strcmp((*iter)->GetFunctionName(), szFunctionName) == 0)
-        {
-            if (args.CallGlobal(m_pLuaVM, szFunctionName, &returns))
-            {
-                return true;
-            }
-        }
-    }
+    // Check if we actually have this function exported
+    if (m_ExportedFunctionsSet.find(szFunctionName) != m_ExportedFunctionsSet.end())
+        return args.CallGlobal(m_pLuaVM, szFunctionName, &returns);
     return false;
 }
 

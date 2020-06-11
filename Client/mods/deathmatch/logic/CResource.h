@@ -16,6 +16,7 @@
 #include "CResourceConfigItem.h"
 #include "CResourceFile.h"
 #include "CElementGroup.h"
+#include "SharedUtil.FastHashSet.h"
 #include <list>
 
 #define MAX_RESOURCE_NAME_LENGTH    255
@@ -94,8 +95,7 @@ public:
     // Use this for cursor showing/hiding
     void ShowCursor(bool bShow, bool bToggleControls = true);
 
-    std::list<CExportedFunction*>::iterator IterBeginExportedFunctions() { return m_exportedFunctions.begin(); }
-    std::list<CExportedFunction*>::iterator IterEndExportedFunctions() { return m_exportedFunctions.end(); }
+    const auto& GetExportedFunctionNames() const { return m_ExportedFunctionsSet; }
 
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
@@ -144,7 +144,7 @@ private:
 
     std::list<class CResourceFile*>       m_ResourceFiles;
     std::list<class CResourceConfigItem*> m_ConfigFiles;
-    std::list<CExportedFunction*>         m_exportedFunctions;
+    std::set<std::string, std::less<>>    m_ExportedFunctionsSet;            // std::less<> for transparent lookup: https://stackoverflow.com/questions/20317413/what-are-transparent-comparators
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 };
