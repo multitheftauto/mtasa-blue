@@ -96,16 +96,14 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
 
 void CResourceManager::OnDownloadGroupFinished()
 {
-    // Try to load newly ready resources
-    for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
+    for (auto* pResource : m_resources)
     {
-        CResource* pResource = *iter;
         if (!pResource->IsActive())
         {
             // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
             if (pResource->IsWaitingForInitialDownloads())
                 break;
-            pResource->Load();
+            pResource->Load(false);
         }
     }
 }
