@@ -321,14 +321,14 @@ bool CResource::CanBeLoaded()
 
 bool CResource::IsWaitingForInitialDownloads()
 {
-    for (std::list<CResourceConfigItem*>::iterator iter = m_ConfigFiles.begin(); iter != m_ConfigFiles.end(); ++iter)
-        if ((*iter)->IsWaitingForDownload())
+    for (auto* pFile : m_ResourceFiles)
+        if (pFile->IsWaitingForDownload())
             return true;
 
-    for (std::list<CResourceFile*>::iterator iter = m_ResourceFiles.begin(); iter != m_ResourceFiles.end(); ++iter)
-        if ((*iter)->IsAutoDownload())
-            if ((*iter)->IsWaitingForDownload())
-                return true;
+    for (auto* pFile : m_ResourceFiles)
+        if (pFile->IsAutoDownload() && pFile->IsWaitingForDownload())
+            return true;
+
     return false;
 }
 
