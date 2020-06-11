@@ -45,6 +45,7 @@ public:
     }
 
     SString(const std::string& strText) : std::string(strText) {}
+    SString(std::string&& strText) : std::string(strText) {}
 
     SString& Format(const char* szFormat, ...)
     {
