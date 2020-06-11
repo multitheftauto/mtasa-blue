@@ -468,15 +468,18 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 // Handle when things go wrong
 //
-void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
+void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile)
 {
+    const bool bScript = pResourceFile->GetResourceType() == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT;
+
     // Compose message
-    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-    SString strGotMd5 = ConvertDataToHexString(CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()).md5.data, sizeof(MD5));
+    SString strGotMd5 = ConvertDataToHexString(pResourceFile->GetLastClientChecksum().md5.data, sizeof(MD5));
     SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+
+    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage =
-        SString("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
+
+    SString strMessage("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);

@@ -105,7 +105,7 @@ public:
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
     bool           IsOOPEnabled() { return m_bOOPEnabled; }
-    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
+    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile);
     bool           IsWaitingForInitialDownloads();
     int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
