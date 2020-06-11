@@ -402,17 +402,6 @@ bool CResource::Load(const bool bCanDownload)
 
             DECLARE_PROFILER_SECTION(OnPostLoadScript)
         }
-        else if (pResourceFile->IsAutoDownload())
-        {
-            // Check the file contents
-            if (CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
-            {
-            }
-            else
-            {
-                HandleDownloadedFileTrouble(pResourceFile, false);
-            }
-        }
     }
 
     // Set active flag
