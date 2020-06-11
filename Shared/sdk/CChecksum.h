@@ -17,17 +17,14 @@
 class CChecksum
 {
 public:
-    // Initialize to zeros
-    CChecksum()
-    {
-        ulCRC = 0;
-        memset(md5.data, 0, sizeof(md5.data));
-    }
+    CChecksum() noexcept = default;
 
     // Comparison operators
     bool operator==(const CChecksum& other) const { return ulCRC == other.ulCRC && memcmp(md5.data, other.md5.data, sizeof(md5.data)) == 0; }
 
     bool operator!=(const CChecksum& other) const { return !operator==(other); }
+
+    operator bool() const { return bIsValid; }
 
     // static generators
     static CChecksum GenerateChecksumFromFile(const SString& strFilename)
@@ -35,6 +32,8 @@ public:
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
         CMD5Hasher().Calculate(strFilename, result.md5);
+        result.bIsValid = true;
+
         return result;
     }
 
@@ -43,11 +42,14 @@ public:
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromBuffer(cpBuffer, ulLength);
         CMD5Hasher().Calculate(cpBuffer, ulLength, result.md5);
+        result.bIsValid = true;
+
         return result;
     }
 
-    unsigned long ulCRC;
-    MD5           md5;
+    unsigned long ulCRC = 0;
+    MD5           md5 = { 0 };
+    bool          bIsValid = false;
 };
 
 #endif
