@@ -4758,28 +4758,30 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 {
     // Used for dummy progress when a server has over 50MB of client files to process
-    static uint         uiTotalSizeProcessed = 0;
+    static uint         uiTotalSizeProcessedMB = 0;
     static CElapsedTime totalSizeProcessedResetTimer;
     if (totalSizeProcessedResetTimer.Get() > 5000)
-        uiTotalSizeProcessed = 0;
+        uiTotalSizeProcessedMB = 0;
 
     /*
-     * unsigned char (1)   - resource name size
+     * unsigned char (1)    - resource name size
      * unsigned char (x)    - resource name
      * unsigned short (2)   - resource id
      * unsigned short (2)   - resource entity id
      * unsigned short (2)   - resource dynamic entity id
-     * list of configs and scripts
-     * * unsigned char (1)    - type chunk (F - File, E - Exported Function)
-     * * unsigned char (1)    - file name size
-     * * unsigned char (x)    - file name
-     * * unsigned char (1)    - type
-     * * unsigned long        - CRC
-     * * double               - size
-     * list of exported functions
-     * * unsigned char (1)    - type chunk (F - File, E - Exported Function)
-     * * unsigned char (1)    - function name size
-     * * unsigned char (x)    - function name
+     *
+     * unsigned char (1)    - type of chunk (F - File, E - Exported Function)
+     * unsigned char (1)    - function / file name size
+     * unsigned char (x)    - function / file name
+     *
+     * list of resource files - If type is F
+     * * unsigned char (1)    - file type(Config, Script, File)
+     * * unsigned long        - server CRC checksum
+     * * MD5                  - MD5 checksum
+     * * double               - size in bytes
+     *
+     * list of exported functions - If type is E
+     * Only contains name size, and name
      */
 
     // Number of 'no client cache' scripts
@@ -4797,7 +4799,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     }
 
     // Resource Name
-    char* szResourceName = new char[ucResourceNameSize + 1];
+    char szResourceName[MAX_RESOURCE_NAME_LENGTH + 1];
     bitStream.Read(szResourceName, ucResourceNameSize);
     if (ucResourceNameSize)
         szResourceName[ucResourceNameSize] = NULL;
@@ -4856,131 +4858,79 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
-        // Resource Chunk Size
-        unsigned char ucChunkSize;
-        // Resource Chunk Data
-        char* szChunkData = NULL;
-        // Resource Chunk Sub Type
-        unsigned char ucChunkSubType;
-        // Resource Chunk checksum
-        CChecksum chunkChecksum;
-        // Resource Chunk File Size
-        double dChunkDataSize;
-
         while (bitStream.Read(ucChunkType))
         {
+            // Read function / file name
+            char fileOrFunctionName[256 + 1]; // ucFileOrScriptNameSize cant be more than 256, so make buffer 256 + 0 terminator = 257
+            {
+                unsigned char ucFileOrScriptNameSize;
+                if (!bitStream.Read(ucFileOrScriptNameSize))
+                {
+                    dassert(0);
+                    break;
+                }
+
+                // Read data into buff
+                bitStream.Read(fileOrFunctionName, ucFileOrScriptNameSize);
+                fileOrFunctionName[ucFileOrScriptNameSize] = NULL; // Remember: arrays start at 0, so we need to terminate here, not + 1
+            }
+
             switch (ucChunkType)
             {
-                case 'E':            // Exported Function
-                    if (bitStream.Read(ucChunkSize))
-                    {
-                        szChunkData = new char[ucChunkSize + 1];
-                        if (ucChunkSize > 0)
-                        {
-                            bitStream.Read(szChunkData, ucChunkSize);
-                        }
-                        szChunkData[ucChunkSize] = NULL;
+                case 'E': // Exported Function              
+                    pResource->AddExportedFunction(fileOrFunctionName);
+                    break;
 
-                        pResource->AddExportedFunction(szChunkData);
+                case 'F': // Resource File
+                {
+                    // Res file type
+                    CDownloadableResource::eResourceType resFileType;
+                    bitStream.Read(reinterpret_cast<unsigned char&>(resFileType));
+
+                    // Resource file checksum
+                    CChecksum chunkChecksum;
+                    bitStream.Read(chunkChecksum.ulCRC);
+                    bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
+
+                    // Data size in bytes
+                    double dThisFileSizeBytes;
+                    bitStream.Read(dThisFileSizeBytes);
+                    uint thisFileSizeBytes = (uint)dThisFileSizeBytes;
+
+                    // Update progress if needed
+                    uiTotalSizeProcessedMB += thisFileSizeBytes / 1024 / 1024;
+                    if (uiTotalSizeProcessedMB > 50) // If more than 50 MB
+                        g_pCore->UpdateDummyProgress(uiTotalSizeProcessedMB, " MB");
+
+                    // Create downloadable file
+                    CDownloadableResource* pDownloadableResource = nullptr;
+                    switch (resFileType)
+                    {
+                    case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                        pDownloadableResource = pResource->AddResourceFile(resFileType, fileOrFunctionName, thisFileSizeBytes, chunkChecksum, bitStream.ReadBit() /* Read is auto download */);
+                        break;
+
+                    case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                        pDownloadableResource = pResource->AddResourceFile(resFileType, fileOrFunctionName, thisFileSizeBytes, chunkChecksum, true /* Cached scripts are always auto-dl */);
+                        break;
+
+                    case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                        pDownloadableResource = pResource->AddConfigFile(fileOrFunctionName, thisFileSizeBytes, chunkChecksum);
+                        break;
                     }
 
-                    break;
-                case 'F':            // Resource File
-                    if (bitStream.Read(ucChunkSize))
-                    {
-                        szChunkData = new char[ucChunkSize + 1];
-                        if (ucChunkSize > 0)
-                        {
-                            bitStream.Read(szChunkData, ucChunkSize);
-                        }
-                        szChunkData[ucChunkSize] = NULL;
-
-                        bitStream.Read(ucChunkSubType);
-                        bitStream.Read(chunkChecksum.ulCRC);
-                        bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
-                        bitStream.Read(dChunkDataSize);
-
-                        uint uiDownloadSize = (uint)dChunkDataSize;
-                        uiTotalSizeProcessed += uiDownloadSize;
-                        if (uiTotalSizeProcessed / 1024 / 1024 > 50)
-                            g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
-
-                        // Create the resource downloadable
-                        CDownloadableResource* pDownloadableResource = NULL;
-                        switch (ucChunkSubType)
-                        {
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                            {
-                                bool bDownload = bitStream.ReadBit();
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, bDownload);
-
-                                break;
-                            }
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, true);
-
-                                break;
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                pDownloadableResource = pResource->AddConfigFile(szChunkData, uiDownloadSize, chunkChecksum);
-
-                                break;
-                            default:
-
-                                break;
-                        }
-
-                        // Does the Client and Server checksum differ?
-                        if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
-                        {
-                            // Delete the file that already exists
-                            FileDelete(pDownloadableResource->GetName());
-                            if (FileExists(pDownloadableResource->GetName()))
-                            {
-                                SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
-                                g_pClientGame->TellServerSomethingImportant(1009, strMessage);
-                            }
-
-                            // Is it downloadable now?
-                            if (pDownloadableResource->IsAutoDownload())
-                            {
-                                // Make sure the directory exists
-                                MakeSureDirExists(pDownloadableResource->GetName());
-
-                                // Queue the file to be downloaded
-                                g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
-                            }
-                        }
-                    }
-
-                    break;
-            }
-
-            // Does the chunk data exist
-            if (szChunkData)
-            {
-                // Delete the chunk data
-                delete[] szChunkData;
-                szChunkData = NULL;
+                    // Make sure we have a valid checksum by the time it gets checked
+                    // In CResource::CheckAllFilesAndReDownloadIfNeeded()
+                    if (pDownloadableResource && !pDownloadableResource->HasClientChecksumGenerated())
+                        pDownloadableResource->GenerateClientChecksumAsync();
+                }
+                 break;
             }
         }
 
-        g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
-
-        // Are there any resources to being downloaded?
-        if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
-        {
-            // Load the resource now
-            if (pResource->CanBeLoaded())
-            {
-                pResource->Load();
-            }
-        }
+        // Load the resource now(or at least try, it may fail if file checksums mismatch or something)
+        pResource->Load(true);    
     }
-
-    delete[] szResourceName;
-    szResourceName = NULL;
 
     g_pCore->UpdateDummyProgress(0);
     totalSizeProcessedResetTimer.Reset();

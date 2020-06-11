@@ -25,7 +25,7 @@
 class CDownloadableResource
 {
 public:
-    enum eResourceType
+    enum eResourceType : unsigned char // Must be unsigned char, so in CClientGame::Packet_StartResource it's read properly from the packet.
     {
         RESOURCE_FILE_TYPE_MAP,
         RESOURCE_FILE_TYPE_SCRIPT,
