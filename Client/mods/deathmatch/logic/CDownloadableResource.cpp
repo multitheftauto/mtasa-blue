@@ -15,21 +15,15 @@
 #define INVALIDATE_OLD_FUTURE if (m_GenerateChecksumFuture.valid()) m_GenerateChecksumFuture = std::future<CChecksum>();
 
 CDownloadableResource::CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
-                                             CChecksum serverChecksum, bool bAutoDownload)
+                                             CChecksum serverChecksum, bool bAutoDownload) :
+    m_pResource(pResource),
+    m_resourceType(resourceType),
+    m_strName(std::string(szName)),
+    m_strNameShort(std::string(szNameShort)),
+    m_ServerChecksum(serverChecksum),
+    m_bAutoDownload(bAutoDownload),
+    m_uiDownloadSize(uiDownloadSize)
 {
-    m_pResource = pResource;
-    m_resourceType = resourceType;
-    m_strName = szName;
-    m_strNameShort = szNameShort;
-    m_ServerChecksum = serverChecksum;
-    m_bAutoDownload = bAutoDownload;
-    m_bInDownloadQueue = false;
-    m_bDownloaded = false;
-    m_uiDownloadSize = uiDownloadSize;
-    m_uiHttpServerIndex = 0;
-    m_bModifedByScript = false;
-
-    GenerateClientChecksum();
     g_pClientGame->GetResourceManager()->OnAddResourceFile(this);
 }
 

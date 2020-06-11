@@ -71,19 +71,20 @@ public:
 protected:
     void MakeSureChecksumIsGenerated();
 
+    CResource*    m_pResource = nullptr;
     eResourceType m_resourceType;
 
-    SString m_strName;
-    SString m_strNameShort;
+    SString m_strName = "";
+    SString m_strNameShort = "";
 
     std::future<CChecksum> m_GenerateChecksumFuture;
     CChecksum              m_LastClientChecksum;
     CChecksum              m_ServerChecksum;
 
-    bool m_bAutoDownload;
-    bool m_bInDownloadQueue;            // File in auto download queue
-    bool m_bDownloaded;                 // File has been downloaded and is ready to use
-    uint m_uiDownloadSize;
-    uint m_uiHttpServerIndex;
-    bool m_bModifedByScript;
+    bool m_bAutoDownload = false;
+    bool m_bInDownloadQueue = false;    // File in auto download queue
+    bool m_bDownloaded = false;         // File has been downloaded and is ready to use
+    uint m_uiDownloadSize = 0;
+    uint m_uiHttpServerIndex = 0;
+    bool m_bModifedByScript = false;
 };
