@@ -261,6 +261,7 @@ void CLuaManager::LoadCFunctions()
 
         // World get functions
         {"getTime", CLuaFunctionDefs::GetTime_},
+        {"getRoofPosition", CLuaFunctionDefs::GetRoofPosition},
         {"getGroundPosition", CLuaFunctionDefs::GetGroundPosition},
         {"processLineOfSight", CLuaFunctionDefs::ProcessLineOfSight},
         {"getWorldFromScreenPosition", CLuaFunctionDefs::GetWorldFromScreenPosition},

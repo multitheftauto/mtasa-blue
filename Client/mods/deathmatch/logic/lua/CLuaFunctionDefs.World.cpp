@@ -86,6 +86,33 @@ int CLuaFunctionDefs::GetGroundPosition(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
+{
+    //  float getRoofPosition ( float x, float y, float z )
+    CVector vecStart;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(vecStart);
+
+    if (!argStream.HasErrors())
+    {
+        // Get the ground position and return it
+        bool bOutResult;
+        float fRoof = g_pGame->GetWorld()->FindRoofZFor3DCoord(&vecStart, &bOutResult);
+        if (bOutResult)
+        {
+            lua_pushnumber(luaVM, fRoof);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Return false
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::ProcessLineOfSight(lua_State* luaVM)
 {
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
