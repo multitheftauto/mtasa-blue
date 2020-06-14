@@ -768,6 +768,9 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
 
+            SetOutPath "$INSTDIR\MTA\data"
+            File "${FILES_ROOT}\mta\data\gta_sa_diff.dat"
+
             SetOutPath "$INSTDIR\MTA\config"
             File "${FILES_ROOT}\mta\config\chatboxpresets.xml"
 
