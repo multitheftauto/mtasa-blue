@@ -579,8 +579,12 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s'", *strPatchBase));
         SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
         strMessage += "\n\n" + strPatchBase;
+#ifdef TO_DO
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
         return "quit";
+#else
+        return "ok";
+#endif
     }
 
     // Backup current gta_sa.exe
@@ -608,8 +612,12 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
             strMessage += "\n\n" + strGtaExe;
             strMessage += "\n\n" + _("Error") + SString(" %d", result);
+#ifdef TO_DO
             BrowseToSolution(SString("gengta_error&code=%d", result), ASK_GO_ONLINE, strMessage);
             return "quit";
+#else
+            return "ok";
+#endif
         }
     }
 
