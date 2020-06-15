@@ -1047,8 +1047,9 @@ void CModelInfoSA::ResetVehicleDummies()
 
 void CModelInfoSA::ResetAllVehicleDummies()
 {
+    CGame* game = g_pCore->GetGame();
     for (auto& info : ms_ModelDefaultDummiesPosition) {
-        CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(info.first);
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
             modelInfo->ResetVehicleDummies();
     }
