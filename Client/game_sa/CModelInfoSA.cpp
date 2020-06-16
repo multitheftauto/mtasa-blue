@@ -19,7 +19,7 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_Mod
 std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::map<TimeInfo*, TimeInfo*>                                        CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
@@ -1007,18 +1007,18 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
         Request(BLOCKING, "SetVehicleDummyPosition");
 
     // Store default position in map
-    auto iter = ms_ModelDefaultDummiesPosition.find(this);
+    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({this, std::map<eVehicleDummies, CVector>()});
+        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<eVehicleDummies, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
     }
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    if (ms_ModelDefaultDummiesPosition[this].find(eDummy) == ms_ModelDefaultDummiesPosition[this].end())
+    if (ms_ModelDefaultDummiesPosition[m_dwModelID].find(eDummy) == ms_ModelDefaultDummiesPosition[m_dwModelID].end())
     {
-        ms_ModelDefaultDummiesPosition[this][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
+        ms_ModelDefaultDummiesPosition[m_dwModelID][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
     }
 
     // Set dummy position
@@ -1030,26 +1030,29 @@ void CModelInfoSA::ResetVehicleDummies()
     if (!IsVehicle())
         return;
 
-    auto iter = ms_ModelDefaultDummiesPosition.find(this);
+    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
         return; // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    for (const auto& dummy : ms_ModelDefaultDummiesPosition[this])
+    for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
     {
         if (pVehicleModel->pVisualInfo != nullptr)
             pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
     }
-    ms_ModelDefaultDummiesPosition[this].clear();
-    ms_ModelDefaultDummiesPosition.erase(this); // Remove the vehicle entry from dummies position cache
+    ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
     // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
     pVehicleModel->usNumberOfRefs--;
 }
 
 void CModelInfoSA::ResetAllVehicleDummies()
 {
-    for (auto& info : ms_ModelDefaultDummiesPosition)
-        info.first->ResetVehicleDummies();
+    CGame* game = g_pCore->GetGame();
+    for (auto& info : ms_ModelDefaultDummiesPosition) {
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
+        if (modelInfo)
+            modelInfo->ResetVehicleDummies();
+    }
 
     ms_ModelDefaultDummiesPosition.clear();
 }
