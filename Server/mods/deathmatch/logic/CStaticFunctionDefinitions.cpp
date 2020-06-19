@@ -4382,8 +4382,10 @@ bool CStaticFunctionDefinitions::reloadPedWeapon(CElement* pElement)
 
     if (IS_PED(pElement))
     {
-        CPed*      pPed = static_cast<CPed*>(pElement);
         CBitStream BitStream;
+        CPed*      pPed = static_cast<CPed*>(pElement);
+        pPed->SetReloadingWeapon(true);
+
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, RELOAD_PED_WEAPON, *BitStream.pBitStream));
         return true;
     }
