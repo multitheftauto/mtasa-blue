@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -75,6 +76,7 @@ void CLuaPedDefs::LoadFunctions()
         {"takeAllWeapons", TakeAllWeapons},
         {"giveWeaponAmmo", GiveWeapon},
         {"takeWeaponAmmo", TakeWeapon},
+        {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
     };
 
     // Add functions
@@ -114,6 +116,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -165,6 +168,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
+    lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");
@@ -1612,4 +1616,9 @@ int CLuaPedDefs::TakeAllWeapons(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped)
+{
+    return ped->IsReloadingWeapon();
 }

@@ -1104,6 +1104,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     flags.data.bHasAWeapon = (pPlayerWeapon != NULL);
     flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || (pPlayerModel->GetPlayerSyncCount() % 4) == 0);
     flags.data.bStealthAiming = (pPlayerModel->IsStealthAiming() == true);
+    flags.data.bReloadingWeapon = (pPlayerModel->IsReloadingWeapon() == true);
 
     if (pPlayerWeapon->GetSlot() > 15)
         flags.data.bHasAWeapon = false;

@@ -169,6 +169,9 @@ public:
     unsigned short GetWeaponTotalAmmo(unsigned char ucSlot = 0xFF);
     void           SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF);
 
+    bool IsReloadingWeapon() { return m_bReloadingWeapon; };
+    void SetReloadingWeapon(bool bReloadingWeapon) { m_bReloadingWeapon = bReloadingWeapon; };
+
     float GetMaxHealth();
     float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
@@ -302,6 +305,7 @@ protected:
     bool                                 m_bHeadless;
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
+    bool                                 m_bReloadingWeapon;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
