@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaEngineDefs::LoadFunctions()
 {
@@ -37,8 +38,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", EngineSetModelVisibleTime},
-        {"engineGetModelVisibleTime", EngineGetModelVisibleTime},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -1104,16 +1104,14 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
+bool CLuaEngineDefs::EngineSetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID, char hourOn, char hourOff)
 {
-    // bool engineSetModelVisibleTime ( int/string modelID, int hourOn, int hourOff )
-    SString strModelId;
-    char cHourOn,cHourOff;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-    argStream.ReadNumber(cHourOn);
-    argStream.ReadNumber(cHourOff);
+    const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
+    CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        throw std::invalid_argument(SString("Invalid model id %u", modelID));
 
+<<<<<<< HEAD
     if (!argStream.HasErrors())
     {
         ushort      usModelID = CModelNames::ResolveModelID(strModelId);
@@ -1129,10 +1127,18 @@ int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
     }
     else
         luaL_error(luaVM, argStream.GetFullErrorMessage());
+=======
+    if (hourOn > 24 || hourOn < 0)
+        throw std::invalid_argument("hourOn must be between 0 and 24");
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (hourOff > 24 || hourOff < 0)
+        throw std::invalid_argument("hourOff must be between 0 and 24");
+>>>>>>> 2e0e48872... Refactor EngineSetModelVisibleTime to use the new parser
+
+    if (hourOn > hourOff)
+        std::swap(hourOn, hourOff);
+
+    return modelInfo->SetTime(hourOn, hourOff);
 }
 
 int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)

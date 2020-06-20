@@ -49,8 +49,7 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
-    LUA_DECLARE(EngineSetModelVisibleTime);
-    LUA_DECLARE(EngineGetModelVisibleTime);
+    static bool EngineSetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID, char hourOn, char hourOff);
     LUA_DECLARE(EngineGetModelTextures);
     LUA_DECLARE(EngineSetSurfaceProperties);
     LUA_DECLARE(EngineGetSurfaceProperties);
