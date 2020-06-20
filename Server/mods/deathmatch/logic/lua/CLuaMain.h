@@ -134,6 +134,7 @@ private:
     CMapManager*         m_pMapManager;
 
     list<CXMLFile*>     m_XMLFiles;
+    list<CXMLNode*>     m_XMLNodes;
     list<CTextDisplay*> m_Displays;
     list<CTextItem*>    m_TextItems;
 

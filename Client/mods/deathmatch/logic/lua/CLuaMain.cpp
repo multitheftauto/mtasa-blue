@@ -58,6 +58,12 @@ CLuaMain::~CLuaMain()
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
+    list<CXMLNode*>::iterator iterXMLNodes = m_XMLNodes.begin();
+    for (; iterXMLNodes != m_XMLNodes.end(); ++iterXMLNodes)
+    {
+        delete *iterXMLNodes;
+    }
+
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
@@ -366,6 +372,8 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
     CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
+    if (xmlNode)
+        m_XMLNodes.push_back(xmlNode);
     return xmlNode;
 }
 
