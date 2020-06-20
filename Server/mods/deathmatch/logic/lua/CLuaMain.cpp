@@ -72,16 +72,14 @@ CLuaMain::~CLuaMain()
     delete m_pLuaTimerManager;
 
     // Eventually delete the XML files the LUA script didn't
-    list<CXMLFile*>::iterator iterXMLFiles = m_XMLFiles.begin();
-    for (; iterXMLFiles != m_XMLFiles.end(); ++iterXMLFiles)
+    for (auto& xmlFile : m_XMLFiles)
     {
-        delete *iterXMLFiles;
+        delete xmlFile;
     }
 
-    list<CXMLNode*>::iterator iterXMLNodes = m_XMLNodes.begin();
-    for (; iterXMLNodes != m_XMLNodes.end(); ++iterXMLNodes)
+    for (auto& xmlNode : m_XMLNodes)
     {
-        delete *iterXMLNodes;
+        delete xmlNode;
     }
 
     // Eventually delete the text displays the LUA script didn't

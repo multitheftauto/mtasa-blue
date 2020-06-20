@@ -57,11 +57,10 @@ CLuaMain::~CLuaMain()
 
     // Delete the timer manager
     delete m_pLuaTimerManager;
-
-    list<CXMLNode*>::iterator iterXMLNodes = m_XMLNodes.begin();
-    for (; iterXMLNodes != m_XMLNodes.end(); ++iterXMLNodes)
+    
+    for (auto& xmlNode : m_XMLNodes)
     {
-        delete *iterXMLNodes;
+        delete xmlNode;
     }
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
