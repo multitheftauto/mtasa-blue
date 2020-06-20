@@ -39,6 +39,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
         {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
+        {"engineGetModelVisibleTime", ArgumentParser<EngineGetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -1139,41 +1140,16 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(const std::variant<std::string, u
     return modelInfo->SetTime((char)hourOn, (char)hourOff);
 }
 
-int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
+std::tuple<char, char> CLuaEngineDefs::EngineGetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID)
 {
-    // int, int engineGetModelVisibleTime ( int/string modelID )
-    SString strModelId;
+    const unsigned short modelID = CStaticFunctionDefinitions::ResolveModelID(variantModelID);
+    CModelInfo* const modelInfo = g_pGame->GetModelInfo(modelID);
+    if (!modelInfo)
+        throw std::invalid_argument(SString("Invalid model id %u", modelID));
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-
-    if (!argStream.HasErrors())
-    {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            char cHourOn, cHourOff;
-            if (pModelInfo->GetTime(cHourOn, cHourOff))
-            {
-                lua_pushnumber(luaVM, cHourOn);
-                lua_pushnumber(luaVM, cHourOff);
-                return 2;
-            }
-            else // Model is incompatible, don't let confuse user.
-            {
-                lua_pushnumber(luaVM, 0);
-                lua_pushnumber(luaVM, 24);
-                return 2;
-            }
-        }
-    }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    char hourOn = 0, hourOff = 24; // If model is incompatible it returns these numbers(in order: 0, 24) so we dont confuse the user
+    modelInfo->GetTime(hourOn, hourOff); 
+    return { hourOn, hourOff };
 }
 
 int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
