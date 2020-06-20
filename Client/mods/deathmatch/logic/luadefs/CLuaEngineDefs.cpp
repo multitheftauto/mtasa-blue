@@ -1112,22 +1112,6 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(const std::variant<std::string, u
     if (!modelInfo)
         throw std::invalid_argument(SString("Invalid model id %u", modelID));
 
-    if (!argStream.HasErrors())
-    {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
-            {
-                lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
-                return 1;
-            }
-        }
-    }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
-
     if (hourOn > 24 || hourOn < 0)
         throw std::invalid_argument("hourOn must be between 0 and 24");
 
@@ -1137,7 +1121,7 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(const std::variant<std::string, u
     if (hourOn > hourOff)
         std::swap(hourOn, hourOff);
 
-    return modelInfo->SetTime((char)hourOn, (char)hourOff);
+    return modelInfo->SetTime(hourOn, hourOff);
 }
 
 std::tuple<char, char> CLuaEngineDefs::EngineGetModelVisibleTime(const std::variant<std::string, unsigned short> variantModelID)
