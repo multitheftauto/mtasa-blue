@@ -16,7 +16,6 @@
 #include "CResourceConfigItem.h"
 #include "CResourceFile.h"
 #include "CElementGroup.h"
-#include "SharedUtil.FastHashSet.h"
 #include <list>
 
 #define MAX_RESOURCE_NAME_LENGTH    255
