@@ -345,7 +345,7 @@ public:
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
-    void         ResetVehicleDummies(bool bRemoveFromDummiesMap = false);
+    void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
 
     // ONLY use for peds

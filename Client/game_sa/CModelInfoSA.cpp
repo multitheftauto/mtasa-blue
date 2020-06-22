@@ -1053,7 +1053,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
     for (auto& info : ms_ModelDefaultDummiesPosition) {
         CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
-            modelInfo->ResetVehicleDummies();
+            modelInfo->ResetVehicleDummies(false);
     }
 
     ms_ModelDefaultDummiesPosition.clear();
