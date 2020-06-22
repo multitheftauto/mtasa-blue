@@ -291,10 +291,10 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [data, key] {
+                            [toEncode = std::move(data), encodeKey = std::move(key)]{
                                 // Execute time-consuming task
                                 SString result;
-                                SharedUtil::TeaEncode(data, key, &result);
+                                SharedUtil::TeaEncode(toEncode, encodeKey, &result);
                                 return result;
                             },
                             [luaFunctionRef](const SString& result) {
@@ -305,7 +305,8 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     arguments.PushString(result);
                                     arguments.Call(pLuaMain, luaFunctionRef);
                                 }
-                            });
+                            }
+                        );
 
                         lua_pushboolean(luaVM, true);
                     }
@@ -370,10 +371,10 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [data, key] {
+                            [toEncode = std::move(data), encodeKey = std::move(key)]{
                                 // Execute time-consuming task
                                 SString result;
-                                SharedUtil::TeaDecode(data, key, &result);
+                                SharedUtil::TeaDecode(toEncode, encodeKey, &result);
                                 return result;
                             },
                             [luaFunctionRef](const SString& result) {
@@ -384,7 +385,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                     arguments.PushString(result);
                                     arguments.Call(pLuaMain, luaFunctionRef);
                                 }
-                            });
+                            }
+                        );
 
                         lua_pushboolean(luaVM, true);
                     }
