@@ -696,7 +696,7 @@ namespace SharedUtil
             return GenerateHashHexString(hashFunction, NULL, 0);
     }
 
-    void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    inline void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
     {
         unsigned int v0 = v[0], v1 = v[1], i, sum = 0;
         unsigned int delta = 0x9E3779B9;
@@ -710,7 +710,7 @@ namespace SharedUtil
         w[1] = v1;
     }
 
-    void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    inline void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
     {
         unsigned int v0 = v[0], v1 = v[1], i, sum = 0xC6EF3720;
         unsigned int delta = 0x9E3779B9;
@@ -772,7 +772,7 @@ namespace SharedUtil
         delete[] strbuf;
     }
 
-    void TeaDecode(const SString& str, const SString& key, SString* out, const bool trimPaddingAtEnd)
+    void TeaDecode(const SString& str, const SString& key, SString* out)
     {
         unsigned int v[2];
         unsigned int w[2];
@@ -819,10 +819,9 @@ namespace SharedUtil
         out->assign((char*)buffer, numPasses * 4);
         delete[] buffer;
 
-        if (trimPaddingAtEnd)
-        {
-            // Check last block for 0 padding, and delete
 
+        // Check last block for 0 padding, and erase if there's any
+        {
             auto iter = out->end() - 1;
             if (*iter != 0)
                 return;
@@ -833,7 +832,7 @@ namespace SharedUtil
             // Loop goes past the non-0 char, so make sure we only delete 0
             iter++;
 
-            out->erase(iter, out->end()); // At this point its 100% theres a 0 padding, so we can delete that
+            out->erase(iter, out->end());
         }
     }
 }            // namespace SharedUtil
