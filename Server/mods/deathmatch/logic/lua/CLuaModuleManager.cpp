@@ -86,12 +86,8 @@ int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFil
     // Perform registering for late loaded modules
     if (bLateLoad)
     {
-        list<CLuaMain*>::const_iterator iter = m_pLuaManager->IterBegin();
-        for (; iter != m_pLuaManager->IterEnd(); ++iter)
-        {
-            lua_State* luaVM = (*iter)->GetVM();
-            pModule->_RegisterFunctions(luaVM);
-        }
+        for (CLuaMain* luaMain : m_pLuaManager->GetLuaMains())
+            pModule->_RegisterFunctions(luaMain->GetVM());
     }
 
     return iSuccess;

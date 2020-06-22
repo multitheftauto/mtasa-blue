@@ -190,19 +190,17 @@ void CLuaModule::_RegisterFunctions(lua_State* luaVM)
 
 void CLuaModule::_UnregisterFunctions()
 {
-    list<CLuaMain*>::const_iterator liter = m_pLuaModuleManager->GetLuaManager()->IterBegin();
-    for (; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd(); ++liter)
+    for (CLuaMain* luaMain : m_pLuaModuleManager->GetLuaManager()->GetLuaMains())
     {
-        lua_State*                luaVM = (*liter)->GetVM();
-        vector<SString>::iterator iter = m_Functions.begin();
-        for (; iter != m_Functions.end(); ++iter)
+        lua_State* luaVM = luaMain->GetVM();
+        for (const SString& strFuncName : m_Functions)
         {
-            // points function to nill
+            // Remove function global variable
             lua_pushnil(luaVM);
-            lua_setglobal(luaVM, iter->c_str());
+            lua_setglobal(luaVM, strFuncName.c_str());
 
-            // Remove func from CLuaCFunctions
-            CLuaCFunctions::RemoveFunction(*iter);
+            // Remove function from CLuaCFunctions
+            CLuaCFunctions::RemoveFunction(strFuncName);
         }
     }
 }

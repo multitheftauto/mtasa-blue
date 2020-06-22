@@ -45,8 +45,7 @@ public:
 
     CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; };
 
-    list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
-    list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
+    auto GetLuaMains() const { return m_VirtualMachines; }
 
     void DoPulse();
 
@@ -64,5 +63,5 @@ private:
     CLuaModuleManager*         m_pLuaModuleManager;
 
     CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;
-    list<CLuaMain*>                     m_virtualMachines;
+    std::vector<CLuaMain*>              m_VirtualMachines;
 };

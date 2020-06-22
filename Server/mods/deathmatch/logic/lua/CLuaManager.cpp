@@ -34,6 +34,8 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
     lua_registerPreCallHook(CLuaDefs::CanUseFunction);
     lua_registerUndumpHook(CLuaMain::OnUndump);
 
+    m_VirtualMachines.reserve(256);
+
 #ifdef MTA_DEBUG
     // Check rounding in case json is updated
     json_object* obj = json_object_new_double(5.1);
@@ -46,11 +48,9 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
 CLuaManager::~CLuaManager()
 {
     CLuaCFunctions::RemoveAllFunctions();
-    list<CLuaMain*>::iterator iter;
-    for (iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
-    {
-        delete (*iter);
-    }
+
+    for (auto* vm : m_VirtualMachines)
+        delete vm;
 
     // Destroy the module manager
     delete m_pLuaModuleManager;
@@ -59,11 +59,11 @@ CLuaManager::~CLuaManager()
 CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP)
 {
     // Create it and add it to the list over VM's
-    CLuaMain* pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
-                                      pResourceOwner, bEnableOOP);
-    m_virtualMachines.push_back(pLuaMain);
-    pLuaMain->InitVM();
+    auto pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
+        pResourceOwner, bEnableOOP);
+    m_VirtualMachines.push_back(pLuaMain);
 
+    pLuaMain->InitVM();
     m_pLuaModuleManager->RegisterFunctions(pLuaMain->GetVirtualMachine());
 
     return pLuaMain;
@@ -79,12 +79,13 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
         // Delete it unless it is already
         if (!pLuaMain->BeingDeleted())
-        {
             delete pLuaMain;
-        }
 
         // Remove it from our list
-        m_virtualMachines.remove(pLuaMain);
+        const auto iter = std::find(m_VirtualMachines.begin(), m_VirtualMachines.end(), pLuaMain);
+        assert(iter != m_VirtualMachines.end()); // Make sure it exists
+        m_VirtualMachines.erase(iter);
+
         return true;
     }
 
@@ -93,30 +94,29 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
 
 void CLuaManager::OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM)
 {
-    MapSet(m_VirtualMachineMap, pLuaMain->GetVirtualMachine(), pLuaMain);
+    m_VirtualMachineMap.insert({ pLuaMain->GetVirtualMachine(), pLuaMain });
 }
 
 void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
 {
-    MapRemove(m_VirtualMachineMap, pLuaMain->GetVirtualMachine());
+    m_VirtualMachineMap.erase(pLuaMain->GetVirtualMachine());
 }
 
 void CLuaManager::DoPulse()
 {
-    list<CLuaMain*>::iterator iter;
-    for (iter = m_virtualMachines.begin(); iter != m_virtualMachines.end(); ++iter)
-    {
-        (*iter)->DoPulse();
-    }
+    for (auto* vm : m_VirtualMachines)
+        vm->DoPulse();
+
     m_pLuaModuleManager->DoPulse();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 {
     if (!luaVM)
-        return NULL;
+        return nullptr;
 
-    // Grab the main virtual state because the one we've got passed might be a coroutine state
+    // Grab the main virtual state because the one
+    // we've got passed might be a coroutine state
     // and only the main state is in our list.
     lua_State* main = lua_getmainstate(luaVM);
     if (main)
@@ -130,18 +130,18 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
         return pLuaMain;
 
     // Find a matching VM in our list
-    list<CLuaMain*>::const_iterator iter = m_virtualMachines.begin();
-    for (; iter != m_virtualMachines.end(); ++iter)
+    // Note: This is a fallback method, and in an ideal world it's never used
+    for (CLuaMain* vm : m_VirtualMachines)
     {
-        if (luaVM == (*iter)->GetVirtualMachine())
+        if (luaVM == vm->GetVirtualMachine())
         {
-            dassert(0);            // Why not in map?
-            return *iter;
+            dassert(0); // Why not in map?
+            return vm;
         }
     }
 
     // Doesn't exist
-    return NULL;
+    return nullptr;
 }
 
 // Return resource associated with a lua state
