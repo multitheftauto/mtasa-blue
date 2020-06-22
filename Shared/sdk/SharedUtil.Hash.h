@@ -84,7 +84,7 @@ namespace SharedUtil
     void decodeXTea(unsigned int* v, unsigned int* w, unsigned int* k);
 
     void TeaEncode(const SString& str, const SString& key, SString* out);
-    void TeaDecode(const SString& str, const SString& key, SString* out);
+    void TeaDecode(const SString& str, const SString& key, SString* out, const bool trimPaddingAtEnd = false);
 
     unsigned int HashString(const char* szString);
     unsigned int HashString(const char* szString, unsigned int length);

@@ -772,7 +772,7 @@ namespace SharedUtil
         delete[] strbuf;
     }
 
-    void TeaDecode(const SString& str, const SString& key, SString* out)
+    void TeaDecode(const SString& str, const SString& key, SString* out, const bool trimPaddingAtEnd)
     {
         unsigned int v[2];
         unsigned int w[2];
@@ -818,5 +818,22 @@ namespace SharedUtil
 
         out->assign((char*)buffer, numPasses * 4);
         delete[] buffer;
+
+        if (trimPaddingAtEnd)
+        {
+            // Check last block for 0 padding, and delete
+
+            auto iter = out->end() - 1;
+            if (*iter != 0)
+                return;
+
+            const auto blockEnd = out->end() - 4;
+            while (iter > blockEnd && *--iter == 0);
+
+            // Loop goes past the non-0 char, so make sure we only delete 0
+            iter++;
+
+            out->erase(iter, out->end()); // At this point its 100% theres a 0 padding, so we can delete that
+        }
     }
 }            // namespace SharedUtil

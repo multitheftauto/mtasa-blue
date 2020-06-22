@@ -63,7 +63,7 @@ std::string CLuaCryptDefs::TeaDecode(std::string str, std::string key)
 {
     SString result = SharedUtil::Base64decode(str);
     SString strOutResult;
-    SharedUtil::TeaDecode(result, key, &strOutResult);
+    SharedUtil::TeaDecode(result, key, &strOutResult, true);
     return strOutResult;
 }
 
@@ -373,7 +373,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                             [data, key] {
                                 // Execute time-consuming task
                                 SString result;
-                                SharedUtil::TeaDecode(data, key, &result);
+                                SharedUtil::TeaDecode(data, key, &result, true);
                                 return result;
                             },
                             [luaFunctionRef](const SString& result) {
@@ -392,7 +392,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 else            // Sync
                 {
                     SString result;
-                    SharedUtil::TeaDecode(data, key, &result);
+                    SharedUtil::TeaDecode(data, key, &result, true);
                     lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;
