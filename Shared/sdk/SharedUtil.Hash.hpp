@@ -696,6 +696,7 @@ namespace SharedUtil
             return GenerateHashHexString(hashFunction, NULL, 0);
     }
 
+#ifdef SDK_WITH_TEA
     void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
     {
         unsigned int v0 = v[0], v1 = v[1], i, sum = 0;
@@ -819,4 +820,5 @@ namespace SharedUtil
         out->assign((char*)buffer, numPasses * 4);
         delete[] buffer;
     }
+#endif // SDK_WITH_TEA
 }            // namespace SharedUtil
