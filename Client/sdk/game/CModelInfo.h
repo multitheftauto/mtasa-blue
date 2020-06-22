@@ -155,7 +155,7 @@ public:
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
-    virtual void         ResetVehicleDummies() = 0;
+    virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap = false) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;

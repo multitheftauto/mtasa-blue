@@ -1025,7 +1025,7 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
     pVehicleModel->pVisualInfo->vecDummies[eDummy] = vecPosition;
 }
 
-void CModelInfoSA::ResetVehicleDummies()
+void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 {
     if (!IsVehicle())
         return;
@@ -1040,9 +1040,11 @@ void CModelInfoSA::ResetVehicleDummies()
         if (pVehicleModel->pVisualInfo != nullptr)
             pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
     }
-    ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
     // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
     pVehicleModel->usNumberOfRefs--;
+
+    if (bRemoveFromDummiesMap)
+        ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
 }
 
 void CModelInfoSA::ResetAllVehicleDummies()
