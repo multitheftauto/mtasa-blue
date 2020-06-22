@@ -760,10 +760,11 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
+#ifdef SDK_WITH_TEA
     // TeaEncode/TeaDecode
     {
         TEST_FUNCTION
-        SString strEncoded;
+            SString strEncoded;
         TeaEncode(a, b, &strEncoded);
         if (!result.empty())
             assert(strEncoded == result);
@@ -771,7 +772,7 @@ void SharedUtil_Hash_Tests()
         TeaDecode(strEncoded, b, &strDecoded);
         assert(a == *strDecoded);
         TEST_VARS
-        const SString a;
+            const SString a;
         const SString b;
         const SString result;
         TEST_DATA = {
@@ -781,7 +782,7 @@ void SharedUtil_Hash_Tests()
         };
         TEST_END
     }
-
+#endif // SDK_WITH_TEA
     #define szTempFilename "hash_""\xD0""\x98""_test"
 
     // MD5
