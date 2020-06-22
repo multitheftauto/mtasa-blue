@@ -7,7 +7,7 @@ project "Client Deathmatch"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
-	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
+	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT", "SDK_WITH_TEA" }
 	links {
 		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt",
 		"../../../vendor/bass/lib/bass",

@@ -52,16 +52,16 @@ std::string CLuaCryptDefs::Hash(EHashFunctionType hashFunction, std::string strS
     return GenerateHashHexString(hashFunction, strSourceData).ToLower();
 }
 
-std::string CLuaCryptDefs::TeaEncode(std::string str, std::string key)
+std::string CLuaCryptDefs::TeaEncode(std::string_view str, std::string_view key)
 {
     SString result;
     SharedUtil::TeaEncode(str, key, &result);
     return SharedUtil::Base64encode(result);
 }
 
-std::string CLuaCryptDefs::TeaDecode(std::string str, std::string key)
+std::string CLuaCryptDefs::TeaDecode(std::string_view str, std::string_view key)
 {
-    SString result = SharedUtil::Base64decode(str);
+    SString result = SharedUtil::Base64decode(std::string{ str.data(), str.length() });
     SString strOutResult;
     SharedUtil::TeaDecode(result, key, &strOutResult);
     return strOutResult;

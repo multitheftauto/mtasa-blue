@@ -724,7 +724,7 @@ namespace SharedUtil
         w[1] = v1;
     }
 
-    void TeaEncode(const SString& str, const SString& key, SString* out)
+    void TeaEncode(const std::string_view str, const std::string_view key, SString* out)
     {
         unsigned int v[2];
         unsigned int w[2];
@@ -742,7 +742,7 @@ namespace SharedUtil
         int len = key.length();
         if (len > 16)
             len = 16;
-        memcpy(keybuffer, key.c_str(), len);
+        memcpy(keybuffer, key.data(), len);
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
@@ -754,7 +754,7 @@ namespace SharedUtil
             strbuflen += 4 - (strbuflen % 4);
         unsigned char* strbuf = new unsigned char[strbuflen];
         memset(strbuf, 0, strbuflen);
-        memcpy(strbuf, str.c_str(), str.length());
+        memcpy(strbuf, str.data(), str.length());
 
         // Encode it!
         v[1] = 0;
@@ -772,7 +772,7 @@ namespace SharedUtil
         delete[] strbuf;
     }
 
-    void TeaDecode(const SString& str, const SString& key, SString* out)
+    void TeaDecode(const std::string_view str, const std::string_view key, SString* out)
     {
         unsigned int v[2];
         unsigned int w[2];
@@ -797,7 +797,7 @@ namespace SharedUtil
         int len = key.length();
         if (len > 16)
             len = 16;
-        memcpy(keybuffer, key.c_str(), len);
+        memcpy(keybuffer, key.data(), len);
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
@@ -806,7 +806,7 @@ namespace SharedUtil
         memset(buffer, 0, numPasses * 4 + 4);
 
         // Decode it!
-        const char* p = str.c_str();
+        const char* p = str.data();
         v[1] = *(unsigned int*)&p[numPasses * 4];
         for (int i = 0; i < numPasses; ++i)
         {

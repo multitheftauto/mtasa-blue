@@ -9,6 +9,10 @@
  *
  *****************************************************************************/
 
+#ifdef SDK_WITH_TEA
+#include <string_view>
+#endif
+
 namespace EHashFunction
 {
     enum EHashFunctionType
@@ -80,11 +84,13 @@ namespace SharedUtil
         unsigned char m_digest[16];
     };
 
+#ifdef SDK_WITH_TEA
     void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k);
-    void decodeXTea(unsigned int* v, unsigned int* w, unsigned int* k);
+    void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k);
 
-    void TeaEncode(const SString& str, const SString& key, SString* out);
-    void TeaDecode(const SString& str, const SString& key, SString* out);
+    void TeaEncode(const std::string_view str, const std::string_view key, SString* out);
+    void TeaDecode(const std::string_view str, const std::string_view key, SString* out);
+#endif
 
     unsigned int HashString(const char* szString);
     unsigned int HashString(const char* szString, unsigned int length);
