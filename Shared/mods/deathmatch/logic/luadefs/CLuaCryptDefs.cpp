@@ -257,7 +257,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 {
     StringEncryptFunction algorithm;
-    SString               data;
+    std::string_view      data;
     CStringMap            options;
     CLuaFunctionRef       luaFunctionRef;
 
@@ -291,8 +291,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [toEncode = std::move(data), encodeKey = std::move(key)]{
-                                // Execute time-consuming task
+                            [toEncode = std::string(data), encodeKey = std::move(key)]{ // Must copy data into std::string, because value might get GC'd
                                 SString result;
                                 SharedUtil::TeaEncode(toEncode, encodeKey, &result);
                                 return result;
@@ -337,7 +336,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 int CLuaCryptDefs::DecodeString(lua_State* luaVM)
 {
     StringEncryptFunction algorithm;
-    SString               data;
+    std::string_view      data;
     CStringMap            options;
     CLuaFunctionRef       luaFunctionRef;
 
@@ -371,7 +370,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
-                            [toEncode = std::move(data), encodeKey = std::move(key)]{
+                            [toEncode = std::string(data), encodeKey = std::move(key)]{ // Must copy data into std::string, because value might get GC'd
                                 // Execute time-consuming task
                                 SString result;
                                 SharedUtil::TeaDecode(toEncode, encodeKey, &result);
