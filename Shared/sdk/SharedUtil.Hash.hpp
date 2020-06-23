@@ -820,18 +820,23 @@ namespace SharedUtil
         delete[] buffer;
 
 
-        // Check last block for 0 padding, and erase if there's any
+        // Delete all 0's from the end
+        // As of now, even if the user passed it in
+        // We'll delete it, because there's no way
+        // We can know if the user added the padding or not.
         {
             auto iter = out->end() - 1;
             if (*iter != 0)
                 return;
 
-            const auto blockEnd = out->end() - 4;
-            while (iter > blockEnd && *--iter == 0);
+            // Traverse string until the beginning,
+            // Stop at the first non-zero char
+            while (iter > out->begin() && *--iter == 0);
 
-            // Loop goes past the non-0 char, so make sure we only delete 0
+            // Go back to the zero char
             iter++;
 
+            // Erase 0s
             out->erase(iter, out->end());
         }
     }
