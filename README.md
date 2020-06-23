@@ -1,4 +1,5 @@
-## Multi Theft Auto: San Andreas [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush)
+[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://multitheftauto.com/discord) [![Mainpage](https://img.shields.io/website?down_message=offline&up_message=download&url=https%3A%2F%2Fmultitheftauto.com)](https://multitheftauto.com) [![Wiki](https://img.shields.io/website?down_message=offline&up_message=wiki&url=https%3A%2F%2Fwiki.multitheftauto.com)](https://wiki.multitheftauto.com)
+## Multi Theft Auto: San Andreas
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
