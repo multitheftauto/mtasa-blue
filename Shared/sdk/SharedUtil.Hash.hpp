@@ -824,20 +824,20 @@ namespace SharedUtil
         // As of now, even if the user passed it in
         // We'll delete it, because there's no way
         // We can know if the user added the padding or not.
+
+        // Note: If we get there, there's at least 1 block(4 chars)
+        //       before out->end()
         {
-            auto iter = out->end() - 1;
-            if (*iter != 0)
-                return;
+            // Traverse the string until the beginning, or until the fist non-0 char
+            auto iter = out->end();
+            for (; iter != out->begin(); iter--)
+            {
+                if (*std::prev(iter) != 0)
+                    break;
+            }
 
-            // Traverse string until the beginning,
-            // Stop at the first non-zero char
-            while (iter > out->begin() && *--iter == 0);
-
-            // Go back to the zero char
-            iter++;
-
-            // Erase 0s
-            out->erase(iter, out->end());
+            if (iter != out->end()) 
+                out->erase(iter, out->end()); // Erase all 0s
         }
     }
 }            // namespace SharedUtil
