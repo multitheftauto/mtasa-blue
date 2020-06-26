@@ -35,6 +35,12 @@ If not using Visual Studio 2017, download and install the [EditorConfig](https:/
 
 ### Build Instructions
 #### Windows
+
+Prerequisites
+- [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+- [Microsoft DirectX SDK](https://www.microsoft.com/en-us/download/details.aspx?id=23549)
+- [Git for Windows](https://git-scm.com/download/win) (Optional)
+
 1. Execute `win-create-projects.bat`
 2. Open `MTASA.sln` in the `Build` directory
 3. Compile
