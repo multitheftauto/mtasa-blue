@@ -836,7 +836,7 @@ namespace SharedUtil
                     break;
             }
 
-            if (iter != out->end()) 
+            if (iter != out->end())
                 out->erase(iter, out->end()); // Erase all 0s
         }
     }
