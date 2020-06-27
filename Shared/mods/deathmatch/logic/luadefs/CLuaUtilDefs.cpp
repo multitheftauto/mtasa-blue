@@ -165,38 +165,70 @@ int CLuaUtilDefs::GetCTime(lua_State* luaVM)
 
 int CLuaUtilDefs::Split(lua_State* luaVM)
 {
-    SString          strInput;
-    SString          strDelimiter;
+    std::string_view input;
+    SString          strDelimeter;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
+    argStream.ReadString(input);
 
     if (argStream.NextIsNumber()) // Convert char code to delimeter string
     {
-        unsigned int uiDelimiter;
-        argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
-        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+        unsigned int delimeterCharCode;
+        argStream.ReadNumber(delimeterCharCode);
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(delimeterCharCode), '\0'}; 
+        strDelimeter = UTF16ToMbUTF8(wUNICODE);
     }
     else
-        argStream.ReadString(strDelimiter);
+        argStream.ReadString(strDelimeter);
 
     if (!argStream.HasErrors())
     {
-        // IMPORTANT: Don't use strInput after this, because strtok changes it!
-        char* szToken = strtok(strInput.data(), strDelimiter);
-
-        lua_newtable(luaVM);
-
-        // strtok until we're out of tokens
-        unsigned int uiLuaTblIndex = 1;
-        while (szToken)
+        if (strDelimeter.length() == 1) // Fast way(doesn't need a separate buffer)
         {
-            // Add the token to the table
-            lua_pushnumber(luaVM, uiLuaTblIndex++);     // Push table index
-            lua_pushstring(luaVM, szToken);             // Push string value
-            lua_settable(luaVM, -3);                    // Push it into the table
+            const char delimeter = strDelimeter[0];
 
-            szToken = strtok(NULL, strDelimiter);
+            size_t start = 0;               // Beginning of the token
+            size_t end = std::string::npos; // End of the token
+
+            lua_Number tblindex = 1;
+            while (true)
+            {
+                end = input.find_first_of(delimeter, start);
+
+                if (start != end) // Make sure this token isn't empty(it may be)
+                {
+                    const auto token = input.substr(start, end - start);
+                    lua_pushnumber(luaVM, tblindex++);                      // Push table index
+                    lua_pushlstring(luaVM, token.data(), token.length());   // Push string value
+                    lua_settable(luaVM, -3);                                // Push it into the table   
+                }
+
+                if (end == std::string::npos) // No more delimeter chars
+                    break;
+
+                start = end + 1;                // Move caret after this delimeter
+                if (start >= input.length())    // Make sure we still are in the string
+                    break;
+            }
+        }
+        else // Slow way (needs separate buffer)
+        {
+            // Copy the string
+            auto szInputCopy = std::make_unique<char[]>(input.length() + 1);
+            strcpy_s(szInputCopy.get(), input.length(), input.data());
+
+            unsigned int uiCount = 0;
+            char* szToken = strtok(szInputCopy.get(), strDelimeter.c_str());
+
+            // strtok until we're out of tokens
+            lua_Number tblindex = 1;
+            while (szToken)
+            {
+                lua_pushnumber(luaVM, tblindex++);  // Push table index
+                lua_pushstring(luaVM, szToken);     // Push string value
+                lua_settable(luaVM, -3);            // Push it into the table
+
+                szToken = strtok(NULL, strDelimeter.c_str());
+            }
         }
     }
     else
