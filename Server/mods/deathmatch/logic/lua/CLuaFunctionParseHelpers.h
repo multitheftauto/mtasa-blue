@@ -48,6 +48,14 @@ enum eHudComponent
 };
 DECLARE_ENUM(eHudComponent);
 
+enum class eSpeedUnit
+{
+    KMPH,
+    MPH,
+    MPS
+};
+DECLARE_ENUM_CLASS(eSpeedUnit);
+
 // class -> class type
 typedef int        eEntityType;
 inline eEntityType GetClassType(CElement*)

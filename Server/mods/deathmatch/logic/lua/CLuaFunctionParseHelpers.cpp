@@ -83,6 +83,12 @@ ADD_ENUM(JSONPRETTY_NONE, "none")
 ADD_ENUM(JSONPRETTY_TABS, "tabs")
 IMPLEMENT_ENUM_END("json-pretty-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eSpeedUnit)
+ADD_ENUM(eSpeedUnit::KMPH, "kmph")
+ADD_ENUM(eSpeedUnit::MPH, "mph")
+ADD_ENUM(eSpeedUnit::MPS, "mps")
+IMPLEMENT_ENUM_CLASS_END("speed-unit")
+
 IMPLEMENT_ENUM_BEGIN(eWeaponType)
 // Compatible with getWeaponNameFromID                          From setWeaponProperty before r4523
 ADD_ENUM(WEAPONTYPE_UNARMED, "fist")
