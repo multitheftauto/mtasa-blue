@@ -587,7 +587,7 @@ public:
     }
 
     //
-    // Read next string, using default if needed
+    // Read next string
     //
     void ReadString(std::string_view& outValue)
     {
