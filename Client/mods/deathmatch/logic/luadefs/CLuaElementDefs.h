@@ -10,6 +10,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <variant>
 
 class CLuaElementDefs : public CLuaDefs
 {
@@ -96,4 +97,6 @@ public:
     LUA_DECLARE(SetElementFrozen);
     LUA_DECLARE(SetLowLodElement);
     LUA_DECLARE(SetElementCallPropagationEnabled);
+
+    static std::variant<float, bool> GetElementSpeed(CClientEntity* element, std::optional<eSpeedUnit> unit);
 };
