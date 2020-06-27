@@ -2466,18 +2466,27 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
 std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CElement* element, std::optional<eSpeedUnit> unit)
 {
-    CVector vecVelocity;
-    if (CStaticFunctionDefinitions::GetElementVelocity(element, vecVelocity))
+    if (element->GetType() == EElementType::PLAYER || element->GetType() == EElementType::VEHICLE || element->GetType() == EElementType::PED)
     {
-        switch (unit.value_or(eSpeedUnit::KMPH))
+    
+        CVector vecVelocity;
+        if (CStaticFunctionDefinitions::GetElementVelocity(element, vecVelocity))
         {
-            case eSpeedUnit::MPH:
-                return (vecVelocity * 111.84681456).Length();
-            case eSpeedUnit::KMPH:
-                return (vecVelocity * 180).Length();
-            case eSpeedUnit::MPS:
-                return (vecVelocity * 50).Length();
+            switch (unit.value_or(eSpeedUnit::KMPH))
+            {
+                case eSpeedUnit::MPH:
+                    return (vecVelocity * 111.84681456).Length();
+                case eSpeedUnit::KMPH:
+                    return (vecVelocity * 180).Length();
+                case eSpeedUnit::MPS:
+                    return (vecVelocity * 50).Length();
+            }
         }
     }
+    else
+    {
+        throw std::invalid_argument(SString("Bad argument @ getElementSpeed [Expected ped/player/vehicle at 1, got %s]", element->GetTypeName().c_str()));
+    }
+
     return false;
 }
