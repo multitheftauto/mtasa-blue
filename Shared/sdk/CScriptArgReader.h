@@ -586,6 +586,34 @@ public:
         m_iIndex++;
     }
 
+
+    //
+    // Read next string
+    //
+    void ReadString(std::string_view& outValue)
+    {
+        switch (lua_type(m_luaVM, m_iIndex))
+        {
+        case LUA_TNUMBER:
+        case LUA_TSTRING:
+        {
+            outValue = {
+                lua_tostring(m_luaVM, m_iIndex),
+                lua_strlen(m_luaVM, m_iIndex)
+            };
+
+            break;
+        }
+        default:
+        {
+            outValue = { nullptr, 0 };
+            SetTypeError("string");
+        }
+        }
+
+        m_iIndex++;
+    }
+
     //
     // Force-reads next argument as string
     //
