@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -41,6 +42,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementPosition", getElementPosition},
         {"getElementRotation", getElementRotation},
         {"getElementVelocity", getElementVelocity},
+        {"getElementSpeed", ArgumentParser<GetElementSpeed>},
         {"getElementAngularVelocity", getElementTurnVelocity},
         {"getElementsByType", getElementsByType},
         {"getElementType", getElementType},
@@ -2460,4 +2462,22 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CElement* element, std::optional<eSpeedUnit> unit)
+{
+    CVector vecVelocity;
+    if (CStaticFunctionDefinitions::GetElementVelocity(element, vecVelocity))
+    {
+        switch (unit.value_or(eSpeedUnit::KMPH))
+        {
+            case eSpeedUnit::MPH:
+                return (vecVelocity * 111.84681456).Length();
+            case eSpeedUnit::KMPH:
+                return (vecVelocity * 180).Length();
+            case eSpeedUnit::MPS:
+                return (vecVelocity * 50).Length();
+        }
+    }
+    return false;
 }
