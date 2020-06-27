@@ -105,5 +105,5 @@ public:
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
 
-    static float GetElementSpeed(CElement* element, std::optional<eSpeedUnit> unit);
+    static std::variant<float, bool> GetElementSpeed(CElement* element, std::optional<eSpeedUnit> unit);
 };
