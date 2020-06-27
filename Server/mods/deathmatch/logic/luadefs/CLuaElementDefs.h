@@ -11,7 +11,6 @@
 
 #pragma once
 #include "CLuaDefs.h"
-#include <optional>
 
 class CLuaElementDefs : public CLuaDefs
 {
