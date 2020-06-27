@@ -103,6 +103,14 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+enum class eSpeedUnit
+{
+    KMPH,
+    MPH,
+    MPS
+};
+DECLARE_ENUM_CLASS(eSpeedUnit);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
