@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 using std::list;
 #define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
@@ -27,6 +28,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
         {"getElementVelocity", GetElementVelocity},
+        {"getElementSpeed", ArgumentParser<GetElementSpeed>},
         {"getElementAngularVelocity", GetElementTurnVelocity},
         {"getElementType", GetElementType},
         {"getElementChildren", GetElementChildren},
@@ -2581,4 +2583,30 @@ int CLuaElementDefs::IsElementWaitingForGroundToLoad(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CClientEntity* element, std::optional<eSpeedUnit> unit)
+{
+    if (element->GetType() == eClientEntityType::CCLIENTPLAYER || element->GetType() == eClientEntityType::CCLIENTVEHICLE || element->GetType() == eClientEntityType::CCLIENTPED)
+    {
+        CVector vecVelocity;
+        if (CStaticFunctionDefinitions::GetElementVelocity(*element, vecVelocity))
+        {
+            switch (unit.value_or(eSpeedUnit::KMPH))
+            {
+                case eSpeedUnit::MPH:
+                    return (vecVelocity * 111.84681456).Length();
+                case eSpeedUnit::KMPH:
+                    return (vecVelocity * 180).Length();
+                case eSpeedUnit::MPS:
+                    return (vecVelocity * 50).Length();
+            }
+        }
+    }
+    else
+    {
+        throw std::invalid_argument(SString("Bad argument @ getElementSpeed [Expected ped/player/vehicle at 1, got %s]", element->GetTypeName().c_str()));
+    }
+
+    return false;
 }
