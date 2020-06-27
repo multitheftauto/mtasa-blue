@@ -165,46 +165,39 @@ int CLuaUtilDefs::GetCTime(lua_State* luaVM)
 
 int CLuaUtilDefs::Split(lua_State* luaVM)
 {
-    SString          strInput = "";
-    unsigned int     uiDelimiter = 0;
+    SString          strInput;
     SString          strDelimiter;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strInput);
 
-    if (argStream.NextIsNumber())
+    if (argStream.NextIsNumber()) // Convert char code to delimeter string
     {
+        unsigned int uiDelimiter;
         argStream.ReadNumber(uiDelimiter);
         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
-    else            // It's already a string
+    else
         argStream.ReadString(strDelimiter);
 
     if (!argStream.HasErrors())
     {
-        // Copy the string
-        char* strText = new char[strInput.length() + 1];
-        strcpy(strText, strInput);
+        // IMPORTANT: Don't use strInput after this, because strtok changes it!
+        char* szToken = strtok(strInput.data(), strDelimiter);
 
-        unsigned int uiCount = 0;
-        char*        szToken = strtok(strText, strDelimiter);
-
-        // Create a new table
         lua_newtable(luaVM);
 
         // strtok until we're out of tokens
+        unsigned int uiLuaTblIndex = 1;
         while (szToken)
         {
             // Add the token to the table
-            lua_pushnumber(luaVM, ++uiCount);
-            lua_pushstring(luaVM, szToken);
-            lua_settable(luaVM, -3);
+            lua_pushnumber(luaVM, uiLuaTblIndex++);     // Push table index
+            lua_pushstring(luaVM, szToken);             // Push string value
+            lua_settable(luaVM, -3);                    // Push it into the table
 
             szToken = strtok(NULL, strDelimiter);
         }
-
-        // Delete the text
-        delete[] strText;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
