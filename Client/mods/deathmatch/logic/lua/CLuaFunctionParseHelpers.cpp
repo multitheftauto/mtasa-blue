@@ -112,6 +112,12 @@ ADD_ENUM(HUD_CROSSHAIR, "crosshair")
 ADD_ENUM(HUD_ALL, "all")
 IMPLEMENT_ENUM_END("hud-component")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eSpeedUnit)
+ADD_ENUM(eSpeedUnit::KMPH, "kmph")
+ADD_ENUM(eSpeedUnit::MPH, "mph")
+ADD_ENUM(eSpeedUnit::MPS, "mps")
+IMPLEMENT_ENUM_CLASS_END("speed-unit")
+
 IMPLEMENT_ENUM_BEGIN(eAmbientSoundType)
 ADD_ENUM(AMBIENT_SOUND_GENERAL, "general")
 ADD_ENUM(AMBIENT_SOUND_GUNFIRE, "gunfire")
