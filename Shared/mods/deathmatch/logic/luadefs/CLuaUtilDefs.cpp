@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <string.h>
 
 void CLuaUtilDefs::LoadFunctions()
 {
@@ -215,7 +214,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         {
             // Copy the string
             auto szInputCopy = std::make_unique<char[]>(input.length() + 1);
-            strcpy_s(szInputCopy.get(), input.length(), input.data());
+            strcpy(szInputCopy.get(), input.data());
 
             unsigned int uiCount = 0;
             char* szToken = strtok(szInputCopy.get(), strDelimeter.c_str());
