@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <cstring>
+#include <string.h>
 
 void CLuaUtilDefs::LoadFunctions()
 {
