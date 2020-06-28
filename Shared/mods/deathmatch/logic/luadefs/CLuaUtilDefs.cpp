@@ -183,11 +183,11 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (strDelimeter.length() == 1) // Fast way(doesn't need a separate buffer)
+        if (strDelimeter.length() == 1) // Fast way (doesn't need a separate buffer)
         {
             const char delimeter = strDelimeter[0];
 
-            size_t start = 0;               // Beginning of the token
+            size_t start = 0; // Beginning of the token
             size_t end = std::string::npos; // End of the token
 
             lua_Number tblindex = 1;
@@ -198,16 +198,16 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
                 if (start != end) // Make sure this token isn't empty(it may be)
                 {
                     const auto token = input.substr(start, end - start);
-                    lua_pushnumber(luaVM, tblindex++);                      // Push table index
-                    lua_pushlstring(luaVM, token.data(), token.length());   // Push string value
-                    lua_settable(luaVM, -3);                                // Push it into the table   
+                    lua_pushnumber(luaVM, tblindex++); // Push table index
+                    lua_pushlstring(luaVM, token.data(), token.length()); // Push string value
+                    lua_settable(luaVM, -3); // Push it into the table   
                 }
 
                 if (end == std::string::npos) // No more delimeter chars
                     break;
 
-                start = end + 1;                // Move caret after this delimeter
-                if (start >= input.length())    // Make sure we still are in the string
+                start = end + 1; // Move caret after this delimeter
+                if (start >= input.length()) // Make sure we still are in the string
                     break;
             }
         }
@@ -224,9 +224,9 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
             lua_Number tblindex = 1;
             while (szToken)
             {
-                lua_pushnumber(luaVM, tblindex++);  // Push table index
-                lua_pushstring(luaVM, szToken);     // Push string value
-                lua_settable(luaVM, -3);            // Push it into the table
+                lua_pushnumber(luaVM, tblindex++); // Push table index
+                lua_pushstring(luaVM, szToken); // Push string value
+                lua_settable(luaVM, -3); // Push it into the table
 
                 szToken = strtok(NULL, strDelimeter.c_str());
             }
