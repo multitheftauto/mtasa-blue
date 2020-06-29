@@ -114,10 +114,7 @@ private:
     CGUIStaticImage* m_pVersion;
     CGUIStaticImage* m_pMenuArea;
 
-    CGUIStaticImage* m_pDiscordButton;
-    CGUIStaticImage* m_pTwitterButton;
-    CGUIStaticImage* m_pYoutubeButton;
-    CGUIStaticImage* m_pGithubButton;
+    std::unique_ptr<CGUIStaticImage> m_socialButtons[4] = {nullptr};
 
     CGUIScrollPane* m_pCanvas;
 
