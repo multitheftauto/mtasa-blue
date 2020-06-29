@@ -858,7 +858,7 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 }
 
 CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(
-    std::variant<CClientDxFont*, eFontType> font, // is optional, so we can call it from DxGetTextSize with a std::nullopt, and we just grab the FONT_DEFAULT.
+    std::variant<CClientDxFont*, eFontType> variantFont, // is optional, so we can call it from DxGetTextSize with a std::nullopt, and we just grab the FONT_DEFAULT.
     const std::string text,
     const std::optional<float> optWidth,
     const std::optional<float> optScaleXY,
