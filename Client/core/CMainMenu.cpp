@@ -23,6 +23,9 @@
 #define NATIVE_LOGO_X     1058.0f
 #define NATIVE_LOGO_Y     540.0f
 
+#define NATIVE_SOCIAL_ICON_X     32.0f
+#define NATIVE_SOCIAL_ICON_Y     32.0f
+
 #define CORE_MTA_MENUITEMS_START_X  0.168
 
 #define CORE_MTA_BG_MAX_ALPHA       1.00f   //ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
@@ -47,6 +50,11 @@
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 #define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
+
+#define CORE_MTA_DISCORD_BUTTON     "cgui\\images\\socialset\\discord.png"
+#define CORE_MTA_TWITTER_BUTTON     "cgui\\images\\socialset\\twitter.png"
+#define CORE_MTA_YOUTUBE_BUTTON     "cgui\\images\\socialset\\youtube.png"
+#define CORE_MTA_GITHUB_BUTTON      "cgui\\images\\socialset\\github.png"
 
 static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
@@ -160,6 +168,58 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->SetSize(logoSize, false);
     m_pLogo->SetPosition(CVector2D(0.5f * m_iMenuSizeX - logoSize.fX / 2, 0.365f * m_iMenuSizeY - logoSize.fY / 2), false);
     m_pLogo->SetZOrderingEnabled(false);
+
+
+    // Our Buttons Size
+    CVector2D buttonSize = CVector2D((NATIVE_SOCIAL_ICON_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_SOCIAL_ICON_Y / NATIVE_RES_Y) * m_iMenuSizeY);
+
+    // Create our Discord Button
+    m_pDiscordButton = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pDiscordButton->LoadFromFile(CORE_MTA_DISCORD_BUTTON);
+    m_pDiscordButton->SetProperty("InheritsAlpha", "False");
+    m_pDiscordButton->SetAlpha(0.35f);
+    m_pDiscordButton->SetSize(buttonSize, false);
+    m_pDiscordButton->SetPosition(CVector2D(0.01f * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2), false);
+    m_pDiscordButton->SetZOrderingEnabled(false);
+    m_pDiscordButton->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonHover, this));
+    m_pDiscordButton->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonUnhover, this));
+    m_pDiscordButton->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnDiscordButtonClick, this));
+
+    // Create our Twitter Button
+    m_pTwitterButton = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pTwitterButton->LoadFromFile(CORE_MTA_TWITTER_BUTTON);
+    m_pTwitterButton->SetProperty("InheritsAlpha", "False");
+    m_pTwitterButton->SetAlpha(0.35f);
+    m_pTwitterButton->SetSize(buttonSize, false);
+    m_pTwitterButton->SetPosition(CVector2D(0.04f * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2), false);
+    m_pTwitterButton->SetZOrderingEnabled(false);
+    m_pTwitterButton->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonHover, this));
+    m_pTwitterButton->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonUnhover, this));
+    m_pTwitterButton->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnTwitterButtonClick, this));
+    
+    // Create our Youtube Button
+    m_pYoutubeButton = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pYoutubeButton->LoadFromFile(CORE_MTA_YOUTUBE_BUTTON);
+    m_pYoutubeButton->SetProperty("InheritsAlpha", "False");
+    m_pYoutubeButton->SetAlpha(0.35f);
+    m_pYoutubeButton->SetSize(buttonSize, false);
+    m_pYoutubeButton->SetPosition(CVector2D(0.07f * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2), false);
+    m_pYoutubeButton->SetZOrderingEnabled(false);
+    m_pYoutubeButton->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonHover, this));
+    m_pYoutubeButton->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonUnhover, this));
+    m_pYoutubeButton->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnYoutubeButtonClick, this));
+
+    // Create our Github Button
+    m_pGithubButton = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pGithubButton->LoadFromFile(CORE_MTA_GITHUB_BUTTON);
+    m_pGithubButton->SetProperty("InheritsAlpha", "False");
+    m_pGithubButton->SetAlpha(0.35f);
+    m_pGithubButton->SetSize(buttonSize, false);
+    m_pGithubButton->SetPosition(CVector2D(0.10f * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2), false);
+    m_pGithubButton->SetZOrderingEnabled(false);
+    m_pGithubButton->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonHover, this));
+    m_pGithubButton->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialButtonUnhover, this));
+    m_pGithubButton->SetClickHandler(GUI_CALLBACK(&CMainMenu::OnGithubButtonClick, this));
 
     // Create the image showing the version number
     m_pVersion = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
@@ -350,6 +410,10 @@ CMainMenu::~CMainMenu()
     delete m_pLatestNews;
     delete m_pVersion;
     delete m_pMenuArea;
+    delete m_pDiscordButton;
+    delete m_pTwitterButton;
+    delete m_pYoutubeButton;
+    delete m_pGithubButton;
 
     // Destroy the menu items. Note: The disconnect item isn't always in the
     // list of menu items (it's only in there when we're in game). This means we
@@ -977,6 +1041,53 @@ bool CMainMenu::OnQuitButtonClick(CGUIElement* pElement)
 
     // Send "exit" command to the command handler
     CCommands::GetSingleton().Execute("exit", "");
+
+    return true;
+}
+
+bool CMainMenu::OnSocialButtonHover(CGUIElement* pElement)
+{
+    pElement->SetAlpha(0.8f);
+
+    return true;
+}
+
+bool CMainMenu::OnSocialButtonUnhover(CGUIElement* pElement)
+{
+    pElement->SetAlpha(0.35f);
+
+    return true;
+}
+
+bool CMainMenu::OnDiscordButtonClick(CGUIElement* pElement)
+{
+    // Visit the discord url
+    ShellExecuteNonBlocking("open", "https://multitheftauto.com/discord");
+
+    return true;
+}
+
+bool CMainMenu::OnTwitterButtonClick(CGUIElement* pElement)
+{
+    // Visit the discord url
+    ShellExecuteNonBlocking("open", "https://twitter.com/MTAQA");
+
+    return true;
+}
+
+
+bool CMainMenu::OnYoutubeButtonClick(CGUIElement* pElement)
+{
+    // Visit the discord url
+    ShellExecuteNonBlocking("open", "https://www.youtube.com/user/MTAQA");
+
+    return true;
+}
+
+bool CMainMenu::OnGithubButtonClick(CGUIElement* pElement)
+{
+    // Visit the discord url
+    ShellExecuteNonBlocking("open", "https://github.com/multitheftauto/mtasa-blue");
 
     return true;
 }

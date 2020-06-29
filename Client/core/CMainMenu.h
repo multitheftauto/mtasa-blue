@@ -93,6 +93,14 @@ private:
     bool OnQuitButtonClick(CGUIElement* pElement);
     bool OnNewsButtonClick(CGUIElement* pElement);
 
+    bool OnSocialButtonHover(CGUIElement* pElement);
+    bool OnSocialButtonUnhover(CGUIElement* pElement);
+
+    bool OnDiscordButtonClick(CGUIElement* pElement);
+    bool OnTwitterButtonClick(CGUIElement* pElement);
+    bool OnYoutubeButtonClick(CGUIElement* pElement);
+    bool OnGithubButtonClick(CGUIElement* pElement);
+
     void HideServerInfo();
 
     CGUI* m_pManager;
@@ -105,6 +113,11 @@ private:
     CGUIStaticImage* m_pFiller2;
     CGUIStaticImage* m_pVersion;
     CGUIStaticImage* m_pMenuArea;
+
+    CGUIStaticImage* m_pDiscordButton;
+    CGUIStaticImage* m_pTwitterButton;
+    CGUIStaticImage* m_pYoutubeButton;
+    CGUIStaticImage* m_pGithubButton;
 
     CGUIScrollPane* m_pCanvas;
 
