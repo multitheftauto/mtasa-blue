@@ -10,13 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-<<<<<<< HEAD
-#include <lua/CLuaFunctionParser.h>
 #include "CLuaDefs.h"
-=======
 #include "lua/CLuaFunctionParser.h"
 
->>>>>>> 00211615c... Move ResolveD3DxFont from .cpp to .h. Add overload variant<eFontType, CClientDxFont*>
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
