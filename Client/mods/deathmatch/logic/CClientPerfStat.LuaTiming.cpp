@@ -223,27 +223,15 @@ void CClientPerfStatLuaTimingImpl::OnLuaMainDestroy(CLuaMain* pLuaMain)
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const SString& strEventName, TIMEUS timeUs)
 {
-    CLuaMainTiming* pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
-    if (!pLuaMainTiming)
+    CLuaMainTiming& pLuaMainTiming = AllLuaTiming.LuaMainTimingMap[pLuaMain];
     {
-        MapSet(AllLuaTiming.LuaMainTimingMap, pLuaMain, CLuaMainTiming());
-        pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
-    }
-
-    {
-        CTiming& acc = pLuaMainTiming->ResourceTiming.s5.acc;
+        CTiming& acc = pLuaMainTiming.ResourceTiming.s5.acc;
         acc.total_us += timeUs;
     }
 
-    CTimingBlock* pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    if (!pEventTiming)
+    CTimingBlock& pEventTiming = pLuaMainTiming.EventTimingMap[strEventName];
     {
-        MapSet(pLuaMainTiming->EventTimingMap, szEventName, CTimingBlock());
-        pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    }
-
-    {
-        CTiming& acc = pEventTiming->s5.acc;
+        CTiming& acc = pEventTiming.s5.acc;
         acc.calls++;
         acc.total_us += timeUs;
         acc.max_us = std::max(acc.max_us, timeUs);
