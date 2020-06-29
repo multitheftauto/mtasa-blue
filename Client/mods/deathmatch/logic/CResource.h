@@ -141,7 +141,7 @@ private:
 
     std::list<class CResourceFile*>       m_ResourceFiles;
     std::list<class CResourceConfigItem*> m_ConfigFiles;
-    std::set<std::string, std::less<>>    m_ExportedFunctionsSet;            // std::less<> for transparent lookup: https://stackoverflow.com/questions/20317413/what-are-transparent-comparators
+    CFastHashSet<SString>                 m_ExportedFunctionsSet;
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 };
