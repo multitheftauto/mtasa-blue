@@ -123,7 +123,7 @@ public:
     // CClientPerfStatLuaTiming
     virtual void OnLuaMainCreate(CLuaMain* pLuaMain);
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain);
-    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs);
+    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const SString& strEventName, TIMEUS timeUs);
 
     // CClientPerfStatLuaTimingImpl functions
     void GetLuaTimingStats(CClientPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
@@ -221,7 +221,7 @@ void CClientPerfStatLuaTimingImpl::OnLuaMainDestroy(CLuaMain* pLuaMain)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs)
+void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const SString& strEventName, TIMEUS timeUs)
 {
     CLuaMainTiming* pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
     if (!pLuaMainTiming)

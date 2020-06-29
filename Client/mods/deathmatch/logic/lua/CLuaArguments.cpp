@@ -250,10 +250,9 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
     return true;
 }
 
-bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues) const
+bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const SString& strFunctionName, CLuaArguments* returnValues) const
 {
     assert(pLuaMain);
-    assert(szFunction);
     TIMEUS startTime = GetTimeUs();
 
     // Add the function name to the stack and get the event from the table
@@ -261,7 +260,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     assert(luaVM);
     LUA_CHECKSTACK(luaVM, 1);
     int luaStackPointer = lua_gettop(luaVM);
-    lua_pushstring(luaVM, szFunction);
+    lua_pushlstring(luaVM, strFunctionName.data(), strFunctionName.length());
     lua_gettable(luaVM, LUA_GLOBALSINDEX);
 
     // If that function doesn't exist, return false
@@ -310,7 +309,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, strFunctionName, GetTimeUs() - startTime);
     return true;
 }
 

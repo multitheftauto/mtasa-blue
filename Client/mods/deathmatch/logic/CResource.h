@@ -74,7 +74,7 @@ public:
     void           AddToElementGroup(CClientEntity* pElement);
 
     void AddExportedFunction(const char* szFunctionName);
-    bool CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
+    bool CallExportedFunction(const SString& strFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
 
     class CClientEntity* GetResourceEntity() { return m_pResourceEntity; }
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }

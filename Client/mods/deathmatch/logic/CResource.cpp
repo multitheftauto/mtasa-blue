@@ -202,11 +202,10 @@ void CResource::AddExportedFunction(const char* szFunctionName)
     m_ExportedFunctionsSet.insert(szFunctionName); 
 }
 
-bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
+bool CResource::CallExportedFunction(const SString& strFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
-    // Check if we actually have this function exported
-    if (m_ExportedFunctionsSet.find(szFunctionName) != m_ExportedFunctionsSet.end())
-        return args.CallGlobal(m_pLuaVM, szFunctionName, &returns);
+    if (m_ExportedFunctionsSet.find(strFunctionName) != m_ExportedFunctionsSet.end()) // Is it actually exported?
+        return args.CallGlobal(m_pLuaVM, strFunctionName, &returns);
     return false;
 }
 

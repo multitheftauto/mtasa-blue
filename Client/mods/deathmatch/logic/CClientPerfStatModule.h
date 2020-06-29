@@ -99,7 +99,7 @@ public:
     // CClientPerfStatLuaTiming
     virtual void OnLuaMainCreate(CLuaMain* pLuaMain) = 0;
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) = 0;
-    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs) = 0;
+    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const SString& strEventName, TIMEUS timeUs) = 0;
 
     static CClientPerfStatLuaTiming* GetSingleton();
 };
