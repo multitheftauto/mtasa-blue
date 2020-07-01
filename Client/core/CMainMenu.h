@@ -96,8 +96,10 @@ private:
     bool OnSocialButtonHover(CGUIElement* pElement);
     bool OnSocialButtonUnhover(CGUIElement* pElement);
 
+    bool OnWebsiteButtonClick(CGUIElement* pElement);
     bool OnDiscordButtonClick(CGUIElement* pElement);
     bool OnTwitterButtonClick(CGUIElement* pElement);
+    bool OnFacebookButtonClick(CGUIElement* pElement);
     bool OnYoutubeButtonClick(CGUIElement* pElement);
     bool OnGithubButtonClick(CGUIElement* pElement);
 
@@ -114,7 +116,7 @@ private:
     CGUIStaticImage* m_pVersion;
     CGUIStaticImage* m_pMenuArea;
 
-    std::unique_ptr<CGUIStaticImage> m_socialButtons[4] = {nullptr};
+    std::unique_ptr<CGUIStaticImage> m_socialButtons[6] = {nullptr};
 
     CGUIScrollPane* m_pCanvas;
 

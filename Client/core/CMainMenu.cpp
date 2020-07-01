@@ -165,10 +165,12 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->SetZOrderingEnabled(false);
 
     const std::pair<const char*, GUI_CALLBACK> socialButtonDatas[]{
+        {"website", GUI_CALLBACK(&CMainMenu::OnWebsiteButtonClick, this)},
         {"discord", GUI_CALLBACK(&CMainMenu::OnDiscordButtonClick, this)},
-        {"github", GUI_CALLBACK(&CMainMenu::OnGithubButtonClick, this)},
-        {"youtube", GUI_CALLBACK(&CMainMenu::OnYoutubeButtonClick, this)},
         {"twitter", GUI_CALLBACK(&CMainMenu::OnTwitterButtonClick, this)},
+        {"facebook", GUI_CALLBACK(&CMainMenu::OnFacebookButtonClick, this)},
+        {"youtube", GUI_CALLBACK(&CMainMenu::OnYoutubeButtonClick, this)},
+        {"github", GUI_CALLBACK(&CMainMenu::OnGithubButtonClick, this)},
     };
 
     float offsetX = 0.01f;
@@ -1027,6 +1029,14 @@ bool CMainMenu::OnSocialButtonUnhover(CGUIElement* pElement)
     return true;
 }
 
+bool CMainMenu::OnWebsiteButtonClick(CGUIElement* pElement)
+{
+    // Visit the website url
+    ShellExecuteNonBlocking("open", "https://multitheftauto.com/");
+
+    return true;
+}
+
 bool CMainMenu::OnDiscordButtonClick(CGUIElement* pElement)
 {
     // Visit the discord url
@@ -1037,16 +1047,23 @@ bool CMainMenu::OnDiscordButtonClick(CGUIElement* pElement)
 
 bool CMainMenu::OnTwitterButtonClick(CGUIElement* pElement)
 {
-    // Visit the discord url
+    // Visit the twitter url
     ShellExecuteNonBlocking("open", "https://twitter.com/MTAQA");
 
     return true;
 }
 
+bool CMainMenu::OnFacebookButtonClick(CGUIElement* pElement)
+{
+    // Visit the facebook url
+    ShellExecuteNonBlocking("open", "https://www.facebook.com/multitheftauto");
+
+    return true;
+}
 
 bool CMainMenu::OnYoutubeButtonClick(CGUIElement* pElement)
 {
-    // Visit the discord url
+    // Visit the youtube url
     ShellExecuteNonBlocking("open", "https://www.youtube.com/user/MTAQA");
 
     return true;
@@ -1054,7 +1071,7 @@ bool CMainMenu::OnYoutubeButtonClick(CGUIElement* pElement)
 
 bool CMainMenu::OnGithubButtonClick(CGUIElement* pElement)
 {
-    // Visit the discord url
+    // Visit the github url
     ShellExecuteNonBlocking("open", "https://github.com/multitheftauto/mtasa-blue");
 
     return true;
