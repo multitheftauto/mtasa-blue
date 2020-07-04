@@ -276,6 +276,7 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
 
 void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
+    unsigned short usOldDimension;
     unsigned short usDimension;
     if (bitStream.Read(usDimension))
     {
@@ -292,7 +293,16 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                     m_pClientGame->SetAllDimensions(usDimension);
                 }
 
+                usOldDimension = pPlayer->GetDimension();
                 pPlayer->SetDimension(usDimension);
+
+                if (usOldDimension != usDimension)
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(usOldDimension);
+                    Arguments.PushNumber(usDimension);
+                    pPlayer->CallEvent("onClientElementDimensionChange", Arguments, true);
+                }
             }
         }
         else
@@ -307,7 +317,16 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                 }
             }
 
+            usOldDimension = pSource->GetDimension();
             pSource->SetDimension(usDimension);
+
+            if (usOldDimension != usDimension)
+            {
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usOldDimension);
+                Arguments.PushNumber(usDimension);
+                pSource->CallEvent("onClientElementDimensionChange", Arguments, true);
+            }
         }
     }
 }
