@@ -1382,6 +1382,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     assert(pElement);
     RUN_CHILDREN(SetElementDimension(*iter, usDimension))
 
+    unsigned short usOldDimension;
     if (pElement->GetType() == CElement::TEAM)
     {
         CTeam*                         pTeam = static_cast<CTeam*>(pElement);
@@ -1390,7 +1391,16 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         {
             if ((*iter)->IsSpawned())
             {
+                usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
+
+                if (usOldDimension != usDimension)
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(usOldDimension);
+                    Arguments.PushNumber(usDimension);
+                    (*iter)->CallEvent("onElementDimensionChange", Arguments);
+                }
             }
         }
     }
@@ -1432,7 +1442,17 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WORLD_MESH_UNUSED:
         case CElement::WATER:
         {
+            usOldDimension = pElement->GetDimension();
             pElement->SetDimension(usDimension);
+
+            if (usOldDimension != usDimension)
+            {
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usOldDimension);
+                Arguments.PushNumber(usDimension);
+                pElement->CallEvent("onElementDimensionChange", Arguments);
+            }
+            
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
