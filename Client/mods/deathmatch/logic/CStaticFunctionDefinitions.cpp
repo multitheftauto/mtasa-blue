@@ -1260,7 +1260,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
 {
     RUN_CHILDREN(SetElementDimension(**iter, usDimension))
 
-    unsigned short usOldDimension;
     switch (Entity.GetType())
     {
         // Client side elements
@@ -1270,7 +1269,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             list<CClientPlayer*>::const_iterator iter = Team.IterBegin();
             for (; iter != Team.IterEnd(); iter++)
             {
-                usOldDimension = (*iter)->GetDimension();
+                unsigned short usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
 
                 if (usOldDimension != usDimension)
@@ -1298,7 +1297,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTSOUND:
         case CCLIENTWATER:
         {
-            usOldDimension = Entity.GetDimension();
+            unsigned short usOldDimension = Entity.GetDimension();
             Entity.SetDimension(usDimension);
 
             if (usOldDimension != usDimension)
@@ -1320,7 +1319,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
                 m_pClientGame->SetAllDimensions(usDimension);
             }
 
-            usOldDimension = Ped.GetDimension();
+            unsigned short usOldDimension = Ped.GetDimension();
             Ped.SetDimension(usDimension);
 
             if (usOldDimension != usDimension)

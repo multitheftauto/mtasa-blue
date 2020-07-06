@@ -1382,7 +1382,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     assert(pElement);
     RUN_CHILDREN(SetElementDimension(*iter, usDimension))
 
-    unsigned short usOldDimension;
     if (pElement->GetType() == CElement::TEAM)
     {
         CTeam*                         pTeam = static_cast<CTeam*>(pElement);
@@ -1391,7 +1390,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         {
             if ((*iter)->IsSpawned())
             {
-                usOldDimension = (*iter)->GetDimension();
+                unsigned short usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
 
                 if (usOldDimension != usDimension)
@@ -1442,7 +1441,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WORLD_MESH_UNUSED:
         case CElement::WATER:
         {
-            usOldDimension = pElement->GetDimension();
+            unsigned short usOldDimension = pElement->GetDimension();
             pElement->SetDimension(usDimension);
 
             if (usOldDimension != usDimension)
