@@ -2480,6 +2480,8 @@ std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CElement* element, st
                     return (vecVelocity * 180).Length();
                 case eSpeedUnit::MPS:
                     return (vecVelocity * 50).Length();
+                case eSpeedUnit::KT:
+                    return (vecVelocity * 180 * 0.539956803).Length();
             }
         }
     }

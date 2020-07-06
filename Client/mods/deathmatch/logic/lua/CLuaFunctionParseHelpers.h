@@ -107,7 +107,8 @@ enum class eSpeedUnit
 {
     KMPH,
     MPH,
-    MPS
+    MPS,
+    KT
 };
 DECLARE_ENUM_CLASS(eSpeedUnit);
 
