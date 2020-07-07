@@ -108,7 +108,8 @@ enum class eSpeedUnit
     KMPH,
     MPH,
     MPS,
-    KN
+    KN,
+    GTASA
 };
 DECLARE_ENUM_CLASS(eSpeedUnit);
 

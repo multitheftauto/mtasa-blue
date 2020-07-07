@@ -117,6 +117,7 @@ ADD_ENUM(eSpeedUnit::KMPH, "kmph")
 ADD_ENUM(eSpeedUnit::MPH, "mph")
 ADD_ENUM(eSpeedUnit::MPS, "mps")
 ADD_ENUM(eSpeedUnit::KN, "kn")
+ADD_ENUM(eSpeedUnit::GTASA, "gtasa")
 IMPLEMENT_ENUM_CLASS_END("speed-unit")
 
 IMPLEMENT_ENUM_BEGIN(eAmbientSoundType)
