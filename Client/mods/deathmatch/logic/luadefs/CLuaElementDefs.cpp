@@ -2592,7 +2592,7 @@ std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CClientEntity* elemen
         CVector vecVelocity;
         if (CStaticFunctionDefinitions::GetElementVelocity(*element, vecVelocity))
         {
-            switch (unit.value_or(eSpeedUnit::KMPH))
+            switch (unit.value_or(eSpeedUnit::GTASA))
             {
                 case eSpeedUnit::MPH:
                     return (vecVelocity * 111.84681456).Length();
@@ -2601,7 +2601,9 @@ std::variant<float, bool> CLuaElementDefs::GetElementSpeed(CClientEntity* elemen
                 case eSpeedUnit::MPS:
                     return (vecVelocity * 50).Length();
                 case eSpeedUnit::KN:
-                    return (vecVelocity * 180 * 0.539956803).Length();
+                    return (vecVelocity * 97.19222454).Length();
+                case eSpeedUnit::GTASA:
+                    return vecVelocity.Length();
             }
         }
     }
