@@ -330,6 +330,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)
 {
     unsigned int uiResult = 0;
+    const unsigned int uiMax = 4LL * 1024 * 1024 * 1024;
 
     SString DevVen;
     DevVen.Format("VEN_%04X&DEV_%04X", ulVen, ulDev);
@@ -351,7 +352,7 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
 
         if (iAvailability == 3 && PNPDeviceID.Contains(DevVen))
         {
-            uiResult = uiAdapterRAM;
+            uiResult = std::min(uiMax, uiAdapterRAM);
             break;            // Found match
         }
     }
