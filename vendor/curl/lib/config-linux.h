@@ -97,6 +97,9 @@
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
 
+/* to enable MQTT */
+/* #undef CURL_ENABLE_MQTT */
+
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
 
@@ -299,16 +302,6 @@
 /* Define to 1 if you have a working gmtime_r function. */
 #define HAVE_GMTIME_R 1
 
-/* Define to 1 if you have the `gnutls_alpn_set_protocols' function. */
-/* #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS */
-
-/* Define to 1 if you have the `gnutls_certificate_set_x509_key_file2'
-   function. */
-/* #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2 */
-
-/* Define to 1 if you have the `gnutls_ocsp_req_init' function. */
-/* #undef HAVE_GNUTLS_OCSP_REQ_INIT */
-
 /* if you have the function gnutls_srp_verifier */
 /* #undef HAVE_GNUTLS_SRP */
 
@@ -503,6 +496,9 @@
    */
 /* #undef HAVE_OLD_GSSMIT */
 
+/* Define to 1 if using OpenSSL 3 or later. */
+/* #undef HAVE_OPENSSL3 */
+
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
 
@@ -556,6 +552,9 @@
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
+
+/* Define to 1 if you have the `quiche_conn_set_qlog_fd' function. */
+/* #undef HAVE_QUICHE_CONN_SET_QLOG_FD */
 
 /* Define to 1 if you have the <quiche.h> header file. */
 /* #undef HAVE_QUICHE_H */
@@ -695,6 +694,9 @@
 /* Define to 1 if you have the timeval struct. */
 #define HAVE_STRUCT_TIMEVAL 1
 
+/* Define to 1 if suseconds_t is an available type. */
+#define HAVE_SUSECONDS_T 1
+
 /* Define to 1 if you have the <sys/filio.h> header file. */
 /* #undef HAVE_SYS_FILIO_H */
 
@@ -797,6 +799,9 @@
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
+/* if you have wolfSSL_DES_set_odd_parity */
+/* #undef HAVE_WOLFSSL_DES_SET_ODD_PARITY */
+
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
 
@@ -804,7 +809,7 @@
 /* #undef HAVE_WOLFSSL_USEALPN */
 
 /* Define this symbol if your OS supports changing the contents of argv */
-/* #undef HAVE_WRITABLE_ARGV */
+#define HAVE_WRITABLE_ARGV 1
 
 /* Define to 1 if you have the writev function. */
 #define HAVE_WRITEV 1
@@ -1006,6 +1011,9 @@
 
 /* if ngtcp2 is in use */
 /* #undef USE_NGTCP2 */
+
+/* if ngtcp2_crypto_gnutls is in use */
+/* #undef USE_NGTCP2_CRYPTO_GNUTLS */
 
 /* if ngtcp2_crypto_openssl is in use */
 /* #undef USE_NGTCP2_CRYPTO_OPENSSL */

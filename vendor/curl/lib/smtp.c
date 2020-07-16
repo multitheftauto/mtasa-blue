@@ -183,7 +183,7 @@ static void smtp_to_smtps(struct connectdata *conn)
   conn->handler = &Curl_handler_smtps;
 
   /* Set the connection's upgraded to TLS flag */
-  conn->tls_upgraded = TRUE;
+  conn->bits.tls_upgraded = TRUE;
 }
 #else
 #define smtp_to_smtps(x) Curl_nop_stmt
@@ -625,8 +625,7 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
         utf8 = TRUE;
 
       if(host.name) {
-        free(from);
-        from = aprintf("<%s@%s>", address, host.name);
+        auth = aprintf("<%s@%s>", address, host.name);
 
         Curl_free_idnconverted_hostname(&host);
       }
@@ -636,8 +635,6 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
         auth = aprintf("<%s>", address);
 
       free(address);
-      if(!from)
-        return CURLE_OUT_OF_MEMORY;
     }
     else
       /* Empty AUTH, RFC-2554, sect. 5 */
@@ -1620,7 +1617,7 @@ static CURLcode smtp_setup_connection(struct connectdata *conn)
   CURLcode result;
 
   /* Clear the TLS upgraded flag */
-  conn->tls_upgraded = FALSE;
+  conn->bits.tls_upgraded = FALSE;
 
   /* Initialise the SMTP layer */
   result = smtp_init(conn);
@@ -1692,7 +1689,8 @@ static CURLcode smtp_parse_url_path(struct connectdata *conn)
   }
 
   /* URL decode the path and use it as the domain in our EHLO */
-  return Curl_urldecode(conn->data, path, 0, &smtpc->domain, NULL, TRUE);
+  return Curl_urldecode(conn->data, path, 0, &smtpc->domain, NULL,
+                        REJECT_CTRL);
 }
 
 /***********************************************************************
@@ -1710,7 +1708,7 @@ static CURLcode smtp_parse_custom_request(struct connectdata *conn)
 
   /* URL decode the custom request */
   if(custom)
-    result = Curl_urldecode(data, custom, 0, &smtp->custom, NULL, TRUE);
+    result = Curl_urldecode(data, custom, 0, &smtp->custom, NULL, REJECT_CTRL);
 
   return result;
 }
@@ -1741,10 +1739,10 @@ static CURLcode smtp_parse_custom_request(struct connectdata *conn)
  * Notes:
  *
  * Should a UTF-8 host name require conversion to IDN ACE and we cannot honor
- * that convertion then we shall return success. This allow the caller to send
+ * that conversion then we shall return success. This allow the caller to send
  * the data to the server as a U-label (as per RFC-6531 sect. 3.2).
  *
- * If an mailbox '@' seperator cannot be located then the mailbox is considered
+ * If an mailbox '@' separator cannot be located then the mailbox is considered
  * to be either a local mailbox or an invalid mailbox (depending on what the
  * calling function deems it to be) then the input will simply be returned in
  * the address part with the host name being NULL.
@@ -1765,7 +1763,7 @@ static CURLcode smtp_parse_address(struct connectdata *conn, const char *fqma,
   if(dup[length - 1] == '>')
     dup[length - 1] = '\0';
 
-  /* Extract the host name from the addresss (if we can) */
+  /* Extract the host name from the address (if we can) */
   host->name = strpbrk(dup, "@");
   if(host->name) {
     *host->name = '\0';
