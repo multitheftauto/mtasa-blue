@@ -112,7 +112,7 @@ std::tuple<int, int> CLuaCameraDefs::GetCameraViewMode()
     unsigned short ucVehicleMode = (unsigned short)pCamera->GetCameraVehicleViewMode();
     unsigned short ucPedMode = (unsigned short)pCamera->GetCameraPedViewMode();
 
-    return std::make_tuple(ucVehicleMode, ucPedMode);
+    return {ucVehicleMode, ucPedMode};
 }
 
 int CLuaCameraDefs::GetCameraMatrix(lua_State* luaVM)
