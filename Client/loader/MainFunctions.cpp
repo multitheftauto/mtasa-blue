@@ -640,11 +640,7 @@ void ValidateGTAPath()
         return ExitProcess(EXIT_ERROR);
     }
 
-    SString strGTAPath = GetGTAPath();
-
-    // We can now set this
-    SetCurrentDirectory(strGTAPath);
-
+    const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {
