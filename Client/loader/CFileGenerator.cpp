@@ -13,7 +13,11 @@
 
 CFileGenerator::CFileGenerator(const SString& strTarget, const SString& strRequiredTargetMd5, const std::vector<CFileGenerator::SResetItem>& targetResetList,
                                const SString& strPatchBase, const SString& strPatchDiff)
-    : m_strTarget(strTarget), m_strRequiredTargetMd5(strRequiredTargetMd5), m_targetResetList(targetResetList), m_strPatchBase(strPatchBase), m_strPatchDiff(strPatchDiff)
+    : m_strTarget(strTarget),
+      m_strRequiredTargetMd5(strRequiredTargetMd5),
+      m_targetResetList(targetResetList),
+      m_strPatchBase(strPatchBase),
+      m_strPatchDiff(strPatchDiff)
 {
 }
 
@@ -132,7 +136,7 @@ CFileGenerator::EResult CFileGenerator::ApplyPatchFile(const SString& strPatchBa
 CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, const SString& strOutputFile)
 {
     WString wstrArchive = FromUTF8(strArchive);
-    WString wstrOutputFile= FromUTF8(strOutputFile);
+    WString wstrOutputFile = FromUTF8(strOutputFile);
     // Open archive
     RAROpenArchiveDataEx archiveData = {};
     archiveData.ArcNameW = (wchar_t*)*wstrArchive;

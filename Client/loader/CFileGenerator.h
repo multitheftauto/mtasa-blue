@@ -32,17 +32,17 @@ public:
 
     CFileGenerator(const SString& strTarget, const SString& strRequiredTargetMd5, const std::vector<SResetItem>& targetResetList, const SString& strPatchBase,
                    const SString& strPatchDiff);
-    bool           IsGenerationRequired();
-    EResult        GenerateFile();
-    SString        GetCurrentTargetMd5();
-    SString        GetErrorRecords();
-    void           ClearErrorRecords();
+    bool    IsGenerationRequired();
+    EResult GenerateFile();
+    SString GetCurrentTargetMd5();
+    SString GetErrorRecords();
+    void    ClearErrorRecords();
 
 protected:
     EResult CheckTarget(const SString& strTarget);
     EResult ApplyPatchFile(const SString& strPatchBase, const SString& strPatchDiff, const SString& strOutputFile);
     EResult UnrarFile(const SString& strArchive, const SString& strOutputFile);
-    EResult RecordError(CFileGenerator::EResult code, const SString& strContext="", const SString& strContext2="");
+    EResult RecordError(CFileGenerator::EResult code, const SString& strContext = "", const SString& strContext2 = "");
 
     struct SErrorInfo
     {
