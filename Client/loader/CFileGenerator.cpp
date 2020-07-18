@@ -131,11 +131,13 @@ CFileGenerator::EResult CFileGenerator::ApplyPatchFile(const SString& strPatchBa
 //////////////////////////////////////////////////////////
 CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, const SString& strOutputFile)
 {
+    WString wstrArchive = FromUTF8(strArchive);
+    WString wstrOutputFile= FromUTF8(strOutputFile);
     // Open archive
-    RAROpenArchiveData archiveData = {};
-    archiveData.ArcName = (char*)*strArchive;
+    RAROpenArchiveDataEx archiveData = {};
+    archiveData.ArcNameW = (wchar_t*)*wstrArchive;
     archiveData.OpenMode = RAR_OM_EXTRACT;
-    HANDLE hArcData = RAROpenArchive(&archiveData);
+    HANDLE hArcData = RAROpenArchiveEx(&archiveData);
     if (!hArcData)
         return RecordError(EResult::ArchiveOpenError, strArchive);
 
@@ -144,7 +146,7 @@ CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, con
     RARHeaderData headerData = {};
     if (RARReadHeader(hArcData, &headerData) == 0)
     {
-        if (RARProcessFile(hArcData, RAR_EXTRACT, nullptr, (char*)*strOutputFile) == 0)
+        if (RARProcessFileW(hArcData, RAR_EXTRACT, nullptr, (wchar_t*)*wstrOutputFile) == 0)
         {
             result = EResult::Success;
         }
