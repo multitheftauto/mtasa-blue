@@ -572,6 +572,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
     if (!bGenerationRequired)
     {
+        AddReportLog(2053, "_ProcessGtaVersionCheck: No action required");
         return "ok";
     }
 
