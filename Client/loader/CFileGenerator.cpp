@@ -11,9 +11,9 @@
 #include "StdInc.h"
 #include "../../vendor/unrar/dll.hpp"
 
-CFileGenerator::CFileGenerator(const SString& strTarget, const SString& strTargetMd5, const std::vector<CFileGenerator::SResetItem>& targetResetList,
+CFileGenerator::CFileGenerator(const SString& strTarget, const SString& strRequiredTargetMd5, const std::vector<CFileGenerator::SResetItem>& targetResetList,
                                const SString& strPatchBase, const SString& strPatchDiff)
-    : m_strTarget(strTarget), m_strTargetMd5(strTargetMd5), m_targetResetList(targetResetList), m_strPatchBase(strPatchBase), m_strPatchDiff(strPatchDiff)
+    : m_strTarget(strTarget), m_strRequiredTargetMd5(strRequiredTargetMd5), m_targetResetList(targetResetList), m_strPatchBase(strPatchBase), m_strPatchDiff(strPatchDiff)
 {
 }
 
@@ -47,9 +47,18 @@ CFileGenerator::EResult CFileGenerator::CheckTarget(const SString& strTarget)
         }
     }
 
-    if (GenerateHashHexString(EHashFunctionType::MD5, buffer.GetData(), buffer.GetSize()) != m_strTargetMd5)
+    m_strCurrentTargetMd5 = GenerateHashHexString(EHashFunctionType::MD5, buffer.GetData(), buffer.GetSize());
+    if (m_strCurrentTargetMd5 != m_strRequiredTargetMd5)
         return RecordError(EResult::TargetHashIncorrect, strTarget);
     return EResult::Success;
+}
+
+//////////////////////////////////////////////////////////
+// Return actual MD5 of target file
+//////////////////////////////////////////////////////////
+SString CFileGenerator::GetCurrentTargetMd5()
+{
+    return m_strCurrentTargetMd5;
 }
 
 //////////////////////////////////////////////////////////

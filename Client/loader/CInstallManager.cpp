@@ -568,7 +568,9 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     CFileGenerator fileGenerator(strGtaExe, strGtaExeMd5, gtaExeResetList, strPatchBase, strPatchDiff);
 
     // Need to fix gta_sa.exe?
-    if (!fileGenerator.IsGenerationRequired())
+    bool bGenerationRequired = fileGenerator.IsGenerationRequired();
+    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
+    if (!bGenerationRequired)
     {
         return "ok";
     }
@@ -621,6 +623,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         }
     }
 
+    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
     AddReportLog(2052, "_ProcessGtaVersionCheck: success");
     return "ok";
 }

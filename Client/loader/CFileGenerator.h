@@ -30,10 +30,11 @@ public:
         std::vector<uchar> data;
     };
 
-    CFileGenerator(const SString& strTarget, const SString& strTargetMd5, const std::vector<SResetItem>& targetResetList, const SString& strPatchBase,
+    CFileGenerator(const SString& strTarget, const SString& strRequiredTargetMd5, const std::vector<SResetItem>& targetResetList, const SString& strPatchBase,
                    const SString& strPatchDiff);
     bool           IsGenerationRequired();
     EResult        GenerateFile();
+    SString        GetCurrentTargetMd5();
     SString        GetErrorRecords();
     void           ClearErrorRecords();
 
@@ -51,7 +52,8 @@ protected:
     };
 
     SString                 m_strTarget;
-    SString                 m_strTargetMd5;
+    SString                 m_strRequiredTargetMd5;
+    SString                 m_strCurrentTargetMd5;
     std::vector<SResetItem> m_targetResetList;
     SString                 m_strPatchBase;
     SString                 m_strPatchDiff;
