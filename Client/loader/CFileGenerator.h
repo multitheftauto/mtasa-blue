@@ -34,15 +34,26 @@ public:
                    const SString& strPatchDiff);
     bool           IsGenerationRequired();
     EResult        GenerateFile();
+    SString        GetErrorRecords();
+    void           ClearErrorRecords();
 
 protected:
-    EResult        CheckTarget(const SString& strTarget);
-    static EResult ApplyPatchFile(const SString& strPatchBase, const SString& strPatchDiff, const SString& strOutputFile);
-    static EResult UnrarFile(const SString& strArchive, const SString& strOutputFile);
+    EResult CheckTarget(const SString& strTarget);
+    EResult ApplyPatchFile(const SString& strPatchBase, const SString& strPatchDiff, const SString& strOutputFile);
+    EResult UnrarFile(const SString& strArchive, const SString& strOutputFile);
+    EResult RecordError(CFileGenerator::EResult code, const SString& strContext="", const SString& strContext2="");
+
+    struct SErrorInfo
+    {
+        EResult code;
+        SString strContext;
+        SString strContext2;
+    };
 
     SString                 m_strTarget;
     SString                 m_strTargetMd5;
     std::vector<SResetItem> m_targetResetList;
     SString                 m_strPatchBase;
     SString                 m_strPatchDiff;
+    std::vector<SErrorInfo> m_errorInfoList;
 };
