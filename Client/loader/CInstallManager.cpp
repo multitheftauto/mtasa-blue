@@ -577,9 +577,10 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     }
 
     // Check required GTA file is correct
-    if (GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase) != strPatchBaseMd5)
+    SString strPatchBaseCurrentMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase);
+    if (strPatchBaseCurrentMd5 != strPatchBaseMd5)
     {
-        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s'", *strPatchBase));
+        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s' %d %s", *strPatchBase, (int)FileSize(strPatchBase), *strPatchBaseCurrentMd5));
         SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
         strMessage += "\n\n" + strPatchBase;
 #ifdef TO_DO
@@ -589,6 +590,9 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         return "ok";
 #endif
     }
+
+    // Ensure GTA exe is not running
+    TerminateGTAIfRunning();
 
     // Backup current gta_sa.exe
     SString strGTAExeBak = strGtaExe + ".bak";
@@ -605,7 +609,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     {
         if (!IsUserAdmin())
         {
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin", result));
+            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin %s", result, *fileGenerator.GetErrorRecords()));
             m_strAdminReason = _("Patch GTA");
             return "fail";
         }

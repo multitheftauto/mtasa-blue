@@ -146,7 +146,7 @@ CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, con
         return RecordError(EResult::ArchiveOpenError, strArchive);
 
     // Extract first file
-    EResult       result = RecordError(EResult::ArchiveExtractError, strOutputFile);
+    EResult       result = EResult::ArchiveExtractError;
     RARHeaderData headerData = {};
     if (RARReadHeader(hArcData, &headerData) == 0)
     {
@@ -156,6 +156,9 @@ CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, con
         }
     }
     RARCloseArchive(hArcData);
+
+    if (result != EResult::Success)
+        return RecordError(result, strArchive, strOutputFile);
     return result;
 }
 
