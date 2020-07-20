@@ -77,35 +77,37 @@ struct SDiscordActivity
         : m_activityType(EDiscordActivityT_Playing),
           m_startTimestamp(0),
           m_endTimestamp(0),
-          m_name(""),
-          m_state(""),
-          m_details(""),
-          m_joinSecret(""),
-          m_spectateSecret("")
+          m_partySize(0),
+          m_partyMax(0)
     {
     }
 
     int64             m_startTimestamp;
     int64             m_endTimestamp;
-    const char*       m_name;
-    const char*       m_state;
-    const char*       m_details;
-    const char*       m_joinSecret;
-    const char*       m_spectateSecret;
+    SString           m_name;
+    SString           m_state;
+    SString           m_details;
+    SString           m_joinSecret;
+    SString           m_spectateSecret;
+    SString           m_smallText;
+    SString           m_smallImage;
+    SString           m_partyID;
+    int               m_partySize;
+    int               m_partyMax;
     EDiscordActivityT m_activityType;
 };
 
 class CDiscordManagerInterface
 {
 public:
-    virtual void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetName(char const* name, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetState(char const* state, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetDetails(char const* details, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback) = 0;
-    virtual void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback) = 0;
+    virtual void UpdateActivity(SDiscordActivity& activity) = 0;
+    virtual void SetType(EDiscordActivityT type) = 0;
+    virtual void SetName(char const* name) = 0;
+    virtual void SetState(char const* state) = 0;
+    virtual void SetDetails(char const* details) = 0;
+    virtual void SetStartEndTimestamp(int64 start, int64 end) = 0;
+    virtual void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax) = 0;
+    virtual void SetSpectateSecret(const char* spectateSecret) = 0;
     virtual void RegisterPlay(bool connected) = 0;
     virtual void Disconnect() = 0;
 

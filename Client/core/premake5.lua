@@ -19,6 +19,7 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/hwbrk",
+            "../../vendor/discord-rpc/include",
 		}
 
 	libdirs {
@@ -50,12 +51,15 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours",
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours", "DiscordRPC"
 	}
 
 	defines {
 		"INITGUID",
-		"PNG_SETJMP_NOT_SUPPORTED"
+		"PNG_SETJMP_NOT_SUPPORTED",
+        "DISCORD_DISABLE_IO_THREAD",
+        "DISCORD_DYNAMIC_LIB",
+        "DISCORD_WINDOWS"
 	}
 
 	filter "architecture:x64"

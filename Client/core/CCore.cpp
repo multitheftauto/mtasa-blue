@@ -2001,12 +2001,7 @@ void CCore::ResetDiscordRichPresence()
     activity.m_details = "In Main Menu";
     activity.m_startTimestamp = currentTime;
 
-    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
-        if (res == DiscordRes_Ok)
-            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
-        else
-            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
-    });
+    m_DiscordManager->UpdateActivity(activity);
     m_DiscordManager->RegisterPlay(false);
 }
 

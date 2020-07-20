@@ -13,13 +13,6 @@
 #include <core/CDiscordManagerInterface.h>
 #include "SharedUtil.Thread.h"
 
-namespace discord
-{
-    enum class LogLevel;
-    class Core;
-    class Activity;
-}
-
 class CDiscordManager : public CDiscordManagerInterface
 {
 public:
@@ -28,35 +21,44 @@ public:
     void Initialize();
 
     // ActivityManager
-    void UpdateActivity(SDiscordActivity& activity, std::function<void(EDiscordRes)> callback);            // Change it all, or ...
-    void UpdateActivity(std::function<void(EDiscordRes)> callback);                                        // Change it all, or ...
-    void SetType(EDiscordActivityT type, std::function<void(EDiscordRes)> callback);                       // Singular modifications
-    void SetName(char const* name, std::function<void(EDiscordRes)> callback);
-    void SetState(char const* state, std::function<void(EDiscordRes)> callback);
-    void SetDetails(char const* details, std::function<void(EDiscordRes)> callback);
-    void SetStartEndTimestamp(int64 start, int64 end, std::function<void(EDiscordRes)> callback);
-    void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax, std::function<void(EDiscordRes)> callback);
-    void SetSpectateSecret(const char* spectateSecret, std::function<void(EDiscordRes)> callback);
+    void UpdateActivity(SDiscordActivity& activity);            // Change it all, or ...
+    void UpdateActivity();                                        // Change it all, or ...
+    void SetType(EDiscordActivityT type);                       // Singular modifications
+    void SetName(char const* name);
+    void SetState(char const* state);
+    void SetDetails(char const* details);
+    void SetStartEndTimestamp(int64 start, int64 end);
+    void SetJoinParameters(const char* joinSecret, const char* partyId, uint partySize, uint partyMax);
+    void SetSpectateSecret(const char* spectateSecret);
     void RegisterPlay(bool connected);
     void Disconnect();
 
     SString GetJoinSecret();
+
+protected:
+    void SetConnected(bool state);
 
 private:
     void Reconnect(bool bOnInitialization = false);
     void DoPulse();
     void Restore();
 
-    static void  DiscordLogCallback(discord::LogLevel level, const char* message);
-    static void  OnActivityJoin(const char* joinSecret);
+    // Callbacks
+    static void HandleDiscordReady(const struct DiscordUser* connectedUser);
+    static void HandleDiscordDisconnected(int errcode, const char* message);
+    static void HandleDiscordError(int errcode, const char* message);
+    static void HandleDiscordJoin(const char* secret);
+    static void HandleDiscordSpectate(const char* secret);
+    static void HandleDiscordJoinRequest(const struct DiscordUser* request);
+
     static void* DiscordThread(void* arg);
 
     bool NeedsSuicide() const { return m_Suicide; }
     void SetDead() { m_Suicide = false; }
 
-    discord::Core*    m_DiscordCore = nullptr;
-    discord::Activity* m_StoredActivity;
+    SDiscordActivity m_StoredActivity;
 
+    bool m_Connected = false;
     bool m_WaitingForServerName = false;
     bool m_Initialized = false;
 

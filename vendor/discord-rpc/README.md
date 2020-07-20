@@ -1,0 +1,1 @@
+This project is under https://github.com/0x416c69/discord-rpc

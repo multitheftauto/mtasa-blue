@@ -7123,5 +7123,5 @@ void CClientGame::UpdateDiscordState()
         state += "/" + std::to_string(playerSlot);
 
     state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
-    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
+    g_pCore->GetDiscordManager()->SetState(state);
 }
