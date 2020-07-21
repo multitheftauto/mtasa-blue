@@ -57,9 +57,9 @@ project "Client Core"
 	defines {
 		"INITGUID",
 		"PNG_SETJMP_NOT_SUPPORTED",
-        "DISCORD_DISABLE_IO_THREAD",
-        "DISCORD_DYNAMIC_LIB",
-        "DISCORD_WINDOWS"
+		"DISCORD_DISABLE_IO_THREAD",
+		"DISCORD_DYNAMIC_LIB",
+		"DISCORD_WINDOWS"
 	}
 
 	filter "architecture:x64"
