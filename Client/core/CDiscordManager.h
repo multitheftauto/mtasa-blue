@@ -35,9 +35,6 @@ public:
 
     SString GetJoinSecret();
 
-protected:
-    void SetConnected(bool state);
-
 private:
     void Reconnect(bool bOnInitialization = false);
     void DoPulse();
