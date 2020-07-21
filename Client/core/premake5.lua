@@ -19,7 +19,7 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/hwbrk",
-            "../../vendor/discord-rpc/include",
+			"../../vendor/discord-rpc/include",
 		}
 
 	libdirs {
