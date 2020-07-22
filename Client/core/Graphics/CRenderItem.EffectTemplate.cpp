@@ -17,10 +17,10 @@
 //
 ///////////////////////////////////////////////////////////////
 CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
-                                   HRESULT& outHResult)
+        const std::vector<std::pair<SString, SString>>& macros, HRESULT& outHResult)
 {
     CEffectTemplate* pEffectTemplate = new CEffectTemplate();
-    pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
+    pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
 
     outHResult = pEffectTemplate->m_CreateHResult;
     if (!pEffectTemplate->IsValid())
@@ -121,12 +121,13 @@ namespace
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
 {
     Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
+    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -201,7 +202,8 @@ void CEffectTemplate::OnResetDevice()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
 {
     assert(!m_pD3DEffect);
 
@@ -213,6 +215,13 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     macroList.push_back(D3DXMACRO());
     macroList.back().Name = "IS_DEPTHBUFFER_RAWZ";
     macroList.back().Definition = bUsesRAWZ ? "1" : "0";
+
+    for (const auto& entry : macros)
+    {
+        macroList.push_back(D3DXMACRO());
+        macroList.back().Name = entry.first.c_str();
+        macroList.back().Definition = entry.second.c_str();
+    }
 
     macroList.push_back(D3DXMACRO());
     macroList.back().Name = NULL;
@@ -350,6 +359,9 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
             SAFE_RELEASE(pDisassembly);
         }
     }
+
+    // Copy macros
+    m_Macros = macros;
 
     // Copy MD5s of all loaded files
     m_FileMD5Map = IncludeManager.m_FileMD5Map;

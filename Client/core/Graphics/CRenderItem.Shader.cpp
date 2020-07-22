@@ -21,7 +21,8 @@ uint CShaderItem::ms_uiCreateTimeCounter = 0;
 //
 ////////////////////////////////////////////////////////////////
 void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                                float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
+                                float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask,
+                                const std::vector<std::pair<SString, SString>>& macros)
 {
     m_fPriority = fPriority;
     m_uiCreateTime = ms_uiCreateTimeCounter++;            // Priority tie breaker
@@ -32,7 +33,7 @@ void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& str
     Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
+    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -91,12 +92,13 @@ void CShaderItem::OnResetDevice()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
+void CShaderItem::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
 {
     assert(!m_pEffectWrap);
     assert(!m_pShaderInstance);
 
-    m_pEffectWrap = m_pManager->GetEffectCloner()->CreateD3DEffect(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
+    m_pEffectWrap = m_pManager->GetEffectCloner()->CreateD3DEffect(strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
     if (!m_pEffectWrap)
         return;
 

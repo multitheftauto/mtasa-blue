@@ -1126,6 +1126,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
     SString                      strFile;
+    std::vector<std::pair<SString, SString>>                   macros;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;
@@ -1133,6 +1134,8 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strFile);
+    if (argStream.NextIsTable())
+        argStream.ReadPairTable(macros);
     argStream.ReadNumber(fPriority, 0.0f);
     argStream.ReadNumber(fMaxDistance, 0.0f);
     argStream.ReadBool(bLayered, false);
@@ -1207,7 +1210,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
     SString        strStatus;
     CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(strPath, strRootPath, bIsRawData, strStatus, fPriority,
-                                                                                                  fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+                                                                                                  fMaxDistance, bLayered, false, iEntityTypeMaskResult, macros);
 
     if (pShader)
     {

@@ -1008,6 +1008,25 @@ public:
     }
 
     //
+    // Reads a table of string key-value pairs
+    //
+    void ReadPairTable(std::vector<std::pair<SString, SString>>& outPairs)
+    {
+        outPairs.clear();
+
+        int argument = lua_type(m_luaVM, m_iIndex);
+        if (argument == LUA_TTABLE)
+        {
+            InternalReadPair(outPairs, m_iIndex);
+            ++m_iIndex;
+            return;
+        }
+
+        SetTypeError("table");
+        ++m_iIndex;
+    }
+
+    //
     // Reads a table as key-value string pair
     //
     void ReadStringMap(CStringMap& outMap)
@@ -1052,6 +1071,31 @@ public:
     }
 
 protected:
+    void InternalReadPair(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
+    {
+        lua_pushnil(m_luaVM);
+        while (lua_next(m_luaVM, iIndex) != 0)
+        {
+            int keyType = lua_type(m_luaVM, -2);
+            int valueType = lua_type(m_luaVM, -1);
+            if (keyType == LUA_TSTRING)
+            {
+                SString value;
+                if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
+                {
+                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    value.assign(lua_tostring(m_luaVM, -1), uiLength);
+                }
+                else if (valueType == LUA_TBOOLEAN)
+                {
+                    value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
+                }
+                outPairs.emplace_back(SStringX(lua_tostring(m_luaVM, -2)), value);
+            }
+            lua_pop(m_luaVM, 1);
+        }
+    }
+
     void InternalReadStringMap(CStringMap& outMap, int iIndex)
     {
         lua_pushnil(m_luaVM);
