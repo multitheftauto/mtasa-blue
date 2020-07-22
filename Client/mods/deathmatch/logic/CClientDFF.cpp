@@ -369,5 +369,5 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 // Return true if data looks like DFF file contents
 bool CClientDFF::IsDFFData(const SString& strData)
 {
-    return strData.length() > 32 && memcmp(strData, "\x10\x00\x00\x00", 4) == 0;
+    return strData.length() > 32 && (memcmp(strData, "\x10\x00\x00\x00", 4) == 0 || memcmp(strData, "\x2B\x00\x00\x00", 4) == 0);
 }
