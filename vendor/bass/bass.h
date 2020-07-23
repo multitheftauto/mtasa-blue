@@ -202,6 +202,7 @@ typedef struct {
 #define BASS_DEVICE_DEFAULT		2
 #define BASS_DEVICE_INIT		4
 #define BASS_DEVICE_LOOPBACK	8
+#define BASS_DEVICE_DEFAULTCOM	128
 
 #define BASS_DEVICE_TYPE_MASK			0xff000000
 #define BASS_DEVICE_TYPE_NETWORK		0x01000000
@@ -647,6 +648,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 
 // BASS_ChannelGetData flags
 #define BASS_DATA_AVAILABLE	0			// query how much data is buffered
+#define BASS_DATA_NOREMOVE	0x10000000	// flag: don't remove data from recording buffer
 #define BASS_DATA_FIXED		0x20000000	// flag: return 8.24 fixed-point data
 #define BASS_DATA_FLOAT		0x40000000	// flag: return floating-point sample data
 #define BASS_DATA_FFT256	0x80000000	// 256 sample FFT
@@ -668,6 +670,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_LEVEL_STEREO	2
 #define BASS_LEVEL_RMS		4
 #define BASS_LEVEL_VOLPAN	8
+#define BASS_LEVEL_NOREMOVE	16
 
 // BASS_ChannelGetTags types : what's returned
 #define BASS_TAG_ID3		0	// ID3v1 tags : TAG_ID3 structure
@@ -686,6 +689,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_TAG_WAVEFORMAT	14	// WAVE format : WAVEFORMATEEX structure
 #define BASS_TAG_AM_MIME	15	// Android Media MIME type : ASCII string
 #define BASS_TAG_AM_NAME	16	// Android Media codec name : ASCII string
+#define BASS_TAG_ID3V2_2	17	// ID3v2 tags (2nd block) : variable length block
 #define BASS_TAG_RIFF_INFO	0x100 // RIFF "INFO" tags : series of null-terminated ANSI strings
 #define BASS_TAG_RIFF_BEXT	0x101 // RIFF/BWF "bext" tags : TAG_BEXT structure
 #define BASS_TAG_RIFF_CART	0x102 // RIFF/BWF "cart" tags : TAG_CART structure
@@ -1006,7 +1010,7 @@ status : The notification (BASS_IOSNOTIFY_xxx) */
 BOOL BASSDEF(BASS_SetConfig)(DWORD option, DWORD value);
 DWORD BASSDEF(BASS_GetConfig)(DWORD option);
 BOOL BASSDEF(BASS_SetConfigPtr)(DWORD option, const void *value);
-void *BASSDEF(BASS_GetConfigPtr)(DWORD option);
+const void *BASSDEF(BASS_GetConfigPtr)(DWORD option);
 DWORD BASSDEF(BASS_GetVersion)();
 int BASSDEF(BASS_ErrorGetCode)();
 BOOL BASSDEF(BASS_GetDeviceInfo)(DWORD device, BASS_DEVICEINFO *info);

@@ -1120,9 +1120,6 @@ int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
         if (pModelInfo)
         {
-            if (cHourOn > cHourOff)
-                std::swap(cHourOn, cHourOff);
-
             if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
             {
                 lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
