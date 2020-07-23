@@ -1008,16 +1008,18 @@ public:
     }
 
     //
-    // Reads a table of string key-value pairs
+    // Reads a table of key-value string pairs
     //
     void ReadPairTable(std::vector<std::pair<SString, SString>>& outPairs)
     {
-        outPairs.clear();
+        outPairs.clear();        
 
         int argument = lua_type(m_luaVM, m_iIndex);
         if (argument == LUA_TTABLE)
         {
+            outPairs.reserve(64);
             InternalReadPair(outPairs, m_iIndex);
+            outPairs.shrink_to_fit();
             ++m_iIndex;
             return;
         }
@@ -1074,11 +1076,12 @@ protected:
     void InternalReadPair(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
     {
         lua_pushnil(m_luaVM);
+
         while (lua_next(m_luaVM, iIndex) != 0)
         {
             int keyType = lua_type(m_luaVM, -2);
             int valueType = lua_type(m_luaVM, -1);
-            if (keyType == LUA_TSTRING)
+            if (keyType == LUA_TSTRING || keyType == LUA_TNUMBER)
             {
                 SString value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
@@ -1090,7 +1093,18 @@ protected:
                 {
                     value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
                 }
-                outPairs.emplace_back(SStringX(lua_tostring(m_luaVM, -2)), value);
+
+                // Dumb number -> string convertion to avoid stack perturbations
+                if (keyType == LUA_TNUMBER)
+                {
+                    char s[LUAI_MAXNUMBER2STR];
+                    lua_Number n = lua_tonumber(m_luaVM, -2);
+                    lua_number2str(s, n);
+
+                    outPairs.emplace_back(SStringX(s), value);
+                }
+                else
+                    outPairs.emplace_back(SStringX(lua_tostring(m_luaVM, -2)), value);
             }
             lua_pop(m_luaVM, 1);
         }

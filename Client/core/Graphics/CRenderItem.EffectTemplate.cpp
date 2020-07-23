@@ -17,7 +17,7 @@
 //
 ///////////////////////////////////////////////////////////////
 CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
-        const std::vector<std::pair<SString, SString>>& macros, HRESULT& outHResult)
+        const EffectMacroList& macros, HRESULT& outHResult)
 {
     CEffectTemplate* pEffectTemplate = new CEffectTemplate();
     pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
@@ -122,7 +122,7 @@ namespace
 //
 ////////////////////////////////////////////////////////////////
 void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
+    bool bDebug, const EffectMacroList& macros)
 {
     Super::PostConstruct(pManager);
 
@@ -203,7 +203,7 @@ void CEffectTemplate::OnResetDevice()
 //
 ////////////////////////////////////////////////////////////////
 void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
+    bool bDebug, const EffectMacroList& macros)
 {
     assert(!m_pD3DEffect);
 
@@ -216,12 +216,8 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     macroList.back().Name = "IS_DEPTHBUFFER_RAWZ";
     macroList.back().Definition = bUsesRAWZ ? "1" : "0";
 
-    for (const auto& entry : macros)
-    {
-        macroList.push_back(D3DXMACRO());
-        macroList.back().Name = entry.first.c_str();
-        macroList.back().Definition = entry.second.c_str();
-    }
+    for (const auto& [name, definition] : macros)
+        macroList.push_back(std::move(D3DXMACRO{ name.c_str(), definition.c_str() }));
 
     macroList.push_back(D3DXMACRO());
     macroList.back().Name = NULL;
@@ -359,9 +355,6 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
             SAFE_RELEASE(pDisassembly);
         }
     }
-
-    // Copy macros
-    m_Macros = macros;
 
     // Copy MD5s of all loaded files
     m_FileMD5Map = IncludeManager.m_FileMD5Map;

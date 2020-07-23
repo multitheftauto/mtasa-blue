@@ -232,7 +232,7 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY
 //
 ////////////////////////////////////////////////////////////////
 CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const std::vector<std::pair<SString, SString>>& macros)
+                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
 {
     if (!CanCreateRenderItem(CShaderItem::GetClassId()))
         return NULL;

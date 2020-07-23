@@ -1126,7 +1126,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
     SString                      strFile;
-    std::vector<std::pair<SString, SString>>                   macros;
+    EffectMacroList              macros;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;

@@ -21,7 +21,7 @@ class CEffectTemplate : public CEffectParameters
     DECLARE_CLASS(CEffectTemplate, CEffectParameters)
     CEffectTemplate() : ClassInit(this) {}
     virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-        bool bDebug, const std::vector<std::pair<SString, SString>>& macros);
+        bool bDebug, const EffectMacroList& macros);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
@@ -31,7 +31,7 @@ class CEffectTemplate : public CEffectParameters
     CEffectWrap* CloneD3DEffect(SString& strOutStatus);
     void         UnCloneD3DEffect(CEffectWrap* pD3DEffect);
     void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-        bool bDebug, const std::vector<std::pair<SString, SString>>& macros);
+        bool bDebug, const EffectMacroList& macros);
     void         ReleaseUnderlyingData();
     bool         ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra);
 
@@ -41,8 +41,7 @@ class CEffectTemplate : public CEffectParameters
     CTickCount                 m_TickCountLastUsed;
     uint                       m_uiCloneCount;
     HRESULT                    m_CreateHResult;
-    std::vector<std::pair<SString, SString>> m_Macros;
 };
 
 CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
-    const std::vector<std::pair<SString, SString>>& macros, HRESULT& outHResult);
+    const EffectMacroList& macros, HRESULT& outHResult);

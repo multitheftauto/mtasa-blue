@@ -32,19 +32,22 @@ CEffectCloner::CEffectCloner(CRenderItemManager* pManager)
 //
 ////////////////////////////////////////////////////////////////
 CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const std::vector<std::pair<SString, SString>>& macros)
+    bool bDebug, const EffectMacroList& macros)
 {
-    const std::size_t h0 = CalculateInvariantHash(strFile, macros);
+    SEffectInvariant invariant{
+        ConformPathForSorting(strFile),
+        macros
+    };
 
     // Do we have a match with the initial path
-    CEffectTemplate* pEffectTemplate = MapFindRef(m_ValidMap, h0);
+    CEffectTemplate* pEffectTemplate = MapFindRef(m_ValidMap, invariant);
     if (pEffectTemplate)
     {
         // Have files changed since create?
         if (pEffectTemplate->HaveFilesChanged())
         {
             // EffectTemplate is no good for cloning now, so move it to the old list
-            MapRemove(m_ValidMap, h0);
+            MapRemove(m_ValidMap, invariant);
             m_OldList.push_back(pEffectTemplate);
             pEffectTemplate = NULL;
         }
@@ -78,7 +81,7 @@ CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SStrin
         else
         {
             // Add to active map
-            MapSet(m_ValidMap, h0, pEffectTemplate);
+            m_ValidMap[std::move(invariant)] = pEffectTemplate;
         }
 
         if (!strReport.empty())
@@ -160,7 +163,7 @@ void CEffectCloner::MaybeTidyUp(bool bForceDrasticMeasures)
 #endif
 
     // Valid Effect not used for a little while can go
-    for (std::map<std::size_t, CEffectTemplate*>::iterator iter = m_ValidMap.begin(); iter != m_ValidMap.end();)
+    for (auto iter = m_ValidMap.begin(); iter != m_ValidMap.end();)
     {
         CEffectTemplate* pEffectTemplate = iter->second;
         if (pEffectTemplate->GetTicksSinceLastUsed() > (bForceDrasticMeasures ? 0 : iTicks))
@@ -177,18 +180,4 @@ void CEffectCloner::MaybeTidyUp(bool bForceDrasticMeasures)
     {
         CGraphics::GetSingleton().GetDevice()->EvictManagedResources();
     }
-}
-
-std::size_t CEffectCloner::CalculateInvariantHash(const SString& strFile, const std::vector<std::pair<SString, SString>>& macros)
-{
-    std::size_t h0 = std::hash<SString>{}(ConformPathForSorting(strFile));
-
-    for (const auto& entry : macros)
-    {
-        // Hash function from boost
-        h0 ^= std::hash<SString>{}(entry.first)  + 0x9e3779b9 + (h0 << 6) + (h0 >> 2);
-        h0 ^= std::hash<SString>{}(entry.second) + 0x9e3779b9 + (h0 << 6) + (h0 >> 2);
-    }
-
-    return h0;
 }
