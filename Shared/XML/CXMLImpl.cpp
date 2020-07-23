@@ -51,28 +51,13 @@ CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
         {
             TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
             CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
-            CXMLImpl::BuildNode(xmlBaseNode, xmlDocumentRoot);
+            xmlBaseNode->BuildFromDocument();
             return xmlBaseNode;
         }
     }
     return nullptr;
 }
 
-void CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
-{
-    TiXmlNode*    xmlChild = nullptr;
-    TiXmlElement* xmlChildElement;
-    CXMLNodeImpl* xmlChildNode;
-    while (xmlChild = xmlNode->IterateChildren(xmlChild))
-    {
-        xmlChildElement = xmlChild->ToElement();
-        if (xmlChildElement)
-        {
-            xmlChildNode = new CXMLNodeImpl(nullptr, xmlParent, *xmlChildElement);
-            CXMLImpl::BuildNode(xmlChildNode, xmlChildElement);
-        }
-    }
-}
 
 CXMLNode* CXMLImpl::CreateDummyNode()
 {

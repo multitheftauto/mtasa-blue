@@ -21,7 +21,6 @@ public:
 
     CXMLFile* CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly);
     CXMLNode* ParseString(const char* strXmlContent);
-    void      BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode);
     void      DeleteXML(CXMLFile* pFile);
 
     CXMLNode* CreateDummyNode();
