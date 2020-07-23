@@ -51,14 +51,14 @@ CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
         {
             TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
             CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
-            CXMLNode*     xmlRootNode = CXMLImpl::BuildNode(xmlBaseNode, xmlDocumentRoot);
-            return xmlRootNode;
+            CXMLImpl::BuildNode(xmlBaseNode, xmlDocumentRoot);
+            return xmlBaseNode;
         }
     }
     return nullptr;
 }
 
-CXMLNode* CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
+void CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
 {
     TiXmlNode*    xmlChild = nullptr;
     TiXmlElement* xmlChildElement;
@@ -72,7 +72,6 @@ CXMLNode* CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
             CXMLImpl::BuildNode(xmlChildNode, xmlChildElement);
         }
     }
-    return xmlParent;
 }
 
 CXMLNode* CXMLImpl::CreateDummyNode()
