@@ -41,7 +41,7 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
     delete pFile;
 }
 
-CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
+std::unique_ptr<SXMLString> CXMLImpl::ParseString(const char* strXmlContent)
 {
     TiXmlDocument* xmlDoc = new TiXmlDocument();
     if (xmlDoc)
@@ -52,7 +52,7 @@ CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
             TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
             CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
             xmlBaseNode->BuildFromDocument();
-            return xmlBaseNode;
+            return std::unique_ptr<SXMLString>(new SXMLStringImpl(xmlDoc, xmlBaseNode));
         }
     }
     return nullptr;

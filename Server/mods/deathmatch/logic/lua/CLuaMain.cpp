@@ -77,11 +77,6 @@ CLuaMain::~CLuaMain()
         delete xmlFile;
     }
 
-    for (auto& xmlNode : m_XMLNodes)
-    {
-        delete xmlNode;
-    }
-
     // Eventually delete the text displays the LUA script didn't
     list<CTextDisplay*>::iterator iterDisplays = m_Displays.begin();
     for (; iterDisplays != m_Displays.end(); ++iterDisplays)
@@ -422,10 +417,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
-    if (xmlNode)
-        m_XMLNodes.push_back(xmlNode);
-    return xmlNode;
+    auto xmlStringNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)
