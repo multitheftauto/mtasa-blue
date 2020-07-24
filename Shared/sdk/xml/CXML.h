@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #pragma once
-#include <iostream>
 
 class CXMLNode;
 class CXMLFile;
@@ -18,11 +17,7 @@ class CXMLAttribute;
 typedef struct SXMLString
 {
     CXMLNode* node;
-    ~SXMLString()
-    {
-        delete node;
-        std::cout << "delete node;\n";
-    }
+    virtual ~SXMLString(){};
 } SXMLString;
 
 class CXML

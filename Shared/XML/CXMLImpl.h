@@ -20,6 +20,7 @@ typedef struct SXMLStringImpl : SXMLString
     SXMLStringImpl(TiXmlDocument* d, CXMLNode* n) : doc(d) { node = n; };
     ~SXMLStringImpl()
     {
+        delete node;
         delete doc;
         std::cout << "delete doc;\n";
     };
