@@ -12,7 +12,6 @@
 #pragma once
 
 #include <xml/CXML.h>
-#include <iostream>
 
 typedef struct SXMLStringImpl : SXMLString
 {
@@ -22,7 +21,6 @@ typedef struct SXMLStringImpl : SXMLString
     {
         delete node;
         delete doc;
-        std::cout << "delete doc;\n";
     };
 } SXMLStringImpl;
 
