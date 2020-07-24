@@ -10,15 +10,19 @@
  *****************************************************************************/
 
 #pragma once
+#include <iostream>
 
 class CXMLNode;
 class CXMLFile;
 class CXMLAttribute;
-
 typedef struct SXMLString
 {
     CXMLNode* node;
-    ~SXMLString() { delete node; }
+    ~SXMLString()
+    {
+        delete node;
+        std::cout << "delete node;\n";
+    }
 } SXMLString;
 
 class CXML

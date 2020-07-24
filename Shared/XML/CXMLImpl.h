@@ -12,12 +12,17 @@
 #pragma once
 
 #include <xml/CXML.h>
+#include <iostream>
 
 typedef struct SXMLStringImpl : SXMLString
 {
     TiXmlDocument* doc;
     SXMLStringImpl(TiXmlDocument* d, CXMLNode* n) : doc(d) { node = n; };
-    ~SXMLStringImpl() { delete doc; };
+    ~SXMLStringImpl()
+    {
+        delete doc;
+        std::cout << "delete doc;\n";
+    };
 } SXMLStringImpl;
 
 class CXMLImpl : public CXML
