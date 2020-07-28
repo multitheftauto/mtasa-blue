@@ -3190,6 +3190,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     strQueryURL = strQueryURL.Replace("_USAGE_", strConnectUsage);
     strQueryURL = strQueryURL.Replace("_SCUT_", strSoundCut);
     strQueryURL = strQueryURL.Replace("_OPTIMUS_", strOptimusInfo);
+    strQueryURL = strQueryURL.Replace("_GTAMD5_", GetApplicationSetting("gta-exe-md5"));
 
     // See if this download qualifies for using a resumable file
     if (!m_JobInfo.strFilename.empty() && strQueryURL.EndsWith(m_JobInfo.strFilename))

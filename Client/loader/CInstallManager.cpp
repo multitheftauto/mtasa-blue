@@ -568,15 +568,19 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     CFileGenerator fileGenerator(strGtaExe, strGtaExeMd5, gtaExeResetList, strPatchBase, strPatchDiff);
 
     // Need to fix gta_sa.exe?
-    if (!fileGenerator.IsGenerationRequired())
+    bool bGenerationRequired = fileGenerator.IsGenerationRequired();
+    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
+    if (!bGenerationRequired)
     {
+        AddReportLog(2053, "_ProcessGtaVersionCheck: No action required");
         return "ok";
     }
 
     // Check required GTA file is correct
-    if (GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase) != strPatchBaseMd5)
+    SString strPatchBaseCurrentMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase);
+    if (strPatchBaseCurrentMd5 != strPatchBaseMd5)
     {
-        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s'", *strPatchBase));
+        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s' %d %s", *strPatchBase, (int)FileSize(strPatchBase), *strPatchBaseCurrentMd5));
         SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
         strMessage += "\n\n" + strPatchBase;
 #ifdef TO_DO
@@ -586,6 +590,9 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         return "ok";
 #endif
     }
+
+    // Ensure GTA exe is not running
+    TerminateGTAIfRunning();
 
     // Backup current gta_sa.exe
     SString strGTAExeBak = strGtaExe + ".bak";
@@ -602,13 +609,13 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     {
         if (!IsUserAdmin())
         {
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin", result));
+            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin %s", result, *fileGenerator.GetErrorRecords()));
             m_strAdminReason = _("Patch GTA");
             return "fail";
         }
         else
         {
-            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s'", result, *strGtaExe));
+            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
             SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
             strMessage += "\n\n" + strGtaExe;
             strMessage += "\n\n" + _("Error") + SString(" %d", result);
@@ -621,6 +628,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         }
     }
 
+    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
     AddReportLog(2052, "_ProcessGtaVersionCheck: success");
     return "ok";
 }

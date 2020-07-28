@@ -11,9 +11,13 @@
 #include "StdInc.h"
 #include "../../vendor/unrar/dll.hpp"
 
-CFileGenerator::CFileGenerator(const SString& strTarget, const SString& strTargetMd5, const std::vector<CFileGenerator::SResetItem>& targetResetList,
+CFileGenerator::CFileGenerator(const SString& strTarget, const SString& strRequiredTargetMd5, const std::vector<CFileGenerator::SResetItem>& targetResetList,
                                const SString& strPatchBase, const SString& strPatchDiff)
-    : m_strTarget(strTarget), m_strTargetMd5(strTargetMd5), m_targetResetList(targetResetList), m_strPatchBase(strPatchBase), m_strPatchDiff(strPatchDiff)
+    : m_strTarget(strTarget),
+      m_strRequiredTargetMd5(strRequiredTargetMd5),
+      m_targetResetList(targetResetList),
+      m_strPatchBase(strPatchBase),
+      m_strPatchDiff(strPatchDiff)
 {
 }
 
@@ -33,7 +37,7 @@ CFileGenerator::EResult CFileGenerator::CheckTarget(const SString& strTarget)
     // Load into a buffer
     CBuffer buffer;
     if (!buffer.LoadFromFile(strTarget))
-        return EResult::TargetLoadError;
+        return RecordError(EResult::TargetLoadError, strTarget);
 
     // List of pokes to restore
     CBufferWriteStream stream(buffer);
@@ -47,9 +51,18 @@ CFileGenerator::EResult CFileGenerator::CheckTarget(const SString& strTarget)
         }
     }
 
-    if (GenerateHashHexString(EHashFunctionType::MD5, buffer.GetData(), buffer.GetSize()) != m_strTargetMd5)
-        return EResult::TargetHashIncorrect;
+    m_strCurrentTargetMd5 = GenerateHashHexString(EHashFunctionType::MD5, buffer.GetData(), buffer.GetSize());
+    if (m_strCurrentTargetMd5 != m_strRequiredTargetMd5)
+        return RecordError(EResult::TargetHashIncorrect, strTarget);
     return EResult::Success;
+}
+
+//////////////////////////////////////////////////////////
+// Return actual MD5 of target file
+//////////////////////////////////////////////////////////
+SString CFileGenerator::GetCurrentTargetMd5()
+{
+    return m_strCurrentTargetMd5;
 }
 
 //////////////////////////////////////////////////////////
@@ -57,6 +70,7 @@ CFileGenerator::EResult CFileGenerator::CheckTarget(const SString& strTarget)
 //////////////////////////////////////////////////////////
 CFileGenerator::EResult CFileGenerator::GenerateFile()
 {
+    ClearErrorRecords();
     // Base + Diff => rar archive containing new target file
     SString strTmpArchive = m_strPatchDiff + ".tmp";
     EResult result = ApplyPatchFile(m_strPatchBase, m_strPatchDiff, strTmpArchive);
@@ -79,7 +93,7 @@ CFileGenerator::EResult CFileGenerator::GenerateFile()
                 }
                 else
                 {
-                    result = EResult::TargetMoveError;
+                    result = RecordError(EResult::TargetMoveError, strTmpNewTarget, m_strTarget);
                 }
             }
         }
@@ -98,8 +112,10 @@ CFileGenerator::EResult CFileGenerator::ApplyPatchFile(const SString& strPatchBa
     std::vector<char> diffData;
     FileLoad(strPatchBase, baseData);
     FileLoad(strPatchDiff, diffData);
-    if (baseData.empty() || diffData.empty())
-        return EResult::PatchInputError;
+    if (baseData.empty())
+        return RecordError(EResult::PatchInputError, strPatchBase);
+    if (diffData.empty())
+        return RecordError(EResult::PatchInputError, strPatchDiff);
 
     // Reuncompression using future delta system
     uint uiPos = 0;
@@ -110,7 +126,7 @@ CFileGenerator::EResult CFileGenerator::ApplyPatchFile(const SString& strPatchBa
     }
 
     if (!FileSave(strOutputFile, &diffData[0], diffData.size()))
-        return EResult::PatchOutputError;
+        return RecordError(EResult::PatchOutputError, strOutputFile);
     return EResult::Success;
 }
 
@@ -119,24 +135,60 @@ CFileGenerator::EResult CFileGenerator::ApplyPatchFile(const SString& strPatchBa
 //////////////////////////////////////////////////////////
 CFileGenerator::EResult CFileGenerator::UnrarFile(const SString& strArchive, const SString& strOutputFile)
 {
+    WString wstrArchive = FromUTF8(strArchive);
+    WString wstrOutputFile = FromUTF8(strOutputFile);
     // Open archive
-    RAROpenArchiveData archiveData = {};
-    archiveData.ArcName = (char*)*strArchive;
+    RAROpenArchiveDataEx archiveData = {};
+    archiveData.ArcNameW = (wchar_t*)*wstrArchive;
     archiveData.OpenMode = RAR_OM_EXTRACT;
-    HANDLE hArcData = RAROpenArchive(&archiveData);
+    HANDLE hArcData = RAROpenArchiveEx(&archiveData);
     if (!hArcData)
-        return EResult::ArchiveOpenError;
+        return RecordError(EResult::ArchiveOpenError, strArchive);
 
     // Extract first file
     EResult       result = EResult::ArchiveExtractError;
     RARHeaderData headerData = {};
     if (RARReadHeader(hArcData, &headerData) == 0)
     {
-        if (RARProcessFile(hArcData, RAR_EXTRACT, nullptr, (char*)*strOutputFile) == 0)
+        if (RARProcessFileW(hArcData, RAR_EXTRACT, nullptr, (wchar_t*)*wstrOutputFile) == 0)
         {
             result = EResult::Success;
         }
     }
     RARCloseArchive(hArcData);
+
+    if (result != EResult::Success)
+        return RecordError(result, strArchive, strOutputFile);
     return result;
+}
+
+//////////////////////////////////////////////////////////
+// Save error info for later
+//////////////////////////////////////////////////////////
+CFileGenerator::EResult CFileGenerator::RecordError(CFileGenerator::EResult code, const SString& strContext, const SString& strContext2)
+{
+    m_errorInfoList.push_back({code, strContext, strContext2});
+    return code;
+}
+
+//////////////////////////////////////////////////////////
+// Remove all error records
+//////////////////////////////////////////////////////////
+void CFileGenerator::ClearErrorRecords()
+{
+    m_errorInfoList.clear();
+}
+
+//////////////////////////////////////////////////////////
+// Return all error records as a string
+//////////////////////////////////////////////////////////
+SString CFileGenerator::GetErrorRecords()
+{
+    SString strStatus;
+    for (const auto& item : m_errorInfoList)
+    {
+        strStatus += SString("[%d-%s-%s]", item.code, *item.strContext, *item.strContext2);
+    }
+    ClearErrorRecords();
+    return strStatus;
 }

@@ -752,6 +752,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
             usModel = pPickup.GetModel();
             break;
         }
+        case CCLIENTPROJECTILE:
+        {
+            CClientProjectile& pProjectile = static_cast<CClientProjectile&>(Entity);
+            usModel = pProjectile.GetModel();
+            break;
+        }
         default:
             return false;
     }
