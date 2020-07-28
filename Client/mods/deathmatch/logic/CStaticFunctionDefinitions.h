@@ -401,7 +401,14 @@ public:
     static bool SetCursorAlpha(float fAlpha);
 
     // Drawing funcs
-    static ID3DXFont* ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static ID3DXFont*        ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static inline ID3DXFont* ResolveD3DXFont(const std::variant<CClientDxFont*, eFontType>& variant)
+    {
+        if (std::holds_alternative<eFontType>(variant))
+            return g_pCore->GetGraphics()->GetFont(std::get<eFontType>(variant));
+
+        return std::get<CClientDxFont*>(variant)->GetD3DXFont();
+    };
 
     // GUI funcs
     static bool        GUIGetInputEnabled();

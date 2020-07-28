@@ -10,7 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <lua/CLuaFunctionParser.h>
+#include "CLuaDefs.h"
+#include "lua/CLuaFunctionParser.h"
+
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
@@ -31,8 +33,8 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxDrawWiredSphere", ArgumentParser<DxDrawWiredSphere>},
-        {"dxGetTextWidth", DxGetTextWidth},
-        {"dxGetTextSize", DxGetTextSize},
+        {"dxGetTextWidth", ArgumentParser<DxGetTextWidth>},
+        {"dxGetTextSize", ArgumentParser<DxGetTextSize>},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
         {"dxCreateTexture", DxCreateTexture},
@@ -107,7 +109,7 @@ void CLuaDrawingDefs::AddDxFontClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getHeight", OOP_DxGetFontHeight);
     lua_classfunction(luaVM, "getTextWidth", OOP_DxGetTextWidth);
-    lua_classfunction(luaVM, "getTextSize", OOP_DxGetTextSize);
+    lua_classfunction(luaVM, "getTextSize", ArgumentParser<OOP_DxGetTextSize>);
 
     // lua_classvariable ( luaVM, "height", NULL, "dxGetFontHeight"); // swap arguments, .height[scale] = int(height);
 
@@ -855,98 +857,27 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
     return 1;
 }
 
-int CLuaDrawingDefs::DxGetTextSize(lua_State* luaVM)
+CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontType> variantFont, const std::string text, const std::optional<float> optWidth,
+                                             const std::optional<float> optScaleXY, const std::optional<float> optScaleY,
+                                             const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded)
 {
-    //  float, float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
-    //      bool wordBreak=false, bool colorCoded=false] )
-    SString        strText;
-    float          fWidth;
-    float          fScaleX;
-    float          fScaleY;
-    eFontType      fontType;
-    CClientDxFont* pDxFontElement;
-    bool           bWordBreak;
-    bool           bColorCoded;
+    // float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default", bool wordBreak=false, bool
+    // colorCoded=false] )
+    CGraphicsInterface* const graphics = g_pCore->GetGraphics();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strText);
-    argStream.ReadNumber(fWidth, 0);
-    if (argStream.NextIsUserDataOfType<CLuaVector2D>())
+    // resolve scale (use X as Y value, if optScaleY is empty)
+    CVector2D scale(1.0f, 1.0f);
+    if (optScaleXY.has_value())
     {
-        CVector2D vecScale;
-        argStream.ReadVector2D(vecScale);
-        fScaleX = vecScale.fX;
-        fScaleY = vecScale.fY;
+        scale.fX = optScaleXY.value();
+        scale.fY = optScaleY.has_value() ? optScaleY.value() : scale.fX;
     }
-    else
-    {
-        argStream.ReadNumber(fScaleX, 1);
-        if (argStream.NextIsNumber())
-            argStream.ReadNumber(fScaleY);
-        else
-            fScaleY = fScaleX;
-    }
-    MixedReadDxFontString(argStream, fontType, FONT_DEFAULT, pDxFontElement);
-    argStream.ReadBool(bWordBreak, false);
-    argStream.ReadBool(bColorCoded, false);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Get DX font
-    ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont(fontType, pDxFontElement);
 
     CVector2D vecSize;
-    g_pCore->GetGraphics()->GetDXTextSize(vecSize, strText.c_str(), fWidth, fScaleX, fScaleY, pD3DXFont, bWordBreak, bColorCoded);
-    lua_pushnumber(luaVM, vecSize.fX);
-    lua_pushnumber(luaVM, vecSize.fY);
-    return 2;
-}
+    graphics->GetDXTextSize(vecSize, text.c_str(), optWidth.value_or(0.0f), scale.fX, scale.fY, CStaticFunctionDefinitions::ResolveD3DXFont(variantFont),
+                            optWordBreak.value_or(false), optColorCoded.value_or(false));
 
-int CLuaDrawingDefs::OOP_DxGetTextSize(lua_State* luaVM)
-{
-    //  vector2 DxFont:getTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0,
-    //      bool wordBreak=false, bool colorCoded=false] )
-    SString        strText;
-    float          fWidth;
-    float          fScaleX;
-    float          fScaleY;
-    CClientDxFont* pDxFontElement;
-    bool           bWordBreak;
-    bool           bColorCoded;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pDxFontElement);
-    argStream.ReadString(strText);
-    argStream.ReadNumber(fWidth, 0);
-    if (argStream.NextIsUserDataOfType<CLuaVector2D>())
-    {
-        CVector2D vecScale;
-        argStream.ReadVector2D(vecScale);
-        fScaleX = vecScale.fX;
-        fScaleY = vecScale.fY;
-    }
-    else
-    {
-        argStream.ReadNumber(fScaleX, 1);
-        if (argStream.NextIsNumber())
-            argStream.ReadNumber(fScaleY);
-        else
-            fScaleY = fScaleX;
-    }
-    argStream.ReadBool(bWordBreak, false);
-    argStream.ReadBool(bColorCoded, false);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Get DX font
-    ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont(FONT_DEFAULT, pDxFontElement);
-
-    CVector2D  vecSize;
-    g_pCore->GetGraphics()->GetDXTextSize(vecSize, strText.c_str(), fWidth, fScaleX, fScaleY, pD3DXFont, bWordBreak, bColorCoded);
-    lua_pushvector(luaVM, vecSize);
-    return 1;
+    return vecSize;
 }
 
 int CLuaDrawingDefs::DxGetFontHeight(lua_State* luaVM)
