@@ -281,7 +281,6 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
-    // lua_classvariable ( luaVM, "property" "guiSetProperty", "guiGetProperty" ); todo: .property[name] = value
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
@@ -351,7 +350,6 @@ void CLuaGUIDefs::AddGuiLabelClass(lua_State* luaVM)
     lua_classvariable(luaVM, "verticalAlign", "guiLabelSetVerticalAlign", NULL);
     lua_classvariable(luaVM, "fontHeight", NULL, "guiLabelGetFontHeight");
     lua_classvariable(luaVM, "textExtent", NULL, "guiLabelGetTextExtent");
-    //    lua_classvariable ( luaVM, "color", "guiLabelGetColor", "guiLabelSetColor" );
 
     lua_registerclass(luaVM, "GuiLabel", "GuiElement");
 }
@@ -541,10 +539,6 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classvariable(luaVM, "horizontalScrollPosition", "guiGridListSetHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
     lua_classvariable(luaVM, "verticalScrollPosition", "guiGridListGetVerticalScrollPosition", "guiGridListGetVerticalScrollPosition");
-    // lua_classvariable ( luaVM, "selectedItem", NULL, "guiGridListGetSelectedItem" ); table
-    // lua_classvariable ( luaVM, "selectedItem", "guiGridListSetSelectedItem", NULL ); .selectedItem[column] = row (row in column) table
-    // lua_classvariable ( luaVM, "itemColor", "setItemColor", "getItemColor" ); table
-    // lua_classvariable ( luaVM, "columnTitle", "setColumnTitle", "getColumnTitle" ); table
 
     lua_registerclass(luaVM, "GuiGridList", "GuiElement");
 }

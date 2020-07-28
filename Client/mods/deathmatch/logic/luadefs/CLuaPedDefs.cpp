@@ -111,8 +111,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTypeIndexFromClothes", "getTypeIndexFromClothes");
     lua_classfunction(luaVM, "getClothesByTypeIndex", "getClothesByTypeIndex");
     lua_classvariable(luaVM, "validModels", NULL, "getValidPedModels");
-    // lua_classvariable ( luaVM, "clothesTypeName", NULL, "getClothesTypeName" ); table
-    // lua_classvariable ( luaVM, "bodyPartName", NULL, "getBodyPartName" ); table
 
     lua_classfunction(luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classfunction(luaVM, "doesHaveJetPack", "doesPedHaveJetPack");
@@ -214,12 +212,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
-    // lua_classvariable ( luaVM, "ammoInClip", NULL, CLuaOOPDefs::GetPedAmmoInClip ); // .ammoInClip["slot"] (readonly)
-    // lua_classvariable ( luaVM, "analogControlState", CLuaOOPDefs::SetPedAnalogControlState, CLuaOOPDefs::GetPedAnalogControlState ); //TODO:
-    // .analogControlState["control"] = value lua_classvariable ( luaVM, "controlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState ); //
-    // TODO: .controlState["control"] = value lua_classvariable ( luaVM, "stats", NULL, CLuaOOPDefs::GetPedStat ); // table (readonly) lua_classvariable (
-    // luaVM, "doingTask", NULL, CLuaOOPDefs::IsPedDoingTask ); // table (readonly) lua_classvariable ( luaVM, "totalAmmo", NULL, CLuaDefs::GetPedTotalAmmo );
-    // // table readonly
     lua_registerclass(luaVM, "Ped", "Element");
 }
 

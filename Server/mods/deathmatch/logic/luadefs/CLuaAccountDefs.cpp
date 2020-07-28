@@ -84,7 +84,7 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "player", NULL, "getAccountPlayer");
     lua_classvariable(luaVM, "guest", NULL, "isGuestAccount");
     lua_classvariable(luaVM, "password", "setAccountPassword", NULL);
-    lua_classvariable(luaVM, "data", NULL, "getAllAccountData");            // allow setting
+    lua_classvariable(luaVM, "data", NULL, "getAllAccountData");
 
     lua_registerclass(luaVM, "Account");
 }
