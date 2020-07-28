@@ -281,7 +281,6 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
-    lua_classvariable(luaVM, "screenSize", NULL, "guiGetScreenSize");
     // lua_classvariable ( luaVM, "property" "guiSetProperty", "guiGetProperty" ); todo: .property[name] = value
 
     lua_registerclass(luaVM, "GuiElement", "Element");
@@ -804,7 +803,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
                     else
                         argStream.SetCustomError(path, "Failed to create static image");
                 }
-                else 
+                else
                     argStream.SetCustomError(path, "File not found");
             }
             else
@@ -3195,7 +3194,7 @@ int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIEdit>(theElement);
-    
+
     if (!argStream.HasErrors())
     {
         bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
@@ -3477,7 +3476,7 @@ int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    
+
     // error: bad arguments
     lua_pushnil(luaVM);
     return 1;
@@ -3733,7 +3732,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                     else
                         lua_pushnumber(luaVM, fNumber);
                 }
-                
+
                 // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
                 if (bAll)
                     lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
