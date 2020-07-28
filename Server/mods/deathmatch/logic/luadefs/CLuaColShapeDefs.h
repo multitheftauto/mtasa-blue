@@ -28,7 +28,7 @@ public:
     
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE(GetColShapeSize);
+    LUA_DECLARE_OOP(GetColShapeSize);
     LUA_DECLARE(SetColShapeSize);
     LUA_DECLARE(GetColPolygonPoints);
     LUA_DECLARE(GetColPolygonPointPosition);
