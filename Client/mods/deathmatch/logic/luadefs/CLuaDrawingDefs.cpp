@@ -111,8 +111,6 @@ void CLuaDrawingDefs::AddDxFontClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTextWidth", OOP_DxGetTextWidth);
     lua_classfunction(luaVM, "getTextSize", ArgumentParser<OOP_DxGetTextSize>);
 
-    // lua_classvariable ( luaVM, "height", NULL, "dxGetFontHeight"); // swap arguments, .height[scale] = int(height);
-
     lua_registerclass(luaVM, "DxFont");
 }
 

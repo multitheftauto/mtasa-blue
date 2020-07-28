@@ -62,7 +62,6 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "level", "setWaterLevel", "getWaterLevel");
     lua_classvariable(luaVM, "height", "setWaveHeight", "getWaveHeight");
-    // lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
 
     lua_registerclass(luaVM, "Water", "Element");
 }

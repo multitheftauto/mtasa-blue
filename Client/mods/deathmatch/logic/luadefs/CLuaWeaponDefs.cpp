@@ -76,8 +76,6 @@ void CLuaWeaponDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "state", "setWeaponState", "getWeaponState");
     lua_classvariable(luaVM, "ammo", "setWeaponAmmo", "getWeaponAmmo");
     lua_classvariable(luaVM, "clipAmmo", "setWeaponClipAmmo", "getWeaponClipAmmo");
-    // lua_classvariable ( luaVM, "property" "setWeaponProperty", "getWeaponProperty" ); todo: .property[wepID/name]["skill"] = property
-    // lua_classvariable ( luaVM, "flags" "setWeaponFlags", "getWeaponFlags" ); todo: .flags[flag] = value
 
     lua_registerclass(luaVM, "Weapon", "Element");
 }

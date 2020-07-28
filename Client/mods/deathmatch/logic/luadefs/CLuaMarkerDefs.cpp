@@ -59,7 +59,6 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "size", "setMarkerSize", "getMarkerSize");
 
     lua_classvariable(luaVM, "target", SetMarkerTarget, OOP_GetMarkerTarget);
-    // lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor );
 
     lua_registerclass(luaVM, "Marker", "Element");
 }
