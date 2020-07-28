@@ -4962,6 +4962,15 @@ bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector
     return false;
 }
 
+// Find custom font from an element, or a standard font from a name.
+ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement)
+{
+    if (pDxFontElement)
+        return pDxFontElement->GetD3DXFont();
+
+    return g_pCore->GetGraphics()->GetFont(fontType);
+}
+
 bool CStaticFunctionDefinitions::IsCursorShowing(bool& bShowing)
 {
     bShowing = m_pClientGame->AreCursorEventsEnabled() || m_pCore->IsCursorForcedVisible();

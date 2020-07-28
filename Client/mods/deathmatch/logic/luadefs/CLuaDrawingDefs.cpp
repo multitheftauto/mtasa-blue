@@ -857,19 +857,15 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
     return 1;
 }
 
-CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(
-    std::variant<CClientDxFont*, eFontType> variantFont, // is optional, so we can call it from DxGetTextSize with a std::nullopt, and we just grab the FONT_DEFAULT.
-    const std::string text,
-    const std::optional<float> optWidth,
-    const std::optional<float> optScaleXY,
-    const std::optional<float> optScaleY,
-    const std::optional<bool> optWordBreak,
-    const std::optional<bool> optColorCoded)
+CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontType> variantFont, const std::string text, const std::optional<float> optWidth,
+                                             const std::optional<float> optScaleXY, const std::optional<float> optScaleY,
+                                             const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded)
 {
-    // float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default", bool wordBreak=false, bool colorCoded=false] )
+    // float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default", bool wordBreak=false, bool
+    // colorCoded=false] )
     CGraphicsInterface* const graphics = g_pCore->GetGraphics();
 
-    // resolve scale(use X as Y value, if optScaleY is empty)
+    // resolve scale (use X as Y value, if optScaleY is empty)
     CVector2D scale(1.0f, 1.0f);
     if (optScaleXY.has_value())
     {
@@ -878,16 +874,8 @@ CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(
     }
 
     CVector2D vecSize;
-    graphics->GetDXTextSize(
-        vecSize,
-        text.c_str(),
-        optWidth.value_or(0.0f),
-        scale.fX,
-        scale.fY,
-        CStaticFunctionDefinitions::ResolveD3DXFont(variantFont),
-        optWordBreak.value_or(false),
-        optColorCoded.value_or(false)
-    );
+    graphics->GetDXTextSize(vecSize, text.c_str(), optWidth.value_or(0.0f), scale.fX, scale.fY, CStaticFunctionDefinitions::ResolveD3DXFont(variantFont),
+                            optWordBreak.value_or(false), optColorCoded.value_or(false));
 
     return vecSize;
 }
