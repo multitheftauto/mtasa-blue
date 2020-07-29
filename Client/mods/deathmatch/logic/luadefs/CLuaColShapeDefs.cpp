@@ -70,7 +70,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "radius", SetColShapeRadius, GetColShapeRadius);
     lua_classvariable(luaVM, "size", SetColShapeSize, GetColShapeSize);
-    lua_classvariable(luaVM, "points", nullptr, GetColPolygonPoints);
+    lua_classvariable(luaVM, "points", nullptr, OOP_GetColPolygonPoints);
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
