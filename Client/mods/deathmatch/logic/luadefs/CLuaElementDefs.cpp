@@ -12,11 +12,10 @@
 
 #include "StdInc.h"
 using std::list;
-#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Element get funcs
         {"getRootElement", GetRootElement},
         {"isElement", IsElement},
@@ -98,10 +97,8 @@ void CLuaElementDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaElementDefs::AddClass(lua_State* luaVM)
@@ -1038,22 +1035,9 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         CVector vecMin, vecMax;
         if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
         {
-            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
-            {
-                lua_pushnumber(luaVM, vecMin.fX);
-                lua_pushnumber(luaVM, vecMin.fY);
-                lua_pushnumber(luaVM, vecMin.fZ);
-                lua_pushnumber(luaVM, vecMax.fX);
-                lua_pushnumber(luaVM, vecMax.fY);
-                lua_pushnumber(luaVM, vecMax.fZ);
-                return 6;
-            }
-            else
-            {
-                lua_pushvector(luaVM, vecMin);
-                lua_pushvector(luaVM, vecMax);
-                return 2;
-            }
+            lua_pushvector(luaVM, vecMin);
+            lua_pushvector(luaVM, vecMax);
+            return 2;
         }
     }
     else

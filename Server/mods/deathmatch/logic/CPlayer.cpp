@@ -39,7 +39,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
-    m_ucDriveByDirection = 0;
+    m_ucDriveByDirection = eVehicleAimDirection::FORWARDS;
     m_bAkimboArmUp = false;
 
     m_VoiceState = VOICESTATE_IDLE;

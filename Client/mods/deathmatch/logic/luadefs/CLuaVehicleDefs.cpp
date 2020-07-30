@@ -10,11 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#define MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP      "1.5.5-9.11710"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaVehicleDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Vehicle get funcs
         {"getVehicleType", GetVehicleType},
         {"getVehicleModelFromName", GetVehicleModelFromName},
@@ -36,7 +36,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleDoorState", GetVehicleDoorState},
         {"getVehicleLightState", GetVehicleLightState},
         {"getVehiclePanelState", GetVehiclePanelState},
-        {"areVehicleLightsOn", AreVehicleLightsOn},
+        {"areVehicleLightsOn", ArgumentParser<AreVehicleLightsOn>},
         {"getVehicleOverrideLights", GetVehicleOverrideLights},
         {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
         {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
@@ -142,10 +142,8 @@ void CLuaVehicleDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
@@ -321,9 +319,6 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging");
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
-
-    // lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor );
-    // lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor );
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -1011,18 +1006,9 @@ int CLuaVehicleDefs::GetVehiclePanelState(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::AreVehicleLightsOn(lua_State* luaVM)
+bool CLuaVehicleDefs::AreVehicleLightsOn(CClientVehicle* const pVehicle)
 {
-    CClientVehicle*  pVehicle;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    bool bLightsOn = (pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2);
-    lua_pushboolean(luaVM, bLightsOn);
-    return 1;
+    return pVehicle->AreLightsOn() || pVehicle->GetOverrideLights() == 2;
 }
 
 int CLuaVehicleDefs::GetVehicleOverrideLights(lua_State* luaVM)
@@ -3250,13 +3236,6 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentPosition(lua_State* luaVM)
         CVector vecPosition;
         if (pVehicle->GetComponentPosition(strComponent, vecPosition, outputBase))
         {
-            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP))
-            {
-                lua_pushnumber(luaVM, vecPosition.fX);
-                lua_pushnumber(luaVM, vecPosition.fY);
-                lua_pushnumber(luaVM, vecPosition.fZ);
-                return 3;
-            }
             lua_pushvector(luaVM, vecPosition);
             return 1;
         }
@@ -3348,13 +3327,6 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation(lua_State* luaVM)
         {
             // Script uses degrees
             ConvertRadiansToDegrees(vecRotation);
-            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP))
-            {
-                lua_pushnumber(luaVM, vecRotation.fX);
-                lua_pushnumber(luaVM, vecRotation.fY);
-                lua_pushnumber(luaVM, vecRotation.fZ);
-                return 3;
-            }
             lua_pushvector(luaVM, vecRotation);
             return 1;
         }

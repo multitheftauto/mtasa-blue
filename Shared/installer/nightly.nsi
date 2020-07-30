@@ -576,79 +576,16 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 Call RemoveVirtualStore
             ${EndIf}
         ${EndIf}
-        #############################################################
-
-        # Handle "Grand Theft Auto San Andreas.exe" being present instead of gta_sa.exe
-        IfFileExists "$GTA_DIR\gta_sa.exe" noCopyReq
-            IfFileExists "$GTA_DIR\Grand Theft Auto San Andreas.exe" 0 noCopyReq
-                CopyFiles "$GTA_DIR\Grand Theft Auto San Andreas.exe" "$GTA_DIR\gta_sa.exe"
-        noCopyReq:
 
         #############################################################
-        # Patch our San Andreas .exe if it is required
-            nsArray::SetList array "gta_sa.exe" "gta-sa.exe" "testapp.exe" /end
-            ${ForEachIn} array $0 $1
-                IfFileExists $GTA_DIR\$1 0 TryNextExe
-                ${GetSize} "$GTA_DIR" "/M=$1 /S=0M /G=0" $0 $3 $4
-                StrCmp "$0" "0" TryNextExe
-                !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
-                DetailPrint "$1 successfully detected ($ExeMD5)"
-                ${LogText} "GetMD5 $GTA_DIR\$1 $ExeMD5"
-                ${Switch} $ExeMD5
-                    ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
-                    ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
-                    ${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
-                    ${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
-                    ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
-                    ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
-                    ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
-                    ${Case} "a2929a61e4d63dd3c15749b2b7ed74ae" #?? 1.01
-                    ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
-                    ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
-                    ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
-                    ${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
-                    ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
-                    ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
-                    ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
-                    ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
-                    ${Case} "c29d96e0c063cd4568d977bcf273215f" #?? ?.?? 5,719,552 bytes
-                        # Copy to gta_sa.exe.bak and patch to gta_sa.exe
-                        CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
-                        StrCpy $PATCH_TARGET "$GTA_DIR\gta_sa.exe"
-                        Call InstallPatch
-                        ${If} $PatchInstalled == "1"
-                            Goto CompletePatchProc
-                        ${EndIf}
-                        Goto TryNextExe
-                        ${Break}
-
-                    ${Case} "6687a315558935b3fc80cdbff04437a4" #?? ?.?? 5,685,688 bytes (RS Launcher 2019-08-29)
-                        # Don't patch if proxy_sa is already present (and is over 10MB)
-                        ${GetSize} "$GTA_DIR" "/M=proxy_sa.exe /S=0M /G=0" $0 $3 $4
-                        ${If} $0 > 10
-                            Goto CompletePatchProc
-                        ${EndIf}
-                        # Copy to gta_sa.exe.bak and patch to proxy_sa.exe
-                        CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
-                        StrCpy $PATCH_TARGET "$GTA_DIR\proxy_sa.exe"
-                        Call InstallPatch
-                        ${If} $PatchInstalled == "1"
-                            Goto CompletePatchProc
-                        ${EndIf}
-                        Goto TryNextExe
-                        ${Break}
-                    ${Default}
-                        ${If} $1 == "gta_sa.exe"
-                            Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
-                        ${EndIf}
-                        ${Break}
-                ${EndSwitch}
-                TryNextExe:
-            ${Next}
-
-        NoExeFound:
+        # Issue warning if GTA path looks incorrect
+        Push $GTA_DIR 
+        Call IsGtaDirectory
+        Pop $0
+        ${If} $0 != "gta"
             MessageBox MB_ICONSTOP "$(MSGBOX_INVALID_GTASA)"
-        CompletePatchProc:
+        ${EndIf}
+        #############################################################
 
         #############################################################
         # Fix missing or incorrect VS2013 redist files
@@ -767,6 +704,9 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
+
+            SetOutPath "$INSTDIR\MTA\data"
+            File "${FILES_ROOT}\mta\data\gta_sa_diff.dat"
 
             SetOutPath "$INSTDIR\MTA\config"
             File "${FILES_ROOT}\mta\config\chatboxpresets.xml"
@@ -929,12 +869,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 
     !ifndef LIGHTBUILD
         SectionGroup "$(INST_SEC_OPTIONAL_RESOURCES)" SEC07
-            Section "AMX Emulation package"
-            SectionIn 1 2
-                SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[amx]"
-                SetOverwrite ifnewer
-                File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[amx]\amx"
-            SectionEnd
             Section "Assault Gamemode"
             SectionIn 1 2
                 SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[assault]"
@@ -1186,45 +1120,6 @@ Function SkipDirectoryPage
     Abort
 FunctionEnd
 
-
-;====================================================================================
-; Patcher related functions
-;====================================================================================
-Var PATCHFILE
-
-LangString MSGBOX_PATCH_FAIL1 ${LANG_ENGLISH}   "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
-LangString MSGBOX_PATCH_FAIL2 ${LANG_ENGLISH}   "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
-Function InstallPatch
-    ${LogText} "+Function begin - InstallPatch"
-    DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
-    StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
-    NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
-    Pop $0
-    ${If} $0 != "success"
-        DetailPrint "* Download of patch file failed:"
-        DetailPrint "* $0"
-        DetailPrint "* Installation continuing anyway"
-        MessageBox MB_ICONSTOP "$(MSGBOX_PATCH_FAIL1)"
-        StrCpy $PatchInstalled "0"
-    ${Else}
-        DetailPrint "Patch download successful.  Installing patch..."
-        vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" $PATCH_TARGET
-        Pop $R0
-        ${If} $R0 == "OK"
-            StrCpy $PatchInstalled "1"
-        ${ElseIf} $R0 == "OK, new version already installed"
-            StrCpy $PatchInstalled "1"
-        ${Else}
-            StrCpy $PatchInstalled "0"
-            DetailPrint "* Some error occured installing the patch for Grand Theft Auto: San Andreas:"
-            DetailPrint "* $R0"
-            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-            DetailPrint "* Installation continuing anyway"
-            MessageBox MB_ICONSTOP MSGBOX_PATCH_FAIL2
-        ${EndIf}
-    ${EndIf}
-    ${LogText} "-Function end - InstallPatch"
-FunctionEnd
 
 ;====================================================================================
 ; UAC related functions
@@ -1894,8 +1789,8 @@ Function "GTADirectoryLeaveProc"
             Abort
     hasdir:
 
-    ; data subdirectory should exist
-    IfFileExists "$GTA_DIR\data\*.*" cont
+    ; models\gta3.img should exist
+    IfFileExists "$GTA_DIR\models\gta3.img" cont
         MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
             "$(INST_GTA_ERROR2)" \
             IDOK cont1
@@ -1919,17 +1814,10 @@ Function IsGtaDirectory
     Pop $0
     StrCpy $1 "gta"
 
-    ; gta_sa.exe or gta-sa.exe should exist
-    IfFileExists "$0\gta_sa.exe" cont1
-        IfFileExists "$0\gta-sa.exe" cont1
-            IfFileExists "$0\Grand Theft Auto San Andreas.exe" cont1
-                StrCpy $1 ""
-    cont1:
-
-    ; data subdirectory should exist
-    IfFileExists "$0\data\*.*" cont2
+    ; models\gta3.img should exist
+    ${IfNot} ${FileExists} "$0\models\gta3.img"
         StrCpy $1 ""
-    cont2:
+    ${EndIf}
 
     Push $1
 FunctionEnd

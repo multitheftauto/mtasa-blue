@@ -123,6 +123,8 @@ typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
+enum class eVehicleAimDirection : unsigned char;
+
 /**
  * This class contains information used for shot syncing, one exists per player.
  */
@@ -135,7 +137,7 @@ public:
     float m_fArmDirectionX;
     float m_fArmDirectionY;
     // only for in-vehicle shooting
-    char m_cInVehicleAimDirection;            // 0 = forwards, 1 = left, 2 = back, 3 = right
+    eVehicleAimDirection m_cInVehicleAimDirection;
     // use origin
     bool m_bUseOrigin;
 

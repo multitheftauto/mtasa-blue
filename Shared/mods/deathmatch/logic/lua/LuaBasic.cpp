@@ -42,6 +42,12 @@ namespace lua
     }
 
     template <>
+    int64_t PopPrimitive<int64_t>(lua_State* L, std::size_t& index)
+    {
+        return static_cast<int64_t>(lua_tonumber(L, index++));
+    }
+
+    template <>
     uint64_t PopPrimitive<uint64_t>(lua_State* L, std::size_t& index)
     {
         return static_cast<uint64_t>(lua_tonumber(L, index++));

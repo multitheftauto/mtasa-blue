@@ -14,7 +14,7 @@ using std::list;
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"getTeamFromName", GetTeamFromName},
         {"getTeamName", GetTeamName},
         {"getTeamColor", GetTeamColor},
@@ -24,10 +24,8 @@ void CLuaTeamDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaTeamDefs::AddClass(lua_State* luaVM)
@@ -46,7 +44,6 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "friendlyFire", NULL, "getTeamFriendlyFire");
     lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", NULL, "getTeamName");
-    // lua_classvariable ( luaVM, "color", NULL, "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

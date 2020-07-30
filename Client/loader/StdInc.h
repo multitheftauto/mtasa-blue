@@ -29,3 +29,4 @@ extern CLocalizationInterface* g_pLocalization;
 #include "CInstallManager.h"
 #include "D3DStuff.h"
 #include "CExePatchedStatus.h"
+#include "CFileGenerator.h"

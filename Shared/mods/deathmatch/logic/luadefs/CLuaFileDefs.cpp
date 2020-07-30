@@ -14,7 +14,7 @@
 
 void CLuaFileDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"fileOpen", fileOpen},
         {"fileCreate", fileCreate},
         {"fileExists", fileExists},
@@ -36,10 +36,8 @@ void CLuaFileDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)
