@@ -200,10 +200,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
     lua_classvariable(luaVM, "scriptDebugLevel", "setPlayerScriptDebugLevel", "getPlayerScriptDebugLevel");
-    // lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaPlayerDefs::SetPlayerNametagColor,
-    // OOP_GetPlayerNametagColor ); lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue",
-    // CLuaPlayerDefs::SetPlayerAnnounceValue, OOP_GetPlayerAnnounceValue ); // .announceValue[key]=value lua_classvariable ( luaVM, "hudComponent",
-    // "setHudComponentVisible", "", CLuaOOPDefs::SetHudComponentVisible, NULL ); .hudComponent["radar"]=true (a get function to needs to be implemented too)
 
     lua_registerclass(luaVM, "Player", "Ped");
 }

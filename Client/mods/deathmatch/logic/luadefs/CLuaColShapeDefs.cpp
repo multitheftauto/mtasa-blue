@@ -57,7 +57,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getRadius", GetColShapeRadius);
     lua_classfunction(luaVM, "setRadius", SetColShapeRadius);
-    lua_classfunction(luaVM, "getSize", GetColShapeSize);
+    lua_classfunction(luaVM, "getSize", OOP_GetColShapeSize);
     lua_classfunction(luaVM, "setSize", SetColShapeSize);
     lua_classfunction(luaVM, "getPoints", OOP_GetColPolygonPoints);
     lua_classfunction(luaVM, "getPointPosition", OOP_GetColPolygonPointPosition);
@@ -69,7 +69,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
     lua_classvariable(luaVM, "radius", SetColShapeRadius, GetColShapeRadius);
-    lua_classvariable(luaVM, "size", SetColShapeSize, GetColShapeSize);
+    lua_classvariable(luaVM, "size", SetColShapeSize, OOP_GetColShapeSize);
     lua_classvariable(luaVM, "points", nullptr, OOP_GetColPolygonPoints);
 
     lua_registerclass(luaVM, "ColShape", "Element");
@@ -449,6 +449,45 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
 }
 
 int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
+{
+    CClientColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            CVector2D size = static_cast<CClientColRectangle*>(pColShape)->GetSize();
+            lua_pushnumber(luaVM, size.fX);
+            lua_pushnumber(luaVM, size.fY);
+            return 2;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            CVector size = static_cast<CClientColCuboid*>(pColShape)->GetSize();
+            lua_pushnumber(luaVM, size.fX);
+            lua_pushnumber(luaVM, size.fY);
+            lua_pushnumber(luaVM, size.fZ);
+            return 3;
+        }
+        case COLSHAPE_TUBE:
+        {
+            float fHeight = static_cast<CClientColTube*>(pColShape)->GetHeight();
+            lua_pushnumber(luaVM, fHeight);
+            return 1;
+        }
+    }
+
+    argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
 {
     CClientColShape* pColShape;
 
