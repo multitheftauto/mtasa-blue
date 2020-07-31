@@ -330,7 +330,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)
 {
     unsigned int uiResult = 0;
-    const unsigned int uiMax = 4LL * 1024 * 1024 * 1024;
+    const unsigned int uiMax = 4294967295; // 4 GB
 
     SString DevVen;
     DevVen.Format("VEN_%04X&DEV_%04X", ulVen, ulDev);
@@ -356,12 +356,11 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
         }
     }
 
-    if (uiResult == 0)
+    if (uiResult > uiMax)
     {
-        uiResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+        uiResult = uiMax;
     }
 
-    uiResult = std::min(uiMax, uiResult);
     return uiResult;
 }
 
