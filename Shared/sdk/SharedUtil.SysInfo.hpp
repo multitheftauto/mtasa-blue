@@ -349,10 +349,9 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
         unsigned int uiAdapterRAM = atoi(AdapterRAM);
         int          iAvailability = atoi(Availability);
 
-
-        if (iAvailability == 3 && PNPDeviceID.Contains(DevVen))
+        if ((iAvailability == 8 || iAvailability == 3) && PNPDeviceID.Contains(DevVen))
         {
-            uiResult = std::min(uiMax, uiAdapterRAM);
+            uiResult = uiAdapterRAM;
             break;            // Found match
         }
     }
@@ -361,6 +360,8 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
     {
         uiResult = 2LL * 1024 * 1024 * 1024;            // 2GB
     }
+
+    uiResult = std::min(uiMax, uiResult);
     return uiResult;
 }
 
