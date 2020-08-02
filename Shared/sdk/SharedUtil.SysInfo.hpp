@@ -14,7 +14,6 @@
 #define _WIN32_DCOM
 #include <comdef.h>
 #include <Wbemidl.h>
-#include <iomanip>
 
 # pragma comment(lib, "wbemuuid.lib")
 #pragma comment(lib, "Version.lib")
