@@ -581,7 +581,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI, false);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -591,10 +591,12 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case Primitive3DVerticeSizes::VERT_XYZ:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                         static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF});
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                         static_cast<float>(vecTableContent[2]), static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -631,7 +633,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI, false);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -641,12 +643,15 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case Primitive3DVerticeSizes::VERT_XYZ_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF,
-                                                                 vecTableContent[3], vecTableContent[4]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                 static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF,
+                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2],
-                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])), vecTableContent[4], vecTableContent[5]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                 static_cast<float>(vecTableContent[2]),
+                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])),
+                                                                 static_cast<float>(vecTableContent[4]), static_cast<float>(vecTableContent[5])});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -681,7 +686,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -691,10 +696,11 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case PrimitiveVerticeSizes::VERT_XY:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0, (DWORD)0xFFFFFFFF});
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
+                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                         static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
@@ -731,7 +737,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI);
 
-    std::vector<float> vecTableContent;
+    std::vector<double> vecTableContent;
 
     while (argStream.NextIsTable())
     {
@@ -741,12 +747,14 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
         switch (vecTableContent.size())
         {
             case PrimitiveVerticeSizes::VERT_XY_UV:
-                pVecVertices->push_back(
-                    PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                 (DWORD)0xFFFFFFFF, static_cast<float>(vecTableContent[2]),
+                                                                 static_cast<float>(vecTableContent[3])});
                 break;
             case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
-                                                                 vecTableContent[3], vecTableContent[4]});
+                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
+                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
                 break;
             default:
                 argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
