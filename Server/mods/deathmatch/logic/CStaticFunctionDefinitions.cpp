@@ -1925,14 +1925,6 @@ const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer
     return pPlayer->GetPlayerVersion();
 }
 
-bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
-{
-    assert(pPlayer);
-
-    uiLevel = pPlayer->GetScriptDebugLevel();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* szName)
 {
     assert(pElement);

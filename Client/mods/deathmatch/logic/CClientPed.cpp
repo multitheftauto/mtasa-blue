@@ -1347,8 +1347,6 @@ void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, u
 
 void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 {
-    SetWarpInToVehicleRequired(true);
-
     // Ensure vehicle model is loaded
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
     if (g_pGame->IsASyncLoadingEnabled() && !pModelInfo->IsLoaded())
@@ -1514,15 +1512,15 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     RemoveTargetPosition();
 
+    if (!pVehicle->IsStreamedIn() || !m_pPlayerPed)
+        SetWarpInToVehicleRequired(true);
+
     // Make peds stream in when they warp to a vehicle
-    if (pVehicle)
-    {
-        CVector vecInVehiclePosition;
-        GetPosition(vecInVehiclePosition);
-        UpdateStreamPosition(vecInVehiclePosition);
-        if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
-            StreamIn(true);
-    }
+    CVector vecInVehiclePosition;
+    GetPosition(vecInVehiclePosition);
+    UpdateStreamPosition(vecInVehiclePosition);
+    if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
+        StreamIn(true);
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon()
@@ -1537,6 +1535,7 @@ void CClientPed::ResetToOutOfVehicleWeapon()
 
 CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 {
+    SetWarpInToVehicleRequired(false);
     SetDoingGangDriveby(false);
 
     // Reset any enter/exit tasks
@@ -2557,7 +2556,7 @@ CVector CClientPed::GetAim() const
     return CVector();
 }
 
-void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2569,7 +2568,7 @@ void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned cha
     }
 }
 
-void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2588,7 +2587,7 @@ void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX,
     }
 }
 
-void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                CVector* pSource, bool bInterpolateAim)
 {
     if (!m_bIsLocalPlayer)

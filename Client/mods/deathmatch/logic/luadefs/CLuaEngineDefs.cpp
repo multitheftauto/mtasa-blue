@@ -13,7 +13,7 @@
 
 void CLuaEngineDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"engineFreeModel", EngineFreeModel},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
@@ -37,8 +37,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", EngineSetModelVisibleTime},
-        {"engineGetModelVisibleTime", EngineGetModelVisibleTime},
         {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
@@ -59,10 +57,8 @@ void CLuaEngineDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -74,7 +70,6 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
-    lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -82,18 +77,12 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
-    lua_classfunction(luaVM, "getModelVisibleTime", "engineGetModelVisibleTime");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setObjectGroupPhysicalProperty", "engineSetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
-
-    //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
-    //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
-    //  lua_classvariable ( luaVM, "modelIDFromName", NULL, "engineGetModelIDFromName" ); .modelIDFromName["name"] = id
-    //  lua_classvariable ( luaVM, "modelTextureNames", NULL, "engineGetModelTextureNames" ); .modelTextureNames[mode] = {names}
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -782,7 +771,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    
+
     unsigned short usModelID = CModelNames::ResolveModelID(strModel);
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -1102,77 +1091,6 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
-{
-    // bool engineSetModelVisibleTime ( int/string modelID, int hourOn, int hourOff )
-    SString strModelId;
-    char cHourOn,cHourOff;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-    argStream.ReadNumber(cHourOn);
-    argStream.ReadNumber(cHourOff);
-
-    if (!argStream.HasErrors())
-    {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            if (cHourOn > cHourOff)
-                std::swap(cHourOn, cHourOff);
-
-            if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
-            {
-                lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
-                return 1;
-            }
-        }
-    }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
-{
-    // int, int engineGetModelVisibleTime ( int/string modelID )
-    SString strModelId;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelId);
-
-    if (!argStream.HasErrors())
-    {
-        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
-        {
-            char cHourOn, cHourOff;
-            if (pModelInfo->GetTime(cHourOn, cHourOff))
-            {
-                lua_pushnumber(luaVM, cHourOn);
-                lua_pushnumber(luaVM, cHourOff);
-                return 2;
-            }
-            else // Model is incompatible, don't let confuse user.
-            {
-                lua_pushnumber(luaVM, 0);
-                lua_pushnumber(luaVM, 24);
-                return 2;
-            }
-        }
-    }
-    else
-        luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

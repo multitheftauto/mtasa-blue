@@ -121,6 +121,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_FASTSPRINT] = false;
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
+    m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -3052,7 +3053,7 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
     pPlayer->GetAim(fAimX, fAimY);
     const CVector& vecAimSource = pPlayer->GetAimSource();
     const CVector& vecAimTarget = pPlayer->GetAimTarget();
-    unsigned char  ucDrivebyAim = pPlayer->GetVehicleAimAnim();
+    eVehicleAimDirection ucDrivebyAim = pPlayer->GetVehicleAimAnim();
 
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true);
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x90DE1212, false);
@@ -3221,7 +3222,7 @@ void CClientGame::UpdateMimics()
             m_pLocalPlayer->GetShotData(&vecOrigin, &vecTarget);
             float fAimX = pShotSync->m_fArmDirectionX;
             float fAimY = pShotSync->m_fArmDirectionY;
-            char  cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
+            eVehicleAimDirection cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
             bool  bAkimboUp = g_pMultiplayer->GetAkimboTargetUp();
 
             /*
@@ -3559,7 +3560,6 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetAlphaTransparencies();
-    g_pGame->ResetModelTimes();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);

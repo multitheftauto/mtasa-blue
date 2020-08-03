@@ -28,10 +28,10 @@ public:
     
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE(GetColShapeSize);
+    LUA_DECLARE_OOP(GetColShapeSize);
     LUA_DECLARE(SetColShapeSize);
-    LUA_DECLARE(GetColPolygonPoints);
-    LUA_DECLARE(GetColPolygonPointPosition);
+    LUA_DECLARE_OOP(GetColPolygonPoints);
+    LUA_DECLARE_OOP(GetColPolygonPointPosition);
     LUA_DECLARE(SetColPolygonPointPosition);
     LUA_DECLARE(AddColPolygonPoint);
     LUA_DECLARE(RemoveColPolygonPoint);
