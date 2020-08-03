@@ -59,8 +59,8 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRadius", "setColShapeRadius", SetColShapeRadius);
     lua_classfunction(luaVM, "getSize", "getColShapeSize", OOP_GetColShapeSize);
     lua_classfunction(luaVM, "setSize", "setColShapeSize", SetColShapeSize);
-    lua_classfunction(luaVM, "getPoints", "getColPolygonPoints", GetColPolygonPoints);
-    lua_classfunction(luaVM, "getPointPosition", "getColPolygonPointPosition", GetColPolygonPointPosition);
+    lua_classfunction(luaVM, "getPoints", "getColPolygonPoints", OOP_GetColPolygonPoints);
+    lua_classfunction(luaVM, "getPointPosition", "getColPolygonPointPosition", OOP_GetColPolygonPointPosition);
     lua_classfunction(luaVM, "setPointPosition", "setColPolygonPointPosition", SetColPolygonPointPosition);
     lua_classfunction(luaVM, "addPoint", "addColPolygonPoint", AddColPolygonPoint);
     lua_classfunction(luaVM, "removePoint", "removeColPolygonPoint", RemoveColPolygonPoint);
@@ -69,7 +69,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "radius", "setColShapeRadius", "getColShapeRadius", SetColShapeRadius, GetColShapeRadius);
     lua_classvariable(luaVM, "size", "setColShapeSize", "getColShapeSize", SetColShapeSize, OOP_GetColShapeSize);
-    lua_classvariable(luaVM, "points", nullptr, "getColPolygonPoints", nullptr, GetColPolygonPoints);
+    lua_classvariable(luaVM, "points", nullptr, "getColPolygonPoints", nullptr, OOP_GetColPolygonPoints);
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -571,6 +571,46 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
         uint uiIndex = 0;
         for (auto iter = pColPolygon->IterBegin(); iter != pColPolygon->IterEnd(); ++iter)
         {
+            CVector2D vecPoint = *iter;
+            lua_pushnumber(luaVM, ++uiIndex);
+            lua_newtable(luaVM);
+            {
+                lua_pushnumber(luaVM, 1);
+                lua_pushnumber(luaVM, vecPoint.fX);
+                lua_settable(luaVM, -3);
+
+                lua_pushnumber(luaVM, 2);
+                lua_pushnumber(luaVM, vecPoint.fY);
+                lua_settable(luaVM, -3);
+            }
+            lua_settable(luaVM, -3);
+        }
+        return 1;
+    }
+
+    argStream.SetCustomError("ColShape must be Polygon");
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
+{
+    CColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+    {
+        CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
+
+        lua_newtable(luaVM);
+
+        uint uiIndex = 0;
+        for (auto iter = pColPolygon->IterBegin(); iter != pColPolygon->IterEnd(); ++iter)
+        {
             lua_pushnumber(luaVM, ++uiIndex);
             lua_pushvector(luaVM, *iter);
             lua_settable(luaVM, -3);
@@ -598,6 +638,38 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     {
         CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
         CVector2D          vecPoint;
+        if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
+        {
+            lua_pushnumber(luaVM, vecPoint.fX);
+            lua_pushnumber(luaVM, vecPoint.fY);
+            return 2;
+        }
+
+        m_pScriptDebugging->LogWarning(luaVM, "Invalid point index");
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    argStream.SetCustomError("ColShape must be Polygon");
+    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
+{
+    CColShape* pColShape;
+    uint       uiPointIndex;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadNumber(uiPointIndex);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+    {
+        CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
+        CVector2D    vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushvector(luaVM, vecPoint);
