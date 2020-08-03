@@ -103,12 +103,12 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     return 1;
 }
 
-std::tuple<int, int> CLuaCameraDefs::GetCameraViewMode()
+std::tuple<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    unsigned short ucVehicleMode = (unsigned short)pCamera->GetCameraVehicleViewMode();
-    unsigned short ucPedMode = (unsigned short)pCamera->GetCameraPedViewMode();
+    unsigned char ucVehicleMode = (unsigned char)pCamera->GetCameraVehicleViewMode();
+    unsigned char ucPedMode = (unsigned char)pCamera->GetCameraPedViewMode();
 
     return {ucVehicleMode, ucPedMode};
 }
@@ -437,14 +437,14 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
     return 2;
 }
 
-bool CLuaCameraDefs::SetCameraViewMode(int usVehicleViewMode, std::optional<int> usPedViewMode)
+bool CLuaCameraDefs::SetCameraViewMode(unsigned char ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    pCamera->SetCameraVehicleViewMode((eVehicleCamMode)usVehicleViewMode);
+    pCamera->SetCameraVehicleViewMode((eVehicleCamMode)ucVehicleViewMode);
 
-    if (usPedViewMode)
-        pCamera->SetCameraPedViewMode((ePedCamMode)usPedViewMode.value());
+    if (ucPedViewMode)
+        pCamera->SetCameraPedViewMode((ePedCamMode)ucPedViewMode.value());
 
     return true;
     }

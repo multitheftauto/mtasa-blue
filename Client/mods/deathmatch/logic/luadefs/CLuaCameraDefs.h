@@ -18,8 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static bool SetCameraViewMode(int usVehicleViewMode, std::optional<int> usPedViewMode);
-    static std::tuple<int, int> GetCameraViewMode();
+    static bool SetCameraViewMode(unsigned char usVehicleViewMode, std::optional<unsigned char> usPedViewMode);
+    static std::tuple<unsigned char, unsigned char> GetCameraViewMode();
 
     // Cam get funcs
     LUA_DECLARE(GetCamera);
