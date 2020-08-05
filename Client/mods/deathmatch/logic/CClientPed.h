@@ -70,7 +70,9 @@ enum eMovementState
     MOVEMENTSTATE_ROLL,                 // Crouch-rolling (Needs adding)
     MOVEMENTSTATE_JUMP,                 // Jumping
     MOVEMENTSTATE_FALL,                 // Falling
-    MOVEMENTSTATE_CLIMB                 // Climbing
+    MOVEMENTSTATE_CLIMB,                // Climbing
+	MOVEMENTSTATE_ENTERINGVEHICLE,      // Entering vehicle
+    MOVEMENTSTATE_LEAVINGVEHICLE,       // Leaving vehicle
 };
 
 enum eDeathAnims
