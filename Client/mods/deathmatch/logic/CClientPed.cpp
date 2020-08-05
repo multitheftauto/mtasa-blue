@@ -193,7 +193,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_MovementStateNames[MOVEMENTSTATE_STAND] = "stand";
     m_MovementStateNames[MOVEMENTSTATE_WALK] = "walk";
     m_MovementStateNames[MOVEMENTSTATE_POWERWALK] = "powerwalk";
-	m_MovementStateNames[MOVEMENTSTATE_ENTERINGVEHICLE] = "enteringvehicle";
+    m_MovementStateNames[MOVEMENTSTATE_ENTERINGVEHICLE] = "enteringvehicle";
     m_MovementStateNames[MOVEMENTSTATE_LEAVINGVEHICLE] = "leavingvehicle";
     m_MovementStateNames[MOVEMENTSTATE_JOG] = "jog";
     m_MovementStateNames[MOVEMENTSTATE_SPRINT] = "sprint";
@@ -2380,7 +2380,7 @@ eMovementState CClientPed::GetMovementState()
             return MOVEMENTSTATE_JUMP;
         // Is he entering a vehicle?
         else if (IsEnteringVehicle())
-			return MOVEMENTSTATE_ENTERINGVEHICLE;
+            return MOVEMENTSTATE_ENTERINGVEHICLE;
         // Is he falling?
         else if (!IsOnGround() && !GetContactEntity())
             return MOVEMENTSTATE_FALL;
@@ -2426,7 +2426,7 @@ eMovementState CClientPed::GetMovementState()
     {
         // Is he leaving a vehicle?
         if (IsLeavingVehicle())
-        return MOVEMENTSTATE_LEAVINGVEHICLE;
+            return MOVEMENTSTATE_LEAVINGVEHICLE;
     }
     return MOVEMENTSTATE_UNKNOWN;
 }

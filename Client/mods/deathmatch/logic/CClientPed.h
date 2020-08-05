@@ -60,19 +60,19 @@ enum eBodyPart
 enum eMovementState
 {
     MOVEMENTSTATE_UNKNOWN,
-    MOVEMENTSTATE_STAND,                // Standing still
-    MOVEMENTSTATE_WALK,                 // Walking
-    MOVEMENTSTATE_POWERWALK,            // Walking quickly
-    MOVEMENTSTATE_JOG,                  // Jogging
-    MOVEMENTSTATE_SPRINT,               // Sprinting
-    MOVEMENTSTATE_CROUCH,               // Crouching still
-    MOVEMENTSTATE_CRAWL,                // Crouch-moving
-    MOVEMENTSTATE_ROLL,                 // Crouch-rolling (Needs adding)
-    MOVEMENTSTATE_JUMP,                 // Jumping
-    MOVEMENTSTATE_FALL,                 // Falling
-    MOVEMENTSTATE_CLIMB,                // Climbing
-	MOVEMENTSTATE_ENTERINGVEHICLE,      // Entering vehicle
-    MOVEMENTSTATE_LEAVINGVEHICLE,       // Leaving vehicle
+    MOVEMENTSTATE_STAND,                      // Standing still
+    MOVEMENTSTATE_WALK,                       // Walking
+    MOVEMENTSTATE_POWERWALK,                  // Walking quickly
+    MOVEMENTSTATE_JOG,                        // Jogging
+    MOVEMENTSTATE_SPRINT,                     // Sprinting
+    MOVEMENTSTATE_CROUCH,                     // Crouching still
+    MOVEMENTSTATE_CRAWL,                      // Crouch-moving
+    MOVEMENTSTATE_ROLL,                       // Crouch-rolling (Needs adding)
+    MOVEMENTSTATE_JUMP,                       // Jumping
+    MOVEMENTSTATE_FALL,                       // Falling
+    MOVEMENTSTATE_CLIMB,                      // Climbing
+    MOVEMENTSTATE_ENTERINGVEHICLE,            // Entering vehicle
+    MOVEMENTSTATE_LEAVINGVEHICLE,             // Leaving vehicle
 };
 
 enum eDeathAnims
