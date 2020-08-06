@@ -1232,34 +1232,42 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
 
-            // Convert to number
-            int iLevel = atoi(szArguments);
-            if (iLevel != (int)pPlayer->GetScriptDebugLevel())
+            // To prevent characters before converting
+            if (strcmp(szArguments, "0") == 0 || strcmp(szArguments, "1") == 0 || strcmp(szArguments, "2") == 0 || strcmp(szArguments, "3") == 0)
             {
-                // Between 0 and 3?
-                if (iLevel >= 0 && iLevel <= 3)
+                // Convert to number
+                int iLevel = atoi(szArguments);
+                if (iLevel != (int)pPlayer->GetScriptDebugLevel())
                 {
-                    // Set the new level
-                    pPlayer->SetScriptDebugLevel(iLevel);
+                    // Between 0 and 3?
+                    if (iLevel >= 0 && iLevel <= 3)
+                    {
+                        // Set the new level
+                        pPlayer->SetScriptDebugLevel(iLevel);
 
-                    // Tell the player and the console
-                    pEchoClient->SendEcho(SString("debugscript: Your debug mode was set to %i", iLevel));
-                    CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %i\n", GetAdminNameForLog(pClient).c_str(), iLevel);
+                        // Tell the player and the console
+                        pEchoClient->SendEcho(SString("debugscript: Your debug mode was set to %i", iLevel));
+                        CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %i\n", GetAdminNameForLog(pClient).c_str(), iLevel);
 
-                    // Enable/Disable their debugger
-                    if (iLevel == 0)
-                        CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, false);
+                        // Enable/Disable their debugger
+                        if (iLevel == 0)
+                            CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, false);
+                        else
+                            CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, true);
+                    }
                     else
-                        CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, true);
+                    {
+                        pEchoClient->SendEcho("debugscript: Modes available are 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)");
+                    }
                 }
                 else
                 {
-                    pEchoClient->SendEcho("debugscript: Modes available are 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)");
+                    pEchoClient->SendEcho("debugscript: Your debug mode is already that");
                 }
             }
             else
             {
-                pEchoClient->SendEcho("debugscript: Your debug mode is already that");
+                pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
             }
         }
         else
