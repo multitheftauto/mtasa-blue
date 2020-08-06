@@ -3603,6 +3603,8 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
+    memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+
     // Keep the bonet and boot intact
     ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
     memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
