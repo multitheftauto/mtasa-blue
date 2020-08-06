@@ -13,7 +13,7 @@
 
 void CLuaMarkerDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createMarker", CreateMarker},
 
         {"getMarkerCount", GetMarkerCount},
@@ -31,10 +31,8 @@ void CLuaMarkerDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaMarkerDefs::AddClass(lua_State* luaVM)
@@ -61,7 +59,6 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "size", "setMarkerSize", "getMarkerSize");
 
     lua_classvariable(luaVM, "target", SetMarkerTarget, OOP_GetMarkerTarget);
-    // lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor );
 
     lua_registerclass(luaVM, "Marker", "Element");
 }

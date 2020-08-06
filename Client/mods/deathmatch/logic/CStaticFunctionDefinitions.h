@@ -188,7 +188,6 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
-    static bool SetPedArmor(CClientPed& Ped, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
@@ -402,7 +401,14 @@ public:
     static bool SetCursorAlpha(float fAlpha);
 
     // Drawing funcs
-    static ID3DXFont* ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static ID3DXFont*        ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static inline ID3DXFont* ResolveD3DXFont(const std::variant<CClientDxFont*, eFontType>& variant)
+    {
+        if (std::holds_alternative<eFontType>(variant))
+            return g_pCore->GetGraphics()->GetFont(std::get<eFontType>(variant));
+
+        return std::get<CClientDxFont*>(variant)->GetD3DXFont();
+    };
 
     // GUI funcs
     static bool        GUIGetInputEnabled();

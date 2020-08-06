@@ -447,6 +447,7 @@ public:
     void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType);
 
     virtual int GetCustomMoveAnim();
+    bool        IsDoingGangDriveby();
 
     static void StaticSetHooks();
 };

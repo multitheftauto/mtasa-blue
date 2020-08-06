@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "game/CAnimBlendAssocGroup.h"
 
 std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
 {
@@ -116,9 +117,9 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
                 return true;
             }
 
-            int iGroupID = pCurrentAnimAssociation->GetAnimGroup();
-            int iAnimID = pCurrentAnimAssociation->GetAnimID();
-            if (iGroupID < 0 && iAnimID < 0)
+            eAnimGroup iGroupID = pCurrentAnimAssociation->GetAnimGroup();
+            eAnimID iAnimID = pCurrentAnimAssociation->GetAnimID();
+            if (iGroupID < eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID < eAnimID::ANIM_ID_WALK)
             {
                 return true;
             }

@@ -696,7 +696,7 @@ namespace SharedUtil
             return GenerateHashHexString(hashFunction, NULL, 0);
     }
 
-    void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    inline void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
     {
         unsigned int v0 = v[0], v1 = v[1], i, sum = 0;
         unsigned int delta = 0x9E3779B9;
@@ -710,7 +710,7 @@ namespace SharedUtil
         w[1] = v1;
     }
 
-    void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    inline void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
     {
         unsigned int v0 = v[0], v1 = v[1], i, sum = 0xC6EF3720;
         unsigned int delta = 0x9E3779B9;
@@ -818,5 +818,26 @@ namespace SharedUtil
 
         out->assign((char*)buffer, numPasses * 4);
         delete[] buffer;
+
+
+        // Delete all 0's from the end
+        // As of now, even if the user passed it in
+        // We'll delete it, because there's no way
+        // We can know if the user added the padding or not.
+
+        // Note: If we get there, there's at least 1 block(4 chars)
+        //       before out->end()
+        {
+            // Traverse the string until the beginning, or until the fist non-0 char
+            auto iter = out->end();
+            for (; iter != out->begin(); iter--)
+            {
+                if (*std::prev(iter) != 0)
+                    break;
+            }
+
+            if (iter != out->end())
+                out->erase(iter, out->end()); // Erase all 0s
+        }
     }
 }            // namespace SharedUtil

@@ -676,22 +676,34 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
     {
         const CRegistryResultRow& row = result->Data.front();
 
-        const char* szValue = (const char*)row[0].pVal;
-        int         iType = static_cast<int>(row[1].nVal);
+        const auto type = static_cast<int>(row[1].nVal);
+        const auto value = (const char*)row[0].pVal;
 
         // Cache value for next get
-        pAccount->SetData(szKey, szValue, iType);
+        pAccount->SetData(szKey, value, type);
 
         // Account data is stored as text so we don't need to check what type it is just return it
-        if (iType == LUA_TBOOLEAN)
+        switch (type)
         {
-            SString strResult = szValue;
-            pResult->ReadBool(strResult == "true");
+        case LUA_TBOOLEAN:
+            pResult->ReadBool(strcmp(value, "true") == 0);
+            break;
+
+        case LUA_TNUMBER:
+            pResult->ReadNumber(strtod(value, NULL));
+            break;
+
+        case LUA_TNIL:
+            break;
+
+        case LUA_TSTRING:
+            pResult->ReadString(value);
+            break;
+
+        default:
+            dassert(0); // It never should hit this, if so, something corrupted
+            break;
         }
-        else if (iType == LUA_TNUMBER)
-            pResult->ReadNumber(strtod(szValue, NULL));
-        else
-            pResult->ReadString(szValue);
     }
     else
     {

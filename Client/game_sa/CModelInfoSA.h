@@ -267,8 +267,7 @@ protected:
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<CModelInfoSA*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<TimeInfo*, TimeInfo*>                                        ms_ModelDefaultModelTimeInfo;
+    static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     bool                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
@@ -320,9 +319,6 @@ public:
     void           RestreamIPL();
     static void    StaticFlushPendingRestreamIPL();
     static void    StaticSetHooks();
-    bool           GetTime(char& cHourOn, char& cHourOff);
-    bool           SetTime(char cHourOn, char cHourOff);
-    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -345,7 +341,7 @@ public:
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) override;
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
-    void         ResetVehicleDummies();
+    void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
 
     // ONLY use for peds
