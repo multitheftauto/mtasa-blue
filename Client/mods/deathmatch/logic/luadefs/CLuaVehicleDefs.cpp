@@ -4030,8 +4030,11 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2)
+bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> optVariant, std::optional<unsigned char> optVariant2)
 {
+    unsigned char ucVariant = optVariant.value_or(0xFE);
+    unsigned char ucVariant2 = optVariant2.value_or(0xFE);
+
     if (ucVariant == 254 && ucVariant2 == 254)
         CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
 
