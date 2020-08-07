@@ -2377,6 +2377,10 @@ eMovementState CClientPed::GetMovementState()
         else if (strcmp(szComplexTaskName, "TASK_COMPLEX_JUMP") == 0)
             return MOVEMENTSTATE_JUMP;
 
+        // Is he entering a vehicle?
+        else if (IsEnteringVehicle())
+            return MOVEMENTSTATE_UNKNOWN;
+
         // Is he falling?
         else if (!IsOnGround() && !GetContactEntity())
             return MOVEMENTSTATE_FALL;
@@ -2416,6 +2420,15 @@ eMovementState CClientPed::GetMovementState()
                 return MOVEMENTSTATE_CRAWL;
         }
     }
+
+    // Do we have a player, and are we in a car?
+    if (m_pPlayerPed && GetRealOccupiedVehicle())
+    {
+        // Is he leaving a vehicle?
+        if (IsLeavingVehicle())
+            return MOVEMENTSTATE_UNKNOWN;
+    }
+
     return MOVEMENTSTATE_UNKNOWN;
 }
 
@@ -4626,7 +4639,7 @@ bool CClientPed::IsOnGround()
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
-    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel) <= 1.0f);
+    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel) <= 1.01f);
 }
 
 bool CClientPed::IsClimbing()
