@@ -44,6 +44,10 @@ CDebugHookManager::CDebugHookManager()
                         {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
                         {"passwordHash", {{EArgType::Password, 0}}},                    // 0=PASSWORD, ...
                         {"passwordVerify", {{EArgType::Password, 0}}},                  // 0=PASSWORD, ...
+                        {"encodeString", {{EArgType::MaxArgs, 2}}},                     // 2=SECRETKEY, CALLBACK
+                        {"decodeString", {{EArgType::MaxArgs, 2}}},                     // 2=SECRETKEY, CALLBACK
+                        {"teaEncode", {{EArgType::MaxArgs, 1}}},                        // 1=SECRETKEY
+                        {"teaDecode", {{EArgType::MaxArgs, 1}}},                        // 1=SECRETKEY
                     };
 }
 
