@@ -276,6 +276,8 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
     SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
     if (pComponent)
     {
+        if (g_pCore->GetGame()->GetHud()->IsDisabled())
+            return false;
         // Determine if invisible by matching data with disabled values
         uchar* pSrc = (uchar*)(&pComponent->disabledData);
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
