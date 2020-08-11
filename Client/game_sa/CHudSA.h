@@ -77,7 +77,7 @@ public:
     bool CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2);
     void Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor);
     void SetComponentVisible(eHudComponent component, bool bVisible);
-    bool IsComponentVisible(eHudComponent component);
+    bool IsComponentVisible(eHudComponent component, bool bOutIsEnabled);
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
 

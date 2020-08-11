@@ -334,16 +334,18 @@ int CLuaPlayerDefs::ShowPlayerHudComponent(lua_State* luaVM)
 
 int CLuaPlayerDefs::IsPlayerHudComponentVisible(lua_State* luaVM)
 {
-    //  bool isPlayerHudComponentVisible ( string componen )
+    //  bool isPlayerHudComponentVisible ( string component, checkEnabled = true )
     eHudComponent component;
+    bool          bIsEnabled;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(component);
+    argStream.ReadBool(bIsEnabled, true);
 
     if (!argStream.HasErrors())
     {
         bool bIsVisible;
-        if (CStaticFunctionDefinitions::IsPlayerHudComponentVisible(component, bIsVisible))
+        if (CStaticFunctionDefinitions::IsPlayerHudComponentVisible(component, bIsEnabled, bIsVisible))
         {
             lua_pushboolean(luaVM, bIsVisible);
             return 1;

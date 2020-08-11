@@ -119,7 +119,7 @@ public:
 
     // Player set funcs
     static bool ShowPlayerHudComponent(eHudComponent component, bool bShow);
-    static bool IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible);
+    static bool IsPlayerHudComponentVisible(eHudComponent component, bool bOutIsEnabled, bool& bOutIsVisible);
     static bool SetPlayerMoney(long lMoney, bool bInstant);
     static bool GivePlayerMoney(long lMoney);
     static bool TakePlayerMoney(long lMoney);

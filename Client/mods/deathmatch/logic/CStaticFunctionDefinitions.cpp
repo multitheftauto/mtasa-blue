@@ -1951,9 +1951,9 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent(eHudComponent component,
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible)
+bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool bOutIsEnabled, bool& bOutIsVisible)
 {
-    bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component);
+    bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component, bOutIsEnabled);
     return true;
 }
 

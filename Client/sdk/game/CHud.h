@@ -50,7 +50,7 @@ public:
     //  virtual VOID                SetVehicleName( char * szName )=0;
     // virtual VOID              SetZoneName( char * szName )=0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
-    virtual bool IsComponentVisible(eHudComponent component) = 0;
+    virtual bool IsComponentVisible(eHudComponent component, bool bOutIsEnabled) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
     virtual void ResetComponentAdjustment() = 0;
 };
