@@ -303,6 +303,22 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
     return NULL;
 }
 
+CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
+{
+    assert(table);
+
+    // Grab it and return a pointer to the variable
+    std::map<std::string, SCustomData>::const_iterator iter = m_pCustomData->IterBegin();
+    for (; iter != m_pCustomData->IterEnd(); iter++)
+    {
+        table->PushString(iter->first.c_str());                // key
+        table->PushArgument(iter->second.Variable);            // value
+    }
+
+    return table;
+}
+
+
 bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable

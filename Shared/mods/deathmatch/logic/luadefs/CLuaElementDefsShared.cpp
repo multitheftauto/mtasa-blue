@@ -50,6 +50,41 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::GetAllElementData(lua_State* luaVM)
+{
+    //  table getAllElementData ( element theElement )
+
+#ifdef MTA_CLIENT
+    CClientEntity* pElement;
+#else
+    CElement* pElement;
+#endif
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaArguments Args;
+#ifdef MTA_CLIENT
+        CLuaArguments* pVariable = pElement->GetAllCustomData(&Args);
+#else
+        CLuaArguments* pVariable = CStaticFunctionDefinitions::GetAllElementData(pElement, &Args);
+#endif
+        if (pVariable)
+        {
+            pVariable->PushAsTable(luaVM);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
 int CLuaElementDefs::HasElementData(lua_State* luaVM)
 {
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )

@@ -198,6 +198,7 @@ public:
 
     CCustomData*  GetCustomDataPointer() { return m_pCustomData; }
     CLuaArgument* GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
+    CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool          GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
     bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
     bool          GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);

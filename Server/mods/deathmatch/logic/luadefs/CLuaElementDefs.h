@@ -34,7 +34,6 @@ public:
     LUA_DECLARE(getElementID);
     LUA_DECLARE(getElementByID);
     LUA_DECLARE(getElementByIndex);
-    LUA_DECLARE(getAllElementData);
     LUA_DECLARE(getElementParent);
     LUA_DECLARE_OOP(getElementMatrix);
     LUA_DECLARE_OOP(getElementPosition);
@@ -68,6 +67,7 @@ public:
 
     // Element data
     LUA_DECLARE(GetElementData);
+    LUA_DECLARE(GetAllElementData);
     LUA_DECLARE(HasElementData);
     LUA_DECLARE(setElementData);
     LUA_DECLARE(removeElementData);

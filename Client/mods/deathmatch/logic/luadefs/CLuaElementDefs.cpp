@@ -22,6 +22,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementByID", GetElementByID},
         {"getElementByIndex", GetElementByIndex},
         {"getElementData", GetElementData},
+        {"getAllElementData", GetAllElementData},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
