@@ -66,11 +66,7 @@ int CLuaElementDefs::GetAllElementData(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CLuaArguments Args;
-#ifdef MTA_CLIENT
         CLuaArguments* pVariable = pElement->GetAllCustomData(&Args);
-#else
-        CLuaArguments* pVariable = CStaticFunctionDefinitions::GetAllElementData(pElement, &Args);
-#endif
         if (pVariable)
         {
             pVariable->PushAsTable(luaVM);
