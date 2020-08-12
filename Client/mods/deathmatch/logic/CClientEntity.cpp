@@ -318,7 +318,6 @@ CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
     return table;
 }
 
-
 bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable
