@@ -1010,7 +1010,7 @@ public:
     //
     // Reads a table of key-value string pairs
     //
-    void ReadPairTable(std::vector<std::pair<SString, SString>>& outPairs)
+    void ReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, bool bKeyValue = true)
     {
         outPairs.clear();        
 
@@ -1018,7 +1018,11 @@ public:
         if (argument == LUA_TTABLE)
         {
             outPairs.reserve(64);
-            InternalReadPair(outPairs, m_iIndex);
+            // Iterate sequentially first( { key, value } )
+            InternalReadPairTable(outPairs, m_iIndex);
+            // Now we can take into account flag's pairs( [ key ] = value )
+            if (bKeyValue)
+                InternalReadPairKeyValue(outPairs, m_iIndex);
             outPairs.shrink_to_fit();
             ++m_iIndex;
             return;
@@ -1073,27 +1077,27 @@ public:
     }
 
 protected:
-    void InternalReadPair(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
+    // Takes key-value pair from top of the stack
+    bool InternalReadPair(std::pair<SString, SString>& keyValue)
     {
-        lua_pushnil(m_luaVM);
-
-        while (lua_next(m_luaVM, iIndex) != 0)
+        int keyType = lua_type(m_luaVM, -2);
+        int valueType = lua_type(m_luaVM, -1);
+        if (keyType == LUA_TSTRING || keyType == LUA_TNUMBER)
         {
-            int keyType = lua_type(m_luaVM, -2);
-            int valueType = lua_type(m_luaVM, -1);
-            if (keyType == LUA_TSTRING || keyType == LUA_TNUMBER)
+            SString value;
+            if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
             {
-                SString value;
-                if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
-                {
-                    uint uiLength = lua_strlen(m_luaVM, -1);
-                    value.assign(lua_tostring(m_luaVM, -1), uiLength);
-                }
-                else if (valueType == LUA_TBOOLEAN)
-                {
-                    value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
-                }
+                uint uiLength = lua_strlen(m_luaVM, -1);
+                value.assign(lua_tostring(m_luaVM, -1), uiLength);
+            }
+            else if (valueType == LUA_TBOOLEAN)
+            {
+                value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
+            }
 
+            // Get rid of empty values
+            if (value.length() > 0)
+            {
                 // Dumb number -> string convertion to avoid stack perturbations
                 if (keyType == LUA_TNUMBER)
                 {
@@ -1101,11 +1105,59 @@ protected:
                     lua_Number n = lua_tonumber(m_luaVM, -2);
                     lua_number2str(s, n);
 
-                    outPairs.emplace_back(SStringX(s), value);
+                    keyValue = std::make_pair(SStringX(s), value);
                 }
                 else
-                    outPairs.emplace_back(SStringX(lua_tostring(m_luaVM, -2)), value);
+                    keyValue = std::make_pair(SStringX(lua_tostring(m_luaVM, -2)), value);
+
+                return true;
             }
+        }
+
+        return false;
+    }    
+
+    // Reads { key, value } as a pair
+    void InternalReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
+    {
+        std::pair<SString, SString> keyValue;
+
+        // lua_next has a bug after it calling findindex internally
+        // But we have to iterate sequentially right now. So luaL_getn is the solution.
+        for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
+        {
+            lua_pushnumber(m_luaVM, i);
+            lua_gettable(m_luaVM, iIndex);
+
+            if (lua_type(m_luaVM, -1) == LUA_TTABLE && luaL_getn(m_luaVM, -1) >= 2)
+            {
+                lua_pushnumber(m_luaVM, 1);
+                lua_gettable(m_luaVM, -2);
+
+                lua_pushnumber(m_luaVM, 2);
+                lua_gettable(m_luaVM, -3);
+
+                if (InternalReadPair(keyValue))
+                    outPairs.push_back(std::move(keyValue));
+
+                lua_pop(m_luaVM, 2);
+            }
+
+            lua_pop(m_luaVM, 1);
+        }       
+    }
+
+    // Reads [ key ] = value as a pair
+    void InternalReadPairKeyValue(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
+    {
+        lua_pushnil(m_luaVM);
+
+        std::pair<SString, SString> keyValue;
+        while (lua_next(m_luaVM, iIndex) != 0)
+        {
+            if (InternalReadPair(keyValue))
+                outPairs.push_back(std::move(keyValue));
+
             lua_pop(m_luaVM, 1);
         }
     }
