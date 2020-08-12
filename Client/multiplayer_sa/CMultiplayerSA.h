@@ -147,6 +147,8 @@ public:
                       unsigned char BottomBlue);
     void  SetHeatHaze(const SHeatHazeSettings& settings);
     void  GetHeatHaze(SHeatHazeSettings& settings);
+    void  SetColorCorrectionEnabled(bool bEnabled);
+    void  GetColorCorrectionEnabled(bool& bEnabled);
     void  ResetHeatHaze();
     void  SetHeatHazeEnabled(bool bEnabled);
     void  ApplyHeatHazeEnabled();

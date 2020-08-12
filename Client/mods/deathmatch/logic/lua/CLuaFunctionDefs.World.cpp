@@ -656,6 +656,16 @@ int CLuaFunctionDefs::GetHeatHaze(lua_State* luaVM)
     return 9;
 }
 
+int CLuaFunctionDefs::GetColorCorrectionEnabled(lua_State* luaVM)
+{
+    //  bool getColorCorrectionEnabled()
+    bool bEnabled;
+    CStaticFunctionDefinitions::GetColorCorrectionEnabled(bEnabled);
+
+    lua_pushboolean(luaVM, bEnabled);
+    return 1;
+}
+
 int CLuaFunctionDefs::SetHeatHaze(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
@@ -684,6 +694,29 @@ int CLuaFunctionDefs::SetHeatHaze(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Return false
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::SetColorCorrectionEnabled(lua_State* luaVM)
+{
+    //  bool setColorCorrectionEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetColorCorrectionEnabled(bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -6657,6 +6657,18 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetColorCorrectionEnabled(bool& bEnabled)
+{
+    g_pMultiplayer->GetColorCorrectionEnabled(bEnabled);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColorCorrectionEnabled(bool bEnabled)
+{
+    g_pMultiplayer->SetColorCorrectionEnabled(bEnabled);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pMultiplayer->ResetHeatHaze();

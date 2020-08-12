@@ -114,6 +114,8 @@ public:
     LUA_DECLARE(ResetSkyGradient);
     LUA_DECLARE(GetHeatHaze);
     LUA_DECLARE(SetHeatHaze);
+    LUA_DECLARE(SetColorCorrectionEnabled);
+    LUA_DECLARE(GetColorCorrectionEnabled);
     LUA_DECLARE(ResetHeatHaze);
     LUA_DECLARE(SetWeather);
     LUA_DECLARE(SetWeatherBlended);

@@ -1610,6 +1610,29 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
+void CMultiplayerSA::SetColorCorrectionEnabled(bool bEnabled)
+{
+    // Exit if it already set
+    if ((*(BYTE*)0x704D1C == 0x52) == bEnabled)
+        return;
+
+    if (bEnabled)
+    {
+        static BYTE DefaultBytes[2] = { 0x52, 0x50 };
+        MemCpy((void*)0x704D1C, DefaultBytes, sizeof(DefaultBytes));
+    }
+    else
+    {
+        static BYTE JmpBytes[2] = { 0xEB, 0x8 };
+        MemCpy((void*)0x704D1C, JmpBytes, sizeof(JmpBytes));
+    }
+}
+
+void CMultiplayerSA::GetColorCorrectionEnabled(bool& bEnabled)
+{
+    bEnabled = *(BYTE*)0x704D1C == 0x52;
+}
+
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
                         bool bAllowAutoTypeChange)
 {

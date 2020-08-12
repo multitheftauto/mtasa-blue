@@ -609,6 +609,8 @@ public:
     static bool ResetSkyGradient();
     static bool GetHeatHaze(SHeatHazeSettings& settings);
     static bool SetHeatHaze(const SHeatHazeSettings& settings);
+    static bool GetColorCorrectionEnabled(bool& bEnabled);
+    static bool SetColorCorrectionEnabled(bool bEnabled);
     static bool ResetHeatHaze();
     static bool GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha);
     static bool SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha);
