@@ -63,7 +63,7 @@ public:
         top = 0.0f;
     }
 
-    // custom function. Used for fixing custom map collision crashes in CPhysical class (infinite loop)
+    // Fix #1613: custom function. Used for fixing custom map collision crashes in CPhysical class (infinite loop)
     void FixIncorrectTopLeft()
     {
         if (left > right) left = right - 1.0f;
