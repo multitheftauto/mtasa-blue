@@ -106,12 +106,17 @@ public:
     float                     m_fLighting;                                // 300
     float                     m_fLighting2;                               // 304
     class CShadowDataSA*      m_pShadowData;                              // 308
+
+    CRect* GetBoundRect_(CRect* pRect);
 };
 static_assert(sizeof(CPhysicalSAInterface) == 0x138, "Invalid size for CPhysicalSAInterface");
 
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {
 public:
+    CPhysicalSA();
+    void         InstallHooks();
+
     virtual void RestoreLastGoodPhysicsState();
     CVector*     GetMoveSpeed(CVector* vecMoveSpeed);
     CVector*     GetTurnSpeed(CVector* vecTurnSpeed);

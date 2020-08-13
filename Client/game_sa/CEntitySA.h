@@ -33,6 +33,7 @@
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
 
+class CRect;
 class CEntitySAInterfaceVTBL
 {
 public:
@@ -193,6 +194,10 @@ public:
 
     uint8 m_pad0;            // 55
 
+    CRect* GetBoundRect_(CRect* pRect);
+    void TransformFromObjectSpace(CVector& outPosn, CVector const& offset);
+    CVector* GetBoundCentre(CVector* pOutCentre);
+
     //
     // Functions to hide member variable misuse
     //
@@ -227,13 +232,13 @@ class CEntitySA : public virtual CEntity
     friend class COffsets;
 
 public:
-    CEntitySA();
-
     CEntitySAInterface* m_pInterface;
 
     DWORD internalID;
     //  VOID                        SetModelAlpha ( int iAlpha );
 
+    CEntitySA();
+    void                InstallHooks();
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 

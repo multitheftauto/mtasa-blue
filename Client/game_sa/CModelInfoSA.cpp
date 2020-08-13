@@ -14,6 +14,7 @@
 
 extern CGameSA* pGame;
 
+CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
