@@ -21,13 +21,7 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
     return pRect;
 }
 
-
-CPhysicalSA::CPhysicalSA()
-{
-    InstallHooks();
-}
-
-void CPhysicalSA::InstallHooks()
+void CPhysicalSAInterface::StaticSetHooks()
 {
     HookInstall(0x5449B0, &CPhysicalSAInterface::GetBoundRect_);
 }

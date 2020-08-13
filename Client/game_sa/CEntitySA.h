@@ -197,6 +197,7 @@ public:
     CRect* GetBoundRect_(CRect* pRect);
     void TransformFromObjectSpace(CVector& outPosn, CVector const& offset);
     CVector* GetBoundCentre(CVector* pOutCentre);
+    static void StaticSetHooks();
 
     //
     // Functions to hide member variable misuse
@@ -238,7 +239,6 @@ public:
     //  VOID                        SetModelAlpha ( int iAlpha );
 
     CEntitySA();
-    void                InstallHooks();
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 

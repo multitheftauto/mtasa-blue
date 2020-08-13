@@ -49,6 +49,11 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
     return pRect;
 }
 
+void CEntitySAInterface::StaticSetHooks()
+{
+    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+}
+
 CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
@@ -58,12 +63,6 @@ CEntitySA::CEntitySA()
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
     m_ulArrayID = INVALID_POOL_ARRAY_ID;
-    InstallHooks();
-}
-
-void CEntitySA::InstallHooks()
-{
-   HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
 }
 
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
