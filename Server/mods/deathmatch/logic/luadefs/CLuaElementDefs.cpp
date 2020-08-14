@@ -212,10 +212,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
-    // Don't know how this works, but don't forget to add isElementData if needed
-    // lua_classvariable(luaVM, "data", "setElementData", "getElementData", OOP_setElementData, OOP_getElementData);
-    // lua_classvariable(luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", OOP_setElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo); //
-    // .visibility[john]=false
 
     lua_registerclass(luaVM, "Element");
 }

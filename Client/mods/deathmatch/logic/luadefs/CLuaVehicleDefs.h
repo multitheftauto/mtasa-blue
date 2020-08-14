@@ -44,7 +44,7 @@ public:
     LUA_DECLARE(GetVehicleDoorState);
     LUA_DECLARE(GetVehicleLightState);
     LUA_DECLARE(GetVehiclePanelState);
-    LUA_DECLARE(AreVehicleLightsOn);
+    static bool AreVehicleLightsOn(CClientVehicle* const pVehicle);
     LUA_DECLARE(GetVehicleOverrideLights);
     LUA_DECLARE(GetVehicleTowedByVehicle);
     LUA_DECLARE(GetVehicleTowingVehicle);
