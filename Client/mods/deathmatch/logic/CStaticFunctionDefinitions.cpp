@@ -6982,9 +6982,12 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     bool                bKey = pKeyBinds->IsKey(szKey);
+    CCommandBind*       pBind;
+
     if (bKey)
     {
         bool bCheckHitState = false, bHitState = true;
+
         if (szHitState)
         {
             if (stricmp(szHitState, "down") == 0)
@@ -6996,10 +6999,20 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
                 bCheckHitState = true, bHitState = false;
             }
         }
+
+
+        pBind = g_pCore->GetKeyBinds()->GetBindFromCommand(szCommandName, NULL, false, szKey, bCheckHitState, bHitState);
+
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
             pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
+
+            if (pBind)
+            {
+                pKeyBinds->Remove(pBind);
+            }
+
             bSuccess = true;
         }
         bHitState = false;
@@ -7007,6 +7020,12 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
+
+            if (pBind)
+            {
+                pKeyBinds->Remove(pBind);
+            }
+
             bSuccess = true;
         }
     }
