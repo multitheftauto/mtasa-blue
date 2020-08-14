@@ -7009,9 +7009,7 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
 
             if (pBind)
-            {
                 pKeyBinds->Remove(pBind);
-            }
 
             bSuccess = true;
         }
@@ -7022,9 +7020,7 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
 
             if (pBind)
-            {
                 pKeyBinds->Remove(pBind);
-            }
 
             bSuccess = true;
         }
