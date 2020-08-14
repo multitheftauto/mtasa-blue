@@ -525,7 +525,7 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     // Grab it and return a pointer to the variable
     for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
     {
-        table->PushString(it->first);                // key
+        table->PushString(it->first);                        // key
         table->PushArgument(it->second.Variable);            // value
     }
 
