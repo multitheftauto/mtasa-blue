@@ -45,7 +45,7 @@ CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
     TransformFromObjectSpace(point, vecMax);
     rect.StretchToPoint(point.fX, point.fY);
     *pRect = rect;
-    pRect->FixIncorrectTopLeft(); // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
