@@ -4645,13 +4645,8 @@ bool CClientPed::IsOnGround()
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
-
-    // We don't care if the ped is underground
-    if ((vecPosition.fZ - fGroundLevel) <= FLOAT_EPSILON)
-        return false;
-        
-    // Check that (zPos - groundLevel) <= 1, but also account for epsilon
-    return (vecPosition.fZ - fGroundLevel - 1.0f) <= FLOAT_EPSILON;
+    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel - 1.0f) <=
+                                                 ((fabs(vecPosition.fZ) < fabs(fGroundLevel) ? fabs(fGroundLevel) : fabs(vecPosition.fZ)) * FLOAT_EPSILON));
 }
 
 bool CClientPed::IsClimbing()
