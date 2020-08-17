@@ -1,7 +1,20 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/CRect.h
+ *  PURPOSE:     3D vector math implementation
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #pragma once
 
 #include "CVector2D.h"
 
+// This is an actual GTA SA class. MTA has its own version of CRect, and it's called CRect2D.
+// CRect behaves similarly to CRect2D, except it's used by GTA:SA, and the initial values are NOT zero when constructed. 
 class CRect
 {
 public:
@@ -64,6 +77,11 @@ public:
     }
 
     // Fix #1613: custom function. Used for fixing custom map collision crashes in CPhysical class (infinite loop)
+    // The value must be greater than or equal to 1.0f because let 's say if the value of left is 15.5,
+    // when it' s casted to int, it will be rounded off to 15, so we need to subtract at least 0.6 to make make it
+    // 14 when it 's casted to int . It doesn't really matter which value we subtract because the bounding box
+    // values are already corrupted at this point, and we're just trying to avert the crash by making sure
+    // the top and left values are always less than the bottom and right values.
     void FixIncorrectTopLeft()
     {
         if (left > right) left = right - 1.0f;
