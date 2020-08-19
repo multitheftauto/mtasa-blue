@@ -391,7 +391,7 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 
             // CClumpModelInfo::SetClump will increment CTxdStore reference count.
             // We must remove it again to avoid TXD leaks.
-            // UPDATE: Fix disabled due to crash reported in issue #1617
+            // UPDATE: This is disabled due to a crash reported in issue #1617
             // CTxdStore_RemoveRef(pModelInfoInterface->usTextureDictionary);
             RpClumpDestroy(pOldClump);
         }
