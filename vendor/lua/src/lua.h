@@ -221,10 +221,11 @@ LUA_API int   (lua_load) (lua_State *L, lua_Reader reader, void *dt,
 
 LUA_API int (lua_dump) (lua_State *L, lua_Writer writer, void *data);
 // MTA specific: Returns the number of expected results in a C call.
-// Note that this will no longer be reliable if 
+// Note that this will no longer be reliable if another C function is
+// called before calling lua_ncallresult.
 // It will also not be reliable in case of incorrectly called functions
-// e.g. 
-//   local a, b = tostring(3) 
+// e.g.
+//   local a, b = tostring(3)
 // will return 2, despite tostring only returning one number
 LUA_API int (lua_ncallresult) (lua_State* L);
 
