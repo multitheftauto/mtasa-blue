@@ -180,7 +180,7 @@
       <right name="command.delaccount" access="true" />
       <right name="command.chgpass" access="true" />
       <right name="function.addAccount" access="true" />
-      <right name="function.removeAccount" access="true" />
+      <right name="function.removeAccount" access="false" />
       <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
    </acl>
