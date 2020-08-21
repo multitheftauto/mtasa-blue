@@ -15,7 +15,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
     int iIndex = 0;
     lua_newtable(luaVM);
 
-    // gather GTASA default skins
+    // Gather GTASA default skins
     for (int i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
@@ -26,8 +26,8 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
         }
     }
 
-    // gather our custom skin model IDs allocated with engineRequestModel
-    // (there might be some < 313 as well, and since we dont want duplicates, we start at 313, others are already included by the loop above)
+    // Gather our custom skin model IDs allocated with engineRequestModel
+    // (there might be some < 313 as well, and since we don't want duplicates, we start at 313, others are already included by the loop above)
     for (const CClientModel* model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::CCLIENTMODELPED, 313)) 
     {
         lua_pushnumber(luaVM, ++iIndex);
