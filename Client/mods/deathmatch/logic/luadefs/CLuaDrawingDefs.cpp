@@ -864,7 +864,7 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 }
 
 CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontType> variantFont, const std::string text, const std::optional<float> optWidth,
-                                             std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak,
+                                             const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak,
                                              const std::optional<bool> optColorCoded)
 {
     // float, float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
