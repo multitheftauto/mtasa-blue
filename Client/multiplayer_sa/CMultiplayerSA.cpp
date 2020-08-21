@@ -1610,27 +1610,34 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
-void CMultiplayerSA::SetColorCorrectionEnabled(bool bEnabled)
+void CMultiplayerSA::ResetColorCorrection()
 {
-    // Exit if it already set
-    if ((*(BYTE*)0x704D1C == 0x52) == bEnabled)
-        return;
-
-    if (bEnabled)
+    if (*(BYTE*)0x7036EC == 0xB8)
     {
-        static BYTE DefaultBytes[2] = { 0x52, 0x50 };
-        MemCpy((void*)0x704D1C, DefaultBytes, sizeof(DefaultBytes));
-    }
-    else
-    {
-        static BYTE JmpBytes[2] = { 0xEB, 0x8 };
-        MemCpy((void*)0x704D1C, JmpBytes, sizeof(JmpBytes));
+        static BYTE DefaultBytes[5] = { 0xC1, 0xE0, 0x08, 0x0B, 0xC1 }; // shl     eax, 8
+                                                                        // or      eax, ecx
+        MemCpy((void*)0x7036EC, DefaultBytes, sizeof(DefaultBytes));
+        MemCpy((void*)0x70373D, DefaultBytes, sizeof(DefaultBytes));
     }
 }
 
-void CMultiplayerSA::GetColorCorrectionEnabled(bool& bEnabled)
+void CMultiplayerSA::SetColorCorrection(DWORD dwPass0Color, DWORD dwPass1Color)
 {
-    bEnabled = *(BYTE*)0x704D1C == 0x52;
+    const bool bEnabled = *(BYTE*)0x7036EC == 0xB8;
+
+    // Update a pass0 color if needed
+    if (!bEnabled || *(DWORD*)0x7036ED != dwPass0Color)
+    {
+        MemPut<BYTE>(0x7036EC, 0xB8); // mov eax
+        MemPut<DWORD>(0x7036ED, dwPass0Color);
+    }
+
+    // Update a pass1 color if needed
+    if (!bEnabled || *(DWORD*)0x70373E != dwPass1Color)
+    {
+        MemPut<BYTE>(0x70373D, 0xB8); // mov eax
+        MemPut<DWORD>(0x70373E, dwPass1Color);
+    }
 }
 
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,

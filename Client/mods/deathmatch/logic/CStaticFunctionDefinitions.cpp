@@ -6657,15 +6657,15 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetColorCorrectionEnabled(bool& bEnabled)
+bool CStaticFunctionDefinitions::ResetColorCorrection()
 {
-    g_pMultiplayer->GetColorCorrectionEnabled(bEnabled);
+    g_pMultiplayer->ResetColorCorrection();
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetColorCorrectionEnabled(bool bEnabled)
+bool CStaticFunctionDefinitions::SetColorCorrection(DWORD dwPass0Color, DWORD dwPass1Color)
 {
-    g_pMultiplayer->SetColorCorrectionEnabled(bEnabled);
+    g_pMultiplayer->SetColorCorrection(dwPass0Color, dwPass1Color);
     return true;
 }
 

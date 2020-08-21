@@ -656,13 +656,12 @@ int CLuaFunctionDefs::GetHeatHaze(lua_State* luaVM)
     return 9;
 }
 
-int CLuaFunctionDefs::GetColorCorrectionEnabled(lua_State* luaVM)
+int CLuaFunctionDefs::ResetColorCorrection(lua_State* luaVM)
 {
-    //  bool getColorCorrectionEnabled()
-    bool bEnabled;
-    CStaticFunctionDefinitions::GetColorCorrectionEnabled(bEnabled);
+    //  bool resetColorCorrection()
+    CStaticFunctionDefinitions::ResetColorCorrection();
 
-    lua_pushboolean(luaVM, bEnabled);
+    lua_pushboolean(luaVM, true);
     return 1;
 }
 
@@ -698,17 +697,29 @@ int CLuaFunctionDefs::SetHeatHaze(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::SetColorCorrectionEnabled(lua_State* luaVM)
+int CLuaFunctionDefs::SetColorCorrection(lua_State* luaVM)
 {
-    //  bool setColorCorrectionEnabled ( bool enabled )
-    bool bEnabled;
-
     CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bEnabled);
+
+    // Set the new sky gradient
+    uchar ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha;
+    uchar ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha;
+
+    argStream.ReadNumber(ucPass0Red, 0);
+    argStream.ReadNumber(ucPass0Green, 0);
+    argStream.ReadNumber(ucPass0Blue, 0);
+    argStream.ReadNumber(ucPass0Alpha, 0);
+    argStream.ReadNumber(ucPass1Red, 0);
+    argStream.ReadNumber(ucPass1Green, 0);
+    argStream.ReadNumber(ucPass1Blue, 0);
+    argStream.ReadNumber(ucPass1Alpha, 0);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetColorCorrectionEnabled(bEnabled))
+        unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
+        unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
+
+        if (CStaticFunctionDefinitions::SetColorCorrection(ulColor0, ulColor1))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -717,6 +728,7 @@ int CLuaFunctionDefs::SetColorCorrectionEnabled(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    // Return false
     lua_pushboolean(luaVM, false);
     return 1;
 }
