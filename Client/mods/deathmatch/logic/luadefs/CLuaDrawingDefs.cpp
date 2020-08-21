@@ -864,19 +864,27 @@ int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 }
 
 CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontType> variantFont, const std::string text, const std::optional<float> optWidth,
-                                             const std::optional<float> optScaleXY, const std::optional<float> optScaleY,
-                                             const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded)
+                                             std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak,
+                                             const std::optional<bool> optColorCoded)
 {
-    // float dxGetTextHeight ( string text, [float width, float scaleXY=1.0, float=scaleY=1.0, mixed font="default", bool wordBreak=false, bool
-    // colorCoded=false] )
+    // float, float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
+    // bool wordBreak=false, bool colorCoded=false] )
     CGraphicsInterface* const graphics = g_pCore->GetGraphics();
 
     // resolve scale (use X as Y value, if optScaleY is empty)
     CVector2D scale(1.0f, 1.0f);
     if (optScaleXY.has_value())
     {
-        scale.fX = optScaleXY.value();
-        scale.fY = optScaleY.has_value() ? optScaleY.value() : scale.fX;
+        std::variant<CVector2D, float> scaleXY = optScaleXY.value();
+        if (std::holds_alternative<float>(scaleXY))
+        {
+            scale.fX = std::get<float>(scaleXY);
+            scale.fY = scale.fX;
+        }
+        else
+        {
+            scale = std::get<CVector2D>(scaleXY);
+        }
     }
 
     CVector2D vecSize;
