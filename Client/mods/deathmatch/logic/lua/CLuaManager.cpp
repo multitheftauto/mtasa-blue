@@ -208,6 +208,8 @@ void CLuaManager::LoadCFunctions()
         {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
         {"setControlState", CLuaPedDefs::SetPedControlState},
         {"getControlState", CLuaPedDefs::GetPedControlState},
+        {"getCameraShakeLevel", CLuaCameraDefs::GetCameraDrunkLevel},
+        {"setCameraShakeLevel", CLuaCameraDefs::SetCameraDrunkLevel},
         // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
         // Event funcs
