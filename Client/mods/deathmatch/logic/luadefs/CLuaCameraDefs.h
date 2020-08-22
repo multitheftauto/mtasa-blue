@@ -22,10 +22,9 @@ public:
     LUA_DECLARE(GetCameraViewMode);
     LUA_DECLARE_OOP(GetCameraMatrix);
     LUA_DECLARE(GetCameraTarget);
-    LUA_DECLARE(GetCameraClip);
     LUA_DECLARE(GetCameraInterior);
     LUA_DECLARE(GetCameraGoggleEffect);
-    LUA_DECLARE(GetCameraDrunkLevel);
+    LUA_DECLARE(GetCameraShakeLevel);
     LUA_DECLARE(GetCameraFieldOfView);
 
     // Cam set funcs
@@ -35,9 +34,10 @@ public:
     LUA_DECLARE(SetCameraFieldOfView);
     LUA_DECLARE(FadeCamera);
     LUA_DECLARE(SetCameraClip);
+    LUA_DECLARE(GetCameraClip);
     LUA_DECLARE(SetCameraViewMode);
     LUA_DECLARE(SetCameraGoggleEffect);
-    LUA_DECLARE(SetCameraDrunkLevel);
+    LUA_DECLARE(SetCameraShakeLevel);
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);

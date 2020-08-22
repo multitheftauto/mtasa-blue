@@ -22,7 +22,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraTarget", GetCameraTarget},
         {"getCameraInterior", GetCameraInterior},
         {"getCameraGoggleEffect", GetCameraGoggleEffect},
-        {"getCameraDrunkLevel", GetCameraDrunkLevel},
+        {"getCameraShakeLevel", GetCameraShakeLevel},
         {"getCameraFieldOfView", GetCameraFieldOfView},
 
         // Cam set funcs
@@ -35,7 +35,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraClip", GetCameraClip},
         {"setCameraViewMode", SetCameraViewMode},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
-        {"setCameraDrunkLevel", SetCameraDrunkLevel},
+        {"setCameraShakeLevel", SetCameraShakeLevel},
     };
 
     // Add functions
@@ -186,9 +186,9 @@ int CLuaCameraDefs::GetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetCameraDrunkLevel(lua_State* luaVM)
+int CLuaCameraDefs::GetCameraShakeLevel(lua_State* luaVM)
 {
-    //  int getCameraDrunkLevel ()
+    //  int getCameraShakeLevel ()
     CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
     if (pPlayerInfo)
     {
@@ -506,9 +506,9 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::SetCameraDrunkLevel(lua_State* luaVM)
+int CLuaCameraDefs::SetCameraShakeLevel(lua_State* luaVM)
 {
-    //  bool setCameraDrunkLevel ( int level )
+    //  bool setCameraShakeLevel ( int level )
     int              drunkLevel;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(drunkLevel);
@@ -520,17 +520,9 @@ int CLuaCameraDefs::SetCameraDrunkLevel(lua_State* luaVM)
             CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
             if (pPlayerInfo)
             {
-                if (pPlayerInfo->GetCamDrunkLevel() != drunkLevel)
-                {
-                    pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-                else
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
+                pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
+                lua_pushboolean(luaVM, true);
+                return 1;
             }
         }
         else
