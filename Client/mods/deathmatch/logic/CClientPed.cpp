@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "game/CAnimBlendAssocGroup.h"
+#include "Utils.h"
 
 using std::list;
 using std::vector;
@@ -4645,8 +4646,8 @@ bool CClientPed::IsOnGround()
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
-    return (vecPosition.fZ > fGroundLevel && (vecPosition.fZ - fGroundLevel - 1.0f) <=
-                                                 ((fabs(vecPosition.fZ) < fabs(fGroundLevel) ? fabs(fGroundLevel) : fabs(vecPosition.fZ)) * FLOAT_EPSILON));
+    // Check (vecPosition.fZ - fGroundLevel) <= 1.0f
+    return definitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || essentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
 }
 
 bool CClientPed::IsClimbing()
