@@ -327,3 +327,9 @@ void DeletePointersAndClearList(T& elementList)
 #if defined(MTA_DEBUG) && defined(MTA_CLIENT)
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
 #endif
+
+// Comparing floating point numbers
+bool approximatelyEqual(float a, float b, float epsilon = FLOAT_EPSILON);
+bool essentiallyEqual(float a, float b, float epsilon = FLOAT_EPSILON);
+bool definitelyGreaterThan(float a, float b, float epsilon = FLOAT_EPSILON);
+bool definitelyLessThan(float a, float b, float epsilon = FLOAT_EPSILON);
