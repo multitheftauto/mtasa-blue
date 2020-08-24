@@ -4646,6 +4646,9 @@ bool CClientPed::IsOnGround()
     CVector vecPosition;
     GetPosition(vecPosition);
     float fGroundLevel = static_cast<float>(g_pGame->GetWorld()->FindGroundZFor3DPosition(&vecPosition));
+    // We don't care if the ped is underground
+    if (definitelyLessThan(vecPosition.fZ, fGroundLevel))
+        return false;
     // Check (vecPosition.fZ - fGroundLevel) <= 1.0f
     return definitelyLessThan((vecPosition.fZ - fGroundLevel), 1.0f) || essentiallyEqual((vecPosition.fZ - fGroundLevel), 1.0f);
 }
