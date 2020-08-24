@@ -2413,7 +2413,15 @@ eMovementState CClientPed::GetMovementState()
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
+            {
+                // Is he aiming and rolling while crouching?
+                if ((cs.LeftStickX == -128 || cs.LeftStickX == 128) && cs.RightShoulder1)
+                    return MOVEMENTSTATE_ROLL;
+
+                // Is he crouching and moving?
                 return MOVEMENTSTATE_CRAWL;
+
+            }
         }
     }
     return MOVEMENTSTATE_UNKNOWN;

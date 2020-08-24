@@ -67,7 +67,7 @@ enum eMovementState
     MOVEMENTSTATE_SPRINT,               // Sprinting
     MOVEMENTSTATE_CROUCH,               // Crouching still
     MOVEMENTSTATE_CRAWL,                // Crouch-moving
-    MOVEMENTSTATE_ROLL,                 // Crouch-rolling (Needs adding)
+    MOVEMENTSTATE_ROLL,                 // Crouch-rolling & Crawl-rolling
     MOVEMENTSTATE_JUMP,                 // Jumping
     MOVEMENTSTATE_FALL,                 // Falling
     MOVEMENTSTATE_CLIMB                 // Climbing
