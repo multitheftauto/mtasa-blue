@@ -2416,15 +2416,9 @@ eMovementState CClientPed::GetMovementState()
         {
             // Is he moving the contoller at all?
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
-            {
                 return MOVEMENTSTATE_CROUCH;
-            }
             else
-            {
-                if ((cs.LeftStickX == -128 || cs.LeftStickX == 128) && cs.RightShoulder1)
-                    return MOVEMENTSTATE_ROLL;
                 return MOVEMENTSTATE_CRAWL;
-            }
         }
     }
 
