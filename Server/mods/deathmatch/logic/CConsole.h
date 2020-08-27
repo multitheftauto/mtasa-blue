@@ -24,7 +24,7 @@ public:
 
     bool HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient);
 
-    void             AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted);
+    void             AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, string m_sConsoleHelp);
     void             DeleteCommand(const char* szCommand);
     void             DeleteAllCommands();
     CConsoleCommand* GetCommand(const char* szKey);

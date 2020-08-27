@@ -740,59 +740,59 @@ bool CMainConfig::LoadExtended()
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
 
     // Register the commands
-    RegisterCommand("start", CConsoleCommands::StartResource, false);
-    RegisterCommand("stop", CConsoleCommands::StopResource, false);
-    RegisterCommand("stopall", CConsoleCommands::StopAllResources, false);
-    RegisterCommand("restart", CConsoleCommands::RestartResource, false);
-    RegisterCommand("refresh", CConsoleCommands::RefreshResources, false);
-    RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false);
-    RegisterCommand("list", CConsoleCommands::ListResources, false);
-    RegisterCommand("info", CConsoleCommands::ResourceInfo, false);
-    RegisterCommand("upgrade", CConsoleCommands::UpgradeResources, false);
-    RegisterCommand("check", CConsoleCommands::CheckResources, false);
+    RegisterCommand("start", CConsoleCommands::StartResource, false, "`start` can be used to start a resource.");
+    RegisterCommand("stop", CConsoleCommands::StopResource, false, "`stop` can be used to stop a resource.");
+    RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "`stopall` can be used to stop all resources.");
+    RegisterCommand("restart", CConsoleCommands::RestartResource, false, "`restart` can be used to restart a resource.");
+    RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Test");
+    RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Test");
+    RegisterCommand("list", CConsoleCommands::ListResources, false, "Test");
+    RegisterCommand("info", CConsoleCommands::ResourceInfo, false, "Test");
+    RegisterCommand("upgrade", CConsoleCommands::UpgradeResources, false, "Test");
+    RegisterCommand("check", CConsoleCommands::CheckResources, false, "Test");
 
-    RegisterCommand("say", CConsoleCommands::Say, false);
-    RegisterCommand("teamsay", CConsoleCommands::TeamSay, false);
-    RegisterCommand("msg", CConsoleCommands::Msg, false);
-    RegisterCommand("me", CConsoleCommands::Me, false);
-    RegisterCommand("nick", CConsoleCommands::Nick, false);
+    RegisterCommand("say", CConsoleCommands::Say, false, "Test");
+    RegisterCommand("teamsay", CConsoleCommands::TeamSay, false, "Test");
+    RegisterCommand("msg", CConsoleCommands::Msg, false, "Test");
+    RegisterCommand("me", CConsoleCommands::Me, false, "Test");
+    RegisterCommand("nick", CConsoleCommands::Nick, false, "Test");
 
-    RegisterCommand("login", CConsoleCommands::LogIn, false);
-    RegisterCommand("logout", CConsoleCommands::LogOut, false);
-    RegisterCommand("chgmypass", CConsoleCommands::ChgMyPass, false);
+    RegisterCommand("login", CConsoleCommands::LogIn, false, "Test");
+    RegisterCommand("logout", CConsoleCommands::LogOut, false, "Test");
+    RegisterCommand("chgmypass", CConsoleCommands::ChgMyPass, false, "Test");
 
-    RegisterCommand("addaccount", CConsoleCommands::AddAccount, false);
-    RegisterCommand("delaccount", CConsoleCommands::DelAccount, false);
-    RegisterCommand("chgpass", CConsoleCommands::ChgPass, false);
-    RegisterCommand("shutdown", CConsoleCommands::Shutdown, false);
+    RegisterCommand("addaccount", CConsoleCommands::AddAccount, false, "Test");
+    RegisterCommand("delaccount", CConsoleCommands::DelAccount, false, "Test");
+    RegisterCommand("chgpass", CConsoleCommands::ChgPass, false, "Test");
+    RegisterCommand("shutdown", CConsoleCommands::Shutdown, false, "Test");
 
-    RegisterCommand("aexec", CConsoleCommands::AExec, false);
+    RegisterCommand("aexec", CConsoleCommands::AExec, false, "Test");
 
-    RegisterCommand("whois", CConsoleCommands::WhoIs, false);
+    RegisterCommand("whois", CConsoleCommands::WhoIs, false, "Test");
 
-    RegisterCommand("debugscript", CConsoleCommands::DebugScript, false);
+    RegisterCommand("debugscript", CConsoleCommands::DebugScript, false, "Test");
 
-    RegisterCommand("help", CConsoleCommands::Help, false);
+    RegisterCommand("help", CConsoleCommands::Help, false, "Test");
 
-    RegisterCommand("loadmodule", CConsoleCommands::LoadModule, false);
-    RegisterCommand("unloadmodule", CConsoleCommands::UnloadModule, false);
-    RegisterCommand("reloadmodule", CConsoleCommands::ReloadModule, false);
+    RegisterCommand("loadmodule", CConsoleCommands::LoadModule, false, "Test");
+    RegisterCommand("unloadmodule", CConsoleCommands::UnloadModule, false, "Test");
+    RegisterCommand("reloadmodule", CConsoleCommands::ReloadModule, false, "Test");
 
-    RegisterCommand("ver", CConsoleCommands::Ver, false);
-    RegisterCommand("sver", CConsoleCommands::Ver, false);
-    RegisterCommand("ase", CConsoleCommands::Ase, false);
-    RegisterCommand("openports", CConsoleCommands::OpenPortsTest, false);
+    RegisterCommand("ver", CConsoleCommands::Ver, false, "Test");
+    RegisterCommand("sver", CConsoleCommands::Ver, false, "Test");
+    RegisterCommand("ase", CConsoleCommands::Ase, false, "Test");
+    RegisterCommand("openports", CConsoleCommands::OpenPortsTest, false, "Test");
 
-    RegisterCommand("debugdb", CConsoleCommands::SetDbLogLevel, false);
+    RegisterCommand("debugdb", CConsoleCommands::SetDbLogLevel, false, "Test");
 
-    RegisterCommand("reloadbans", CConsoleCommands::ReloadBans, false);
+    RegisterCommand("reloadbans", CConsoleCommands::ReloadBans, false, "Test");
 
-    RegisterCommand("aclrequest", CConsoleCommands::AclRequest, false);
-    RegisterCommand("authserial", CConsoleCommands::AuthorizeSerial, false);
-    RegisterCommand("reloadacl", CConsoleCommands::ReloadAcl, false);
-    RegisterCommand("debugjoinflood", CConsoleCommands::DebugJoinFlood, false);
-    RegisterCommand("debuguptime", CConsoleCommands::DebugUpTime, false);
-    RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false);
+    RegisterCommand("aclrequest", CConsoleCommands::AclRequest, false, "Test");
+    RegisterCommand("authserial", CConsoleCommands::AuthorizeSerial, false, "Test");
+    RegisterCommand("reloadacl", CConsoleCommands::ReloadAcl, false, "Test");
+    RegisterCommand("debugjoinflood", CConsoleCommands::DebugJoinFlood, false, "Test");
+    RegisterCommand("debuguptime", CConsoleCommands::DebugUpTime, false, "Test");
+    RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false, "Test");
     return true;
 }
 
@@ -914,10 +914,10 @@ bool CMainConfig::SetFPSLimit(unsigned short usFPS, bool bSave)
     return false;
 }
 
-void CMainConfig::RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted)
+void CMainConfig::RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, string sConsoleHelp)
 {
     // Register the function with the given name and function pointer
-    m_pConsole->AddCommand(pFunction, szName, bRestricted);
+    m_pConsole->AddCommand(pFunction, szName, bRestricted, sConsoleHelp);
 }
 
 void CMainConfig::SetCommandLineParser(CCommandLineParser* pCommandLineParser)
