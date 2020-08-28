@@ -740,59 +740,59 @@ bool CMainConfig::LoadExtended()
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
 
     // Register the commands
-    RegisterCommand("start", CConsoleCommands::StartResource, false, "`start` can be used to start a resource.");
-    RegisterCommand("stop", CConsoleCommands::StopResource, false, "`stop` can be used to stop a resource.");
-    RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "`stopall` can be used to stop all resources.");
-    RegisterCommand("restart", CConsoleCommands::RestartResource, false, "`restart` can be used to restart a resource.");
-    RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Test");
-    RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Test");
-    RegisterCommand("list", CConsoleCommands::ListResources, false, "Test");
-    RegisterCommand("info", CConsoleCommands::ResourceInfo, false, "Test");
-    RegisterCommand("upgrade", CConsoleCommands::UpgradeResources, false, "Test");
-    RegisterCommand("check", CConsoleCommands::CheckResources, false, "Test");
+    RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource-name>\nStart a loaded resource eg: start admin");
+    RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource-name>\nStop a resource eg: stop admin");
+    RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "Stop all running resources");
+    RegisterCommand("restart", CConsoleCommands::RestartResource, false, "Usage: restart <resource-name>\nRestarts a running resource eg: restart admin");
+    RegisterCommand("refresh", CConsoleCommands::RefreshResources, false, "Refresh resource list to find new resources");
+    RegisterCommand("refreshall", CConsoleCommands::RefreshAllResources, false, "Refresh resources and restart any changed resources");
+    RegisterCommand("list", CConsoleCommands::ListResources, false, "Shows a list of resources");
+    RegisterCommand("info", CConsoleCommands::ResourceInfo, false, "Usage: info <resource-name>\nGet info for a resource eg: info admin");
+    RegisterCommand("upgrade", CConsoleCommands::UpgradeResources, false, "Usage: upgrade [ all | <resource-name> ]\nPerform a basic upgrade of all resources.");
+    RegisterCommand("check", CConsoleCommands::CheckResources, false, "Usage: check [ all | <resource-name> ]\nChecks which files would be changed with upgrade command. Does not modify anything.");
 
-    RegisterCommand("say", CConsoleCommands::Say, false, "Test");
-    RegisterCommand("teamsay", CConsoleCommands::TeamSay, false, "Test");
-    RegisterCommand("msg", CConsoleCommands::Msg, false, "Test");
-    RegisterCommand("me", CConsoleCommands::Me, false, "Test");
-    RegisterCommand("nick", CConsoleCommands::Nick, false, "Test");
+    RegisterCommand("say", CConsoleCommands::Say, false, "Usage: say <text>\nShow a message to all players on the server eg: say hello");
+    RegisterCommand("teamsay", CConsoleCommands::TeamSay, false, "Usage: teamsay <test>\nSend a message to all players on the same team");
+    RegisterCommand("msg", CConsoleCommands::Msg, false, "Usage: msg <nick> <text>\nSend a message to a player eg: msg playername hello");
+    RegisterCommand("me", CConsoleCommands::Me, false, "Usage: me <text>\nShow a message to all players on the server, with your nick prepended");
+    RegisterCommand("nick", CConsoleCommands::Nick, false, "Usage: nick <old-nick> <new-nick>\nChange your ingame nickname");
 
-    RegisterCommand("login", CConsoleCommands::LogIn, false, "Test");
-    RegisterCommand("logout", CConsoleCommands::LogOut, false, "Test");
-    RegisterCommand("chgmypass", CConsoleCommands::ChgMyPass, false, "Test");
+    RegisterCommand("login", CConsoleCommands::LogIn, false, "Usage: login <accountname> <password>\nLogin to an account eg: login accountname password");
+    RegisterCommand("logout", CConsoleCommands::LogOut, false, "Log out of the current account");
+    RegisterCommand("chgmypass", CConsoleCommands::ChgMyPass, false, "Usage: chgmypass <oldpass> <newpass>\nChange your password eg: chgmypass oldpw newpw");
 
-    RegisterCommand("addaccount", CConsoleCommands::AddAccount, false, "Test");
-    RegisterCommand("delaccount", CConsoleCommands::DelAccount, false, "Test");
-    RegisterCommand("chgpass", CConsoleCommands::ChgPass, false, "Test");
-    RegisterCommand("shutdown", CConsoleCommands::Shutdown, false, "Test");
+    RegisterCommand("addaccount", CConsoleCommands::AddAccount, false, "Usage: addaccount <accountname> <password>\nAdd an account eg: addaccount accountname password");
+    RegisterCommand("delaccount", CConsoleCommands::DelAccount, false, "Usage: delaccount <accountname>\nDelete an account eg: delaccount accountname");
+    RegisterCommand("chgpass", CConsoleCommands::ChgPass, false, "Usage: chgpass <accountname> <password>\nChange an accounts password eg: chgpass account newpw");
+    RegisterCommand("shutdown", CConsoleCommands::Shutdown, false, "Usage: shutdown <reason>\nShutdown the server eg: shutdown put reason here");
 
-    RegisterCommand("aexec", CConsoleCommands::AExec, false, "Test");
+    RegisterCommand("aexec", CConsoleCommands::AExec, false, "Usage: aexec <nick> <command>\nForce a player to execute a command eg: aexec playername say hello");
 
-    RegisterCommand("whois", CConsoleCommands::WhoIs, false, "Test");
+    RegisterCommand("whois", CConsoleCommands::WhoIs, false, "Usage: whois <nick>\nGet the IP of a player currently connected (use whowas for IP/serial/version)");
 
-    RegisterCommand("debugscript", CConsoleCommands::DebugScript, false, "Test");
+    RegisterCommand("debugscript", CConsoleCommands::DebugScript, false, "Usage: debugscript <0-3>\nRemove (This does not work 'Incorrect client type for this command')");
 
-    RegisterCommand("help", CConsoleCommands::Help, false, "Test");
+    RegisterCommand("help", CConsoleCommands::Help, false, "");
 
-    RegisterCommand("loadmodule", CConsoleCommands::LoadModule, false, "Test");
-    RegisterCommand("unloadmodule", CConsoleCommands::UnloadModule, false, "Test");
-    RegisterCommand("reloadmodule", CConsoleCommands::ReloadModule, false, "Test");
+    RegisterCommand("loadmodule", CConsoleCommands::LoadModule, false, "Usage: loadmodule <module-filename>\nLoad a module eg: loadmodule ml_sockets.dll");
+    RegisterCommand("unloadmodule", CConsoleCommands::UnloadModule, false, "Usage: unloadmodule <module-filename>\nUnload a module eg: unloadmodule ml_sockets.dll");
+    RegisterCommand("reloadmodule", CConsoleCommands::ReloadModule, false, "Usage: reloadmodule <module-filename>\nReload a module eg: reloadmodule ml_sockets.dll");
 
-    RegisterCommand("ver", CConsoleCommands::Ver, false, "Test");
-    RegisterCommand("sver", CConsoleCommands::Ver, false, "Test");
-    RegisterCommand("ase", CConsoleCommands::Ase, false, "Test");
-    RegisterCommand("openports", CConsoleCommands::OpenPortsTest, false, "Test");
+    RegisterCommand("ver", CConsoleCommands::Ver, false, "Get the MTA version");
+    RegisterCommand("sver", CConsoleCommands::Ver, false, "Get the server MTA version");
+    RegisterCommand("ase", CConsoleCommands::Ase, false, "See the amount of master server list queries");
+    RegisterCommand("openports", CConsoleCommands::OpenPortsTest, false, "Test if server ports are open");
 
-    RegisterCommand("debugdb", CConsoleCommands::SetDbLogLevel, false, "Test");
+    RegisterCommand("debugdb", CConsoleCommands::SetDbLogLevel, false, "Usage: debugdb <0-2>\nSet logging level for database functions. [0-Off  1-Errors only  2-All]");
 
-    RegisterCommand("reloadbans", CConsoleCommands::ReloadBans, false, "Test");
+    RegisterCommand("reloadbans", CConsoleCommands::ReloadBans, false, "Reloads all the bans from banlist.xml.");
 
-    RegisterCommand("aclrequest", CConsoleCommands::AclRequest, false, "Test");
-    RegisterCommand("authserial", CConsoleCommands::AuthorizeSerial, false, "Test");
-    RegisterCommand("reloadacl", CConsoleCommands::ReloadAcl, false, "Test");
-    RegisterCommand("debugjoinflood", CConsoleCommands::DebugJoinFlood, false, "Test");
-    RegisterCommand("debuguptime", CConsoleCommands::DebugUpTime, false, "Test");
-    RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false, "Test");
+    RegisterCommand("aclrequest", CConsoleCommands::AclRequest, false, "Usage: aclrequest [ list | allow | deny ] <resource-name> [ <right> | all ]\nManage ACL requests from resources implementing <aclrequest> in their meta.xml");
+    RegisterCommand("authserial", CConsoleCommands::AuthorizeSerial, false, "Usage: authserial <account-name> [list|removelast|httppass]\nManage serial authentication for an account.");
+    RegisterCommand("reloadacl", CConsoleCommands::ReloadAcl, false, "Perform a simple ACL reload");
+    RegisterCommand("debugjoinflood", CConsoleCommands::DebugJoinFlood, false, "Shows debug information regarding the join flood mitigation feature.");
+    RegisterCommand("debuguptime", CConsoleCommands::DebugUpTime, false, "Shows how many days the server has been up and running.");
+    RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false, "Usage: sfakelag <packet loss> <extra ping> <ping variance> [<KBPS limit>]\nOnly available if enabled in the mtaserver.conf file.\nAdds artificial packet loss, ping, jitter and bandwidth limits to the server-client connections.");
     return true;
 }
 
