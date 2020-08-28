@@ -143,6 +143,9 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
+    static float GetVehicleWheelScale(CClientVehicle* const pVehicle);
+    static bool SetVehicleWheelScale(CClientVehicle* const pVehicle, const float fWheelScale);
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

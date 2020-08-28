@@ -369,7 +369,7 @@ public:
     unsigned char m_colour1, m_colour2, m_colour3, m_colour4;
     char          m_comp1, m_comp2;
     short         m_upgrades[MAX_UPGRADES_ATTACHED];            // 1082
-    float         m_wheelScale;                                 // 1112
+    float         m_fWheelScale;                                // 1112
 
     unsigned short CarAlarmState;               // 1116
     unsigned short ForcedRandomSeed;            // if this is non-zero the random wander gets deterministic
@@ -822,6 +822,8 @@ public:
     std::map<SString, SVehicleFrame>& GetComponentMap() { return m_ExtraFrames; }
     bool                              SetPlateText(const SString& strText);
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
+    float                             GetWheelScale() { return GetVehicleInterface()->m_fWheelScale; }
+    void                              SetWheelScale(float fWheelScale) { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
 
     void UpdateLandingGearPosition();
 

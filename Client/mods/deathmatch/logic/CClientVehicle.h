@@ -494,6 +494,9 @@ public:
 
     void SetHeliBladeCollisionsEnabled(bool bEnable) { m_bEnableHeliBladeCollisions = bEnable; }
 
+    float GetWheelScale();
+    void  SetWheelScale(float fWheelScale);
+
     bool OnVehicleFallThroughMap();
 
 protected:
@@ -608,6 +611,7 @@ protected:
     CHandlingEntry*                        m_pHandlingEntry;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
+    float                                  m_fWheelScale;
 
     bool  m_bChainEngine;
     bool  m_bIsDerailed;

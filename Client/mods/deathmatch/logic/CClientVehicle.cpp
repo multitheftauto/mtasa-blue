@@ -135,6 +135,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bEnableHeliBladeCollisions = true;
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
+    m_fWheelScale = 1.0f;
 
     for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
     {
@@ -2681,6 +2682,7 @@ void CClientVehicle::Create()
         m_pVehicle->SetGravity(&m_vecGravity);
         m_pVehicle->SetHeadLightColor(m_HeadLightColor);
         m_pVehicle->SetRadioStatus(0);
+        m_pVehicle->SetWheelScale(m_fWheelScale);
 
         if (IsNitroInstalled())
         {
@@ -4981,4 +4983,22 @@ bool CClientVehicle::IsWindowOpen(uchar ucWindow)
         return m_bWindowOpen[ucWindow];
     }
     return false;
+}
+
+void CClientVehicle::SetWheelScale(float fWheelScale)
+{
+    if (m_pVehicle)
+    {
+        m_pVehicle->SetWheelScale(fWheelScale);
+    }
+    m_fWheelScale = fWheelScale;
+}
+
+float CClientVehicle::GetWheelScale()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetWheelScale();
+    }
+    return m_fWheelScale;
 }
