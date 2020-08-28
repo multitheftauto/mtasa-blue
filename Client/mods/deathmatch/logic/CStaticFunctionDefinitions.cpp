@@ -3664,18 +3664,6 @@ bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned sh
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleWheelScale(CClientVehicle& Vehicle, float& fWheelScale)
-{
-    fWheelScale = Vehicle.GetWheelScale();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetVehicleWheelScale(CClientVehicle& Vehicle, float fWheelScale)
-{
-    Vehicle.SetWheelScale(fWheelScale);
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled)
 {
     switch (Entity.GetType())
