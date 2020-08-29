@@ -143,6 +143,11 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
+    static float GetVehicleModelFrontWheelSize(const unsigned short usModel);
+    static bool  SetVehicleModelFrontWheelSize(const unsigned short usModel, const float fWheelSize);
+    static float GetVehicleModelRearWheelSize(const unsigned short usModel);
+    static bool  SetVehicleModelRearWheelSize(const unsigned short usModel, const float fWheelSize);
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

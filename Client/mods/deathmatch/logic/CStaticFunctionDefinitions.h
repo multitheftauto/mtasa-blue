@@ -226,6 +226,8 @@ public:
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
     static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelWheelSizeFront(unsigned short usModel, float& fWheelSize);
+    static bool            GetVehicleModelWheelSizeRear(unsigned short usModel, float& fWheelSize);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -270,6 +272,8 @@ public:
     static bool SetVehiclePlateText(CClientEntity& Entity, const SString& strText);
     static bool SetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle, bool bEnabled);
     static bool SetVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow, bool bOpen);
+    static bool SetVehicleModelWheelSizeFront(unsigned short usModel, float fWheelSize);
+    static bool SetVehicleModelWheelSizeRear(unsigned short usModel, float fWheelSize);
 
     // Object get funcs
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);

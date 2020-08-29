@@ -22,6 +22,7 @@ std::map<DWORD, float>                                                CModelInfo
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -1012,6 +1013,84 @@ void CModelInfoSA::ResetAllVehicleDummies()
     }
 
     ms_ModelDefaultDummiesPosition.clear();
+}
+
+float CModelInfoSA::GetVehicleWheelSizeFront()
+{
+    if (!IsVehicle())
+        return 0.0f;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->fWheelSizeFront;
+}
+
+void CModelInfoSA::SetVehicleWheelSizeFront(float fWheelSize, bool bStoreDefaultSize)
+{
+    if (!IsVehicle())
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+
+    // Store default wheel sizes in map
+    if (bStoreDefaultSize && !MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
+        MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
+
+    pVehicleModel->fWheelSizeFront = fWheelSize;
+}
+
+float CModelInfoSA::GetVehicleWheelSizeRear()
+{
+    if (!IsVehicle())
+        return 0.0f;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->fWheelSizeRear;
+}
+
+void CModelInfoSA::SetVehicleWheelSizeRear(float fWheelSize, bool bStoreDefaultSize)
+{
+    if (!IsVehicle())
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+
+    // Store default wheel sizes in map
+    if (bStoreDefaultSize && !MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
+        MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
+
+    pVehicleModel->fWheelSizeRear = fWheelSize;
+}
+
+void CModelInfoSA::ResetVehicleWheelSizes()
+{
+    if (!IsVehicle())
+        return;
+
+    auto sizesPair = MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+    if (!sizesPair)
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    pVehicleModel->fWheelSizeFront = sizesPair->first;
+    pVehicleModel->fWheelSizeRear = sizesPair->second;
+
+    MapRemove(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+}
+
+void CModelInfoSA::ResetAllVehiclesWheelSizes()
+{
+    CGame* game = g_pCore->GetGame();
+    for (auto& info : ms_VehicleModelDefaultWheelSizes)
+    {
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
+        if (modelInfo)
+        {
+            modelInfo->SetVehicleWheelSizeFront(info.second.first, false);
+            modelInfo->SetVehicleWheelSizeRear(info.second.second, false);
+        }
+    }
+
+    ms_VehicleModelDefaultWheelSizes.clear();
 }
 
 void CModelInfoSA::SetCustomModel(RpClump* pClump)
