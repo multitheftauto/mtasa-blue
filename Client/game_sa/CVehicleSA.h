@@ -822,8 +822,8 @@ public:
     std::map<SString, SVehicleFrame>& GetComponentMap() { return m_ExtraFrames; }
     bool                              SetPlateText(const SString& strText);
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
-    float                             GetWheelScale() { return GetVehicleInterface()->m_fWheelScale; }
-    void                              SetWheelScale(float fWheelScale) { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
+    void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
 
     void UpdateLandingGearPosition();
 
