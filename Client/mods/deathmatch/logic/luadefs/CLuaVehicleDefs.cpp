@@ -4057,12 +4057,10 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
-    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
+std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(const unsigned short              usModel,
+                                                                                                      const eResizableVehicleWheelGroup eWheelGroup)
 {
-    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
-
-    if (eActualWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
+    if (eWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
     {
         float fFrontWheelSize;
         if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::FRONT_AXLE, fFrontWheelSize))
@@ -4081,7 +4079,7 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     else
     {
         float fWheelSize;
-        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eActualWheelGroup, fWheelSize))
+        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eWheelGroup, fWheelSize))
             throw std::invalid_argument("Invalid model ID");
 
         return fWheelSize;
