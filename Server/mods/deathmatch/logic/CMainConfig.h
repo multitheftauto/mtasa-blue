@@ -141,7 +141,7 @@ public:
     void                            OnAseSettingChange();
 
 private:
-    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, string m_sConsoleHelp);
+    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, string sConsoleHelp);
     bool GetSettingTable(const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable);
     bool AddMissingSettings();
 
