@@ -83,8 +83,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
-        {"getVehicleModelFrontWheelSize", ArgumentParser<GetVehicleModelFrontWheelSize>},
-        {"getVehicleModelRearWheelSize", ArgumentParser<GetVehicleModelRearWheelSize>},
+        {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -141,8 +140,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition },
-        {"setVehicleModelFrontWheelSize", ArgumentParser<SetVehicleModelFrontWheelSize>},
-        {"setVehicleModelRearWheelSize", ArgumentParser<SetVehicleModelRearWheelSize>},
+        {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
     };
 
     // Add functions
@@ -225,8 +223,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
-    lua_classfunction(luaVM, "getModelFrontWheelSize", "getVehicleModelFrontWheelSize");
-    lua_classfunction(luaVM, "getModelRearWheelSize", "getVehicleModelRearWheelSize");
+    lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -270,8 +267,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
     lua_classfunction(luaVM, "setModelExhaustFumesPosition", "setVehicleModelExhaustFumesPosition");
     lua_classfunction(luaVM, "setVehicleModelDummyPosition", "setVehicleModelDummyPosition");
-    lua_classfunction(luaVM, "setModelFrontWheelSize", "setVehicleModelFrontWheelSize");
-    lua_classfunction(luaVM, "setModelRearWheelSize", "setVehicleModelRearWheelSize");
+    lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -4061,38 +4057,42 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-float CLuaVehicleDefs::GetVehicleModelFrontWheelSize(const unsigned short usModel)
+std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
+    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
 {
-    float fWheelSize;
+    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
 
-    if (!CStaticFunctionDefinitions::GetVehicleModelWheelSizeFront(usModel, fWheelSize))
-        throw std::invalid_argument("Invalid model ID");
+    if (eActualWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
+    {
+        float fFrontWheelSize;
+        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::FRONT_AXLE, fFrontWheelSize))
+            throw std::invalid_argument("Invalid model ID");
 
-    return fWheelSize;
+        float fRearWheelSize;
+        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::REAR_AXLE, fRearWheelSize))
+            throw std::invalid_argument("Invalid model ID");
+
+        // Return a table like { ["front_axle"] = 0.7, ["rear_axle"] = 0.8 }
+        return std::unordered_map<std::string, float>{
+            {"front_axle", fFrontWheelSize},
+            {"rear_axle", fRearWheelSize},
+        };
+    }
+    else
+    {
+        float fWheelSize;
+        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eActualWheelGroup, fWheelSize))
+            throw std::invalid_argument("Invalid model ID");
+
+        return fWheelSize;
+    }
 }
 
-bool CLuaVehicleDefs::SetVehicleModelFrontWheelSize(const unsigned short usModel, const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup,
+                                               const float fWheelSize)
 {
     if (fWheelSize <= 0)
         throw std::invalid_argument("Invalid wheel size");
 
-    return CStaticFunctionDefinitions::SetVehicleModelWheelSizeFront(usModel, fWheelSize);
-}
-
-float CLuaVehicleDefs::GetVehicleModelRearWheelSize(const unsigned short usModel)
-{
-    float fWheelSize;
-
-    if (!CStaticFunctionDefinitions::GetVehicleModelWheelSizeRear(usModel, fWheelSize))
-        throw std::invalid_argument("Invalid model ID");
-
-    return fWheelSize;
-}
-
-bool CLuaVehicleDefs::SetVehicleModelRearWheelSize(const unsigned short usModel, const float fWheelSize)
-{
-    if (fWheelSize <= 0)
-        throw std::invalid_argument("Invalid wheel size");
-
-    return CStaticFunctionDefinitions::SetVehicleModelWheelSizeRear(usModel, fWheelSize);
+    return CStaticFunctionDefinitions::SetVehicleModelWheelSize(usModel, eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS), fWheelSize);
 }

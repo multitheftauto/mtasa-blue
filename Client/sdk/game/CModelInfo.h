@@ -154,11 +154,9 @@ public:
     virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
     virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
-    virtual float        GetVehicleWheelSizeFront() = 0;
-    virtual void         SetVehicleWheelSizeFront(float fWheelSize, bool bStoreDefaultSize = true) = 0;
-    virtual float        GetVehicleWheelSizeRear() = 0;
-    virtual void         SetVehicleWheelSizeRear(float fWheelSize, bool bStoreDefaultSize = true) = 0;
-    virtual void         ResetVehicleWheelSizes() = 0;
+    virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
+    virtual void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
+    virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = NULL) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;

@@ -3603,32 +3603,17 @@ bool CStaticFunctionDefinitions::SetVehicleWindowOpen(CClientVehicle& Vehicle, u
     return Vehicle.SetWindowOpen(ucWindow, bOpen);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelWheelSizeFront(unsigned short usModel, float fWheelSize)
+bool CStaticFunctionDefinitions::SetVehicleModelWheelSize(unsigned short usModel, eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
         {
-            pModelInfo->SetVehicleWheelSizeFront(fWheelSize);
+            pModelInfo->SetVehicleWheelSize(eWheelGroup, fWheelSize);
             // Restream needed to update ride height
             m_pVehicleManager->RestreamVehicles(usModel);
-            return true;
-        }
-    }
-    return false;
-}
 
-bool CStaticFunctionDefinitions::SetVehicleModelWheelSizeRear(unsigned short usModel, float fWheelSize)
-{
-    if (CClientVehicleManager::IsValidModel(usModel))
-    {
-        auto pModelInfo = g_pGame->GetModelInfo(usModel);
-        if (pModelInfo)
-        {
-            pModelInfo->SetVehicleWheelSizeRear(fWheelSize);
-            // Restream needed to update ride height
-            m_pVehicleManager->RestreamVehicles(usModel);
             return true;
         }
     }
@@ -3668,28 +3653,14 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelWheelSizeFront(unsigned short usModel, float& fWheelSize)
+bool CStaticFunctionDefinitions::GetVehicleModelWheelSize(unsigned short usModel, eResizableVehicleWheelGroup eWheelGroup, float& fWheelSize)
 {
-    if (CClientVehicleManager::IsValidModel(usModel))
+    if (CClientVehicleManager::IsValidModel(usModel) && eWheelGroup != eResizableVehicleWheelGroup::ALL_WHEELS)
     {
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
         {
-            fWheelSize = pModelInfo->GetVehicleWheelSizeFront();
-            return true;
-        }
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleModelWheelSizeRear(unsigned short usModel, float& fWheelSize)
-{
-    if (CClientVehicleManager::IsValidModel(usModel))
-    {
-        auto pModelInfo = g_pGame->GetModelInfo(usModel);
-        if (pModelInfo)
-        {
-            fWheelSize = pModelInfo->GetVehicleWheelSizeRear();
+            fWheelSize = pModelInfo->GetVehicleWheelSize(eWheelGroup);
             return true;
         }
     }

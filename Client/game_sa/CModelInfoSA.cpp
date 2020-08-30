@@ -1015,16 +1015,24 @@ void CModelInfoSA::ResetAllVehicleDummies()
     ms_ModelDefaultDummiesPosition.clear();
 }
 
-float CModelInfoSA::GetVehicleWheelSizeFront()
+float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
 {
     if (!IsVehicle())
         return 0.0f;
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return pVehicleModel->fWheelSizeFront;
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            return pVehicleModel->fWheelSizeFront;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            return pVehicleModel->fWheelSizeRear;
+    }
+
+    return 0.0f;
 }
 
-void CModelInfoSA::SetVehicleWheelSizeFront(float fWheelSize, bool bStoreDefaultSize)
+void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
 {
     if (!IsVehicle())
         return;
@@ -1032,49 +1040,47 @@ void CModelInfoSA::SetVehicleWheelSizeFront(float fWheelSize, bool bStoreDefault
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
 
     // Store default wheel sizes in map
-    if (bStoreDefaultSize && !MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
+    if (!MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
         MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
 
-    pVehicleModel->fWheelSizeFront = fWheelSize;
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::ALL_WHEELS:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+    }
 }
 
-float CModelInfoSA::GetVehicleWheelSizeRear()
-{
-    if (!IsVehicle())
-        return 0.0f;
-
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return pVehicleModel->fWheelSizeRear;
-}
-
-void CModelInfoSA::SetVehicleWheelSizeRear(float fWheelSize, bool bStoreDefaultSize)
+void CModelInfoSA::ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes)
 {
     if (!IsVehicle())
         return;
 
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    std::pair<float, float>* sizesPair;
+    if (!defaultSizes)
+    {
+        sizesPair = MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+        MapRemove(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+    }
+    else
+    {
+        sizesPair = defaultSizes;
+    }
 
-    // Store default wheel sizes in map
-    if (bStoreDefaultSize && !MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
-        MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
-
-    pVehicleModel->fWheelSizeRear = fWheelSize;
-}
-
-void CModelInfoSA::ResetVehicleWheelSizes()
-{
-    if (!IsVehicle())
-        return;
-
-    auto sizesPair = MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+    // Default values not found in map
     if (!sizesPair)
         return;
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     pVehicleModel->fWheelSizeFront = sizesPair->first;
     pVehicleModel->fWheelSizeRear = sizesPair->second;
-
-    MapRemove(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
 }
 
 void CModelInfoSA::ResetAllVehiclesWheelSizes()
@@ -1085,8 +1091,7 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
         CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
         {
-            modelInfo->SetVehicleWheelSizeFront(info.second.first, false);
-            modelInfo->SetVehicleWheelSizeRear(info.second.second, false);
+            modelInfo->ResetVehicleWheelSizes(&info.second);
         }
     }
 

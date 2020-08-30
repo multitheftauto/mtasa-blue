@@ -355,11 +355,9 @@ public:
     void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
-    float        GetVehicleWheelSizeFront() override;
-    void         SetVehicleWheelSizeFront(float fWheelSize, bool bStoreDefaultSize = true) override;
-    float        GetVehicleWheelSizeRear() override;
-    void         SetVehicleWheelSizeRear(float fWheelSize, bool bStoreDefaultSize = true) override;
-    void         ResetVehicleWheelSizes() override;
+    float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;
+    void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
+    void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = NULL) override;
     static void  ResetAllVehiclesWheelSizes();
 
     // ONLY use for peds
