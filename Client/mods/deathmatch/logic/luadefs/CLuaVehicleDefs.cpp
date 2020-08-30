@@ -4057,10 +4057,12 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(const unsigned short              usModel,
-                                                                                                      const eResizableVehicleWheelGroup eWheelGroup)
+std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
+    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
 {
-    if (eWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
+    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
+
+    if (eActualWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
     {
         float fFrontWheelSize;
         if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::FRONT_AXLE, fFrontWheelSize))
@@ -4079,18 +4081,17 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     else
     {
         float fWheelSize;
-        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eWheelGroup, fWheelSize))
+        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eActualWheelGroup, fWheelSize))
             throw std::invalid_argument("Invalid model ID");
 
         return fWheelSize;
     }
 }
 
-bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup,
-                                               const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
 {
     if (fWheelSize <= 0)
         throw std::invalid_argument("Invalid wheel size");
 
-    return CStaticFunctionDefinitions::SetVehicleModelWheelSize(usModel, eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS), fWheelSize);
+    return CStaticFunctionDefinitions::SetVehicleModelWheelSize(usModel, eWheelGroup, fWheelSize);
 }

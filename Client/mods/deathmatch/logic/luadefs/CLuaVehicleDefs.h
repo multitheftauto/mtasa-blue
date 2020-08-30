@@ -143,9 +143,9 @@ public:
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
-    static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short              usModel,
-                                                                                                const eResizableVehicleWheelGroup eWheelGroup);
-    static bool SetVehicleModelWheelSize(const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup, const float fWheelSize);
+    static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
+                                                                                                const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
+    static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
