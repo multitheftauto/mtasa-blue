@@ -18,7 +18,7 @@ typedef bool(FCommandHandler)(class CConsole*, const char*, CClient*, CClient*);
 class CConsoleCommand
 {
 public:
-    CConsoleCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, string m_sConsoleHelp);
+    CConsoleCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, string sConsoleHelp);
     ~CConsoleCommand() { delete[] m_szCommand; };
 
     bool             operator()(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
