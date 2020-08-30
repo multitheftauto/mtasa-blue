@@ -357,7 +357,7 @@ public:
     static void  ResetAllVehicleDummies();
     float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) override;
     void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
-    void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = NULL) override;
+    void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) override;
     static void  ResetAllVehiclesWheelSizes();
 
     // ONLY use for peds

@@ -156,7 +156,7 @@ public:
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
     virtual float        GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup) = 0;
     virtual void         SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
-    virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = NULL) = 0;
+    virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
