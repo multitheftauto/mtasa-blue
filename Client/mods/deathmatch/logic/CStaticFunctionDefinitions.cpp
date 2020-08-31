@@ -3603,23 +3603,6 @@ bool CStaticFunctionDefinitions::SetVehicleWindowOpen(CClientVehicle& Vehicle, u
     return Vehicle.SetWindowOpen(ucWindow, bOpen);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelWheelSize(unsigned short usModel, eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
-{
-    if (CClientVehicleManager::IsValidModel(usModel))
-    {
-        auto pModelInfo = g_pGame->GetModelInfo(usModel);
-        if (pModelInfo)
-        {
-            pModelInfo->SetVehicleWheelSize(eWheelGroup, fWheelSize);
-            // Restream needed to update ride height
-            m_pVehicleManager->RestreamVehicles(usModel);
-
-            return true;
-        }
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow)
 {
     return Vehicle.IsWindowOpen(ucWindow);
@@ -3647,20 +3630,6 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
         if (pModelInfo)
         {
             vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
-            return true;
-        }
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GetVehicleModelWheelSize(unsigned short usModel, eResizableVehicleWheelGroup eWheelGroup, float& fWheelSize)
-{
-    if (CClientVehicleManager::IsValidModel(usModel) && eWheelGroup != eResizableVehicleWheelGroup::ALL_WHEELS)
-    {
-        auto pModelInfo = g_pGame->GetModelInfo(usModel);
-        if (pModelInfo)
-        {
-            fWheelSize = pModelInfo->GetVehicleWheelSize(eWheelGroup);
             return true;
         }
     }

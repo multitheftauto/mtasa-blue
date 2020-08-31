@@ -4077,38 +4077,41 @@ bool CLuaVehicleDefs::SetVehicleWheelScale(CClientVehicle* const pVehicle, const
 std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
     const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
 {
-    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
+    CModelInfo* pModelInfo = nullptr;
+    if (CClientVehicleManager::IsValidModel(usModel))
+        pModelInfo = g_pGame->GetModelInfo(usModel);
 
+    if (!pModelInfo)
+        throw std::invalid_argument("Invalid model ID");
+
+    eResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(eResizableVehicleWheelGroup::ALL_WHEELS);
     if (eActualWheelGroup == eResizableVehicleWheelGroup::ALL_WHEELS)
     {
-        float fFrontWheelSize;
-        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::FRONT_AXLE, fFrontWheelSize))
-            throw std::invalid_argument("Invalid model ID");
-
-        float fRearWheelSize;
-        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eResizableVehicleWheelGroup::REAR_AXLE, fRearWheelSize))
-            throw std::invalid_argument("Invalid model ID");
-
         // Return a table like { ["front_axle"] = 0.7, ["rear_axle"] = 0.8 }
         return std::unordered_map<std::string, float>{
-            {"front_axle", fFrontWheelSize},
-            {"rear_axle", fRearWheelSize},
+            {"front_axle", pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE)},
+            {"rear_axle", pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::REAR_AXLE)},
         };
     }
-    else
-    {
-        float fWheelSize;
-        if (!CStaticFunctionDefinitions::GetVehicleModelWheelSize(usModel, eActualWheelGroup, fWheelSize))
-            throw std::invalid_argument("Invalid model ID");
-
-        return fWheelSize;
-    }
+    return pModelInfo->GetVehicleWheelSize(eActualWheelGroup);
 }
 
 bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
 {
+    CModelInfo* pModelInfo = nullptr;
+
     if (fWheelSize <= 0)
         throw std::invalid_argument("Invalid wheel size");
 
-    return CStaticFunctionDefinitions::SetVehicleModelWheelSize(usModel, eWheelGroup, fWheelSize);
+    if (CClientVehicleManager::IsValidModel(usModel))
+        pModelInfo = g_pGame->GetModelInfo(usModel);
+
+    if (!pModelInfo)
+        throw std::invalid_argument("Invalid model ID");
+
+    pModelInfo->SetVehicleWheelSize(eWheelGroup, fWheelSize);
+    // Restream needed to update ride height
+    m_pVehicleManager->RestreamVehicles(usModel);
+
+    return true;
 }
