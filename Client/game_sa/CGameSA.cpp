@@ -473,6 +473,9 @@ void CGameSA::Reset()
         CModelInfoSA::RestoreAllObjectsPropertiesGroups();
         // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
         CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
+
+        // Restore vehicle model wheel sizes
+        CModelInfoSA::ResetAllVehiclesWheelSizes();
     }
 }
 
