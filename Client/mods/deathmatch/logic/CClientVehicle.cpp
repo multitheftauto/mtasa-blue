@@ -5024,7 +5024,7 @@ void CClientVehicle::ResetWheelScale()
 {
     // The calculation of the default wheel scale is based on original GTA code at functions
     // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
-    if (m_pUpgrades && m_pUpgrades->GetSlotState(12) != 0)
+    if (m_pUpgrades->GetSlotState(12) != 0)
         m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
     else
         m_fWheelScale = 1.0f;
