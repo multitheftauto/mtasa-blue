@@ -2828,14 +2828,16 @@ void CClientVehicle::Create()
                 ApplyHandling();
         }
 
-        // Re-add all the upgrades - Has to be applied after handling *shrugs*
-        bool bPreviousWheelScaleChanged = m_bWheelScaleChanged;
+        // Applying wheel upgrades can change these values.
+        // We should keep track of the original values to restore them
+        bool  bPreviousWheelScaleChanged = m_bWheelScaleChanged;
         float fPreviousWheelScale = m_fWheelScale;
+
+        // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
 
-        // Set wheel scale after wheel upgrades have been added.
-        // They change it and reset m_bWheelScaleChanged
+        // Restore custom wheel scale
         if (bPreviousWheelScaleChanged)
         {
             m_pVehicle->SetWheelScale(fPreviousWheelScale);
