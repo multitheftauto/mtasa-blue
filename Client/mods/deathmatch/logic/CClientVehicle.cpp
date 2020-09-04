@@ -171,6 +171,9 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not yet been streamed in
     m_bJustStreamedIn = false;
+
+    // We've not changed the wheel scale
+    m_bWheelScaleChanged = false;
 }
 
 CClientVehicle::~CClientVehicle()
@@ -2682,7 +2685,6 @@ void CClientVehicle::Create()
         m_pVehicle->SetGravity(&m_vecGravity);
         m_pVehicle->SetHeadLightColor(m_HeadLightColor);
         m_pVehicle->SetRadioStatus(0);
-        m_pVehicle->SetWheelScale(m_fWheelScale);
 
         if (IsNitroInstalled())
         {
@@ -2825,9 +2827,20 @@ void CClientVehicle::Create()
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
+        bool bPreviousWheelScaleChanged = m_bWheelScaleChanged;
+        float fPreviousWheelScale = m_fWheelScale;
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
+
+        // Set wheel scale after wheel upgrades have been added.
+        // They change it and reset m_bWheelScaleChanged
+        if (bPreviousWheelScaleChanged)
+        {
+            m_pVehicle->SetWheelScale(fPreviousWheelScale);
+            m_bWheelScaleChanged = true;
+        }
 
         if (m_ComponentData.empty())
         {
@@ -4992,6 +5005,8 @@ void CClientVehicle::SetWheelScale(float fWheelScale)
         m_pVehicle->SetWheelScale(fWheelScale);
     }
     m_fWheelScale = fWheelScale;
+
+    m_bWheelScaleChanged = true;
 }
 
 float CClientVehicle::GetWheelScale()
@@ -5001,4 +5016,18 @@ float CClientVehicle::GetWheelScale()
         return m_pVehicle->GetWheelScale();
     }
     return m_fWheelScale;
+}
+
+// This function is meant to be called after GTA resets wheel scale
+// (i.e. after installing a wheel upgrade)
+void CClientVehicle::ResetWheelScale()
+{
+    // The calculation of the default wheel scale is based on original GTA code at functions
+    // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
+    if (m_pUpgrades->GetSlotState(12) != 0)
+        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
+    else
+        m_fWheelScale = 1.0f;
+
+    m_bWheelScaleChanged = false;
 }
