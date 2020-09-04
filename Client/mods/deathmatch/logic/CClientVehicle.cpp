@@ -5022,6 +5022,8 @@ float CClientVehicle::GetWheelScale()
 // (i.e. after installing a wheel upgrade)
 void CClientVehicle::ResetWheelScale()
 {
+    assert(m_pUpgrades);
+
     // The calculation of the default wheel scale is based on original GTA code at functions
     // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
     if (m_pUpgrades->GetSlotState(12) != 0)
