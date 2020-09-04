@@ -2841,6 +2841,7 @@ void CClientVehicle::Create()
         if (bPreviousWheelScaleChanged)
         {
             m_pVehicle->SetWheelScale(fPreviousWheelScale);
+            m_fWheelScale = fPreviousWheelScale;
             m_bWheelScaleChanged = true;
         }
 
