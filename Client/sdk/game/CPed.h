@@ -269,4 +269,5 @@ public:
     virtual void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType) = 0;
 
     virtual int GetCustomMoveAnim() = 0;
+    virtual bool IsDoingGangDriveby() = 0;
 };

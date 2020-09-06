@@ -109,7 +109,7 @@ public:
     const char* GetAnimBlockName(AssocGroupId groupID);
 
     std::unique_ptr<CAnimBlendAssociation> CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
-    StaticAssocIntface_type                GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID);
+    StaticAssocIntface_type                GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID);
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID);

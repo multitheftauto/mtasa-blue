@@ -1517,6 +1517,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
@@ -2509,7 +2510,7 @@ namespace
     }
 }            // namespace WireShpere
 
-void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColorARGB color, float fLineWidth, int iterations)
+void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations)
 {
     const SWireModel& model = GetSphereWireModel(iterations);
 

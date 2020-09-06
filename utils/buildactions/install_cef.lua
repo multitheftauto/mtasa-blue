@@ -8,8 +8,8 @@ local CEF_URL_PREFIX = "http://opensource.spotify.com/cefbuilds/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "81.2.15+ge07275d+chromium-81.0.4044.92"
-local CEF_HASH = "da92f0a5b5454c9052f93ccedb9dcaa8c3a482e78b72e49f49fef8383ae1560d"
+local CEF_VERSION = "81.3.10+gb223419+chromium-81.0.4044.138"
+local CEF_HASH = "27d698c45cc2c0b15972589c32243fff15aca8d3fc1638c8a05ba54db0b63f05"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
@@ -49,8 +49,18 @@ newaction {
 	description = "Downloads and installs CEF",
 
 	execute = function(...)
-		local upgrade = #_ARGS == 1 and _ARGS[1] == "upgrade"
-		if upgrade then
+		local upgrade = _ARGS[1] == "upgrade"
+		if upgrade and _ARGS[2] then
+			local version = _ARGS[2]
+
+			if version == CEF_VERSION then
+				print(("CEF version is already %s"):format(version))
+				return
+			end
+
+			CEF_VERSION = version
+			CEF_HASH = ""
+		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
 			resource, result_str, result_code = http.get("http://opensource.spotify.com/cefbuilds/index.html")
 			if result_str ~= "OK" or result_code ~= 200 then
@@ -98,7 +108,7 @@ newaction {
 		end
 
 		-- Download CEF
-		print("Downloading CEF...")
+		print("Downloading CEF " .. CEF_VERSION ..  "...")
 		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
 		if result_str ~= "OK" or response_code ~= 200 then
 			errormsg(("Could not download CEF with status code %s: "):format(response_code), result_str)

@@ -16,6 +16,9 @@
         T PopPrimitive(L, std::size_t stackIndex)
 */
 
+class CVector2D;
+class CVector;
+class CVector4D;
 
 namespace lua
 {
@@ -68,10 +71,19 @@ namespace lua
         return 1;
     }
 
+    inline int Push(lua_State* L, const CLuaArgument& arg)
+    {
+        if (arg.GetType() == LUA_TNONE)
+            return 0;
+
+        arg.Push(L);
+        return 1;
+    }
+
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
     {
-        return std::visit([L](auto&& value) -> int { return Push(L, value); }, val);
+        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
     }
 
     template <typename T>
@@ -82,6 +94,24 @@ namespace lua
         else
             return Push(L, nullptr);
      }
+
+    inline int Push(lua_State* L, const CVector2D& value)
+    {
+        lua_pushvector(L, value);
+        return 1;
+    }
+
+    inline int Push(lua_State* L, const CVector& value)
+    {
+        lua_pushvector(L, value);
+        return 1;
+    }
+
+    inline int Push(lua_State* L, const CVector4D& value)
+    {
+        lua_pushvector(L, value);
+        return 1;
+    }
 
     template <typename T>
     int Push(lua_State* L, const std::vector<T>&& val)
@@ -112,6 +142,15 @@ namespace lua
 
         // Only the table remains on the stack
         return 1;
+    }
+
+    // Tuples can be used to return multiple results
+    template<typename... Ts>
+    int Push(lua_State* L, const std::tuple<Ts...>&& tuple)
+    {
+        // Call Push on each element of the tuple
+        std::apply([L](const auto&... value) { (Push(L, value), ...); }, tuple);
+        return sizeof...(Ts);
     }
 
     // Overload for enum types only

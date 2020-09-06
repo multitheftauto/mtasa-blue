@@ -631,20 +631,8 @@ void ValidateGTAPath()
             _E("CL13"));
         return ExitProcess(EXIT_ERROR);
     }
-    else if (iResult == GAME_PATH_STEAM)
-    {
-        DisplayErrorMessageBox(_("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to "
-                                 "a page where you can find information to resolve this issue."),
-                               _E("CL14"));
-        BrowseToSolution("downgrade-steam");
-        return ExitProcess(EXIT_ERROR);
-    }
 
-    SString strGTAPath = GetGTAPath();
-
-    // We can now set this
-    SetCurrentDirectory(strGTAPath);
-
+    const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {
@@ -844,13 +832,13 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"07387638905CF786BA12433F97782EE1", "bass.dll"},
-                              {"853933A2518EBF8E966C04C2EAA95391", "bass_aac.dll"},
+    } integrityCheckList[] = {{"5B94D8E034A90032062ABEE2F6F8C2B9", "bass.dll"},
+                              {"1427B642B1E10B15E84C10FF43B1D8A5", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"C176D670BF5440A6C704B55A21B01FEF", "bass_fx.dll"},
+                              {"27D2069B89AA55C21DB23C835AA90730", "bass_fx.dll"},
                               {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
-                              {"5C2A325EC18952945F07C881CB7E44CC", "bassmidi.dll"},
-                              {"6CBD7A375E98420DC8CC2475B62C895B", "bassmix.dll"},
+                              {"AFF8A753E795DF59C9285324124B9132", "bassmidi.dll"},
+                              {"7B00E76ABC6128AE2B29B2B7F77F49FC", "bassmix.dll"},
                               {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
                               {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
