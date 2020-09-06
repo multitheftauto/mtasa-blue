@@ -580,6 +580,12 @@ ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)
+ADD_ENUM(eResizableVehicleWheelGroup::FRONT_AXLE, "front_axle")
+ADD_ENUM(eResizableVehicleWheelGroup::REAR_AXLE, "rear_axle")
+ADD_ENUM(eResizableVehicleWheelGroup::ALL_WHEELS, "all_wheels")
+IMPLEMENT_ENUM_CLASS_END("resizable-vehicle-wheel-group")
+
 IMPLEMENT_ENUM_BEGIN(eSurfaceProperties)
 ADD_ENUM(SURFACE_PROPERTY_AUDIO, "audio")
 ADD_ENUM(SURFACE_PROPERTY_STEPWATERSPLASH, "stepwatersplash")

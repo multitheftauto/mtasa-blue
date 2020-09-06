@@ -529,6 +529,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
         ushort usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
+            // Fixes vehicle dff leak problem with engineReplaceModel
             m_pDFFManager->RestoreModel(usModelID);
             if (pDFF->ReplaceModel(usModelID, bAlphaTransparency))
             {
