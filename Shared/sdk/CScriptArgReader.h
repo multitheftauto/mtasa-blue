@@ -1043,9 +1043,6 @@ public:
                 {
                     outList.push_back(static_cast<T>(lua_tonumber(m_luaVM, -1)));
                 }
-                iLimit--;
-                if (iLimit <= 0)
-                    return;
             }
             m_iIndex++;
             return;

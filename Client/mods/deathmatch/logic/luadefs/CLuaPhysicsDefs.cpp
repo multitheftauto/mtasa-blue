@@ -312,7 +312,7 @@ int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)
                 argStream.ReadNumber(iSizeX);
                 argStream.ReadNumber(iSizeY);
                 if (argStream.NextIsTable())
-                    argStream.ReadNumberTable(vecFloat, iSizeX * iSizeY);
+                    argStream.ReadNumberTable(vecFloat);
                 else            // fill with empty table
                     for (int i = 0; i < iSizeX * iSizeY; i++)
                         vecFloat.emplace_back(0);
