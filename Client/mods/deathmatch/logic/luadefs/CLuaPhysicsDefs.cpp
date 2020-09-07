@@ -20,7 +20,7 @@
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        {"physicsCreateWorld", PhysicsCreateWorld},
+        {"physicsCreateWorld", ArgumentParser<PhysicsCreateWorld>},
         {"physicsDestroy", PhysicsDestroy},
         {"physicsCreateRigidBody", PhysicsCreateRigidBody},
         {"physicsCreateStaticCollision", PhysicsCreateStaticCollision},
@@ -38,7 +38,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsGetConstraints", PhysicsGetConstraints},
         {"physicsSetProperties", PhysicsSetProperties},
         {"physicsGetProperties", PhysicsGetProperties},
-        {"physicsDrawDebug", PhysicsDrawDebug},            // seems to be finished
+        {"physicsDrawDebug", PhysicsDrawDebug},
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsGetDebugMode", PhysicsGetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
@@ -70,35 +70,25 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
     lua_registerstaticclass(luaVM, "Physics");
 }
 
-int CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM)
+CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity)
 {
-    ePhysicsProperty eProperty;
-    CScriptArgReader argStream(luaVM);
-    CVector          vecGravity;
-    argStream.ReadVector3D(vecGravity, CVector(0, 0, -9.81));
-
-    if (!argStream.HasErrors())
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        CResource* pResource = pLuaMain->GetResource();
+        if (pResource)
         {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
+            CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
+            CElementGroup*  pGroup = pResource->GetElementGroup();
+            if (pGroup)
             {
-                CClientPhysics* pPhysics = new CClientPhysics(m_pManager, INVALID_ELEMENT_ID, pLuaMain);
-                CElementGroup*  pGroup = pResource->GetElementGroup();
-                if (pGroup)
-                {
-                    pGroup->Add((CClientEntity*)pPhysics);
-                }
-                pPhysics->SetGravity(vecGravity);
-                lua_pushelement(luaVM, pPhysics);
-                return 1;
+                pGroup->Add((CClientEntity*)pPhysics);
             }
+            pPhysics->SetGravity(vecGravity.value_or(CVector(0,0,-9.81)));
+            return pPhysics;
         }
     }
-    lua_pushboolean(luaVM, false);
-    return 1;
+    throw std::invalid_argument("Unknown error");
 }
 
 int CLuaPhysicsDefs::PhysicsCreateShape(lua_State* luaVM)

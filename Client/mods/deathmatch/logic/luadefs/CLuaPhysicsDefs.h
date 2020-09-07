@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaFunctionParser.h"
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -18,7 +19,8 @@ public:
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(PhysicsCreateWorld);
+    static CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
+
     LUA_DECLARE(PhysicsDestroy);
     LUA_DECLARE(PhysicsCreateRigidBody);
     LUA_DECLARE(PhysicsCreateShapeFromModel);
