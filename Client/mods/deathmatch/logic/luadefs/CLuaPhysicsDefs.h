@@ -22,7 +22,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     static CClientPhysics* PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
-    static bool            IsPhysicsElement(lua_State* luaVM, CLuaPhysicsElement* pPhysicsElement);
+    static bool            IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement);
 
     LUA_DECLARE(PhysicsDestroy);
     LUA_DECLARE(PhysicsCreateRigidBody);

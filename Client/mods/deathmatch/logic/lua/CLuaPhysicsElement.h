@@ -27,6 +27,7 @@ public:
 
     CClientPhysics* GetPhysics() const { return m_pPhysics; }
     uint            GetScriptID() const { return m_uiScriptID; }
+    EIdClass::EIdClassType GetClassType() const { return m_classType; }
 
 private:
     void RemoveScriptID();
