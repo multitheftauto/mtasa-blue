@@ -44,6 +44,7 @@ class CClientRadarArea;
 class CClientPointLights;
 class CClientPhysics;
 class CLuaTimer;
+class CLuaPhysicsElement;
 class CLuaPhysicsRigidBody;
 class CLuaPhysicsStaticCollision;
 class CLuaPhysicsConstraint;

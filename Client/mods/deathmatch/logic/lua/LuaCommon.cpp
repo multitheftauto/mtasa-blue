@@ -18,6 +18,7 @@
 // Prevent the warning issued when doing unsigned short -> void*
 #pragma warning(disable:4312)
 
+#include "../lua/CLuaPhysicsElement.h"
 #include "../lua/CLuaPhysicsStaticCollision.h"
 #include "../lua/CLuaPhysicsRigidBody.h"
 #include "../lua/CLuaPhysicsConstraint.h"

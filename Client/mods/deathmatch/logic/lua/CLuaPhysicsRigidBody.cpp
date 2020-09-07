@@ -17,10 +17,9 @@
 #include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+    : CLuaPhysicsElement(pPhysics, EIdClass::RIGID_BODY)
 {
-    m_pPhysics = pPhysics;
     m_pPhysicsShape = pShape;
-    m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RIGID_BODY);
 
     m_pBtRigidBody = CLuaPhysicsSharedLogic::CreateRigidBody(pShape->GetBtShape(), fMass, vecLocalInertia, vecCenterOfMass);
     m_pPhysicsShape->AddRigidBody(this);
@@ -34,7 +33,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
     for (int i = 0; i < m_pBtRigidBody->getNumConstraintRefs(); i++)
     {
-        m_pPhysics->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
+        GetPhysics()->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
     }
 
     if (m_pBtRigidBody && m_pBtRigidBody->getMotionState())
@@ -42,20 +41,11 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
         delete m_pBtRigidBody->getMotionState();
     }
 
-    m_pPhysics->GetDynamicsWorld()->removeRigidBody(m_pBtRigidBody);
+    GetPhysics()->GetDynamicsWorld()->removeRigidBody(m_pBtRigidBody);
     m_pPhysicsShape->RemoveRigidBody(this);
     delete m_pBtRigidBody;
-    RemoveScriptID();
 }
 
-void CLuaPhysicsRigidBody::RemoveScriptID()
-{
-    if (m_uiScriptID != INVALID_ARRAY_ID)
-    {
-        CIdArray::PushUniqueId(this, EIdClass::RIGID_BODY, m_uiScriptID);
-        m_uiScriptID = INVALID_ARRAY_ID;
-    }
-}
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {
@@ -68,8 +58,8 @@ void CLuaPhysicsRigidBody::Activate()
     m_pBtRigidBody->setCollisionFlags(m_pBtRigidBody->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
     m_pBtRigidBody->setActivationState(ACTIVE_TAG);
     m_pBtRigidBody->activate(true);
-    m_pPhysics->GetDynamicsWorld()->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(m_pBtRigidBody->getBroadphaseHandle(),
-                                                                                                    m_pPhysics->GetDynamicsWorld()->getDispatcher());
+    GetPhysics()->GetDynamicsWorld()->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(m_pBtRigidBody->getBroadphaseHandle(),
+                                                                                                      GetPhysics()->GetDynamicsWorld()->getDispatcher());
 }
 
 void CLuaPhysicsRigidBody::SetMotionThreshold(float fThreshold)

@@ -66,6 +66,7 @@ public:
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
 
     bool       BeingDeleted();
     lua_State* GetVirtualMachine() const { return m_luaVM; };

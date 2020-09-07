@@ -17,15 +17,13 @@ class CLuaPhysicsRigidBody;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-class CLuaPhysicsRigidBody
+class CLuaPhysicsRigidBody : public CLuaPhysicsElement
 {
 public:
     CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
-    void RemoveScriptID();
-
-    void UpdateAABB() { m_pPhysics->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
+    void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
     // for compound rigid bodies
     void AddBox(CVector& vecHalf);
     void AddSphere(float fRadius);
@@ -71,16 +69,12 @@ public:
     bool WantsSleeping();
     float GetMass();
 
-    CClientPhysics* GetPhysics() const { return m_pPhysics; }
-    uint            GetScriptID() const { return m_uiScriptID; }
     btRigidBody*    GetBtRigidBody() const { return m_pBtRigidBody; }
 
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
 private:
-    uint                                 m_uiScriptID;
-    CClientPhysics*                      m_pPhysics;
     btRigidBody*                         m_pBtRigidBody;
     CLuaPhysicsShape*                    m_pPhysicsShape;
     std::vector<CLuaPhysicsConstraint*>  m_constraintList;

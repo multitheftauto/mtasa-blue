@@ -512,6 +512,10 @@ inline SString GetClassTypeName(CLuaPhysicsShape*)
 {
     return "physics-shape";
 }
+inline SString GetClassTypeName(CLuaPhysicsElement*)
+{
+    return "physics-element";
+}
 inline SString GetClassTypeName(CEntity*)
 {
     return "entity";
@@ -659,7 +663,7 @@ CLuaPhysicsConstraint* UserDataCast(CLuaPhysicsConstraint*, void* ptr, lua_State
     return NULL;
 }
 //
-// CLuaPhysicsContraint from userdata
+// CLuaPhysicsShape from userdata
 //
 template <class T>
 CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
@@ -671,6 +675,20 @@ CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
     }
     return NULL;
 }
+//
+// CLuaPhysicsContraint from userdata
+//
+template <class T>
+CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
+
 
 //
 // CLuaVector2D from userdata

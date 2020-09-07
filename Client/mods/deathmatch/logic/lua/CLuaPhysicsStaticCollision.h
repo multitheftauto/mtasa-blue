@@ -9,6 +9,7 @@
  *
  *****************************************************************************/
 
+class CLuaPhysicsElement;
 class CLuaPhysicsStaticCollision;
 class btHeightfieldTerrainShape;
 class heightfieldTerrainShape;
@@ -19,13 +20,11 @@ class heightfieldTerrainShape;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-class CLuaPhysicsStaticCollision
+class CLuaPhysicsStaticCollision : public CLuaPhysicsElement
 {
 public:
     CLuaPhysicsStaticCollision(CClientPhysics* pPhysics);
     ~CLuaPhysicsStaticCollision();
-
-    void RemoveScriptID();
 
     // use only once
 
@@ -56,14 +55,10 @@ public:
     void SetFilterGroup(int iGroup);
     void GetFilterGroup(int& iGroup);
 
-    CClientPhysics*    GetPhysics() const { return m_pPhysics; }
-    uint               GetScriptID() const { return m_uiScriptID; }
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
     void               SetCollisionHandler(const CLuaFunctionRef& iLuaFunction) { m_iLuaCollisionHandlerFunction = iLuaFunction; }
 
 private:
-    CClientPhysics*          m_pPhysics;
-    uint m_uiScriptID;
     btCollisionObject*       m_btCollisionObject;
     CLuaFunctionRef          m_iLuaCollisionHandlerFunction;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsShape.h
  *  PURPOSE:     Lua physics shape class
@@ -17,42 +17,38 @@ class CLuaPhysicsShape;
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-class CLuaPhysicsShape
+class CLuaPhysicsShape : public CLuaPhysicsElement
 {
 public:
     CLuaPhysicsShape(CClientPhysics* pPhysics);
     ~CLuaPhysicsShape();
 
-    void RemoveScriptID();
-
     //// for compound rigid bodies
-    //void AddBox(CVector& vecHalf);
-    //void AddSphere(float fRadius);
+    // void AddBox(CVector& vecHalf);
+    // void AddSphere(float fRadius);
 
-    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0,0,0));
+    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
 
-    btBoxShape*              InitializeWithBox(CVector& vecHalf);
-    void                     FinalizeInitialization(btCollisionShape* pShape);
-    btSphereShape*           InitializeWithSphere(float fRadius);
-    btCapsuleShape*          InitializeWithCapsule(float fRadius, float fHeight);
-    btCompoundShape*         InitializeWithCompound(int initialChildCapacity = 0);
-    btConeShape*             InitializeWithCone(float fRadius, float fHeight);
-    btCylinderShape*         InitializeWithCylinder(CVector& half);
-    btConvexHullShape*       InitializeWithConvexHull(std::vector<CVector>& vecPoints);
-    btBvhTriangleMeshShape*  InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
+    btBoxShape*                InitializeWithBox(CVector& vecHalf);
+    void                       FinalizeInitialization(btCollisionShape* pShape);
+    btSphereShape*             InitializeWithSphere(float fRadius);
+    btCapsuleShape*            InitializeWithCapsule(float fRadius, float fHeight);
+    btCompoundShape*           InitializeWithCompound(int initialChildCapacity = 0);
+    btConeShape*               InitializeWithCone(float fRadius, float fHeight);
+    btCylinderShape*           InitializeWithCylinder(CVector& half);
+    btConvexHullShape*         InitializeWithConvexHull(std::vector<CVector>& vecPoints);
+    btBvhTriangleMeshShape*    InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
     btHeightfieldTerrainShape* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
-    CClientPhysics*       GetPhysics() const { return m_pPhysics; }
-    uint                  GetScriptID() const { return m_uiScriptID; }
-    btCollisionShape*     GetBtShape() const { return m_pBtShape; }
-    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void                  AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    void                  RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    btCollisionShape*              GetBtShape() const { return m_pBtShape; }
+    void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void                           RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void                           AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void                           RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     std::vector<CLuaPhysicsShape*> GetChildShapes();
-    bool RemoveChildShape(int index);
-    bool GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
-    bool SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
+    bool                           RemoveChildShape(int index);
+    bool                           GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
+    bool                           SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
 
     bool SetSize(CVector vecSize);
     bool GetSize(CVector& vecSize);
@@ -69,12 +65,10 @@ public:
     void UpdateRigids();
 
     BroadphaseNativeTypes GetType();
-    const char* GetName();
+    const char*           GetName();
 
 private:
-    uint               m_uiScriptID;
-    CClientPhysics*    m_pPhysics;
-    btCollisionShape*  m_pBtShape;
+    btCollisionShape*        m_pBtShape;
     heightfieldTerrainShape* m_heightfieldTerrainData = nullptr;
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;

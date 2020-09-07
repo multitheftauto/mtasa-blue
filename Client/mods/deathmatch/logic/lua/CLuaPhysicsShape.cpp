@@ -17,10 +17,8 @@
 #include "CLuaPhysicsShapeManager.h"
 #include "bulletphysics3d/BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 
-CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics)
+CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
 {
-    m_pPhysics = pPhysics;
-    m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::SHAPE);
     m_pBtShape = nullptr;
     m_heightfieldTerrainData = nullptr;
 }
@@ -29,27 +27,17 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
 {
     for (int i = m_vecRigidBodyList.size() - 1; i >= 0; i--)
     {
-        m_pPhysics->DestroyRigidBody(m_vecRigidBodyList[i]);
+        GetPhysics()->DestroyRigidBody(m_vecRigidBodyList[i]);
     }
     for (int i = m_vecStaticCollisions.size() - 1; i >= 0; i--)
     {
-        m_pPhysics->DestroyStaticCollision(m_vecStaticCollisions[i]);
+        GetPhysics()->DestroyStaticCollision(m_vecStaticCollisions[i]);
     }
     delete m_pBtShape;
 
     if (m_heightfieldTerrainData != nullptr)
         delete m_heightfieldTerrainData;
 
-    RemoveScriptID();
-}
-
-void CLuaPhysicsShape::RemoveScriptID()
-{
-    if (m_uiScriptID != INVALID_ARRAY_ID)
-    {
-        CIdArray::PushUniqueId(this, EIdClass::SHAPE, m_uiScriptID);
-        m_uiScriptID = INVALID_ARRAY_ID;
-    }
 }
 
 void CLuaPhysicsShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)

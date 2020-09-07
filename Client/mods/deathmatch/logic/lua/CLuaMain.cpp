@@ -98,6 +98,23 @@ CLuaPhysicsShape* CLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
     return m_pLuaPhysicsShapeManager->GetShapeFromScriptID(uiScriptID);
 }
 
+CLuaPhysicsElement* CLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)
+{
+    auto pShape = GetShapeFromScriptID(uiScriptID);
+    if (pShape != nullptr)
+        return (CLuaPhysicsElement*)pShape;
+    auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
+    if (pStaticCollision != nullptr)
+        return (CLuaPhysicsElement*)pStaticCollision;
+    auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
+    if (pRigidBody != nullptr)
+        return (CLuaPhysicsElement*)pRigidBody;
+    auto pConstraint = GetContraintFromScriptID(uiScriptID);
+    if (pConstraint != nullptr)
+        return (CLuaPhysicsElement*)pConstraint;
+    return nullptr;
+}
+
 void CLuaMain::ResetInstructionCount()
 {
     m_FunctionEnterTimer.Reset();

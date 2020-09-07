@@ -14,6 +14,7 @@ class CLuaPhysicsRigidBodyManager;
 #pragma once
 
 #include "LuaCommon.h"
+#include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsRigidBody.h"
 #include <list>
 

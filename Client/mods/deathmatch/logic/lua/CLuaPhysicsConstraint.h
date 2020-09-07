@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsConstraint.h
  *  PURPOSE:     Lua timer class
@@ -19,13 +19,11 @@ class CLuaPhysicsConstraint;
 
 enum ePhysicsConstraint;
 
-class CLuaPhysicsConstraint
+class CLuaPhysicsConstraint : public CLuaPhysicsElement
 {
 public:
     CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
     ~CLuaPhysicsConstraint();
-
-    void RemoveScriptID();
 
     // use only once after constructor
     void CreatePointToPointConstraint(CVector& anchorA, CVector& anchorB, bool bDisableCollisionsBetweenLinkedBodies);
@@ -47,8 +45,6 @@ public:
     float GetAppliedImpulse();
     btJointFeedback* GetJoinFeedback();
 
-    CClientPhysics*       GetPhysics() const { return m_pPhysics; }
-    uint                  GetScriptID() const { return m_uiScriptID; }
     CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
     CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
     bool                  IsBroken() const { return !m_pConstraint->isEnabled(); }
@@ -60,7 +56,6 @@ private:
     btTypedConstraint*       m_pConstraint;
     uint                     m_uiScriptID;
     btJointFeedback*         m_pJointFeedback;
-    CClientPhysics*          m_pPhysics;
     CLuaPhysicsRigidBody*    m_pRigidBodyA;
     CLuaPhysicsRigidBody*    m_pRigidBodyB;
     bool                     m_bLastBreakingStatus;

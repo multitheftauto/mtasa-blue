@@ -13,13 +13,16 @@
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
 
+class CLuaPhysicsElement;
+
 class CLuaPhysicsDefs : public CLuaDefs
 {
 public:
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    static CClientPhysics* CLuaPhysicsDefs::PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
+    static CClientPhysics* PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
+    static bool            IsPhysicsElement(lua_State* luaVM, CLuaPhysicsElement* pPhysicsElement);
 
     LUA_DECLARE(PhysicsDestroy);
     LUA_DECLARE(PhysicsCreateRigidBody);
@@ -50,5 +53,4 @@ public:
     LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);
     LUA_DECLARE(PhysicsGetElementType);
-    LUA_DECLARE(PhysicsIsElement);
 };

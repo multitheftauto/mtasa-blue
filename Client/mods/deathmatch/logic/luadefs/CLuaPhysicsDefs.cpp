@@ -50,7 +50,7 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
         {"physicsGetElementType", PhysicsGetElementType},
-        {"physicsIsElement", PhysicsIsElement},
+        {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
     };
 
     // Add functions
@@ -2455,7 +2455,7 @@ int CLuaPhysicsDefs::PhysicsGetElementType(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPhysicsDefs::PhysicsIsElement(lua_State* luaVM)
+bool CLuaPhysicsDefs::IsPhysicsElement(lua_State* luaVM, CLuaPhysicsElement* pPhysicsElement)
 {
     CLuaPhysicsRigidBody*       pRigidBody = nullptr;
     CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
@@ -2479,9 +2479,9 @@ int CLuaPhysicsDefs::PhysicsIsElement(lua_State* luaVM)
         if (pRigidBody != nullptr || pStaticCollision != nullptr || pStaticConstraint != nullptr || pShape != nullptr)
         {
             lua_pushboolean(luaVM, true);
-            return 1;
+            return true;
         }
     }
     lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }

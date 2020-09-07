@@ -11,36 +11,23 @@
 
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
+#include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsRigidBodyManager.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CClientPhysics* pPhysics)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CClientPhysics* pPhysics) : CLuaPhysicsElement(pPhysics, EIdClass::STATIC_COLLISION)
 {
-    m_pPhysics = pPhysics;
-    m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::STATIC_COLLISION);
     m_btCollisionObject = nullptr;
-    
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
     if (m_btCollisionObject)
     {
-        m_pPhysics->GetDynamicsWorld()->removeCollisionObject(m_btCollisionObject);
+        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(m_btCollisionObject);
         delete m_btCollisionObject;
-    }
-
-    RemoveScriptID();
-}
-
-void CLuaPhysicsStaticCollision::RemoveScriptID()
-{
-    if (m_uiScriptID != INVALID_ARRAY_ID)
-    {
-        CIdArray::PushUniqueId(this, EIdClass::STATIC_COLLISION, m_uiScriptID);
-        m_uiScriptID = INVALID_ARRAY_ID;
     }
 }
 
@@ -99,7 +86,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
     btCompoundShape* pCompoundShape = new btCompoundShape(true);
     m_btCollisionObject->setCollisionShape(pCompoundShape);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -108,7 +95,7 @@ void CLuaPhysicsStaticCollision::SetCollisionShape(btCollisionShape* pShape)
     m_btCollisionObject = new btCollisionObject();
     m_btCollisionObject->setCollisionShape(pShape);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
 }
 
 void CLuaPhysicsStaticCollision::SetCollisionShape(CLuaPhysicsShape* pShape)
@@ -117,7 +104,7 @@ void CLuaPhysicsStaticCollision::SetCollisionShape(CLuaPhysicsShape* pShape)
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
     pShape->AddStaticCollision(this);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
 }
 
 void CLuaPhysicsStaticCollision::SetFilterMask(short sIndex, bool bEnabled)
@@ -180,7 +167,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<s
     SetPosition(position);
     SetRotation(rotation);
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -201,7 +188,7 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
     m_btCollisionObject->setCollisionShape(pBoxShape);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
 
@@ -222,6 +209,6 @@ btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadiu
     m_btCollisionObject->setCollisionShape(pSphereShape);
     m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
     m_btCollisionObject->setUserPointer((void*)this);
-    m_pPhysics->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
     return m_btCollisionObject;
 }
