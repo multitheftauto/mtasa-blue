@@ -154,6 +154,15 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 // - Caz
                 pVehicle->SetLastSyncedHealth(fHealth);
 
+                bool bInWater = pVehicle->IsInWater();
+                if (bInWater && bInWater != pVehicle->GetLastSyncedIsInWater())
+                {
+                    // Call the event once in water
+                    CLuaArguments Arguments;
+                    pVehicle->CallEvent("onVehicleDrown", Arguments);
+                }
+                pVehicle->setLastSyncedIsInWater(bInWater);
+
                 // Trailer chain
                 CVehicle* pTowedByVehicle = pVehicle;
                 ElementID TrailerID;

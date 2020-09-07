@@ -417,6 +417,14 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                         bool bDerailed = pVehicle->IsDerailed();
                         bool bInWater = pVehicle->IsInWater();
 
+                        if (bInWater && bInWater != pVehicle->GetLastSyncedIsInWater())
+                        {
+                            // Call the event once in water
+                            CLuaArguments Arguments;
+                            pVehicle->CallEvent("onVehicleDrown", Arguments);
+                        }
+                        pVehicle->setLastSyncedIsInWater(bInWater);
+
                         // Turn the engine on if it's on
                         pVehicle->SetEngineOn(vehicle.data.bEngineOn);
 

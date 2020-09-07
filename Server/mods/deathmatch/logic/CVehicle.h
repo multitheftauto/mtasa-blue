@@ -23,6 +23,7 @@ class CVehicle;
 #define MAX_VEHICLE_SEATS 9
 #define DEFAULT_VEHICLE_HEALTH 1000
 #define MAX_VEHICLE_HEALTH 10000
+#define DEFAULT_IS_IN_WATER false
 
 enum eWheelStatus
 {
@@ -188,6 +189,8 @@ public:
     void  SetHealth(float fHealth) { m_fHealth = fHealth; };
     float GetLastSyncedHealth() { return m_fLastSyncedHealthHealth; };
     void  SetLastSyncedHealth(float fHealth) { m_fLastSyncedHealthHealth = fHealth; };
+    float GetLastSyncedIsInWater() { return m_bLastSyncedIsInWater; };
+    void  setLastSyncedIsInWater(bool bIsInWater) { m_bLastSyncedIsInWater = bIsInWater; };
 
     CVehicleColor& RandomizeColor();
 
@@ -364,6 +367,7 @@ private:
     CVector        m_vecTurnSpeed;
     float          m_fHealth;
     float          m_fLastSyncedHealthHealth;
+    bool           m_bLastSyncedIsInWater;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
 

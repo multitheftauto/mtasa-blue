@@ -28,6 +28,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fLastSyncedHealthHealth = DEFAULT_VEHICLE_HEALTH;
+    m_bLastSyncedIsInWater = DEFAULT_IS_IN_WATER;
     m_llIdleTime = CTickCount::Now();
     m_fTurretPositionX = 0;
     m_fTurretPositionY = 0;
