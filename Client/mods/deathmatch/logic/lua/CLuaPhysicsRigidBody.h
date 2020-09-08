@@ -20,7 +20,7 @@ class CLuaPhysicsRigidBody;
 class CLuaPhysicsRigidBody : public CLuaPhysicsElement
 {
 public:
-    CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
+    CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
     void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }

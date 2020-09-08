@@ -40,10 +40,8 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
-    CLuaPhysicsShape*           CreateShape();
-
     void AddShape(CLuaPhysicsShape* pShape);
+    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 

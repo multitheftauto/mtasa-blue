@@ -16,8 +16,8 @@
 #include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsElement(pPhysics, EIdClass::RIGID_BODY)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+    : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::RIGID_BODY)
 {
     m_pPhysicsShape = pShape;
 
@@ -25,8 +25,9 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CClientPhysics* pPhysics, CLuaPhysics
     m_pPhysicsShape->AddRigidBody(this);
     m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);
-    pPhysics->GetDynamicsWorld()->addRigidBody(m_pBtRigidBody);
+    pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(m_pBtRigidBody);
     m_pBtRigidBody->setUserPointer((void*)this);
+    pShape->GetPhysics()->AddRigidBody(this);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()

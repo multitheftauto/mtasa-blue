@@ -140,13 +140,11 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
     for (uint i = 0; pColData->numColSpheres > i; i++)
     {
         pColSphere = pColData->pColSpheres[i];
-        CLuaPhysicsShape* pShpereShape = CreateShape();
         pCompoundShape->AddShape(new CLuaPhysicsSphereShape(this, pColSphere.fRadius), position);
     }
 
     if (pColData->numColTriangles > 0)
     {
-        CLuaPhysicsShape*    pTriangleMesh = CreateShape();
         std::vector<CVector> vecIndices;
         for (uint i = 0; pColData->numColTriangles > i; i++)
         {
@@ -329,18 +327,10 @@ void CClientPhysics::AddShape(CLuaPhysicsShape* pShape)
     m_vecShapes.push_back(pShape);
 }
 
-CLuaPhysicsShape* CClientPhysics::CreateShape()
+void CClientPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
 {
-    CLuaPhysicsShape* pShape = m_pLuaMain->GetPhysicsShapeManager()->AddShape(this);
-    m_vecShapes.push_back(pShape);
-    return pShape;
-}
-
-CLuaPhysicsRigidBody* CClientPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-{
-    CLuaPhysicsRigidBody* pRigidBody = m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(this, pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    m_pLuaMain->GetPhysicsRigidBodyManager()->AddRigidBody(pRigidBody);
     m_vecRigidBodies.push_back(pRigidBody);
-    return pRigidBody;
 }
 
 CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
