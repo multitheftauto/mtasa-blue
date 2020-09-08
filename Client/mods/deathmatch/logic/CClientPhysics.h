@@ -40,15 +40,16 @@ public:
     void ClearOutsideWorldRigidBodies();
     void ProcessCollisions();
 
-    void AddShape(CLuaPhysicsShape* pShape);
-    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void AddConstraint(CLuaPhysicsConstraint* pConstraint);
+    void AddShape(std::unique_ptr<CLuaPhysicsShape> pShape);
+    void AddRigidBody(std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody);
+    void AddConstraint(std::unique_ptr<CLuaPhysicsConstraint> pConstraint);
+    void AddStaticCollision(std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision);
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
-    void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
+    void                                       RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
@@ -58,8 +59,9 @@ public:
     void                        StartBuildCollisionFromGTA();
     void                        BuildCollisionFromGTAInRadius(CVector& center, float fRadius);
     void                        BuildCollisionFromGTA();
-    CLuaPhysicsShape*           CreateShapeFromModel(unsigned short usModelId);
-    CLuaPhysicsStaticCollision* CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0), CVector vecRotation = CVector(0, 0, 0));
+    std::unique_ptr<CLuaPhysicsShape>         CreateShapeFromModel(unsigned short usModelId);
+    std::unique_ptr<CLuaPhysicsStaticCollision> CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition = CVector(0, 0, 0),
+                                                               CVector vecRotation = CVector(0, 0, 0));
 
     void SetGravity(CVector vecGravity);
     void GetGravity(CVector& vecGravity);
@@ -79,19 +81,16 @@ public:
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
 
-    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-
-    std::vector<CLuaPhysicsShape*> GetShapes() const { return m_vecShapes; }
-    std::vector<CLuaPhysicsRigidBody*>  GetRigidBodies() const { return m_vecRigidBodies; }
-    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
-    std::vector<CLuaPhysicsConstraint*> GetConstraints() const { return m_vecConstraints; }
-    btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_pDynamicsWorld; }
+    std::vector<std::unique_ptr<CLuaPhysicsShape>>           GetShapes() const { return m_vecShapes; }
+    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       GetRigidBodies() const { return m_vecRigidBodies; }
+    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>> GetStaticCollisions() const { return m_vecStaticCollisions; }
+    std::vector<std::unique_ptr<CLuaPhysicsConstraint>>      GetConstraints() const { return m_vecConstraints; }
+    btDiscreteDynamicsWorld*                                 GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
-    void DestroyCostraint(btTypedConstraint* pConstraint);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
@@ -118,15 +117,15 @@ private:
     float      m_fImpulseThreshold = 0.01f;
     bool       m_bSimulationEnabled = true;
     bool       m_bTriggerEvents = true;
-    bool       m_bTriggerCollisionEvents = false;                              // spam alert
+    bool       m_bTriggerCollisionEvents = false;            // spam alert
     bool       m_bTriggerConstraintEvents = false;
     CVector    m_vecWorldSize = CVector(4000.0f, 4000.0f, 1000.0f);            // negative and positive
 
     std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>> pWorldObjects;
     bool                                                                m_bObjectsCached = false;
 
-    std::vector<CLuaPhysicsShape*>           m_vecShapes;
-    std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
-    std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
-    std::vector<CLuaPhysicsConstraint*>      m_vecConstraints;
+    std::vector<std::unique_ptr<CLuaPhysicsShape>>           m_vecShapes;
+    std::vector<std::unique_ptr<CLuaPhysicsStaticCollision>> m_vecStaticCollisions;
+    std::vector<std::unique_ptr<CLuaPhysicsRigidBody>>       m_vecRigidBodies;
+    std::vector<std::unique_ptr<CLuaPhysicsConstraint>>      m_vecConstraints;
 };

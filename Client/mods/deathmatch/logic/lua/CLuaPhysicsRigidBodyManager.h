@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBodyManager.h
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua rigid body manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -26,15 +26,15 @@ public:
 
     CLuaPhysicsRigidBody* GetRigidBodyFromScriptID(unsigned int uiScriptID);
 
-    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
+    void                  AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     CLuaPhysicsRigidBody* GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape);
     void                  RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
 
-    unsigned long         GetRigidBodyCount() const { return m_RigidBodyList.size(); }
+    unsigned long GetRigidBodyCount() const { return m_RigidBodyList.size(); }
 
-    CFastList<CLuaPhysicsRigidBody*>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
-    CFastList<CLuaPhysicsRigidBody*>::const_iterator IterEnd() { return m_RigidBodyList.end(); }
+    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterBegin() { return m_RigidBodyList.begin(); }
+    std::vector<CLuaPhysicsRigidBody*>::const_iterator IterEnd() { return m_RigidBodyList.end(); }
 
 private:
-    CFastList<CLuaPhysicsRigidBody*> m_RigidBodyList;
+    std::vector<CLuaPhysicsRigidBody*> m_RigidBodyList;
 };

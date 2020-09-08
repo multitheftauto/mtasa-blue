@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsShapeManager.h
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua physics shapes manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -25,15 +25,14 @@ public:
 
     CLuaPhysicsShape* GetShapeFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsShape*     AddShape(CClientPhysics* pPhysics);
-    void                  AddShape(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape);
+    void AddShape(CLuaPhysicsShape* pShape);
 
-    void                  RemoveShape(CLuaPhysicsShape* pShape);
-    unsigned long         GetShapeCount() const { return m_ShapeList.size(); }
+    void          RemoveShape(CLuaPhysicsShape* pShape);
+    unsigned long GetShapeCount() const { return m_ShapeList.size(); }
 
-    CFastList<CLuaPhysicsShape*>::const_iterator IterBegin() { return m_ShapeList.begin(); }
-    CFastList<CLuaPhysicsShape*>::const_iterator IterEnd() { return m_ShapeList.end(); }
+    std::vector<CLuaPhysicsShape*>::const_iterator IterBegin() { return m_ShapeList.begin(); }
+    std::vector<CLuaPhysicsShape*>::const_iterator IterEnd() { return m_ShapeList.end(); }
 
 private:
-    CFastList<CLuaPhysicsShape*> m_ShapeList;
+    std::vector<CLuaPhysicsShape*> m_ShapeList;
 };

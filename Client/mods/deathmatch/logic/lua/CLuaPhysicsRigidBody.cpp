@@ -27,7 +27,6 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     SetSleepingThresholds(0.1f, 0.1f);
     pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(GetBtRigidBody());
     m_pBtRigidBody->setUserPointer((void*)this);
-    pShape->GetPhysics()->AddRigidBody(this);
 }
 
 CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()

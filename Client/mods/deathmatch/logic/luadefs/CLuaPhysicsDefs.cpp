@@ -627,8 +627,10 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(CLuaPhysicsShape* 
         throw std::invalid_argument("Mass must bet greater than 0");
 
     CClientPhysics*       pPhysics = pShape->GetPhysics();
-    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)), vecCenterOfMass.value_or(CVector(0, 0, 0)));
-    return pRigidBody;
+    std::unique_ptr<CLuaPhysicsRigidBody> pRigidBody = std::make_unique<CLuaPhysicsRigidBody>(pShape, fMass.value_or(1.0f), vecLocalInertia.value_or(CVector(0, 0, 0)), vecCenterOfMass.value_or(CVector(0, 0, 0)));
+    CLuaPhysicsRigidBody* pRigidBodyPtr = pRigidBody.get();
+    pPhysics->AddRigidBody(std::move(pRigidBody));
+    return pRigidBodyPtr;
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel)

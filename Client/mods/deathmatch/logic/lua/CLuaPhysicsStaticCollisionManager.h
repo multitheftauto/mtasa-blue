@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsStaticCollisionManager.h
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua static collision manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -26,15 +26,15 @@ public:
 
     CLuaPhysicsStaticCollision* GetStaticCollisionFromScriptID(unsigned int uiScriptID);
 
-void                                     AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void                                     AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void                                     RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    unsigned long               GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
-    CLuaPhysicsStaticCollision* GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape);
+    unsigned long                            GetRigidBodyCount() const { return m_StaticCollisionList.size(); }
+    CLuaPhysicsStaticCollision*              GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape);
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisionsFromCollisionShape(const btCollisionShape* pCollisionShape);
 
-	CFastList<CLuaPhysicsStaticCollision*>::const_iterator IterBegin() { return m_StaticCollisionList.begin(); }
-    CFastList<CLuaPhysicsStaticCollision*>::const_iterator IterEnd() { return m_StaticCollisionList.end(); }
+    std::vector<CLuaPhysicsStaticCollision*>::const_iterator IterBegin() { return m_StaticCollisionList.begin(); }
+    std::vector<CLuaPhysicsStaticCollision*>::const_iterator IterEnd() { return m_StaticCollisionList.end(); }
 
 private:
-    CFastList<CLuaPhysicsStaticCollision*> m_StaticCollisionList;
+    std::vector<CLuaPhysicsStaticCollision*> m_StaticCollisionList;
 };

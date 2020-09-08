@@ -27,13 +27,12 @@ public:
 
     void                   AddConstraint(CLuaPhysicsConstraint* pConstraint);
     void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
-    CLuaPhysicsConstraint* GetContraint(btTypedConstraint* pConstraint);
 
     unsigned long GetContraintCount() const { return m_List.size(); }
 
-    CFastList<CLuaPhysicsConstraint*>::const_iterator IterBegin() { return m_List.begin(); }
-    CFastList<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_List.end(); }
+    std::vector<CLuaPhysicsConstraint*>::const_iterator                 IterBegin() { return m_List.begin(); }
+    std::vector<CLuaPhysicsConstraint*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
-    CFastList<CLuaPhysicsConstraint*> m_List;
+    std::vector<CLuaPhysicsConstraint*> m_List;
 };

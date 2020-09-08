@@ -3,16 +3,13 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsShapeManager.cpp
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua physics shapes manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiScriptID)
@@ -26,14 +23,7 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::GetShapeFromScriptID(unsigned int uiS
     return pLuaShape;
 }
 
-CLuaPhysicsShape* CLuaPhysicsShapeManager::AddShape(CClientPhysics* pPhysics)
-{
-    CLuaPhysicsShape* pShape = new CLuaPhysicsShape(pPhysics);
-    m_ShapeList.push_back(pShape);
-    return pShape;
-}
-
-void CLuaPhysicsShapeManager::AddShape(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
+void CLuaPhysicsShapeManager::AddShape(CLuaPhysicsShape* pShape)
 {
     m_ShapeList.push_back(pShape);
 }

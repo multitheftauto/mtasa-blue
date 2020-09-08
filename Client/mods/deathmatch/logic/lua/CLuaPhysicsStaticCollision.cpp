@@ -23,7 +23,6 @@ CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
     m_btCollisionObject->setUserPointer((void*)this);
     GetPhysics()->GetDynamicsWorld()->addCollisionObject(GetCollisionObject());
     pShape->AddStaticCollision(this);
-    pShape->GetPhysics()->AddStaticCollision(this);
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()

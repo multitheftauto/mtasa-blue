@@ -1,32 +1,27 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsConstraintManager.cpp
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua physics constraints manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsRigidBodyManager.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
 #include "CLuaPhysicsConstraintManager.h"
-#include "CLuaPhysicsShapeManager.h"
 
-void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pLuaRigidBody)
+void CLuaPhysicsConstraintManager::RemoveContraint(CLuaPhysicsConstraint* pConstraint)
 {
-    assert(pLuaRigidBody);
+    assert(pConstraint);
 
     // Check if already removed
-    if (!ListContains(m_List, pLuaRigidBody))
+    if (!ListContains(m_List, pConstraint))
         return;
 
     // Remove all references
-    ListRemove(m_List, pLuaRigidBody);
-
-    delete pLuaRigidBody;
+    ListRemove(m_List, pConstraint);
 }
 
 CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(unsigned int uiScriptID)
@@ -39,22 +34,6 @@ CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraintFromScriptID(un
         return NULL;
 
     return pLuaContraint;
-}
-
-CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraint(btTypedConstraint* pConstraint)
-{
-    if (m_List.empty())
-        return nullptr;
-
-    CFastList<CLuaPhysicsConstraint*>::const_iterator iter = IterBegin();
-    for (; iter != IterEnd(); iter++)
-    {
-        if ((*iter)->GetConstraint() == pConstraint)
-        {
-            return *iter;
-        }
-    }
-    return nullptr;
 }
 
 void CLuaPhysicsConstraintManager::AddConstraint(CLuaPhysicsConstraint* pConstraint)

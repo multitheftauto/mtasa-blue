@@ -12,9 +12,6 @@
 #include <StdInc.h>
 #include "lua/CLuaPhysicsSharedLogic.h"
 #include "lua/CLuaPhysicsRigidBodyManager.h"
-#include "lua/CLuaPhysicsStaticCollisionManager.h"
-#include "lua/CLuaPhysicsConstraintManager.h"
-#include "lua/CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
@@ -48,11 +45,9 @@ void CLuaPhysicsRigidBodyManager::RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBo
 
 CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromCollisionShape(const btCollisionShape* pCollisionShape)
 {
-    for (CLuaPhysicsRigidBody* pRigidBody : m_RigidBodyList)
-    {
+    for (auto &pRigidBody : m_RigidBodyList)
         if (pRigidBody->GetBtRigidBody()->getCollisionShape() == pCollisionShape)
             return pRigidBody;
-    }
 
     return nullptr;
 }

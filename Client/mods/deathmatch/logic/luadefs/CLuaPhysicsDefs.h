@@ -16,6 +16,7 @@
 class CLuaPhysicsElement;
 class CLuaPhysicsCompoundShape;
 class CLuaPhysicsElement;
+class CLuaPhysicsShape;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -46,7 +47,6 @@ public:
     static bool                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
     static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
                                                         std::optional<CVector> vecCenterOfMass);
-    static std::string           PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
     static bool                  PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
                                                       std::optional<CVector> vecRotation);
 
