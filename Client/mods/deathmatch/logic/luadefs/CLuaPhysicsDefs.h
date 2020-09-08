@@ -15,6 +15,7 @@
 
 class CLuaPhysicsElement;
 class CLuaPhysicsCompoundShape;
+class CLuaPhysicsElement;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -30,6 +31,11 @@ public:
     static CVector                        PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
     static bool                           PhysicsSetChildShapeOffsets(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector position, CVector rotation);
     static bool                           PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative);
+    static bool                           PhysicsApplyVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative);
+    static bool                           PhysicsApplyDamping(CLuaPhysicsRigidBody* pRigidBody, float fDamping);
+    static bool                           PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity);
+    static bool                           PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity);
+    static std::string                    PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
     static CLuaPhysicsStaticCollision*    PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape);
     static CLuaPhysicsShape*              PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel);
     static bool                           PhysicsDrawDebug(CClientPhysics* pPhysics);
@@ -40,21 +46,17 @@ public:
     static bool                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
     static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
                                                         std::optional<CVector> vecCenterOfMass);
+    static std::string           PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement);
+    static bool                  PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
+                                                      std::optional<CVector> vecRotation);
 
     LUA_DECLARE(PhysicsCreateShape);
-    LUA_DECLARE(PhysicsAddChildShape);
-    LUA_DECLARE(PhysicsGetChildShapeOffsets);
     LUA_DECLARE(PhysicsSetProperties);
     LUA_DECLARE(PhysicsGetProperties);
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsGetDebugMode);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
-    LUA_DECLARE(PhysicsApplyVelocityForce);
-    LUA_DECLARE(PhysicsApplyAngularVelocityForce);
-    LUA_DECLARE(PhysicsApplyAngularVelocity);
-    LUA_DECLARE(PhysicsApplyDamping);
     LUA_DECLARE(PhysicsCreateConstraint);
     LUA_DECLARE(PhysicsRayCast);
     LUA_DECLARE(PhysicsShapeCast);
-    LUA_DECLARE(PhysicsGetElementType);
 };

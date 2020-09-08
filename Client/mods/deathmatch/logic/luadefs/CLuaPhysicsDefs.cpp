@@ -17,6 +17,7 @@
 #include "lua/CLuaPhysicsShapeManager.h"
 #include "lua/CLuaPhysicsSharedLogic.h"
 
+#include "lua/CLuaPhysicsElement.h"
 #include "lua/CLuaPhysicsBoxShape.h"
 #include "lua/CLuaPhysicsCompoundShape.h"
 #include "lua/CLuaPhysicsSphereShape.h"
@@ -38,10 +39,11 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsCreateConstraint", ArgumentParser<PhysicsCreateConstraint>},
         {"physicsCreateShape", PhysicsCreateShape},
         {"physicsCreateShapeFromModel", ArgumentParser<PhysicsCreateShapeFromModel>},
-        {"physicsAddChildShape", PhysicsAddChildShape},
+        {"physicsAddChildShape", ArgumentParser<PhysicsAddChildShape>},
         {"physicsRemoveChildShape", ArgumentParser<PhysicsRemoveChildShape>},
         {"physicsGetChildShapes", ArgumentParser<PhysicsGetChildShapes>},
-        {"physicsGetChildShapeOffsets", ArgumentParser<PhysicsGetChildShapeOffsets>},
+        {"physicsGetChildShapeOffsetPosition", ArgumentParser<PhysicsGetChildShapeOffsetPosition>},
+        {"physicsGetChildShapeOffsetRotation", ArgumentParser<PhysicsGetChildShapeOffsetRotation>},
         {"physicsSetChildShapeOffsets", ArgumentParser<PhysicsSetChildShapeOffsets>},
         {"physicsGetShapes", ArgumentParser<PhysicsGetShapes>},
         {"physicsGetRigidBodies", ArgumentParser<PhysicsGetRigidBodies>},
@@ -53,14 +55,14 @@ void CLuaPhysicsDefs::LoadFunctions(void)
         {"physicsSetDebugMode", PhysicsSetDebugMode},
         {"physicsGetDebugMode", PhysicsGetDebugMode},
         {"physicsBuildCollisionFromGTA", PhysicsBuildCollisionFromGTA},
-        {"physicsApplyVelocityForce", PhysicsApplyVelocityForce},
+        {"physicsApplyVelocityForce", ArgumentParser<PhysicsApplyVelocityForce>},
         {"physicsApplyVelocity", ArgumentParser<PhysicsApplyVelocity>},
-        {"physicsApplyAngularVelocity", PhysicsApplyAngularVelocity},
-        {"physicsApplyAngularVelocityForce", PhysicsApplyAngularVelocityForce},
-        {"physicsApplyDamping", PhysicsApplyDamping},
+        {"physicsApplyAngularVelocity", ArgumentParser<PhysicsApplyAngularVelocity>},
+        {"physicsApplyAngularVelocityForce", ArgumentParser<PhysicsApplyAngularVelocityForce > },
+        {"physicsApplyDamping", ArgumentParser<PhysicsApplyDamping>},
         {"physicsRayCast", PhysicsRayCast},
         {"physicsShapeCast", PhysicsShapeCast},
-        {"physicsGetElementType", PhysicsGetElementType},
+        {"physicsGetElementType", ArgumentParser<PhysicsGetElementType>},
         {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
     };
 
@@ -641,54 +643,16 @@ CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPh
     return pStaticCollision;
 }
 
-int CLuaPhysicsDefs::PhysicsAddChildShape(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition, std::optional<CVector> vecRotation)
 {
-    CLuaPhysicsShape* pCompoundShape;
-    CLuaPhysicsShape* pShape;
-    CVector           vecPosition;
-    CVector           vecRotation;
-    ePhysicsShapeType shapeType;
-    CScriptArgReader  argStream(luaVM);
-    argStream.ReadUserData(pCompoundShape);
-    argStream.ReadUserData(pShape);
-    argStream.ReadVector3D(vecPosition, CVector(0, 0, 0));
-    argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
+    if (pCompoundShape->GetPhysics() != pShape->GetPhysics())
+        throw std::invalid_argument("Shapes need to belong to the same physics world");
 
-    if (!argStream.HasErrors())
-    {
-        if (pCompoundShape && pShape)
-        {
-            if (pCompoundShape->GetPhysics() != pShape->GetPhysics())
-            {
-                m_pScriptDebugging->LogCustom(luaVM, "Shapes need to belong to the same physics world");
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
-        if (pCompoundShape->GetType() != COMPOUND_SHAPE_PROXYTYPE)
-        {
-            m_pScriptDebugging->LogCustom(luaVM, "Target shape need to be compound");
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-        if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
-        {
-            m_pScriptDebugging->LogCustom(luaVM, "Shape can not be compound");
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-        pCompoundShape->AddShape(pShape, vecPosition, vecRotation);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
+    if (pShape->GetType() == COMPOUND_SHAPE_PROXYTYPE)
+        throw std::invalid_argument("Shape can not be compound");
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    pCompoundShape->AddShape(pShape, vecPosition.value_or(CVector(0, 0, 0)), vecRotation.value_or(CVector(0, 0, 0)));
+    return true;
 }
 
 std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape)
@@ -699,9 +663,8 @@ std::vector<CLuaPhysicsShape*> CLuaPhysicsDefs::PhysicsGetChildShapes(CLuaPhysic
 bool CLuaPhysicsDefs::PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex)
 {
     if (pCompoundShape->RemoveChildShape(iIndex))
-    {
         return true;
-    }
+
     throw std::invalid_argument("Invalid shape index");
 }
 
@@ -709,9 +672,8 @@ CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundS
 {
     CVector position, rotation;
     if (pCompoundShape->GetChildShapeOffsets(iIndex, position, rotation))
-    {
         return position;
-    }
+
     throw std::invalid_argument("Invalid shape index");
 }
 
@@ -719,124 +681,53 @@ CVector CLuaPhysicsDefs::PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundS
 {
     CVector position, rotation;
     if (pCompoundShape->GetChildShapeOffsets(iIndex, position, rotation))
-    {
         return rotation;
-    }
+
     throw std::invalid_argument("Invalid shape index");
 }
 
 bool CLuaPhysicsDefs::PhysicsSetChildShapeOffsets(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector position, CVector rotation)
 {
     if (pCompoundShape->SetChildShapeOffsets(iIndex, position, rotation))
-    {
         return true;
-    }
+
     throw std::invalid_argument("Invalid shape index");
 }
 
 bool CLuaPhysicsDefs::PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative)
 {
     if (vecRelative.has_value())
-    {
         pRigidBody->ApplyImpulse(vecVelocity, vecRelative.value());
-    }
     else
-    {
         pRigidBody->ApplyCentralImpulse(vecVelocity);
-    }
     return true;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyVelocityForce(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsApplyVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative)
 {
-    CLuaPhysicsRigidBody* pRigidBody;
-    CVector               vecVelocity, vecRelative;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(vecVelocity);
-    argStream.ReadVector3D(vecRelative, CVector(0, 0, 0));
-
-    if (!argStream.HasErrors())
-    {
-        if (vecRelative.LengthSquared() == 0)
-            pRigidBody->ApplyCentralForce(vecVelocity);
-        else
-            pRigidBody->ApplyForce(vecVelocity, vecRelative);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
+    if (vecRelative.has_value())
+        pRigidBody->ApplyForce(vecVelocity, vecRelative.value());
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+        pRigidBody->ApplyCentralForce(vecVelocity);
+    return true;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyDamping(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsApplyDamping(CLuaPhysicsRigidBody* pRigidBody, float fDamping)
 {
-    CLuaPhysicsRigidBody* pRigidBody;
-    float                 fDamping;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadNumber(fDamping);
-
-    if (!argStream.HasErrors())
-    {
-        pRigidBody->ApplyDamping(fDamping);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    pRigidBody->ApplyDamping(fDamping);
+    return true;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyAngularVelocityForce(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsApplyAngularVelocityForce(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity)
 {
-    CLuaPhysicsRigidBody* pRigidBody;
-    CVector               vecVelocity;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(vecVelocity);
-
-    if (!argStream.HasErrors())
-    {
-        pRigidBody->ApplyTorque(vecVelocity);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    pRigidBody->ApplyTorque(vecVelocity);
+    return true;
 }
 
-int CLuaPhysicsDefs::PhysicsApplyAngularVelocity(lua_State* luaVM)
+bool CLuaPhysicsDefs::PhysicsApplyAngularVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecAngularVelocity)
 {
-    CLuaPhysicsRigidBody* pRigidBody;
-    CVector               vecAngularVelocity;
-    CScriptArgReader      argStream(luaVM);
-    argStream.ReadUserData(pRigidBody);
-    argStream.ReadVector3D(vecAngularVelocity);
-
-    if (!argStream.HasErrors())
-    {
-        pRigidBody->ApplyTorqueImpulse(vecAngularVelocity);
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    pRigidBody->ApplyTorqueImpulse(vecAngularVelocity);
+    return true;
 }
 
 int CLuaPhysicsDefs::PhysicsSetProperties(lua_State* luaVM)
@@ -2036,50 +1927,21 @@ std::vector<CLuaPhysicsConstraint*> CLuaPhysicsDefs::PhysicsGetConstraints(CClie
     return pPhysics->GetConstraints();
 }
 
-int CLuaPhysicsDefs::PhysicsGetElementType(lua_State* luaVM)
+std::string CLuaPhysicsDefs::PhysicsGetElementType(CLuaPhysicsElement* pPhysicsElement)
 {
-    CLuaPhysicsRigidBody*       pRigidBody = nullptr;
-    CLuaPhysicsStaticCollision* pStaticCollision = nullptr;
-    CLuaPhysicsConstraint*      pStaticConstraint = nullptr;
-    CLuaPhysicsShape*           pShape = nullptr;
-
-    ePhysicsProperty eProperty;
-    CScriptArgReader argStream(luaVM);
-
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-        argStream.ReadUserData(pRigidBody);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsStaticCollision>())
-        argStream.ReadUserData(pStaticCollision);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsConstraint>())
-        argStream.ReadUserData(pStaticConstraint);
-    else if (argStream.NextIsUserDataOfType<CLuaPhysicsShape>())
-        argStream.ReadUserData(pShape);
-
-    if (!argStream.HasErrors())
+    switch (pPhysicsElement->GetClassType())
     {
-        if (pRigidBody != nullptr)
-        {
-            lua_pushstring(luaVM, "rigidbody");
-            return 1;
-        }
-        else if (pStaticCollision != nullptr)
-        {
-            lua_pushstring(luaVM, "staticcollision");
-            return 1;
-        }
-        else if (pStaticConstraint != nullptr)
-        {
-            lua_pushstring(luaVM, "constraint");
-            return 1;
-        }
-        else if (pShape != nullptr)
-        {
-            lua_pushstring(luaVM, "shape");
-            return 1;
-        }
+        case EIdClassType::RIGID_BODY:
+            return "rigidbody";
+        case EIdClassType::SHAPE:
+            return "staticcollision";
+        case EIdClassType::STATIC_COLLISION:
+            return "constraint";
+        case EIdClassType::CONSTRAINT:
+            return "shape";
+        default:
+            return "unknown";
     }
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 bool CLuaPhysicsDefs::IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
