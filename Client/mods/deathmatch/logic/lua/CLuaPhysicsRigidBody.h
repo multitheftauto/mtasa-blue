@@ -24,9 +24,6 @@ public:
     ~CLuaPhysicsRigidBody();
 
     void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
-    // for compound rigid bodies
-    void AddBox(CVector& vecHalf);
-    void AddSphere(float fRadius);
 
     void Activate();
     void SetMass(float fMass);

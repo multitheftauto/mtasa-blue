@@ -16,15 +16,14 @@
 #include "lua/CLuaPhysicsConstraintManager.h"
 #include "lua/CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(uint uiScriptID)
+CLuaPhysicsRigidBody* CLuaPhysicsRigidBodyManager::GetRigidBodyFromScriptID(unsigned int uiScriptID)
 {
     CLuaPhysicsRigidBody* pLuaRigidBody = (CLuaPhysicsRigidBody*)CIdArray::FindEntry(uiScriptID, EIdClass::RIGID_BODY);
     if (!pLuaRigidBody)
-        return nullptr;
+        return NULL;
 
     if (!ListContains(m_RigidBodyList, pLuaRigidBody))
-        return nullptr;
-
+        return NULL;
     return pLuaRigidBody;
 }
 
