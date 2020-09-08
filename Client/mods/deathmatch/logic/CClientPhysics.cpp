@@ -333,11 +333,10 @@ void CClientPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
     m_vecRigidBodies.push_back(pRigidBody);
 }
 
-CLuaPhysicsConstraint* CClientPhysics::CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+void CClientPhysics::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
-    CLuaPhysicsConstraint* pContraint = m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(this, pRigidBodyA, pRigidBodyB);
-    m_vecConstraints.push_back(pContraint);
-    return pContraint;
+    m_pLuaMain->GetPhysicsConstraintManager()->AddConstraint(pConstraint);
+    m_vecConstraints.push_back(pConstraint);
 }
 
 void CClientPhysics::SetDebugLineWidth(float fWidth)

@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsConstraint.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Physics constraint class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -26,23 +26,35 @@ btSolverConstraint, btUniversalConstraint, btSolve2LinearConstraint, btGearConst
 btPoint2PointConstraint, btHingeConstraint, btFixedConstraint, btSliderConstraint
 */
 
-CLuaPhysicsConstraint::CLuaPhysicsConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+CLuaPhysicsConstraint::CLuaPhysicsConstraint(CClientPhysics* pPhysics, ePhysicsConstraint constraintType, bool bDisableCollisionsBetweenLinkedBodies)
     : CLuaPhysicsElement(pPhysics, EIdClass::CONSTRAINT)
 {
-    m_pRigidBodyA = pRigidBodyA;
-    m_pRigidBodyB = pRigidBodyB;
-    m_pJointFeedback = new btJointFeedback();
+    m_bDisableCollisionsBetweenLinkedBodies = bDisableCollisionsBetweenLinkedBodies;
     m_bLastBreakingStatus = false;
     m_pConstraint = nullptr;
-    m_pRigidBodyA->AddConstraint(this);
-    if (m_pRigidBodyB)
-        m_pRigidBodyB->AddConstraint(this);
+    m_pRigidBodyA = nullptr;
+    m_pRigidBodyB = nullptr;
+    m_eType = constraintType;
+}
+
+void CLuaPhysicsConstraint::Initialize(btTypedConstraint* pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+{
+    assert(m_pConstraint == nullptr);
+    m_pConstraint = pConstraint;
+    m_pJointFeedback = new btJointFeedback();
+    m_pConstraint->enableFeedback(true);
+    m_pConstraint->setJointFeedback(m_pJointFeedback);
+    m_pRigidBodyA = pRigidBodyA;
+    m_pRigidBodyB = pRigidBodyB;
+
+    GetPhysics()->GetDynamicsWorld()->addConstraint(pConstraint, m_bDisableCollisionsBetweenLinkedBodies);
 }
 
 CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
 {
-    m_pRigidBodyA->RemoveConstraint(this);
-    if (m_pRigidBodyB)
+    if (m_pRigidBodyA != nullptr)
+        m_pRigidBodyA->RemoveConstraint(this);
+    if (m_pRigidBodyB != nullptr)
         m_pRigidBodyB->RemoveConstraint(this);
 
     if (m_pConstraint != nullptr)
@@ -52,226 +64,6 @@ CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
         delete m_pConstraint;
     }
     delete m_pJointFeedback;
-}
-
-void CLuaPhysicsConstraint::CreatePointToPointConstraint(CVector& anchorA, CVector& anchorB, bool bDisableCollisionsBetweenLinkedBodies)
-{
-    m_eType = ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT;
-    if (m_pRigidBodyB)
-    {
-        btPoint2PointConstraint* pConstraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(),
-                                                                           reinterpret_cast<btVector3&>(anchorA), reinterpret_cast<btVector3&>(anchorB));
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-        m_pRigidBodyB->GetBtRigidBody()->activate(true);
-    }
-    else
-    {
-        btPoint2PointConstraint* pConstraint = new btPoint2PointConstraint(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<btVector3&>(anchorA));
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-    }
-}
-
-void CLuaPhysicsConstraint::CreateHidgeConstraint(CVector& pivotA, CVector& pivotB, CVector& axisA, CVector& axisB, bool bDisableCollisionsBetweenLinkedBodies)
-{
-    m_eType = ePhysicsConstraint::PHYSICS_CONTRAINT_HIDGE;
-    if (m_pRigidBodyB)
-    {
-        btHingeConstraint* pConstraint =
-            new btHingeConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA),
-                                  reinterpret_cast<btVector3&>(pivotB), reinterpret_cast<btVector3&>(axisA), reinterpret_cast<btVector3&>(axisB));
-
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-        m_pRigidBodyB->GetBtRigidBody()->activate(true);
-    }
-    else
-    {
-        btHingeConstraint* pConstraint =
-            new btHingeConstraint(*m_pRigidBodyA->GetBtRigidBody(), reinterpret_cast<btVector3&>(pivotA), reinterpret_cast<btVector3&>(axisA));
-
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-    }
-}
-
-void CLuaPhysicsConstraint::CreateFixedConstraint(CVector& vecPositionA, CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
-                                                  bool bDisableCollisionsBetweenLinkedBodies)
-{
-    m_eType = ePhysicsConstraint::PHYSICS_CONTRAINT_FIXED;
-
-    btTransform transformA;
-    btTransform transformB;
-    transformA.setIdentity();
-    transformB.setIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transformA, vecPositionA);
-    CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
-    CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
-    CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
-    btFixedConstraint* pConstraint = new btFixedConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), transformA, transformB);
-
-    pConstraint->enableFeedback(true);
-    pConstraint->setJointFeedback(m_pJointFeedback);
-    m_pConstraint = pConstraint;
-    GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-    m_pRigidBodyA->GetBtRigidBody()->activate(true);
-    m_pRigidBodyB->GetBtRigidBody()->activate(true);
-}
-
-void CLuaPhysicsConstraint::CreateSliderConstraint(CVector& vecPositionA, CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
-                                                   bool bDisableCollisionsBetweenLinkedBodies)
-{
-    m_eType = ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER;
-    if (m_pRigidBodyB)
-    {
-        btTransform transformA;
-        btTransform transformB;
-        transformA.setIdentity();
-        transformB.setIdentity();
-        CLuaPhysicsSharedLogic::SetPosition(transformA, vecPositionA);
-        CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
-        CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
-        CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
-        btSliderConstraint* pConstraint =
-            new btSliderConstraint(*m_pRigidBodyA->GetBtRigidBody(), *m_pRigidBodyB->GetBtRigidBody(), transformA, transformB, true);
-
-        pConstraint->setLowerLinLimit(btScalar(0));
-        pConstraint->setUpperLinLimit(btScalar(0));
-        pConstraint->setLowerAngLimit(btScalar(0));
-        pConstraint->setUpperAngLimit(btScalar(0));
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-        m_pRigidBodyB->GetBtRigidBody()->activate(true);
-    }
-    else
-    {
-        btTransform transformA;
-        transformA.setIdentity();
-        CLuaPhysicsSharedLogic::SetPosition(transformA, vecPositionA);
-        CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
-        btSliderConstraint* pConstraint = new btSliderConstraint(*m_pRigidBodyA->GetBtRigidBody(), transformA, true);
-
-        pConstraint->setLowerLinLimit(btScalar(0));
-        pConstraint->setUpperLinLimit(btScalar(0));
-        pConstraint->setLowerAngLimit(btScalar(0));
-        pConstraint->setUpperAngLimit(btScalar(0));
-        pConstraint->enableFeedback(true);
-        pConstraint->setJointFeedback(m_pJointFeedback);
-        m_pConstraint = pConstraint;
-        GetPhysics()->GetDynamicsWorld()->addConstraint(m_pConstraint, bDisableCollisionsBetweenLinkedBodies);
-        m_pRigidBodyA->GetBtRigidBody()->activate(true);
-    }
-}
-
-bool CLuaPhysicsConstraint::SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_FIXED)
-    {
-        btFixedConstraint* pConstraint = (btFixedConstraint*)m_pConstraint;
-        pConstraint->setStiffness(iIndex, fStiffness, bLimitIfNeeded);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetPivotA(CVector& vecPivotA)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
-    {
-        btPoint2PointConstraint* pConstraint = (btPoint2PointConstraint*)m_pConstraint;
-        pConstraint->setPivotA(reinterpret_cast<btVector3&>(vecPivotA));
-        return true;
-    }
-    else if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        btTransform         transformA = pConstraint->getFrameOffsetA();
-        btTransform         transformB = pConstraint->getFrameOffsetB();
-        transformA.setOrigin(reinterpret_cast<btVector3&>(vecPivotA));
-        pConstraint->setFrames(transformA, transformB);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetPivotB(CVector& vecPivotB)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_POINTTOPOINT)
-    {
-        btPoint2PointConstraint* pConstraint = (btPoint2PointConstraint*)m_pConstraint;
-        pConstraint->setPivotB(reinterpret_cast<btVector3&>(vecPivotB));
-        return true;
-    }
-    else if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        btTransform         transformA = pConstraint->getFrameOffsetA();
-        btTransform         transformB = pConstraint->getFrameOffsetB();
-        transformB.setOrigin(reinterpret_cast<btVector3&>(vecPivotB));
-        pConstraint->setFrames(transformA, transformB);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetLowerLinLimit(float fLength)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        pConstraint->setLowerLinLimit(fLength);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetUpperLinLimit(float fLength)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        pConstraint->setUpperLinLimit(fLength);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetLowerAngLimit(float lowerLimit)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        pConstraint->setLowerAngLimit(lowerLimit);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsConstraint::SetUpperAngLimit(float upperLimit)
-{
-    if (m_eType == ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER)
-    {
-        btSliderConstraint* pConstraint = (btSliderConstraint*)m_pConstraint;
-        pConstraint->setUpperAngLimit(upperLimit);
-        return true;
-    }
-    return false;
 }
 
 void CLuaPhysicsConstraint::SetBreakingImpulseThreshold(float fThreshold)

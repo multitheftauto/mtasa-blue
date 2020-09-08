@@ -1,0 +1,44 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsFixedConstraint.cpp
+ *  PURPOSE:     Physics fixed constraint
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#include <StdInc.h>
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsConstraintManager.h"
+#include "CLuaPhysicsSharedLogic.h"
+#include "CLuaPhysicsFixedConstraint.h"
+
+CLuaPhysicsFixedConstraint::CLuaPhysicsFixedConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
+                                                       CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
+                                                       bool bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), ePhysicsConstraint::PHYSICS_CONTRAINT_FIXED, bDisableCollisionsBetweenLinkedBodies)
+{
+    btTransform transformA;
+    btTransform transformB;
+    transformA.setIdentity();
+    transformB.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(transformA, vecPositionA);
+    CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
+    CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
+    CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
+    btFixedConstraint* pConstraint = new btFixedConstraint(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB);
+
+    Initialize(pConstraint, pRigidBodyA, pRigidBodyB);
+}
+
+CLuaPhysicsFixedConstraint::~CLuaPhysicsFixedConstraint()
+{
+}
+
+void CLuaPhysicsFixedConstraint::SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded)
+{
+    btFixedConstraint* pConstraint = (btFixedConstraint*)GetConstraint();
+    pConstraint->setStiffness(iIndex, fStiffness, bLimitIfNeeded);
+}

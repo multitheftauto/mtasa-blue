@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsConstraintManager.h
- *  PURPOSE:     Lua timer manager class
+ *  PURPOSE:     Lua physics constraints manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -25,8 +25,7 @@ public:
 
     CLuaPhysicsConstraint* GetContraintFromScriptID(unsigned int uiScriptID);
 
-    CLuaPhysicsConstraint* AddConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
-
+    void                   AddConstraint(CLuaPhysicsConstraint* pConstraint);
     void                   RemoveContraint(CLuaPhysicsConstraint* pLuaPhysicsConstraint);
     CLuaPhysicsConstraint* GetContraint(btTypedConstraint* pConstraint);
 

@@ -42,8 +42,7 @@ public:
 
     void AddShape(CLuaPhysicsShape* pShape);
     void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-
-    CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
+    void AddConstraint(CLuaPhysicsConstraint* pConstraint);
 
     void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 

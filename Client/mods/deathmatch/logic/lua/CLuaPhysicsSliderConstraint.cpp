@@ -1,0 +1,111 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsSliderConstraint.cpp
+ *  PURPOSE:     Physics slider constraint
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#include <StdInc.h>
+#include "CLuaPhysicsRigidBodyManager.h"
+#include "CLuaPhysicsConstraint.h"
+#include "CLuaPhysicsSliderConstraint.h"
+#include "CLuaPhysicsSharedLogic.h"
+
+
+CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
+                                                         CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
+                                                         bool bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsConstraint(pRigidBodyA->GetPhysics(), ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER, bDisableCollisionsBetweenLinkedBodies)
+{
+    btTransform transformA;
+    btTransform transformB;
+    transformA.setIdentity();
+    transformB.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(transformA, vecPositionA);
+    CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
+    CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
+    CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
+    btSliderConstraint* pConstraint = new btSliderConstraint(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB, true);
+
+    pConstraint->setLowerLinLimit(btScalar(0));
+    pConstraint->setUpperLinLimit(btScalar(0));
+    pConstraint->setLowerAngLimit(btScalar(0));
+    pConstraint->setUpperAngLimit(btScalar(0));
+
+    Initialize(pConstraint, pRigidBodyA, pRigidBodyB);
+}
+
+CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& vecPosition, CVector& vecRotation,
+                                                         bool bDisableCollisionsBetweenLinkedBodies)
+    : CLuaPhysicsConstraint(pRigidBody->GetPhysics(), ePhysicsConstraint::PHYSICS_CONTRAINT_SLIDER, bDisableCollisionsBetweenLinkedBodies)
+{
+    btTransform transform;
+    transform.setIdentity();
+    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
+    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
+    btSliderConstraint* pConstraint = new btSliderConstraint(*pRigidBody->GetBtRigidBody(), transform, true);
+
+    pConstraint->setLowerLinLimit(btScalar(0));
+    pConstraint->setUpperLinLimit(btScalar(0));
+    pConstraint->setLowerAngLimit(btScalar(0));
+    pConstraint->setUpperAngLimit(btScalar(0));
+
+    Initialize(pConstraint, pRigidBody);
+}
+
+CLuaPhysicsSliderConstraint::~CLuaPhysicsSliderConstraint()
+{
+
+}
+
+void CLuaPhysicsSliderConstraint::SetStiffness(int iIndex, float fStiffness, bool bLimitIfNeeded)
+{
+    btFixedConstraint* pConstraint = (btFixedConstraint*)GetConstraint();
+    pConstraint->setStiffness(iIndex, fStiffness, bLimitIfNeeded);
+}
+
+void CLuaPhysicsSliderConstraint::SetPivotA(CVector& vecPivotA)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    btTransform         transformA = pConstraint->getFrameOffsetA();
+    btTransform         transformB = pConstraint->getFrameOffsetB();
+    transformA.setOrigin(reinterpret_cast<btVector3&>(vecPivotA));
+    pConstraint->setFrames(transformA, transformB);
+}
+
+void CLuaPhysicsSliderConstraint::SetPivotB(CVector& vecPivotB)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    btTransform         transformA = pConstraint->getFrameOffsetA();
+    btTransform         transformB = pConstraint->getFrameOffsetB();
+    transformB.setOrigin(reinterpret_cast<btVector3&>(vecPivotB));
+    pConstraint->setFrames(transformA, transformB);
+}
+
+void CLuaPhysicsSliderConstraint::SetLowerLinLimit(float fLength)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    pConstraint->setLowerLinLimit(fLength);
+}
+
+void CLuaPhysicsSliderConstraint::SetUpperLinLimit(float fLength)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    pConstraint->setUpperLinLimit(fLength);
+}
+
+void CLuaPhysicsSliderConstraint::SetLowerAngLimit(float lowerLimit)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    pConstraint->setLowerAngLimit(lowerLimit);
+}
+
+void CLuaPhysicsSliderConstraint::SetUpperAngLimit(float upperLimit)
+{
+    btSliderConstraint* pConstraint = (btSliderConstraint*)GetConstraint();
+    pConstraint->setUpperAngLimit(upperLimit);
+}

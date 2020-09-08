@@ -57,10 +57,7 @@ CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::GetContraint(btTypedConstra
     return nullptr;
 }
 
-CLuaPhysicsConstraint* CLuaPhysicsConstraintManager::AddConstraint(CClientPhysics* pPhysics, CLuaPhysicsRigidBody* pRigidBodyA,
-                                                                   CLuaPhysicsRigidBody* pRigidBodyB)
+void CLuaPhysicsConstraintManager::AddConstraint(CLuaPhysicsConstraint* pConstraint)
 {
-    CLuaPhysicsConstraint* pContraint = new CLuaPhysicsConstraint(pPhysics, pRigidBodyA, pRigidBodyB);
-    m_List.push_back(pContraint);
-    return pContraint;
+    m_List.push_back(pConstraint);
 }
