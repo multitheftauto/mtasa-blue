@@ -20,6 +20,11 @@
 #include "bulletphysics3d/LinearMath/btRandom.h"
 #include "CPhysicsDebugDrawer.h"
 
+#include "lua/CLuaPhysicsCompoundShape.h"
+#include "lua/CLuaPhysicsBoxShape.h"
+#include "lua/CLuaPhysicsSphereShape.h"
+#include "lua/CLuaPhysicsTriangleMeshShape.h"
+
 CClientPhysics::CClientPhysics(CClientManager* pManager, ElementID ID, CLuaMain* luaMain) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -107,9 +112,11 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
 {
     CColDataSA* pColData = CLuaPhysicsSharedLogic::GetModelColData(usModelId);
     if (pColData == nullptr)
-        return nullptr;
+        return nullptr; // model has no collision
 
-    if ((pColData->numColBoxes == 0) && (pColData->pColTriangles == 0) && (pColData->numColSpheres == 0))
+    int iInitialSize = pColData->numColBoxes + pColData->numColSpheres;
+
+    if (iInitialSize == 0)
         return nullptr;            // don't create empty collisions
 
     CColSphereSA   pColSphere;
@@ -117,25 +124,24 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
     CColTriangleSA pColTriangle;
     CVector        position, halfSize;
 
-    CLuaPhysicsShape* pCompoundShape = CreateShape();
-    btCompoundShape*  pCompound = pCompoundShape->InitializeWithCompound();
+    if (pColData->numColTriangles > 0)
+        iInitialSize++;
+
+    CLuaPhysicsCompoundShape* pCompoundShape = new CLuaPhysicsCompoundShape(this, iInitialSize);
 
     for (uint i = 0; pColData->numColBoxes > i; i++)
     {
         pColBox = pColData->pColBoxes[i];
         position = (pColBox.max + pColBox.min) / 2;
         halfSize = (pColBox.max - pColBox.min) * 0.5;
-        CLuaPhysicsShape* pBoxShape = CreateShape();
-        pBoxShape->InitializeWithBox(halfSize);
-        pCompoundShape->AddShape(pBoxShape, position);
+        pCompoundShape->AddShape(new CLuaPhysicsBoxShape(this, halfSize), position);
     }
 
     for (uint i = 0; pColData->numColSpheres > i; i++)
     {
         pColSphere = pColData->pColSpheres[i];
         CLuaPhysicsShape* pShpereShape = CreateShape();
-        pShpereShape->InitializeWithSphere(pColSphere.fRadius);
-        pCompoundShape->AddShape(pShpereShape, pColSphere.vecCenter);
+        pCompoundShape->AddShape(new CLuaPhysicsSphereShape(this, pColSphere.fRadius), position);
     }
 
     if (pColData->numColTriangles > 0)
@@ -149,8 +155,8 @@ CLuaPhysicsShape* CClientPhysics::CreateShapeFromModel(unsigned short usModelId)
             vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[1]].getVector());
             vecIndices.push_back(pColData->pVertices[pColTriangle.vertex[2]].getVector());
         }
-        pTriangleMesh->InitializeWithTriangleMesh(vecIndices);
-        pCompoundShape->AddShape(pTriangleMesh, CVector(0, 0, 0));
+
+        pCompoundShape->AddShape(new CLuaPhysicsTriangleMeshShape(this, vecIndices), CVector(0, 0, 0));
     }
 
     return pCompoundShape;
@@ -275,6 +281,11 @@ void CClientPhysics::RayCastMultiple(lua_State* luaVM, CVector from, CVector to,
     }
 }
 
+void CClientPhysics::DestroyElement(CLuaPhysicsElement* pPhysicsElement)
+{
+
+}
+
 void CClientPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     ListRemove(m_vecRigidBodies, pLuaRigidBody);
@@ -325,6 +336,12 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionSha
     CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
     pStaticCollision->SetCollisionShape(pCollisionShape);
     return pStaticCollision;
+}
+
+void CClientPhysics::AddShape(CLuaPhysicsShape* pShape)
+{
+    m_pLuaMain->GetPhysicsShapeManager()->AddShape(this, pShape);
+    m_vecShapes.push_back(pShape);
 }
 
 CLuaPhysicsShape* CClientPhysics::CreateShape()

@@ -36,3 +36,8 @@ void CLuaPhysicsElement::RemoveScriptID()
         m_uiScriptID = INVALID_ARRAY_ID;
     }
 }
+
+void CLuaPhysicsElement::Destroy()
+{
+    m_pPhysics->DestroyElement(this);
+}

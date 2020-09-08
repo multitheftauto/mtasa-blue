@@ -33,6 +33,11 @@ CLuaPhysicsShape* CLuaPhysicsShapeManager::AddShape(CClientPhysics* pPhysics)
     return pShape;
 }
 
+void CLuaPhysicsShapeManager::AddShape(CClientPhysics* pPhysics, CLuaPhysicsShape* pShape)
+{
+    m_ShapeList.push_back(pShape);
+}
+
 void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
 {
     assert(pShape);

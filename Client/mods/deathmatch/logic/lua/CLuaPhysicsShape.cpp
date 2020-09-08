@@ -25,167 +25,14 @@ CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics) : CLuaPhysicsElemen
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
-    for (int i = m_vecRigidBodyList.size() - 1; i >= 0; i--)
-    {
-        GetPhysics()->DestroyRigidBody(m_vecRigidBodyList[i]);
-    }
-    for (int i = m_vecStaticCollisions.size() - 1; i >= 0; i--)
-    {
-        GetPhysics()->DestroyStaticCollision(m_vecStaticCollisions[i]);
-    }
-    delete m_pBtShape;
-
-    if (m_heightfieldTerrainData != nullptr)
-        delete m_heightfieldTerrainData;
-
-}
-
-void CLuaPhysicsShape::AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation)
-{
-    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
-    btTransform      transform;
-    transform.setIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    pCompound->addChildShape(transform, pShape->GetBtShape());
-    pCompound->recalculateLocalAabb();
-}
-
-std::vector<CLuaPhysicsShape*> CLuaPhysicsShape::GetChildShapes()
-{
-    btCompoundShape*               pCompound = (btCompoundShape*)m_pBtShape;
-    std::vector<CLuaPhysicsShape*> vecChildShapes;
-    btCollisionShape*              pCollisionShape;
-    for (int i = 0; i < pCompound->getNumChildShapes(); i++)
-    {
-        pCollisionShape = pCompound->getChildShape(i);
-        vecChildShapes.push_back((CLuaPhysicsShape*)pCollisionShape->getUserPointer());
-    }
-    return vecChildShapes;
-}
-
-bool CLuaPhysicsShape::RemoveChildShape(int index)
-{
-    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
-    if (index >= 0 && index < pCompound->getNumChildShapes())
-    {
-        pCompound->removeChildShapeByIndex(index);
-        UpdateRigids();
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation)
-{
-    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
-    if (index >= 0 && index < pCompound->getNumChildShapes())
-    {
-        btTransform transform = pCompound->getChildTransform(index);
-        CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
-        CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation)
-{
-    btCompoundShape* pCompound = (btCompoundShape*)m_pBtShape;
-    if (index >= 0 && index < pCompound->getNumChildShapes())
-    {
-        btTransform transform;
-        transform.setIdentity();
-        if (vecPosition.Length() == 0)
-        {
-            btTransform compoundTransform = pCompound->getChildTransform(index);
-            CLuaPhysicsSharedLogic::GetPosition(transform, vecPosition);
-        }
-        if (vecRotation.Length() == 0)
-        {
-            btTransform compoundTransform = pCompound->getChildTransform(index);
-            CLuaPhysicsSharedLogic::GetRotation(transform, vecRotation);
-        }
-        CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
-        CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
-        pCompound->updateChildTransform(index, transform);
-        UpdateRigids();
-        return true;
-    }
-    return false;
+    if (m_pBtShape != nullptr)
+        delete m_pBtShape;
 }
 
 void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
 {
-    if (pShape)
-    {
-        pShape->setUserPointer((void*)this);
-        m_pBtShape = pShape;
-    }
-}
-
-btBoxShape* CLuaPhysicsShape::InitializeWithBox(CVector& half)
-{
-    btBoxShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
-    FinalizeInitialization(boxCollisionShape);
-    return boxCollisionShape;
-}
-
-btSphereShape* CLuaPhysicsShape::InitializeWithSphere(float fRadius)
-{
-    btSphereShape* sphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-    FinalizeInitialization(sphereCollisionShape);
-    return sphereCollisionShape;
-}
-
-btCapsuleShape* CLuaPhysicsShape::InitializeWithCapsule(float fRadius, float fHeight)
-{
-    btCapsuleShape* capsuleCollisionShape = CLuaPhysicsSharedLogic::CreateCapsule(fRadius, fHeight);
-    FinalizeInitialization(capsuleCollisionShape);
-    return capsuleCollisionShape;
-}
-
-btConeShape* CLuaPhysicsShape::InitializeWithCone(float fRadius, float fHeight)
-{
-    btConeShape* coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
-    FinalizeInitialization(coneCollisionShape);
-    return coneCollisionShape;
-}
-
-btCylinderShape* CLuaPhysicsShape::InitializeWithCylinder(CVector& half)
-{
-    btCylinderShape* cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
-    FinalizeInitialization(cylinderCollisionShape);
-    return cylinderCollisionShape;
-}
-
-btCompoundShape* CLuaPhysicsShape::InitializeWithCompound(int initialChildCapacity)
-{
-    btCompoundShape* pCompoundShape = new btCompoundShape(true);
-    FinalizeInitialization(pCompoundShape);
-    return pCompoundShape;
-}
-
-btConvexHullShape* CLuaPhysicsShape::InitializeWithConvexHull(std::vector<CVector>& vecPoints)
-{
-    btConvexHullShape* pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
-    FinalizeInitialization(pConvexHull);
-    return pConvexHull;
-}
-
-btBvhTriangleMeshShape* CLuaPhysicsShape::InitializeWithTriangleMesh(std::vector<CVector>& vecIndices)
-{
-    btBvhTriangleMeshShape* pTriangleMeshShape = CLuaPhysicsSharedLogic::CreateTriangleMesh(vecIndices);
-    FinalizeInitialization(pTriangleMeshShape);
-    return pTriangleMeshShape;
-}
-
-btHeightfieldTerrainShape* CLuaPhysicsShape::InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
-{
-    heightfieldTerrainShape* pHeightfieldTerrain = CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(iSizeX, iSizeY, vecHeightData);
-    FinalizeInitialization(pHeightfieldTerrain->pHeightfieldTerrainShape);
-    m_heightfieldTerrainData = pHeightfieldTerrain;
-    return pHeightfieldTerrain->pHeightfieldTerrainShape;
+    pShape->setUserPointer((void*)this);
+    m_pBtShape = pShape;
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
@@ -218,35 +65,6 @@ void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStatic
         return;
 
     ListRemove(m_vecStaticCollisions, pStaticCollision);
-}
-
-bool CLuaPhysicsShape::SetSize(CVector vecSize)
-{
-    if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
-    {
-        btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
-        vecSize.fX -= pInternalShape->getMargin();
-        vecSize.fY -= pInternalShape->getMargin();
-        vecSize.fZ -= pInternalShape->getMargin();
-        pInternalShape->setImplicitShapeDimensions(reinterpret_cast<btVector3&>(vecSize));
-        UpdateRigids();
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::GetSize(CVector& vecSize)
-{
-    if (m_pBtShape->getShapeType() == BOX_SHAPE_PROXYTYPE)
-    {
-        btConvexInternalShape* pInternalShape = (btConvexInternalShape*)m_pBtShape;
-        const btVector3        pSize = pInternalShape->getImplicitShapeDimensions();
-        vecSize.fX = pSize.getX();
-        vecSize.fY = pSize.getY();
-        vecSize.fZ = pSize.getZ();
-        return true;
-    }
-    return false;
 }
 
 bool CLuaPhysicsShape::SetRadius(float fRadius)
@@ -406,6 +224,7 @@ const char* CLuaPhysicsShape::GetName()
     return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);
 }
 
+// Call after shape change, makes all rigid bodies update their position
 void CLuaPhysicsShape::UpdateRigids()
 {
     for (auto const& rigidBody : m_vecRigidBodyList)

@@ -14,6 +14,7 @@
 #include "lua/CLuaFunctionParser.h"
 
 class CLuaPhysicsElement;
+class CLuaPhysicsCompoundShape;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -21,30 +22,33 @@ public:
     static void LoadFunctions(void);
     static void AddClass(lua_State* luaVM);
 
-    static CClientPhysics* PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
-    static bool            IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement);
+    static CClientPhysics*                PhysicsCreateWorld(lua_State* luaVM, std::optional<CVector> vecGravity);
+    static bool                           IsPhysicsElement(CLuaPhysicsElement* pPhysicsElement);
+    static std::vector<CLuaPhysicsShape*> PhysicsGetChildShapes(CLuaPhysicsCompoundShape* pCompoundShape);
+    static bool                           PhysicsRemoveChildShape(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
+    static CVector                        PhysicsGetChildShapeOffsetPosition(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
+    static CVector                        PhysicsGetChildShapeOffsetRotation(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex);
+    static bool                           PhysicsSetChildShapeOffsets(CLuaPhysicsCompoundShape* pCompoundShape, int iIndex, CVector position, CVector rotation);
+    static bool                           PhysicsApplyVelocity(CLuaPhysicsRigidBody* pRigidBody, CVector vecVelocity, std::optional<CVector> vecRelative);
+    static CLuaPhysicsStaticCollision*    PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape);
+    static CLuaPhysicsShape*              PhysicsCreateShapeFromModel(CClientPhysics* pPhysics, unsigned short usModel);
+    static bool                           PhysicsDrawDebug(CClientPhysics* pPhysics);
+    static std::vector<CLuaPhysicsShape*> PhysicsGetShapes(CClientPhysics* pPhysics);
+    static std::vector<CLuaPhysicsRigidBody*>       PhysicsGetRigidBodies(CClientPhysics* pPhysics);
+    static std::vector<CLuaPhysicsStaticCollision*> PhysicsGetStaticCollisions(CClientPhysics* pPhysics);
+    static std::vector<CLuaPhysicsConstraint*>      PhysicsGetConstraints(CClientPhysics* pPhysics);
+    static bool                                     PhysicsDestroy(CLuaPhysicsElement* physicsElement);
+    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(CLuaPhysicsShape* pShape, std::optional<float> fMass, std::optional<CVector> vecLocalInertia,
+                                                        std::optional<CVector> vecCenterOfMass);
 
-    LUA_DECLARE(PhysicsDestroy);
-    LUA_DECLARE(PhysicsCreateRigidBody);
-    LUA_DECLARE(PhysicsCreateShapeFromModel);
     LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsAddChildShape);
-    LUA_DECLARE(PhysicsRemoveChildShape);
-    LUA_DECLARE(PhysicsGetChildShapes);
     LUA_DECLARE(PhysicsGetChildShapeOffsets);
-    LUA_DECLARE(PhysicsSetChildShapeOffsets);
-    LUA_DECLARE(PhysicsGetShapes);
-    LUA_DECLARE(PhysicsGetRigidBodies);
-    LUA_DECLARE(PhysicsGetStaticCollisions);
-    LUA_DECLARE(PhysicsGetConstraints);
     LUA_DECLARE(PhysicsSetProperties);
     LUA_DECLARE(PhysicsGetProperties);
-    LUA_DECLARE(PhysicsCreateStaticCollision);
     LUA_DECLARE(PhysicsSetDebugMode);
     LUA_DECLARE(PhysicsGetDebugMode);
-    LUA_DECLARE(PhysicsDrawDebug);
     LUA_DECLARE(PhysicsBuildCollisionFromGTA);
-    LUA_DECLARE(PhysicsApplyVelocity);
     LUA_DECLARE(PhysicsApplyVelocityForce);
     LUA_DECLARE(PhysicsApplyAngularVelocityForce);
     LUA_DECLARE(PhysicsApplyAngularVelocity);

@@ -33,7 +33,7 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
     for (int i = 0; i < m_pBtRigidBody->getNumConstraintRefs(); i++)
     {
-        GetPhysics()->DestroyCostraint(m_pBtRigidBody->getConstraintRef(i));
+        GetPhysics()->DestroyElement((CLuaPhysicsElement*)(m_pBtRigidBody->getConstraintRef(i)));
     }
 
     if (m_pBtRigidBody && m_pBtRigidBody->getMotionState())

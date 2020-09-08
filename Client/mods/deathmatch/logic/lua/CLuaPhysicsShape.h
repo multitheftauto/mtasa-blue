@@ -10,12 +10,15 @@
  *****************************************************************************/
 
 class CLuaPhysicsShape;
+class CLuaPhysicsElement;
 
 #pragma once
 
 // Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
+#include "CLuaPhysicsElement.h"
+#include "CLuaPhysicsShape.h"
 
 class CLuaPhysicsShape : public CLuaPhysicsElement
 {
@@ -29,26 +32,13 @@ public:
 
     void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
 
-    btBoxShape*                InitializeWithBox(CVector& vecHalf);
     void                       FinalizeInitialization(btCollisionShape* pShape);
-    btSphereShape*             InitializeWithSphere(float fRadius);
-    btCapsuleShape*            InitializeWithCapsule(float fRadius, float fHeight);
-    btCompoundShape*           InitializeWithCompound(int initialChildCapacity = 0);
-    btConeShape*               InitializeWithCone(float fRadius, float fHeight);
-    btCylinderShape*           InitializeWithCylinder(CVector& half);
-    btConvexHullShape*         InitializeWithConvexHull(std::vector<CVector>& vecPoints);
-    btBvhTriangleMeshShape*    InitializeWithTriangleMesh(std::vector<CVector>& vecIndices);
-    btHeightfieldTerrainShape* InitializeWithHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
 
     btCollisionShape*              GetBtShape() const { return m_pBtShape; }
     void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                           RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                           AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void                           RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
-    std::vector<CLuaPhysicsShape*> GetChildShapes();
-    bool                           RemoveChildShape(int index);
-    bool                           GetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
-    bool                           SetChildShapeOffsets(int index, CVector& vecPosition, CVector& vecRotation);
 
     bool SetSize(CVector vecSize);
     bool GetSize(CVector& vecSize);

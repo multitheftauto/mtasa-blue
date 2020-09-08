@@ -45,13 +45,12 @@ public:
     CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
     CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
     CLuaPhysicsShape*           CreateShape();
+
+    void AddShape(CLuaPhysicsShape* pShape);
+
     CLuaPhysicsConstraint*      CreateConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB);
 
-    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
-    void DestroyShape(CLuaPhysicsShape* pLuaShape);
-    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
-    void DestroyCostraint(btTypedConstraint* pConstraint);
-    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
+    void DestroyElement(CLuaPhysicsElement* pPhysicsElement);
 
     bool                                       RayCastIsClear(CVector from, CVector to);
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
@@ -94,6 +93,11 @@ public:
     btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_pDynamicsWorld; }
 
 private:
+    void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
+    void DestroyShape(CLuaPhysicsShape* pLuaShape);
+    void DestroyCostraint(CLuaPhysicsConstraint* pLuaConstraint);
+    void DestroyCostraint(btTypedConstraint* pConstraint);
+    void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     btDefaultCollisionConfiguration*     m_pCollisionConfiguration;
     btCollisionDispatcher*               m_pDispatcher;
