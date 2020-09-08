@@ -19,20 +19,17 @@
 
 CLuaPhysicsShape::CLuaPhysicsShape(CClientPhysics* pPhysics) : CLuaPhysicsElement(pPhysics, EIdClass::SHAPE)
 {
-    m_pBtShape = nullptr;
     m_heightfieldTerrainData = nullptr;
 }
 
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
-    if (m_pBtShape != nullptr)
-        delete m_pBtShape;
 }
 
-void CLuaPhysicsShape::FinalizeInitialization(btCollisionShape* pShape)
+void CLuaPhysicsShape::Initialization(std::unique_ptr<btCollisionShape> pShape)
 {
     pShape->setUserPointer((void*)this);
-    m_pBtShape = pShape;
+    m_pBtShape = std::move(pShape);
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
@@ -65,111 +62,6 @@ void CLuaPhysicsShape::RemoveStaticCollision(CLuaPhysicsStaticCollision* pStatic
         return;
 
     ListRemove(m_vecStaticCollisions, pStaticCollision);
-}
-
-bool CLuaPhysicsShape::SetRadius(float fRadius)
-{
-    float fHeight;
-    switch (m_pBtShape->getShapeType())
-    {
-        case SPHERE_SHAPE_PROXYTYPE:
-            ((btSphereShape*)m_pBtShape)->setUnscaledRadius(fRadius);
-            UpdateRigids();
-            return true;
-        case CAPSULE_SHAPE_PROXYTYPE:
-            GetHeight(fHeight);
-            ((btCapsuleShape*)m_pBtShape)->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
-            UpdateRigids();
-            return true;
-        case CONE_SHAPE_PROXYTYPE:
-            ((btConeShape*)m_pBtShape)->setRadius(fRadius);
-            UpdateRigids();
-            return true;
-        case CYLINDER_SHAPE_PROXYTYPE:
-            GetHeight(fHeight);
-            ((btCylinderShape*)m_pBtShape)->setImplicitShapeDimensions(btVector3(fRadius, fHeight / 2, fRadius));
-            UpdateRigids();
-            return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::GetRadius(float& fRadius)
-{
-    btVector3 implicityShapeDimension;
-    switch (m_pBtShape->getShapeType())
-    {
-        case SPHERE_SHAPE_PROXYTYPE:
-            fRadius = ((btSphereShape*)m_pBtShape)->getRadius();
-            return true;
-        case CAPSULE_SHAPE_PROXYTYPE:
-            implicityShapeDimension = ((btSphereShape*)m_pBtShape)->getImplicitShapeDimensions();
-            fRadius = implicityShapeDimension.getX();
-            return true;
-        case CONE_SHAPE_PROXYTYPE:
-            fRadius = ((btConeShape*)m_pBtShape)->getRadius();
-            return true;
-        case CYLINDER_SHAPE_PROXYTYPE:
-            fRadius = ((btCylinderShape*)m_pBtShape)->getRadius();
-            return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::SetHeight(float fHeight)
-{
-    if (m_pBtShape->getShapeType() == CAPSULE_SHAPE_PROXYTYPE)
-    {
-        btCapsuleShape* pCapsule = (btCapsuleShape*)m_pBtShape;
-        float           fRadius;
-        GetRadius(fRadius);
-        fHeight /= 2;
-        pCapsule->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
-        UpdateRigids();
-        return true;
-    }
-    else if (m_pBtShape->getShapeType() == CONE_SHAPE_PROXYTYPE)
-    {
-        btConeShape* pCone = (btConeShape*)m_pBtShape;
-        pCone->setHeight(fHeight);
-        return true;
-    }
-    else if (m_pBtShape->getShapeType() == CYLINDER_SHAPE_PROXYTYPE)
-    {
-        btCylinderShape* pCylinder = (btCylinderShape*)m_pBtShape;
-        float            fRadius;
-        GetRadius(fRadius);
-        fRadius += pCylinder->getMargin();
-        fHeight -= pCylinder->getMargin();
-        pCylinder->setImplicitShapeDimensions(btVector3(fRadius, fHeight, fRadius));
-        return true;
-    }
-    return false;
-}
-
-bool CLuaPhysicsShape::GetHeight(float& fHeight)
-{
-    if (m_pBtShape->getShapeType() == CAPSULE_SHAPE_PROXYTYPE)
-    {
-        btCapsuleShape* pCapsule = (btCapsuleShape*)m_pBtShape;
-        fHeight = pCapsule->getHalfHeight();
-        fHeight *= 2;
-        return true;
-    }
-    else if (m_pBtShape->getShapeType() == CONE_SHAPE_PROXYTYPE)
-    {
-        btConeShape* pCone = (btConeShape*)m_pBtShape;
-        fHeight = pCone->getHeight();
-        return true;
-    }
-    else if (m_pBtShape->getShapeType() == CYLINDER_SHAPE_PROXYTYPE)
-    {
-        btCylinderShape* pCylinder = (btCylinderShape*)m_pBtShape;
-        fHeight = pCylinder->getImplicitShapeDimensions().getY();
-        fHeight += pCylinder->getMargin();
-        return true;
-    }
-    return false;
 }
 
 void CLuaPhysicsShape::GetMargin(float& fMargin)
@@ -221,7 +113,7 @@ BroadphaseNativeTypes CLuaPhysicsShape::GetType()
 
 const char* CLuaPhysicsShape::GetName()
 {
-    return CLuaPhysicsSharedLogic::GetShapeName(m_pBtShape);
+    return CLuaPhysicsSharedLogic::GetShapeName(GetBtShape());
 }
 
 // Call after shape change, makes all rigid bodies update their position

@@ -25,24 +25,25 @@ public:
     CLuaPhysicsConstraint(CClientPhysics* pPhysics, ePhysicsConstraint constraintType, bool bDisableCollisionsBetweenLinkedBodies);
     ~CLuaPhysicsConstraint();
 
-    void SetBreakingImpulseThreshold(float fThreshold);
+    void  SetBreakingImpulseThreshold(float fThreshold);
     float GetBreakingImpulseThreshold();
     float GetAppliedImpulse();
-    btJointFeedback* GetJoinFeedback();
 
-    bool                  IsBroken() const { return !m_pConstraint->isEnabled(); }
-    bool                  BreakingStatusHasChanged();
-    btTypedConstraint*    GetConstraint() const { return m_pConstraint; }
+    bool IsBroken() const { return !m_pConstraint->isEnabled(); }
+    bool BreakingStatusHasChanged();
 
-    void Initialize(btTypedConstraint* pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB = nullptr);
+    btTypedConstraint* GetConstraint() const { return m_pConstraint.get(); }
+    btJointFeedback*   GetJoinFeedback() { return m_pJointFeedback.get(); }
+
+    void Initialize(std::unique_ptr<btTypedConstraint> pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB = nullptr);
 
 private:
-    bool                     m_bDisableCollisionsBetweenLinkedBodies;
-    ePhysicsConstraint       m_eType;
-    btTypedConstraint*       m_pConstraint = nullptr;
-    uint                     m_uiScriptID;
-    btJointFeedback*         m_pJointFeedback = nullptr;
-    bool                     m_bLastBreakingStatus;
-    CLuaPhysicsRigidBody*    m_pRigidBodyA;
-    CLuaPhysicsRigidBody*    m_pRigidBodyB;
+    bool                               m_bDisableCollisionsBetweenLinkedBodies;
+    ePhysicsConstraint                 m_eType;
+    uint                               m_uiScriptID;
+    std::unique_ptr<btTypedConstraint> m_pConstraint;
+    std::unique_ptr<btJointFeedback>   m_pJointFeedback;
+    bool                               m_bLastBreakingStatus;
+    CLuaPhysicsRigidBody*              m_pRigidBodyA;
+    CLuaPhysicsRigidBody*              m_pRigidBodyB;
 };

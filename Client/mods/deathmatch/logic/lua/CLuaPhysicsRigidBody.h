@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBody.h
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua rigid body class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -23,7 +23,7 @@ public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
 
-    void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(m_pBtRigidBody); }
+    void UpdateAABB() { GetPhysics()->GetDynamicsWorld()->updateSingleAabb(GetBtRigidBody()); }
 
     void Activate();
     void SetMass(float fMass);
@@ -66,13 +66,13 @@ public:
     bool WantsSleeping();
     float GetMass();
 
-    btRigidBody*    GetBtRigidBody() const { return m_pBtRigidBody; }
+    btRigidBody*    GetBtRigidBody() const { return m_pBtRigidBody.get(); }
 
     void AddConstraint(CLuaPhysicsConstraint* pConstraint) { m_constraintList.push_back(pConstraint); }
     void RemoveConstraint(CLuaPhysicsConstraint* pConstraint) { ListRemove(m_constraintList, pConstraint); }
 
 private:
-    btRigidBody*                         m_pBtRigidBody;
+    std::unique_ptr<btRigidBody>         m_pBtRigidBody;
     CLuaPhysicsShape*                    m_pPhysicsShape;
     std::vector<CLuaPhysicsConstraint*>  m_constraintList;
     int                                  m_iLastSimulationCounter = 0;

@@ -16,8 +16,8 @@
 
 CLuaPhysicsConvexHullShape::CLuaPhysicsConvexHullShape(CClientPhysics* pPhysics, std::vector<CVector>& vecPoints) : CLuaPhysicsShape(pPhysics)
 {
-    btConvexHullShape* pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
-    FinalizeInitialization(pConvexHull);
+    std::unique_ptr<btConvexHullShape> pConvexHull = CLuaPhysicsSharedLogic::CreateConvexHull(vecPoints);
+    Initialization(std::move(pConvexHull));
 }
 
 CLuaPhysicsConvexHullShape::~CLuaPhysicsConvexHullShape()

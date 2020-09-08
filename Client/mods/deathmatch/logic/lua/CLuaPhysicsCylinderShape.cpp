@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsCylinderShape.cpp
- *  PURPOSE:     Lua physics shape class
+ *  PURPOSE:     Lua physics cylinder shape class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -16,8 +16,8 @@
 
 CLuaPhysicsCylinderShape::CLuaPhysicsCylinderShape(CClientPhysics* pPhysics, CVector half) : CLuaPhysicsShape(pPhysics)
 {
-    btCylinderShape* cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
-    FinalizeInitialization(cylinderCollisionShape);
+    std::unique_ptr<btCylinderShape> cylinderCollisionShape = CLuaPhysicsSharedLogic::CreateCylinder(half);
+    Initialization(std::move(cylinderCollisionShape));
 }
 
 CLuaPhysicsCylinderShape::~CLuaPhysicsCylinderShape()

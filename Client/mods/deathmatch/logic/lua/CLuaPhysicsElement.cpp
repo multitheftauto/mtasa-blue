@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsElement.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua physics element class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -12,8 +12,6 @@
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
 CLuaPhysicsElement::CLuaPhysicsElement(CClientPhysics* pPhysics, EIdClass::EIdClassType classType)

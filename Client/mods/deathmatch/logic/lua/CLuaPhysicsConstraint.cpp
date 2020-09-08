@@ -34,20 +34,21 @@ CLuaPhysicsConstraint::CLuaPhysicsConstraint(CClientPhysics* pPhysics, ePhysicsC
     m_pConstraint = nullptr;
     m_pRigidBodyA = nullptr;
     m_pRigidBodyB = nullptr;
+    m_uiScriptID = 0;
     m_eType = constraintType;
 }
 
-void CLuaPhysicsConstraint::Initialize(btTypedConstraint* pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
+void CLuaPhysicsConstraint::Initialize(std::unique_ptr<btTypedConstraint> pConstraint, CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB)
 {
     assert(m_pConstraint == nullptr);
-    m_pConstraint = pConstraint;
-    m_pJointFeedback = new btJointFeedback();
+    m_pConstraint = std::move(pConstraint);
+    m_pJointFeedback = std::make_unique<btJointFeedback>();
     m_pConstraint->enableFeedback(true);
-    m_pConstraint->setJointFeedback(m_pJointFeedback);
+    m_pConstraint->setJointFeedback(m_pJointFeedback.get());
     m_pRigidBodyA = pRigidBodyA;
     m_pRigidBodyB = pRigidBodyB;
 
-    GetPhysics()->GetDynamicsWorld()->addConstraint(pConstraint, m_bDisableCollisionsBetweenLinkedBodies);
+    GetPhysics()->GetDynamicsWorld()->addConstraint(pConstraint.get(), m_bDisableCollisionsBetweenLinkedBodies);
 }
 
 CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
@@ -59,11 +60,8 @@ CLuaPhysicsConstraint::~CLuaPhysicsConstraint()
 
     if (m_pConstraint != nullptr)
     {
-        GetPhysics()->GetDynamicsWorld()->removeConstraint(m_pConstraint);
-
-        delete m_pConstraint;
+        GetPhysics()->GetDynamicsWorld()->removeConstraint(m_pConstraint.get());
     }
-    delete m_pJointFeedback;
 }
 
 void CLuaPhysicsConstraint::SetBreakingImpulseThreshold(float fThreshold)
@@ -79,11 +77,6 @@ float CLuaPhysicsConstraint::GetBreakingImpulseThreshold()
 float CLuaPhysicsConstraint::GetAppliedImpulse()
 {
     return m_pConstraint->getAppliedImpulse();
-}
-
-btJointFeedback* CLuaPhysicsConstraint::GetJoinFeedback()
-{
-    return m_pJointFeedback;
 }
 
 bool CLuaPhysicsConstraint::BreakingStatusHasChanged()

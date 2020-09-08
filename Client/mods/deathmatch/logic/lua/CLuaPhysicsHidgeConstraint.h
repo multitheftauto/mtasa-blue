@@ -24,11 +24,4 @@ public:
                                CVector& axisB, bool bDisableCollisionsBetweenLinkedBodies);
     CLuaPhysicsHidgeConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& pivot, CVector& axis, bool bDisableCollisionsBetweenLinkedBodies);
     ~CLuaPhysicsHidgeConstraint();
-
-    CLuaPhysicsRigidBody* GetRigidBodyA() const { return m_pRigidBodyA; }
-    CLuaPhysicsRigidBody* GetRigidBodyB() const { return m_pRigidBodyB; }
-
-private:
-    CLuaPhysicsRigidBody* m_pRigidBodyA;
-    CLuaPhysicsRigidBody* m_pRigidBodyB;
 };

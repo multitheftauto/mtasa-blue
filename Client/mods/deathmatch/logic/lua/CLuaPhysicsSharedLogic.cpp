@@ -162,55 +162,55 @@ bool CLuaPhysicsSharedLogic::GetScale(btCollisionShape* pCollisionShape, CVector
     return true;
 }
 
-btBoxShape* CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
+std::unique_ptr<btBoxShape> CLuaPhysicsSharedLogic::CreateBox(CVector& half, CVector& vecPosition, CVector& vecRotation)
 {
-    btBoxShape* pBoxShape = new btBoxShape(reinterpret_cast<btVector3&>(half));
-    btTransform transform;
+    std::unique_ptr<btBoxShape> pBoxShape = std::make_unique<btBoxShape>(reinterpret_cast<btVector3&>(half));
+    btTransform                 transform;
     transform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
 
-    return pBoxShape;
+    return std::move(pBoxShape);
 }
 
-btSphereShape* CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
+std::unique_ptr<btSphereShape> CLuaPhysicsSharedLogic::CreateSphere(float fRadius, CVector& vecPosition, CVector& vecRotation)
 {
-    btSphereShape* pSphereShape = new btSphereShape(fRadius);
-    btTransform    transform;
+    std::unique_ptr<btSphereShape> pSphereShape = std::make_unique<btSphereShape>(fRadius);
+    btTransform                    transform;
     transform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetPosition(transform, vecRotation);
 
-    return pSphereShape;
+    return std::move(pSphereShape);
 }
 
-btCapsuleShape* CLuaPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeight)
+std::unique_ptr<btCapsuleShape> CLuaPhysicsSharedLogic::CreateCapsule(float fRadius, float fHeight)
 {
-    btCapsuleShape* pSphereShape = new btCapsuleShape(fRadius, fHeight);
-    return pSphereShape;
+    std::unique_ptr<btCapsuleShape> pSphereShape = std::make_unique<btCapsuleShape>(fRadius, fHeight);
+    return std::move(pSphereShape);
 }
 
-btConeShape* CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
+std::unique_ptr<btConeShape> CLuaPhysicsSharedLogic::CreateCone(float fRadius, float fHeight)
 {
-    btConeShape* pConeShape = new btConeShape(fRadius, fHeight);
-    return pConeShape;
+    std::unique_ptr<btConeShape> pConeShape = std::make_unique<btConeShape>(fRadius, fHeight);
+    return std::move(pConeShape);
 }
 
-btCylinderShape* CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
+std::unique_ptr<btCylinderShape> CLuaPhysicsSharedLogic::CreateCylinder(CVector& half)
 {
-    btCylinderShape* pCylinderShape = new btCylinderShape(reinterpret_cast<btVector3&>(half));
+    std::unique_ptr<btCylinderShape> pCylinderShape = std::make_unique<btCylinderShape>(reinterpret_cast<btVector3&>(half));
 
-    return pCylinderShape;
+    return std::move(pCylinderShape);
 }
 
-btCompoundShape* CLuaPhysicsSharedLogic::CreateCompound()
+std::unique_ptr<btCompoundShape> CLuaPhysicsSharedLogic::CreateCompound()
 {
-    btCompoundShape* pCylinderShape = new btCompoundShape(true);
+    std::unique_ptr<btCompoundShape> pCylinderShape = std::make_unique<btCompoundShape>(true);
 
-    return pCylinderShape;
+    return std::move(pCylinderShape);
 }
 
-btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+std::unique_ptr<btRigidBody> CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     btTransform transformZero;
     transformZero.setIdentity();
@@ -218,15 +218,15 @@ btRigidBody* CLuaPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, f
     btDefaultMotionState* motionstate = new btDefaultMotionState(transformZero);
     motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
 
-    btVector3             localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);
+    btVector3 localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);
     pShape->calculateLocalInertia(fMass, localInertia);
 
     btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
-    btRigidBody*                             pRigidBody = new btRigidBody(rigidBodyCI);
-    return pRigidBody;
+    std::unique_ptr<btRigidBody>             pRigidBody = std::make_unique<btRigidBody>(rigidBodyCI);
+    return std::move(pRigidBody);
 }
 
-btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<CVector>& vecIndices)
+std::unique_ptr<btBvhTriangleMeshShape> CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<CVector>& vecIndices)
 {
     if (vecIndices.size() % 3 != 0 || vecIndices.size() == 0)
         return nullptr;
@@ -237,17 +237,18 @@ btBvhTriangleMeshShape* CLuaPhysicsSharedLogic::CreateTriangleMesh(std::vector<C
         triangleMesh->addTriangle(reinterpret_cast<btVector3&>(vecIndices[i]), reinterpret_cast<btVector3&>(vecIndices[i + 1]),
                                   reinterpret_cast<btVector3&>(vecIndices[i + 2]));
     }
-    btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(triangleMesh, true);
-    return trimeshShape;
+
+    std::unique_ptr<btBvhTriangleMeshShape> triangleMeshShape = std::make_unique<btBvhTriangleMeshShape>(triangleMesh, true);
+    return std::move(triangleMeshShape);
 }
 
-heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
+std::unique_ptr<heightfieldTerrainShape> CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData)
 {
     if (iSizeX * iSizeY != vecHeightData.size())
         return nullptr;
 
-    bool                     flipQuadEdges = true;
-    heightfieldTerrainShape* heightfieldTerrain = new heightfieldTerrainShape();
+    bool                                     flipQuadEdges = true;
+    std::unique_ptr<heightfieldTerrainShape> heightfieldTerrain = std::make_unique<heightfieldTerrainShape>();
     heightfieldTerrain->data = std::vector<float>(vecHeightData);
     float minHeight = 0;
     float maxHeight = 0;
@@ -258,165 +259,20 @@ heightfieldTerrainShape* CLuaPhysicsSharedLogic::CreateHeightfieldTerrain(int iS
         maxHeight = std::max(maxHeight, height);
     }
 
-    btHeightfieldTerrainShape* pHeightfieldTerrain =
-        new btHeightfieldTerrainShape(iSizeX, iSizeY, &heightfieldTerrain->data[0], 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
+    std::unique_ptr<btHeightfieldTerrainShape> pHeightfieldTerrain = std::make_unique<btHeightfieldTerrainShape>(
+        iSizeX, iSizeY, &heightfieldTerrain->data[0], 1.0f, minHeight, maxHeight, 2, PHY_ScalarType::PHY_FLOAT, flipQuadEdges);
 
-    heightfieldTerrain->pHeightfieldTerrainShape = pHeightfieldTerrain;
-    return heightfieldTerrain;
+    heightfieldTerrain->pHeightfieldTerrainShape = std::move(pHeightfieldTerrain);
+    return std::move(heightfieldTerrain);
 }
 
-btConvexHullShape* CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>& vecPoints)
+std::unique_ptr<btConvexHullShape> CLuaPhysicsSharedLogic::CreateConvexHull(std::vector<CVector>& vecPoints)
 {
     if (vecPoints.size() < 3)
         return nullptr;
 
-    btConvexHullShape* pConvexHull = new btConvexHullShape(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
-    return pConvexHull;
-}
-
-bool CLuaPhysicsSharedLogic::AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position, CVector& rotation)
-{
-    if (half.LengthSquared() < MINIMUM_PRIMITIVE_SIZE)
-        return false;
-
-    if (pCollisionObject == nullptr)
-        return false;
-
-    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
-    if (pCollisionShape == nullptr)
-        return false;
-
-    if (!pCollisionShape->isCompound())
-        return false;
-
-    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
-    btBoxShape*      boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(half);
-
-    btTransform transform;
-    transform.setIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transform, position);
-    CLuaPhysicsSharedLogic::SetRotation(transform, rotation);
-    pCompoundShape->addChildShape(transform, boxCollisionShape);
-
-    return true;
-}
-
-bool CLuaPhysicsSharedLogic::AddSphere(btCollisionObject* pCollisionObject, float fRadius, CVector& position, CVector& rotation)
-{
-    if (fRadius < MINIMUM_PRIMITIVE_SIZE)
-        return false;
-
-    if (pCollisionObject == nullptr)
-        return false;
-
-    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
-    if (pCollisionShape == nullptr)
-        return false;
-
-    if (!pCollisionShape->isCompound())
-        return false;
-
-    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
-    btSphereShape*   pSphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-
-    btTransform transform;
-    transform.setIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transform, position);
-    CLuaPhysicsSharedLogic::SetRotation(transform, rotation);
-    pCompoundShape->addChildShape(transform, pSphereCollisionShape);
-
-    return true;
-}
-
-bool CLuaPhysicsSharedLogic::AddTriangleMesh(btCollisionObject* pCollisionObject, std::vector<CVector>& vecIndices, CVector& position, CVector& rotation)
-{
-    if (pCollisionObject == nullptr)
-        return false;
-
-    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
-    if (pCollisionShape == nullptr)
-        return false;
-
-    if (!pCollisionShape->isCompound())
-        return false;
-
-    btCompoundShape*     pCompoundShape = (btCompoundShape*)pCollisionShape;
-    btTriangleMeshShape* pTriangleMeshShape = CreateTriangleMesh(vecIndices);
-
-    btTransform transform;
-    transform.setIdentity();
-    CLuaPhysicsSharedLogic::SetPosition(transform, position);
-    CLuaPhysicsSharedLogic::SetRotation(transform, rotation);
-    pCompoundShape->addChildShape(transform, pTriangleMeshShape);
-
-    return true;
-}
-
-bool CLuaPhysicsSharedLogic::AddBoxes(btCompoundShape* pCompoundShape, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList)
-{
-    btBoxShape* pBoxCollisionShape;
-    btTransform transform;
-    for (std::pair<CVector, std::pair<CVector, CVector>> pair : halfList)
-    {
-        if (pair.first.LengthSquared() >= MINIMUM_PRIMITIVE_SIZE)
-        {
-            pBoxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(pair.first);
-
-            transform.setIdentity();
-            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
-            CLuaPhysicsSharedLogic::SetRotation(transform, pair.second.second);
-            pCompoundShape->addChildShape(transform, pBoxCollisionShape);
-        }
-    }
-    return true;
-}
-
-bool CLuaPhysicsSharedLogic::AddBoxes(btCollisionObject* pCollisionObject, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList)
-{
-    if (pCollisionObject == nullptr)
-        return false;
-
-    if (halfList.empty())
-        return false;
-
-    btCollisionShape* pCollisionShape = pCollisionObject->getCollisionShape();
-    if (pCollisionShape == nullptr)
-        return false;
-
-    if (!pCollisionShape->isCompound())
-        return false;
-
-    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
-    return AddBoxes(pCompoundShape, halfList);
-}
-
-bool CLuaPhysicsSharedLogic::AddSpheres(btCompoundShape* pCollisionShape, std::vector<std::pair<float, CVector>>& spheresList)
-{
-    if (spheresList.empty())
-        return false;
-
-    if (pCollisionShape == nullptr)
-        return false;
-
-    if (!pCollisionShape->isCompound())
-        return false;
-
-    btCompoundShape* pCompoundShape = (btCompoundShape*)pCollisionShape;
-    btSphereShape*   pSphereCollisionShape;
-    btTransform      transform;
-    for (std::pair<float, CVector> pair : spheresList)
-    {
-        if (pair.first >= MINIMUM_PRIMITIVE_SIZE)
-        {
-            btSphereShape* pSphereCollisionShape = CLuaPhysicsSharedLogic::CreateSphere(pair.first);
-
-            transform.setIdentity();
-            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second);
-            pCompoundShape->addChildShape(transform, pSphereCollisionShape);
-        }
-    }
-
-    return true;
+    std::unique_ptr<btConvexHullShape> pConvexHull = std::make_unique<btConvexHullShape>(&vecPoints[0].fX, vecPoints.size(), sizeof(CVector));
+    return std::move(pConvexHull);
 }
 
 void CLuaPhysicsSharedLogic::QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut)

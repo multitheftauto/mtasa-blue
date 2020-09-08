@@ -7,7 +7,7 @@
 
 struct heightfieldTerrainShape
 {
-    btHeightfieldTerrainShape* pHeightfieldTerrainShape;
+    std::unique_ptr<btHeightfieldTerrainShape> pHeightfieldTerrainShape;
     std::vector<float>         data;
 };
 
@@ -29,25 +29,18 @@ public:
     static bool SetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
     static bool GetScale(btCollisionShape* pCollisionShape, CVector& vecScale);
 
-    static btBoxShape*             CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
-    static btSphereShape*          CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
-    static btCapsuleShape*         CreateCapsule(float fRadius, float fHeight);
-    static btConeShape*            CreateCone(float fRadius, float fHeight);
-    static btCylinderShape*        CreateCylinder(CVector& half);
-    static btCompoundShape*        CreateCompound();
+    static std::unique_ptr<btBoxShape> CreateBox(CVector& half, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
+    static std::unique_ptr<btSphereShape>  CreateSphere(float fRadius, CVector& vecPosition = CVector(0, 0, 0), CVector& vecRotation = CVector(0, 0, 0));
+    static std::unique_ptr<btCapsuleShape>   CreateCapsule(float fRadius, float fHeight);
+    static std::unique_ptr<btConeShape>             CreateCone(float fRadius, float fHeight);
+    static std::unique_ptr<btCylinderShape>  CreateCylinder(CVector& half);
+    static std::unique_ptr<btCompoundShape>        CreateCompound();
 
-    static btBvhTriangleMeshShape* CreateTriangleMesh(std::vector<CVector>& vecIndices);
-    static heightfieldTerrainShape* CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
-    static btConvexHullShape*       CreateConvexHull(std::vector<CVector>& vecPoints);
+    static std::unique_ptr<btBvhTriangleMeshShape> CreateTriangleMesh(std::vector<CVector>& vecIndices);
+    static std::unique_ptr<heightfieldTerrainShape> CreateHeightfieldTerrain(int iSizeX, int iSizeY, std::vector<float>& vecHeightData);
+    static std::unique_ptr<btConvexHullShape> CreateConvexHull(std::vector<CVector>& vecPoints);
 
-    static btRigidBody* CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
-
-    static bool AddBox(btCollisionObject* pCollisionObject, CVector& half, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
-    static bool AddBoxes(btCompoundShape* pCompoundShape, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList);
-    static bool AddBoxes(btCollisionObject* pCollisionObject, std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList);
-    static bool AddSphere(btCollisionObject* pCollisionObject, float fRadius, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
-    static bool AddSpheres(btCompoundShape* pCompoundShape, std::vector<std::pair<float, CVector>>& spheresList);
-    static bool AddTriangleMesh(btCollisionObject* pCollisionObject, std::vector<CVector>& vecIndices, CVector& position = CVector(0, 0, 0), CVector& rotation = CVector(0, 0, 0));
+    static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
     static void QueryWorldObjects(CVector vecPosition, float fRadius, std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);
     static void CacheWorldObjects(std::vector<std::pair<unsigned short, std::pair<CVector, CVector>>>& pOut);

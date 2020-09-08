@@ -16,8 +16,8 @@
 
 CLuaPhysicsSphereShape::CLuaPhysicsSphereShape(CClientPhysics* pPhysics, float fRadius) : CLuaPhysicsShape(pPhysics)
 {
-    btSphereShape* pSphere = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-    FinalizeInitialization(pSphere);
+    std::unique_ptr<btSphereShape> pSphere = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
+    Initialization(std::move(pSphere));
 }
 
 CLuaPhysicsSphereShape::~CLuaPhysicsSphereShape()

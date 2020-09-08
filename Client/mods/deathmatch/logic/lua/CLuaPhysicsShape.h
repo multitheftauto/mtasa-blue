@@ -26,26 +26,14 @@ public:
     CLuaPhysicsShape(CClientPhysics* pPhysics);
     ~CLuaPhysicsShape();
 
-    //// for compound rigid bodies
-    // void AddBox(CVector& vecHalf);
-    // void AddSphere(float fRadius);
+    void Initialization(std::unique_ptr<btCollisionShape> pShape);
 
-    void AddShape(CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation = CVector(0, 0, 0));
-
-    void                       FinalizeInitialization(btCollisionShape* pShape);
-
-    btCollisionShape*              GetBtShape() const { return m_pBtShape; }
+    btCollisionShape*              GetBtShape() const { return m_pBtShape.get(); }
     void                           AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                           RemoveRigidBody(CLuaPhysicsRigidBody* pRigidBody);
     void                           AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
     void                           RemoveStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
-    bool SetSize(CVector vecSize);
-    bool GetSize(CVector& vecSize);
-    bool SetRadius(float fRadius);
-    bool GetRadius(float& fRadius);
-    bool SetHeight(float fHeight);
-    bool GetHeight(float& fHeight);
     bool SetScale(CVector scale);
     bool GetScale(CVector& scale);
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
@@ -58,7 +46,7 @@ public:
     const char*           GetName();
 
 private:
-    btCollisionShape*        m_pBtShape;
+    std::unique_ptr<btCollisionShape> m_pBtShape;
     heightfieldTerrainShape* m_heightfieldTerrainData = nullptr;
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;

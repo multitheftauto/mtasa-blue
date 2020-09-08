@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsConeShape.cpp
- *  PURPOSE:     Lua physics shape class
+ *  PURPOSE:     Lua physics cone shape class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -16,14 +16,15 @@
 
 CLuaPhysicsConeShape::CLuaPhysicsConeShape(CClientPhysics* pPhysics, float fRadius, float fHeight) : CLuaPhysicsShape(pPhysics)
 {
-    btConeShape* coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
-    FinalizeInitialization(coneCollisionShape);
+    std::unique_ptr<btConeShape> coneCollisionShape = CLuaPhysicsSharedLogic::CreateCone(fRadius, fHeight);
+    Initialization(std::move(coneCollisionShape));
 }
 
 CLuaPhysicsConeShape::~CLuaPhysicsConeShape()
 {
 
 }
+
 bool CLuaPhysicsConeShape::SetRadius(float fRadius)
 {
     ((btConeShape*)GetBtShape())->setRadius(fRadius);

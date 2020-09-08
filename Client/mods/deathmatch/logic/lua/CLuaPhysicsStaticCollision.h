@@ -44,8 +44,8 @@ public:
     void SetFilterGroup(int iGroup);
     void GetFilterGroup(int& iGroup);
 
-    btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
+    btCollisionObject* GetCollisionObject() const { return m_btCollisionObject.get(); }
 
 private:
-    btCollisionObject*       m_btCollisionObject;
+    std::unique_ptr<btCollisionObject> m_btCollisionObject;
 };

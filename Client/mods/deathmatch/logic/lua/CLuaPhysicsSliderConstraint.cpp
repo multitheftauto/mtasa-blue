@@ -15,7 +15,6 @@
 #include "CLuaPhysicsSliderConstraint.h"
 #include "CLuaPhysicsSharedLogic.h"
 
-
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBodyA, CLuaPhysicsRigidBody* pRigidBodyB, CVector& vecPositionA,
                                                          CVector& vecRotationA, CVector& vecPositionB, CVector& vecRotationB,
                                                          bool bDisableCollisionsBetweenLinkedBodies)
@@ -29,14 +28,14 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
     CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
     CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
     CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
-    btSliderConstraint* pConstraint = new btSliderConstraint(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB, true);
+    auto pConstraint = std::make_unique<btSliderConstraint>(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB, true);
 
     pConstraint->setLowerLinLimit(btScalar(0));
     pConstraint->setUpperLinLimit(btScalar(0));
     pConstraint->setLowerAngLimit(btScalar(0));
     pConstraint->setUpperAngLimit(btScalar(0));
 
-    Initialize(pConstraint, pRigidBodyA, pRigidBodyB);
+    Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
 }
 
 CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* pRigidBody, CVector& vecPosition, CVector& vecRotation,
@@ -47,14 +46,14 @@ CLuaPhysicsSliderConstraint::CLuaPhysicsSliderConstraint(CLuaPhysicsRigidBody* p
     transform.setIdentity();
     CLuaPhysicsSharedLogic::SetPosition(transform, vecPosition);
     CLuaPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    btSliderConstraint* pConstraint = new btSliderConstraint(*pRigidBody->GetBtRigidBody(), transform, true);
+    auto pConstraint = std::make_unique<btSliderConstraint>(*pRigidBody->GetBtRigidBody(), transform, true);
 
     pConstraint->setLowerLinLimit(btScalar(0));
     pConstraint->setUpperLinLimit(btScalar(0));
     pConstraint->setLowerAngLimit(btScalar(0));
     pConstraint->setUpperAngLimit(btScalar(0));
 
-    Initialize(pConstraint, pRigidBody);
+    Initialize(std::move(pConstraint), pRigidBody);
 }
 
 CLuaPhysicsSliderConstraint::~CLuaPhysicsSliderConstraint()

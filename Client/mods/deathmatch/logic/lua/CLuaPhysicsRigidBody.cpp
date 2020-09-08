@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsRigidBody.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua rigid body class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -25,7 +25,7 @@ CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass
     m_pPhysicsShape->AddRigidBody(this);
     m_pBtRigidBody->setDamping(0.001f, 0.001f);
     SetSleepingThresholds(0.1f, 0.1f);
-    pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(m_pBtRigidBody);
+    pShape->GetPhysics()->GetDynamicsWorld()->addRigidBody(GetBtRigidBody());
     m_pBtRigidBody->setUserPointer((void*)this);
     pShape->GetPhysics()->AddRigidBody(this);
 }
@@ -42,11 +42,9 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
         delete m_pBtRigidBody->getMotionState();
     }
 
-    GetPhysics()->GetDynamicsWorld()->removeRigidBody(m_pBtRigidBody);
+    GetPhysics()->GetDynamicsWorld()->removeRigidBody(GetBtRigidBody());
     m_pPhysicsShape->RemoveRigidBody(this);
-    delete m_pBtRigidBody;
 }
-
 
 void CLuaPhysicsRigidBody::SetMass(float fMass)
 {

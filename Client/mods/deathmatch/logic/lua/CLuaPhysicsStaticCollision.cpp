@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsStaticCollision.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua static collision class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -17,11 +17,11 @@
 
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
-    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject = std::make_unique<btCollisionObject>();
     m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
     pShape->AddStaticCollision(this);
     m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(GetCollisionObject());
     pShape->AddStaticCollision(this);
     pShape->GetPhysics()->AddStaticCollision(this);
 }
@@ -30,29 +30,28 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
     if (m_btCollisionObject)
     {
-        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(m_btCollisionObject);
-        delete m_btCollisionObject;
+        GetPhysics()->GetDynamicsWorld()->removeCollisionObject(GetCollisionObject());
     }
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
 {
-    CLuaPhysicsSharedLogic::SetPosition(m_btCollisionObject, vecPosition);
+    CLuaPhysicsSharedLogic::SetPosition(GetCollisionObject(), vecPosition);
 }
 
 void CLuaPhysicsStaticCollision::SetRotation(CVector vecRotation)
 {
-    CLuaPhysicsSharedLogic::SetRotation(m_btCollisionObject, vecRotation);
+    CLuaPhysicsSharedLogic::SetRotation(GetCollisionObject(), vecRotation);
 }
 
 void CLuaPhysicsStaticCollision::GetPosition(CVector& vecPosition)
 {
-    CLuaPhysicsSharedLogic::GetPosition(m_btCollisionObject, vecPosition);
+    CLuaPhysicsSharedLogic::GetPosition(GetCollisionObject(), vecPosition);
 }
 
 void CLuaPhysicsStaticCollision::GetRotation(CVector& vecRotation)
 {
-    CLuaPhysicsSharedLogic::GetRotation(m_btCollisionObject, vecRotation);
+    CLuaPhysicsSharedLogic::GetRotation(GetCollisionObject(), vecRotation);
 }
 
 bool CLuaPhysicsStaticCollision::SetScale(CVector& vecScale)

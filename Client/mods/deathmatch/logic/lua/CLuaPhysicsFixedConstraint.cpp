@@ -28,9 +28,9 @@ CLuaPhysicsFixedConstraint::CLuaPhysicsFixedConstraint(CLuaPhysicsRigidBody* pRi
     CLuaPhysicsSharedLogic::SetPosition(transformB, vecPositionB);
     CLuaPhysicsSharedLogic::SetRotation(transformA, vecRotationA);
     CLuaPhysicsSharedLogic::SetRotation(transformB, vecRotationB);
-    btFixedConstraint* pConstraint = new btFixedConstraint(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB);
+    auto pConstraint = std::make_unique<btFixedConstraint>(*pRigidBodyA->GetBtRigidBody(), *pRigidBodyB->GetBtRigidBody(), transformA, transformB);
 
-    Initialize(pConstraint, pRigidBodyA, pRigidBodyB);
+    Initialize(std::move(pConstraint), pRigidBodyA, pRigidBodyB);
 }
 
 CLuaPhysicsFixedConstraint::~CLuaPhysicsFixedConstraint()
