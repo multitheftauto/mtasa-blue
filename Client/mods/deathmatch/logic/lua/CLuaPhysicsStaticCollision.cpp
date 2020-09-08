@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsStaticCollision.cpp
  *  PURPOSE:     Lua timer class
@@ -12,14 +12,18 @@
 #include <StdInc.h>
 #include "CLuaPhysicsSharedLogic.h"
 #include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsRigidBodyManager.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
-#include "CLuaPhysicsConstraintManager.h"
 #include "CLuaPhysicsShapeManager.h"
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CClientPhysics* pPhysics) : CLuaPhysicsElement(pPhysics, EIdClass::STATIC_COLLISION)
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape) : CLuaPhysicsElement(pShape->GetPhysics(), EIdClass::STATIC_COLLISION)
 {
-    m_btCollisionObject = nullptr;
+    m_btCollisionObject = new btCollisionObject();
+    m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
+    pShape->AddStaticCollision(this);
+    m_btCollisionObject->setUserPointer((void*)this);
+    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
+    pShape->AddStaticCollision(this);
+    pShape->GetPhysics()->AddStaticCollision(this);
 }
 
 CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
@@ -80,33 +84,6 @@ void CLuaPhysicsStaticCollision::GetDebugColor(SColor& color)
     color.B = btColor.getZ() * 255;
 }
 
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithCompound()
-{
-    m_btCollisionObject = new btCollisionObject();
-    btCompoundShape* pCompoundShape = new btCompoundShape(true);
-    m_btCollisionObject->setCollisionShape(pCompoundShape);
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-    return m_btCollisionObject;
-}
-
-void CLuaPhysicsStaticCollision::SetCollisionShape(btCollisionShape* pShape)
-{
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(pShape);
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-}
-
-void CLuaPhysicsStaticCollision::SetCollisionShape(CLuaPhysicsShape* pShape)
-{
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(pShape->GetBtShape());
-    pShape->AddStaticCollision(this);
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-}
-
 void CLuaPhysicsStaticCollision::SetFilterMask(short sIndex, bool bEnabled)
 {
     if (bEnabled)
@@ -132,83 +109,4 @@ void CLuaPhysicsStaticCollision::SetFilterGroup(int iGroup)
 void CLuaPhysicsStaticCollision::GetFilterGroup(int& iGroup)
 {
     iGroup = m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterGroup;
-}
-
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList, CVector& position,
-                                                                   CVector& rotation)
-{
-    if (halfList.empty())
-        return nullptr;
-
-    if (m_btCollisionObject != nullptr)
-        return nullptr;
-
-    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
-        return nullptr;
-
-    btCompoundShape* boxesCollisionShape = new btCompoundShape(true, halfList.size());
-
-    btTransform transform;
-    for (auto pair : halfList)
-    {
-        if (pair.first.LengthSquared() >= MINIMUM_PRIMITIVE_SIZE)
-        {
-            transform.setIdentity();
-            CLuaPhysicsSharedLogic::SetPosition(transform, pair.second.first);
-            CLuaPhysicsSharedLogic::SetRotation(transform, pair.second.second);
-            btBoxShape* boxCollisionShape = CLuaPhysicsSharedLogic::CreateBox(pair.first);
-            boxesCollisionShape->addChildShape(transform, boxCollisionShape);
-        }
-    }
-
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(boxesCollisionShape);
-
-    SetPosition(position);
-    SetRotation(rotation);
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-    return m_btCollisionObject;
-}
-
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithBox(CVector& half)
-{
-    if (m_btCollisionObject != nullptr)
-        return nullptr;
-
-    if (half.LengthSquared() < MINIMUM_PRIMITIVE_SIZE)
-        return nullptr;
-
-    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
-        return nullptr;
-
-    btBoxShape* pBoxShape = CLuaPhysicsSharedLogic::CreateBox(half);
-
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(pBoxShape);
-    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-    return m_btCollisionObject;
-}
-
-btCollisionObject* CLuaPhysicsStaticCollision::InitializeWithSphere(float fRadius)
-{
-    if (m_btCollisionObject != nullptr)
-        return nullptr;
-
-    if (fRadius < MINIMUM_PRIMITIVE_SIZE)
-        return nullptr;
-
-    if (m_btCollisionObject != nullptr && m_btCollisionObject->getCollisionShape() != nullptr)
-        return nullptr;
-
-    btSphereShape* pSphereShape = CLuaPhysicsSharedLogic::CreateSphere(fRadius);
-
-    m_btCollisionObject = new btCollisionObject();
-    m_btCollisionObject->setCollisionShape(pSphereShape);
-    m_btCollisionObject->getBroadphaseHandle()->m_collisionFilterMask = 1;
-    m_btCollisionObject->setUserPointer((void*)this);
-    GetPhysics()->GetDynamicsWorld()->addCollisionObject(m_btCollisionObject);
-    return m_btCollisionObject;
 }

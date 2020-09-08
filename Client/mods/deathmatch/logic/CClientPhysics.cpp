@@ -102,7 +102,7 @@ CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollisionFromModel(unsig
     if (pShape == nullptr)
         return nullptr;
 
-    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
     return pStaticCollision;
@@ -317,25 +317,10 @@ void CClientPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticC
     m_pLuaMain->GetPhysicsStaticCollisionManager()->RemoveStaticCollision(pStaticCollision);
 }
 
-CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision()
+void CClientPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(this);
     m_vecStaticCollisions.push_back(pStaticCollision);
-    return pStaticCollision;
-}
-
-CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
-{
-    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
-    pStaticCollision->SetCollisionShape(pShape);
-    return pStaticCollision;
-}
-
-CLuaPhysicsStaticCollision* CClientPhysics::CreateStaticCollision(btCollisionShape* pCollisionShape)
-{
-    CLuaPhysicsStaticCollision* pStaticCollision = CreateStaticCollision();
-    pStaticCollision->SetCollisionShape(pCollisionShape);
-    return pStaticCollision;
+    m_pLuaMain->GetPhysicsStaticCollisionManager()->AddStaticCollision(pStaticCollision);
 }
 
 void CClientPhysics::AddShape(CLuaPhysicsShape* pShape)

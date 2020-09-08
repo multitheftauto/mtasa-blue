@@ -638,7 +638,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateShapeFromModel(CClientPhysics* p
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(CLuaPhysicsShape* pShape)
 {
     CClientPhysics*             pPhysics = pShape->GetPhysics();
-    CLuaPhysicsStaticCollision* pStaticCollision = pPhysics->CreateStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
     return pStaticCollision;
 }
 

@@ -41,9 +41,6 @@ public:
     void ProcessCollisions();
 
     CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
-    CLuaPhysicsStaticCollision* CreateStaticCollision();
-    CLuaPhysicsStaticCollision* CreateStaticCollision(btCollisionShape* pCollisionShape);
-    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
     CLuaPhysicsShape*           CreateShape();
 
     void AddShape(CLuaPhysicsShape* pShape);
@@ -56,7 +53,6 @@ public:
     btCollisionWorld::ClosestRayResultCallback RayCastDefault(CVector from, CVector to, bool bFilterBackfaces);
     void RayCastMultiple(lua_State* luaVM, CVector from, CVector to, bool bFilterBackfaces);
     void ShapeCast(CLuaPhysicsShape* pShape, btTransform& from, btTransform& to, btCollisionWorld::ClosestConvexResultCallback& result);
-
 
     bool                        SetDebugMode(ePhysicsDebugMode eDebugMode, bool bEnabled);
     bool                        GetDebugMode(ePhysicsDebugMode eDebugMode);
@@ -85,6 +81,8 @@ public:
     void SetWorldSize(CVector vecSize) { m_vecWorldSize = vecSize; }
     void GetWorldSize(CVector& vecSize) const { vecSize = m_vecWorldSize; }
     int  GetSimulationCounter() const { return m_iSimulationCounter; }
+
+    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     std::vector<CLuaPhysicsShape*> GetShapes() const { return m_vecShapes; }
     std::vector<CLuaPhysicsRigidBody*>  GetRigidBodies() const { return m_vecRigidBodies; }

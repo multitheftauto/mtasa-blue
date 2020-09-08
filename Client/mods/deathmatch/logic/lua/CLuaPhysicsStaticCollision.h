@@ -23,19 +23,8 @@ class heightfieldTerrainShape;
 class CLuaPhysicsStaticCollision : public CLuaPhysicsElement
 {
 public:
-    CLuaPhysicsStaticCollision(CClientPhysics* pPhysics);
+    CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
-
-    // use only once
-
-    void               SetCollisionShape(btCollisionShape* pShape);
-    void               SetCollisionShape(CLuaPhysicsShape* pShape);
-    btCollisionObject* InitializeWithCompound();
-
-    btCollisionObject* InitializeWithBox(CVector& vecHalf);
-    btCollisionObject* InitializeWithBoxes(std::vector<std::pair<CVector, std::pair<CVector, CVector>>>& halfList, CVector& position, CVector& rotation);
-
-    btCollisionObject* InitializeWithSphere(float fRadius);
 
     void SetPosition(CVector vecPosition);
     void GetPosition(CVector& vecPosition);
@@ -56,10 +45,7 @@ public:
     void GetFilterGroup(int& iGroup);
 
     btCollisionObject* GetCollisionObject() const { return m_btCollisionObject; }
-    void               SetCollisionHandler(const CLuaFunctionRef& iLuaFunction) { m_iLuaCollisionHandlerFunction = iLuaFunction; }
 
 private:
     btCollisionObject*       m_btCollisionObject;
-    CLuaFunctionRef          m_iLuaCollisionHandlerFunction;
-
 };

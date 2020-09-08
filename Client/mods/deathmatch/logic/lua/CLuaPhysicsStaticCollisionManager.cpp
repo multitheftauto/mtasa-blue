@@ -40,11 +40,9 @@ CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisio
     return pLuaStaticCollision;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::AddStaticCollision(CClientPhysics* pPhysics)
+void CLuaPhysicsStaticCollisionManager::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pPhysics);
     m_StaticCollisionList.push_back(pStaticCollision);
-    return pStaticCollision;
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsStaticCollisionManager::GetStaticCollisionFromCollisionShape(const btCollisionShape* pCollisionShape)
