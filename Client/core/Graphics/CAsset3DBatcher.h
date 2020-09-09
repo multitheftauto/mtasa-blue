@@ -11,10 +11,15 @@
 
 #pragma once
 
-struct SRenderingSettings
+struct SRenderAssetItem
 {
     CMatrix                 matrix;
-    unsigned int            uiGroup;
+    CLuaAssetNodeInterface* assetNode;
+};
+
+struct SRenderAssetItemGroup
+{
+    std::vector<CMatrix> vecMatrix;
     CLuaAssetNodeInterface* assetNode;
 };
 
@@ -27,13 +32,13 @@ public:
     CAsset3DBatcher(CGraphics* pGraphics);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
-    void AddAsset(SRenderingSettings& settings);
+    void AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem);
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride);
-    bool HasItems() const { return !m_vecRenderList.empty(); }
+    bool HasItems() const { return !m_mapRenderList.empty(); }
     void ClearQueue();
 
 protected:
     IDirect3DDevice9*                     m_pDevice;
     CGraphics*                            m_pGraphics;
-    std::vector<SRenderingSettings>       m_vecRenderList;
+    std::unordered_map<CLuaAssetNodeInterface*, std::vector<CMatrix>> m_mapRenderList;
 };

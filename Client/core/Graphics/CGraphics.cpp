@@ -835,12 +835,12 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawAssetNode(SRenderingSettings& settings)
+void CGraphics::DrawAssetNode(std::unique_ptr<SRenderAssetItem> settings)
 {
     if (g_pCore->IsWindowMinimized())
         return;
 
-    m_pAssetBatcher->AddAsset(settings);
+    m_pAssetBatcher->AddAsset(std::move(settings));
 }
 
 void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI)

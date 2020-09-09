@@ -26,10 +26,9 @@ class CLuaAssetMesh;
 class CClientMaterial;
 class CClientMeshBuffer;
 
-struct SRenderingSettings
+struct SRenderAssetItem
 {
     CMatrix                 matrix;
-    unsigned int            uiGroup;
     CLuaAssetNodeInterface* assetNode;
 };
 

@@ -26,7 +26,7 @@ void CAsset3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportS
 
 void CAsset3DBatcher::Flush()
 {
-    if (m_vecRenderList.empty())
+    if (m_mapRenderList.empty())
         return;
 
     // Get scene matrices
@@ -73,14 +73,12 @@ void CAsset3DBatcher::Flush()
 
     CClientMeshBuffer* pMeshBuffer;
     CMaterialItem*     pLastMaterial = nullptr;
-    for (SRenderingSettings& renderSetting : m_vecRenderList)
+    for (auto const& renderItem : m_mapRenderList)
     {
-        //pGroup = g_pCore->GetAssetsManager()->GetRenderGroup(renderSetting.uiGroup);
-        renderSetting.matrix.GetBuffer(m_fBuffer);
-        m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-        for (int i = 0; i < renderSetting.assetNode->GetMeshNum(); i++)
+        //pGroup = g_pCore->GetAssetsManager()->GetRenderGroup(renderItem.uiGroup);
+        for (int i = 0; i < renderItem.first->GetMeshNum(); i++)
         {
-            pMeshBuffer = renderSetting.assetNode->GetMeshBuffer(i);
+            pMeshBuffer = renderItem.first->GetMeshBuffer(i);
 
             for (int i = 0; i < 8; i++)
                 if (pMeshBuffer->m_arrayVertexBuffer[i] != nullptr)
@@ -91,7 +89,7 @@ void CAsset3DBatcher::Flush()
 
             if (pMeshBuffer->m_uiMaterialIndex >= 0)
             {
-                CMaterialItem* pMaterial = renderSetting.assetNode->GetTexture(pMeshBuffer->m_uiMaterialIndex);
+                CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex);
                 if (pMaterial)
                 {
                     if (pMaterial != pLastMaterial)
@@ -107,7 +105,12 @@ void CAsset3DBatcher::Flush()
                     if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
                     {
                         m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                        for (auto const& matrix : renderItem.second)
+                        {
+                            matrix.GetBuffer(&m_fBuffer[0]);
+                            m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
+                            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                        }
                     }
                     else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
                     {
@@ -173,7 +176,7 @@ void CAsset3DBatcher::Flush()
 
 void CAsset3DBatcher::ClearQueue()
 {
-    m_vecRenderList.clear();
+    m_mapRenderList.clear();
 }
 
 void CAsset3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride)
@@ -201,7 +204,16 @@ void CAsset3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSi
     m_pDevice->DrawPrimitiveUP(eType, iSize, pDataAddr, uiVertexStride);
 }
 
-void CAsset3DBatcher::AddAsset(SRenderingSettings& settings)
+void CAsset3DBatcher::AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem)
 {
-    m_vecRenderList.push_back(std::move(settings));
+    auto const& renderItem = m_mapRenderList.find(assetRenderItem->assetNode);
+
+    if(renderItem == m_mapRenderList.end())
+    {
+        m_mapRenderList.insert({assetRenderItem->assetNode, std::vector<CMatrix>{assetRenderItem->matrix}});
+    }
+    else
+    {
+        renderItem->second.push_back(assetRenderItem->matrix);
+    }
 }

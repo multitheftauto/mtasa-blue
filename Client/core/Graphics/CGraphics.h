@@ -36,7 +36,7 @@ struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
 class CLuaAssetNode;
-struct SRenderingSettings;
+struct SRenderAssetItem;
 
 
 namespace EDrawMode
@@ -165,7 +165,7 @@ public:
                           short siSegments, float fRatio, bool bPostGUI);
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColor color, float fLineWidth, int iterations);
-    void DrawAssetNode(SRenderingSettings& settings);
+    void DrawAssetNode(std::unique_ptr<SRenderAssetItem> settings);
 
 
     bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);

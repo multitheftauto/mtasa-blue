@@ -39,13 +39,11 @@ void CLuaAssetNode::RemoveScriptID()
     }
 }
 
-void CLuaAssetNode::AddToRenderQueue(SRenderingSettings& settings)
+void CLuaAssetNode::AddToRenderQueue(std::unique_ptr<SRenderAssetItem> renderItem)
 {
     // m_vecRender.push_back(std::move(settings));
-    g_pCore->GetGraphics()->DrawAssetNode(settings);
+    g_pCore->GetGraphics()->DrawAssetNode(std::move(renderItem));
 }
-
-CMaterialItem* pLastMaterial;
 
 CClientMeshBuffer* CLuaAssetNode::GetMeshBuffer(int idx)
 {

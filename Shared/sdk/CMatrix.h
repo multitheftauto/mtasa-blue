@@ -300,7 +300,7 @@ public:
         return vRight;
     }
 
-    void GetBuffer(float* array)
+    void GetBuffer(float* array) const
     {
         array[0] = vRight.fX;
         array[1] = vRight.fY;

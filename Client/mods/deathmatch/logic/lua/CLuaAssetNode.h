@@ -33,7 +33,7 @@ public:
     void                        GetMetaData(lua_State* luaVM);
     aiAABB                      GetBoundingBox();
     const aiNode*               GetNode() const { return m_pNode; }
-    void                        AddToRenderQueue(SRenderingSettings& settings);
+    void                        AddToRenderQueue(std::unique_ptr<SRenderAssetItem> settings);
     std::vector<CLuaAssetNode*> GetChildNodes();
     CClientMeshBuffer*          GetMeshBuffer(int idx);
     CMaterialItem*              GetTexture(int idx);

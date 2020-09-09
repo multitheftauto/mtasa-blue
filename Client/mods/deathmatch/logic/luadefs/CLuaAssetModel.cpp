@@ -20,7 +20,7 @@ void CLuaAssetModelDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},
         {"getAssetProperties", GetAssetProperties},
-        {"assetGetChilldrenNodes", AssetGetChilldrenNodes},
+        {"assetGetNodes", AssetGetNodes},
         {"assetGetNodeMeshes", AssetGetNodeMeshes},
         {"assetGetTextures", AssetGetTextures},
         {"assetRender", AssetRender},
@@ -348,7 +348,7 @@ int CLuaAssetModelDefs::AssetGetTextures(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
+int CLuaAssetModelDefs::AssetGetNodes(lua_State* luaVM)
 {
     CClientAssetModel* pAssetModel = nullptr;
     CLuaAssetNode*     pAssetNode = nullptr;
@@ -398,7 +398,7 @@ int CLuaAssetModelDefs::AssetGetChilldrenNodes(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
 {
-    //  bool assetRender ( asset-node theAssetNode, position, rotation, scale, options  )
+    //  bool assetRender ( asset-node theAssetNode, position, rotation, scale )
     CLuaAssetNode*   pAssetNode = nullptr;
     unsigned int     uiGroup;
     CVector          vecPosition;
@@ -412,24 +412,15 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     if (argStream.NextIsVector3D())
         argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
 
-    argStream.ReadNumber(uiGroup, 0);
-
     if (!argStream.HasErrors())
     {
-        CVector cameraPosition;
-        m_pManager->GetCamera()->GetPosition(cameraPosition);
-        //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
-        //if (pGroup->GetEffectiveDrawDistance() >= DistanceBetweenPoints3D(cameraPosition, vecPosition))
-        //{
-        //    SRenderingSettings settings;
-        //    settings.matrix.SetPosition(vecPosition);
-        //    ConvertDegreesToRadiansNoWrap(vecRotation);
-        //    settings.matrix.SetRotation(vecRotation);
-        //    settings.matrix.SetScale(vecScale);
-        //    settings.uiGroup = uiGroup;
-        //    settings.assetNode = (CLuaAssetNodeInterface*)pAssetNode;
-        //    g_pCore->GetGraphics()->DrawAssetNode(settings);
-        //}
+        std::unique_ptr<SRenderAssetItem> settings = std::make_unique<SRenderAssetItem>();
+        settings->matrix.SetPosition(vecPosition);
+        ConvertDegreesToRadiansNoWrap(vecRotation);
+        settings->matrix.SetRotation(vecRotation);
+        settings->matrix.SetScale(vecScale);
+        settings->assetNode = (CLuaAssetNodeInterface*)pAssetNode;
+        g_pCore->GetGraphics()->DrawAssetNode(std::move(settings));
         lua_pushboolean(luaVM, true);
         return 1;
     }
