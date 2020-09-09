@@ -38,6 +38,4 @@ void CLuaPhysicsShapeManager::RemoveShape(CLuaPhysicsShape* pShape)
 
     // Remove all references
     ListRemove(m_ShapeList, pShape);
-
-    delete pShape;
 }

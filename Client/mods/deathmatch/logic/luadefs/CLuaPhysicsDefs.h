@@ -15,8 +15,8 @@
 
 class CLuaPhysicsElement;
 class CLuaPhysicsCompoundShape;
-class CLuaPhysicsElement;
 class CLuaPhysicsShape;
+class CLuaPhysicsPointToPointConstraint;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -49,6 +49,14 @@ public:
                                                         std::optional<CVector> vecCenterOfMass);
     static bool                  PhysicsAddChildShape(CLuaPhysicsCompoundShape* pCompoundShape, CLuaPhysicsShape* pShape, std::optional<CVector> vecPosition,
                                                       std::optional<CVector> vecRotation);
+
+    static CLuaPhysicsPointToPointConstraint* PhysicsCreatePointToPointConstraintVariantA(ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBodyA,
+                                                                                  CLuaPhysicsRigidBody* pRigidBodyB, CVector& anchorA, CVector& anchorB,
+                                                                                  std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
+
+    static CLuaPhysicsPointToPointConstraint* PhysicsCreatePointToPointConstraintVariantB(ePhysicsConstraint eConstraint, CLuaPhysicsRigidBody* pRigidBody,
+                                                                                          CVector& position, CVector& anchor,
+                                                                                          std::optional<bool> bDisableCollisionsBetweenLinkedBodies);
 
     LUA_DECLARE(PhysicsCreateShape);
     LUA_DECLARE(PhysicsSetProperties);

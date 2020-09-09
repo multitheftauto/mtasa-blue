@@ -99,10 +99,10 @@ void CClientPhysics::SetUseContinous(bool bUse)
 std::unique_ptr<CLuaPhysicsStaticCollision> CClientPhysics::CreateStaticCollisionFromModel(unsigned short usModelId, CVector vecPosition, CVector vecRotation)
 {
     std::unique_ptr<CLuaPhysicsShape> pShape = CreateShapeFromModel(usModelId);
-    if (pShape == nullptr)
-        return nullptr;
+    if (pShape.get() == nullptr)
+        return std::unique_ptr<CLuaPhysicsStaticCollision>(nullptr);
 
-    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape.release());
+    std::unique_ptr<CLuaPhysicsStaticCollision> pStaticCollision = std::make_unique<CLuaPhysicsStaticCollision>(pShape.get());
     pStaticCollision->SetPosition(vecPosition);
     pStaticCollision->SetRotation(vecRotation);
     return pStaticCollision;
