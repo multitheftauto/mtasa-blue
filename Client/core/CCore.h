@@ -84,25 +84,26 @@ public:
     ~CCore();
 
     // Subsystems (query)
-    eCoreVersion            GetVersion();
-    CConsoleInterface*      GetConsole();
-    CCommandsInterface*     GetCommands();
-    CConnectManager*        GetConnectManager() { return m_pConnectManager; };
-    CGame*                  GetGame();
-    CGUI*                   GetGUI();
-    CGraphicsInterface*     GetGraphics();
-    CModManagerInterface*   GetModManager();
-    CMultiplayer*           GetMultiplayer();
-    CNet*                   GetNetwork();
-    CXML*                   GetXML() { return m_pXML; };
-    CXMLNode*               GetConfig();
-    CClientVariables*       GetCVars() { return &m_ClientVariables; };
-    CKeyBindsInterface*     GetKeyBinds();
-    CMouseControl*          GetMouseControl() { return m_pMouseControl; };
-    CLocalGUI*              GetLocalGUI();
-    CLocalizationInterface* GetLocalization() { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore();
-    CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
+    eCoreVersion              GetVersion();
+    CConsoleInterface*        GetConsole();
+    CCommandsInterface*       GetCommands();
+    CConnectManager*          GetConnectManager() { return m_pConnectManager; };
+    CGame*                    GetGame();
+    CGUI*                     GetGUI();
+    CGraphicsInterface*       GetGraphics();
+    CModManagerInterface*     GetModManager();
+    CMultiplayer*             GetMultiplayer();
+    CNet*                     GetNetwork();
+    CXML*                     GetXML() { return m_pXML; };
+    CXMLNode*                 GetConfig();
+    CClientVariables*         GetCVars() { return &m_ClientVariables; };
+    CKeyBindsInterface*       GetKeyBinds();
+    CMouseControl*            GetMouseControl() { return m_pMouseControl; };
+    CLocalGUI*                GetLocalGUI();
+    CLocalizationInterface*   GetLocalization() { return g_pLocalization; };
+    CWebCoreInterface*        GetWebCore();
+    CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
+    CDiscordManagerInterface* GetDiscordManager() { return reinterpret_cast<CDiscordManagerInterface*>(m_DiscordManager.get()); }
     CAssetsManagerInterface* GetAssetsManager() { return m_pAssets; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
@@ -228,6 +229,8 @@ public:
     uint GetMinStreamingMemory();
     uint GetMaxStreamingMemory();
 
+    void ResetDiscordRichPresence();
+
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
     bool    bScreenShot;
@@ -298,6 +301,8 @@ private:
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
     CAssetsManager*    m_pAssets;
+
+    std::unique_ptr<class CDiscordManager> m_DiscordManager;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;

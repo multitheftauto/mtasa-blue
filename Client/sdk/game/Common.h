@@ -1536,6 +1536,13 @@ enum eVehicleDummies
     VEH_GUN,
 };
 
+enum class eResizableVehicleWheelGroup
+{
+    FRONT_AXLE = 0,
+    REAR_AXLE,
+    ALL_WHEELS = 0xFF,
+};
+
 enum eObjectProperty
 {
     OBJECT_PROPERTY_ALL,

@@ -151,7 +151,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 
 void CLuaManager::LoadCFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
         {"getPlayerRotation", CLuaPedDefs::GetPedRotation},
         {"canPlayerBeKnockedOffBike", CLuaPedDefs::CanPedBeKnockedOffBike},
@@ -316,6 +316,7 @@ void CLuaManager::LoadCFunctions()
         {"setGarageOpen", CLuaFunctionDefs::SetGarageOpen},
         {"setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled},
         {"setBlurLevel", CLuaFunctionDefs::SetBlurLevel},
+        {"resetBlurLevel", CLuaFunctionDefs::ResetBlurLevel},
         {"setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight},
         {"setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled},
         {"setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState},
@@ -404,10 +405,8 @@ void CLuaManager::LoadCFunctions()
     };
 
     // Add all functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 
     // Luadef definitions
     CLuaAudioDefs::LoadFunctions();

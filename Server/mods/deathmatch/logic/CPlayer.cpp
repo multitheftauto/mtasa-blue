@@ -39,7 +39,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
-    m_ucDriveByDirection = 0;
+    m_ucDriveByDirection = eVehicleAimDirection::FORWARDS;
     m_bAkimboArmUp = false;
 
     m_VoiceState = VOICESTATE_IDLE;
@@ -214,6 +214,42 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
         return true;
 #endif
     return false;
+}
+
+bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
+{
+    OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
+{
+    OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
+    return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
+}
+
+bool CPlayer::UnsubscribeElementData(CElement* pElement)
+{
+    bool erased = false;
+
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    {
+        if (it->first == pElement)
+        {
+            OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
+            it = m_DataSubscriptions.erase(it);
+            erased = true;
+        }
+        else
+            ++it;
+    }
+
+    return erased;
+}
+
+bool CPlayer::IsSubscribed(CElement* pElement, const std::string& strName) const
+{
+    return m_DataSubscriptions.find(std::make_pair(pElement, strName)) != m_DataSubscriptions.end();
 }
 
 const char* CPlayer::GetSourceIP()

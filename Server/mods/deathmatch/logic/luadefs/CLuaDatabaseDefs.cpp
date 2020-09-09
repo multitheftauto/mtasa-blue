@@ -13,7 +13,7 @@
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"dbConnect", DbConnect},
         {"dbExec", DbExec},
         {"dbQuery", DbQuery},
@@ -31,10 +31,8 @@ void CLuaDatabaseDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaDatabaseDefs::AddClass(lua_State* luaVM)

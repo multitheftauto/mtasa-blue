@@ -13,7 +13,7 @@
 
 void CLuaPlayerDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Player get funcs
         {"getPlayerCount", GetPlayerCount},
         {"getPlayerFromNick", GetPlayerFromName},
@@ -43,7 +43,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerACInfo", GetPlayerACInfo},
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
-        {"getPlayerScriptDebugLevel", GetPlayerScriptDebugLevel},
+        {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -60,11 +60,12 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
         {"setPlayerMuted", SetPlayerMuted},
         {"setPlayerBlurLevel", SetPlayerBlurLevel},
+        {"setPlayerDiscordJoinParams", SetPlayerDiscordJoinParams},
         {"redirectPlayer", RedirectPlayer},
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
-        {"setPlayerScriptDebugLevel", SetPlayerScriptDebugLevel},
+        {"setPlayerScriptDebugLevel", ArgumentParser<SetPlayerScriptDebugLevel>},
 
         // All seeing eye
         {"getPlayerAnnounceValue", GetPlayerAnnounceValue},
@@ -101,10 +102,8 @@ void CLuaPlayerDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPlayerDefs::AddClass(lua_State* luaVM)
@@ -141,6 +140,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMuted", "setPlayerMuted");
     lua_classfunction(luaVM, "setName", "setPlayerName");
     lua_classfunction(luaVM, "setBlurLevel", "setPlayerBlurLevel");
+    lua_classfunction(luaVM, "setDiscordJoinParams", "setPlayerDiscordJoinParams");
     lua_classfunction(luaVM, "setWantedLevel", "setPlayerWantedLevel");
     lua_classfunction(luaVM, "setMoney", "setPlayerMoney");
     lua_classfunction(luaVM, "setNametagText", "setPlayerNametagText");
@@ -200,10 +200,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
     lua_classvariable(luaVM, "scriptDebugLevel", "setPlayerScriptDebugLevel", "getPlayerScriptDebugLevel");
-    // lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaPlayerDefs::SetPlayerNametagColor,
-    // OOP_GetPlayerNametagColor ); lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue",
-    // CLuaPlayerDefs::SetPlayerAnnounceValue, OOP_GetPlayerAnnounceValue ); // .announceValue[key]=value lua_classvariable ( luaVM, "hudComponent",
-    // "setHudComponentVisible", "", CLuaOOPDefs::SetHudComponentVisible, NULL ); .hudComponent["radar"]=true (a get function to needs to be implemented too)
 
     lua_registerclass(luaVM, "Player", "Ped");
 }
@@ -946,47 +942,23 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
+bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const std::variant<unsigned int, bool> variant)
 {
-    CElement*    pElement;
-    unsigned int uiMode;
-    bool         bHideDebugger = false;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    if (argStream.NextIsBool())
+    unsigned int level;
+    if (std::holds_alternative<bool>(variant))
     {
-        bool bTemp;
-        argStream.ReadBool(bTemp);
-
-        if (bTemp)
-            argStream.SetCustomError("You can only pass false to hide the debug window or a level (0-3)");
-        else
-            bHideDebugger = true;
+        // cant be a true bool
+        if (std::get<bool>(variant))
+            throw std::invalid_argument("You can only pass 'false' to hide the debug window, pass in a level(0-3) to enable it");
+        level = 0;
     }
     else
     {
-        argStream.ReadNumber(uiMode);
-
-        if (uiMode < 0 || uiMode > 3)
-            argStream.SetCustomError("Invalid level (0-3)");
+        level = std::get<unsigned int>(variant);
+        if (level > 3)
+            throw std::invalid_argument("Invalid level (0-3)");
     }
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    return CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(element, level);
 }
 
 int CLuaPlayerDefs::SetPlayerWantedLevel(lua_State* luaVM)
@@ -1182,6 +1154,38 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPlayerDefs::SetPlayerDiscordJoinParams(lua_State* luaVM)
+{
+    CElement* pElement;
+    SString   strKey;
+    SString   strPartyId;
+    uint      uiPartySize;
+    uint      uiPartyMax;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strPartyId);
+    argStream.ReadNumber(uiPartySize);
+    argStream.ReadNumber(uiPartyMax);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(pElement, strKey, strPartyId, uiPartySize, uiPartyMax))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1479,31 +1483,9 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::GetPlayerScriptDebugLevel(lua_State* luaVM)
+unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 {
-    // int getPlayerScriptDebugLevel ( player thePlayer )
-    CPlayer* pPlayer;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    unsigned int uiLevel;
-
-    if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
-    {
-        lua_pushnumber(luaVM, uiLevel);
-        return 1;
-    }
-    else
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    return player->GetScriptDebugLevel();
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
@@ -1978,7 +1960,7 @@ int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
 
     if (argStream.NextIsUserData())
     {
-        CPlayer* pResponsible;
+        CClient* pResponsible;
         argStream.ReadUserData(pResponsible);
         if (!argStream.HasErrors())
         {

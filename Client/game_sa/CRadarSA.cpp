@@ -175,20 +175,11 @@ VOID CRadarSA::ClearMarkerForEntity(CPed* ped)
     }
 }
 
-struct CRect
-{
-    float fX1, fY1, fX2, fY2;
-};
-
 VOID CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color)
 {
     // Convert color to required abgr at the last moment
     unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
-    CRect         myRect;
-    myRect.fX1 = fX1;
-    myRect.fY1 = fY1;
-    myRect.fX2 = fX2;
-    myRect.fY2 = fY2;
+    CRect         myRect(fX1, fY2, fX2, fY1);
     DWORD dwFunc = FUNC_DrawAreaOnRadar;
     _asm
     {

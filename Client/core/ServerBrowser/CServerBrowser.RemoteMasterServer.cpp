@@ -322,11 +322,8 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
         }
     }
 
-#if MTA_DEBUG
     OutputDebugLine(
         SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
-#endif
-
     return true;
 }
 

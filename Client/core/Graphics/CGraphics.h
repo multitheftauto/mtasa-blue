@@ -164,7 +164,7 @@ public:
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
 
-    void DrawWiredSphere(CVector vecPosition, float radius, SColorARGB color, float fLineWidth, int iterations);
+    void DrawWiredSphere(CVector vecPosition, float radius, SColor color, float fLineWidth, int iterations);
     void DrawAssetNode(SRenderingSettings& settings);
 
 
