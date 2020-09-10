@@ -3,37 +3,44 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaAssetMesh.h
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua asset mesh class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 class CLuaAssetMesh;
+class CClientAssetModel;
+class aiMesh;
 
 #pragma once
-class aiMesh;
-class CClientAssetModel;
-// Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
 class CLuaAssetMesh
 {
 public:
-    CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh);
+    CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh, std::shared_ptr<CLuaAssetNode> pNode);
     ~CLuaAssetMesh();
 
     void RemoveScriptID();
 
     uint                  GetScriptID() const { return m_uiScriptID; }
-    CClientMeshBuffer*    GetMeshBuffer() const { return m_pMeshBuffer; }
+    CClientMeshBuffer*    GetMeshBuffer() const { return m_pMeshBuffer.get(); }
     static CLuaAssetMesh* GetFromScriptID(unsigned int uiScriptID);
-    int                   GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
+    std::shared_ptr<CLuaAssetNode> GetNode() const { return m_pNode; };
 
+    unsigned int                 GetVerticesCount() const;
+    unsigned int                 GetFacesCount() const;
+    void                         GetUVComponentsCount(const unsigned int* pComponents) const;
+    unsigned int                 GetUVChannels() const;
+    unsigned int                 GetColorChannelsCount() const;
+    unsigned int                 GetBonesCount() const;
+    std::tuple<CVector, CVector> GetBoundingBox() const;
 private:
     CClientAssetModel* m_pAssetModel;
     const aiMesh* m_pMesh;
     uint m_uiScriptID;
-    CClientMeshBuffer* m_pMeshBuffer;
+    std::shared_ptr<CLuaAssetNode>      m_pNode;
+    std::unique_ptr<CClientMeshBuffer> m_pMeshBuffer;
 };

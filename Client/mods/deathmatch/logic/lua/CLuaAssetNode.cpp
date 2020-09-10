@@ -23,6 +23,7 @@ CLuaAssetNode::CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETNODE);
     m_pAssetModel = pAssetModel;
     m_pNode = pNode;
+    m_vecMeshes = pAssetModel->GetMeshesOfNode(this);
 }
 
 CLuaAssetNode::~CLuaAssetNode()
@@ -96,9 +97,7 @@ CLuaAssetNode* CLuaAssetNode::GetFromScriptID(unsigned int uiScriptID)
 CMatrix convertAiMatrixToCMatrix(const aiMatrix4x4& aiMatrix)
 {
     CMatrix matrix;
-    float*  pBuffer = (float*)malloc(sizeof(float) * 16);
-    matrix.GetBuffer(pBuffer);
-    memcpy(pBuffer, &aiMatrix.a1, sizeof(float) * 16);
+    memcpy(&matrix, &aiMatrix.a1, sizeof(float) * 16);
     return matrix;
 }
 
@@ -121,6 +120,26 @@ aiAABB CLuaAssetNode::GetBoundingBox()
     return NodeAABB;
 }
 
+std::tuple<CVector, CVector> CLuaAssetNode::GetCVectorBoundingBox()
+{
+    const aiScene* pScene = m_pAssetModel->GetScene();
+    aiAABB         NodeAABB;
+    CVector        min;
+    CVector        max;
+    for (int i = 0; i < m_pNode->mNumMeshes; i++)
+    {
+        // something wrong TODO
+        NodeAABB = pScene->mMeshes[m_pNode->mMeshes[i]]->mAABB;
+        min.fX = std::min(NodeAABB.mMin.x, min.fX);
+        min.fY = std::min(NodeAABB.mMin.y, min.fY);
+        min.fZ = std::min(NodeAABB.mMin.z, min.fZ);
+        max.fX = std::max(NodeAABB.mMax.x, max.fX);
+        max.fY = std::max(NodeAABB.mMax.y, max.fY);
+        max.fZ = std::max(NodeAABB.mMax.z, max.fZ);
+    }
+    return {min, max};
+}
+
 std::vector<CLuaAssetNode*> CLuaAssetNode::GetChildNodes()
 {
     std::vector<CLuaAssetNode*> vecChildNodes;
@@ -131,64 +150,6 @@ std::vector<CLuaAssetNode*> CLuaAssetNode::GetChildNodes()
     }
 
     return vecChildNodes;
-}
-
-int CLuaAssetNode::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
-{
-    CVector vector;
-    aiAABB  AABB;
-    switch (assetProperty)
-    {
-        case ASSET_NAME:
-            lua_pushstring(luaVM, m_pNode->mName.C_Str());
-            return 1;
-        case ASSET_POSITION:
-            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetPosition();
-            lua_pushnumber(luaVM, vector.fX);
-            lua_pushnumber(luaVM, vector.fY);
-            lua_pushnumber(luaVM, vector.fZ);
-            return 3;
-        case ASSET_ROTATION:
-            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetRotation();
-            lua_pushnumber(luaVM, vector.fX);
-            lua_pushnumber(luaVM, vector.fY);
-            lua_pushnumber(luaVM, vector.fZ);
-            return 3;
-        case ASSET_SCALE:
-            vector = convertAiMatrixToCMatrix(m_pNode->mTransformation).GetScale();
-            lua_pushnumber(luaVM, vector.fX);
-            lua_pushnumber(luaVM, vector.fY);
-            lua_pushnumber(luaVM, vector.fZ);
-            return 3;
-        case ASSET_MESHES_COUNT:
-            lua_pushnumber(luaVM, m_pNode->mNumMeshes);
-            return 1;
-        case ASSET_CHILD_NODES_COUNT:
-            lua_pushnumber(luaVM, m_pNode->mNumChildren);
-            return 1;
-        case ASSET_PARENT_NODE:
-            if (m_pNode->mParent != nullptr)
-            {
-                lua_pushassetnode(luaVM, m_pAssetModel->GetNode(m_pNode->mParent));
-            }
-            else
-            {
-                lua_pushboolean(luaVM, false);
-            }
-            return 1;
-        case ASSET_BOUNDING_BOX:
-            AABB = GetBoundingBox();
-            lua_pushnumber(luaVM, AABB.mMin.x);
-            lua_pushnumber(luaVM, AABB.mMin.y);
-            lua_pushnumber(luaVM, AABB.mMin.z);
-            lua_pushnumber(luaVM, AABB.mMax.x);
-            lua_pushnumber(luaVM, AABB.mMax.y);
-            lua_pushnumber(luaVM, AABB.mMax.z);
-            return 6;
-        default:
-            lua_pushboolean(luaVM, false);
-            return 1;
-    }
 }
 
 void CLuaAssetNode::GetMetaData(lua_State* luaVM)
@@ -252,4 +213,17 @@ void CLuaAssetNode::GetMetaData(lua_State* luaVM)
         }
         lua_settable(luaVM, -3);
     }
+}
+
+CVector CLuaAssetNode::GetPosition() const
+{
+    return convertAiMatrixToCMatrix(m_pNode->mTransformation).GetPosition();
+}
+CVector CLuaAssetNode::GetRotation() const
+{
+    return convertAiMatrixToCMatrix(m_pNode->mTransformation).GetRotation();
+}
+CVector CLuaAssetNode::GetScale() const
+{
+    return convertAiMatrixToCMatrix(m_pNode->mTransformation).GetScale();
 }

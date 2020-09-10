@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 #include "../lua/CLuaAssetNode.h"
 #include "../lua/CLuaAssetMesh.h"
 #include "core/CLuaAssetNodeInterface.h"
@@ -19,9 +20,10 @@ void CLuaAssetModelDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"loadAssetModel", LoadAssetModel},
-        {"getAssetProperties", GetAssetProperties},
+        {"getAssetProperties", ArgumentParser<GetAssetModelProperty>},
+        //{"getAssetProperties", ArgumentParser<GetAssetModelProperty, GetAssetNodeProperty, GetAssetMeshProperty>},
         {"assetGetNodes", AssetGetNodes},
-        {"assetGetNodeMeshes", AssetGetNodeMeshes},
+        //{"assetGetNodeMeshes", ArgumentParser<AssetGetModelMeshes, AssetGetNodeMeshes>},
         {"assetGetTextures", AssetGetTextures},
         {"assetRender", AssetRender},
         {"assetSetTexture", AssetSetTexture},
@@ -215,92 +217,107 @@ int CLuaAssetModelDefs::LoadAssetModel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAssetModelDefs::GetAssetProperties(lua_State* luaVM)
+unsigned int CLuaAssetModelDefs::GetAssetModelProperty(CClientAssetModel* pModel, eAssetProperty eProperty)
 {
-    //  float GetAssetProperties ( searchlight light )
-    CClientAssetModel* pAssetModel = nullptr;
-    CLuaAssetNode*     pAssetNode = nullptr;
-    CLuaAssetMesh*     pAssetMesh = nullptr;
-    eAssetProperty     eProperty;
-    CScriptArgReader   argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
-        argStream.ReadUserData(pAssetModel);
-    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
-        argStream.ReadUserData(pAssetNode);
-    else if (argStream.NextIsUserDataOfType<CLuaAssetMesh>())
-        argStream.ReadUserData(pAssetMesh);
+    if (!pModel->IsLoaded())
+        throw std::invalid_argument("Model is not loaded yet.");
 
-    argStream.ReadEnumString(eProperty);
-
-    if (!argStream.HasErrors())
+    switch (eProperty)
     {
-        int i;
-        if (pAssetModel != nullptr)
-        {
-            if (!pAssetModel->IsLoaded())
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-            i = pAssetModel->GetProperties(luaVM, eProperty);
-        }
-        else if (pAssetNode != nullptr)
-            i = pAssetNode->GetProperties(luaVM, eProperty);
-        else if (pAssetMesh != nullptr)
-            i = pAssetMesh->GetProperties(luaVM, eProperty);
-
-        return i;
+        case ASSET_ANIMATIONS_COUNT:
+            return pModel->GetAnimationsCount();
+        case ASSET_CAMERAS_COUNT:
+            return pModel->GetCamerasCount();
+        case ASSET_LIGHTS_COUNT:
+            return pModel->GetLightsCount();
+        case ASSET_MATERIALS_COUNT:
+            return pModel->GetMaterialsCount();
+        case ASSET_MESHES_COUNT:
+            return pModel->GetMeshesCount();
+        case ASSET_TEXTURES_COUNT:
+            return pModel->GetTexturesCount();
+        case ASSET_NODES_COUNT:
+            return pModel->GetNodesCount();
+        default:
+            throw std::invalid_argument("Unsupported property");
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
-int CLuaAssetModelDefs::AssetGetNodeMeshes(lua_State* luaVM)
+std::variant<unsigned int, float, std::tuple<CVector, CVector>, const char*, CVector, CLuaAssetNode*> CLuaAssetModelDefs::GetAssetNodeProperty(
+    CLuaAssetNode* pNode, eAssetProperty eProperty)
 {
-    CClientAssetModel* pAssetModel = nullptr;
-    CLuaAssetNode*     pAssetNode = nullptr;
-    eAssetProperty     eProperty;
-    CScriptArgReader   argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
-        argStream.ReadUserData(pAssetModel);
-    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
-        argStream.ReadUserData(pAssetNode);
-
-    if (!argStream.HasErrors())
+    switch (eProperty)
     {
-        if (pAssetModel != nullptr)
-        {
-            if (!pAssetModel->IsLoaded())
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-            pAssetModel->GetMeshes(luaVM);
-            return 1;
-        }
-        else
-        {
-            // std::vector<CLuaAssetNode*> childNodes = pAssetNode->GetChildNodes();
-            // lua_newtable(luaVM);
-            // for (int i = 0; i < childNodes.size(); i++)
-            //{
-            //    lua_pushnumber(luaVM, i + 1);
-            //    lua_pushassetnode(luaVM, childNodes[i]);
-            //    lua_settable(luaVM, -3);
-            //}
-            return 1;
-        }
-        lua_pushboolean(luaVM, false);
-        return 1;
+        case ASSET_NAME:
+            return pNode->GetName();
+        case ASSET_POSITION:
+            return pNode->GetPosition();
+        case ASSET_ROTATION:
+            return pNode->GetRotation();
+        case ASSET_SCALE:
+            return pNode->GetScale();
+        case ASSET_MESHES_COUNT:
+            return pNode->GetMeshesCount();
+        case ASSET_CHILD_NODES_COUNT:
+            return pNode->GetChildrenCount();
+        case ASSET_PARENT_NODE:
+            return pNode->GetParentNode();
+        case ASSET_BOUNDING_BOX:
+            return pNode->GetCVectorBoundingBox();
+        default:
+            throw std::invalid_argument("Unsupported property");
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+}
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+std::variant<unsigned int, std::tuple<CVector, CVector>, std::tuple<CVector4D, CVector4D>> CLuaAssetModelDefs::GetAssetMeshProperty(CLuaAssetMesh* pMesh, eAssetProperty eProperty)
+{
+    switch (eProperty)
+    {
+        case ASSET_VERTICES_COUNT:
+            return pMesh->GetVerticesCount();
+        case ASSET_FACES_COUNT:
+            return pMesh->GetFacesCount();
+        case ASSET_UV_COMPONENTS_COUNT:
+            unsigned int uvComponents[8];
+            pMesh->GetUVComponentsCount(&uvComponents[0]);
+            return std::make_tuple(CVector4D(uvComponents[0], uvComponents[1], uvComponents[2], uvComponents[3]),CVector4D(uvComponents[4], uvComponents[5], uvComponents[6],
+                                   uvComponents[7]));
+        case ASSET_UV_CHANNELS:
+            return pMesh->GetUVChannels();
+        case ASSET_COLOR_CHANNELS:
+            return pMesh->GetColorChannelsCount();
+        case ASSET_BONES_COUNT:
+            return pMesh->GetBonesCount();
+        case ASSET_BOUNDING_BOX:
+            return pMesh->GetBoundingBox();
+        default:
+            throw std::invalid_argument("Unsupported property");
+    }
+}
+
+std::variant<bool, std::vector<CLuaAssetMesh*>> CLuaAssetModelDefs::AssetGetModelMeshes(CClientAssetModel* pAssetModel)
+{
+    if (!pAssetModel->IsLoaded())
+        return false;
+
+    std::vector<std::shared_ptr<CLuaAssetMesh>> sharedMeshes = pAssetModel->GetMeshes();
+    std::vector<CLuaAssetMesh*> meshes(sharedMeshes.size());
+    for (const auto& item : sharedMeshes)
+    {
+        meshes.push_back(item.get());
+    }
+    return meshes;
+}
+
+std::vector<CLuaAssetMesh*> CLuaAssetModelDefs::AssetGetNodeMeshes(CLuaAssetNode* pAssetNode)
+{
+    std::vector<std::shared_ptr<CLuaAssetMesh>> sharedMeshes = pAssetNode->GetMeshes();
+    std::vector<CLuaAssetMesh*> meshes(sharedMeshes.size());
+    for (const auto& item : sharedMeshes)
+    {
+        meshes.push_back(item.get());
+    }
+    return meshes;
 }
 
 int CLuaAssetModelDefs::AssetGetTextures(lua_State* luaVM)
@@ -323,7 +340,7 @@ int CLuaAssetModelDefs::AssetGetTextures(lua_State* luaVM)
                 lua_pushboolean(luaVM, false);
                 return 1;
             }
-            pAssetModel->GetTextures(luaVM);
+            //pAssetModel->GetTextures(luaVM);
             return 1;
         }
         else
@@ -551,9 +568,9 @@ int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetCreateInstance(lua_State* luaVM)
 {
-    CLuaAssetNode*     pAssetNode = nullptr;
-    eAssetProperty     eProperty;
-    CScriptArgReader   argStream(luaVM);
+    CLuaAssetNode*   pAssetNode = nullptr;
+    eAssetProperty   eProperty;
+    CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
         argStream.ReadUserData(pAssetNode);
     if (!argStream.HasErrors())
@@ -571,21 +588,21 @@ int CLuaAssetModelDefs::AssetCreateInstance(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
 {
-    unsigned int uiGroup;
+    unsigned int            uiGroup;
     eAssetRenderingProperty eProperty;
-    CScriptArgReader   argStream(luaVM);
+    CScriptArgReader        argStream(luaVM);
 
     argStream.ReadNumber(uiGroup);
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
     {
-        //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+        // CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
 
         switch (eProperty)
         {
             case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
             {
-                //lua_pushnumber(luaVM, pGroup->GetDrawDistance());
+                // lua_pushnumber(luaVM, pGroup->GetDrawDistance());
                 return 1;
             }
         }
@@ -599,16 +616,16 @@ int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
 
 int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
 {
-    unsigned int uiGroup;
+    unsigned int            uiGroup;
     eAssetRenderingProperty eProperty;
-    CScriptArgReader   argStream(luaVM);
+    CScriptArgReader        argStream(luaVM);
 
     argStream.ReadNumber(uiGroup);
     argStream.ReadEnumString(eProperty);
     if (!argStream.HasErrors())
     {
-        bool booleanValue;
-        float floatValue;
+        bool    booleanValue;
+        float   floatValue;
         CVector vector;
         if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_BOOL)
         {
@@ -646,17 +663,17 @@ int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            //CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
+            // CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
 
             switch (eProperty)
             {
                 case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
                 {
-                    //pGroup->SetDrawDistance(floatValue);
+                    // pGroup->SetDrawDistance(floatValue);
                     break;
                 }
             }
-            
+
             lua_pushboolean(luaVM, true);
             return 1;
         }

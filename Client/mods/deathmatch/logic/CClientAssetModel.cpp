@@ -31,7 +31,7 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
     // Init
     m_pManager = pManager;
     m_pAssetModelManager = pManager->GetAssetModelManager();
-    m_pProgressHandler = new CAssetProgressHandler();
+    m_pProgressHandler = std::make_unique<CAssetProgressHandler>();
     SetTypeName("asset-model");
 
     m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes | aiProcess_EmbedTextures |
@@ -52,37 +52,6 @@ void CClientAssetModel::Unlink()
     m_pAssetModelManager->RemoveFromList(this);
 }
 
-int CClientAssetModel::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
-{
-    switch (assetProperty)
-    {
-        case ASSET_ANIMATIONS_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumAnimations);
-            return 1;
-        case ASSET_CAMERAS_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumCameras);
-            return 1;
-        case ASSET_LIGHTS_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumLights);
-            return 1;
-        case ASSET_MATERIALS_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumMaterials);
-            return 1;
-        case ASSET_MESHES_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumMeshes);
-            return 1;
-        case ASSET_TEXTURES_COUNT:
-            lua_pushnumber(luaVM, m_pScene->mNumTextures);
-            return 1;
-        case ASSET_NODES_COUNT:
-            lua_pushnumber(luaVM, vecNodes.size());
-            return 1;
-        default:
-            lua_pushboolean(luaVM, false);
-            return 1;
-    }
-}
-
 CLuaAssetNode* CClientAssetModel::GetNode(const aiNode* pNode)
 {
     if (pNode == nullptr)
@@ -90,41 +59,28 @@ CLuaAssetNode* CClientAssetModel::GetNode(const aiNode* pNode)
 
     for (const auto& pAssetNode : m_vecAssetNodes)
         if (pAssetNode->GetNode() == pNode)
-            return pAssetNode;
+            return pAssetNode.get();
 
     return nullptr;
 }
 
-void CClientAssetModel::GetMeshes(lua_State* luaVM)
+
+void CClientAssetModel::CacheNodesAndMeshes(const aiNode* pNode)
 {
-    lua_newtable(luaVM);
-    for (int i = 0; i < m_vecAssetMeshes.size(); i++)
+    for (int i = 0; i < pNode->mNumChildren; i++)
     {
-        lua_pushnumber(luaVM, i + 1);
-        lua_pushassetmesh(luaVM, m_vecAssetMeshes[i]);
-        lua_settable(luaVM, -3);
+        vecNodes.push_back(pNode->mChildren[i]);
+        CacheNodesAndMeshes(pNode->mChildren[i]);
     }
+    std::shared_ptr<CLuaAssetNode> pAssetNode = std::make_shared<CLuaAssetNode>(this, pNode);
+    for (int i = 0; i < pNode->mNumMeshes; i++)
+    {
+        std::shared_ptr<CLuaAssetMesh> pMesh = std::make_shared<CLuaAssetMesh>(this, m_pScene->mMeshes[i], pAssetNode);
+        m_vecAssetMeshes.push_back(pMesh);
+    }
+    m_vecAssetNodes.push_back(pAssetNode);
 }
 
-void CClientAssetModel::GetTextures(lua_State* luaVM)
-{
-    lua_newtable(luaVM);
-    for (int i = 0; i < m_vecAssetTextures.size(); i++)
-    {
-        lua_pushnumber(luaVM, i + 1);
-        lua_pushelement(luaVM, m_vecAssetTextures[i].pClientTexture);
-        lua_settable(luaVM, -3);
-    }
-}
-
-void CClientAssetModel::CacheMeshes()
-{
-    m_vecAssetMeshes.reserve(m_pScene->mNumMeshes);
-    for (int i = 0; i < m_pScene->mNumMeshes; i++)
-    {
-        m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
-    }
-}
 void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialIndex)
 {
     if (iMaterialIndex >= 0 && iMaterialIndex < m_pScene->mNumMaterials)
@@ -255,38 +211,34 @@ void CClientAssetModel::CacheTextures(CResource* pParentResource)
     // m_vecAssetMeshes.push_back(new CLuaAssetMesh(this, m_pScene->mMeshes[i]));
 }
 
-void CClientAssetModel::CacheNodes(const aiNode* pNode)
-{
-    for (int i = 0; i < pNode->mNumChildren; i++)
-    {
-        vecNodes.push_back(pNode->mChildren[i]);
-        CacheNodes(pNode->mChildren[i]);
-    }
-    m_vecAssetNodes.push_back(new CLuaAssetNode(this, pNode));
-}
-
 const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
 {
-    importer.SetProgressHandler(m_pProgressHandler);
-    m_pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
-    if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
+    importer.SetProgressHandler(m_pProgressHandler.get());
+    const aiScene* pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
+    if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
     {
         return importer.GetErrorString();
     }
 
+    std::unique_ptr<const aiScene> pointer;
+    pointer.reset(pScene);
+    m_pScene = std::move(pointer);
     m_bModelLoaded = true;
     return "";
 }
 
 const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
-    importer.SetProgressHandler(m_pProgressHandler);
-    m_pScene = importer.ReadFile(strPath, m_uiImportFlags);
+    importer.SetProgressHandler(m_pProgressHandler.get());
+    const aiScene* pScene = importer.ReadFile(strPath, m_uiImportFlags);
     if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
     {
         return importer.GetErrorString();
     }
 
+    std::unique_ptr<const aiScene> pointer;
+    pointer.reset(pScene);
+    m_pScene = std::move(pointer);
     m_bModelLoaded = true;
     return "";
 }
@@ -307,10 +259,20 @@ bool CClientAssetModel::SetTexture(int idx, CClientMaterial* pMaterial)
     return false;
 }
 
+std::vector<std::shared_ptr<CLuaAssetMesh>> CClientAssetModel::GetMeshesOfNode(CLuaAssetNode* pNode)
+{
+    std::vector<std::shared_ptr<CLuaAssetMesh>> vecMeshes;
+    for (const auto& mesh : m_vecAssetMeshes)
+    {
+        if (mesh->GetNode().get() == pNode)
+            vecMeshes.push_back(mesh);
+    }
+    return vecMeshes;
+}
+
 void CClientAssetModel::Cache()
 {
-    CacheNodes(m_pScene->mRootNode);
-    CacheMeshes();
+    CacheNodesAndMeshes(m_pScene->mRootNode);
 }
 
 void CClientAssetModel::DoPulse()

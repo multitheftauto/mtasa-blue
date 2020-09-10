@@ -19,9 +19,18 @@ public:
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(LoadAssetModel);
-    LUA_DECLARE(GetAssetProperties);
+
+    static unsigned int GetAssetModelProperty(CClientAssetModel* pModel, eAssetProperty eProperty);
+    static std::variant<unsigned int, float, std::tuple<CVector, CVector>, const char*, CVector, CLuaAssetNode*> GetAssetNodeProperty(CLuaAssetNode* pNode,
+                                                                                                                                      eAssetProperty eProperty);
+    static std::variant<unsigned int, std::tuple<CVector, CVector>,
+                        std::tuple<CVector4D, CVector4D>> GetAssetMeshProperty(CLuaAssetMesh* pMesh, eAssetProperty eProperty);
+
+    static std::variant<bool, std::vector<CLuaAssetMesh*>> AssetGetModelMeshes(CClientAssetModel* pAssetModel);
+    static std::vector<CLuaAssetMesh*>                     AssetGetNodeMeshes(CLuaAssetNode* pAssetNode);
+
+
     LUA_DECLARE(AssetGetNodes);
-    LUA_DECLARE(AssetGetNodeMeshes);
     LUA_DECLARE(AssetGetTextures);
     LUA_DECLARE(AssetRender);
     LUA_DECLARE(AssetSetTexture);

@@ -370,6 +370,10 @@ inline SString GetClassTypeName(CGUIWebBrowser*)
 {
     return "gui-browser";
 }
+inline SString GetClassTypeName(CClientAssetModel*)
+{
+    return "asset-model";
+}
 
 inline SString GetClassTypeName(CResource*)
 {

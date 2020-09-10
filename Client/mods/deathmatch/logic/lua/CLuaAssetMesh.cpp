@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaAssetMesh.cpp
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua asset mesh class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -17,11 +17,13 @@ using namespace Assimp;
 #include "StdInc.h"
 #include "CLuaAssetMesh.h"
 
-CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh)
+CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh, std::shared_ptr<CLuaAssetNode> pNode)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETMESH);
     m_pAssetModel = pAssetModel;
     m_pMesh = pMesh;
+    m_pNode = pNode;
+
     std::vector<int> indices;
     aiFace*          face;
     for (int i = 0; i < m_pMesh->mNumFaces; i++)
@@ -33,7 +35,7 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
         }
     }
 
-    m_pMeshBuffer = new CClientMeshBuffer();
+    m_pMeshBuffer = std::make_unique<CClientMeshBuffer>();
     m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_XYZ);
     if (m_pMesh->GetNumUVChannels() > 0 && m_pMesh->HasTextureCoords(0))
     {
@@ -53,7 +55,6 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
 CLuaAssetMesh::~CLuaAssetMesh()
 {
     RemoveScriptID();
-    delete m_pMeshBuffer;
 }
 
 void CLuaAssetMesh::RemoveScriptID()
@@ -71,44 +72,32 @@ CLuaAssetMesh* CLuaAssetMesh::GetFromScriptID(unsigned int uiScriptID)
     return pLuaMesh;
 }
 
-int CLuaAssetMesh::GetProperties(lua_State* luaVM, eAssetProperty assetProperty)
+unsigned int CLuaAssetMesh::GetVerticesCount() const
 {
-    switch (assetProperty)
-    {
-        case ASSET_VERTICES_COUNT:
-            lua_pushnumber(luaVM, m_pMesh->mNumVertices);
-            return 1;
-        case ASSET_FACES_COUNT:
-            lua_pushnumber(luaVM, m_pMesh->mNumFaces);
-            return 1;
-        case ASSET_UV_COMPONENTS_COUNT:
-            lua_newtable(luaVM);
-            for (int i = 0; i < 8; i++)
-            {
-                lua_pushnumber(luaVM, i + 1);
-                lua_pushnumber(luaVM, m_pMesh->mNumUVComponents[i]);
-                lua_settable(luaVM, -3);
-            }
-            return 1;
-        case ASSET_UV_CHANNELS:
-            lua_pushnumber(luaVM, m_pMesh->GetNumUVChannels());
-            return 1;
-        case ASSET_COLOR_CHANNELS:
-            lua_pushnumber(luaVM, m_pMesh->GetNumColorChannels());
-            return 1;
-        case ASSET_BONES_COUNT:
-            lua_pushnumber(luaVM, m_pMesh->mNumBones);
-            return 1;
-        case ASSET_BOUNDING_BOX:
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.x);
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.y);
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMin.z);
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.x);
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.y);
-            lua_pushnumber(luaVM, m_pMesh->mAABB.mMax.z);
-            return 6;
-        default:
-            lua_pushboolean(luaVM, false);
-            return 1;
-    }
+    return m_pMesh->mNumVertices;
+}
+unsigned int CLuaAssetMesh::GetFacesCount() const
+{
+    return m_pMesh->mNumFaces;
+}
+void CLuaAssetMesh::GetUVComponentsCount(const unsigned int* pComponents) const
+{
+    pComponents = &m_pMesh->mNumUVComponents[0];
+}
+unsigned int CLuaAssetMesh::GetUVChannels() const
+{
+    return m_pMesh->GetNumUVChannels();
+}
+unsigned int CLuaAssetMesh::GetColorChannelsCount() const
+{
+    return m_pMesh->GetNumColorChannels();
+}
+unsigned int CLuaAssetMesh::GetBonesCount() const
+{
+    return m_pMesh->mNumBones;
+}
+std::tuple<CVector, CVector> CLuaAssetMesh::GetBoundingBox() const
+{
+    return {CVector(m_pMesh->mAABB.mMin.x, m_pMesh->mAABB.mMin.y, m_pMesh->mAABB.mMin.z),
+            CVector(m_pMesh->mAABB.mMax.x, m_pMesh->mAABB.mMax.y, m_pMesh->mAABB.mMax.z)};
 }

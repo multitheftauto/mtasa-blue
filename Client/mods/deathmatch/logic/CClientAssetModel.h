@@ -74,17 +74,19 @@ public:
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
 
     void DoPulse();
-    void GetMeshes(lua_State* luaVM);
-    void GetTextures(lua_State* luaVM);
+    std::vector<std::shared_ptr<CLuaAssetNode>> GetNodes() const { return m_vecAssetNodes; }
+    std::vector<std::shared_ptr<CLuaAssetMesh>> GetMeshes() const { return m_vecAssetMeshes; }
+    std::vector<SAssetTexture> GetTextures() const { return m_vecAssetTextures; }
+
+    //void GetTextures(lua_State* luaVM);
 
     const char* LoadFromFile(std::string strPath);
     const char* LoadFromRawData(const SString& strPath, const SString& strHint);
-    int         GetProperties(lua_State* luaVM, eAssetProperty assetProperty);
 
     CLuaAssetNode* GetNode(const aiNode* pNode = nullptr);
 
     Assimp::Importer& GetImporter() { return importer; }
-    const aiScene*    GetScene() { return m_pScene; }
+    const aiScene*    GetScene() { return m_pScene.get(); }
     bool              IsLoaded() { return m_bModelLoaded; }
 
     void           CacheTextures(CResource* pParentResource);
@@ -94,22 +96,31 @@ public:
     CClientMeshBuffer* GetMeshBuffer(int idx) { return m_vecAssetMeshes[idx]->GetMeshBuffer(); }
     size_t GetMeshNum() { return m_vecAssetMeshes.size(); }
     SAssetTexture*     GetTexture(int idx);
-    bool               SetTexture(int idx, CClientMaterial* pMaterial);
+    bool                                        SetTexture(int idx, CClientMaterial* pMaterial);
+    std::vector<std::shared_ptr<CLuaAssetMesh>> GetMeshesOfNode(CLuaAssetNode* pNode);
+
+
+    unsigned int GetAnimationsCount() const { return m_pScene->mNumAnimations; } 
+    unsigned int GetCamerasCount() const { return m_pScene->mNumCameras; } 
+    unsigned int GetLightsCount() const { return m_pScene->mNumLights; } 
+    unsigned int GetMaterialsCount() const { return m_pScene->mNumMaterials; } 
+    unsigned int GetMeshesCount() const { return m_pScene->mNumMeshes; } 
+    unsigned int GetTexturesCount() const { return m_pScene->mNumTextures; } 
+    unsigned int GetNodesCount() const { return vecNodes.size(); } 
 
 protected:
-    void CacheNodes(const aiNode* pNode);
-    void CacheMeshes();
+    void CacheNodesAndMeshes(const aiNode* pNode);
 
     CClientAssetModelManager* m_pAssetModelManager;
 
     unsigned int                      m_uiImportFlags;
-    CAssetProgressHandler*            m_pProgressHandler;
+    std::unique_ptr<CAssetProgressHandler>            m_pProgressHandler;
     Assimp::Importer                  importer;
     CVector                           m_vecPosition;
     std::vector<const aiNode*>        vecNodes;
-    const aiScene*                    m_pScene;
-    std::vector<CLuaAssetNode*>       m_vecAssetNodes;
-    std::vector<CLuaAssetMesh*>       m_vecAssetMeshes;
+    std::unique_ptr<const aiScene>                    m_pScene;
+    std::vector<std::shared_ptr<CLuaAssetNode>>       m_vecAssetNodes;
+    std::vector<std::shared_ptr<CLuaAssetMesh>>       m_vecAssetMeshes;
     std::vector<SAssetTexture>        m_vecAssetTextures;
     std::atomic<bool>                 m_bModelLoaded = false;
 };
