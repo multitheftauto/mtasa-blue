@@ -399,7 +399,7 @@ void CClientMarker::StreamOut()
 
 void CClientMarker::Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity)
 {
-    if (IS_PLAYER(&Entity))
+    if (IS_PLAYER(&Entity) && GetInterior() == Entity.GetInterior())            // Matching interior?
     {
         // Call the marker hit event
         CLuaArguments Arguments;
@@ -411,7 +411,7 @@ void CClientMarker::Callback_OnCollision(CClientColShape& Shape, CClientEntity& 
 
 void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity)
 {
-    if (IS_PLAYER(&Entity))
+    if (IS_PLAYER(&Entity) && GetInterior() == Entity.GetInterior())            // Matching interior?
     {
         // Call the marker hit event
         CLuaArguments Arguments;
