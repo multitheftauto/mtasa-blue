@@ -15,7 +15,5 @@ class CAssetInstance;
 class CAssetsManagerInterface
 {
 public:
-    virtual DWORD GetAmbientColor() = 0;
-    virtual bool RenderGroupExists(unsigned int idx) const = 0;
-    virtual CAssetInstance* GetRenderGroup(unsigned int idx) = 0;
+    virtual DWORD         GetAmbientColor() const = 0;
 };

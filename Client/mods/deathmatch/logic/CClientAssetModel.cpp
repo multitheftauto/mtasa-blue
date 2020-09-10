@@ -220,9 +220,7 @@ const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SSt
         return importer.GetErrorString();
     }
 
-    std::unique_ptr<const aiScene> pointer;
-    pointer.reset(pScene);
-    m_pScene = std::move(pointer);
+    m_pScene.reset(pScene);
     m_bModelLoaded = true;
     return "";
 }
@@ -231,14 +229,12 @@ const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
     importer.SetProgressHandler(m_pProgressHandler.get());
     const aiScene* pScene = importer.ReadFile(strPath, m_uiImportFlags);
-    if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
+    if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
     {
         return importer.GetErrorString();
     }
 
-    std::unique_ptr<const aiScene> pointer;
-    pointer.reset(pScene);
-    m_pScene = std::move(pointer);
+    m_pScene.reset(pScene);
     m_bModelLoaded = true;
     return "";
 }

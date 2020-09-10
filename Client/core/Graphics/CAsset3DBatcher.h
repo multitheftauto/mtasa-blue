@@ -30,6 +30,7 @@ class CAsset3DBatcher
 {
 public:
     CAsset3DBatcher(CGraphics* pGraphics);
+    ~CAsset3DBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem);
@@ -41,4 +42,5 @@ protected:
     IDirect3DDevice9*                     m_pDevice;
     CGraphics*                            m_pGraphics;
     std::unordered_map<CLuaAssetNodeInterface*, std::vector<CMatrix>> m_mapRenderList;
+    CTextureItem*                                                     m_pMissingTexture = nullptr;
 };

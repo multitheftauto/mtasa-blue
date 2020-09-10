@@ -103,5 +103,6 @@ public:
     float                          m_fBuffer[24] = {0};
     bool                           m_bUseIndexedPrimitives;
     int                            m_uiMaterialIndex;
+    std::vector<int>               m_vecMaterials;
     size_t                         m_szMemoryUsageInBytes;
 };

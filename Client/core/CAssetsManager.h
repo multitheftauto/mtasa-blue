@@ -16,11 +16,8 @@ class CAssetsManager : public CAssetsManagerInterface
 public:
     CAssetsManager();
     ~CAssetsManager();
-    DWORD GetAmbientColor();
-    bool                RenderGroupExists(unsigned int idx) const { return m_renderingGroups.find(idx) != m_renderingGroups.end(); }
-    CAssetInstance* GetRenderGroup(unsigned int idx);
+    DWORD        GetAmbientColor() const { return m_ambientColor; }
 
 private:
-    DWORD ambientColor;            // argb ambient color
-    std::unordered_map<unsigned int, CAssetInstance*> m_renderingGroups;
+    DWORD m_ambientColor;            // argb ambient color
 };

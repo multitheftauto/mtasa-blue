@@ -17,6 +17,13 @@
 
 CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
 {
+
+}
+
+CAsset3DBatcher::~CAsset3DBatcher()
+{
+    // Make missing texture even more missing
+    SAFE_DELETE(m_pMissingTexture);
 }
 
 void CAsset3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
@@ -26,9 +33,15 @@ void CAsset3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportS
 
 void CAsset3DBatcher::Flush()
 {
+    if (m_pMissingTexture == nullptr)
+    {
+        auto p = CalcMTASAPath("MTA\\cgui\\images\\missing.png");
+        m_pMissingTexture = m_pGraphics->GetRenderItemManager()->CreateTexture(p);
+    }
     if (m_mapRenderList.empty())
         return;
 
+    auto pAssetManager = g_pCore->GetAssetsManager();
     // Get scene matrices
     D3DXMATRIX matWorld;
     D3DXMatrixIdentity(&matWorld);
@@ -67,7 +80,7 @@ void CAsset3DBatcher::Flush()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
-    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, g_pCore->GetAssetsManager()->GetAmbientColor());
+    m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, pAssetManager->GetAmbientColor());
 
     float m_fBuffer[24] = {0};
 
@@ -152,13 +165,19 @@ void CAsset3DBatcher::Flush()
                 }
                 else
                 {
-                    m_pDevice->SetTexture(0, nullptr);
-                    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+
+                    m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
+                    for (auto const& matrix : renderItem.second)
+                    {
+                        matrix.GetBuffer(&m_fBuffer[0]);
+                        m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
+                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
+                    }
                 }
             }
             else
             {
-                m_pDevice->SetTexture(0, nullptr);
+                m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
                 m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
             }
         }

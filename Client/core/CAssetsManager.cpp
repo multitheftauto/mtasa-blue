@@ -13,24 +13,9 @@
 
 CAssetsManager::CAssetsManager()
 {
-    ambientColor = D3DCOLOR_ARGB(255, 150, 150, 150);
-
+    m_ambientColor = D3DCOLOR_ARGB(255, 150, 150, 150);
 }
 
 CAssetsManager::~CAssetsManager()
 {
-}
-
-CAssetInstance* CAssetsManager::GetRenderGroup(unsigned int idx)
-{
-    if (!RenderGroupExists(idx))
-    {
-        m_renderingGroups.insert({idx, new CAssetInstance()});
-    }
-    return m_renderingGroups.at(idx);
-}
-
-DWORD CAssetsManager::GetAmbientColor()
-{
-    return ambientColor;
 }
