@@ -21,7 +21,8 @@ CClientMeshBuffer::~CClientMeshBuffer()
     delete m_pIndexBuffer;
     for (int i = 0; i < 8; i++)
     {
-        m_arrayVertexBuffer[i]->Release();
+        if (m_arrayVertexBuffer[i] != nullptr)
+            m_arrayVertexBuffer[i]->Release();
     }
     delete[] m_arrayVertexBuffer;
 }
@@ -32,10 +33,11 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
     m_pManager = pManager;
     m_pAssetModelManager = pManager->GetAssetModelManager();
     m_pProgressHandler = std::make_unique<CAssetProgressHandler>();
+    m_pIOHandler = std::make_unique<CAssetIOHandler>();
     SetTypeName("asset-model");
 
-    m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes | aiProcess_EmbedTextures |
-                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices;
+    m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes |
+                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices;
 
     // Add us to the manager's list
     m_pAssetModelManager->AddToList(this);
@@ -214,6 +216,9 @@ void CClientAssetModel::CacheTextures(CResource* pParentResource)
 const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
 {
     importer.SetProgressHandler(m_pProgressHandler.get());
+    importer.ApplyPostProcessing(m_uiImportFlags);
+    //importer.SetExtraVerbose(true);
+    //importer.SetIOHandler(m_pIOHandler.get());
     const aiScene* pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
     {
@@ -228,6 +233,9 @@ const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SSt
 const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
     importer.SetProgressHandler(m_pProgressHandler.get());
+    importer.ApplyPostProcessing(m_uiImportFlags);
+    //importer.SetExtraVerbose(true);
+    //importer.SetIOHandler(m_pIOHandler.get());
     const aiScene* pScene = importer.ReadFile(strPath, m_uiImportFlags);
     if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
     {

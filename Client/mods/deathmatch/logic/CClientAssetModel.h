@@ -17,6 +17,7 @@
 #include <assimp/include/assimp/Importer.hpp>
 #include <assimp/include/assimp/postprocess.h>
 #include "assimp/ProgressHandler.hpp"
+#include "assimp/IOSystem.hpp"
 
 using namespace Assimp;
 
@@ -57,6 +58,29 @@ private:
     void UpdatePostProcess(int currentStep, int numberOfSteps) {}
     void UpdateFileWrite(int currentStep, int numberOfSteps) {}
 };
+
+class CAssetIOHandler : public IOSystem
+{
+public:
+    CAssetIOHandler() {}
+    ~CAssetIOHandler() {}
+    bool Exists(const std::string& pFile) const { return false; }
+    bool Exists(const char* pFile) const { return false; }
+    char getOsSeparator() const { return '.'; }
+    IOStream*          Open(const char* pFile, const char* pMode = "rb") { return nullptr; }
+    IOStream*          Open(const std::string& pFile, const std::string& pMode = std::string("rb")) { return nullptr; }
+    void               Close(IOStream* pFile) {}
+    bool               ComparePaths(const char* one, const char* second) const { return true; }
+    bool               PushDirectory(const std::string& path) { return true; }
+    bool               ComparePaths(const std::string& one, const std::string& second) const { return false; }
+    const std::string& CurrentDirectory() const { return ""; }
+    size_t             StackSize() const { return 0; }
+    bool               PopDirectory() { return true; }
+    bool               CreateDirectory(const std::string& path) { return true; }
+    bool               ChangeDirectory(const std::string& path) { return true; }
+    bool               DeleteFile(const std::string& file) { return true; }
+};
+
 
 class CClientAssetModel : public CClientEntity
 {
@@ -115,6 +139,7 @@ protected:
 
     unsigned int                      m_uiImportFlags;
     std::unique_ptr<CAssetProgressHandler>            m_pProgressHandler;
+    std::unique_ptr<CAssetIOHandler>            m_pIOHandler;
     Assimp::Importer                  importer;
     CVector                           m_vecPosition;
     std::vector<const aiNode*>        vecNodes;
