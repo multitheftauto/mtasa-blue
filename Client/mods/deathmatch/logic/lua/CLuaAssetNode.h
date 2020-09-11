@@ -41,6 +41,7 @@ public:
     void                                        AddToRenderQueue(std::unique_ptr<SRenderAssetItem> settings);
     std::vector<CLuaAssetNode*>                 GetChildNodes();
     CClientMeshBuffer*                          GetMeshBuffer(int idx);
+    CClientMultiMaterialMeshBuffer*             GetMeshBuffer() const;
     CMaterialItem*                              GetTexture(int idx);
     size_t                                      GetMeshNum();
 

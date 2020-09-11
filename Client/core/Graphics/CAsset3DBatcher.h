@@ -39,7 +39,7 @@ public:
     void ClearQueue();
 
 protected:
-    IDirect3DDevice9*                     m_pDevice;
+    IDirect3DDevice9*                     m_pDevice = nullptr;
     CGraphics*                            m_pGraphics;
     std::unordered_map<CLuaAssetNodeInterface*, std::vector<CMatrix>> m_mapRenderList;
     CTextureItem*                                                     m_pMissingTexture = nullptr;

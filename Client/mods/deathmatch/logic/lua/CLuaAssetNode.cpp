@@ -72,10 +72,13 @@ void CLuaAssetNode::CreateMeshBuffer()
     */
 
     unsigned int uiVertexCount = 0;
+    unsigned int uiFaceCount = 0;
+    unsigned int uiIndexCount = 0;
     for (auto const& item : m_vecMeshes)
     {
         const aiMesh* pMesh = item->GetMesh();
         uiVertexCount += pMesh->mNumVertices;
+        uiFaceCount += pMesh->mNumFaces;
     }
 
     std::vector<CVector> vecVertices;
@@ -90,6 +93,7 @@ void CLuaAssetNode::CreateMeshBuffer()
     for (auto const& item : m_vecMeshes)
     {
         const aiMesh* pMesh = item->GetMesh();
+        unsigned int  uiTempIndexCount = 0;
         vecTexturesOffsets.emplace_back(pMesh->mNumVertices + currentVertexOffset);
 
         for (int i = 0; i < pMesh->mNumVertices; i++)
@@ -101,9 +105,10 @@ void CLuaAssetNode::CreateMeshBuffer()
         for (int i = 0; i < pMesh->mNumFaces; i++)
         {
             face = &pMesh->mFaces[i];
+            uiTempIndexCount += face->mNumIndices;
             for (int idx = 0; idx < face->mNumIndices; idx++)
             {
-                indices.push_back(face->mIndices[idx]);
+                indices.emplace_back(face->mIndices[idx] + currentVertexOffset);
             }
         }
 
@@ -123,6 +128,7 @@ void CLuaAssetNode::CreateMeshBuffer()
             }
         }
 
+        uiIndexCount += uiTempIndexCount;
         currentVertexOffset += pMesh->mNumVertices;
     }
 
@@ -130,6 +136,9 @@ void CLuaAssetNode::CreateMeshBuffer()
     m_pMultimaterialMeshBuffer->CreateIndexBuffer(indices, vecTexturesOffsets);
     m_pMultimaterialMeshBuffer->AddVertexBuffer(&vecVertices[0].fX, vecVertices.size(), sizeof(CVector), ePrimitiveData::PRIMITIVE_DATA_XYZ);
     m_pMultimaterialMeshBuffer->AddVertexBuffer(&vecTexCoords[0].fX, vecVertices.size(), sizeof(CVector), ePrimitiveData::PRIMITIVE_DATA_UV);
+    m_pMultimaterialMeshBuffer->m_iFaceCount = uiFaceCount;
+    m_pMultimaterialMeshBuffer->m_iVertexCount = vecVertices.size();
+    m_pMultimaterialMeshBuffer->Finalize();
 }
 
 void CLuaAssetNode::RemoveScriptID()
@@ -150,6 +159,11 @@ void CLuaAssetNode::AddToRenderQueue(std::unique_ptr<SRenderAssetItem> renderIte
 CClientMeshBuffer* CLuaAssetNode::GetMeshBuffer(int idx)
 {
     return m_pAssetModel->GetMeshBuffer(m_pNode->mMeshes[idx]);
+}
+
+CClientMultiMaterialMeshBuffer* CLuaAssetNode::GetMeshBuffer() const
+{
+    return m_pMultimaterialMeshBuffer.get();
 }
 
 CMaterialItem* CLuaAssetNode::GetTexture(int idx)
