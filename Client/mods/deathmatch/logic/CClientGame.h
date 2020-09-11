@@ -422,6 +422,8 @@ public:
     bool GetShowCollision() { return m_bShowCollision; }
     void SetShowSound(bool bEnable) { m_bShowSound = bEnable; }
     bool GetShowSound() { return m_bShowSound; }
+    void SetShowAssets(bool bEnable) { m_bShowAssets = bEnable; }
+    bool GetShowAssets() { return m_bShowAssets; }
 
     void        TakePlayerScreenShot(uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize,
                                      CResource* pResource, uint uiServerSentTime);
@@ -817,6 +819,7 @@ private:
     bool m_bDevelopmentMode;
     bool m_bShowCollision;
     bool m_bShowSound;
+    bool m_bShowAssets;
 
     // Debug class. Empty in release.
 public:
