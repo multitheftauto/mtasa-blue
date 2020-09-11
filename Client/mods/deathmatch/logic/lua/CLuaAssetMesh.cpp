@@ -31,7 +31,7 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
         face = &m_pMesh->mFaces[i];
         for (int idx = 0; idx < face->mNumIndices; idx++)
         {
-            indices.push_back(face->mIndices[idx]);
+            indices.emplace_back(face->mIndices[idx]);
         }
     }
 

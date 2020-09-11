@@ -17,19 +17,119 @@ using namespace Assimp;
 #include "StdInc.h"
 #include "CLuaAssetNode.h"
 #include "CLuaAssetMesh.h"
+#include "CClientMultiMaterialMeshBuffer.h"
 
 CLuaAssetNode::CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ASSETNODE);
     m_pAssetModel = pAssetModel;
     m_pNode = pNode;
-    m_vecMeshes = pAssetModel->GetMeshesOfNode(this);
+}
+
+void CLuaAssetNode::Cache()
+{
+    m_vecMeshes = m_pAssetModel->GetMeshesOfNode(this);
     CacheMetadata();
+    CreateMeshBuffer();
 }
 
 CLuaAssetNode::~CLuaAssetNode()
 {
     RemoveScriptID();
+}
+
+void CLuaAssetNode::CreateMeshBuffer()
+{
+    if (m_vecMeshes.size() == 0)
+        return;
+    /*
+        std::vector<int> indices;
+    aiFace*          face;
+    for (int i = 0; i < m_pMesh->mNumFaces; i++)
+    {
+        face = &m_pMesh->mFaces[i];
+        for (int idx = 0; idx < face->mNumIndices; idx++)
+        {
+            indices.push_back(face->mIndices[idx]);
+        }
+    }
+
+    m_pMeshBuffer = std::make_unique<CClientMeshBuffer>();
+    m_pMeshBuffer->AddVertexBuffer<CVector>(&m_pMesh->mVertices[0].x, m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_XYZ);
+    if (m_pMesh->GetNumUVChannels() > 0 && m_pMesh->HasTextureCoords(0))
+    {
+        m_pMeshBuffer->AddVertexBuffer<CVector>(m_pMesh->mTextureCoords[0], m_pMesh->mNumVertices, ePrimitiveData::PRIMITIVE_DATA_UV);
+        m_pMeshBuffer->m_uiMaterialIndex = m_pMesh->mMaterialIndex;
+    }
+    else
+    {
+        m_pMeshBuffer->m_uiMaterialIndex = -1;
+    }
+    m_pMeshBuffer->Finalize();
+    m_pMeshBuffer->CreateIndexBuffer<int>(indices);
+    m_pMeshBuffer->m_iFaceCount = m_pMesh->mNumFaces;
+    m_pMeshBuffer->m_iVertexCount = m_pMesh->mNumVertices;
+    */
+
+    unsigned int uiVertexCount = 0;
+    for (auto const& item : m_vecMeshes)
+    {
+        const aiMesh* pMesh = item->GetMesh();
+        uiVertexCount += pMesh->mNumVertices;
+    }
+
+    std::vector<CVector> vecVertices;
+    std::vector<CVector> vecTexCoords;
+    std::vector<int>     indices;
+    std::vector<int>     vecTexturesOffsets;
+    vecVertices.reserve(uiVertexCount);
+    vecTexturesOffsets.reserve(uiVertexCount);
+
+    int           currentVertexOffset = 0;
+    const aiFace* face;
+    for (auto const& item : m_vecMeshes)
+    {
+        const aiMesh* pMesh = item->GetMesh();
+        vecTexturesOffsets.emplace_back(pMesh->mNumVertices + currentVertexOffset);
+
+        for (int i = 0; i < pMesh->mNumVertices; i++)
+        {
+            auto vertex = pMesh->mVertices[i];
+            vecVertices.emplace_back(vertex.x, vertex.y, vertex.z);
+        }
+
+        for (int i = 0; i < pMesh->mNumFaces; i++)
+        {
+            face = &pMesh->mFaces[i];
+            for (int idx = 0; idx < face->mNumIndices; idx++)
+            {
+                indices.push_back(face->mIndices[idx]);
+            }
+        }
+
+        if (pMesh->GetNumUVChannels() > 0 && pMesh->HasTextureCoords(0))
+        {
+            for (int i = 0; i < pMesh->mNumVertices; i++)
+            {
+                auto vertex = pMesh->mTextureCoords[0][i];
+                vecTexCoords.emplace_back(vertex.x, vertex.y, vertex.z);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < pMesh->mNumVertices; i++)
+            {
+                vecTexCoords.emplace_back(0, 0, 0);
+            }
+        }
+
+        currentVertexOffset += pMesh->mNumVertices;
+    }
+
+    m_pMultimaterialMeshBuffer = std::make_unique<CClientMultiMaterialMeshBuffer>();
+    m_pMultimaterialMeshBuffer->CreateIndexBuffer(indices, vecTexturesOffsets);
+    m_pMultimaterialMeshBuffer->AddVertexBuffer(&vecVertices[0].fX, vecVertices.size(), sizeof(CVector), ePrimitiveData::PRIMITIVE_DATA_XYZ);
+    m_pMultimaterialMeshBuffer->AddVertexBuffer(&vecTexCoords[0].fX, vecVertices.size(), sizeof(CVector), ePrimitiveData::PRIMITIVE_DATA_UV);
 }
 
 void CLuaAssetNode::RemoveScriptID()
@@ -133,14 +233,14 @@ void CLuaAssetNode::CacheMetadata()
     {
         aiString*        pKeyName = &m_pNode->mMetaData->mKeys[i];
         aiMetadataEntry* pValue = &m_pNode->mMetaData->mValues[i];
-        std::string strKey(pKeyName->C_Str());
-        bool       boolValue;
-        float      floatValue;
-        uint64_t   longValue;
-        double     doubleValue;
-        aiString   stringValue;
-        int        intValue;
-        aiVector3D vector3Value;
+        std::string      strKey(pKeyName->C_Str());
+        bool             boolValue;
+        float            floatValue;
+        uint64_t         longValue;
+        double           doubleValue;
+        aiString         stringValue;
+        int              intValue;
+        aiVector3D       vector3Value;
         switch (pValue->mType)
         {
             case AI_BOOL:

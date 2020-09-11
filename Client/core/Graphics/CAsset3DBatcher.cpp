@@ -13,6 +13,7 @@
 #include "CAsset3DBatcher.h"
 #include "core/CLuaAssetNodeInterface.h"
 #include "../Client\mods\deathmatch\logic\CClientMeshBuffer.h"
+#include "../Client\mods\deathmatch\logic\CClientMultiMaterialMeshBuffer.h"
 #include "CAssetInstance.h"
 
 CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
@@ -34,10 +35,8 @@ void CAsset3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportS
 void CAsset3DBatcher::Flush()
 {
     if (m_pMissingTexture == nullptr)
-    {
-        auto p = CalcMTASAPath("MTA\\cgui\\images\\missing.png");
-        m_pMissingTexture = m_pGraphics->GetRenderItemManager()->CreateTexture(p);
-    }
+        m_pMissingTexture = m_pGraphics->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\missing.png"));
+
     if (m_mapRenderList.empty())
         return;
 

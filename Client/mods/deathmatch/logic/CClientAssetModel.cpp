@@ -66,23 +66,6 @@ CLuaAssetNode* CClientAssetModel::GetNode(const aiNode* pNode)
     return nullptr;
 }
 
-
-void CClientAssetModel::CacheNodesAndMeshes(const aiNode* pNode)
-{
-    for (int i = 0; i < pNode->mNumChildren; i++)
-    {
-        vecNodes.push_back(pNode->mChildren[i]);
-        CacheNodesAndMeshes(pNode->mChildren[i]);
-    }
-    std::shared_ptr<CLuaAssetNode> pAssetNode = std::make_shared<CLuaAssetNode>(this, pNode);
-    for (int i = 0; i < pNode->mNumMeshes; i++)
-    {
-        std::shared_ptr<CLuaAssetMesh> pMesh = std::make_shared<CLuaAssetMesh>(this, m_pScene->mMeshes[i], pAssetNode);
-        m_vecAssetMeshes.push_back(pMesh);
-    }
-    m_vecAssetNodes.push_back(pAssetNode);
-}
-
 void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialIndex)
 {
     if (iMaterialIndex >= 0 && iMaterialIndex < m_pScene->mNumMaterials)
@@ -251,10 +234,27 @@ bool CClientAssetModel::SetTexture(int idx, CClientMaterial* pMaterial)
     return false;
 }
 
+void CClientAssetModel::CacheNodesAndMeshes(const aiNode* pNode)
+{
+    for (int i = 0; i < pNode->mNumChildren; i++)
+    {
+        vecNodes.push_back(pNode->mChildren[i]);
+        CacheNodesAndMeshes(pNode->mChildren[i]);
+    }
+    std::shared_ptr<CLuaAssetNode> pAssetNode = std::make_shared<CLuaAssetNode>(this, pNode);
+    for (int i = 0; i < pNode->mNumMeshes; i++)
+    {
+        std::shared_ptr<CLuaAssetMesh> pMesh = std::make_shared<CLuaAssetMesh>(this, m_pScene->mMeshes[i], pAssetNode);
+        m_vecAssetMeshes.push_back(std::move(pMesh));
+    }
+
+    m_vecAssetNodes.push_back(pAssetNode);
+}
+
 std::vector<std::shared_ptr<CLuaAssetMesh>> CClientAssetModel::GetMeshesOfNode(CLuaAssetNode* pNode)
 {
     std::vector<std::shared_ptr<CLuaAssetMesh>> vecMeshes;
-    for (const auto& mesh : m_vecAssetMeshes)
+    for (const std::shared_ptr<CLuaAssetMesh> mesh : m_vecAssetMeshes)
     {
         if (mesh->GetNode().get() == pNode)
             vecMeshes.push_back(mesh);
@@ -265,6 +265,8 @@ std::vector<std::shared_ptr<CLuaAssetMesh>> CClientAssetModel::GetMeshesOfNode(C
 void CClientAssetModel::Cache()
 {
     CacheNodesAndMeshes(m_pScene->mRootNode);
+    for (auto const& item : m_vecAssetNodes)
+        item->Cache();
 }
 
 void CClientAssetModel::DoPulse()

@@ -10,10 +10,11 @@
  *****************************************************************************/
 
 class CLuaAssetNode;
-
-#pragma once
 class aiNode;
 class CClientAssetModel;
+class CClientMultiMaterialMeshBuffer;
+
+#pragma once
 // Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
@@ -25,9 +26,10 @@ public:
     ~CLuaAssetNode();
 
     void RemoveScriptID();
+    void CreateMeshBuffer();
 
     uint GetScriptID() const { return m_uiScriptID; }
-
+    void                         Cache();
     static CLuaAssetNode*        GetFromScriptID(unsigned int uiScriptID);
     void                         CacheMetadata();
     aiAABB                       GetBoundingBox();
@@ -59,10 +61,11 @@ public:
     std::unordered_map<std::string, CVector>     GetVectorMetdata() const { return m_mapMetadataCVector; }
 
 private:
-    uint                                        m_uiScriptID;
-    CClientAssetModel*                          m_pAssetModel;
-    const aiNode*                               m_pNode;
-    std::vector<std::shared_ptr<CLuaAssetMesh>> m_vecMeshes;
+    uint                                            m_uiScriptID;
+    CClientAssetModel*                              m_pAssetModel;
+    const aiNode*                                   m_pNode;
+    std::unique_ptr<CClientMultiMaterialMeshBuffer> m_pMultimaterialMeshBuffer;
+    std::vector<std::shared_ptr<CLuaAssetMesh>>     m_vecMeshes;
 
     std::unordered_map<std::string, bool>        m_mapMetadataBool;
     std::unordered_map<std::string, int>         m_mapMetadataInt;

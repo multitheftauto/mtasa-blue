@@ -37,6 +37,9 @@ public:
     unsigned int                 GetColorChannelsCount() const;
     unsigned int                 GetBonesCount() const;
     std::tuple<CVector, CVector> GetBoundingBox() const;
+
+    const aiMesh* GetMesh() const { return m_pMesh; }
+
 private:
     CClientAssetModel* m_pAssetModel;
     const aiMesh* m_pMesh;
@@ -44,3 +47,4 @@ private:
     std::shared_ptr<CLuaAssetNode>      m_pNode;
     std::unique_ptr<CClientMeshBuffer> m_pMeshBuffer;
 };
+
