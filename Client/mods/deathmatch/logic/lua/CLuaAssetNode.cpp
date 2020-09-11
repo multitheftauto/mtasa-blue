@@ -24,6 +24,7 @@ CLuaAssetNode::CLuaAssetNode(CClientAssetModel* pAssetModel, const aiNode* pNode
     m_pAssetModel = pAssetModel;
     m_pNode = pNode;
     m_vecMeshes = pAssetModel->GetMeshesOfNode(this);
+    CacheMetadata();
 }
 
 CLuaAssetNode::~CLuaAssetNode()
@@ -73,21 +74,6 @@ size_t CLuaAssetNode::GetMeshNum()
     return m_pNode->mNumMeshes;
 }
 
-// void CLuaAssetNode::Render(SRenderingSettings& settings)
-//{
-//    CClientMeshBuffer* pMeshBuffer;
-//    CLuaAssetMesh*     pLuaMesh;
-//    IDirect3DDevice9*  device = g_pCore->GetGraphics()->GetDevice();
-//
-//    // for (int i = 0; i < m_pNode->mNumMeshes; i++)
-//    //{
-//    //    pLuaMesh = m_pAssetModel->GetMesh(m_pNode->mMeshes[i]);
-//    //    }
-//    //    else
-//    //        device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-//    //}
-//}
-
 CLuaAssetNode* CLuaAssetNode::GetFromScriptID(unsigned int uiScriptID)
 {
     CLuaAssetNode* pLuaNode = (CLuaAssetNode*)CIdArray::FindEntry(uiScriptID, EIdClass::ASSETNODE);
@@ -122,22 +108,8 @@ aiAABB CLuaAssetNode::GetBoundingBox()
 
 std::tuple<CVector, CVector> CLuaAssetNode::GetCVectorBoundingBox()
 {
-    const aiScene* pScene = m_pAssetModel->GetScene();
-    aiAABB         NodeAABB;
-    CVector        min;
-    CVector        max;
-    for (int i = 0; i < m_pNode->mNumMeshes; i++)
-    {
-        // something wrong TODO
-        NodeAABB = pScene->mMeshes[m_pNode->mMeshes[i]]->mAABB;
-        min.fX = std::min(NodeAABB.mMin.x, min.fX);
-        min.fY = std::min(NodeAABB.mMin.y, min.fY);
-        min.fZ = std::min(NodeAABB.mMin.z, min.fZ);
-        max.fX = std::max(NodeAABB.mMax.x, max.fX);
-        max.fY = std::max(NodeAABB.mMax.y, max.fY);
-        max.fZ = std::max(NodeAABB.mMax.z, max.fZ);
-    }
-    return {min, max};
+    aiAABB bbox = GetBoundingBox();
+    return {CVector(bbox.mMin.x, bbox.mMin.y, bbox.mMin.z), CVector(bbox.mMax.x, bbox.mMax.y, bbox.mMax.z)};
 }
 
 std::vector<CLuaAssetNode*> CLuaAssetNode::GetChildNodes()
@@ -152,18 +124,16 @@ std::vector<CLuaAssetNode*> CLuaAssetNode::GetChildNodes()
     return vecChildNodes;
 }
 
-void CLuaAssetNode::GetMetaData(lua_State* luaVM)
+void CLuaAssetNode::CacheMetadata()
 {
-    lua_newtable(luaVM);
     if (m_pNode->mMetaData == nullptr)
-    {
         return;
-    }
+
     for (int i = 0; i < m_pNode->mMetaData->mNumProperties; i++)
     {
         aiString*        pKeyName = &m_pNode->mMetaData->mKeys[i];
         aiMetadataEntry* pValue = &m_pNode->mMetaData->mValues[i];
-        lua_pushstring(luaVM, pKeyName->C_Str());
+        std::string strKey(pKeyName->C_Str());
         bool       boolValue;
         float      floatValue;
         uint64_t   longValue;
@@ -175,43 +145,33 @@ void CLuaAssetNode::GetMetaData(lua_State* luaVM)
         {
             case AI_BOOL:
                 m_pNode->mMetaData->Get<bool>(*pKeyName, boolValue);
-                lua_pushboolean(luaVM, boolValue);
+                m_mapMetadataBool[strKey] = boolValue;
                 break;
             case AI_INT32:
                 m_pNode->mMetaData->Get<int>(*pKeyName, intValue);
-                lua_pushnumber(luaVM, intValue);
+                m_mapMetadataInt[strKey] = intValue;
                 break;
             case AI_UINT64:
                 m_pNode->mMetaData->Get<uint64_t>(*pKeyName, longValue);
-                lua_pushnumber(luaVM, longValue);
+                m_mapMetadataInt64[strKey] = longValue;
                 break;
             case AI_FLOAT:
                 m_pNode->mMetaData->Get<float>(*pKeyName, floatValue);
-                lua_pushnumber(luaVM, floatValue);
+                m_mapMetadataFloat[strKey] = floatValue;
                 break;
             case AI_DOUBLE:
                 m_pNode->mMetaData->Get<double>(*pKeyName, doubleValue);
-                lua_pushnumber(luaVM, doubleValue);
+                m_mapMetadataDouble[strKey] = doubleValue;
                 break;
             case AI_AISTRING:
                 m_pNode->mMetaData->Get<aiString>(*pKeyName, stringValue);
-                lua_pushstring(luaVM, stringValue.C_Str());
+                m_mapMetadataString[strKey] = std::string(stringValue.C_Str());
                 break;
             case AI_AIVECTOR3D:
                 m_pNode->mMetaData->Get<aiVector3D>(*pKeyName, vector3Value);
-                lua_newtable(luaVM);
-                lua_pushnumber(luaVM, 1);
-                lua_pushnumber(luaVM, vector3Value.x);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 2);
-                lua_pushnumber(luaVM, vector3Value.y);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 3);
-                lua_pushnumber(luaVM, vector3Value.z);
-                lua_settable(luaVM, -3);
+                m_mapMetadataCVector[strKey] = CVector(vector3Value.x, vector3Value.y, vector3Value.z);
                 break;
         }
-        lua_settable(luaVM, -3);
     }
 }
 

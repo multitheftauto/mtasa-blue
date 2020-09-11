@@ -23,12 +23,15 @@ public:
     static unsigned int GetAssetModelProperty(CClientAssetModel* pModel, eAssetProperty eProperty);
     static std::variant<unsigned int, float, std::tuple<CVector, CVector>, const char*, CVector, CLuaAssetNode*> GetAssetNodeProperty(CLuaAssetNode* pNode,
                                                                                                                                       eAssetProperty eProperty);
-    static std::variant<unsigned int, std::tuple<CVector, CVector>,
-                        std::tuple<CVector4D, CVector4D>> GetAssetMeshProperty(CLuaAssetMesh* pMesh, eAssetProperty eProperty);
+    static std::variant<unsigned int, std::tuple<CVector, CVector>, std::tuple<CVector4D, CVector4D>>            GetAssetMeshProperty(CLuaAssetMesh* pMesh,
+                                                                                                                                      eAssetProperty eProperty);
 
     static std::variant<bool, std::vector<CLuaAssetMesh*>> AssetGetModelMeshes(CClientAssetModel* pAssetModel);
     static std::vector<CLuaAssetMesh*>                     AssetGetNodeMeshes(CLuaAssetNode* pAssetNode);
 
+    static std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> AssetGetModelMetaData(
+        CClientAssetModel* pAssetModel);
+    static std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> AssetGetNodeMetaData(CLuaAssetNode* pNode);
 
     LUA_DECLARE(AssetGetNodes);
     LUA_DECLARE(AssetGetTextures);

@@ -116,7 +116,7 @@ public:
     void           CacheTextures(CResource* pParentResource);
     void           Cache();
     void               GetMaterialProperties(lua_State* luaVM, int iMaterialIndex);
-    void               GetMetaData(lua_State* luaVM);
+    void                                        CacheMetadata();
     CClientMeshBuffer* GetMeshBuffer(int idx) { return m_vecAssetMeshes[idx]->GetMeshBuffer(); }
     size_t GetMeshNum() { return m_vecAssetMeshes.size(); }
     SAssetTexture*     GetTexture(int idx);
@@ -130,7 +130,15 @@ public:
     unsigned int GetMaterialsCount() const { return m_pScene->mNumMaterials; } 
     unsigned int GetMeshesCount() const { return m_pScene->mNumMeshes; } 
     unsigned int GetTexturesCount() const { return m_pScene->mNumTextures; } 
-    unsigned int GetNodesCount() const { return vecNodes.size(); } 
+    unsigned int GetNodesCount() const { return vecNodes.size(); }
+
+    std::unordered_map<std::string, bool>        GetBoolMetdata() const { return m_mapMetadataBool; }
+    std::unordered_map<std::string, int>         GetIntMetdata() const { return m_mapMetadataInt; }
+    std::unordered_map<std::string, uint64_t>    GetInt64Metdata() const { return m_mapMetadataInt64; }
+    std::unordered_map<std::string, float>       GetFloatMetdata() const { return m_mapMetadataFloat; }
+    std::unordered_map<std::string, double>      GetDoubleMetdata() const { return m_mapMetadataDouble; }
+    std::unordered_map<std::string, std::string> GetStringMetdata() const { return m_mapMetadataString; }
+    std::unordered_map<std::string, CVector>     GetVectorMetdata() const { return m_mapMetadataCVector; }
 
 protected:
     void CacheNodesAndMeshes(const aiNode* pNode);
@@ -148,4 +156,12 @@ protected:
     std::vector<std::shared_ptr<CLuaAssetMesh>>       m_vecAssetMeshes;
     std::vector<SAssetTexture>        m_vecAssetTextures;
     std::atomic<bool>                 m_bModelLoaded = false;
+
+    std::unordered_map<std::string, bool>        m_mapMetadataBool;
+    std::unordered_map<std::string, int>         m_mapMetadataInt;
+    std::unordered_map<std::string, uint64_t>    m_mapMetadataInt64;
+    std::unordered_map<std::string, float>       m_mapMetadataFloat;
+    std::unordered_map<std::string, double>      m_mapMetadataDouble;
+    std::unordered_map<std::string, std::string> m_mapMetadataString;
+    std::unordered_map<std::string, CVector>     m_mapMetadataCVector;
 };

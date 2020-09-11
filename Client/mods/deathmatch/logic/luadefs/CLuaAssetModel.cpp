@@ -28,7 +28,7 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"assetRender", AssetRender},
         {"assetSetTexture", AssetSetTexture},
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
-        {"assetGetMetaData", AssetGetMetaData},
+        //{"assetGetMetaData", ArgumentParser<AssetGetModelMetaData, AssetGetNodeMetaData>},
         {"assetCreateInstance", AssetCreateInstance},
         {"assetGetRenderGroupProperties", AssetGetRenderGroupProperties},
         {"assetSetRenderGroupProperties", AssetSetRenderGroupProperties},
@@ -269,7 +269,8 @@ std::variant<unsigned int, float, std::tuple<CVector, CVector>, const char*, CVe
     }
 }
 
-std::variant<unsigned int, std::tuple<CVector, CVector>, std::tuple<CVector4D, CVector4D>> CLuaAssetModelDefs::GetAssetMeshProperty(CLuaAssetMesh* pMesh, eAssetProperty eProperty)
+std::variant<unsigned int, std::tuple<CVector, CVector>, std::tuple<CVector4D, CVector4D>> CLuaAssetModelDefs::GetAssetMeshProperty(CLuaAssetMesh* pMesh,
+                                                                                                                                    eAssetProperty eProperty)
 {
     switch (eProperty)
     {
@@ -280,8 +281,8 @@ std::variant<unsigned int, std::tuple<CVector, CVector>, std::tuple<CVector4D, C
         case ASSET_UV_COMPONENTS_COUNT:
             unsigned int uvComponents[8];
             pMesh->GetUVComponentsCount(&uvComponents[0]);
-            return std::make_tuple(CVector4D(uvComponents[0], uvComponents[1], uvComponents[2], uvComponents[3]),CVector4D(uvComponents[4], uvComponents[5], uvComponents[6],
-                                   uvComponents[7]));
+            return std::make_tuple(CVector4D(uvComponents[0], uvComponents[1], uvComponents[2], uvComponents[3]),
+                                   CVector4D(uvComponents[4], uvComponents[5], uvComponents[6], uvComponents[7]));
         case ASSET_UV_CHANNELS:
             return pMesh->GetUVChannels();
         case ASSET_COLOR_CHANNELS:
@@ -301,7 +302,7 @@ std::variant<bool, std::vector<CLuaAssetMesh*>> CLuaAssetModelDefs::AssetGetMode
         return false;
 
     std::vector<std::shared_ptr<CLuaAssetMesh>> sharedMeshes = pAssetModel->GetMeshes();
-    std::vector<CLuaAssetMesh*> meshes(sharedMeshes.size());
+    std::vector<CLuaAssetMesh*>                 meshes(sharedMeshes.size());
     for (const auto& item : sharedMeshes)
     {
         meshes.push_back(item.get());
@@ -312,7 +313,7 @@ std::variant<bool, std::vector<CLuaAssetMesh*>> CLuaAssetModelDefs::AssetGetMode
 std::vector<CLuaAssetMesh*> CLuaAssetModelDefs::AssetGetNodeMeshes(CLuaAssetNode* pAssetNode)
 {
     std::vector<std::shared_ptr<CLuaAssetMesh>> sharedMeshes = pAssetNode->GetMeshes();
-    std::vector<CLuaAssetMesh*> meshes(sharedMeshes.size());
+    std::vector<CLuaAssetMesh*>                 meshes(sharedMeshes.size());
     for (const auto& item : sharedMeshes)
     {
         meshes.push_back(item.get());
@@ -340,7 +341,7 @@ int CLuaAssetModelDefs::AssetGetTextures(lua_State* luaVM)
                 lua_pushboolean(luaVM, false);
                 return 1;
             }
-            //pAssetModel->GetTextures(luaVM);
+            // pAssetModel->GetTextures(luaVM);
             return 1;
         }
         else
@@ -528,42 +529,51 @@ int CLuaAssetModelDefs::AssetGetMaterialProperties(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAssetModelDefs::AssetGetMetaData(lua_State* luaVM)
+std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> CLuaAssetModelDefs::AssetGetModelMetaData(
+    CClientAssetModel* pAssetModel)
 {
-    CClientAssetModel* pAssetModel = nullptr;
-    CLuaAssetNode*     pAssetNode = nullptr;
-    eAssetProperty     eProperty;
-    CScriptArgReader   argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientAssetModel>())
-        argStream.ReadUserData(pAssetModel);
-    else if (argStream.NextIsUserDataOfType<CLuaAssetNode>())
-        argStream.ReadUserData(pAssetNode);
-    if (!argStream.HasErrors())
-    {
-        if (pAssetModel != nullptr)
-        {
-            if (!pAssetModel->IsLoaded())
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
+    if (!pAssetModel->IsLoaded())
+        throw std::invalid_argument("Model is not loaded yet.");
 
-            pAssetModel->GetMetaData(luaVM);
-            return 1;
-        }
-        else if (pAssetNode != nullptr)
-        {
-            pAssetNode->GetMetaData(luaVM);
-            return 1;
-        }
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> mapMetadata;
+    for (auto const& item : pAssetModel->GetBoolMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetIntMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetInt64Metdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetFloatMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetDoubleMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetStringMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pAssetModel->GetVectorMetdata())
+        mapMetadata[item.first] = item.second;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return mapMetadata;
+}
+
+std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> CLuaAssetModelDefs::AssetGetNodeMetaData(
+    CLuaAssetNode* pNode)
+{
+    std::unordered_map<std::string, std::variant<bool, int, uint64_t, float, double, std::string, CVector>> mapMetadata;
+    for (auto const& item : pNode->GetBoolMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetIntMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetInt64Metdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetFloatMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetDoubleMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetStringMetdata())
+        mapMetadata[item.first] = item.second;
+    for (auto const& item : pNode->GetVectorMetdata())
+        mapMetadata[item.first] = item.second;
+
+    return mapMetadata;
 }
 
 int CLuaAssetModelDefs::AssetCreateInstance(lua_State* luaVM)

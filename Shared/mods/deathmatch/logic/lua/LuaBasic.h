@@ -52,6 +52,12 @@ namespace lua
         lua_pushnumber(L, value);
         return 1;
     }
+    
+    inline int Push(lua_State* L, uint64_t value)
+    {
+        lua_pushnumber(L, value);
+        return 1;
+    }
 
     inline int Push(lua_State* L, bool value)
     {

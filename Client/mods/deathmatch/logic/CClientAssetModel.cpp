@@ -121,66 +121,54 @@ void CClientAssetModel::GetMaterialProperties(lua_State* luaVM, int iMaterialInd
     }
 }
 
-void CClientAssetModel::GetMetaData(lua_State* luaVM)
+void CClientAssetModel::CacheMetadata()
 {
-    lua_newtable(luaVM);
     if (m_pScene->mMetaData == nullptr)
-    {
         return;
-    }
+
     for (int i = 0; i < m_pScene->mMetaData->mNumProperties; i++)
     {
         aiString*        pKeyName = &m_pScene->mMetaData->mKeys[i];
         aiMetadataEntry* pValue = &m_pScene->mMetaData->mValues[i];
-        lua_pushstring(luaVM, pKeyName->C_Str());
-        bool       boolValue;
-        float      floatValue;
-        uint64_t   longValue;
-        double     doubleValue;
-        aiString   stringValue;
-        int        intValue;
-        aiVector3D vector3Value;
+        std::string      strKey(pKeyName->C_Str());
+        bool             boolValue;
+        float            floatValue;
+        uint64_t         longValue;
+        double           doubleValue;
+        aiString         stringValue;
+        int              intValue;
+        aiVector3D       vector3Value;
         switch (pValue->mType)
         {
             case AI_BOOL:
                 m_pScene->mMetaData->Get<bool>(*pKeyName, boolValue);
-                lua_pushboolean(luaVM, boolValue);
+                m_mapMetadataBool[strKey] = boolValue;
                 break;
             case AI_INT32:
                 m_pScene->mMetaData->Get<int>(*pKeyName, intValue);
-                lua_pushnumber(luaVM, intValue);
+                m_mapMetadataInt[strKey] = intValue;
                 break;
             case AI_UINT64:
                 m_pScene->mMetaData->Get<uint64_t>(*pKeyName, longValue);
-                lua_pushnumber(luaVM, longValue);
+                m_mapMetadataInt64[strKey] = longValue;
                 break;
             case AI_FLOAT:
                 m_pScene->mMetaData->Get<float>(*pKeyName, floatValue);
-                lua_pushnumber(luaVM, floatValue);
+                m_mapMetadataFloat[strKey] = floatValue;
                 break;
             case AI_DOUBLE:
                 m_pScene->mMetaData->Get<double>(*pKeyName, doubleValue);
-                lua_pushnumber(luaVM, doubleValue);
+                m_mapMetadataDouble[strKey] = doubleValue;
                 break;
             case AI_AISTRING:
                 m_pScene->mMetaData->Get<aiString>(*pKeyName, stringValue);
-                lua_pushstring(luaVM, stringValue.C_Str());
+                m_mapMetadataString[strKey] = std::string(stringValue.C_Str());
                 break;
             case AI_AIVECTOR3D:
                 m_pScene->mMetaData->Get<aiVector3D>(*pKeyName, vector3Value);
-                lua_newtable(luaVM);
-                lua_pushnumber(luaVM, 1);
-                lua_pushnumber(luaVM, vector3Value.x);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 2);
-                lua_pushnumber(luaVM, vector3Value.y);
-                lua_settable(luaVM, -3);
-                lua_pushnumber(luaVM, 3);
-                lua_pushnumber(luaVM, vector3Value.z);
-                lua_settable(luaVM, -3);
+                m_mapMetadataCVector[strKey] = CVector(vector3Value.x, vector3Value.y, vector3Value.z);
                 break;
         }
-        lua_settable(luaVM, -3);
     }
 }
 
