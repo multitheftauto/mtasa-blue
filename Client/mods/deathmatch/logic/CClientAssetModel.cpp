@@ -196,7 +196,7 @@ const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SSt
         return importer.GetErrorString();
     }
 
-    m_pScene.reset(pScene);
+    m_pScene = pScene;
     m_bModelLoaded = true;
     return "";
 }
@@ -213,7 +213,7 @@ const char* CClientAssetModel::LoadFromFile(std::string strPath)
         return importer.GetErrorString();
     }
 
-    m_pScene.reset(pScene);
+    m_pScene = pScene;
     m_bModelLoaded = true;
     return "";
 }

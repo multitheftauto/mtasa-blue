@@ -110,7 +110,7 @@ public:
     CLuaAssetNode* GetNode(const aiNode* pNode = nullptr);
 
     Assimp::Importer& GetImporter() { return importer; }
-    const aiScene*    GetScene() { return m_pScene.get(); }
+    const aiScene*    GetScene() { return m_pScene; }
     bool              IsLoaded() { return m_bModelLoaded; }
 
     void           CacheTextures(CResource* pParentResource);
@@ -151,7 +151,7 @@ protected:
     Assimp::Importer                  importer;
     CVector                           m_vecPosition;
     std::vector<const aiNode*>        vecNodes;
-    std::unique_ptr<const aiScene>                    m_pScene;
+    const aiScene*                    m_pScene; // importer take care about freeing
     std::vector<std::shared_ptr<CLuaAssetNode>>       m_vecAssetNodes;
     std::vector<std::shared_ptr<CLuaAssetMesh>>       m_vecAssetMeshes;
     std::vector<SAssetTexture>        m_vecAssetTextures;
