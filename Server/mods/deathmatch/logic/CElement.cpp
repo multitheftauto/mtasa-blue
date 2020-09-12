@@ -1126,6 +1126,29 @@ bool CElement::IsElementAttached(CElement* pElement)
     return false;
 }
 
+bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
+{
+    if (bRecursive)
+    {
+        std::set<CElement*> history;
+
+        for (CElement* pCurrent = this; pCurrent; pCurrent = pCurrent->GetAttachedToElement())
+        {
+            if (pCurrent == pElement)
+                return true;
+
+            if (MapContains(history, pCurrent))
+                break; // This should not be possible, but you never know
+
+            MapInsert(history, pCurrent);
+        }
+
+        return false;
+    }
+
+    return m_pAttachedTo == pElement;
+}
+
 bool CElement::IsAttachable()
 {
     switch (GetType())

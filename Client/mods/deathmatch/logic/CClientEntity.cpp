@@ -1070,6 +1070,29 @@ bool CClientEntity::IsEntityAttached(CClientEntity* pEntity)
     return ListContains(m_AttachedEntities, pEntity);
 }
 
+bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
+{
+    if (bRecursive)
+    {
+        std::set<CClientEntity*> history;
+
+        for (CClientEntity* pCurrent = this; pCurrent; pCurrent = pCurrent->GetAttachedTo())
+        {
+            if (pCurrent == pEntity)
+                return true;
+
+            if (MapContains(history, pCurrent))
+                break; // This should not be possible, but you never know
+
+            MapInsert(history, pCurrent);
+        }
+
+        return false;
+    }
+
+    return m_pAttachedToEntity == pEntity;
+}
+
 void CClientEntity::ReattachEntities()
 {
     // Jax: this should be called on streamIn/creation
