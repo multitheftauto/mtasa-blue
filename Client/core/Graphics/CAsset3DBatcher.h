@@ -34,7 +34,6 @@ public:
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem);
-    void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride);
     bool HasItems() const { return !m_mapRenderList.empty(); }
     void ClearQueue();
 

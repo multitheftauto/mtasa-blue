@@ -47,7 +47,7 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
     SetTypeName("asset-model");
 
     m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes |
-                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_EmbedTextures;
+                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_EmbedTextures | aiProcess_SplitLargeMeshes;
 
     // Add us to the manager's list
     m_pAssetModelManager->AddToList(this);

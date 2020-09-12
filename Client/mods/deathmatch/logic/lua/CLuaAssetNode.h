@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaAssetNode.h
- *  PURPOSE:     Lua timer class
+ *  PURPOSE:     Lua asset node class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -12,7 +12,6 @@
 class CLuaAssetNode;
 class aiNode;
 class CClientAssetModel;
-class CClientMultiMaterialMeshBuffer;
 
 #pragma once
 // Define includes
@@ -41,7 +40,6 @@ public:
     void                                        AddToRenderQueue(std::unique_ptr<SRenderAssetItem> settings);
     std::vector<CLuaAssetNode*>                 GetChildNodes();
     CClientMeshBuffer*                          GetMeshBuffer(int idx);
-    CClientMultiMaterialMeshBuffer*             GetMeshBuffer() const;
     CMaterialItem*                              GetTexture(int idx);
     size_t                                      GetMeshNum();
 
@@ -65,7 +63,6 @@ private:
     uint                                            m_uiScriptID;
     CClientAssetModel*                              m_pAssetModel;
     const aiNode*                                   m_pNode;
-    std::unique_ptr<CClientMultiMaterialMeshBuffer> m_pMultimaterialMeshBuffer;
     std::vector<std::shared_ptr<CLuaAssetMesh>>     m_vecMeshes;
 
     std::unordered_map<std::string, bool>        m_mapMetadataBool;

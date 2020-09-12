@@ -24,14 +24,15 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
     m_pMesh = pMesh;
     m_pNode = pNode;
 
-    std::vector<int> indices;
     aiFace*          face;
+
+    unsigned int iMaxIndex = 0;
     for (int i = 0; i < m_pMesh->mNumFaces; i++)
     {
         face = &m_pMesh->mFaces[i];
         for (int idx = 0; idx < face->mNumIndices; idx++)
         {
-            indices.emplace_back(face->mIndices[idx]);
+            iMaxIndex = std::max(iMaxIndex, face->mIndices[idx]);
         }
     }
 
@@ -46,8 +47,35 @@ CLuaAssetMesh::CLuaAssetMesh(CClientAssetModel* pAssetModel, const aiMesh* pMesh
     {
         m_pMeshBuffer->m_uiMaterialIndex = -1;
     }
+
+    if (iMaxIndex > 65535)
+    {
+        std::vector<int> indices;
+        for (int i = 0; i < m_pMesh->mNumFaces; i++)
+        {
+            face = &m_pMesh->mFaces[i];
+            for (int idx = 0; idx < face->mNumIndices; idx++)
+            {
+                indices.emplace_back(face->mIndices[idx]);
+            }
+        }
+        m_pMeshBuffer->CreateIndexBuffer<int>(indices);
+    }
+    else
+    {
+        std::vector<short> indices;
+        for (int i = 0; i < m_pMesh->mNumFaces; i++)
+        {
+            face = &m_pMesh->mFaces[i];
+            for (int idx = 0; idx < face->mNumIndices; idx++)
+            {
+                indices.emplace_back(face->mIndices[idx]);
+            }
+        }
+        m_pMeshBuffer->CreateIndexBuffer<short>(indices);
+    }
+
     m_pMeshBuffer->Finalize();
-    m_pMeshBuffer->CreateIndexBuffer<int>(indices);
     m_pMeshBuffer->m_iFaceCount = m_pMesh->mNumFaces;
     m_pMeshBuffer->m_iVertexCount = m_pMesh->mNumVertices;
 }
@@ -76,26 +104,32 @@ unsigned int CLuaAssetMesh::GetVerticesCount() const
 {
     return m_pMesh->mNumVertices;
 }
+
 unsigned int CLuaAssetMesh::GetFacesCount() const
 {
     return m_pMesh->mNumFaces;
 }
+
 void CLuaAssetMesh::GetUVComponentsCount(const unsigned int* pComponents) const
 {
     pComponents = &m_pMesh->mNumUVComponents[0];
 }
+
 unsigned int CLuaAssetMesh::GetUVChannels() const
 {
     return m_pMesh->GetNumUVChannels();
 }
+
 unsigned int CLuaAssetMesh::GetColorChannelsCount() const
 {
     return m_pMesh->GetNumColorChannels();
 }
+
 unsigned int CLuaAssetMesh::GetBonesCount() const
 {
     return m_pMesh->mNumBones;
 }
+
 std::tuple<CVector, CVector> CLuaAssetMesh::GetBoundingBox() const
 {
     return {CVector(m_pMesh->mAABB.mMin.x, m_pMesh->mAABB.mMin.y, m_pMesh->mAABB.mMin.z),

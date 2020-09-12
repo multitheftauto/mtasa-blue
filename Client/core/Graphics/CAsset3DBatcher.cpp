@@ -13,7 +13,6 @@
 #include "CAsset3DBatcher.h"
 #include "core/CLuaAssetNodeInterface.h"
 #include "../Client\mods\deathmatch\logic\CClientMeshBuffer.h"
-#include "../Client\mods\deathmatch\logic\CClientMultiMaterialMeshBuffer.h"
 #include "CAssetInstance.h"
 
 CAsset3DBatcher::CAsset3DBatcher(CGraphics* pGraphics) : m_pGraphics(pGraphics)
@@ -33,11 +32,11 @@ void CAsset3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportS
 
 void CAsset3DBatcher::Flush()
 {
-    if (m_pMissingTexture == nullptr)
-        m_pMissingTexture = m_pGraphics->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\missing.png"));
-
     if (m_mapRenderList.empty())
         return;
+
+    if (m_pMissingTexture == nullptr)
+        m_pMissingTexture = m_pGraphics->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\missing.png"));
 
     auto pAssetManager = g_pCore->GetAssetsManager();
     // Get scene matrices
@@ -58,8 +57,6 @@ void CAsset3DBatcher::Flush()
 
     IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
-
-    m_pDevice->SetTexture(0, nullptr);
 
     if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
@@ -82,9 +79,9 @@ void CAsset3DBatcher::Flush()
 
     float m_fBuffer[24] = {0};
 
-    std::unordered_map<const CMaterialItem*, std::unordered_map<CClientMeshBuffer*, std::vector<D3DMATRIX>>> mapTextured;
-    std::unordered_map<CClientMeshBuffer*, std::vector<D3DMATRIX>>                                           mapFlatColor;
-    std::unordered_map<CClientMeshBuffer*, std::vector<D3DMATRIX>>                                           mapMissingTexture;
+    std::unordered_map<const CMaterialItem*, std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>> mapTextured;
+    std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>                                           mapFlatColor;
+    std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>                                           mapMissingTexture;
 
     CClientMeshBuffer* pMeshBuffer;
     CMaterialItem*     pLastMaterial = nullptr;
@@ -101,42 +98,29 @@ void CAsset3DBatcher::Flush()
                 {
                     if (mapTextured.find(pMaterial) == mapTextured.end())
                     {
-                        mapTextured[pMaterial] = std::unordered_map<CClientMeshBuffer*, std::vector<D3DMATRIX>>();
+                        mapTextured[pMaterial] = std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>();
                     }
                     if (mapTextured[pMaterial].find(pMeshBuffer) == mapFlatColor.end())
                     {
-                        mapTextured[pMaterial][pMeshBuffer] = std::vector<D3DMATRIX>();
+                        mapTextured[pMaterial][pMeshBuffer] = std::vector<CMatrix>();
+                        mapTextured[pMaterial][pMeshBuffer].resize(mapTextured[pMaterial][pMeshBuffer].size() + renderItem.second.size());
                     }
 
                     for (auto const& matrix : renderItem.second)
                     {
-                        matrix.GetBuffer(&floats[0]);
-                        D3DMATRIX d3dMatrix;
-                        int       i = 0;
-                        for (int i1 = 0; i1 < 4; i1++)
-                            for (int i2 = 0; i2 < 4; i2++)
-                                d3dMatrix.m[i1][i2] = floats[i++];
-
-                        mapTextured[pMaterial][pMeshBuffer].push_back(d3dMatrix);
+                        mapTextured[pMaterial][pMeshBuffer].push_back(matrix);
                     }
                 }
                 else
                 {
                     if (mapMissingTexture.find(pMeshBuffer) == mapFlatColor.end())
                     {
-                        mapMissingTexture[pMeshBuffer] = std::vector<D3DMATRIX>();
+                        mapMissingTexture[pMeshBuffer] = std::vector<CMatrix>();
                     }
 
                     for (auto const& matrix : renderItem.second)
                     {
-                        matrix.GetBuffer(&floats[0]);
-                        D3DMATRIX d3dMatrix;
-                        int       i = 0;
-                        for (int i1 = 0; i1 < 4; i1++)
-                            for (int i2 = 0; i2 < 4; i2++)
-                                d3dMatrix.m[i1][i2] = floats[i++];
-
-                        mapMissingTexture[pMeshBuffer].push_back(d3dMatrix);
+                        mapMissingTexture[pMeshBuffer].push_back(matrix);
                     }
                 }
             }
@@ -144,19 +128,12 @@ void CAsset3DBatcher::Flush()
             {
                 if (mapFlatColor.find(pMeshBuffer) == mapFlatColor.end())
                 {
-                    mapFlatColor[pMeshBuffer] = std::vector<D3DMATRIX>();
+                    mapFlatColor[pMeshBuffer] = std::vector<CMatrix>();
                 }
 
                 for (auto const& matrix : renderItem.second)
                 {
-                    matrix.GetBuffer(&floats[0]);
-                    D3DMATRIX d3dMatrix;
-                    int       i = 0;
-                    for (int i1 = 0; i1 < 4; i1++)
-                        for (int i2 = 0; i2 < 4; i2++)
-                            d3dMatrix.m[i1][i2] = floats[i++];
-
-                    mapFlatColor[pMeshBuffer].push_back(d3dMatrix);
+                    mapFlatColor[pMeshBuffer].push_back(matrix);
                 }
             }
         }
@@ -181,9 +158,19 @@ void CAsset3DBatcher::Flush()
                 m_pDevice->SetFVF(meshPair.first->m_FVF);
                 m_pDevice->SetVertexDeclaration(meshPair.first->m_pVertexDeclaration);
 
+                /*std::sort(meshPair.second.begin(), meshPair.second.end(), [vecCameraPos](const CMatrix a, const CMatrix& b) -> bool {
+                    return (vecCameraPos - a.GetPosition()).LengthSquared() > (vecCameraPos - b.GetPosition()).LengthSquared();
+                });*/
+
                 for (auto const& matrix : meshPair.second)
                 {
-                    m_pDevice->SetTransform(D3DTS_WORLD, &matrix);
+                    matrix.GetBuffer(&floats[0]);
+                    D3DMATRIX d3dMatrix;
+                    int       i = 0;
+                    for (int i1 = 0; i1 < 4; i1++)
+                        for (int i2 = 0; i2 < 4; i2++)
+                            d3dMatrix.m[i1][i2] = floats[i++];
+                    m_pDevice->SetTransform(D3DTS_WORLD, &d3dMatrix);
                     m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, meshPair.first->m_iIndicesCount, 0, meshPair.first->m_iFaceCount);
                 }
             }
@@ -222,192 +209,7 @@ void CAsset3DBatcher::Flush()
         }
     }
 
-    //for (auto const& renderItem : m_mapRenderList)
-    //{
-    //    const CClientMultiMaterialMeshBuffer* pMultimaterialMesh = renderItem.first->GetMeshBuffer();
-    //    if (pMultimaterialMesh != nullptr && false)
-    //    {
-    //        for (int i = 0; i < 8; i++)
-    //            if (pMultimaterialMesh->m_arrayVertexBuffer[i] != nullptr)
-    //                m_pDevice->SetStreamSource(i, pMultimaterialMesh->m_arrayVertexBuffer[i], 0, pMultimaterialMesh->m_iStrideSize[i]);
-    //        m_pDevice->SetIndices(pMultimaterialMesh->m_pIndexBuffer);
-    //        m_pDevice->SetFVF(pMultimaterialMesh->m_FVF);
-    //        m_pDevice->SetVertexDeclaration(pMultimaterialMesh->m_pVertexDeclaration);
-    //        if (pMultimaterialMesh->m_uiMaterialIndex >= 0)
-    //        {
-    //            CMaterialItem* pMaterial = renderItem.first->GetTexture(pMultimaterialMesh->m_uiMaterialIndex);
-    //            if (pMaterial)
-    //            {
-    //                if (pMaterial != pLastMaterial)
-    //                {
-    //                    // Set texture addressing mode
-    //                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
-    //                    m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
-
-    //                    if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
-    //                        m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
-    //                }
-
-    //                if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
-    //                {
-    //                    m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-    //                    for (auto const& matrix : renderItem.second)
-    //                    {
-    //                        matrix.GetBuffer(&m_fBuffer[0]);
-    //                        m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-    //                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMultimaterialMesh->m_iIndicesCount, 0, pMultimaterialMesh->m_iFaceCount);
-    //                    }
-    //                }
-    //                else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
-    //                {
-    //                    // Draw using shader
-    //                    ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-
-    //                    if (pMaterial != pLastMaterial)
-    //                    {
-    //                        // Apply custom parameters
-    //                        pShaderInstance->ApplyShaderParameters();
-    //                        // Apply common parameters
-    //                        pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-    //                        // Apply mapped parameters
-    //                        pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
-    //                    }
-
-    //                    // Do shader passes
-    //                    DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
-    //                    uint  uiNumPasses = 0;
-    //                    pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
-
-    //                    for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
-    //                    {
-    //                        pD3DEffect->BeginPass(uiPass);
-    //                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMultimaterialMesh->m_iIndicesCount, 0, pMultimaterialMesh->m_iFaceCount);
-    //                        pD3DEffect->EndPass();
-    //                    }
-    //                    pShaderInstance->m_pEffectWrap->End();
-
-    //                    // If we didn't get the effect to save the shader state, clear some things here
-    //                    if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
-    //                    {
-    //                        m_pDevice->SetVertexShader(NULL);
-    //                        m_pDevice->SetPixelShader(NULL);
-    //                    }
-    //                }
-    //                pLastMaterial = pMaterial;
-    //                // pMaterial->Release();
-    //            }
-    //            else
-    //            {
-    //                m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
-    //                for (auto const& matrix : renderItem.second)
-    //                {
-    //                    matrix.GetBuffer(&m_fBuffer[0]);
-    //                    m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-    //                    m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMultimaterialMesh->m_iIndicesCount, 0, pMultimaterialMesh->m_iFaceCount);
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-    //            m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
-    //            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        for (int i = 0; i < renderItem.first->GetMeshNum(); i++)
-    //        {
-    //            pMeshBuffer = renderItem.first->GetMeshBuffer(i);
-
-    //            for (int i = 0; i < 8; i++)
-    //                if (pMeshBuffer->m_arrayVertexBuffer[i] != nullptr)
-    //                    m_pDevice->SetStreamSource(i, pMeshBuffer->m_arrayVertexBuffer[i], 0, pMeshBuffer->m_iStrideSize[i]);
-    //            m_pDevice->SetIndices(pMeshBuffer->m_pIndexBuffer);
-    //            m_pDevice->SetFVF(pMeshBuffer->m_FVF);
-    //            m_pDevice->SetVertexDeclaration(pMeshBuffer->m_pVertexDeclaration);
-
-    //            if (pMeshBuffer->m_uiMaterialIndex >= 0)
-    //            {
-    //                CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex - 1);
-    //                if (pMaterial)
-    //                {
-    //                    if (pMaterial != pLastMaterial)
-    //                    {
-    //                        // Set texture addressing mode
-    //                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, pMaterial->m_TextureAddress);
-    //                        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, pMaterial->m_TextureAddress);
-
-    //                        if (pMaterial->m_TextureAddress == TADDRESS_BORDER)
-    //                            m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, pMaterial->m_uiBorderColor);
-    //                    }
-
-    //                    if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
-    //                    {
-    //                        m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-    //                        for (auto const& matrix : renderItem.second)
-    //                        {
-    //                            matrix.GetBuffer(&m_fBuffer[0]);
-    //                            m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-    //                            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    //                        }
-    //                    }
-    //                    else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
-    //                    {
-    //                        // Draw using shader
-    //                        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-
-    //                        if (pMaterial != pLastMaterial)
-    //                        {
-    //                            // Apply custom parameters
-    //                            pShaderInstance->ApplyShaderParameters();
-    //                            // Apply common parameters
-    //                            pShaderInstance->m_pEffectWrap->ApplyCommonHandles();
-    //                            // Apply mapped parameters
-    //                            pShaderInstance->m_pEffectWrap->ApplyMappedHandles();
-    //                        }
-
-    //                        // Do shader passes
-    //                        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
-    //                        uint  uiNumPasses = 0;
-    //                        pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags, false);
-
-    //                        for (uint uiPass = 0; uiPass < uiNumPasses; uiPass++)
-    //                        {
-    //                            pD3DEffect->BeginPass(uiPass);
-    //                            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    //                            pD3DEffect->EndPass();
-    //                        }
-    //                        pShaderInstance->m_pEffectWrap->End();
-
-    //                        // If we didn't get the effect to save the shader state, clear some things here
-    //                        if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
-    //                        {
-    //                            m_pDevice->SetVertexShader(NULL);
-    //                            m_pDevice->SetPixelShader(NULL);
-    //                        }
-    //                    }
-    //                    pLastMaterial = pMaterial;
-    //                    // pMaterial->Release();
-    //                }
-    //                else
-    //                {
-    //                    m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
-    //                    for (auto const& matrix : renderItem.second)
-    //                    {
-    //                        matrix.GetBuffer(&m_fBuffer[0]);
-    //                        m_pDevice->SetTransform(D3DTS_WORLD, (const D3DMATRIX*)&m_fBuffer);
-    //                        m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    //                    }
-    //                }
-    //            }
-    //            else
-    //            {
-    //                m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
-    //                m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, pMeshBuffer->m_iIndicesCount, 0, pMeshBuffer->m_iFaceCount);
-    //            }
-    //        }
-    //    }
-    //}
+    m_pDevice->SetTexture(0, nullptr);
 
     // Clean up
     ClearQueue();
@@ -424,31 +226,6 @@ void CAsset3DBatcher::ClearQueue()
     m_mapRenderList.clear();
 }
 
-void CAsset3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride)
-{
-    int iSize = 1;
-    switch (eType)
-    {
-        case D3DPT_POINTLIST:
-            iSize = iCollectionSize;
-            break;
-        case D3DPT_LINELIST:
-            iSize = iCollectionSize / 2;
-            break;
-        case D3DPT_LINESTRIP:
-            iSize = iCollectionSize - 1;
-            break;
-        case D3DPT_TRIANGLEFAN:
-        case D3DPT_TRIANGLESTRIP:
-            iSize = iCollectionSize - 2;
-            break;
-        case D3DPT_TRIANGLELIST:
-            iSize = iCollectionSize / 3;
-            break;
-    }
-    m_pDevice->DrawPrimitiveUP(eType, iSize, pDataAddr, uiVertexStride);
-}
-
 void CAsset3DBatcher::AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem)
 {
     auto const& renderItem = m_mapRenderList.find(assetRenderItem->assetNode);
@@ -459,6 +236,6 @@ void CAsset3DBatcher::AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem
     }
     else
     {
-        renderItem->second.push_back(assetRenderItem->matrix);
+        renderItem->second.push_back(std::move(assetRenderItem->matrix));
     }
 }

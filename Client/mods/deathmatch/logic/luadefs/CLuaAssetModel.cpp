@@ -424,6 +424,12 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     CVector          vecScale = CVector(1, 1, 1);
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pAssetNode);
+    if (pAssetNode->GetMeshNum() == 0) // nothing will render, ignore
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
     argStream.ReadVector3D(vecPosition);
     if (argStream.NextIsVector3D())
         argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));

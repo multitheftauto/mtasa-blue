@@ -100,7 +100,6 @@ public:
     int                            m_iIndicesCount;
     int                            m_iVertexCount;
     int                            m_FVF = 0;
-    float                          m_fBuffer[24] = {0};
     bool                           m_bUseIndexedPrimitives;
     int                            m_uiMaterialIndex;
     size_t                         m_szMemoryUsageInBytes;
