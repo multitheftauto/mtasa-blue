@@ -1137,10 +1137,8 @@ bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
             if (pCurrent == pElement)
                 return true;
 
-            if (MapContains(history, pCurrent))
+            if (!std::get<bool>(history.insert(pCurrent)))
                 break; // This should not be possible, but you never know
-
-            MapInsert(history, pCurrent);
         }
 
         return false;

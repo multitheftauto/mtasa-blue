@@ -1081,10 +1081,8 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
             if (pCurrent == pEntity)
                 return true;
 
-            if (MapContains(history, pCurrent))
+            if (!std::get<bool>(history.insert(pCurrent)))
                 break; // This should not be possible, but you never know
-
-            MapInsert(history, pCurrent);
         }
 
         return false;
