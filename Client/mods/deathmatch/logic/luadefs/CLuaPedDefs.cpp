@@ -2188,9 +2188,6 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
 bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
-    if (!ped->IsLocalEntity())
-        return false;
-
     ped->SetArmor(armor);
     return true;
 }

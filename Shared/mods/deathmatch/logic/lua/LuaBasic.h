@@ -83,7 +83,7 @@ namespace lua
     template <typename... Ts>
     int Push(lua_State* L, const std::variant<Ts...>&& val)
     {
-        return std::visit([L](auto&& value) -> int { return Push(L, value); }, val);
+        return std::visit([L](auto&& value) -> int { return Push(L, std::move(value)); }, val);
     }
 
     template <typename T>
