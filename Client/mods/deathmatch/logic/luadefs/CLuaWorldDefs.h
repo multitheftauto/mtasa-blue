@@ -119,8 +119,8 @@ public:
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);    
 
-    static bool ResetColorCorrection(lua_State* const luaVM);
-    static bool SetColorCorrection(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+    static bool ResetColorFilter(lua_State* const luaVM);
+    static bool SetColorFilter(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
         uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
 
 private:

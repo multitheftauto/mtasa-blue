@@ -1610,7 +1610,7 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.bInsideBuilding = *(bool*)0xC402BA;
 }
 
-void CMultiplayerSA::ResetColorCorrection()
+void CMultiplayerSA::ResetColorFilter()
 {
     if (*(BYTE*)0x7036EC == 0xB8)
     {
@@ -1621,7 +1621,7 @@ void CMultiplayerSA::ResetColorCorrection()
     }
 }
 
-void CMultiplayerSA::SetColorCorrection(DWORD dwPass0Color, DWORD dwPass1Color)
+void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
 {
     const bool bEnabled = *(BYTE*)0x7036EC == 0xB8;
 

@@ -39,7 +39,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"areTrafficLightsLocked", CLuaWorldDefs::AreTrafficLightsLocked},
         {"getSkyGradient", CLuaWorldDefs::GetSkyGradient},
         {"getHeatHaze", CLuaWorldDefs::GetHeatHaze},
-        {"resetColorCorrection", ArgumentParser<ResetColorCorrection>},
+        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
         {"getJetpackMaxHeight", CLuaWorldDefs::GetJetpackMaxHeight},
         {"getWindVelocity", CLuaWorldDefs::GetWindVelocity},
         {"getInteriorSoundsEnabled", CLuaWorldDefs::GetInteriorSoundsEnabled},
@@ -68,7 +68,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"setTime", CLuaWorldDefs::SetTime},
         {"setSkyGradient", CLuaWorldDefs::SetSkyGradient},
         {"setHeatHaze", CLuaWorldDefs::SetHeatHaze},
-        {"setColorCorrection", ArgumentParser<SetColorCorrection>},
+        {"setColorFilter", ArgumentParser<SetColorFilter>},
         {"setWeather", CLuaWorldDefs::SetWeather},
         {"setWeatherBlended", CLuaWorldDefs::SetWeatherBlended},
         {"setGravity", CLuaWorldDefs::SetGravity},
@@ -1954,20 +1954,20 @@ int CLuaWorldDefs::GetFPSLimit(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaWorldDefs::ResetColorCorrection(lua_State* const luaVM)
+bool CLuaWorldDefs::ResetColorFilter(lua_State* const luaVM)
 {
     //  bool resetColorCorrection()
-    CStaticFunctionDefinitions::ResetColorCorrection();
+    CStaticFunctionDefinitions::ResetColorFilter();
 
     return true;
 }
 
-bool CLuaWorldDefs::SetColorCorrection(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+bool CLuaWorldDefs::SetColorFilter(lua_State* const luaVM, uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
     uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha)
 {
-    // setColorCorrection()
+    // setColorFilter()
     unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
 
-    return CStaticFunctionDefinitions::SetColorCorrection(ulColor0, ulColor1);
+    return CStaticFunctionDefinitions::SetColorFilter(ulColor0, ulColor1);
 }
