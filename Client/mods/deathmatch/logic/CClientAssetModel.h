@@ -18,6 +18,7 @@
 #include <assimp/include/assimp/postprocess.h>
 #include "assimp/ProgressHandler.hpp"
 #include "assimp/IOSystem.hpp"
+#include "assimp/DefaultLogger.hpp"
 
 using namespace Assimp;
 
@@ -101,6 +102,7 @@ public:
     std::vector<std::shared_ptr<CLuaAssetNode>> GetNodes() const { return m_vecAssetNodes; }
     std::vector<std::shared_ptr<CLuaAssetMesh>> GetMeshes() const { return m_vecAssetMeshes; }
     std::vector<SAssetTexture> GetTextures() const { return m_vecAssetTextures; }
+    void                                        CacheMaterials();
 
     //void GetTextures(lua_State* luaVM);
 

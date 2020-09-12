@@ -193,7 +193,7 @@ void CAsset3DBatcher::Flush()
 
                 if (pMeshBuffer->m_uiMaterialIndex >= 0)
                 {
-                    CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex);
+                    CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex - 1);
                     if (pMaterial)
                     {
                         if (pMaterial != pLastMaterial)

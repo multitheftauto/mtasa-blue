@@ -13,7 +13,17 @@
 #include "../logic/lua/CLuaAssetNode.h"
 #include "../logic/lua/CLuaAssetMesh.h"
 
+
 class CClientTexture;
+
+class myStream : public LogStream
+{
+public:
+    // Write womethink using your own functionality
+    void write(const char* message) {
+        g_pCore->GetConsole()->Printf(message);
+    }
+};
 
 CClientMeshBuffer::~CClientMeshBuffer()
 {
@@ -37,7 +47,7 @@ CClientAssetModel::CClientAssetModel(class CClientManager* pManager, ElementID I
     SetTypeName("asset-model");
 
     m_uiImportFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes |
-                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices;
+                      aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_EmbedTextures;
 
     // Add us to the manager's list
     m_pAssetModelManager->AddToList(this);
@@ -155,6 +165,45 @@ void CClientAssetModel::CacheMetadata()
     }
 }
 
+void CClientAssetModel::CacheMaterials()
+{
+    for (int iMaterialIndex = 0; iMaterialIndex < m_pScene->mNumMaterials; iMaterialIndex++)
+    {
+        aiMaterial* pMaterial = m_pScene->mMaterials[iMaterialIndex];
+        for (int i = 0; i < pMaterial->mNumProperties; i++)
+        {
+            aiMaterialProperty* pProperty = pMaterial->mProperties[i];
+            const char*         strkey = pProperty->mKey.C_Str();
+            aiString*                   str = new aiString();
+            const char*               pChar;
+            std::string               strr;
+            int                         ii;
+            float                       f;
+            double                      d;
+            switch (pProperty->mType)
+            {
+                case aiPTI_Float:
+                    f = strtof(pProperty->mData, NULL);
+                    break;
+                case aiPTI_Double:
+                    d = atof(pProperty->mData);
+                    break;
+                case aiPTI_String:
+                    str = (aiString*)malloc(pProperty->mDataLength);
+                    memcpy(str, pProperty->mData, pProperty->mDataLength);
+                    pChar = str->C_Str();
+                    break;
+                case aiPTI_Buffer:
+                    //lua_pushlstring(luaVM, pProperty->mData, pProperty->mDataLength - 1);
+                    break;
+                case aiPTI_Integer:
+                    ii = atoi(pProperty->mData);
+                    break;
+            }
+        }
+    }
+}
+
 void CClientAssetModel::CacheTextures(CResource* pParentResource)
 {
     m_vecAssetTextures.reserve(m_pScene->mNumTextures);
@@ -187,7 +236,7 @@ void CClientAssetModel::CacheTextures(CResource* pParentResource)
 const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SString& strHint)
 {
     importer.SetProgressHandler(m_pProgressHandler.get());
-    importer.ApplyPostProcessing(m_uiImportFlags);
+    //importer.ApplyPostProcessing(m_uiImportFlags);
     //importer.SetExtraVerbose(true);
     //importer.SetIOHandler(m_pIOHandler.get());
     const aiScene* pScene = importer.ReadFileFromMemory(strPath, strPath.size(), m_uiImportFlags, strHint.c_str());
@@ -203,8 +252,15 @@ const char* CClientAssetModel::LoadFromRawData(const SString& strPath, const SSt
 
 const char* CClientAssetModel::LoadFromFile(std::string strPath)
 {
+    const unsigned int severity = Logger::Debugging | Logger::Info | Logger::Err | Logger::Warn;
+
+    // Attaching it to the default logger
+    Assimp::DefaultLogger::create("", Logger::LogSeverity::VERBOSE, aiDefaultLogStream_STDOUT);
+    Assimp::DefaultLogger::get()->setLogSeverity(Logger::LogSeverity::VERBOSE);
+    Assimp::DefaultLogger::get()->attachStream(new myStream, severity);
+    Assimp::DefaultLogger::get()->warn("test");
     importer.SetProgressHandler(m_pProgressHandler.get());
-    importer.ApplyPostProcessing(m_uiImportFlags);
+    //importer.ApplyPostProcessing(m_uiImportFlags);
     //importer.SetExtraVerbose(true);
     //importer.SetIOHandler(m_pIOHandler.get());
     const aiScene* pScene = importer.ReadFile(strPath, m_uiImportFlags);
@@ -264,6 +320,7 @@ std::vector<std::shared_ptr<CLuaAssetMesh>> CClientAssetModel::GetMeshesOfNode(C
 
 void CClientAssetModel::Cache()
 {
+    CacheMaterials();
     CacheNodesAndMeshes(m_pScene->mRootNode);
     for (auto const& item : m_vecAssetNodes)
         item->Cache();
