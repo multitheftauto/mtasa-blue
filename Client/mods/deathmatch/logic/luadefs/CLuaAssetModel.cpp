@@ -13,8 +13,8 @@
 #include <lua/CLuaFunctionParser.h>
 #include "../lua/CLuaAssetNode.h"
 #include "../lua/CLuaAssetMesh.h"
-#include "core/CLuaAssetNodeInterface.h"
 #include "../core/CAssetInstance.h"
+#include "core/CLuaAssetNodeInterface.h"
 
 void CLuaAssetModelDefs::LoadFunctions()
 {
@@ -30,8 +30,6 @@ void CLuaAssetModelDefs::LoadFunctions()
         {"assetGetMaterialProperties", AssetGetMaterialProperties},
         //{"assetGetMetaData", ArgumentParser<AssetGetModelMetaData, AssetGetNodeMetaData>},
         {"assetCreateInstance", AssetCreateInstance},
-        {"assetGetRenderGroupProperties", AssetGetRenderGroupProperties},
-        {"assetSetRenderGroupProperties", AssetSetRenderGroupProperties},
     };
 
     // Add functions
@@ -601,105 +599,6 @@ int CLuaAssetModelDefs::AssetCreateInstance(lua_State* luaVM)
         return 1;
     }
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAssetModelDefs::AssetGetRenderGroupProperties(lua_State* luaVM)
-{
-    unsigned int            uiGroup;
-    eAssetRenderingProperty eProperty;
-    CScriptArgReader        argStream(luaVM);
-
-    argStream.ReadNumber(uiGroup);
-    argStream.ReadEnumString(eProperty);
-    if (!argStream.HasErrors())
-    {
-        // CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
-
-        switch (eProperty)
-        {
-            case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
-            {
-                // lua_pushnumber(luaVM, pGroup->GetDrawDistance());
-                return 1;
-            }
-        }
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAssetModelDefs::AssetSetRenderGroupProperties(lua_State* luaVM)
-{
-    unsigned int            uiGroup;
-    eAssetRenderingProperty eProperty;
-    CScriptArgReader        argStream(luaVM);
-
-    argStream.ReadNumber(uiGroup);
-    argStream.ReadEnumString(eProperty);
-    if (!argStream.HasErrors())
-    {
-        bool    booleanValue;
-        float   floatValue;
-        CVector vector;
-        if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_BOOL)
-        {
-            if (!argStream.NextIsBool())
-            {
-                argStream.SetCustomError(SString("Rendering property %s require boolean value", EnumToString(eProperty).c_str()).c_str());
-            }
-            else
-            {
-                argStream.ReadBool(booleanValue);
-            }
-        }
-        else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
-        {
-            if (!argStream.NextIsNumber())
-            {
-                argStream.SetCustomError(SString("Rendering property %s require float value", EnumToString(eProperty).c_str()).c_str());
-            }
-            else
-            {
-                argStream.ReadNumber(floatValue);
-            }
-        }
-        else if (eProperty & ASSET_RENDERING_PROPERTY_TYPE_FLOAT)
-        {
-            if (!argStream.NextIsVector3D())
-            {
-                argStream.SetCustomError(SString("Rendering property %s require vector3 value", EnumToString(eProperty).c_str()).c_str());
-            }
-            else
-            {
-                argStream.ReadVector3D(vector);
-            }
-        }
-
-        if (!argStream.HasErrors())
-        {
-            // CAssetInstance* pGroup = g_pCore->GetAssetsControl()->GetRenderGroup(uiGroup);
-
-            switch (eProperty)
-            {
-                case ASSET_REDNERING_PROPERTY_DRAW_DISTANCE:
-                {
-                    // pGroup->SetDrawDistance(floatValue);
-                    break;
-                }
-            }
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 

@@ -82,7 +82,7 @@ void CAsset3DBatcher::Flush()
     float m_fBuffer[24] = {0};
 
     std::unordered_map<const CMaterialItem*, std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix,CMatrix>>>> mapTextured;
-    std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>                                           mapFlatColor;
+    std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>                                          mapFlatColor;
     std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>                                          mapMissingTexture;
 
     CClientMeshBuffer* pMeshBuffer;
@@ -95,7 +95,7 @@ void CAsset3DBatcher::Flush()
 
             if (pMeshBuffer->m_uiMaterialIndex >= 0)
             {
-                const CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex + 1);
+                const CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex);
                 if (pMaterial != nullptr)
                 {
                     if (mapTextured.find(pMaterial) == mapTextured.end())
@@ -217,6 +217,46 @@ void CAsset3DBatcher::Flush()
                 m_pDevice->SetVertexShader(NULL);
                 m_pDevice->SetPixelShader(NULL);
             }
+        }
+    }
+
+    if (mapMissingTexture.size() > 0)
+    {
+        // Set texture addressing mode
+        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, m_pMissingTexture->m_TextureAddress);
+        m_pDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, m_pMissingTexture->m_TextureAddress);
+
+        if (m_pMissingTexture->m_TextureAddress == TADDRESS_BORDER)
+            m_pDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, m_pMissingTexture->m_uiBorderColor);
+        m_pDevice->SetTexture(0, m_pMissingTexture->m_pD3DTexture);
+    }
+    for (auto const& renderItem : mapMissingTexture)
+    {
+        for (int i = 0; i < 8; i++)
+        if (renderItem.first->m_arrayVertexBuffer[i] != nullptr)
+                m_pDevice->SetStreamSource(i, renderItem.first->m_arrayVertexBuffer[i], 0, renderItem.first->m_iStrideSize[i]);
+        m_pDevice->SetIndices(renderItem.first->m_pIndexBuffer);
+        m_pDevice->SetFVF(renderItem.first->m_FVF);
+        m_pDevice->SetVertexDeclaration(renderItem.first->m_pVertexDeclaration);
+        for (auto const& matrix : renderItem.second)
+        {
+            matrix.first.GetBuffer(&floats[0]);
+            D3DMATRIX d3dModelMatrix;
+            int       i = 0;
+            for (int i1 = 0; i1 < 4; i1++)
+                for (int i2 = 0; i2 < 4; i2++)
+                    d3dModelMatrix.m[i1][i2] = floats[i++];
+            m_pDevice->SetTransform(D3DTS_WORLD, &d3dModelMatrix);
+
+            matrix.second.GetBuffer(&floats[0]);
+            D3DMATRIX d3dTextureMatrix;
+                    i = 0;
+            for (int i1 = 0; i1 < 4; i1++)
+                for (int i2 = 0; i2 < 4; i2++)
+                    d3dTextureMatrix.m[i1][i2] = floats[i++];
+            m_pDevice->SetTransform(D3DTS_TEXTURE0, &d3dTextureMatrix);
+
+            m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, renderItem.first->m_iIndicesCount, 0, renderItem.first->m_iFaceCount);
         }
     }
 

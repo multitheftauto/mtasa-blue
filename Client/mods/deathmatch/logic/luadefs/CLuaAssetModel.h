@@ -40,6 +40,4 @@ public:
     LUA_DECLARE(AssetGetMaterialProperties);
     LUA_DECLARE(AssetGetMetaData);
     LUA_DECLARE(AssetCreateInstance);
-    LUA_DECLARE(AssetGetRenderGroupProperties);
-    LUA_DECLARE(AssetSetRenderGroupProperties);
 };
