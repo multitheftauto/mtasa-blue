@@ -18,6 +18,7 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
+    LUA_DECLARE(EngineLoadIMG);
     LUA_DECLARE(EngineLoadDFF);
     LUA_DECLARE(EngineLoadTXD);
     LUA_DECLARE(EngineLoadCOL);
@@ -62,4 +63,5 @@ private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);
     static void AddEngineDffClass(lua_State* luaVM);
+    static void AddEngineImgClass(lua_State* luaVM);
 };

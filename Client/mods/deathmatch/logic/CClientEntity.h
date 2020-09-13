@@ -78,6 +78,7 @@ enum eClientEntityType
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
     CCLIENTUNKNOWN,
+    CCLIENTIMG,
 };
 
 class CClientColShape;
@@ -141,7 +142,8 @@ enum eCClientEntityClassTypes
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
-    CLASS_CClientSearchLight
+    CLASS_CClientSearchLight,
+    CLASS_CClientIMG,
 };
 
 class CClientEntity : public CClientEntityBase

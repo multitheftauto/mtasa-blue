@@ -15,6 +15,7 @@ void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"engineFreeModel", EngineFreeModel},
+        {"engineLoadIMG", EngineLoadIMG},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
         {"engineLoadDFF", EngineLoadDFF},
@@ -112,6 +113,14 @@ void CLuaEngineDefs::AddEngineTxdClass(lua_State* luaVM)
     lua_registerclass(luaVM, "EngineTXD", "Element");
 }
 
+void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
+{
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "engineLoadIMG");
+}
+
+
 void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
@@ -121,6 +130,68 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
     lua_registerclass(luaVM, "EngineDFF", "Element");
 }
+
+int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
+{
+    SString          input;
+    CScriptArgReader argStream(luaVM);
+    // Grab the IMG filename or data
+    argStream.ReadString(input);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the lua main and the resource belonging to this script
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            // Get the resource we belong to
+            CResource* pResource = pLuaMain->GetResource();
+            if (pResource)
+            {
+
+                SString filePath;
+
+                // Is this a legal filepath?
+                if (CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
+                {
+                    // Grab the resource root entity
+                    // CClientEntity* pRoot = pResource->GetResourceIMGFilesRoot();
+
+                    // Create the col model
+                    CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
+
+                    // Attempt loading the file
+                    if (pImg->Load(std::move(filePath)))
+                    {
+                        // Success. Make it a child of the resource img root
+                        // pImg->SetParent(pRoot);
+
+                        lua_pushelement(luaVM, pImg);
+                        return 1;
+                    }
+                    else
+                    {
+                        delete pImg;
+                        argStream.SetCustomError(input, "Error loading IMG");
+                    }
+                }
+                else
+                {
+                    argStream.SetCustomError(input, "Bad file path");
+                }
+            }
+        }
+    }
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 
 int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 {

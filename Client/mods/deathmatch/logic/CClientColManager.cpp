@@ -69,6 +69,7 @@ void CClientColManager::DoHitDetectionForColShape(CClientColShape* pShape)
             case CCLIENTDFF:
             case CCLIENTCOL:
             case CCLIENTTXD:
+            case CCLIENTIMG:
             case CCLIENTSOUND:
                 break;
             default:
