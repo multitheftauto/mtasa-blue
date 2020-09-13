@@ -15,6 +15,7 @@ struct SRenderAssetItem
 {
     CMatrix                 matrix;
     CLuaAssetNodeInterface* assetNode;
+    bool                    preserveUV;
 };
 
 struct SRenderAssetItemGroup
@@ -40,6 +41,6 @@ public:
 protected:
     IDirect3DDevice9*                     m_pDevice = nullptr;
     CGraphics*                            m_pGraphics;
-    std::unordered_map<CLuaAssetNodeInterface*, std::vector<CMatrix>> m_mapRenderList;
+    std::unordered_map<CLuaAssetNodeInterface*, std::vector<std::pair<CMatrix,CMatrix>>> m_mapRenderList;
     CTextureItem*                                                     m_pMissingTexture = nullptr;
 };

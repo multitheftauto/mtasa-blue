@@ -32,6 +32,7 @@ struct SRenderAssetItem
 {
     CMatrix                 matrix;
     CLuaAssetNodeInterface* assetNode;
+    bool                    preserveUV;
 };
 
 struct SAssetTexture

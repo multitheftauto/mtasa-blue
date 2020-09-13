@@ -300,7 +300,7 @@ void CClientAssetModel::CacheNodesAndMeshes(const aiNode* pNode)
     std::shared_ptr<CLuaAssetNode> pAssetNode = std::make_shared<CLuaAssetNode>(this, pNode);
     for (int i = 0; i < pNode->mNumMeshes; i++)
     {
-        std::shared_ptr<CLuaAssetMesh> pMesh = std::make_shared<CLuaAssetMesh>(this, m_pScene->mMeshes[i], pAssetNode);
+        std::shared_ptr<CLuaAssetMesh> pMesh = std::make_shared<CLuaAssetMesh>(this, m_pScene->mMeshes[pNode->mMeshes[i]], pAssetNode);
         m_vecAssetMeshes.push_back(std::move(pMesh));
     }
 

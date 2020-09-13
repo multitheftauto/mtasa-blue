@@ -422,6 +422,8 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
     CVector          vecPosition;
     CVector          vecRotation;
     CVector          vecScale = CVector(1, 1, 1);
+    bool             bPreserveUV = false;
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pAssetNode);
     if (pAssetNode->GetMeshNum() == 0) // nothing will render, ignore
@@ -435,7 +437,10 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
         argStream.ReadVector3D(vecRotation, CVector(0, 0, 0));
     if (argStream.NextIsVector3D())
         argStream.ReadVector3D(vecScale, CVector(1, 1, 1));
-
+    if (argStream.NextIsBool())
+    {
+        argStream.ReadBool(bPreserveUV);
+    }
     if (!argStream.HasErrors())
     {
         std::unique_ptr<SRenderAssetItem> settings = std::make_unique<SRenderAssetItem>();
@@ -444,6 +449,7 @@ int CLuaAssetModelDefs::AssetRender(lua_State* luaVM)
         settings->matrix.SetRotation(vecRotation);
         settings->matrix.SetScale(vecScale);
         settings->assetNode = (CLuaAssetNodeInterface*)pAssetNode;
+        settings->preserveUV = bPreserveUV;
         g_pCore->GetGraphics()->DrawAssetNode(std::move(settings));
         lua_pushboolean(luaVM, true);
         return 1;

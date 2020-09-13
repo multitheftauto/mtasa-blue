@@ -77,11 +77,13 @@ void CAsset3DBatcher::Flush()
     m_pDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CONSTANT);
     m_pDevice->SetTextureStageState(1, D3DTSS_CONSTANT, pAssetManager->GetAmbientColor());
 
+    
+    m_pDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
     float m_fBuffer[24] = {0};
 
-    std::unordered_map<const CMaterialItem*, std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>> mapTextured;
-    std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>                                           mapFlatColor;
-    std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>                                           mapMissingTexture;
+    std::unordered_map<const CMaterialItem*, std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix,CMatrix>>>> mapTextured;
+    std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>                                           mapFlatColor;
+    std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>                                          mapMissingTexture;
 
     CClientMeshBuffer* pMeshBuffer;
     CMaterialItem*     pLastMaterial = nullptr;
@@ -93,16 +95,16 @@ void CAsset3DBatcher::Flush()
 
             if (pMeshBuffer->m_uiMaterialIndex >= 0)
             {
-                const CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex - 1);
+                const CMaterialItem* pMaterial = renderItem.first->GetTexture(pMeshBuffer->m_uiMaterialIndex + 1);
                 if (pMaterial != nullptr)
                 {
                     if (mapTextured.find(pMaterial) == mapTextured.end())
                     {
-                        mapTextured[pMaterial] = std::unordered_map<CClientMeshBuffer*, std::vector<CMatrix>>();
+                        mapTextured[pMaterial] = std::unordered_map<CClientMeshBuffer*, std::vector<std::pair<CMatrix, CMatrix>>>();
                     }
                     if (mapTextured[pMaterial].find(pMeshBuffer) == mapFlatColor.end())
                     {
-                        mapTextured[pMaterial][pMeshBuffer] = std::vector<CMatrix>();
+                        mapTextured[pMaterial][pMeshBuffer] = std::vector<std::pair<CMatrix, CMatrix>>();
                         mapTextured[pMaterial][pMeshBuffer].resize(mapTextured[pMaterial][pMeshBuffer].size() + renderItem.second.size());
                     }
 
@@ -115,7 +117,7 @@ void CAsset3DBatcher::Flush()
                 {
                     if (mapMissingTexture.find(pMeshBuffer) == mapFlatColor.end())
                     {
-                        mapMissingTexture[pMeshBuffer] = std::vector<CMatrix>();
+                        mapMissingTexture[pMeshBuffer] = std::vector<std::pair<CMatrix, CMatrix>>();
                     }
 
                     for (auto const& matrix : renderItem.second)
@@ -128,7 +130,7 @@ void CAsset3DBatcher::Flush()
             {
                 if (mapFlatColor.find(pMeshBuffer) == mapFlatColor.end())
                 {
-                    mapFlatColor[pMeshBuffer] = std::vector<CMatrix>();
+                    mapFlatColor[pMeshBuffer] = std::vector<std::pair<CMatrix, CMatrix>>();
                 }
 
                 for (auto const& matrix : renderItem.second)
@@ -164,13 +166,22 @@ void CAsset3DBatcher::Flush()
 
                 for (auto const& matrix : meshPair.second)
                 {
-                    matrix.GetBuffer(&floats[0]);
-                    D3DMATRIX d3dMatrix;
+                    matrix.first.GetBuffer(&floats[0]);
+                    D3DMATRIX d3dModelMatrix;
                     int       i = 0;
                     for (int i1 = 0; i1 < 4; i1++)
                         for (int i2 = 0; i2 < 4; i2++)
-                            d3dMatrix.m[i1][i2] = floats[i++];
-                    m_pDevice->SetTransform(D3DTS_WORLD, &d3dMatrix);
+                            d3dModelMatrix.m[i1][i2] = floats[i++];
+                    m_pDevice->SetTransform(D3DTS_WORLD, &d3dModelMatrix);
+
+                    matrix.second.GetBuffer(&floats[0]);
+                    D3DMATRIX d3dTextureMatrix;
+                           i = 0;
+                    for (int i1 = 0; i1 < 4; i1++)
+                        for (int i2 = 0; i2 < 4; i2++)
+                            d3dTextureMatrix.m[i1][i2] = floats[i++];
+                    m_pDevice->SetTransform(D3DTS_TEXTURE0, &d3dTextureMatrix);
+
                     m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, meshPair.first->m_iIndicesCount, 0, meshPair.first->m_iFaceCount);
                 }
             }
@@ -232,10 +243,16 @@ void CAsset3DBatcher::AddAsset(std::unique_ptr<SRenderAssetItem> assetRenderItem
 
     if (renderItem == m_mapRenderList.end())
     {
-        m_mapRenderList.insert({assetRenderItem->assetNode, std::vector<CMatrix>{assetRenderItem->matrix}});
+        m_mapRenderList[assetRenderItem->assetNode] = std::vector<std::pair<CMatrix, CMatrix>>();
+    }
+    if (assetRenderItem->preserveUV)
+    {
+        CMatrix matrixTexture;
+        matrixTexture.SetScale(-assetRenderItem->matrix.GetScale());
+        m_mapRenderList[assetRenderItem->assetNode].push_back(std::pair{assetRenderItem->matrix, matrixTexture});
     }
     else
     {
-        renderItem->second.push_back(std::move(assetRenderItem->matrix));
+        m_mapRenderList[assetRenderItem->assetNode].push_back(std::pair{assetRenderItem->matrix, CMatrix()});
     }
 }
