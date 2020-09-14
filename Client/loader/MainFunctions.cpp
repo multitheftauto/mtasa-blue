@@ -631,20 +631,8 @@ void ValidateGTAPath()
             _E("CL13"));
         return ExitProcess(EXIT_ERROR);
     }
-    else if (iResult == GAME_PATH_STEAM)
-    {
-        DisplayErrorMessageBox(_("It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to "
-                                 "a page where you can find information to resolve this issue."),
-                               _E("CL14"));
-        BrowseToSolution("downgrade-steam");
-        return ExitProcess(EXIT_ERROR);
-    }
 
-    SString strGTAPath = GetGTAPath();
-
-    // We can now set this
-    SetCurrentDirectory(strGTAPath);
-
+    const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     if (strGTAPath.Contains(";") || strMTASAPath.Contains(";"))
     {

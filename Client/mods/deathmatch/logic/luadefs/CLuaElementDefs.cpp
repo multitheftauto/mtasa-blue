@@ -12,7 +12,6 @@
 
 #include "StdInc.h"
 using std::list;
-#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -1036,7 +1035,9 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         CVector vecMin, vecMax;
         if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
         {
-            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
+            // If the caller expects six results, return six floats, otherwise two vectors
+            int iExpected = lua_ncallresult(luaVM);
+            if (iExpected == 6)
             {
                 lua_pushnumber(luaVM, vecMin.fX);
                 lua_pushnumber(luaVM, vecMin.fY);

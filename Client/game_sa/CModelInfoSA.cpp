@@ -14,14 +14,15 @@
 
 extern CGameSA* pGame;
 
+CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<TimeInfo*, TimeInfo*>                                        CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -563,51 +564,6 @@ float CModelInfoSA::GetLODDistance()
     return 0.0f;
 }
 
-bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
-{
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
-        return false;
-
-    TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
-    if (!pTime)
-        return false;
-
-    if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
-        MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
-
-    pTime->m_nTimeOn = cHourOn;
-    pTime->m_nTimeOff = cHourOff;
-    return true;
-}
-
-bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
-{
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
-        return false;
-
-    TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
-    if (!time)
-        return false;
-
-    cHourOn = time->m_nTimeOn;
-    cHourOff = time->m_nTimeOff;
-    return true;
-}
-
-void CModelInfoSA::StaticResetModelTimes()
-{
-    // Restore default values
-    for (std::map<TimeInfo*, TimeInfo*>::const_iterator iter = ms_ModelDefaultModelTimeInfo.begin(); iter != ms_ModelDefaultModelTimeInfo.end(); ++iter)
-    {
-        iter->first->m_nTimeOn = iter->second->m_nTimeOn;
-        iter->first->m_nTimeOff = iter->second->m_nTimeOff;
-    }
-
-    ms_ModelDefaultModelTimeInfo.clear();
-}
-
 float CModelInfoSA::GetOriginalLODDistance()
 {
     // Return default LOD distance value (if doesn't exist, LOD distance hasn't been changed)
@@ -1057,6 +1013,97 @@ void CModelInfoSA::ResetAllVehicleDummies()
     }
 
     ms_ModelDefaultDummiesPosition.clear();
+}
+
+float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
+{
+    if (!IsVehicle())
+        return 0.0f;
+
+    // Request model load right now if not loaded yet
+    if (!IsLoaded())
+        Request(BLOCKING, "GetVehicleWheelSize");
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            return pVehicleModel->fWheelSizeFront;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            return pVehicleModel->fWheelSizeRear;
+    }
+
+    return 0.0f;
+}
+
+void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
+{
+    if (!IsVehicle())
+        return;
+
+    // Request model load right now if not loaded yet
+    if (!IsLoaded())
+        Request(BLOCKING, "SetVehicleWheelSize");
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+
+    // Store default wheel sizes in map
+    if (!MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
+        MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
+
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::ALL_WHEELS:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+    }
+}
+
+void CModelInfoSA::ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes)
+{
+    if (!IsVehicle())
+        return;
+
+    std::pair<float, float>* sizesPair;
+    if (!defaultSizes)
+    {
+        sizesPair = MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+        MapRemove(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+    }
+    else
+    {
+        sizesPair = defaultSizes;
+    }
+
+    // Default values not found in map
+    if (!sizesPair)
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    pVehicleModel->fWheelSizeFront = sizesPair->first;
+    pVehicleModel->fWheelSizeRear = sizesPair->second;
+}
+
+void CModelInfoSA::ResetAllVehiclesWheelSizes()
+{
+    CGame* game = g_pCore->GetGame();
+    for (auto& info : ms_VehicleModelDefaultWheelSizes)
+    {
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
+        if (modelInfo)
+        {
+            modelInfo->ResetVehicleWheelSizes(&info.second);
+        }
+    }
+
+    ms_VehicleModelDefaultWheelSizes.clear();
 }
 
 void CModelInfoSA::SetCustomModel(RpClump* pClump)

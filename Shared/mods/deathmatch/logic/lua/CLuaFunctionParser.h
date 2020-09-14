@@ -46,11 +46,10 @@ struct CLuaFunctionParserBase
     {
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return "string";
-        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
-                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
-            return "number";
         else if constexpr (std::is_same_v<T, bool>)
             return "boolean";
+        else if constexpr (std::is_arithmetic_v<T>)
+            return "number";
         else if constexpr (std::is_enum_v<T>)
             return "enum";
         else if constexpr (is_specialization<T, std::optional>::value)
@@ -188,11 +187,10 @@ struct CLuaFunctionParserBase
         // primitive types
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER);
-        if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, short> ||
-                      std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short>)
-            return lua_isnumber(L, index);
         if constexpr (std::is_same_v<T, bool>)
             return (iArgument == LUA_TBOOLEAN);
+        if constexpr (std::is_arithmetic_v<T>)
+            return lua_isnumber(L, index);
 
         // Advanced types
         // Enums are represented as strings to Lua
@@ -336,8 +334,7 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, int> || std::is_same_v<T, short> || std::is_same_v<T, bool> ||
-                           std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned short> || std::is_same_v<T, std::string_view>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_integral_v<T>)
             return lua::PopPrimitive<T>(L, index);
         // floats/doubles may not be NaN
         else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)

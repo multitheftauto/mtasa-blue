@@ -11,25 +11,6 @@
 
 #include "StdInc.h"
 
-//
-////////////////////////////////////////////////////////////////////
-
-BOOL HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize)
-{
-    BYTE JumpBytes[MAX_JUMPCODE_SIZE];
-    MemSetFast(JumpBytes, 0x90, MAX_JUMPCODE_SIZE);
-    if (CreateJump(dwInstallAddress, dwHookHandler, JumpBytes))
-    {
-        MemCpy((PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize);
-        return TRUE;
-    }
-    else
-    {
-        return FALSE;
-    }
-}
-
-////////////////////////////////////////////////////////////////////
 
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray)
 {
