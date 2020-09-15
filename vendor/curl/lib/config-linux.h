@@ -435,6 +435,9 @@
 /* if zlib is available */
 #define HAVE_LIBZ 1
 
+/* Define to 1 if you have the `zstd' library (-lzstd). */
+/* #undef HAVE_LIBZSTD */
+
 /* Define to 1 if you have the <linux/tcp.h> header file. */
 #define HAVE_LINUX_TCP_H 1
 
@@ -799,8 +802,8 @@
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
-/* if you have wolfSSL_DES_set_odd_parity */
-/* #undef HAVE_WOLFSSL_DES_SET_ODD_PARITY */
+/* if you have wolfSSL_DES_ecb_encrypt */
+/* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
 
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
@@ -822,6 +825,12 @@
 
 /* if you have the zlib.h header file */
 #define HAVE_ZLIB_H 1
+
+/* if libzstd is in use */
+/* #undef HAVE_ZSTD */
+
+/* Define to 1 if you have the <zstd.h> header file. */
+/* #undef HAVE_ZSTD_H */
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
