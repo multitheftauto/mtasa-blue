@@ -1285,8 +1285,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
 
         // Loop through all added commands
         int                                    iCount = 0;
-        list<CConsoleCommand*>::const_iterator iter = pConsole->CommandsBegin();
-        for (; iter != pConsole->CommandsEnd(); iter++)
+        for (CConsoleCommand* command : pConsole->CommandsList())
         {
             // Add a new line every third command
             if (iCount == 3)
@@ -1296,7 +1295,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
             }
 
             // Add the commandname and pad it to 20 letters with spaces
-            const char* szCommand = (*iter)->GetCommand();
+            const char* szCommand = (command)->GetCommand();
             strHelpText.append(szCommand);
             strHelpText.append(25 - strlen(szCommand), ' ');
 
@@ -1316,8 +1315,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
             CConsoleCommand* pConsoleCommand = pConsole->GetCommand(szArguments);
             if (pConsoleCommand)
             {
-                string sHelp = pConsoleCommand->GetHelp();
-                pEchoClient->SendConsole(sHelp.c_str());
+                pEchoClient->SendConsole(pConsoleCommand->GetHelp());
                 return true;
             }
             else

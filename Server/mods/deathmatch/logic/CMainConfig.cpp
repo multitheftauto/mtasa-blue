@@ -914,10 +914,10 @@ bool CMainConfig::SetFPSLimit(unsigned short usFPS, bool bSave)
     return false;
 }
 
-void CMainConfig::RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, string sConsoleHelp)
+void CMainConfig::RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText)
 {
     // Register the function with the given name and function pointer
-    m_pConsole->AddCommand(pFunction, szName, bRestricted, sConsoleHelp);
+    m_pConsole->AddCommand(pFunction, szName, bRestricted, szConsoleHelpText);
 }
 
 void CMainConfig::SetCommandLineParser(CCommandLineParser* pCommandLineParser)

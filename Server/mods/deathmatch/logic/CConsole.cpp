@@ -119,10 +119,10 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
     return false;
 }
 
-void CConsole::AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, string sConsoleHelp)
+void CConsole::AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, const char* szConsoleHelpText)
 {
     // Make a command class and add it to the list
-    CConsoleCommand* pCommand = new CConsoleCommand(pHandler, szCommand, bRestricted, sConsoleHelp);
+    CConsoleCommand* pCommand = new CConsoleCommand(pHandler, szCommand, bRestricted, szConsoleHelpText);
     m_Commands.push_back(pCommand);
 }
 
