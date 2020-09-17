@@ -1181,6 +1181,12 @@ int CLuaElementDefs::getAttachedElements(lua_State* luaVM)
         list<CElement*>::const_iterator iter = pElement->AttachedElementsBegin();
         for (; iter != pElement->AttachedElementsEnd(); ++iter)
         {
+            if (IS_MARKER(pElement))
+            {
+                CMarker* marker = static_cast<CMarker*>(pElement);
+                if (marker->GetColShape() == *iter)
+                    continue;
+            }
             if ((*iter)->GetAttachedToElement() == pElement)
             {
                 lua_pushnumber(luaVM, ++uiIndex);
