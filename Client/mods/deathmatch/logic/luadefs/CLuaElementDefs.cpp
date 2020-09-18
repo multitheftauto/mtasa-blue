@@ -1196,12 +1196,6 @@ int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
             {
                 CClientEntity* pAttached = pEntity->GetAttachedEntity(i);
                 assert(pAttached->GetAttachedTo() == pEntity);
-                if (IS_MARKER(pEntity))
-                {
-                    CClientMarker* marker = static_cast<CClientMarker*>(pEntity);
-                    if (marker->GetColShape() == pAttached)
-                        continue;
-                }
                 if (!pAttached->IsBeingDeleted())
                 {
                     lua_pushnumber(luaVM, i + 1);
