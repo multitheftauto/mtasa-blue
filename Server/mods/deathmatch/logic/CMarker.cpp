@@ -384,6 +384,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
 
         m_pCollision->SetCallback(this);
         m_pCollision->SetAutoCallEvent(false);
+        m_pCollision->SetCanBeDestroyedByScript(false);
     }
 
     // Set the radius after the size
