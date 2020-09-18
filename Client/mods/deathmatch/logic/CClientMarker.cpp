@@ -484,6 +484,8 @@ void CClientMarker::CreateOfType(int iType)
         default:
             break;
     }
+    if (m_pCollision)
+        m_pCollision->SetCanBeDestroyedByScript(false);
 }
 
 CSphere CClientMarker::GetWorldBoundingSphere()
