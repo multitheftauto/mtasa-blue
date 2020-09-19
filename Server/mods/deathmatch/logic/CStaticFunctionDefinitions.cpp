@@ -246,6 +246,9 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
 
 bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 {
+    if (!pElement->CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = pElement->IterBegin();
     while (iter != pElement->IterEnd())

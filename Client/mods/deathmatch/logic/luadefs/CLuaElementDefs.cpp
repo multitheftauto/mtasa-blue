@@ -1680,7 +1680,7 @@ int CLuaElementDefs::DestroyElement(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Destroy it
-        if (pEntity->CanBeDestroyedByScript() && CStaticFunctionDefinitions::DestroyElement(*pEntity))
+        if (CStaticFunctionDefinitions::DestroyElement(*pEntity))
         {
             lua_pushboolean(luaVM, true);
             return 1;
