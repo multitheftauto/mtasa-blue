@@ -322,6 +322,9 @@ public:
     bool         IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     virtual void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
 
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
+
 protected:
     CClientManager*       m_pManager;
     CClientEntity*        m_pParent;
@@ -368,7 +371,8 @@ protected:
     bool                              m_bWorldIgnored;
     bool                              m_bCallPropagationEnabled;
     bool                              m_bDisallowCollisions;
-
+    bool                              m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                                  // have no effect on this element
 public:
     // Optimization for getElementsByType starting at root
     static void StartupEntitiesFromRoot();

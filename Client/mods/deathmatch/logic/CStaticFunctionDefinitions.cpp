@@ -928,6 +928,9 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
 
 bool CStaticFunctionDefinitions::DestroyElement(CClientEntity& Entity)
 {
+    if (!Entity.CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = Entity.IterBegin();
     while (iter != Entity.IterEnd())
