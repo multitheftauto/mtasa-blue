@@ -197,7 +197,7 @@ public:
     bool                                 IsElementAttached(CElement* pElement);
     bool                                 IsAttachedToElement(CElement* pElement, bool bRecursive = true);
     virtual bool                         IsAttachable();
-    virtual bool                         IsAttachToable();    
+    virtual bool                         IsAttachToable();
     void                                 GetAttachedPosition(CVector& vecPosition);
     void                                 GetAttachedRotation(CVector& vecRotation);
 
