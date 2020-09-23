@@ -65,6 +65,12 @@ CEntitySA::CEntitySA()
     m_ulArrayID = INVALID_POOL_ARRAY_ID;
 }
 
+void CEntitySA::UpdateRpHAnim()
+{
+    auto CEntity_UpdateRpHAnim = (void(__thiscall*)(CEntitySAInterface*))0x532B20;
+    CEntity_UpdateRpHAnim(m_pInterface);
+}
+
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
 {
     this->internalInterface->ModelClump->SetAlpha(iAlpha);

@@ -18,7 +18,7 @@ class CTaskManager;
 #include "CWeapon.h"
 #include "CPedIntelligence.h"
 #include "CPedSound.h"
-
+#include "CPedIK.h"
 #include <CVector2D.h>
 
 #include <windows.h>
@@ -27,6 +27,8 @@ class CTaskManager;
 class CVehicle;
 class CObject;
 class CWeaponStat;
+
+class CPedIKSAInterface;
 
 enum ePedPieceTypes
 {
@@ -270,4 +272,8 @@ public:
 
     virtual int GetCustomMoveAnim() = 0;
     virtual bool IsDoingGangDriveby() = 0;
+
+    virtual CPedIKSAInterface* GetPedIKInterface() = 0;
+    virtual void*              GetPedNodeInterface(std::int32_t nodeId) = 0;
+    virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 };

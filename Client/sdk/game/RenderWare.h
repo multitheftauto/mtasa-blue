@@ -72,17 +72,21 @@ struct RwSphere
     RwV3d position;
     float radius;
 };
-struct RwMatrix
-{                                  // 16-byte padded
-    RwV3d        right;            // 0
-    unsigned int flags;            // 12
-    RwV3d        up;               // 16
-    unsigned int pad1;             // 28
-    RwV3d        at;               // 32
-    unsigned int pad2;             // 44
-    RwV3d        pos;              // 48
-    unsigned int pad3;             // 60
+
+struct RwMatrixTag
+{
+    /* These are padded to be 16 byte quantities per line */
+    RwV3d    right;
+    std::uint32_t flags;
+    RwV3d    up;
+    std::uint32_t pad1;
+    RwV3d    at;
+    std::uint32_t pad2;
+    RwV3d    pos;
+    std::uint32_t pad3;
 };
+
+typedef RwMatrixTag RwMatrix;
 
 // RenderWare enumerations
 enum RwPrimitiveType

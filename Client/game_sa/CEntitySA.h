@@ -242,6 +242,7 @@ public:
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
+    void UpdateRpHAnim();
     VOID SetPosition(float fX, float fY, float fZ);
     VOID Teleport(float fX, float fY, float fZ);
     VOID ProcessControl();

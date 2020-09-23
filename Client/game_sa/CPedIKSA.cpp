@@ -10,3 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+
+void CPedIKSA::RotateTorso(void* bone, LimbOrientation* orientation, bool flag)
+{
+    auto CPedIKSA_RotateTorso = (void(__thiscall*)(CPedIKSAInterface*, void*, LimbOrientation*, bool))0x5FDDB0;
+    CPedIKSA_RotateTorso(internalInterface, bone, orientation, flag);
+}

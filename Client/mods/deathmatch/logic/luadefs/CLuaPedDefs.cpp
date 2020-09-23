@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include "CMatrix_Pad.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -49,6 +50,14 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedDucked", IsPedDucked},
         {"getPedStat", GetPedStat},
         {"getPedBonePosition", GetPedBonePosition},
+        {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
+        {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
+        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
+        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"setPedNodeOrientation", ArgumentParser<SetPedNodeOrientation>},
+        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
         {"getPedClothes", GetPedClothes},
         {"getPedControlState", GetPedControlState},
         {"getPedAnalogControlState", GetPedAnalogControlState},
@@ -967,6 +976,197 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+
+class CMatrixInterface
+{
+private:
+    // RwV3d-like:
+    CVector      m_right;
+    unsigned int flags;
+    CVector      m_forward;
+    unsigned int pad1;
+    CVector      m_up;
+    unsigned int pad2;
+    CVector      m_pos;
+    unsigned int pad3;
+
+public:
+    RwMatrixTag* m_pAttachMatrix = nullptr;
+    bool m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
+
+    CMatrixInterface(CMatrixInterface const& matrix);
+    CMatrixInterface(RwMatrixTag* matrix, bool temporary);            // like previous + attach
+    ~CMatrixInterface();                                           // destructor detaches matrix if attached
+
+    void ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags)
+    {
+        ((void(__thiscall*)(CMatrixInterface*, float&, float&, float&, std::int32_t))0x59A840)(this, x, y, z, flags);
+    }
+    void ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags)
+    {
+        ((void(__thiscall*)(CMatrixInterface*, float, float, float, std::int32_t))0x59AA40)(this, x, y, z, flags);
+    }
+    void UpdateRW() { ((void(__thiscall*)(CMatrixInterface*))0x59BBB0)(this); }
+};
+
+CMatrixInterface::CMatrixInterface(CMatrixInterface const& matrix)
+{
+    ((void(__thiscall*)(CMatrixInterface*, CMatrixInterface const&))0x59BCF0)(this, matrix);
+}
+
+// like previous + attach
+CMatrixInterface::CMatrixInterface(RwMatrixTag* matrix, bool temporary)
+{
+    ((void(__thiscall*)(CMatrixInterface*, RwMatrixTag*, bool))0x59C050)(this, matrix, temporary);
+}
+
+// destructor detaches matrix if attached
+CMatrixInterface::~CMatrixInterface()
+{
+    ((void(__thiscall*)(CMatrixInterface*))0x59ACD0)(this);
+}
+
+
+struct RpHAnimHierarchy;
+auto GetAnimHierarchyFromSkinClump = (RpHAnimHierarchy * (__cdecl*)(RpClump*))0x734A40;
+auto RpHAnimIDGetIndex = (int(__cdecl*)(RpHAnimHierarchy*, int))0x7C51A0;
+auto RpHAnimHierarchyGetMatrixArray = (RwMatrix * (__cdecl*)(RpHAnimHierarchy*))0x7C5120;
+
+bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, CVector position)
+{
+    if (IS_PED(entity)) {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        CMatrixInterface  boneMatrix(boneMatrixArray, false);
+       
+        float             x = 0.0, y = 0.0f, z = 0.0f;
+        //boneMatrix.ConvertToEulerAngles(x, y, z, 21);
+        //printf("boneId = %d | rotation: %f, %f, %f\n", boneId, x, y, z);
+
+        boneMatrix.ConvertFromEulerAngles(position.fX, position.fY, position.fZ, 21);
+        boneMatrix.UpdateRW();
+        
+        //printf("boneId = %d | rotation: %f, %f, %f\n", boneId, x, y, z);
+        return true;
+    }
+    return false;
+}
+
+bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, CVector position)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        CMatrixInterface  boneMatrix(boneMatrixArray, false);
+
+        float x = 0.0, y = 0.0f, z = 0.0f;
+        // boneMatrix.ConvertToEulerAngles(x, y, z, 21);
+        // printf("boneId = %d | rotation: %f, %f, %f\n", boneId, x, y, z);
+
+        boneMatrix.ConvertFromEulerAngles(position.fX, position.fY, position.fZ, 21);
+        boneMatrix.UpdateRW();
+        // printf("boneId = %d | rotation: %f, %f, %f\n", boneId, x, y, z);
+        return true;
+    }
+    return false;
+}
+
+std::tuple<float, float, float> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        const RwV3d&      position = boneMatrixArray->pos;
+        return {position.x, position.y, position.z};
+    }
+    throw std::invalid_argument("element type is not supported\n");
+}
+
+std::tuple<float, float, float> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        CMatrixInterface  boneMatrix(boneMatrixArray, false);
+
+        float x = 0.0, y = 0.0f, z = 0.0f;
+        boneMatrix.ConvertToEulerAngles(x, y, z, 21);
+        return {x, y, z};
+    }
+    throw std::invalid_argument("element type is not supported\n");
+}
+
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, CMatrix boneMatrix)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        *boneMatrixArray = *(RwMatrixTag*)&boneMatrix;
+        return true;
+    }
+    throw std::invalid_argument("element type is not supported\n");
+    return false;
+}
+
+std::tuple<CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed&       ped = static_cast<CClientPed&>(*entity);
+        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
+        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+        return *(CMatrix*)boneMatrixArray;
+    }
+    throw std::invalid_argument("element type is not supported\n");
+}
+
+
+bool CLuaPedDefs::SetPedNodeOrientation(lua_State* const luaVM, CClientPed* ped, std::int32_t nodeId, float yaw, float pitch)
+{
+    if (IS_PED(ped))
+    {
+        LimbOrientation theLimbOrientation = {yaw, pitch};
+        CPlayerPed* thePed = ped->GetGamePlayer();
+        if (thePed) {
+            auto pedIK = thePed->GetPedIK();
+            pedIK->RotateTorso(thePed->GetPedNodeInterface(nodeId), &theLimbOrientation, 0);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity)
+{
+    if (IS_PED(entity))
+    {
+        CClientPed& ped = static_cast<CClientPed&>(*entity);
+        CPlayerPed* thePed = ped.GetGamePlayer();
+        if (thePed)
+        {
+            thePed->UpdateRpHAnim();
+            return true;
+        }
+    }
+    throw std::invalid_argument("element type is not supported\n");
+    return false;
 }
 
 int CLuaPedDefs::GetPedBonePosition(lua_State* luaVM)

@@ -45,12 +45,6 @@ typedef struct
     float pitchD;
 } LimbMovementInfo;
 
-// Structure containing current state of limb
-struct LimbOrientation
-{
-    float yaw, pitch;
-};
-
 /********* END ***********/
 
 class CPedIKSAInterface
@@ -78,4 +72,6 @@ public:
     void SetFlag(DWORD flag) { this->internalInterface->m_flags |= flag; }
     void ClearFlag(DWORD flag) { this->internalInterface->m_flags &= ~flag; }
     bool IsFlagSet(DWORD flag) { return ((this->internalInterface->m_flags & flag) > 0 ? 1 : 0); }
+
+    void RotateTorso(void* bone, LimbOrientation* orientation, bool flag);
 };
