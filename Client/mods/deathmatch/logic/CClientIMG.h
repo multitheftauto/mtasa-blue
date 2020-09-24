@@ -31,4 +31,5 @@ private:
 
     SString              m_strFilename;
     SString              m_FileData;
+    unsigned char        m_ucStreamID;
 };

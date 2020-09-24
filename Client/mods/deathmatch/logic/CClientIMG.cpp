@@ -33,10 +33,13 @@ bool CClientIMG::Load(SString sFilePath)
     if (!g_pCore->GetNetwork()->CheckFile("img", m_strFilename))
         return false;
 */
+
+    Stream();
     return true;
 }
 
 bool CClientIMG::Stream()
 {
+    m_ucStreamID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
     return true;
 }

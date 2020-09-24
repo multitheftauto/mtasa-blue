@@ -156,7 +156,7 @@ int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
                 {
                     // Grab the resource root entity
                     // CClientEntity* pRoot = pResource->GetResourceIMGFilesRoot();
-
+                    CClientEntity* pRoot = pResource->GetResourceDFFRoot();
                     // Create the col model
                     CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
@@ -164,7 +164,7 @@ int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
                     if (pImg->Load(std::move(filePath)))
                     {
                         // Success. Make it a child of the resource img root
-                        // pImg->SetParent(pRoot);
+                        pImg->SetParent(pRoot);
 
                         lua_pushelement(luaVM, pImg);
                         return 1;
