@@ -35,7 +35,6 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementParent", GetElementParent},
         {"getElementsByType", GetElementsByType},
         {"getElementCount", GetElementCount},
-        {"getElementsCount", GetElementsCount},
         {"getElementInterior", GetElementInterior},
         {"isElementWithinColShape", IsElementWithinColShape},
         {"isElementWithinMarker", IsElementWithinMarker},
@@ -829,12 +828,6 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::GetElementsCount(lua_State* luaVM)
-{
     lua_pushboolean(luaVM, false);
     return 1;
 }

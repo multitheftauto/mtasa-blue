@@ -36,7 +36,6 @@ public:
     LUA_DECLARE_OOP(GetElementTurnVelocity);
     LUA_DECLARE(GetElementType);
     LUA_DECLARE(GetElementsByType);
-    LUA_DECLARE(GetElementsCount);
     LUA_DECLARE(GetElementInterior);
     LUA_DECLARE(IsElementWithinColShape);
     LUA_DECLARE(IsElementWithinMarker);
