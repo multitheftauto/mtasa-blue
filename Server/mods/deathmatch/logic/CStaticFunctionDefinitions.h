@@ -128,7 +128,6 @@ public:
     static bool               GetPlayerIP(CElement* pElement, SString& strOutIP);
     static CAccount*          GetPlayerAccount(CElement* pElement);
     static const CMtaVersion& GetPlayerVersion(CPlayer* pPlayer);
-    static bool               GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel);
 
     // Player set functions
     static bool SetPlayerMoney(CElement* pElement, long lMoney, bool bInstant);
