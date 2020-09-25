@@ -63,6 +63,7 @@ class CStreamingSA : public CStreaming
 private:
     CStreamHandlerInfo* GetStreamingHandlerInfo(uint id);
 public:
+    bool SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks);
     void RequestModel(DWORD dwModelID, DWORD dwFlags);
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);

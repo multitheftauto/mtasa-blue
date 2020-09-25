@@ -26,6 +26,7 @@ public:
     LUA_DECLARE(EngineImportTXD);
     LUA_DECLARE(EngineReplaceCOL);
     LUA_DECLARE(EngineRestoreCOL);
+    LUA_DECLARE(EngineSetModelIMG);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
     LUA_DECLARE(EngineRequestModel);

@@ -23,6 +23,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImportTXD", EngineImportTXD},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineSetModelIMG", EngineSetModelIMG},
         {"engineReplaceModel", EngineReplaceModel},
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
@@ -155,9 +156,8 @@ int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
                 if (CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
                     // Grab the resource root entity
-                    // CClientEntity* pRoot = pResource->GetResourceIMGFilesRoot();
                     CClientEntity* pRoot = pResource->GetResourceIMGRoot();
-                    // Create the col model
+                    // Create the img handle
                     CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
                     // Attempt loading the file
@@ -564,6 +564,38 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
+{
+    unsigned short usModelID;
+    CClientIMG* pIMG;
+    // TEMP
+    unsigned short usOffsetInBlock;
+    unsigned short usSizeInBlocks;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModelID);
+    argStream.ReadUserData(pIMG);
+
+    argStream.ReadNumber(usOffsetInBlock);
+    argStream.ReadNumber(usSizeInBlocks);
+
+    if (!argStream.HasErrors())
+    {
+        if (pIMG->LinkModel(usModelID, usOffsetInBlock, usSizeInBlocks))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+           argStream.SetCustomError(SString("Model ID %d replace failed", usModelID));
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

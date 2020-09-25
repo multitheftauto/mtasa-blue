@@ -20,4 +20,5 @@ public:
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
     virtual unsigned char AddStreamHandler(const char* szFilePath) = 0;
     //virtual BOOL RemoveStreamHandler(DWORD dwStreamHandler) = 0;
+    virtual bool SetModelStreamInfo(unsigned short id, unsigned char ucArchiveId, unsigned short usOffestInBlocks, unsigned short usSizeInBlocks) = 0;
 };

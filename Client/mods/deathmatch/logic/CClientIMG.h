@@ -27,6 +27,8 @@ public:
     eClientEntityType GetType() const { return CCLIENTIMG; }
     bool              Load(SString sFilePath);
     bool              Stream();
+    bool              LinkModel(unsigned short usModelID, unsigned short usOffsetInBlocks, unsigned short usSizeInBlocks);
+
 private:
 
     SString              m_strFilename;

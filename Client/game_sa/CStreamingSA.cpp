@@ -142,6 +142,17 @@ CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
     return pItemInfo + id;
 }
 
+bool CStreamingSA::SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks)
+{
+    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
+    pItemInfo->archiveId = ucArchiveId;
+    pItemInfo->offsetInBlocks = usOffestInBlocks;
+    pItemInfo->sizeInBlocks = usSizeInBlocks;
+    // TODO CHANGE THIS INFO FOR PREV MODEL
+    pItemInfo->nextInImg = -1;
+    return true;
+}
+
 CStreamHandlerInfo* CStreamingSA::GetStreamingHandlerInfo(uint id)
 {
     CStreamHandlerInfo* pHandlerInfo = (CStreamHandlerInfo*)(ARRAY_StreamHandlersInfo);

@@ -43,3 +43,12 @@ bool CClientIMG::Stream()
     m_ucStreamID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
     return true;
 }
+
+bool CClientIMG::LinkModel(unsigned short usModelID, unsigned short usOffestInBlocks, unsigned short usSizeInBlocks)
+{
+    if (!m_ucStreamID)
+        return false;
+
+    g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, usOffestInBlocks, usSizeInBlocks);
+    return true;
+}
