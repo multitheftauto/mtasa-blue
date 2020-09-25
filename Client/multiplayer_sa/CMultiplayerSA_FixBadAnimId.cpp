@@ -12,23 +12,23 @@
 #include "StdInc.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
-CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup);
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(eAnimGroup animGroup);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId)
+eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimGroup, eAnimID* pAnimId)
 {
     pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId, *(DWORD*)0xb4ea34);
 
     // Fix #1109: Weapon Fire ancient crash with anim ID 224
-    if (*pAnimId == 224 && *pAnimGroup != ANIM_GROUP_GRENADE)
+    if (*pAnimId == eAnimID::ANIM_ID_WEAPON_FIRE && *pAnimGroup != eAnimGroup::ANIM_GROUP_GRENADE)
     {
-        if (*pAnimGroup < ANIM_GROUP_PYTHON || *pAnimGroup > ANIM_GROUP_GOGGLES)
+        if (*pAnimGroup < eAnimGroup::ANIM_GROUP_PYTHON || *pAnimGroup > eAnimGroup::ANIM_GROUP_GOGGLES)
         {
             LogEvent(533, "CopyAnimation", "Incorrect Group ID", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 533);
 
             // switch to python anim group as it has 224 anim
-            *pAnimGroup = ANIM_GROUP_PYTHON;
+            *pAnimGroup = eAnimGroup::ANIM_GROUP_PYTHON;
         }
     }
 
@@ -39,13 +39,13 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGro
         LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 534);
 
         // switch to idle animation
-        *pAnimGroup = ANIM_GROUP_DEFAULT;
-        *pAnimId = 3;
+        *pAnimGroup = eAnimGroup::ANIM_GROUP_DEFAULT;
+        *pAnimId = eAnimID::ANIM_ID_IDLE;
         pGroup = getAnimAssocGroupInterface(*pAnimGroup);
     }
 
     // Apply offset
-    int iUseAnimId = *pAnimId - pGroup->iIDOffset;
+    int iUseAnimId = static_cast<int>(*pAnimId) - pGroup->iIDOffset;
 
     if (pGroup->pAssociationsArray)
     {
@@ -71,7 +71,7 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGro
     }
 
     // Unapply offset
-    *pAnimId = iUseAnimId + pGroup->iIDOffset;
+    *pAnimId = static_cast<eAnimID>(iUseAnimId + pGroup->iIDOffset);
 
     return *pAnimId;
 }

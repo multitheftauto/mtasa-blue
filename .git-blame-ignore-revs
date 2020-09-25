@@ -79,3 +79,15 @@ eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Enable every entry in .gitattributes
 #
 # - Mark .git-blame-ignore-revs as export-ignore
+
+15b2ec72367c1a4226b5afebb7d38b113ca34022
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Thu Apr 2 11:25:58 2020 +0100
+#
+# Convert vendor line endings to LF
+
+927509565ab3a8d48df006440654c38e0942aa89
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Thu Apr 2 12:03:34 2020 +0100
+#
+# Convert more line endings to LF

@@ -29,9 +29,6 @@ public:
 
     void DoPulse();
 
-    void DrawFromAim();
-    void DrawDefault();
-
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
     unsigned int GetDimension() { return m_usDimension; }
@@ -40,6 +37,8 @@ public:
     bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
+    unsigned char m_ucInterior = 0;
+
 private:
     static bool CompareNametagDistance(CClientPlayer* p1, CClientPlayer* p2);
 
@@ -47,7 +46,6 @@ private:
     CClientStreamer*      m_pPlayerStreamer;
     bool                  m_bDrawHealth;
     CHud*                 m_pHud;
-    bool                  m_bDrawFromAim;
     unsigned short        m_usDimension;
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;

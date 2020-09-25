@@ -42,9 +42,7 @@ CWebView::~CWebView()
     // Make sure we don't dead lock the CEF render thread
     m_RenderData.cv.notify_all();
 
-#ifdef MTA_DEBUG
     OutputDebugLine("CWebView::~CWebView");
-#endif
 }
 
 void CWebView::Initialise()
