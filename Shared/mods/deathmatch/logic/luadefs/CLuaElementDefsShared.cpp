@@ -1,5 +1,49 @@
 #include "StdInc.h"
 
+unsigned int CLuaElementDefs::GetElementCount(EElementCountType elementType)
+{
+    switch (elementType)
+    {
+        case ELEMENT_PLAYER:
+            return m_pPlayerManager->Count();
+        case ELEMENT_PED:
+            return m_pPedManager->Count() - m_pPlayerManager->Count();
+        case ELEMENT_WATER:
+            return m_pWaterManager->Count();
+        case ELEMENT_VEHICLE:
+            return m_pVehicleManager->Count();
+        case ELEMENT_OBJECT:
+            return m_pObjectManager->Count();
+        case ELEMENT_PICKUP:
+            return m_pPickupManager->Count();
+        case ELEMENT_MARKER:
+            return m_pMarkerManager->Count();
+        case ELEMENT_COLSHAPE:
+        {
+            auto iter = m_pColManager->IterBegin();
+            int  count = 0;
+            for (; iter != m_pColManager->IterEnd(); iter++)
+                if (!(*iter)->GetAutoCallEvent())            // filter away markers and pickups
+                    count++;
+
+            return count;
+        }
+        case ELEMENT_BLIP:
+#ifdef MTA_CLIENT
+            return m_pRadarMarkerManager->Count();
+#else
+            return m_pBlipManager->Count();
+#endif
+        case ELEMENT_RADARAREA:
+            return m_pRadarAreaManager->Count();
+        case ELEMENT_TEAM:
+            return m_pTeamManager->Count();
+    }
+
+    throw std::invalid_argument("Invalid element type");
+}
+
+
 int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )

@@ -52,11 +52,14 @@ public:
     static CClientEntity*             m_pRootEntity;
     static CClientGUIManager*         m_pGUIManager;
     static CClientPlayerManager*      m_pPlayerManager;
+    static CClientRadarAreaManager*   m_pRadarAreaManager;
     static CClientRadarMarkerManager* m_pRadarMarkerManager;
     static CResourceManager*          m_pResourceManager;
     static CClientVehicleManager*     m_pVehicleManager;
     static CClientColManager*         m_pColManager;
     static CClientObjectManager*      m_pObjectManager;
+    static CClientPedManager*         m_pPedManager;
+    static CClientWaterManager*       m_pWaterManager;
     static CClientTeamManager*        m_pTeamManager;
     static CRenderWare*               m_pRenderWare;
     static CClientMarkerManager*      m_pMarkerManager;

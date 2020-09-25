@@ -7625,44 +7625,6 @@ bool CStaticFunctionDefinitions::GetMarkerCount(unsigned int& uiCount)
     return true;
 }
 
-int CStaticFunctionDefinitions::GetElementCount(EElementCountType eElementType)
-{
-    switch (eElementType)
-    {
-        case ELEMENT_PLAYER:
-            return m_pPlayerManager->Count();
-        case ELEMENT_PED:
-            return m_pPedManager->Count();
-        case ELEMENT_WATER:
-            return m_pWaterManager->Count();
-        case ELEMENT_VEHICLE:
-            return m_pVehicleManager->GetVehicleCount();
-        case ELEMENT_OBJECT:
-            return m_pObjectManager->Count();
-        case ELEMENT_PICKUP:
-            return m_pPickupManager->Count();
-        case ELEMENT_MARKER:
-            return m_pMarkerManager->Count();
-        case ELEMENT_COLSHAPE:
-            {
-                auto iter = m_pColManager->IterBegin();
-                int count = 0;
-                for (; iter != m_pColManager->IterEnd(); iter++)
-                    if ((*iter)->GetAutoCallEvent()) // filter away markers and pickups
-                        count++;
-
-                return count;
-            }
-        case ELEMENT_BLIP:
-            return m_pBlipManager->Count();
-        case ELEMENT_RADARAREA:
-            return m_pRadarAreaManager->Count();
-        case ELEMENT_TEAM:
-            return m_pTeamManager->Count();
-    }
-    return -1;
-}
-
 bool CStaticFunctionDefinitions::GetMarkerType(CMarker* pMarker, char* szType)
 {
     assert(pMarker);

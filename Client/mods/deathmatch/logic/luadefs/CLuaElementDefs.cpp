@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 using std::list;
 
 void CLuaElementDefs::LoadFunctions()
@@ -34,7 +35,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementID", GetElementID},
         {"getElementParent", GetElementParent},
         {"getElementsByType", GetElementsByType},
-        {"getElementCount", GetElementCount},
+        {"getElementCount", ArgumentParser<GetElementCount>},
         {"getElementInterior", GetElementInterior},
         {"isElementWithinColShape", IsElementWithinColShape},
         {"isElementWithinMarker", IsElementWithinMarker},
@@ -2581,33 +2582,6 @@ int CLuaElementDefs::IsElementWaitingForGroundToLoad(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::GetElementCount(lua_State* luaVM)
-{
-    // Verify the argument
-    EElementCountType eType;
-    CScriptArgReader  argStream(luaVM);
-    argStream.ReadEnumString(eType);
-
-    if (!argStream.HasErrors())
-    {
-        // Find our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            size_t iCount = CStaticFunctionDefinitions::GetElementCount(eType);
-            lua_pushnumber(luaVM, iCount);
-            return 1;
-        }
-    }
-
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

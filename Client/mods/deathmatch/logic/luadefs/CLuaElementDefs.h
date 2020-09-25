@@ -36,6 +36,7 @@ public:
     LUA_DECLARE_OOP(GetElementTurnVelocity);
     LUA_DECLARE(GetElementType);
     LUA_DECLARE(GetElementsByType);
+    static unsigned int GetElementCount(EElementCountType elementType);
     LUA_DECLARE(GetElementInterior);
     LUA_DECLARE(IsElementWithinColShape);
     LUA_DECLARE(IsElementWithinMarker);
@@ -68,7 +69,6 @@ public:
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
-    LUA_DECLARE(GetElementCount);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);

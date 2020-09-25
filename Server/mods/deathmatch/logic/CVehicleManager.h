@@ -57,7 +57,8 @@ public:
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 
-    Container::size_type GetVehicleCount() { return m_List.size(); }
+    Container::size_type GetVehicleCount() { return Count(); }
+    Container::size_type Count() { return m_List.size(); }
 
     Container&       GetVehicles() noexcept { return m_List; }
     const Container& GetVehicles() const noexcept { return m_List; }

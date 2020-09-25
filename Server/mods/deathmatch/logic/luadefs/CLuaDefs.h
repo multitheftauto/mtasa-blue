@@ -72,6 +72,7 @@ protected:
     static CLuaManager*               m_pLuaManager;
     static CMarkerManager*            m_pMarkerManager;
     static CObjectManager*            m_pObjectManager;
+    static CPedManager*               m_pPedManager;
     static CPickupManager*            m_pPickupManager;
     static CPlayerManager*            m_pPlayerManager;
     static CRadarAreaManager*         m_pRadarAreaManager;
@@ -79,6 +80,7 @@ protected:
     static CElement*                  m_pRootElement;
     static CScriptDebugging*          m_pScriptDebugging;
     static CVehicleManager*           m_pVehicleManager;
+    static CWaterManager*             m_pWaterManager;
     static CTeamManager*              m_pTeamManager;
     static CAccountManager*           m_pAccountManager;
     static CColManager*               m_pColManager;
