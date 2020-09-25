@@ -401,6 +401,10 @@ inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
 }
+inline SString GetClassTypeName(CLuaQuaternion*)
+{
+    return "quaternion";
+}
 inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 {
     return "primitive-type";
@@ -520,6 +524,15 @@ template <class T>
 CLuaMatrix* UserDataCast(CLuaMatrix*, void* ptr, lua_State* luaVM)
 {
     return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaQuaternion from userdata
+//
+template <class T>
+CLuaQuaternion* UserDataCast(CLuaQuaternion*, void* ptr, lua_State* luaVM)
+{
+    return CLuaQuaternion::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
 }
 
 //

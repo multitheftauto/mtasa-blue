@@ -39,6 +39,7 @@ struct SAclRequest;
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"
+#include "CQuaternion.h"
 #include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>

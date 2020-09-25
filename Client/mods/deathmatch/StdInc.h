@@ -40,6 +40,7 @@
 #include <CVector.h>
 #include <CVector4D.h>
 #include <CMatrix4.h>
+#include <CQuaternion.h>
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>

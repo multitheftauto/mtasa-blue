@@ -18,6 +18,7 @@ class CLuaMain;
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
 #include "lua/CLuaMatrix.h"
+#include "lua/CLuaQuaternion.h"
 
 #include "CLuaFunctionDefs.h"
 

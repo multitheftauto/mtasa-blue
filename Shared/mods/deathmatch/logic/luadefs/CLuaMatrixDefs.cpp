@@ -32,12 +32,14 @@ void CLuaMatrixDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getPosition", GetPosition);
     lua_classfunction(luaVM, "getRotation", GetRotation);
+    lua_classfunction(luaVM, "getQuaternion", GetQuaternion);
     lua_classfunction(luaVM, "getForward", GetForward);
     lua_classfunction(luaVM, "getRight", GetRight);
     lua_classfunction(luaVM, "getUp", GetUp);
 
     lua_classfunction(luaVM, "setPosition", SetPosition);
     lua_classfunction(luaVM, "setRotation", SetRotation);
+    lua_classfunction(luaVM, "setQuaternion", SetQuaternion);
     lua_classfunction(luaVM, "setForward", SetForward);
     lua_classfunction(luaVM, "setRight", SetRight);
     lua_classfunction(luaVM, "setUp", SetUp);
@@ -56,12 +58,14 @@ void CLuaMatrixDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getPosition", "", GetPosition);
     lua_classfunction(luaVM, "getRotation", "", GetRotation);
+    lua_classfunction(luaVM, "getQuaternion", "", GetQuaternion);
     lua_classfunction(luaVM, "getForward", "", GetForward);
     lua_classfunction(luaVM, "getRight", "", GetRight);
     lua_classfunction(luaVM, "getUp", "", GetUp);
 
     lua_classfunction(luaVM, "setPosition", "", SetPosition);
     lua_classfunction(luaVM, "setRotation", "", SetRotation);
+    lua_classfunction(luaVM, "setQuaternion", "", SetQuaternion);
     lua_classfunction(luaVM, "setForward", "", SetForward);
     lua_classfunction(luaVM, "setRight", "", SetRight);
     lua_classfunction(luaVM, "setUp", "", SetUp);
@@ -91,7 +95,7 @@ int CLuaMatrixDefs::Create(lua_State* luaVM)
             argStream.ReadVector3D(vecRotation);
             ConvertDegreesToRadiansNoWrap(vecRotation);
             matrix = CMatrix(vecPosition, vecRotation);
-        }
+        }        
         else
         {
             matrix = CMatrix(vecPosition);
@@ -102,9 +106,16 @@ int CLuaMatrixDefs::Create(lua_State* luaVM)
         argStream.ReadMatrix(matrix);
         matrix = CMatrix(matrix);
     }
+    else if (argStream.NextIsQuaternion())
+    {
+        CQuaternion quat;
+        argStream.ReadQuaternion(quat);
+
+        matrix = quat.GetRotationMatrix();
+    }
     else if (!argStream.NextIsNone())
     {
-        argStream.SetCustomError("Expected vector3, matrix or nothing");
+        argStream.SetCustomError("Expected vector3, matrix, quaternion or nothing");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
         lua_pushboolean(luaVM, false);
@@ -277,6 +288,30 @@ int CLuaMatrixDefs::GetRotation(lua_State* luaVM)
     return 1;
 }
 
+int CLuaMatrixDefs::GetQuaternion(lua_State* luaVM)
+{
+    CLuaMatrix* pMatrix = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pMatrix);
+
+    if (!argStream.HasErrors())
+    {
+        CQuaternion quat;
+        quat.FromRotationMatrix(pMatrix->GetRotationMatrix());
+
+        lua_pushquaternion(luaVM, quat);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaMatrixDefs::GetForward(lua_State* luaVM)
 {
     CLuaMatrix* pMatrix = NULL;
@@ -377,6 +412,35 @@ int CLuaMatrixDefs::SetRotation(lua_State* luaVM)
     {
         ConvertRadiansToDegreesNoWrap(vecRotation);
         pMatrix->SetRotation(vecRotation);
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaMatrixDefs::SetQuaternion(lua_State* luaVM)
+{
+    CLuaMatrix* pMatrix = nullptr;
+    CQuaternion quat;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pMatrix);
+    argStream.ReadQuaternion(quat);
+
+    if (!argStream.HasErrors())
+    {
+        CMatrix transformed = quat.GetRotationMatrix();
+
+        pMatrix->vRight = transformed.vRight;
+        pMatrix->vFront = transformed.vFront;
+        pMatrix->vUp = transformed.vUp;
 
         lua_pushboolean(luaVM, true);
         return 1;

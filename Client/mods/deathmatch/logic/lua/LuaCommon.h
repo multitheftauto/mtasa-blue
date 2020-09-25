@@ -62,6 +62,7 @@ void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
 void lua_pushvector(lua_State* luaVM, const CVector& vector);
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector);
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
+void lua_pushquaternion(lua_State* luaVM, const CQuaternion& quat);
 
 // Internal use
 void lua_initclasses(lua_State* luaVM);

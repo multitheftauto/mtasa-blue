@@ -477,6 +477,39 @@ public:
     }
 
     //
+    // Read next Quaternion
+    //
+    void ReadQuaternion(CQuaternion& outValue)
+    {
+        int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        {
+            ReadNumber(outValue.fW);
+            ReadNumber(outValue.fX);
+            ReadNumber(outValue.fY);
+            ReadNumber(outValue.fZ);
+            return;
+        }
+        else if (iArgument == LUA_TUSERDATA)
+        {
+            // we don't pass around the pointer as it may get destroyed any time
+            CLuaQuaternion* pQuat = NULL;
+            ReadUserData(pQuat);
+            if (pQuat)
+            {
+                outValue = *pQuat;
+                return;
+            }
+            outValue = CQuaternion();
+            return;            // Error set in ReadUserData
+        }
+
+        outValue = CQuaternion();
+        SetTypeError("quaternion");
+        m_iIndex++;
+    }
+
+    //
     // Read next color
     //
     void ReadColor(SColor& outValue)
@@ -1199,6 +1232,12 @@ public:
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CLuaVector2D>() || NextIsUserDataOfType<CLuaVector3D>() ||
                NextIsUserDataOfType<CLuaVector4D>();
+    }
+
+    bool NextIsQuaternion() const
+    {
+        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaQuaternion>() ||
+            NextIsUserDataOfType<CLuaVector4D>();
     }
 
     //

@@ -104,6 +104,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaVector3Defs::AddClass(luaVM);
     CLuaVector2Defs::AddClass(luaVM);
     CLuaMatrixDefs ::AddClass(luaVM);
+    CLuaQuatDefs::AddClass(luaVM);
 
     if (!m_bEnableOOP)
         return;
