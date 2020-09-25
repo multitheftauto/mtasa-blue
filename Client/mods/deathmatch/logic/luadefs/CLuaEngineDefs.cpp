@@ -156,7 +156,7 @@ int CLuaEngineDefs::EngineLoadIMG(lua_State* luaVM)
                 {
                     // Grab the resource root entity
                     // CClientEntity* pRoot = pResource->GetResourceIMGFilesRoot();
-                    CClientEntity* pRoot = pResource->GetResourceDFFRoot();
+                    CClientEntity* pRoot = pResource->GetResourceIMGRoot();
                     // Create the col model
                     CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
