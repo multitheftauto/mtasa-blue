@@ -705,9 +705,9 @@ ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::GetTXDIDForModelID
+// CRenderWareSA::SetTXDIDForModelID
 //
-// Get a TXD ID associated with the model ID
+// Set a TXD ID associated with the model ID
 //
 ////////////////////////////////////////////////////////////////
 bool CRenderWareSA::SetTXDIDForModelID(ushort usModelID, ushort usTXDID)
