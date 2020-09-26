@@ -92,6 +92,7 @@ public:
     bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName);
 
     ushort             GetTXDIDForModelID(ushort usModelID);
+    bool               SetTXDIDForModelID(ushort usModelID, ushort usTXDID);
     void               PulseWorldTextureWatch();
     void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
     bool               GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usModelID, std::vector<SString> vTextureNames);

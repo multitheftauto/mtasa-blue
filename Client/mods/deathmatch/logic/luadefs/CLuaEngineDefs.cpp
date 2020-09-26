@@ -35,6 +35,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelTXDID", EngineGetModelTXDID},
+        {"engineSetModelTXDID", EngineSetModelTXDID},
         {"engineGetModelNameFromID", EngineGetModelNameFromID},
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
@@ -1067,6 +1069,56 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
         return 1;
     }
     else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelTXDID(lua_State* luaVM)
+{
+    //  int engineGetModelTXDID ( int modelID )
+    unsigned short usModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModelID);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned short usTXDID = g_pGame->GetRenderWare()->GetTXDIDForModelID(usModelID);
+        lua_pushinteger(luaVM, usTXDID);
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
+int CLuaEngineDefs::EngineSetModelTXDID(lua_State* luaVM)
+{
+    unsigned short usModelID;
+    unsigned short usTXDID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModelID);
+    argStream.ReadNumber(usTXDID);
+
+    if (!argStream.HasErrors())
+    {
+        bool bResult = g_pGame->GetRenderWare()->SetTXDIDForModelID(usModelID, usTXDID);
+        if (bResult)
+        {
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
