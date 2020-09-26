@@ -37,18 +37,6 @@
 #define FUNC_CStreaming_RemoveImages                 0x4066B3 // Remove all IMG`s from streaming
 #define FUNC_CStreaming_RemoveImage                  0x4068A0
 
-struct CStreamingInfo
-{
-    WORD prevId;
-    WORD nextId;
-    WORD  nextInImg;
-    uchar flg;
-    uchar archiveId;
-    DWORD offsetInBlocks;
-    DWORD sizeInBlocks;
-    DWORD loadState;
-};
-
 struct CStreamHandlerInfo
 {
     char szName[40];

@@ -37,7 +37,17 @@ bool CClientModel::Allocate(void)
     // Allocate only on free IDs
     if (!pModelInfo->IsValid())
     {
-        pModelInfo->MakePedModel("PSYCHO");
+        switch (m_eModelType)
+        {
+            case CCLIENTMODELPED:
+                pModelInfo->MakePedModel("PSYCHO");
+                break;
+            case CCLIENTMODELOBJECT:
+                pModelInfo->MakeObjectModel(1337);
+                break;
+            default:
+                return false;
+        }
         return true;
     }
     return false;

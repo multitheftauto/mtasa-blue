@@ -684,6 +684,8 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 {
                     eModelType = CCLIENTMODELPED;
                 }
+                else if (strModelType == "object")
+                    eModelType = CCLIENTMODELOBJECT;
                 else
                 {
                     lua_pushboolean(luaVM, false);

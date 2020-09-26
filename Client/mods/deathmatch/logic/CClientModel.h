@@ -17,7 +17,8 @@ class CClientModel;
 
 enum eClientModelType
 {
-    CCLIENTMODELPED
+    CCLIENTMODELPED,
+    CCLIENTMODELOBJECT,
 };
 
 class CClientModel
