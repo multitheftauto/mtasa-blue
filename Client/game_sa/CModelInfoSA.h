@@ -290,7 +290,6 @@ public:
 
     CBaseModelInfoSAInterface* GetInterface();
     CPedModelInfoSAInterface*  GetPedModelInfoInterface() { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
-    CObjectSAInterface*        GetObjectInterface() { return reinterpret_cast<CObjectSAInterface*>(GetInterface()); }
 
     DWORD          GetModel() { return m_dwModelID; }
     eModelInfoType GetModelType();
@@ -380,7 +379,6 @@ public:
 
     // CModelInfoSA methods
     void MakePedModel(char* szTexture);
-    void MakeObjectModel(ushort usBaseModelID);
     void DeallocateModel(void);
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }
