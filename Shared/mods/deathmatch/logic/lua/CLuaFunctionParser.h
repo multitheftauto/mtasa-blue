@@ -260,10 +260,10 @@ struct CLuaFunctionParserBase
                 return true;
             return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
         }
-        // CMatrix may either be represented by 3 CLuaVector or by 16 numbers
+        // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
         if constexpr (std::is_same_v<T, CMatrix>)
         {
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < sizeof(CMatrix)/sizeof(float); i++)
             {
                 if (!lua_isnumber(L, index + i))
                     return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;

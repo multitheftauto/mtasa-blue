@@ -3977,31 +3977,7 @@ void CClientGame::PostWorldProcessHandler()
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
-    Arguments.PushNumber(1.0);
-    const char *szName = "onClientPedsProcessed";
-    if (!m_pRootEntity->CallEvent(szName, Arguments, false))
-    {
-        printf("failed to call event\n");
-    }
-
-
-     if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, m_pRootEntity, NULL))
-        return;
-
-    TIMEUS startTime = GetTimeUs();
-
-    CEvents* pEvents = g_pClientGame->GetEvents();
-
-    // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse();
-
-    // Call the event on our parents/us first
-    m_pRootEntity->CallParentEvent(szName, Arguments, m_pRootEntity);
-
-    // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse();
-
-    g_pClientGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, m_pRootEntity, NULL);
+    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }
 
 void CClientGame::IdleHandler()
