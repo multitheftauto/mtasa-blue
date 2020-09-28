@@ -134,3 +134,9 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         add     esp, 0xC
     }
 }
+
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
+{
+    CStreamingInfo* pItemInfo = (CStreamingInfo*)(ARRAY_StreamModelInfo);
+    return pItemInfo + id;
+}

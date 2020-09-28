@@ -1329,10 +1329,35 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::MakeObjectModel(ushort usBaseID)
+{
+    ppModelInfo[m_dwModelID] = ppModelInfo[usBaseID];
+    CStreamingInfo* pBaseModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseID);
+    CStreamingInfo* pTargetModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+
+    pTargetModelStreamigInfo->loadState = 0;
+    pTargetModelStreamigInfo->nextInImg = -1;
+    pTargetModelStreamigInfo->nextId = -1;
+    pTargetModelStreamigInfo->prevId = -1;
+    pTargetModelStreamigInfo->archiveId = pBaseModelStreamigInfo->archiveId;
+    pTargetModelStreamigInfo->offsetInBlocks = pBaseModelStreamigInfo->offsetInBlocks;
+    pTargetModelStreamigInfo->sizeInBlocks = pBaseModelStreamigInfo->sizeInBlocks;
+}
+
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
     ppModelInfo[m_dwModelID] = nullptr;
+    CStreamingInfo* pModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+
+    pModelStreamigInfo->loadState = 0;
+    pModelStreamigInfo->nextInImg = -1;
+    pModelStreamigInfo->nextId = -1;
+    pModelStreamigInfo->prevId = -1;
+    pModelStreamigInfo->archiveId = 0;
+    pModelStreamigInfo->flg= 0;
+    pModelStreamigInfo->offsetInBlocks = 0;
+    pModelStreamigInfo->sizeInBlocks = 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

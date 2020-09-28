@@ -25,6 +25,9 @@ public:
 
     void DeleteAll();
 
+    std::vector<CClientObject*>::const_iterator IterBegin() { return m_Objects.begin(); };
+    std::vector<CClientObject*>::const_iterator IterEnd() { return m_Objects.end(); };
+
     unsigned int          Count() { return static_cast<unsigned int>(m_Objects.size()); };
     unsigned int          CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject* Get(ElementID ID);

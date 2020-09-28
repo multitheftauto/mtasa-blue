@@ -37,7 +37,17 @@ bool CClientModel::Allocate(void)
     // Allocate only on free IDs
     if (!pModelInfo->IsValid())
     {
-        pModelInfo->MakePedModel("PSYCHO");
+        switch (m_eModelType)
+        {
+            case CCLIENTMODELPED:
+                pModelInfo->MakePedModel("PSYCHO");
+                break;
+            case CCLIENTMODELOBJECT:
+                pModelInfo->MakeObjectModel(1337);
+                break;
+            default:
+                return false;
+        }
         return true;
     }
     return false;
@@ -67,6 +77,21 @@ bool CClientModel::Deallocate(void)
                         (*iter)->StreamOutForABit();
                     }
                     (*iter)->SetModel(0);
+                }
+            }
+        }
+        else if (m_eModelType == CCLIENTMODELOBJECT) {
+            CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
+            std::vector<CClientObject*>::const_iterator iter = pObjectManager->IterBegin();
+            for (; iter != pObjectManager->IterEnd(); iter++)
+            {
+                if ((*iter)->GetModel() == m_iModelID)
+                {
+                    if ((*iter)->IsStreamedIn())
+                    {
+                        (*iter)->StreamOutForABit();
+                    }
+                    (*iter)->SetModel(1337);
                 }
             }
         }

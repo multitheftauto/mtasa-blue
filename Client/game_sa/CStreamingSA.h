@@ -14,6 +14,8 @@
 #include <game/CStreaming.h>
 #include "Common.h"
 
+#define ARRAY_StreamModelInfo 0x8E4CC0            // size = 26316
+
 #define FUNC_CStreaming__RequestModel                0x4087E0
 #define FUNC_LoadAllRequestedModels                  0x40EA10
 #define FUNC_CStreaming__HasVehicleUpgradeLoaded     0x407820
@@ -27,4 +29,6 @@ public:
     void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
+
+    CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
 };
