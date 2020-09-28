@@ -250,17 +250,6 @@ public:
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
 };
 
-enum eModelInfoType : unsigned char
-{
-    MODEL_INFO_TYPE_ATOMIC = 1,
-    MODEL_INFO_TYPE_TIME = 3,
-    MODEL_INFO_TYPE_WEAPON = 4,
-    MODEL_INFO_TYPE_CLUMP = 5,
-    MODEL_INFO_TYPE_VEHICLE = 6,
-    MODEL_INFO_TYPE_PED = 7,
-    MODEL_INFO_TYPE_LOD_ATOMIC = 8,
-};
-
 /**
  * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
  */

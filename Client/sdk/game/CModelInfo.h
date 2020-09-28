@@ -28,6 +28,17 @@ public:
     float   fRadius;
 };
 
+enum eModelInfoType : unsigned char
+{
+    MODEL_INFO_TYPE_ATOMIC = 1,
+    MODEL_INFO_TYPE_TIME = 3,
+    MODEL_INFO_TYPE_WEAPON = 4,
+    MODEL_INFO_TYPE_CLUMP = 5,
+    MODEL_INFO_TYPE_VEHICLE = 6,
+    MODEL_INFO_TYPE_PED = 7,
+    MODEL_INFO_TYPE_LOD_ATOMIC = 8,
+};
+
 enum eVehicleUpgradePosn
 {
     VEHICLE_UPGRADE_POSN_BONET = 0,
@@ -101,6 +112,7 @@ class CModelInfo
 public:
     virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
+    virtual eModelInfoType GetModelType() = 0;
     virtual DWORD GetModel() = 0;
     virtual bool  IsPlayerModel() = 0;
     virtual BOOL  IsBoat() = 0;
