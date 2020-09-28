@@ -98,7 +98,7 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
         if (pModelInfo && pModelInfo->GetInterface())
         {
             eModelInfoType eType = pModelInfo->GetModelType();
-            if (eType == MODEL_INFO_TYPE_CLUMP || eType == MODEL_INFO_TYPE_ATOMIC)
+            if (eType == MODEL_INFO_TYPE_CLUMP || eType == MODEL_INFO_TYPE_ATOMIC || eType == MODEL_INFO_TYPE_WEAPON)
                 return true;
         }
     }
