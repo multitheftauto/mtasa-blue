@@ -28,15 +28,15 @@ public:
     float   fRadius;
 };
 
-enum eModelInfoType : unsigned char
+enum class eModelInfoType : unsigned char
 {
-    MODEL_INFO_TYPE_ATOMIC = 1,
-    MODEL_INFO_TYPE_TIME = 3,
-    MODEL_INFO_TYPE_WEAPON = 4,
-    MODEL_INFO_TYPE_CLUMP = 5,
-    MODEL_INFO_TYPE_VEHICLE = 6,
-    MODEL_INFO_TYPE_PED = 7,
-    MODEL_INFO_TYPE_LOD_ATOMIC = 8,
+    ATOMIC = 1,
+    TIME = 3,
+    WEAPON = 4,
+    CLUMP = 5,
+    VEHICLE = 6,
+    PED = 7,
+    LOD_ATOMIC = 8,
 };
 
 enum eVehicleUpgradePosn

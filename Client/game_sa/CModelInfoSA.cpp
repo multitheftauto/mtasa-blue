@@ -1120,15 +1120,15 @@ void CModelInfoSA::SetCustomModel(RpClump* pClump)
     {
         switch (GetModelType())
         {
-            case MODEL_INFO_TYPE_PED:
+            case eModelInfoType::PED:
                 return pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_WEAPON:
+            case eModelInfoType::WEAPON:
                 return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_VEHICLE:
+            case eModelInfoType::VEHICLE:
                 return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case MODEL_INFO_TYPE_ATOMIC:
-            case MODEL_INFO_TYPE_LOD_ATOMIC:
-            case MODEL_INFO_TYPE_TIME:
+            case eModelInfoType::ATOMIC:
+            case eModelInfoType::LOD_ATOMIC:
+            case eModelInfoType::TIME:
                 return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
         }
     }
