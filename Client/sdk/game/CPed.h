@@ -265,6 +265,7 @@ public:
     virtual void SetVoice(short sVoiceType, short sVoiceID) = 0;
     virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
     virtual void SetLanding(bool bIsLanding) = 0;
+    virtual void SetUpdateMetricsRequired(bool required) = 0;
 
     virtual CWeaponStat* GetCurrentWeaponStat() = 0;
     virtual float        GetCurrentWeaponRange() = 0;
