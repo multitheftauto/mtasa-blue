@@ -16,8 +16,8 @@ struct CStreamingInfo
     WORD  prevId;
     WORD  nextId;
     WORD  nextInImg;
-    unsigned char flg;
-    unsigned char archiveId;
+    BYTE flg;
+    BYTE archiveId;
     DWORD offsetInBlocks;
     DWORD sizeInBlocks;
     DWORD loadState;
