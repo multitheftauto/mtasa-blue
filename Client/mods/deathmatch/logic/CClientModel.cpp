@@ -67,31 +67,31 @@ bool CClientModel::Deallocate(void)
         {
             // If some ped is using this ID, change him to CJ
             CClientPedManager*                       pPedManager = g_pClientGame->GetManager()->GetPedManager();
-            std::vector<CClientPed*>::const_iterator iter = pPedManager->IterBegin();
-            for (; iter != pPedManager->IterEnd(); iter++)
+            for (auto iter = pPedManager->IterBegin(); iter != pPedManager->IterEnd(); iter++)
             {
-                if ((*iter)->GetModel() == m_iModelID)
+                CClientPed* pPed = *iter;
+                if (pPed->GetModel() == m_iModelID)
                 {
-                    if ((*iter)->IsStreamedIn())
+                    if (pPed->IsStreamedIn())
                     {
-                        (*iter)->StreamOutForABit();
+                        pPed->StreamOutForABit();
                     }
-                    (*iter)->SetModel(0);
+                    pPed->SetModel(0);
                 }
             }
         }
         else if (m_eModelType == CCLIENTMODELOBJECT) {
             CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
-            std::vector<CClientObject*>::const_iterator iter = pObjectManager->IterBegin();
-            for (; iter != pObjectManager->IterEnd(); iter++)
+            for (auto iter = pObjectManager->IterBegin(); iter != pObjectManager->IterEnd(); iter++)
             {
-                if ((*iter)->GetModel() == m_iModelID)
+                CClientObject* pObject = *iter;
+                if (pObject->GetModel() == m_iModelID)
                 {
-                    if ((*iter)->IsStreamedIn())
+                    if (pObject->IsStreamedIn())
                     {
-                        (*iter)->StreamOutForABit();
+                        pObject->StreamOutForABit();
                     }
-                    (*iter)->SetModel(1337);
+                    pObject->SetModel(1337);
                 }
             }
         }
