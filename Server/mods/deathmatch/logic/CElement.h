@@ -195,7 +195,6 @@ public:
     std::list<CElement*>::const_iterator AttachedElementsEnd() { return m_AttachedElements.end(); }
     const char*                          GetAttachToID() { return m_strAttachToID; }
     bool                                 IsElementAttached(CElement* pElement);
-    bool                                 IsAttachedToElement(CElement* pElement, bool bRecursive = true);
     virtual bool                         IsAttachable();
     virtual bool                         IsAttachToable();
     void                                 GetAttachedPosition(CVector& vecPosition);
