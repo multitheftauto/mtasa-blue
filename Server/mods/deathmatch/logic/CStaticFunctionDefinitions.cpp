@@ -9117,6 +9117,32 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
     // If its a different team
     if (pTeam != pPlayer->GetTeam())
     {
+        if (pPlayer->GetTeam() && IS_TEAM(pPlayer->GetTeam()))
+        {
+            // Call onPlayerTeamLeave event
+            CLuaArguments Arguments;
+            Arguments.PushElement(pPlayer->GetTeam()); // team
+            pPlayer->CallEvent("onPlayerTeamLeave", Arguments);
+
+            // Call onTeamLeave event
+            CLuaArguments Arguments2;
+            Arguments2.PushElement(pPlayer); // player
+            pPlayer->GetTeam()->CallEvent("onTeamLeave", Arguments2);
+        }
+
+        if (pTeam && IS_TEAM(pTeam))
+        {
+            // Call onPlayerTeamJoin event
+            CLuaArguments Arguments;
+            Arguments.PushElement(pTeam); // team
+            pPlayer->CallEvent("onPlayerTeamJoin", Arguments);
+
+            // Call onTeamJoin event
+            CLuaArguments Arguments2;
+            Arguments2.PushElement(pPlayer); // player
+            pTeam->CallEvent("onTeamJoin", Arguments2);
+        }
+
         // Change his team
         pPlayer->SetTeam(pTeam, true);
 

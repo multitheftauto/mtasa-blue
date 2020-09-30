@@ -1518,6 +1518,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
+    m_Events.AddEvent("onPlayerTeamJoin", "team", NULL, false);
+    m_Events.AddEvent("onPlayerTeamLeave", "team", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
@@ -1570,6 +1572,10 @@ void CGame::AddBuiltInEvents()
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
     m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
+
+    // Team events
+    m_Events.AddEvent("onTeamJoin", "player", NULL, false);
+    m_Events.AddEvent("onTeamLeave", "player", NULL, false);
 }
 
 void CGame::ProcessTrafficLights(long long llCurrentTime)
