@@ -39,10 +39,10 @@ bool CClientModel::Allocate(void)
     {
         switch (m_eModelType)
         {
-            case CCLIENTMODELPED:
+            case eClientModelType::PED:
                 pModelInfo->MakePedModel("PSYCHO");
                 break;
-            case CCLIENTMODELOBJECT:
+            case eClientModelType::OBJECT:
                 pModelInfo->MakeObjectModel(1337);
                 break;
             default:
@@ -63,7 +63,7 @@ bool CClientModel::Deallocate(void)
     // ModelInfo must be valid
     if (pModelInfo->IsValid())
     {
-        if (m_eModelType == CCLIENTMODELPED)
+        if (m_eModelType == eClientModelType::PED)
         {
             // If some ped is using this ID, change him to CJ
             CClientPedManager*                       pPedManager = g_pClientGame->GetManager()->GetPedManager();
@@ -80,7 +80,8 @@ bool CClientModel::Deallocate(void)
                 }
             }
         }
-        else if (m_eModelType == CCLIENTMODELOBJECT) {
+        else if (m_eModelType == eClientModelType::OBJECT)
+        {
             CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
             for (auto iter = pObjectManager->IterBegin(); iter != pObjectManager->IterEnd(); iter++)
             {
@@ -100,7 +101,7 @@ bool CClientModel::Deallocate(void)
         g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
 
         // Restore COL (for non ped models)
-        if (m_eModelType != CCLIENTMODELPED)
+        if (m_eModelType != eClientModelType::PED)
         {
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
         }

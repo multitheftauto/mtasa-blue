@@ -15,10 +15,10 @@ class CClientModel;
 #include <list>
 #include "CClientModelManager.h"
 
-enum eClientModelType
+enum class eClientModelType
 {
-    CCLIENTMODELPED,
-    CCLIENTMODELOBJECT,
+    PED,
+    OBJECT,
 };
 
 class CClientModel

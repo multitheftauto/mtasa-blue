@@ -577,10 +577,10 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 eClientModelType eModelType;
                 if (strModelType == "ped")
                 {
-                    eModelType = CCLIENTMODELPED;
+                    eModelType = eClientModelType::PED;
                 }
                 else if (strModelType == "object")
-                    eModelType = CCLIENTMODELOBJECT;
+                    eModelType = eClientModelType::OBJECT;
                 else
                 {
                     lua_pushboolean(luaVM, false);
