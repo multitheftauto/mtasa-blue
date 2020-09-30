@@ -233,6 +233,7 @@ public:
     virtual void   GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     virtual void   SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     bool           IsEntityAttached(CClientEntity* pEntity);
+    bool           IsAttachedToElement(CClientEntity* pEntity, bool bRecursive = true);
     uint           GetAttachedEntityCount() { return m_AttachedEntities.size(); }
     CClientEntity* GetAttachedEntity(uint uiIndex) { return m_AttachedEntities[uiIndex]; }
     void           ReattachEntities();
