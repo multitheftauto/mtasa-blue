@@ -45,7 +45,8 @@ enum ePedPieceTypes
 
 enum eBone
 {
-    BONE_PELVIS1 = 1,
+    BONE_ROOT = 0,
+    BONE_PELVIS1,
     BONE_PELVIS,
     BONE_SPINE1,
     BONE_UPPERTORSO,
@@ -72,7 +73,10 @@ enum eBone
     BONE_RIGHTHIP = 51,
     BONE_RIGHTKNEE,
     BONE_RIGHTANKLE,
-    BONE_RIGHTFOOT
+    BONE_RIGHTFOOT,
+    BONE_BELLY = 201,
+    BONE_RIGHTBREAST = 301,
+    BONE_LEFTBREAST = 302,
 };
 
 enum

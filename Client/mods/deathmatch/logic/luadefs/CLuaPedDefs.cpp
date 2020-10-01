@@ -977,403 +977,62 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
     return 1;
 }
 
-
-class CMatrixInterface
+bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position)
 {
-private:
-    // RwV3d-like:
-    CVector      m_right;
-    unsigned int flags;
-    CVector      m_forward;
-    unsigned int pad1;
-    CVector      m_up;
-    unsigned int pad2;
-    CVector      m_pos;
-    unsigned int pad3;
-
-public:
-    RwMatrixTag* m_pAttachMatrix = nullptr;
-    bool         m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
-
-    CMatrixInterface(CMatrixInterface const& matrix);
-    CMatrixInterface(RwMatrixTag* matrix, bool temporary);            // like previous + attach
-    ~CMatrixInterface();                                              // destructor detaches matrix if attached
-
-    void ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags)
-    {
-        ((void(__thiscall*)(CMatrixInterface*, float&, float&, float&, std::int32_t))0x59A840)(this, x, y, z, flags);
-    }
-    void ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags)
-    {
-        ((void(__thiscall*)(CMatrixInterface*, float, float, float, std::int32_t))0x59AA40)(this, x, y, z, flags);
-    }
-    void UpdateRW() { ((void(__thiscall*)(CMatrixInterface*))0x59BBB0)(this); }
-    void SetTranslateOnly(CVector position) { m_pos = position; }
-    void SetMatrix(const CVector& right, const CVector& forward, const CVector& up, const CVector& pos) {
-        m_right = right;
-        m_forward = forward;
-        m_up = up;
-        m_pos = pos;
-    }
-};
-
-CMatrixInterface::CMatrixInterface(CMatrixInterface const& matrix)
-{
-    ((void(__thiscall*)(CMatrixInterface*, CMatrixInterface const&))0x59BCF0)(this, matrix);
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBonePosition(static_cast<eBone>(boneId), position) : false;
 }
 
-// like previous + attach
-CMatrixInterface::CMatrixInterface(RwMatrixTag* matrix, bool temporary)
+bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll)
 {
-    ((void(__thiscall*)(CMatrixInterface*, RwMatrixTag*, bool))0x59C050)(this, matrix, temporary);
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll, rwCOMBINEPRECONCAT) : false;
 }
 
-// destructor detaches matrix if attached
-CMatrixInterface::~CMatrixInterface()
+std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
-    ((void(__thiscall*)(CMatrixInterface*))0x59ACD0)(this);
-}
-
-struct RpHAnimNodeInfo
-{
-    int      nodeID;    /**< User defined ID for this node  */
-    int      nodeIndex; /**< Array index of node  */
-    int      flags;     /**< Matrix push/pop flags  */
-    RwFrame* pFrame;    /**< Pointer to an attached RwFrame (see \ref RpHAnimHierarchyAttach) */
-};
-
-struct RpHAnimHierarchy
-{
-    int flags;    /**< Flags for the hierarchy  */
-    int numNodes; /**< Number of nodes in the hierarchy  */
-
-    RwMatrix* pMatrixArray;             /**< Pointer to node matrices*/
-    void*     pMatrixArrayUnaligned;    /**< Pointer to memory used for node matrices
-                                         * from which the aligned pMatrixArray is allocated */
-    RpHAnimNodeInfo* pNodeInfo;         /**< Array of node information (push/pop flags etc) */
-    RwFrame*         parentFrame;       /**< Pointer to the Root RwFrame of the hierarchy this
-                                         * RpHAnimHierarchy represents */
-    RpHAnimHierarchy* parentHierarchy;  /**< Internal use */
-    int               rootParentOffset; /**< Internal use */
-
-    void* currentAnim; /**< Internal use */
-};
-
-auto GetAnimHierarchyFromSkinClump = (RpHAnimHierarchy * (__cdecl*)(RpClump*))0x734A40;
-auto RpHAnimIDGetIndex = (int(__cdecl*)(RpHAnimHierarchy*, int))0x7C51A0;
-auto RpHAnimHierarchyGetMatrixArray = (RwMatrix * (__cdecl*)(RpHAnimHierarchy*))0x7C5120;
-
-typedef RpAtomic* (*RpAtomicCallBack)(RpAtomic* atomic, void* data);
-typedef struct RpSkin RpSkin;
-
-RwMatrix* RwFrameGetLTM(RwFrame* frame)
-{
-    return ((RwMatrix * (__cdecl*)(RwFrame*))0x7F0990)(frame);
-}
-
-RpClump* RpClumpForAllAtomics(RpClump* clump, RpAtomicCallBack callback, void* pData)
-{
-    return ((RpClump * (__cdecl*)(RpClump*, RpAtomicCallBack, void*))0x749B70)(clump, callback, pData);
-}
-
-RpSkin* RpSkinGeometryGetSkin(RpGeometry* geometry)
-{
-    return ((RpSkin * (__cdecl*)(RpGeometry*))0x7C7550)(geometry);
-}
-
-RpHAnimHierarchy* RpSkinAtomicGetHAnimHierarchy(const RpAtomic* atomic)
-{
-    return ((RpHAnimHierarchy * (__cdecl*)(const RpAtomic*))0x7C7540)(atomic);
-}
-
-RpAtomic* __cdecl RpClumpGetFirstAtomicCB(RpAtomic* atomic, void* data)
-{
-    *(DWORD*)data = (DWORD)atomic;
-    return 0;
-}
-
-RpAtomic* __cdecl RpClumpGetSkinAnimHierarchyCB(RpAtomic* atomic, void* data)
-{
-    *(DWORD*)data = (DWORD)RpSkinAtomicGetHAnimHierarchy(atomic);
-    return 0;
-}
-
-enum RwOpCombineType
-{
-    rwCOMBINEREPLACE = 0, /**<Replace -
-                              all previous transformations are lost */
-    rwCOMBINEPRECONCAT,   /**<Pre-concatenation -
-                              the given transformation is applied
-                              before all others */
-    rwCOMBINEPOSTCONCAT,  /**<Post-concatenation -
-                              the given transformation is applied
-                              after all others */
-    rwOPCOMBINETYPEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
-};
-
-struct RtQuat
-{
-    RwV3d imag; /**< The imaginary part(s) */
-    float real; /**< The real part */
-};
-
-RtQuat* RtQuatRotate(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp)
-{
-    return ((RtQuat * (__cdecl*)(RtQuat*, const RwV3d*, float, RwOpCombineType))0x7EB7C0)(quat, axis, angle, combineOp);
-}
-
-
-#define rpHANIMPOPPARENTMATRIX         0x01
-#define rpHANIMPUSHPARENTMATRIX        0x02
-#define rwMatrixSetFlags(m, flagsbit)  ((m)->flags = (flagsbit))
-#define rwMatrixGetFlags(m)            ((m)->flags)
-#define rwMatrixTestFlags(m, flagsbit) ((m)->flags & (int)(flagsbit))
-
-enum RwMatrixType
-{
-    rwMATRIXTYPENORMAL = 0x00000001,
-    rwMATRIXTYPEORTHOGONAL = 0x00000002,
-    rwMATRIXTYPEORTHONORMAL = 0x00000003,
-    rwMATRIXTYPEMASK = 0x00000003,
-    rwMATRIXTYPEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
-};
-enum RwMatrixFlag
-{
-    rwMATRIXINTERNALIDENTITY = 0x00020000,
-    rwMATRIXFLAGFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
-};
-void RwMatrixSetIdentity(RwMatrix* matrix)
-{
-    const int flags = (rwMATRIXINTERNALIDENTITY | rwMATRIXTYPEORTHONORMAL);
-
-    matrix->right.x = matrix->up.y = matrix->at.z = ((float)1);
-    matrix->right.y = matrix->right.z = matrix->up.x = ((float)0);
-    matrix->up.z = matrix->at.x = matrix->at.y = ((float)0);
-    matrix->pos.x = matrix->pos.y = matrix->pos.z = ((float)0);
-    rwMatrixSetFlags(matrix, rwMatrixGetFlags(matrix) | flags);
-}
-
-std::uint32_t RpSkinGetNumBones(RpSkin* skin)
-{
-    return ((std::uint32_t(__cdecl*)(RpSkin*))0x7C77E0)(skin);
-}
-
-const RwMatrix* RpSkinGetSkinToBoneMatrices(RpSkin* skin)
-{
-    return ((const RwMatrix*(__cdecl*)(RpSkin*))0x7C7810)(skin);
-}
-
-RwMatrix* RwMatrixInvert(RwMatrix* matrixOut, const RwMatrix* matrixIn)
-{
-    return ((RwMatrix * (__cdecl*)(RwMatrix*, const RwMatrix*))0x7F2070)(matrixOut, matrixIn);
-}
-
-RwMatrix* RwMatrixMultiply(RwMatrix* matrixOut, const RwMatrix* MatrixIn1, const RwMatrix* matrixIn2)
-{
-    return ((RwMatrix * (__cdecl*)(RwMatrix*, const RwMatrix*, const RwMatrix*))0x7F18B0)(matrixOut, MatrixIn1, matrixIn2);
-}
-
-struct RpHAnimBlendInterpFrame
-{
-    RtQuat orientation;
-    RwV3d  translation;
-};
-class AnimBlendFrameData
-{
-public:
-    union
-    {
-        struct
-        {
-            unsigned char m_bf1 : 1;                                             // doesn't seem to be used
-            unsigned char m_IsIFrameOrientationToAffectedByNodes : 1;            // m_IFrame orientation will be affected
-            unsigned char m_IsIFrameTranslationToAffectedByNodes : 1;            // m_IFrame translation will be affected
-            unsigned char m_bIsInitialized : 1;
-            unsigned char m_bUpdateSkinnedWith3dVelocityExtraction : 1;
-            unsigned char m_bCheckBlendNodeClumpKeyFrames : 1;            // key frames of CAninBlendNode bones will be checked
-            unsigned char m_bIsCompressed : 1;
-            unsigned char m_bUpdatingFrame : 1;            // doesn't seem to be used
-        };
-        unsigned char m_nFlags;
-    };
-    char                     pad[3];
-    CVector                  m_vecOffset;
-    RpHAnimBlendInterpFrame* m_pIFrame;
-    unsigned int             m_nNodeId;
-};
-
-struct SClumpAnimAssocSAInterface
-{
-    SClumpAnimAssocSAInterface*      m_pNext;
-    SClumpAnimAssocSAInterface*      m_pPrevious;
-    __int16                          m_nNumBlendNodes;
-    __int16                          m_nAnimGroup;
-    class CAnimBlendNodeSAInterface* m_pNodeArray;
-    CAnimBlendHierarchySAInterface*  m_pHierarchy;
-    float                            m_fBlendAmount;
-    float                            m_fBlendDelta;
-    float                            m_fCurrentTime;
-    float                            m_fSpeed;
-    float                            fTimeStep;
-    __int16                          m_nAnimId;
-    __int16                          m_nFlags;
-};
-
-struct CAnimBlendClumpDataSAInterface
-{
-    SClumpAnimAssocSAInterface* m_pFirstAssociation;
-    int                         field_4;
-    int                         m_dwNumBones;
-    int                         field_C;
-    AnimBlendFrameData*         m_frames;
-};
-
-static unsigned int& ClumpOffset = *(unsigned int*)0xB5F878;
-
-/* macros used to access plugin data in objects */
-#define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((std::uint8_t*)(_base) + (_offset)))
-#define CLUMPDATA(clump)                      (RWPLUGINOFFSET(CAnimBlendClumpDataSAInterface*, clump, ClumpOffset))
-
-static RwV3d& CPedIK_XaxisIK = *(RwV3d*)0x8D232C;
-static RwV3d& CPedIK_YaxisIK = *(RwV3d*)0x8D2338;
-static RwV3d& CPedIK_ZaxisIK = *(RwV3d*)0x8D2344;
-
-static void RwMatrixToCMatrix(CMatrix& matrix, const RwMatrix* rwMatrix)
-{
-    matrix.vRight = *(CVector*)&rwMatrix->right; 
-    matrix.vFront = *(CVector*)&rwMatrix->up.x; // yes, rw up is front in gta  
-    matrix.vUp = *(CVector*)&rwMatrix->at;            // yes, rw front is up in gta  
-    matrix.vPos = *(CVector*)&rwMatrix->pos;
-}
-
-static void CMatrixToRwMatrix(RwMatrix* rwMatrix, const CMatrix& matrix)
-{
-    CMatrixInterface boneMatrix(rwMatrix, false);
-    boneMatrix.SetMatrix(matrix.vRight, matrix.vFront, matrix.vUp, matrix.vPos);
-    boneMatrix.UpdateRW();
-}
-
-bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, CVector position)
-{
-    if (IS_PED(entity)) {
-        // NOTE: This position will be reset if UpdateElementRpHAnim is called after this.
-        CClientPed&       ped = static_cast<CClientPed&>(*entity);
-        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
-        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
-        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
-        CMatrixInterface  boneMatrix(boneMatrixArray, false);
-        boneMatrix.SetTranslateOnly(position);
-        boneMatrix.UpdateRW();
-        return true;
-    }
+    CEntity* theEntity = entity->GetGameEntity();
+    CVector  position;
+    if (theEntity && theEntity->GetBonePosition(static_cast<eBone>(boneId), position))
+        return std::make_tuple(position.fX, position.fY, position.fZ);
     return false;
 }
 
-bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, float yaw, float pitch, float roll)
+std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
-    if (IS_PED(entity))
-    {
-        LimbOrientation;
-        CClientPed& ped = static_cast<CClientPed&>(*entity);
-        CPlayerPed* thePed = ped.GetGamePlayer();
-        if (thePed)
-        {
-            // updating the bone frame orientation will also update its children
-            // This rotation is only applied when UpdateElementRpHAnim is called
-            CAnimBlendClumpDataSAInterface* clumpDataInterface = *CLUMPDATA(ped.GetClump());
-            for (int i = 0; i < clumpDataInterface->m_dwNumBones; i++)
-            {
-                AnimBlendFrameData* frameData = &clumpDataInterface->m_frames[i];
-                if (frameData->m_nNodeId == boneId)
-                {
-                    RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
-                    RtQuatRotate(boneOrientation, &CPedIK_XaxisIK, yaw, rwCOMBINEPRECONCAT);
-                    RtQuatRotate(boneOrientation, &CPedIK_ZaxisIK, pitch, rwCOMBINEPRECONCAT);
-                    RtQuatRotate(boneOrientation, &CPedIK_YaxisIK, roll, rwCOMBINEPRECONCAT);
-                    thePed->SetUpdateMetricsRequired(true);
-                    return true;
-                }
-            }
-        }
-    }
+    float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
+        return std::make_tuple(yaw, pitch, roll);
+        //return std::make_tuple(ConvertRadiansToDegreesNoWrap(yaw), ConvertRadiansToDegreesNoWrap(pitch), ConvertRadiansToDegreesNoWrap(roll));
     return false;
 }
 
-std::tuple<float, float, float> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix)
 {
-    if (IS_PED(entity))
-    {
-        CClientPed&       ped = static_cast<CClientPed&>(*entity);
-        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
-        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
-        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
-        const RwV3d&      position = boneMatrixArray->pos;
-        return {position.x, position.y, position.z};
-    }
-    throw std::invalid_argument("element type is not supported\n");
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::tuple<float, float, float> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
+std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
-    if (IS_PED(entity))
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity)
     {
-        CClientPed&       ped = static_cast<CClientPed&>(*entity);
-        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
-        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
-        RwMatrixTag*      boneMatrixArray = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
-        CMatrixInterface  boneMatrix(boneMatrixArray, false);
-
-        float x = 0.0, y = 0.0f, z = 0.0f;
-        boneMatrix.ConvertToEulerAngles(x, y, z, 21);
-        return {ConvertRadiansToDegreesNoWrap(x), ConvertRadiansToDegreesNoWrap(y), ConvertRadiansToDegreesNoWrap(z)};
+        RwMatrix* boneRwMatrix = theEntity->GetBoneRwMatrix(static_cast<eBone>(boneId));
+        return boneRwMatrix ? CMatrix(boneRwMatrix) : false;
     }
-    throw std::invalid_argument("element type is not supported\n");
-}
-
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId, CMatrix boneMatrix)
-{
-    if (IS_PED(entity))
-    {
-        // NOTE: This position will be reset if UpdateElementRpHAnim is called after this. 
-        CClientPed&       ped = static_cast<CClientPed&>(*entity);
-        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
-        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
-        RwMatrixTag*      boneRwMatrix = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
-        CMatrixToRwMatrix(boneRwMatrix, boneMatrix);
-        return true;
-    }
-    throw std::invalid_argument("element type is not supported\n");
     return false;
-}
-
-std::tuple<CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientEntity* entity, std::int32_t boneId)
-{
-    if (IS_PED(entity))
-    {
-        CClientPed&       ped = static_cast<CClientPed&>(*entity);
-        RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(ped.GetClump());
-        int               boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
-        RwMatrixTag*      boneRwMatrix = &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
-        CMatrix  boneMatrix;
-        RwMatrixToCMatrix(boneMatrix, boneRwMatrix);
-        return boneMatrix;
-    }
-    throw std::invalid_argument("element type is not supported\n");
 }
 
 bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity)
 {
-    if (IS_PED(entity))
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity)
     {
-        CClientPed& ped = static_cast<CClientPed&>(*entity);
-        CPlayerPed* thePed = ped.GetGamePlayer();
-        if (thePed)
-        {
-            thePed->UpdateRpHAnim();
-            return true;
-        }
+        theEntity->UpdateRpHAnim();
+        return true;
     }
-    throw std::invalid_argument("element type is not supported\n");
     return false;
 }
 

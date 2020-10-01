@@ -18,6 +18,8 @@
 
 #include <windows.h>
 
+enum eBone;
+
 enum eEntityType
 {
     ENTITY_TYPE_NOTHING,
@@ -105,4 +107,12 @@ public:
     virtual void SetStaticWaitingForCollision(bool bStatic) = 0;
 
     virtual unsigned long GetArrayID() = 0;
+
+    virtual RwMatrixTag* GetBoneRwMatrix(eBone boneId) = 0;
+    virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
+
+    virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;
+    virtual bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll, RwOpCombineType combineType) = 0;
+    virtual bool GetBonePosition(eBone boneId, CVector& position) = 0;
+    virtual bool SetBonePosition(eBone boneId, const CVector& position) = 0;
 };

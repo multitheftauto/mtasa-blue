@@ -18,6 +18,10 @@
 /*****************************************************************************/
 
 // RenderWare definitions
+#if (!defined(RWFORCEENUMSIZEINT))
+    #define RWFORCEENUMSIZEINT ((std::int32_t)((~((std::uint32_t)0)) >> 1))
+#endif
+#define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((std::uint8_t*)(_base) + (_offset)))
 #define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
 #define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23
@@ -76,19 +80,66 @@ struct RwSphere
 struct RwMatrixTag
 {
     /* These are padded to be 16 byte quantities per line */
-    RwV3d    right;
+    RwV3d         right;
     std::uint32_t flags;
-    RwV3d    up;
+    RwV3d         up;
     std::uint32_t pad1;
-    RwV3d    at;
+    RwV3d         at;
     std::uint32_t pad2;
-    RwV3d    pos;
+    RwV3d         pos;
     std::uint32_t pad3;
 };
 
 typedef RwMatrixTag RwMatrix;
 
+struct RtQuat
+{
+    RwV3d imag; /**< The imaginary part(s) */
+    float real; /**< The real part */
+};
+
+struct RwFrame;
+struct RtAnimInterpolator;
+
+struct RpHAnimNodeInfo
+{
+    int      nodeID;    /**< User defined ID for this node  */
+    int      nodeIndex; /**< Array index of node  */
+    int      flags;     /**< Matrix push/pop flags  */
+    RwFrame* pFrame;    /**< Pointer to an attached RwFrame (see \ref RpHAnimHierarchyAttach) */
+};
+
+struct RpHAnimHierarchy
+{
+    int flags;    /**< Flags for the hierarchy  */
+    int numNodes; /**< Number of nodes in the hierarchy  */
+
+    RwMatrix* pMatrixArray;             /**< Pointer to node matrices*/
+    void*     pMatrixArrayUnaligned;    /**< Pointer to memory used for node matrices
+                                         * from which the aligned pMatrixArray is allocated */
+    RpHAnimNodeInfo* pNodeInfo;         /**< Array of node information (push/pop flags etc) */
+    RwFrame*         parentFrame;       /**< Pointer to the Root RwFrame of the hierarchy this
+                                         * RpHAnimHierarchy represents */
+    RpHAnimHierarchy* parentHierarchy;  /**< Internal use */
+    int               rootParentOffset; /**< Internal use */
+
+    RtAnimInterpolator* currentAnim; /**< Internal use */
+};
+
 // RenderWare enumerations
+enum RwOpCombineType
+{
+    rwCOMBINEREPLACE = 0, /**<Replace -
+                              all previous transformations are lost */
+    rwCOMBINEPRECONCAT,   /**<Pre-concatenation -
+                              the given transformation is applied
+                              before all others */
+    rwCOMBINEPOSTCONCAT,  /**<Post-concatenation -
+                              the given transformation is applied
+                              after all others */
+    rwOPCOMBINETYPEFORCEENUMSIZEINT = RWFORCEENUMSIZEINT
+};
+
 enum RwPrimitiveType
 {
     PRIMITIVE_NULL = 0,

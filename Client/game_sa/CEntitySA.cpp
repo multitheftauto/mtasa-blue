@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
+#include "BoneNode_cSA.h"
 
 extern CGameSA* pGame;
 
@@ -587,6 +589,104 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     }
     if (dwReturn) return true;
     else return false;
+}
+
+RwMatrixTag* CEntitySA::GetBoneRwMatrix(eBone boneId)
+{
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return nullptr;
+    RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(clump);
+    if (hAnimHier)
+    {
+        int boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
+        if (boneAnimIdIndex != -1)
+            return &RpHAnimHierarchyGetMatrixArray(hAnimHier)[boneAnimIdIndex];
+    }
+    return nullptr;
+}
+
+bool CEntitySA::SetBoneMatrix(eBone boneId, const CMatrix& matrix)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
+        boneMatrix.SetMatrix(matrix.vRight, matrix.vFront, matrix.vUp, matrix.vPos);
+        boneMatrix.UpdateRW();
+        return true;
+    }
+    return false;
+}
+
+bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            RwV3d   angles = {yaw, roll, pitch};
+            BoneNode_cSAInterface::QuatToEuler(boneOrientation, &angles);
+            yaw = angles.x;
+            roll = angles.y;
+            pitch = angles.z;
+            return true;
+        }
+    }
+    return false;
+
+}
+
+bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll, RwOpCombineType combineType)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            RwV3d   angles = {yaw, roll, pitch};
+            BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        const RwV3d& pos = rwBoneMatrix->pos;
+        position = {pos.x, pos.y, pos.z};
+        return true;
+    }
+    return false;
+}
+
+// NOTE: The position will be reset if UpdateElementRpHAnim is called after this.
+bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
+{
+    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    if (rwBoneMatrix)
+    {
+        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
+        boneMatrix.SetTranslateOnly(position);
+        boneMatrix.UpdateRW();
+        return true;
+    }
+    return false;
 }
 
 BYTE CEntitySA::GetAreaCode()

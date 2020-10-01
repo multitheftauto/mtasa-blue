@@ -97,6 +97,9 @@ struct SCheatSA
         m_bCanBeSet = bCanBeSet;
     }
 };
+
+class CAnimBlendClumpDataSAInterface;
+
 class CGameSA : public CGame
 {
     friend class COffsets;
@@ -426,6 +429,7 @@ public:
     void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
+    CAnimBlendClumpDataSAInterface** GetClumpData(RpClump* clump) { return RWPLUGINOFFSET(CAnimBlendClumpDataSAInterface*, clump, ClumpOffset); }
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
@@ -493,6 +497,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
 
+    static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
     static unsigned long* VAR_IsGameLoaded;
@@ -512,6 +517,6 @@ private:
 
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
 
-    CPed*      m_pPedContext;
-    CTickCount m_llASyncLoadingAutoUnsuspendTime;
+    CPed*                m_pPedContext;
+    CTickCount           m_llASyncLoadingAutoUnsuspendTime;
 };

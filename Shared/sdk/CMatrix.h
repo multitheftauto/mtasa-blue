@@ -16,6 +16,7 @@
 /**
  * Contains full positional data for a point
  */
+
 class CMatrix
 {
 public:
@@ -26,6 +27,15 @@ public:
         vFront = CVector(0.0f, 1.0f, 0.0f);
         vUp = CVector(0.0f, 0.0f, 1.0f);
         vPos = CVector(0.0f, 0.0f, 0.0f);
+    }
+
+    CMatrix(struct RwMatrixTag* rwMatrix)
+    {
+        float* theRwMatrix = reinterpret_cast<float*>(rwMatrix);
+        vRight = *(CVector*)&theRwMatrix[0];            // rwMatrix->right;
+        vFront = *(CVector*)&theRwMatrix[4];            // rwMatrix->up; yes, rw up is front in gta
+        vUp = *(CVector*)&theRwMatrix[8];               // rwMatrix->at;  yes, rw front is up in gta
+        vPos = *(CVector*)&theRwMatrix[12];             // rwMatrix->pos;
     }
 
     CMatrix(const CVector& vecPosition)

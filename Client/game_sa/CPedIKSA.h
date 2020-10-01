@@ -57,6 +57,10 @@ public:
     float            m_fSlopeRoll;
     float            m_fBodyRoll;
     DWORD            m_flags;
+
+    static RwV3d& XaxisIK;
+    static RwV3d& YaxisIK;
+    static RwV3d& ZaxisIK;
 };
 
 class CPedIKSA : public CPedIK
