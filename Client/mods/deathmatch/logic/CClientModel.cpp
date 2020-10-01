@@ -77,6 +77,11 @@ bool CClientModel::Deallocate(void)
                         pPed->StreamOutForABit();
                     }
                     pPed->SetModel(0);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(m_iModelID);
+                    Arguments.PushNumber(0);
+                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
                 }
             }
         }
@@ -92,6 +97,11 @@ bool CClientModel::Deallocate(void)
                         pObject->StreamOutForABit();
                     }
                     pObject->SetModel(1337);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(m_iModelID);
+                    Arguments.PushNumber(1337);
+                    pObject->CallEvent("onClientElementModelChange", Arguments, true);
                 }
             }
         }
