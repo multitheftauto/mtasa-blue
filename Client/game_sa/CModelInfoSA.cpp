@@ -1350,10 +1350,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CStreamingInfo* pBaseModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseID);
     CStreamingInfo* pTargetModelStreamigInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
 
-    pTargetModelStreamigInfo->loadState = 0;
-    pTargetModelStreamigInfo->nextInImg = -1;
-    pTargetModelStreamigInfo->nextId = -1;
-    pTargetModelStreamigInfo->prevId = -1;
+    pTargetModelStreamigInfo->Reset();
     pTargetModelStreamigInfo->archiveId = pBaseModelStreamigInfo->archiveId;
     pTargetModelStreamigInfo->offsetInBlocks = pBaseModelStreamigInfo->offsetInBlocks;
     pTargetModelStreamigInfo->sizeInBlocks = pBaseModelStreamigInfo->sizeInBlocks;
@@ -1365,14 +1362,7 @@ void CModelInfoSA::DeallocateModel(void)
     ppModelInfo[m_dwModelID] = nullptr;
     CStreamingInfo* pModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
 
-    pModelStreamingInfo->loadState = 0;
-    pModelStreamingInfo->nextInImg = -1;
-    pModelStreamingInfo->nextId = -1;
-    pModelStreamingInfo->prevId = -1;
-    pModelStreamingInfo->archiveId = 0;
-    pModelStreamingInfo->flg = 0;
-    pModelStreamingInfo->offsetInBlocks = 0;
-    pModelStreamingInfo->sizeInBlocks = 0;
+    pModelStreamingInfo->Reset();
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

@@ -21,6 +21,18 @@ struct CStreamingInfo
     DWORD offsetInBlocks;
     DWORD sizeInBlocks;
     DWORD loadState;
+public:
+    void Reset()
+    {
+        this->loadState = 0;
+        this->nextInImg = -1;
+        this->nextId = -1;
+        this->prevId = -1;
+        this->archiveId = 0;
+        this->flg = 0;
+        this->offsetInBlocks = 0;
+        this->sizeInBlocks = 0;
+    };
 };
 
 class CStreaming
