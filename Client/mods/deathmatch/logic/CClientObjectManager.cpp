@@ -92,15 +92,15 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
-    if (ulObjectModel < 20000)
+    if (ulObjectModel >= 20000)
+        return false;
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
+    if (pModelInfo && pModelInfo->GetInterface())
     {
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
-        if (pModelInfo && pModelInfo->GetInterface())
-        {
-            eModelInfoType eType = pModelInfo->GetModelType();
-            if (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON)
-                return true;
-        }
+        eModelInfoType eType = pModelInfo->GetModelType();
+        if (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON)
+            return true;
     }
 
     return false;
