@@ -64,6 +64,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
+DECLARE_ENUM_CLASS(eClientModelType);
 
 class CRemoteCall;
 
@@ -452,6 +453,11 @@ inline SString GetClassByTypeName(eObjectGroup::FxType*)
 inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
 {
     return "objectgroup-breakmode";
+}
+
+inline SString GetClassByTypeName(eClientModelType)
+{
+    return "client-model-type";
 }
 
 //
