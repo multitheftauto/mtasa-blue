@@ -516,7 +516,12 @@ bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX)
         return true;
-    return ppModelInfo[m_dwModelID] != 0 && pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks;
+
+    if (ppModelInfo[m_dwModelID] == nullptr)
+        return false;
+
+    auto sizeInBlocks = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks;
+    return sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
