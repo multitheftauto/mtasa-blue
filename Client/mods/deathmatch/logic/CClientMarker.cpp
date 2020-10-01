@@ -39,6 +39,8 @@ CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarker
 
 CClientMarker::~CClientMarker()
 {
+    AttachTo(nullptr);
+
     // Unlink
     Unlink();
 
@@ -48,6 +50,7 @@ CClientMarker::~CClientMarker()
     // Remove the colshape
     if (m_pCollision)
         delete m_pCollision;
+    m_pCollision = nullptr;
 
     // Stream out first so the element counter is correct
     StreamOut();
@@ -74,26 +77,33 @@ void CClientMarker::GetPosition(CVector& vecPosition) const
     }
     else
     {
-        vecPosition = CVector();
+        vecPosition = m_vecPosition;
     }
 }
 
 void CClientMarker::SetPosition(const CVector& vecPosition)
 {
-    if (m_pMarker)
-        m_pMarker->SetPosition(vecPosition);
-    if (m_pCollision)
-        m_pCollision->SetPosition(vecPosition);
+    if (m_vecPosition != vecPosition)
+    {
+        m_vecPosition = vecPosition;
+        if (m_pMarker)
+            m_pMarker->SetPosition(vecPosition);
+        if (m_pCollision)
+            m_pCollision->SetPosition(vecPosition);
 
-    // Update our streaming position
-    UpdateStreamPosition(vecPosition);
+        // Update our streaming position
+        UpdateStreamPosition(vecPosition);
+    }
 }
 
 void CClientMarker::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pCollision)
-        m_pCollision->AttachTo(this);
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
+    }
 }
 
 void CClientMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
