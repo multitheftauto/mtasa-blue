@@ -512,15 +512,37 @@ unsigned char CPlayer::GetAttackBodyPart()
     return m_ucAttackBodyPart;
 }
 
-void CPlayer::SetTeam(CTeam* pTeam, bool bChangeTeam, const char* szReason)
+void CPlayer::SetTeam(CTeam* pTeam, bool bChangeTeam, CTeam::eChangeReason Reason)
 {
     if (pTeam == m_pTeam)
         return;
 
+    // If the new team is NULL, this means he was removed from his previous team
+    if (Reason == CTeam::CHANGE_CHANGED && pTeam == NULL)
+        Reason = CTeam::CHANGE_REMOVED;
+
+    // Grab change reason
+    const char* szReason = "unknown";
+    switch (Reason)
+    {
+        case CTeam::CHANGE_CHANGED:
+            szReason = "changed";
+            break;
+        case CTeam::CHANGE_REMOVED:
+            szReason = "removed";
+            break;
+        case CTeam::CHANGE_DISCONNECTED:
+            szReason = "disconnected";
+            break;
+        case CTeam::CHANGE_DESTROYED:
+            szReason = "destroyed";
+            break;
+    }
+
     CLuaArguments Arguments;
     Arguments.PushElement(m_pTeam); // previous team
     Arguments.PushElement(pTeam); // new team
-    Arguments.PushString(szReason); // possible reasons - (destroyed, changed)
+    Arguments.PushString(szReason); // change reason
     CallEvent("onPlayerTeamChange", Arguments);
 
     if (m_pTeam && bChangeTeam)

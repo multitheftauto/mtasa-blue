@@ -1410,14 +1410,10 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     // If he had joined
     if (Player.IsJoined())
     {
-        // Check if the player was inside a team and fire the event
+        // Check if the player was inside a team so we could fire onPlayerTeamChange event
         if (Player.GetTeam())
         {
-            CLuaArguments Arguments;
-            Arguments.PushElement(Player.GetTeam());
-            Arguments.PushNil();
-            Arguments.PushString("disconnected");
-            Player.CallEvent("onPlayerTeamChange", Arguments);
+            Player.SetTeam(NULL, false, CTeam::CHANGE_DISCONNECTED);
         }
 
         // Tell our scripts the player has quit, but only if the scripts got told he joined

@@ -109,7 +109,7 @@ void CTeam::RemoveAllPlayers()
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)
     {
-        (*iter)->SetTeam(NULL, false, "destroyed");
+        (*iter)->SetTeam(NULL, false, CHANGE_DESTROYED);
     }
     m_Players.clear();
 }

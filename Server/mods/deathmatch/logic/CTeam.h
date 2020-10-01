@@ -24,6 +24,15 @@ class CTeam : public CElement
     friend class CTeamManager;
 
 public:
+    enum eChangeReason
+    {
+        CHANGE_CHANGED,
+        CHANGE_REMOVED,
+        CHANGE_DISCONNECTED,
+        CHANGE_DESTROYED,
+    };
+
+public:
     CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
           unsigned char ucBlue = 0);
     ~CTeam();
