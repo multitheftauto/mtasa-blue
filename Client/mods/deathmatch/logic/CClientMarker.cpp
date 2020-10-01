@@ -47,10 +47,7 @@ CClientMarker::~CClientMarker()
     // Make sure nothing is still referencing us
     m_pManager->UnreferenceEntity(this);
 
-    // Remove the colshape
-    if (m_pCollision)
-        delete m_pCollision;
-    m_pCollision = nullptr;
+    SAFE_DELETE(m_pCollision)
 
     // Stream out first so the element counter is correct
     StreamOut();
