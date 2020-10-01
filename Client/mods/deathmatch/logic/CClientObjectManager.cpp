@@ -96,14 +96,11 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
-    if (pModelInfo && pModelInfo->GetInterface())
-    {
-        eModelInfoType eType = pModelInfo->GetModelType();
-        if (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON)
-            return true;
-    }
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
 
-    return false;
+    eModelInfoType eType = pModelInfo->GetModelType();
+    return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON);
 }
 
 bool CClientObjectManager::IsBreakableModel(unsigned long ulObjectModel)
