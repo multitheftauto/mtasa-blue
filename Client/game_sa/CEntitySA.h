@@ -312,7 +312,7 @@ public:
     bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
-    bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll, RwOpCombineType combineType);
+    bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
 

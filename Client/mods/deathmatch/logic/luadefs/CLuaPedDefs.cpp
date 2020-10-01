@@ -986,7 +986,7 @@ bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* ent
 bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll)
 {
     CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll, rwCOMBINEPRECONCAT) : false;
+    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
 }
 
 std::variant<bool, std::tuple<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)

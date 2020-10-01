@@ -643,7 +643,7 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
 
 }
 
-bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll, RwOpCombineType combineType)
+bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
 {
     RpClump* clump = GetRpClump();
     if (clump)
