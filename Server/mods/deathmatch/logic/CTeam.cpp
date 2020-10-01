@@ -28,7 +28,7 @@ CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, 
 
 CTeam::~CTeam()
 {
-    RemoveAllPlayers();
+    //RemoveAllPlayers(); // Called in CElementDeleter.cpp
     Unlink();
 }
 
@@ -109,7 +109,7 @@ void CTeam::RemoveAllPlayers()
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)
     {
-        (*iter)->SetTeam(NULL, false);
+        (*iter)->SetTeam(NULL, false, "destroyed");
     }
     m_Players.clear();
 }

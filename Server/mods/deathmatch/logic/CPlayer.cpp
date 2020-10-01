@@ -512,10 +512,16 @@ unsigned char CPlayer::GetAttackBodyPart()
     return m_ucAttackBodyPart;
 }
 
-void CPlayer::SetTeam(CTeam* pTeam, bool bChangeTeam)
+void CPlayer::SetTeam(CTeam* pTeam, bool bChangeTeam, const char* szReason)
 {
     if (pTeam == m_pTeam)
         return;
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(m_pTeam); // previous team
+    Arguments.PushElement(pTeam); // new team
+    Arguments.PushString(szReason); // possible reasons - (destroyed, changed)
+    CallEvent("onPlayerTeamChange", Arguments);
 
     if (m_pTeam && bChangeTeam)
         m_pTeam->RemovePlayer(this, false);

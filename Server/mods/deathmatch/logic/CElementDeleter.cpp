@@ -19,6 +19,12 @@ void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdat
     {
         if (!IsBeingDeleted(pElement))
         {
+            // Check if the element is a team and remove players
+            if (IS_TEAM(pElement))
+            {
+               ((CTeam*)pElement)->RemoveAllPlayers();
+            }
+            
             // Before we do anything, fire the on-destroy event
             CLuaArguments Arguments;
             pElement->CallEvent("onElementDestroy", Arguments);

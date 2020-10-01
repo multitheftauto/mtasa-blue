@@ -177,7 +177,7 @@ public:
     unsigned char GetAttackBodyPart();
 
     CTeam* GetTeam() { return m_pTeam; }
-    void   SetTeam(CTeam* pTeam, bool bChangeTeam = false);
+    void   SetTeam(CTeam* pTeam, bool bChangeTeam = false, const char* szReason = "changed");
 
     CPad* GetPad() { return m_pPad; }
 

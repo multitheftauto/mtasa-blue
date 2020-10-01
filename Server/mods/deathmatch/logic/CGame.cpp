@@ -1410,6 +1410,16 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     // If he had joined
     if (Player.IsJoined())
     {
+        // Check if the player was inside a team and fire the event
+        if (Player.GetTeam())
+        {
+            CLuaArguments Arguments;
+            Arguments.PushElement(Player.GetTeam());
+            Arguments.PushNil();
+            Arguments.PushString("disconnected");
+            Player.CallEvent("onPlayerTeamChange", Arguments);
+        }
+
         // Tell our scripts the player has quit, but only if the scripts got told he joined
         CLuaArguments Arguments;
         Arguments.PushString(szReason);
@@ -1518,8 +1528,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
-    m_Events.AddEvent("onPlayerTeamJoin", "team", NULL, false);
-    m_Events.AddEvent("onPlayerTeamLeave", "team", NULL, false);
+    m_Events.AddEvent("onPlayerTeamChange", "previous, current, reason", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
@@ -1572,10 +1581,6 @@ void CGame::AddBuiltInEvents()
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
     m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
-
-    // Team events
-    m_Events.AddEvent("onTeamJoin", "player", NULL, false);
-    m_Events.AddEvent("onTeamLeave", "player", NULL, false);
 }
 
 void CGame::ProcessTrafficLights(long long llCurrentTime)
