@@ -1020,7 +1020,12 @@ std::variant<bool, CMatrix> CLuaPedDefs::GetElementBoneMatrix(lua_State* const l
     if (theEntity)
     {
         RwMatrix* boneRwMatrix = theEntity->GetBoneRwMatrix(static_cast<eBone>(boneId));
-        return boneRwMatrix ? CMatrix(boneRwMatrix) : false;
+        if (boneRwMatrix)
+        {
+            CMatrix matrix;
+            g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
+            return matrix;
+        }
     }
     return false;
 }
