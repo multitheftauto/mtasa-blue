@@ -83,9 +83,8 @@ bool CClientModel::Deallocate(void)
         else if (m_eModelType == eClientModelType::OBJECT)
         {
             CClientObjectManager* pObjectManager = g_pClientGame->GetManager()->GetObjectManager();
-            for (auto iter = pObjectManager->IterBegin(); iter != pObjectManager->IterEnd(); iter++)
+            for (auto* pObject : pObjectManager->GetObjects())
             {
-                CClientObject* pObject = *iter;
                 if (pObject->GetModel() == m_iModelID)
                 {
                     if (pObject->IsStreamedIn())
