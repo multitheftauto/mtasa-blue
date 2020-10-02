@@ -1360,9 +1360,7 @@ void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
     ppModelInfo[m_dwModelID] = nullptr;
-    CStreamingInfo* pModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
-
-    pModelStreamingInfo->Reset();
+    pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
