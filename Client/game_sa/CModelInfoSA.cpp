@@ -517,7 +517,7 @@ bool CModelInfoSA::IsValid()
     if (m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX)
         return true;
 
-    if (ppModelInfo[m_dwModelID] == nullptr)
+    if (!ppModelInfo[m_dwModelID])
         return false;
 
     auto sizeInBlocks = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks;
