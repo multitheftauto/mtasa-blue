@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+
 namespace
 {
     //

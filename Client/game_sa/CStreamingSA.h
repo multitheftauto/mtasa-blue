@@ -31,6 +31,5 @@ public:
     CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
 
 private:
-    static CStreamingInfo (&s_aInfoForModel)[26316];
-    CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+    static CStreamingInfo (&ms_aInfoForModel)[26316];
 };
