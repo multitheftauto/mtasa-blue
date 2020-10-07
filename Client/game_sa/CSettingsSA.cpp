@@ -339,9 +339,9 @@ void CSettingsSA::SetLightsAndShadowsImprovementEnabled(bool bEnable)
     m_bLightsAndShadowsImprovement = bEnable;
 
     if (bEnable == true) 
-        MemPut<float>(0x00859934, 0.01);
+        MemPut<DWORD>(0x00859934, 1018127695);
     else
-        MemPut<float>(0x00859934, 0.06);
+        MemPut<DWORD>(0x00859934, 1031127695);
 }
     //
 // Volumetric shadow hooks
