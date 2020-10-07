@@ -814,6 +814,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
     m_pCheckBoxMinimize->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxLightsAndShadowsImprovement = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Enable Lights And Shadows Improvement"), true));
+    m_pCheckBoxLightsAndShadowsImprovement->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 50.0f));
+    m_pCheckBoxLightsAndShadowsImprovement->AutoSize(NULL, 20.0f);
+
 #ifndef SHOWALLSETTINGS
     if (!GetVideoModeManager()->IsMultiMonitor())
     {
@@ -823,7 +827,7 @@ void CSettings::CreateGUI()
 #endif
 
     m_pCheckBoxDeviceSelectionDialog = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Enable Device Selection Dialog"), true));
-    m_pCheckBoxDeviceSelectionDialog->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 50.0f));
+    m_pCheckBoxDeviceSelectionDialog->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 70.0f));
     m_pCheckBoxDeviceSelectionDialog->AutoSize(NULL, 20.0f);
 
 #ifndef SHOWALLSETTINGS
@@ -1546,6 +1550,11 @@ void CSettings::UpdateVideoTab()
     bool bHighDetailPeds;
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
+
+    // Improved lights and stencil shadows
+    bool bLightsAndShadowsImprovement;
+    CVARS_GET("improved_lights_and_shadows", bLightsAndShadowsImprovement);
+    m_pCheckBoxLightsAndShadowsImprovement->SetSelected(bLightsAndShadowsImprovement);
 
     PopulateResolutionComboBox();
 
@@ -3372,6 +3381,11 @@ void CSettings::SaveData()
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
+
+    // Improved lights and stencil shadows
+    bool bLightsAndShadowsImprovement = m_pCheckBoxLightsAndShadowsImprovement->GetSelected();
+    CVARS_SET("improved_lights_and_shadows", bLightsAndShadowsImprovement);
+    gameSettings->SetLightsAndShadowsImprovementEnabled(bLightsAndShadowsImprovement);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())

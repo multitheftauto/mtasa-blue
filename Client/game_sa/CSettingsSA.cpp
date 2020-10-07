@@ -43,6 +43,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bLightsAndShadowsImprovement = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
@@ -327,7 +328,22 @@ void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
     m_bVolumetricShadowsSuspended = bSuspended;
 }
 
-//
+
+bool CSettingsSA::IsLightsAndShadowsImprovementEnabled()
+{
+    return m_bLightsAndShadowsImprovement;
+}
+
+void CSettingsSA::SetLightsAndShadowsImprovementEnabled(bool bEnable)
+{
+    m_bLightsAndShadowsImprovement = bEnable;
+
+    if (bEnable == true) 
+        MemPut<float>(0x00859934, 0.01);
+    else
+        MemPut<float>(0x00859934, 0.06);
+}
+    //
 // Volumetric shadow hooks
 //
 DWORD dwFxQualityValue = 0;

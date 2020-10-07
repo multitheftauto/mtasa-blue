@@ -546,6 +546,8 @@ void CCore::ApplyGameSettings()
     pController->SetClassicControls(bVal);
     CVARS_GET("volumetric_shadows", bVal);
     pGameSettings->SetVolumetricShadowsEnabled(bVal);
+    CVARS_GET("improved_lights_and_shadows", bVal);
+    pGameSettings->SetLightsAndShadowsImprovementEnabled(bVal);
     CVARS_GET("aspect_ratio", iVal);
     pGameSettings->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
     CVARS_GET("grass", bVal);

@@ -86,6 +86,7 @@ private:
     CSettingsSAInterface* m_pInterface;
     bool                  m_bVolumetricShadowsEnabled;
     bool                  m_bVolumetricShadowsSuspended;
+    bool                  m_bLightsAndShadowsImprovement;
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
@@ -138,6 +139,9 @@ public:
     bool IsVolumetricShadowsEnabled();
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
+
+    bool IsLightsAndShadowsImprovementEnabled();
+    void SetLightsAndShadowsImprovementEnabled(bool bEnable);
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();
