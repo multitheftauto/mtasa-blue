@@ -364,10 +364,10 @@ public:
 
     CAutoPilot    AutoPilot;                   // +1008
     CVehicleFlags m_nVehicleFlags;             // +1064?
-    unsigned int  m_TimeOfCreation;            // GetTimeInMilliseconds when this vehicle was created.
+    unsigned int  m_TimeOfCreation;            // 1072 - GetTimeInMilliseconds when this vehicle was created. 
 
-    unsigned char m_colour1, m_colour2, m_colour3, m_colour4;
-    char          m_comp1, m_comp2;
+    unsigned char m_colour1, m_colour2, m_colour3, m_colour4;   // 1076, 1077, 1078, 1079
+    char          m_comp1, m_comp2;                             // 1080, 1081
     short         m_upgrades[MAX_UPGRADES_ATTACHED];            // 1082
     float         m_wheelScale;                                 // 1112
 

@@ -8869,6 +8869,20 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
     return false;
 }
 
+template<typename T>
+bool CStaticFunctionDefinitions::SetVehicleSoundProperty(CClientVehicle* pVehicle, eVehicleSoundProperty property, T value)
+{
+    /*
+    * TODO: uncomment
+    if (!pVehicle->IsLocalEntity())
+        return false;
+    */
+
+    if (CVehicleAudioSettings* settings = pVehicle->GetSoundSettings())
+        return settings->SetPropertyValue(property, value);
+    return false;
+}
+
 bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);

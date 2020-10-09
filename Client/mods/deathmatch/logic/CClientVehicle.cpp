@@ -40,6 +40,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_pVehicle = NULL;
     m_pUpgrades = new CVehicleUpgrades(this);
     m_pClump = NULL;
+
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(static_cast<eVehicleTypes>(usModel));
     m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);

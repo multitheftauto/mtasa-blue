@@ -156,4 +156,9 @@ public:
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
+
+    // Vehicle sound modifying things
+    static std::variant<bool, unsigned int> SetVehicleSoundProperty(CClientVehicle* vehicle, eVehicleSoundProperty property, unsigned int value);
+    static std::variant<unsigned int, bool, float, std::string> GetVehicleSoundProperty(CClientVehicle* vehicle, eVehicleSoundProperty property);
+    static std::unordered_map<std::string_view, CLuaArgument> GetVehicleOriginalAudioSettings();
 };

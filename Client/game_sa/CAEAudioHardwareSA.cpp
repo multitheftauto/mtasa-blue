@@ -18,33 +18,10 @@ CAEAudioHardwareSA::CAEAudioHardwareSA(CAEAudioHardwareSAInterface* pInterface)
 
 bool CAEAudioHardwareSA::IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID)
 {
-    DWORD dwSoundBankID = wSoundBankID;
-    DWORD dwSoundBankSlotID = wSoundBankSlotID;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAEAudioHardware__IsSoundBankLoaded;
-    bool  bReturn = false;
-    _asm
-    {
-        push    dwSoundBankSlotID
-        push    dwSoundBankID
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    return ((bool(__thiscall*)(void*, short, short))FUNC_CAEAudioHardware__IsSoundBankLoaded)((void*)m_pInterface, wSoundBankID, wSoundBankSlotID);
 }
 
-void CAEAudioHardwareSA::LoadSoundBank(short wSoundBankID, short wSoundBankSlotID)
+bool CAEAudioHardwareSA::LoadSoundBank(short wSoundBankID, short wSoundBankSlotID)
 {
-    DWORD dwSoundBankID = wSoundBankID;
-    DWORD dwSoundBankSlotID = wSoundBankSlotID;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAEAudioHardware__LoadSoundBank;
-    _asm
-    {
-        push    dwSoundBankSlotID
-        push    dwSoundBankID
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    return ((bool(__thiscall*)(void*, short, short))FUNC_CAEAudioHardware__LoadSoundBank)((void*)m_pInterface, wSoundBankID, wSoundBankSlotID);
 }

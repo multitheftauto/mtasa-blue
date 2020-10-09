@@ -19,8 +19,10 @@
 
 #define CLASS_CAEAudioHardware                                              0xB5F8B8
 
-class CAEAudioHardwareSAInterface
+struct CAEAudioHardwareSAInterface
 {
+    BYTE field_0;
+    char m_bDisableEffectsLoading;
 };
 
 class CAEAudioHardwareSA : public CAEAudioHardware
@@ -28,7 +30,8 @@ class CAEAudioHardwareSA : public CAEAudioHardware
 public:
     CAEAudioHardwareSA(CAEAudioHardwareSAInterface* pInterface);
     bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID);
-    void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID);
+    bool LoadSoundBank(short wSoundBankID, short wSoundBankSlotID);
+    bool IsEffectsLoadingDisabled() const { return m_pInterface->m_bDisableEffectsLoading; }
 
 private:
     CAEAudioHardwareSAInterface* m_pInterface;

@@ -103,6 +103,27 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+enum class eVehicleSoundProperty
+{
+    VEHICLE_SOUND_TYPE,
+
+    HORN_SFX_ID,
+    HORN_HIGH_VOLUME,
+    HORN_VOLUME_DELTA,
+
+    DOOR_SOUND_ID,
+
+    GENERAL_VOLUME,
+
+    ENGINE_ON_SBANK,
+    ENGINE_OFF_SBANK,
+
+    ENGINE_SBANK_SLOT,
+    ENGINE_ACCELERATE_SBANK,
+    ENGINE_DEACCELERATE_SBANK,
+};
+DECLARE_ENUM_CLASS(eVehicleSoundProperty);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {

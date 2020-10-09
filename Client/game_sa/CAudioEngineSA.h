@@ -100,7 +100,7 @@ public:
     };
     unsigned short m_wIsUsed;                         // +88
     short          unk4;                              // +90 = 1005
-    short          m_wCurrentPlayPosition;            // +92
+    short          m_wCurrentPlayPositionPercent;     // +92
     short          unk5;                              // +94 = 0
     float          m_fFinalVolume;                    // +96
     float          m_fFrequency;                      // +100

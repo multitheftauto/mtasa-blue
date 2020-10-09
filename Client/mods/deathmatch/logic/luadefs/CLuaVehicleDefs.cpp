@@ -83,6 +83,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleSoundProperty", ArgumentParser<GetVehicleSoundProperty>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -139,6 +140,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition },
+        {"setVehicleSoundProperty", ArgumentParser<SetVehicleSoundProperty>}
     };
 
     // Add functions
@@ -2954,6 +2956,39 @@ int CLuaVehicleDefs::GetOriginalHandling(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, unsigned int> CLuaVehicleDefs::SetVehicleSoundProperty(CClientVehicle* vehicle, eVehicleSoundProperty property, unsigned int value)
+{
+    switch (property)
+    {
+    case eVehicleSoundProperty::ENGINE_ACCELERATE_SBANK:
+        return vehicle->GetVehicle()->GetVehicleAudioEntity()->SetEngineAccelerationSoundBank(value);
+
+    case eVehicleSoundProperty::ENGINE_DEACCELERATE_SBANK:
+        return vehicle->GetVehicle()->GetVehicleAudioEntity()->SetEngineDeaccelerationSoundBank(value);
+
+    default:
+        throw std::invalid_argument("Unsupported property");
+    }
+}
+
+std::variant<unsigned int, bool, float, std::string> CLuaVehicleDefs::GetVehicleSoundProperty(CClientVehicle* vehicle, eVehicleSoundProperty property)
+{
+    if (!vehicle->GetVehicle())
+        throw std::invalid_argument("vehicle->GetVehicle() is nullptr");
+
+    if (!vehicle->GetVehicle()->GetVehicleAudioEntity())
+        throw std::invalid_argument("vehicle->GetVehicle()->GetVehicleAudioEntity() is nullptr");
+
+    switch (property)
+    {
+    case eVehicleSoundProperty::ENGINE_ACCELERATE_SBANK:
+        return vehicle->GetVehicle()->GetVehicleAudioEntity()->GetEngineAccelerationSoundBank();
+
+    default:
+        throw std::invalid_argument("Unsupported property");
+    }
 }
 
 int CLuaVehicleDefs::SetVehicleDoorOpenRatio(lua_State* luaVM)

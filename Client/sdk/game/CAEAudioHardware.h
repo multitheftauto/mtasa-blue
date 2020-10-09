@@ -11,7 +11,7 @@
 
 #pragma once
 
-enum eBankSlot : short
+enum eBankSlot : short // World sounds?
 {
     BANKSLOT_FRONTEND_GAME = 0,
     BANKSLOT_FRONTEND_MENU = 1,
@@ -64,5 +64,5 @@ class CAEAudioHardware
 {
 public:
     virtual bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID) = 0;
-    virtual void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID) = 0;
+    virtual bool LoadSoundBank(short wSoundBankID, short wSoundBankSlotID) = 0;
 };

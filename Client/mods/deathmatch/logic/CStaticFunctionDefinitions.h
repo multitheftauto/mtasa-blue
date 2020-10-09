@@ -810,6 +810,9 @@ public:
     static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue);
     static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue);
 
+    template<typename T>
+    bool SetVehicleSoundProperty(CClientVehicle* pVehicle, eVehicleSoundProperty property, T value);
+
     // Version funcs
     static unsigned long GetVersion();
     static const char*   GetVersionString();

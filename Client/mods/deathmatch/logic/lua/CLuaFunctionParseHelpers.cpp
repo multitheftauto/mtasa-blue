@@ -654,6 +654,19 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eVehicleSoundProperty)
+ADD_ENUM(eVehicleSoundProperty::ENGINE_ON_SBANK, "engineOnSoundBankId")
+ADD_ENUM(eVehicleSoundProperty::ENGINE_OFF_SBANK, "engineOffSoundBankId")
+ADD_ENUM(eVehicleSoundProperty::ENGINE_SBANK_SLOT, "engineSoundBankSlot")
+ADD_ENUM(eVehicleSoundProperty::ENGINE_ACCELERATE_SBANK, "engineAccelerateSoundBankId")
+ADD_ENUM(eVehicleSoundProperty::ENGINE_DEACCELERATE_SBANK, "engineDeaccelerateSoundBankId")
+ADD_ENUM(eVehicleSoundProperty::HORN_SFX_ID, "hornSfxId")
+ADD_ENUM(eVehicleSoundProperty::HORN_HIGH_VOLUME, "hornHighVolume")
+ADD_ENUM(eVehicleSoundProperty::HORN_VOLUME_DELTA, "hornVolumeDelta")
+ADD_ENUM(eVehicleSoundProperty::DOOR_SOUND_ID, "doorSoundId")
+ADD_ENUM(eVehicleSoundProperty::GENERAL_VOLUME, "generalVolume")
+IMPLEMENT_ENUM_CLASS_END("vehicle-sound-property")
+
 //
 // Get best guess at name of userdata type
 //

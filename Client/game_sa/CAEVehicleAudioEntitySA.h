@@ -122,27 +122,74 @@
 #define FUNC_CAEVehicleAudioEntity__Service                                            0x502280
 
 #define VAR_CAEVehicleAudioEntity__s_pPlayerDriver                                     0xB6B990
+#define VAR_CAEVehicleAudioEntity__s_aDefaultVehicleAudioSettings                      0x860AF0
+#define VAR_CAEVehicleAudioEntity__s_aDummyEngineSlots                                 0xB6B9A0
 
-struct tVehicleAudioSettings
+// TODO: Not sure where I should put this
+enum class eRadioID : char
 {
-    char  m_nVehicleSoundType;
-    char  unk1;
-    short m_wEngineOnSoundBankId;
-    short m_wEngineOffSoundBankId;
-    char  m_nStereo;
-    char  unk2;
-    int   unk3;
-    int   unk4;
-    char  m_bHornTon;
-    char  unk5[3];
-    float m_fHornHigh;
-    char  m_nDoorSound;
-    char  unk6;
-    char  m_nRadioNum;
-    char  m_nRadioType;
-    char  unk7;
-    char  unk8[3];
-    float m_fHornVolumeDelta;
+    PLAYBACK_FM = 1,
+    K_ROSE,
+    K_DST,
+    BOUNCE_FM,
+    SF_UR,
+    LOS_SANTOS,
+    RADIO_X,
+    CSR_103_9,
+    K_JAH_WEST,
+    MASTER_SOUNDS_98_3,
+    WCTR,
+    USER_TRACKS,
+    NONE
+};
+
+enum eVehicleAudioType : unsigned short
+{
+    VEHICLE_AUDIO_CAR = 0,
+    VEHICLE_AUDIO_BIKE,
+    VEHICLE_AUDIO_BICYCLE,
+    VEHICLE_AUDIO_BOAT,
+    VEHICLE_AUDIO_HELI,
+    VEHICLE_AUDIO_PLANE,
+    VEHICLE_AUDIO_SEAPLANE,            // unused?
+
+    VEHICLE_AUDIO_TRAIN = 8,
+    VEHICLE_AUDIO_SPECIAL,            // RC vehicles, vortex, caddy, few trailers
+    VEHICLE_AUDIO_SILENT
+};
+
+enum class eRadioType : char
+{
+    CIVILIAN = 0x0,
+    SPECIAL = 0x1,
+    UNKNOWN = 0x2,
+    EMERGENCY = 0x3,
+    DISABLED = -1,
+};
+
+struct tEngineDummySlot {
+    short m_nBankId;
+    short m_nUsageCount;
+};
+
+struct tVehicleAudioSettings {
+    eVehicleAudioType   m_nVehicleSoundType;
+    short               m_wEngineOnSoundBankId;
+    short               m_wEngineOffSoundBankId;
+    char                m_nBassSetting; // m_nStereo
+    char                pad1;
+    float               m_fBassEq;
+    float               field_C;
+    char                m_bHornTon; // sfx id
+    char                pad2[3];
+    float               m_fHornHigh;
+    char                m_nDoorSound;
+    char                field_19;
+    eRadioID            m_nRadioID;
+    eRadioType          m_nRadioType;
+    char                m_vehTypeForAudio;
+    char                _pad4[3];
+    float               m_fHornVolumeDelta;
 };
 static_assert(sizeof(tVehicleAudioSettings) == 0x24, "Invalid size for tVehicleAudioSettings");
 
@@ -207,9 +254,9 @@ public:
     unsigned int           m_dwTimeToInhibitAcc;                      // +208
     unsigned int           m_dwTimeToInhibitCrz;                      // +212
     float                  m_fGeneralVehicleSoundVolume;              // +216
-    short                  m_wEngineDecelerateSoundBankId;            // +220
-    short                  m_wEngineAccelerateSoundBankId;            // +222
-    short                  m_wEngineBankSlotId;                       // +224
+    short                  m_wEngineOffSoundBankId;                   // +220
+    short                  m_wEngineOnSoundBankId;                    // +222
+    short                  m_wEngineSlotInBank;                       // +224
     short                  unk11;                                     // +226
     tVehicleSound          m_aEngineSounds[12];                       // +228
     int                    unk12;                                     // +324
@@ -247,15 +294,36 @@ public:
 };
 static_assert(sizeof(CAEVehicleAudioEntitySAInterface) == 0x24C, "Invalid size for CAEVehicleAudioEntitySAInterface");
 
+struct DummyEngineSlot
+{
+    short m_nBankId;
+    short m_nUsageCount;
+};
+
 class CAEVehicleAudioEntitySA : public CAEVehicleAudioEntity
 {
+private:
+    int   StoppedUsingBankSlot(int bankId);
+
+    short RequestBankSlot(unsigned short bankId);
+    short DemandBankSlot(unsigned short bankId);
+
+    void  CancelVehicleEngineSound(short engineSoundStateID);
+    void  MakeSureEngineSoundsAreLoaded();
+
 public:
     CAEVehicleAudioEntitySA(CAEVehicleAudioEntitySAInterface* pInterface);
+
     void JustGotInVehicleAsDriver();
     void JustGotOutOfVehicleAsDriver();
     void TurnOnRadioForVehicle();
     void StopVehicleEngineSound(unsigned char ucSlot);
 
+    void SetVehicleSoundType(eVehicleAudioType type) { m_pInterface->m_nSettings.m_nVehicleSoundType = type; }
+
+    unsigned int SetEngineAccelerationSoundBank(unsigned int val);
+    unsigned int SetEngineDeaccelerationSoundBank(unsigned int val);
+    unsigned int GetEngineAccelerationSoundBank() const { return m_pInterface->m_wEngineOnSoundBankId; }
 private:
     CAEVehicleAudioEntitySAInterface* m_pInterface;
 };
