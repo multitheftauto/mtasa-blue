@@ -105,6 +105,7 @@ CCredits::CCredits()
     m_strCredits +=
         "\n\n"
 
+        "Nicolás \"PlatinMTA\" Barrios\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
         "Florian \"Flobu\" Busse\n"
@@ -115,7 +116,9 @@ CCredits::CCredits()
         "Alejandro \"AlexTMjugador\" González\n"
         "Kevin \"ciber96\" Gross\n"
         "Robin \"robhol\" Holm\n"
+        "Daniel \"arfni\" Keller\n"
         "Gabrielius \"Dezash\" Laurinavičius\n"
+        "John \"jlillis\" Lillis\n"
         "Kamil \"forkerer\" Marciniak\n"
         "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Tete \"Tete\" Omar\n"
@@ -188,6 +191,11 @@ CCredits::CCredits()
         "pentaflops\n"
         "Patrick2562\n"
         "knitz12\n"
+        "LosFaul\n"
+        "Lokote1998\n"
+        "AfuSensi\n"
+        "Lordmau5\n"
+        "xLive\n"
         "\n"
         "\n";
 
