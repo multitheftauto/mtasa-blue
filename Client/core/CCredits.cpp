@@ -113,6 +113,7 @@ CCredits::CCredits()
         "Callum \"Callum\" Dawson\n"
         "Philip \"Fenix\" Farquharson\n"
         "Seweryn \"Neproify\" Figura\n"
+        "Adrian \"AGraber\" Graber\n"
         "Alejandro \"AlexTMjugador\" González\n"
         "Kevin \"ciber96\" Gross\n"
         "Robin \"robhol\" Holm\n"
@@ -196,6 +197,7 @@ CCredits::CCredits()
         "AfuSensi\n"
         "Lordmau5\n"
         "xLive\n"
+        "colistro123\n"
         "\n"
         "\n";
 
