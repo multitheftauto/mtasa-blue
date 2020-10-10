@@ -212,7 +212,7 @@ namespace
         {"getRemoteRequestInfo", "1.5.7-9.20307"},
         {"abortRemoteRequest", "1.5.7-9.20307"},
         {"dxDrawWiredSphere", "1.5.7-9.20328"},
-        {"engineResetModelLODDistance", "1.5.7-9.20383"}
+        {"engineResetModelLODDistance", "1.5.7-9.20383"},
         {"setVehicleModelWheelSize", "1.5.7-0.20397"},
         {"getVehicleModelWheelSize", "1.5.7-0.20397"},
         {"setVehicleWheelScale", "1.5.7-0.20397"},
