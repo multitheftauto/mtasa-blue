@@ -1126,11 +1126,24 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
+    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CResource* pParentResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+
+    if (!pParentResource)
+    {
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
                                                                                                          RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        if (pTexture)
+        {
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        }
         lua_pushstring(luaVM, std::get<0>(pair).c_str());
         lua_pushelement(luaVM, pTexture);
         lua_settable(luaVM, -3);
