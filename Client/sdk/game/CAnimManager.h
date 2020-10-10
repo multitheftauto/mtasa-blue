@@ -40,6 +40,8 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchySAInterface;
 class CAnimBlendSequenceSAInterface;
 class CAnimBlockSAInterface;
+enum class eAnimGroup;
+enum class eAnimID;
 
 class CAnimManager
 {
@@ -72,7 +74,7 @@ public:
     virtual const char* GetAnimBlockName(AssocGroupId groupID) = 0;
 
     virtual AnimBlendAssoc_type     CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID) = 0;
-    virtual StaticAssocIntface_type GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID) = 0;
+    virtual StaticAssocIntface_type GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) = 0;
     virtual AnimBlendAssoc_type     GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID) = 0;

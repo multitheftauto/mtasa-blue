@@ -10,12 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 
 void CLuaPedDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createPed", CreatePed},
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
@@ -75,7 +77,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
-        {"setPedFightingStyle", SetPedFightingStyle},
+        {"setPedFightingStyle", ArgumentParser<SetPedFightingStyle>},
         {"setPedLookAt", SetPedLookAt},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
@@ -86,16 +88,14 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
-        {"setPedArmor", SetPedArmor},
+        {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPedDefs::AddClass(lua_State* luaVM)
@@ -111,8 +111,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTypeIndexFromClothes", "getTypeIndexFromClothes");
     lua_classfunction(luaVM, "getClothesByTypeIndex", "getClothesByTypeIndex");
     lua_classvariable(luaVM, "validModels", NULL, "getValidPedModels");
-    // lua_classvariable ( luaVM, "clothesTypeName", NULL, "getClothesTypeName" ); table
-    // lua_classvariable ( luaVM, "bodyPartName", NULL, "getBodyPartName" ); table
 
     lua_classfunction(luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classfunction(luaVM, "doesHaveJetPack", "doesPedHaveJetPack");
@@ -214,12 +212,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
-    // lua_classvariable ( luaVM, "ammoInClip", NULL, CLuaOOPDefs::GetPedAmmoInClip ); // .ammoInClip["slot"] (readonly)
-    // lua_classvariable ( luaVM, "analogControlState", CLuaOOPDefs::SetPedAnalogControlState, CLuaOOPDefs::GetPedAnalogControlState ); //TODO:
-    // .analogControlState["control"] = value lua_classvariable ( luaVM, "controlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState ); //
-    // TODO: .controlState["control"] = value lua_classvariable ( luaVM, "stats", NULL, CLuaOOPDefs::GetPedStat ); // table (readonly) lua_classvariable (
-    // luaVM, "doingTask", NULL, CLuaOOPDefs::IsPedDoingTask ); // table (readonly) lua_classvariable ( luaVM, "totalAmmo", NULL, CLuaDefs::GetPedTotalAmmo );
-    // // table readonly
     lua_registerclass(luaVM, "Ped", "Element");
 }
 
@@ -1764,19 +1756,13 @@ int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
+bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const unsigned int style)
 {
-    CClientEntity*   pEntity;
-    unsigned char    ucStyle;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(ucStyle);
+    // Is valid style?
+    if (style < 4 || style > 16)
+        throw std::invalid_argument("Style can only be between 4 and 16");
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle));
-    return 1;
+    return CStaticFunctionDefinitions::SetPedFightingStyle(*entity, style);
 }
 
 int CLuaPedDefs::SetPedLookAt(lua_State* luaVM)
@@ -2200,21 +2186,10 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
 {
-    CClientPed*      pPed;
-    float            fArmor;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    argStream.ReadNumber(fArmor);
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
-    return 1;
+    ped->SetArmor(armor);
+    return true;
 }
 
 int CLuaPedDefs::SetPedOxygenLevel(lua_State* luaVM)

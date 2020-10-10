@@ -92,9 +92,8 @@ void CClientMarker::SetPosition(const CVector& vecPosition)
 void CClientMarker::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pCollision){
-        m_pCollision->AttachTo(pEntity);
-    }
+    if (m_pCollision)
+        m_pCollision->AttachTo(this);
 }
 
 void CClientMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
@@ -485,6 +484,8 @@ void CClientMarker::CreateOfType(int iType)
         default:
             break;
     }
+    if (m_pCollision)
+        m_pCollision->SetCanBeDestroyedByScript(false);
 }
 
 CSphere CClientMarker::GetWorldBoundingSphere()

@@ -39,7 +39,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
 
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
-    m_ucDriveByDirection = 0;
+    m_ucDriveByDirection = eVehicleAimDirection::FORWARDS;
     m_bAkimboArmUp = false;
 
     m_VoiceState = VOICESTATE_IDLE;
@@ -218,19 +218,13 @@ bool CPlayer::ShouldIgnoreMinClientVersionChecks()
 
 bool CPlayer::SubscribeElementData(CElement* pElement, const std::string& strName)
 {
-#ifdef MTA_DEBUG
-    OutputDebugString(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
-#endif
-
+    OutputDebugLine(SString("[Data] SubscribeElementData %s [%s]", GetNick(), strName.c_str()));
     return m_DataSubscriptions.emplace(std::make_pair(pElement, strName)).second;
 }
 
 bool CPlayer::UnsubscribeElementData(CElement* pElement, const std::string& strName)
 {
-#ifdef MTA_DEBUG
-    OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
-#endif
-
+    OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), strName.c_str()));
     return m_DataSubscriptions.erase(std::make_pair(pElement, strName)) > 0;
 }
 
@@ -242,10 +236,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
     {
         if (it->first == pElement)
         {
-#ifdef MTA_DEBUG
-            OutputDebugString(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
-#endif
-
+            OutputDebugLine(SString("[Data] UnsubscribeElementData %s [%s]", GetNick(), it->second.c_str()));
             it = m_DataSubscriptions.erase(it);
             erased = true;
         }

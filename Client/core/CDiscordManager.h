@@ -10,9 +10,15 @@
 
 #pragma once
 
-#include <discord.h>
 #include <core/CDiscordManagerInterface.h>
 #include "SharedUtil.Thread.h"
+
+namespace discord
+{
+    enum class LogLevel;
+    class Core;
+    class Activity;
+}
 
 class CDiscordManager : public CDiscordManagerInterface
 {
@@ -49,7 +55,7 @@ private:
     void SetDead() { m_Suicide = false; }
 
     discord::Core*    m_DiscordCore = nullptr;
-    discord::Activity m_StoredActivity{};
+    discord::Activity* m_StoredActivity;
 
     bool m_WaitingForServerName = false;
     bool m_Initialized = false;

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
@@ -246,6 +246,9 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
 
 bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 {
+    if (!pElement->CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = pElement->IterBegin();
     while (iter != pElement->IterEnd())
@@ -1342,12 +1345,12 @@ bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElemen
     {
         CPerPlayerEntity* pEntity = static_cast<CPerPlayerEntity*>(pElement);
         if (bVisible)
-            pEntity->AddVisibleToReference(pReference);
+            return pEntity->AddVisibleToReference(pReference);
         else
-            pEntity->RemoveVisibleToReference(pReference);
+            return pEntity->RemoveVisibleToReference(pReference);
     }
 
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition)
@@ -1450,18 +1453,7 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     assert(pElement);
     assert(pAttachedToElement);
 
-    // Check the elements we are attaching are not already connected
-    std::set<CElement*> history;
-    for (CElement* pCurrent = pAttachedToElement; pCurrent; pCurrent = pCurrent->GetAttachedToElement())
-    {
-        if (pCurrent == pElement)
-            return false;
-        if (MapContains(history, pCurrent))
-            break;            // This should not be possible, but you never know
-        MapInsert(history, pCurrent);
-    }
-
-    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && pElement->GetDimension() == pAttachedToElement->GetDimension())
+    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && !pAttachedToElement->IsAttachedToElement(pElement) && pElement->GetDimension() == pAttachedToElement->GetDimension())
     {
         pElement->SetAttachedOffsets(vecPosition, vecRotation);
         ConvertDegreesToRadians(vecRotation);
@@ -1596,14 +1588,6 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 // This makes sure the health is set to what will get reported
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
-
-                // update dead state for peds
-                if (fHealth > 0 && pPed->IsDead())
-                {
-                    pPed->SetIsDead(false);
-                }
-
-                // set new health
                 pPed->SetHealth(fHealth);
             }
             else
@@ -1931,14 +1915,6 @@ const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer
     assert(pPlayer);
 
     return pPlayer->GetPlayerVersion();
-}
-
-bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
-{
-    assert(pPlayer);
-
-    uiLevel = pPlayer->GetScriptDebugLevel();
-    return true;
 }
 
 bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* szName)
