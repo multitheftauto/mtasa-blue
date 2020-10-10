@@ -262,9 +262,6 @@ void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const cha
 {
     if (pResource)
     {
-        CMapManager* m_pMapManager = g_pGame->GetMapManager();
-        CElement*    pRoot         = m_pMapManager->GetRootElement();
-
         CLuaArguments Arguments;
         Arguments.PushResource(pResource);
 
@@ -278,7 +275,7 @@ void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const cha
         else
             Arguments.PushNil();
         
-        pRoot->CallEvent("onResourceLoadStateChange", Arguments);
+        g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourceLoadStateChange", Arguments);
     }
 }
 
