@@ -258,7 +258,7 @@ void CResourceManager::CheckResources(CResource* pResource)
     }
 }
 
-void CResourceManager::OnResourceStateChange(CResource* pResource, const char* szOldState, const char* szNewState)
+void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState)
 {
     if (pResource)
     {
@@ -268,9 +268,13 @@ void CResourceManager::OnResourceStateChange(CResource* pResource, const char* s
         CLuaArguments Arguments;
         Arguments.PushResource(pResource);
         Arguments.PushString(szOldState);
-        Arguments.PushString(szNewState);
 
-        pRoot->CallEvent("onResourceStateChange", Arguments);
+        if (szNewState)
+            Arguments.PushString(szNewState);
+        else
+            Arguments.PushNil();
+
+        pRoot->CallEvent("onResourceLoadStateChange", Arguments);
     }
 }
 
@@ -360,7 +364,7 @@ void CResourceManager::UnloadRemovedResources()
 
     for (CResource* pResource : resourcesToDelete)
     {
-        OnResourceStateChange(pResource, "loaded", "unloading");
+        OnResourceLoadStateChange(pResource, "loaded", nullptr);
         UnloadAndDelete(pResource);
     }
 }
@@ -430,9 +434,9 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
         if (g_pGame->IsServerFullyUp())
         {
             if (!bPreviouslyLoaded)
-                OnResourceStateChange(pLoadedResource, "unloaded", "loaded");
+                OnResourceLoadStateChange(pLoadedResource, nullptr, "loaded");
             else
-                OnResourceStateChange(pLoadedResource, "loaded", "reloaded");
+                OnResourceLoadStateChange(pLoadedResource, "loaded", "loaded");
 
             CLogger::LogPrintf("New resource '%s' loaded\n", pLoadedResource->GetName().c_str());
         }
@@ -690,7 +694,7 @@ bool CResourceManager::Reload(CResource* pResource)
     }
 
     // Call the onResourceStateChange event
-    OnResourceStateChange(pResource, "loaded", "reloaded");
+    OnResourceLoadStateChange(pResource, "loaded", "loaded");
 
     // Success
     return true;
