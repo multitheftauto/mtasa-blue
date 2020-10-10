@@ -171,6 +171,7 @@ CCredits::CCredits()
         "pentaflops\n"
         "knitz12\n"
         "ApeLsiN4eG\n"
+        "theSarrum\n"
         "\n"
         "\n";
 
