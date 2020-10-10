@@ -1127,7 +1127,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    CResource* pParentResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+    CResource* pParentResource = pLuaMain->GetResource();
 
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
