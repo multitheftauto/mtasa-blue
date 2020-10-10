@@ -267,13 +267,17 @@ void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const cha
 
         CLuaArguments Arguments;
         Arguments.PushResource(pResource);
-        Arguments.PushString(szOldState);
+
+        if (szOldState)
+            Arguments.PushString(szOldState);
+        else
+            Arguments.PushNil();
 
         if (szNewState)
             Arguments.PushString(szNewState);
         else
             Arguments.PushNil();
-
+        
         pRoot->CallEvent("onResourceLoadStateChange", Arguments);
     }
 }
