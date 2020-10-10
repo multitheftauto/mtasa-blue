@@ -313,12 +313,28 @@ namespace
         {"setPedWearingJetpack", "1.5.5-9.13846"},
         {"setElementAngularVelocity", "1.5.5-9.14060"},
         {"getElementAngularVelocity", "1.5.5-9.14060"},
-        {"xmlLoadString", "1.5.7-9.20157"},
-        {"getPlayerScriptDebugLevel", "1.5.7-9.20157"},
-        {"setPlayerScriptDebugLevel", "1.5.7-9.20157"},
+
+        // Features added in 1.5.8
+        {"xmlLoadString", "1.5.7-9.19626"},
+        {"getPlayerScriptDebugLevel", "1.5.7-9.19626"},
+        {"setPlayerScriptDebugLevel", "1.5.7-9.19626"},
         {"getRemoteRequests", "1.5.7-9.20307"},
         {"getRemoteRequestInfo", "1.5.7-9.20307"},
         {"abortRemoteRequest", "1.5.7-9.20307"},
+        {"addColPolygonPoint", "1.5.7-0.20397"},
+        {"getColPolygonPointPosition", "1.5.7-0.20397"},
+        {"getColPolygonPoints", "1.5.7-0.20397"},
+        {"getColShapeRadius", "1.5.7-0.20397"},
+        {"getColShapeSize", "1.5.7-0.20397"},
+        {"removeColPolygonPoint", "1.5.7-0.20397"},
+        {"setColPolygonPointPosition", "1.5.7-0.20397"},
+        {"setColShapeRadius", "1.5.7-0.20397"},
+        {"setColShapeSize", "1.5.7-0.20397"},
+        {"isResourceProtected", "1.5.7-9.20468"},
+        {"hasElementData", "1.5.7-9.20477"},
+        {"addElementDataSubscriber", "1.5.7-9.20477"},
+        {"hasElementDataSubscriber", "1.5.7-9.20477"},
+        {"removeElementDataSubscriber", "1.5.7-9.20477"},
     };
 
     //
