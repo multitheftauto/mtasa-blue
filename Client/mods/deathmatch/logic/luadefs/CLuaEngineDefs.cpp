@@ -1129,12 +1129,6 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     CResource* pParentResource = pLuaMain ? pLuaMain->GetResource() : NULL;
 
-    if (!pParentResource)
-    {
-        lua_pushnil(luaVM);
-        return 1;
-    }
-
     lua_newtable(luaVM);
     for (const auto& pair : textureList)
     {
