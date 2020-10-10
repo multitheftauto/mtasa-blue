@@ -158,7 +158,6 @@ CCredits::CCredits()
         "FrankZZ\n"
         "John_Michael\n"
         "-ffs-Sniper\n"
-        "W\n"
         "zneext\n"
         "ZReC\n"
         "Pawelo / 4O4\n"
