@@ -928,6 +928,9 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
 
 bool CStaticFunctionDefinitions::DestroyElement(CClientEntity& Entity)
 {
+    if (!Entity.CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = Entity.IterBegin();
     while (iter != Entity.IterEnd())
@@ -1340,19 +1343,8 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
 {
     RUN_CHILDREN(AttachElements(**iter, AttachedToEntity, vecPosition, vecRotation))
 
-    // Check the elements we are attaching are not already connected
-    std::set<CClientEntity*> history;
-    for (CClientEntity* pCurrent = &AttachedToEntity; pCurrent; pCurrent = pCurrent->GetAttachedTo())
-    {
-        if (pCurrent == &Entity)
-            return false;
-        if (MapContains(history, pCurrent))
-            break;            // This should not be possible, but you never know
-        MapInsert(history, pCurrent);
-    }
-
     // Can these elements be attached?
-    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && Entity.GetDimension() == AttachedToEntity.GetDimension())
+    if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && !AttachedToEntity.IsAttachedToElement(&Entity) && Entity.GetDimension() == AttachedToEntity.GetDimension())
     {
         ConvertDegreesToRadians(vecRotation);
 
@@ -7008,9 +7000,12 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     bool                bKey = pKeyBinds->IsKey(szKey);
+    CCommandBind*       pBind;
+
     if (bKey)
     {
         bool bCheckHitState = false, bHitState = true;
+
         if (szHitState)
         {
             if (stricmp(szHitState, "down") == 0)
@@ -7022,10 +7017,18 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
                 bCheckHitState = true, bHitState = false;
             }
         }
+
+
+        pBind = g_pCore->GetKeyBinds()->GetBindFromCommand(szCommandName, NULL, false, szKey, bCheckHitState, bHitState);
+
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
             pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
+
+            if (pBind)
+                pKeyBinds->Remove(pBind);
+
             bSuccess = true;
         }
         bHitState = false;
@@ -7033,6 +7036,10 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
             pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
+
+            if (pBind)
+                pKeyBinds->Remove(pBind);
+
             bSuccess = true;
         }
     }

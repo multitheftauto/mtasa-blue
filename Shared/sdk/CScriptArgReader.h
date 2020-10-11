@@ -1027,10 +1027,10 @@ public:
     }
 
     //
-    // Reads a table of floating point numbers
-    // Taken from CrosRoad95 dxDrawPrimitive pull request
+    // Reads a table of numbers
     //
-    void ReadNumberTable(std::vector<float>& outList)
+    template <typename T>
+    void ReadNumberTable(std::vector<T>& outList)
     {
         outList.clear();
         int iArgument = lua_type(m_luaVM, m_iIndex);
@@ -1041,7 +1041,7 @@ public:
                 int iArgument = lua_type(m_luaVM, -1);
                 if (iArgument == LUA_TNUMBER)
                 {
-                    outList.push_back(static_cast<float>(lua_tonumber(m_luaVM, -1)));
+                    outList.push_back(static_cast<T>(lua_tonumber(m_luaVM, -1)));
                 }
             }
             m_iIndex++;

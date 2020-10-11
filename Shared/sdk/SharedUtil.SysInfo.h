@@ -35,7 +35,7 @@ namespace SharedUtil
 
     bool         QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
     SString      GetWMIOSVersion();
-    unsigned int GetWMIVideoAdapterMemorySize(const SString& strDisplay);
+    unsigned int GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
     long long    GetWMITotalPhysicalMemory();
     void         GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
     void         GetInstalledHotFixList(std::vector<SString>& outInstalledList);
