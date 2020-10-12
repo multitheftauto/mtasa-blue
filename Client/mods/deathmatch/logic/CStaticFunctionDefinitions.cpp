@@ -1272,17 +1272,9 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             list<CClientPlayer*>::const_iterator iter = Team.IterBegin();
             for (; iter != Team.IterEnd(); iter++)
             {
-                unsigned short usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
-
-                if (usOldDimension != usDimension)
-                {
-                    CLuaArguments Arguments;
-                    Arguments.PushNumber(usOldDimension);
-                    Arguments.PushNumber(usDimension);
-                    (*iter)->CallEvent("onClientElementDimensionChange", Arguments, true);
-                }
             }
+            
         }
 
         case CCLIENTCOLSHAPE:
@@ -1300,16 +1292,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTSOUND:
         case CCLIENTWATER:
         {
-            unsigned short usOldDimension = Entity.GetDimension();
             Entity.SetDimension(usDimension);
-
-            if (usOldDimension != usDimension)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushNumber(usOldDimension);
-                Arguments.PushNumber(usDimension);
-                Entity.CallEvent("onClientElementDimensionChange", Arguments, true);
-            }
             return true;
         }
 
@@ -1322,16 +1305,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
                 m_pClientGame->SetAllDimensions(usDimension);
             }
 
-            unsigned short usOldDimension = Ped.GetDimension();
             Ped.SetDimension(usDimension);
-
-            if (usOldDimension != usDimension)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushNumber(usOldDimension);
-                Arguments.PushNumber(usDimension);
-                Ped.CallEvent("onClientElementDimensionChange", Arguments, true);
-            }
             return true;
         }
     }

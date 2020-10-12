@@ -109,7 +109,7 @@ void CClientRadarArea::DoPulse(bool bRender)
 
 void CClientRadarArea::SetDimension(unsigned short usDimension)
 {
-    m_usDimension = usDimension;
+    CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pRadarAreaManager->GetDimension());
 }
 

@@ -291,17 +291,6 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                     // Update all of our streamers/managers to the local player's dimension
                     m_pClientGame->SetAllDimensions(usDimension);
                 }
-
-                unsigned short usOldDimension = pPlayer->GetDimension();
-                pPlayer->SetDimension(usDimension);
-
-                if (usOldDimension != usDimension)
-                {
-                    CLuaArguments Arguments;
-                    Arguments.PushNumber(usOldDimension);
-                    Arguments.PushNumber(usDimension);
-                    pPlayer->CallEvent("onClientElementDimensionChange", Arguments, true);
-                }
             }
         }
         else
@@ -316,16 +305,7 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                 }
             }
 
-            unsigned short usOldDimension = pSource->GetDimension();
             pSource->SetDimension(usDimension);
-
-            if (usOldDimension != usDimension)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushNumber(usOldDimension);
-                Arguments.PushNumber(usDimension);
-                pSource->CallEvent("onClientElementDimensionChange", Arguments, true);
-            }
         }
     }
 }

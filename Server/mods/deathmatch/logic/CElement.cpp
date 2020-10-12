@@ -1058,6 +1058,17 @@ void CElement::RemoveAllCollisions()
     m_Collisions.clear();
 }
 
+void CElement::SetDimension(unsigned short usDimension)
+{
+    unsigned short usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onElementDimensionChange", Arguments);
+}
+
 CClient* CElement::GetClient()
 {
     CClient* pClient = NULL;

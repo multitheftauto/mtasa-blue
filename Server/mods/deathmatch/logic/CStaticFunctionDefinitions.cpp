@@ -1444,16 +1444,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WORLD_MESH_UNUSED:
         case CElement::WATER:
         {
-            unsigned short usOldDimension = pElement->GetDimension();
             pElement->SetDimension(usDimension);
-
-            if (usOldDimension != usDimension)
-            {
-                CLuaArguments Arguments;
-                Arguments.PushNumber(usOldDimension);
-                Arguments.PushNumber(usDimension);
-                pElement->CallEvent("onElementDimensionChange", Arguments);
-            }
             
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
