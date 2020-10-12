@@ -13,6 +13,20 @@
 
 #include "CClientEntity.h"
 
+struct tImgHeadrer
+{
+    char szMagic[4];
+    unsigned int uiFilesCount;
+};
+
+struct tImgFileInfo
+{
+    unsigned int   uiOffset;
+    unsigned short usSize;
+    unsigned short usUnpackedSize;
+    char           szFileName[24];
+};
+
 class CClientIMG : public CClientEntity
 {
     DECLARE_CLASS(CClientIMG, CClientEntity)
@@ -26,12 +40,14 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTIMG; }
     bool              Load(SString sFilePath);
-    bool              Stream();
-    bool              LinkModel(unsigned short usModelID, unsigned short usOffsetInBlocks, unsigned short usSizeInBlocks);
+    tImgFileInfo*     GetFileInfo(unsigned short usFileID);
 
+    bool              Stream();
+    bool              LinkModel(unsigned short usModelID, unsigned short usFileID);
 private:
 
     SString              m_strFilename;
-    SString              m_FileData;
     unsigned char        m_ucStreamID;
+    unsigned int         m_uiFilesCount;
+    tImgFileInfo*        m_pContentInfo;
 };
