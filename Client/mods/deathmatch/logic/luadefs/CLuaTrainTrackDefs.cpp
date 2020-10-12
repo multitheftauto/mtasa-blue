@@ -67,8 +67,10 @@ int CLuaTrainTrackDefs::GetTrackNodePosition(lua_State* luaVM)
         CVector position;
         if (pTrainTrack->GetNodePosition(nodeIndex, position))
         {
-            lua_pushvector(luaVM, position);
-            return 1;
+            lua_pushnumber(luaVM, position.fX);
+            lua_pushnumber(luaVM, position.fY);
+            lua_pushnumber(luaVM, position.fZ);
+            return 3;
         }
     }
     else
@@ -100,7 +102,7 @@ int CLuaTrainTrackDefs::GetTrackLength(lua_State* luaVM)
 int CLuaTrainTrackDefs::GetDefaultTrack(lua_State* luaVM)
 {
 	uint trackId;
-	
+
 	CScriptArgReader argStream(luaVM);
 	argStream.ReadNumber(trackId);
 

@@ -115,8 +115,10 @@ int CLuaTrainTrackDefs::GetTrackNodePosition(lua_State* luaVM)
         CVector position;
         if (pTrack->GetTrackNodePosition(nodeIndex, position))
         {
-            lua_pushvector(luaVM, position);
-            return 1;
+            lua_pushnumber(luaVM, position.fX);
+            lua_pushnumber(luaVM, position.fY);
+            lua_pushnumber(luaVM, position.fZ);
+            return 3;
         }
     }
     else
