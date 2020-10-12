@@ -107,18 +107,19 @@ public:
     virtual bool      IsChainEngine() = 0;
     virtual void      SetIsChainEngine(bool bChainEngine = true) = 0;
 
-    virtual bool         IsDerailed() = 0;
-    virtual void         SetDerailed(bool bDerailed) = 0;
-    virtual bool         IsDerailable() = 0;
-    virtual void         SetDerailable(bool bDerailable) = 0;
-    virtual float        GetTrainSpeed() = 0;
-    virtual void         SetTrainSpeed(float fSpeed) = 0;
-    virtual bool         GetTrainDirection() = 0;
-    virtual void         SetTrainDirection(bool bDirection) = 0;
+    virtual bool  IsDerailed() = 0;
+    virtual void  SetDerailed(bool bDerailed) = 0;
+    virtual bool  IsDerailable() = 0;
+    virtual void  SetDerailable(bool bDerailable) = 0;
+    virtual float GetTrainSpeed() = 0;
+    virtual void  SetTrainSpeed(float fSpeed) = 0;
+    virtual bool  GetTrainDirection() = 0;
+    virtual void  SetTrainDirection(bool bDirection) = 0;
+    virtual float GetTrainPosition() = 0;
+    virtual void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true) = 0;
+
     virtual CTrainTrack* GetTrainTrack() = 0;
     virtual void         SetTrainTrack(CTrainTrack* pTrainTrack) = 0;
-    virtual float        GetTrainPosition() = 0;
-    virtual void         SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true) = 0;
 
     virtual bool CanPedEnterCar() = 0;
     virtual bool CanPedJumpOutCar(CPed* pPed) = 0;

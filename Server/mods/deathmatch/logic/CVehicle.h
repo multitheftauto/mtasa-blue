@@ -401,11 +401,12 @@ private:
     bool                  m_bHeliSearchLightVisible;
 
     // Train specific data
-    bool         m_bDerailed;
-    bool         m_bIsDerailable;
-    bool         m_bTrainDirection;
-    float        m_fTrainSpeed;
-    float        m_fTrainPosition;
+    bool  m_bDerailed;
+    bool  m_bIsDerailable;
+    bool  m_bTrainDirection;
+    float m_fTrainSpeed;
+    float m_fTrainPosition;
+
     CTrainTrack* m_pTrainTrack = nullptr;
 
     // Used to remember where this vehicle spawns

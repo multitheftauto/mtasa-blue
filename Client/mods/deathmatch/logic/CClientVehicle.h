@@ -613,16 +613,18 @@ protected:
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
     float                                  m_fWheelScale;
-    bool                                   m_bJustStreamedIn;
-    bool                                   m_bWheelScaleChanged;
 
-    bool               m_bChainEngine;
-    bool               m_bIsDerailed;
-    bool               m_bIsDerailable;
-    bool               m_bTrainDirection;
-    float              m_fTrainSpeed;
-    float              m_fTrainPosition;
+    bool  m_bChainEngine;
+    bool  m_bIsDerailed;
+    bool  m_bIsDerailable;
+    bool  m_bTrainDirection;
+    float m_fTrainSpeed;
+    float m_fTrainPosition;
+
     CClientTrainTrack* m_pTrainTrack = nullptr;
+
+    bool m_bJustStreamedIn;
+    bool m_bWheelScaleChanged;
 
     // Time dependent error compensation interpolation
     struct
