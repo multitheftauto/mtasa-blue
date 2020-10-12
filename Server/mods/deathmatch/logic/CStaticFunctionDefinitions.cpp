@@ -1393,7 +1393,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         {
             if ((*iter)->IsSpawned())
             {
-                unsigned short usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
             }
         }
@@ -1437,7 +1436,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WATER:
         {
             pElement->SetDimension(usDimension);
-            
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
