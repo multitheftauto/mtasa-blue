@@ -291,6 +291,8 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                     // Update all of our streamers/managers to the local player's dimension
                     m_pClientGame->SetAllDimensions(usDimension);
                 }
+
+                pPlayer->SetDimension(usDimension);
             }
         }
         else

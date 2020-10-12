@@ -1395,14 +1395,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
             {
                 unsigned short usOldDimension = (*iter)->GetDimension();
                 (*iter)->SetDimension(usDimension);
-
-                if (usOldDimension != usDimension)
-                {
-                    CLuaArguments Arguments;
-                    Arguments.PushNumber(usOldDimension);
-                    Arguments.PushNumber(usDimension);
-                    (*iter)->CallEvent("onElementDimensionChange", Arguments);
-                }
             }
         }
     }
