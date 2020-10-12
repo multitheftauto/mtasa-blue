@@ -877,24 +877,29 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector * vecPositi
     auto nodeIndex = pGame->GetWorld()->FindClosestRailTrackNode(*vecPosition, pTrainTrack, fRailDistance); // TODO
     uint desiredTrackId = pTrainTrack->GetIndex();
 
-    DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
-    _asm
-    {
-        push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
-        push    desiredTrackId // track ID
-        push    nodeIndex // node to start at (-1 for closest node)
-        lea     ecx, pTrainEnd
-        push    ecx // end of train
-        lea     ecx, pTrainBeginning
-        push    ecx // begining of train
-        push    0 // train type (always use 0 as thats where we're writing to)
-        push    bDirection // direction
-        push    fZ // z
-        push    fY // y
-        push    fX // x
-        call    dwFunc
-        add     esp, 0x28
-    }
+    // TODO(qaisjp): this actually returns a CTrainSA, but we don't have that class!
+    typedef CVehicleSA*(__cdecl* CTrain_CreateMissionTrain)(float fX, float fY, float fZ, bool bDirection, int trainType, CVehicleSAInterface** pTrainBeginning,
+                                           CVehicleSAInterface** pTrainEnd, unsigned int nodeIndex, unsigned int desiredTrackId, char unk);
+    CTrain_CreateMissionTrain createMissionTrain = (CTrain_CreateMissionTrain)(FUNC_CTrain_CreateMissionTrain);
+
+    createMissionTrain(
+        fX, fY, fZ, bDirection,
+
+        // NOTE(qaisjp): I have no idea what the below comment means
+        // train type (always use 0 as thats where we're writing to)
+        0,
+
+        &pTrainBeginning, &pTrainEnd,
+
+        // Node to start at (-1 for closest node)
+        nodeIndex,
+
+        // track ID
+        desiredTrackId,
+
+        // NOTE(qaisjp): I have no idea what the below comment is talking about.
+        // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
+        0);
 
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;
