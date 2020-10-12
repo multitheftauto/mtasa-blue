@@ -1060,9 +1060,9 @@ void CElement::RemoveAllCollisions()
 
 void CElement::SetDimension(unsigned short usDimension)
 {
-    unsigned short usOldDimension = m_usDimension;
     if (m_usDimension != usDimension)
     {
+        unsigned short usOldDimension = m_usDimension;
         m_usDimension = usDimension;
 
         CLuaArguments Arguments;

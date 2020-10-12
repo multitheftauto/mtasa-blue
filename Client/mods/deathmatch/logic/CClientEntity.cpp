@@ -595,9 +595,9 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
 
 void CClientEntity::SetDimension(unsigned short usDimension)
 {
-    unsigned int usOldDimension = m_usDimension;
     if (m_usDimension != usDimension)
     {
+        unsigned int usOldDimension = m_usDimension;
         m_usDimension = usDimension;
 
         CLuaArguments Arguments;
