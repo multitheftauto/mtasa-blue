@@ -14,13 +14,15 @@
 
 extern CGameSA* pGame;
 
+CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)0xA9B0C8;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -562,7 +564,16 @@ float CModelInfoSA::GetLODDistance()
     return 0.0f;
 }
 
-void CModelInfoSA::SetLODDistance(float fDistance)
+float CModelInfoSA::GetOriginalLODDistance()
+{
+    // Return default LOD distance value (if doesn't exist, LOD distance hasn't been changed)
+    if (MapContains(ms_ModelDefaultLodDistanceMap, m_dwModelID))
+        return MapGet(ms_ModelDefaultLodDistanceMap, m_dwModelID);
+
+    return 0.0f;
+}
+
+void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
 {
 #if 0
     // fLodDistanceUnscaled values:
@@ -580,18 +591,22 @@ void CModelInfoSA::SetLODDistance(float fDistance)
     // So, to ensure the maximum draw distance with a working alpha fade-in, fLodDistanceUnscaled has to be
     // no more than: 325 - (325-170) * draw_distance_setting
     //
+    if (!bOverrideMaxDistance) {
+        // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
+        float fDrawDistanceSetting = UnlerpClamped(0.925f, CSettingsSA().GetDrawDistance(), 1.8f);
 
-    // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
-    float fDrawDistanceSetting = UnlerpClamped ( 0.925f, CSettingsSA ().GetDrawDistance (), 1.8f );
+        // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
+        float fMaximumValue = Lerp(325.f, fDrawDistanceSetting, 170.f);
 
-    // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
-    float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
-
-    // Ensure fDistance is in range
-    fDistance = std::min ( fDistance, fMaximumValue );
+        // Ensure fDistance is in range
+        fDistance = std::min(fDistance, fMaximumValue);
+    }
 #endif
-    // Limit to 325.f as it goes horrible after that
-    fDistance = std::min(fDistance, 325.f);
+    if (!bOverrideMaxDistance) {
+        // Limit to 325.f as it goes horrible after that
+        fDistance = std::min(fDistance, 325.f);
+    }
+
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
     {
@@ -948,40 +963,147 @@ void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector
         Request(BLOCKING, "SetVehicleDummyPosition");
 
     // Store default position in map
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    auto iter = ms_ModelDefaultDummiesPosition.find(pVehicleModel);
+    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
+        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<eVehicleDummies, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
     }
 
-    if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    if (ms_ModelDefaultDummiesPosition[m_dwModelID].find(eDummy) == ms_ModelDefaultDummiesPosition[m_dwModelID].end())
     {
-        ms_ModelDefaultDummiesPosition[pVehicleModel][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
+        ms_ModelDefaultDummiesPosition[m_dwModelID][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
     }
 
     // Set dummy position
     pVehicleModel->pVisualInfo->vecDummies[eDummy] = vecPosition;
 }
 
+void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
+{
+    if (!IsVehicle())
+        return;
+
+    auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
+    if (iter == ms_ModelDefaultDummiesPosition.end())
+        return; // Early out in case the model doesn't have any dummies modified
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
+    {
+        if (pVehicleModel->pVisualInfo != nullptr)
+            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+    }
+    // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
+    pVehicleModel->usNumberOfRefs--;
+
+    if (bRemoveFromDummiesMap)
+        ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
+}
+
 void CModelInfoSA::ResetAllVehicleDummies()
 {
-    for (auto& info : ms_ModelDefaultDummiesPosition)
-    {
-        CVehicleModelInfoSAInterface* pVehicleModel = info.first;
-        for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
-        {
-            // TODO: Find out why this is a nullptr, and fix underlying bug
-            if (pVehicleModel->pVisualInfo != nullptr)
-                pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
-        }
-        ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
-        // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
-        info.first->usNumberOfRefs--;
+    CGame* game = g_pCore->GetGame();
+    for (auto& info : ms_ModelDefaultDummiesPosition) {
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
+        if (modelInfo)
+            modelInfo->ResetVehicleDummies(false);
     }
+
     ms_ModelDefaultDummiesPosition.clear();
+}
+
+float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
+{
+    if (!IsVehicle())
+        return 0.0f;
+
+    // Request model load right now if not loaded yet
+    if (!IsLoaded())
+        Request(BLOCKING, "GetVehicleWheelSize");
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            return pVehicleModel->fWheelSizeFront;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            return pVehicleModel->fWheelSizeRear;
+    }
+
+    return 0.0f;
+}
+
+void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
+{
+    if (!IsVehicle())
+        return;
+
+    // Request model load right now if not loaded yet
+    if (!IsLoaded())
+        Request(BLOCKING, "SetVehicleWheelSize");
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+
+    // Store default wheel sizes in map
+    if (!MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
+        MapSet(ms_VehicleModelDefaultWheelSizes, m_dwModelID, std::make_pair(pVehicleModel->fWheelSizeFront, pVehicleModel->fWheelSizeRear));
+
+    switch (eWheelGroup)
+    {
+        case eResizableVehicleWheelGroup::FRONT_AXLE:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::REAR_AXLE:
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+        case eResizableVehicleWheelGroup::ALL_WHEELS:
+            pVehicleModel->fWheelSizeFront = fWheelSize;
+            pVehicleModel->fWheelSizeRear = fWheelSize;
+            break;
+    }
+}
+
+void CModelInfoSA::ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes)
+{
+    if (!IsVehicle())
+        return;
+
+    std::pair<float, float>* sizesPair;
+    if (!defaultSizes)
+    {
+        sizesPair = MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+        MapRemove(ms_VehicleModelDefaultWheelSizes, m_dwModelID);
+    }
+    else
+    {
+        sizesPair = defaultSizes;
+    }
+
+    // Default values not found in map
+    if (!sizesPair)
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    pVehicleModel->fWheelSizeFront = sizesPair->first;
+    pVehicleModel->fWheelSizeRear = sizesPair->second;
+}
+
+void CModelInfoSA::ResetAllVehiclesWheelSizes()
+{
+    CGame* game = g_pCore->GetGame();
+    for (auto& info : ms_VehicleModelDefaultWheelSizes)
+    {
+        CModelInfo* modelInfo = game->GetModelInfo(info.first);
+        if (modelInfo)
+        {
+            modelInfo->ResetVehicleWheelSizes(&info.second);
+        }
+    }
+
+    ms_VehicleModelDefaultWheelSizes.clear();
 }
 
 void CModelInfoSA::SetCustomModel(RpClump* pClump)
@@ -1427,7 +1549,7 @@ bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)
 
     const bool isTowTruck = towingModel->GetModel() == 525;
     const bool isTractor = towingModel->GetModel() == 531;
-    
+
     if (IsTrain() || towingModel->IsTrain())
     {
         // A train is never towing other vehicles. Trains are linked by other means

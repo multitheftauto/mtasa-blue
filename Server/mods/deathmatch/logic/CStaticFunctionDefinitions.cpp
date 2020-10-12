@@ -248,6 +248,9 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
 
 bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 {
+    if (!pElement->CanBeDestroyedByScript())
+        return false;
+
     // Run us on all its children
     CChildListType ::const_iterator iter = pElement->IterBegin();
     while (iter != pElement->IterEnd())
@@ -872,17 +875,18 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize)
+bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType)
 {
     assert(pElement);
     assert(szName);
     assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &bIsSynced);
-    if (!pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize)
+    ESyncType     lastSyncType = ESyncType::BROADCAST;
+    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+
+    if (!pCurrentVariable || *pCurrentVariable != Variable || lastSyncType != syncType)
     {
-        if (bSynchronize)
+        if (syncType != ESyncType::LOCAL)
         {
             // Tell our clients to update their data
             unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
@@ -890,14 +894,22 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             BitStream.pBitStream->WriteCompressed(usNameLength);
             BitStream.pBitStream->Write(szName, usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+
+            if (syncType == ESyncType::BROADCAST)
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+            else
+                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
+                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());            
         }
 
+        // Unsubscribe all the players
+        if (lastSyncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
+            m_pPlayerManager->ClearElementData(pElement, szName);
+
         // Set its custom data
-        pElement->SetCustomData(szName, Variable, bSynchronize);
+        pElement->SetCustomData(szName, Variable, syncType);
         return true;
     }
     return false;
@@ -920,6 +932,9 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
         BitStream.pBitStream->WriteBit(false);            // Unused (was recursive flag)
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
 
+        // Clean up after the data removal
+        m_pPlayerManager->ClearElementData(pElement, szName);
+
         // Delete here
         pElement->DeleteCustomData(szName);
         return true;
@@ -927,6 +942,55 @@ bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const cha
 
     // Failed
     return false;
+}
+
+bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    ESyncType     lastSyncType;
+    CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
+
+    if (lastSyncType == ESyncType::SUBSCRIBE)
+    {
+        if (!pPlayer->SubscribeElementData(pElement, szName))
+            return false;
+
+        // Tell our clients to update their data
+        unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+        CBitStream     BitStream;
+        BitStream.pBitStream->WriteCompressed(usNameLength);
+        BitStream.pBitStream->Write(szName, usNameLength);
+        pCurrentVariable->WriteToBitStream(*BitStream.pBitStream);
+
+        pPlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+
+        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, 1, BitStream.pBitStream->GetNumberOfBytesUsed());
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    return pPlayer->UnsubscribeElementData(pElement, szName);
+}
+
+bool CStaticFunctionDefinitions::HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(szName);
+    assert(pPlayer);
+
+    return pPlayer->IsSubscribed(pElement, szName);
 }
 
 bool CStaticFunctionDefinitions::SetElementParent(CElement* pElement, CElement* pParent)
@@ -1283,12 +1347,12 @@ bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElemen
     {
         CPerPlayerEntity* pEntity = static_cast<CPerPlayerEntity*>(pElement);
         if (bVisible)
-            pEntity->AddVisibleToReference(pReference);
+            return pEntity->AddVisibleToReference(pReference);
         else
-            pEntity->RemoveVisibleToReference(pReference);
+            return pEntity->RemoveVisibleToReference(pReference);
     }
 
-    return true;
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition)
@@ -1391,18 +1455,7 @@ bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pA
     assert(pElement);
     assert(pAttachedToElement);
 
-    // Check the elements we are attaching are not already connected
-    std::set<CElement*> history;
-    for (CElement* pCurrent = pAttachedToElement; pCurrent; pCurrent = pCurrent->GetAttachedToElement())
-    {
-        if (pCurrent == pElement)
-            return false;
-        if (MapContains(history, pCurrent))
-            break;            // This should not be possible, but you never know
-        MapInsert(history, pCurrent);
-    }
-
-    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && pElement->GetDimension() == pAttachedToElement->GetDimension())
+    if (pElement->IsAttachToable() && pAttachedToElement->IsAttachable() && !pAttachedToElement->IsAttachedToElement(pElement) && pElement->GetDimension() == pAttachedToElement->GetDimension())
     {
         pElement->SetAttachedOffsets(vecPosition, vecRotation);
         ConvertDegreesToRadians(vecRotation);
@@ -1864,14 +1917,6 @@ const CMtaVersion& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer
     assert(pPlayer);
 
     return pPlayer->GetPlayerVersion();
-}
-
-bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
-{
-    assert(pPlayer);
-
-    uiLevel = pPlayer->GetScriptDebugLevel();
-    return true;
 }
 
 bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* szName)
@@ -3301,6 +3346,34 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax)
+{
+    assert(pElement);
+
+    if (uiPartyMax > m_pMainConfig->GetMaxPlayers() || uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
+        return false;
+
+    RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        if (pPlayer->GetBitStreamVersion() < 0x06E)
+            return false;
+
+        CBitStream bitStream;
+        bitStream.pBitStream->WriteString<uchar>(strKey);
+        bitStream.pBitStream->WriteString<uchar>(strPartyId);
+        bitStream.pBitStream->Write(uiPartySize);
+        bitStream.pBitStream->Write(uiPartyMax);
+        pPlayer->Send(CLuaPacket(SET_DISCORD_JOIN_PARAMETERS, *bitStream.pBitStream));
+
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword)
 {
     if (IS_PLAYER(pElement))
@@ -4149,7 +4222,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
+    RUN_CHILDREN(
+        SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
 
     if (IS_PED(pElement))
     {
@@ -9289,7 +9363,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
 CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList)
 {
     if (vecPointList.size() < 4)
-        return NULL;
+        return nullptr;
 
     CVector      vecPosition(vecPointList[0].fX, vecPointList[0].fY, 0);
     CColPolygon* pColShape = new CColPolygon(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition);
@@ -9330,6 +9404,174 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     }
 
     return pColShape;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeRadius(CColShape* pColShape, float& fRadius)
+{
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            fRadius = static_cast<CColCircle*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_SPHERE:
+            fRadius = static_cast<CColSphere*>(pColShape)->GetRadius();
+            break;
+        case COLSHAPE_TUBE:
+            fRadius = static_cast<CColTube*>(pColShape)->GetRadius();
+            break;
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float fRadius)
+{
+    if (fRadius < 0.0f)
+        fRadius = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_CIRCLE:
+            static_cast<CColCircle*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_SPHERE:
+            static_cast<CColSphere*>(pColShape)->SetRadius(fRadius);
+            break;
+        case COLSHAPE_TUBE:
+            static_cast<CColTube*>(pColShape)->SetRadius(fRadius);
+            break;
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    // Tell all players
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(fRadius);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_RADIUS, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& vecSize)
+{
+    if (vecSize.fX < 0.0f)
+        vecSize.fX = 0.0f;
+    if (vecSize.fY < 0.0f)
+        vecSize.fY = 0.0f;
+    if (vecSize.fZ < 0.0f)
+        vecSize.fZ = 0.0f;
+
+    switch (pColShape->GetShapeType())
+    {
+        case COLSHAPE_RECTANGLE:
+        {
+            static_cast<CColRectangle*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_CUBOID:
+        {
+            static_cast<CColCuboid*>(pColShape)->SetSize(vecSize);
+            break;
+        }
+        case COLSHAPE_TUBE:
+        {
+            static_cast<CColTube*>(pColShape)->SetHeight(vecSize.fX);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    RefreshColShapeColliders(pColShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteVector(vecSize.fX, vecSize.fY, vecSize.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_SIZE, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint)
+{
+    if (uiPointIndex < pColPolygon->CountPoints())
+    {
+        vecPoint = *(pColPolygon->IterBegin() + uiPointIndex);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->SetPointPosition(uiPointIndex, vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(uiPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, UPDATE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, ADD_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AddColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint)
+{
+    if (pColPolygon->AddPoint(vecPoint, uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        SPosition2DSync size(false);
+        size.data.vecPosition = vecPoint;
+        BitStream.pBitStream->Write(&size);
+        BitStream.pBitStream->Write(uiPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, ADD_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::RemoveColPolygonPoint(CColPolygon* pColPolygon, uint uiPointIndex)
+{
+    if (pColPolygon->RemovePoint(uiPointIndex))
+    {
+        RefreshColShapeColliders(pColPolygon);
+
+        CBitStream      BitStream;
+        BitStream.pBitStream->Write(uiPointIndex);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColPolygon, REMOVE_COLPOLYGON_POINT, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
@@ -9812,6 +10054,7 @@ bool CStaticFunctionDefinitions::SetMaxPlayers(unsigned int uiMax)
         return false;
     m_pMainConfig->SetSoftMaxPlayers(uiMax);
     g_pNetServer->SetMaximumIncomingConnections(uiMax);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CServerInfoSyncPacket(SERVER_INFO_FLAG_MAX_PLAYERS));
     return true;
 }
 
@@ -9822,7 +10065,7 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     assert(szText);
 
     RUN_CHILDREN(OutputChatBox(szText, *iter, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain))
-
+    
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
@@ -9841,6 +10084,14 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     }
 
     return false;
+}
+
+void CStaticFunctionDefinitions::OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen,
+                                               unsigned char ucBlue, bool bColorCoded)
+{
+    assert(szText);
+
+    CPlayerManager::Broadcast(CChatEchoPacket(szText, ucRed, ucGreen, ucBlue, bColorCoded), sendList);
 }
 
 bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)

@@ -38,6 +38,12 @@ public:
         fY = vec.fY;
     }
 
+    CVector2D(const CVector4D& vec)
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+    }
+
     CVector2D& operator=(const CVector& vec)
     {
         fX = vec.fX;

@@ -494,6 +494,10 @@ public:
 
     void SetHeliBladeCollisionsEnabled(bool bEnable) { m_bEnableHeliBladeCollisions = bEnable; }
 
+    float GetWheelScale();
+    void  SetWheelScale(float fWheelScale);
+    void  ResetWheelScale();
+
     bool OnVehicleFallThroughMap();
 
 protected:
@@ -608,6 +612,9 @@ protected:
     CHandlingEntry*                        m_pHandlingEntry;
     float                                  m_fNitroLevel;
     char                                   m_cNitroCount;
+    float                                  m_fWheelScale;
+    bool                                   m_bJustStreamedIn;
+    bool                                   m_bWheelScaleChanged;
 
     bool               m_bChainEngine;
     bool               m_bIsDerailed;
@@ -616,8 +623,6 @@ protected:
     float              m_fTrainSpeed;
     float              m_fTrainPosition;
     CClientTrainTrack* m_pTrainTrack = nullptr;
-
-    bool               m_bJustStreamedIn;
 
     // Time dependent error compensation interpolation
     struct

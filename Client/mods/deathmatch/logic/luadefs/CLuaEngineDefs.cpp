@@ -13,7 +13,7 @@
 
 void CLuaEngineDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"engineFreeModel", EngineFreeModel},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
@@ -29,6 +29,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRequestModel", EngineRequestModel},
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineResetModelLODDistance", EngineResetModelLODDistance},
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
@@ -36,6 +37,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineGetModelTextures", EngineGetModelTextures},
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
         {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
         {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
@@ -55,10 +57,8 @@ void CLuaEngineDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -69,10 +69,12 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "restoreModel", "engineRestoreModel");
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
+    lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
+    lua_classfunction(luaVM, "getModelTextures", "engineGetModelTextures");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
@@ -81,11 +83,6 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setObjectGroupPhysicalProperty", "engineSetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
-
-    //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
-    //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
-    //  lua_classvariable ( luaVM, "modelIDFromName", NULL, "engineGetModelIDFromName" ); .modelIDFromName["name"] = id
-    //  lua_classvariable ( luaVM, "modelTextureNames", NULL, "engineGetModelTextureNames" ); .modelTextureNames[mode] = {names}
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -227,7 +224,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                 }
 
                 SString filePath;
-                
+
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
                     // Grab the resource root entity
@@ -516,6 +513,8 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
         ushort usModelID = CModelNames::ResolveModelID(strModelName);
         if (usModelID != INVALID_MODEL_ID)
         {
+            // Fixes vehicle dff leak problem with engineReplaceModel
+            m_pDFFManager->RestoreModel(usModelID);
             if (pDFF->ReplaceModel(usModelID, bAlphaTransparency))
             {
                 lua_pushboolean(luaVM, true);
@@ -588,7 +587,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
+                    if (pModel == nullptr)
+                        pModel = new CClientModel(m_pManager, iModelID, eModelType);
                     pModel->Allocate();
                     pModel->SetParentResource(pResource);
 
@@ -758,6 +759,33 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
+{
+    SString          strModel = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModel);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        float fCurrentDistance = pModelInfo->GetLODDistance();
+        float fOriginalDistance = pModelInfo->GetOriginalLODDistance();
+        //Make sure we're dealing with a valid LOD distance, and not setting the same LOD distance
+        if (fOriginalDistance > 0.0f && fOriginalDistance != fCurrentDistance) {
+            pModelInfo->SetLODDistance(fOriginalDistance, true);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1065,6 +1093,56 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
     // We failed
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
+{
+    //  table engineGetModelTextures ( string/int modelName/modelID, string/table textureNames )
+    SString                                       strModelName;
+    std::vector<SString>                          vTextureNames;
+    std::vector<std::tuple<std::string, CPixels>> textureList;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelName);
+
+    if (argStream.NextIsString())
+    {
+        SString strTextureName;
+        argStream.ReadString(strTextureName, "");
+        vTextureNames.push_back(strTextureName);
+    }
+    else if (argStream.NextIsTable())
+        argStream.ReadStringTable(vTextureNames);
+
+    ushort usModelID = CModelNames::ResolveModelID(strModelName);
+
+    if (usModelID == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, usModelID, vTextureNames))
+    {
+        argStream.SetCustomError("Invalid model ID");
+        lua_pushboolean(luaVM, false);
+    }
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CResource* pParentResource = pLuaMain->GetResource();
+
+    lua_newtable(luaVM);
+    for (const auto& pair : textureList)
+    {
+        CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &std::get<1>(pair), RDEFAULT, RDEFAULT, RDEFAULT,
+                                                                                                         RFORMAT_UNKNOWN, TADDRESS_WRAP);
+        if (pTexture)
+        {
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        }
+        lua_pushstring(luaVM, std::get<0>(pair).c_str());
+        lua_pushelement(luaVM, pTexture);
+        lua_settable(luaVM, -3);
+    }
+
     return 1;
 }
 
@@ -1493,7 +1571,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1530,7 +1608,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1559,7 +1637,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
@@ -1743,7 +1821,7 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
             }
         }
     }
-    
+
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 

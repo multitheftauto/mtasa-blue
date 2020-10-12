@@ -110,6 +110,11 @@ struct SAclRequest;
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
+#include "packets/CDiscordJoinPacket.h"
+
+// has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
+#include "CRemoteCalls.h"
 
 // Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
@@ -140,9 +145,6 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
-
-// has to be included before CLuaFunctionParseHelpers to prevent "invalid use of incomplete type ‘class CRemoteCalls´
-#include "CRemoteCalls.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"

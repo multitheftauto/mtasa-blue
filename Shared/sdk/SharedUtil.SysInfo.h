@@ -33,15 +33,15 @@ namespace SharedUtil
         SString strProductName;
     };
 
-    bool      QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
-    SString   GetWMIOSVersion();
-    long long GetWMIVideoAdapterMemorySize(const SString& strDisplay);
-    long long GetWMITotalPhysicalMemory();
-    void      GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
-    void      GetInstalledHotFixList(std::vector<SString>& outInstalledList);
-    bool      IsHotFixInstalled(const SString& strHotFixId);
-    bool      GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
-    bool      Is64BitOS();
+    bool         QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
+    SString      GetWMIOSVersion();
+    unsigned int GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
+    long long    GetWMITotalPhysicalMemory();
+    void         GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
+    void         GetInstalledHotFixList(std::vector<SString>& outInstalledList);
+    bool         IsHotFixInstalled(const SString& strHotFixId);
+    bool         GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
+    bool         Is64BitOS();
 }            // namespace SharedUtil
 
 #endif

@@ -35,7 +35,7 @@ public:
     static bool WasEventCancelled();
 
     // Misc funcs
-    static bool DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum = CChecksum());
+    static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
 
     // Output funcs
     static bool OutputConsole(const char* szText);
@@ -139,10 +139,9 @@ public:
     static bool           GetPedBonePosition(CClientPed& Ped, eBone bone, CVector& vecPosition);
     static bool           GetPedClothes(CClientPed& Ped, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
     static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
-    static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState);
+    static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
     static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
-    static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
     static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
     static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
     static bool           IsPedHeadless(CClientPed& Ped, bool& bHeadless);
@@ -189,7 +188,6 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
-    static bool SetPedArmor(CClientPed& Ped, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
@@ -403,7 +401,14 @@ public:
     static bool SetCursorAlpha(float fAlpha);
 
     // Drawing funcs
-    static ID3DXFont* ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static ID3DXFont*        ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static inline ID3DXFont* ResolveD3DXFont(const std::variant<CClientDxFont*, eFontType>& variant)
+    {
+        if (std::holds_alternative<eFontType>(variant))
+            return g_pCore->GetGraphics()->GetFont(std::get<eFontType>(variant));
+
+        return std::get<CClientDxFont*>(variant)->GetD3DXFont();
+    };
 
     // GUI funcs
     static bool        GUIGetInputEnabled();
@@ -643,7 +648,7 @@ public:
     static bool UnbindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource);
     static bool GetKeyState(const char* szKey, bool& bState);
     static bool GetControlState(const char* szControl, bool& bState);
-    static bool GetAnalogControlState(const char* szControl, float& fState);
+    static bool GetAnalogControlState(const char* szControl, float& fState, bool bRawInput);
     static bool IsControlEnabled(const char* szControl, bool& bEnabled);
 
     static bool SetControlState(const char* szControl, bool bState);
@@ -664,6 +669,19 @@ public:
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
     static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
+
+    // Shape get functions
+    static bool GetColShapeRadius(CClientColShape* pColShape, float& fRadius);
+    static bool GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
+
+    // Shape set functions
+    static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
+    static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
+    static bool SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint);
+    static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
+    static bool RemoveColPolygonPoint(CClientColPolygon* pColPolygon, uint uiPointIndex);
 
     // Weapon funcs
     static bool           GetWeaponNameFromID(unsigned char ucID, SString& strOutName);
@@ -719,8 +737,8 @@ public:
     static CClientEffect* CreateEffect(CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable);
 
     // Sound funcs
-    static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle);
-    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);

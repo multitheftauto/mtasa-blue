@@ -43,10 +43,11 @@ int CLuaFunctionDefs::SetMaxPlayers(lua_State* luaVM)
 
 int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 {
-    // bool outputChatBox ( string text [, element visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
-    SString   ssChat;
-    CElement* pElement;
-    bool      bColorCoded;
+    // bool outputChatBox ( string text [, element/table visibleTo=getRootElement(), int r=231, int g=217, int b=176, bool colorCoded=false ] )
+    SString               ssChat;
+    std::vector<CPlayer*> sendList;
+    CElement*             pElement = nullptr;
+    bool                  bColorCoded;
     // Default
     unsigned char ucRed = 231;
     unsigned char ucGreen = 217;
@@ -54,7 +55,15 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(ssChat);
-    argStream.ReadUserData(pElement, m_pRootElement);
+
+    if (argStream.NextIsTable())
+    {
+        argStream.ReadUserDataTable(sendList);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement, m_pRootElement);
+    }
 
     if (argStream.NextIsNumber() && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
     {
@@ -72,9 +81,30 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            if (pElement)
+            {
+                if (IS_TEAM(pElement))
+                {
+                    CTeam* pTeam = static_cast<CTeam*>(pElement);
+                    for (auto iter = pTeam->PlayersBegin(); iter != pTeam->PlayersEnd(); iter++)
+                    {
+                        sendList.push_back(*iter);
+                    }
+                }
+                else
+                {
+                    CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+
+            if (sendList.size() > 0)
+            {
+                CStaticFunctionDefinitions::OutputChatBox((const char*)ssChat, sendList, ucRed, ucGreen, ucBlue, bColorCoded);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
@@ -184,18 +214,18 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     argStream.ReadAnyAsString(strMessage);
     argStream.ReadNumber(uiLevel, 3);
 
-    if (uiLevel == 0)
+    if (uiLevel == 0 || uiLevel == 4)
     {
-        argStream.ReadNumber(ucR, 0xFF);
-        argStream.ReadNumber(ucG, 0xFF);
-        argStream.ReadNumber(ucB, 0xFF);
+        argStream.ReadNumber(ucR, 255);
+        argStream.ReadNumber(ucG, 255);
+        argStream.ReadNumber(ucB, 255);
     }
 
     if (!argStream.HasErrors())
     {
-        if (uiLevel > 3)
+        if (uiLevel > 4)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-3)", lua_tostring(luaVM, lua_upvalueindex(1)));
+            m_pScriptDebugging->LogWarning(luaVM, "Bad level argument sent to %s (0-4)", lua_tostring(luaVM, lua_upvalueindex(1)));
 
             lua_pushboolean(luaVM, false);
             return 1;
@@ -213,9 +243,13 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
         {
             m_pScriptDebugging->LogInformation(luaVM, "%s", strMessage.c_str());
         }
-        else if (uiLevel == 0)
+        else if (uiLevel == 4)
         {
             m_pScriptDebugging->LogCustom(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
+        }
+        else if (uiLevel == 0)
+        {
+            m_pScriptDebugging->LogDebug(luaVM, ucR, ucG, ucB, "%s", strMessage.c_str());
         }
         lua_pushboolean(luaVM, true);
         return 1;
@@ -733,7 +767,7 @@ int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
     if (pResource)
         pLuaMain = pResource->GetVirtualMachine();
 
-    if(!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
         lua_newtable(luaVM);
 
@@ -1377,28 +1411,30 @@ int CLuaFunctionDefs::GetVersion(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 {
-    if (lua_type(luaVM, 1) == LUA_TSTRING)
+    SString strModuleName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModuleName);
+
+    if (!argStream.HasErrors())
     {
-        list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-        list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-        SString                     strAttribute = lua_tostring(luaVM, 2);
-        SString                     strModuleName = lua_tostring(luaVM, 1);
-        for (; iter != lua_LoadedModules.end(); ++iter)
+        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
+        for (const auto mod : modules)
         {
-            if (stricmp(strModuleName, (*iter)->_GetName().c_str()) == 0)
+            if (mod->_GetName() == strModuleName)
             {
                 lua_newtable(luaVM);
 
                 lua_pushstring(luaVM, "name");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szModuleName);
+                lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "author");
-                lua_pushstring(luaVM, (*iter)->_GetFunctions().szAuthor);
+                lua_pushstring(luaVM, mod->_GetFunctions().szAuthor);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", (*iter)->_GetFunctions().fVersion);
+                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
                 lua_pushstring(luaVM, strVersion);
                 lua_settable(luaVM, -3);
 
@@ -1406,8 +1442,10 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
-    m_pScriptDebugging->LogBadType(luaVM);
     return 1;
 }
 

@@ -13,7 +13,7 @@
 
 void CLuaVehicleDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Vehicle create/destroy funcs
         {"createVehicle", CreateVehicle},
 
@@ -120,10 +120,8 @@ void CLuaVehicleDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
@@ -267,17 +265,9 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
-    // lua_classvariable ( luaVM, "upgradeOnSlot", NULL, "getVehicleUpgradeOnSlot", NULL, CLuaOOPDefs::GetVehicleUpgradeOnSlot ); // .upgradeOnSlot[slot]=int
-    // lua_classvariable ( luaVM, "doorOpenRatio", "setVehicleDoorOpenRatio", "getVehicleDoorOpenRatio", CLuaOOPDefs::SetVehicleDoorOpenRation,
-    // CLuaOOPDefs::GetVehicleDoorOpenRatio ); // .doorOpenRatio[door]=ratio lua_classvariable ( luaVM, "doorState", "setVehicleDoorState",
-    // "getVehicleDoorState", CLuaOOPDefs::SetVehicleDoorState, CLuaOOPDefs::GetVehicleDoorState ); // .doorState[id]=state lua_classvariable ( luaVM,
-    // "lightState", "setVehicleLightState", "getVehicleLightState", CLuaOOPDefs::SetVehicleLightState, CLuaOOPDefs::GetVehicleLightState ); //
-    // .lightState[id]=state lua_classvariable ( luaVM, "panelState", "setVehiclePanelState", "getVehiclePanelState", CLuaOOPDefs::SetVehiclePanelState,
-    // CLuaOOPDefs::GetVehiclePanelState ); // .panelState[panel]=state lua_classvariable ( luaVM, "headLightColor", "setVehicleHeadLightColor",
-    // "getVehicleHeadLightColor" ); lua_classvariable ( luaVM, "color", "setVehicleColor", "getVehicleColor" );
-    lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");                   // TODO: support .sirens[point] = {...}
-    lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");            // .handling[property]=value
-    lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");               // Currrently returns driver, support .occupant[seat]=ped
+    lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
+    lua_classvariable(luaVM, "handling", nullptr, "getVehicleHandling");
+    lua_classvariable(luaVM, "occupant", NULL, "getVehicleOccupant");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }

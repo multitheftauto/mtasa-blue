@@ -134,6 +134,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bEnableHeliBladeCollisions = true;
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
+    m_fWheelScale = 1.0f;
 
     for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
     {
@@ -169,6 +170,9 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
 
     // We've not yet been streamed in
     m_bJustStreamedIn = false;
+
+    // We've not changed the wheel scale
+    m_bWheelScaleChanged = false;
 }
 
 CClientVehicle::~CClientVehicle()
@@ -2299,7 +2303,7 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
 
-                if (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed())
+                if (!m_pTowedByVehicle && (GetVehicleType() != CLIENTVEHICLE_TRAIN || IsDerailed()))
                 {
                     m_pVehicle->SetMatrix(&m_matFrozen);
                     CVector vec(0.0f, 0.0f, 0.0f);
@@ -2821,9 +2825,23 @@ void CClientVehicle::Create()
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
+        // Applying wheel upgrades can change these values.
+        // We should keep track of the original values to restore them
+        bool  bPreviousWheelScaleChanged = m_bWheelScaleChanged;
+        float fPreviousWheelScale = m_fWheelScale;
+
         // Re-add all the upgrades - Has to be applied after handling *shrugs*
         if (m_pUpgrades)
             m_pUpgrades->ReAddAll();
+
+        // Restore custom wheel scale
+        if (bPreviousWheelScaleChanged)
+        {
+            m_pVehicle->SetWheelScale(fPreviousWheelScale);
+            m_fWheelScale = fPreviousWheelScale;
+            m_bWheelScaleChanged = true;
+        }
 
         if (m_ComponentData.empty())
         {
@@ -2979,14 +2997,19 @@ void CClientVehicle::Destroy()
         {
             // Only remove him physically. Don't let the ped update us
             pPed->InternalRemoveFromVehicle(m_pVehicle);
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE))
+                pPed->SetWarpInToVehicleRequired(true);
         }
 
         // Remove all the passengers physically
+        bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
         for (unsigned int i = 0; i < 8; i++)
         {
-            if (m_pPassengers[i])
+            CClientPed* pPassenger = m_pPassengers[i];
+            if (pPassenger)
             {
-                m_pPassengers[i]->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->InternalRemoveFromVehicle(m_pVehicle);
+                pPassenger->SetWarpInToVehicleRequired(bWarpInToVehicleRequired);
             }
         }
 
@@ -4974,4 +4997,40 @@ bool CClientVehicle::IsWindowOpen(uchar ucWindow)
         return m_bWindowOpen[ucWindow];
     }
     return false;
+}
+
+void CClientVehicle::SetWheelScale(float fWheelScale)
+{
+    if (m_pVehicle)
+    {
+        m_pVehicle->SetWheelScale(fWheelScale);
+    }
+    m_fWheelScale = fWheelScale;
+
+    m_bWheelScaleChanged = true;
+}
+
+float CClientVehicle::GetWheelScale()
+{
+    if (m_pVehicle)
+    {
+        return m_pVehicle->GetWheelScale();
+    }
+    return m_fWheelScale;
+}
+
+// This function is meant to be called after GTA resets wheel scale
+// (i.e. after installing a wheel upgrade)
+void CClientVehicle::ResetWheelScale()
+{
+    assert(m_pUpgrades);
+
+    // The calculation of the default wheel scale is based on original GTA code at functions
+    // 0x6E3290 (CVehicle::AddVehicleUpgrade) and 0x6DF930 (CVehicle::RemoveVehicleUpgrade)
+    if (m_pUpgrades->GetSlotState(12) != 0)
+        m_fWheelScale = m_pModelInfo->GetVehicleWheelSize(eResizableVehicleWheelGroup::FRONT_AXLE);
+    else
+        m_fWheelScale = 1.0f;
+
+    m_bWheelScaleChanged = false;
 }
