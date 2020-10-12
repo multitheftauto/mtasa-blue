@@ -1274,7 +1274,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             {
                 (*iter)->SetDimension(usDimension);
             }
-            
         }
 
         case CCLIENTCOLSHAPE:
