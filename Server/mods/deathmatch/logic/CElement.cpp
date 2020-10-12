@@ -1061,12 +1061,15 @@ void CElement::RemoveAllCollisions()
 void CElement::SetDimension(unsigned short usDimension)
 {
     unsigned short usOldDimension = m_usDimension;
-    m_usDimension = usDimension;
+    if (m_usDimension != usDimension)
+    {
+        m_usDimension = usDimension;
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(usOldDimension);
-    Arguments.PushNumber(usDimension);
-    CallEvent("onElementDimensionChange", Arguments);
+        CLuaArguments Arguments;
+        Arguments.PushNumber(usOldDimension);
+        Arguments.PushNumber(usDimension);
+        CallEvent("onElementDimensionChange", Arguments);
+    }
 }
 
 CClient* CElement::GetClient()
