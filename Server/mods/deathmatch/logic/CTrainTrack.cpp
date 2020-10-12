@@ -26,14 +26,13 @@ CTrainTrack::~CTrainTrack()
 {
     // Remove all vehicles from the track
     CVehicleManager* pVehicleManager = g_pGame->GetVehicleManager();
-    for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
+    for (auto pVehicle : pVehicleManager->GetVehicles())
     {
-        CVehicle* pVehicle = *iter;
-        if (pVehicle->GetTrainTrack() == this)
-        {
-            pVehicle->SetTrainTrack(nullptr);
-            pVehicle->SetDerailed(true);
-        }
+        if (pVehicle->GetTrainTrack() != this)
+            continue;
+
+        pVehicle->SetTrainTrack(nullptr);
+        pVehicle->SetDerailed(true);
     }
 
     // Unreference train track
