@@ -58,5 +58,5 @@ private:
     unsigned int                m_uiFilesCount;
     std::vector<tImgFileInfo>   m_pContentInfo;
 
-    std::vector<tLinkedModelRestoreInfo> m_pRestoreData;
+    std::vector<tLinkedModelRestoreInfo*> m_pRestoreData;
 };

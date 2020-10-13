@@ -69,7 +69,8 @@ public:
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
 
+    void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     CStreamingInfo* GetStreamingInfoFromModelId(ushort id);
-    unsigned char AddStreamHandler(const char* szFilePath);
-    //BOOL RemoveStreamHandler(DWORD dwStreamHandler);
+    unsigned char   AddStreamHandler(const char* szFilePath);
+    void            RemoveStreamHandler(unsigned char ucStreamHandler);
 };

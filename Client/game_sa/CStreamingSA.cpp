@@ -136,6 +136,15 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
     }
 }
 
+void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
+{
+    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
+    pItemInfo->archiveId = usStreamID;
+    pItemInfo->offsetInBlocks = uiOffset;
+    pItemInfo->sizeInBlocks = usSize;
+    pItemInfo->nextInImg = uiNextInImg;
+}
+
 CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(ARRAY_StreamModelInfo);
@@ -212,4 +221,27 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
     pNewArchiveInfo->uiStreamHandleId = (ucStreamID << 24);
 
     return ucArchiveId;
+}
+
+bool CStreamingSA::SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks)
+{
+    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
+    pItemInfo->archiveId = ucArchiveId;
+    pItemInfo->offsetInBlocks = usOffestInBlocks;
+    pItemInfo->sizeInBlocks = usSizeInBlocks;
+    // TODO CHANGE THIS INFO FOR PREV MODEL
+    pItemInfo->nextInImg = -1;
+    return true;
+}
+
+CStreamHandlerInfo* CStreamingSA::GetStreamingHandlerInfo(uint id)
+{
+    CStreamHandlerInfo* pHandlerInfo = (CStreamHandlerInfo*)(ARRAY_StreamHandlersInfo);
+    return pHandlerInfo + id;
+}
+
+
+void CStreamingSA::RemoveStreamHandler(unsigned char ucArhiveID)
+{
+    return;
 }

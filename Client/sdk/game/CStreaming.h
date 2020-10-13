@@ -11,6 +11,31 @@
 
 #pragma once
 
+struct CStreamingInfo
+{
+    WORD  prevId;
+    WORD  nextId;
+    WORD  nextInImg;
+    BYTE  flg;
+    BYTE  archiveId;
+    DWORD offsetInBlocks;
+    DWORD sizeInBlocks;
+    DWORD loadState;
+
+public:
+    void Reset()
+    {
+        this->loadState = 0;
+        this->nextInImg = -1;
+        this->nextId = -1;
+        this->prevId = -1;
+        this->archiveId = 0;
+        this->flg = 0;
+        this->offsetInBlocks = 0;
+        this->sizeInBlocks = 0;
+    };
+};
+
 class CStreaming
 {
 public:
@@ -19,6 +44,7 @@ public:
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
     virtual unsigned char AddStreamHandler(const char* szFilePath) = 0;
-    virtual BOOL RemoveStreamHandler(unsigned char dwStreamHandler) = 0;
-    virtual bool SetModelStreamInfo(unsigned short id, unsigned char ucArchiveId, unsigned short usOffestInBlocks, unsigned short usSizeInBlocks) = 0;
+    virtual void RemoveStreamHandler(unsigned char dwStreamHandler) = 0;
+    virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned int id) = 0;
+    virtual void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1) = 0;
 };
