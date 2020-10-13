@@ -13,10 +13,10 @@
 
 #include "CClientEntity.h"
 
-struct tImgHeadrer
+struct tImgHeader
 {
-    char szMagic[4];
-    unsigned int uiFilesCount;
+    char            szMagic[4];
+    unsigned int    uiFilesCount;
 };
 
 struct tImgFileInfo
@@ -40,14 +40,16 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTIMG; }
     bool              Load(SString sFilePath);
+    bool              Unload();
     tImgFileInfo*     GetFileInfo(unsigned short usFileID);
+    unsigned int      GetFileID(SString sFileName);
 
     bool              Stream();
     bool              LinkModel(unsigned short usModelID, unsigned short usFileID);
 private:
 
-    SString              m_strFilename;
-    unsigned char        m_ucStreamID;
-    unsigned int         m_uiFilesCount;
-    tImgFileInfo*        m_pContentInfo;
+    SString                     m_strFilename;
+    unsigned char               m_ucStreamID;
+    unsigned int                m_uiFilesCount;
+    std::vector<tImgFileInfo>   m_pContentInfo;
 };

@@ -13,7 +13,6 @@
 CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
-    m_pContentInfo = NULL;
     m_uiFilesCount = 0;
     m_pManager = pManager;
     m_ucStreamID = -1;
@@ -34,6 +33,9 @@ bool CClientIMG::Load(SString sFilePath)
     if (!FileExists(sFilePath))
         return false;
 
+    if (!m_pContentInfo.empty())
+        return false;
+
     m_strFilename = std::move(sFilePath);
 
 /*    g_pClientGame->GetResourceManager()->ValidateResourceFile(m_strFilename, nullptr, 0);
@@ -41,27 +43,47 @@ bool CClientIMG::Load(SString sFilePath)
         return false;
 */
 
-    tImgHeadrer fileHeadrer;
-
-    SString buffer;
-
-    FileLoad(m_strFilename, buffer, sizeof(tImgHeadrer), 0);
-
-    if (fileHeadrer.szMagic != "VER2")
+    // Open the file
+    FILE* pFile = File::Fopen(m_strFilename, "rb");
+    if (!pFile)
         return false;
 
-    m_uiFilesCount = fileHeadrer.uiFilesCount;
+    tImgHeader filerHeader;
 
-    m_pContentInfo = new tImgFileInfo[m_uiFilesCount];
+    // Read header
+    int iReadCount = fread(&filerHeader, sizeof(filerHeader), 1, pFile);
 
-    FileLoad(m_strFilename, *(SString*)m_pContentInfo, m_uiFilesCount * sizeof(tImgFileInfo), 8);
+    if (!iReadCount || memcmp(&filerHeader.szMagic, "VER2", 4))
+    {
+        fclose(pFile);
+        return false;
+    }
 
-    Stream();
+    m_uiFilesCount = filerHeader.uiFilesCount;
+
+    // Read content info
+
+    m_pContentInfo.resize(m_uiFilesCount);
+
+    iReadCount = fread(&m_pContentInfo.at(0), sizeof(tImgFileInfo), m_uiFilesCount, pFile);
+    
+    if (iReadCount != m_uiFilesCount)
+    {
+        fclose(pFile);
+        m_pContentInfo.clear();
+        return false;
+    }
+
+    //Stream();
+
+    fclose(pFile);
     return true;
 }
 
 tImgFileInfo* CClientIMG::GetFileInfo(unsigned short usFileID)
 {
+    if (usFileID > m_uiFilesCount)
+        return NULL;
     return &m_pContentInfo[usFileID];
 }
 
@@ -78,6 +100,6 @@ bool CClientIMG::LinkModel(unsigned short usModelID, unsigned short usFileID )
 
     tImgFileInfo* pFileInfo = GetFileInfo(usFileID);
 
-    g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
+    //g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
     return true;
 }
