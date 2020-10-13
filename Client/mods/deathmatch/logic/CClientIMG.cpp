@@ -80,11 +80,22 @@ bool CClientIMG::Load(SString sFilePath)
     return true;
 }
 
-tImgFileInfo* CClientIMG::GetFileInfo(unsigned short usFileID)
+tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
 {
     if (usFileID > m_uiFilesCount)
         return NULL;
     return &m_pContentInfo[usFileID];
+}
+
+unsigned int CClientIMG::GetFileID(SString strFileName)
+{
+    strFileName.resize(24);
+    for (unsigned int i = 0; i < m_uiFilesCount; i++)
+    {
+        if (strFileName.compare(m_pContentInfo[i].szFileName))
+            return i;
+    }
+    return -1;
 }
 
 bool CClientIMG::Stream()
@@ -93,13 +104,16 @@ bool CClientIMG::Stream()
     return true;
 }
 
-bool CClientIMG::LinkModel(unsigned short usModelID, unsigned short usFileID )
+bool CClientIMG::LinkModel(unsigned short usModelID, unsigned int uiFileID )
 {
     if (!m_ucStreamID)
         return false;
 
-    tImgFileInfo* pFileInfo = GetFileInfo(usFileID);
+    if (uiFileID >= m_uiFilesCount)
+        return false;
 
-    //g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
+    tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
+
+    g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
     return true;
 }

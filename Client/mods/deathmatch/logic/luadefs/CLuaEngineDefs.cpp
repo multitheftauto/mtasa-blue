@@ -574,18 +574,24 @@ int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
 {
     unsigned short usModelID;
     CClientIMG* pIMG;
-    // TEMP
-    unsigned short fileID;
+    unsigned int fileID = -1;
+    SString strFileName;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModelID);
     argStream.ReadUserData(pIMG);
 
-    argStream.ReadNumber(fileID);
+    if (argStream.NextIsNumber())
+        argStream.ReadNumber(fileID);
+    else
+        argStream.ReadString(strFileName);
 
     if (!argStream.HasErrors())
     {
-        if (pIMG->LinkModel(usModelID, fileID))
+        if (fileID == -1)
+            fileID = pIMG->GetFileID(strFileName);
+
+        if (fileID != -1 && pIMG->LinkModel(usModelID, fileID))
         {
             lua_pushboolean(luaVM, true);
             return 1;

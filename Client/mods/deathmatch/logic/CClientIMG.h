@@ -41,11 +41,11 @@ public:
     eClientEntityType GetType() const { return CCLIENTIMG; }
     bool              Load(SString sFilePath);
     bool              Unload();
-    tImgFileInfo*     GetFileInfo(unsigned short usFileID);
+    tImgFileInfo*     GetFileInfo(unsigned int usFileID);
     unsigned int      GetFileID(SString sFileName);
 
     bool              Stream();
-    bool              LinkModel(unsigned short usModelID, unsigned short usFileID);
+    bool              LinkModel(unsigned short usModelID, unsigned int usFileID);
 private:
 
     SString                     m_strFilename;
