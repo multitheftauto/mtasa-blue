@@ -47,6 +47,9 @@ int CLuaTrainTrackDefs::CreateTrack(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (vecNodeList.size() < 2)
+            return luaL_error(luaVM, "Please provide at least two nodes");
+
         auto pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
