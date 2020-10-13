@@ -176,7 +176,7 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
     }
 
     if (ucArchiveId == 0)
-        return 0;
+        return -1;
 
     // Get free stream handler id
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -193,7 +193,7 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
     };
 
     if (ucStreamID == 0)
-        return 0;
+        return -1;
 
     //  Create new stream handler
     DWORD  dOpenFlags = *(DWORD*)(VAR_StreamHandlerCreateFlags) | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS;
@@ -201,7 +201,7 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
     hFile = CreateFileA(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, dOpenFlags, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
-        return 0;
+        return -1;
 
     // Register stream handler
     void* streamHandlerPos = (void*)(ARRAY_StreamHandlers + ucStreamID * sizeof(HANDLE));
