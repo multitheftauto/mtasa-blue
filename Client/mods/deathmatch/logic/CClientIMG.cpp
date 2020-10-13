@@ -10,6 +10,12 @@
 
 #include <StdInc.h>
 
+struct tImgHeader
+{
+    char         szMagic[4];
+    unsigned int uiFilesCount;
+};
+
 CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -21,8 +27,8 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit
 
 CClientIMG::~CClientIMG()
 {
-    if (m_ucStreamID)
-        Unlink();
+    if (m_ucStreamID != -1)
+        StreamDisable();
 }
 
 bool CClientIMG::Load(SString sFilePath)
@@ -98,15 +104,35 @@ unsigned int CClientIMG::GetFileID(SString strFileName)
     return -1;
 }
 
-bool CClientIMG::Stream()
+bool CClientIMG::StreamEnable()
 {
+    if (!m_uiFilesCount)
+        return false;
+
+    m_pRestoreData.resize(m_uiFilesCount);
     m_ucStreamID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
+    return m_ucStreamID != -1;
+}
+
+bool CClientIMG::StreamDisable()
+{
+    if (m_ucStreamID == -1)
+        return false;
+
+    for (unsigned int i = 0; i < m_pRestoreData.size(); i++ )
+    {
+        tLinkedModelRestoreInfo* pRestoreData = &m_pRestoreData[i];
+        if (pRestoreData->uiOffset)
+            g_pGame->GetStreaming()->SetModelStreamInfo(pRestoreData->uiModelID, pRestoreData->ucStreamID, pRestoreData->uiOffset, pRestoreData->usSize);
+    }
+
+    m_pRestoreData.clear();
     return true;
 }
 
-bool CClientIMG::LinkModel(unsigned short usModelID, unsigned int uiFileID )
+bool CClientIMG::LinkModel(unsigned int usModelID, unsigned int uiFileID )
 {
-    if (!m_ucStreamID)
+    if (m_ucStreamID == -1)
         return false;
 
     if (uiFileID >= m_uiFilesCount)
@@ -116,4 +142,18 @@ bool CClientIMG::LinkModel(unsigned short usModelID, unsigned int uiFileID )
 
     g_pGame->GetStreaming()->SetModelStreamInfo(usModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
     return true;
+}
+
+bool CClientIMG::UnlinkModel(unsigned int uiModelID)
+{
+    for (unsigned int i = 0; i < m_pRestoreData.size(); i++)
+    {
+        if (m_pRestoreData[i].uiModelID == uiModelID)
+        {
+            g_pGame->GetStreaming()->SetModelStreamInfo(uiModelID, m_pRestoreData[i].ucStreamID, m_pRestoreData[i].uiOffset, m_pRestoreData[i].usSize);
+            return true;
+        }
+    }
+
+    return false;
 }

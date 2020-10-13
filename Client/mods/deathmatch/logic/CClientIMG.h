@@ -13,18 +13,20 @@
 
 #include "CClientEntity.h"
 
-struct tImgHeader
-{
-    char            szMagic[4];
-    unsigned int    uiFilesCount;
-};
-
 struct tImgFileInfo
 {
     unsigned int   uiOffset;
     unsigned short usSize;
     unsigned short usUnpackedSize;
     char           szFileName[24];
+};
+
+struct tLinkedModelRestoreInfo
+{
+    unsigned int   uiModelID;
+    unsigned char  ucStreamID;
+    unsigned int   uiOffset;
+    unsigned short usSize;
 };
 
 class CClientIMG : public CClientEntity
@@ -44,12 +46,17 @@ public:
     tImgFileInfo*     GetFileInfo(unsigned int usFileID);
     unsigned int      GetFileID(SString sFileName);
 
-    bool              Stream();
-    bool              LinkModel(unsigned short usModelID, unsigned int usFileID);
+    bool              StreamEnable();
+    bool              StreamDisable();
+    bool              LinkModel(unsigned int usModelID, unsigned int usFileID);
+    bool              UnlinkModel(unsigned int usModelID);
+
 private:
 
     SString                     m_strFilename;
     unsigned char               m_ucStreamID;
     unsigned int                m_uiFilesCount;
     std::vector<tImgFileInfo>   m_pContentInfo;
+
+    std::vector<tLinkedModelRestoreInfo> m_pRestoreData;
 };
