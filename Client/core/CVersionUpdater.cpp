@@ -3385,12 +3385,12 @@ int CVersionUpdater::DoPollPost()
 void CVersionUpdater::OnMainMenuFullyVisible()
 {
     const SString requiredValue = "discord-rich-presence";
-    SString       lastSubKey = "version-revert-reason";
+    const SString lastSubKey = "version-revert-reason";
     if (GetApplicationSetting(lastSubKey) != requiredValue)
     {
         SetApplicationSetting(lastSubKey, requiredValue);
         // check if the MTA client version is 1.5.8
-        if (MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
+        if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
         {
             CVARS_SET("update_build_type", 0);
             SString strMessage = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
