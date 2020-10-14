@@ -268,7 +268,6 @@ public:
     static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);
     static bool  GetTrainDirection(CVehicle* pVehicle, bool& bDirection);
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
-    static bool  GetTrainTrack(CVehicle* pVehicle, uchar& ucTrack);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  IsVehicleBlown(CVehicle* pVehicle);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
@@ -331,7 +330,6 @@ public:
     static bool SetTrainDerailable(CVehicle* pVehicle, bool bDerailable);
     static bool SetTrainDirection(CVehicle* pVehicle, bool bDirection);
     static bool SetTrainSpeed(CVehicle* pVehicle, float fSpeed);
-    static bool SetTrainTrack(CVehicle* pVehicle, uchar ucTrack);
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
