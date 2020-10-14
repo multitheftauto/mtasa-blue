@@ -62,6 +62,7 @@ public:
     LUA_DECLARE(IsTrainDerailable);
     LUA_DECLARE(GetTrainDirection);
     LUA_DECLARE(GetTrainSpeed);
+    static std::variant<CTrainTrack*, bool> GetTrainTrack(CVehicle* pVehicle);
     LUA_DECLARE(GetTrainPosition);
     LUA_DECLARE(IsVehicleBlown);
     LUA_DECLARE(GetVehicleHeadLightColor);
@@ -110,6 +111,7 @@ public:
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
     LUA_DECLARE(SetTrainSpeed);
+    static bool SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleHeadLightColor);
     LUA_DECLARE(SetVehicleTurretPosition);
