@@ -19,6 +19,7 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_Mod
 
 std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
@@ -482,20 +483,66 @@ BOOL CModelInfoSA::DoIsLoaded()
     return bLoaded;
 }
 
-BYTE CModelInfoSA::GetFlags()
+unsigned short CModelInfoSA::GetFlags()
 {
-    DWORD dwFunc = FUNC_GetModelFlags;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bFlags = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunc
-        add     esp, 4
-        mov     bFlags, al
-    }
-    return bFlags;
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (m_pInterface)
+        return m_pInterface->usFlags;
+    return 0;
 }
+
+unsigned short CModelInfoSA::GetOriginalFlags()
+{
+    if (MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
+        return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
+
+    return 0;
+}
+
+void CModelInfoSA::SetFlags(unsigned int uiFlags)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return;
+
+    // Save default value if not done yet
+    if (!MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
+        MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
+
+    m_pInterface->usFlags = 0xC0;
+    typedef char(__cdecl * Function_SetAtomicModelFlags)(CBaseModelInfoSAInterface * pInterface, unsigned int uiFlags);
+    Function_SetAtomicModelFlags setAtomicModelFlags = (Function_SetAtomicModelFlags)(FUNC_SetAtimicModelFlags);
+
+    setAtomicModelFlags(m_pInterface, uiFlags);
+}
+
+void CModelInfoSA::StaticResetFlags()
+{
+    // Restore default values
+    for (std::map<DWORD, unsigned short>::const_iterator iter = ms_ModelDefaultFlagsMap.begin(); iter != ms_ModelDefaultFlagsMap.end(); ++iter)
+    {
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
+        if (pInterface)
+            pInterface->usFlags = iter->second;
+    }
+
+    ms_ModelDefaultFlagsMap.clear();
+}
+
+//BYTE CModelInfoSA::GetStreamFlags()
+//{
+//    DWORD dwFunc = FUNC_GetModelFlags;
+//    DWORD ModelID = m_dwModelID;
+//    BYTE  bFlags = 0;
+//    _asm
+//    {
+//        push    ModelID
+//        call    dwFunc
+//        add     esp, 4
+//        mov     bFlags, al
+//    }
+//    return bFlags;
+//}
 
 CBoundingBox* CModelInfoSA::GetBoundingBox()
 {

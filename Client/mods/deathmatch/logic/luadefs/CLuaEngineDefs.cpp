@@ -46,7 +46,10 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
-        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineGetModelFlags", EngineGetModelFlags},
+        {"engineSetModelFlags", EngineSetModelFlags},
+        {"engineResetModelFlags", EngineResetModelFlags},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -83,6 +86,10 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setObjectGroupPhysicalProperty", "engineSetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
+
+    lua_classfunction(luaVM, "setModelFlags", "engineSetModelFlags");
+    lua_classfunction(luaVM, "resetModelFlags", "engineResetModelFlags");
+    lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -1967,5 +1974,94 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
     pGroup->RestoreDefault();
     lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelFlags(lua_State* luaVM)
+{
+    // float engineGetModelFlags ( int/string modelID )
+    SString          strModelId;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelId);
+
+    if (!argStream.HasErrors())
+    {
+        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        if (usModelID < 20000)
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            if (pModelInfo)
+            {
+                lua_pushnumber(luaVM, pModelInfo->GetFlags());
+                return 1;
+            }
+        }
+        else
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelFlags(lua_State* luaVM)
+{
+    // bool engineSetModelFlags ( int/string modelID, int flags )
+    SString          strModelId;
+    unsigned int     uiFlags;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelId);
+    argStream.ReadNumber(uiFlags);
+
+    if (!argStream.HasErrors())
+    {
+        ushort usModelID = CModelNames::ResolveModelID(strModelId);
+        if (usModelID < 20000)
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            if (pModelInfo)
+            {
+                pModelInfo->SetFlags(uiFlags);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+            argStream.SetCustomError(SString("Expected a valid model name or ID in range [0-19999] at argument 1, got \"%s\"", *strModelId));
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineResetModelFlags(lua_State* luaVM)
+{
+    SString          strModel = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModel);
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (pModelInfo)
+    {
+        float uiCurrentFlags = pModelInfo->GetFlags();
+        float uiOriginalFlags = pModelInfo->GetOriginalFlags();
+        if (uiOriginalFlags != uiCurrentFlags)
+        {
+            pModelInfo->SetLODDistance(uiOriginalFlags, true);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -415,6 +415,7 @@ public:
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
     void         FlushPendingRestreamIPL();
     void         ResetModelLodDistances();
+    void         ResetModelFlags();
     void         ResetAlphaTransparencies();
     void         DisableVSync();
 

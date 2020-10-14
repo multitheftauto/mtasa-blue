@@ -36,7 +36,9 @@ class CPedModelInfoSAInterface;
 #define     ARRAY_ModelInfo                 0xA9B0C8
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
-#define     FUNC_GetModelFlags              0x4044E0
+#define     FUNC_SetBaseModelFlags          0x5B3AD0
+#define     FUNC_SetAtimicModelFlags        0x5B3B20
+#define     FUNC_GetModelStreamFlags        0x4044E0
 #define     FUNC_GetBoundingBox             0x4082F0
 
 #define     FUNC_RemoveRef                  0x4C4BB0
@@ -153,23 +155,31 @@ public:
     unsigned short usDynamicIndex : 16;            // +16
 
     // Flags used by CBaseModelInfo
-    unsigned char bHasBeenPreRendered : 1;            // +18
-    unsigned char bAlphaTransparency : 1;
-    unsigned char bIsLod : 1;
-    unsigned char bDontWriteZBuffer : 1;
-    unsigned char bDontCastShadowsOn : 1;
-    unsigned char bDrawAdditive : 1;
-    unsigned char bDrawLast : 1;
-    unsigned char bDoWeOwnTheColModel : 1;
+    union
+    {
+        struct
+        {
+            unsigned short bHasBeenPreRendered : 1;            // +18
+            unsigned short bAlphaTransparency : 1;
+            unsigned short bIsLod : 1;
+            unsigned short bDontWriteZBuffer : 1;
+            unsigned short bDontCastShadowsOn : 1;
+            unsigned short bDrawAdditive : 1;
+            unsigned short bDrawLast : 1;
+            unsigned short bDoWeOwnTheColModel : 1;
 
-    unsigned char dwUnknownFlag25 : 1;            // +19
-    unsigned char dwUnknownFlag26 : 1;
-    unsigned char dwUnknownFlag27 : 1;
-    unsigned char bSwaysInWind : 1;
-    unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
-    unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
-    unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
-    unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+            unsigned short dwUnknownFlag25 : 1;            // +19
+            unsigned short dwUnknownFlag26 : 1;
+            unsigned short dwUnknownFlag27 : 1;
+            unsigned short bSwaysInWind : 1;
+            unsigned short bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
+            unsigned short bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
+            unsigned short bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
+            unsigned short bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
+        };
+
+        unsigned short usFlags;
+    };
 
     CColModelSAInterface* pColModel;            // +20      CColModel: public CBoundingBox
 
@@ -218,6 +228,7 @@ public:
     // +762 = Array of WORD containing something relative to paintjobs
     // +772 = Anim file index
 };
+static_assert(sizeof(CBaseModelInfoSAInterface) == 0x20, "Invalid size for CBaseModelInfoSAInterface");
 
 class CVehicleModelVisualInfoSAInterface            // Not sure about this name. If somebody knows more, please change
 {
@@ -277,6 +288,7 @@ protected:
     RpClump*                                                                     m_pCustomClump;
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, unsigned short>                                       ms_ModelDefaultFlagsMap;
     static std::map<DWORD, BYTE>                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
@@ -318,7 +330,10 @@ public:
     BYTE           GetLevelFromPosition(CVector* vecPosition);
     BOOL           IsLoaded();
     BOOL           DoIsLoaded();
-    BYTE           GetFlags();
+    unsigned short GetFlags();
+    unsigned short GetOriginalFlags();
+    void           SetFlags(unsigned int uiFlags);
+    static void    StaticResetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
     float          GetDistanceFromCentreOfMassToBaseOfModel();
