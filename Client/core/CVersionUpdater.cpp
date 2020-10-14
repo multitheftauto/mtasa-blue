@@ -3393,7 +3393,7 @@ void CVersionUpdater::OnMainMenuFullyVisible()
         if (MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
         {
             CVARS_SET("update_build_type", 0);
-            SString strMessage = _("We've reset you back to Default, please go change your settings again if you want Nightly updates.\n");
+            SString strMessage = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
             g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
         }
     }
