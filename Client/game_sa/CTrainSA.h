@@ -67,7 +67,7 @@ public:
             unsigned short bIsTheChainEngine : 1;            // front carriage
             unsigned short bIsLastCarriage : 1;
             unsigned short bMissionTrain : 1;
-            unsigned short bClockwiseDirection : 1;  // bClockwiseDirection
+            unsigned short bClockwiseDirection : 1;
             unsigned short bStopsAtStations : 1;
 
             unsigned short bIsDerailed : 1;
