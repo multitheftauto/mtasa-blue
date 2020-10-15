@@ -145,7 +145,7 @@ void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID,
     pItemInfo->nextInImg = uiNextInImg;
 }
 
-CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(ushort id)
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(ARRAY_StreamModelInfo);
     return pItemInfo + id;
@@ -222,24 +222,6 @@ unsigned char CStreamingSA::AddStreamHandler(const char* szFilePath)
 
     return ucArchiveId;
 }
-
-bool CStreamingSA::SetModelStreamInfo(ushort id, uchar ucArchiveId, ushort usOffestInBlocks, ushort usSizeInBlocks)
-{
-    CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
-    pItemInfo->archiveId = ucArchiveId;
-    pItemInfo->offsetInBlocks = usOffestInBlocks;
-    pItemInfo->sizeInBlocks = usSizeInBlocks;
-    // TODO CHANGE THIS INFO FOR PREV MODEL
-    pItemInfo->nextInImg = -1;
-    return true;
-}
-
-CStreamHandlerInfo* CStreamingSA::GetStreamingHandlerInfo(uint id)
-{
-    CStreamHandlerInfo* pHandlerInfo = (CStreamHandlerInfo*)(ARRAY_StreamHandlersInfo);
-    return pHandlerInfo + id;
-}
-
 
 void CStreamingSA::RemoveStreamHandler(unsigned char ucArhiveID)
 {

@@ -40,7 +40,8 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    eClientEntityType GetType() const { return CCLIENTIMG; }
+    eClientEntityType GetType() const { return CCLIENTIMG; };
+    unsigned char     GetArchiveID() { return m_ucArchiveID; };
     bool              Load(SString sFilePath);
     bool              Unload();
     tImgFileInfo*     GetFileInfo(unsigned int usFileID);
@@ -54,7 +55,7 @@ public:
 private:
 
     SString                     m_strFilename;
-    unsigned char               m_ucStreamID;
+    unsigned char               m_ucArchiveID;
     unsigned int                m_uiFilesCount;
     std::vector<tImgFileInfo>   m_pContentInfo;
 

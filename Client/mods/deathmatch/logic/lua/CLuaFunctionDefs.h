@@ -243,4 +243,5 @@ private:
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
+    static CClientIMGManager*         m_pImgManager;
 };

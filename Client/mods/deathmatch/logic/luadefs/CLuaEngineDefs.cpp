@@ -24,6 +24,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
         {"engineSetModelIMG", EngineSetModelIMG},
+        {"engineRestoreModelIMG", EngineRestoreModelIMG},
         {"engineReplaceModel", EngineReplaceModel},
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
@@ -602,6 +603,32 @@ int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRestoreModelIMG(lua_State* luaVM)
+{
+    // Grab the model ID
+    unsigned int uiModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
+
+    // Valid client DFF and model?
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+    {
+        // Restore the model
+        if (m_pImgManager->RestoreModel(uiModelID))
+        {
+            // Success
+            lua_pushboolean(luaVM, true);
+            return true;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogBadType(luaVM);
+    }
+
+    // Failure
     lua_pushboolean(luaVM, false);
     return 1;
 }

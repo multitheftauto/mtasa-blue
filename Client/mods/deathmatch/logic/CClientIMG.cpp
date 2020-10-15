@@ -21,13 +21,13 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit
     // Init
     m_uiFilesCount = 0;
     m_pManager = pManager;
-    m_ucStreamID = -1;
+    m_ucArchiveID = -1;
     SetTypeName("img");
 }
 
 CClientIMG::~CClientIMG()
 {
-    if (m_ucStreamID != -1)
+    if (m_ucArchiveID != -1)
         StreamDisable();
 }
 
@@ -110,13 +110,13 @@ bool CClientIMG::StreamEnable()
         return false;
 
     m_pRestoreData.reserve(m_uiFilesCount);
-    m_ucStreamID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
-    return m_ucStreamID != -1;
+    m_ucArchiveID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
+    return m_ucArchiveID != -1;
 }
 
 bool CClientIMG::StreamDisable()
 {
-    if (m_ucStreamID == -1)
+    if (m_ucArchiveID == -1)
         return false;
 
     for (unsigned int i = 0; i < m_pRestoreData.size(); i++ )
@@ -132,14 +132,14 @@ bool CClientIMG::StreamDisable()
 
     m_pRestoreData.clear();
 
-    g_pGame->GetStreaming()->RemoveStreamHandler(m_ucStreamID);
-    m_ucStreamID = -1;
+    g_pGame->GetStreaming()->RemoveStreamHandler(m_ucArchiveID);
+    m_ucArchiveID = -1;
     return true;
 }
 
 bool CClientIMG::LinkModel(unsigned int uiModelID, unsigned int uiFileID)
 {
-    if (m_ucStreamID == -1)
+    if (m_ucArchiveID == -1)
         return false;
 
     if (uiFileID >= m_uiFilesCount)
@@ -157,7 +157,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, unsigned int uiFileID)
 
     m_pRestoreData.push_back(pModelRestoreData);
 
-    g_pGame->GetStreaming()->SetStreamingInfoForModelId(uiModelID, m_ucStreamID, pFileInfo->uiOffset, pFileInfo->usSize);
+    g_pGame->GetStreaming()->SetStreamingInfoForModelId(uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
     return true;
 }
 

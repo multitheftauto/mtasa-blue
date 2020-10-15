@@ -46,5 +46,5 @@ public:
     virtual unsigned char AddStreamHandler(const char* szFilePath) = 0;
     virtual void RemoveStreamHandler(unsigned char dwStreamHandler) = 0;
     virtual CStreamingInfo* GetStreamingInfoFromModelId(unsigned int id) = 0;
-    virtual void            SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1) = 0;
+    virtual void            SetStreamingInfoForModelId(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
 };
