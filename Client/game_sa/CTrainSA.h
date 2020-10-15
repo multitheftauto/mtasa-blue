@@ -62,15 +62,15 @@ public:
         struct
         {
             unsigned short b01 : 1;                          // initialised with 1
-            unsigned short bIsTheChainEngine : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
+            unsigned short bStoppedAtStation : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
             unsigned short bPassengersCanEnterAndLeave : 1;
-            unsigned short bIsFrontCarriage : 1;
+            unsigned short bIsTheChainEngine : 1;            // front carriage
             unsigned short bIsLastCarriage : 1;
             unsigned short bMissionTrain : 1;
-            unsigned short bClockwiseDirection : 1;
+            unsigned short bClockwiseDirection : 1;  // bClockwiseDirection
             unsigned short bStopsAtStations : 1;
 
-            unsigned short bNotOnARailRoad : 1;
+            unsigned short bIsDerailed : 1;
             unsigned short bForceSlowDown : 1;
             unsigned short bIsStreakModel : 1;
         } trainFlags;

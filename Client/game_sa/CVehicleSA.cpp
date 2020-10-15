@@ -570,14 +570,12 @@ void CVehicleSA::SetIsChainEngine(bool bChainEngine)
     pInterface->trainFlags.bIsTheChainEngine = bChainEngine;
 }
 
-// Saml1er: Someone gave it incorrect name, not sure if this even works as intended.
 bool CVehicleSA::IsDerailed()
 {
     auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
-    return pInterface->trainFlags.bClockwiseDirection;
+    return pInterface->trainFlags.bIsDerailed;
 }
 
-// Saml1er: Someone gave it incorrect name, not sure if this even works as intended.
 void CVehicleSA::SetDerailed(bool bDerailed)
 {
     WORD wModelID = GetModelIndex();
@@ -585,11 +583,11 @@ void CVehicleSA::SetDerailed(bool bDerailed)
     {
         auto  pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
         DWORD dwThis = (DWORD)pInterface;
-        if (bDerailed != pInterface->trainFlags.bClockwiseDirection)
+        if (bDerailed != pInterface->trainFlags.bIsDerailed)
         {
             if (bDerailed)
             {
-                pInterface->trainFlags.bClockwiseDirection = true;
+                pInterface->trainFlags.bIsDerailed = true;
                 // update the physical flags
                 MemAndFast<DWORD>(dwThis + 64, (DWORD)0xFFFDFFFB);
                 // what this does:
@@ -598,7 +596,7 @@ void CVehicleSA::SetDerailed(bool bDerailed)
             }
             else
             {
-                pInterface->trainFlags.bClockwiseDirection = false;
+                pInterface->trainFlags.bIsDerailed = false;
                 // update the physical flags
                 MemOrFast<DWORD>(dwThis + 64, (DWORD)0x20004);
                 // what this does:
