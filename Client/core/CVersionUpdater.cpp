@@ -3384,8 +3384,8 @@ int CVersionUpdater::DoPollPost()
 // We do this only once, this is why we need to write to registry.
 void CVersionUpdater::OnMainMenuFullyVisible()
 {
-    const SString requiredValue = "discord-rich-presence";
-    const SString lastSubKey = "version-revert-reason";
+    const std::string requiredValue = "discord-rich-presence";
+    const std::string lastSubKey = "version-revert-reason";
     if (GetApplicationSetting(lastSubKey) != requiredValue)
     {
         SetApplicationSetting(lastSubKey, requiredValue);
@@ -3393,8 +3393,8 @@ void CVersionUpdater::OnMainMenuFullyVisible()
         if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
         {
             CVARS_SET("update_build_type", 0);
-            SString strMessage = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
-            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+            std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
+            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
         }
     }
 }
