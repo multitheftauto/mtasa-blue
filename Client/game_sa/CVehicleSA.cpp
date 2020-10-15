@@ -507,7 +507,7 @@ CVehicle* CVehicleSA::GetPreviousTrainCarriage()
 float CVehicleSA::GetDistanceToCarriage(CVehicle* pCarriage)
 {
     auto pCarriageInterface = static_cast<CTrainSAInterface*>(pCarriage->GetVehicleInterface());
-    if (pCarriageInterface->trainFlags.bIsLastCarriage)
+    if (pCarriageInterface->trainFlags.bClockwiseDirection)
     {
         CBoundingBox* pBoundingBox = pGame->GetModelInfo(pCarriage->GetModelIndex())->GetBoundingBox();
         return -(pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY);
@@ -535,7 +535,7 @@ void CVehicleSA::AttachTrainCarriage(CVehicle* pCarriage)
     auto pCarriageInterface = static_cast<CTrainSAInterface*>(pCarriage->GetVehicleInterface());
     pCarriageInterface->trainFlags.bIsTheChainEngine = false;
 
-    if (pCarriageInterface->trainFlags.bIsLastCarriage)
+    if (pCarriageInterface->trainFlags.bClockwiseDirection)
     {
         CBoundingBox* pBoundingBox = pGame->GetModelInfo(pCarriage->GetModelIndex())->GetBoundingBox();
         pCarriageInterface->m_fDistanceToNextCarriage = -(pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY);
