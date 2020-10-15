@@ -282,7 +282,7 @@ public:
     bool IsDerailable() { return m_bIsDerailable; }
     void SetDerailable(bool bDerailable) { m_bIsDerailable = bDerailable; }
     bool GetTrainDirection() { return m_bTrainDirection; }
-    void SetTrainDirection(bool bClockwiseDirection) { m_bTrainDirection = bClockwiseDirection; }
+    void SetTrainDirection(bool bDirection) { m_bTrainDirection = bDirection; }
 
     float GetTrainSpeed() { return m_fTrainSpeed; }
     void  SetTrainSpeed(float fSpeed) { m_fTrainSpeed = fSpeed; }
