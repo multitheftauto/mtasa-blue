@@ -23,10 +23,16 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit
     m_pManager = pManager;
     m_ucArchiveID = -1;
     SetTypeName("img");
+
+    m_pImgManager = pManager->GetIMGManager();
+
+    m_pImgManager->AddToList(this);
 }
 
 CClientIMG::~CClientIMG()
 {
+    m_pImgManager->RemoveFromList(this);
+
     if (m_ucArchiveID != -1)
         StreamDisable();
 }

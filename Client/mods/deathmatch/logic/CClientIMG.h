@@ -32,6 +32,7 @@ struct tLinkedModelRestoreInfo
 class CClientIMG : public CClientEntity
 {
     DECLARE_CLASS(CClientIMG, CClientEntity)
+    friend class CClientIMGManager;
 public:
     CClientIMG(class CClientManager* pManager, ElementID ID);
     ~CClientIMG();
@@ -53,6 +54,7 @@ public:
     bool              UnlinkModel(unsigned int usModelID);
 
 private:
+    class CClientIMGManager*    m_pImgManager;
 
     SString                     m_strFilename;
     unsigned char               m_ucArchiveID;
