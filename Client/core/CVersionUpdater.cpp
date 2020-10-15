@@ -3384,6 +3384,8 @@ int CVersionUpdater::DoPollPost()
 // We do this only once, this is why we need to write to registry.
 void CVersionUpdater::OnMainMenuFullyVisible()
 {
+    if (MTASA_VERSION_BUILD != 20670)            // 20670 is the build number with PR #1712 merged.
+        return;
     const std::string requiredValue = "discord-rich-presence";
     const std::string lastSubKey = "version-revert-reason";
     if (GetApplicationSetting(lastSubKey) != requiredValue)
