@@ -833,7 +833,7 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
         m_pServerPlayerList[Type]->Clear();
     }
 
-    bool didUpdateRowIndexes = false;
+    bool didUpdateRowIndices = false;
 
     // Loop the server list
     for (CServerListIterator it = pList->IteratorBegin(); it != pList->IteratorEnd(); it++)
@@ -850,10 +850,10 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
         // Add/update/remove the item to the list
         if (pServer->revisionInList[Type] != pServer->uiRevision || bClearServerList)
         {
-            if (!didUpdateRowIndexes)
+            if (!didUpdateRowIndices)
             {
                 UpdateRowIndexMembers(Type);
-                didUpdateRowIndexes = true;
+                didUpdateRowIndices = true;
             }
 
             pServer->revisionInList[Type] = pServer->uiRevision;
