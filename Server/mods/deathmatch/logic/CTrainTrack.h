@@ -46,7 +46,6 @@ public:
     inline bool  IsDefault() { return m_DefaultTrackId != 0xFF; }
     inline uchar GetDefaultTrackId() { return m_DefaultTrackId; }
 
-    // CClientEntity methods
     virtual void Unlink() override {}
     bool         ReadSpecialData(const int iLine) override { return false; }
 
