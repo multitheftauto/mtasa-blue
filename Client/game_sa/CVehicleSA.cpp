@@ -2107,16 +2107,16 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LF];
+            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LF];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LB];
+            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LB];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RF];
+            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RF];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RB];
+            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RB];
             break;
         default:
             break;
