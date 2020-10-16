@@ -33,8 +33,10 @@ CClientIMG::~CClientIMG()
 {
     m_pImgManager->RemoveFromList(this);
 
-    if (m_ucArchiveID != -1)
+    if (IsStreamed())
         StreamDisable();
+
+    Unload();
 }
 
 bool CClientIMG::Load(SString sFilePath)
@@ -83,13 +85,18 @@ bool CClientIMG::Load(SString sFilePath)
     {
         fclose(pFile);
         m_pContentInfo.clear();
+        m_uiFilesCount = 0;
         return false;
     }
 
-    //Stream();
-
     fclose(pFile);
     return true;
+}
+
+bool CClientIMG::Unload()
+{
+    m_pContentInfo.clear();
+    m_uiFilesCount = 0;
 }
 
 tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
@@ -110,9 +117,17 @@ unsigned int CClientIMG::GetFileID(SString strFileName)
     return -1;
 }
 
+bool CClientIMG::IsStreamed()
+{
+    return m_ucArchiveID != -1;
+}
+
 bool CClientIMG::StreamEnable()
 {
     if (!m_uiFilesCount)
+        return false;
+
+    if (IsStreamed())
         return false;
 
     m_pRestoreData.reserve(m_uiFilesCount);
@@ -122,7 +137,7 @@ bool CClientIMG::StreamEnable()
 
 bool CClientIMG::StreamDisable()
 {
-    if (m_ucArchiveID == -1)
+    if (!IsStreamed())
         return false;
 
     for (unsigned int i = 0; i < m_pRestoreData.size(); i++ )

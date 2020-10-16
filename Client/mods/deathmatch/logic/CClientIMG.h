@@ -50,6 +50,7 @@ public:
 
     bool              StreamEnable();
     bool              StreamDisable();
+    bool              IsStreamed();
     bool              LinkModel(unsigned int usModelID, unsigned int usFileID);
     bool              UnlinkModel(unsigned int usModelID);
 
