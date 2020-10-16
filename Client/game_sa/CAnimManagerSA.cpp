@@ -264,7 +264,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::CreateAnimAssociation(Ass
     return nullptr;
 }
 
-CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID)
+CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID)
 {
     CAnimBlendStaticAssociationSAInterface* pInterface = nullptr;
     DWORD                                   dwFunc = FUNC_CAnimManager_GetAnimAssociation;

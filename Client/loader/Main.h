@@ -13,7 +13,7 @@
 
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 #define MTA_HTAEXE_NAME "proxy_sa.exe"
-#define MTA_GTASTEAMEXE_NAME "gta-sa.exe"
+#define MTA_GTA_KNOWN_FILE_NAME "models\\gta3.img"
 #define MTA_GUID "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD353}"
 #define URI_CONNECT 1
 #define MTA_EXE_NAME_RELEASE "Multi Theft Auto.exe"

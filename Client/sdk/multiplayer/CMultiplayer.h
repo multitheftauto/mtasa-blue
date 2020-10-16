@@ -62,6 +62,8 @@ class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
+enum class eAnimGroup;
+enum class eAnimID;
 
 typedef bool(ExplosionHandler)(class CEntity* pExplodingEntity, class CEntity* pCreator, const CVector& vecPosition, enum eExplosionType ExplosionType);
 typedef void(PreContextSwitchHandler)(class CPlayerPed* pPlayer);
@@ -94,7 +96,7 @@ typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* p
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
 typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
-                                             AnimationId animID);
+                                             eAnimID animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
@@ -121,6 +123,8 @@ typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
+enum class eVehicleAimDirection : unsigned char;
+
 /**
  * This class contains information used for shot syncing, one exists per player.
  */
@@ -133,7 +137,7 @@ public:
     float m_fArmDirectionX;
     float m_fArmDirectionY;
     // only for in-vehicle shooting
-    char m_cInVehicleAimDirection;            // 0 = forwards, 1 = left, 2 = back, 3 = right
+    eVehicleAimDirection m_cInVehicleAimDirection;
     // use origin
     bool m_bUseOrigin;
 
@@ -379,7 +383,7 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
-    virtual DWORD GetLastStaticAnimationGroupID() = 0;
-    virtual DWORD GetLastStaticAnimationID() = 0;
+    virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
+    virtual eAnimID GetLastStaticAnimationID() = 0;
     virtual DWORD GetLastAnimArrayAddress() = 0;
 };

@@ -13,14 +13,13 @@
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"dbConnect", DbConnect},
         {"dbExec", DbExec},
         {"dbQuery", DbQuery},
         {"dbFree", DbFree},
         {"dbPoll", DbPoll},
         {"dbPrepareString", DbPrepareString},
-        {"dbGetConnectionQueueSize", DbGetConnectionQueueSize},
 
         {"executeSQLCreateTable", ExecuteSQLCreateTable},
         {"executeSQLDropTable", ExecuteSQLDropTable},
@@ -32,10 +31,8 @@ void CLuaDatabaseDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaDatabaseDefs::AddClass(lua_State* luaVM)
@@ -656,29 +653,6 @@ int CLuaDatabaseDefs::DbPrepareString(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaDatabaseDefs::DbGetConnectionQueueSize(lua_State* luaVM)
-{
-    CDatabaseConnectionElement* pElement;
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        int size = g_pGame->GetDatabaseManager()->GetQueueSizeFromConnection(pElement->GetConnectionHandle());
-        if (size >= 0)
-        {
-            lua_pushnumber(luaVM, size);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

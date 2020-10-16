@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CAnimBlendAssocGroup.h"
 
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
@@ -551,8 +552,8 @@ CMultiplayerSA::CMultiplayerSA()
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
     m_fMaddDoggPoolLevel = 1082.73f;
-    m_dwLastStaticAnimGroupID = 0;
-    m_dwLastStaticAnimID = 0;
+    m_dwLastStaticAnimGroupID = eAnimGroup::ANIM_GROUP_DEFAULT;
+    m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
 void CMultiplayerSA::InitHooks()

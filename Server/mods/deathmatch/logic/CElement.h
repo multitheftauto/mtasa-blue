@@ -195,6 +195,7 @@ public:
     std::list<CElement*>::const_iterator AttachedElementsEnd() { return m_AttachedElements.end(); }
     const char*                          GetAttachToID() { return m_strAttachToID; }
     bool                                 IsElementAttached(CElement* pElement);
+    bool                                 IsAttachedToElement(CElement* pElement, bool bRecursive = true);
     virtual bool                         IsAttachable();
     virtual bool                         IsAttachToable();
     void                                 GetAttachedPosition(CVector& vecPosition);
@@ -228,6 +229,9 @@ public:
 
     bool IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
+
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
 protected:
     CElement*    GetRootElement();
@@ -277,7 +281,8 @@ protected:
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
-
+    bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                       // have no effect on this element
     // Optimization for getElementsByType starting at root
 public:
     static void StartupEntitiesFromRoot();

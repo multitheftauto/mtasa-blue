@@ -36,7 +36,7 @@ CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation,
     */
     // create our mirror classes
     for (int i = 0; i < MAX_DOORS; i++)
-        this->door[i] = new CDoorSA(&((CAutomobileSAInterface*)this->GetInterface())->doors[i]);
+        this->door[i] = new CDoorSA(&((CAutomobileSAInterface*)this->GetInterface())->m_doors[i]);
     /*}
      */
 }

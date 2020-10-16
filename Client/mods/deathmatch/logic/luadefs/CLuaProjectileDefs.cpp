@@ -13,7 +13,7 @@
 
 void CLuaProjectileDefs::LoadFunctions()
 {
-    std::map<const char*, lua_CFunction> functions{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createProjectile", CreateProjectile},
         {"getProjectileType", GetProjectileType},
         {"getProjectileTarget", GetProjectileTarget},
@@ -24,10 +24,8 @@ void CLuaProjectileDefs::LoadFunctions()
     };
 
     // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaProjectileDefs::AddClass(lua_State* luaVM)

@@ -124,6 +124,8 @@ struct lua_State {
   GCObject *gclist;
   struct lua_longjmp *errorJmp;  /* current error recover point */
   ptrdiff_t errfunc;  /* current error handling function (stack index) */
+  int nexpectedresults; /* MTA specific: Number of expected results from a C call. Only valid inside a function call. 
+						   May no longer be valid if any further Lua calls were made (e.g. via lua_pcall) */
 };
 
 

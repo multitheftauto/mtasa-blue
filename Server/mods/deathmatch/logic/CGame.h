@@ -57,12 +57,12 @@ class CGame;
 #include "lua/CLuaManager.h"
 
 #include "CLightsyncManager.h"
+#include "CBanManager.h"
 
 // Forward declarations
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
-class CBanManager;
 class CBlipManager;
 class CClock;
 class CColManager;
@@ -182,6 +182,7 @@ public:
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
+        GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
 

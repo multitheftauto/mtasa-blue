@@ -16,6 +16,44 @@ extern CGameSA* pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
+void CEntitySAInterface::TransformFromObjectSpace(CVector& outPosn, CVector const& offset)
+{
+    ((void(__thiscall*)(CEntitySAInterface*, CVector&, CVector const&))0x533560)(this, outPosn, offset);
+}
+
+CVector* CEntitySAInterface::GetBoundCentre(CVector* pOutCentre)
+{
+    return ((CVector * (__thiscall*)(CEntitySAInterface*, CVector*))0x534250)(this, pOutCentre);
+}
+
+CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
+{
+    CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
+    CVector               vecMin = colModel->boundingBox.vecMin;
+    CVector               vecMax = colModel->boundingBox.vecMax;
+    CRect                 rect;
+    CVector               point;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    float maxX = vecMax.fX;
+    vecMax.fX = vecMin.fX;
+    vecMin.fX = maxX;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    *pRect = rect;
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    return pRect;
+}
+
+void CEntitySAInterface::StaticSetHooks()
+{
+    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+}
+
 CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
