@@ -54,6 +54,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineAddImage", EngineAddImage},
         {"engineRemoveImage", EngineRemoveImage},
+        {"engineImageGetFilesCount", EngineImageGetFilesCount},
+        {"engineImageGetFileList", EngineImageGetFileList}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -126,6 +128,10 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "engineLoadIMG");
     lua_classfunction(luaVM, "add", "engineAddImage");
     lua_classfunction(luaVM, "remove", "engineRemoveImage");
+
+    lua_classvariable(luaVM, "filesCount", nullptr, EngineImageGetFilesCount);
+
+    lua_registerclass(luaVM, "EngineIMG", "Element");
 }
 
 
@@ -612,6 +618,55 @@ int CLuaEngineDefs::EngineRemoveImage(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaEngineDefs::EngineImageGetFilesCount(lua_State* luaVM)
+{
+    CClientIMG* pIMG;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pIMG);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, pIMG->GetFilesCount());
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineImageGetFileList(lua_State* luaVM)
+{
+    CClientIMG* pIMG;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pIMG);
+
+    if (!argStream.HasErrors())
+    {
+        lua_newtable(luaVM);
+
+        for (unsigned int i = 0; i < pIMG->GetFilesCount(); i++)
+        {
+            tImgFileInfo* pFileInfo = pIMG->GetFileInfo(i);
+
+            lua_pushnumber(luaVM, i);
+            lua_pushstring(luaVM, pFileInfo->szFileName);
+            lua_settable(luaVM, -3);
+        }
+        
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 
 int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
 {

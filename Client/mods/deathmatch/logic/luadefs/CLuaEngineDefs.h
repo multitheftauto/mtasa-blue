@@ -64,6 +64,8 @@ public:
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
     LUA_DECLARE(EngineAddImage)
     LUA_DECLARE(EngineRemoveImage)
+    LUA_DECLARE(EngineImageGetFilesCount)
+    LUA_DECLARE(EngineImageGetFileList)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
