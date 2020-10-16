@@ -47,7 +47,7 @@ public:
     inline uchar GetDefaultTrackId() { return m_DefaultTrackId; }
 
     // CClientEntity methods
-    virtual void Unlink() override {}            // todo(qaisjp): should this be defined?
+    virtual void Unlink() override {}
     bool         ReadSpecialData(const int iLine) override { return false; }
 
 private:
