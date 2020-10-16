@@ -48,6 +48,7 @@ public:
     void              Unload();
     tImgFileInfo*     GetFileInfo(unsigned int uiFileID);
     unsigned int      GetFileID(SString sFileName);
+    long              GetFile(unsigned int uiFileID, SString& buffer);
 
     bool              StreamEnable();
     bool              StreamDisable();
@@ -59,6 +60,7 @@ private:
     class CClientIMGManager*    m_pImgManager;
 
     SString                     m_strFilename;
+    FILE*                       m_pFile;
     unsigned char               m_ucArchiveID;
     unsigned int                m_uiFilesCount;
     std::vector<tImgFileInfo>   m_pContentInfo;

@@ -66,6 +66,7 @@ public:
     LUA_DECLARE(EngineRemoveImage)
     LUA_DECLARE(EngineImageGetFilesCount)
     LUA_DECLARE(EngineImageGetFileList)
+    LUA_DECLARE(EngineImageGetFile)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

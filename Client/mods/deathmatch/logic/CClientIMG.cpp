@@ -10,6 +10,8 @@
 
 #include <StdInc.h>
 
+#define INVALID_ARCHIVE_ID 0xFF
+
 struct tImgHeader
 {
     char         szMagic[4];
@@ -21,7 +23,8 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID) : ClassInit
     // Init
     m_uiFilesCount = 0;
     m_pManager = pManager;
-    m_ucArchiveID = -1;
+    m_ucArchiveID = INVALID_ARCHIVE_ID;
+    m_pFile = nullptr;
     SetTypeName("img");
 
     m_pImgManager = pManager->GetIMGManager();
@@ -58,18 +61,18 @@ bool CClientIMG::Load(SString sFilePath)
 */
 
     // Open the file
-    FILE* pFile = File::Fopen(m_strFilename, "rb");
-    if (!pFile)
+    m_pFile = File::Fopen(m_strFilename, "rb");
+    if (!m_pFile)
         return false;
 
     tImgHeader fileHeader;
 
     // Read header
-    int iReadCount = fread(&fileHeader, sizeof(fileHeader), 1, pFile);
+    int iReadCount = fread(&fileHeader, sizeof(fileHeader), 1, m_pFile);
 
     if (!iReadCount || memcmp(&fileHeader.szMagic, "VER2", 4))
     {
-        fclose(pFile);
+        fclose(m_pFile);
         return false;
     }
 
@@ -79,17 +82,14 @@ bool CClientIMG::Load(SString sFilePath)
 
     m_pContentInfo.resize(m_uiFilesCount);
 
-    iReadCount = fread(&m_pContentInfo.at(0), sizeof(tImgFileInfo), m_uiFilesCount, pFile);
+    iReadCount = fread(&m_pContentInfo.at(0), sizeof(tImgFileInfo), m_uiFilesCount, m_pFile);
     
     if (iReadCount != m_uiFilesCount)
     {
-        fclose(pFile);
-        m_pContentInfo.clear();
-        m_uiFilesCount = 0;
+        Unload();
         return false;
     }
 
-    fclose(pFile);
     return true;
 }
 
@@ -97,6 +97,34 @@ void CClientIMG::Unload()
 {
     m_pContentInfo.clear();
     m_uiFilesCount = 0;
+
+    if (m_pFile)
+    {
+        fclose(m_pFile);
+        m_pFile = nullptr;
+    }
+}
+
+long CClientIMG::GetFile(unsigned int uiFileID, SString& buffer)
+{
+    tImgFileInfo* pFileInfo = GetFileInfo(uiFileID);
+    if (!pFileInfo)
+        return -1;
+
+    unsigned long ulReadCount = pFileInfo->usSize * 2048;
+
+    try
+    {
+        buffer.resize(ulReadCount);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return -2;
+    }
+
+    long iReadCount = fread(buffer.data(), 1, ulReadCount, m_pFile);
+
+    return iReadCount;
 }
 
 tImgFileInfo* CClientIMG::GetFileInfo(unsigned int usFileID)
@@ -119,7 +147,7 @@ unsigned int CClientIMG::GetFileID(SString strFileName)
 
 bool CClientIMG::IsStreamed()
 {
-    return m_ucArchiveID != -1;
+    return m_ucArchiveID != INVALID_ARCHIVE_ID;
 }
 
 bool CClientIMG::StreamEnable()
@@ -132,7 +160,7 @@ bool CClientIMG::StreamEnable()
 
     m_pRestoreData.reserve(m_uiFilesCount);
     m_ucArchiveID = g_pGame->GetStreaming()->AddStreamHandler(*m_strFilename);
-    return m_ucArchiveID != -1;
+    return IsStreamed();
 }
 
 bool CClientIMG::StreamDisable()
@@ -154,13 +182,13 @@ bool CClientIMG::StreamDisable()
     m_pRestoreData.clear();
 
     g_pGame->GetStreaming()->RemoveStreamHandler(m_ucArchiveID);
-    m_ucArchiveID = -1;
+    m_ucArchiveID = INVALID_ARCHIVE_ID;
     return true;
 }
 
 bool CClientIMG::LinkModel(unsigned int uiModelID, unsigned int uiFileID)
 {
-    if (m_ucArchiveID == -1)
+    if (!IsStreamed())
         return false;
 
     if (uiFileID >= m_uiFilesCount)

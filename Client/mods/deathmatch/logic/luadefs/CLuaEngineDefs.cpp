@@ -15,7 +15,6 @@ void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"engineFreeModel", EngineFreeModel},
-        {"engineLoadIMG", EngineLoadIMG},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
         {"engineLoadDFF", EngineLoadDFF},
@@ -23,8 +22,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImportTXD", EngineImportTXD},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
-        {"engineSetModelIMG", EngineSetModelIMG},
-        {"engineRestoreModelIMG", EngineRestoreModelIMG},
         {"engineReplaceModel", EngineReplaceModel},
         {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
@@ -36,8 +33,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
-        {"engineGetModelTXDID", EngineGetModelTXDID},
-        {"engineSetModelTXDID", EngineSetModelTXDID},
         {"engineGetModelNameFromID", EngineGetModelNameFromID},
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
@@ -52,10 +47,16 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineLoadIMG", EngineLoadIMG},
+        {"engineSetModelIMG", EngineSetModelIMG},
+        {"engineRestoreModelIMG", EngineRestoreModelIMG},
         {"engineAddImage", EngineAddImage},
         {"engineRemoveImage", EngineRemoveImage},
         {"engineImageGetFilesCount", EngineImageGetFilesCount},
-        {"engineImageGetFileList", EngineImageGetFileList}
+        {"engineImageGetFileList", EngineImageGetFileList},
+        {"engineImageGetFile", EngineImageGetFile},
+        {"engineGetModelTXDID", EngineGetModelTXDID},
+        {"engineSetModelTXDID", EngineSetModelTXDID},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -98,6 +99,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     AddEngineColClass(luaVM);
     AddEngineTxdClass(luaVM);
     AddEngineDffClass(luaVM);
+    AddEngineImgClass(luaVM);
 }
 
 void CLuaEngineDefs::AddEngineColClass(lua_State* luaVM)
@@ -128,8 +130,10 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "engineLoadIMG");
     lua_classfunction(luaVM, "add", "engineAddImage");
     lua_classfunction(luaVM, "remove", "engineRemoveImage");
+    lua_classfunction(luaVM, "getFile", "engineImageGetFile");
 
     lua_classvariable(luaVM, "filesCount", nullptr, EngineImageGetFilesCount);
+    lua_classvariable(luaVM, "files", nullptr, EngineImageGetFileList);
 
     lua_registerclass(luaVM, "EngineIMG", "Element");
 }
@@ -664,6 +668,52 @@ int CLuaEngineDefs::EngineImageGetFileList(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineImageGetFile(lua_State* luaVM)
+{
+    CClientIMG*    pIMG;
+    unsigned int   fileID = -1;
+    SString        strFileName;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pIMG);
+
+    if (argStream.NextIsNumber())
+        argStream.ReadNumber(fileID);
+    else
+        argStream.ReadString(strFileName);
+
+    if (!argStream.HasErrors())
+    {
+        if (fileID == -1)
+            fileID = pIMG->GetFileID(strFileName);
+
+        SString buffer;
+        long    lBytesRead = pIMG->GetFile(fileID, buffer);
+
+        if (lBytesRead >= 0)
+        {
+            // Push the string onto the Lua stack. Use pushlstring so we are binary
+            // compatible. Normal push string takes zero terminated strings.
+            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
+            return 1;
+        }
+        else if (lBytesRead == -2)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+        }
+        else
+        {
+            argStream.SetCustomWarning("File not found");
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Error
+    lua_pushnil(luaVM);
     return 1;
 }
 
