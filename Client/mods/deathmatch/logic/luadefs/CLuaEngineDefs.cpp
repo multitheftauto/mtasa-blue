@@ -56,7 +56,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImageGetFileList", EngineImageGetFileList},
         {"engineImageGetFile", EngineImageGetFile},
         {"engineGetModelTXDID", EngineGetModelTXDID},
-        {"engineSetModelTXDID", EngineSetModelTXDID},
+        //{"engineSetModelTXDID", EngineSetModelTXDID},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1277,32 +1277,32 @@ int CLuaEngineDefs::EngineGetModelTXDID(lua_State* luaVM)
 }
 
 
-int CLuaEngineDefs::EngineSetModelTXDID(lua_State* luaVM)
-{
-    unsigned short usModelID;
-    unsigned short usTXDID;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
-    argStream.ReadNumber(usTXDID);
-
-    if (!argStream.HasErrors())
-    {
-        bool bResult = g_pGame->GetRenderWare()->SetTXDIDForModelID(usModelID, usTXDID);
-        if (bResult)
-        {
-            lua_pushboolean(luaVM, bResult);
-            return 1;
-        }
-        argStream.SetCustomError("Expected valid model ID at argument 1");
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // We failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
+//int CLuaEngineDefs::EngineSetModelTXDID(lua_State* luaVM)
+//{
+//    unsigned short usModelID;
+//    unsigned short usTXDID;
+//
+//    CScriptArgReader argStream(luaVM);
+//    argStream.ReadNumber(usModelID);
+//    argStream.ReadNumber(usTXDID);
+//
+//    if (!argStream.HasErrors())
+//    {
+//        bool bResult = g_pGame->GetRenderWare()->SetTXDIDForModelID(usModelID, usTXDID);
+//        if (bResult)
+//        {
+//            lua_pushboolean(luaVM, bResult);
+//            return 1;
+//        }
+//        argStream.SetCustomError("Expected valid model ID at argument 1");
+//    }
+//    if (argStream.HasErrors())
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    // We failed
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)
 {
