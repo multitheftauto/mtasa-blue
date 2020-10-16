@@ -78,6 +78,7 @@ public:
         WATER,
         WEAPON,
         DATABASE_CONNECTION,
+        TRAIN_TRACK,
         ROOT,
         UNKNOWN,
     };
