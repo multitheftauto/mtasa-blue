@@ -48,8 +48,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineLoadIMG", EngineLoadIMG},
-        {"engineSetModelIMG", EngineImageLinkModel},
-        {"engineRestoreModelIMG", EngineRestoreModelImage},
+        {"engineImageLinkModel", EngineImageLinkModel},
+        {"engineRestoreModelImage", EngineRestoreModelImage},
         {"engineAddImage", EngineAddImage},
         {"engineRemoveImage", EngineRemoveImage},
         {"engineImageGetFilesCount", EngineImageGetFilesCount},
@@ -131,6 +131,7 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "add", "engineAddImage");
     lua_classfunction(luaVM, "remove", "engineRemoveImage");
     lua_classfunction(luaVM, "getFile", "engineImageGetFile");
+    lua_classfunction(luaVM, "linkModel", "engineImageLinkModel");
 
     lua_classvariable(luaVM, "filesCount", nullptr, EngineImageGetFilesCount);
     lua_classvariable(luaVM, "files", nullptr, EngineImageGetFileList);
