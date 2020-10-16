@@ -62,18 +62,18 @@ bool CClientIMG::Load(SString sFilePath)
     if (!pFile)
         return false;
 
-    tImgHeader filerHeader;
+    tImgHeader fileHeader;
 
     // Read header
-    int iReadCount = fread(&filerHeader, sizeof(filerHeader), 1, pFile);
+    int iReadCount = fread(&fileHeader, sizeof(fileHeader), 1, pFile);
 
-    if (!iReadCount || memcmp(&filerHeader.szMagic, "VER2", 4))
+    if (!iReadCount || memcmp(&fileHeader.szMagic, "VER2", 4))
     {
         fclose(pFile);
         return false;
     }
 
-    m_uiFilesCount = filerHeader.uiFilesCount;
+    m_uiFilesCount = fileHeader.uiFilesCount;
 
     // Read content info
 
