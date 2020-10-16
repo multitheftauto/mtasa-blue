@@ -42,6 +42,13 @@ public:
         this->fZ = fZ;
     }
 
+    CVector(const CVector4D& vec)
+    {
+        this->fX = vec.fX;
+        this->fY = vec.fY;
+        this->fZ = vec.fZ;
+    }
+
     float Normalize()
     {
         float t = sqrt(fX * fX + fY * fY + fZ * fZ);

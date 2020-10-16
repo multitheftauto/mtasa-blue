@@ -28,6 +28,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     m_pCollision = new CColCircle(pColManager, nullptr, m_vecPosition, m_fSize, true);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);
+    m_pCollision->SetCanBeDestroyedByScript(false);
 
     // Add us to the marker manager
     pMarkerManager->AddToList(this);
@@ -367,6 +368,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
 
         m_pCollision->SetCallback(this);
         m_pCollision->SetAutoCallEvent(false);
+        m_pCollision->SetCanBeDestroyedByScript(false);
     }
 
     // Set the radius after the size

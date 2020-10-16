@@ -9,7 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendHierarchy.h"
+#include "game/CAnimBlendAssocGroup.h"
+
 using std::list;
 using std::vector;
 
@@ -1516,15 +1517,15 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     RemoveTargetPosition();
 
+    if (!pVehicle->IsStreamedIn() || !m_pPlayerPed)
+        SetWarpInToVehicleRequired(true);
+
     // Make peds stream in when they warp to a vehicle
-    if (pVehicle)
-    {
-        CVector vecInVehiclePosition;
-        GetPosition(vecInVehiclePosition);
-        UpdateStreamPosition(vecInVehiclePosition);
-        if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
-            StreamIn(true);
-    }
+    CVector vecInVehiclePosition;
+    GetPosition(vecInVehiclePosition);
+    UpdateStreamPosition(vecInVehiclePosition);
+    if (pVehicle->IsStreamedIn() && !m_pPlayerPed)
+        StreamIn(true);
 }
 
 void CClientPed::ResetToOutOfVehicleWeapon()
@@ -1539,6 +1540,7 @@ void CClientPed::ResetToOutOfVehicleWeapon()
 
 CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 {
+    SetWarpInToVehicleRequired(false);
     SetDoingGangDriveby(false);
 
     // Reset any enter/exit tasks
@@ -2559,7 +2561,7 @@ CVector CClientPed::GetAim() const
     return CVector();
 }
 
-void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2571,7 +2573,7 @@ void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, unsigned cha
     }
 }
 
-void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim)
+void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2590,7 +2592,7 @@ void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX,
     }
 }
 
-void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                CVector* pSource, bool bInterpolateAim)
 {
     if (!m_bIsLocalPlayer)
@@ -2925,9 +2927,9 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         if (pAssoc)
         {
             // Check we're not doing any important animations
-            AnimationId animId = pAssoc->GetAnimID();
-            if (animId == ANIM_ID_WALK_CIVI || animId == ANIM_ID_RUN_CIVI || animId == ANIM_ID_IDLE_STANCE || animId == ANIM_ID_WEAPON_CROUCH ||
-                animId == ANIM_ID_STEALTH_AIM)
+            eAnimID animId = pAssoc->GetAnimID();
+            if (animId == eAnimID::ANIM_ID_WALK || animId == eAnimID::ANIM_ID_RUN || animId == eAnimID::ANIM_ID_IDLE ||
+                animId == eAnimID::ANIM_ID_WEAPON_CROUCH || animId == eAnimID::ANIM_ID_STEALTH_AIM)
             {
                 // Are our knife anims loaded?
                 std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("KNIFE");
@@ -4169,6 +4171,7 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
             pInTask->SetIsWarpingPedIntoCar();
             pInTask->ProcessPed(m_pPlayerPed);
             pInTask->Destroy();
+            SetWarpInToVehicleRequired(false);
         }
 
         // If we're a remote player
@@ -4184,6 +4187,8 @@ void CClientPed::InternalRemoveFromVehicle(CVehicle* pGameVehicle)
 {
     if (m_pPlayerPed && m_pTaskManager)
     {
+        SetWarpInToVehicleRequired(false);
+
         // Reset whatever task
         m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
 
@@ -6169,8 +6174,9 @@ void CClientPed::RestoreAllAnimations()
         {
             auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
             auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
-            int  iGroupID = pAnimAssociation->GetAnimGroup(), iAnimID = pAnimAssociation->GetAnimID();
-            if (pAnimHierarchy && iGroupID >= 0 && iAnimID >= 0)
+            eAnimGroup  iGroupID = pAnimAssociation->GetAnimGroup();
+            eAnimID iAnimID = pAnimAssociation->GetAnimID();
+            if (pAnimHierarchy && iGroupID >= eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID >= eAnimID::ANIM_ID_WALK)
             {
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())

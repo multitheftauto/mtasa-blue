@@ -321,10 +321,10 @@ public:
     CVector        GetAim() const;
     const CVector& GetAimSource() { return m_shotSyncData->m_vecShotOrigin; };
     const CVector& GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
-    unsigned char  GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
-    void           SetAim(float fArmDirectionX, float fArmDirectionY, unsigned char cInVehicleAimAnim);
-    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, unsigned char cInVehicleAimAnim);
-    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, char cInVehicleAimAnim,
+    eVehicleAimDirection GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
+    void           SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
+    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
                                  CVector* pSource, bool bInterpolateAim);
 
     unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
@@ -569,6 +569,9 @@ public:
     void      SetTaskTypeToBeRestoredOnAnimEnd(eTaskType taskType) { m_eTaskTypeToBeRestoredOnAnimEnd = taskType; }
     eTaskType GetTaskTypeToBeRestoredOnAnimEnd() { return m_eTaskTypeToBeRestoredOnAnimEnd; }
 
+    bool IsWarpInToVehicleRequired() { return m_bWarpInToVehicleRequired; }
+    void SetWarpInToVehicleRequired(bool warp) { m_bWarpInToVehicleRequired = warp; }
+
     void NotifyCreate();
     void NotifyDestroy();
 
@@ -735,4 +738,5 @@ public:
     ReplacedAnim_type m_mapOfReplacedAnimations;
     bool              m_bTaskToBeRestoredOnAnimEnd;
     eTaskType         m_eTaskTypeToBeRestoredOnAnimEnd;
+    bool              m_bWarpInToVehicleRequired = false;
 };

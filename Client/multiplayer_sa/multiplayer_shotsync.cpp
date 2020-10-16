@@ -15,6 +15,7 @@
 #include "../game_sa/CPedSA.h"
 #include "../game_sa/CEventDamageSA.h"
 #include "../game_sa/CColPointSA.h"
+#include <net/SyncStructures.h>
 
 extern CMultiplayerSA* pMultiplayer;
 
@@ -49,7 +50,7 @@ CVector vecLastOrigin;
 CVector vecLastLocalPlayerBulletStart;
 CVector vecLastLocalPlayerBulletEnd;
 
-char cTempGunDirection;
+eVehicleAimDirection cTempGunDirection;
 
 DWORD             vecTargetPosition;
 DWORD             vecAltPos;
@@ -138,9 +139,15 @@ bool IsLocalPlayer(CPedSAInterface* pPedInterface)
     return false;
 }
 
-VOID WriteGunDirectionDataForPed(CPedSAInterface* pPedInterface, float* fGunDirectionX, float* fGunDirectionY, char* cGunDirection)
+VOID WriteGunDirectionDataForPed(CPedSAInterface* pPedInterface, float* fGunDirectionX, float* fGunDirectionY, eVehicleAimDirection* cGunDirection)
 {
-    if (!IsLocalPlayer(pPedInterface))
+    SClientEntity<CPedSA>* pPedClientEntity = m_pools->GetPed((DWORD*)pPedInterface);
+    CPed*                  pAimingPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+
+    if (!pAimingPed)
+        return;
+
+    if (!IsLocalPlayer(pAimingPed))
     {
         CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(pPedInterface);
         if (data)
@@ -167,6 +174,18 @@ VOID WriteGunDirectionDataForPed(CPedSAInterface* pPedInterface, float* fGunDire
         {
             // Make sure our pitch is updated (fixes first-person weapons not moving)
             *fGunDirectionY = pGameInterface->GetCamera()->Find3rdPersonQuickAimPitch();
+
+            if (pAimingPed->IsDoingGangDriveby())
+            {
+                // Fix pitch in driveby when facing left or backwards
+                switch (LocalShotSyncData.m_cInVehicleAimDirection)
+                {
+                    case eVehicleAimDirection::LEFT:
+                    case eVehicleAimDirection::BACKWARDS:
+                        *fGunDirectionY = -*fGunDirectionY;
+                        break;
+                }
+            }
 
             LocalShotSyncData.m_fArmDirectionX = *fGunDirectionX;
             LocalShotSyncData.m_fArmDirectionY = *fGunDirectionY;

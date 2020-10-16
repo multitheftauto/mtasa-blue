@@ -162,12 +162,7 @@ protected:
     bool                        m_IsHiddenLowLod;               // true if this object is low LOD and should not be drawn
 
 public:
-<<<<<<< HEAD
     CObject*                            m_pObject;
     SLastSyncedObjectData               m_LastSyncedData;
     static std::list < CClientEntity * >   m_DisabledCollisions;
-=======
-    CObject*              m_pObject;
-    SLastSyncedObjectData m_LastSyncedData;
->>>>>>> a0ce68f284487ba636e839b06c103bc2442d95e0
 };

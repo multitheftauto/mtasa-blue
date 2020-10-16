@@ -24,8 +24,19 @@ if not exist %MSBUILDPATH% (
 )
 echo Found MSBuild at: %MSBUILDPATH%
 
+set BUILD_TARGET=Release
+IF [%1] == [Debug] (
+    set BUILD_TARGET=Debug
+) ELSE IF [%1] == [Release] (
+    set BUILD_TARGET=Release
+) ELSE (
+    IF not [%1] == [] (
+        echo Invalid first argument %1. Using default build-target %BUILD_TARGET%.
+    )
+)
+
 rem Start compiling
-%MSBUILDPATH% Build/MTASA.sln /property:Configuration=Release /m
+%MSBUILDPATH% Build/MTASA.sln /property:Configuration=%BUILD_TARGET% /m
 
 :end
 pause
