@@ -139,7 +139,7 @@ unsigned int CClientIMG::GetFileID(SString strFileName)
     strFileName.resize(24);
     for (unsigned int i = 0; i < m_uiFilesCount; i++)
     {
-        if (strFileName.compare(m_pContentInfo[i].szFileName))
+        if (strFileName.EqualsI(m_pContentInfo[i].szFileName))
             return i;
     }
     return -1;
