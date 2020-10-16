@@ -26,8 +26,6 @@ public:
     LUA_DECLARE(EngineImportTXD);
     LUA_DECLARE(EngineReplaceCOL);
     LUA_DECLARE(EngineRestoreCOL);
-    LUA_DECLARE(EngineSetModelIMG);
-    LUA_DECLARE(EngineRestoreModelIMG);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
     LUA_DECLARE(EngineRequestModel);
@@ -67,6 +65,8 @@ public:
     LUA_DECLARE(EngineImageGetFilesCount)
     LUA_DECLARE(EngineImageGetFileList)
     LUA_DECLARE(EngineImageGetFile)
+    LUA_DECLARE(EngineImageLinkModel);
+    LUA_DECLARE(EngineRestoreModelImage);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

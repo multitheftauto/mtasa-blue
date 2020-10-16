@@ -48,8 +48,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
         {"engineLoadIMG", EngineLoadIMG},
-        {"engineSetModelIMG", EngineSetModelIMG},
-        {"engineRestoreModelIMG", EngineRestoreModelIMG},
+        {"engineSetModelIMG", EngineImageLinkModel},
+        {"engineRestoreModelIMG", EngineRestoreModelImage},
         {"engineAddImage", EngineAddImage},
         {"engineRemoveImage", EngineRemoveImage},
         {"engineImageGetFilesCount", EngineImageGetFilesCount},
@@ -718,7 +718,7 @@ int CLuaEngineDefs::EngineImageGetFile(lua_State* luaVM)
 }
 
 
-int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
+int CLuaEngineDefs::EngineImageLinkModel(lua_State* luaVM)
 {
     unsigned short usModelID;
     CClientIMG* pIMG;
@@ -726,13 +726,12 @@ int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
     SString strFileName;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
     argStream.ReadUserData(pIMG);
-
     if (argStream.NextIsNumber())
         argStream.ReadNumber(fileID);
     else
         argStream.ReadString(strFileName);
+    argStream.ReadNumber(usModelID);
 
     if (!argStream.HasErrors())
     {
@@ -754,7 +753,7 @@ int CLuaEngineDefs::EngineSetModelIMG(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineRestoreModelIMG(lua_State* luaVM)
+int CLuaEngineDefs::EngineRestoreModelImage(lua_State* luaVM)
 {
     // Grab the model ID
     unsigned int uiModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
