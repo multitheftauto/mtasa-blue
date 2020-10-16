@@ -678,6 +678,15 @@ struct SVehiclePuresyncFlags : public ISyncStructure
     } data;
 };
 
+
+enum class eVehicleAimDirection : unsigned char
+{
+    FORWARDS = 0,
+    LEFT,
+    BACKWARDS,
+    RIGHT,
+};
+
 struct SDrivebyDirectionSync : public ISyncStructure
 {
     enum
@@ -690,7 +699,7 @@ struct SDrivebyDirectionSync : public ISyncStructure
 
     struct
     {
-        unsigned char ucDirection : 2;
+        eVehicleAimDirection ucDirection : 2;
     } data;
 };
 

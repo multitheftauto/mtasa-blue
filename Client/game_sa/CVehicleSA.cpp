@@ -507,8 +507,8 @@ CVehicle* CVehicleSA::GetPreviousTrainCarriage()
 
 float CVehicleSA::GetDistanceToCarriage(CVehicle* pCarriage)
 {
-    CVehicleSAInterface* pCarriageInterface = pCarriage->GetVehicleInterface();
-    if (pCarriageInterface->trainFlags.bDirection)
+    auto pCarriageInterface = static_cast<CTrainSAInterface*>(pCarriage->GetVehicleInterface());
+    if (pCarriageInterface->trainFlags.bClockwiseDirection)
     {
         CBoundingBox* pBoundingBox = pGame->GetModelInfo(pCarriage->GetModelIndex())->GetBoundingBox();
         return -(pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY);
@@ -533,11 +533,10 @@ void CVehicleSA::AttachTrainCarriage(CVehicle* pCarriage)
     SetNextTrainCarriage(pCarriage);
 
     // Mark the carriage as non chain engine
-    CVehicleSAInterface* pCarriageInterface = pCarriage->GetVehicleInterface();
+    auto pCarriageInterface = static_cast<CTrainSAInterface*>(pCarriage->GetVehicleInterface());
     pCarriageInterface->trainFlags.bIsTheChainEngine = false;
-    // pNextInterface->trainFlags.bIsDrivenByBrownSteak = true;
 
-    if (pCarriageInterface->trainFlags.bDirection)
+    if (pCarriageInterface->trainFlags.bClockwiseDirection)
     {
         CBoundingBox* pBoundingBox = pGame->GetModelInfo(pCarriage->GetModelIndex())->GetBoundingBox();
         pCarriageInterface->m_fDistanceToNextCarriage = -(pBoundingBox->vecBoundMax.fY - pBoundingBox->vecBoundMin.fY);
@@ -562,17 +561,19 @@ void CVehicleSA::DetachTrainCarriage(CVehicle* pCarriage)
 
 bool CVehicleSA::IsChainEngine()
 {
-    return GetVehicleInterface()->trainFlags.bIsTheChainEngine;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    return pInterface->trainFlags.bIsTheChainEngine;
 }
 
 void CVehicleSA::SetIsChainEngine(bool bChainEngine)
 {
-    GetVehicleInterface()->trainFlags.bIsTheChainEngine = bChainEngine;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    pInterface->trainFlags.bIsTheChainEngine = bChainEngine;
 }
 
 bool CVehicleSA::IsDerailed()
 {
-    CVehicleSAInterface* pInterface = GetVehicleInterface();
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     return pInterface->trainFlags.bIsDerailed;
 }
 
@@ -581,19 +582,27 @@ void CVehicleSA::SetDerailed(bool bDerailed)
     WORD wModelID = GetModelIndex();
     if (wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449)
     {
-        CVehicleSAInterface* pInterface = GetVehicleInterface();
-        DWORD                dwThis = (DWORD)pInterface;
+        auto  pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+        DWORD dwThis = (DWORD)pInterface;
         if (bDerailed != pInterface->trainFlags.bIsDerailed)
         {
             if (bDerailed)
             {
                 pInterface->trainFlags.bIsDerailed = true;
+                // update the physical flags
                 MemAndFast<DWORD>(dwThis + 64, (DWORD)0xFFFDFFFB);
+                // what this does:
+                // physicalFlags.bDisableCollisionForce = false (3rd flag)
+                // physicalFlags.bDisableSimpleCollision = false (18th flag)
             }
             else
             {
                 pInterface->trainFlags.bIsDerailed = false;
+                // update the physical flags
                 MemOrFast<DWORD>(dwThis + 64, (DWORD)0x20004);
+                // what this does:
+                // physicalFlags.bDisableCollisionForce = true (3rd flag)
+                // physicalFlags.bDisableSimpleCollision = true (18th flag)
 
                 // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
                 DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
@@ -604,7 +613,7 @@ void CVehicleSA::SetDerailed(bool bDerailed)
                 }
 
                 // Reset the speed
-                GetVehicleInterface()->m_fTrainSpeed = 0.0f;
+                static_cast<CTrainSAInterface*>(GetVehicleInterface())->m_fTrainSpeed = 0.0f;
             }
         }
     }
@@ -612,34 +621,32 @@ void CVehicleSA::SetDerailed(bool bDerailed)
 
 float CVehicleSA::GetTrainSpeed()
 {
-    return GetVehicleInterface()->m_fTrainSpeed;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    return pInterface->m_fTrainSpeed;
 }
 
 void CVehicleSA::SetTrainSpeed(float fSpeed)
 {
-    GetVehicleInterface()->m_fTrainSpeed = fSpeed;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    pInterface->m_fTrainSpeed = fSpeed;
 }
 
 bool CVehicleSA::GetTrainDirection()
 {
-    return (*((BYTE*)GetInterface() + 1464) & 0x40) != 0;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetInterface());
+    return pInterface->trainFlags.bClockwiseDirection;
 }
 
 void CVehicleSA::SetTrainDirection(bool bDirection)
 {
-    if (bDirection)
-    {
-        MemOrFast<BYTE>((BYTE*)GetInterface() + 1464, 0x40);
-    }
-    else
-    {
-        MemAndFast<BYTE>((BYTE*)GetInterface() + 1464, ~0x40);
-    }
+    auto pInterface = static_cast<CTrainSAInterface*>(GetInterface());
+    pInterface->trainFlags.bClockwiseDirection = bDirection;
 }
 
 BYTE CVehicleSA::GetRailTrack()
 {
-    return GetVehicleInterface()->m_ucRailTrackID;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    return pInterface->m_ucRailTrackID;
 }
 
 void CVehicleSA::SetRailTrack(BYTE ucTrackID)
@@ -647,7 +654,7 @@ void CVehicleSA::SetRailTrack(BYTE ucTrackID)
     if (ucTrackID >= NUM_RAILTRACKS)
         return;
 
-    CVehicleSAInterface* pInterf = GetVehicleInterface();
+    auto pInterf = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     if (pInterf->m_ucRailTrackID != ucTrackID)
     {
         pInterf->m_ucRailTrackID = ucTrackID;
@@ -665,12 +672,13 @@ void CVehicleSA::SetRailTrack(BYTE ucTrackID)
 
 float CVehicleSA::GetTrainPosition()
 {
-    return GetVehicleInterface()->m_fTrainRailDistance;
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+    return pInterface->m_fTrainRailDistance;
 }
 
 void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
 {
-    CVehicleSAInterface* pInterface = GetVehicleInterface();
+    auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     // if ( pInterface->m_fTrainRailDistance <= fPosition - 0.1 || pInterface->m_fTrainRailDistance >= fPosition + 0.1 )
     {
         pInterface->m_fTrainRailDistance = fPosition;
@@ -1528,7 +1536,7 @@ FLOAT CVehicleSA::GetHealth()
 //-----------------------------------------------------------
 void CVehicleSA::SetHealth(FLOAT fHealth)
 {
-    CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     vehicle->m_nHealth = fHealth;
     if (fHealth >= 250.0f)
         vehicle->m_fBurningTime = 0.0f;
@@ -1987,13 +1995,12 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
-    CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
-
+    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     switch (vehicle->m_type)
     {
         case 0:
             if (eWheelPosition < 4)
-                return vehicle->wheelCollisionState[eWheelPosition] == 4.f;
+                return vehicle->m_wheelCollisionState[eWheelPosition] == 4.f;
             break;
 
         case 9:
@@ -2101,21 +2108,21 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 
 void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
 {
-    CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
+    auto     vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     RwFrame*             pFrame = NULL;
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->pWheelFrontLeft;
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LF];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->pWheelRearLeft;
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LB];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->pWheelFrontRight;
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RF];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->pWheelRearRight;
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RB];
             break;
         default:
             break;
@@ -2140,16 +2147,17 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
 
 CVector CVehicleSA::GetWheelPosition(eWheelPosition wheel)
 {
+    auto pInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            return GetVehicleInterface()->WheelFrontLeftColPoint.Position;
+            return pInterface->m_wheelColPoint[FRONT_LEFT_WHEEL].Position;
         case FRONT_RIGHT_WHEEL:
-            return GetVehicleInterface()->WheelFrontRightColPoint.Position;
+            return pInterface->m_wheelColPoint[FRONT_RIGHT_WHEEL].Position;
         case REAR_LEFT_WHEEL:
-            return GetVehicleInterface()->WheelRearLeftColPoint.Position;
+            return pInterface->m_wheelColPoint[REAR_LEFT_WHEEL].Position;
         case REAR_RIGHT_WHEEL:
-            return GetVehicleInterface()->WheelRearRightColPoint.Position;
+            return pInterface->m_wheelColPoint[REAR_RIGHT_WHEEL].Position;
     }
     return CVector();
 }
@@ -2329,11 +2337,11 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
         if (vecDelta.LengthSquared() > 10 * 10)
         {
             // Reposition colpoints for big moves to avoid random spinning
-            CVehicleSAInterface* pInterface = GetVehicleInterface();
-            pInterface->WheelFrontLeftColPoint.Position += vecDelta;
-            pInterface->WheelRearLeftColPoint.Position += vecDelta;
-            pInterface->WheelFrontRightColPoint.Position += vecDelta;
-            pInterface->WheelRearRightColPoint.Position += vecDelta;
+            auto pInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+            pInterface->m_wheelColPoint[FRONT_LEFT_WHEEL].Position += vecDelta;
+            pInterface->m_wheelColPoint[REAR_LEFT_WHEEL].Position += vecDelta;
+            pInterface->m_wheelColPoint[FRONT_RIGHT_WHEEL].Position += vecDelta;
+            pInterface->m_wheelColPoint[REAR_RIGHT_WHEEL].Position += vecDelta;
         }
     }
 }
