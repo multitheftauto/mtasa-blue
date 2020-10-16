@@ -1,20 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        MTA10_Server/mods/deathmatch/logic/CTrainTrack.cpp
-*  PURPOSE:     Train Node class
-*  DEVELOPERS:  Cazomino05 <Cazomino05@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 
 CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
     : CElement(pParent), m_pManager(pManager)
 {
-    m_iType = CElement::TRAINTRACK;
+    m_iType = CElement::TRAIN_TRACK;
     SetTypeName("train-track");
 
     m_LinkLastNodes = linkLastNodes;

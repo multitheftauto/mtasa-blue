@@ -138,6 +138,8 @@ struct SSirenInfo
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
 };
 
+class CTrainTrack;
+
 class CVehicle : public CElement
 {
     friend class CPlayer;

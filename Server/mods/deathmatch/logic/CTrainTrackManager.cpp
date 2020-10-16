@@ -1,20 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CTrainTrackManager.cpp
-*  PURPOSE:     Train Node Manager class
-*  DEVELOPERS:  Cazomino05 <Cazomino05@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 #include "CTrainTrack.h"
 #include <TrackNodes.h>
 #include <algorithm>
 
-CTrainTrackManager::CTrainTrackManager ( )
+CTrainTrackManager::CTrainTrackManager()
 {
     Reset();
 }

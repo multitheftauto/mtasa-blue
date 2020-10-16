@@ -61,32 +61,36 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
             pSourcePlayer->SetPosition(position.data.vecPosition);
 
+            // If the remote vehicle is a train, we want to read special train-specific data
             if (remoteVehicleType == VEHICLE_TRAIN)
             {
-                // Train specific data
-                float fPosition;
-                bool  bDirection;
-                float fSpeed;
+                float        fPosition;
+                bool         bDirection;
+                CTrainTrack* pTrainTrack;
+                float        fSpeed;
+
                 BitStream.Read(fPosition);
                 BitStream.ReadBit(bDirection);
-                BitStream.Read(fSpeed);
 
-                CTrainTrack* pTrainTrack = nullptr;
+                // TODO(qaisjp, feature/custom-train-tracks): this extra bit is not backwards compatible
                 if (BitStream.ReadBit())
                 {
-                    uint trackIndex;
+                    // TODO(qaisjp, feature/custom-train-tracks): here we use a uchar, in the CTT branch this was originally a uint. Just don't forget that, it might be important
+                    uchar trackIndex;
                     BitStream.Read(trackIndex);
-
                     pTrainTrack = g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackIndex);
                 }
                 else
                 {
                     ElementID trainTrackID;
                     BitStream.Read(trainTrackID);
-
                     pTrainTrack = GetElementFromId<CTrainTrack>(trainTrackID);
                 }
 
+                // In 1.6 we can move this under bDirection for neatness. We can't do it right now because of backwards compat.
+                BitStream.Read(fSpeed);
+
+                // But we should only actually apply that train-specific data if that vehicle is train on our side
                 if (vehicleType == VEHICLE_TRAIN)
                 {
                     pVehicle->SetTrainPosition(fPosition);
@@ -497,34 +501,41 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                 position.data.vecPosition = pVehicle->GetPosition();
                 BitStream.Write(&position);
 
+                // If the remote vehicle is a train, we want to read special train-specific data
                 if (pVehicle->GetVehicleType() == VEHICLE_TRAIN)
                 {
                     // Train specific data
                     float fPosition = pVehicle->GetTrainPosition();
-                    auto  pTrainTrack = pVehicle->GetTrainTrack();
                     bool  bDirection = pVehicle->GetTrainDirection();
                     float fSpeed = pVehicle->GetTrainSpeed();
 
                     BitStream.Write(fPosition);
                     BitStream.WriteBit(bDirection);
-                    BitStream.Write(fSpeed);
 
-                    if (pTrainTrack && pTrainTrack->IsDefault())
+                    // Push the train track information
+                    const auto trainTrack = pVehicle->GetTrainTrack();
+                    if (!trainTrack || pVehicle->IsDerailed())
+                    {
+                        // NOTE(qaisjp, feature/custom-train-tracks): when can a train both be on a track AND derailed?
+                        // I suppose it's possible for some weirdness here. We should make sure that whenever we set the train track,
+                        // we set that the train is NOT derailed; and that whenever we derail the track, we set the train track to nil.
+                        // Note: here we use a uchar, in the CTT branch this is a uint. Just don't forget that, it might be important
+                        BitStream.WriteBit(true);
+                        BitStream.Write((uchar)0);
+                    }
+                    else if (trainTrack && trainTrack->IsDefault())
                     {
                         BitStream.WriteBit(true);            // is default track
-                        BitStream.Write(pTrainTrack->GetDefaultTrackId());
-                    }
-                    else if (!pTrainTrack || pVehicle->IsDerailed())
-                    {
-                        // place derailed tracks on track 0
-                        BitStream.WriteBit(true);
-                        BitStream.Write((uint)0);
+                        BitStream.Write(trainTrack->GetDefaultTrackId());
                     }
                     else
                     {
                         BitStream.WriteBit(false);            // isn't default track
                         BitStream.Write(pTrainTrack->GetID());
                     }
+
+                    // In 1.6 we can move this under bDirection for neatness. We can't do it right now because of backwards compat.
+                    BitStream.Write(fSpeed);
                 }
 
                 // Vehicle rotation

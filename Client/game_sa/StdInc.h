@@ -118,3 +118,4 @@
 #include "CBuoyancySA.h"
 #include "CTrainTrackManagerSA.h"
 #include "CEventGroupSA.h"
+#include "CTrainSA.h"

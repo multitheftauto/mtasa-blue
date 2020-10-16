@@ -102,7 +102,7 @@ class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
 class CWaterManager;
-
+class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 
@@ -255,6 +255,8 @@ public:
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     CTrainTrackManager*              GetTrainTrackManager() { return m_pTrainTrackManager; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+
+    std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);
@@ -557,6 +559,8 @@ private:
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;
+
+    std::shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
     CCustomWeaponManager* m_pCustomWeaponManager;
     CFunctionUseLogger*   m_pFunctionUseLogger;
