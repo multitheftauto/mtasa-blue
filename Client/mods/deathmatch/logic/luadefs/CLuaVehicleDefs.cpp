@@ -2330,7 +2330,6 @@ bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
         return false;
     else if (pVehicle->IsDerailed())
     {
-        // TODO(qaisjp, feature/custom-train-tracks): we should probably set the train.derailed = false instead
         return false;
     }
 
