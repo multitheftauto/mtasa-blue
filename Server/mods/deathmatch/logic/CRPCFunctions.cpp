@@ -169,6 +169,11 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
             Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(uiSlot));
 
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
+
+            CBitStream BitStream;
+            BitStream.pBitStream->Write((unsigned int)ucPrevSlot);
+            BitStream.pBitStream->Write(uiSlot);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(m_pSourcePlayer, REMOTE_PLAYER_WEAPON_SWITCH, *BitStream.pBitStream), m_pSourcePlayer);
         }
 
         m_pSourcePlayer->SetWeaponSlot(uiSlot);
