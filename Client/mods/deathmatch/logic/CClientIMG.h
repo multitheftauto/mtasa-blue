@@ -44,7 +44,7 @@ public:
     eClientEntityType GetType() const { return CCLIENTIMG; };
     unsigned char     GetArchiveID() { return m_ucArchiveID; };
     bool              Load(SString sFilePath);
-    bool              Unload();
+    void              Unload();
     tImgFileInfo*     GetFileInfo(unsigned int usFileID);
     unsigned int      GetFileID(SString sFileName);
 

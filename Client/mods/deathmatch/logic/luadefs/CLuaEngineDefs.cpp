@@ -51,7 +51,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
-        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineAddImage", EngineAddImage},
+        {"engineRemoveImage", EngineRemoveImage},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -122,6 +124,8 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "engineLoadIMG");
+    lua_classfunction(luaVM, "add", "engineAddImage");
+    lua_classfunction(luaVM, "remove", "engineRemoveImage");
 }
 
 
@@ -567,6 +571,44 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineAddImage(lua_State* luaVM)
+{
+    CClientIMG*    pIMG;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pIMG);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pIMG->StreamEnable());
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRemoveImage(lua_State* luaVM)
+{
+    CClientIMG* pIMG;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pIMG);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pIMG->StreamDisable());
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

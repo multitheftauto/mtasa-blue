@@ -93,7 +93,7 @@ bool CClientIMG::Load(SString sFilePath)
     return true;
 }
 
-bool CClientIMG::Unload()
+void CClientIMG::Unload()
 {
     m_pContentInfo.clear();
     m_uiFilesCount = 0;
