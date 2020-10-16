@@ -80,6 +80,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
+    lua_classfunction(luaVM, "restoreModelImage", "engineRestoreModelImage");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -131,6 +132,8 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classfunction(luaVM, "add", "engineAddImage");
     lua_classfunction(luaVM, "remove", "engineRemoveImage");
     lua_classfunction(luaVM, "getFile", "engineImageGetFile");
+    lua_classfunction(luaVM, "getFileList", "engineImageGetFileList");
+    lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
     lua_classfunction(luaVM, "linkModel", "engineImageLinkModel");
 
     lua_classvariable(luaVM, "filesCount", nullptr, EngineImageGetFilesCount);
