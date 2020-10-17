@@ -114,7 +114,7 @@ public:
     LUA_DECLARE(ResetMoonSize);
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
-    
+
     LUA_DECLARE(CreateExplosion);
 
     static bool ResetColorFilter(lua_State* const luaVM);
