@@ -13,8 +13,8 @@
 #include "Fileapi.h"
 
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
-HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
-CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])ARRAY_StreamHandlersInfo;
+HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
+CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
 
 namespace
 {
@@ -143,11 +143,22 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
 void CStreamingSA::SetStreamingInfoForModelId(uint id, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfoFromModelId(id);
+
+    // Change nextInImg filed for prev model
+    for ( unsigned int i = 0; i < 26316; i++)
+    {
+        if (ms_aInfoForModel[i].archiveId == pItemInfo->archiveId &&
+            (ms_aInfoForModel[i].offsetInBlocks + ms_aInfoForModel[i].sizeInBlocks) == pItemInfo->offsetInBlocks)
+        {
+            ms_aInfoForModel[i].nextInImg = -1;
+            break;
+        }
+    }
+
     pItemInfo->archiveId = usStreamID;
     pItemInfo->offsetInBlocks = uiOffset;
     pItemInfo->sizeInBlocks = usSize;
     pItemInfo->nextInImg = uiNextInImg;
-    // TODO CHANGE THIS INFO FOR PREV MODEL
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint id)
@@ -202,20 +213,18 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
     m_aStreamingHandlers[ucStreamID] = hFile;
 
     // Register archive data
-    GetArchiveInfo(ucArchiveId)->uiStreamHandleId = (ucStreamID << 24);
+    ms_aAchiveInfo[ucArchiveId].uiStreamHandleId = (ucStreamID << 24);
 
     return ucArchiveId;
 }
 
 void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
 {
-    CArchiveInfo* pArchiveInfo = GetArchiveInfo(ucArhiveID);
-
-    unsigned int  uiStreamHandlerID = pArchiveInfo->uiStreamHandleId;
+    unsigned int uiStreamHandlerID = ms_aAchiveInfo[ucArhiveID].uiStreamHandleId;
     if (!uiStreamHandlerID)
         return;
 
-    pArchiveInfo->uiStreamHandleId = 0;
+    ms_aAchiveInfo[ucArhiveID].uiStreamHandleId = 0;
 
     CloseHandle(m_aStreamingHandlers[uiStreamHandlerID]);
     m_aStreamingHandlers[uiStreamHandlerID] = NULL;

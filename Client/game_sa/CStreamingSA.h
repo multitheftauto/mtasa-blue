@@ -16,7 +16,6 @@
 
 // Shoud be changed to interfaces
 #define ARRAY_StreamHandlersNames                    0x8E4098 // [32][64]
-#define ARRAY_StreamHandlersInfo                     0x8E48D8 // [8][0x30]
 
 #define ARRAY_StreamModelInfo                        0x8E4CC0 // size = 26316
 
