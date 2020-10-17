@@ -26,18 +26,15 @@ public:
     static void AddClass(lua_State* luaVM);
 
     static TrainTrack GetDefaultTrack(uchar trackID);
+    static int        GetTrackNodeCount(TrainTrack track);
+
+    static std::tuple<float, float, float> CLuaTrainTrackDefs::GetTrackNodePosition(TrainTrack track, uint nodeIndex);
 
 #ifdef MTA_CLIENT
-    LUA_DECLARE(GetTrackNodeCount);
-    LUA_DECLARE(GetTrackNodePosition);
     LUA_DECLARE(GetTrackLength);
 #else
     LUA_DECLARE(CreateTrack);
-
-    LUA_DECLARE(GetTrackNodePosition);
     LUA_DECLARE(SetTrackNodePosition);
-
-    LUA_DECLARE(GetTrackNodeCount);
 #endif
 
 private:

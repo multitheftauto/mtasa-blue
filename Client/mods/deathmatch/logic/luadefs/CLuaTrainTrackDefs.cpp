@@ -10,52 +10,6 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-int CLuaTrainTrackDefs::GetTrackNodeCount(lua_State* luaVM)
-{
-    CClientTrainTrack* pTrack;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTrack);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushinteger(luaVM, pTrack->GetNumberOfNodes());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaTrainTrackDefs::GetTrackNodePosition(lua_State* luaVM)
-{
-    CClientTrainTrack* pTrainTrack;
-    uint nodeIndex;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTrainTrack);
-    argStream.ReadNumber(nodeIndex);
-
-    if (!argStream.HasErrors())
-    {
-        CVector position;
-        if (pTrainTrack->GetNodePosition(nodeIndex, position))
-        {
-            lua_pushnumber(luaVM, position.fX);
-            lua_pushnumber(luaVM, position.fY);
-            lua_pushnumber(luaVM, position.fZ);
-            return 3;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaTrainTrackDefs::GetTrackLength(lua_State* luaVM)
 {
     CClientTrainTrack* pTrainTrack;

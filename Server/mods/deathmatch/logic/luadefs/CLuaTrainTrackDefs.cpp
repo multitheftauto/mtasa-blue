@@ -50,33 +50,6 @@ int CLuaTrainTrackDefs::CreateTrack(lua_State* luaVM)
     return 1;
 }
 
-int CLuaTrainTrackDefs::GetTrackNodePosition(lua_State* luaVM)
-{
-    CTrainTrack* pTrack;
-    uint nodeIndex;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTrack);
-    argStream.ReadNumber(nodeIndex);
-
-    if (!argStream.HasErrors())
-    {
-        CVector position;
-        if (pTrack->GetTrackNodePosition(nodeIndex, position))
-        {
-            lua_pushnumber(luaVM, position.fX);
-            lua_pushnumber(luaVM, position.fY);
-            lua_pushnumber(luaVM, position.fZ);
-            return 3;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaTrainTrackDefs::SetTrackNodePosition(lua_State* luaVM)
 {
     CTrainTrack* pTrack;
@@ -90,26 +63,7 @@ int CLuaTrainTrackDefs::SetTrackNodePosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushboolean(luaVM, pTrack->SetTrackNodePosition(nodeIndex, position));
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaTrainTrackDefs::GetTrackNodeCount(lua_State* luaVM)
-{
-    CTrainTrack* pTrack;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTrack);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushinteger(luaVM, pTrack->GetNumberOfNodes());
+        lua_pushboolean(luaVM, pTrack->SetNodePosition(nodeIndex, position));
         return 1;
     }
     else

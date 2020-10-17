@@ -26,17 +26,14 @@ void CLuaTrainTrackDefs::LoadFunctions()
 {
     CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
 
+    CLuaCFunctions::AddFunction("getTrackNodeCount", ArgumentParser<GetTrackNodeCount>);
+    CLuaCFunctions::AddFunction("getTrackNodePosition", ArgumentParser<GetTrackNodePosition>);
+
 #ifdef MTA_CLIENT
-    CLuaCFunctions::AddFunction("getTrackNodeCount", GetTrackNodeCount);
-    CLuaCFunctions::AddFunction("getTrackNodePosition", GetTrackNodePosition);
     CLuaCFunctions::AddFunction("getTrackLength", GetTrackLength);
 #else
     CLuaCFunctions::AddFunction("createTrack", CreateTrack);
-
-    CLuaCFunctions::AddFunction("getTrackNodePosition", GetTrackNodePosition);
     CLuaCFunctions::AddFunction("setTrackNodePosition", SetTrackNodePosition);
-
-    CLuaCFunctions::AddFunction("getTrackNodeCount", GetTrackNodeCount);
 #endif
 }
 
@@ -75,4 +72,16 @@ TrainTrack CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID)
         throw std::invalid_argument("Bad default track ID (0-3)");
 
     return GetManager()->GetTrainTrackByIndex(trackID);
+}
+
+int CLuaTrainTrackDefs::GetTrackNodeCount(TrainTrack track)
+{
+    return track->GetNumberOfNodes();
+}
+
+std::tuple<float, float, float> CLuaTrainTrackDefs::GetTrackNodePosition(TrainTrack track, uint nodeIndex)
+{
+    CVector position;
+    track->GetNodePosition(nodeIndex, position);
+    return {position.fX, position.fY, position.fZ};
 }
