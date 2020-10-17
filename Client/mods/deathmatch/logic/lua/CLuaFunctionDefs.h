@@ -85,6 +85,7 @@ public:
     // World functions
     LUA_DECLARE(GetTime_);
     LUA_DECLARE(GetGroundPosition);
+    LUA_DECLARE(GetRoofPosition);
     LUA_DECLARE(ProcessLineOfSight);
     LUA_DECLARE(IsLineOfSightClear);
     LUA_DECLARE(GetWorldFromScreenPosition);
