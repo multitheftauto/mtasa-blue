@@ -34,8 +34,8 @@ public:
     // TODO: Add move constructor
     virtual ~CTrainTrack();
 
-    bool SetTrackNodePosition(uint nodeIndex, const CVector& position);
-    bool GetTrackNodePosition(uint nodeIndex, CVector& position);
+    bool SetNodePosition(uint nodeIndex, const CVector& position);
+    bool GetNodePosition(uint nodeIndex, CVector& position);
 
     inline const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
     inline std::size_t                    GetNumberOfNodes() const { return m_Nodes.size(); }

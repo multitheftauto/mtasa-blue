@@ -37,7 +37,7 @@ CTrainTrack::~CTrainTrack()
     m_pManager->DestroyTrainTrack(this);
 }
 
-bool CTrainTrack::SetTrackNodePosition(uint nodeIndex, const CVector& position)
+bool CTrainTrack::SetNodePosition(uint nodeIndex, const CVector& position)
 {
     if (nodeIndex >= m_Nodes.size())
         return false;
@@ -47,7 +47,7 @@ bool CTrainTrack::SetTrackNodePosition(uint nodeIndex, const CVector& position)
     return true;
 }
 
-bool CTrainTrack::GetTrackNodePosition(uint nodeIndex, CVector& position)
+bool CTrainTrack::GetNodePosition(uint nodeIndex, CVector& position)
 {
     if (nodeIndex >= m_Nodes.size())
         return false;
