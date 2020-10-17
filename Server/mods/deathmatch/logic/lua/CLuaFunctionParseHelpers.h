@@ -9,6 +9,7 @@
  *****************************************************************************/
 #pragma once
 #include "CElementIDs.h"
+#include "CConsoleClient.h"
 
 // Forward declare enum reflection stuff
 enum eLuaType
@@ -26,6 +27,7 @@ DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
+DECLARE_ENUM_CLASS(ESyncType);
 
 enum eHudComponent
 {
@@ -118,6 +120,10 @@ inline SString GetClassTypeName(CElement*)
 {
     return "element";
 }
+inline SString GetClassTypeName(CClient*)
+{
+    return "client";
+}
 inline SString GetClassTypeName(CPlayer*)
 {
     return "player";
@@ -154,8 +160,11 @@ inline SString GetClassTypeName(CPed*)
 {
     return "ped";
 }
-inline SString GetClassTypeName(CColShape*)
+inline SString GetClassTypeName(CRemoteCall*)
 {
+    return "remotecall";
+}
+inline SString GetClassTypeName(CColShape*) {
     return "colshape";
 }
 inline SString GetClassTypeName(CDummy*)
@@ -405,6 +414,20 @@ CPed* UserDataCast(CPed*, void* ptr, lua_State*)
 }
 
 //
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+
+    if (pRemoteCall && g_pGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+    
+    return nullptr;
+}
+
+//
 // CPlayer from userdata
 //
 // Disallows conversion of CPeds to CPlayers
@@ -417,6 +440,24 @@ CPlayer* UserDataCast(CPlayer*, void* ptr, lua_State*)
     if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PLAYER))
         return NULL;
     return (CPlayer*)pElement;
+}
+
+// CClient from CConsoleClient or a CPlayer
+template <class T>
+CClient* UserDataCast(CClient*, void* ptr, lua_State*)
+{
+    ElementID ID = TO_ELEMENTID(ptr);
+    CElement* pElement = CElementIDs::GetElement(ID);
+    if (!pElement || pElement->IsBeingDeleted())
+        return nullptr;
+
+    CClient* pClient = nullptr;
+    if (pElement->GetType() == CElement::PLAYER)
+        pClient = reinterpret_cast<CPlayer*>(pElement);
+    else if (pElement->GetType() == CElement::CONSOLE)
+        pClient = reinterpret_cast<CConsoleClient*>(pElement);
+
+    return pClient;
 }
 
 //
@@ -451,9 +492,22 @@ bool    StringToBool(const SString& strText);
 void    MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason);
 void    ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 bool    ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
-void    CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr);
-void    CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                        bool* pbReadOnly = nullptr);
+
+//
+// Resource access helpers
+//
+enum class eResourceModifyScope
+{
+    NONE,
+    SINGLE_RESOURCE,
+    EVERY_RESOURCE,
+};
+
+eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource* pOtherResource);
+void                 CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
+void                 CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
+void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
+                                     bool* pbReadOnly = nullptr);
 
 //
 // Other misc helpers

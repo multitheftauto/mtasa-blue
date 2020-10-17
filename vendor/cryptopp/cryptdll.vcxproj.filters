@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -42,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="darn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="des.cpp">
@@ -89,7 +92,13 @@
     <ClCompile Include="gcm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gcm_simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="gf2n.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gf2n_simd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gfpcrypt.cpp">
@@ -152,6 +161,9 @@
     <ClCompile Include="rijndael.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rijndael_simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="rng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -164,10 +176,16 @@
     <ClCompile Include="sha.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sha_simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="simple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="skipjack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sse_simd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="strciphr.cpp">
@@ -220,6 +238,9 @@
     <ClInclude Include="cryptlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="darn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="des.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -239,6 +260,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ecp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ecpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="emsa2.h">
@@ -269,9 +293,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hkdf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hmac.h">

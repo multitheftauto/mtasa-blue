@@ -147,7 +147,7 @@ CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats(eWeaponType type, eWea
     }
     return NULL;
 }
-void CWeaponStatManagerSA::Init(void)
+void CWeaponStatManagerSA::Init()
 {
     // Load SA Defaults
     // Script to Dump:

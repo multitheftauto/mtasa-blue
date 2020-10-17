@@ -9,19 +9,16 @@
  *
  *****************************************************************************/
 
-#ifndef __CPickupRPCs_H
-#define __CPickupRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CPickupRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllPickups);
     DECLARE_ELEMENT_RPC(SetPickupType);
     DECLARE_ELEMENT_RPC(SetPickupVisible);
 };
-
-#endif

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientPad_H
-#define __CClientPad_H
+#pragma once
 
 #define MAX_GTA_CONTROLS 44
 #define MAX_GTA_ANALOG_CONTROLS 14
@@ -25,7 +24,7 @@ public:
 
     static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
 
-    CClientPad(void);
+    CClientPad();
 
     bool GetControlState(const char* szName, bool& bState);
     bool SetControlState(const char* szName, bool bState);
@@ -35,7 +34,7 @@ public:
 
     void DoPulse(CClientPed* pPed);
 
-    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState);
+    static bool GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides);
     static bool SetAnalogControlState(const char* szName, float fState);
     static void RemoveSetAnalogControlState(const char* szName);
 
@@ -54,5 +53,3 @@ public:
 protected:
     SFixedArray<float, MAX_GTA_CONTROLS> m_fStates;
 };
-
-#endif

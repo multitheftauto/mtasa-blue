@@ -22,11 +22,11 @@ CResourceScriptItem::CResourceScriptItem(CResource* resource, const char* szShor
     m_type = RESOURCE_FILE_TYPE_SCRIPT;
 }
 
-CResourceScriptItem::~CResourceScriptItem(void)
+CResourceScriptItem::~CResourceScriptItem()
 {
 }
 
-bool CResourceScriptItem::Start(void)
+bool CResourceScriptItem::Start()
 {
     m_pVM = m_resource->GetVirtualMachine();
 
@@ -43,7 +43,7 @@ bool CResourceScriptItem::Start(void)
     return true;
 }
 
-bool CResourceScriptItem::Stop(void)
+bool CResourceScriptItem::Stop()
 {
     return true;
 }

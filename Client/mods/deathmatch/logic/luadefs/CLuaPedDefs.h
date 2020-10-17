@@ -14,7 +14,7 @@
 class CLuaPedDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(CreatePed);
@@ -24,10 +24,9 @@ public:
     LUA_DECLARE(GetPedVoice);
     LUA_DECLARE(SetPedVoice);
     LUA_DECLARE(GetPedTarget);
-    LUA_DECLARE(GetPedTargetStart);
-    LUA_DECLARE(GetPedTargetEnd);
-    LUA_DECLARE(GetPedTargetRange);
-    LUA_DECLARE(GetPedTargetCollision);
+    LUA_DECLARE_OOP(GetPedTargetStart);
+    LUA_DECLARE_OOP(GetPedTargetEnd);
+    LUA_DECLARE_OOP(GetPedTargetCollision);
     LUA_DECLARE(GetPedWeaponSlot);
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedAmmoInClip);
@@ -54,6 +53,7 @@ public:
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
+    LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
@@ -69,7 +69,9 @@ public:
     LUA_DECLARE(SetPedCanBeKnockedOffBike);
     LUA_DECLARE(SetPedAnimation);
     LUA_DECLARE(SetPedAnimationProgress);
+    LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
+    static bool SetPedArmor(CClientPed* const ped, const float armor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
     LUA_DECLARE(IsPedReloadingWeapon);
@@ -77,8 +79,8 @@ public:
     LUA_DECLARE(RemovePedClothes);
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
-    LUA_DECLARE(SetPedSunbathing);
     LUA_DECLARE(SetPedDoingGangDriveby);
+    static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);

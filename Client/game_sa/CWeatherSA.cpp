@@ -18,7 +18,7 @@ float*         CWeatherSA::VAR_AmountOfRain;
 
 unsigned long CWeatherSA::FUNC_IsRaining;
 
-unsigned char CWeatherSA::Get(void)
+unsigned char CWeatherSA::Get()
 {
     DEBUG_TRACE("unsigned char CWeatherSA::Get ( void )");
     return (unsigned char)*VAR_CurrentWeather;
@@ -59,13 +59,13 @@ void CWeatherSA::ForceWeatherNow(unsigned char weather)
     *VAR_CurrentWeather_c = ucWeather;
 }
 
-void CWeatherSA::Release(void)
+void CWeatherSA::Release()
 {
     DEBUG_TRACE("void CWeatherSA::Release ( void )");
     *VAR_CurrentWeather = 0xFF;
 }
 
-bool CWeatherSA::IsRaining(void)
+bool CWeatherSA::IsRaining()
 {
     DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
     DWORD dwFunc = FUNC_IsRaining;
@@ -78,7 +78,7 @@ bool CWeatherSA::IsRaining(void)
     return bReturn;
 }
 
-float CWeatherSA::GetAmountOfRain(void)
+float CWeatherSA::GetAmountOfRain()
 {
     return *VAR_AmountOfRain;
 }
@@ -102,7 +102,7 @@ void CWeatherSA::SetAmountOfRain(float fAmount)
     *VAR_AmountOfRain = fAmount;
 }
 
-void CWeatherSA::ResetAmountOfRain(void)
+void CWeatherSA::ResetAmountOfRain()
 {
     BYTE originalMov[5] = {0xA3, 0x24, 0x13, 0xC8, 0x00};                    // 0x72BC72
     BYTE originalFstp1[6] = {0xD9, 0x1D, 0x24, 0x13, 0xC8, 0x00};            // 0x72BC92

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRopesSA_H
-#define __CRopesSA_H
+#pragma once
 
 #include <game/CRopes.h>
 
@@ -46,5 +45,3 @@ class CRopesSA : public CRopes
 public:
     int CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000);
 };
-
-#endif

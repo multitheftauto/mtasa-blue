@@ -26,11 +26,11 @@ class CDatabaseJobQueueImpl : public CDatabaseJobQueue
 {
 public:
     ZERO_ON_NEW
-    CDatabaseJobQueueImpl(void);
-    virtual ~CDatabaseJobQueueImpl(void);
+    CDatabaseJobQueueImpl();
+    virtual ~CDatabaseJobQueueImpl();
 
     // Main thread functions
-    virtual void        DoPulse(void);
+    virtual void        DoPulse();
     virtual CDbJobData* AddCommand(EJobCommandType jobType, SConnectionHandle connectionHandle, const SString& strData);
     virtual bool        PollCommand(CDbJobData* pJobData, uint uiTimeout);
     virtual bool        FreeCommand(CDbJobData* pJobData);
@@ -39,14 +39,14 @@ public:
     virtual bool        UsesConnection(SConnectionHandle connectionHandle);
 
 protected:
-    void        StopThread(void);
-    CDbJobData* GetNewJobData(void);
-    void        UpdateDebugData(void);
+    void        StopThread();
+    CDbJobData* GetNewJobData();
+    void        UpdateDebugData();
     void        IgnoreJobResults(CDbJobData* pJobData);
 
     // Other thread functions
     static void*         StaticThreadProc(void* pContext);
-    void*                ThreadProc(void);
+    void*                ThreadProc();
     void                 ProcessCommand(CDbJobData* pJobData);
     void                 ProcessConnect(CDbJobData* pJobData);
     void                 ProcessDisconnect(CDbJobData* pJobData);
@@ -88,7 +88,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueue* NewDatabaseJobQueue(void)
+CDatabaseJobQueue* NewDatabaseJobQueue()
 {
     return new CDatabaseJobQueueImpl();
 }
@@ -100,7 +100,7 @@ CDatabaseJobQueue* NewDatabaseJobQueue(void)
 // Init known database types and start the job service thread
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueueImpl::CDatabaseJobQueueImpl(void) : m_uiJobCountWarnThresh(200), m_uiConnectionCountWarnThresh(20)
+CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200), m_uiConnectionCountWarnThresh(20)
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite();
@@ -121,7 +121,7 @@ CDatabaseJobQueueImpl::CDatabaseJobQueueImpl(void) : m_uiJobCountWarnThresh(200)
 // Stop threads and delete everything
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl(void)
+CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl()
 {
     // Stop the job queue processing thread
     StopThread();
@@ -141,7 +141,7 @@ CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl(void)
 // Stop the job queue processing thread
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::StopThread(void)
+void CDatabaseJobQueueImpl::StopThread()
 {
     // Stop the job queue processing thread
     shared.m_Mutex.Lock();
@@ -168,7 +168,7 @@ void CDatabaseJobQueueImpl::StopThread(void)
 // Return a new job data object
 //
 ///////////////////////////////////////////////////////////////
-CDbJobData* CDatabaseJobQueueImpl::GetNewJobData(void)
+CDbJobData* CDatabaseJobQueueImpl::GetNewJobData()
 {
     g_pStats->iDbJobDataCount++;
     CDbJobData* pJobData = new CDbJobData();
@@ -215,7 +215,7 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand(EJobCommandType jobType, SConnecti
 // Check if any callback functions are due
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::DoPulse(void)
+void CDatabaseJobQueueImpl::DoPulse()
 {
     // Check if any connection needs a flush
     while (m_PendingFlushMap.size())
@@ -285,7 +285,7 @@ again:
 // Update info relevant to debugging database jobs
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseJobQueueImpl::UpdateDebugData(void)
+void CDatabaseJobQueueImpl::UpdateDebugData()
 {
     // Update once every 10 seconds
     if (m_JobCountElpasedTime.Get() < 10000)
@@ -543,7 +543,7 @@ void* CDatabaseJobQueueImpl::StaticThreadProc(void* pContext)
 // Job service loop
 //
 ///////////////////////////////////////////////////////////////
-void* CDatabaseJobQueueImpl::ThreadProc(void)
+void* CDatabaseJobQueueImpl::ThreadProc()
 {
     shared.m_Mutex.Lock();
     while (!shared.m_bTerminateThread)

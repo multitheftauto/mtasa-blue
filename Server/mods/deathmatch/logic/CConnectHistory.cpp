@@ -91,7 +91,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const string& strIP)
     return iter->second;
 }
 
-void CConnectHistory::RemoveExpired(void)
+void CConnectHistory::RemoveExpired()
 {
     long long llCurrentTime = GetModuleTickCount64();
 
@@ -141,7 +141,7 @@ void CConnectHistory::RemoveExpired(void)
     }
 }
 
-uint CConnectHistory::GetTotalFloodingCount(void)
+uint CConnectHistory::GetTotalFloodingCount()
 {
     // Delete the expired entries
     RemoveExpired();
@@ -150,7 +150,7 @@ uint CConnectHistory::GetTotalFloodingCount(void)
 }
 
 // Internal function for debugging
-long long CConnectHistory::GetModuleTickCount64(void)
+long long CConnectHistory::GetModuleTickCount64()
 {
     long long llValue = ::GetModuleTickCount64();
     llValue += m_llDebugTickCountOffset;

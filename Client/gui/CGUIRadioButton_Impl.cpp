@@ -48,7 +48,7 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     }
 }
 
-CGUIRadioButton_Impl::~CGUIRadioButton_Impl(void)
+CGUIRadioButton_Impl::~CGUIRadioButton_Impl()
 {
     DestroyElement();
 }
@@ -58,7 +58,7 @@ void CGUIRadioButton_Impl::SetSelected(bool bChecked)
     reinterpret_cast<CEGUI::RadioButton*>(m_pWindow)->setSelected(bChecked);
 }
 
-bool CGUIRadioButton_Impl::GetSelected(void)
+bool CGUIRadioButton_Impl::GetSelected()
 {
     return reinterpret_cast<CEGUI::RadioButton*>(m_pWindow)->isSelected();
 }

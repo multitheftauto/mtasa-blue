@@ -25,7 +25,7 @@ namespace SharedUtil
         m_pServiceThreadHandle = new CThreadHandle(CIntervalCounter::StaticThreadProc, this);
     }
 
-    CIntervalCounter::~CIntervalCounter(void)
+    CIntervalCounter::~CIntervalCounter()
     {
         // Stop and delete processing thread
         StopThread();
@@ -39,7 +39,7 @@ namespace SharedUtil
     // Stop the processing thread
     //
     ///////////////////////////////////////////////////////////////
-    void CIntervalCounter::StopThread(void)
+    void CIntervalCounter::StopThread()
     {
         // Stop the processing thread
         shared.m_Mutex.Lock();
@@ -80,7 +80,7 @@ namespace SharedUtil
     // Thread loop
     //
     ///////////////////////////////////////////////////////////////
-    void* CIntervalCounter::ThreadProc(void)
+    void* CIntervalCounter::ThreadProc()
     {
         shared.m_Mutex.Lock();
         while (!shared.m_bTerminateThread)

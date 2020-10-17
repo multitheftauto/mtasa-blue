@@ -6,633 +6,585 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2017-07-26 20:22+0000\n"
-"Last-Translator: Francisco <wolfpire1337@gmail.com>\n"
+"POT-Creation-Date: 2019-09-07 18:33+0100\n"
+"PO-Revision-Date: 2019-09-10 18:54+0000\n"
+"Last-Translator: WolfPire <wolfpire1337@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Francisco Arias; otoutou\n"
+"Translators: WolfPire; otoutou\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1501100558.0\n"
+"X-POOTLE-MTIME: 1568141681.0\n"
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
+#: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "ウェッブサイトリクエスト"
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:26
+#: ..\Client\cefweb\CWebsiteRequests.cpp:27
 msgid ""
 "The server requests the following websites in order to load them (later):"
 msgstr "後にロードするため、サーバーは次のウェッブサイトをリクエストしています："
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
+#: ..\Client\cefweb\CWebsiteRequests.cpp:32
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
 msgstr "盗まらないように、個人情報を絶対書かないでください"
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
+#: ..\Client\cefweb\CWebsiteRequests.cpp:44
 msgid "Remember decision"
-msgstr "決を保存"
+msgstr "決定を保存する"
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:48
-#: C:\mtasa-blue\Client\core\CSettings.cpp:903
+#: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:923
 msgid "Allow"
 msgstr "有効"
 
-#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:54
+#: ..\Client\cefweb\CWebsiteRequests.cpp:55
 msgid "Deny"
 msgstr "否定"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:36
+#: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ コマンド ヘルプ ]***\n"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:189
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:182
+#, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* 時間： %d:%02d:%02d"
+msgstr "* 時間は %d:%02d:%02d"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:279
-msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "接続構文：'connect <host> <port> [<nick> <pass>]'"
+#: ..\Client\core\CCommandFuncs.cpp:266
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "接続：'connect <ホスト> [<ポート> <ニック> <パスワード>]'"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:287
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:338
+#: ..\Client\core\CCommandFuncs.cpp:274 ..\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
 msgstr "接続: 無効なポート番号"
 
 # %s:%u
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:303
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:353
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:296 ..\Client\core\CCommandFuncs.cpp:357
+#, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "接続: %s:%u に接続している..."
+msgstr "接続: %s:%uに接続している..."
 
 # %s:%u
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:307
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:357
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
+#, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "接続: %s:%u と接続できませんでした！"
+msgstr "接続: %s:%u に接続できませんでした！"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:312
+#: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
-msgstr "接続：MODの消去することができませんでした"
+msgstr "接続：現在MODをアンロードすることができませんでした"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:391
+#: ..\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
-msgstr "全てのバインドは GTAから コピーされました。"
+msgstr "全てのバインドはGTAからコピーされました"
 
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:405
+#: ..\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
-msgstr "保存された設定ファイル"
+msgstr "保存した設定ファイル"
 
 #. Print it
-#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:468
-#, c-format
+#: ..\Client\core\CCommandFuncs.cpp:475
+#, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "＊あなたのシリアル番号は： %s"
 
 #. Unknown command
-#: C:\mtasa-blue\Client\core\CCommands.cpp:213
+#: ..\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
 msgstr "不明なコマンド:"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:84
+#: ..\Client\core\CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "接続に失敗しました。無効なニックネーム!"
+msgstr "接続に失敗しました。無効なニックネームが記入されました!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:85
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:116
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:132
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:271
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:321
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:412
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:419
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:429
-#: C:\mtasa-blue\Client\core\CCore.cpp:1287
-#: C:\mtasa-blue\Client\core\CCore.cpp:1300
-#: C:\mtasa-blue\Client\core\CGUI.cpp:85
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:149
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:158
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:163
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:172
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2812
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3888
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3917
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4315
-#: C:\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:126
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1224
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1246
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1303
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1353
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:532
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:239
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:252
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:255
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:813
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:639
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1021
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1101
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1111
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1180
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1254
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1266
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:138
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:194
-#: C:\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:374
-#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
+#: ..\Client\core\CConnectManager.cpp:80
+#: ..\Client\core\CConnectManager.cpp:111
+#: ..\Client\core\CConnectManager.cpp:127
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\core\CConnectManager.cpp:321
+#: ..\Client\core\CConnectManager.cpp:404
+#: ..\Client\core\CConnectManager.cpp:411
+#: ..\Client\core\CConnectManager.cpp:421 ..\Client\core\CCore.cpp:1185
+#: ..\Client\core\CCore.cpp:1198 ..\Client\core\CGUI.cpp:86
+#: ..\Client\core\CSettings.cpp:2859 ..\Client\core\CSettings.cpp:4009
+#: ..\Client\core\CSettings.cpp:4037 ..\Client\core\CSettings.cpp:4542
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:128
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1330
+#: ..\Client\loader\CInstallManager.cpp:505
+#: ..\Client\loader\CInstallManager.cpp:514
+#: ..\Client\loader\MainFunctions.cpp:239
+#: ..\Client\loader\MainFunctions.cpp:254
+#: ..\Client\loader\MainFunctions.cpp:256
+#: ..\Client\loader\MainFunctions.cpp:817
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:574
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1246
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
+#: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Error"
 msgstr "エラー"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:115
+#: ..\Client\core\CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
-msgstr "接続に失敗しました。無効なホストです!"
+msgstr "接続に失敗しました。無効なホストが記入されました!!"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:131
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:126
+#, c-format, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "%sの%uの接続に失敗しました！"
+msgstr "%sの%u の接続が失敗しました！"
 
 #. Display the status box
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:152
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:147
+#, c-format, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "%s:%uに接続中。。。"
+msgstr "%s:%u に接続中。。。"
 
 #. Display the status box
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:153
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:581
+#: ..\Client\core\CConnectManager.cpp:148
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:590
 msgid "CONNECTING"
 msgstr "接続中"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:271
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1180
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
 msgstr "接続がタイムアウトしました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:285
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:288
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
+#: ..\Client\core\CConnectManager.cpp:277
+#: ..\Client\core\CConnectManager.cpp:281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1208
 msgid "Disconnected: unknown protocol error"
 msgstr "切断：不明なプロトコルエラー"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:291
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1228
+#: ..\Client\core\CConnectManager.cpp:285
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1212
 msgid "Disconnected: disconnected remotely"
 msgstr "切断：リモートで切断しました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:294
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1231
+#: ..\Client\core\CConnectManager.cpp:289
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1216
 msgid "Disconnected: connection lost remotely"
 msgstr "切断： リモートで接続が失われました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:297
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1234
+#: ..\Client\core\CConnectManager.cpp:293
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1220
 msgid "Disconnected: you are banned from this server"
 msgstr "切断： あなたはこのサーバーから禁止されました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:303
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1240
+#: ..\Client\core\CConnectManager.cpp:300
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected from the server"
 msgstr "切断： サーバーから切断されました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:306
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1243
+#: ..\Client\core\CConnectManager.cpp:304
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: connection to the server was lost"
 msgstr "切断：サーバーとの接続が失われました"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:312
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1249
+#: ..\Client\core\CConnectManager.cpp:311
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1240
 msgid "Disconnected: connection was refused"
-msgstr "切断: 接続が拒否されました"
+msgstr "切断： 接続が拒否されました"
 
 #. Failed loading the mod
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:411
-#, c-format
+#: ..\Client\core\CConnectManager.cpp:403
+#, c-format, c-format
 msgid "No such mod installed (%s)"
-msgstr "(%s) MODはインストールしていません"
+msgstr "MODはインストールしていません (%s)"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:419
+#: ..\Client\core\CConnectManager.cpp:411
 msgid "Bad server response (2)"
-msgstr "不正なサーバーレスポンス (2)"
+msgstr "無効なサーバーレスポンス (2)"
 
-#: C:\mtasa-blue\Client\core\CConnectManager.cpp:429
+#: ..\Client\core\CConnectManager.cpp:421
 msgid "Bad server response (1)"
-msgstr "不正なサーバー返答でした (1)"
+msgstr "無効なサーバー返答でした (1)"
 
 #. Create window
-#: C:\mtasa-blue\Client\core\CConsole.cpp:445
+#: ..\Client\core\CConsole.cpp:417
 msgid "CONSOLE"
 msgstr "コンソール"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:709
-#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:202
-#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:641
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "この問題についてにオンラインで調べたいですか？"
-
-#: C:\mtasa-blue\Client\core\CCore.cpp:714
-#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1090
-#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:204
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1318
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1344
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4162
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4210
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1582
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1601
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1886
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1906
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:482
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:33
-msgid "No"
-msgstr "いいえ"
-
-#. /////////////////////////////////////////////////////////////////////////
-#. Dialog strings
-#. /////////////////////////////////////////////////////////////////////////
-#: C:\mtasa-blue\Client\core\CCore.cpp:715
-#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
-#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:205
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1319
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1345
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4163
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4211
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1583
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1602
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1887
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1907
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:482
-#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:68
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:32
-msgid "Yes"
-msgstr "はい"
-
-#: C:\mtasa-blue\Client\core\CCore.cpp:770
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:683
-#, c-format
+#: ..\Client\core\CCore.cpp:698 ..\Client\loader\CInstallManager.cpp:657
+#, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "%sドライブのスペースが不足しています。MTA:SA続行不能"
+msgstr "%s ドライブのスペースが不足しているため、MTA:SAは続行不能。"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:772
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:152
+#: ..\Client\core\CCore.cpp:700 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "致命的なエラー"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:924
+#: ..\Client\core\CCore.cpp:843
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "修正するには、このファイルを消してください："
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:957
-#, c-format
+#: ..\Client\core\CCore.cpp:875
+#, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "%s モジュールは正しくありません！"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1287
+#: ..\Client\core\CCore.cpp:1185
 msgid "Error executing URL"
 msgstr "URL実行エラー"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1299
-#, c-format
+#: ..\Client\core\CCore.cpp:1197
+#, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "実行中のMODの具体的なエラーはコマンドラインにあります ('%s')"
+msgstr "コマンドラインに記入されたMODの実行が失敗しました ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: C:\mtasa-blue\Client\core\CCore.cpp:1386
+#: ..\Client\core\CCore.cpp:1282
 msgid "this help screen"
 msgstr "このヘルプ画面"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1387
-#: C:\mtasa-blue\Client\core\CCore.cpp:1388
+#: ..\Client\core\CCore.cpp:1283 ..\Client\core\CCore.cpp:1284
 msgid "exits the application"
-msgstr "アプリケーションを終了"
+msgstr "アプリケーションを終了する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1389
+#: ..\Client\core\CCore.cpp:1285
 msgid "shows the version"
-msgstr "バージョンを表示"
+msgstr "バージョンを表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1390
+#: ..\Client\core\CCore.cpp:1286
 msgid "shows the time"
-msgstr "時間を表示"
+msgstr "時間を表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1391
+#: ..\Client\core\CCore.cpp:1287
 msgid "shows the hud"
-msgstr "HUDを表示"
+msgstr "HUDを表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1392
+#: ..\Client\core\CCore.cpp:1288
 msgid "shows all the binds"
-msgstr "すべての割り当てを表示"
+msgstr "すべてのバインドを表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1393
+#: ..\Client\core\CCore.cpp:1289
 msgid "shows your serial"
 msgstr "シリアル番号を表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1402
+#: ..\Client\core\CCore.cpp:1298
 msgid "connects to a server (host port nick pass)"
 msgstr "サーバーに接続する (ホスト ポート ニックネーム パスワード)"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1403
+#: ..\Client\core\CCore.cpp:1299
 msgid "connects to a previous server"
 msgstr "以前のサーバーに接続する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1404
+#: ..\Client\core\CCore.cpp:1300
 msgid "binds a key (key control)"
-msgstr "キーを割り当てます。(キーコントローラ)"
+msgstr "キーをバインドします (キーコントローラ)"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1405
+#: ..\Client\core\CCore.cpp:1301
 msgid "unbinds a key (key)"
-msgstr "キー割り当てを削除します。 (キー)"
+msgstr "キーバインドを削除します (キー)"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1406
+#: ..\Client\core\CCore.cpp:1302
 msgid "copies the default gta controls"
-msgstr "GTA: San Andreasのデフォルトコントロールをコピー"
+msgstr "GTA: San Andreasのデフォルトコントロールをコピーする"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1407
+#: ..\Client\core\CCore.cpp:1303
 msgid "outputs a screenshot"
-msgstr "スクリーンショットを出力する"
+msgstr "スクリーンショットを出す"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1408
+#: ..\Client\core\CCore.cpp:1304
 msgid "immediately saves the config"
-msgstr "すぐに設定を保存する"
+msgstr "設定をすぐに保存する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1410
+#: ..\Client\core\CCore.cpp:1306
 msgid "clears the debug view"
 msgstr "デバッグスクリーンを消す"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1411
+#: ..\Client\core\CCore.cpp:1307
 msgid "scrolls the chatbox upwards"
 msgstr "チャットボックスを上にスクロールする"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1412
+#: ..\Client\core\CCore.cpp:1308
 msgid "scrolls the chatbox downwards"
 msgstr "チャットボックスを下にスクロールする"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1413
+#: ..\Client\core\CCore.cpp:1309
 msgid "scrolls the debug view upwards"
 msgstr "デバッグを上にスクロールする"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1414
+#: ..\Client\core\CCore.cpp:1310
 msgid "scrolls the debug view downwards"
 msgstr "デバッグを下にスクロールする"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1417
+#: ..\Client\core\CCore.cpp:1313
 msgid "shows the memory statistics"
-msgstr "メモリデータを表示"
+msgstr "メモリデータを表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.cpp:1418
+#: ..\Client\core\CCore.cpp:1314
 msgid "shows the frame timing graph"
 msgstr "FPSグラフを表示する"
 
-#: C:\mtasa-blue\Client\core\CCore.h:55
-msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
-
-#: C:\mtasa-blue\Client\core\CCredits.cpp:32
+#: ..\Client\core\CCredits.cpp:32
 msgid "Programming"
 msgstr "プログラミング"
 
-#: C:\mtasa-blue\Client\core\CCredits.cpp:58
+#: ..\Client\core\CCredits.cpp:60
 msgid "Contributors"
 msgstr "寄稿者"
 
-#: C:\mtasa-blue\Client\core\CCredits.cpp:72
+#: ..\Client\core\CCredits.cpp:76
 msgid "Game Design / Scripting"
 msgstr "ゲームデザイン / スクリプティング"
 
-#: C:\mtasa-blue\Client\core\CCredits.cpp:88
-msgid "Patch contributors"
-msgstr "パッチ協力者"
-
-#: C:\mtasa-blue\Client\core\CCredits.cpp:146
+#: ..\Client\core\CCredits.cpp:96
 msgid "Language Localization"
 msgstr "言語ローカリゼーション"
 
-#: C:\mtasa-blue\Client\core\CCredits.cpp:152
-msgid "Special Thanks"
-msgstr "スペシャルサンクス"
+#: ..\Client\core\CCredits.cpp:102
+msgid "Patch contributors"
+msgstr "パッチ協力者"
 
-#: C:\mtasa-blue\Client\core\CCredits.cpp:177
+#: ..\Client\core\CCredits.cpp:177
+msgid "Special Thanks"
+msgstr "特別な感謝"
+
+#: ..\Client\core\CCredits.cpp:204
 msgid "This software makes use of the following libraries and software:"
 msgstr "このソフトウェアが下記のライブラリやソフトウェアを利用しています:"
 
 #. Even the default skin doesn't work, so give up
-#: C:\mtasa-blue\Client\core\CGUI.cpp:85
+#: ..\Client\core\CGUI.cpp:85
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
-msgstr "選択したスキンをロードできませんでした。また、デフォルトのスキンもロードできませんでした。MTAを再インストールしてください。"
+msgstr "選択したスキンとデフォルトのスキンをロードすることができませんでした。MTAを再インストールしてください。"
 
-#: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1628
+#: ..\Client\core\CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
 msgstr "加速軸"
 
-#: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1629
+#: ..\Client\core\CJoystickManager.cpp:1580
 msgid "Brake Axis"
 msgstr "ブレーキ軸"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:187
+#: ..\Client\core\CKeyBinds.cpp:180
 msgid "Fire"
 msgstr "撃つ"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:188
+#: ..\Client\core\CKeyBinds.cpp:181
 msgid "Next weapon"
 msgstr "次の武器"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:189
+#: ..\Client\core\CKeyBinds.cpp:182
 msgid "Previous weapon"
 msgstr "前の武器"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:190
+#: ..\Client\core\CKeyBinds.cpp:183
 msgid "Forwards"
-msgstr "前方へ"
+msgstr "前方"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:191
+#: ..\Client\core\CKeyBinds.cpp:184
 msgid "Backwards"
-msgstr "後方へ"
+msgstr "後方"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:192
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2117
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2145
+#: ..\Client\core\CKeyBinds.cpp:185 ..\Client\core\CSettings.cpp:2177
+#: ..\Client\core\CSettings.cpp:2205
 msgid "Left"
 msgstr "左"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:193
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2119
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2146
+#: ..\Client\core\CKeyBinds.cpp:186 ..\Client\core\CSettings.cpp:2179
+#: ..\Client\core\CSettings.cpp:2206
 msgid "Right"
 msgstr "右"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:194
+#: ..\Client\core\CKeyBinds.cpp:187
 msgid "Zoom in"
-msgstr "拡大表示ボタン"
+msgstr "ズーム拡大"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:195
+#: ..\Client\core\CKeyBinds.cpp:188
 msgid "Zoom out"
-msgstr "縮小表示ボタン"
+msgstr "ズーム縮小"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:196
+#: ..\Client\core\CKeyBinds.cpp:189
 msgid "Enter/Exit"
 msgstr "入る/出る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:197
+#: ..\Client\core\CKeyBinds.cpp:190
 msgid "Change camera"
 msgstr "カメラを変更する"
 
 #. 10
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:198
+#: ..\Client\core\CKeyBinds.cpp:191
 msgid "Jump"
 msgstr "ジャンプ"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:199
+#: ..\Client\core\CKeyBinds.cpp:192
 msgid "Sprint"
 msgstr "走る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:200
+#: ..\Client\core\CKeyBinds.cpp:193
 msgid "Look behind"
 msgstr "後ろを見る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:201
+#: ..\Client\core\CKeyBinds.cpp:194
 msgid "Crouch"
 msgstr "かがむ"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:202
+#: ..\Client\core\CKeyBinds.cpp:195
 msgid "Action"
 msgstr "アクション"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:203
+#: ..\Client\core\CKeyBinds.cpp:196
 msgid "Walk"
 msgstr "歩く"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:204
+#: ..\Client\core\CKeyBinds.cpp:197
 msgid "Vehicle fire"
-msgstr "運転席で攻撃する"
+msgstr "車両攻撃"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:205
+#: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
-msgstr "助手席で攻撃する"
+msgstr "車両二次攻撃"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:206
+#: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
-msgstr "車両の左"
+msgstr "車両左"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:207
+#: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle right"
-msgstr "車両の右"
+msgstr "車両右"
 
 #. 20
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:208
+#: ..\Client\core\CKeyBinds.cpp:201
 msgid "Steer forwards/down"
-msgstr "舵を下/前方に取る"
+msgstr "舵を下/前方に操縦する"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:209
+#: ..\Client\core\CKeyBinds.cpp:202
 msgid "Steer backwards/up"
-msgstr "舵を上/後方に取る"
+msgstr "舵を上/後方に操縦する"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:210
+#: ..\Client\core\CKeyBinds.cpp:203
 msgid "Accelerate"
 msgstr "アクセル"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:211
+#: ..\Client\core\CKeyBinds.cpp:204
 msgid "Brake/Reverse"
 msgstr "ブレーキ/バック"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:212
+#: ..\Client\core\CKeyBinds.cpp:205
 msgid "Radio next"
 msgstr "次のラジオチャンネル"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:213
+#: ..\Client\core\CKeyBinds.cpp:206
 msgid "Radio previous"
 msgstr "前のラジオチャンネル"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:214
+#: ..\Client\core\CKeyBinds.cpp:207
 msgid "Radio user track skip"
-msgstr "ユーザラジオトラックをスキップ"
+msgstr "ユーザラジオトラックをスキップする"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:215
+#: ..\Client\core\CKeyBinds.cpp:208
 msgid "Horn"
 msgstr "警笛"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:216
+#: ..\Client\core\CKeyBinds.cpp:209
 msgid "Sub-mission"
 msgstr "サブミッション"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:217
+#: ..\Client\core\CKeyBinds.cpp:210
 msgid "Handbrake"
 msgstr "ハンドブレーキ"
 
 #. 30
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:218
+#: ..\Client\core\CKeyBinds.cpp:211
 msgid "Vehicle look left"
-msgstr "車で左に見る"
+msgstr "車両内で左に見る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:219
+#: ..\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look right"
-msgstr "車で右に見る"
+msgstr "車両内で右に見る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:220
+#: ..\Client\core\CKeyBinds.cpp:213
 msgid "Vehicle look behind"
-msgstr "車で後ろに見る"
+msgstr "車両内で後ろに見る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:221
+#: ..\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle mouse look"
-msgstr "車にマウスで見る"
+msgstr "車両内にマウスで見る"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:222
+#: ..\Client\core\CKeyBinds.cpp:215
 msgid "Special control left"
 msgstr "スペシャルコントロール左"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:223
+#: ..\Client\core\CKeyBinds.cpp:216
 msgid "Special control right"
 msgstr "スペシャルコントロール右"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:224
+#: ..\Client\core\CKeyBinds.cpp:217
 msgid "Special control down"
 msgstr "スペシャルコントロール下"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:225
+#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control up"
 msgstr "スペシャルコントロール上"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:226
+#: ..\Client\core\CKeyBinds.cpp:219
 msgid "Aim weapon"
 msgstr "武器で狙う"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:227
+#: ..\Client\core\CKeyBinds.cpp:220
 msgid "Conversation yes"
 msgstr "会話はい"
 
 #. 40
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:228
+#: ..\Client\core\CKeyBinds.cpp:221
 msgid "Conversation no"
 msgstr "会話いいえ"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:229
+#: ..\Client\core\CKeyBinds.cpp:222
 msgid "Group control forwards"
 msgstr "グループコントロール前方"
 
-#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:230
+#: ..\Client\core\CKeyBinds.cpp:223
 msgid "Group control backwards"
 msgstr "グループコントロール後方"
 
-#: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
+#. TRANSLATORS: Replace with your language native name
+#: ..\Client\core\CLocalization.cpp:16
+msgid "English"
+msgstr "日本語"
+
+#: ..\Client\core\CMainMenu.cpp:315
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
-msgstr ""
+msgstr "新機能ブランチを利用しています！これはテストビルドであるため、公共サーバーには接続できません！"
 
-#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
+#: ..\Client\core\CMainMenu.cpp:334 ..\Client\core\CVersionUpdater.cpp:1919
+msgid ""
+"MTA will not receive updates on XP/Vista after July 2019.\n"
+"\n"
+"Upgrade Windows to play on the latest servers."
+msgstr ""
+"２０１９年７月以来、MTAはXP/Vistaのアップデートを停止します。\n"
+"\n"
+"新しいサーバーでプレイするためにWindowsをアップデートしてください。"
+
+#: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -640,680 +592,655 @@ msgid ""
 msgstr ""
 "サーバーから切断されることになります。\n"
 "\n"
-"本当にサーバーから切断しますか。"
+"サーバーから切断に確かですか？"
 
-#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1088
+#: ..\Client\core\CMainMenu.cpp:1137
 msgid "DISCONNECT WARNING"
 msgstr "切断警告"
 
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:149
-msgid "No host specified!"
-msgstr "ホストが指定されていません！"
+#: ..\Client\core\CMainMenu.cpp:1139 ..\Client\core\CQuestionBox.cpp:194
+#: ..\Client\core\CSettings.cpp:1333 ..\Client\core\CSettings.cpp:1357
+#: ..\Client\core\CSettings.cpp:4329 ..\Client\core\CSettings.cpp:4396
+#: ..\Client\core\CSettings.cpp:4445 ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CVersionUpdater.cpp:1588
+#: ..\Client\core\CVersionUpdater.cpp:1857
+#: ..\Client\core\CVersionUpdater.cpp:1876
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\loader\Dialogs.cpp:32
+msgid "No"
+msgstr "いいえ"
 
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:158
-msgid "No port specified!"
-msgstr "ポートが指定されていません！"
+#. /////////////////////////////////////////////////////////////////////////
+#. Dialog strings
+#. /////////////////////////////////////////////////////////////////////////
+#: ..\Client\core\CMainMenu.cpp:1140 ..\Client\core\CQuestionBox.cpp:195
+#: ..\Client\core\CSettings.cpp:1334 ..\Client\core\CSettings.cpp:1358
+#: ..\Client\core\CSettings.cpp:4330 ..\Client\core\CSettings.cpp:4397
+#: ..\Client\core\CSettings.cpp:4446 ..\Client\core\CVersionUpdater.cpp:1571
+#: ..\Client\core\CVersionUpdater.cpp:1589
+#: ..\Client\core\CVersionUpdater.cpp:1858
+#: ..\Client\core\CVersionUpdater.cpp:1877
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:72 ..\Client\loader\Dialogs.cpp:31
+msgid "Yes"
+msgstr "はい"
 
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:163
-msgid "Invalid port specified!"
-msgstr " 無効なポート指定です "
+#. News link
+#: ..\Client\core\CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "最新ニュース記事を読む"
 
-#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:172
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1246
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1303
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "無効なニックネームです。設定でニックネームを変えてください。"
+#: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "この問題についてにオンラインで調べたいですか？"
 
-#: C:\mtasa-blue\Client\core\CScreenShot.cpp:53
-#, c-format
+#: ..\Client\core\CScreenShot.cpp:51
+#, c-format, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "スクリーンショットを撮影: '%s'"
+msgstr "スクリーンショットを撮影しました: '%s'"
 
 #. Create window (with frame) if it will fit inside the screen resolution
-#: C:\mtasa-blue\Client\core\CSettings.cpp:88
+#: ..\Client\core\CSettings.cpp:82
 msgid "SETTINGS"
 msgstr "設定"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:120
+#: ..\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
-msgstr "マルチプレーヤー"
+msgstr "ネットゲーム"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:121
+#: ..\Client\core\CSettings.cpp:115
 msgid "Video"
 msgstr "ビデオ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:122
+#: ..\Client\core\CSettings.cpp:116
 msgid "Audio"
 msgstr "サウンド"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:123
+#: ..\Client\core\CSettings.cpp:117
 msgid "Binds"
-msgstr "割り当て"
+msgstr "バインド"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:124
+#: ..\Client\core\CSettings.cpp:118
 msgid "Controls"
 msgstr "コントロール"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:125
+#: ..\Client\core\CSettings.cpp:119
 msgid "Interface"
 msgstr "インターフェース"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:126
+#: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
 msgstr "ウェブブラウザー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:127
+#: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
 msgstr "上級"
 
 #. Create buttons
 #. OK button
-#: C:\mtasa-blue\Client\core\CSettings.cpp:131
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4336
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1620
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1849
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1947
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1970
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1989
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2002
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2160
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2170
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2179
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2194
-#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:64
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:34
+#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4563
+#: ..\Client\core\CVersionUpdater.cpp:1606
+#: ..\Client\core\CVersionUpdater.cpp:1822
+#: ..\Client\core\CVersionUpdater.cpp:1915
+#: ..\Client\core\CVersionUpdater.cpp:1941
+#: ..\Client\core\CVersionUpdater.cpp:1959
+#: ..\Client\core\CVersionUpdater.cpp:1971
+#: ..\Client\core\CVersionUpdater.cpp:2123
+#: ..\Client\core\CVersionUpdater.cpp:2132
+#: ..\Client\core\CVersionUpdater.cpp:2141
+#: ..\Client\core\CVersionUpdater.cpp:2155
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
 msgstr "OK"
 
 #. Cancel button
-#: C:\mtasa-blue\Client\core\CSettings.cpp:136
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4335
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1814
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1831
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1868
-#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:66
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:37
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:125
+#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4562
+#: ..\Client\core\CVersionUpdater.cpp:1789
+#: ..\Client\core\CVersionUpdater.cpp:1805
+#: ..\Client\core\CVersionUpdater.cpp:1840
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:151
-#: C:\mtasa-blue\Client\core\CSettings.cpp:350
-#: C:\mtasa-blue\Client\core\CSettings.cpp:573
-#: C:\mtasa-blue\Client\core\CSettings.cpp:832
+#: ..\Client\core\CSettings.cpp:145 ..\Client\core\CSettings.cpp:336
+#: ..\Client\core\CSettings.cpp:593 ..\Client\core\CSettings.cpp:852
 msgid "Load defaults"
 msgstr "デフォルトを読み込む"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:162
-#: C:\mtasa-blue\Client\core\CSettings.cpp:188
+#. *
+#. *  Controls tab
+#. *
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:179
 msgid "Mouse sensitivity:"
-msgstr "マウスの感度:"
+msgstr "マウス感度:"
 
 #. VerticalAimSensitivity
-#: C:\mtasa-blue\Client\core\CSettings.cpp:163
-#: C:\mtasa-blue\Client\core\CSettings.cpp:206
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:197
 msgid "Vertical aim sensitivity:"
 msgstr "垂直狙い感度:"
 
 #. Mouse Options
-#: C:\mtasa-blue\Client\core\CSettings.cpp:167
+#: ..\Client\core\CSettings.cpp:158
 msgid "Mouse options"
 msgstr "マウスオプション"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:174
+#: ..\Client\core\CSettings.cpp:165
 msgid "Invert mouse vertically"
 msgstr "マウスを垂直に反転する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:178
+#: ..\Client\core\CSettings.cpp:169
 msgid "Steer with mouse"
-msgstr "マウスで舵を取る"
+msgstr "マウスで操縦する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:182
+#: ..\Client\core\CSettings.cpp:173
 msgid "Fly with mouse"
 msgstr "マウスで飛ぶ"
 
 #. Joypad options
-#: C:\mtasa-blue\Client\core\CSettings.cpp:224
+#: ..\Client\core\CSettings.cpp:215
 msgid "Joypad options"
 msgstr "ジョイパッドオプション"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:237
+#: ..\Client\core\CSettings.cpp:228
 msgid "Standard controls (Mouse + Keyboard)"
 msgstr "普通のコントロール （マウスとキーボード）"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:244
+#: ..\Client\core\CSettings.cpp:235
 msgid "Classic controls (Joypad)"
 msgstr "クラシックコントロール (ジョイパッド)"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:281
+#: ..\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
 msgstr "デッドゾーン"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:286
+#: ..\Client\core\CSettings.cpp:277
 msgid "Saturation"
 msgstr "彩度"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:292
+#: ..\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "ジョイパッドボタンを設定するために「割り当て」を使ってください。"
+msgstr "ジョイパッドボタンを設定するために「バインド」を使ってください。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:335
+#: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
 msgstr "左スティック"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:341
+#: ..\Client\core\CSettings.cpp:328
 msgid "Right Stick"
 msgstr "右スティック"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:357
+#: ..\Client\core\CSettings.cpp:343
 msgid "DESCRIPTION"
 msgstr "説明"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:358
+#: ..\Client\core\CSettings.cpp:344
 msgid "KEY"
 msgstr "キー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:360
+#: ..\Client\core\CSettings.cpp:346
 msgid "ALT. KEY"
-msgstr "Altキー"
+msgstr "二次キー"
 
 #. *
-#. *	Multiplayer tab
+#. *    Multiplayer tab
 #. *
-#: C:\mtasa-blue\Client\core\CSettings.cpp:365
-#: C:\mtasa-blue\Client\core\CSettings.cpp:368
+#: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
 msgstr "ニックネーム:"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:378
+#: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
 msgstr "サーバーのパスワードを保存する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:383
+#: ..\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
-msgstr "サーバーブラウザを自動リフレッシュ"
+msgstr "サーバーブラウザを自動リフレッシュする"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:388
+#: ..\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
-msgstr "スクリーンショットを有効する"
+msgstr "スクリーンショットアップロードを有効する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:393
+#: ..\Client\core\CSettings.cpp:379
+msgid "Allow external sounds"
+msgstr "外部音を許可する"
+
+#: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
-msgstr "カスタムGTA:SAファイルを利用"
+msgstr "カスタムGTA:SAファイルを利用する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:398
+#: ..\Client\core\CSettings.cpp:389
 msgid "Map rendering options"
 msgstr "マップレンダリングオプション"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:404
-#: C:\mtasa-blue\Client\core\CSettings.cpp:592
+#: ..\Client\core\CSettings.cpp:395 ..\Client\core\CSettings.cpp:604
 msgid "Opacity:"
 msgstr "不透明度:"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:426
-#: C:\mtasa-blue\Client\core\CSettings.cpp:439
+#. *
+#. *  Audio tab
+#. *
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:424
+msgid "Master volume:"
+msgstr "マスタ音量："
+
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:443
 msgid "Radio volume:"
-msgstr "ラジオの音量:"
+msgstr "ラジオの音量："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:427
-#: C:\mtasa-blue\Client\core\CSettings.cpp:458
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:462
 msgid "SFX volume:"
-msgstr "SFX音量:"
+msgstr "SFX音量："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:428
-#: C:\mtasa-blue\Client\core\CSettings.cpp:477
+#: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:481
 msgid "MTA volume:"
-msgstr "MTA音量:"
+msgstr "MTA音量："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:429
-#: C:\mtasa-blue\Client\core\CSettings.cpp:496
+#: ..\Client\core\CSettings.cpp:416 ..\Client\core\CSettings.cpp:500
 msgid "Voice volume:"
-msgstr "声音量"
+msgstr "声音量："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:430
-#: C:\mtasa-blue\Client\core\CSettings.cpp:554
+#: ..\Client\core\CSettings.cpp:416 ..\Client\core\CSettings.cpp:541
 msgid "Play mode:"
-msgstr "プレイモード:"
+msgstr "プレイモード："
 
 #. *
 #. * Webbrowser tab
 #. *
-#: C:\mtasa-blue\Client\core\CSettings.cpp:433
-#: C:\mtasa-blue\Client\core\CSettings.cpp:595
-#: C:\mtasa-blue\Client\core\CSettings.cpp:847
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1883
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:53
+#: ..\Client\core\CSettings.cpp:418 ..\Client\core\CSettings.cpp:606
+#: ..\Client\core\CSettings.cpp:867 ..\Client\core\CSettings.cpp:1955
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
 msgstr "一般的な設定"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:517
-msgid "Mute Radio sounds when minimized"
-msgstr "ウインドウを隠す際、ラジオの音をミュートする"
+#: ..\Client\core\CSettings.cpp:519
+msgid "Radio options"
+msgstr "ラジオ設定"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:522
-msgid "Mute SFX sounds when minimized"
-msgstr "ウインドウを隠す際、SFXの音をミュートする"
-
-#: C:\mtasa-blue\Client\core\CSettings.cpp:527
-msgid "Mute MTA sounds when minimized"
-msgstr "ウインドウを隠す際、MTAの音をミュートする"
-
-#: C:\mtasa-blue\Client\core\CSettings.cpp:532
-msgid "Mute Voice sounds when minimized"
-msgstr "ウインドウを隠す際、声の音をミュートする"
-
-#: C:\mtasa-blue\Client\core\CSettings.cpp:539
+#: ..\Client\core\CSettings.cpp:525
 msgid "Radio Equalizer"
 msgstr "ラジオイコライザー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:543
+#: ..\Client\core\CSettings.cpp:530
 msgid "Radio Auto-tune"
 msgstr "ラジオオートチューン"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:548
+#: ..\Client\core\CSettings.cpp:535
 msgid "Usertrack options"
 msgstr "ユーザートラックオプション"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:562
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2901
+#: ..\Client\core\CSettings.cpp:549 ..\Client\core\CSettings.cpp:2975
 msgid "Radio"
 msgstr "ラジオ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:563
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2902
+#: ..\Client\core\CSettings.cpp:550 ..\Client\core\CSettings.cpp:2977
 msgid "Random"
 msgstr "ランダム"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:564
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2903
+#: ..\Client\core\CSettings.cpp:551 ..\Client\core\CSettings.cpp:2979
 msgid "Sequential"
 msgstr "順番に"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:567
+#: ..\Client\core\CSettings.cpp:554
 msgid "Automatic Media Scan"
 msgstr "自動メディアスキャン"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:584
-#: C:\mtasa-blue\Client\core\CSettings.cpp:601
-msgid "Resolution:"
-msgstr "解像度:"
+#: ..\Client\core\CSettings.cpp:561
+msgid "Mute options"
+msgstr "ミュートオプションス"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:585
-#: C:\mtasa-blue\Client\core\CSettings.cpp:642
+#: ..\Client\core\CSettings.cpp:567
+msgid "Mute All sounds when minimized"
+msgstr "ウィンドウを隠す際、SFXの音をミュートする"
+
+#: ..\Client\core\CSettings.cpp:572
+msgid "Mute Radio sounds when minimized"
+msgstr "ウインドウを隠す際、ラジオの音をミュートする"
+
+#: ..\Client\core\CSettings.cpp:577
+msgid "Mute SFX sounds when minimized"
+msgstr "ウインドウを隠す際、SFXの音をミュートする"
+
+#: ..\Client\core\CSettings.cpp:582
+msgid "Mute MTA sounds when minimized"
+msgstr "ウインドウを隠す際、MTAの音をミュートする"
+
+#: ..\Client\core\CSettings.cpp:587
+msgid "Mute Voice sounds when minimized"
+msgstr "ウインドウを隠す際、声の音をミュートする"
+
+#. *
+#. *  Video tab
+#. *
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:612
+msgid "Resolution:"
+msgstr "解像度："
+
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:659
 msgid "FOV:"
 msgstr "FOV："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:586
-#: C:\mtasa-blue\Client\core\CSettings.cpp:658
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:675
 msgid "Draw Distance:"
-msgstr "レンダリング距離:"
+msgstr "レンダリング距離："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:587
-#: C:\mtasa-blue\Client\core\CSettings.cpp:676
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:693
 msgid "Brightness:"
-msgstr "輝度:"
+msgstr "輝度："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:588
-#: C:\mtasa-blue\Client\core\CSettings.cpp:694
+#: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:711
 msgid "FX Quality:"
-msgstr "FXの質:"
+msgstr "FXの質："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:589
-#: C:\mtasa-blue\Client\core\CSettings.cpp:708
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:725
 msgid "Anisotropic filtering:"
-msgstr "異方性フィルタリング:"
+msgstr "異方性フィルタリング："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:590
-#: C:\mtasa-blue\Client\core\CSettings.cpp:735
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:752
 msgid "Anti-aliasing:"
-msgstr "アンチエイリアス:"
+msgstr "アンチエイリアス："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:591
-#: C:\mtasa-blue\Client\core\CSettings.cpp:750
+#: ..\Client\core\CSettings.cpp:604 ..\Client\core\CSettings.cpp:766
 msgid "Aspect Ratio:"
-msgstr "アスペクト比:"
+msgstr "アスペクト比："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:613
+#: ..\Client\core\CSettings.cpp:624
 msgid "Windowed"
 msgstr "ウィンドウ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:621
-#: C:\mtasa-blue\Client\core\CSettings.cpp:938
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:366
-msgid "Fullscreen mode:"
-msgstr "フルスクリーンモード:"
+#: ..\Client\core\CSettings.cpp:630
+msgid "DPI aware"
+msgstr "DPI承知"
 
-#. Fullscreen style
-#: C:\mtasa-blue\Client\core\CSettings.cpp:628
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1506
+#: ..\Client\core\CSettings.cpp:638 ..\Client\core\CSettings.cpp:953
+#: ..\Client\loader\MainFunctions.cpp:370
+msgid "Fullscreen mode:"
+msgstr "フルスクリーンモード："
+
+#: ..\Client\core\CSettings.cpp:645 ..\Client\core\CSettings.cpp:1554
 msgid "Standard"
 msgstr "標準"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:629
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1507
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:366
+#: ..\Client\core\CSettings.cpp:646 ..\Client\core\CSettings.cpp:1556
+#: ..\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
-msgstr "枠なしウインドウ"
+msgstr "ボーダーなしウィンドウ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:630
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1508
+#: ..\Client\core\CSettings.cpp:647 ..\Client\core\CSettings.cpp:1558
 msgid "Borderless keep res"
-msgstr "枠なしウィンドウの解像度を保存する"
+msgstr "ボーダーなしウィンドウにして解像度を保存する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:634
+#: ..\Client\core\CSettings.cpp:651
 msgid "Mip Mapping"
 msgstr "ミップマッピング"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:702
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1436
+#: ..\Client\core\CSettings.cpp:719 ..\Client\core\CSettings.cpp:1462
 msgid "Low"
 msgstr "低"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:703
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1437
+#: ..\Client\core\CSettings.cpp:720 ..\Client\core\CSettings.cpp:1464
 msgid "Medium"
 msgstr "中"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:704
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1025
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1438
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2945
+#: ..\Client\core\CSettings.cpp:721 ..\Client\core\CSettings.cpp:1035
+#: ..\Client\core\CSettings.cpp:1466 ..\Client\core\CSettings.cpp:3033
 msgid "High"
 msgstr "高"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:705
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1439
+#: ..\Client\core\CSettings.cpp:722 ..\Client\core\CSettings.cpp:1468
 msgid "Very high"
 msgstr "最高"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:720
-#: C:\mtasa-blue\Client\core\CSettings.cpp:743
-#: C:\mtasa-blue\Client\core\CSettings.cpp:956
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1010
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1141
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1442
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2951
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2973
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2991
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3957
+#: ..\Client\core\CSettings.cpp:737 ..\Client\core\CSettings.cpp:760
+#: ..\Client\core\CSettings.cpp:966 ..\Client\core\CSettings.cpp:1020
+#: ..\Client\core\CSettings.cpp:1151 ..\Client\core\CSettings.cpp:1472
+#: ..\Client\core\CSettings.cpp:3040 ..\Client\core\CSettings.cpp:3072
+#: ..\Client\core\CSettings.cpp:3094 ..\Client\core\CSettings.cpp:4077
 msgid "Off"
-msgstr "消す"
+msgstr "無効"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:744
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1443
+#: ..\Client\core\CSettings.cpp:761 ..\Client\core\CSettings.cpp:1474
 msgid "1x"
 msgstr "1x"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:745
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1444
+#: ..\Client\core\CSettings.cpp:762 ..\Client\core\CSettings.cpp:1476
 msgid "2x"
 msgstr "2x"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:746
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1445
+#: ..\Client\core\CSettings.cpp:763 ..\Client\core\CSettings.cpp:1478
 msgid "3x"
 msgstr "3x"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:760
-#: C:\mtasa-blue\Client\core\CSettings.cpp:958
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1450
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2952
+#: ..\Client\core\CSettings.cpp:776 ..\Client\core\CSettings.cpp:968
+#: ..\Client\core\CSettings.cpp:1484 ..\Client\core\CSettings.cpp:3042
 msgid "Auto"
 msgstr "自動"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:761
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1451
+#: ..\Client\core\CSettings.cpp:777 ..\Client\core\CSettings.cpp:1486
 msgid "4:3"
 msgstr "4:3"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:762
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1452
+#: ..\Client\core\CSettings.cpp:778 ..\Client\core\CSettings.cpp:1488
 msgid "16:10"
 msgstr "16:10"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:763
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1453
+#: ..\Client\core\CSettings.cpp:779 ..\Client\core\CSettings.cpp:1490
 msgid "16:9"
 msgstr "16:9"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:766
+#: ..\Client\core\CSettings.cpp:782
 msgid "HUD Match Aspect Ratio"
 msgstr "HUDアスペクト比"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:772
+#: ..\Client\core\CSettings.cpp:788
 msgid "Volumetric Shadows"
 msgstr "体積影"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:776
+#: ..\Client\core\CSettings.cpp:792
 msgid "Grass effect"
 msgstr "グラスFX"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:780
+#: ..\Client\core\CSettings.cpp:796
 msgid "Heat haze"
 msgstr "陽炎"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:784
+#: ..\Client\core\CSettings.cpp:800
 msgid "Tyre Smoke etc"
 msgstr "タイヤの煙など"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:788
+#: ..\Client\core\CSettings.cpp:804
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "車を最高質でレンダーする"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:793
+#: ..\Client\core\CSettings.cpp:808
+msgid "Render peds always in high detail"
+msgstr "ペッドを最高質でレンダーする"
+
+#: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
 msgstr "フルスクリーン最小化"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:805
+#: ..\Client\core\CSettings.cpp:825
 msgid "Enable Device Selection Dialog"
-msgstr "デバイス選択ダイアログを有効にする"
+msgstr "デバイス有効選択ダイアログ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:817
+#: ..\Client\core\CSettings.cpp:837
 msgid "Show unsafe resolutions"
-msgstr "不安全な解像度を表示"
+msgstr "不安全な解像度を表示する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:853
+#: ..\Client\core\CSettings.cpp:873
 msgid "Enable remote websites"
 msgstr "リモートウェブサイトを有効する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:858
+#: ..\Client\core\CSettings.cpp:878
 msgid "Enable Javascript on remote websites"
-msgstr "リモートサイトにJavascriptを有効する"
+msgstr "リモートウェブサイトにJavascriptを有効する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:863
+#: ..\Client\core\CSettings.cpp:883
 msgid "Custom blacklist"
 msgstr "カスタムブラックリスト"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:873
-#: C:\mtasa-blue\Client\core\CSettings.cpp:901
+#: ..\Client\core\CSettings.cpp:893 ..\Client\core\CSettings.cpp:921
 msgid "Enter a domain e.g. google.com"
 msgstr "ドメインを入力してください（例：google.com）"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:875
+#: ..\Client\core\CSettings.cpp:895
 msgid "Block"
 msgstr "ブロック"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:883
-#: C:\mtasa-blue\Client\core\CSettings.cpp:911
+#: ..\Client\core\CSettings.cpp:903 ..\Client\core\CSettings.cpp:931
 msgid "Domain"
 msgstr "ドメイン"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:885
-#: C:\mtasa-blue\Client\core\CSettings.cpp:913
+#: ..\Client\core\CSettings.cpp:905 ..\Client\core\CSettings.cpp:933
 msgid "Remove domain"
 msgstr "ドメインを消す"
 
 #. Reset vecTemp
-#: C:\mtasa-blue\Client\core\CSettings.cpp:891
+#: ..\Client\core\CSettings.cpp:911
 msgid "Custom whitelist"
 msgstr "カスタムホワイトリスト"
 
 #. Misc section label
-#: C:\mtasa-blue\Client\core\CSettings.cpp:926
+#: ..\Client\core\CSettings.cpp:946
 msgid "Misc"
 msgstr "その他"
 
 #. Fast clothes loading
-#: C:\mtasa-blue\Client\core\CSettings.cpp:933
-#: C:\mtasa-blue\Client\core\CSettings.cpp:949
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4354
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:959
+#: ..\Client\core\CSettings.cpp:4581
 msgid "Fast CJ clothes loading:"
 msgstr "CJの服を高速読み込み:"
 
 #. Browser scan speed
-#: C:\mtasa-blue\Client\core\CSettings.cpp:934
-#: C:\mtasa-blue\Client\core\CSettings.cpp:963
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4356
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:973
+#: ..\Client\core\CSettings.cpp:4583
 msgid "Browser speed:"
 msgstr "ブラウザの速さ:"
 
 #. Single download
-#: C:\mtasa-blue\Client\core\CSettings.cpp:935
-#: C:\mtasa-blue\Client\core\CSettings.cpp:977
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4358
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:987
+#: ..\Client\core\CSettings.cpp:4585
 msgid "Single connection:"
 msgstr "単一接続:"
 
 #. Packet tag
-#: C:\mtasa-blue\Client\core\CSettings.cpp:936
-#: C:\mtasa-blue\Client\core\CSettings.cpp:990
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4360
+#: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:1000
+#: ..\Client\core\CSettings.cpp:4587
 msgid "Packet tag:"
 msgstr "パケットタッグ："
 
 #. Progress animation
-#: C:\mtasa-blue\Client\core\CSettings.cpp:937
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1003
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4362
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1013
+#: ..\Client\core\CSettings.cpp:4589
 msgid "Progress animation:"
 msgstr "アニメーション進歩："
 
 #. Process priority
-#: C:\mtasa-blue\Client\core\CSettings.cpp:939
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1016
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4352
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1026
+#: ..\Client\core\CSettings.cpp:4579
 msgid "Process priority:"
-msgstr "プロセス優先度:"
+msgstr "プロセス優先度："
 
 #. Debug setting
-#: C:\mtasa-blue\Client\core\CSettings.cpp:940
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1030
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4364
+#: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1040
+#: ..\Client\core\CSettings.cpp:4591
 msgid "Debug setting:"
-msgstr "デバッグ設定:"
+msgstr "デバッグ設定："
 
 #. Streaming memory
-#: C:\mtasa-blue\Client\core\CSettings.cpp:941
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1053
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4366
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1063
+#: ..\Client\core\CSettings.cpp:4593
 msgid "Streaming memory:"
-msgstr "ストリーミングメモリ量"
+msgstr "ストリーミングメモリ量："
 
 #. Update build type
-#: C:\mtasa-blue\Client\core\CSettings.cpp:942
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1155
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1165
 msgid "Update build type:"
-msgstr "ビルドタイプをアップデートする:"
+msgstr "ビルドタイプをアップデートする："
 
 #. UpdateAutoInstall
-#: C:\mtasa-blue\Client\core\CSettings.cpp:943
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1134
+#: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1144
 msgid "Install important updates:"
 msgstr "重要なアップデートをインストール："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:957
-#: C:\mtasa-blue\Client\core\CSettings.cpp:985
-#: C:\mtasa-blue\Client\core\CSettings.cpp:998
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2953
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2964
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2969
+#: ..\Client\core\CSettings.cpp:967 ..\Client\core\CSettings.cpp:995
+#: ..\Client\core\CSettings.cpp:1008 ..\Client\core\CSettings.cpp:3044
+#: ..\Client\core\CSettings.cpp:3060 ..\Client\core\CSettings.cpp:3067
 msgid "On"
 msgstr "つける"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:970
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2957
+#: ..\Client\core\CSettings.cpp:980 ..\Client\core\CSettings.cpp:3049
 msgid "Very slow"
 msgstr "さらに遅く"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:971
-#: C:\mtasa-blue\Client\core\CSettings.cpp:984
-#: C:\mtasa-blue\Client\core\CSettings.cpp:997
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1011
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1037
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1049
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1142
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1162
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2958
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2963
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2968
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2974
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2986
+#: ..\Client\core\CSettings.cpp:981 ..\Client\core\CSettings.cpp:994
+#: ..\Client\core\CSettings.cpp:1007 ..\Client\core\CSettings.cpp:1021
+#: ..\Client\core\CSettings.cpp:1047 ..\Client\core\CSettings.cpp:1059
+#: ..\Client\core\CSettings.cpp:1152 ..\Client\core\CSettings.cpp:1172
+#: ..\Client\core\CSettings.cpp:3051 ..\Client\core\CSettings.cpp:3058
+#: ..\Client\core\CSettings.cpp:3065 ..\Client\core\CSettings.cpp:3074
+#: ..\Client\core\CSettings.cpp:3087
 msgid "Default"
 msgstr "デフォルト"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:972
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2959
+#: ..\Client\core\CSettings.cpp:982 ..\Client\core\CSettings.cpp:3053
 msgid "Fast"
 msgstr "速い"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1023
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2943
+#: ..\Client\core\CSettings.cpp:1033 ..\Client\core\CSettings.cpp:3029
 msgid "Normal"
-msgstr ""
+msgstr "普通"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1024
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2944
+#: ..\Client\core\CSettings.cpp:1034 ..\Client\core\CSettings.cpp:3031
 msgid "Above normal"
-msgstr ""
+msgstr "良い"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1060
+#: ..\Client\core\CSettings.cpp:1070
 msgid "Min"
 msgstr "最小"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1073
+#: ..\Client\core\CSettings.cpp:1083
 msgid "Max"
 msgstr "最大"
 
 #. Windows 8 compatibility
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1080
+#: ..\Client\core\CSettings.cpp:1090
 msgid "Windows 8 compatibility:"
-msgstr "Windows 8 サポート"
+msgstr "Windows 8 サポート："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1085
+#: ..\Client\core\CSettings.cpp:1095
 msgid "16-bit color"
-msgstr "16-ビットカラー(&B)"
+msgstr "16-ビットカラー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1090
+#: ..\Client\core\CSettings.cpp:1100
 msgid "Mouse fix"
 msgstr "マウスフィックス"
 
 #. Cache path info
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1108
+#: ..\Client\core\CSettings.cpp:1118
 msgid "Client resource files:"
-msgstr ""
+msgstr "クライアント資源ファイル："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1112
+#: ..\Client\core\CSettings.cpp:1122
 msgid "Show in Explorer"
-msgstr ""
+msgstr "エクスプローラに表示する"
 
 #. Auto updater section label
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1127
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1130
+#: ..\Client\core\CSettings.cpp:1137 ..\Client\core\CSettings.cpp:1140
 msgid "Auto updater"
 msgstr "自動アップデータ"
 
 #. Check for updates
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1168
+#: ..\Client\core\CSettings.cpp:1178
 msgid "Check for update now"
-msgstr "今すぐアップデートをチェックする"
+msgstr "今にアップデートをチェックする"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1312
+#: ..\Client\core\CSettings.cpp:1327
 msgid "Some settings will be changed when you next start MTA"
-msgstr "次のMTAの起動時に設定が反映されます。"
+msgstr "今度、MTAを実行する際、ある設定が変わります"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1313
+#: ..\Client\core\CSettings.cpp:1328
 msgid ""
 "\n"
 "\n"
@@ -1321,17 +1248,17 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"今すぐ再起動しますか。"
+"今に再起動しますか？"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1316
+#: ..\Client\core\CSettings.cpp:1331
 msgid "RESTART REQUIRED"
-msgstr "再起動が必要です"
+msgstr "再起動は必要です"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1338
+#: ..\Client\core\CSettings.cpp:1351
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "サーバーとの接続を切ってから、ある設定が変わる"
+msgstr "サーバーから切断すると、ある設定が変わります"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1339
+#: ..\Client\core\CSettings.cpp:1352
 msgid ""
 "\n"
 "\n"
@@ -1339,170 +1266,168 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"今、切断しますか？"
+"今に切断しますか？"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1342
+#: ..\Client\core\CSettings.cpp:1355
 msgid "DISCONNECT REQUIRED"
 msgstr "切断必要"
 
 #. Update the joystick name
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1631
+#: ..\Client\core\CSettings.cpp:1678
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "ジョイパッドはつながっていません - 接続をチェックして、ゲームを再起動してください"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1793
+#: ..\Client\core\CSettings.cpp:1869
 msgid "Binding axis"
-msgstr "軸の割り当て"
+msgstr "バインディング軸"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1793
+#: ..\Client\core\CSettings.cpp:1869
 msgid "Move an axis to bind, or escape to clear"
-msgstr "軸を動かして、割り当てます。または、ESCを押してクリアしてください。"
+msgstr "バインドするため、軸を動かしてください。または、ESCを押してクリアしてください。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1872
+#: ..\Client\core\CSettings.cpp:1946
 msgid "Language:"
-msgstr "言語:"
+msgstr "言語："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1873
+#: ..\Client\core\CSettings.cpp:1946
 msgid "Skin:"
-msgstr "スキン:"
+msgstr "スキン："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1874
+#: ..\Client\core\CSettings.cpp:1946
 msgid "Presets:"
-msgstr "プリセット:"
+msgstr "プリセット："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1925
+#: ..\Client\core\CSettings.cpp:1995
 msgid "Chat"
 msgstr "チャット"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1942
+#: ..\Client\core\CSettings.cpp:2012
 msgid "Load"
 msgstr "読み込み"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1954
+#: ..\Client\core\CSettings.cpp:2024
 msgid "Colors"
-msgstr ""
+msgstr "色"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1955
+#: ..\Client\core\CSettings.cpp:2025
 msgid "Layout"
-msgstr ""
+msgstr "設計"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1956
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+#: ..\Client\core\CSettings.cpp:2026 ..\Client\core\CSettings.cpp:2272
 msgid "Options"
-msgstr ""
+msgstr "設定"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1962
+#: ..\Client\core\CSettings.cpp:2032
 msgid "Chat Background"
-msgstr ""
+msgstr "インプットBG"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1963
+#: ..\Client\core\CSettings.cpp:2032
 msgid "Chat Text"
-msgstr "チャットテキスト:"
+msgstr "チャットテキスト"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1964
+#: ..\Client\core\CSettings.cpp:2032
 msgid "Input Background"
-msgstr ""
+msgstr "インプットBG"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1965
+#: ..\Client\core\CSettings.cpp:2032
 msgid "Input Text"
 msgstr "インプットテキスト"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1988
+#: ..\Client\core\CSettings.cpp:2055
 msgid "Lines:"
-msgstr "ライン数:"
+msgstr "ライン数："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1989
+#: ..\Client\core\CSettings.cpp:2055
 msgid "Scale:"
-msgstr "拡大縮小:"
+msgstr "拡大縮小："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1990
+#: ..\Client\core\CSettings.cpp:2055
 msgid "Width:"
-msgstr "幅:"
+msgstr "幅："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:1993
+#: ..\Client\core\CSettings.cpp:2058
 msgid "Size"
-msgstr ""
+msgstr "サイス"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2042
+#: ..\Client\core\CSettings.cpp:2107
 msgid "after"
-msgstr "あと"
+msgstr "後"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2043
+#: ..\Client\core\CSettings.cpp:2107
 msgid "for"
 msgstr "の"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2044
+#: ..\Client\core\CSettings.cpp:2107
 msgid "sec"
 msgstr "秒"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2047
+#: ..\Client\core\CSettings.cpp:2110
 msgid "Fading"
-msgstr ""
+msgstr "薄れ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2053
+#: ..\Client\core\CSettings.cpp:2116
 msgid "Fade out old lines"
 msgstr "古いラインをフェードアウトする"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2093
+#: ..\Client\core\CSettings.cpp:2156
 msgid "Horizontal:"
-msgstr ""
+msgstr "横："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2094
+#: ..\Client\core\CSettings.cpp:2156
 msgid "Vertical:"
-msgstr ""
+msgstr "縦："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2095
+#: ..\Client\core\CSettings.cpp:2156
 msgid "Text-Align:"
-msgstr ""
+msgstr "テキストアライメント："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2096
+#: ..\Client\core\CSettings.cpp:2156
 msgid "X-Offset:"
-msgstr ""
+msgstr "Xオフセット："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2097
+#: ..\Client\core\CSettings.cpp:2157
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Yオフセット："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2103
+#: ..\Client\core\CSettings.cpp:2163
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2118
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2132
+#: ..\Client\core\CSettings.cpp:2178 ..\Client\core\CSettings.cpp:2192
 msgid "Center"
-msgstr ""
+msgstr "中"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2131
+#: ..\Client\core\CSettings.cpp:2191
 msgid "Top"
-msgstr ""
+msgstr "トップ"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2133
+#: ..\Client\core\CSettings.cpp:2193
 msgid "Bottom"
-msgstr ""
+msgstr "底"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#: ..\Client\core\CSettings.cpp:2241
 msgid "Font"
-msgstr ""
+msgstr "フォント"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2223
+#: ..\Client\core\CSettings.cpp:2278
 msgid "Hide background when not typing"
-msgstr "書いていない時に背景を隠す"
+msgstr "書いていない時にBGを隠す"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2228
+#: ..\Client\core\CSettings.cpp:2283
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "「タッブ」キーでニック完成する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2233
+#: ..\Client\core\CSettings.cpp:2288
 msgid "Allow server to flash the window"
 msgstr "サーバーをウィンドウフラッシュするのを有効する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2238
+#: ..\Client\core\CSettings.cpp:2293
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "トレイ通知を有効する"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2243
+#: ..\Client\core\CSettings.cpp:2298
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "チャットテキスト白黒アウトライン"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1510,65 +1435,63 @@ msgstr ""
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
 #. pItemBind->GetText ().c_str () );
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2494
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2501
+#: ..\Client\core\CSettings.cpp:2546 ..\Client\core\CSettings.cpp:2553
 msgid "Press a key to bind, or escape to clear"
-msgstr "キーを押して、割り当てます。または、ESCを押して、クリアしてください。"
+msgstr "キーを押して、バインドしてください。または、ESCを押して、クリアしてください。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2495
+#: ..\Client\core\CSettings.cpp:2547
 msgid "Binding a primary key"
-msgstr "一次キーを割り当てる"
+msgstr "一次キーをバインドしています"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2502
+#: ..\Client\core\CSettings.cpp:2554
 msgid "Binding a secondary key"
-msgstr "二次キーを割り当てる"
+msgstr "二次キーをバインドしています"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2579
+#: ..\Client\core\CSettings.cpp:2628
 msgid "GTA GAME CONTROLS"
 msgstr "GTAゲームコントロール"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2581
+#: ..\Client\core\CSettings.cpp:2630
 msgid "MULTIPLAYER CONTROLS"
-msgstr "マルチプレーヤーコントロール"
+msgstr "ネットゲームコントロール"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:2812
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4315
+#: ..\Client\core\CSettings.cpp:2859 ..\Client\core\CSettings.cpp:4542
 msgid "Your nickname contains invalid characters!"
 msgstr "ニックネームに無効な文字が含まれています！"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3496
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Red:"
 msgstr "R (赤):"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3497
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Green:"
 msgstr "G (緑):"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3498
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Blue:"
 msgstr "B (青):"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3499
+#: ..\Client\core\CSettings.cpp:3621
 msgid "Transparency:"
 msgstr "透明:"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3502
+#: ..\Client\core\CSettings.cpp:3624
 msgid "Color"
-msgstr ""
+msgstr "色"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3579
+#: ..\Client\core\CSettings.cpp:3701
 msgid "Preview"
-msgstr ""
+msgstr "プリビュー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3888
+#: ..\Client\core\CSettings.cpp:4009
 msgid "Please disconnect before changing language"
 msgstr "言語を変更する前に、切断してください"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:3917
+#: ..\Client\core\CSettings.cpp:4037
 msgid "Please disconnect before changing skin"
-msgstr "スキンを変える前に、切断してください"
+msgstr "スキンを変更する前に、切断してください"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4156
+#: ..\Client\core\CSettings.cpp:4323
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1576,27 +1499,43 @@ msgid ""
 msgstr ""
 "流量影がOS速度を落とすかもしれません。\n"
 "\n"
-"有効にしますか。"
+"有効にたしかですか？"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4160
+#: ..\Client\core\CSettings.cpp:4327
 msgid "PERFORMANCE WARNING"
-msgstr "リモートウェブサイトを有効する"
+msgstr "パフォーマンス警告"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4179
+#: ..\Client\core\CSettings.cpp:4347
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"時々、スクリーンのアップロードが必要です。これはアンチチートのためです。\n"
+"時々アンチチートのため、画面アップロードはあるサーバーに必要です。\n"
 "\n"
 "（チャットボックスとGUIがアップロードに除外されています）\n"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4181
+#: ..\Client\core\CSettings.cpp:4349
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "スクリーンアップロード情報"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4202
+#: ..\Client\core\CSettings.cpp:4364
+msgid ""
+"Some scripts may play sounds, such as radio, from the internet.\n"
+"\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr ""
+"あるスクリプトが音をします。例え、インターネットラジオ。\n"
+"\n"
+"この設定を無効にしたら\n"
+"帯域幅消費が減ります。\n"
+
+#: ..\Client\core\CSettings.cpp:4367
+msgid "EXTERNAL SOUNDS"
+msgstr "外部音"
+
+#: ..\Client\core\CSettings.cpp:4388
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1605,124 +1544,139 @@ msgid ""
 "\n"
 "Are you sure you want to use them?"
 msgstr ""
-"GTA:SAは変更されています。\n"
+"GTA:SAインストールフォルダーにあるカスタムデーターがあります。\n"
+"このチェックボックスはをチェックする限り、このカスタムファイルを利用します。\n"
 "\n"
-"このチェックボックスを有効にすると、変更されたGTA:SAが利用できます。\n"
+"しかし、カスタムファイルはあるサーバーに利用禁止です。\n"
 "\n"
-"しかし、変更されたGTA:SAは多くのサーバにより利用禁止(BAN対象)となっています。\n"
-"\n"
-"このファイルを利用しますか？"
+"利用するに確かですか？"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4208
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2120
+#: ..\Client\core\CSettings.cpp:4394 ..\Client\core\CVersionUpdater.cpp:2084
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "変更されたGTA:SAのファイル"
+msgstr "カスタムGTA:SAファイル"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4333
+#: ..\Client\core\CSettings.cpp:4437
+msgid ""
+"Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n"
+"\n"
+"Are you sure you want to enable this option?"
+msgstr ""
+"DPI承知は実験的機能であるため\n"
+"MTA:SAをスケーリングされたモニターでプレイする場合だけに推薦します。\n"
+"この設定を有効したらグラフィック問題が現れるかもしれません。\n"
+"\n"
+"この設定を有効しますか。"
+
+#: ..\Client\core\CSettings.cpp:4443
+msgid "EXPERIMENTAL FEATURE"
+msgstr "実験的機能"
+
+#: ..\Client\core\CSettings.cpp:4560
 msgid "Please enter a nickname"
 msgstr "ニックネームを入れてください"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4334
+#: ..\Client\core\CSettings.cpp:4561
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr ""
-"ゲームで使うニックネームを選んでください。\n"
-"これはサーバーに接続するたびにこのニックネームになります"
+"ゲームで利用するニックネームを記入して。  \n"
+"これはサーバーに接続しプレイするニックネームになります"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4352
+#: ..\Client\core\CSettings.cpp:4579
 msgid "Very experimental feature."
 msgstr "とても実験的な機能"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4354
+#: ..\Client\core\CSettings.cpp:4581
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "CJバリエーション屋台を停止（65MB RAM以上）"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4356
+#: ..\Client\core\CSettings.cpp:4583
 msgid "Older routers may require a slower scan speed."
 msgstr "古いルーターは遅いスキャンスピードが必要かも知れません。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4358
+#: ..\Client\core\CSettings.cpp:4585
 msgid "Switch on to use only one connection when downloading."
 msgstr "ダウンロード中に単一接続にスイッチします。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4360
+#: ..\Client\core\CSettings.cpp:4587
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "ISPがMTAの交通を確認するため、パケットをタッグしてください。"
+msgstr "ISPがMTAの交通を確認するため、パケットをタッグします。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4362
+#: ..\Client\core\CSettings.cpp:4589
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "画面の底に回転するサークル"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4364
+#: ..\Client\core\CSettings.cpp:4591
 msgid "Select default always. (This setting is not saved)"
-msgstr "いつもデフォルトを選ぶ。（この設定は保存しません）"
+msgstr "いつもデフォルトを選ぶ。（この設定は保存されません）"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4366
+#: ..\Client\core\CSettings.cpp:4593
 msgid "Maximum is usually best"
-msgstr "最高は普通に一番いい"
+msgstr "最高は普通に一番良い"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4368
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4370
+#: ..\Client\core\CSettings.cpp:4595 ..\Client\core\CSettings.cpp:4597
 msgid "Auto updater:"
-msgstr "自動アップデータ:"
+msgstr "自動アップデータ："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4368
+#: ..\Client\core\CSettings.cpp:4595
 msgid "Select default unless you like filling out bug reports."
-msgstr "バグレポートが可能な人以外、デフォルトを選んでください。"
+msgstr "バグレポートが得意な人以外、デフォルトを選んでください。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4370
+#: ..\Client\core\CSettings.cpp:4597
 msgid "Select default to automatically install important updates."
-msgstr "重要なアップデートをインストールするように、ディフォルトを選びください。"
+msgstr "重要なアップデートをインストールするようにディフォルトを選んでください。"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4372
+#: ..\Client\core\CSettings.cpp:4599
 msgid "16-bit color:"
 msgstr "16-ビットカラー"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4372
+#: ..\Client\core\CSettings.cpp:4599
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "16-ビットカラーのモードを有効にする - MTAの再起動が必要です"
+msgstr "16-ビットカラーモードを有効する - MTAを再起動するのが必要です"
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4374
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Mouse fix:"
-msgstr "マウス修正:"
+msgstr "マウス修正："
 
-#: C:\mtasa-blue\Client\core\CSettings.cpp:4374
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Mouse movement fix - May need PC restart"
-msgstr "マウスの動き修正 - パソコンの再起動が必要かもしれません"
+msgstr "マウス移動修正 - パソコンを再起動するのが必要かもしれません"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Busy"
-msgstr "取り込み中"
+msgstr "忙しい"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
+#: ..\Client\core\CVersionUpdater.cpp:625
 msgid "Can't check for updates right now"
-msgstr "現在アップデートのチェックは出来ません。"
+msgstr "現在、アップデートチェックは出来ません"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1579
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1599
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1618
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1566
+#: ..\Client\core\CVersionUpdater.cpp:1586
+#: ..\Client\core\CVersionUpdater.cpp:1604
+#, c-format, c-format
 msgid "MTA:SA %s required"
-msgstr "MTA:SA %s が必要"
+msgstr "MTA:SA %s が必要です"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1580
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1567
+#, c-format, c-format
 msgid ""
 "An updated version of MTA:SA %s is required to join the selected server.\n"
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"このサーバーに参加するために、MTA:SA %s 最新アップデートが必要です。\n"
+"このサーバーに参加するために、MTA:SA %s の最新アップデートが必要です。\n"
 "\n"
 "MTA:SA %s をダウンロードして、インストールしますか？"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1600
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:1587
+#, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "%s MTA:SAを実行して、このサーバーに参加しますか？"
+msgstr "MTA:SA %s を実行して、このサーバーに参加しますか？"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1619
+#: ..\Client\core\CVersionUpdater.cpp:1605
 msgid ""
 "It is not possible to connect at this time.\n"
 "\n"
@@ -1730,43 +1684,43 @@ msgid ""
 msgstr ""
 "現在、サーバーに接続することができません。\n"
 "\n"
-"あとで、もう一度試してみてください。"
+"後で、もう一回試してみてください。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1812
+#: ..\Client\core\CVersionUpdater.cpp:1787
 msgid "Connecting"
 msgstr "接続中"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1813
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1830
+#: ..\Client\core\CVersionUpdater.cpp:1788
+#: ..\Client\core\CVersionUpdater.cpp:1804
 msgid "Please wait..."
 msgstr "しばらくお待ちください。。。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1829
+#: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "CHECKING"
 msgstr "チェック中"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1847
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1945
+#: ..\Client\core\CVersionUpdater.cpp:1820
+#: ..\Client\core\CVersionUpdater.cpp:1913
 msgid "UPDATE CHECK"
 msgstr "アップデートチェック中"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1848
+#: ..\Client\core\CVersionUpdater.cpp:1821
 msgid "No update needed"
 msgstr "アップデートする必要はありません"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1866
+#: ..\Client\core\CVersionUpdater.cpp:1838
 msgid "DOWNLOADING"
 msgstr "ダウンロード中"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1867
+#: ..\Client\core\CVersionUpdater.cpp:1839
 msgid "waiting..."
 msgstr "待機中..."
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1884
+#: ..\Client\core\CVersionUpdater.cpp:1855
 msgid "MANDATORY UPDATE"
 msgstr "義務的なアップデート"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1885
+#: ..\Client\core\CVersionUpdater.cpp:1856
 msgid ""
 "To join this server, you must update MTA.\n"
 "\n"
@@ -1774,78 +1728,90 @@ msgid ""
 msgstr ""
 "このサーバーに参加するために、MTAをアップデートすることが必要です。\n"
 "\n"
-"今、アップデートしますか。"
+"今にアップデートしますか。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1904
+#: ..\Client\core\CVersionUpdater.cpp:1874
 msgid "OPTIONAL UPDATE"
-msgstr "オプショナルアップデート"
+msgstr "不要なアップデート"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1905
+#: ..\Client\core\CVersionUpdater.cpp:1875
 msgid ""
 "Server says an update is recommended, but not essential.\n"
 "\n"
 " Do you want to update now ?"
 msgstr ""
-"サーバーはアップデートが推奨されていますが、アップデートの必要はありません。\n"
+"サーバーはアップデートは推奨されていますが、アップデート必要はありません。\n"
 "\n"
 "アップデートしますか？"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1946
+#: ..\Client\core\CVersionUpdater.cpp:1914
 msgid ""
 "Update not currently avalable.\n"
 "\n"
 "Please check www.mtasa.com"
 msgstr ""
-"現在、アップデートが不可能です。\n"
+"現在、アップデートは不可能です。\n"
 "\n"
-"「www.mtasa.com 」へ行ってください。"
+"「www.mtasa.com 」にチェックしてください。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1968
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2158
+#: ..\Client\core\CVersionUpdater.cpp:1939
+#: ..\Client\core\CVersionUpdater.cpp:2121
 msgid "ERROR SAVING"
 msgstr "保存エラー"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1969
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2159
+#: ..\Client\core\CVersionUpdater.cpp:1940
+#: ..\Client\core\CVersionUpdater.cpp:2122
 msgid "Unable to create the file."
 msgstr "ファイルを作成できません。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1978
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1987
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2168
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2177
+#: ..\Client\core\CVersionUpdater.cpp:1948
+#: ..\Client\core\CVersionUpdater.cpp:1957
+#: ..\Client\core\CVersionUpdater.cpp:2130
+#: ..\Client\core\CVersionUpdater.cpp:2139
 msgid "ERROR DOWNLOADING"
 msgstr "ダウンロードエラー"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1979
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2169
+#: ..\Client\core\CVersionUpdater.cpp:1949
+#: ..\Client\core\CVersionUpdater.cpp:2131
 msgid "The downloaded file appears to be incorrect."
-msgstr "ダウンロードしたファイルは不正ようです。"
+msgstr "ダウンロードしたファイルは無効のようです。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1988
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2178
+#: ..\Client\core\CVersionUpdater.cpp:1958
+#: ..\Client\core\CVersionUpdater.cpp:2140
 msgid "For some reason."
 msgstr "なんとか。"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2000
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2192
+#: ..\Client\core\CVersionUpdater.cpp:1969
+#: ..\Client\core\CVersionUpdater.cpp:2153
 msgid "DOWNLOAD COMPLETE"
-msgstr "ダウンロード成功です"
+msgstr "ダウンロード成功"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2025
+#: ..\Client\core\CVersionUpdater.cpp:1993
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- 不明なエラー _DialogUpdateResult"
+msgstr "- _DialogUpdateResult に不明なエラー "
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2127
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2137
+#: ..\Client\core\CVersionUpdater.cpp:2086
+msgid ""
+"This server is blocking your customized GTA:SA files.\n"
+"\n"
+"To join this server please uncheck:\n"
+"Settings->Multiplayer->Use customized GTA:SA files"
+msgstr ""
+"このサーバーはカスタムGTA:SAファイルを禁止しています。\n"
+"\n"
+"このサーバーに参加するため、この設定をオフにしてください：\n"
+"設定->ネットゲーム->カスタムGTA:SAファイルを利用する"
+
+#: ..\Client\core\CVersionUpdater.cpp:2091
+#: ..\Client\core\CVersionUpdater.cpp:2101
 msgid "Ok"
 msgstr "OK"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2135
+#: ..\Client\core\CVersionUpdater.cpp:2099
 msgid "ERROR"
 msgstr "エラー"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2136
+#: ..\Client\core\CVersionUpdater.cpp:2100
 msgid ""
 "Some MTA:SA data files are missing.\n"
 "\n"
@@ -1857,13 +1823,13 @@ msgstr ""
 "\n"
 "MTA:SAを再インストールしてください"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2777
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:2727
+#, c-format, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% 完了"
 
-#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2779
-#, c-format
+#: ..\Client\core\CVersionUpdater.cpp:2729
+#, c-format, c-format
 msgid ""
 "\n"
 "\n"
@@ -1873,16 +1839,16 @@ msgstr ""
 "\n"
 "返事を待っています - %-3d"
 
-#: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
-#, c-format
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
+#, c-format, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "スクリーンショットは%dバイト、%dが期待されました"
+msgstr "スクリーンショットは %d バイトですが、%d が所期されました"
 
-#: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:239
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
 msgstr "スクリーンショット失敗"
 
-#: C:\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:123
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:125
 msgid ""
 "Could not initialize Direct3D9.\n"
 "\n"
@@ -1892,360 +1858,362 @@ msgstr ""
 "Direct3D9は初期化できませんでした。\n"
 "\n"
 "DirectX End-User Runtimeと\n"
-"最新のWindowsサービスパックがインストール\n"
+"最新Windowsサービスパックがインストール\n"
 "されているか確認してください。"
 
 #. Create the window
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:91
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "サーバーブラウザ"
 
 #. Create the tabs
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:139
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:92
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:133
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:90
 msgid "Internet"
 msgstr "インターネット"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:140
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:134
 msgid "Local"
 msgstr "ローカル"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:141
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:135
 msgid "Favourites"
 msgstr "お気に入り"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:142
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:136
 msgid "Recent"
 msgstr "最近"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:197
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:191
 msgid ""
 "FOR QUICK CONNECT:\n"
 "\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
 msgstr ""
-"早くに接続するために\n"
+"早めに接続するために：\n"
 "\n"
-"アドレスバーにアドレスとポートを書いてください。\n"
+"アドレスバーにアドレスとポートを記入してください。\n"
 "または、最近のサーバーリストでサーバーを選んで 「接続する」をクリックしてください。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:210
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:203
 msgid "HELP"
 msgstr "ヘルプ"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:220
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:266
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:252
 msgid "Refresh"
 msgstr "リフレッシュ"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:221
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:267
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:253
 msgid "Add Favorite"
 msgstr "お気に入りに追加"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:222
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:268
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:317
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:376
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:254
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:301
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:361
 msgid "Connect"
 msgstr "接続する"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:223
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:269
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:255
 msgid "Server information"
 msgstr "サーバー情報"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:226
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:270
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:256
 msgid "Search servers"
 msgstr "サーバを検索"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:227
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:271
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:257
 msgid "Search players"
 msgstr "プレイヤーを検索する"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:228
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:272
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:258
 msgid "Start search"
 msgstr "検索開始"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:314
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1642
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:299
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1616
 msgid "Search players..."
 msgstr "プレイヤー検索。。。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:315
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:426
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1640
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:411
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1614
 msgid "Search servers..."
 msgstr "サーバーを検索する…"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:457
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:442
 msgid "Name"
 msgstr "名前"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:458
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:443
 msgid "Players"
 msgstr "プレイヤー"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:459
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:444
 msgid "Ping"
-msgstr "Ping"
+msgstr "レイテンシ"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:460
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:445
 msgid "Gamemode"
 msgstr "ゲームモード"
 
 #. Player List Columns
 #. Column for player names
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:482
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:145
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:467
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:138
 msgid "Player list"
 msgstr "プレイヤーリスト"
 
 #. Include label
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:490
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:475
 msgid "Include:"
 msgstr "含む:"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:496
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:481
 msgid "Empty"
 msgstr "空"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:502
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:487
 msgid "Full"
 msgstr "満杯"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:508
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:493
 msgid "Locked"
 msgstr "ロック中"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:520
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:505
 msgid "Offline"
 msgstr "オフライン"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:533
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:518
 msgid "Other Versions"
 msgstr "他のバージョン"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:554
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:539
 msgid "Back"
 msgstr "戻る"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:560
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:36
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:545
+#: ..\Client\loader\Dialogs.cpp:35
 msgid "Help"
 msgstr "ヘルプ"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:743
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:728
 msgid "Loading..."
-msgstr "読み込み中..."
+msgstr "読み込み中。。。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1193
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:2139
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1172
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:2103
 msgid "  ..loading.."
-msgstr "..読み込み中.."
+msgstr "  。。読み込み中。。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1224
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1353
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1330
 msgid "No address specified!"
 msgstr "アドレスが指定されていません！"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1237
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
 msgid "Unknown protocol"
 msgstr "不明なプロトコル"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1237
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1215
 msgid "Please use the mtasa:// protocol!"
-msgstr "「mtasa://」プロトコルを使ってください！"
+msgstr "「mtasa://」プロトコルを利用してください！"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1325
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:322
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:583
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1222
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1224
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:574
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "無効なニックネームです！ 設定でニックネームを変更してください！"
+
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
+#: ..\Client\loader\MainFunctions.cpp:584
+#: ..\Client\loader\MainFunctions.cpp:591
+#: ..\Client\loader\MainFunctions.cpp:1201
 msgid "Information"
 msgstr "情報"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1325
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1304
 msgid "You have to select a server to connect to."
 msgstr "サーバーを選んでください。"
 
 #. Create queue window
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:32
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:305
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:32
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:302
 msgid "SERVER IS FULL"
 msgstr "サーバーが満ちている"
 
+#. Determine our label draw position for L10n
 #. Start position
 #. Server Name
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:45
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:59
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:53
 msgid "Name:"
-msgstr "名前:"
+msgstr "名前："
 
 #. Server IP
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:46
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:71
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "サーバーアドレス:"
+msgstr "サーバーアドレス："
 
 #. Gamemode
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:47
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:83
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "ゲームモード"
+msgstr "ゲームモード："
 
 #. Map
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:48
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:94
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:86
 msgid "Map:"
-msgstr "マップ:"
+msgstr "マップ："
 
 #. Players
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:49
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:105
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:97
 msgid "Players:"
-msgstr "プレイヤー:"
+msgstr "プレイヤー："
 
 #. Passworded
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:50
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:116
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "パスワード:"
+msgstr "パスワード："
 
 #. Latency
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:51
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:127
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "レイテンシ"
+msgstr "レイテンシ："
 
 #. Close button
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:151
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:144
 msgid "Close"
 msgstr "閉じる"
 
 #. Join Game button
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:158
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:152
 msgid "Join Game"
 msgstr "ゲームに参加する"
 
 #. Please enter password label
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:172
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "サーバーのパスワードを入力してください:"
+msgstr "サーバーのパスワードを入力してください："
 
-#. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line
-#. using a newline (\n).
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
 msgstr "スペースが空いたら、すぐに参加する。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:313
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
 msgstr "パスワードを入れてください"
 
 #. The server has timed out
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:405
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:402
 msgid "Timed Out"
 msgstr "タイムアウト"
 
 #. Set every GUI elements text to blank
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:434
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:431
 msgid "Querying..."
-msgstr "問い合わせています..."
+msgstr "問い合わせています。。。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:26
+#: ..\Client\core\ServerBrowser\CServerList.cpp:25
 msgid "Idle"
 msgstr "待機中です"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:154
+#: ..\Client\core\ServerBrowser\CServerList.cpp:152
 msgid "player"
 msgid_plural "players"
 msgstr[0] "プレイヤープレイヤー"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:155
+#: ..\Client\core\ServerBrowser\CServerList.cpp:153
 msgid "on"
 msgstr "に"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:158
+#: ..\Client\core\ServerBrowser\CServerList.cpp:156
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "サーバー"
+msgstr[0] "サーバーサーバー"
 
 #. We are polling for the master server list (first pass)
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
-#, c-format
+#: ..\Client\core\ServerBrowser\CServerList.cpp:240
+#, c-format, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "マスターリストをリクエストしています。(%lu ms 過ぎました。)"
+msgstr "マスターリストをリクエストしています。(%lu ms 過ぎました)"
 
 #. Abort
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:263
+#: ..\Client\core\ServerBrowser\CServerList.cpp:256
 msgid "Master server list could not be parsed."
 msgstr "マスターサーバーリストが解析できませんでした。"
 
 #. Abort
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:270
+#: ..\Client\core\ServerBrowser\CServerList.cpp:266
 msgid "Master server list could not be retrieved."
 msgstr "マスターサーバーリストが取得できませんでした。"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:280
+#: ..\Client\core\ServerBrowser\CServerList.cpp:276
 msgid "(Backup server list)"
 msgstr "(バックアップサーバーリスト）"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:330
+#: ..\Client\core\ServerBrowser\CServerList.cpp:328
 msgid "Cannot bind LAN-broadcast socket"
 msgstr "LAN放送ソケットをバインドすることはできませんでした"
 
-#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:350
+#: ..\Client\core\ServerBrowser\CServerList.cpp:347
 msgid "Attempting to discover LAN servers"
 msgstr "LANサーバーを検索中"
 
-#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:701
+#: ..\Client\game_sa\CSettingsSA.cpp:800
 msgid "Can't find valid screen resolution."
 msgstr "有効な解像度が見つかりませんでした。"
 
 #. Confirm that res should be used
-#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:778
+#: ..\Client\game_sa\CSettingsSA.cpp:876
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "本当にこの解像度を使いますか。"
+msgstr "この解像度を利用するに確かですか？"
 
-#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:780
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:94
+#: ..\Client\game_sa\CSettingsSA.cpp:878 ..\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:158
+#: ..\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
-msgstr "Aeroセッティングアップデート"
+msgstr "Aero設定アップデート"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:160
+#: ..\Client\loader\CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
-msgstr "ラージメモリセッティングアップデート"
+msgstr "ラージメモリ設定アップデート"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:162
+#: ..\Client\loader\CExePatchedStatus.cpp:157
 msgid "Update DEP setting"
 msgstr "DEP設定アップデート"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
+#: ..\Client\loader\CExePatchedStatus.cpp:159
 msgid "Update graphics driver compliance"
 msgstr "グラフィックドライバの準拠をアップデートする"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:166
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:168
+#: ..\Client\loader\CExePatchedStatus.cpp:161
+#: ..\Client\loader\CExePatchedStatus.cpp:163
 msgid "Fix file issues"
-msgstr "ファイル問題を修理する"
+msgstr "ファイル問題を修正する"
 
-#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:169
+#: ..\Client\loader\CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
-msgstr "実行可能をコピーする。これはグラフィックエラーを防ぐためです"
+msgstr "グラフィックエラーを防ぐために実行可能ファイルをコピーする"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:335
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1268
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:314 ..\Client\loader\Utils.cpp:1207
+#, c-format, c-format
 msgid ""
 "MTA:SA needs Administrator access for the following task:\n"
 "\n"
@@ -2253,24 +2221,24 @@ msgid ""
 "\n"
 "Please confirm in the next window."
 msgstr ""
-"下記のタスクをできるようにため、管理者アクセスが必要です:\n"
+"下記のタスクをを完成するために、管理者アクセスが必要です\n"
 "\n"
-"'%s'\n"
+"  '%s'\n"
 "\n"
 "次のウインドウで確認してください。"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:349
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:329
+#, c-format, c-format
 msgid ""
 "MTA:SA could not complete the following task:\n"
 "\n"
 "  '%s'\n"
 msgstr ""
-"MTA:SAは下記のタスクができませんでした:\n"
+"MTA:SAは下記のタスクを完成することができませんでした\n"
 "\n"
-"'%s'\n"
+"  '%s'\n"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:400
+#: ..\Client\loader\CInstallManager.cpp:379
 msgid ""
 "** The crash was caused by a graphics driver error **\n"
 "\n"
@@ -2280,151 +2248,151 @@ msgstr ""
 "\n"
 "＊＊グラフィックドライバをアップデートしてください＊＊"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:511
+#: ..\Client\loader\CInstallManager.cpp:485
 msgid "Install updated MTA:SA files"
-msgstr "アプデートしたMTA:SAファイルをインストールします"
+msgstr "アプデートしたMTA:SAファイルをインストールする"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:532
+#: ..\Client\loader\CInstallManager.cpp:505
 msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
-msgstr "ほかのプログラムの影響でアプデートすることができませんでした。他のプログラムを閉じてください"
+msgstr "他のプログラムの影響でアプデートすることができませんでした。他のプログラムを閉じて、もう一回試してみてください"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
-#, c-format
+#: ..\Client\loader\CInstallManager.cpp:514
+#, c-format, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "MTAは完全にインストールできませんでした。再インストールしてください。 %s"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
+#: ..\Client\loader\CInstallManager.cpp:713
 msgid "Missing file:"
 msgstr "不足ファイル:"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:744
+#: ..\Client\loader\CInstallManager.cpp:717
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "もしMTAがロードを失敗したら、GTA:SAを再インストールをしてください"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:869
+#: ..\Client\loader\CInstallManager.cpp:838
 msgid "Update install settings"
 msgstr "アップデートインストール設定"
 
-#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:981
+#: ..\Client\loader\CInstallManager.cpp:971
 msgid "Update compatibility settings"
-msgstr "互換性セッティングアップデート"
+msgstr "互換性設定アップデート"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:35
+#: ..\Client\loader\Dialogs.cpp:34
 msgid "Quit"
 msgstr "終了"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:51
+#: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreasは問題が見つかりました"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:52
+#: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
 msgstr "クラッシュ情報"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:53
+#: ..\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "MTAデベロッパーにこの情報を送るために、このチェックボックスにチェックしてください"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:54
+#: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "すると、このクラッシュを直す可能性が高くなります。"
+msgstr "すると、このクラッシュを修正する可能性が高くなります。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:55
+#: ..\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "MTA: San Andreasを再起動しますか。"
+msgstr "MTA: San Andreasを再起動しますか？"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:62
+#: ..\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - 警告"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:63
+#: ..\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
-msgstr "あなたのGTA: San Andreasインストールがd3d9.dllファイルを含んでいます:"
+msgstr "GTA: San Andreasインストールフォルダにd3d9.dllファイルが存在しています:"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
+#: ..\Client\loader\Dialogs.cpp:65
 msgid ""
 "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"このファイルは必要ありません。そして、このバーションのグラフィカル機能に干渉するかもしれません。\n"
+"このファイルは必要ありません。そして、このバーションのグラフィカル機能に問題を行うかもしれません。\n"
 "\n"
 "d3d9.dllファイルの名前を変更してください。または、ファイルを消しておいてください"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:66
+#: ..\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
-msgstr "このd3d9.dllファイルのことを知らせないでください"
+msgstr "このd3d9.dllファイルについて知らせないでください"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:67
+#: ..\Client\loader\Dialogs.cpp:68
 msgid "Show me the file"
 msgstr "ファイルを表示してください"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:68
+#: ..\Client\loader\Dialogs.cpp:69
 msgid "Play MTA:SA"
 msgstr "MTA:SAをプレイする"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:75
+#: ..\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - 紛らわしいオプション"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:76
+#: ..\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
 msgstr "NVidia Optimus が検出されました！"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:77
+#: ..\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
 msgstr "オプションを試してみてください:"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:78
+#: ..\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
 msgstr "A - NVIDIAスタンダード"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:79
+#: ..\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
 msgstr "B - 別のNVIDIA"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:80
+#: ..\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - NVIDIAスタンダードとEXE名前の変更"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:81
+#: ..\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - 別のNVIDIAとEXE名前の変更"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:82
+#: ..\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
 msgstr "E - スタンダードインテル"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:83
+#: ..\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
 msgstr "F - 別のインテル"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:84
+#: ..\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
 msgstr "G - スタンダードインテルとEXE名前の変更"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:85
+#: ..\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - 別のインテルとEXE名前の変更"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:86
+#: ..\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
-msgstr "絶望的な時に、これが助けてくれる:"
+msgstr "絶望的な時に、これが助けてくれる："
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:87
+#: ..\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
 msgstr "ウィンドウモードを強制"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:95
+#: ..\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
-msgstr "警告:アンチウイルスソフトが見つかりませんでした"
+msgstr "警告： アンチウイルスソフトが見つかりませんでした"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:96
+#: ..\Client\loader\Dialogs.cpp:97
 msgid ""
 "MTA could not detect an anti-virus on your PC.\n"
 "\n"
@@ -2434,67 +2402,59 @@ msgid ""
 msgstr ""
 "MTAはパソコンにアンチウイルスが見つかりませんでした。\n"
 "\n"
-"ウイルスはMTAと妨害、そしてゲーム経験をデグレードするもしれません。\n"
+"ウイルスはMTAと妨害し、ゲーム経験を悪くするもしれません。\n"
 "\n"
-"情報について、「ヘルプ」をクリックしてください。"
+"情報に関しては「ヘルプ」をクリックしてください。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:99
+#: ..\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
 msgstr "私はもうアンチウイルスをインストールしています"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:100
+#: ..\Client\loader\Dialogs.cpp:102
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
-"アンチウイルスをインストールしません。\n"
-"私のパソコンがクラックされて、ボットネットの一部になってほしい。"
+"私、アンチウイルスをインストールしません。\n"
+"パソコンが遅くなって、ボットネットの一部になってが良い。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:702
-#: C:\mtasa-blue\Client\loader\Utils.cpp:786
+#: ..\Client\loader\Dialogs.cpp:691 ..\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "GTA：San Andreasを探しています"
+msgstr "Grand Theft Auto San Andreas を探しています"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:705
-#: C:\mtasa-blue\Client\loader\Utils.cpp:788
+#: ..\Client\loader\Dialogs.cpp:694 ..\Client\loader\Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "GTA：San Andreasをスタートしてください"
+msgstr "Grand Theft Auto San Andreas をスタートしてください"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:713
-#: C:\mtasa-blue\Client\loader\Install.cpp:189
+#: ..\Client\loader\Dialogs.cpp:702 ..\Client\loader\Install.cpp:187
 msgid "Installing update..."
 msgstr "アップデートインストール中。。。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:721
-#: C:\mtasa-blue\Client\loader\Install.cpp:291
+#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:290
 msgid "Extracting files..."
 msgstr "ファイルを抽出中。。。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:726
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1713
+#: ..\Client\loader\Dialogs.cpp:715 ..\Client\loader\Utils.cpp:1630
 msgid "Copying files..."
 msgstr "ファイルコピー中。。。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:731
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1773
+#: ..\Client\loader\Dialogs.cpp:720 ..\Client\loader\Utils.cpp:1690
 msgid "Copy finished early. Everything OK."
-msgstr "ファイルコピーが完成しました。全てがOKです。"
+msgstr "ファイルコピーが完成しました。全てはOKです。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:736
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1779
+#: ..\Client\loader\Dialogs.cpp:725 ..\Client\loader\Utils.cpp:1696
 msgid "Finishing..."
 msgstr "終了。。。"
 
-#: C:\mtasa-blue\Client\loader\Dialogs.cpp:740
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1781
+#: ..\Client\loader\Dialogs.cpp:729 ..\Client\loader\Utils.cpp:1698
 msgid "Done!"
 msgstr "完了です!"
 
-#: C:\mtasa-blue\Client\loader\Install.cpp:95
+#: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr "MTAサーバーを停止して、アップデートしますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
+#: ..\Client\loader\MainFunctions.cpp:235
 msgid ""
 "Trouble restarting MTA:SA\n"
 "\n"
@@ -2504,15 +2464,15 @@ msgid ""
 "\n"
 "Try to launch MTA:SA again?"
 msgstr ""
-"MTA:SA再スタート失敗\n"
+"MTA:SA再実行失敗\n"
 "\n"
-"この問題が続いたら、タスクマネジャーをあけて\n"
-"「gta_sa.exe」と「Multi Theft Auto.exe」のプロセスを止めてください\n"
+"この問題が続いたら、タスクマネジャーを開けて\n"
+"「gta_sa.exe」と「Multi Theft Auto.exe」のプロセスを停止してください\n"
 "\n"
 "\n"
-"再起動しますか。"
+"再起動しますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:252
+#: ..\Client\loader\MainFunctions.cpp:253
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2522,7 +2482,7 @@ msgstr ""
 "\n"
 "この問題が続いたら、パソコンを再起動してください"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:255
+#: ..\Client\loader\MainFunctions.cpp:256
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2530,78 +2490,78 @@ msgid ""
 msgstr ""
 "他のMTAインスタンスが実行しています。\n"
 "\n"
-"終了しますか。"
+"終了しますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:279
+#: ..\Client\loader\MainFunctions.cpp:280
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Do you want to revert to an earlier version?"
 msgstr ""
-"MTA:SAの実行と問題がありますか？\n"
+"MTA:SA実行問題がありますか？\n"
 "\n"
 "以前のバージョンに戻しますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:307
+#: ..\Client\loader\MainFunctions.cpp:309
 msgid ""
 "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n"
 "\n"
 "Do you want to reset GTA settings now?"
 msgstr ""
-"MTA:SAの実行と問題があるそうです。\n"
-"GTAのセッティングをリセットすると、問題が直されるかもしれません。\n"
+"MTA:SA実行問題があるそうです。\n"
+"GTAの設定をリセットすると、問題が修正されるかもしれません。\n"
 "\n"
-"GTAのセッティングをリセットしますか。"
+"GTAの設定をリセットしますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:316
+#: ..\Client\loader\MainFunctions.cpp:320
 msgid ""
 "GTA settings have been reset.\n"
 "\n"
 "Press OK to continue."
 msgstr ""
-"GTAセッティングがリセットされました。\n"
+"GTA設定がリセットされました。\n"
 "\n"
-"「OK」を押してください。"
+"続けるに「OK」を押してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:321
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:325
+#, c-format, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "次のファイルを消すことができませんでした: '%s'"
+msgstr "次のファイルを消すことができませんでした： %s'"
 
 #. No settings to delete, or can't find them
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:328
+#: ..\Client\loader\MainFunctions.cpp:333
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Do you want to see some online help?"
 msgstr ""
-"MTA:SAの実行と問題がありますか。\n"
+"MTA:SA実行問題がありますか。\n"
 "\n"
-"オンラインでヘルプを探しますか？"
+"オンラインでヘルプを調べますか？"
 
 #. Inform user
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:365
+#: ..\Client\loader\MainFunctions.cpp:369
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
-"MTA:SAを実行するには問題がありまか？\n"
+"MTA:SA実行問題がありまか？\n"
 "\n"
-"次の設定に変更したいですか？"
+"次の設定を変更したいですか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:409
+#: ..\Client\loader\MainFunctions.cpp:412
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
-"MTA：SAを実行するには問題ありますか？\n"
+"MTA：SA実行問題ありますか？\n"
 "\n"
 "次のソフトを無効してみてください："
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:443
+#: ..\Client\loader\MainFunctions.cpp:446
 msgid ""
 "WARNING\n"
 "\n"
@@ -2612,51 +2572,52 @@ msgstr ""
 "警告\n"
 "\n"
 "MTA:SAは珍しい活動が検出されました。\n"
-"システムの安全のために、ウイルススキャンをしてください。\n"
+"システム安全のために、ウイルススキャンをしてください。\n"
 "\n"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:449
+#, c-format, c-format
 msgid "The detected file was:  %s\n"
-msgstr "検出されたファイルは: %s\n"
+msgstr "検出されたファイルは：  %s\n"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:583
+#: ..\Client\loader\MainFunctions.cpp:583
 msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "GTA: San Andreasのインスタンスはまだ実行しています。スタートする前に終了しなければなりません。そうしますか？"
+msgstr "GTA: San Andreasのインスタンスはまだ実行しています。実行する前に終了しなければなりません。そうしますか？"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
+#: ..\Client\loader\MainFunctions.cpp:590
 msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
-msgstr "GTA: San Andreasを中止できませんでした。この問題が続いたら、パソコンを再起動してください。"
+msgstr "GTA: San Andreasを停止できませんでした。この問題が続いたら、パソコンを再起動してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
+#: ..\Client\loader\MainFunctions.cpp:613
 msgid ""
 "Registry entries are missing. Please reinstall Multi Theft Auto: San "
 "Andreas."
-msgstr "レジストリエントリ不足。MTA:SAを再インストールしてください。"
+msgstr "レジストリエントリがないです。MTA:SAを再インストールしてください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
+#: ..\Client\loader\MainFunctions.cpp:619
 msgid ""
 "The path to your installation of GTA: San Andreas contains unsupported "
 "(unicode) characters. Please move your Grand Theft Auto: San Andreas "
 "installation to a compatible path that contains only standard ASCII "
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
-"GTA: San "
-"Andreasのインストールパスのキャラクタがサポートされていません（ユニコード）。GTA:SAのインストールフォルダをASCIIのパスに移動して、MTA:SAを再インストールしてください。"
+"GTA: San Andreas のインストールパスの文字がサポートされていません（ユニコード）。Grand Theft Auto: San "
+"Andreas のインストールフォルダをASCIIのみにあるパスに移動して、Multi Theft Auto: San Andreas "
+"を再インストールしてください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
+#: ..\Client\loader\MainFunctions.cpp:626
 msgid ""
 "It appears you have a Steam version of GTA:SA, which is currently "
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr ""
-"あなたはGTA:SAのSteamバーションを使っているそうです。現在、Steamバーションはサポートされていませんので、オンラインでフィックスにあるページにリダイレクトされます。"
+"GTA:SAのSteam版を利用しているそうです。現在、Steam版はサポートされていません。 オンラインで修正する情報ウェブページに移動されます。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
+#: ..\Client\loader\MainFunctions.cpp:641
 msgid ""
 "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n"
@@ -2666,59 +2627,58 @@ msgid ""
 msgstr ""
 "「MTA:SA」や「GTA:SA」のインストールパスに「；」が含んでいます。\n"
 "\n"
-"問題があったら、\n"
-"「；」のないパスにインストールを移動してください。"
+" 問題があったら、\n"
+" インストールフォルダを「；」のないパスに移動してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
+#: ..\Client\loader\MainFunctions.cpp:781
 msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
-msgstr "読み込み失敗。最新データがインストールしているのを確認して下さい。"
+msgstr "読み込み失敗。最新データファイルがインストールしているのを確認して下さい。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:787
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:790
+#, c-format, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "読み込み失敗。%s が正しくにインストールされたのが確認して下さい。"
+msgstr "読み込み失敗。%s が正しくにインストールされたのを確認して下さい。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:794
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:797
+#, c-format, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "読み込み失敗。gta_sa.exe は %s に見つかれませんでした"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:807
+#, c-format, c-format
 msgid ""
 "Load failed. %s exists in the GTA directory. Please delete before "
 "continuing."
-msgstr "読み込み失敗。%s は存在しています。続く前に、消しておいてください。"
+msgstr "読み込み失敗。%s はGTAインストールフォルダに存在しています。続く前に、このファイルを消しておいてください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:812
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:816
+#, c-format, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "メインファイルは正しくない名前をもっています(%s)"
+msgstr "メインファイルは無効な名前である (%s)"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:823
+#: ..\Client\loader\MainFunctions.cpp:827
 msgid ""
 "Main file is unsigned. Possible virus activity.\n"
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
-"メインファイルが割り当てられていません。ウイルスの活動があるかもしれません。\n"
+"メインファイルが署名されていません。ウイルスの活動があるかもしれません。\n"
 "\n"
-"MTAになにか、珍しいことまたは実行していないは、オンラインヘルプを探してください。"
+"MTAになにか、珍しいこと、または実行していない場合はオンラインで検索してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:851
+#: ..\Client\loader\MainFunctions.cpp:857
 msgid ""
 "Data files modified. Possible virus activity.\n"
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
-"データファイルが変わりました。ウイルス活動の可能性があります。\n"
+"データファイルが変更されました。ウイルス活動の可能性があります。\n"
 "\n"
-"MTAになにか、珍しいことまたは実行していないは、オンライン手伝いを探してください。"
+"MTAになにか、珍しいこと、または実行していない場合はオンラインで検索してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
+#: ..\Client\loader\MainFunctions.cpp:869
 msgid ""
 ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
@@ -2728,16 +2688,16 @@ msgstr ""
 "\n"
 "MTAと問題があったら、このファイルを消してください。"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
+#: ..\Client\loader\MainFunctions.cpp:931
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "ファイルバージョンミスマッチ。MTA:SAと問題があったら、再インストールしてください。\n"
+msgstr "ファイルバージョンミスマッチエラー。MTA:SAと問題があったら、再インストールしてください。\n"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
+#: ..\Client\loader\MainFunctions.cpp:940
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "ファイル不足。問題があったら、MTA:SAを再インストールをしてください。"
+msgstr "ファイル不足。問題があったら、MTA:SAを再インストールをしてください。\n"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
+#: ..\Client\loader\MainFunctions.cpp:952
 msgid ""
 "MTA:SA is not compatible with Windows 'Safe Mode'.\n"
 "\n"
@@ -2747,314 +2707,313 @@ msgstr ""
 "\n"
 "パソコンを再起動してください。\n"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1103
+#: ..\Client\loader\MainFunctions.cpp:1088
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "設定問題を修正する"
 
 #. Try to relaunch as admin if not done so already
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1154
+#: ..\Client\loader\MainFunctions.cpp:1130
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "アドミン問題を修正する"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
-#, c-format
+#: ..\Client\loader\MainFunctions.cpp:1137
+#, c-format, c-format
 msgid ""
 "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"GTA：San Andreasが実行できませんでした。 再起動してください、この問題が続いたら、MTAを「www.multitheftauto.com. 」までに連絡してください。 \n"
+"GTA：San Andreasが実行できませんでした。 再起動してください。この問題が続いたら、MTAを「www.multitheftauto.com. 」までに連絡してください。 \n"
 "\n"
 "[%s]"
 
-#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1222
+#: ..\Client\loader\MainFunctions.cpp:1201
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr "GTA：San Andreasが正しく実行しなかったかも知れません。終了しますか？"
+msgstr "GTA：San Andreas が正しく実行しなかったかもしれません。終了しますか？"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:874
+#: ..\Client\loader\Utils.cpp:832
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "GTA：San Andreasのインストールパスを選んでください"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1372
-#, c-format
+#: ..\Client\loader\Utils.cpp:1308
+#, c-format, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "%s(%s) モジュール読み込み失敗"
+msgstr "%s モジュールの読み込みが失敗しました (%s)"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1822
-#, c-format
+#: ..\Client\loader\Utils.cpp:1738
+#, c-format, c-format
 msgid ""
 "New installation of %s detected.\n"
 "\n"
 "Do you want to copy your settings from %s ?"
 msgstr ""
-"%s 新たなインストールを検出されました。\n"
+"%s の最新インストールを検出されました。\n"
 "\n"
-"%s からセッティングをコピーしますか？"
+"%s から設定をコピーしますか？"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1863
-#, c-format
+#: ..\Client\loader\Utils.cpp:1777
+#, c-format, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SAが '%s' ファイルの読み込みに失敗しました。"
+msgstr "GTA:SAは '%s' ファイル読み込みに失敗しました"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1886
-#, c-format
+#: ..\Client\loader\Utils.cpp:1799
+#, c-format, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SAに '%s' ファイルが不足しています。"
+msgstr "GTA:SAが '%s' ファイルが不足しています。"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1912
+#: ..\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SAがモデルを読み込みに失敗しました。"
+msgstr "GTA:SAはモデルを読み込みに失敗しました。"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1914
+#: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "最近「gta3.img」を変更した場合、GTA:SAを再インストールしてください。"
+msgstr "最近「gta3.img」を変更した場合は、GTA:SAを再インストールしてみてください。"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1940
+#: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SAが車のアップグレードを失敗しました。"
+msgstr "GTA:SAが車のアップグレードに失敗しました。"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:1960
+#: ..\Client\loader\Utils.cpp:1870
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SAは「%s」ファイルにエラーを発見しました"
 
-#. Ask user to confirm
-#: C:\mtasa-blue\Client\loader\Utils.cpp:2035
+#: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "MTA:SAをプレイ中にパソコンを再起動しましたか？"
 
-#: C:\mtasa-blue\Client\loader\Utils.cpp:2103
+#: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
-msgstr "続ける前に、次のプログラムを閉じてください:"
+msgstr "続ける前に、次のプログラムを閉じてください："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:41
+#: ..\Client\mods\deathmatch\CClient.cpp:35
 msgid "This version has expired."
 msgstr "このバージョンが失効しました。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:62
+#: ..\Client\mods\deathmatch\CClient.cpp:55
 msgid "disconnect from the game"
 msgstr "ゲームから切断する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:63
+#: ..\Client\mods\deathmatch\CClient.cpp:56
 msgid "shows the nametags"
 msgstr "ネームタグを表示する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:64
+#: ..\Client\mods\deathmatch\CClient.cpp:57
 msgid "shows the chatbox"
 msgstr "チャットボックスを表示する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:65
+#: ..\Client\mods\deathmatch\CClient.cpp:58
 msgid "shows the network statistics"
 msgstr "ネット統計を表示する"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:69
+#: ..\Client\mods\deathmatch\CClient.cpp:62
 msgid "open the chat input"
-msgstr "チャットインプットを開ける"
+msgstr "チャット入力を開ける"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:70
+#: ..\Client\mods\deathmatch\CClient.cpp:63
 msgid "transmits voice to other players"
-msgstr "他のプレーヤーに送信する"
+msgstr "他のプレーヤーに声を送信する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:71
+#: ..\Client\mods\deathmatch\CClient.cpp:64
 msgid "enters a car as passenger"
 msgstr "同乗で車に乗る"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:72
+#: ..\Client\mods\deathmatch\CClient.cpp:65
 msgid "next radio channel"
 msgstr "次のラジオチャンネル"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:73
+#: ..\Client\mods\deathmatch\CClient.cpp:66
 msgid "previous radio channel"
 msgstr "前のラジオチャンネル"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:74
+#: ..\Client\mods\deathmatch\CClient.cpp:67
 msgid "enables the radar view"
 msgstr "ラダービューを有効"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:75
+#: ..\Client\mods\deathmatch\CClient.cpp:68
 msgid "zooms the radar in"
 msgstr "ラダーをズームイン"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:76
+#: ..\Client\mods\deathmatch\CClient.cpp:69
 msgid "zooms the radar out"
 msgstr "ラダーをズームアウト"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:77
+#: ..\Client\mods\deathmatch\CClient.cpp:70
 msgid "moves the radar north"
 msgstr "ラダーを北へ移動し"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:78
+#: ..\Client\mods\deathmatch\CClient.cpp:71
 msgid "moves the radar south"
 msgstr "ラダーを南へ移動し"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:79
+#: ..\Client\mods\deathmatch\CClient.cpp:72
 msgid "moves the radar east"
 msgstr "ラダーを東へ移動し"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:80
+#: ..\Client\mods\deathmatch\CClient.cpp:73
 msgid "moves the radar west"
 msgstr "ラダーを西へ移動し"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:81
+#: ..\Client\mods\deathmatch\CClient.cpp:74
 msgid "attaches the radar"
 msgstr "ラダーを添付する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:82
+#: ..\Client\mods\deathmatch\CClient.cpp:75
 msgid "reduces radar opacity"
 msgstr "ラダー不透明を減る"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:83
+#: ..\Client\mods\deathmatch\CClient.cpp:76
 msgid "increases radar opacity"
 msgstr "ラダー不透明を増える"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:84
+#: ..\Client\mods\deathmatch\CClient.cpp:77
 msgid "toggles radar help text"
 msgstr "ラダーヘルプテキストを表示する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:85
+#: ..\Client\mods\deathmatch\CClient.cpp:78
 msgid "sends a message to the targetted player"
 msgstr "選んだプレーヤーにメセージを送る"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:86
+#: ..\Client\mods\deathmatch\CClient.cpp:79
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "車に乗ってるとき、次の武器に変える。"
+msgstr "車に乗っている時、次の武器に変える。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:87
+#: ..\Client\mods\deathmatch\CClient.cpp:80
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "車に乗ってるとき、前の武器に変える。"
+msgstr "車に乗っている時、前の武器に変える。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:88
+#: ..\Client\mods\deathmatch\CClient.cpp:81
 msgid "outputs info about the current server"
-msgstr "現在にいるサーバーの情報をアウトプット"
+msgstr "現在サーバーの情報を表示する"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:91
+#: ..\Client\mods\deathmatch\CClient.cpp:84
 msgid "defines the scale multiplier of all text-displays"
-msgstr "テキストのスケールマルチプライヤの設定"
+msgstr "テキストのスケールマルチプライヤ設定"
 
 #. Development mode
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:98
+#: ..\Client\mods\deathmatch\CClient.cpp:91
 msgid "(Development mode) shows the colshapes"
-msgstr "（デベロップメントモード）コリジョンを表示"
+msgstr "（デベロップメントモード）コリジョン形を表示する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:99
+#: ..\Client\mods\deathmatch\CClient.cpp:92
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "（デベロップメントモード）世界の音IDをデバッグウインドウにアウトプットする"
+msgstr "（デベロップメントモード）世界音IDをデバッグウインドウに表示する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:581
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:590
 msgid "Entering the game ..."
 msgstr "参加中。。。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:639
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr "接続していません；「クイックコネクト」や「connect」コマンドを利用して、サーバーに参加してください。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
 msgid "The server is not installed"
-msgstr "サーバーがインストールしていません"
+msgstr "サーバーはインストールしていません"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:696
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1090
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Local Server"
-msgstr "ローカルサーバ"
+msgstr "ローカルサーバー"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:696
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
 msgid "Starting local server ..."
-msgstr "ローカルサーバをスタートしています。。。"
+msgstr "ローカルサーバーを実行しています。。。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1021
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "ゲームからキックされました （理由： %s）"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1090
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Connecting to local server..."
 msgstr "ローカルサーバーに接続中..."
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1101
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
 msgid "Error connecting to server."
-msgstr "サーバ接続中にエラー。"
+msgstr "サーバー接続エラー。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1111
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
 msgid "Connecting to local server timed out. See console for details."
 msgstr "ローカルサーバの接続がタイムアウトしてしまいました。情報はコンソールにあります。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Connection with the server was lost"
-msgstr "サーバとの接続が失われました"
+msgstr "サーバーとの接続が失われてしまいました"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1237
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1224
 msgid "Disconnected: the server is currently full"
-msgstr "切断：サーバは現在満ちています"
+msgstr "切断：サーバーは現在満ちています"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1246
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1236
 msgid "Disconnected: invalid password specified"
-msgstr "接続切断：パスワードは正しくありません。"
+msgstr "切断：パスワードは無効です。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1266
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
 msgid "MTA Client verification failed!"
 msgstr "MTAクライアント確認失敗！"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:39
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "ゲームホストする"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:55
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:53
 msgid "Resources"
 msgstr "資源"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:57
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:59
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:55
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "サーバ名:"
+msgstr "サーバ名："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:66
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:68
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:64
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:66
 msgid "Password:"
-msgstr "パスワード:"
+msgstr "パスワード："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:75
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:77
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:73
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "最大プレイヤー数:"
+msgstr "最大プレイヤー数："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:84
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:86
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:82
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
 msgstr "放送："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:88
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
 msgstr "LAN"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:101
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:99
 msgid "Selected"
 msgstr "選択"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:118
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:116
 msgid "All"
 msgstr "全部"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:120
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:118
 msgid "Start"
 msgstr "開始"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
-msgstr "接続切断：不正なニックネーム"
+msgstr "切断：無効なニックネーム"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:482
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
-msgstr "サーバから切断する"
+msgstr "サーバーから切断する"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:485
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
+#, c-format, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
@@ -3062,8 +3021,8 @@ msgstr ""
 "切断：シリアルが禁止されました。\n"
 "理由： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:490
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
+#, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
@@ -3071,8 +3030,8 @@ msgstr ""
 "切断： あなたが禁止されました。\n"
 "理由：%s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
@@ -3080,194 +3039,266 @@ msgstr ""
 "切断：アカウントが禁止されました。\n"
 "理由： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:499
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
 msgstr "切断： バージョンミスマッチ"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:502
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "切断： 参加溢水。しばらくお待ちください、そして再接続してください。"
+msgstr "切断： 参加溢水。しばらくお待ちください。後で参加してみてください。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:505
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
+#, c-format, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr ""
-"切断： サーバのブランチは違います。\n"
+"切断： サーバーのブランチは違います。\n"
 "情報： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
+#, c-format, c-format
 msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr ""
-"切断： 不正バージョン。\n"
+"切断： 無効なバージョン。\n"
 "情報： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
+#, c-format, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr ""
-"切断： サーバが新しいビルドを実行しています。\n"
+"切断： サーバーは新しいビルドで実行しています。\n"
 "情報： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:517
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
+#, c-format, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "接続切断： サーバが古いビルドを実行しています。情報： %s"
+msgstr ""
+"切断： サーバーは古いビルドで実行しています。\n"
+"情報： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:521
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
-msgstr "接続切断： ニックネームは今使われています"
+msgstr "切断： ニックネームはもう利用されています"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:524
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
 msgstr "切断： プレーヤーエレメントが作成できませんでした。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:527
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
+#, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "切断： サーバが接続をことわりました： %s"
+msgstr "切断： サーバーが接続を断りました： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:531
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
-msgstr "切断： シリアル確認失敗"
+msgstr "切断： シリアル確認が失敗しました"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:534
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
+#, c-format, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "切断： 接続非同期化 %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:542
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
+#, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "切断： %s にキックされました"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:546
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
+#, c-format, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "切断： %s に禁止されました"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "切断：サーバー停止、また再起動"
+msgstr "切断：サーバー停止したようです。もしくは再起動しているようです"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:578
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
+msgid "You were kicked from the game"
+msgstr "ゲームからキックされました"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "このサーバーは変更されていないgta_sa.exeが必要です"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+msgid "Please replace gta_sa.exe"
+msgstr "gta_sa.exeを変更してください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "このサーバーはカスタムD3D9.DLLを禁じしています"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "GTAインストールフォルダからD3D9.DLLを消して、MTAを再起動してください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+msgid "This server does not allow virtual machines"
+msgstr "このサーバーは仮想マシンを禁じしています"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
+msgid "This server requires driver signing to be enabled"
+msgstr "このサーバーはドライバー署名を有効するのが必要です"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
+msgid "Please restart your PC"
+msgstr "パソコンを再起動してください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
+msgid "This server has detected missing anti-cheat components"
+msgstr "このサーバーは不足しているアンチチートコンポネントを検出しました"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
+msgid "Try restarting MTA"
+msgstr "MTAを再起動してみてください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "このサーバーは変更されていないgta3.imgとgta_int.imgが必要です"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "gta3.img、あるいはgta_int.imgを変更してください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
+msgid "This server does not allow Wine"
+msgstr "このサーバーはWineを禁じしています"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "他のプログラムがMTA:SAを変更していないのを確認してください"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
-msgstr "残り時間:"
+msgstr "残り時間: "
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:588
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:629
+#, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 日"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:631
+#, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 時間"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:633
+#, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:635
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
+msgstr[0] "%d 秒"
 
 #. Display the error
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639
 msgid "Disconnected"
 msgstr "切断されました"
 
 #. Throw the error and disconnect
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:130
+#, c-format, c-format
 msgid "Download error: %s"
-msgstr "ダウンロードエラー: %s"
+msgstr "ダウンロードエラー： %s"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:194
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 msgid "Could not start the local server. See console for details."
-msgstr "ローカルサーバがスタートできませんでした。コンソールに事件の情報があります。"
+msgstr "ローカルサーバーが実行できませんでした。詳しい情報はコンソールにあります。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:195
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:182
+#, c-format, c-format
 msgid "Error: Could not start local server. [%s]"
-msgstr "エラー： ローカルサーバがスタートできませんでした。[%s]"
+msgstr "エラー： ローカルサーバーが実行できませんでした。[%s]"
 
 #. Create our text for each transfer type
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:30
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:24
 msgid "Download Progress:"
-msgstr "ダウンロード進捗:"
+msgstr "ダウンロード進捗："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:31
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "マップダウンロード進捗:"
+msgstr "マップダウンロード進捗："
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:36
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:122
-#, c-format
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:31
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:119
+#, c-format, c-format
 msgid "%s of %s"
 msgstr "%s の %s"
 
 #. stats label
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:37
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:63
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:32
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:58
 msgid "Disconnect to cancel download"
 msgstr "ダウンロードをキャンセルするには、切断してください"
 
 #. Populate the message and show the box
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:150
-#, c-format
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:142
+#, c-format, c-format
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
-msgstr "致命的なエラー (%u)。この問題が続いたら「サポート」に行ってください。"
+msgstr "致命的なエラー (%u)。この問題が続いたら「mtasa.com」までに連絡してください。"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:167
-#, c-format
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:158
+#, c-format, c-format
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
-msgstr "プロトコルエラー (%u)。この問題が続いたら「サポート」に行ってください。"
+msgstr "プロトコルエラー (%u)。この問題が続いたら「mtasa.com」までに連絡してください。"
 
-#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:169
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"
 msgstr "接続エラー"
 
 #. Couldn't create render target for CPostEffects
-#: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
+#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1382
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "グラフィックドライバと問題があります"
 
-#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto は正しくインストールできませんでした、再インストールしてください。"
+msgstr "Multi Theft Autoは正しくインストールできませんでした。再インストールしてください。"
 
-#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:705
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr ""
-"あなたのブラウザが今情報にあるウェッブページを表す。\n"
+"ブラウザは情報のあるウェッブページを表す。\n"
 "\n"
 "（ページのロード失敗したら、URLをブラウザにペーストしてください（CTRL-V））"
+
+#~ msgid "No host specified!"
+#~ msgstr "ホストが指定されていません！"
+
+#~ msgid "No port specified!"
+#~ msgstr "ポートが指定されていません！"
+
+#~ msgid "Invalid port specified!"
+#~ msgstr "無効なポートが指定されました！"
+
+#~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
+#~ msgstr "接続構文：'connect <host> <port> [<nick> <pass>]'"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "サービスは現在利用できません"

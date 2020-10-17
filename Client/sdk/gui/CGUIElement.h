@@ -11,13 +11,18 @@
 
 class CGUIElement;
 
-#ifndef __CGUIELEMENT_H
-#define __CGUIELEMENT_H
+#pragma once
 
 #include "CGUIEvent.h"
 #include "CGUICallback.h"
 #include <string>
 #include "CGUITypes.h"
+
+// Forward declaration
+namespace CEGUI
+{
+    class EventArgs;
+}
 
 enum eCGUIType
 {
@@ -42,18 +47,18 @@ enum eCGUIType
 class CGUIElement
 {
 public:
-    virtual ~CGUIElement(void){};
+    virtual ~CGUIElement(){};
 
     virtual void SetVisible(bool bVisible) = 0;
-    virtual bool IsVisible(void) = 0;
+    virtual bool IsVisible() = 0;
 
     virtual void SetEnabled(bool bEnabled) = 0;
-    virtual bool IsEnabled(void) = 0;
+    virtual bool IsEnabled() = 0;
     virtual void SetZOrderingEnabled(bool bZOrderingEnabled) = 0;
-    virtual bool IsZOrderingEnabled(void) = 0;
+    virtual bool IsZOrderingEnabled() = 0;
 
-    virtual void BringToFront(void) = 0;
-    virtual void MoveToBack(void) = 0;
+    virtual void BringToFront() = 0;
+    virtual void MoveToBack() = 0;
 
     virtual void      SetPosition(const CVector2D& vecPosition, bool bRelative = false) = 0;
     virtual CVector2D GetPosition(bool bRelative = false) = 0;
@@ -72,33 +77,33 @@ public:
     virtual std::string GetProperty(const char* szProperty) = 0;
 
     virtual void      SetMinimumSize(const CVector2D& vecSize) = 0;
-    virtual CVector2D GetMinimumSize(void) = 0;
+    virtual CVector2D GetMinimumSize() = 0;
     virtual void      GetMinimumSize(CVector2D& vecSize) = 0;
 
     virtual void      SetMaximumSize(const CVector2D& vecSize) = 0;
-    virtual CVector2D GetMaximumSize(void) = 0;
+    virtual CVector2D GetMaximumSize() = 0;
     virtual void      GetMaximumSize(CVector2D& vecSize) = 0;
 
     virtual void        SetText(const char* Text) = 0;
-    virtual std::string GetText(void) = 0;
+    virtual std::string GetText() = 0;
 
     virtual bool        SetFont(const char* szFontName) = 0;
-    virtual std::string GetFont(void) = 0;
+    virtual std::string GetFont() = 0;
 
     virtual void  SetAlpha(float fAlpha) = 0;
-    virtual float GetAlpha(void) = 0;
-    virtual float GetEffectiveAlpha(void) = 0;
+    virtual float GetAlpha() = 0;
+    virtual float GetEffectiveAlpha() = 0;
     virtual void  SetInheritsAlpha(bool bInheritsAlpha) = 0;
-    virtual bool  GetInheritsAlpha(void) = 0;
+    virtual bool  GetInheritsAlpha() = 0;
 
-    virtual void Activate(void) = 0;
-    virtual void Deactivate(void) = 0;
-    virtual bool IsActive(void) = 0;
+    virtual void Activate() = 0;
+    virtual void Deactivate() = 0;
+    virtual bool IsActive() = 0;
 
     virtual void SetAlwaysOnTop(bool bAlwaysOnTop) = 0;
-    virtual bool IsAlwaysOnTop(void) = 0;
+    virtual bool IsAlwaysOnTop() = 0;
 
-    virtual void ForceRedraw(void) = 0;
+    virtual void ForceRedraw() = 0;
 
     virtual CRect2D   AbsoluteToRelative(const CRect2D& Rect) = 0;
     virtual CVector2D AbsoluteToRelative(const CVector2D& Vector) = 0;
@@ -107,19 +112,20 @@ public:
     virtual CVector2D RelativeToAbsolute(const CVector2D& Vector) = 0;
 
     virtual void         SetParent(CGUIElement* pParent) = 0;
-    virtual CGUIElement* GetParent(void) = 0;
+    virtual CGUIElement* GetParent() = 0;
 
     virtual void  SetUserData(void* pData) = 0;
-    virtual void* GetUserData(void) = 0;
+    virtual void* GetUserData() = 0;
 
-    virtual eCGUIType GetType(void) = 0;
+    virtual eCGUIType GetType() = 0;
 
-    virtual CGUIPropertyIter GetPropertiesBegin(void) = 0;
-    virtual CGUIPropertyIter GetPropertiesEnd(void) = 0;
+    virtual CGUIPropertyIter GetPropertiesBegin() = 0;
+    virtual CGUIPropertyIter GetPropertiesEnd() = 0;
 
     virtual void SetMovedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetSizedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetClickHandler(GUI_CALLBACK Callback) = 0;
+    virtual void SetClickHandler(const GUI_CALLBACK_MOUSE& Callback) = 0;
     virtual void SetDoubleClickHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetMouseEnterHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetMouseLeaveHandler(GUI_CALLBACK Callback) = 0;
@@ -130,11 +136,9 @@ public:
     virtual void SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback) = 0;
     virtual void SetEnterKeyHandler(GUI_CALLBACK Callback) = 0;
 
-    virtual bool Event_OnClick(void) = 0;
-    virtual bool Event_OnDoubleClick(void) = 0;
-    virtual bool Event_OnMouseEnter(void) = 0;
-    virtual bool Event_OnMouseLeave(void) = 0;
-    virtual bool Event_OnMouseButtonDown(void) = 0;
+    virtual bool Event_OnClick(const CEGUI::EventArgs& e) = 0;
+    virtual bool Event_OnDoubleClick() = 0;
+    virtual bool Event_OnMouseEnter() = 0;
+    virtual bool Event_OnMouseLeave() = 0;
+    virtual bool Event_OnMouseButtonDown() = 0;
 };
-
-#endif

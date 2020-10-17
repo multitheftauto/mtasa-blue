@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWATERSA_H
-#define __CWATERSA_H
+#pragma once
 
 // -------------------------------
 // SA interfaces
@@ -71,8 +70,8 @@ public:
 
     void OnChangeLevel(float fOldZ, float fNewZ);
     void Init(bool bIsWorldWaterVertex);
-    void Reset(void);
-    bool IsWorldNonSeaLevel(void);
+    void Reset();
+    bool IsWorldNonSeaLevel();
 
 protected:
     bool                     m_bIsWorldWaterVertex;
@@ -130,5 +129,3 @@ public:
     EWaterPolyType GetType() { return WATER_POLY_TRIANGLE; }
     int            GetNumVertices() { return 3; }
 };
-
-#endif

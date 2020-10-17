@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CREMOTEDATASA
-#define __CREMOTEDATASA
+#pragma once
 
 #include "multiplayersa_init.h"
 #include <multiplayer/CMultiplayer.h>
@@ -78,5 +77,3 @@ private:
     static CPools*                                      m_pPools;
     static std::map<CPlayerPed*, CRemoteDataStorageSA*> m_RemoteData;
 };
-
-#endif

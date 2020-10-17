@@ -11,7 +11,7 @@
 #include <StdInc.h>
 #include "CInputRPCs.h"
 
-void CInputRPCs::LoadFunctions(void)
+void CInputRPCs::LoadFunctions()
 {
     AddHandler(BIND_KEY, BindKey, "BindKey");
     AddHandler(BIND_COMMAND, BindCommand, "BindCommand");

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CColShape::CColShape(CColManager* pManager, CElement* pParent, CXMLNode* pNode, bool bIsPartnered) : CElement(pParent, pNode)
+CColShape::CColShape(CColManager* pManager, CElement* pParent, bool bIsPartnered) : CElement(pParent)
 {
     // Init
     m_bIsEnabled = true;
@@ -27,7 +27,7 @@ CColShape::CColShape(CColManager* pManager, CElement* pParent, CXMLNode* pNode, 
     pManager->AddToList(this);
 }
 
-CColShape::~CColShape(void)
+CColShape::~CColShape()
 {
     if (m_pCallback)
         m_pCallback->Callback_OnCollisionDestroy(this);
@@ -37,13 +37,13 @@ CColShape::~CColShape(void)
     Unlink();
 }
 
-void CColShape::Unlink(void)
+void CColShape::Unlink()
 {
     // Remove us from manager's list
     m_pManager->RemoveFromList(this);
 }
 
-const CVector& CColShape::GetPosition(void)
+const CVector& CColShape::GetPosition()
 {
     if (m_pAttachedTo)
         GetAttachedPosition(m_vecPosition);
@@ -55,6 +55,16 @@ void CColShape::SetPosition(const CVector& vecPosition)
     m_vecPosition = vecPosition;
     UpdateSpatialData();
     CStaticFunctionDefinitions::RefreshColShapeColliders(this);
+}
+
+void CColShape::AttachTo(CElement* pElement)
+{
+    CElement::AttachTo(pElement);
+    if (pElement && m_pAttachedTo)
+    {
+        CVector pVector = pElement->GetPosition();
+        SetPosition(pVector + m_vecAttachedPosition);
+    }
 }
 
 void CColShape::CallHitCallback(CElement& Element)
@@ -88,7 +98,7 @@ bool CColShape::ColliderExists(CElement* pElement)
     return false;
 }
 
-void CColShape::RemoveAllColliders(void)
+void CColShape::RemoveAllColliders()
 {
     list<CElement*>::iterator iter = m_Colliders.begin();
     for (; iter != m_Colliders.end(); iter++)
@@ -98,7 +108,7 @@ void CColShape::RemoveAllColliders(void)
     m_Colliders.clear();
 }
 
-void CColShape::SizeChanged(void)
+void CColShape::SizeChanged()
 {
     UpdateSpatialData();
     // Maybe queue RefreshColliders for v1.1

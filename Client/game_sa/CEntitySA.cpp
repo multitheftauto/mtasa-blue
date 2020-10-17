@@ -16,7 +16,45 @@ extern CGameSA* pGame;
 unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
 unsigned long CEntitySA::FUNC_RwFrameGetLTM;
 
-CEntitySA::CEntitySA(void)
+void CEntitySAInterface::TransformFromObjectSpace(CVector& outPosn, CVector const& offset)
+{
+    ((void(__thiscall*)(CEntitySAInterface*, CVector&, CVector const&))0x533560)(this, outPosn, offset);
+}
+
+CVector* CEntitySAInterface::GetBoundCentre(CVector* pOutCentre)
+{
+    return ((CVector * (__thiscall*)(CEntitySAInterface*, CVector*))0x534250)(this, pOutCentre);
+}
+
+CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
+{
+    CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
+    CVector               vecMin = colModel->boundingBox.vecMin;
+    CVector               vecMax = colModel->boundingBox.vecMax;
+    CRect                 rect;
+    CVector               point;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    float maxX = vecMax.fX;
+    vecMax.fX = vecMin.fX;
+    vecMin.fX = maxX;
+    TransformFromObjectSpace(point, vecMin);
+    rect.StretchToPoint(point.fX, point.fY);
+    TransformFromObjectSpace(point, vecMax);
+    rect.StretchToPoint(point.fX, point.fY);
+    *pRect = rect;
+    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    return pRect;
+}
+
+void CEntitySAInterface::StaticSetHooks()
+{
+    HookInstall(0x534120, &CEntitySAInterface::GetBoundRect_);
+}
+
+CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
     m_pInterface = NULL;
@@ -97,7 +135,7 @@ VOID CEntitySA::Teleport(float fX, float fY, float fZ)
     }
 }
 
-VOID CEntitySA::ProcessControl(void)
+VOID CEntitySA::ProcessControl()
 {
     DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
     DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
@@ -189,7 +227,7 @@ VOID CEntitySA::SetOrientation(float fX, float fY, float fZ)
     pGame->GetWorld()->Add(this, CEntity_SetOrientation);
 }
 
-VOID CEntitySA::FixBoatOrientation(void)
+VOID CEntitySA::FixBoatOrientation()
 {
     DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
@@ -233,7 +271,7 @@ VOID CEntitySA::SetPosition(CVector* vecPosition)
         SetPosition(vecPosition->fX, vecPosition->fY, vecPosition->fZ);
 }
 
-void CEntitySA::RestoreLastGoodPhysicsState(void)
+void CEntitySA::RestoreLastGoodPhysicsState()
 {
     // Validate m_LastGoodPosition
     if (!IsValidPosition(m_LastGoodPosition))
@@ -248,7 +286,7 @@ void CEntitySA::RestoreLastGoodPhysicsState(void)
 //
 // Get entity position. Fixes bad numbers
 //
-CVector* CEntitySA::GetPosition(void)
+CVector* CEntitySA::GetPosition()
 {
     CVector* pPosition = GetPositionInternal();
     if (!IsValidPosition(*pPosition))
@@ -470,7 +508,7 @@ bool CEntitySA::IsOnScreen()
     return bReturn;
 }
 
-bool CEntitySA::IsFullyVisible(void)
+bool CEntitySA::IsFullyVisible()
 {
     if (m_pInterface->bDistanceFade)
         return false;
@@ -481,7 +519,7 @@ bool CEntitySA::IsFullyVisible(void)
     return true;
 }
 
-bool CEntitySA::IsVisible(void)
+bool CEntitySA::IsVisible()
 {
     return m_pInterface->bIsVisible;
 }
@@ -545,7 +583,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     else return false;
 }
 
-BYTE CEntitySA::GetAreaCode(void)
+BYTE CEntitySA::GetAreaCode()
 {
     return m_pInterface->m_areaCode;
 }
@@ -560,7 +598,7 @@ void CEntitySA::SetUnderwater(bool bUnderwater)
     m_pInterface->bUnderwater = bUnderwater;
 }
 
-bool CEntitySA::GetUnderwater(void)
+bool CEntitySA::GetUnderwater()
 {
     return m_pInterface->bUnderwater;
 }

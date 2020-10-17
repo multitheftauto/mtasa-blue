@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECT3DHOOKMANAGER_H
-#define __CDIRECT3DHOOKMANAGER_H
+#pragma once
 
 #include "CDirect3DHook9.h"
 class CDirect3DHookManager
@@ -25,5 +24,3 @@ public:
 private:
     CDirect3DHook9* m_pDirect3DHook9;
 };
-
-#endif

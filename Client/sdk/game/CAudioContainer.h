@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAUDIOCONTAINER_H
-#define __CAUDIOCONTAINER_H
+#pragma once
 
 #include "Common.h"
 
@@ -56,5 +55,3 @@ public:
 
     virtual bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length) = 0;
 };
-
-#endif

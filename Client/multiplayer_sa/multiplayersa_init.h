@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __MULTIPLAYERSA_INIT
-#define __MULTIPLAYERSA_INIT
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -143,5 +142,3 @@ bool                            GetDebugIdEnabled(uint uiDebugId);
 void                            LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
 void                            CallGameEntityRenderHandler(CEntitySAInterface* pEntity);
 extern GameEntityRenderHandler* pGameEntityRenderHandler;
-
-#endif

@@ -9,10 +9,7 @@
  *
  *****************************************************************************/
 
-/* CAnimBlendStaticAssociation: 1 per uncompressed animation?*/
-
-#ifndef __CAnimBlendStaticAssociationSA_H
-#define __CAnimBlendStaticAssociationSA_H
+#pragma once
 
 #include <game/CAnimBlendStaticAssociation.h>
 #include "Common.h"
@@ -47,14 +44,13 @@ public:
     void SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
     void SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }
 
-    unsigned short                  GetNumBlendNodes(void) { return m_pInterface->nNumBlendNodes; };
-    short                           GetAnimID(void) { return m_pInterface->sAnimID; }
-    short                           GetAnimGroup(void) { return m_pInterface->sAnimGroup; }
-    short                           GetFlags(void) { return m_pInterface->sFlags; }
-    CAnimBlendHierarchySAInterface* GetAnimHierachyInterface(void) { return m_pInterface->pAnimHeirarchy; }
+    unsigned short                          GetNumBlendNodes() { return m_pInterface->nNumBlendNodes; };
+    short                                   GetAnimID() { return m_pInterface->sAnimID; }
+    short                                   GetAnimGroup() { return m_pInterface->sAnimGroup; }
+    short                                   GetFlags() { return m_pInterface->sFlags; }
+    CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface() { return m_pInterface->pAnimHeirarchy; }
+    CAnimBlendStaticAssociationSAInterface* GetInterface() { return m_pInterface; }
 
 protected:
     CAnimBlendStaticAssociationSAInterface* m_pInterface;
 };
-
-#endif

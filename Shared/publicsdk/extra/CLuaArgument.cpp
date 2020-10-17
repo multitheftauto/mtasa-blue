@@ -4,9 +4,9 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright © 2003-2008 MTA.  All Rights Reserved.
+ *  Copyright Â© 2003-2018 MTA.  All Rights Reserved.
  *
- *  Grand Theft Auto is © 2002-2003 Rockstar North
+ *  Grand Theft Auto is Â© 2002-2018 Rockstar North
  *
  *  THE FOLLOWING SOURCES ARE PART OF THE MULTI THEFT
  *  AUTO SOFTWARE DEVELOPMENT KIT AND ARE RELEASED AS
@@ -22,7 +22,7 @@
 
 using namespace std;
 
-CLuaArgument::CLuaArgument(void)
+CLuaArgument::CLuaArgument()
 {
     m_szString = NULL;
     m_iType = LUA_TNIL;
@@ -72,7 +72,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, unsigned int uiArgument)
     Read(luaVM, uiArgument);
 }
 
-CLuaArgument::~CLuaArgument(void)
+CLuaArgument::~CLuaArgument()
 {
     // Eventually destroy our string
     if (m_szString)

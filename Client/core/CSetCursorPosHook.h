@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSETCURSORPOSHOOK_H
-#define __CSETCURSORPOSHOOK_H
+#pragma once
 
 #include <windows.h>
 #include "CSingleton.h"
@@ -21,15 +20,15 @@ typedef BOOL(WINAPI* pSetCursorPos)(int X, int Y);
 class CSetCursorPosHook : public CSetCursorPosHookInterface, public CSingleton<CSetCursorPosHook>
 {
 public:
-    CSetCursorPosHook(void);
-    ~CSetCursorPosHook(void);
+    CSetCursorPosHook();
+    ~CSetCursorPosHook();
 
-    void ApplyHook(void);
-    void RemoveHook(void);
+    void ApplyHook();
+    void RemoveHook();
 
-    void DisableSetCursorPos(void);
-    void EnableSetCursorPos(void);
-    bool IsSetCursorPosEnabled(void);
+    void DisableSetCursorPos();
+    void EnableSetCursorPos();
+    bool IsSetCursorPosEnabled();
 
     BOOL CallSetCursorPos(int X, int Y);
 
@@ -39,5 +38,3 @@ private:
     bool          m_bCanCall;
     pSetCursorPos m_pfnSetCursorPos;
 };
-
-#endif

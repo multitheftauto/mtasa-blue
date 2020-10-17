@@ -52,7 +52,7 @@ CGUIMemo_Impl::CGUIMemo_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* 
     }
 }
 
-CGUIMemo_Impl::~CGUIMemo_Impl(void)
+CGUIMemo_Impl::~CGUIMemo_Impl()
 {
     if (GetParent() == NULL)
     {
@@ -70,18 +70,18 @@ void CGUIMemo_Impl::SetReadOnly(bool bReadOnly)
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setReadOnly(bReadOnly);
 }
 
-bool CGUIMemo_Impl::IsReadOnly(void)
+bool CGUIMemo_Impl::IsReadOnly()
 {
     return reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->isReadOnly();
 }
 
-void CGUIMemo_Impl::EnsureCaratIsVisible(void)
+void CGUIMemo_Impl::EnsureCaratIsVisible()
 {
     CEGUI::MultiLineEditbox* wndMemo = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow);
     wndMemo->setCaratIndex((wndMemo->getText()).length());
 }
 
-unsigned int CGUIMemo_Impl::GetCaretIndex(void)
+unsigned int CGUIMemo_Impl::GetCaretIndex()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getCaratIndex());
 }
@@ -91,7 +91,7 @@ void CGUIMemo_Impl::SetCaretIndex(unsigned int uiIndex)
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setCaratIndex(uiIndex);
 }
 
-float CGUIMemo_Impl::GetVerticalScrollPosition(void)
+float CGUIMemo_Impl::GetVerticalScrollPosition()
 {
     CEGUI::Scrollbar* pScrollbar = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->d_vertScrollbar;
     if (pScrollbar)
@@ -111,7 +111,12 @@ void CGUIMemo_Impl::SetVerticalScrollPosition(float fPosition)
     }
 }
 
-float CGUIMemo_Impl::GetScrollbarDocumentSize(void)
+float CGUIMemo_Impl::GetMaxVerticalScrollPosition()
+{
+    return GetScrollbarDocumentSize() - GetScrollbarPageSize();
+}
+
+float CGUIMemo_Impl::GetScrollbarDocumentSize()
 {
     CEGUI::Scrollbar* pScrollbar = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->d_vertScrollbar;
     if (pScrollbar)
@@ -122,7 +127,7 @@ float CGUIMemo_Impl::GetScrollbarDocumentSize(void)
     return 1.0f;
 }
 
-float CGUIMemo_Impl::GetScrollbarPageSize(void)
+float CGUIMemo_Impl::GetScrollbarPageSize()
 {
     CEGUI::Scrollbar* pScrollbar = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->d_vertScrollbar;
     if (pScrollbar)
@@ -138,22 +143,22 @@ void CGUIMemo_Impl::SetSelection(unsigned int uiStart, unsigned int uiEnd)
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setSelection(uiStart, uiEnd);
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionStart(void)
+unsigned int CGUIMemo_Impl::GetSelectionStart()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionStartIndex());
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionEnd(void)
+unsigned int CGUIMemo_Impl::GetSelectionEnd()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionEndIndex());
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionLength(void)
+unsigned int CGUIMemo_Impl::GetSelectionLength()
 {
     return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionLength());
 }
 
-bool CGUIMemo_Impl::ActivateOnTab(void)
+bool CGUIMemo_Impl::ActivateOnTab()
 {
     // Only select this as active if its visible and writable
     if (IsVisible() && !IsReadOnly())

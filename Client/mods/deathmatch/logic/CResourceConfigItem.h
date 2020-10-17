@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECONFIGITEM_H
-#define CRESOURCECONFIGITEM_H
+#pragma once
 
 #include "CResource.h"
 #include "CDownloadableResource.h"
@@ -24,16 +23,14 @@ class CResourceConfigItem : public CDownloadableResource
 {
 public:
     CResourceConfigItem(class CResource* resource, const char* szShortName, const char* szResourceFileName, uint uiDownloadSize, CChecksum serverChecksum);
-    ~CResourceConfigItem(void);
+    ~CResourceConfigItem();
 
-    bool            Start(void);
-    bool            Stop(void);
-    class CXMLFile* GetFile(void) { return m_pXMLFile; }
-    class CXMLNode* GetRoot(void) { return m_pXMLRootNode; }
+    bool            Start();
+    bool            Stop();
+    class CXMLFile* GetFile() { return m_pXMLFile; }
+    class CXMLNode* GetRoot() { return m_pXMLRootNode; }
 
 private:
     class CXMLFile* m_pXMLFile;
     CXMLNode*       m_pXMLRootNode;
 };
-
-#endif

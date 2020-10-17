@@ -11,23 +11,29 @@
 
 #include "StdInc.h"
 
-void CLuaPickupDefs::LoadFunctions(void)
+void CLuaPickupDefs::LoadFunctions()
 {
-    // Create/destroy
-    CLuaCFunctions::AddFunction("createPickup", createPickup);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Create/destroy
+        {"createPickup", createPickup},
 
-    // Get
-    CLuaCFunctions::AddFunction("getPickupType", getPickupType);
-    CLuaCFunctions::AddFunction("getPickupWeapon", getPickupWeapon);
-    CLuaCFunctions::AddFunction("getPickupAmount", getPickupAmount);
-    CLuaCFunctions::AddFunction("getPickupAmmo", getPickupAmmo);
-    CLuaCFunctions::AddFunction("getPickupRespawnInterval", getPickupRespawnInterval);
-    CLuaCFunctions::AddFunction("isPickupSpawned", isPickupSpawned);
+        // Get
+        {"getPickupType", getPickupType},
+        {"getPickupWeapon", getPickupWeapon},
+        {"getPickupAmount", getPickupAmount},
+        {"getPickupAmmo", getPickupAmmo},
+        {"getPickupRespawnInterval", getPickupRespawnInterval},
+        {"isPickupSpawned", isPickupSpawned},
 
-    // Set
-    CLuaCFunctions::AddFunction("setPickupType", setPickupType);
-    CLuaCFunctions::AddFunction("setPickupRespawnInterval", setPickupRespawnInterval);
-    CLuaCFunctions::AddFunction("usePickup", usePickup);
+        // Set
+        {"setPickupType", setPickupType},
+        {"setPickupRespawnInterval", setPickupRespawnInterval},
+        {"usePickup", usePickup},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPickupDefs::AddClass(lua_State* luaVM)

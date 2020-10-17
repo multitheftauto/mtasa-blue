@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECTINPUT_H
-#define __CPROXYDIRECTINPUT_H
+#pragma once
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -24,8 +23,8 @@ public:
     ~CProxyDirectInput8();
     /*** IUnknown methods ***/
     virtual HRESULT __stdcall QueryInterface(REFIID riid, LPVOID* ppvObj);
-    virtual ULONG __stdcall AddRef(VOID);
-    virtual ULONG __stdcall Release(VOID);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     /*** IDirectInput8A methods ***/
     virtual HRESULT __stdcall CreateDevice(REFGUID, LPDIRECTINPUTDEVICE8A*, LPUNKNOWN);
@@ -40,5 +39,3 @@ public:
 private:
     IDirectInput8A* m_pDevice;
 };
-
-#endif

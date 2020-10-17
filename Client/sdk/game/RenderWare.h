@@ -7,12 +7,11 @@
  *               Grand Theft Auto: San Andreas
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *  RenderWare is © Criterion Software
+ *  RenderWare is Â© Criterion Software
  *
  *****************************************************************************/
 
-#ifndef __RENDERWARE_COMPAT
-#define __RENDERWARE_COMPAT
+#pragma once
 
 /*****************************************************************************/
 /** RenderWare rendering types                                              **/
@@ -425,5 +424,3 @@ struct RwError
 {
     int err1, err2;
 };
-
-#endif

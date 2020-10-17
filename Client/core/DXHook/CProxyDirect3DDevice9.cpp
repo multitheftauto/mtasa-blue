@@ -18,7 +18,7 @@ CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
 {
-    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x", this));
+    WriteDebugEvent(SString("CProxyDirect3DDevice9::CProxyDirect3DDevice9 %08x (device: %08x)", this, pDevice));
 
     // Set our wrapped device.
     m_pDevice = pDevice;
@@ -45,7 +45,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
     pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
 
-    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.DeviceName) / 1024;
+    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
     // Just incase, fallback to using texture memory stats
     if (iVideoCardMemoryKBTotal < 16)
@@ -100,12 +100,12 @@ HRESULT CProxyDirect3DDevice9::QueryInterface(REFIID riid, void** ppvObj)
     return m_pDevice->QueryInterface(riid, ppvObj);
 }
 
-ULONG CProxyDirect3DDevice9::AddRef(VOID)
+ULONG CProxyDirect3DDevice9::AddRef()
 {
     return m_pDevice->AddRef();
 }
 
-ULONG CProxyDirect3DDevice9::Release(VOID)
+ULONG CProxyDirect3DDevice9::Release()
 {
     // Check if will be final release
     m_pDevice->AddRef();
@@ -122,17 +122,17 @@ ULONG CProxyDirect3DDevice9::Release(VOID)
 }
 
 /*** IDirect3DDevice9 methods ***/
-HRESULT CProxyDirect3DDevice9::TestCooperativeLevel(VOID)
+HRESULT CProxyDirect3DDevice9::TestCooperativeLevel()
 {
     return m_pDevice->TestCooperativeLevel();
 }
 
-UINT CProxyDirect3DDevice9::GetAvailableTextureMem(VOID)
+UINT CProxyDirect3DDevice9::GetAvailableTextureMem()
 {
     return m_pDevice->GetAvailableTextureMem();
 }
 
-HRESULT CProxyDirect3DDevice9::EvictManagedResources(VOID)
+HRESULT CProxyDirect3DDevice9::EvictManagedResources()
 {
     return m_pDevice->EvictManagedResources();
 }
@@ -182,7 +182,7 @@ HRESULT CProxyDirect3DDevice9::GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9
     return m_pDevice->GetSwapChain(iSwapChain, pSwapChain);
 }
 
-UINT CProxyDirect3DDevice9::GetNumberOfSwapChains(VOID)
+UINT CProxyDirect3DDevice9::GetNumberOfSwapChains()
 {
     return m_pDevice->GetNumberOfSwapChains();
 }
@@ -481,7 +481,7 @@ HRESULT CProxyDirect3DDevice9::GetDepthStencilSurface(IDirect3DSurface9** ppZSte
     return m_pDevice->GetDepthStencilSurface(ppZStencilSurface);
 }
 
-HRESULT CProxyDirect3DDevice9::BeginScene(VOID)
+HRESULT CProxyDirect3DDevice9::BeginScene()
 {
     HRESULT hResult;
 
@@ -507,7 +507,7 @@ HRESULT CProxyDirect3DDevice9::BeginScene(VOID)
     return hResult;
 }
 
-HRESULT CProxyDirect3DDevice9::EndScene(VOID)
+HRESULT CProxyDirect3DDevice9::EndScene()
 {
     // Call our event handler.
     if (CDirect3DEvents9::OnEndScene(m_pDevice))
@@ -629,7 +629,7 @@ HRESULT CProxyDirect3DDevice9::CreateStateBlock(D3DSTATEBLOCKTYPE Type, IDirect3
     return m_pDevice->CreateStateBlock(Type, ppSB);
 }
 
-HRESULT CProxyDirect3DDevice9::BeginStateBlock(VOID)
+HRESULT CProxyDirect3DDevice9::BeginStateBlock()
 {
     return m_pDevice->BeginStateBlock();
 }
@@ -728,7 +728,7 @@ HRESULT CProxyDirect3DDevice9::SetSoftwareVertexProcessing(BOOL bSoftware)
     return m_pDevice->SetSoftwareVertexProcessing(bSoftware);
 }
 
-BOOL CProxyDirect3DDevice9::GetSoftwareVertexProcessing(VOID)
+BOOL CProxyDirect3DDevice9::GetSoftwareVertexProcessing()
 {
     return m_pDevice->GetSoftwareVertexProcessing();
 }
@@ -738,7 +738,7 @@ HRESULT CProxyDirect3DDevice9::SetNPatchMode(float nSegments)
     return m_pDevice->SetNPatchMode(nSegments);
 }
 
-FLOAT CProxyDirect3DDevice9::GetNPatchMode(VOID)
+FLOAT CProxyDirect3DDevice9::GetNPatchMode()
 {
     return m_pDevice->GetNPatchMode();
 }

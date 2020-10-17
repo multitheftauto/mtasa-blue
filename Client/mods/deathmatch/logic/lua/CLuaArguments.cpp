@@ -143,7 +143,7 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables)
+void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK(luaVM, 4);
@@ -264,12 +264,23 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     lua_pushstring(luaVM, szFunction);
     lua_gettable(luaVM, LUA_GLOBALSINDEX);
 
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
+
     // Push our arguments onto the stack
     PushArguments(luaVM);
 
-    // Call the function with our arguments
+    // Reset function call timer (checks long-running functions)
     pLuaMain->ResetInstructionCount();
 
+    // Call the function with our arguments
     int iret = pLuaMain->PCall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
@@ -303,7 +314,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     return true;
 }
 
-CLuaArgument* CLuaArguments::PushNil(void)
+CLuaArgument* CLuaArguments::PushNil()
 {
     CLuaArgument* pArgument = new CLuaArgument;
     m_Arguments.push_back(pArgument);
@@ -366,7 +377,7 @@ CLuaArgument* CLuaArguments::PushTable(CLuaArguments* table)
 }
 
 // Gets rid of all the arguments in the list
-void CLuaArguments::DeleteArguments(void)
+void CLuaArguments::DeleteArguments()
 {
     // Delete each item
     vector<CLuaArgument*>::iterator iter = m_Arguments.begin();
@@ -380,7 +391,7 @@ void CLuaArguments::DeleteArguments(void)
 }
 
 // Gets rid of the last argument in the list
-void CLuaArguments::Pop(void)
+void CLuaArguments::Pop()
 {
     // Delete the last element
     CLuaArgument* item = m_Arguments.back();
@@ -390,7 +401,7 @@ void CLuaArguments::Pop(void)
     m_Arguments.pop_back();
 }
 
-void CLuaArguments::ValidateTableKeys(void)
+void CLuaArguments::ValidateTableKeys()
 {
     // Iterate over m_Arguments as pairs
     // If first is LUA_TNIL, then remove pair
@@ -436,33 +447,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     }
 
     unsigned int uiNumArgs;
-    bool         bResult;
-#if MTA_DM_VERSION >= 0x150
-    bResult = bitStream.ReadCompressed(uiNumArgs);
-#else
-    unsigned short usNumArgs;
-    if (bitStream.Version() < 0x05B)
-    {
-        // We got the old version
-        bResult = bitStream.ReadCompressed(usNumArgs);
-        uiNumArgs = usNumArgs;
-    }
-    else
-    {
-        // Check if we got the new version
-        if ((bResult = bitStream.ReadCompressed(usNumArgs)))
-        {
-            if (usNumArgs == 0xFFFF)
-                // We got the new version
-                bResult = bitStream.ReadCompressed(uiNumArgs);
-            else
-                // We got the old version
-                uiNumArgs = usNumArgs;
-        }
-    }
-#endif
-
-    if (bResult)
+    if (bitStream.ReadCompressed(uiNumArgs))
     {
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
@@ -489,15 +474,7 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
 
     bool bSuccess = true;
     pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-
-#if MTA_DM_VERSION >= 0x150
     bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-#else
-    if (bitStream.Version() < 0x05B)
-        bitStream.WriteCompressed(static_cast<unsigned short>(m_Arguments.size()));
-    else
-        bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-#endif
 
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter++)
@@ -656,7 +633,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
     }
 
     json_object* object = json_tokener_parse(szJSON);
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -664,7 +641,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
             std::vector<CLuaArguments*> knownTables;
 
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
@@ -697,7 +674,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
 bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_object)
         {
@@ -735,7 +712,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
 
 bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -749,7 +726,7 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             pKnownTables->push_back(this);
 
             bool bSuccess = true;
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();

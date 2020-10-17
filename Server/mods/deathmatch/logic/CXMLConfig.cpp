@@ -18,7 +18,7 @@ CXMLConfig::CXMLConfig(const char* szFileName)
     SetFileName(szFileName);
 }
 
-CXMLConfig::~CXMLConfig(void)
+CXMLConfig::~CXMLConfig()
 {
     delete m_pFile;
 }

@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CWaterRPCs_H
-#define __CWaterRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CWaterRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetWorldWaterLevel);
     DECLARE_RPC(ResetWorldWaterLevel);
@@ -27,5 +26,3 @@ public:
     DECLARE_RPC(SetWaterColor);
     DECLARE_RPC(ResetWaterColor);
 };
-
-#endif

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-const char* sNoTaskName = "[NO TASK TYPE]";
+const char* const sNoTaskName = "[NO TASK TYPE]";
 
 const sTaskName TaskNames[1802] = {
     {"TASK_SIMPLE_PLAYER_ON_FOOT"},

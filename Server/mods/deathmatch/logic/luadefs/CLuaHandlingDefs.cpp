@@ -11,16 +11,22 @@
 
 #include "StdInc.h"
 
-void CLuaHandlingDefs::LoadFunctions(void)
+void CLuaHandlingDefs::LoadFunctions()
 {
-    // Set
-    CLuaCFunctions::AddFunction("setVehicleHandling", CLuaHandlingDefs::SetVehicleHandling);
-    CLuaCFunctions::AddFunction("setModelHandling", CLuaHandlingDefs::SetModelHandling);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Set
+        {"setVehicleHandling", SetVehicleHandling},
+        {"setModelHandling", SetModelHandling},
 
-    // Get
-    CLuaCFunctions::AddFunction("getVehicleHandling", CLuaHandlingDefs::GetVehicleHandling);
-    CLuaCFunctions::AddFunction("getModelHandling", CLuaHandlingDefs::GetModelHandling);
-    CLuaCFunctions::AddFunction("getOriginalHandling", CLuaHandlingDefs::GetOriginalHandling);
+        // Get
+        {"getVehicleHandling", GetVehicleHandling},
+        {"getModelHandling", GetModelHandling},
+        {"getOriginalHandling", GetOriginalHandling},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)

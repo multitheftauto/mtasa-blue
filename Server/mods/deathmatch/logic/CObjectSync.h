@@ -22,13 +22,13 @@ class CObjectSync
 public:
     CObjectSync(CPlayerManager* pPlayerManager, CObjectManager* pObjectManager);
 
-    void DoPulse(void);
+    void DoPulse();
     bool ProcessPacket(CPacket& Packet);
 
     void OverrideSyncer(CObject* pObject, CPlayer* pPlayer);
 
 private:
-    void     Update(void);
+    void     Update();
     void     UpdateObject(CObject* pObject);
     void     FindSyncer(CObject* pObject);
     CPlayer* FindPlayerCloseToObject(CObject* pObject, float fMaxDistance);

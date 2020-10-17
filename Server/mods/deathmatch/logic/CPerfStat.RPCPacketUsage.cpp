@@ -52,6 +52,7 @@ ADD_ENUM1(REMOVE_PED_FROM_VEHICLE)
 ADD_ENUM1(SET_PED_DOING_GANG_DRIVEBY)
 ADD_ENUM1(SET_PED_ANIMATION)
 ADD_ENUM1(SET_PED_ANIMATION_PROGRESS)
+ADD_ENUM1(SET_PED_ANIMATION_SPEED)
 ADD_ENUM1(SET_PED_ON_FIRE)
 ADD_ENUM1(SET_PED_HEADLESS)
 ADD_ENUM1(SET_PED_FROZEN)
@@ -211,6 +212,13 @@ ADD_ENUM1(SET_VEHICLE_PLATE_TEXT)
 ADD_ENUM1(SET_PROPAGATE_CALLS_ENABLED)
 ADD_ENUM1(SET_TRAIN_TRACK)
 ADD_ENUM1(SET_TRAIN_POSITION)
+ADD_ENUM1(SET_ELEMENT_ANGULAR_VELOCITY)
+ADD_ENUM1(SET_COLSHAPE_RADIUS)
+ADD_ENUM1(SET_COLSHAPE_SIZE)
+ADD_ENUM1(ADD_COLPOLYGON_POINT)
+ADD_ENUM1(REMOVE_COLPOLYGON_POINT)
+ADD_ENUM1(UPDATE_COLPOLYGON_POINT)
+ADD_ENUM1(SET_DISCORD_JOIN_PARAMETERS)
 IMPLEMENT_ENUM_END("eElementRPCFunctions")
 
 DECLARE_ENUM(CRPCFunctions::eRPCFunctions);
@@ -242,12 +250,12 @@ class CPerfStatRPCPacketUsageImpl : public CPerfStatRPCPacketUsage
 public:
     ZERO_ON_NEW
 
-    CPerfStatRPCPacketUsageImpl(void);
-    virtual ~CPerfStatRPCPacketUsageImpl(void);
+    CPerfStatRPCPacketUsageImpl();
+    virtual ~CPerfStatRPCPacketUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatRPCPacketUsage
@@ -255,7 +263,7 @@ public:
     virtual void UpdatePacketUsageOut(uchar ucRpcId, uint uiSize);
 
     // CPerfStatRPCPacketUsageImpl
-    void MaybeRecordStats(void);
+    void MaybeRecordStats();
 
     int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
@@ -294,7 +302,7 @@ CPerfStatRPCPacketUsage* CPerfStatRPCPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl(void)
+CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl()
 {
     m_strCategoryName = "RPC Packet usage";
     assert(sizeof(m_PacketStatsIn) == sizeof(m_PrevPacketStatsIn));
@@ -308,7 +316,7 @@ CPerfStatRPCPacketUsageImpl::CPerfStatRPCPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl(void)
+CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl()
 {
 }
 
@@ -319,7 +327,7 @@ CPerfStatRPCPacketUsageImpl::~CPerfStatRPCPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName(void)
+const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -331,7 +339,7 @@ const SString& CPerfStatRPCPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatRPCPacketUsageImpl::DoPulse(void)
+void CPerfStatRPCPacketUsageImpl::DoPulse()
 {
     MaybeRecordStats();
 }
@@ -371,7 +379,7 @@ void CPerfStatRPCPacketUsageImpl::UpdatePacketUsageOut(uchar ucRpcId, uint uiSiz
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatRPCPacketUsageImpl::MaybeRecordStats(void)
+void CPerfStatRPCPacketUsageImpl::MaybeRecordStats()
 {
     // Someone watching?
     if (m_TimeSinceGetStats.Get() < 10000)

@@ -11,16 +11,22 @@
 
 #include "StdInc.h"
 
-void CLuaPickupDefs::LoadFunctions(void)
+void CLuaPickupDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createPickup", CreatePickup);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createPickup", CreatePickup},
 
-    CLuaCFunctions::AddFunction("getPickupType", GetPickupType);
-    CLuaCFunctions::AddFunction("getPickupWeapon", GetPickupWeapon);
-    CLuaCFunctions::AddFunction("getPickupAmount", GetPickupAmount);
-    CLuaCFunctions::AddFunction("getPickupAmmo", GetPickupAmmo);
+        {"getPickupType", GetPickupType},
+        {"getPickupWeapon", GetPickupWeapon},
+        {"getPickupAmount", GetPickupAmount},
+        {"getPickupAmmo", GetPickupAmmo},
 
-    CLuaCFunctions::AddFunction("setPickupType", SetPickupType);
+        {"setPickupType", SetPickupType},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaPickupDefs::AddClass(lua_State* luaVM)

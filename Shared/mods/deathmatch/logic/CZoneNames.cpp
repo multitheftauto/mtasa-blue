@@ -9,7 +9,7 @@
 
 #include "StdInc.h"
 
-static const char* szUnknownZone = "Unknown";
+static const char* const szUnknownZone = "Unknown";
 
 static const SFixedArray<const char*, 8> cityNameList = {{
     "Tierra Robada",
@@ -403,7 +403,7 @@ static const SZone _zoneInfoList[] = {
 };
 static const IMPLEMENT_FIXED_ARRAY(SZone, zoneInfoList);
 
-CZoneNames::CZoneNames(void)
+CZoneNames::CZoneNames()
 {
     // Initialize zone tree
     for (uint i = 0; i < NUMELMS(zoneInfoList); i++)

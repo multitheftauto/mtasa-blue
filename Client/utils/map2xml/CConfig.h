@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONFIG_H
-#define __CCONFIG_H
+#pragma once
 
 #include <string.h>
 #include <stdio.h>
@@ -40,5 +39,3 @@ private:
     char* m_szFileName;
     FILE* m_fp;
 };
-
-#endif

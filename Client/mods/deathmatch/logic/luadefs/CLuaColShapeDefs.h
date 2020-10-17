@@ -15,7 +15,7 @@
 class CLuaColShapeDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(CreateColCircle);
@@ -24,4 +24,17 @@ public:
     LUA_DECLARE(CreateColRectangle);
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
+
+    LUA_DECLARE(GetColShapeRadius);
+    LUA_DECLARE(SetColShapeRadius);
+    LUA_DECLARE_OOP(GetColShapeSize);
+    LUA_DECLARE(SetColShapeSize);
+    LUA_DECLARE_OOP(GetColPolygonPoints);
+    LUA_DECLARE_OOP(GetColPolygonPointPosition);
+    LUA_DECLARE(SetColPolygonPointPosition);
+    LUA_DECLARE(AddColPolygonPoint);
+    LUA_DECLARE(RemoveColPolygonPoint);
+
+    LUA_DECLARE(IsInsideColShape);
+    LUA_DECLARE(GetColShapeType);
 };

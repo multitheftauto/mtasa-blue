@@ -11,22 +11,28 @@
 
 #include "StdInc.h"
 
-void CLuaMarkerDefs::LoadFunctions(void)
+void CLuaMarkerDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createMarker", CreateMarker);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createMarker", CreateMarker},
 
-    CLuaCFunctions::AddFunction("getMarkerCount", GetMarkerCount);
-    CLuaCFunctions::AddFunction("getMarkerType", GetMarkerType);
-    CLuaCFunctions::AddFunction("getMarkerSize", GetMarkerSize);
-    CLuaCFunctions::AddFunction("getMarkerColor", GetMarkerColor);
-    CLuaCFunctions::AddFunction("getMarkerTarget", GetMarkerTarget);
-    CLuaCFunctions::AddFunction("getMarkerIcon", GetMarkerIcon);
+        {"getMarkerCount", GetMarkerCount},
+        {"getMarkerType", GetMarkerType},
+        {"getMarkerSize", GetMarkerSize},
+        {"getMarkerColor", GetMarkerColor},
+        {"getMarkerTarget", GetMarkerTarget},
+        {"getMarkerIcon", GetMarkerIcon},
 
-    CLuaCFunctions::AddFunction("setMarkerType", SetMarkerType);
-    CLuaCFunctions::AddFunction("setMarkerSize", SetMarkerSize);
-    CLuaCFunctions::AddFunction("setMarkerColor", SetMarkerColor);
-    CLuaCFunctions::AddFunction("setMarkerTarget", SetMarkerTarget);
-    CLuaCFunctions::AddFunction("setMarkerIcon", SetMarkerIcon);
+        {"setMarkerType", SetMarkerType},
+        {"setMarkerSize", SetMarkerSize},
+        {"setMarkerColor", SetMarkerColor},
+        {"setMarkerTarget", SetMarkerTarget},
+        {"setMarkerIcon", SetMarkerIcon},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaMarkerDefs::AddClass(lua_State* luaVM)
@@ -53,7 +59,6 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "size", "setMarkerSize", "getMarkerSize");
 
     lua_classvariable(luaVM, "target", SetMarkerTarget, OOP_GetMarkerTarget);
-    // lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor );
 
     lua_registerclass(luaVM, "Marker", "Element");
 }

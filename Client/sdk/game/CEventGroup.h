@@ -9,13 +9,10 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_EVENTGROUP
-#define __CGAME_EVENTGROUP
+#pragma once
 
 class CEventGroup
 {
 public:
     virtual CEvent* Add(CEvent* pEvent, bool b_1) = 0;
 };
-
-#endif

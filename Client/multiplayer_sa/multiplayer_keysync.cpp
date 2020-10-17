@@ -79,7 +79,7 @@ VOID InitKeysyncHooks()
 }
 
 extern CPed* pContextSwitchedPed;
-void         PostContextSwitch(void)
+void         PostContextSwitch()
 {
     // Prevent the game making remote player's weapons get switched by the local player's
     MemPutFast<BYTE>(0x60D850, 0x56);
@@ -253,12 +253,9 @@ VOID ReturnContextToLocalPlayer()
 
 void SwitchContext(CPed* thePed)
 {
-    if (thePed == NULL)
-        return;
-
     pContextSwitchedPed = thePed;
     // Are we not already in another context?
-    if (!bNotInLocalContext)
+    if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
         CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
@@ -433,11 +430,9 @@ void SwitchContext(CPed* thePed)
 
 void SwitchContext(CPedSAInterface* ped)
 {
-    CPed* thePed = pGameInterface->GetPools()->GetPed((DWORD*)ped);
-    if (thePed)
-    {
-        SwitchContext(thePed);
-    }
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)ped);
+    CPed*                  thePed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+    SwitchContext(thePed);
 }
 
 void SwitchContext(CVehicle* pVehicle)
@@ -502,8 +497,9 @@ void SwitchContext(CVehicle* pVehicle)
 void SwitchContext(CVehicleSAInterface* pVehicleInterface)
 {
     // Grab the CVehicle for the given vehicle interface
-    CPoolsSA* pool = (CPoolsSA*)pGameInterface->GetPools();
-    CVehicle* pVehicle = pool->GetVehicle((DWORD*)pVehicleInterface);
+    CPools*                    pPools = pGameInterface->GetPools();
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle)
     {
         SwitchContext(pVehicle);

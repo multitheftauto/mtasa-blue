@@ -11,18 +11,26 @@
 
 #include "StdInc.h"
 
-void CLuaCameraDefs::LoadFunctions(void)
-{
-    // Get functions
-    CLuaCFunctions::AddFunction("getCameraMatrix", getCameraMatrix);
-    CLuaCFunctions::AddFunction("getCameraTarget", getCameraTarget);
-    CLuaCFunctions::AddFunction("getCameraInterior", getCameraInterior);
+#define MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20677"
 
-    // Set functions
-    CLuaCFunctions::AddFunction("setCameraMatrix", setCameraMatrix);
-    CLuaCFunctions::AddFunction("setCameraTarget", setCameraTarget);
-    CLuaCFunctions::AddFunction("setCameraInterior", setCameraInterior);
-    CLuaCFunctions::AddFunction("fadeCamera", fadeCamera);
+void CLuaCameraDefs::LoadFunctions()
+{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Get functions
+        {"getCameraMatrix", getCameraMatrix},
+        {"getCameraTarget", getCameraTarget},
+        {"getCameraInterior", getCameraInterior},
+
+        // Set functions
+        {"setCameraMatrix", setCameraMatrix},
+        {"setCameraTarget", setCameraTarget},
+        {"setCameraInterior", setCameraInterior},
+        {"fadeCamera", fadeCamera},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 int CLuaCameraDefs::getCameraMatrix(lua_State* luaVM)
@@ -186,6 +194,9 @@ int CLuaCameraDefs::setCameraTarget(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
     argStream.ReadUserData(pTarget, NULL);
+
+    if (pTarget && pTarget->GetType() != CElement::PLAYER)
+        MinServerReqCheck(argStream, MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
     if (!argStream.HasErrors())
     {

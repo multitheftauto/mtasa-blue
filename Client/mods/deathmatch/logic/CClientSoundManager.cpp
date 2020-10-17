@@ -63,14 +63,14 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     }
 }
 
-CClientSoundManager::~CClientSoundManager(void)
+CClientSoundManager::~CClientSoundManager()
 {
     ProcessStopQueues(true);
     BASS_Stop();
     BASS_Free();
 }
 
-void CClientSoundManager::DoPulse(void)
+void CClientSoundManager::DoPulse()
 {
     UpdateVolume();
 
@@ -123,13 +123,21 @@ void CClientSoundManager::SetDimension(unsigned short usDimension)
     m_usDimension = usDimension;
 }
 
-CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
+CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
     if (bIsURL)
     {
         pSound->PlayStream(strSound, bLoop, bThrottle);
         return pSound;
+    }
+    else if (bIsRawData)
+    {
+        size_t size = strSound.size();
+        void* pMemory = new char[size];
+        memcpy(pMemory, strSound.data(), size);
+        if (pSound->Play((void*)pMemory, size, bLoop))
+            return pSound;
     }
     else if (pSound->Play(strSound, bLoop))
         return pSound;
@@ -149,7 +157,7 @@ CClientSound* CClientSoundManager::PlaySound2D(void* pMemory, unsigned int uiLen
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle)
+CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
 
@@ -158,6 +166,17 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
         pSound->PlayStream(strSound, bLoop, bThrottle, true);
         pSound->SetPosition(vecPosition);
         return pSound;
+    }
+    else if (bIsRawData)
+    {
+        size_t size = strSound.size();
+        void* pMemory = new char[size];
+        memcpy(pMemory, strSound.data(), size);
+        if (pSound->Play3D((void*)pMemory, size, bLoop))
+        {
+            pSound->SetPosition(vecPosition);
+            return pSound;
+        }
     }
     else if (pSound->Play3D(strSound, bLoop))
     {
@@ -258,12 +277,17 @@ int CClientSoundManager::GetFxEffectFromName(const std::string& strEffectName)
 
 void CClientSoundManager::UpdateVolume()
 {
-    // set our master sound volume if the cvar changed
+    // set our mta sound volume if mtavolume or mastervolume cvar changed
     float fValue = 0.0f;
+
     if (!m_bMinimizeMuted)
     {
+        float fMasterVolume = g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
+
         if (g_pCore->GetCVars()->Get("mtavolume", fValue))
         {
+            fValue *= fMasterVolume;
+
             if (fValue * 10000 == BASS_GetConfig(BASS_CONFIG_GVOL_STREAM))
                 return;
 
@@ -271,7 +295,7 @@ void CClientSoundManager::UpdateVolume()
         }
         else
         {
-            fValue = 1.0f;
+            fValue = fMasterVolume;
         }
     }
 
@@ -345,17 +369,18 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
     //  If the sound is more than 40 units away (or in another dimension), make sure it is deactivated
     //  If the sound is less than 20 units away, make sure it is activated
     //
-    for (std::set<CClientSound*>::iterator iter = considerMap.begin(); iter != considerMap.end(); ++iter)
+    for (CClientSound* pSound : considerMap)
     {
-        CClientSound* pSound = *iter;
-
         // Calculate distance to the edge of the sphere
         CSphere sphere = pSound->GetWorldBoundingSphere();
         float   fDistance = (vecListenerPosition - sphere.vecPosition).Length() - sphere.fRadius;
 
         if (fDistance > 40 || m_usDimension != pSound->GetDimension())
-            pSound->DistanceStreamOut();
-        else if (fDistance < 20)
+        {
+            if (MapContains(m_DistanceStreamedInMap, pSound))
+                pSound->DistanceStreamOut();
+        }
+        else if (fDistance < 20) 
             pSound->DistanceStreamIn();
     }
 }

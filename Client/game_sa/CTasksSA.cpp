@@ -17,7 +17,7 @@ CTasksSA::CTasksSA(CTaskManagementSystemSA* pTaskManagementSystem)
     m_pTaskManagementSystem = pTaskManagementSystem;
 }
 
-CTaskSimplePlayerOnFoot* CTasksSA::CreateTaskSimplePlayerOnFoot(void)
+CTaskSimplePlayerOnFoot* CTasksSA::CreateTaskSimplePlayerOnFoot()
 {
     DEBUG_TRACE("CTaskSimplePlayerOnFoot* CTasksSA::CreateTaskSimplePlayerOnFoot ( void )");
 
@@ -26,7 +26,7 @@ CTaskSimplePlayerOnFoot* CTasksSA::CreateTaskSimplePlayerOnFoot(void)
     return pTask;
 }
 
-CTaskComplexFacial* CTasksSA::CreateTaskComplexFacial(void)
+CTaskComplexFacial* CTasksSA::CreateTaskComplexFacial()
 {
     DEBUG_TRACE("CTaskComplexFacial* CTasksSA::CreateTaskComplexFacial ( void )");
 
@@ -345,7 +345,7 @@ void _declspec(naked) HOOK_CEventHandler_ComputeDamageResponse_Mid()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CTasksSA::StaticSetHooks(void)
+void CTasksSA::StaticSetHooks()
 {
     EZHookInstall(CEventHandler_ComputeDamageResponse_Mid);
 }

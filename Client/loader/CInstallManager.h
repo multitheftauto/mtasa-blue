@@ -22,33 +22,34 @@ class CInstallManager
 {
 public:
     void    SetMTASAPathSource(const SString& strCommandLineIn);
-    void    InitSequencer(void);
+    void    InitSequencer();
     SString Continue(/*const SString& strCommandLine*/);
     void    RestoreSequencerFromSnapshot(const SString& strText);
-    SString GetSequencerSnapshot(void);
-    SString GetLauncherPathFilename(void);
-    bool    UpdateOptimusSymbolExport(void);
+    SString GetSequencerSnapshot();
+    SString GetLauncherPathFilename();
+    bool    UpdateOptimusSymbolExport();
     SString MaybeRenameExe(const SString& strGTAPath);
 
 protected:
-    SString _ShowCrashFailDialog(void);
-    SString _CheckOnRestartCommand(void);
-    SString _MaybeSwitchToTempExe(void);
-    SString _SwitchBackFromTempExe(void);
-    SString _InstallFiles(void);
-    SString _ChangeToAdmin(void);
-    SString _ShowCopyFailDialog(void);
-    SString _ProcessLayoutChecks(void);
-    SString _ProcessLangFileChecks(void);
-    SString _ProcessExePatchChecks(void);
-    SString _ProcessServiceChecks(void);
-    SString _ProcessAppCompatChecks(void);
-    SString _ChangeFromAdmin(void);
-    SString _InstallNewsItems(void);
-    SString _Quit(void);
+    SString _ShowCrashFailDialog();
+    SString _CheckOnRestartCommand();
+    SString _MaybeSwitchToTempExe();
+    SString _SwitchBackFromTempExe();
+    SString _InstallFiles();
+    SString _ChangeToAdmin();
+    SString _ShowCopyFailDialog();
+    SString _ProcessGtaVersionCheck();
+    SString _ProcessLayoutChecks();
+    SString _ProcessLangFileChecks();
+    SString _ProcessExePatchChecks();
+    SString _ProcessServiceChecks();
+    SString _ProcessAppCompatChecks();
+    SString _ChangeFromAdmin();
+    SString _InstallNewsItems();
+    SString _Quit();
 
     CSequencerType* m_pSequencer;
     SString         m_strAdminReason;
 };
 
-CInstallManager* GetInstallManager(void);
+CInstallManager* GetInstallManager();

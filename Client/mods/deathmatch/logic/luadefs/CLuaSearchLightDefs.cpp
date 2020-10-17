@@ -11,19 +11,25 @@
 
 #include "StdInc.h"
 
-void CLuaSearchLightDefs::LoadFunctions(void)
+void CLuaSearchLightDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createSearchLight", CreateSearchLight);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createSearchLight", CreateSearchLight},
 
-    CLuaCFunctions::AddFunction("getSearchLightStartPosition", GetSearchLightStartPosition);
-    CLuaCFunctions::AddFunction("getSearchLightEndPosition", GetSearchLightEndPosition);
-    CLuaCFunctions::AddFunction("getSearchLightStartRadius", GetSearchLightStartRadius);
-    CLuaCFunctions::AddFunction("getSearchLightEndRadius", GetSearchLightEndRadius);
+        {"getSearchLightStartPosition", GetSearchLightStartPosition},
+        {"getSearchLightEndPosition", GetSearchLightEndPosition},
+        {"getSearchLightStartRadius", GetSearchLightStartRadius},
+        {"getSearchLightEndRadius", GetSearchLightEndRadius},
 
-    CLuaCFunctions::AddFunction("setSearchLightStartPosition", SetSearchLightStartPosition);
-    CLuaCFunctions::AddFunction("setSearchLightEndPosition", SetSearchLightEndPosition);
-    CLuaCFunctions::AddFunction("setSearchLightStartRadius", SetSearchLightStartRadius);
-    CLuaCFunctions::AddFunction("setSearchLightEndRadius", SetSearchLightEndRadius);
+        {"setSearchLightStartPosition", SetSearchLightStartPosition},
+        {"setSearchLightEndPosition", SetSearchLightEndPosition},
+        {"setSearchLightStartRadius", SetSearchLightStartRadius},
+        {"setSearchLightEndRadius", SetSearchLightEndRadius},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaSearchLightDefs::AddClass(lua_State* luaVM)

@@ -20,8 +20,8 @@ class CResourceClientScriptsPacket : public CPacket
 public:
     CResourceClientScriptsPacket(CResource* pResource);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_RESOURCE_CLIENT_SCRIPTS; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_RESOURCE_CLIENT_SCRIPTS; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     void AddItem(CResourceClientScriptItem* pItem);
 

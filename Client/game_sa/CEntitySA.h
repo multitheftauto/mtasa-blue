@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_ENTITY
-#define __CGAMESA_ENTITY
+#pragma once
 
 #include "Common.h"
 #include "COffsets.h"
@@ -34,6 +33,7 @@
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
 
+class CRect;
 class CEntitySAInterfaceVTBL
 {
 public:
@@ -194,14 +194,19 @@ public:
 
     uint8 m_pad0;            // 55
 
+    CRect*      GetBoundRect_(CRect* pRect);
+    void        TransformFromObjectSpace(CVector& outPosn, CVector const& offset);
+    CVector*    GetBoundCentre(CVector* pOutCentre);
+    static void StaticSetHooks();
+
     //
     // Functions to hide member variable misuse
     //
 
     // Sets
-    void SetIsLowLodEntity(void) { numLodChildrenRendered = 0x40; }
+    void SetIsLowLodEntity() { numLodChildrenRendered = 0x40; }
 
-    void SetIsHighLodEntity(void) { numLodChildrenRendered = 0x60; }
+    void SetIsHighLodEntity() { numLodChildrenRendered = 0x60; }
 
     void SetEntityVisibilityResult(int result)
     {
@@ -210,11 +215,11 @@ public:
     }
 
     // Gets
-    bool IsLowLodEntity(void) const { return (numLodChildrenRendered & 0x60) == 0x40; }
+    bool IsLowLodEntity() const { return (numLodChildrenRendered & 0x60) == 0x40; }
 
-    bool IsHighLodEntity(void) const { return (numLodChildrenRendered & 0x60) == 0x60; }
+    bool IsHighLodEntity() const { return (numLodChildrenRendered & 0x60) == 0x60; }
 
-    int GetEntityVisibilityResult(void) const
+    int GetEntityVisibilityResult() const
     {
         if (numLodChildrenRendered & 0x60)
             return numLodChildrenRendered & 0x1f;
@@ -228,31 +233,30 @@ class CEntitySA : public virtual CEntity
     friend class COffsets;
 
 public:
-    CEntitySA(void);
-
     CEntitySAInterface* m_pInterface;
 
     DWORD internalID;
     //  VOID                        SetModelAlpha ( int iAlpha );
 
+    CEntitySA();
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
     VOID SetPosition(float fX, float fY, float fZ);
     VOID Teleport(float fX, float fY, float fZ);
-    VOID ProcessControl(void);
+    VOID ProcessControl();
     VOID SetupLighting();
     VOID Render();
     VOID SetOrientation(float fX, float fY, float fZ);
-    VOID FixBoatOrientation(void);            // eAi you might want to rename this
+    VOID FixBoatOrientation();            // eAi you might want to rename this
     VOID SetPosition(CVector* vecPosition);
 
     void SetUnderwater(bool bUnderwater);
-    bool GetUnderwater(void);
+    bool GetUnderwater();
 
-    virtual void RestoreLastGoodPhysicsState(void);
-    CVector*     GetPosition(void);
-    CVector*     GetPositionInternal(void);
+    virtual void RestoreLastGoodPhysicsState();
+    CVector*     GetPosition();
+    CVector*     GetPositionInternal();
     CMatrix*     GetMatrix(CMatrix* matrix);
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
     VOID         SetMatrix(CMatrix* matrix);
@@ -261,10 +265,10 @@ public:
     bool         IsOnScreen();
     bool         IsFullyVisible();
 
-    bool IsVisible(void);
+    bool IsVisible();
     void SetVisible(bool bVisible);
 
-    BYTE GetAreaCode(void);
+    BYTE GetAreaCode();
     void SetAreaCode(BYTE areaCode);
 
     FLOAT GetDistanceFromCentreOfMassToBaseOfModel();
@@ -281,10 +285,10 @@ public:
     BOOL DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
 
     VOID SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) { DoNotRemoveFromGame = bDoNotRemoveFromGame; };
-    BOOL IsStatic(VOID) { return m_pInterface->bIsStatic; }
+    BOOL IsStatic() { return m_pInterface->bIsStatic; }
     VOID SetStatic(BOOL bStatic) { m_pInterface->bIsStatic = bStatic; };
     VOID SetUsesCollision(BOOL bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
-    BOOL IsBackfaceCulled(VOID) { return m_pInterface->bBackfaceCulled; };
+    BOOL IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
     VOID SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
     VOID SetAlpha(DWORD dwAlpha);
 
@@ -293,13 +297,13 @@ public:
 
     bool IsPlayingAnimation(char* szAnimName);
 
-    void* GetStoredPointer(void) { return m_pStoredPointer; };
+    void* GetStoredPointer() { return m_pStoredPointer; };
     void  SetStoredPointer(void* pPointer) { m_pStoredPointer = pPointer; };
 
-    bool IsStaticWaitingForCollision(void) { return m_pInterface->bIsStaticWaitingForCollision; }
+    bool IsStaticWaitingForCollision() { return m_pInterface->bIsStaticWaitingForCollision; }
     void SetStaticWaitingForCollision(bool bStatic) { m_pInterface->bIsStaticWaitingForCollision = bStatic; }
 
-    unsigned long GetArrayID(void) { return m_ulArrayID; }
+    unsigned long GetArrayID() { return m_ulArrayID; }
     void          SetArrayID(unsigned long ulID) { m_ulArrayID = ulID; }
 
     // CEntitySA interface
@@ -330,5 +334,3 @@ inline bool IsValidMatrix(const CMatrix& mat)
 {
     return IsValidPosition(mat.vPos) && IsValidPosition(mat.vFront);
 }
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssocGroupSA_H
-#define __CAnimBlendAssocGroupSA_H
+#pragma once
 
 #include <game/CAnimBlendAssocGroup.h>
 #include "CAnimBlendStaticAssociationSA.h"
@@ -27,6 +26,17 @@
 class CAnimBlockSA;
 class CAnimBlockSAInterface;
 class CAnimManagerSA;
+
+class CAnimationStyleDescriptorSAInterface
+{
+public:
+    char groupName[16];
+    char blockName[16];
+    int field_20;
+    int animsCount;
+    void *animNames;
+    void *animDesc;
+};
 
 class CAnimBlendAssocGroupSAInterface
 {
@@ -47,21 +57,21 @@ public:
 
     CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
     void                              InitEmptyAssociations(RpClump* pClump);
-    bool                              IsCreated(void);
-    int                               GetNumAnimations(void);
-    CAnimBlock*                       GetAnimBlock(void);
+    bool                              IsCreated();
+    int                               GetNumAnimations();
+    CAnimBlock*                       GetAnimBlock();
     CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
-    AssocGroupId                      GetGroupID(void) { return m_pInterface->groupID; };
+    eAnimGroup                        GetGroupID();
     void                              CreateAssociations(const char* szBlockName);
 
-    bool IsLoaded(void);
+    bool IsLoaded();
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
 
+    CAnimBlendAssocGroupSAInterface*  GetInterface() { return m_pInterface; }
+
 protected:
-    void SetupAnimBlock(void);
+    void SetupAnimBlock();
 
     CAnimBlendAssocGroupSAInterface* m_pInterface;
     CAnimBlockSA*                    m_pAnimBlock;
 };
-
-#endif

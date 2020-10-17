@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CONROLLER_CONFIG_MANAGER
-#define __CGAMESA_CONROLLER_CONFIG_MANAGER
+#pragma once
 
 #include <game/CControllerConfigManager.h>
 
@@ -35,18 +34,16 @@ public:
     void  SetFlyWithMouse(bool bFlyWithMouse);
     void  SetSteerWithMouse(bool bSteerWithMouse);
     void  SuspendSteerAndFlyWithMouse(bool bSuspend);
-    float GetVerticalAimSensitivity(void);
+    float GetVerticalAimSensitivity();
     void  SetVerticalAimSensitivity(float fSensitivity);
-    float GetVerticalAimSensitivityRawValue(void);
+    float GetVerticalAimSensitivityRawValue();
     void  SetVerticalAimSensitivityRawValue(float fRawValue);
 
     // CControllerConfigManagerSA
-    void ApplySteerAndFlyWithMouseSettings(void);
+    void ApplySteerAndFlyWithMouseSettings();
 
 protected:
     bool m_bSteerWithMouse;
     bool m_bFlyWithMouse;
     bool m_bSuspendSteerAndFlyWithMouse;
 };
-
-#endif

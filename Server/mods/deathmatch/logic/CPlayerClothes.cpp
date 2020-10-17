@@ -291,7 +291,7 @@ static const SPlayerClothing g_SuitClothing[SUIT_CLOTHING_MAX + 1] = {
     {"gimpleg", "gimpleg"},     {"valet", "valet"},   {"countrytr", "countrytr"}, {"croupier", "valet"},  {"policetr", "policetr"},
     {"balaclava", "balaclava"}, {"pimptr", "pimptr"}, {"garageleg", "garagetr"},  {"medictr", "medictr"}, {NULL, NULL}};
 
-CPlayerClothes::CPlayerClothes(void)
+CPlayerClothes::CPlayerClothes()
 {
     memset(&m_Clothes[0], 0, sizeof(m_Clothes));
 }
@@ -336,7 +336,7 @@ bool CPlayerClothes::RemoveClothes(unsigned char ucType)
     return false;
 }
 
-void CPlayerClothes::RemoveAll(void)
+void CPlayerClothes::RemoveAll()
 {
     for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
@@ -344,7 +344,7 @@ void CPlayerClothes::RemoveAll(void)
     }
 }
 
-void CPlayerClothes::DefaultClothes(void)
+void CPlayerClothes::DefaultClothes()
 {
     RemoveAll();
 

@@ -78,7 +78,7 @@ static const SFixedArray<eVehicleType, 212> gs_vehicleTypes = {
 
 static SFixedArray<unsigned char, 212> g_ucVariants;
 
-CVehicleManager::CVehicleManager(void)
+CVehicleManager::CVehicleManager()
 {
     assert(NUMELMS(g_ucMaxPassengers) == 212);
     assert(NUMELMS(g_ulVehicleAttributes) == 212);
@@ -370,46 +370,39 @@ CVehicleManager::CVehicleManager(void)
     }
 }
 
-CVehicleManager::~CVehicleManager(void)
+CVehicleManager::~CVehicleManager()
 {
     DeleteAll();
 }
 
-CVehicle* CVehicleManager::Create(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode)
+CVehicle* CVehicleManager::Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
-    // Create the vehicle
-    CVehicle* pVehicle = new CVehicle(this, pParent, pNode, usModel, ucVariant, ucVariant2);
+    CVehicle* const pVehicle = new CVehicle(this, pParent, usModel, ucVariant, ucVariant2);
 
-    // Invalid vehicle id?
     if (pVehicle->GetID() == INVALID_ELEMENT_ID)
     {
         delete pVehicle;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created vehicle
     return pVehicle;
 }
 
 CVehicle* CVehicleManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the vehicle
     RandomizeRandomSeed();
+    CVehicle* pVehicle = new CVehicle(this, pParent, 400, 254, 254);
 
-    CVehicle* pVehicle = new CVehicle(this, pParent, &Node, 400, 254, 254);
-
-    // Verify the vehicle id and load the data from xml
-    if (pVehicle->GetID() == INVALID_ELEMENT_ID || !pVehicle->LoadFromCustomData(pEvents))
+    if (pVehicle->GetID() == INVALID_ELEMENT_ID || !pVehicle->LoadFromCustomData(pEvents, Node))
     {
         delete pVehicle;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created vehicle
     return pVehicle;
 }
 
-void CVehicleManager::DeleteAll(void)
+void CVehicleManager::DeleteAll()
 {
     // Delete all items
     DeletePointersAndClearList(m_List);

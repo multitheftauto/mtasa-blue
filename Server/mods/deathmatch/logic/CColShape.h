@@ -26,45 +26,47 @@ enum eColShapeType
 class CColShape : public CElement
 {
 public:
-    CColShape(class CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL, bool bIsPartnered = false);
-    virtual ~CColShape(void);
+    CColShape(class CColManager* pManager, CElement* pParent, bool bIsPartnered = false);
+    virtual ~CColShape();
 
-    virtual eColShapeType GetShapeType(void) = 0;
+    virtual eColShapeType GetShapeType() = 0;
 
-    void Unlink(void);
+    void Unlink();
 
     virtual bool DoHitDetection(const CVector& vecNowPosition) = 0;
 
-    bool IsEnabled(void) { return m_bIsEnabled; };
+    bool IsEnabled() { return m_bIsEnabled; };
     void SetEnabled(bool bEnabled) { m_bIsEnabled = bEnabled; };
 
-    const CVector& GetPosition(void);
+    const CVector& GetPosition();
     virtual void   SetPosition(const CVector& vecPosition);
+
+    void AttachTo(CElement* pElement);
 
     void                CallHitCallback(CElement& Element);
     void                CallLeaveCallback(CElement& Element);
     class CColCallback* SetCallback(class CColCallback* pCallback) { return (m_pCallback = pCallback); };
 
-    bool GetAutoCallEvent(void) { return m_bAutoCallEvent; };
+    bool GetAutoCallEvent() { return m_bAutoCallEvent; };
     void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
     void                      AddCollider(CElement* pElement) { m_Colliders.push_back(pElement); }
     void                      RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
     bool                      ColliderExists(CElement* pElement);
-    void                      RemoveAllColliders(void);
-    list<CElement*>::iterator CollidersBegin(void) { return m_Colliders.begin(); }
-    list<CElement*>::iterator CollidersEnd(void) { return m_Colliders.end(); }
+    void                      RemoveAllColliders();
+    list<CElement*>::iterator CollidersBegin() { return m_Colliders.begin(); }
+    list<CElement*>::iterator CollidersEnd() { return m_Colliders.end(); }
 
-    bool IsPartnered(void) { return m_bPartnered; }
+    bool IsPartnered() { return m_bPartnered; }
 
-    void SizeChanged(void);
+    void SizeChanged();
 
 protected:
     CVector m_vecPosition;
+    class CColManager*  m_pManager;
 
 private:
     bool                m_bIsEnabled;
-    class CColManager*  m_pManager;
     class CColCallback* m_pCallback;
     bool                m_bAutoCallEvent;
 

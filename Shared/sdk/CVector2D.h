@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector2D_H
-#define __CVector2D_H
+#pragma once
 
 #include <cmath>
 #include "CVector.h"
@@ -21,7 +20,7 @@
 class CVector2D
 {
 public:
-    CVector2D(void)
+    CVector2D()
     {
         fX = 0;
         fY = 0;
@@ -34,6 +33,12 @@ public:
     }
 
     CVector2D(const CVector& vec)
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+    }
+
+    CVector2D(const CVector4D& vec)
     {
         fX = vec.fX;
         fY = vec.fY;
@@ -57,9 +62,9 @@ public:
 
     float Length() const { return sqrt(fX * fX + fY * fY); }
 
-    float LengthSquared(void) const { return (fX * fX) + (fY * fY); }
+    float LengthSquared() const { return (fX * fX) + (fY * fY); }
 
-    void Normalize(void)
+    void Normalize()
     {
         float fLength = Length();
         if (fLength > 0.0f)
@@ -140,5 +145,3 @@ public:
     float fX;
     float fY;
 };
-
-#endif

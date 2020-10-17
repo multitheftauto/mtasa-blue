@@ -271,6 +271,12 @@ ADD_ENUM(CAccountPassword::SHA256, "sha256")
 ADD_ENUM(CAccountPassword::MD5, "md5")
 IMPLEMENT_ENUM_END("account-password-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(ESyncType)
+ADD_ENUM(ESyncType::BROADCAST, "broadcast")
+ADD_ENUM(ESyncType::LOCAL, "local")
+ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
+IMPLEMENT_ENUM_CLASS_END("sync-mode")
+
 //
 // Get best guess at name of userdata type
 //
@@ -371,7 +377,7 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         CResource* pResource = pLuaMain->GetResource();
         if (pResource)
         {
-            if (pResource->GetMinServerReqFromMetaXml() < szVersionReq)
+            if (pResource->GetMinServerRequirement() < szVersionReq)
             {
                 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);
@@ -497,33 +503,83 @@ uint GetWeaponPropertyFlagBit(eWeaponProperty weaponProperty)
 }
 
 //
+// Returns the permission level of pThisResource to modify pOtherResource
+//
+eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource* pOtherResource)
+{
+    if (pThisResource == pOtherResource)
+        return eResourceModifyScope::SINGLE_RESOURCE;
+
+    CAccessControlListManager* const pACLManager = g_pGame->GetACLManager();
+    const SString& strResourceName = pThisResource->GetName();
+
+    // Check if resource has right to modify any resource
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects", CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+        return eResourceModifyScope::EVERY_RESOURCE;
+
+    // Check if resource has right to modify only pOtherResource
+    const SString strRightName("ModifyOtherObjects.%s", pOtherResource->GetName().c_str());
+
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(), CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+        return eResourceModifyScope::SINGLE_RESOURCE;
+
+    return eResourceModifyScope::NONE;
+}
+
+//
 // Set error if pThisResource does not have permission to modify pOtherResource
 //
-void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2)
+void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
 {
-    // Check if other object is different and right is denied
-    if ((pThisResource != pOtherResource || (pOtherResource2 != nullptr && pThisResource != pOtherResource2)) &&
-        (g_pGame->GetACLManager()->CanObjectUseRight(pThisResource->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects",
-                                                     CAccessControlListRight::RIGHT_TYPE_GENERAL, false) == false))
+    if (GetResourceModifyScope(pThisResource, pOtherResource) == eResourceModifyScope::NONE)
+        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()), "Access denied");
+}
+
+//
+// Set error if pThisResource does not have permission to modify every resource in resourceList
+//
+void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
+{
+    // std::unordered_set only allows unique values and resourceList can contain duplicates
+    std::unordered_set<CResource*> setNoPermissionResources;
+
+    for (CResource* pOtherResource : resourceList)
     {
-        SString strWho;
-        if (pThisResource != pOtherResource)
-            strWho += pOtherResource->GetName();
-        if (pOtherResource2 != nullptr && pThisResource != pOtherResource2 && pOtherResource != pOtherResource2)
-        {
-            if (!strWho.empty())
-                strWho += " and ";
-            strWho += pOtherResource2->GetName();
-        }
-        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName(), *strWho), "Access denied");
+        eResourceModifyScope modifyScope = GetResourceModifyScope(pThisResource, pOtherResource);
+
+        if (modifyScope == eResourceModifyScope::SINGLE_RESOURCE)
+            continue;
+
+        if (modifyScope == eResourceModifyScope::EVERY_RESOURCE)
+            return;
+
+        setNoPermissionResources.emplace(pOtherResource);
     }
+
+    if (setNoPermissionResources.empty())
+        return;
+
+    std::stringstream ssResourceNames;
+    size_t remainingElements = setNoPermissionResources.size();
+
+    for (CResource* pResource : setNoPermissionResources)
+    {
+        ssResourceNames << pResource->GetName();
+        
+        if (remainingElements > 1)
+            ssResourceNames << ", ";
+
+        --remainingElements;
+    }
+
+    argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
 }
 
 //
 // Set error if resource file access is blocked due to reasons
 //
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                     bool* pbReadOnly)
+    bool* pbReadOnly)
 {
     if (!g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled())
         return;

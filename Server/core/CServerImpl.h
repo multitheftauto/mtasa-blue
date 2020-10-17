@@ -24,14 +24,10 @@ class CServerImpl;
 #include <xml/CXML.h>
 #include "CThreadCommandQueue.h"
 
-#ifndef WIN32
-#include <ncursesw/curses.h>
-#endif
-
 #define SERVER_RESET_RETURN 500
 
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
-typedef CNetServer* (*InitNetServerInterface)(void);
+typedef CNetServer* (*InitNetServerInterface)();
 
 #ifdef WIN32
 typedef void(FClientFeedback)(const char* szText);
@@ -44,20 +40,25 @@ public:
     #ifdef WIN32
     CServerImpl(CThreadCommandQueue* pThreadCommandQueue);
     #else
-    CServerImpl(void);
+    CServerImpl();
     #endif
 
-    ~CServerImpl(void);
+    ~CServerImpl();
 
-    CNetServer*  GetNetwork(void);
-    CModManager* GetModManager(void);
-    CXML*        GetXML(void);
+    CNetServer*  GetNetwork();
+    CModManager* GetModManager();
+    CXML*        GetXML();
 
-    const char* GetServerModPath(void) { return m_strServerModPath; };
+    const char* GetServerModPath() { return m_strServerModPath; };
     SString     GetAbsolutePath(const char* szRelative);
 
     void Printf(const char* szText, ...);
-    bool IsRequestingExit(void);
+    bool IsRequestingExit();
+
+    // Clears input buffer
+    bool ClearInput();
+    // Prints current input buffer on a new line, clears the input buffer and resets history selection
+    bool ResetInput();
 
     int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
@@ -67,16 +68,17 @@ public:
 #endif
 
 private:
-    void MainLoop(void);
+    void MainLoop();
 
     bool ParseArguments(int iArgumentCount, char* szArguments[]);
 
     void ShowInfoTag(char* szTag);
-    void HandleInput(void);
-    void HandlePulseSleep(void);
+    void HandleInput();
+    void SelectCommandHistoryEntry(uint uiEntry);
+    void HandlePulseSleep();
     void ApplyFrameRateLimit(uint uiUseRate);
 
-    void DestroyWindow(void);
+    void DestroyWindow();
 
     CDynamicLibrary  m_NetworkLibrary;
     CDynamicLibrary  m_XMLLibrary;
@@ -94,13 +96,16 @@ private:
     bool m_bRequestedQuit;
     bool m_bRequestedReset;
 
-    wchar_t      m_szInputBuffer[255];
-    unsigned int m_uiInputCount;
+    wchar_t m_szInputBuffer[255];
+    uint    m_uiInputCount;
 
     char m_szTag[80];
 
     double m_dLastTimeMs;
     double m_dPrevOverrun;
+
+    std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
+    uint                              m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;

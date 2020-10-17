@@ -13,14 +13,15 @@
 
 extern CGame* g_pGame;
 
-CPickup::CPickup(CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupManager, CColManager* pColManager) : CElement(pParent, pNode)
+CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager* pColManager) : CElement(pParent)
 {
     // Init
     m_pPickupManager = pPickupManager;
-    m_pCollision = new CColSphere(pColManager, NULL, m_vecPosition, 2.0f, NULL, true);
+    m_pCollision = new CColSphere(pColManager, nullptr, m_vecPosition, 2.0f, true);
     m_pCollision->SetEnabled(false);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);
+    m_pCollision->SetCanBeDestroyedByScript(false);
 
     // Add us to the pickup manager's list and grab an unique id
     pPickupManager->AddToList(this);
@@ -46,7 +47,7 @@ CPickup::CPickup(CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMana
     UpdateSpatialData();
 }
 
-CPickup::~CPickup(void)
+CPickup::~CPickup()
 {
     // Delete our collision object
     if (m_pCollision)
@@ -56,33 +57,47 @@ CPickup::~CPickup(void)
     Unlink();
 }
 
-void CPickup::Unlink(void)
+CElement* CPickup::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CPickup* pTemp = m_pPickupManager->Create(GetParentEntity());
+    if (pTemp)
+    {
+        pTemp->SetPickupType(GetPickupType());
+        pTemp->SetModel(GetModel());
+        pTemp->SetWeaponType(GetWeaponType());
+        pTemp->SetAmmo(GetAmmo());
+        pTemp->SetRespawnIntervals(GetRespawnIntervals());
+    }
+    return pTemp;
+}
+
+void CPickup::Unlink()
 {
     // Remove us from the pickup manager's list
     m_pPickupManager->RemoveFromList(this);
 }
 
-bool CPickup::ReadSpecialData(void)
+bool CPickup::ReadSpecialData(const int iLine)
 {
     unsigned short usBuffer = 0;
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <pickup> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <pickup> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <pickup> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <pickup> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <pickup> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <pickup> (line %d)\n", iLine);
         return false;
     }
 
@@ -128,7 +143,7 @@ bool CPickup::ReadSpecialData(void)
         }
         else
         {
-            CLogger::LogPrintf("WARNING: Unknown 'type' value in <pickup>; defaulting to \"random\" (line %u)\n", m_uiLine);
+            CLogger::LogPrintf("WARNING: Unknown 'type' value in <pickup>; defaulting to \"random\" (line %d)\n", iLine);
 
             m_ucType = HEALTH;
             m_usModel = CPickupManager::GetHealthModel();
@@ -137,7 +152,7 @@ bool CPickup::ReadSpecialData(void)
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'type' attribute in <pickup> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'type' attribute in <pickup> (line %d)\n", iLine);
         return false;
     }
 
@@ -228,14 +243,14 @@ bool CPickup::ReadSpecialData(void)
             }
             else
             {
-                CLogger::ErrorPrintf("Bad 'model' id specified in <pickup> (line %u)\n", m_uiLine);
+                CLogger::ErrorPrintf("Bad 'model' id specified in <pickup> (line %d)\n", iLine);
                 return false;
             }
         }
         else
         {
             // Error out if custom is specified but no model id is
-            CLogger::ErrorPrintf("Pickup type set to 'custom' but no 'model' id specified (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Pickup type set to 'custom' but no 'model' id specified (line %d)\n", iLine);
             return false;
         }
     }
@@ -303,7 +318,7 @@ void CPickup::SetVisible(bool bVisible)
         m_pCollision->SetEnabled(bVisible);
 }
 
-void CPickup::Randomize(void)
+void CPickup::Randomize()
 {
     // Randomize type
     if (m_bIsTypeRandom)

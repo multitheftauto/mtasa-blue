@@ -10,7 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CNewsBrowser.h"
 #include <game/CGame.h>
+#include <windowsx.h>
 
 using std::string;
 
@@ -22,9 +24,9 @@ CLocalGUI* CSingleton<CLocalGUI>::m_pSingleton = NULL;
 #endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
-const char* DEFAULT_SKIN_NAME = "Default";            // TODO: Change to whatever the default skin is if it changes
+const char* const DEFAULT_SKIN_NAME = "Default";            // TODO: Change to whatever the default skin is if it changes
 
-CLocalGUI::CLocalGUI(void)
+CLocalGUI::CLocalGUI()
 {
     m_pConsole = NULL;
     m_pMainMenu = NULL;
@@ -43,7 +45,7 @@ CLocalGUI::CLocalGUI(void)
     m_LocaleChangeCounter = 0;
 }
 
-CLocalGUI::~CLocalGUI(void)
+CLocalGUI::~CLocalGUI()
 {
     // Destroy all GUI elements
     DestroyObjects();
@@ -106,8 +108,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
-    // Don't delete old Localization as it crashes
-    g_pLocalization = new CLocalization;
+    g_pLocalization->SetCurrentLanguage();
     m_LastLocaleName = szName;
 
     if (guiWasLoaded)
@@ -173,7 +174,7 @@ void CLocalGUI::CreateObjects(IUnknown* pDevice)
     CreateWindows(false);
 }
 
-void CLocalGUI::DestroyWindows(void)
+void CLocalGUI::DestroyWindows()
 {
     SAFE_DELETE(m_pLabelVersionTag);
     SAFE_DELETE(m_pConsole);
@@ -182,7 +183,7 @@ void CLocalGUI::DestroyWindows(void)
     SAFE_DELETE(m_pDebugView);
 }
 
-void CLocalGUI::DestroyObjects(void)
+void CLocalGUI::DestroyObjects()
 {
     DestroyWindows();
 
@@ -190,7 +191,7 @@ void CLocalGUI::DestroyObjects(void)
     SAFE_DELETE(m_pLabelVersionTag);
 }
 
-void CLocalGUI::DoPulse(void)
+void CLocalGUI::DoPulse()
 {
     m_pVersionUpdater->DoPulse();
 
@@ -240,7 +241,7 @@ void CLocalGUI::DoPulse(void)
             }
             else
             {
-                // Do actual local change
+                // Do actual locale change
                 m_LocaleChangeCounter = 0;
                 CCore::GetSingleton().RemoveMessageBox();
 
@@ -256,7 +257,7 @@ void CLocalGUI::DoPulse(void)
     }
 }
 
-void CLocalGUI::Draw(void)
+void CLocalGUI::Draw()
 {
     // Get the game interface
     CGame*       pGame = CCore::GetSingleton().GetGame();
@@ -321,7 +322,7 @@ void CLocalGUI::Draw(void)
     }
 }
 
-void CLocalGUI::Invalidate(void)
+void CLocalGUI::Invalidate()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
@@ -332,7 +333,7 @@ void CLocalGUI::Invalidate(void)
     }
 }
 
-void CLocalGUI::Restore(void)
+void CLocalGUI::Restore()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
@@ -343,14 +344,14 @@ void CLocalGUI::Restore(void)
     }
 }
 
-void CLocalGUI::DrawMouseCursor(void)
+void CLocalGUI::DrawMouseCursor()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
     pGUI->DrawMouseCursor();
 }
 
-CConsole* CLocalGUI::GetConsole(void)
+CConsole* CLocalGUI::GetConsole()
 {
     return m_pConsole;
 }
@@ -374,7 +375,7 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
     }
 }
 
-bool CLocalGUI::IsConsoleVisible(void)
+bool CLocalGUI::IsConsoleVisible()
 {
     if (m_pConsole)
     {
@@ -391,7 +392,7 @@ void CLocalGUI::EchoConsole(const char* szText)
     }
 }
 
-CMainMenu* CLocalGUI::GetMainMenu(void)
+CMainMenu* CLocalGUI::GetMainMenu()
 {
     return m_pMainMenu;
 }
@@ -423,7 +424,7 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
     }
 }
 
-bool CLocalGUI::IsMainMenuVisible(void)
+bool CLocalGUI::IsMainMenuVisible()
 {
     if (m_pMainMenu)
     {
@@ -432,12 +433,12 @@ bool CLocalGUI::IsMainMenuVisible(void)
     return false;
 }
 
-CChat* CLocalGUI::GetChat(void)
+CChat* CLocalGUI::GetChat()
 {
     return m_pChat;
 }
 
-CDebugView* CLocalGUI::GetDebugView(void)
+CDebugView* CLocalGUI::GetDebugView()
 {
     return m_pDebugView;
 }
@@ -462,7 +463,7 @@ void CLocalGUI::SetDebugViewVisible(bool bVisible)
     }
 }
 
-bool CLocalGUI::IsChatBoxVisible(void)
+bool CLocalGUI::IsChatBoxVisible()
 {
     if (m_pChat)
     {
@@ -471,7 +472,7 @@ bool CLocalGUI::IsChatBoxVisible(void)
     return false;
 }
 
-bool CLocalGUI::IsDebugViewVisible(void)
+bool CLocalGUI::IsDebugViewVisible()
 {
     if (m_pDebugView)
     {
@@ -488,7 +489,7 @@ void CLocalGUI::SetChatBoxInputEnabled(bool bInputEnabled)
     }
 }
 
-bool CLocalGUI::IsChatBoxInputEnabled(void)
+bool CLocalGUI::IsChatBoxInputEnabled()
 {
     if (m_pChat)
     {
@@ -541,7 +542,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
 
             case WM_MOUSEMOVE:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, LOWORD(lParam), HIWORD(lParam));
+                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 return true;
 
             case WM_LBUTTONDOWN:
@@ -681,7 +682,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return false;
 }
 
-bool CLocalGUI::InputGoesToGUI(void)
+bool CLocalGUI::InputGoesToGUI()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
     if (!pGUI)
@@ -698,7 +699,7 @@ void CLocalGUI::ForceCursorVisible(bool bVisible)
     m_bForceCursorVisible = bVisible;
 }
 
-void CLocalGUI::UpdateCursor(void)
+void CLocalGUI::UpdateCursor()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 

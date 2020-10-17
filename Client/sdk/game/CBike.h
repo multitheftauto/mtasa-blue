@@ -9,17 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_BIKE
-#define __CGAME_BIKE
+#pragma once
 
 #include "CVehicle.h"
 
 class CBike : public virtual CVehicle
 {
 public:
-    virtual ~CBike(void){};
+    virtual ~CBike(){};
 
     // virtual void PlaceOnRoadProperly ( void )=0;
 };
-
-#endif

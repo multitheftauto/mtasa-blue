@@ -21,12 +21,12 @@ namespace SharedUtil
         CIntervalCounter(uint uiMinIntervalMs, T* pCounter);
 
     private:
-        virtual ~CIntervalCounter(void);
+        virtual ~CIntervalCounter();
 
     public:
-        void         StopThread(void);
+        void         StopThread();
         static void* StaticThreadProc(void* pContext);
-        void*        ThreadProc(void);
+        void*        ThreadProc();
 
     protected:
         // Main thread variables

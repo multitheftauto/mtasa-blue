@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_POINTLIGHTS
-#define __CGAMESA_POINTLIGHTS
+#pragma once
 
 #include <game/CPointLights.h>
 
@@ -30,5 +29,3 @@ public:
     virtual void RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot) override;
     ;
 };
-
-#endif

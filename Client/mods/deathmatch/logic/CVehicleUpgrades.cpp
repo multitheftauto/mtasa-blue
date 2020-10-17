@@ -14,7 +14,7 @@ char szUpgradeNameEmpty[] = "";
 
 struct SUpgradeName
 {
-    const char* szName;
+    const char* const szName;
 };
 
 static const SFixedArray<SUpgradeName, 17> UpgradeNames = {{{"Hood"},
@@ -572,7 +572,7 @@ bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade, bool bAddedLocally)
     return false;
 }
 
-void CVehicleUpgrades::AddAllUpgrades(void)
+void CVehicleUpgrades::AddAllUpgrades()
 {
     if (m_pVehicle)
     {
@@ -611,6 +611,10 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
 
         // Add it to the slot
         m_SlotStates[ucSlot] = usUpgrade;
+
+        // Reset wheel scale if it is a wheel upgrade
+        if (ucSlot == 12)
+            m_pVehicle->ResetWheelScale();
     }
 }
 
@@ -656,6 +660,10 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
                 m_SlotStates[ucSlot] = 0;
             }
 
+            // Reset wheel scale if it is a wheel upgrade
+            if (ucSlot == 12)
+                m_pVehicle->ResetWheelScale();
+
             return true;
         }
     }
@@ -671,7 +679,7 @@ unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
     return 0;
 }
 
-void CVehicleUpgrades::ReAddAll(void)
+void CVehicleUpgrades::ReAddAll()
 {
     unsigned char ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
@@ -710,6 +718,10 @@ void CVehicleUpgrades::RemoveAll(bool bRipFromVehicle)
                 }
             }
             m_SlotStates[ucSlot] = 0;
+
+            // Reset wheel scale for wheel upgrades
+            if (ucSlot == 12 && m_pVehicle)
+                m_pVehicle->ResetWheelScale();
         }
     }
 }

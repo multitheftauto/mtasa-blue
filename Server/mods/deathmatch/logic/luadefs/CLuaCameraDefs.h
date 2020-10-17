@@ -15,7 +15,7 @@
 class CLuaCameraDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // Get functions
     LUA_DECLARE_OOP(getCameraMatrix);

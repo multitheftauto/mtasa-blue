@@ -15,13 +15,14 @@
 
 using std::list;
 
-void CElementRPCs::LoadFunctions(void)
+void CElementRPCs::LoadFunctions()
 {
     AddHandler(SET_ELEMENT_PARENT, SetElementParent, "SetElementParent");
     AddHandler(SET_ELEMENT_DATA, SetElementData, "SetElementData");
     AddHandler(REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData");
     AddHandler(SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition");
     AddHandler(SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity");
+    AddHandler(SET_ELEMENT_ANGULAR_VELOCITY, SetElementAngularVelocity, "SetElementAngularVelocity");
     AddHandler(SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior");
     AddHandler(SET_ELEMENT_DIMENSION, SetElementDimension, "SetElementDimension");
     AddHandler(ATTACH_ELEMENTS, AttachElements, "AttachElements");
@@ -49,13 +50,13 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
 }
 
-#define RUN_CHILDREN_SERVER( func ) \
-    if ( pSource->CountChildren () && pSource->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN_SERVER(func) \
+    if (pSource->CountChildren() && pSource->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity()) \
                 func; \
         pList->Release(); \
     }
@@ -210,12 +211,57 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     }
 }
 
+void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    // Read out the entity id and the turn speed
+    CVector vecTurnVelocity;
+    if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
+    {
+        switch (pSource->GetType())
+        {
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
+            {
+                CClientPed* pPed = static_cast<CClientPed*>(pSource);
+
+                pPed->SetTurnSpeed(vecTurnVelocity);
+
+                break;
+            }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+                pVehicle->SetTurnSpeed(vecTurnVelocity);
+
+                break;
+            }
+            case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
+            {
+                CClientObject* pObject = static_cast<CClientObject*>(pSource);
+                pObject->SetTurnSpeed(vecTurnVelocity);
+
+                break;
+            }
+        }
+    }
+}
+
 void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     unsigned char ucInterior, ucSetPosition;
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
     {
         pSource->SetInterior(ucInterior);
+        if (pSource->GetType() == CCLIENTPLAYER)
+        {
+            CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
+            if (pPlayer->IsLocalPlayer())
+            {
+                // Update all of our streamers/managers to the local player's interior
+                m_pClientGame->SetAllInteriors(ucInterior);
+            }
+        }
 
         if (ucSetPosition == 1)
         {
@@ -389,38 +435,73 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
 void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     unsigned short usModel;
-    if (bitStream.Read(usModel))
+
+    if (!bitStream.Read(usModel))
+        return;
+    
+    switch (pSource->GetType())
     {
-        switch (pSource->GetType())
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
-            {
-                CClientPed* pPed = static_cast<CClientPed*>(pSource);
-                pPed->SetModel(usModel);
-                break;
-            }
+            CClientPed* pPed = static_cast<CClientPed*>(pSource);
+            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
 
-            case CCLIENTVEHICLE:
+            if (usCurrentModel != usModel)
             {
-                uchar ucVariant = 255, ucVariant2 = 255;
-                if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
+                if (pPed->SetModel(usModel))
                 {
-                    bitStream.Read(ucVariant);
-                    bitStream.Read(ucVariant2);
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(usCurrentModel);
+                    Arguments.PushNumber(usModel);
+                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
                 }
-                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
-                break;
             }
 
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            break;
+        }
+
+        case CCLIENTVEHICLE:
+        {
+            uchar ucVariant = 255, ucVariant2 = 255;
+            if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
             {
-                CClientObject* pObject = static_cast<CClientObject*>(pSource);
-                pObject->SetModel(usModel);
-                break;
+                bitStream.Read(ucVariant);
+                bitStream.Read(ucVariant2);
             }
+
+            CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+            const unsigned short usCurrentModel = pVehicle->GetModel();
+
+            if (usCurrentModel != usModel)
+            {
+                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usCurrentModel);
+                Arguments.PushNumber(usModel);
+                pVehicle->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
+        }
+
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject* pObject = static_cast<CClientObject*>(pSource);
+            const unsigned short usCurrentModel = pObject->GetModel();
+            
+            if (usCurrentModel != usModel)
+            {
+                pObject->SetModel(usModel);
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usCurrentModel);
+                Arguments.PushNumber(usModel);
+                pObject->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
         }
     }
 }

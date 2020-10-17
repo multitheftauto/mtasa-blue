@@ -23,14 +23,14 @@ CServerInterface* g_pServerInterface = NULL;
 CNetServer*       g_pNetServer = NULL;
 CNetServer*       g_pRealNetServer = NULL;
 
-CServer::CServer(void)
+CServer::CServer()
 {
     // Init
     m_pServerInterface = NULL;
     m_pGame = NULL;
 }
 
-CServer::~CServer(void)
+CServer::~CServer()
 {
 }
 
@@ -56,7 +56,7 @@ bool CServer::ServerStartup(int iArgumentCount, char* szArguments[])
     return false;
 }
 
-void CServer::ServerShutdown(void)
+void CServer::ServerShutdown()
 {
     if (m_pGame)
     {
@@ -103,7 +103,7 @@ bool CServer::IsFinished()
     return false;
 }
 
-bool CServer::PendingWorkToDo(void)
+bool CServer::PendingWorkToDo()
 {
     if (m_pGame && g_pNetServer)
     {

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CAM
-#define __CGAME_CAM
+#pragma once
 
 class CCam
 {
@@ -27,6 +26,5 @@ public:
     virtual void         GetDirection(float& fHorizontal, float& fVertical) = 0;
     virtual void         SetDirection(float fHorizontal, float fVertical) = 0;
     virtual CEntity*     GetTargetEntity() const = 0;
+    virtual void         SetTargetEntity(CEntity* pEntity) = 0;
 };
-
-#endif

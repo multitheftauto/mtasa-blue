@@ -13,7 +13,7 @@
 #include "CHandlingRPCs.h"
 #include "net/SyncStructures.h"
 
-void CHandlingRPCs::LoadFunctions(void)
+void CHandlingRPCs::LoadFunctions()
 {
     AddHandler(SET_VEHICLE_HANDLING, SetVehicleHandling, "SetVehicleHandling");
     AddHandler(SET_VEHICLE_HANDLING_PROPERTY, SetVehicleHandlingProperty, "SetVehicleHandlingProperty");

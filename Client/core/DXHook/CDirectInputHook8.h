@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECTINPUTHOOK8_H
-#define __CDIRECTINPUTHOOK8_H
+#pragma once
 
 typedef HRESULT(__stdcall* pDirectInputCreate)(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter);
 
@@ -31,5 +30,3 @@ private:
     pDirectInputCreate m_pfnDirectInputCreate;
     bool               m_bIsUnicodeInterface;
 };
-
-#endif

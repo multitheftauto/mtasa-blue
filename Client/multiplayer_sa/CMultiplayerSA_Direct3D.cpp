@@ -149,7 +149,7 @@ ok:
 // Setup hook
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Direct3D(void)
+void CMultiplayerSA::InitHooks_Direct3D()
 {
     EZHookInstall(PreCreateDevice);
     EZHookInstall(PostCreateDevice);

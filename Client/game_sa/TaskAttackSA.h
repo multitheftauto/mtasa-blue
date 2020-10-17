@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKATTACK
-#define __CGAMESA_TASKATTACK
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -93,7 +92,7 @@ public:
 class CTaskSimpleGangDriveBySA : public virtual CTaskSimpleSA, public virtual CTaskSimpleGangDriveBy
 {
 public:
-    CTaskSimpleGangDriveBySA(void){};
+    CTaskSimpleGangDriveBySA(){};
     CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS);
 };
 
@@ -131,14 +130,14 @@ public:
 class CTaskSimpleUseGunSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleUseGun
 {
 public:
-    CTaskSimpleUseGunSA(void){};
+    CTaskSimpleUseGunSA(){};
     CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, unsigned char bAimImmediate = false);
 
     bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand);
     bool ControlGunMove(CVector2D* pMoveVec);
     void Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1);
 
-    int         GetTaskType(void);
+    int         GetTaskType();
     bool        MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent);
     bool        ProcessPed(CPed* pPed);
     bool        SetPedPosition(CPed* pPed);
@@ -146,14 +145,14 @@ public:
     void        AbortIK(CPed* pPed);
     void        AimGun(CPed* pPed);
     void        ClearAnim(CPed* pPed);
-    signed char GetCurrentCommand(void);
-    bool        GetDoneFiring(void);
-    bool        GetIsFinished(void);
-    bool        IsLineOfSightBlocked(void);
-    bool        GetIsFiring(void);
-    bool        GetIsReloading(void);
-    bool        GetSkipAim(void);
-    bool        PlayerPassiveControlGun(void);
+    signed char GetCurrentCommand();
+    bool        GetDoneFiring();
+    bool        GetIsFinished();
+    bool        IsLineOfSightBlocked();
+    bool        GetIsFiring();
+    bool        GetIsReloading();
+    bool        GetSkipAim();
+    bool        PlayerPassiveControlGun();
     void        RemoveStanceAnims(CPed* pPed, float);
     static bool RequirePistolWhip(CPed* pPed, CEntity*);
     void        SetBurstLength(short);
@@ -189,8 +188,6 @@ public:
 class CTaskSimpleFightSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleFight
 {
 public:
-    CTaskSimpleFightSA(void){};
+    CTaskSimpleFightSA(){};
     CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 };
-
-#endif

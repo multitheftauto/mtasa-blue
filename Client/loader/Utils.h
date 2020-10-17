@@ -13,7 +13,6 @@ extern HINSTANCE g_hInstance;
 
 enum ePathResult
 {
-    GAME_PATH_STEAM,
     GAME_PATH_UNICODE_CHARS,
     GAME_PATH_MISSING,
     GAME_PATH_OK,
@@ -73,60 +72,60 @@ void    InsertWinMainBlock(HANDLE hProcess);
 void    RemoveWinMainBlock(HANDLE hProcess);
 void    ApplyLoadingCrashPatch(HANDLE hProcess);
 
-void TerminateGTAIfRunning(void);
-bool IsGTARunning(void);
-void TerminateOtherMTAIfRunning(void);
-bool IsOtherMTARunning(void);
+void TerminateGTAIfRunning();
+bool IsGTARunning();
+void TerminateOtherMTAIfRunning();
+bool IsOtherMTARunning();
 
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
 void            SetMTASAPathSource(bool bReadFromRegistry);
-SString         GetMTASAPath(void);
+SString         GetMTASAPath();
 ePathResult     DiscoverGTAPath(bool bFindIfMissing);
-SString         GetGTAPath(void);
-bool            HasGTAPath(void);
+SString         GetGTAPath();
+bool            HasGTAPath();
 EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath);
 void            GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath);
 
 void           FindFilesRecursive(const SString& strPathMatch, std::vector<SString>& outFileList, uint uiMaxDepth = 99);
-SOSVersionInfo GetOSVersion(void);
-SOSVersionInfo GetRealOSVersion(void);
-bool           IsWindows10OrGreater(void);
-bool           IsWindows10Threshold2OrGreater(void);
+SOSVersionInfo GetOSVersion();
+SOSVersionInfo GetRealOSVersion();
+bool           IsWindows10OrGreater();
+bool           IsWindows10Threshold2OrGreater();
 
-BOOL IsUserAdmin(void);
+BOOL IsUserAdmin();
 void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason);
 
 void UpdateMTAVersionApplicationSetting(bool bQuiet = false);
 bool Is32bitProcess(DWORD processID);
 void TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
 
-bool CreateSingleInstanceMutex(void);
-void ReleaseSingleInstanceMutex(void);
+bool CreateSingleInstanceMutex();
+void ReleaseSingleInstanceMutex();
 
-SString CheckOnRestartCommand(void);
-void    CleanDownloadCache(void);
+SString CheckOnRestartCommand();
+void    CleanDownloadCache();
 
 HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError = NULL);
-void    FreeLibraryHandle(void);
+void    FreeLibraryHandle();
 uint    WaitForObject(HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex);
 bool    CheckService(uint uiStage);
 
-void MaybeShowCopySettingsDialog(void);
+void MaybeShowCopySettingsDialog();
 
-bool CheckAndShowFileOpenFailureMessage(void);
-void CheckAndShowMissingFileMessage(void);
-void CheckAndShowModelProblems(void);
-void CheckAndShowUpgradeProblems(void);
-void CheckAndShowImgProblems(void);
+bool CheckAndShowFileOpenFailureMessage();
+void CheckAndShowMissingFileMessage();
+void CheckAndShowModelProblems();
+void CheckAndShowUpgradeProblems();
+void CheckAndShowImgProblems();
 
-void               BsodDetectionPreLaunch(void);
-void               BsodDetectionOnGameBegin(void);
-void               BsodDetectionOnGameEnd(void);
-void               ForbodenProgramsMessage(void);
+void               BsodDetectionPreLaunch();
+void               BsodDetectionOnGameBegin();
+void               BsodDetectionOnGameEnd();
+void               ForbodenProgramsMessage();
 bool               VerifyEmbeddedSignature(const SString& strFilename);
-void               LogSettings(void);
+void               LogSettings();
 SString            PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter);
 bool               IsDeviceSelectionDialogOpen(DWORD dwThreadId);
 std::vector<DWORD> MyEnumProcesses(bool bInclude64bit = false, bool bIncludeCurrent = false);
@@ -177,7 +176,7 @@ public:
     }
 
     // Returns true if process is active and hasn't changed mem usage for uiThresholdMs
-    bool UpdateIsStuck(void)
+    bool UpdateIsStuck()
     {
         PROCESS_MEMORY_COUNTERS psmemCounter;
         BOOL                    bResult = GetProcessMemoryInfo(m_hProcess, &psmemCounter, sizeof(PROCESS_MEMORY_COUNTERS));

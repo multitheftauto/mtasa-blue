@@ -65,13 +65,13 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
     jpeg_mem_src(&cinfo, (uchar*)pData, uiDataSize);
 
     /* Read file header, set default decompression parameters */
-    (void)jpeg_read_header(&cinfo, TRUE);
+    jpeg_read_header(&cinfo, TRUE);
 
     /* default decompression parameters */
     // TODO
 
     /* Start decompressor */
-    (void)jpeg_start_decompress(&cinfo);
+    jpeg_start_decompress(&cinfo);
 
     /* Write output file header */
     JDIMENSION uiWidth = cinfo.output_width;   /* scaled image width */
@@ -108,7 +108,7 @@ bool JpegDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& u
         }
 
         // Finish decompression and release memory.
-        (void)jpeg_finish_decompress(&cinfo);
+        jpeg_finish_decompress(&cinfo);
     }
 
     jpeg_destroy_decompress(&cinfo);
@@ -167,7 +167,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
             pRowTemp[i * 3 + 2] = pRowSrc[i * 4 + 0];
         }
         row_pointer[0] = (JSAMPROW)pRowTemp;
-        (void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
+        jpeg_write_scanlines(&cinfo, row_pointer, 1);
     }
 
     /* Finish compression and release memory */

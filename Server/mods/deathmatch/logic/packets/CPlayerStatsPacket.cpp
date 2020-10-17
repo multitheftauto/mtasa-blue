@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerStatsPacket::~CPlayerStatsPacket(void)
+CPlayerStatsPacket::~CPlayerStatsPacket()
 {
     Clear();
 }
@@ -74,7 +74,7 @@ void CPlayerStatsPacket::Remove(unsigned short usID, float fValue)
         m_List.erase(iter);
     }
 }
-void CPlayerStatsPacket::Clear(void)
+void CPlayerStatsPacket::Clear()
 {
     m_List.clear();
 }

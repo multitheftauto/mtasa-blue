@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLFILEIMPL_H
-#define __CXMLFILEIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <iostream>
@@ -23,45 +22,45 @@ class CXMLFileImpl : public CXMLFile
 
 public:
     CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly);
-    ~CXMLFileImpl(void);
+    ~CXMLFileImpl();
 
-    const char* GetFilename(void);
+    const char* GetFilename();
     void        SetFilename(const char* szFilename);
 
     bool Parse(std::vector<char>* pOutFileContents = NULL);
-    bool Write(void);
-    void Clear(void);
-    void Reset(void);
+    bool Write();
+    void Clear();
+    void Reset();
 
     CXMLNode* CreateRootNode(const std::string& strTagName);
-    CXMLNode* GetRootNode(void);
+    CXMLNode* GetRootNode();
 
     CXMLErrorCodes::Code GetLastError(std::string& strOut);
-    void                 ResetLastError(void);
+    void                 ResetLastError();
 
     // Private functions
     void SetLastError(CXMLErrorCodes::Code errCode, const std::string& strDescription);
 
-    TiXmlDocument* GetDocument(void);
+    TiXmlDocument* GetDocument();
 
-    eXMLClass     GetClassType(void) { return CXML_FILE; };
-    unsigned long GetID(void)
+    eXMLClass     GetClassType() { return CXML_FILE; };
+    unsigned long GetID()
     {
         dassert(m_bUsingIDs);
         return m_ulID;
     };
-    bool IsValid(void) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
-    bool IsUsingIDs(void) { return m_bUsingIDs; }
+    bool IsValid() { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    bool IsUsingIDs() { return m_bUsingIDs; }
 
     static void InitFileRecovery(const char* szSaveFlagDirectory);
     void        FileRecoveryPreSave(const SString& strFilename);
-    void        FileRecoveryPostSave(void);
+    void        FileRecoveryPostSave();
 
 private:
-    bool BuildWrapperTree(void);
+    bool BuildWrapperTree();
     bool BuildSubElements(class CXMLNodeImpl* pNode);
-    void ClearWrapperTree(void);
-    bool WriteSafer(void);
+    void ClearWrapperTree();
+    bool WriteSafer();
 
     std::string m_strFilename;
 
@@ -77,5 +76,3 @@ private:
 
     static SString ms_strSaveFlagFile;
 };
-
-#endif

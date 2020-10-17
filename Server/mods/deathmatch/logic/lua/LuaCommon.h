@@ -38,7 +38,7 @@ void lua_pushxmlnode(lua_State* luaVM, class CXMLNode* pNode);
 void lua_pushban(lua_State* luaVM, class CBan* pBan);
 void lua_pushquery(lua_State* luaVM, class CDbJobData* pJobData);
 void lua_pushuserdata(lua_State* luaVM, void* value);
-void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject);
+void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool bSkipCache = false);
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector);
 void lua_pushvector(lua_State* luaVM, const CVector& vector);
@@ -84,7 +84,7 @@ enum
 
 struct SLuaDebugInfo
 {
-    SLuaDebugInfo(void) : iLine(INVALID_LINE_NUMBER), infoType(DEBUG_INFO_NONE) {}
+    SLuaDebugInfo() : iLine(INVALID_LINE_NUMBER), infoType(DEBUG_INFO_NONE) {}
     SLuaDebugInfo(const SString& strFile, int iLine, const SString& strShortSrc = "")
         : strFile(strFile), strShortSrc(strShortSrc), iLine(iLine), infoType(DEBUG_INFO_FILE_AND_LINE)
     {

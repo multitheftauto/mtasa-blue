@@ -45,7 +45,7 @@ CGUIScrollBar_Impl::CGUIScrollBar_Impl(CGUI_Impl* pGUI, bool bHorizontal, CGUIEl
     }
 }
 
-CGUIScrollBar_Impl::~CGUIScrollBar_Impl(void)
+CGUIScrollBar_Impl::~CGUIScrollBar_Impl()
 {
     DestroyElement();
 }
@@ -55,7 +55,7 @@ void CGUIScrollBar_Impl::SetScrollPosition(float fPosition)
     reinterpret_cast<CEGUI::Scrollbar*>(m_pWindow)->setScrollPosition(fPosition);
 }
 
-float CGUIScrollBar_Impl::GetScrollPosition(void)
+float CGUIScrollBar_Impl::GetScrollPosition()
 {
     return reinterpret_cast<CEGUI::Scrollbar*>(m_pWindow)->getScrollPosition();
 }

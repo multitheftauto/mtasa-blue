@@ -8,5 +8,5 @@
  *
  *****************************************************************************/
 
-void BeginD3DStuff(void);
-void EndD3DStuff(void);
+void BeginD3DStuff();
+void EndD3DStuff();

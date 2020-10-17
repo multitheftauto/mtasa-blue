@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEAPONMANAGER_H
-#define __CCLIENTWEAPONMANAGER_H
+#pragma once
 
 #include <list>
 class CClientWeapon;
@@ -20,9 +19,9 @@ class CClientWeaponManager
 
 public:
     CClientWeaponManager(class CClientManager* pManager);
-    ~CClientWeaponManager(void);
+    ~CClientWeaponManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     void AddToList(CClientWeapon* pWeapon) { m_Weapons.push_back(pWeapon); }
@@ -32,5 +31,3 @@ private:
     std::list<CClientWeapon*> m_Weapons;
     bool                      m_bDeleteAll;
 };
-
-#endif

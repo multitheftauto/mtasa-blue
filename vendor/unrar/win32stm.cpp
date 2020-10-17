@@ -20,11 +20,13 @@ void ExtractStreams20(Archive &Arc,const wchar *FileName)
   wchar StreamName[NM+2];
   if (FileName[0]!=0 && FileName[1]==0)
   {
-    wcscpy(StreamName,L".\\");
-    wcscpy(StreamName+2,FileName);
+    // Convert single character names like f:stream to .\f:stream to
+    // resolve the ambiguity with drive letters.
+    wcsncpyz(StreamName,L".\\",ASIZE(StreamName));
+    wcsncatz(StreamName,FileName,ASIZE(StreamName));
   }
   else
-    wcscpy(StreamName,FileName);
+    wcsncpyz(StreamName,FileName,ASIZE(StreamName));
   if (wcslen(StreamName)+strlen(Arc.StreamHead.StreamName)>=ASIZE(StreamName) ||
       Arc.StreamHead.StreamName[0]!=':')
   {
@@ -35,7 +37,7 @@ void ExtractStreams20(Archive &Arc,const wchar *FileName)
 
   wchar StoredName[NM];
   CharToWide(Arc.StreamHead.StreamName,StoredName,ASIZE(StoredName));
-  ConvertPath(StoredName+1,StoredName+1);
+  ConvertPath(StoredName+1,StoredName+1,ASIZE(StoredName)-1);
 
   wcsncatz(StreamName,StoredName,ASIZE(StreamName));
 
@@ -78,19 +80,18 @@ void ExtractStreams20(Archive &Arc,const wchar *FileName)
 
 
 #ifdef _WIN_ALL
-void ExtractStreams(Archive &Arc,const wchar *FileName)
+void ExtractStreams(Archive &Arc,const wchar *FileName,bool TestMode)
 {
   wchar FullName[NM+2];
   if (FileName[0]!=0 && FileName[1]==0)
   {
-    wcscpy(FullName,L".\\");
-    wcsncpyz(FullName+2,FileName,ASIZE(FullName)-2);
+    // Convert single character names like f:stream to .\f:stream to
+    // resolve the ambiguity with drive letters.
+    wcsncpyz(FullName,L".\\",ASIZE(FullName));
+    wcsncatz(FullName,FileName,ASIZE(FullName));
   }
   else
     wcsncpyz(FullName,FileName,ASIZE(FullName));
-
-  byte *Data=&Arc.SubHead.SubData[0];
-  size_t DataSize=Arc.SubHead.SubData.Size();
 
   wchar StreamName[NM];
   GetStreamNameNTFS(Arc,StreamName,ASIZE(StreamName));
@@ -98,6 +99,13 @@ void ExtractStreams(Archive &Arc,const wchar *FileName)
   {
     uiMsg(UIERROR_STREAMBROKEN,Arc.FileName,FileName);
     ErrHandler.SetErrorCode(RARX_CRC);
+    return;
+  }
+
+  if (TestMode)
+  {
+    File CurFile;
+    Arc.ReadSubData(NULL,&CurFile,true);
     return;
   }
 
@@ -109,7 +117,7 @@ void ExtractStreams(Archive &Arc,const wchar *FileName)
   if ((fd.FileAttr & FILE_ATTRIBUTE_READONLY)!=0)
     SetFileAttr(FileName,fd.FileAttr & ~FILE_ATTRIBUTE_READONLY);
   File CurFile;
-  if (CurFile.WCreate(FullName) && Arc.ReadSubData(NULL,&CurFile))
+  if (CurFile.WCreate(FullName) && Arc.ReadSubData(NULL,&CurFile,false))
     CurFile.Close();
   File HostFile;
   if (Found && HostFile.Open(FileName,FMF_OPENSHARED|FMF_UPDATE))

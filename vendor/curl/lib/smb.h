@@ -8,7 +8,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2014, Bill Nagel <wnagel@tycoint.com>, Exacq Technologies
- * Copyright (C) 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2018 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -35,6 +35,7 @@ struct smb_conn {
   enum smb_conn_state state;
   char *user;
   char *domain;
+  char *share;
   unsigned char challenge[8];
   unsigned int session_key;
   unsigned short uid;
@@ -192,7 +193,6 @@ struct smb_nt_create_response {
   unsigned int ext_file_attributes;
   curl_off_t allocation_size;
   curl_off_t end_of_file;
-
 } PACK;
 
 struct smb_read {

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUI_TYPES_H
-#define __CGUI_TYPES_H
+#pragma once
 
 #include <CVector2D.h>
 #include <CRect2D.h>
@@ -72,7 +71,7 @@ enum CGUIHorizontalAlign
 class CGUIColor
 {
 public:
-    CGUIColor(void)
+    CGUIColor()
     {
         R = 0;
         G = 0;
@@ -259,5 +258,3 @@ struct CGUIKeys
     };
     /* END OF SCANCODES */
 };
-
-#endif

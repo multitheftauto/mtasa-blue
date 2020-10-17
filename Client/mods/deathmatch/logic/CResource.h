@@ -29,7 +29,7 @@ private:
 public:
     CExportedFunction(const char* szFunctionName) { m_strFunctionName.AssignLeft(szFunctionName, MAX_FUNCTION_NAME_LENGTH); };
 
-    const char* GetFunctionName(void) { return m_strFunctionName; }
+    const char* GetFunctionName() { return m_strFunctionName; }
 };
 
 struct SNoClientCacheScript
@@ -49,65 +49,65 @@ class CResource
 {
 public:
     CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-              const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
-    ~CResource(void);
+              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
+    ~CResource();
 
-    unsigned short GetNetID(void) { return m_usNetID; };
-    uint           GetScriptID(void) const { return m_uiScriptID; };
-    const char*    GetName(void) { return m_strResourceName; };
-    CLuaMain*      GetVM(void) { return m_pLuaVM; };
-    bool           IsActive(void) { return m_bActive; };
-    bool           CanBeLoaded(void);
+    unsigned short GetNetID() { return m_usNetID; };
+    uint           GetScriptID() const { return m_uiScriptID; };
+    const char*    GetName() { return m_strResourceName; };
+    CLuaMain*      GetVM() { return m_pLuaVM; };
+    bool           IsActive() { return m_bActive; };
+    bool           CanBeLoaded();
 
-    void    Load(void);
-    void    Stop(void);
-    SString GetState(void);
+    void    Load();
+    void    Stop();
+    SString GetState();
 
     CDownloadableResource* AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
                                            CChecksum serverChecksum, bool bAutoDownload);
     CDownloadableResource* AddConfigFile(const char* szFileName, uint uiDownloadSize, CChecksum serverChecksum);
 
-    std::list<class CResourceConfigItem*>::iterator ConfigIterBegin(void) { return m_ConfigFiles.begin(); }
-    std::list<class CResourceConfigItem*>::iterator ConfigIterEnd(void) { return m_ConfigFiles.end(); }
+    std::list<class CResourceConfigItem*>::iterator ConfigIterBegin() { return m_ConfigFiles.begin(); }
+    std::list<class CResourceConfigItem*>::iterator ConfigIterEnd() { return m_ConfigFiles.end(); }
 
-    CElementGroup* GetElementGroup(void) { return m_pDefaultElementGroup; }
+    CElementGroup* GetElementGroup() { return m_pDefaultElementGroup; }
     void           AddToElementGroup(CClientEntity* pElement);
 
     void AddExportedFunction(const char* szFunctionName);
     bool CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
 
-    class CClientEntity* GetResourceEntity(void) { return m_pResourceEntity; }
+    class CClientEntity* GetResourceEntity() { return m_pResourceEntity; }
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }
-    class CClientEntity* GetResourceDynamicEntity(void) { return m_pResourceDynamicEntity; }
+    class CClientEntity* GetResourceDynamicEntity() { return m_pResourceDynamicEntity; }
     void                 SetResourceDynamicEntity(CClientEntity* pEntity) { m_pResourceDynamicEntity = pEntity; }
     SString              GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath);
-    class CClientEntity* GetResourceGUIEntity(void) { return m_pResourceGUIEntity; }
+    class CClientEntity* GetResourceGUIEntity() { return m_pResourceGUIEntity; }
     void                 SetResourceGUIEntity(CClientEntity* pEntity) { m_pResourceGUIEntity = pEntity; }
-    CClientEntity*       GetResourceCOLModelRoot(void) { return m_pResourceCOLRoot; };
-    CClientEntity*       GetResourceDFFRoot(void) { return m_pResourceDFFEntity; };
-    CClientEntity*       GetResourceTXDRoot(void) { return m_pResourceTXDRoot; };
-    CClientEntity*       GetResourceIFPRoot(void) { return m_pResourceIFPRoot; };
+    CClientEntity*       GetResourceCOLModelRoot() { return m_pResourceCOLRoot; };
+    CClientEntity*       GetResourceDFFRoot() { return m_pResourceDFFEntity; };
+    CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
+    CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
-    void DeleteClientChildren(void);
+    void DeleteClientChildren();
 
     // Use this for cursor showing/hiding
     void ShowCursor(bool bShow, bool bToggleControls = true);
 
-    std::list<CExportedFunction*>::iterator IterBeginExportedFunctions(void) { return m_exportedFunctions.begin(); }
-    std::list<CExportedFunction*>::iterator IterEndExportedFunctions(void) { return m_exportedFunctions.end(); }
+    std::list<CExportedFunction*>::iterator IterBeginExportedFunctions() { return m_exportedFunctions.begin(); }
+    std::list<CExportedFunction*>::iterator IterEndExportedFunctions() { return m_exportedFunctions.end(); }
 
-    std::list<CResourceFile*>::iterator IterBeginResourceFiles(void) { return m_ResourceFiles.begin(); }
-    std::list<CResourceFile*>::iterator IterEndResourceFiles(void) { return m_ResourceFiles.end(); }
+    std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 
     void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
-    const SString& GetMinServerReq(void) const { return m_strMinServerReq; }
-    const SString& GetMinClientReq(void) const { return m_strMinClientReq; }
-    bool           IsOOPEnabled(void) { return m_bOOPEnabled; }
+    const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
+    const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
+    bool           IsOOPEnabled() { return m_bOOPEnabled; }
     void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
-    bool           IsWaitingForInitialDownloads(void);
-    int            GetDownloadPriorityGroup(void) { return m_iDownloadPriorityGroup; }
+    bool           IsWaitingForInitialDownloads();
+    int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
@@ -129,8 +129,8 @@ private:
     class CClientEntity* m_pResourceIFPRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
-    SString              m_strMinServerReq;
-    SString              m_strMinClientReq;
+    CMtaVersion          m_strMinServerReq;
+    CMtaVersion          m_strMinClientReq;
     bool                 m_bOOPEnabled;
     int                  m_iDownloadPriorityGroup;
 

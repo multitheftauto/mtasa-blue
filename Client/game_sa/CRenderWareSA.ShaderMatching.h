@@ -130,7 +130,7 @@ public:
 class CMatchChannel
 {
 public:
-    CMatchChannel(void)
+    CMatchChannel()
     {
         m_bResetReplacements = false;
         m_uiId = ms_uiIdCounter++;
@@ -172,7 +172,7 @@ public:
         MapRemove(m_ShaderAndEntityList, key);
     }
 
-    uint GetShaderAndEntityCount(void) const { return m_ShaderAndEntityList.size(); }
+    uint GetShaderAndEntityCount() const { return m_ShaderAndEntityList.size(); }
 
     void GetBestShaderForEntity(CClientEntityBase* pClientEntity, int iEntityType, SShaderInfoLayers& outShaderLayers) const
     {
@@ -235,7 +235,7 @@ public:
         m_MatchChain = matchChain;
     }
 
-    const SWildcardMatchChain& GetMatchChain(void) const { return m_MatchChain; }
+    const SWildcardMatchChain& GetMatchChain() const { return m_MatchChain; }
 
     SWildcardMatchChain            m_MatchChain;                    // String matches this channel represents
     CFastHashSet<STexNameInfo*>    m_MatchedTextureList;            // All textures whose name matches the match chain
@@ -268,17 +268,17 @@ protected:
                                              bool bSilent);
     void           AddToOptimizeQueue(CMatchChannel* pChannel);
     void           AddToRematchQueue(CMatchChannel* pChannel);
-    void           FlushChanges(void);
-    void           RecalcEverything(void);
-    void           ProcessRematchTexturesQueue(void);
-    void           ProcessOptimizeChannelsQueue(void);
+    void           FlushChanges();
+    void           RecalcEverything();
+    void           ProcessRematchTexturesQueue();
+    void           ProcessOptimizeChannelsQueue();
     void           MergeChannelTo(CMatchChannel* pSource, CMatchChannel* pTarget);
     CMatchChannel* FindChannelWithMatchChain(const SWildcardMatchChain& matchChain, CMatchChannel* pExcluding);
     CMatchChannel* GetChannelOnlyUsedBy(SShaderInfo* pShaderInfo, CClientEntityBase* pClientEntity, bool bAppendLayers);
     void           AddUsage(const CShaderAndEntityPair& key, CMatchChannel* pChannel);
     void           RemoveUsage(const CShaderAndEntityPair& key, CMatchChannel* pChannel);
     CMatchChannel* GetChannel(const CShaderAndEntityPair& key);
-    CMatchChannel* NewChannel(void);
+    CMatchChannel* NewChannel();
     void           DeleteChannel(CMatchChannel* pChannel);
     SShaderInfo*   GetShaderInfo(CSHADERDUMMY* pShaderData, bool bAddIfRequired, float fPriority, bool bLayered, int iTypeMask, uint uiShaderCreateTime,
                                  bool bUsesVertexShader);

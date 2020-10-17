@@ -12,20 +12,20 @@
 #include <StdInc.h>
 using std::list;
 
-CSingularFileDownloadManager::CSingularFileDownloadManager(void)
+CSingularFileDownloadManager::CSingularFileDownloadManager()
 {
 }
 
-CSingularFileDownloadManager::~CSingularFileDownloadManager(void)
+CSingularFileDownloadManager::~CSingularFileDownloadManager()
 {
     // clear list
     ClearList();
 }
 
 CSingularFileDownload* CSingularFileDownloadManager::AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL,
-                                                             CChecksum checksum)
+                                                             CResource* pRequestResource, CChecksum checksum)
 {
-    CSingularFileDownload* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, checksum);
+    CSingularFileDownload* pFile = new CSingularFileDownload(pResource, szName, szNameShort, strHTTPURL, pRequestResource, checksum);
     m_Downloads.push_back(pFile);
     return NULL;
 }
@@ -40,7 +40,7 @@ void CSingularFileDownloadManager::CancelResourceDownloads(CResource* pResource)
     }
 }
 
-void CSingularFileDownloadManager::ClearList(void)
+void CSingularFileDownloadManager::ClearList()
 {
     list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
     for (; iter != m_Downloads.end(); ++iter)
@@ -50,7 +50,7 @@ void CSingularFileDownloadManager::ClearList(void)
     m_Downloads.clear();
 }
 
-bool CSingularFileDownloadManager::AllComplete(void)
+bool CSingularFileDownloadManager::AllComplete()
 {
     list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
     for (; iter != m_Downloads.end(); ++iter)

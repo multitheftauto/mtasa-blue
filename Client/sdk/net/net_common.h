@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __NET_COMMON_H
-#define __NET_COMMON_H
+#pragma once
 
 #ifdef WIN32
 #include <windows.h>
@@ -115,5 +114,3 @@ enum ePacketOrdering
 
 // Typedefs to make shared code easier
 typedef int NetPlayerID;
-
-#endif

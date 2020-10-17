@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __GAME_COMMON
-#define __GAME_COMMON
+#pragma once
 
 #include <windows.h>
 
@@ -567,7 +566,7 @@ enum eHandlingTypes
     HT_UTIL_TR1,
     HT_ROLLER,
     HT_BIKE,
-    HT_MOPED,
+    HT_PIZZABOY,
     HT_DIRTBIKE,
     HT_FCR900,
     HT_NRG500,
@@ -614,6 +613,14 @@ enum eHandlingTypes
     HT_RCBARON,
     HT_RCGOBLIN,
     HT_RCRAIDER,
+    HT_HOTRINA,
+    HT_HOTRINB,
+    HT_SADLSHIT,
+    HT_GLENSHIT,
+    HT_FAGGIO,
+    HT_FIRELA,
+    HT_RNCHLURE,
+    HT_FREIBOX,
     HT_MAX
 };
 
@@ -1511,4 +1518,104 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
-#endif
+enum eVehicleDummies
+{
+    LIGHT_FRONT_MAIN = 0,
+    LIGHT_REAR_MAIN,
+    LIGHT_FRONT_SECONDARY,
+    LIGHT_REAR_SECONDARY,
+    SEAT_FRONT,
+    SEAT_REAR,
+    EXHAUST,
+    ENGINE,
+    GAS_CAP,
+    TRAILER_ATTACH,
+    HAND_REST,
+    EXHAUST_SECONDARY,
+    WING_AIRTRAIL,
+    VEH_GUN,
+};
+
+enum class eResizableVehicleWheelGroup
+{
+    FRONT_AXLE = 0,
+    REAR_AXLE,
+    ALL_WHEELS = 0xFF,
+};
+
+enum eObjectProperty
+{
+    OBJECT_PROPERTY_ALL,
+    OBJECT_PROPERTY_MASS,
+    OBJECT_PROPERTY_TURNMASS,
+    OBJECT_PROPERTY_AIRRESISTANCE,
+    OBJECT_PROPERTY_ELASTICITY,
+    OBJECT_PROPERTY_CENTEROFMASS,
+    OBJECT_PROPERTY_BUOYANCY,
+    OBJECT_PROPERTY_MAX,
+};
+
+namespace eObjectGroup
+{
+    enum Modifiable
+    {
+        MASS,
+        TURNMASS,
+        AIRRESISTANCE,
+        ELASTICITY,
+        BUOYANCY,
+        UPROOTLIMIT,
+        COLDAMAGEMULTIPLIER,
+        COLDAMAGEEFFECT,
+        SPECIALCOLRESPONSE,
+        CAMERAAVOID,
+        EXPLOSION,
+        FXTYPE,
+        FXOFFSET,
+        FXSYSTEM,
+        SMASHMULTIPLIER,
+        BREAKVELOCITY,
+        BREAKVELOCITYRAND,
+        BREAKMODE,
+        SPARKSONIMPACT
+    };
+
+    enum DamageEffect
+    {
+        NO_EFFECT = 0,
+        CHANGE_MODEL = 1,
+        SMASH_COMPLETELY = 20,
+        CHANGE_THEN_SMASH = 21,
+        BREAKABLE = 200,
+        BREAKABLE_REMOVED = 202
+    };
+
+    enum CollisionResponse
+    {
+        NO_RESPONSE,
+        LAMPPOST,
+        SMALLBOX,
+        BIGBOX,
+        FENCEPART,
+        GRENADE,
+        SWINGDOOR,
+        LOCKDOOR,
+        HANGING,
+        POOLBALL
+    };
+
+    enum FxType
+    {
+        NO_FX,
+        PLAY_ON_HIT,
+        PLAY_ON_DESTROYED,
+        PLAY_ON_HIT_DESTROYED
+    };
+
+    enum BreakMode
+    {
+        NOT_BY_GUN,
+        BY_GUN,
+        SMASHABLE,
+    };
+}

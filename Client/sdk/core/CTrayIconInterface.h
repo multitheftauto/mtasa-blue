@@ -21,8 +21,8 @@ enum eTrayIconType
 class CTrayIconInterface
 {
 public:
-    virtual bool DoesTrayIconExist(void) = 0;
-    virtual bool CreateTrayIcon(void) = 0;
-    virtual void DestroyTrayIcon(void) = 0;
+    virtual bool DoesTrayIconExist() = 0;
+    virtual bool CreateTrayIcon() = 0;
+    virtual void DestroyTrayIcon() = 0;
     virtual bool CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound) = 0;
 };

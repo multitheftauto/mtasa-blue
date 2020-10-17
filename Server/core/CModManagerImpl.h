@@ -25,18 +25,18 @@ class CModManagerImpl : public CModManager
 {
 public:
     CModManagerImpl(CServerImpl* pServer);
-    virtual ~CModManagerImpl(void);
+    virtual ~CModManagerImpl();
 
     void SetServerPath(const char* szServerPath) { m_strServerPath = szServerPath; };
 
     bool RequestLoad(const char* szModName);
 
-    const char*     GetServerPath(void) { return m_strServerPath; };
-    const char*     GetModPath(void) { return m_strModPath; };
+    const char*     GetServerPath() { return m_strServerPath; };
+    const char*     GetModPath() { return m_strModPath; };
     virtual SString GetAbsolutePath(const char* szRelative);
 
-    bool         IsModLoaded(void);
-    CServerBase* GetCurrentMod(void);
+    bool         IsModLoaded();
+    CServerBase* GetCurrentMod();
 
     bool Load(const char* szModName, int iArgumentCount, char* szArguments[]);
     void Unload(bool bKeyPressBeforeTerm = false);
@@ -44,13 +44,13 @@ public:
     void HandleInput(const char* szCommand);
     void GetTag(char* szInfoTag, int iInfoTag);
 
-    void DoPulse(void);
+    void DoPulse();
 
-    bool IsFinished(void);
+    bool IsFinished();
 
-    bool             PendingWorkToDo(void);
+    bool             PendingWorkToDo();
     bool             GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit);
-    CDynamicLibrary& GetDynamicLibrary(void) { return m_Library; };
+    CDynamicLibrary& GetDynamicLibrary() { return m_Library; };
 
 private:
     CServerImpl* m_pServer;

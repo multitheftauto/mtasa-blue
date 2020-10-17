@@ -24,7 +24,7 @@ CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CClientVehicleManager* pVehicleMa
     m_ulLastSyncTime = 0;
 }
 
-CUnoccupiedVehicleSync::~CUnoccupiedVehicleSync(void)
+CUnoccupiedVehicleSync::~CUnoccupiedVehicleSync()
 {
 }
 
@@ -54,7 +54,7 @@ bool CUnoccupiedVehicleSync::ProcessPacket(unsigned char ucPacketID, NetBitStrea
     return false;
 }
 
-void CUnoccupiedVehicleSync::DoPulse(void)
+void CUnoccupiedVehicleSync::DoPulse()
 {
     // Check all our vehicles for damage
     UpdateDamageModels();
@@ -81,7 +81,7 @@ void CUnoccupiedVehicleSync::RemoveVehicle(CDeathmatchVehicle* pVehicle)
     pVehicle->SetIsSyncing(false);
 }
 
-void CUnoccupiedVehicleSync::ClearVehicles(void)
+void CUnoccupiedVehicleSync::ClearVehicles()
 {
     // Mark all vehicles as 'not syncing'
     list<CDeathmatchVehicle*>::const_iterator iter = m_List.begin();
@@ -212,7 +212,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(NetBitStreamInterface&
     }
 }
 
-void CUnoccupiedVehicleSync::UpdateDamageModels(void)
+void CUnoccupiedVehicleSync::UpdateDamageModels()
 {
     // Got any items?
     if (m_List.size() > 0)
@@ -226,7 +226,7 @@ void CUnoccupiedVehicleSync::UpdateDamageModels(void)
     }
 }
 
-void CUnoccupiedVehicleSync::UpdateStates(void)
+void CUnoccupiedVehicleSync::UpdateStates()
 {
     // Got any items?
     if (m_List.size() > 0)

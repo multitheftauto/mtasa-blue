@@ -13,14 +13,20 @@
 
 void CLuaWaterDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createWater", CreateWater);
-    CLuaCFunctions::AddFunction("setWaterLevel", SetWaterLevel);
-    CLuaCFunctions::AddFunction("resetWaterLevel", ResetWaterLevel);
-    CLuaCFunctions::AddFunction("getWaterVertexPosition", GetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("setWaterVertexPosition", SetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("getWaterColor", GetWaterColor);
-    CLuaCFunctions::AddFunction("setWaterColor", SetWaterColor);
-    CLuaCFunctions::AddFunction("resetWaterColor", ResetWaterColor);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createWater", CreateWater},
+        {"setWaterLevel", SetWaterLevel},
+        {"resetWaterLevel", ResetWaterLevel},
+        {"getWaterVertexPosition", GetWaterVertexPosition},
+        {"setWaterVertexPosition", SetWaterVertexPosition},
+        {"getWaterColor", GetWaterColor},
+        {"setWaterColor", SetWaterColor},
+        {"resetWaterColor", ResetWaterColor},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaWaterDefs::AddClass(lua_State* luaVM)
@@ -56,6 +62,7 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 
     CVector          v1, v2, v3, v4;
     CVector*         pv4 = NULL;
+    bool             bShallow;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(v1);
     argStream.ReadVector3D(v2);
@@ -67,9 +74,11 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
         pv4 = &v4;
     }
 
+    argStream.ReadBool(bShallow, false);
+
     if (!argStream.HasErrors())
     {
-        CWater* pWater = CStaticFunctionDefinitions::CreateWater(pLuaMain->GetResource(), &v1, &v2, &v3, pv4);
+        CWater* pWater = CStaticFunctionDefinitions::CreateWater(pLuaMain->GetResource(), &v1, &v2, &v3, pv4, bShallow);
         if (pWater)
         {
             CElementGroup* pGroup = pLuaMain->GetResource()->GetElementGroup();

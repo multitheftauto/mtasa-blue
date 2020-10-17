@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_DAMAGEMANAGER
-#define __CGAMESA_DAMAGEMANAGER
+#pragma once
 
 #include <game/CDamageManager.h>
 #include "Common.h"
@@ -44,6 +43,7 @@ public:
     DWORD Lights;            // 2 bits per light
     DWORD Panels;            // 4 bits per panel
 };
+static_assert(sizeof(CDamageManagerSAInterface) == 0x18, "Invalid size for CDamageManagerSAInterface");
 
 class CDamageManagerSA : public CDamageManager
 {
@@ -55,15 +55,15 @@ public:
     BYTE          GetEngineStatus();
     VOID          SetEngineStatus(BYTE bEngineState);
     BYTE          GetDoorStatus(eDoors bDoor);
-    VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus);
+    VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);
-    unsigned long GetPanelStatus(void);
+    unsigned long GetPanelStatus();
     VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
     void          SetPanelStatus(unsigned long ulStatus);
     BYTE          GetLightStatus(BYTE bLight);
-    unsigned char GetLightStatus(void);
+    unsigned char GetLightStatus();
     VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus);
     void          SetLightStatus(unsigned char ucStatus);
     BYTE          GetAeroplaneCompStatus(BYTE CompID);
@@ -77,5 +77,3 @@ public:
         internalInterface = intInterface;
     };
 };
-
-#endif

@@ -9,34 +9,31 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILABEL_H
-#define __CGUILABEL_H
+#pragma once
 
 #include "CGUIElement.h"
 
 class CGUILabel : public CGUIElement
 {
 public:
-    virtual ~CGUILabel(void){};
+    virtual ~CGUILabel(){};
 
     virtual void SetText(const char* Text) = 0;
 
     virtual void                SetVerticalAlign(CGUIVerticalAlign eAlign) = 0;
-    virtual CGUIVerticalAlign   GetVerticalAlign(void) = 0;
+    virtual CGUIVerticalAlign   GetVerticalAlign() = 0;
     virtual void                SetHorizontalAlign(CGUIHorizontalAlign eAlign) = 0;
-    virtual CGUIHorizontalAlign GetHorizontalAlign(void) = 0;
+    virtual CGUIHorizontalAlign GetHorizontalAlign() = 0;
 
     virtual void      SetTextColor(CGUIColor Color) = 0;
     virtual void      SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) = 0;
-    virtual CGUIColor GetTextColor(void) = 0;
+    virtual CGUIColor GetTextColor() = 0;
     virtual void      GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue) = 0;
 
     virtual void SetFrameEnabled(bool bFrameEnabled) = 0;
-    virtual bool IsFrameEnabled(void) = 0;
+    virtual bool IsFrameEnabled() = 0;
 
     virtual float GetCharacterWidth(int iCharIndex) = 0;
-    virtual float GetFontHeight(void) = 0;
-    virtual float GetTextExtent(void) = 0;
+    virtual float GetFontHeight() = 0;
+    virtual float GetTextExtent() = 0;
 };
-
-#endif

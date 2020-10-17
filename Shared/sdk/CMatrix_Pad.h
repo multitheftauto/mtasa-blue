@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMATRIX_PAD_H
-#define __CMATRIX_PAD_H
+#pragma once
 
 #include "CVector.h"
 #include "CMatrix.h"
@@ -65,5 +64,3 @@ public:
         vRight = Matrix.vRight;
     }
 };
-
-#endif

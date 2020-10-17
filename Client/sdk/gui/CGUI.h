@@ -45,7 +45,7 @@ class CGUI;
 #define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
 #define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
 
-#define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
+#define CHECK_CHANNEL(channel) assert ( (channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT )
 
 class CGUI
 {
@@ -53,20 +53,20 @@ public:
     virtual void SetSkin(const char* szName) = 0;
     virtual void SetBidiEnabled(bool bEnabled) = 0;
 
-    virtual void Draw(void) = 0;
-    virtual void Invalidate(void) = 0;
-    virtual void Restore(void) = 0;
+    virtual void Draw() = 0;
+    virtual void Invalidate() = 0;
+    virtual void Restore() = 0;
 
-    virtual void DrawMouseCursor(void) = 0;
+    virtual void DrawMouseCursor() = 0;
 
     virtual void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton) = 0;
     virtual void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown) = 0;
     virtual void ProcessCharacter(unsigned long ulCharacter) = 0;
 
     //
-    virtual bool       GetGUIInputEnabled(void) = 0;
+    virtual bool       GetGUIInputEnabled() = 0;
     virtual void       SetGUIInputMode(eInputMode a_eMode) = 0;
-    virtual eInputMode GetGUIInputMode(void) = 0;
+    virtual eInputMode GetGUIInputMode() = 0;
 
     //
     virtual CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags) = 0;
@@ -98,15 +98,15 @@ public:
     virtual CGUIStaticImage* CreateStaticImage(CGUIElement* pParent) = 0;
     virtual CGUIStaticImage* CreateStaticImage(CGUITab* pParent) = 0;
     virtual CGUIStaticImage* CreateStaticImage(CGUIGridList* pParent) = 0;
-    virtual CGUIStaticImage* CreateStaticImage(void) = 0;
+    virtual CGUIStaticImage* CreateStaticImage() = 0;
 
     virtual CGUITabPanel* CreateTabPanel(CGUIElement* pParent) = 0;
     virtual CGUITabPanel* CreateTabPanel(CGUITab* pParent) = 0;
-    virtual CGUITabPanel* CreateTabPanel(void) = 0;
+    virtual CGUITabPanel* CreateTabPanel() = 0;
 
     virtual CGUIScrollPane* CreateScrollPane(CGUIElement* pParent) = 0;
     virtual CGUIScrollPane* CreateScrollPane(CGUITab* pParent) = 0;
-    virtual CGUIScrollPane* CreateScrollPane(void) = 0;
+    virtual CGUIScrollPane* CreateScrollPane() = 0;
 
     virtual CGUIScrollBar* CreateScrollBar(bool bHorizontal, CGUIElement* pParent = NULL) = 0;
     virtual CGUIScrollBar* CreateScrollBar(bool bHorizontal, CGUITab* pParent = NULL) = 0;
@@ -121,22 +121,22 @@ public:
 
     virtual CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
     virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false) = 0;
-    virtual CGUITexture* CreateTexture(void) = 0;
+    virtual CGUITexture* CreateTexture() = 0;
 
     virtual void        SetCursorEnabled(bool bEnabled) = 0;
-    virtual bool        IsCursorEnabled(void) = 0;
+    virtual bool        IsCursorEnabled() = 0;
     virtual void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false) = 0;
-    virtual float       GetCurrentServerCursorAlpha(void) = 0;
-    virtual eCursorType GetCursorType(void) = 0;
+    virtual float       GetCurrentServerCursorAlpha() = 0;
+    virtual eCursorType GetCursorType() = 0;
 
-    virtual CVector2D GetResolution(void) = 0;
+    virtual CVector2D GetResolution() = 0;
     virtual void      SetResolution(float fWidth, float fHeight) = 0;
 
-    virtual CGUIFont* GetDefaultFont(void) = 0;
-    virtual CGUIFont* GetSmallFont(void) = 0;
-    virtual CGUIFont* GetBoldFont(void) = 0;
-    virtual CGUIFont* GetClearFont(void) = 0;
-    virtual CGUIFont* GetSansFont(void) = 0;
+    virtual CGUIFont* GetDefaultFont() = 0;
+    virtual CGUIFont* GetSmallFont() = 0;
+    virtual CGUIFont* GetBoldFont() = 0;
+    virtual CGUIFont* GetClearFont() = 0;
+    virtual CGUIFont* GetSansFont() = 0;
     virtual bool      IsFontPresent(const char* szFont) = 0;
 
     virtual float GetTextExtent(const char* szText, const char* szFont = "default-normal") = 0;
@@ -162,12 +162,12 @@ public:
 
     virtual void SelectInputHandlers(eInputChannel channel) = 0;
     virtual void ClearInputHandlers(eInputChannel channel) = 0;
-    virtual void ClearSystemKeys(void) = 0;
+    virtual void ClearSystemKeys() = 0;
 
-    virtual bool IsTransferBoxVisible(void) = 0;
+    virtual bool IsTransferBoxVisible() = 0;
     virtual void SetTransferBoxVisible(bool bVisible) = 0;
 
-    virtual void CleanDeadPool(void) = 0;
+    virtual void CleanDeadPool() = 0;
 
     virtual CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename) = 0;
     virtual bool        LoadImageset(const SString& strFilename) = 0;

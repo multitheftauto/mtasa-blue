@@ -12,10 +12,12 @@
 #pragma once
 #include "CLuaDefs.h"
 
+#define MAX_CHATBOX_LAYOUT_CVARS 20
+
 class CLuaGUIDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(GUIGetInputEnabled);
@@ -52,6 +54,7 @@ public:
     LUA_DECLARE(GUIScrollBarSetScrollPosition);
     LUA_DECLARE(GUIScrollBarGetScrollPosition);
     LUA_DECLARE(GUIGridListSetSortingEnabled);
+    LUA_DECLARE(GUIGridListIsSortingEnabled);
     LUA_DECLARE(GUIGridListAddColumn);
     LUA_DECLARE(GUIGridListRemoveColumn);
     LUA_DECLARE(GUIGridListSetColumnWidth);
@@ -73,6 +76,7 @@ public:
     LUA_DECLARE(GUIGridListSetItemColor);
     LUA_DECLARE(GUIGridListGetItemColor);
     LUA_DECLARE(GUIGridListSetSelectionMode);
+    LUA_DECLARE(GUIGridListGetSelectionMode);
     LUA_DECLARE(GUIGridListGetSelectedItem);
     LUA_DECLARE(GUIGridListGetSelectedItems);
     LUA_DECLARE(GUIGridListGetSelectedCount);
@@ -97,6 +101,8 @@ public:
     LUA_DECLARE(GUISetProperty);
     LUA_DECLARE(GUIBringToFront);
     LUA_DECLARE(GUIMoveToBack);
+    LUA_DECLARE(GUIBlur);
+    LUA_DECLARE(GUIFocus);
     LUA_DECLARE(GUICheckBoxSetSelected);
     LUA_DECLARE(GUIRadioButtonSetSelected);
     LUA_DECLARE(GUIGetEnabled);
@@ -114,17 +120,23 @@ public:
     LUA_DECLARE(GUIProgressBarSetProgress);
     LUA_DECLARE(GUIProgressBarGetProgress);
     LUA_DECLARE(GUIEditSetReadOnly);
+    LUA_DECLARE(GUIEditIsReadOnly);
     LUA_DECLARE(GUIEditSetMasked);
+    LUA_DECLARE(GUIEditIsMasked);
     LUA_DECLARE(GUIEditSetMaxLength);
+    LUA_DECLARE(GUIEditGetMaxLength);
     LUA_DECLARE(GUIEditSetCaretIndex);
     LUA_DECLARE(GUIEditGetCaretIndex);
     LUA_DECLARE(GUIMemoSetReadOnly);
+    LUA_DECLARE(GUIMemoIsReadOnly);
     LUA_DECLARE(GUIMemoSetCaretIndex);
     LUA_DECLARE(GUIMemoGetCaretIndex);
+    LUA_DECLARE(GUIMemoGetVerticalScrollPosition);
+    LUA_DECLARE(GUIMemoSetVerticalScrollPosition);
     LUA_DECLARE(GUIWindowSetMovable);
     LUA_DECLARE(GUIWindowSetSizable);
-    LUA_DECLARE(GUIWindowGetMovable);
-    LUA_DECLARE(GUIWindowGetSizable);
+    LUA_DECLARE(GUIWindowIsMovable);
+    LUA_DECLARE(GUIWindowIsSizable);
     LUA_DECLARE(GUIWindowGetCloseButtonEnabled);
     LUA_DECLARE(GUIWindowGetTitleBarEnabled);
     LUA_DECLARE(GUILabelSetColor);
@@ -142,6 +154,9 @@ public:
     LUA_DECLARE(GUIComboBoxSetSelected);
     LUA_DECLARE(GUIComboBoxGetItemText);
     LUA_DECLARE(GUIComboBoxSetItemText);
+    LUA_DECLARE(GUIComboBoxGetItemCount);
+    LUA_DECLARE(GUIComboBoxSetOpen);
+    LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
 
 private:

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNAMETAGS_H
-#define __CNAMETAGS_H
+#pragma once
 
 class CHud;
 class CClientManager;
@@ -23,23 +22,22 @@ class CNametags
 {
 public:
     CNametags(CClientManager* pManager);
-    ~CNametags(void);
+    ~CNametags();
 
-    bool GetDrawHealth(void) { return m_bDrawHealth; };
+    bool GetDrawHealth() { return m_bDrawHealth; };
     void SetDrawHealth(bool bDrawHealth) { m_bDrawHealth = bDrawHealth; };
 
-    void DoPulse(void);
-
-    void DrawFromAim(void);
-    void DrawDefault(void);
+    void DoPulse();
 
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
-    unsigned int GetDimension(void) { return m_usDimension; }
+    unsigned int GetDimension() { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
-    bool IsVisible(void) { return m_bVisible; }
+    bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
+
+    unsigned char m_ucInterior = 0;
 
 private:
     static bool CompareNametagDistance(CClientPlayer* p1, CClientPlayer* p2);
@@ -48,10 +46,7 @@ private:
     CClientStreamer*      m_pPlayerStreamer;
     bool                  m_bDrawHealth;
     CHud*                 m_pHud;
-    bool                  m_bDrawFromAim;
     unsigned short        m_usDimension;
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;
 };
-
-#endif

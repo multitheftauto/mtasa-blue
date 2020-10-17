@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CBan::CBan(void)
+CBan::CBan()
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::BAN);
     m_tTimeOfBan = 0;
@@ -20,13 +20,13 @@ CBan::CBan(void)
     CBanManager::SetBansModified();
 }
 
-CBan::~CBan(void)
+CBan::~CBan()
 {
     CIdArray::PushUniqueId(this, EIdClass::BAN, m_uiScriptID);
     CBanManager::SetBansModified();
 }
 
-time_t CBan::GetBanTimeRemaining(void)
+time_t CBan::GetBanTimeRemaining()
 {
     time_t End = GetTimeOfUnban();
     if (End > 0)
@@ -36,7 +36,7 @@ time_t CBan::GetBanTimeRemaining(void)
     return 0;
 }
 
-SString CBan::GetDurationDesc(void)
+SString CBan::GetDurationDesc()
 {
     time_t Start = GetTimeOfBan();
     time_t End = GetTimeOfUnban();
@@ -59,7 +59,7 @@ SString CBan::GetDurationDesc(void)
     return "";
 }
 
-SString CBan::GetReasonText(void) const
+SString CBan::GetReasonText() const
 {
     // Remove after first '(' because of extra info added by admin panel
     size_t pos = m_strReason.find_first_of(" (");

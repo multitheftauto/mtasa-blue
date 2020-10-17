@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPOPULATION
-#define __CPOPULATION
+#pragma once
 
 #include <game/CCivilianPed.h>
 
@@ -26,5 +25,3 @@ public:
     virtual void          SetCivilianAddHandler(CivilianAddHandler* pCivilianAddHandler) = 0;
     virtual void          SetCivilianRemoveHandler(CivilianAddHandler* pCivilianAddHandler) = 0;
 };
-
-#endif

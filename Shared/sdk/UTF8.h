@@ -32,7 +32,7 @@
 #define BAD_WCHAR ((wchar_t) 0xfffd)
 #define BAD_CHAR '?'
 
-int utf8_mbtowc(wchar_t *pwc, const unsigned char *src, int src_len)
+int utf8_mbtowc(wchar_t* pwc, const unsigned char* src, int src_len)
 {
     if (!pwc)
         return 0;
@@ -100,7 +100,7 @@ int utf8_mbtowc(wchar_t *pwc, const unsigned char *src, int src_len)
         return RET_ILSEQ;
 }
 
-int utf8_wctomb(unsigned char *dest, wchar_t wc, int dest_size)
+int utf8_wctomb(unsigned char* dest, wchar_t wc, int dest_size)
 {
     if (!dest)
         return 0;
@@ -155,14 +155,14 @@ int utf8_wctomb(unsigned char *dest, wchar_t wc, int dest_size)
 // Original - For testing
 //
 
-std::wstring utf8_mbstowcs_orig(const std::string &str)
+std::wstring utf8_mbstowcs_orig(const std::string& str)
 {
     std::wstring wstr;
     wchar_t      wc;
     unsigned int sn = 0;
     int          un = 0;
 
-    const unsigned char *s = (const unsigned char *)str.c_str();
+    const unsigned char* s = (const unsigned char*)str.c_str();
 
     while (sn < str.length() && *s != 0 && (un = utf8_mbtowc(&wc, s, str.length() - sn)) > 0)
     {
@@ -173,7 +173,7 @@ std::wstring utf8_mbstowcs_orig(const std::string &str)
     return wstr;
 }
 
-std::string utf8_wcstombs_orig(const std::wstring &wstr)
+std::string utf8_wcstombs_orig(const std::wstring& wstr)
 {
     std::string str;
     char        utf8[6];
@@ -181,7 +181,7 @@ std::string utf8_wcstombs_orig(const std::wstring &wstr)
 
     for (unsigned int i = 0; i < wstr.size(); ++i)
     {
-        un = utf8_wctomb((unsigned char *)utf8, wstr[i], 6);
+        un = utf8_wctomb((unsigned char*)utf8, wstr[i], 6);
         if (un > 0)
             str.append(utf8, un);
     }
@@ -194,9 +194,9 @@ std::string utf8_wcstombs_orig(const std::wstring &wstr)
 //
 #define SMALL_STRING_LIMIT 1000
 
-std::wstring utf8_mbstowcs(const std::string &str)
+std::wstring utf8_mbstowcs(const std::string& str)
 {
-    const unsigned char *s = (const unsigned char *)str.c_str();
+    const unsigned char* s = (const unsigned char*)str.c_str();
     const unsigned int   length = str.length();
 
     if (length < SMALL_STRING_LIMIT)
@@ -205,8 +205,8 @@ std::wstring utf8_mbstowcs(const std::string &str)
         uint cCharacters = length + 1;
         uint cBytes = (cCharacters) * sizeof(wchar_t);
 
-        wchar_t *    buffer = (wchar_t *)alloca(cBytes);
-        wchar_t *    ptr = buffer;
+        wchar_t*     buffer = (wchar_t*)alloca(cBytes);
+        wchar_t*     ptr = buffer;
         wchar_t      wc;
         unsigned int sn = 0;
         int          un = 0;
@@ -240,7 +240,7 @@ std::wstring utf8_mbstowcs(const std::string &str)
 }
 
 // Optimized
-std::string utf8_wcstombs(const std::wstring &wstr)
+std::string utf8_wcstombs(const std::wstring& wstr)
 {
     const unsigned int size = wstr.length();
 
@@ -248,11 +248,11 @@ std::string utf8_wcstombs(const std::wstring &wstr)
     {
         // Faster but limited size
         uint  cBytes = (size + 1) * 6;
-        char *buffer = (char *)alloca(cBytes);
-        char *ptr = buffer;
+        char* buffer = (char*)alloca(cBytes);
+        char* ptr = buffer;
         for (unsigned int i = 0; i < size; ++i)
         {
-            ptr += utf8_wctomb((unsigned char *)ptr, wstr[i], 6);
+            ptr += utf8_wctomb((unsigned char*)ptr, wstr[i], 6);
         }
         size_t usedsize = ptr - buffer;
         dassert(usedsize < cBytes);
@@ -266,7 +266,7 @@ std::string utf8_wcstombs(const std::wstring &wstr)
 
         for (unsigned int i = 0; i < size; ++i)
         {
-            int un = utf8_wctomb((unsigned char *)utf8, wstr[i], 6);
+            int un = utf8_wctomb((unsigned char*)utf8, wstr[i], 6);
             if (un > 0)
                 str.append(utf8, un);
         }

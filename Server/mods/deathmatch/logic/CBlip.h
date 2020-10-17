@@ -18,19 +18,22 @@ class CBlip;
 class CBlip : public CPerPlayerEntity
 {
 public:
-    CBlip(CElement* pParent, CXMLNode* pNode, class CBlipManager* pBlipManager);
-    ~CBlip(void);
+    CBlip(CElement* pParent, class CBlipManager* pBlipManager);
+    ~CBlip();
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    void Unlink(void);
-    bool ReadSpecialData(void);
+    void Unlink();
 
-    const CVector& GetPosition(void);
+    const CVector& GetPosition();
     void           SetPosition(const CVector& vecPosition);
 
-    SColor GetColor(void) const { return m_Color; }
+    SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor color) { m_Color = color; }
 
     void AttachTo(CElement* pElement);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     class CBlipManager* m_pBlipManager;

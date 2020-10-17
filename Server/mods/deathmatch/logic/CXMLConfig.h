@@ -18,14 +18,14 @@ class CXMLConfig
 {
 public:
     CXMLConfig(const char* szFileName);
-    virtual ~CXMLConfig(void);
+    virtual ~CXMLConfig();
 
-    std::string& GetFileName(void) { return m_strFileName; }
+    std::string& GetFileName() { return m_strFileName; }
     void         SetFileName(const char* szFileName);
-    CXMLFile*    GetFile(void) { return m_pFile; }
+    CXMLFile*    GetFile() { return m_pFile; }
 
-    virtual bool Load(void) = 0;
-    virtual bool Save(void) = 0;
+    virtual bool Load() = 0;
+    virtual bool Save() = 0;
 
 protected:
     enum

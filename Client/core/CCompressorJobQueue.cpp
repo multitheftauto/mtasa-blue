@@ -24,24 +24,24 @@ class CCompressorJobQueueImpl : public CCompressorJobQueue
 {
 public:
     ZERO_ON_NEW
-    CCompressorJobQueueImpl(void);
-    virtual ~CCompressorJobQueueImpl(void);
+    CCompressorJobQueueImpl();
+    virtual ~CCompressorJobQueueImpl();
 
     // Main thread functions
-    virtual void              DoPulse(void);
+    virtual void              DoPulse();
     virtual CCompressJobData* AddCommand(uint uiSizeX, uint uiSizeY, uint uiQuality, uint uiTimeSpentInQueue, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback,
                                          const CBuffer& buffer);
     virtual bool              PollCommand(CCompressJobData* pJobData, uint uiTimeout);
     virtual bool              FreeCommand(CCompressJobData* pJobData);
 
 protected:
-    void StopThread(void);
-    void RemoveUnwantedResults(void);
+    void StopThread();
+    void RemoveUnwantedResults();
     void IgnoreJobResults(CCompressJobData* pJobData);
 
     // Other thread functions
     static void* StaticThreadProc(void* pContext);
-    void*        ThreadProc(void);
+    void*        ThreadProc();
     void         ProcessCommand(CCompressJobData* pJobData);
     void         ProcessCompress(uint uiSizeX, uint uiSizeY, uint uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer);
 
@@ -67,7 +67,7 @@ protected:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CCompressorJobQueue* NewCompressorJobQueue(void)
+CCompressorJobQueue* NewCompressorJobQueue()
 {
     return new CCompressorJobQueueImpl();
 }
@@ -79,7 +79,7 @@ CCompressorJobQueue* NewCompressorJobQueue(void)
 // Init known database types and start the job service thread
 //
 ///////////////////////////////////////////////////////////////
-CCompressorJobQueueImpl::CCompressorJobQueueImpl(void)
+CCompressorJobQueueImpl::CCompressorJobQueueImpl()
 {
     // Start the job queue processing thread
     m_pServiceThreadHandle = new CThreadHandle(CCompressorJobQueueImpl::StaticThreadProc, this);
@@ -92,7 +92,7 @@ CCompressorJobQueueImpl::CCompressorJobQueueImpl(void)
 // Stop threads and delete everything
 //
 ///////////////////////////////////////////////////////////////
-CCompressorJobQueueImpl::~CCompressorJobQueueImpl(void)
+CCompressorJobQueueImpl::~CCompressorJobQueueImpl()
 {
     // Stop the job queue processing thread
     StopThread();
@@ -108,7 +108,7 @@ CCompressorJobQueueImpl::~CCompressorJobQueueImpl(void)
 // Stop the job queue processing thread
 //
 ///////////////////////////////////////////////////////////////
-void CCompressorJobQueueImpl::StopThread(void)
+void CCompressorJobQueueImpl::StopThread()
 {
     // Stop the job queue processing thread
     shared.m_Mutex.Lock();
@@ -165,7 +165,7 @@ CCompressJobData* CCompressorJobQueueImpl::AddCommand(uint uiSizeX, uint uiSizeY
 // Check if any callback functions are due
 //
 ///////////////////////////////////////////////////////////////
-void CCompressorJobQueueImpl::DoPulse(void)
+void CCompressorJobQueueImpl::DoPulse()
 {
     shared.m_Mutex.Lock();
 
@@ -215,7 +215,7 @@ again:
 // * Must be called from inside a locked section *
 //
 ///////////////////////////////////////////////////////////////
-void CCompressorJobQueueImpl::RemoveUnwantedResults(void)
+void CCompressorJobQueueImpl::RemoveUnwantedResults()
 {
     if (m_IgnoreResultList.empty())
         return;
@@ -383,7 +383,7 @@ void* CCompressorJobQueueImpl::StaticThreadProc(void* pContext)
 // Job service loop
 //
 ///////////////////////////////////////////////////////////////
-void* CCompressorJobQueueImpl::ThreadProc(void)
+void* CCompressorJobQueueImpl::ThreadProc()
 {
     shared.m_Mutex.Lock();
     while (!shared.m_bTerminateThread)
@@ -507,7 +507,7 @@ bool CCompressJobData::SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback
 // Returns true if callback has been set and has not been called yet
 //
 ///////////////////////////////////////////////////////////////
-bool CCompressJobData::HasCallback(void)
+bool CCompressJobData::HasCallback()
 {
     return callback.bSet && !callback.bDone;
 }
@@ -519,7 +519,7 @@ bool CCompressJobData::HasCallback(void)
 // Do callback
 //
 ///////////////////////////////////////////////////////////////
-void CCompressJobData::ProcessCallback(void)
+void CCompressJobData::ProcessCallback()
 {
     assert(HasCallback());
     callback.bDone = true;

@@ -39,6 +39,12 @@ DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
+DECLARE_ENUM(eObjectProperty);
+DECLARE_ENUM(eObjectGroup::Modifiable);
+DECLARE_ENUM(eObjectGroup::DamageEffect);
+DECLARE_ENUM(eObjectGroup::CollisionResponse);
+DECLARE_ENUM(eObjectGroup::FxType);
+DECLARE_ENUM(eObjectGroup::BreakMode);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -49,6 +55,17 @@ DECLARE_ENUM(eWebBrowserMouseButton);
 DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
+DECLARE_ENUM(D3DPRIMITIVETYPE);
+DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
+DECLARE_ENUM(eSurfaceProperties);
+DECLARE_ENUM(eSurfaceAudio);
+DECLARE_ENUM(eSurfaceBulletEffect);
+DECLARE_ENUM(eSurfaceWheelEffect);
+DECLARE_ENUM(eSurfaceSkidMarkType);
+DECLARE_ENUM(eSurfaceAdhesionGroup);
+
+class CRemoteCall;
 
 enum eDXHorizontalAlign
 {
@@ -202,6 +219,10 @@ inline SString GetClassTypeName(CClientPed*)
 {
     return "ped";
 }
+inline SString GetClassTypeName(CRemoteCall*)
+{
+    return "remotecall";
+}
 inline SString GetClassTypeName(CClientProjectile*)
 {
     return "projectile";
@@ -254,9 +275,21 @@ inline SString GetClassTypeName(CClientMaterial*)
 {
     return "material";
 }
+inline SString GetClassTypeName(CClientRenderTarget*)
+{
+    return "render-target-texture";
+}
+inline SString GetClassTypeName(CClientScreenSource*)
+{
+    return "screen-source-texture";
+}
 inline SString GetClassTypeName(CClientTexture*)
 {
     return "texture";
+}
+inline SString GetClassTypeName(CClientWebBrowser*)
+{
+    return "browser";
 }
 inline SString GetClassTypeName(CClientWeapon*)
 {
@@ -368,6 +401,58 @@ inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
 }
+inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
+{
+    return "primitive-type";
+}
+inline SString GetClassTypeName(eVehicleDummies*)
+{
+    return "vehicle-dummy";
+}
+inline SString GetClassTypeName(eSurfaceProperties*)
+{
+    return "surface-property-type";
+}
+inline SString GetClassTypeName(eSurfaceAudio*)
+{
+    return "surface-audio-type";
+}
+inline SString GetClassTypeName(eSurfaceBulletEffect*)
+{
+    return "surface-bullet-effect";
+}
+inline SString GetClassTypeName(eSurfaceWheelEffect*)
+{
+    return "surface-wheel-effect";
+}
+inline SString GetClassTypeName(eSurfaceSkidMarkType*)
+{
+    return "surface-skidmark-type";
+}
+inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
+{
+    return "surface-adhesion-group";
+}
+inline SString GetClassByTypeName(eObjectGroup::Modifiable*)
+{
+    return "objectgroup-modifiable";
+}
+inline SString GetClassByTypeName(eObjectGroup::DamageEffect*)
+{
+    return "objectgroup-damageeffect";
+}
+inline SString GetClassByTypeName(eObjectGroup::CollisionResponse*)
+{
+    return "objectgroup-collisionresponse";
+}
+inline SString GetClassByTypeName(eObjectGroup::FxType*)
+{
+    return "objectgroup-fxtype";
+}
+inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
+{
+    return "objectgroup-breakmode";
+}
 
 //
 // CResource from userdata
@@ -451,6 +536,20 @@ CClientEntity* UserDataCast(CClientEntity*, void* ptr, lua_State*)
 }
 
 //
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+    
+    if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+
+    return nullptr;
+}
+
+//
 // CClientGUIElement ( CGUIElement )
 //
 // Returns true if T is the same class as the one wrapped by pGuiElement
@@ -475,7 +574,12 @@ void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMat
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
 bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr);
 void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
-void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr);
+
+//
+// Resource access helpers
+//
+void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
+void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
                                      bool* pbReadOnly = nullptr);
 

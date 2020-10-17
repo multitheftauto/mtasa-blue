@@ -1,4 +1,4 @@
-// emsa2.cpp - written and placed in the public domain by Wei Dai
+// emsa2.cpp - originally written and placed in the public domain by Wei Dai
 
 #include "pch.h"
 #include "emsa2.h"
@@ -6,6 +6,15 @@
 #ifndef CRYPTOPP_IMPORTS
 
 NAMESPACE_BEGIN(CryptoPP)
+
+// Inclusion based on DLL due to Clang, http://github.com/weidai11/cryptopp/issues/300
+#ifndef CRYPTOPP_IS_DLL
+template<> const byte EMSA2HashId<SHA1>::id = 0x33;
+template<> const byte EMSA2HashId<SHA224>::id = 0x38;
+template<> const byte EMSA2HashId<SHA256>::id = 0x34;
+template<> const byte EMSA2HashId<SHA384>::id = 0x36;
+template<> const byte EMSA2HashId<SHA512>::id = 0x35;
+#endif
 
 void EMSA2Pad::ComputeMessageRepresentative(RandomNumberGenerator& /*rng*/,
 	const byte* recoverableMessage, size_t recoverableMessageLength,

@@ -11,148 +11,192 @@
 
 #include "StdInc.h"
 
-void CLuaGUIDefs::LoadFunctions(void)
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
+    "chat_font",
+    "chat_lines",
+    "chat_color",
+    "chat_text_color",
+    "chat_input_color",
+    "chat_input_prefix_color",
+    "chat_input_text_color",
+    "chat_scale",
+    "chat_position_offset_x",
+    "chat_position_offset_y",
+    "chat_position_horizontal",
+    "chat_position_vertical",
+    "chat_text_alignment",
+    "chat_width",
+    "chat_css_style_text",
+    "chat_css_style_background",
+    "chat_line_life",
+    "chat_line_fade_out",
+    "chat_use_cegui",
+    "text_scale"
+}};
+
+void CLuaGUIDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("guiGetInputEnabled", GUIGetInputEnabled);
-    CLuaCFunctions::AddFunction("guiSetInputEnabled", GUISetInputEnabled);
-    CLuaCFunctions::AddFunction("guiGetInputMode", GUIGetInputMode);
-    CLuaCFunctions::AddFunction("guiSetInputMode", GUISetInputMode);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"guiGetInputEnabled", GUIGetInputEnabled},
+        {"guiSetInputEnabled", GUISetInputEnabled},
+        {"guiGetInputMode", GUIGetInputMode},
+        {"guiSetInputMode", GUISetInputMode},
 
-    CLuaCFunctions::AddFunction("isChatBoxInputActive", GUIIsChatBoxInputActive);
-    CLuaCFunctions::AddFunction("isConsoleActive", GUIIsConsoleActive);
-    CLuaCFunctions::AddFunction("isDebugViewActive", GUIIsDebugViewActive);
-    CLuaCFunctions::AddFunction("setDebugViewActive", GUISetDebugViewActive);
-    CLuaCFunctions::AddFunction("isMainMenuActive", GUIIsMainMenuActive);
-    CLuaCFunctions::AddFunction("isMTAWindowActive", GUIIsMTAWindowActive);
-    CLuaCFunctions::AddFunction("isTransferBoxActive", GUIIsTransferBoxActive);
+        {"isChatBoxInputActive", GUIIsChatBoxInputActive},
+        {"isConsoleActive", GUIIsConsoleActive},
+        {"isDebugViewActive", GUIIsDebugViewActive},
+        {"setDebugViewActive", GUISetDebugViewActive},
+        {"isMainMenuActive", GUIIsMainMenuActive},
+        {"isMTAWindowActive", GUIIsMTAWindowActive},
+        {"isTransferBoxActive", GUIIsTransferBoxActive},
 
-    CLuaCFunctions::AddFunction("guiCreateWindow", GUICreateWindow);
-    CLuaCFunctions::AddFunction("guiCreateLabel", GUICreateLabel);
-    CLuaCFunctions::AddFunction("guiCreateButton", GUICreateButton);
-    CLuaCFunctions::AddFunction("guiCreateEdit", GUICreateEdit);
-    CLuaCFunctions::AddFunction("guiCreateMemo", GUICreateMemo);
-    CLuaCFunctions::AddFunction("guiCreateGridList", GUICreateGridList);
-    CLuaCFunctions::AddFunction("guiCreateScrollPane", GUICreateScrollPane);
-    CLuaCFunctions::AddFunction("guiCreateScrollBar", GUICreateScrollBar);
-    CLuaCFunctions::AddFunction("guiCreateTabPanel", GUICreateTabPanel);
-    CLuaCFunctions::AddFunction("guiCreateTab", GUICreateTab);
-    CLuaCFunctions::AddFunction("guiCreateProgressBar", GUICreateProgressBar);
-    CLuaCFunctions::AddFunction("guiCreateCheckBox", GUICreateCheckBox);
-    CLuaCFunctions::AddFunction("guiCreateRadioButton", GUICreateRadioButton);
-    CLuaCFunctions::AddFunction("guiCreateStaticImage", GUICreateStaticImage);
-    CLuaCFunctions::AddFunction("guiCreateComboBox", GUICreateComboBox);
-    CLuaCFunctions::AddFunction("guiCreateFont", GUICreateFont);
+        {"guiCreateWindow", GUICreateWindow},
+        {"guiCreateLabel", GUICreateLabel},
+        {"guiCreateButton", GUICreateButton},
+        {"guiCreateEdit", GUICreateEdit},
+        {"guiCreateMemo", GUICreateMemo},
+        {"guiCreateGridList", GUICreateGridList},
+        {"guiCreateScrollPane", GUICreateScrollPane},
+        {"guiCreateScrollBar", GUICreateScrollBar},
+        {"guiCreateTabPanel", GUICreateTabPanel},
+        {"guiCreateTab", GUICreateTab},
+        {"guiCreateProgressBar", GUICreateProgressBar},
+        {"guiCreateCheckBox", GUICreateCheckBox},
+        {"guiCreateRadioButton", GUICreateRadioButton},
+        {"guiCreateStaticImage", GUICreateStaticImage},
+        {"guiCreateComboBox", GUICreateComboBox},
+        {"guiCreateFont", GUICreateFont},
 
-    CLuaCFunctions::AddFunction("guiStaticImageLoadImage", GUIStaticImageLoadImage);
-    CLuaCFunctions::AddFunction("guiStaticImageGetNativeSize", GUIStaticImageGetNativeSize);
-    CLuaCFunctions::AddFunction("guiGetSelectedTab", GUIGetSelectedTab);
-    CLuaCFunctions::AddFunction("guiSetSelectedTab", GUISetSelectedTab);
-    CLuaCFunctions::AddFunction("guiDeleteTab", GUIDeleteTab);
+        {"guiStaticImageLoadImage", GUIStaticImageLoadImage},
+        {"guiStaticImageGetNativeSize", GUIStaticImageGetNativeSize},
+        {"guiGetSelectedTab", GUIGetSelectedTab},
+        {"guiSetSelectedTab", GUISetSelectedTab},
+        {"guiDeleteTab", GUIDeleteTab},
 
-    CLuaCFunctions::AddFunction("guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled);
-    CLuaCFunctions::AddFunction("guiGridListAddColumn", GUIGridListAddColumn);
-    CLuaCFunctions::AddFunction("guiGridListRemoveColumn", GUIGridListRemoveColumn);
-    CLuaCFunctions::AddFunction("guiGridListSetColumnWidth", GUIGridListSetColumnWidth);
-    CLuaCFunctions::AddFunction("guiGridListGetColumnWidth", GUIGridListGetColumnWidth);
-    CLuaCFunctions::AddFunction("guiGridListSetColumnTitle", GUIGridListSetColumnTitle);
-    CLuaCFunctions::AddFunction("guiGridListGetColumnTitle", GUIGridListGetColumnTitle);
-    CLuaCFunctions::AddFunction("guiGridListSetScrollBars", GUIGridListSetScrollBars);
-    CLuaCFunctions::AddFunction("guiGridListGetRowCount", GUIGridListGetRowCount);
-    CLuaCFunctions::AddFunction("guiGridListGetColumnCount", GUIGridListGetColumnCount);
-    CLuaCFunctions::AddFunction("guiGridListAddRow", GUIGridListAddRow);
-    CLuaCFunctions::AddFunction("guiGridListInsertRowAfter", GUIGridListInsertRowAfter);
-    CLuaCFunctions::AddFunction("guiGridListRemoveRow", GUIGridListRemoveRow);
-    CLuaCFunctions::AddFunction("guiGridListAutoSizeColumn", GUIGridListAutoSizeColumn);
-    CLuaCFunctions::AddFunction("guiGridListClear", GUIGridListClear);
-    CLuaCFunctions::AddFunction("guiGridListSetItemText", GUIGridListSetItemText);
-    CLuaCFunctions::AddFunction("guiGridListGetItemText", GUIGridListGetItemText);
-    CLuaCFunctions::AddFunction("guiGridListSetItemData", GUIGridListSetItemData);
-    CLuaCFunctions::AddFunction("guiGridListGetItemData", GUIGridListGetItemData);
-    CLuaCFunctions::AddFunction("guiGridListSetItemColor", GUIGridListSetItemColor);
-    CLuaCFunctions::AddFunction("guiGridListGetItemColor", GUIGridListGetItemColor);
-    CLuaCFunctions::AddFunction("guiGridListSetSelectionMode", GUIGridListSetSelectionMode);
-    CLuaCFunctions::AddFunction("guiGridListGetSelectedItem", GUIGridListGetSelectedItem);
-    CLuaCFunctions::AddFunction("guiGridListGetSelectedItems", GUIGridListGetSelectedItems);
-    CLuaCFunctions::AddFunction("guiGridListGetSelectedCount", GUIGridListGetSelectedCount);
-    CLuaCFunctions::AddFunction("guiGridListSetSelectedItem", GUIGridListSetSelectedItem);
-    CLuaCFunctions::AddFunction("guiGridListSetHorizontalScrollPosition", GUIGridListSetHorizontalScrollPosition);
-    CLuaCFunctions::AddFunction("guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition);
-    CLuaCFunctions::AddFunction("guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition);
-    CLuaCFunctions::AddFunction("guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition);
+        {"guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled},
+        {"guiGridListIsSortingEnabled", GUIGridListIsSortingEnabled},
+        {"guiGridListAddColumn", GUIGridListAddColumn},
+        {"guiGridListRemoveColumn", GUIGridListRemoveColumn},
+        {"guiGridListSetColumnWidth", GUIGridListSetColumnWidth},
+        {"guiGridListGetColumnWidth", GUIGridListGetColumnWidth},
+        {"guiGridListSetColumnTitle", GUIGridListSetColumnTitle},
+        {"guiGridListGetColumnTitle", GUIGridListGetColumnTitle},
+        {"guiGridListSetScrollBars", GUIGridListSetScrollBars},
+        {"guiGridListGetRowCount", GUIGridListGetRowCount},
+        {"guiGridListGetColumnCount", GUIGridListGetColumnCount},
+        {"guiGridListAddRow", GUIGridListAddRow},
+        {"guiGridListInsertRowAfter", GUIGridListInsertRowAfter},
+        {"guiGridListRemoveRow", GUIGridListRemoveRow},
+        {"guiGridListAutoSizeColumn", GUIGridListAutoSizeColumn},
+        {"guiGridListClear", GUIGridListClear},
+        {"guiGridListSetItemText", GUIGridListSetItemText},
+        {"guiGridListGetItemText", GUIGridListGetItemText},
+        {"guiGridListSetItemData", GUIGridListSetItemData},
+        {"guiGridListGetItemData", GUIGridListGetItemData},
+        {"guiGridListSetItemColor", GUIGridListSetItemColor},
+        {"guiGridListGetItemColor", GUIGridListGetItemColor},
+        {"guiGridListSetSelectionMode", GUIGridListSetSelectionMode},
+        {"guiGridListGetSelectionMode", GUIGridListGetSelectionMode},
+        {"guiGridListGetSelectedItem", GUIGridListGetSelectedItem},
+        {"guiGridListGetSelectedItems", GUIGridListGetSelectedItems},
+        {"guiGridListGetSelectedCount", GUIGridListGetSelectedCount},
+        {"guiGridListSetSelectedItem", GUIGridListSetSelectedItem},
+        {"guiGridListSetHorizontalScrollPosition", GUIGridListSetHorizontalScrollPosition},
+        {"guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition},
+        {"guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition},
+        {"guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition},
 
-    CLuaCFunctions::AddFunction("guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars);
-    CLuaCFunctions::AddFunction("guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition);
-    CLuaCFunctions::AddFunction("guiScrollPaneGetHorizontalScrollPosition", GUIScrollPaneGetHorizontalScrollPosition);
-    CLuaCFunctions::AddFunction("guiScrollPaneSetVerticalScrollPosition", GUIScrollPaneSetVerticalScrollPosition);
-    CLuaCFunctions::AddFunction("guiScrollPaneGetVerticalScrollPosition", GUIScrollPaneGetVerticalScrollPosition);
+        {"guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars},
+        {"guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition},
+        {"guiScrollPaneGetHorizontalScrollPosition", GUIScrollPaneGetHorizontalScrollPosition},
+        {"guiScrollPaneSetVerticalScrollPosition", GUIScrollPaneSetVerticalScrollPosition},
+        {"guiScrollPaneGetVerticalScrollPosition", GUIScrollPaneGetVerticalScrollPosition},
 
-    CLuaCFunctions::AddFunction("guiScrollBarSetScrollPosition", GUIScrollBarSetScrollPosition);
-    CLuaCFunctions::AddFunction("guiScrollBarGetScrollPosition", GUIScrollBarGetScrollPosition);
+        {"guiScrollBarSetScrollPosition", GUIScrollBarSetScrollPosition},
+        {"guiScrollBarGetScrollPosition", GUIScrollBarGetScrollPosition},
 
-    CLuaCFunctions::AddFunction("guiSetEnabled", GUISetEnabled);
-    CLuaCFunctions::AddFunction("guiSetProperty", GUISetProperty);
-    CLuaCFunctions::AddFunction("guiSetAlpha", GUISetAlpha);
-    CLuaCFunctions::AddFunction("guiSetText", GUISetText);
-    CLuaCFunctions::AddFunction("guiSetFont", GUISetFont);
-    CLuaCFunctions::AddFunction("guiSetSize", GUISetSize);
-    CLuaCFunctions::AddFunction("guiSetPosition", GUISetPosition);
-    CLuaCFunctions::AddFunction("guiSetVisible", GUISetVisible);
+        {"guiSetEnabled", GUISetEnabled},
+        {"guiSetProperty", GUISetProperty},
+        {"guiSetAlpha", GUISetAlpha},
+        {"guiSetText", GUISetText},
+        {"guiSetFont", GUISetFont},
+        {"guiSetSize", GUISetSize},
+        {"guiSetPosition", GUISetPosition},
+        {"guiSetVisible", GUISetVisible},
 
-    CLuaCFunctions::AddFunction("guiBringToFront", GUIBringToFront);
-    CLuaCFunctions::AddFunction("guiMoveToBack", GUIMoveToBack);
+        {"guiBringToFront", GUIBringToFront},
+        {"guiMoveToBack", GUIMoveToBack},
+        {"guiBlur", GUIBlur},
+        {"guiFocus", GUIFocus},
 
-    CLuaCFunctions::AddFunction("guiCheckBoxSetSelected", GUICheckBoxSetSelected);
-    CLuaCFunctions::AddFunction("guiRadioButtonSetSelected", GUIRadioButtonSetSelected);
+        {"guiCheckBoxSetSelected", GUICheckBoxSetSelected},
+        {"guiRadioButtonSetSelected", GUIRadioButtonSetSelected},
 
-    CLuaCFunctions::AddFunction("guiGetEnabled", GUIGetEnabled);
-    CLuaCFunctions::AddFunction("guiGetProperty", GUIGetProperty);
-    CLuaCFunctions::AddFunction("guiGetProperties", GUIGetProperties);
-    CLuaCFunctions::AddFunction("guiGetAlpha", GUIGetAlpha);
-    CLuaCFunctions::AddFunction("guiGetText", GUIGetText);
-    CLuaCFunctions::AddFunction("guiGetFont", GUIGetFont);
-    CLuaCFunctions::AddFunction("guiGetSize", GUIGetSize);
-    CLuaCFunctions::AddFunction("guiGetPosition", GUIGetPosition);
-    CLuaCFunctions::AddFunction("guiGetVisible", GUIGetVisible);
-    CLuaCFunctions::AddFunction("guiGetCursorType", GUIGetCursorType);
+        {"guiGetEnabled", GUIGetEnabled},
+        {"guiGetProperty", GUIGetProperty},
+        {"guiGetProperties", GUIGetProperties},
+        {"guiGetAlpha", GUIGetAlpha},
+        {"guiGetText", GUIGetText},
+        {"guiGetFont", GUIGetFont},
+        {"guiGetSize", GUIGetSize},
+        {"guiGetPosition", GUIGetPosition},
+        {"guiGetVisible", GUIGetVisible},
+        {"guiGetCursorType", GUIGetCursorType},
 
-    CLuaCFunctions::AddFunction("guiCheckBoxGetSelected", GUICheckBoxGetSelected);
-    CLuaCFunctions::AddFunction("guiRadioButtonGetSelected", GUIRadioButtonGetSelected);
+        {"guiCheckBoxGetSelected", GUICheckBoxGetSelected},
+        {"guiRadioButtonGetSelected", GUIRadioButtonGetSelected},
 
-    CLuaCFunctions::AddFunction("guiProgressBarSetProgress", GUIProgressBarSetProgress);
-    CLuaCFunctions::AddFunction("guiProgressBarGetProgress", GUIProgressBarGetProgress);
+        {"guiProgressBarSetProgress", GUIProgressBarSetProgress},
+        {"guiProgressBarGetProgress", GUIProgressBarGetProgress},
 
-    CLuaCFunctions::AddFunction("guiGetScreenSize", GUIGetScreenSize);
+        {"guiGetScreenSize", GUIGetScreenSize},
 
-    CLuaCFunctions::AddFunction("guiEditSetCaretIndex", GUIEditSetCaretIndex);
-    CLuaCFunctions::AddFunction("guiEditGetCaretIndex", GUIEditGetCaretIndex);
-    CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
-    CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
-    CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
+        {"guiEditSetCaretIndex", GUIEditSetCaretIndex},
+        {"guiEditGetCaretIndex", GUIEditGetCaretIndex},
+        {"guiEditSetMasked", GUIEditSetMasked},
+        {"guiEditIsMasked", GUIEditIsMasked},
+        {"guiEditSetMaxLength", GUIEditSetMaxLength},
+        {"guiEditGetMaxLength", GUIEditGetMaxLength},
+        {"guiEditSetReadOnly", GUIEditSetReadOnly},
+        {"guiEditIsReadOnly", GUIEditIsReadOnly},
 
-    CLuaCFunctions::AddFunction("guiMemoSetCaretIndex", GUIMemoSetCaretIndex);
-    CLuaCFunctions::AddFunction("guiMemoGetCaretIndex", GUIMemoGetCaretIndex);
-    CLuaCFunctions::AddFunction("guiMemoSetReadOnly", GUIMemoSetReadOnly);
+        {"guiMemoSetCaretIndex", GUIMemoSetCaretIndex},
+        {"guiMemoGetCaretIndex", GUIMemoGetCaretIndex},
+        {"guiMemoSetReadOnly", GUIMemoSetReadOnly},
+        {"guiMemoIsReadOnly", GUIMemoIsReadOnly},
+        {"guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition},
+        {"guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition},
 
-    CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
-    CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
-    CLuaCFunctions::AddFunction("guiLabelSetVerticalAlign", GUILabelSetVerticalAlign);
-    CLuaCFunctions::AddFunction("guiLabelSetHorizontalAlign", GUILabelSetHorizontalAlign);
+        {"guiLabelSetColor", GUILabelSetColor},
+        {"guiLabelGetColor", GUILabelGetColor},
+        {"guiLabelSetVerticalAlign", GUILabelSetVerticalAlign},
+        {"guiLabelSetHorizontalAlign", GUILabelSetHorizontalAlign},
 
-    CLuaCFunctions::AddFunction("guiLabelGetTextExtent", GUILabelGetTextExtent);
-    CLuaCFunctions::AddFunction("guiLabelGetFontHeight", GUILabelGetFontHeight);
+        {"guiLabelGetTextExtent", GUILabelGetTextExtent},
+        {"guiLabelGetFontHeight", GUILabelGetFontHeight},
 
-    CLuaCFunctions::AddFunction("guiWindowSetMovable", GUIWindowSetMovable);
-    CLuaCFunctions::AddFunction("guiWindowSetSizable", GUIWindowSetSizable);
+        {"guiWindowSetMovable", GUIWindowSetMovable},
+        {"guiWindowSetSizable", GUIWindowSetSizable},
+        {"guiWindowIsMovable", GUIWindowIsMovable},
+        {"guiWindowIsSizable", GUIWindowIsSizable},
 
-    CLuaCFunctions::AddFunction("getChatboxLayout", GUIGetChatboxLayout);
+        {"getChatboxLayout", GUIGetChatboxLayout},
 
-    CLuaCFunctions::AddFunction("guiComboBoxAddItem", GUIComboBoxAddItem);
-    CLuaCFunctions::AddFunction("guiComboBoxRemoveItem", GUIComboBoxRemoveItem);
-    CLuaCFunctions::AddFunction("guiComboBoxClear", GUIComboBoxClear);
-    CLuaCFunctions::AddFunction("guiComboBoxGetSelected", GUIComboBoxGetSelected);
-    CLuaCFunctions::AddFunction("guiComboBoxSetSelected", GUIComboBoxSetSelected);
-    CLuaCFunctions::AddFunction("guiComboBoxGetItemText", GUIComboBoxGetItemText);
-    CLuaCFunctions::AddFunction("guiComboBoxSetItemText", GUIComboBoxSetItemText);
+        {"guiComboBoxAddItem", GUIComboBoxAddItem},
+        {"guiComboBoxRemoveItem", GUIComboBoxRemoveItem},
+        {"guiComboBoxClear", GUIComboBoxClear},
+        {"guiComboBoxGetSelected", GUIComboBoxGetSelected},
+        {"guiComboBoxSetSelected", GUIComboBoxSetSelected},
+        {"guiComboBoxGetItemText", GUIComboBoxGetItemText},
+        {"guiComboBoxSetItemText", GUIComboBoxSetItemText},
+        {"guiComboBoxGetItemCount", GUIComboBoxGetItemCount},
+        {"guiComboBoxSetOpen", GUIComboBoxSetOpen},
+        {"guiComboBoxIsOpen", GUIComboBoxIsOpen},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaGUIDefs::AddClass(lua_State* luaVM)
@@ -183,6 +227,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "bringToFront", "guiBringToFront");
     lua_classfunction(luaVM, "moveToBack", "guiMoveToBack");
+    lua_classfunction(luaVM, "blur", "guiBlur");
+    lua_classfunction(luaVM, "focus", "guiFocus");
 
     lua_classfunction(luaVM, "isChatBoxInputActive", "isChatBoxInputActive");
     lua_classfunction(luaVM, "isConsoleActive", "isConsoleActive");
@@ -235,8 +281,6 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
-    lua_classvariable(luaVM, "screenSize", NULL, "guiGetScreenSize");
-    // lua_classvariable ( luaVM, "property" "guiSetProperty", "guiGetProperty" ); todo: .property[name] = value
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
@@ -246,11 +290,15 @@ void CLuaGUIDefs::AddGuiWindowClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "guiCreateWindow");
+
     lua_classfunction(luaVM, "setMovable", "guiWindowSetMovable");
     lua_classfunction(luaVM, "setSizable", "guiWindowSetSizable");
 
-    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", NULL);
-    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", NULL);
+    lua_classfunction(luaVM, "isMovable", "guiWindowIsMovable");
+    lua_classfunction(luaVM, "isSizable", "guiWindowIsSizable");
+
+    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", "guiWindowIsMovable");
+    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", "guiWindowIsSizable");
 
     lua_registerclass(luaVM, "GuiWindow", "GuiElement");
 }
@@ -276,9 +324,9 @@ void CLuaGUIDefs::AddGuiEditClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMaxLength", "guiEditSetMaxLength");
 
     lua_classvariable(luaVM, "caretIndex", "guiEditSetCaretIndex", "guiEditGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", NULL);
-    lua_classvariable(luaVM, "masked", "guiEditSetMasked", NULL);
-    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", NULL);
+    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", "guiEditIsReadOnly");
+    lua_classvariable(luaVM, "masked", "guiEditSetMasked", "guiEditIsMasked");
+    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", "guiEditGetMaxLength");
 
     lua_registerclass(luaVM, "GuiEdit", "GuiElement");
 }
@@ -302,7 +350,6 @@ void CLuaGUIDefs::AddGuiLabelClass(lua_State* luaVM)
     lua_classvariable(luaVM, "verticalAlign", "guiLabelSetVerticalAlign", NULL);
     lua_classvariable(luaVM, "fontHeight", NULL, "guiLabelGetFontHeight");
     lua_classvariable(luaVM, "textExtent", NULL, "guiLabelGetTextExtent");
-    //    lua_classvariable ( luaVM, "color", "guiLabelGetColor", "guiLabelSetColor" );
 
     lua_registerclass(luaVM, "GuiLabel", "GuiElement");
 }
@@ -314,12 +361,15 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "guiCreateMemo");
 
     lua_classfunction(luaVM, "getCaretIndex", "guiMemoGetCaretIndex");
+    lua_classfunction(luaVM, "getVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
 
     lua_classfunction(luaVM, "setCaretIndex", "guiMemoSetCaretIndex");
+    lua_classfunction(luaVM, "setVerticalScrollPosition", "guiMemoSetVerticalScrollPosition");
     lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classvariable(luaVM, "caretIndex", "guiMemoSetCaretIndex", "guiMemoGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", NULL);
+    lua_classvariable(luaVM, "verticalScrollPosition", "guiMemoSetVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
+    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
@@ -330,6 +380,7 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
+    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
 
@@ -347,11 +398,16 @@ void CLuaGUIDefs::AddGuiComboBoxClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getSelected", "guiComboBoxGetSelected");
     lua_classfunction(luaVM, "getItemText", "guiComboBoxGetItemText");
+    lua_classfunction(luaVM, "isOpen", "guiComboBoxIsOpen");
+    lua_classfunction(luaVM, "getItemCount", "guiComboBoxGetItemCount");
 
     lua_classfunction(luaVM, "setItemText", "guiComboBoxSetItemText");
     lua_classfunction(luaVM, "setSelected", "guiComboBoxSetSelected");
+    lua_classfunction(luaVM, "setOpen", "guiComboBoxSetOpen");
 
     lua_classvariable(luaVM, "selected", "guiComboBoxSetSelected", "guiComboBoxGetSelected");
+    lua_classvariable(luaVM, "itemCount", nullptr, "guiComboBoxGetItemCount");
+    lua_classvariable(luaVM, "open", "guiComboBoxSetOpen", "guiComboBoxIsOpen");
 
     lua_registerclass(luaVM, "GuiComboBox", "GuiElement");
 }
@@ -453,6 +509,8 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getItemText", "guiGridListGetItemText");
     lua_classfunction(luaVM, "getRowCount", "guiGridListGetRowCount");
     lua_classfunction(luaVM, "getSelectedItem", "guiGridListGetSelectedItem");
+    lua_classfunction(luaVM, "getSelectionMode", "guiGridListGetSelectionMode");
+    lua_classfunction(luaVM, "isSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classfunction(luaVM, "getItemColor", "guiGridListGetItemColor");
     lua_classfunction(luaVM, "getColumnTitle", "guiGridListGetColumnTitle");
     lua_classfunction(luaVM, "getHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
@@ -477,14 +535,10 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classvariable(luaVM, "selectedCount", NULL, "guiGridListGetSelectedCount");
     lua_classvariable(luaVM, "selectedItems", NULL, "guiGridListGetSelectedItems");
     lua_classvariable(luaVM, "columnCount", NULL, "guiGridListGetColumnCount");
-    lua_classvariable(luaVM, "selectionMode", "guiGridListSetSelectionMode", NULL);
-    lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", NULL);
+    lua_classvariable(luaVM, "selectionMode", "guiGridListSetSelectionMode", "guiGridListGetSelectionMode");
+    lua_classvariable(luaVM, "sortingEnabled", "guiGridListSetSortingEnabled", "guiGridListIsSortingEnabled");
     lua_classvariable(luaVM, "horizontalScrollPosition", "guiGridListSetHorizontalScrollPosition", "guiGridListGetHorizontalScrollPosition");
     lua_classvariable(luaVM, "verticalScrollPosition", "guiGridListGetVerticalScrollPosition", "guiGridListGetVerticalScrollPosition");
-    // lua_classvariable ( luaVM, "selectedItem", NULL, "guiGridListGetSelectedItem" ); table
-    // lua_classvariable ( luaVM, "selectedItem", "guiGridListSetSelectedItem", NULL ); .selectedItem[column] = row (row in column) table
-    // lua_classvariable ( luaVM, "itemColor", "setItemColor", "getItemColor" ); table
-    // lua_classvariable ( luaVM, "columnTitle", "setColumnTitle", "getColumnTitle" ); table
 
     lua_registerclass(luaVM, "GuiGridList", "GuiElement");
 }
@@ -732,9 +786,19 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
             SString    strPath;
             if (CResourceManager::ParseResourcePathInput(path, pResource, &strPath))
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
-                lua_pushelement(luaVM, pGUIElement);
-                return 1;
+                if (FileExists(strPath))
+                {
+                    CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage(*pLuaMain, position, size, strPath, relative, parent);
+                    if (pGUIElement != nullptr)
+                    {
+                        lua_pushelement(luaVM, pGUIElement);
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(path, "Failed to create static image");
+                }
+                else
+                    argStream.SetCustomError(path, "File not found");
             }
             else
                 argStream.SetCustomError(path, "Bad file path");
@@ -1839,6 +1903,46 @@ int CLuaGUIDefs::GUISetEnabled(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
+{
+    //  bool guiBlur ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIBlur(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
+{
+    //  bool guiFocus ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIFocus(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUISetProperty(lua_State* luaVM)
 {
     //  bool guiSetProperty ( element guiElement, string property, string value )
@@ -2043,6 +2147,26 @@ int CLuaGUIDefs::GUIGridListSetSortingEnabled(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGridListIsSortingEnabled(lua_State* luaVM)
+{
+    //  bool guiGridListIsSortingEnabled ( element guiGridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIGridList>(guiGridlist);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->IsSortingEnabled());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2406,6 +2530,26 @@ int CLuaGUIDefs::GUIGridListSetSelectionMode(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGridListGetSelectionMode(lua_State* luaVM)
+{
+    //  int guiGridListGetSelectionMode ( guiElement gridlist )
+    CClientGUIElement* guiGridlist;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIGridList>(guiGridlist);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetSelectionMode());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2945,6 +3089,28 @@ int CLuaGUIDefs::GUIEditSetReadOnly(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
+{
+    // bool guiEditIsReadOnly( element editField )
+    CClientGUIElement* editField;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(editField);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIEdit*>(editField->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 {
     //  bool guiMemoSetReadOnly ( gui-memo theMemo, bool status )
@@ -2966,6 +3132,28 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
+{
+    // bool guiMemoIsReadOnly( gui-memo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2993,6 +3181,28 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
+{
+    //bool guiEditIsMasked(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
+        lua_pushboolean(luaVM, masked);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
 {
     //  bool guiEditSetMaxLength ( element theElement, int length )
@@ -3007,6 +3217,27 @@ int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUIEditSetMaxLength(*theElement, length);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIEditGetMaxLength(lua_State* luaVM)
+{
+    // int guiEditGetMaxLength(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, static_cast<CGUIEdit*>(theElement->GetCGUIElement())->GetMaxLength());
         return 1;
     }
     else
@@ -3086,6 +3317,29 @@ int CLuaGUIDefs::GUIMemoSetCaretIndex(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIMemoSetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  bool guiMemoSetVerticalScrollPosition ( gui-memo theMemo, float fPosition )
+    CClientGUIElement* theMemo;
+    float              fPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+    argStream.ReadNumber(fPosition);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(*theMemo, fPosition);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoGetCaretIndex(lua_State* luaVM)
 {
     //  bool guiMemoGetCaretIndex ( gui-memo theMemo )
@@ -3097,6 +3351,29 @@ int CLuaGUIDefs::GUIMemoGetCaretIndex(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         lua_pushnumber(luaVM, static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->GetCaretIndex());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoGetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  float guiMemoGetVerticalScrollPosition ( gui-memo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        CGUIMemo* guiMemo = static_cast<CGUIMemo*>(theMemo->GetCGUIElement());
+        float     fPos = guiMemo->GetVerticalScrollPosition() / guiMemo->GetMaxVerticalScrollPosition() * 100.0f;
+        lua_pushnumber(luaVM, fPos);
         return 1;
     }
     else
@@ -3131,6 +3408,28 @@ int CLuaGUIDefs::GUIWindowSetMovable(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIWindowIsMovable(lua_State* luaVM)
+{
+    // bool guiWindowIsMovable( element theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool movable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsMovable();
+        lua_pushboolean(luaVM, movable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 {
     //  bool guiWindowSetSizable ( element theElement, bool status )
@@ -3152,6 +3451,28 @@ int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
+{
+    // bool guiWindowIsSizable( elemen theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
+        lua_pushboolean(luaVM, sizable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -3327,176 +3648,102 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
     //* text_scale - Returns text scale
 
-    CCVarsInterface* pCVars = g_pCore->GetCVars();
-    int              iNumber;
-    float            fNumber;
-    pCVars->Get("chat_font", fNumber);
-    lua_newtable(luaVM);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_font");
-    pCVars->Get("chat_lines", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_lines");
-    pCVars->Get("chat_width", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_width");
-    pCVars->Get("chat_position_offset_x", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_position_offset_x");
-    pCVars->Get("chat_position_offset_y", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_position_offset_y");
-    pCVars->Get("chat_position_horizontal", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_position_horizontal");
-    pCVars->Get("chat_position_vertical", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_position_vertical");
-    pCVars->Get("chat_text_alignment", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_text_alignment");
-    pCVars->Get("chat_css_style_text", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_css_style_text");
-    pCVars->Get("chat_css_style_background", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_css_style_background");
-    pCVars->Get("chat_line_life", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_line_life");
-    pCVars->Get("chat_line_fade_out", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_line_fade_out");
-    pCVars->Get("text_scale", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "text_scale");
-    pCVars->Get("chat_use_cegui", fNumber);
-    lua_pushboolean(luaVM, fNumber ? true : false);
-    lua_setfield(luaVM, -2, "chat_use_cegui");
-    std::string       strCVar;
+    CScriptArgReader  argStream(luaVM);
+    CCVarsInterface*  pCVars = g_pCore->GetCVars();
+    float             fNumber;
+    SString           strCVarValue;
     std::stringstream ss;
     int               iR, iG, iB, iA;
-    pCVars->Get("chat_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_color");
-    }
-    pCVars->Get("chat_text_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_text_color");
-    }
-    pCVars->Get("chat_input_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_color");
-    }
-    pCVars->Get("chat_input_prefix_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_prefix_color");
-    }
-    pCVars->Get("chat_input_text_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_text_color");
-    }
-    pCVars->Get("chat_scale", strCVar);
-    if (!strCVar.empty())
-    {
-        float fX, fY;
-        ss.clear();
-        ss.str(strCVar);
-        ss >> fX >> fY;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, fX);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, fY);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_scale");
-    }
+    SString           strCVarArg;
+    bool              bAll = argStream.NextIsNone();
 
+    // If we are asking for all CVars, prepare a new table
+    if (bAll)
+        lua_newtable(luaVM);
+    else
+        argStream.ReadString(strCVarArg);
+
+    if (!argStream.HasErrors())
+    {
+        // Loop through all CVars
+        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
+        {
+            // If we are asking for all CVars, or we can match the requested CVar with this CVar
+            if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
+            {
+                // Push color values into a table
+                if (g_chatboxLayoutCVars[i] == "chat_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> iR >> iG >> iB >> iA;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, iR);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, iG);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 3);
+                        lua_pushnumber(luaVM, iB);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 4);
+                        lua_pushnumber(luaVM, iA);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                // Push chat scale into a table
+                else if (g_chatboxLayoutCVars[i] == "chat_scale")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        float fX, fY;
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> fX >> fY;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, fX);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, fY);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                else
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], fNumber);
+                    if (g_chatboxLayoutCVars[i] == "chat_use_cegui")
+                        lua_pushboolean(luaVM, fNumber ? true : false);
+                    else
+                        lua_pushnumber(luaVM, fNumber);
+                }
+
+                // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
+                if (bAll)
+                    lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
+                else
+                    return 1;
+            }
+        }
+
+        // We wanted all CVars and that's done so let's stop now
+        if (bAll)
+            return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -3692,6 +3939,69 @@ int CLuaGUIDefs::GUIComboBoxSetItemText(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
+{
+    // int guiComboBoxGetItemCount( element comboBox )
+    CClientGUIElement* comboBox;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+
+    if (!argStream.HasErrors())
+    {
+        int items = CStaticFunctionDefinitions::GUIComboBoxGetItemCount(*comboBox);
+        lua_pushnumber(luaVM, items);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
+{
+    // bool guiComboBoxSetOpen( element comboBox, bool state)
+    CClientGUIElement* comboBox;
+    bool state;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+    argStream.ReadBool(state);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIComboBoxSetOpen(*comboBox, state));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxIsOpen(lua_State* luaVM)
+{
+    // bool guiComboBoxIsOpen( element comboBox )
+    CClientGUIElement* comboBox;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIComboBoxIsOpen(*comboBox));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_GARAGES
-#define __CGAMESA_GARAGES
+#pragma once
 
 #include <game/CGarages.h>
 #include "CGarageSA.h"
@@ -35,5 +34,3 @@ private:
     CGaragesSAInterface* internalInterface;
     CGarageSA*           Garages[MAX_GARAGES];
 };
-
-#endif

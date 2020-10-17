@@ -14,6 +14,7 @@
 #include "luadefs/CLuaCryptDefs.h"
 #include <luadefs/CLuaFileDefs.h>
 #include "luadefs/CLuaMatrixDefs.h"
+#include "luadefs/CLuaTrainTrackDefs.h"
 #include "luadefs/CLuaUTFDefs.h"
 #include "luadefs/CLuaUtilDefs.h"
 #include "luadefs/CLuaVector2Defs.h"
@@ -26,7 +27,7 @@ class CLuaShared
 public:
     static void EmbedChunkName(SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize);
     static bool CheckUTF8BOMAndUpdate(const char** pcpOutBuffer, uint* puiOutSize);
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClasses(lua_State* luaVM);
 
     // Shared scripting is the only place where we need the async task scheduler

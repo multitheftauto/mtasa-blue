@@ -12,17 +12,22 @@
 
 #include "StdInc.h"
 
-void CLuaRadarAreaDefs::LoadFunctions(void)
+void CLuaRadarAreaDefs::LoadFunctions()
 {
-    // Radar-area funcs
-    CLuaCFunctions::AddFunction("createRadarArea", CreateRadarArea);
-    CLuaCFunctions::AddFunction("getRadarAreaColor", GetRadarAreaColor);
-    CLuaCFunctions::AddFunction("getRadarAreaSize", GetRadarAreaSize);
-    CLuaCFunctions::AddFunction("isRadarAreaFlashing", IsRadarAreaFlashing);
-    CLuaCFunctions::AddFunction("setRadarAreaColor", SetRadarAreaColor);
-    CLuaCFunctions::AddFunction("setRadarAreaFlashing", SetRadarAreaFlashing);
-    CLuaCFunctions::AddFunction("setRadarAreaSize", SetRadarAreaSize);
-    CLuaCFunctions::AddFunction("isInsideRadarArea", IsInsideRadarArea);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"createRadarArea", CreateRadarArea},
+        {"getRadarAreaColor", GetRadarAreaColor},
+        {"getRadarAreaSize", GetRadarAreaSize},
+        {"isRadarAreaFlashing", IsRadarAreaFlashing},
+        {"setRadarAreaColor", SetRadarAreaColor},
+        {"setRadarAreaFlashing", SetRadarAreaFlashing},
+        {"setRadarAreaSize", SetRadarAreaSize},
+        {"isInsideRadarArea", IsInsideRadarArea},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
@@ -41,7 +46,6 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setRadarAreaColor");
 
     lua_classvariable(luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing");
-    // lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
     lua_classvariable(luaVM, "size", SetRadarAreaSize, OOP_GetRadarAreaSize);
 
     lua_registerclass(luaVM, "RadarArea", "Element");

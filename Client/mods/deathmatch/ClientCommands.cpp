@@ -732,8 +732,17 @@ void COMMAND_ShowSyncData(const char* szCmdLine)
 
 void COMMAND_VoicePushToTalk(const char* szCmdLine)
 {
-    if (g_pClientGame->GetVoiceRecorder()->IsEnabled())
-        g_pClientGame->GetVoiceRecorder()->UpdatePTTState(atoi(szCmdLine));
+    CVoiceRecorder* const pVoiceRecorder = g_pClientGame->GetVoiceRecorder();
+
+    if (pVoiceRecorder->IsEnabled())
+    {
+        if (!szCmdLine)
+            pVoiceRecorder->SetPTTState(!pVoiceRecorder->GetPTTState());
+        else if (szCmdLine[0] == '0')
+            pVoiceRecorder->SetPTTState(false);
+        else if (szCmdLine[0] == '1')
+            pVoiceRecorder->SetPTTState(true);
+    }
     else
     {
         // Show warning only once per server
@@ -982,7 +991,7 @@ float    fTest = 0;
 #include <crtdbg.h>
 void COMMAND_Debug2(const char* szCmdLine)
 {
-    g_pGame->GetAudio()->StopRadio();
+    g_pGame->GetAudioEngine()->StopRadio();
 }
 
 CClientPed*     pTest = NULL;
@@ -998,8 +1007,8 @@ void COMMAND_Debug3(const char* szCmdLine)
         call    eax
         popad
     }
-    g_pGame->GetAudio()->StopRadio();
-    g_pGame->GetAudio()->StartRadio(1);
+    g_pGame->GetAudioEngine()->StopRadio();
+    g_pGame->GetAudioEngine()->StartRadio(1);
     return;
 }
 

@@ -13,20 +13,26 @@
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("dbConnect", DbConnect);
-    CLuaCFunctions::AddFunction("dbExec", DbExec);
-    CLuaCFunctions::AddFunction("dbQuery", DbQuery);
-    CLuaCFunctions::AddFunction("dbFree", DbFree);
-    CLuaCFunctions::AddFunction("dbPoll", DbPoll);
-    CLuaCFunctions::AddFunction("dbPrepareString", DbPrepareString);
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"dbConnect", DbConnect},
+        {"dbExec", DbExec},
+        {"dbQuery", DbQuery},
+        {"dbFree", DbFree},
+        {"dbPoll", DbPoll},
+        {"dbPrepareString", DbPrepareString},
 
-    CLuaCFunctions::AddFunction("executeSQLCreateTable", ExecuteSQLCreateTable);
-    CLuaCFunctions::AddFunction("executeSQLDropTable", ExecuteSQLDropTable);
-    CLuaCFunctions::AddFunction("executeSQLDelete", ExecuteSQLDelete);
-    CLuaCFunctions::AddFunction("executeSQLSelect", ExecuteSQLSelect);
-    CLuaCFunctions::AddFunction("executeSQLUpdate", ExecuteSQLUpdate);
-    CLuaCFunctions::AddFunction("executeSQLInsert", ExecuteSQLInsert);
-    CLuaCFunctions::AddFunction("executeSQLQuery", ExecuteSQLQuery);
+        {"executeSQLCreateTable", ExecuteSQLCreateTable},
+        {"executeSQLDropTable", ExecuteSQLDropTable},
+        {"executeSQLDelete", ExecuteSQLDelete},
+        {"executeSQLSelect", ExecuteSQLSelect},
+        {"executeSQLUpdate", ExecuteSQLUpdate},
+        {"executeSQLInsert", ExecuteSQLInsert},
+        {"executeSQLQuery", ExecuteSQLQuery},
+    };
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
 }
 
 void CLuaDatabaseDefs::AddClass(lua_State* luaVM)
@@ -181,7 +187,12 @@ void CLuaDatabaseDefs::DbQueryCallback(CDbJobData* pJobData, void* pContext)
     if (pJobData->stage == EJobStage::RESULT)
     {
         if (pLuaCallback)
-            pLuaCallback->Call();
+        {
+            if (pLuaCallback->IsValid())
+                pLuaCallback->Call();
+            else
+                g_pGame->GetDatabaseManager()->QueryFree(pJobData);
+        }
     }
     g_pGame->GetLuaCallbackManager()->DestroyCallback(pLuaCallback);
 }

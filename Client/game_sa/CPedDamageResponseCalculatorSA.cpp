@@ -37,7 +37,7 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CPedDamageRespons
     m_bDestroyInterface = false;
 }
 
-CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA(void)
+CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA()
 {
     if (m_bDestroyInterface)
     {

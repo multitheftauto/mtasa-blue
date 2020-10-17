@@ -7,8 +7,7 @@
  *
  *****************************************************************************/
 
-#ifndef __TINTERPOLATION_H
-#define __TINTERPOLATION_H
+#pragma once
 
 template <typename T>
 class TInterpolation
@@ -137,5 +136,3 @@ protected:
     unsigned long long m_ullEndTime;
     unsigned long      m_ulDuration;
 };
-
-#endif

@@ -11,13 +11,18 @@
 
 #include "StdInc.h"
 
-CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize, CXMLNode* pNode)
-    : CColShape(pManager, pParent, pNode)
+CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize) : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
 
     UpdateSpatialData();
+}
+
+CElement* CColCuboid::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CColCuboid* pColCuboid = new CColCuboid(m_pManager, GetParentEntity(), m_vecPosition, m_vecSize);
+    return pColCuboid;
 }
 
 bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
@@ -30,7 +35,7 @@ bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
             vecNowPosition.fZ <= m_vecPosition.fZ + m_vecSize.fZ);
 }
 
-bool CColCuboid::ReadSpecialData(void)
+bool CColCuboid::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
@@ -47,7 +52,7 @@ bool CColCuboid::ReadSpecialData(void)
     return true;
 }
 
-CSphere CColCuboid::GetWorldBoundingSphere(void)
+CSphere CColCuboid::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition = m_vecPosition + m_vecSize * 0.5f;

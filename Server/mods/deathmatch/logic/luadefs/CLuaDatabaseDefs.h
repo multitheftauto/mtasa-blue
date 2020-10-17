@@ -15,7 +15,7 @@
 class CLuaDatabaseDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     static void DbQueryCallback(CDbJobData* pJobData, void* pContext);

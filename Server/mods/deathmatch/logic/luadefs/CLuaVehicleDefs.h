@@ -15,7 +15,7 @@
 class CLuaVehicleDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Vehicle create/destroy functions
@@ -62,7 +62,7 @@ public:
     LUA_DECLARE(IsTrainDerailable);
     LUA_DECLARE(GetTrainDirection);
     LUA_DECLARE(GetTrainSpeed);
-    LUA_DECLARE(GetTrainTrack);
+    static std::variant<CTrainTrack*, bool> GetTrainTrack(CVehicle* pVehicle);
     LUA_DECLARE(GetTrainPosition);
     LUA_DECLARE(IsVehicleBlown);
     LUA_DECLARE(GetVehicleHeadLightColor);
@@ -90,6 +90,9 @@ public:
     LUA_DECLARE(SetVehicleIdleRespawnDelay);
     LUA_DECLARE(SetVehicleRespawnDelay);
     LUA_DECLARE(SetVehicleRespawnPosition);
+    LUA_DECLARE(SetVehicleRespawnRotation);
+    LUA_DECLARE_OOP(GetVehicleRespawnPosition);
+    LUA_DECLARE_OOP(GetVehicleRespawnRotation);
     LUA_DECLARE(ToggleVehicleRespawn);
     LUA_DECLARE(ResetVehicleExplosionTime);
     LUA_DECLARE(ResetVehicleIdleTime);
@@ -108,7 +111,7 @@ public:
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
     LUA_DECLARE(SetTrainSpeed);
-    LUA_DECLARE(SetTrainTrack);
+    static bool SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleHeadLightColor);
     LUA_DECLARE(SetVehicleTurretPosition);

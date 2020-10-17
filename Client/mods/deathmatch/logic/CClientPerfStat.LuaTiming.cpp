@@ -112,12 +112,12 @@ namespace
 class CClientPerfStatLuaTimingImpl : public CClientPerfStatLuaTiming
 {
 public:
-    CClientPerfStatLuaTimingImpl(void);
-    virtual ~CClientPerfStatLuaTimingImpl(void);
+    CClientPerfStatLuaTimingImpl();
+    virtual ~CClientPerfStatLuaTimingImpl();
 
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CClientPerfStatLuaTiming
@@ -159,7 +159,7 @@ CClientPerfStatLuaTiming* CClientPerfStatLuaTiming::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLuaTimingImpl::CClientPerfStatLuaTimingImpl(void)
+CClientPerfStatLuaTimingImpl::CClientPerfStatLuaTimingImpl()
 {
     m_strCategoryName = "Lua timing";
     m_LastTickCount = 0;
@@ -173,7 +173,7 @@ CClientPerfStatLuaTimingImpl::CClientPerfStatLuaTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLuaTimingImpl::~CClientPerfStatLuaTimingImpl(void)
+CClientPerfStatLuaTimingImpl::~CClientPerfStatLuaTimingImpl()
 {
 }
 
@@ -184,7 +184,7 @@ CClientPerfStatLuaTimingImpl::~CClientPerfStatLuaTimingImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CClientPerfStatLuaTimingImpl::GetCategoryName(void)
+const SString& CClientPerfStatLuaTimingImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -257,7 +257,7 @@ void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const cha
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatLuaTimingImpl::DoPulse(void)
+void CClientPerfStatLuaTimingImpl::DoPulse()
 {
     long long llTickCount = GetTickCount64_();
     long long llDelta = llTickCount - m_LastTickCount;

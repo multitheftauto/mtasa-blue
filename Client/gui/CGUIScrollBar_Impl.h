@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLBAR_IMPL_H
-#define __CGUISCROLLBAR_IMPL_H
+#pragma once
 
 #include <gui/CGUIScrollBar.h>
 #include "CGUIElement_Impl.h"
@@ -19,14 +18,14 @@ class CGUIScrollBar_Impl : public CGUIScrollBar, public CGUIElement_Impl
 {
 public:
     CGUIScrollBar_Impl(class CGUI_Impl* pGUI, bool bHorizontal, CGUIElement* pParent = NULL);
-    ~CGUIScrollBar_Impl(void);
+    ~CGUIScrollBar_Impl();
 
     void SetOnScrollHandler(const GUI_CALLBACK& Callback);
 
     void  SetScrollPosition(float fPosition);
-    float GetScrollPosition(void);
+    float GetScrollPosition();
 
-    eCGUIType GetType(void) { return CGUI_SCROLLBAR; };
+    eCGUIType GetType() { return CGUI_SCROLLBAR; };
 
     #include "CGUIElement_Inc.h"
 
@@ -35,5 +34,3 @@ private:
 
     GUI_CALLBACK m_OnScroll;
 };
-
-#endif

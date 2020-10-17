@@ -1,4 +1,3 @@
-#pragma message("Compiling precompiled header.\n")
 
 // Pragmas
 #pragma warning (disable:4995)
@@ -13,7 +12,6 @@
 
 #include <sys/stat.h>
 #include <d3d9.h>
-#include <d3dx9.h>
 #include <direct.h>
 #include <stdio.h>
 #include <dbghelp.h>
@@ -48,8 +46,10 @@
 #include <net/CNet.h>
 #include <multiplayer/CMultiplayer.h>
 #include <game/CGame.h>
+#include <hwbrk.h>
 
 // Core-level includes
+#include "CQueryReceiver.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"
@@ -63,7 +63,6 @@
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
 #include <Graphics/CVideoModeManager.h>
-#include <Serverbrowser/CServerCache.h>
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
 #include "CGraphStats.h"

@@ -67,14 +67,14 @@ struct SIdEntry
 class CIdArray
 {
 public:
-    static void Initialize(void);
+    static void Initialize();
 
     static SArrayId PopUniqueId(void* pObject, EIdClassType idClass);
     static void     PushUniqueId(void* pObject, EIdClassType idClass, SArrayId id);
 
     static void* FindEntry(SArrayId id, EIdClassType idClass);
-    static uint  GetCapacity(void);
-    static uint  GetUnusedAmount(void);
+    static uint  GetCapacity();
+    static uint  GetUnusedAmount();
 
 private:
     static void ExpandBy(uint uiAmount);

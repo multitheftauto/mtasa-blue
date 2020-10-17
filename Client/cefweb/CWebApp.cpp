@@ -22,7 +22,7 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
 void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
     // Register custom MTA scheme (has to be called in all proceseses)
-    registrar->AddCustomScheme("mtalocal", false, false, false, false, false, true);
+    registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
 }
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
@@ -31,6 +31,12 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     command_line->AppendSwitch("disable-gpu");
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
+
+    if (process_type.empty())
+    {
+        command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+        command_line->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+    }
 }
 
 CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,
@@ -176,11 +182,15 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 return HandleError("404 - Not found", 404);
 
             // Verify local files
-            if (!pWebView->VerifyFile(path))
+            CBuffer fileData;
+            if (!pWebView->VerifyFile(path, fileData))
                 return HandleError("403 - Access Denied", 403);
 
             // Finally, load the file stream
-            auto stream = CefStreamReader::CreateForFile(path);
+            if (fileData.GetData() == nullptr || fileData.GetSize() == 0)
+                fileData = CBuffer("", sizeof(""));
+
+            auto stream = CefStreamReader::CreateForData(fileData.GetData(), fileData.GetSize());
             if (stream.get())
                 return new CefStreamResourceHandler(mimeType, stream);
             return HandleError("404 - Not found", 404);

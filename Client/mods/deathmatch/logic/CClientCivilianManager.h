@@ -10,8 +10,7 @@
 
 class CClientCivilianManager;
 
-#ifndef __CCLIENTCIVILIANMANAGER_H
-#define __CCLIENTCIVILIANMANAGER_H
+#pragma once
 
 #include "CClientCivilian.h"
 
@@ -27,9 +26,9 @@ class CClientCivilianManager
 public:
     CClientCivilian* Create(int iPedModel, ElementID ID);
     CClientCivilian* Create(CCivilianPed* pPed, ElementID ID);
-    void             DeleteAll(void);
+    void             DeleteAll();
 
-    unsigned int                   Count(void) { return static_cast<unsigned int>(m_Civilians.size()); };
+    unsigned int                   Count() { return static_cast<unsigned int>(m_Civilians.size()); };
     static CClientCivilian*        Get(ElementID ID);
     static inline CClientCivilian* Get(CCivilianPed* pPed) { return reinterpret_cast<CClientCivilian*>(pPed->GetStoredPointer()); };
 
@@ -37,14 +36,14 @@ public:
 
     std::list<CClientCivilian*>::iterator         IterGet(CClientCivilian* pCivilian);
     std::list<CClientCivilian*>::reverse_iterator IterGetReverse(CClientCivilian* pCivilian);
-    std::list<CClientCivilian*>::iterator         IterBegin(void) { return m_Civilians.begin(); };
-    std::list<CClientCivilian*>::iterator         IterEnd(void) { return m_Civilians.end(); };
-    std::list<CClientCivilian*>::reverse_iterator IterReverseBegin(void) { return m_Civilians.rbegin(); };
-    std::list<CClientCivilian*>::reverse_iterator IterReverseEnd(void) { return m_Civilians.rend(); };
+    std::list<CClientCivilian*>::iterator         IterBegin() { return m_Civilians.begin(); };
+    std::list<CClientCivilian*>::iterator         IterEnd() { return m_Civilians.end(); };
+    std::list<CClientCivilian*>::reverse_iterator IterReverseBegin() { return m_Civilians.rbegin(); };
+    std::list<CClientCivilian*>::reverse_iterator IterReverseEnd() { return m_Civilians.rend(); };
 
 private:
     CClientCivilianManager(class CClientManager* pManager);
-    ~CClientCivilianManager(void);
+    ~CClientCivilianManager();
 
     void AddToList(CClientCivilian* pCivilian) { m_Civilians.push_back(pCivilian); };
     void RemoveFromList(CClientCivilian* pCivilian);
@@ -53,5 +52,3 @@ private:
     bool                        m_bCanRemoveFromList;
     std::list<CClientCivilian*> m_Civilians;
 };
-
-#endif

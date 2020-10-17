@@ -82,10 +82,10 @@ struct SIntegerSync : public ISyncStructure
     }
     void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits(reinterpret_cast<const char*>(&data), bits); }
 
-    SIntegerSync(void) { assert(bits <= sizeof(type) * 8); }
+    SIntegerSync() { assert(bits <= sizeof(type) * 8); }
     SIntegerSync(type value) { data.value = value; }
 
-    operator type(void) const { return data.value; }
+    operator type() const { return data.value; }
 
     struct
     {
@@ -678,6 +678,15 @@ struct SVehiclePuresyncFlags : public ISyncStructure
     } data;
 };
 
+
+enum class eVehicleAimDirection : unsigned char
+{
+    FORWARDS = 0,
+    LEFT,
+    BACKWARDS,
+    RIGHT,
+};
+
 struct SDrivebyDirectionSync : public ISyncStructure
 {
     enum
@@ -690,7 +699,7 @@ struct SDrivebyDirectionSync : public ISyncStructure
 
     struct
     {
-        unsigned char ucDirection : 2;
+        eVehicleAimDirection ucDirection : 2;
     } data;
 };
 
@@ -862,6 +871,28 @@ struct SFullKeysyncSync : public ISyncStructure
         char cLeftStickY;
 
         bitStream.ReadBits((char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06F)
+        {
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonSquare;
+                bitStream.Read(ucButtonSquare);
+                data.ucButtonSquare = ucButtonSquare;
+            }
+            else
+                data.ucButtonSquare = 0;
+
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonCross;
+                bitStream.Read(ucButtonCross);
+                data.ucButtonCross = ucButtonCross;
+            }
+            else
+                data.ucButtonCross = 0;
+        }
+
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
         {
@@ -874,6 +905,26 @@ struct SFullKeysyncSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits((const char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06F)
+        {
+            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonSquare);
+            }
+            else
+                bitStream.WriteBit(false);
+
+            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonCross);
+            }
+            else
+                bitStream.WriteBit(false);
+        }
+
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
         char cLeftStickY = static_cast<char>((float)data.sLeftStickY * 127.0f / 128.0f);
@@ -882,16 +933,18 @@ struct SFullKeysyncSync : public ISyncStructure
 
     struct
     {
-        bool  bLeftShoulder1 : 1;
-        bool  bRightShoulder1 : 1;
-        bool  bButtonSquare : 1;
-        bool  bButtonCross : 1;
-        bool  bButtonCircle : 1;
-        bool  bButtonTriangle : 1;
-        bool  bShockButtonL : 1;
-        bool  bPedWalk : 1;
-        short sLeftStickX;
-        short sLeftStickY;
+        bool          bLeftShoulder1 : 1;
+        bool          bRightShoulder1 : 1;
+        bool          bButtonSquare : 1;
+        bool          bButtonCross : 1;
+        bool          bButtonCircle : 1;
+        bool          bButtonTriangle : 1;
+        bool          bShockButtonL : 1;
+        bool          bPedWalk : 1;
+        unsigned char ucButtonSquare;
+        unsigned char ucButtonCross;
+        short         sLeftStickX;
+        short         sLeftStickY;
     } data;
 };
 
@@ -907,6 +960,28 @@ struct SSmallKeysyncSync : public ISyncStructure
         char cLeftStickY;
 
         bitStream.ReadBits((char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06F)
+        {
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonSquare;
+                bitStream.Read(ucButtonSquare);
+                data.ucButtonSquare = ucButtonSquare;
+            }
+            else
+                data.ucButtonSquare = 0;
+
+            if (bitStream.ReadBit())
+            {
+                unsigned char ucButtonCross;
+                bitStream.Read(ucButtonCross);
+                data.ucButtonCross = ucButtonCross;
+            }
+            else
+                data.ucButtonCross = 0;
+        }
+
         bitStream.Read(cLeftStickX);
         if (bitStream.Read(cLeftStickY))
         {
@@ -919,6 +994,26 @@ struct SSmallKeysyncSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits((const char*)&data, 8);
+
+        if (bitStream.Version() >= 0x06F)
+        {
+            if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonSquare);
+            }
+            else
+                bitStream.WriteBit(false);
+
+            if (data.ucButtonCross >= 1 && data.ucButtonCross <= 254)
+            {
+                bitStream.WriteBit(true);
+                bitStream.Write(data.ucButtonCross);
+            }
+            else
+                bitStream.WriteBit(false);
+        }
+
         char cLeftStickX = static_cast<char>((float)data.sLeftStickX * 127.0f / 128.0f);
         bitStream.Write(cLeftStickX);
         char cLeftStickY = static_cast<char>((float)data.sLeftStickY * 127.0f / 128.0f);
@@ -927,16 +1022,18 @@ struct SSmallKeysyncSync : public ISyncStructure
 
     struct
     {
-        bool  bLeftShoulder1 : 1;
-        bool  bRightShoulder1 : 1;
-        bool  bButtonSquare : 1;
-        bool  bButtonCross : 1;
-        bool  bButtonCircle : 1;
-        bool  bButtonTriangle : 1;
-        bool  bShockButtonL : 1;
-        bool  bPedWalk : 1;
-        short sLeftStickX;
-        short sLeftStickY;
+        bool          bLeftShoulder1 : 1;
+        bool          bRightShoulder1 : 1;
+        bool          bButtonSquare : 1;
+        bool          bButtonCross : 1;
+        bool          bButtonCircle : 1;
+        bool          bButtonTriangle : 1;
+        bool          bShockButtonL : 1;
+        bool          bPedWalk : 1;
+        unsigned char ucButtonCross;
+        unsigned char ucButtonSquare;
+        short         sLeftStickX;
+        short         sLeftStickY;
     } data;
 };
 
@@ -2047,7 +2144,7 @@ struct SColorSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits(reinterpret_cast<const char*>(&data), 32); }
 
     // From SColor
-    SColorSync(void) {}
+    SColorSync() {}
     SColorSync(SColor color)
     {
         data.ucR = color.R;
@@ -2057,7 +2154,7 @@ struct SColorSync : public ISyncStructure
     }
 
     // To SColor
-    operator SColor(void) const { return SColorRGBA(data.ucR, data.ucG, data.ucB, data.ucA); }
+    operator SColor() const { return SColorRGBA(data.ucR, data.ucG, data.ucB, data.ucA); }
 
     struct
     {
@@ -2180,11 +2277,11 @@ struct SMouseButtonSync : public ISyncStructure
 //////////////////////////////////////////
 struct SHeatHazeSync : public ISyncStructure
 {
-    SHeatHazeSync(void) {}
+    SHeatHazeSync() {}
     SHeatHazeSync(const SHeatHazeSettings& settings) { data.settings = settings; }
 
     // To SHeatHazeSettings
-    operator SHeatHazeSettings(void) const { return data.settings; }
+    operator SHeatHazeSettings() const { return data.settings; }
 
     template <unsigned int bits, typename T>
     bool ReadRange(NetBitStreamInterface& bitStream, T& outvalue, const T low, const T hi)

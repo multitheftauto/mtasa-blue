@@ -11,12 +11,12 @@
 
 #include "StdInc.h"
 
-CTextDisplay::CTextDisplay(void)
+CTextDisplay::CTextDisplay()
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::TEXT_DISPLAY);
 }
 
-CTextDisplay::~CTextDisplay(void)
+CTextDisplay::~CTextDisplay()
 {
     CIdArray::PushUniqueId(this, EIdClass::TEXT_DISPLAY, m_uiScriptID);
     // Delete all our text items

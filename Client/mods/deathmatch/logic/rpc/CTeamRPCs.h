@@ -9,20 +9,17 @@
  *
  *****************************************************************************/
 
-#ifndef __CTeamRPCs_H
-#define __CTeamRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CTeamRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(RemoveTeam);
     DECLARE_ELEMENT_RPC(SetTeamName);
     DECLARE_ELEMENT_RPC(SetTeamColor);
     DECLARE_ELEMENT_RPC(SetTeamFriendlyFire);
 };
-
-#endif

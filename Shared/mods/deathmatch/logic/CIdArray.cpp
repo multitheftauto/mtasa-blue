@@ -27,7 +27,7 @@ static const char* GetIdClassTypeName(EIdClassType eClass);
 //
 // Initialize
 //
-void CIdArray::Initialize(void)
+void CIdArray::Initialize()
 {
     if (!m_bInitialized)
     {
@@ -171,12 +171,12 @@ void CIdArray::ExpandBy(uint uiAmount)
     assert(m_IDStack.GetCapacity() == m_uiCapacity);
 }
 
-uint CIdArray::GetCapacity(void)
+uint CIdArray::GetCapacity()
 {
     return m_uiCapacity;
 }
 
-uint CIdArray::GetUnusedAmount(void)
+uint CIdArray::GetUnusedAmount()
 {
     return m_IDStack.GetUnusedAmount();
 }

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CVehicleColor CVehicleColors::GetRandomColor(void)
+CVehicleColor CVehicleColors::GetRandomColor()
 {
     // Grab a random index
     unsigned int uiSize = CountColors();
@@ -129,7 +129,7 @@ bool CVehicleColorManager::Generate(const char* szFilename)
     return false;
 }
 
-void CVehicleColorManager::Reset(void)
+void CVehicleColorManager::Reset()
 {
     // Remove all colors from all vehicles
     for (int i = 0; i < 212; i++)

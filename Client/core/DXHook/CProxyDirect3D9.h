@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECT3D9_H
-#define __CPROXYDIRECT3D9_H
+#pragma once
 
 #include <d3d9.h>
 #include "CProxyDirect3DDevice9.h"
@@ -22,12 +21,12 @@ public:
     ~CProxyDirect3D9();
     /*** IUnknown methods ***/
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    virtual ULONG __stdcall AddRef(VOID);
-    virtual ULONG __stdcall Release(VOID);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     /*** IDirect3D9 methods ***/
     virtual HRESULT __stdcall RegisterSoftwareDevice(void* pInitializeFunction);
-    virtual UINT __stdcall GetAdapterCount(VOID);
+    virtual UINT __stdcall GetAdapterCount();
     virtual HRESULT __stdcall GetAdapterIdentifier(UINT Adapter, DWORD Flags, D3DADAPTER_IDENTIFIER9* pIdentifier);
     virtual UINT __stdcall GetAdapterModeCount(UINT Adapter, D3DFORMAT Format);
     virtual HRESULT __stdcall EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode);
@@ -46,10 +45,8 @@ public:
                                            D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
 
     static HMONITOR    StaticGetAdapterMonitor(UINT Adapter);
-    static IDirect3D9* StaticGetDirect3D(void);
+    static IDirect3D9* StaticGetDirect3D();
 
 private:
     IDirect3D9* m_pDevice;
 };
-
-#endif

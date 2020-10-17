@@ -10,15 +10,14 @@
 
 class CClientDFF;
 
-#ifndef __CCLIENTDFF_H
-#define __CCLIENTDFF_H
+#pragma once
 
 #include <list>
 #include "CClientEntity.h"
 
 struct SLoadedClumpInfo
 {
-    SLoadedClumpInfo(void) : bTriedLoad(false), pClump(NULL) {}
+    SLoadedClumpInfo() : bTriedLoad(false), pClump(NULL) {}
     bool     bTriedLoad;
     RpClump* pClump;
 };
@@ -30,29 +29,32 @@ class CClientDFF : public CClientEntity
 
 public:
     CClientDFF(class CClientManager* pManager, ElementID ID);
-    ~CClientDFF(void);
+    ~CClientDFF();
 
-    eClientEntityType GetType(void) const { return CCLIENTDFF; }
+    eClientEntityType GetType() const { return CCLIENTDFF; }
 
-    bool LoadDFF(const SString& strFile, bool bIsRawData);
+    bool Load(bool isRaw, SString input);
 
     bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
 
     bool HasReplaced(unsigned short usModel);
 
     void RestoreModel(unsigned short usModel);
-    void RestoreModels(void);
+    void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-protected:
+private:
+    bool LoadFromFile(SString filePath);
+    bool LoadFromBuffer(SString buffer);
+
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
-    void UnloadDFF(void);
+    void UnloadDFF();
     void InternalRestoreModel(unsigned short usModel);
 
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
@@ -65,11 +67,9 @@ protected:
     class CClientDFFManager* m_pDFFManager;
 
     SString                            m_strDffFilename;
-    CBuffer                            m_RawDataBuffer;
-    bool                               m_bIsRawData;
+    SString                            m_RawDataBuffer;
+    bool                               m_bIsRawData = false;
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
 };
-
-#endif

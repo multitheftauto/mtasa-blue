@@ -9,13 +9,13 @@
  *
  *****************************************************************************/
 
-#ifndef __CKEYBINDSINTERFACE_H
-#define __CKEYBINDSINTERFACE_H
+#pragma once
 
 // Beware: this class is poorly written and depends on game while it shouldn't
 #include <game/CControllerConfigManager.h>
 
 #include <list>
+#include <ksignals/ksignals.h>
 
 class CKeyFunctionBind;
 class CControlFunctionBind;
@@ -73,18 +73,18 @@ enum eKeyBindType
 class CKeyBind
 {
 public:
-    CKeyBind(void) : boundKey(NULL), beingDeleted(false) { bActive = true; }
+    CKeyBind() : boundKey(NULL), beingDeleted(false) { bActive = true; }
     const SBindableKey*  boundKey;
     bool                 beingDeleted;
     bool                 bActive;
-    bool                 IsBeingDeleted(void) { return beingDeleted; }
-    virtual eKeyBindType GetType(void) = 0;
+    bool                 IsBeingDeleted() { return beingDeleted; }
+    virtual eKeyBindType GetType() = 0;
 };
 
 class CKeyBindWithState : public CKeyBind
 {
 public:
-    CKeyBindWithState(void) { bState = false; }
+    CKeyBindWithState() { bState = false; }
     bool bState;
     bool bHitState;
 };
@@ -92,7 +92,7 @@ public:
 class CCommandBind : public CKeyBindWithState
 {
 public:
-    CCommandBind(void)
+    CCommandBind()
     {
         szCommand = NULL;
         szArguments = NULL;
@@ -101,7 +101,7 @@ public:
         ;
         bIsReplacingScriptKey = false;
     }
-    ~CCommandBind(void)
+    ~CCommandBind()
     {
         delete[] szCommand;
         if (szArguments)
@@ -109,7 +109,7 @@ public:
         if (szResource)
             delete[] szResource;
     }
-    eKeyBindType GetType(void) { return KEY_BIND_COMMAND; }
+    eKeyBindType GetType() { return KEY_BIND_COMMAND; }
     char*        szCommand;
     char*        szArguments;
     char*        szResource;
@@ -121,7 +121,7 @@ public:
 class CKeyFunctionBind : public CKeyBindWithState
 {
 public:
-    eKeyBindType           GetType(void) { return KEY_BIND_FUNCTION; }
+    eKeyBindType           GetType() { return KEY_BIND_FUNCTION; }
     KeyFunctionBindHandler Handler;
     bool                   bIgnoreGUI;
 };
@@ -129,7 +129,7 @@ public:
 class CControlFunctionBind : public CKeyBindWithState
 {
 public:
-    eKeyBindType               GetType(void) { return KEY_BIND_CONTROL_FUNCTION; }
+    eKeyBindType               GetType() { return KEY_BIND_CONTROL_FUNCTION; }
     SBindableGTAControl*       control;
     ControlFunctionBindHandler Handler;
 };
@@ -137,7 +137,7 @@ public:
 class CGTAControlBind : public CKeyBind
 {
 public:
-    eKeyBindType         GetType(void) { return KEY_BIND_GTA_CONTROL; }
+    eKeyBindType         GetType() { return KEY_BIND_GTA_CONTROL; }
     SBindableGTAControl* control;
     bool                 bState;
     bool                 bEnabled;
@@ -151,11 +151,11 @@ public:
     // Basic funcs
     virtual void Add(CKeyBind* pKeyBind) = 0;
     virtual void Remove(CKeyBind* pKeyBind) = 0;
-    virtual void Clear(void) = 0;
+    virtual void Clear() = 0;
     virtual bool Call(CKeyBind* pKeyBind) = 0;
 
-    virtual std::list<CKeyBind*>::const_iterator IterBegin(void) = 0;
-    virtual std::list<CKeyBind*>::const_iterator IterEnd(void) = 0;
+    virtual std::list<CKeyBind*>::const_iterator IterBegin() = 0;
+    virtual std::list<CKeyBind*>::const_iterator IterEnd() = 0;
 
     // Command-bind funcs
     virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL,
@@ -164,9 +164,9 @@ public:
     virtual bool CommandExists(const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL,
                                const char* szResource = NULL, bool bCheckScriptCreated = false, bool bScriptCreated = false) = 0;
     virtual bool SetCommandActive(const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive,
-                                  bool checkHitState) = 0;
+                                  bool checkHitState, bool bConsiderDefaultKey = false) = 0;
     virtual void SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand = NULL, bool bState = true, const char* szArguments = NULL,
-                                      bool checkHitState = false) = 0;
+                                      bool checkHitState = false, const char* szOnlyWithDefaultKey = NULL) = 0;
     virtual CCommandBind* GetBindFromCommand(const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL,
                                              bool bCheckHitState = false, bool bState = NULL) = 0;
     virtual bool          GetBoundCommands(const char* szCommand, std::list<CCommandBind*>& commandsList) = 0;
@@ -179,7 +179,7 @@ public:
     virtual bool AddGTAControl(const SBindableKey* pKey, SBindableGTAControl* pControl) = 0;
     virtual bool RemoveGTAControl(const char* szKey, const char* szControl) = 0;
     virtual bool RemoveAllGTAControls(const char* szKey) = 0;
-    virtual bool RemoveAllGTAControls(void) = 0;
+    virtual bool RemoveAllGTAControls() = 0;
     virtual bool GTAControlExists(const char* szKey, const char* szControl) = 0;
     virtual bool GTAControlExists(const SBindableKey* pKey, SBindableGTAControl* pControl) = 0;
     virtual void CallGTAControlBind(CGTAControlBind* pBind, bool bState) = 0;
@@ -197,7 +197,7 @@ public:
     virtual bool RemoveFunction(const char* szKey, KeyFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool RemoveAllFunctions(KeyFunctionBindHandler Handler) = 0;
-    virtual bool RemoveAllFunctions(void) = 0;
+    virtual bool RemoveAllFunctions() = 0;
     virtual bool FunctionExists(const char* szKey, KeyFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool FunctionExists(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
 
@@ -207,7 +207,7 @@ public:
     virtual bool RemoveControlFunction(const char* szControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool RemoveControlFunction(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool RemoveAllControlFunctions(ControlFunctionBindHandler Handler) = 0;
-    virtual bool RemoveAllControlFunctions(void) = 0;
+    virtual bool RemoveAllControlFunctions() = 0;
     virtual bool ControlFunctionExists(const char* szControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
     virtual bool ControlFunctionExists(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true) = 0;
 
@@ -230,20 +230,21 @@ public:
     virtual void         SetAllBindStates(bool bState, eKeyBindType onlyType = KEY_BIND_UNDEFINED) = 0;
     virtual unsigned int Count(eKeyBindType bindType) = 0;
 
-    virtual void DoPreFramePulse(void) = 0;
-    virtual void DoPostFramePulse(void) = 0;
+    virtual void DoPreFramePulse() = 0;
+    virtual void DoPostFramePulse() = 0;
 
     virtual bool LoadFromXML(class CXMLNode* pMainNode) = 0;
     virtual bool SaveToXML(class CXMLNode* pMainNode) = 0;
-    virtual void LoadDefaultBinds(void) = 0;
+    virtual void LoadDefaultBinds() = 0;
     // virtual void                    LoadDefaultControls         ( void ) = 0;
     virtual void LoadDefaultCommands(bool bForce) = 0;
-    virtual void LoadControlsFromGTA(void) = 0;
+    virtual void LoadControlsFromGTA() = 0;
 
     virtual void BindCommand(const char* szCmdLine) = 0;
     virtual void UnbindCommand(const char* szCmdLine) = 0;
     virtual void PrintBindsCommand(const char* szCmdLine) = 0;
     virtual bool TriggerKeyStrokeHandler(const SString& strKey, bool bActive, bool bIsConsoleInputKey) = 0;
-};
 
-#endif
+    // Events
+    ksignals::Event<void(const SString&)> OnPaste;
+};

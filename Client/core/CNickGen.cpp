@@ -11,7 +11,7 @@
 #include "time.h"
 
 // These words are of a maximum length of 10 characters, capitalized, and stripped of whitespace
-const char* CNickGen::m_szAdjectives[] = {
+const char* const CNickGen::m_szAdjectives[] = {
     "Aback",      "Abaft",      "Abandoned",  "Abashed",    "Aberrant",   "Abhorrent",  "Abiding",    "Abject",     "Ablaze",     "Able",       "Abnormal",
     "Aboard",     "Aboriginal", "Abortive",   "Abounding",  "Abrasive",   "Abrupt",     "Absent",     "Absorbed",   "Absorbing",  "Abstracted", "Absurd",
     "Abundant",   "Abusive",    "Acceptable", "Accessible", "Accidental", "Accurate",   "Acid",       "Acidic",     "Acoustic",   "Acrid",      "Actually",
@@ -110,7 +110,7 @@ const char* CNickGen::m_szAdjectives[] = {
     "Wretched",   "Wrong",      "Wry",
 };
 
-const char* CNickGen::m_szNouns[] = {
+const char* const CNickGen::m_szNouns[] = {
     "Aardvark",   "Buffalo",    "Alligator",  "Ant",        "Anteater",   "Antelope",   "Ape",        "Armadillo",  "Donkey",     "Baboon",      "Badger",
     "Barracuda",  "Bat",        "Bear",       "Beaver",     "Bee",        "Bison",      "Boar",       "Bush",       "Butterfly",  "Camel",       "Calf",
     "Cat",        "Kitten",     "Cattle",     "Chamois",    "Cheetah",    "Chicken",    "Chick",      "Chimpanzee", "Infant",     "Empress",     "Troop",
@@ -198,7 +198,7 @@ const char* CNickGen::m_szNouns[] = {
     "Conductor",  "Wheelman",   "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
-SString CNickGen::GetRandomNickname(void)
+SString CNickGen::GetRandomNickname()
 {
     srand((unsigned int)time(NULL));
     int iAdjective = rand() % NICKGEN_NUM_ADJECTIVES;

@@ -22,14 +22,14 @@ class CClientRenderElementManager
 {
 public:
     CClientRenderElementManager(CClientManager* pClientManager);
-    ~CClientRenderElementManager(void);
+    ~CClientRenderElementManager();
 
     CClientDxFont*       CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
     CClientGuiFont*      CreateGuiFont(const SString& strFullFilePath, const SString& strUniqueName, uint uiSize);
     CClientTexture*      CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                        uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                        ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
-    CClientShader*       CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance,
+    CClientShader*       CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                       bool bLayered, bool bDebug, int iTypeMask);
     CClientRenderTarget* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
     CClientScreenSource* CreateScreenSource(uint uiSizeX, uint uiSizeY);
@@ -37,13 +37,13 @@ public:
     CClientTexture*      FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
     void                 Remove(CClientRenderElement* pElement);
 
-    uint GetDxFontCount(void) { return m_uiStatsDxFontCount; }
-    uint GetGuiFontCount(void) { return m_uiStatsGuiFontCount; }
-    uint GetTextureCount(void) { return m_uiStatsTextureCount; }
-    uint GetShaderCount(void) { return m_uiStatsShaderCount; }
-    uint GetRenderTargetCount(void) { return m_uiStatsRenderTargetCount; }
-    uint GetScreenSourceCount(void) { return m_uiStatsScreenSourceCount; }
-    uint GetWebBrowserCount(void) { return m_uiStatsWebBrowserCount; }
+    uint GetDxFontCount() { return m_uiStatsDxFontCount; }
+    uint GetGuiFontCount() { return m_uiStatsGuiFontCount; }
+    uint GetTextureCount() { return m_uiStatsTextureCount; }
+    uint GetShaderCount() { return m_uiStatsShaderCount; }
+    uint GetRenderTargetCount() { return m_uiStatsRenderTargetCount; }
+    uint GetScreenSourceCount() { return m_uiStatsScreenSourceCount; }
+    uint GetWebBrowserCount() { return m_uiStatsWebBrowserCount; }
 
 protected:
     CClientManager*                               m_pClientManager;

@@ -9,6 +9,10 @@
  *
  */
 
+/**
+ * @file
+ * @brief Do not use, json-c internal, may be changed or removed at any time.
+ */
 #ifndef seed_h
 #define seed_h
 
@@ -16,7 +20,7 @@
 extern "C" {
 #endif
 
-extern int json_c_get_random_seed();
+extern int json_c_get_random_seed(void);
 
 #ifdef __cplusplus
 }
