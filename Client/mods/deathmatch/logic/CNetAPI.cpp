@@ -1296,9 +1296,9 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         if (remoteVehicleType == CLIENTVEHICLE_TRAIN)
         {
             // Train specific data
-            float fPosition;
-            bool  bDirection;
-            float fSpeed;
+            float fPosition = 0.0f;
+            bool  bDirection = false;
+            float fSpeed = 0.0f;
             BitStream.Read(fPosition);
             BitStream.ReadBit(bDirection);
             BitStream.Read(fSpeed);

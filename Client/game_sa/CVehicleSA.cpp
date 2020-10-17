@@ -330,7 +330,6 @@ void CVehicleSA::Init()
     m_ExtraFrames.clear();
     // dump the frames
     VehicleDump(this);
-
     FinalizeFramesList();
 }
 

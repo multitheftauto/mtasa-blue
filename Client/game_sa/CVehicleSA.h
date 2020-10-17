@@ -483,18 +483,19 @@ public:
     bool                 IsChainEngine();
     void                 SetIsChainEngine(bool bChainEngine = true);
 
-    bool         IsDerailed();
-    void         SetDerailed(bool bDerailed);
-    bool         IsDerailable() { return m_bIsDerailable; }
-    void         SetDerailable(bool bDerailable) { m_bIsDerailable = bDerailable; }
-    float        GetTrainSpeed();
-    void         SetTrainSpeed(float fSpeed);
-    bool         GetTrainDirection();
-    void         SetTrainDirection(bool bDirection);
+    bool  IsDerailed();
+    void  SetDerailed(bool bDerailed);
+    bool  IsDerailable() { return m_bIsDerailable; }
+    void  SetDerailable(bool bDerailable) { m_bIsDerailable = bDerailable; }
+    float GetTrainSpeed();
+    void  SetTrainSpeed(float fSpeed);
+    bool  GetTrainDirection();
+    void  SetTrainDirection(bool bDirection);
+    float GetTrainPosition(void);
+    void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
+
     CTrainTrack* GetTrainTrack();
     void         SetTrainTrack(CTrainTrack* pTrainTrack);
-    float        GetTrainPosition(void);
-    void         SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
 
     bool CanPedEnterCar();
     bool CanPedJumpOutCar(CPed* pPed);

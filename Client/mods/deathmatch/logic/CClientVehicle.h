@@ -620,11 +620,10 @@ protected:
     bool  m_bTrainDirection;
     float m_fTrainSpeed;
     float m_fTrainPosition;
+    bool  m_bJustStreamedIn;
+    bool  m_bWheelScaleChanged;
 
     CClientTrainTrack* m_pTrainTrack = nullptr;
-
-    bool m_bJustStreamedIn;
-    bool m_bWheelScaleChanged;
 
     // Time dependent error compensation interpolation
     struct
