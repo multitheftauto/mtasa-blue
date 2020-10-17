@@ -94,19 +94,17 @@ int CLuaFunctionDefs::GetRoofPosition(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecStart);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    // Get the ground position and return it
+    bool bOutResult;
+    float fRoof = g_pGame->GetWorld()->FindRoofZFor3DCoord(&vecStart, &bOutResult);
+    if (bOutResult)
     {
-        // Get the ground position and return it
-        bool bOutResult;
-        float fRoof = g_pGame->GetWorld()->FindRoofZFor3DCoord(&vecStart, &bOutResult);
-        if (bOutResult)
-        {
-            lua_pushnumber(luaVM, fRoof);
-            return 1;
-        }
+        lua_pushnumber(luaVM, fRoof);
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Return false
     lua_pushboolean(luaVM, false);
